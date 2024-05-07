@@ -1,25 +1,55 @@
 import Alpine from 'alpinejs';
 import api, { searchOrganizationsUrl } from '../utils/api';
-import { removeAndAddClassConditionaly } from '../utils/cssUtils';
+import {
+  addClassIfNotExists,
+  removeAndAddClassConditionaly,
+} from '../utils/cssUtils';
 
-function OrganizationSearch(currentOrganization, required = false) {
+function OrganizationSearch(
+  currentOrganization,
+  required = false,
+  dsfr = false,
+  requestMethod = 'GET'
+) {
   return {
     organization: '',
     results: [],
-    required: false,
+    required: required,
+    requestMethod: requestMethod,
+    dsfr: dsfr,
     init() {
       this.organization = currentOrganization;
-      ['focusout', 'input'].forEach((event) => {
+
+      [('focusout', 'input')].forEach((event) => {
         this.$refs.organization.addEventListener(event, (e) => {
-          const errors = required && e.target.value.length < 2;
+          const hadErrors = required && e.target.value.length < 2;
           removeAndAddClassConditionaly(
-            errors,
+            hadErrors,
             e.target.parentElement,
             'fr-input-group--valid',
             'fr-input-group--error'
           );
         });
       });
+    },
+    validateData(submittedForm = false) {
+      if (
+        this.dsfr &&
+        this.required &&
+        (this.requestMethod === 'POST' || submittedForm)
+      ) {
+        if (this.organization) {
+          addClassIfNotExists(
+            this.$refs.organization.parentElement,
+            'fr-input-group--valid'
+          );
+        } else {
+          addClassIfNotExists(
+            this.$refs.organization.parentElement,
+            'fr-input-group--error'
+          );
+        }
+      }
     },
     async handleOrganizationChange(e) {
       e.preventDefault();

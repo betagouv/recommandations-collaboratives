@@ -26,19 +26,18 @@
             {% include "home/onboarding/fragments/site-description.html" %}
             <div x-data="DsrcFormValidator('{{ form.helper.form_id }}', schemaValidator)"
                  x-init="init">
-                 <form id="{{ form.helper.form_id }}" method="{{ form.helper.form_method }}"  action="{% url "onboarding" %}">
-                  <input type="hidden"
-                   name="js_enabled"
-                   id="{{ form.helper.form_id }}_js_enabled"
-                   value="false">
-                   <fieldset class="fr-fieldset">
-                    {% csrf_token %}
-
-                   {{ form.email|as_crispy_field }}
+              <form id="{{ form.helper.form_id }}" method="{{ form.helper.form_method }}"  action="{% url "onboarding" %}">
+                <input type="hidden"
+                  name="js_enabled"
+                  id="{{ form.helper.form_id }}_js_enabled"
+                  value="false">
+                <fieldset class="fr-fieldset">
+                  {% csrf_token %}
+                  {{ form.email|as_crispy_field }}
                 </fieldset>
                 {% include "dsrc/core/blocks/buttons/button_group.html" %}
-                 </form>
-                </div>
+              </form>
+            </div>
           </div>
         </div>
       </div>

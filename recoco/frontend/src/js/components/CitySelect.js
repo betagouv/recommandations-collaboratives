@@ -1,5 +1,6 @@
 import Alpine from 'alpinejs';
 import {
+  addClassIfNotExists,
   removeAndAddClassConditionaly,
   removeClassIfExists,
 } from '../utils/cssUtils';
@@ -13,8 +14,20 @@ function CitySearch(required = false) {
     postal: null,
     cities: null,
     required: required,
+    currentPostal: null,
+    currentInsee: null,
 
     init() {
+      addClassIfNotExists(
+        this.$refs.postcode.parentElement,
+        `fr-input-group--${this.currentPostal ? 'valid' : 'error'}`
+      );
+
+      addClassIfNotExists(
+        this.$refs.insee.parentElement,
+        `fr-input-group--${this.currentInsee ? 'valid' : 'error'}`
+      );
+
       ['focusout', 'input'].forEach((event) => {
         this.$refs.postcode.addEventListener(event, (e) => {
           const errors = required && e.target.value.length < 5;
@@ -43,6 +56,8 @@ function CitySearch(required = false) {
     getPostcode(postcode, insee) {
       const postCodeString = JSON.parse(postcode.textContent);
       const inseeString = JSON.parse(insee.textContent);
+      this.currentPostal = postCodeString;
+      this.currentInsee = inseeString;
 
       if (postCodeString) this.postal = postCodeString;
       if (inseeString) this.fetchCities(inseeString);

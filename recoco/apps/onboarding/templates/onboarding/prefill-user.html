@@ -51,27 +51,7 @@
       <div class="onboarding__form"
            x-data="DsrcFormValidator('{{ form.helper.form_id }}', schemaValidator)"
            x-init="init">
-        <form id="{{ form.helper.form_id }}" method="post">
-          <input type="hidden"
-           name="js_enabled"
-           id="{{ form.helper.form_id }}_js_enabled"
-           value="false">
-          <fieldset class="fr-fieldset">
-            <legend class="fr-fieldset__legend--regular fr-fieldset__legend">
-              <h6>Créez votre compte</h6>
-            </legend>
-            {% csrf_token %}
-            {{ form.first_name|as_crispy_field }}
-            {{ form.last_name|as_crispy_field }}
-            <div class="fr-fieldset__element">
-              {% include "tools/organization_search.html" with name=form.org_name.name label=form.org_name.label value=form.org_name.value id_for_label=form.org_name.id_for_label errors=form.org_name.errors dsfr=True %}
-            </div>
-            {{ form.role|as_crispy_field }}
-            {{ form.email|as_crispy_field }}
-            {{ form.phone|as_crispy_field }}
-          </fieldset>
-          {% include "dsrc/core/blocks/buttons/button_group.html" %}
-        </form>
+           {% include "onboarding/fragments/form-user.html" with include_password_field=False %}
       </div>
     </div>
   </div>
