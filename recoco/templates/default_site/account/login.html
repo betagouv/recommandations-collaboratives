@@ -4,11 +4,14 @@
 {% load i18n %}
 {% block head_title %}
   {% trans "Sign In" %}
-{% endblock %}
+{% endblock head_title %}
+{% block title %}Connexion{% endblock title %}
+{% block og_title %}Connexion{% endblock og_title %}
+
 {% load django_vite %}
 {% block js %}
   {% vite_asset 'js/apps/auth.js' %}
-{% endblock %}
+{% endblock js %}
 {% block css %}
 
   <link href="{% sass_src 'home/css/dsfr/custom-dsfr.scss' %}"
