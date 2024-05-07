@@ -60,7 +60,7 @@ Cypress.Commands.add("login", (role) => {
 })
 
 Cypress.Commands.add('loginWithUi', (role) => {
-    const { username } = currentUser    
+    const { username } = currentUser
     cy.visit('/accounts/login/')
 
     cy.url().should('include', '/accounts/login/')

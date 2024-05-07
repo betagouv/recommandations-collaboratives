@@ -13,11 +13,9 @@ init_django("recoco")
 # %%
 
 
-from django.db.models import Model
 from recoco.apps.projects.models import Project
 
 
-from graphviz import Source
 from IPython.display import Image
 
 # # Les composants

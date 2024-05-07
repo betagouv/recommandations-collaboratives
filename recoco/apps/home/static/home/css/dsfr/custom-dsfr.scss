@@ -41,6 +41,10 @@ a {
   }
 }
 
+p a {
+  text-decoration: underline;
+}
+
 a.fr-btn {
   &:hover {
     &:not(.fr-btn--secondary) {
@@ -70,23 +74,20 @@ a.fr-btn {
 .custom-login-button {
   min-width: 300px;
   justify-content: center;
-  min-width: 300px;
-  justify-content: center;
 }
 
 .custom-button {
-  background: #00BBC3 !important;
+  background: #00bbc3 !important;
   color: white !important;
   text-decoration: none;
 
   &:hover {
     background: #479195 !important;
+    color: white !important;
   }
 }
 
-
 .mt-n150px {
-  margin-top: 0;
   margin-top: 0;
 }
 
@@ -94,17 +95,11 @@ a.fr-btn {
   .mt-n150px {
     margin-top: -150px;
   }
-
-  .mt-n150px {
-    margin-top: -150px;
-  }
 }
 
 .fr-btn-custom-hover:hover {
-  background-color: #8585F6 !important;
-  box-shadow: 0 0 0 1px #8585F6 !important;
-  background-color: #8585F6 !important;
-  box-shadow: 0 0 0 1px #8585F6 !important;
+  background-color: #8585f6 !important;
+  box-shadow: 0 0 0 1px #8585f6 !important;
 }
 
 /* ¯¯¯¯¯¯¯¯¯ *\
@@ -112,8 +107,6 @@ a.fr-btn {
 \* ˍˍˍˍˍˍˍˍˍ */
 
 .fr-h6 {
-  font-size: 1.25rem !important;
-  line-height: 1.75rem !important;
   font-size: 1.25rem !important;
   line-height: 1.75rem !important;
 }
@@ -131,18 +124,6 @@ a.fr-btn {
   background-color: #f6f6f6;
   --hover: var(--background-contrast-grey-hover);
   --active: var(--background-contrast-grey-active);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 5rem 2rem;
-  text-align: center;
-  --text-spacing: 0 0 1.5rem;
-  --title-spacing: 0 0 0.5rem;
-  // background-color: var(--background-contrast-grey);
-  background-color: #f6f6f6;
-  --hover: var(--background-contrast-grey-hover);
-  --active: var(--background-contrast-grey-active);
 }
 
 .fr-consent-banner {
@@ -158,26 +139,9 @@ a.fr-btn {
   --title-spacing: 0 0 1rem;
   background-color: #f6f6f6;
   box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.5);
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  max-height: calc(100% - 8rem);
-  padding: 1rem;
-  z-index: 4000;
-  overflow: auto;
-  --text-spacing: 0 0 1rem;
-  --title-spacing: 0 0 1rem;
-  background-color: #f6f6f6;
-  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.5);
 }
 
 .fr-consent-banner {
-  padding: 2rem;
-  bottom: 2.5rem;
-  left: 2.5rem;
-  max-width: 40rem;
-  max-height: calc(100% - 5rem);
   padding: 2rem;
   bottom: 2.5rem;
   left: 2.5rem;
@@ -189,9 +153,6 @@ a.fr-btn {
   flex-direction: row-reverse;
   justify-content: flex-start;
   display: flex;
-  flex-direction: row-reverse;
-  justify-content: flex-start;
-  display: flex;
 }
 
 .fr-consent-banner__title {
@@ -199,15 +160,9 @@ a.fr-btn {
   font-size: 1.125rem;
   line-height: 1.5rem;
   margin-bottom: 1rem;
-  font-weight: 700;
-  font-size: 1.125rem;
-  line-height: 1.5rem;
-  margin-bottom: 1rem;
 }
 
 .fr-consent-banner__buttons {
-  margin-top: 1.5rem;
-  margin-bottom: -1rem;
   margin-top: 1.5rem;
   margin-bottom: -1rem;
 }
@@ -218,23 +173,17 @@ a.fr-btn {
 .fr-consent-service {
   position: relative;
   /**
-  position: relative;
-  /**
     * Nom du service
     **/
-  /**
   /**
     * Description du service
     **/
   /**
-  /**
     * Bloc dépliable, contient des sous services
     **/
   /**
-  /**
     * Conteneur des radio-group
     **/
-  /**
   /**
     * Groupe de radios avec séparateur
     **/
@@ -246,29 +195,17 @@ a.fr-btn {
   flex-direction: column;
   width: 100%;
   position: initial;
-  padding: 0 0 1.25rem;
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  position: initial;
 }
 
 .fr-consent-service:last-child>.fr-fieldset {
-  padding: 2rem 0 1rem;
   padding: 2rem 0 1rem;
 }
 
 .fr-consent-service:last-child>.fr-fieldset .fr-consent-service>.fr-fieldset:last-child {
   margin-bottom: 0;
-  margin-bottom: 0;
 }
 
 .fr-consent-service__title {
-  font-weight: 700;
-  font-size: 1.125rem;
-  line-height: 1.5rem;
-  padding: 2rem 0 0.75rem;
-  margin: 0;
   font-weight: 700;
   font-size: 1.125rem;
   line-height: 1.5rem;
@@ -280,16 +217,9 @@ a.fr-btn {
   font-size: 0.875rem;
   line-height: 1.5rem;
   --text-spacing: 0.75rem 0 0.75rem 0;
-  font-size: 0.875rem;
-  line-height: 1.5rem;
-  --text-spacing: 0.75rem 0 0.75rem 0;
 }
 
 .fr-consent-service__collapse {
-  margin-top: -0.25rem;
-  margin-bottom: 0.75rem;
-  width: 100%;
-  /**
   margin-top: -0.25rem;
   margin-bottom: 0.75rem;
   width: 100%;
@@ -309,20 +239,10 @@ a.fr-btn {
   background: transparent;
   padding: 0;
   color: inherit;
-  font-size: 0.875rem;
-  line-height: 1.5rem;
-  padding: 0 0;
-  flex-direction: row-reverse;
-  overflow: initial;
-  max-width: 100%;
-  max-height: none;
-  background: transparent;
-  padding: 0;
-  color: inherit;
 }
 
 .fr-consent-service__collapse .fr-consent-service__collapse-btn::before {
-  content: "";
+  content: '';
   flex: 0 0 auto;
   display: inline-block;
   vertical-align: middle;
@@ -331,29 +251,15 @@ a.fr-btn {
   height: var(--icon-size);
   -webkit-mask-size: 100% 100%;
   mask-size: 100% 100%;
-  -webkit-mask-image: url("icons/system/arrow-down-s-line.svg");
-  mask-image: url("icons/system/arrow-down-s-line.svg");
-  --icon-size: 1rem;
-  margin-right: -0.16667rem;
-  margin-left: 0.25rem;
-  content: "";
-  flex: 0 0 auto;
-  display: inline-block;
-  vertical-align: middle;
-  background-color: currentColor;
-  width: var(--icon-size);
-  height: var(--icon-size);
-  -webkit-mask-size: 100% 100%;
-  mask-size: 100% 100%;
-  -webkit-mask-image: url("icons/system/arrow-down-s-line.svg");
-  mask-image: url("icons/system/arrow-down-s-line.svg");
+  -webkit-mask-image: url('icons/system/arrow-down-s-line.svg');
+  mask-image: url('icons/system/arrow-down-s-line.svg');
   --icon-size: 1rem;
   margin-right: -0.16667rem;
   margin-left: 0.25rem;
 }
 
-.fr-consent-service__collapse .fr-consent-service__collapse-btn[aria-expanded="true"]::before {
-  content: "";
+.fr-consent-service__collapse .fr-consent-service__collapse-btn[aria-expanded='true']::before {
+  content: '';
   flex: 0 0 auto;
   display: inline-block;
   vertical-align: middle;
@@ -362,20 +268,8 @@ a.fr-btn {
   height: var(--icon-size);
   -webkit-mask-size: 100% 100%;
   mask-size: 100% 100%;
-  -webkit-mask-image: url("icons/system/arrow-up-s-line.svg");
-  mask-image: url("icons/system/arrow-up-s-line.svg");
-  --icon-size: 1rem;
-  content: "";
-  flex: 0 0 auto;
-  display: inline-block;
-  vertical-align: middle;
-  background-color: currentColor;
-  width: var(--icon-size);
-  height: var(--icon-size);
-  -webkit-mask-size: 100% 100%;
-  mask-size: 100% 100%;
-  -webkit-mask-image: url("icons/system/arrow-up-s-line.svg");
-  mask-image: url("icons/system/arrow-up-s-line.svg");
+  -webkit-mask-image: url('icons/system/arrow-up-s-line.svg');
+  mask-image: url('icons/system/arrow-up-s-line.svg');
   --icon-size: 1rem;
 }
 
@@ -386,30 +280,10 @@ a.fr-btn {
   position: relative;
   --hover-tint: transparent;
   --active-tint: transparent;
-  display: inline-flex;
-  flex-direction: row;
-  align-items: center;
-  position: relative;
-  --hover-tint: transparent;
-  --active-tint: transparent;
 }
 
 .fr-consent-service__collapse-btn::after {
-  content: "";
-  display: block;
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  width: calc(100% - 1rem);
-  height: calc(100% - 0.25rem);
-  background-image: var(--underline-img), var(--underline-img);
-  background-position: 50% calc(50% + 0.65625em), 50% calc(50% + 0.65625em);
-  background-repeat: no-repeat, no-repeat;
-  transition: background-size 0s;
-  background-size: 0 0.125em, 100% 0.0625em;
-  content: "";
+  content: '';
   display: block;
   position: absolute;
   top: 0;
@@ -429,30 +303,18 @@ a.fr-btn {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
 }
 
 .fr-consent-service .fr-radio-group {
   position: relative;
-  position: relative;
 }
 
-.fr-consent-service .fr-radio-group:not(:last-child) input[type="radio"]+label {
-  margin-right: 3rem;
+.fr-consent-service .fr-radio-group:not(:last-child) input[type='radio']+label {
   margin-right: 3rem;
 }
 
 .fr-consent-service .fr-radio-group:not(:first-child)::before {
-  content: "";
-  display: block;
-  width: 1px;
-  height: 1.5rem;
-  position: absolute;
-  left: calc(-1.5rem - 1px);
-  top: 0.75rem;
-  content: "";
+  content: '';
   display: block;
   width: 1px;
   height: 1.5rem;
@@ -468,54 +330,39 @@ a.fr-btn {
   margin-top: 0.5rem;
   margin-bottom: -0.5rem;
   width: 100%;
-  margin-top: 0.5rem;
-  margin-bottom: -0.5rem;
-  width: 100%;
 }
 
 .fr-consent-services .fr-consent-service,
 .fr-consent-services .fr-consent-service:last-child {
-  box-shadow: none;
   box-shadow: none;
 }
 
 .fr-consent-services .fr-consent-service>.fr-fieldset,
 .fr-consent-services .fr-consent-service:last-child>.fr-fieldset {
   padding: 0;
-  padding: 0;
 }
 
 .fr-consent-services .fr-consent-service:last-child>.fr-fieldset {
-  margin-bottom: 1.25rem;
   margin-bottom: 1.25rem;
 }
 
 .fr-consent-services .fr-consent-service__title {
   padding-top: 0.75rem;
-  padding-top: 0.75rem;
 }
 
 .fr-consent-services .fr-consent-service__radios {
-  top: 0;
   top: 0;
 }
 
 .fr-consent-services .fr-consent-service__desc {
   --text-spacing: 0.25rem 0 0.75rem 0;
-  --text-spacing: 0.25rem 0 0.75rem 0;
 }
 
 .fr-consent-manager__header {
   padding-top: 0;
-  padding-top: 0;
 }
 
 .fr-consent-manager__header .fr-consent-service__title {
-  width: 100%;
-  padding: 0 0 0.75rem 0;
-  font-size: 1rem;
-  line-height: 1.5rem;
-  font-weight: 400;
   width: 100%;
   padding: 0 0 0.75rem 0;
   font-size: 1rem;
@@ -528,21 +375,14 @@ a.fr-btn {
   justify-content: flex-start;
   top: 0;
   position: initial;
-  width: 100%;
-  justify-content: flex-start;
-  top: 0;
-  position: initial;
 }
 
 .fr-consent-manager__buttons {
   margin-bottom: -3rem;
   margin-top: 1rem;
-  margin-bottom: -3rem;
-  margin-top: 1rem;
 }
 
 .fr-consent-manager .fr-consent-service:last-of-type {
-  box-shadow: none;
   box-shadow: none;
 }
 
@@ -550,14 +390,12 @@ a.fr-btn {
 .fr-consent-service {
   box-shadow: inset 0 -1px 0 0 var(--border-default-grey);
   color: var(--text-default-grey);
-  box-shadow: inset 0 -1px 0 0 var(--border-default-grey);
-  color: var(--text-default-grey);
 }
 
 .fr-consent-manager__header .fr-radio-group+.fr-radio-group::before,
 .fr-consent-service .fr-radio-group+.fr-radio-group::before {
   box-shadow: inset 0 0 0 1px var(--border-default-grey);
-  box-shadow: inset 0 0 0 1px var(--border-default-grey);
+
 }
 
 

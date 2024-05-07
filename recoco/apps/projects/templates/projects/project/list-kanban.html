@@ -86,15 +86,34 @@
                                @dragstart="onDragStart(event, t.uuid)"
                                @dragend="onDragEnd(event)"
                                :data-test-id="`item-draggable-${taskIndex}`">
+
+                            <template x-if="t.inactive_since !== null">
+                              <div style="display: flex;
+                              position: absolute;
+                              top: -15px;
+                              gap: 0.8rem">
+                                <div class="left-0">
+                                  <div style="padding: 0.25rem 0.5rem;
+                                  font-size: 12px;
+                                  text-transform: uppercase;
+                                  font-weight: 700;
+                                  border-radius: 2px; background-color: #E5E5E5;
+                                  color: #222;">En pause</div>
+                                </div>
+                              </div>
+                            </template>
+
                             <template x-if="t.notifications.count > 0">
                               <span class="position-absolute top-25 start-100 translate-middle badge rounded-pill bg-info"
                                     :class="{'bg-danger': t.notifications.has_collaborator_activity == true}"><span x-text="t.notifications.count"></span> <span class="visually-hidden">nouvelle activité</span></span>
                             </template>
-                            <div class="fw-semibold">
-                              <a class="project-link"
-                                 :href="makeProjectURL(t.id)"
-                                 x-text="truncate(t.name)"></a>
-                            </div>
+
+                              <div class="fw-semibold">
+                                <a class="project-link"
+                                   :href="makeProjectURL(t.id)"
+                                   x-text="truncate(t.name)"
+                                   ></a>
+                              </div>
                             <template x-if="t.commune">
                               <div class="fw-bold text-uppercase small">
                                 <span x-text="t.commune.name"></span>

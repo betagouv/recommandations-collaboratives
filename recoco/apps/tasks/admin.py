@@ -38,7 +38,7 @@ class TaskFollowupRsvpAdmin(admin.ModelAdmin):
 
 @admin.register(models.TaskRecommendation)
 class TaskRecommendationAdmin(admin.ModelAdmin):
-    pass
+    list_select_related = ("resource",)
 
 
 # eof

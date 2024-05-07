@@ -494,7 +494,11 @@ def invite_user_to_project(
         template_name=communication_constants.TPL_SHARING_INVITATION,
         recipients=[{"email": user.email}],
         params={
-            "sender": {"email": request.user.email},
+            "sender": {
+                "first_name": request.user.first_name,
+                "last_name": request.user.last_name,
+                "email": request.user.email,
+            },
             "message": invite.message,
             "invite_url": build_absolute_url(
                 invite.get_absolute_url(),

@@ -25,7 +25,9 @@ def test_send_email_call_send_debug_email_in_debug_mode(mocker, settings, reques
     current_site = get_current_site(request)
     baker.make(home_models.SiteConfiguration, site=current_site)
 
-    django_send_mail_mock = mocker.patch("recoco.apps.communication.api.django_send_mail")
+    django_send_mail_mock = mocker.patch(
+        "recoco.apps.communication.api.django_send_mail"
+    )
     brevo_mock = mocker.patch("recoco.apps.communication.brevo.Brevo.send_email")
 
     template_name = "a template"
@@ -37,7 +39,7 @@ def test_send_email_call_send_debug_email_in_debug_mode(mocker, settings, reques
 
     brevo_mock.assert_not_called()
     django_send_mail_mock.assert_called_once()
-    
+
 
 @pytest.mark.django_db
 def test_send_debug_email_creates_transaction_without_related(request):
@@ -141,11 +143,13 @@ def test_send_brevo_email_creates_transaction(mocker, request):
 
 @pytest.mark.django_db
 def test_send_brevo_email_non_existent_template(mocker, request):
-
     class TransacResponse:
         message_id = "this-is-an-id"
 
-    mocker.patch("recoco.apps.communication.brevo.Brevo.send_email", return_value=TransacResponse())
+    mocker.patch(
+        "recoco.apps.communication.brevo.Brevo.send_email",
+        return_value=TransacResponse(),
+    )
 
     template_name = "a non existent template"
 
@@ -165,11 +169,13 @@ def test_send_brevo_email_non_existent_template(mocker, request):
 
 @pytest.mark.django_db
 def test_send_brevo_email_use_default_template(mocker, request):
-
     class TransacResponse:
         message_id = "this-is-an-id"
 
-    mocker.patch("recoco.apps.communication.brevo.Brevo.send_email", return_value=TransacResponse())
+    mocker.patch(
+        "recoco.apps.communication.brevo.Brevo.send_email",
+        return_value=TransacResponse(),
+    )
 
     template_name = "a template"
 
@@ -188,26 +194,34 @@ def test_send_brevo_email_use_default_template(mocker, request):
     brevo.Brevo.send_email.assert_called_once_with(
         template.sib_id,
         recipients,
-        {'site_name': current_site.name, 'site_domain': current_site.domain, "legal_address": "here"},
-        test=False
+        {
+            "site_name": current_site.name,
+            "site_domain": current_site.domain,
+            "legal_address": "here",
+        },
+        test=False,
     )
 
 
 @pytest.mark.django_db
 def test_send_brevo_email_use_overrided_template(mocker, request):
-
     class TransacResponse:
         message_id = "this-is-an-id"
 
-    mocker.patch("recoco.apps.communication.brevo.Brevo.send_email", return_value=TransacResponse())
+    mocker.patch(
+        "recoco.apps.communication.brevo.Brevo.send_email",
+        return_value=TransacResponse(),
+    )
 
     template_name = "a template"
 
     current_site = get_current_site(request)
     baker.make(home_models.SiteConfiguration, site=current_site, legal_address="here")
 
-    template = baker.make(models.EmailTemplate, name=template_name, site=None)
-    overrided_template = baker.make(models.EmailTemplate, name=template_name, site=current_site)
+    baker.make(models.EmailTemplate, name=template_name, site=None)
+    overrided_template = baker.make(
+        models.EmailTemplate, name=template_name, site=current_site
+    )
 
     user1 = Recipe(auth.User, username="Bob", first_name="Bobi", last_name="Joe").make()
     user1.profile.sites.add(current_site)
@@ -219,6 +233,10 @@ def test_send_brevo_email_use_overrided_template(mocker, request):
     brevo.Brevo.send_email.assert_called_once_with(
         overrided_template.sib_id,
         recipients,
-        {'site_name': current_site.name, 'site_domain': current_site.domain, "legal_address": "here"},
-        test=False
+        {
+            "site_name": current_site.name,
+            "site_domain": current_site.domain,
+            "legal_address": "here",
+        },
+        test=False,
     )

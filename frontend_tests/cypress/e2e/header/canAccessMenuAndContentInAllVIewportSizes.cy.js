@@ -17,7 +17,7 @@ describe('As a visitor, I can access the menu and content on different devices',
 				devices.forEach(({ dimensions }) => {
 					const [width, height] = dimensions;
 					let menuIsHidden = breakpoint > width;
-	
+
 					layouts.config.forEach((orientation) => {
 						cy.visit(`/`);
 						if(orientation === "portrait") {

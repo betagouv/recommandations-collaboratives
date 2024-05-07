@@ -12,3 +12,4 @@ class InviteAdmin(admin.ModelAdmin):
     list_display = ["created_on", "email", "project", "role"]
     readonly_fields = ("created_on", "accepted_on")
     ordering = ["-created_on"]
+    list_select_related = ("project__commune",)

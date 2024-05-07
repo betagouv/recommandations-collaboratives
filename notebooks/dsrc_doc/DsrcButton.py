@@ -10,7 +10,6 @@ init_django("recoco")
 
 # %%
 
-from django.db.models import Model
 from recoco.apps.projects.models import Project
 
 projects = Project.objects.all()
@@ -36,7 +35,8 @@ component = load_asset("js/components/DsrcButton.js")
 from ipywidgets import widgets
 from IPython.display import Javascript, Markdown
 
-out = widgets.Output(layout={'border': '1px solid black'})
+out = widgets.Output(layout={"border": "1px solid black"})
+
 
 def on_button_clicked(b):
     my_js = """
@@ -44,33 +44,32 @@ def on_button_clicked(b):
     alert("hi");
     """
     with out:
-        #print(my_js)
+        # print(my_js)
         display(Javascript(my_js))
         display(Markdown("on_button_clicked called"))
         print("on_button_clicked call ended")
 
+
 button = widgets.Button(
-    description='Button',
+    description="Button",
     disabled=False,
-    button_style='',
-    tooltip='Button',
-    icon='check'
+    button_style="",
+    tooltip="Button",
+    icon="check",
 )
 
 # button.on_click(on_button_clicked)
 # display(button, out)
 
 
-
-
- # %%
- """
+# %%
+"""
     Params  : `data_dict` a dict structure that contains `<button>` element parameters
               (equivalent of `props` in JavaScript components)
     Returns : a styled `<button>` element with an event handler
 
     ```python
-    
+
     data_dict = {
         "label": "Label of the button item",
         "name": "(Optional) name of the button",
@@ -88,11 +87,11 @@ button = widgets.Button(
             and the label will be used as the icon title (default: False)",
         "classes": "(Optional) extra classes"
     }
-    
+
     ```
 
     All of the keys of the dict can be passed directly as named parameters of the tag.
-    
+
     **Tag name**:
 
         dsrc_button
@@ -122,21 +121,18 @@ template = Template(
 )
 
 data_dict = {
-    "label"         : "DsrcButton",
-    "onclick"       : "(event) => alert('clicked')",
-    "type"          : "button",
-    "name"          : "dsrc_button",
-    "is_disabled"   : False,
-    "size"          : "md",
-    "variant"       : "secondary",
-    "icon"          : "fr-icon--info-fill", # nom de l'icône, sans l'extension SVG
-    "align"         : "right",
-    "classes"       : "dsrc-color--primary",
+    "label": "DsrcButton",
+    "onclick": "(event) => alert('clicked')",
+    "type": "button",
+    "name": "dsrc_button",
+    "is_disabled": False,
+    "size": "md",
+    "variant": "secondary",
+    "icon": "fr-icon--info-fill",  # nom de l'icône, sans l'extension SVG
+    "align": "right",
+    "classes": "dsrc-color--primary",
 }
 
-context = Context(
-    {"data_dict": data_dict, "csscore": csscore.data}
-)
+context = Context({"data_dict": data_dict, "csscore": csscore.data})
 
 HTML(template.render(context))
-
