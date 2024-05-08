@@ -3,6 +3,10 @@
 {% load sass_tags %}
 {% load static %}
 {% block title %}Page d'accueil{% endblock %}
+{% load django_vite %}
+{% block js %}
+  {% vite_asset 'js/apps/home.js' %}
+{% endblock js %}
 {% block css %}
   <link href="{% sass_src 'home/css/dsfr/custom-dsfr.scss' %}"
         rel="stylesheet"
@@ -24,7 +28,9 @@
             <li>
               {% if user.is_authenticated %}
                 <a href="{% url 'onboarding-project' %}"
-                   class="fr-btn fr-text--xl custom-button">Solliciter {{ request.site.name }}</a>
+                   class="fr-btn fr-text--xl custom-button"
+                   data-test-id="button-need-help"
+                   >Solliciter {{ request.site.name }}</a>
               {% else %}
                 <button class="fr-btn fr-text--xl custom-button"
                         data-fr-opened="false"
@@ -201,4 +207,5 @@
     </div>
   </div>
   <div class="border-bottom"></div>
-{% endblock %}
+  {% include "home/onboarding/onboarding-modal.html" with form=onboarding_modal_form %}
+{% endblock content %}
