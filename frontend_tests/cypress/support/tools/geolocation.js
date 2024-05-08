@@ -17,7 +17,7 @@ const domElements = {
     LEAFLET_LOCATION_MARKER_PANE: '.leaflet-marker-pane',
     LEAFLET_AREA_CIRCLE: '.area-circle',
     LEAFLET_AREA_COMMUNE: '.area-commune',
-    LEAFLET_MARKER_PROJECT_LOCATION: '.project-location-marker',
+    LEAFLET_MARKER_PROJECT_LOCATION: '.project-coordinates-marker',
     LEAFLET_MARKER_PROJECT_COORDINATES: '.project-coordinates-marker',
     LEAFLET_POPUP_LATITUDE: '[data-test-id="project-coord-x-latitude"]',
     LEAFLET_POPUP_LONGITUDE: '[data-test-id="project-coord-y-longitude"]',
@@ -129,7 +129,7 @@ class ProjectLocation {
         cy.get(this.getSelector(map))
             .get(this.dom.LEAFLET_LOCATION_MARKER_PANE)
             .then(() => {
-                cy.get(this.dom.LEAFLET_MARKER_PROJECT_LOCATION).click({
+                cy.get(this.dom.LEAFLET_MARKER_PROJECT_LOCATION).first().click({
                     force: true,
                 });
                 cy.get(this.dom.LEAFLET_POPUP_LATITUDE).should('exist');
