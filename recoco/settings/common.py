@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     "django.contrib.postgres",
     "django.contrib.sites",
     "multisite",
+    "reversion",
     "django.contrib.admin",
     "hijack",
     "hijack.contrib.admin",
