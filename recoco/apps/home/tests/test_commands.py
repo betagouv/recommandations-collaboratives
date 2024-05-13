@@ -21,7 +21,6 @@ from recoco.apps.home.models import SiteConfiguration
 from recoco.utils import get_group_for_site
 
 
-
 from ..management.commands import cleanuporgs
 
 ########################################################################
@@ -99,7 +98,7 @@ def test_command_create_site_domain_already_exists(request):
         "name": "New site",
         "domain": existing_site.domain,
         "sender_email": "jdoe@example.org",
-        "sender_name": "jdoe", 
+        "sender_name": "jdoe",
         "contact_form_recipient": "contact@example.org",
         "legal_address": "36 green street 75000 Paris",
     }
@@ -116,13 +115,16 @@ def test_command_create_site(request):
         "name": "New site",
         "domain": "example2.org",
         "sender_email": "jdoe@example2.org",
-        "sender_name": "jdoe", 
+        "sender_name": "jdoe",
         "contact_form_recipient": "contact@example2.org",
         "legal_address": "36 green street 75000 Paris",
     }
     out = StringIO()
     call_command("create_site", stdout=out, **command_args)
-    assert f"The site {command_args['name']} has been created successfully" in out.getvalue()
+    assert (
+        f"The site {command_args['name']} has been created successfully"
+        in out.getvalue()
+    )
 
     new_site = Site.objects.get(domain=command_args["domain"])
     site_config = SiteConfiguration.objects.get(site=new_site)
@@ -138,5 +140,6 @@ def test_command_create_site(request):
     advisor.groups.add(group)
     with settings.SITE_ID.override(new_site.pk):
         assert advisor.has_perm("sites.list_projects", new_site)
+
 
 # # eof
