@@ -47,7 +47,7 @@ jobs:
         with:
           node-version: 20
 
-      - uses: borales/actions-yarn@v5.0.0
+      - uses: borales/actions-yarn@v3.0.0
 
       - name: Install packages
         run: |
