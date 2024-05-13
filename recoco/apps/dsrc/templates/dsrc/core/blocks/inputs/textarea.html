@@ -1,5 +1,4 @@
 <textarea x-model="form['{{ field.html_name }}'].value"
-          value="{{ field.value }}"
           x-ref="{{ field.html_name }}"
           @input="changeInput"
           @focus="touchInput"
@@ -13,4 +12,4 @@
           {% if field.field.placeholder %}placeholder="{{ field.field.placeholder }}"{% endif %}
           {% if field.field.required %}required{% endif %}
           {% if field.field.disabled %}disabled{% endif %}
-          data-test="{{ field.field.widget.attrs.input_test_id }}"></textarea>
+          data-test="{{ field.field.widget.attrs.input_test_id }}">{{ field.value }}</textarea>
