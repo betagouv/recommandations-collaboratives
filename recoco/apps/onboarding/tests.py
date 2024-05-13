@@ -500,7 +500,7 @@ def test_create_prefilled_project_creates_a_new_project(request, client):
     # Project
     project = projects_models.Project.on_site.all()[0]
 
-    assert last_url == reverse("onboarding-summary", args=[project.pk])
+    assert last_url == reverse("projects-project-detail-overview", args=[project.pk])
 
     assert project.name == project_data["name"]
     assert project.location == project_data["location"]
