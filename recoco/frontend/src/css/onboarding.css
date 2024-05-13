@@ -23,6 +23,7 @@ body {
 .container__form {
   padding-top: 1.5rem;
   background-color: #fff;
+  margin-bottom: 4rem;
 }
 
 .onboarding__form {
