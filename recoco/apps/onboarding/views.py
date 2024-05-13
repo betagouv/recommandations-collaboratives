@@ -318,7 +318,9 @@ def prefill_project_submit(request):
             if "prefill_set_user" in request.session:
                 del request.session["prefill_set_user"]
 
-            return redirect(f"{reverse('onboarding-summary', args=(project.pk,))}")
+            return redirect(
+                f"{reverse('projects-project-detail-overview', args=(project.pk,))}"
+            )
 
     return render(request, "onboarding/prefill-project.html", locals())
 

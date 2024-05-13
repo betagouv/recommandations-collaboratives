@@ -5,7 +5,7 @@
      x-init="getPostcode(projectPostcode,projectInsee)"
      x-effect='validateData(submittedForm)'>
   <div class="row">
-    <div class="col-6 fr-input-group {% if form.postcode.errors %}fr-input-group--error{% endif %} mb-0" x-ref="formGroupPostcode">
+    <div class="col-6 fr-input-group {% if form.postcode.errors %}fr-input-group--error{% endif %} mb-0" x-ref="formGroupPostcode" data-test-id="input-group-postcode">
       <label class="fr-label" for="input-project-address">Code postal {% if isRequired %}*{% endif %}</label>
       <input :disabled="isLoading"
              @change.debounce="fetchCities()"
@@ -16,12 +16,13 @@
              name="postcode"
              x-ref="postcode"
              value="{{ form.postcode.value|default:'' }}"
+             data-test-id="input-postcode"
              required>
       {% for error in form.postcode.errors %}<div class="text-danger text-end">{{ error }}</div>{% endfor %}
     </div>
-    <div class="col-6 fr-select-group">
+    <div class="col-6 fr-select-group" data-test-id="select-group-city">
       <label class="fr-label" for="input-project-address">Commune {% if isRequired %}*{% endif %}</label>
-      <select required x-ref="insee" name="insee" class="fr-select">
+      <select required x-ref="insee" name="insee" class="fr-select" data-test-id="select-city">
         <template x-if="cities && cities.length > 0">
           <template x-for="city in cities" :key="city.insee">
             <option :value="city.insee" x-text="city.name"></option>

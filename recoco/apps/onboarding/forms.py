@@ -324,9 +324,9 @@ class PrefillProjectForm(DsrcBaseForm):
             )
         )
 
-    name = forms.CharField(label="Nom du projet", initial="", required=True)
+    name = forms.CharField(label="Nom du projet *", initial="", required=True)
     location = forms.CharField(
-        label="Adresse",
+        label="Adresse *",
         initial="",
         required=True,
         help_text="Si le projet n'a pas d'adresse exacte, donnez-nous une indication proche.",
@@ -339,7 +339,7 @@ class PrefillProjectForm(DsrcBaseForm):
         required=True,
     )
 
-    description = forms.CharField(label="Description", initial="", required=True)
+    description = forms.CharField(label="Description *", initial="", required=True)
 
 
 # eof
