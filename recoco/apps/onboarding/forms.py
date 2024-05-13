@@ -241,7 +241,12 @@ class OnboardingProject(DsrcBaseForm):
         required=True,
     )
 
-    description = forms.CharField(label="Description *", initial="", required=True)
+    description = forms.CharField(
+        label="Description *",
+        initial="",
+        required=True,
+        widget=forms.Textarea(attrs={"rows": 3}),
+    )
 
 
 class PrefillSetuserForm(DsrcBaseForm):
@@ -339,7 +344,12 @@ class PrefillProjectForm(DsrcBaseForm):
         required=True,
     )
 
-    description = forms.CharField(label="Description *", initial="", required=True)
+    description = forms.CharField(
+        label="Description *",
+        initial="",
+        required=True,
+        widget=forms.Textarea(attrs={"rows": 3}),
+    )
 
 
 # eof

@@ -1,7 +1,15 @@
 <textarea x-model="form['{{ field.html_name }}'].value"
+          value="{{ field.value }}"
+          x-ref="{{ field.html_name }}"
+          @input="changeInput"
+          @focus="touchInput"
+          @blur="validateInput"
           class="fr-input {% if field.errors %}fr-input--error{% endif %}{% if field.is_valid %} fr-input--valid{% endif %}{% if field.field.widget.attrs.size %} fr-input--{{ field.field.widget.attrs.size }}{% endif %} {{ field.field.widget.attrs.classes }}"
+          :class="`fr-input--${form['{{ field.html_name }}'].valid_class}`"
           id="{{ field.id_for_label }}"
           name="{{ field.html_name }}"
+          {% if field.field.widget.attrs.rows %}rows="{{ field.field.widget.attrs.rows }}"{% endif %}
+          {% if field.field.widget.attrs.cols %}cols="{{ field.field.widget.attrs.cols }}"{% endif %}
           {% if field.field.placeholder %}placeholder="{{ field.field.placeholder }}"{% endif %}
           {% if field.field.required %}required{% endif %}
           {% if field.field.disabled %}disabled{% endif %}
