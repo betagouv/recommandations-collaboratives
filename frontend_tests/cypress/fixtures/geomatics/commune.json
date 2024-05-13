@@ -27,12 +27,24 @@
         "fields": {
             "department": "42",
             "insee": "42218",
-            "latitude": 45.4463958410,
+            "latitude": 45.446395841,
             "longitude": 4.39273574323,
             "name": "commune localisée",
             "postal": "42000"
         },
         "model": "geomatics.commune",
         "pk": 2
+    },
+    {
+        "fields": {
+            "department": "93",
+            "insee": "93006",
+            "latitude": 48.8690836308,
+            "longitude": 2.42274096688,
+            "name": "commune localisée",
+            "postal": "93170"
+        },
+        "model": "geomatics.commune",
+        "pk": 3
     }
 ]
