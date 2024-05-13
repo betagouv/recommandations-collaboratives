@@ -7,7 +7,7 @@
                 <div class="d-flex flex-column align-items-center justify-content-center w-100 py-4">
                     <span class="text-info-custom text-grey-dark name fw-normal mb-2">Pas encore de projet</span>
                     <a class="button filled blue small inherit"
-                       href="{% url 'projects-project-prefill' %}">Créer un projet</a>
+                       href="{% url 'onboarding-prefill-set-user' %}">Créer un projet</a>
                 </div>
             </div>
         </template>
@@ -57,6 +57,7 @@
                     <header class="d-flex align-items-center justify-content-between w-100 mb-1">
                         <div class="d-flex align-items-center">
                             <a class="project-link d-flex align-items-center"
+                              data-test-id="project-link"
                                :href="makeProjectURL('{% url 'projects-project-detail' 0 %}', item.project.id)">
                                 <template x-if="item.project.commune">
                                     <span class="fw-bold title-info me-2 location"

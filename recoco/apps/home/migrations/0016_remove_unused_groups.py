@@ -2,12 +2,11 @@
 
 from django.db import migrations
 
-from django.contrib.auth import models
-
 
 def remove_unused_groups(apps, schema_editor):
+    Group = apps.get_model("auth", "Group")
     groups = ["switchtender", "project_moderator"]
-    models.Group.objects.filter(name__in=groups).delete()
+    Group.objects.filter(name__in=groups).delete()
 
 
 class Migration(migrations.Migration):

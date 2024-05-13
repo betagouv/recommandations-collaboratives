@@ -13,12 +13,12 @@ describe('As site staff, I can pause and reactivate a project', () => {
 			projectView.navigateToPreferencesTab()
 			projectView.deactivateProject()
 		})
-	
+
 		it('Reactivates a project from the project preferences', () => {
 			projectView.navigateToPreferencesTab()
 			projectView.activateProjectFromPreferences()
 		})
-	
+
 		it('Reactivates a project from the header banner', () => {
 			projectView.navigateToPreferencesTab()
 			projectView.deactivateProject()

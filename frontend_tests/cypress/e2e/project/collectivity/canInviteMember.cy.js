@@ -8,7 +8,7 @@ describe('I can invite a member', () => {
     const inviterFullName =  'Boba collectivité'
     const inviterEmail =  'boba@test.fr'
     const project = "Friche numéro 2"
-    
+
     it('goes to the overview page and invite a member', () => {
 
         cy.login("boba");

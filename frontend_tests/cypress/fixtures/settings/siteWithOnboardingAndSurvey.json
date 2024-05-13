@@ -173,7 +173,8 @@
             "project_survey": 1,
             "onboarding": 1,
             "sender_email": "noreply@recoconseil.fr",
-            "sender_name": "Recoconseil"
+            "sender_name": "Recoconseil",
+            "contact_form_recipient": "noreply@nodomain.nowhere"
         }
     }
 ]

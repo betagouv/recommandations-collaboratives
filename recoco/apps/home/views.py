@@ -7,7 +7,6 @@ authors: raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created: 2021-08-16 15:40:08 CEST
 """
 
-
 import django.core.mail
 from django.contrib import messages
 from django.contrib.auth import login as log_user
@@ -15,7 +14,7 @@ from django.contrib.auth import models as auth
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models import Count, F, Q
-from django.shortcuts import redirect, render, reverse
+from django.shortcuts import redirect, render
 from django.utils.decorators import method_decorator
 from django.views.generic import View
 from django.views.generic.base import TemplateView
@@ -25,15 +24,24 @@ from recoco.apps.projects.utils import (
     get_active_project,
 )
 from recoco.apps.tasks import models as tasks
+from recoco.apps.resources import models as resources_models
 from recoco.utils import check_if_advisor
 
 from . import models
 from .forms import ContactForm, UserPasswordFirstTimeSetupForm
 from .utils import get_current_site_sender_email
 
+from recoco.apps.onboarding.forms import OnboardingEmailForm
+
 
 class HomePageView(TemplateView):
     template_name = "home/home.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["onboarding_modal_form"] = OnboardingEmailForm()
+        return context
+
 
 @method_decorator([login_required], name="dispatch")
 class LoginRedirectView(View):
@@ -144,6 +152,10 @@ class StatisticsView(TemplateView):
                 latitude=F("commune__latitude"), longitude=F("commune__longitude")
             )
         )
+
+        context["resource_count"] = resources_models.Resource.on_site.exclude(
+            status=resources_models.Resource.DRAFT
+        ).count()
 
         return context
 

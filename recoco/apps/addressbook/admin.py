@@ -16,3 +16,4 @@ class ContactAdmin(VersionAdmin):
     search_fields = ["first_name", "last_name", "organization__name"]
     list_display = ["last_name", "first_name", "email", "phone_no", "organization"]
     ordering = ["last_name", "first_name"]
+    list_select_related = ("organization",)

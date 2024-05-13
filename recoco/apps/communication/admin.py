@@ -26,6 +26,7 @@ class EmailTemplateAdmin(admin.ModelAdmin):
 
     list_filter = ["site"]
     list_display = ["name", "site"]
+    list_select_related = ("site",)
 
 
 @admin.register(models.TransactionRecord)

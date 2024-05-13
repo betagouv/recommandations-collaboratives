@@ -50,4 +50,6 @@ SESSION_COOKIE_SAMESITE = "None"
 
 X_FRAME_OPTIONS = "DENY"
 
+WAGTAILADMIN_BASE_URL = "recoconseil.fr"
+
 # eof
