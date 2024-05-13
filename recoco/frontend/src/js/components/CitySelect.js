@@ -45,19 +45,15 @@ function CitySearch(required = false, requestMethod = 'GET') {
       });
     },
     validateData(submittedForm = false) {
-      if (
-        this.$ref &&
-        this.required &&
-        (this.requestMethod === 'POST' || submittedForm)
-      ) {
+      if (this.required && (this.requestMethod === 'POST' || submittedForm)) {
         addClassIfNotExists(
           this.$refs.postcode.parentElement,
-          `fr-input-group--${this.$ref.postcode ? 'valid' : 'error'}`
+          `fr-input-group--${this.$refs.postcode.value ? 'valid' : 'error'}`
         );
 
         addClassIfNotExists(
           this.$refs.insee.parentElement,
-          `fr-select-group--${this.$ref.insee ? 'valid' : 'error'}`
+          `fr-select-group--${this.$refs.insee.value ? 'valid' : 'error'}`
         );
       }
     },
