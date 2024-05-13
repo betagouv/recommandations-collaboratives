@@ -63,8 +63,6 @@ class Command(BaseCommand):
                 legal_address=legal_address,
             )
 
-            # TODO : add questions for onboarding_questions, or not ?
-            
             self.stdout.write("Create group and permissions..")
             with settings.SITE_ID.override(site.pk):
                 for group_name, permissions in models.SITE_GROUP_PERMISSIONS.items():
@@ -72,4 +70,8 @@ class Command(BaseCommand):
                     for perm_name in permissions:
                         assign_perm(perm_name, group, obj=site)
                         
-                self.stdout.write(self.style.SUCCESS(f"The site {name} has been created successfully"))
+            self.stdout.write(self.style.SUCCESS(f"The site {name} has been created successfully"))
+
+            if not domain.endswith(".recoconseil.fr"):
+                self.stdout.write(self.style.SUCCESS(f"The domain {domain} requires additional configuration on the server !"))
+
