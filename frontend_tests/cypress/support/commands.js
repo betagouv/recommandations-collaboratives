@@ -44,7 +44,7 @@ Cypress.Commands.add('login', (role) => {
     const regExp = /\=([^=]+)\;/;
     const matches = regExp.exec(setCookieValue);
     const token = matches[1];
-
+    cy.log('USERNAME ', username);
     cy.request({
       method: 'POST',
       url: '/accounts/login/',
@@ -91,7 +91,7 @@ Cypress.Commands.add('loginWithUi', (role) => {
 });
 
 Cypress.Commands.add('logout', () => {
-  cy.get('#user-menu-button').click();
+  cy.get('#user-menu-button').click({ force: true });
   cy.contains('Déconnexion').click({ force: true });
 });
 
@@ -168,10 +168,11 @@ Cypress.Commands.add('createProject', (label) => {
 });
 
 Cypress.Commands.add('becomeAdvisor', () => {
-  cy.visit('/');
   cy.get('body').then((body) => {
     if (body.find('#positioning-form').length > 0) {
-      cy.contains('Conseiller le projet').click({ force: true });
+      cy.get('[data-test-id="button-join-as-advisor"]').click({
+        force: true,
+      });
     } else {
       assert.isOk('advisor', 'already advisor');
     }
@@ -181,10 +182,11 @@ Cypress.Commands.add('becomeAdvisor', () => {
 Cypress.Commands.add(
   'createTask',
   (label, topic = '', withResource = false) => {
-    cy.visit('/');
     cy.get('body').then((body) => {
       if (body.find('[data-test-id="submit-task-button"]').length > 0) {
-        cy.contains('Émettre une recommandation').click({ force: true });
+        cy.contains('Émettre une recommandation').click({
+          force: true,
+        });
 
         if (!withResource) {
           cy.get('#push-noresource').click({ force: true });
@@ -198,7 +200,9 @@ Cypress.Commands.add(
             currentResource.fields.title,
             { force: true }
           );
-          cy.get(`#resource-${currentResource.pk}`).check({ force: true });
+          cy.get(`#resource-${currentResource.pk}`).check({
+            force: true,
+          });
         }
 
         cy.get('textarea')
@@ -264,6 +268,13 @@ Cypress.Commands.add('navigateToProject', (index) => {
   cy.visit(`/`);
   cy.get('#projects-list-button').click({ force: true });
   cy.contains(`${project.name} ${index}`).click({ force: true });
+});
+
+Cypress.Commands.add('hideCookieBannerAndDjango', () => {
+  cy.get('[data-test-id="fr-consent-banner"]')
+    .find('[data-test-id="button-consent-accept-all"]')
+    .click();
+  cy.get('#djHideToolBarButton').click();
 });
 
 /**
