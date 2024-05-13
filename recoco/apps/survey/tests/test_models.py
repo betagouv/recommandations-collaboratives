@@ -173,7 +173,7 @@ def test_question_set_first_question():
     survey = Recipe(models.Survey).make()
     qs = Recipe(models.QuestionSet, survey=survey).make()
     q1 = Recipe(models.Question, text="Q1", question_set=qs).make()
-    q2 = Recipe(models.Question, text="Q2", question_set=qs).make()  # NOQA
+    Recipe(models.Question, text="Q2", question_set=qs).make()
 
     assert qs.first_question() == q1
 
