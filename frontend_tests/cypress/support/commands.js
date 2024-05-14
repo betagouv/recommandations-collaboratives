@@ -126,8 +126,8 @@ Cypress.Commands.add('createProject', (label) => {
 
   cy.get('#id_name')
     .should('not.have.class', 'fr-input--error')
-    .type(project.name)
-    .should('have.value', project.name)
+    .type(label || project.name)
+    .should('have.value', label || project.name)
     .should('have.class', 'fr-input--valid');
 
   cy.get('#id_location')
