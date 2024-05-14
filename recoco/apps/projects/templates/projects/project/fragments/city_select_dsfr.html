@@ -1,7 +1,7 @@
 {{ form.postcode.value|json_script:"projectPostcode" }}
 {{ form.insee.value|json_script:"projectInsee" }}
 <div class="col-12"
-     x-data='CitySearch({% if isRequired %}true{% endif %}, "{{ request.method }}")'
+     x-data='CitySearch({% if isRequired %}true{% endif %}, "{{ request.method }}", true)'
      x-init="getPostcode(projectPostcode,projectInsee)"
      x-effect='validateData(submittedForm)'>
   <div class="row">
