@@ -1,4 +1,6 @@
 //Bootstrap librairie
+import '@gouvfr/dsfr/dist/dsfr.min.css';
+import '@gouvfr/dsfr/dist/utility/utility.min.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 import 'vite/modulepreload-polyfill';
@@ -14,6 +16,7 @@ import './store/app';
 //Global reused component
 import './components/Notification';
 import './components/Editor';
+import './components/FieldValidator';
 
 //Global CSS
 import '../css/dsfr-custom.css';
@@ -25,6 +28,7 @@ import '../css/colors.css';
 import '../css/text-colors.css';
 import '../css/border.css';
 import '../css/role.css';
+import '../css/navbar.css';
 
 //Layouts CSS
 import '../css/layouts/stack.css';

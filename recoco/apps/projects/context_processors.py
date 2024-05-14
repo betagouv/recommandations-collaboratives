@@ -2,8 +2,8 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models import Q
 from recoco.apps.projects import models as projects_models
-from recoco.apps.tasks import models as tasks_models
 from recoco.apps.survey import models as survey_models
+from recoco.apps.tasks import models as tasks_models
 from recoco.utils import check_if_advisor, get_site_config_or_503
 
 from .utils import can_administrate_project, get_active_project
@@ -40,13 +40,17 @@ def active_project_processor(request):
         )
 
     if active_project:
+        session = None
+
         try:
             site_config = get_site_config_or_503(request.site)
-            session, _ = survey_models.Session.objects.get_or_create(
-                project=active_project, survey=site_config.project_survey
-            )
+
+            if site_config.project_survey:
+                session, _ = survey_models.Session.objects.get_or_create(
+                    project=active_project, survey=site_config.project_survey
+                )
         except (survey_models.Survey.DoesNotExist, ImproperlyConfigured):
-            session = None
+            pass
 
         # Retrieve notification count
         project_notifications = request.user.notifications.filter(

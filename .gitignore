@@ -33,6 +33,7 @@ venv
 screenshots
 .idea
 .tool-versions
+.python-version
 .env
 
 ## Ignore Jupyter Notebooks files
@@ -43,3 +44,6 @@ notebooks/**/.ipynb_checkpoints/
 dsrc_doc/*.md
 !dsrc_doc/README.md
 
+docker/docker-compose.local.yml
+**/.vite
+**/cypress/reports/*

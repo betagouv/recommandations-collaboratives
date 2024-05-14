@@ -14,5 +14,13 @@
         },
         "model": "geomatics.department",
         "pk": "1"
+    },
+    {
+        "fields": {
+            "name": "Département de test numéro 3",
+            "region": "1"
+        },
+        "model": "geomatics.department",
+        "pk": "93"
     }
 ]

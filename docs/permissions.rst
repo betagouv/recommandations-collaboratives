@@ -6,7 +6,7 @@ Projects
 
 There are 3 permission levels::
  - **Read-only** : you can only see some info (mostly public) about a project.
- - **Manage** : you can manage a project, except for internal team data. 
+ - **Manage** : you can manage a project, except for internal team data.
  - **Administrate** : you can administrate most of the data of a project, except for
    site-level administrator data
 

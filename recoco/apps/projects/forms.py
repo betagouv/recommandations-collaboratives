@@ -74,6 +74,7 @@ class ProjectForm(forms.ModelForm):
             "description": "Contexte du projet",
         }
 
+
 class DocumentUploadForm(forms.ModelForm):
     class Meta:
         model = models.Document

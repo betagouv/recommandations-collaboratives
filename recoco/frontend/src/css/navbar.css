@@ -1,0 +1,5 @@
+@media screen and (min-width: 690px) {
+  .secondary-navbar .collapse {
+    display: block;
+  }
+}

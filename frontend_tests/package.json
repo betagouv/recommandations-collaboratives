@@ -1,24 +1,27 @@
 {
-  "name": "tests",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test_ui": "./node_modules/cypress/bin/cypress open",
-      "cy:run": "./node_modules/cypress/bin/cypress run",
-      "test": "start-server-and-test 'yarn django:start-server' http://localhost:8000 'yarn run django:update-permissions ; yarn run cy:run'",
-      "django:start-server": "DJANGO_SETTINGS_MODULE=recoco.settings.frontend_tests ../manage.py testserver ./cypress/fixtures/settings/siteWithOnboardingAndSurvey.json ./cypress/fixtures/users/users.json ./cypress/fixtures/geomatics/region.json ./cypress/fixtures/geomatics/department.json ./cypress/fixtures/geomatics/commune.json ./cypress/fixtures/projects/projects.json ./cypress/fixtures/projects/projectsMembers.json ./cypress/fixtures/projects/reminders.json ./cypress/fixtures/addressbook/organizations.json ./cypress/fixtures/profiles/profiles.json ./cypress/fixtures/resources/resources.json ./cypress/fixtures/addressbook/contacts.json ./cypress/fixtures/documents/documents.json --noinput",
-      "django:update-permissions": "DJANGO_SETTINGS_MODULE=recoco.settings.frontend_tests ../manage.py update_permissions"
-  },
-  "author": "",
-  "license": " GPL-3.0-or-later",
-  "devDependencies": {
-    "cypress": "^13.6.0",
-    "cypress-mochawesome-reporter": "^3.8.1",
-    "eslint": "^8.56.0",
-    "prettier": "^3.2.2"
-  },
-  "dependencies": {
-    "start-server-and-test": "^2.0.3"
-  }
+    "name": "tests",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "test_ui": "cypress open",
+        "cy:run": "cypress run",
+        "test": "concurrently \"yarn frontend:start-server\" \"yarn start-server-and-test\"",
+        "start-server-and-test": "start-server-and-test 'yarn django:start-server --verbosity 0' http://localhost:8000  'yarn django:update-permissions ; yarn cy:run'",
+        "django:start-server": "cross-env DJANGO_SETTINGS_MODULE=recoco.settings.frontend_tests ../manage.py testserver ./cypress/fixtures/settings/siteWithOnboardingAndSurvey.json ./cypress/fixtures/users/users.json ./cypress/fixtures/geomatics/region.json ./cypress/fixtures/geomatics/department.json ./cypress/fixtures/geomatics/commune.json ./cypress/fixtures/projects/projects.json ./cypress/fixtures/projects/projectsMembers.json ./cypress/fixtures/projects/reminders.json ./cypress/fixtures/addressbook/organizations.json ./cypress/fixtures/profiles/profiles.json ./cypress/fixtures/resources/resources.json ./cypress/fixtures/addressbook/contacts.json ./cypress/fixtures/documents/documents.json --noinput",
+        "frontend:start-server": "cross-env yarn --cwd ../recoco/frontend dev",
+        "django:start-server-test_ui": "cross-env DJANGO_SETTINGS_MODULE=recoco.settings.frontend_tests ../manage.py runserver",
+        "django:update-permissions": "cross-env DJANGO_SETTINGS_MODULE=recoco.settings.frontend_tests ../manage.py update_permissions"
+    },
+    "author": "",
+    "license": " GPL-3.0-or-later",
+    "devDependencies": {
+        "cross-env": "^7.0.3",
+        "cypress": "^13.6.0",
+        "cypress-mochawesome-reporter": "^3.8.1",
+        "eslint": "^8.56.0",
+        "prettier": "^3.2.2",
+        "concurrently": "^8.2.2",
+        "start-server-and-test": "^2.0.2"
+    }
 }

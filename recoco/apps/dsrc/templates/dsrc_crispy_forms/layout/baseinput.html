@@ -1,13 +1,13 @@
 {% if field.field.widget.input_type == "text" %}
-    {% include "dsrc/core/blocks/inputs/input_text.html" %}
+  {% include "dsrc/core/blocks/inputs/input_text.html" %}
 {% elif field.field.widget.input_type == "password" %}
-    {% include "dsrc/core/blocks/inputs/input_text.html" %}
+  {% include "dsrc/core/blocks/inputs/input_text.html" %}
 {% elif field.field.widget.input_type == "email" %}
-    {% include "dsrc/core/blocks/inputs/input_text.html" %}
+  {% include "dsrc/core/blocks/inputs/input_text.html" %}
 {% elif field.field.widget.input_type == "select" %}
-    {% include "dsrc/core/blocks/inputs/select.html" %}
+  {% include "dsrc/core/blocks/inputs/select.html" %}
 {% elif field.field.widget.attrs.cols != None and field.field.widget.attrs.rows != None %}
-    {% include "dsrc/core/blocks/inputs/textarea.html" %}
+  {% include "dsrc/core/blocks/inputs/textarea.html" %}
 {% elif field.field.widget.input_type == "richtext" %}
-    {% include "dsrc/core/compositions/forms/richtext.html" %}
+  {% include "dsrc/core/compositions/forms/richtext.html" %}
 {% endif %}

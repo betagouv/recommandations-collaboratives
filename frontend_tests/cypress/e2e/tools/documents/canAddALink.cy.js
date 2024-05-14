@@ -33,7 +33,7 @@ describe('I can add a link on the document tab', () => {
         cy.contains("Fichiers et liens").click({ force: true })
 
         cy.url().should('include', '/documents')
-        
+
         cy.contains(link.description);
     })
 })

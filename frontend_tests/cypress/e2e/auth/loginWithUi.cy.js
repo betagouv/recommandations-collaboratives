@@ -2,7 +2,7 @@ import users from '../../fixtures/users/users.json'
 
 
 describe('The Login Page', () => {
-    
+
     let currentUser = {}
 
     beforeEach(() => {

@@ -50,7 +50,7 @@ export const schemaFormInputs = {
       format: 'Veuillez rentrer une adresse email valide',
     },
   },
-  password: {
+  passwordStrict: {
     // TODO:Adapt for better password strength validation
     // See: https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html
     allOf: [
@@ -69,6 +69,18 @@ export const schemaFormInputs = {
         type: 'string',
         pattern: '[0-9]{1}',
         errorMessage: '1 chiffre minimum',
+      },
+    ],
+  },
+  passwordSoft: {
+    // TODO:Adapt for better password strength validation
+    // See: https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html
+    allOf: [
+      {
+        type: 'string',
+        format: 'password',
+        minLength: 8,
+        errorMessage: minLengthErrorMessage(8),
       },
     ],
   },

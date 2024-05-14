@@ -1,6 +1,7 @@
 recursive-include recoco/static *.*
 recursive-include recoco/frontend/dist/ *.*
 recursive-exclude recoco/frontend/modules *.*
+recursive-exclude recoco/frontend/node_modules *.*
 recursive-include recoco/apps/home/static *.*
 recursive-include recoco/apps/projects *.txt
 recursive-include recoco/apps/projects *.md
@@ -9,4 +10,5 @@ recursive-include recoco/apps/resources/static *.*
 recursive-include recoco/apps/survey/static *.*
 recursive-include recoco/apps/resources *.md
 recursive-include recoco/sql/ *.sql
-recursive-include recoco *.html
+recursive-include recoco/apps/ *.html
+recursive-include recoco/templates *.html
