@@ -1,39 +1,42 @@
-import projects from '../../../../fixtures/projects/projects.json'
-import tasks from '../../../../fixtures/projects/tasks.json'
-import users from '../../../../fixtures/users/users.json'
+import projects from '../../../../fixtures/projects/projects.json';
+import tasks from '../../../../fixtures/projects/tasks.json';
+import users from '../../../../fixtures/users/users.json';
 
 const currentProject = projects[1];
-const task3 = tasks[2]
-const currentUser = users[1]
-
+const task3 = tasks[2];
+const currentUser = users[1];
 
 describe('I can go tasks tab', () => {
-    beforeEach(() => {
-        cy.login("jean");
-    })
+  beforeEach(() => {
+    cy.login('jean');
+    cy.createTask(task3.fields.intent);
+  });
 
-    it('posts a followup', () => {
-        cy.visit(`/project/${currentProject.pk}`)
-        cy.contains('Recommandations').click({ force: true })
-        cy.url().should('include', '/actions')
+  it('posts a followup', () => {
+    cy.visit(`/project/${currentProject.pk}`);
+    cy.contains('Recommandations').click({ force: true });
+    cy.url().should('include', '/actions');
 
-        cy.get('[data-test-id="list-tasks-switch-button"]').should('have.class', 'active')
+    cy.get('[data-test-id="list-tasks-switch-button"]').should(
+      'have.class',
+      'active'
+    );
 
-        cy.createTask(task3.fields.intent);
-        cy.contains(task3.fields.intent).click({ force: true })
-        cy.contains(task3.fields.intent)
+    cy.createTask(task3.fields.intent);
+    cy.contains(task3.fields.intent).click({ force: true });
+    cy.contains(task3.fields.intent);
 
-        const now = new Date();
+    const now = new Date();
 
-        cy.get('.ProseMirror p').then(($el) => {
-            const el = $el.get(0) //native DOM element
-            el.innerHTML = `test ${now}`
-        })
+    cy.get('.ProseMirror p').then(($el) => {
+      const el = $el.get(0); //native DOM element
+      el.innerHTML = `test ${now}`;
+    });
 
-        cy.contains('Enregistrer').click({ force: true })
-        cy.contains(`${currentUser.fields.first_name}`)
-        cy.contains(`${currentUser.fields.last_name}`)
+    cy.contains('Envoyer').click({ force: true });
+    cy.contains(`${currentUser.fields.first_name}`);
+    cy.contains(`${currentUser.fields.last_name}`);
 
-        cy.contains(`test ${now}`)
-    })
-})
+    cy.contains(`test ${now}`);
+  });
+});
