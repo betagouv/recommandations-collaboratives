@@ -1,7 +1,8 @@
 from django import template
 
 from .. import utils
-from ..models import Choice
+from ..models import Choice, Answer
+
 
 register = template.Library()
 
@@ -30,3 +31,11 @@ def lookup_choices_from_answer(answer):
             pass
 
     return choices
+
+
+@register.simple_tag
+def question_answer(session, question):
+    try:
+        return Answer.objects.get(question=question, session=session)
+    except Answer.DoesNotExist:
+        return None
