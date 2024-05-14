@@ -1,29 +1,37 @@
 import pytest
 from django.urls import reverse
-from django.contrib.sites.shortcuts import get_current_site
-from model_bakery import baker
-
 from django.contrib.auth import get_user_model
+from django.conf import settings
+from model_bakery import baker
+import jwt
 
 
 @pytest.mark.django_db
 def test_obtain_token(client, request):
-    User = get_user_model()
-    user = baker.make(User, email="anakin@skywalker.com")
+    user = baker.make(
+        get_user_model(),
+        email="anakin.skywalker@example.com",
+        first_name="Anakin",
+        last_name="Skywalker",
+    )
     user.set_password("maytheforcebewithyou")
-
-    current_site = get_current_site(request)
-    assert User.objects.filter(profile__sites=current_site).count() == 0
+    user.save()
 
     token_url = reverse("api_token")
-    payload = {"username": "anakin@skywalker.com", "password": "maytheforcebewithyou"}
-
-    response = client.post(token_url, data=payload)
-    assert response.status_code == 401, response.data
-
-    user.profile.sites.add(current_site)
-    assert User.objects.filter(profile__sites=current_site).count() == 1
+    payload = {
+        "username": "anakin.skywalker@example.com",
+        "password": "maytheforcebewithyou",
+    }
 
     response = client.post(token_url, data=payload)
     assert response.status_code == 200, response.data
-    assert response.json["token"]
+    token = response.json()["access"]
+
+    decoded_token = jwt.decode(
+        jwt=token,
+        key=settings.SECRET_KEY,
+        algorithms=["HS256"],
+    )
+    assert decoded_token["first_name"] == "Anakin"
+    assert decoded_token["last_name"] == "Skywalker"
+    assert decoded_token["email"] == "anakin.skywalker@example.com"

@@ -29,7 +29,6 @@ from recoco.apps.tasks.urls import urlpatterns as tasks_urls
 from recoco.apps.resources.urls import urlpatterns as resources_urls
 from recoco.apps.resources import rest as resources_rest
 from recoco.apps.survey.urls import urlpatterns as survey_urls
-from recoco.apps.tasks.urls import urlpatterns as tasks_urls
 
 # Rest
 # router = routers.DefaultRouter()
