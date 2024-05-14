@@ -5,9 +5,9 @@ from rest_framework import routers
 from recoco.apps.addressbook import rest as addressbook_rest
 from recoco.apps.geomatics import rest as geomatics_rest
 from recoco.apps.projects.views import rest as projects_rest
-from recoco.apps.resources import views as resources_views
 from recoco.apps.tasks.views import rest as tasks_rest
 from recoco.apps.training import rest as training_rest
+from recoco.apps.resources import rest as resources_rest
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 router = routers.DefaultRouter()
@@ -29,7 +29,7 @@ router.register(
 )
 router.register(
     r"resources",
-    resources_views.ResourceViewSet,
+    resources_rest.ResourceViewSet,
     basename="resources",
 )
 router.register(
@@ -95,12 +95,12 @@ auth_urls = [
     path(
         "token/",
         TokenObtainPairView.as_view(),
-        name="api_token",
+        name="token",
     ),
     path(
         "token/refresh/",
         TokenRefreshView.as_view(),
-        name="api_token_refresh",
+        name="token-refresh",
     ),
 ]
 

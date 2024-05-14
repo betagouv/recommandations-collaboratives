@@ -27,45 +27,8 @@ from recoco.apps.onboarding.urls import urlpatterns as onboarding_urls
 from recoco.apps.projects.urls import urlpatterns as projects_urls
 from recoco.apps.tasks.urls import urlpatterns as tasks_urls
 from recoco.apps.resources.urls import urlpatterns as resources_urls
-from recoco.apps.resources import rest as resources_rest
 from recoco.apps.survey.urls import urlpatterns as survey_urls
 
-# Rest
-# router = routers.DefaultRouter()
-
-# router.register(
-#     r"projects/(?P<project_id>[^/.]+)/tasks/(?P<task_id>[^/.]+)/followups",
-#     tasks_rest.TaskFollowupViewSet,
-#     basename="project-tasks-followups",
-# )
-
-# router.register(
-#     r"projects/(?P<project_id>[^/.]+)/tasks",
-#     tasks_rest.TaskViewSet,
-#     basename="project-tasks",
-# )
-
-# router.register(
-#     r"projects/(?P<project_id>[^/.]+)/tasks/(?P<task_id>[^/.]+)/notifications",
-#     tasks_rest.TaskNotificationViewSet,
-#     basename="project-tasks-notifications",
-# )
-
-# router.register(r"resources", resources_rest.ResourceViewSet, basename="resources")
-# router.register(
-#     r"departments", geomatics_rest.DepartmentViewSet, basename="departments"
-# )
-# router.register(r"regions", geomatics_rest.RegionViewSet, basename="regions")
-# router.register(r"communes", geomatics_rest.CommuneViewSet, basename="communes")
-# router.register(
-#     r"organizations", addressbook_rest.OrganizationViewSet, basename="organizations"
-# )
-# router.register(r"topics", projects_rest.TopicViewSet, basename="topics")
-# router.register(
-#     r"challenges/definitions",
-#     training_rest.ChallengeDefinitionViewSet,
-#     basename="challenge-definitions",
-# )
 
 urlpatterns = [
     path("api/", include(rest_api_urls)),

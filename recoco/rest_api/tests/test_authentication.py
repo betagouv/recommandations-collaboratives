@@ -17,7 +17,7 @@ def test_obtain_token(client, request):
     user.set_password("maytheforcebewithyou")
     user.save()
 
-    token_url = reverse("api_token")
+    token_url = reverse("token")
     payload = {
         "username": "anakin.skywalker@example.com",
         "password": "maytheforcebewithyou",
