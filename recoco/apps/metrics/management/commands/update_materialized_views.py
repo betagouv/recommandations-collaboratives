@@ -31,7 +31,7 @@ class Command(BaseCommand):
                 for spec in settings.MATERIALIZED_VIEWS_SPEC:
                     try:
                         materialized_view = MaterializedView.create_for_site(
-                            site_id=site.id, spec=spec
+                            site=site, spec=spec
                         )
                     except MaterializedViewSpecError as err:
                         self.stdout.write(self.style.ERROR(str(err)))
