@@ -16,6 +16,8 @@ from django.shortcuts import get_object_or_404, redirect, render, reverse
 from django.template.loader import render_to_string
 from django.utils.http import urlencode
 from django.views.generic import FormView
+from allauth.account.views import LoginView
+
 
 from recoco.apps.addressbook import models as addressbook
 from recoco.apps.communication import constants as communication_constants
@@ -42,6 +44,13 @@ from recoco.utils import (
 )
 
 from . import forms, models
+
+
+class OnboardingLogin(LoginView):
+    """Allauth login view overriden to match onboarding style"""
+
+    template_name = "onboarding/onboarding-signin.html"
+
 
 ########################################################################
 # User driven onboarding for a new project

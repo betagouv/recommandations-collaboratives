@@ -18,6 +18,11 @@ urlpatterns = [
         name="onboarding",
     ),
     path(
+        r"onboarding/signin",
+        views.OnboardingLogin.as_view(),
+        name="onboarding-signin",
+    ),
+    path(
         r"onboarding/signup",
         views.onboarding_signup,
         name="onboarding-signup",
