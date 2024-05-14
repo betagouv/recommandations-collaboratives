@@ -28,9 +28,13 @@ from sesame.utils import get_query_string
 from recoco.apps.home.models import SiteConfiguration
 
 
+def make_site_slug(site: Site):
+    return site.domain.translate(str.maketrans("-.", "__")).lower()
+
+
 def make_group_name_for_site(name: str, site: Site) -> str:
     """Make a group label usable by django for the given site"""
-    prefix = site.domain.translate(str.maketrans("-.", "__")).lower()
+    prefix = make_site_slug(site)
     return f"{prefix}_{name}"
 
 

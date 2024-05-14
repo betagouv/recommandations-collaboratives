@@ -7,7 +7,7 @@ from typing import Any
 from django.conf import settings
 from dataclasses import dataclass
 
-from recoco.utils import make_group_name_for_site
+from recoco.utils import make_site_slug
 
 
 class MaterializedViewSpecError(Exception):
@@ -69,7 +69,7 @@ class MaterializedView:
 
     @property
     def db_schema_name(self) -> str:
-        site_slug = make_group_name_for_site(name="schema", site=self.site)
+        site_slug = make_site_slug(site=self.site)
         return f"metrics_{site_slug}"
 
     def set_cursor(self, cursor: CursorWrapper | None) -> None:
