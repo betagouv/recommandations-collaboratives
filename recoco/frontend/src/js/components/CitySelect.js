@@ -7,7 +7,7 @@ import {
 
 Alpine.data('CitySearch', CitySearch);
 
-function CitySearch(required = false, requestMethod = 'GET') {
+function CitySearch(required = false, requestMethod = 'GET', dsfr = false) {
   return {
     // other default properties
     isLoading: false,
@@ -17,8 +17,12 @@ function CitySearch(required = false, requestMethod = 'GET') {
     currentPostal: null,
     currentInsee: null,
     requestMethod: requestMethod,
+    dsfr: dsfr,
 
     init() {
+      if (!this.$refs.postcode || !this.$refs.insee) {
+        return;
+      }
       ['focusout', 'input'].forEach((event) => {
         this.$refs.postcode.addEventListener(event, (e) => {
           const errors = required && e.target.value.length < 5;
@@ -45,7 +49,12 @@ function CitySearch(required = false, requestMethod = 'GET') {
       });
     },
     validateData(submittedForm = false) {
-      if (this.required && (this.requestMethod === 'POST' || submittedForm)) {
+      if (
+        this.$refs.postcode &&
+        this.$refs.insee &&
+        this.required &&
+        (this.requestMethod === 'POST' || submittedForm)
+      ) {
         addClassIfNotExists(
           this.$refs.postcode.parentElement,
           `fr-input-group--${this.$refs.postcode.value ? 'valid' : 'error'}`
@@ -75,7 +84,7 @@ function CitySearch(required = false, requestMethod = 'GET') {
         .then((data) => {
           this.isLoading = false;
           this.cities = data;
-          if (this.cities.length == 1) {
+          if (dsfr && this.cities.length == 1) {
             removeAndAddClassConditionaly(
               true,
               this.$refs.insee.parentElement,

@@ -1,53 +1,52 @@
+import project from '../../../fixtures/projects/project.json';
+import communes from '../../../fixtures/geomatics/commune.json';
+
+const projectCommune = communes.find(
+  (c) => c.fields.postal == project.postcode
+);
+
 describe('I cant create a projetc if the postal cities are empty', () => {
-    beforeEach(() => {
-        cy.login('bob');
-    });
+  beforeEach(() => {
+    cy.login('bob');
+  });
 
-    it('goes to the onboarding page and trigger an error if the postal is set but returns 0 cities', () => {
-        cy.visit('/');
+  it('goes to the onboarding page and trigger an error if the postal is set but returns 0 cities', () => {
+    cy.visit('/');
 
-        cy.get('a')
-            .should('have.class', 'fr-btn fr-text--xl custom-button')
-            .contains('Solliciter example')
-            .click({ force: true });
+    cy.get('[data-test-id="button-need-help"]')
+      .contains('Solliciter')
+      .click({ force: true });
 
-        cy.url().should('include', '/onboarding/');
+    cy.url().should('include', '/onboarding/project');
 
-        cy.get('#id_name')
-            .type('fake project name', { force: true })
-            .should('have.value', 'fake project name');
+    cy.get('#id_name')
+      .should('not.have.class', 'fr-input--error')
+      .type(project.name)
+      .should('have.value', project.name)
+      .should('have.class', 'fr-input--valid');
 
-        cy.get('#input-project-address')
-            .type('143 rue fake', { force: true })
-            .should('have.value', '143 rue fake');
+    cy.get('#id_location')
+      .should('not.have.class', 'fr-input--error')
+      .type(project.location)
+      .should('have.value', project.location)
+      .should('have.class', 'fr-input--valid');
 
-        cy.get('[name=postcode]')
-            .type('qsdze', { force: true })
-            .should('have.value', 'qsdze');
+    cy.get('#id_description')
+      .should('not.have.class', 'fr-input--error')
+      .type(project.description)
+      .should('have.value', project.description)
+      .should('have.class', 'fr-input--valid');
 
-        cy.get('#input-project-description')
-            .type('Fake project description', { force: true })
-            .should('have.value', 'Fake project description');
+    cy.get('button[type="submit"]').click();
 
-        cy.get('#id_response_1')
-            .type('Fake project description precision', { force: true })
-            .should('have.value', 'Fake project description precision');
+    cy.url().should('include', '/onboarding/project');
 
-        cy.get('#id_response_2_0').check({ force: true });
+    cy.get('[data-test-id="input-postcode"]')
+      .parent()
+      .should('have.class', 'fr-input-group--error');
 
-        cy.document().then((doc) => {
-            var iframe = doc
-                .getElementById('id_captcha')
-                .querySelector('iframe');
-            var innerDoc =
-                iframe.contentDocument || iframe.contentWindow.document;
-            innerDoc.querySelector('.recaptcha-checkbox').click();
-        });
-
-        cy.wait(500);
-
-        cy.contains('Envoyer ma demande').click({ force: true });
-
-        cy.contains('Aucune commune trouvée, vérifiez le code postal ?');
-    });
+    cy.get('[data-test-id="select-city"]')
+      .parent()
+      .should('have.class', 'fr-select-group--error');
+  });
 });
