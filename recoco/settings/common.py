@@ -83,6 +83,7 @@ INSTALLED_APPS = [
     "recoco.apps.crm",
     "recoco.apps.training",
     "recoco.apps.pages",
+    "recoco.apps.metrics",
     "crispy_forms",
     "wagtail.contrib.forms",
     "wagtail.contrib.redirects",
@@ -345,5 +346,11 @@ WAGTAIL_PASSWORD_MANAGEMENT_ENABLED = False
 WAGTAIL_EMAIL_MANAGEMENT_ENABLED = False
 
 # WAGTAILADMIN_BASE_URL = define that
+
+# Materialized views
+MATERIALIZED_VIEWS_SPEC = []
+MATERIALIZED_VIEWS_SQL_DIR = BASE_DIR / "apps/metrics/sql_queries"
+MATERIALIZED_VIEWS_PREFIX = "mv"
+
 
 # eof
