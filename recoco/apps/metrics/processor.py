@@ -5,6 +5,8 @@ from django.db.models import QuerySet
 from typing import Any
 from django.conf import settings
 from dataclasses import dataclass
+from django.contrib.sites.models import Site
+from recoco.utils import make_group_name_for_site
 
 
 class MaterializedViewSpecError(Exception):
@@ -23,7 +25,7 @@ class MaterializedViewSqlQuery:
 
 
 class MaterializedView:
-    site_id: int
+    site: Site
     name: str
     cursor: CursorWrapper
     indexes: list[str]
@@ -31,12 +33,12 @@ class MaterializedView:
 
     def __init__(
         self,
-        site_id: int,
+        site: Site,
         name: str,
         indexes: list[str] = None,
         unique_indexes: list[str] = None,
     ):
-        self.site_id = site_id
+        self.site = site
         self.name = name
         self.cursor = None
         self.indexes = indexes or []
@@ -44,10 +46,10 @@ class MaterializedView:
 
     @classmethod
     def create_for_site(
-        cls, site_id: int, spec: dict[str, Any], check_sql_query: bool = True
+        cls, site: Site, spec: dict[str, Any], check_sql_query: bool = True
     ) -> "MaterializedView":
         try:
-            materialized_view = MaterializedView(site_id, **spec)
+            materialized_view = MaterializedView(site, **spec)
         except TypeError:
             raise MaterializedViewSpecError(
                 f"Invalid materialized view specification '{spec}'"
@@ -62,7 +64,12 @@ class MaterializedView:
 
     @property
     def db_view_name(self) -> str:
-        return f"{settings.MATERIALIZED_VIEWS_PREFIX}_{self.site_id}_{self.name}"
+        return f"{settings.MATERIALIZED_VIEWS_PREFIX}_{self.name}"
+
+    @property
+    def db_schema_name(self) -> str:
+        site_slug = make_group_name_for_site(name="schema", site=self.site)
+        return f"metrics_{site_slug}"
 
     def set_cursor(self, cursor: CursorWrapper | None) -> None:
         self.cursor = cursor
@@ -82,7 +89,7 @@ class MaterializedView:
             return None
 
         try:
-            queryset = module.get_queryset(site_id=self.site_id)
+            queryset = module.get_queryset(site_id=self.site.id)
         except AttributeError:
             return None
 
@@ -96,7 +103,7 @@ class MaterializedView:
             return None
 
         with open(sql_file, "r") as f:
-            return MaterializedViewSqlQuery(sql=f.read(), params=(self.site_id,))
+            return MaterializedViewSqlQuery(sql=f.read(), params=(self.site.id,))
 
     def get_sql_query(self) -> MaterializedViewSqlQuery | None:
         return self.get_django_sql_query() or self.get_raw_sql_query()
@@ -106,23 +113,33 @@ class MaterializedView:
         if sql_query is None:
             return
 
+        # Create the schema if it does not exist
+        self.cursor.execute(sql=f"CREATE SCHEMA IF NOT EXISTS {self.db_schema_name};")
+
+        # Create the materialized view
         self.cursor.execute(
-            sql=f"CREATE MATERIALIZED VIEW {self.db_view_name} AS ( {sql_query.sql} ) WITH NO DATA;",
+            sql=f"CREATE MATERIALIZED VIEW {self.db_schema_name}.{self.db_view_name} AS ( {sql_query.sql} ) WITH NO DATA;",
             params=sql_query.params,
         )
 
+        # Create indexes if any
         for index in self.indexes:
-            self.cursor.execute(sql=f"CREATE INDEX ON {self.db_view_name} ({index});")
+            self.cursor.execute(
+                sql=f"CREATE INDEX ON {self.db_schema_name}.{self.db_view_name} ({index});"
+            )
 
+        # Create unique indexes if any
         for index in self.unique_indexes:
             self.cursor.execute(
-                sql=f"CREATE UNIQUE INDEX ON {self.db_view_name} ({index});"
+                sql=f"CREATE UNIQUE INDEX ON {self.db_schema_name}.{self.db_view_name} ({index});"
             )
 
     def drop(self) -> None:
         self.cursor.execute(
-            sql=f"DROP MATERIALIZED VIEW IF EXISTS {self.db_view_name};"
+            sql=f"DROP MATERIALIZED VIEW IF EXISTS {self.db_schema_name}.{self.db_view_name};"
         )
 
     def refresh(self) -> None:
-        self.cursor.execute(sql=f"REFRESH MATERIALIZED VIEW {self.db_view_name};")
+        self.cursor.execute(
+            sql=f"REFRESH MATERIALIZED VIEW {self.db_schema_name}.{self.db_view_name};"
+        )
