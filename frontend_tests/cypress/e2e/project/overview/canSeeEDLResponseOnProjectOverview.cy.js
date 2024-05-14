@@ -13,7 +13,7 @@ describe('I can see onboarding answer on the overview tab', () => {
     cy.logout();
   });
 
-  it.skip('should see the project description on overview tab as staff', () => {
+  it('should see the project description on overview tab as staff', () => {
     cy.login('staff');
     cy.visit('/projects');
     cy.contains(projectName).first().click({ force: true });
@@ -33,5 +33,5 @@ describe('I can see onboarding answer on the overview tab', () => {
     );
   });
 
-  // TODO fixture for complete questions onboarding
+  // TODO add fixture for complete questions onboarding
 });
