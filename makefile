@@ -53,4 +53,10 @@ safe:
 	pre-commit run --all-files bandit
 	semgrep --config=p/ci recoco
 
+runserver:
+	@python manage.py runserver 0.0.0.0:8000
+
+runworker:
+	@celery -A recoco.worker worker -l info -Q webhooks
+
 # eof

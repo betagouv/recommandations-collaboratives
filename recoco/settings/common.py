@@ -391,4 +391,25 @@ MATERIALIZED_VIEWS_SPEC = [
 MATERIALIZED_VIEWS_SQL_DIR = BASE_DIR / "apps/metrics/sql_queries"
 MATERIALIZED_VIEWS_PREFIX = "mv"
 
+# Celery
+# https://docs.celeryproject.org/en/stable/userguide/configuration.html
+CELERY_TIMEZONE = "Europe/Paris"
+CELERY_TASK_TRACK_STARTED = True
+CELERY_TASK_TIME_LIMIT = 30 * 60
+CELERY_BROKER_URL = "redis://localhost:6379/0"
+CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
+
+# Webhook
+INSTALLED_APPS += [
+    "django_webhook",
+    "recoco.apps.webhook",
+]
+DJANGO_WEBHOOK = {
+    "MODELS": [
+        "projects.Project",
+    ],
+    "SIGNAL_LISTENER": "recoco.apps.webhook.signals.WebhookSignalListener",
+    "USE_CACHE": False,
+}
+
 # eof
