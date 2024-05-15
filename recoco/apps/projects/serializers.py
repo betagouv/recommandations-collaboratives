@@ -41,10 +41,7 @@ class ProjectSerializer(serializers.HyperlinkedModelSerializer):
             "updated_on",
             "org_name",
             "switchtenders",
-            "is_switchtender",
-            "is_observer",
             "commune",
-            "notifications",
             "recommendation_count",
             "public_message_count",
             "private_message_count",
@@ -148,6 +145,7 @@ class ProjectForListSerializer(serializers.BaseSerializer):
         return {
             "id": data.id,
             "name": data.name,
+            "description": data.description,
             "org_name": data.org_name,
             "status": data.status,
             "inactive_since": data.inactive_since,

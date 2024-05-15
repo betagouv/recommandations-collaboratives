@@ -412,4 +412,18 @@ CELERY_RESULT_BACKEND = "django-db"
 METABASE_HOST = os.environ.get("METABASE_HOST")
 METABASE_API_KEY = os.environ.get("METABASE_API_KEY")
 
+# Webhook
+INSTALLED_APPS += [
+    "django_webhook",
+    "recoco.apps.webhook",
+]
+DJANGO_WEBHOOK = {
+    "MODELS": [
+        "projects.Project",
+        "survey.Answer",
+    ],
+    "SIGNAL_LISTENER": "recoco.apps.webhook.signals.WebhookSignalListener",
+    "USE_CACHE": False,
+}
+
 # eof

@@ -24,6 +24,7 @@ class QuestionSerializer(serializers.ModelSerializer):
             "id",
             "text",
             "text_short",
+            "slug",
             "is_multiple",
             "choices",
         ]
