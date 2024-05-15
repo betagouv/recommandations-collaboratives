@@ -23,7 +23,9 @@ class Command(BaseCommand):
 
     def _create_views_for_site(self, site: Site, **options: Any):
         self.stdout.write(
-            f"Updating materialized views for site {site.name} (#{site.id})"
+            self.style.SUCCESS(
+                f"Updating materialized views for site {site.name} (#{site.id})"
+            )
         )
 
         with connection.cursor() as cursor:
@@ -38,6 +40,9 @@ class Command(BaseCommand):
                         continue
 
                     materialized_view.set_cursor(cursor)
+                    self.stdout.write(
+                        f"Schema name: '{materialized_view.db_schema_name}'"
+                    )
 
                     self.stdout.write(
                         f"Dropping materialized view '{materialized_view.db_view_name}'"
@@ -58,3 +63,4 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         for site in Site.objects.order_by("id"):
             self._create_views_for_site(site, **options)
+            self.stdout.write("")

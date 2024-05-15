@@ -348,8 +348,14 @@ WAGTAIL_EMAIL_MANAGEMENT_ENABLED = False
 # WAGTAILADMIN_BASE_URL = define that
 
 # Materialized views
-MATERIALIZED_VIEWS_SPEC = []
 MATERIALIZED_VIEWS_SQL_DIR = BASE_DIR / "apps/metrics/sql_queries"
 MATERIALIZED_VIEWS_PREFIX = "mv"
+
+MATERIALIZED_VIEWS_SPEC = [
+    {
+        "name": "switchtenders_conn_per_day",
+        "unique_indexes": ["last_login_day"],
+    },
+]
 
 # eof
