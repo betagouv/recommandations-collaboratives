@@ -139,10 +139,6 @@ class TestMaterializedView:
 
         with connection.cursor() as cursor:
             cursor.execute(
-                "SELECT COUNT(*) FROM pg_matviews WHERE matviewname = 'mv_view_test_django_qs' AND schemaname = 'metrics_example_com';"
-            )
-            assert cursor.fetchone()[0] == 0
-            cursor.execute(
-                "SELECT COUNT(*) FROM pg_matviews WHERE matviewname = 'mv_view_test_raw_sql' AND schemaname = 'metrics_example_com';"
+                "SELECT COUNT(*) FROM pg_matviews WHERE schemaname = 'metrics_example_com';"
             )
             assert cursor.fetchone()[0] == 0

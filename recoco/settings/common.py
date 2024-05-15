@@ -354,7 +354,7 @@ MATERIALIZED_VIEWS_PREFIX = "mv"
 MATERIALIZED_VIEWS_SPEC = [
     {
         "name": "switchtenders_conn_per_day",
-        "unique_indexes": ["last_login_day"],
+        "unique_indexes": ["day"],
     },
 ]
 

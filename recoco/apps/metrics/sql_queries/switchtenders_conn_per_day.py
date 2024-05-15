@@ -11,8 +11,8 @@ def get_queryset(site_id: int) -> QuerySet:
         .objects.filter(
             projects_switchtended_on_site__site_id=site_id,
         )
-        .annotate(last_login_day=F("last_login__date"))
-        .values("last_login_day")
-        .order_by("-last_login_day")
+        .annotate(day=F("last_login__date"))
+        .values("day")
+        .order_by("-day")
         .annotate(count=Count("id", distinct=True))
     )
