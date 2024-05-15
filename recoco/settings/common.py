@@ -353,6 +353,14 @@ MATERIALIZED_VIEWS_PREFIX = "mv"
 
 MATERIALIZED_VIEWS_SPEC = [
     {
+        "name": "project_members_conn_per_day",
+        "unique_indexes": ["day"],
+    },
+    {
+        "name": "projects_in_activity_per_day",
+        "unique_indexes": ["day"],
+    },
+    {
         "name": "switchtenders_conn_per_day",
         "unique_indexes": ["day"],
     },
