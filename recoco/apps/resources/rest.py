@@ -1,6 +1,6 @@
 from django.contrib.sites.shortcuts import get_current_site
 from rest_framework import permissions, viewsets
-from urbanvitaliz.utils import has_perm
+from recoco.utils import has_perm
 from .serializers import ResourceSerializer
 from . import models
 
