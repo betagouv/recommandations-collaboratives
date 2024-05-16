@@ -20,7 +20,7 @@ from recoco.apps.geomatics import models as geomatics
 from recoco.apps.projects import models as projects_models
 from recoco.utils import login
 
-from . import models
+from .. import models
 
 ########################################################################
 # resources

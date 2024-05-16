@@ -39,7 +39,7 @@ def test_anonymous_can_see_resources_list_api(request):
 
 @pytest.mark.django_db
 def test_anonymous_cannot_see_unpublished_resource_in_list_api(request):
-    resource = Recipe(
+    Recipe(
         models.Resource,
         sites=[get_current_site(request)],
         status=models.Resource.TO_REVIEW,
