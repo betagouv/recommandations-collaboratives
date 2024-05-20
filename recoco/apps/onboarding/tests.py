@@ -27,7 +27,7 @@ def test_onboarding_page_without_login_redirects_to_signin(request, client):
     response = client.get(url, follow=True)
     last_url, status_code = response.redirect_chain[-1]
     assert status_code == 302
-    assert last_url == reverse("account_login")
+    assert last_url == reverse("onboarding-signin")
 
 
 @pytest.mark.django_db
@@ -64,7 +64,7 @@ def test_onboarding_with_existing_account_redirects_to_signin(request, client):
     response = client.post(reverse("onboarding"), data=data, follow=True)
     last_url, status_code = response.redirect_chain[-1]
     assert status_code == 302
-    assert last_url.startswith(reverse("account_login"))
+    assert last_url.startswith(reverse("onboarding-signin"))
 
 
 @pytest.mark.django_db
@@ -172,7 +172,7 @@ def test_performing_onboarding_signup_with_existing_user_redirects_to_signin(
     response = client.post(reverse("onboarding-signup"), data=data, follow=True)
     last_url, status_code = response.redirect_chain[-1]
     assert status_code == 302
-    assert last_url.startswith(reverse("account_login"))
+    assert last_url.startswith(reverse("onboarding-signin"))
 
     assert auth.User.objects.count() == user_count
 

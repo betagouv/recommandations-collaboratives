@@ -69,22 +69,21 @@ class OnboardingView(FormView):
         return super().dispatch(request, *args, **kwargs)
 
     def get(self, request, *args, **kwargs):
-        return redirect(reverse("account_login"))
+        return redirect(reverse("onboarding-signin"))
 
     def form_valid(self, form):
         self.request.session["onboarding_email"] = form.cleaned_data["email"]
-
         try:
             auth.User.objects.get(email=form.cleaned_data["email"])
             next_args = urlencode({"next": reverse("onboarding-project")})
-            login_url = reverse("account_login")
+            login_url = reverse("onboarding-signin")
             return redirect(f"{login_url}?{next_args}")
         except auth.User.DoesNotExist:
             signup_url = reverse("onboarding-signup")
             return redirect(signup_url)
 
     def form_invalid(self, form):
-        return redirect(reverse("account_login"))
+        return redirect(reverse("onboarding-signin"))
 
 
 def onboarding_signup(request):
