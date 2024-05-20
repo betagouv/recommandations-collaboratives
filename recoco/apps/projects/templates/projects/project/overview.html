@@ -154,7 +154,7 @@
                             </ul>
                             {% if "invite_collaborators" in user_project_perms %}
                                 <div class="d-block mb-2 mt-3">
-                                    <a style="cursor: pointer"
+                                    <button style="cursor: pointer"
                                        @click="openInviteMemberModal"
                                        data-toggle="modal"
                                        data-target="#InviteMemberModal"
@@ -166,7 +166,7 @@
                                             &nbsp;
                                         {% endif %}
                                         <span>Inviter un membre de la collectivité</span>
-                                    </a>
+                                    </button>
                                 </div>
                             {% endif %}
                         </div>
@@ -182,7 +182,7 @@
                             </ul>
                             {% if "invite_advisors" in user_project_perms or is_regional_actor %}
                                 <div class="d-block mb-2 mt-3">
-                                    <a style="cursor: pointer"
+                                    <button style="cursor: pointer"
                                        @click="openInviteSwitchtenderModal"
                                        data-toggle="modal"
                                        data-target="#InviteSwitchtenderModal"
@@ -194,7 +194,7 @@
                                             &nbsp;
                                         {% endif %}
                                         <span>Inviter un conseiller</span>
-                                    </a>
+                                        </button>
                                 </div>
                             {% endif %}
                         </div>
