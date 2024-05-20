@@ -113,7 +113,8 @@ def onboarding_signup(request):
 
         if not is_new_user:
             # user exists but is not currently logged in,
-            login_url = reverse("account_login")
+            request.session["onboarding_email"] = email
+            login_url = reverse("onboarding-signin")
             next_args = urlencode({"next": reverse("onboarding-project")})
             return redirect(f"{login_url}?{next_args}")
 
