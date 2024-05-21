@@ -51,6 +51,18 @@ class OnboardingLogin(LoginView):
 
     template_name = "onboarding/onboarding-signin.html"
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        current_site = self.request.site.name
+        # FIXME: is it possible to do it in a more dynamic way?
+        excluded_sites = ["Bac à Sable Recoconseil", "Reco-Conseil", current_site]
+        all_sites = sites.Site.objects.exclude(name__in=excluded_sites).values_list(
+            "name", flat=True
+        )
+
+        context["sites"] = all_sites
+        return context
+
 
 ########################################################################
 # User driven onboarding for a new project

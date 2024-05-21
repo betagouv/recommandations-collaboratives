@@ -63,20 +63,27 @@
                             {% csrf_token %}
                             {% if redirect_field_value %}
                                 <input type="hidden"
-                                        name="js_enabled"
-                                        id="onboarding-login-form_js_enabled"
-                                        value="false">
-                                <input type="hidden"
                                     name="{{ redirect_field_name }}"
                                     value="{{ redirect_field_value }}" />
                             {% endif %}
+                            <input type="hidden"
+                                        name="js_enabled"
+                                        id="onboarding-login-form_js_enabled"
+                                        value="false">
                             <fieldset class="fr-fieldset">
                                 <legend class="fr-fieldset__legend" style="font-size:1.5rem">Vous avez dejà un compte ? Identifiez-vous !</legend>
-
+                                    <div class="mx-2 custom-callout-blue">
+                                        Pour vous connecter à {{ request.site.name }}, utilisez le même compte que sur
+                                        {% for site in sites %}
+                                            {% if not forloop.first and not forloop.last %}, {% endif %}
+                                            {% if forloop.last %}ou {% endif %}
+                                            {{ site }}
+                                    {% endfor %} si vous en avez un.
+                                    </div>
                                     <div id="field_id_login" data-test="" class="fr-fieldset__element">
                                         <div class="fr-input-group" :class="`fr-input-group--${form['login'].valid_class}`">
                                             <label for="id_login" class="fr-label">E-mail</label>
-                                    <input value="{{ request.session.onboarding_email }}" x-ref="login" @input="changeInput" @focus="touchInput" @blur="validateInput" id="id_login" name="login" type="email" data-test="" class="fr-input fr-input--undefined" :class="`fr-input--${form['login'].valid_class}`" aria-describedby="id_login-desc-undefined" :aria-describedby="`id_login-desc-${form['login'].valid_class}`" required="" maxlength="320">
+                                    <input value="{% if request.session.onboarding_email %}{{ request.session.onboarding_email }}{% else %}{% endif %}" x-ref="login" @input="changeInput" @focus="touchInput" @blur="validateInput" id="id_login" name="login" type="email" data-test="" class="fr-input fr-input--undefined" :class="`fr-input--${form['login'].valid_class}`" aria-describedby="id_login-desc-undefined" :aria-describedby="`id_login-desc-${form['login'].valid_class}`" required="" maxlength="320">
                                           <ul x-show="fieldHasError('login')" class="fr-messages-group" id="id_login-desc-error" aria-live="polite">
                                             <template x-for="(error, index) in form['login'].errors" :key="index">
                                               <!-- Display client-side validation errors here -->
