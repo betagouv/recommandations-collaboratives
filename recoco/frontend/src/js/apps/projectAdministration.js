@@ -1,3 +1,3 @@
-import '../components/CitySelect'
-import '../components/ProjectShare'
-import '../components/StandByProject'
+import '../components/CitySelect';
+import '../components/ProjectShare';
+import '../components/StandByProject';

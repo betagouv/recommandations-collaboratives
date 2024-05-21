@@ -1,1 +1,1 @@
-export const NO_TOPICS = "Tous sujets";
+export const NO_TOPICS = 'Tous sujets';

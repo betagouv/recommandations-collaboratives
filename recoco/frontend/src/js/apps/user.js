@@ -1,2 +1,2 @@
-import '../../css/user.css'
-import '../components/User'
+import '../../css/user.css';
+import '../components/User';

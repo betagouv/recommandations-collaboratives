@@ -5,10 +5,10 @@ export default {
 	output: {
 		dir: './dist/',
 		format: 'esm',
-		assetFileNames: '[name][extname]'
+		assetFileNames: '[name][extname]',
 	},
 	plugins: [copy({ patterns: '**/*.{woff,woff2}', rootDir: './src/lib/' })],
 	watch: {
-		include: 'src/**'
-	}
+		include: 'src/**',
+	},
 };

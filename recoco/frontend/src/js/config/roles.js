@@ -1,8 +1,8 @@
 export const roles = {
-    switchtender : {
-        color: '#0063CB'
-    },
-    observer : {
-        color: '#27A658'
-    }
-}
+  switchtender: {
+    color: '#0063CB',
+  },
+  observer: {
+    color: '#27A658',
+  },
+};

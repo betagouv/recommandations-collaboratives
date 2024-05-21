@@ -1,1 +1,1 @@
-import '../components/ContactList'
+import '../components/ContactList';

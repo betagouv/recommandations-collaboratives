@@ -1,10 +1,10 @@
-import Alpine from 'alpinejs'
+import Alpine from 'alpinejs';
 import { isPlural } from '../utils/isPlural';
-import { gravatar_url } from '../utils/gravatar'
+import { gravatar_url } from '../utils/gravatar';
 
 Alpine.store('utils', {
-    isPlural,
-    gravatar_url
-})
+  isPlural,
+  gravatar_url,
+});
 
-export default Alpine.store('utils')
+export default Alpine.store('utils');

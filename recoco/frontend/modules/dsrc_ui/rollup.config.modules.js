@@ -24,19 +24,19 @@ export default {
 		),
 	},
 	output: {
-    dir: './dist/js/',
-    format: 'esm',
-   },
+		dir: './dist/js/',
+		format: 'esm',
+	},
 	plugins: [
 		resolve({
 			browser: true,
 		}),
 		terser(), // TODO: env based minification
-    commonjs({
-      include: /node_modules/,
-      requireReturnsDefault: 'auto',
-    }),
-    json()
+		commonjs({
+			include: /node_modules/,
+			requireReturnsDefault: 'auto',
+		}),
+		json(),
 	],
 	watch: {
 		include: 'src/**',

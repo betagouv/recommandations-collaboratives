@@ -1,2 +1,2 @@
-import '../components/WordCloud'
-import '../../css/wordCloud.css'
+import '../components/WordCloud';
+import '../../css/wordCloud.css';
