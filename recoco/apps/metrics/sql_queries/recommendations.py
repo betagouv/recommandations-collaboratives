@@ -16,7 +16,7 @@ def get_queryset(site_id: int) -> QuerySet:
         .annotate(status_name=display_value(Task.STATUS_CHOICES, "status"))
         .annotate(created_by_hash=hash_field("created_by", salt="user"))
         .annotate(
-            with_resource=Case(
+            has_resource=Case(
                 When(resource__isnull=True, then=False),
                 default=True,
                 output_field=BooleanField(),
@@ -50,7 +50,7 @@ def get_queryset(site_id: int) -> QuerySet:
             "member_comment_count",
             "advisor_comment_count",
             "visited",
-            "with_resource",
+            "has_resource",
             "topic__name",
         )
     )
