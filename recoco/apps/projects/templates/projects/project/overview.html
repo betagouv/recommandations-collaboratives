@@ -155,10 +155,10 @@
                             {% if "invite_collaborators" in user_project_perms %}
                                 <div class="d-block mb-2 mt-3">
                                     <button style="cursor: pointer"
-                                       @click="openInviteMemberModal"
-                                       data-toggle="modal"
-                                       data-target="#InviteMemberModal"
-                                       class="{% if project.status == 'DRAFT' %} disabled{% endif %} button d-inline-flex justify-content-center w-100">
+                                            @click="openInviteMemberModal"
+                                            data-toggle="modal"
+                                            data-target="#InviteMemberModal"
+                                            class="{% if project.status == 'DRAFT' %} disabled{% endif %} button d-inline-flex justify-content-center w-100">
                                         {% if project.status == 'DRAFT' %}
                                             <svg class="bi align-middle" width="18" height="18" fill="currentColor">
                                                 <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#lock-fill" />
@@ -183,10 +183,10 @@
                             {% if "invite_advisors" in user_project_perms or is_regional_actor %}
                                 <div class="d-block mb-2 mt-3">
                                     <button style="cursor: pointer"
-                                       @click="openInviteSwitchtenderModal"
-                                       data-toggle="modal"
-                                       data-target="#InviteSwitchtenderModal"
-                                       class="{% if project.status == 'DRAFT' %} disabled{% endif %} button d-inline-flex justify-content-center w-100">
+                                            @click="openInviteSwitchtenderModal"
+                                            data-toggle="modal"
+                                            data-target="#InviteSwitchtenderModal"
+                                            class="{% if project.status == 'DRAFT' %} disabled{% endif %} button d-inline-flex justify-content-center w-100">
                                         {% if project.status == 'DRAFT' %}
                                             <svg class="bi align-middle" width="18" height="18" fill="currentColor">
                                                 <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#lock-fill" />
@@ -194,7 +194,7 @@
                                             &nbsp;
                                         {% endif %}
                                         <span>Inviter un conseiller</span>
-                                        </button>
+                                    </button>
                                 </div>
                             {% endif %}
                         </div>

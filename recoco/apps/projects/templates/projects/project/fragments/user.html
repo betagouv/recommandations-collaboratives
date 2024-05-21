@@ -1,47 +1,49 @@
 {% load gravatar %}
 {% load static %}
-
 {% load guardian_tags %}
-
 {% get_obj_perms request.user for request.site as "user_site_perms" %}
 {% get_obj_perms request.user for project as "user_project_perms" %}
-
 <div class="d-flex flex-column align-items-start mb-2">
-        <!-- member -->
+    <!-- member -->
     {% if member %}
-            {% if member.first_name %}
-                <div class="w-100 d-flex align-items-center justify-content-between">
-                    <span class="me-2 d-flex align-items-center">
-                        <img class="rounded-circle me-2" src="{% gravatar_url member.email size=24 %}" alt="{{action.actor}}">
-                        <strong class="text-nowrap text-capitalize">
-                            {{ member.first_name }}
-                            {{ member.last_name }}
-                        </strong>
-                    </span>
-                    {% if 'use_crm' in user_site_perms %}
+        {% if member.first_name %}
+            <div class="w-100 d-flex align-items-center justify-content-between">
+                <span class="me-2 d-flex align-items-center">
+                    <img class="rounded-circle me-2"
+                         src="{% gravatar_url member.email size=24 %}"
+                         alt="{{ action.actor }}">
+                    <strong class="text-nowrap text-capitalize">
+                        {{ member.first_name }}
+                        {{ member.last_name }}
+                    </strong>
+                </span>
+                {% if 'use_crm' in user_site_perms %}
                     <a class="small" href="{% url 'crm-user-details' member.pk %}">
                         <svg class="bi me-1" width="16" height="16" fill="currentColor">
                             <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#activity" />
                         </svg>
                     </a>
-                    {% endif %}
-                </div>
-            {% else %}
-                    <span class="me-2"><strong>{{member}}</strong>
-                        {% if 'use_crm' in user_site_perms %}
-                        <a class="small" href="{% url 'crm-user-details' member.pk %}">
-                            <svg class="bi me-1" width="16" height="16" fill="currentColor">
-                                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#activity" />
-                            </svg>
-                        </a>
-                        {% endif %}
-                    </span>
-            {% endif %}
-            <div class="d-flex align-items-center">
-                <span style="color: #666666; font-style: italic; font-weight: 300;">{{member.profile.organization.name}}</span>
-                {% if  member.profile.organization_position %}
-                    <span class="ms-1 text-lowercase" style="color: #666666; font-style: italic; font-weight: 300;">({{member.profile.organization_position}})</span>
                 {% endif %}
             </div>
+        {% else %}
+            <span class="me-2"><strong>{{ member }}</strong>
+                {% if 'use_crm' in user_site_perms %}
+                    <a class="small" href="{% url 'crm-user-details' member.pk %}">
+                        <svg class="bi me-1" width="16" height="16" fill="currentColor">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#activity" />
+                        </svg>
+                    </a>
+                {% endif %}
+            </span>
+        {% endif %}
+        <div class="d-flex align-items-center">
+            <span style="color: #666666; font-style: italic; font-weight: 300;">{{ member.profile.organization.name }}</span>
+            {% if  member.profile.organization_position %}
+                <span class="ms-1 text-lowercase"
+                      style="color: #666666;
+                             font-style: italic;
+                             font-weight: 300">({{ member.profile.organization_position }})</span>
+            {% endif %}
+        </div>
     {% endif %}
 </div>

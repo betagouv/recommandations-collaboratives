@@ -1,7 +1,6 @@
 {% load static %}
-
 <div class="text-justified font-marianne">
-        {% include 'resources/resource/fragments/title.html' %}
-        {% include 'resources/resource/fragments/summary.html' %}
-        {{ resource.content_rendered|safe }}
+    {% include 'resources/resource/fragments/title.html' %}
+    {% include 'resources/resource/fragments/summary.html' %}
+    {{ resource.content_rendered|safe }}
 </div>

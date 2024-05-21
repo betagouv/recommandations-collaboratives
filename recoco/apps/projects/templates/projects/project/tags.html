@@ -25,9 +25,7 @@
             </h4>
             <form action="{% url "projects-project-tags" project.pk %}" method="post">
                 <div class="d-flex flex-column mt-4">
-                    <div class="common-input">
-                        {{form.tags}}
-                    </div>
+                    <div class="common-input">{{ form.tags }}</div>
                     <div class="mt-2 flag grey mb-4 d-flex align-items-center justify-content-start">
                         <p class="text-info-custom font-small text-grey-dark my-0 ">{{ form.tags.help_text }}</p>
                     </div>

@@ -3,11 +3,7 @@
 {% load humanize %}
 {% load sass_tags %}
 {% load django_vite %}
-
-{% block title %}
-    Thématiques du projet {{project.name}}
-{% endblock %}
-
+{% block title %}Thématiques du projet {{ project.name }}{% endblock %}
 {% block js %}
     {% vite_asset 'js/apps/topicSearch.js' %}
 {% endblock %}
@@ -48,20 +44,20 @@
                 <ul class="topic-list l-stack">
                     {% for topic_form in topic_formset %}
                         <li class="d-flex justify-content-between align-items-end topic-item "
-                            x-data='TopicSearch("{{ topic_form.name.value|default:"" }}", "projects")'
-                            >
+                            x-data='TopicSearch("{{ topic_form.name.value|default:"" }}", "projects")'>
                             {% if topic_form.name.value %}
                                 <div class="topic-item disabled">
                                     <div class="l-stack w-100 justify-content-between align-items-end ">
-                                        <label for="{{ topic_form.name.id_for_label }}" class="tiny fw-bold w-100" :value="deleted">
-                                          <template x-if="deleted">
-                                            <span>Thématique supprimée</span>
-                                          </template>
-                                          <template x-if="!deleted">
-                                            <span>Thématique</span>
-                                          </template>
+                                        <label for="{{ topic_form.name.id_for_label }}"
+                                               class="tiny fw-bold w-100"
+                                               :value="deleted">
+                                            <template x-if="deleted">
+                                                <span>Thématique supprimée</span>
+                                            </template>
+                                            <template x-if="!deleted">
+                                                <span>Thématique</span>
+                                            </template>
                                         </label>
-
                                         <input type="text"
                                                class="form-control tiny w-100"
                                                :class="{'text-decoration-line-through' : deleted}"

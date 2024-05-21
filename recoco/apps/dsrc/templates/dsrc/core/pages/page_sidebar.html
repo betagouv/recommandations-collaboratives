@@ -1,17 +1,17 @@
 {% load static %}
 {% block main %}
-  {% include 'dsrc/core/pages/page_header.html' %}
-  <main role="main" id="content">
-    {# include 'dsrc/core/layouts/center.html' #}
-    <div class="fr-container fr-container--fluid fr-mb-md-14v">
-      <div class="fr-grid-row fr-grid-row--gutters">
-        <div class="fr-col-12 fr-col-md-4">
-          {% block sidebar_side_content %}{% endblock %}
+    {% include 'dsrc/core/pages/page_header.html' %}
+    <main role="main" id="content">
+        {# include 'dsrc/core/layouts/center.html' #}
+        <div class="fr-container fr-container--fluid fr-mb-md-14v">
+            <div class="fr-grid-row fr-grid-row--gutters">
+                <div class="fr-col-12 fr-col-md-4">
+                    {% block sidebar_side_content %}{% endblock %}
+                </div>
+                <div class="fr-col-12 fr-col-md-8 fr-py-12v">
+                    {% block sidebar_main_content %}{% endblock %}
+                </div>
+            </div>
         </div>
-        <div class="fr-col-12 fr-col-md-8 fr-py-12v">
-          {% block sidebar_main_content %}{% endblock %}
-        </div>
-      </div>
-    </div>
-  </main>
+    </main>
 {% endblock %}
