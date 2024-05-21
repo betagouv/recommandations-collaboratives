@@ -144,6 +144,12 @@ class SiteConfiguration(models.Model):
         blank=True,
         max_length=100,
     )
+    legal_owner = models.CharField(
+        verbose_name="Propriétaire légal",
+        null=True,
+        blank=True,
+        max_length=100,
+    )
 
     def logo_upload_path(self, filename):
         return f"images/{self.site.pk}/logo/{filename}"
