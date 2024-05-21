@@ -30,6 +30,11 @@ class ResourceSerializer(TaggitSerializer, serializers.HyperlinkedModelSerialize
             "web_url",
             "embeded_url",
         ]
+        read_only_fields = [
+            "created_on",
+            "updated_on",
+            "created_by",
+        ]
 
     web_url = serializers.URLField(source="get_absolute_url", read_only=True)
     embeded_url = serializers.URLField(source="get_embeded_url", read_only=True)

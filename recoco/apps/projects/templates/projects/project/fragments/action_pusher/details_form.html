@@ -76,7 +76,7 @@
                 <template x-if="push_type == 'noresource'">
                     <div class="buttons d-flex flex-row justify-content-between">
                         {% if not disable_draft %}
-                            <button @click="set_draft(true)" class="button small">Enregister comme Brouillon</button>
+                            <button data-test-id="publish-draft-task-button" @click="set_draft(true)" class="button small">Enregister comme Brouillon</button>
                         {% endif %}
                         <button data-test-id="publish-task-button" @click="set_draft(false)" type="submit" class="button filled small">Publier</button>
                     </div>

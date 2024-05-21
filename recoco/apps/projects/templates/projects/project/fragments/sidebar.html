@@ -47,7 +47,7 @@
     {% endif %}
     {% if 'actions' not in url_name and 'conversations' not in url_name and 'internal-followup' not in url_name %}
         {% if project.status == 'DRAFT' %}
-            <a style="cursor: pointer"
+            <button style="cursor: pointer"
                @click="openPublicShareModal"
                data-toggle="modal"
                data-target="#publicShareModal"
@@ -58,15 +58,15 @@
                 </svg>
                 &nbsp;
                 <span>Partager l'état des lieux</span>
-            </a>
+            </button>
         {% else %}
-            <a style="cursor: pointer"
+            <button style="cursor: pointer"
                @click="openPublicShareModal"
                data-toggle="modal"
                data-target="#publicShareModal"
                class="button btn btn-outline-primary btn-sm btn-sm--header">
                 <span>Partager l'état des lieux</span>
-            </a>
+            </button>
         {% endif %}
     {% endif %}
 </div>

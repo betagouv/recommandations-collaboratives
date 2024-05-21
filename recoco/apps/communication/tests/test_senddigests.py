@@ -208,7 +208,7 @@ def test_command_pending_reminder_sent_and_rescheduled(request, mocker):
 
     call_command("senddigests")
 
-    assert reminders_models.Reminder.on_site_to_send.count() == 2
+    assert reminders_models.Reminder.on_site_to_send.count() == 1
     assert reminders_models.Reminder.on_site_sent.count() == 2
 
 

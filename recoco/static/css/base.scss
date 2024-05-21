@@ -255,9 +255,18 @@ progress::-moz-progress-bar {
   }
 }
 
-
 .custom-callout-blue {
   background: rgba(96, 162, 228, 0.10);
   color: #4285F4;
   padding: 0.5rem;
 }
+
+p {
+
+  &>input,
+  &>select {
+    border: 1px solid #ccc;
+    background-color: white;
+    border-radius: 0.2rem;
+    width: 100%;
+  }

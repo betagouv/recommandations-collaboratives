@@ -464,10 +464,10 @@ def test_make_or_update_new_recommendations_reminder_is_deleted_if_no_task(
 
 
 @pytest.mark.django_db
-def test_make_or_update_new_reco_reminder_with_sent_reminder_honors_interval(
+def test_make_or_update_new_reco_reminder_with_sent_reminder_is_not_rescheduled(
     request,
 ):
-    """Make sure we do not reschedule a reminder the day after the one sent"""
+    """Make sure we do not reschedule a reminder after the one sent"""
     current_site = get_current_site(request)
     baker.make(
         home_models.SiteConfiguration, site=current_site, reminder_interval=6 * 7
@@ -496,18 +496,49 @@ def test_make_or_update_new_reco_reminder_with_sent_reminder_honors_interval(
 
     reminder.refresh_from_db()
 
-    assert models.Reminder.on_site_to_send.count() == 1
+    assert models.Reminder.on_site_to_send.count() == 0
     assert models.Reminder.on_site_sent.count() == 1
 
-    next_reminder = models.Reminder.on_site_to_send.first()
 
-    assert (
-        next_reminder.deadline
-        == (
-            reminder.sent_on
-            + datetime.timedelta(days=current_site.configuration.reminder_interval)
-        ).date()
+@pytest.mark.django_db
+def test_make_or_update_new_reco_reminder_with_new_task_schedules_a_new_reminder(
+    request,
+):
+    current_site = get_current_site(request)
+    project = baker.make(projects_models.Project, sites=[current_site])
+    old_task = baker.make(
+        tasks_models.Task,
+        created_on=timezone.now() - datetime.timedelta(days=200),
+        project=project,
+        public=True,
+        site=current_site,
+        status=tasks_models.Task.INPROGRESS,
     )
+
+    old_reminder = baker.make(
+        models.Reminder,
+        site=current_site,
+        project=project,
+        kind=models.Reminder.NEW_RECO,
+        sent_on=old_task.created_on + datetime.timedelta(days=2),
+        deadline=old_task.created_on + datetime.timedelta(days=3),
+    )
+
+    recent_task = baker.make(
+        tasks_models.Task,
+        created_on=timezone.now(),
+        project=project,
+        public=True,
+        site=current_site,
+        status=tasks_models.Task.INPROGRESS,
+    )
+
+    api.make_or_update_new_recommendations_reminder(current_site, project)
+
+    assert models.Reminder.on_site_to_send.count() == 1
+    reminder = models.Reminder.on_site.last()
+    assert reminder != old_reminder
+    assert reminder.deadline >= recent_task.created_on.date()
 
 
 ########################################################################

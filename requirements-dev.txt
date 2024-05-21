@@ -3,6 +3,7 @@ black
 coverage==7.4.1
 django-debug-toolbar==4.3.0
 django_coverage_plugin
+drf-spectacular[sidecar]
 fabric==3.2.2
 ipython
 model-bakery==1.17.0
