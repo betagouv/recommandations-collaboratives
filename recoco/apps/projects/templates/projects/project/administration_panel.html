@@ -122,7 +122,7 @@
       <div class="col">
         <p class="text-info-custom mb-2">Équipe de suivi</p>
         {% if "invite_advisors" in user_project_perms %}
-          <a style="cursor: pointer"
+          <button style="cursor: pointer"
              @click="openInviteSwitchtenderModal"
              data-toggle="modal"
              data-target="#InviteSwitchtenderModal"
@@ -134,7 +134,7 @@
               &nbsp;
             {% endif %}
             <span>Inviter un conseiller</span>
-          </a>
+            </button>
         {% endif %}
         {% if project.switchtenders_on_site.all.count == 0 %}
           <div class="bg-light d-flex flex-column justify-content-center align-items-center py-4 rounded">
@@ -184,7 +184,7 @@
       <div class="col">
         <p class="text-info-custom mb-2">Membres de la collectivité</p>
         {% if "invite_collaborators" in user_project_perms %}
-          <a style="cursor: pointer"
+          <button style="cursor: pointer"
              @click="openInviteMemberModal"
              data-toggle="modal"
              data-target="#InviteMemberModal"
@@ -195,7 +195,7 @@
               </svg>
             {% endif %}
             <span>Inviter un membre de la collectivité</span>
-          </a>
+            </button>
         {% endif %}
         <ul class="flex-column list-unstyled mb-0">
           {% for pm in project.projectmember_set.all %}
