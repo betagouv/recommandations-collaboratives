@@ -1,7 +1,7 @@
 # coding: utf-8
 
 """
-Production settings for urbanvitaliz-django
+Production settings for recoco-django
 """
 
 from .common import *  # noqa

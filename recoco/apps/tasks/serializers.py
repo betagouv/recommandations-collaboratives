@@ -28,7 +28,7 @@ class TaskFollowupSerializer(serializers.HyperlinkedModelSerializer):
             "task_id",
             "who_id",
         ]
-        read_only_fields = ["who"]
+        read_only_fields = ["id", "who", "timestamp"]
         extra_kwargs = {"task_id": {"write_only": True}, "who_id": {"write_only": True}}
 
     who = UserSerializer(read_only=True, many=False)
@@ -87,6 +87,7 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer, OrderedModelSeriali
             "comments_count",
             "topic",
         ]
+        read_only_fields = ["created_on", "updated_on", "created_by"]
 
     created_by = UserSerializer(read_only=True, many=False)
 
