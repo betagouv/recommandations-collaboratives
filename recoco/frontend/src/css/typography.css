@@ -1,50 +1,50 @@
 .font-marianne {
-    font-family: 'Marianne', arial, sans-serif;
+  font-family: 'Marianne', arial, sans-serif;
 }
 
 .title-info {
-    font-family: 'Marianne';
-    font-style: normal;
-    font-size: 14px;
-    font-weight: 700;
-    line-height: normal;
+  font-family: 'Marianne';
+  font-style: normal;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: normal;
 
-    text-transform: uppercase;
+  text-transform: uppercase;
 }
 
 .text-transform-none {
-    text-transform: none;
+  text-transform: none;
 }
 
 .text-info-custom {
-    font-family: 'Marianne';
-    font-style: normal;
-    font-weight: 300;
-    font-size: 16px;
-    line-height: 24px;
+  font-family: 'Marianne';
+  font-style: normal;
+  font-weight: 300;
+  font-size: 16px;
+  line-height: 24px;
 }
 
 .fw-medium {
-    font-weight: 500 !important;
+  font-weight: 500 !important;
 }
 
 .font-medium {
-    font-size: 18px;
+  font-size: 18px;
 }
 
-.font-small ,
+.font-small,
 h6.font-small {
-    font-size: 14px;
+  font-size: 14px;
 }
 
 .font-very-small {
-    font-size: 13px;
+  font-size: 13px;
 }
 
 .tiny {
-    font-size: 12px;
+  font-size: 12px;
 }
 
 .font-italic {
-    font-style: italic;
+  font-style: italic;
 }

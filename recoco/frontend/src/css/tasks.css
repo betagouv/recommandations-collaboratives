@@ -1,195 +1,194 @@
 body.modal-open {
-    height: 100%;
-    overflow: auto;
+  height: 100%;
+  overflow: auto;
 }
 
 .status-color-indicator {
-    width: 12px;
-    height: 12px;
+  width: 12px;
+  height: 12px;
 
-    border-radius: 2px;
+  border-radius: 2px;
 }
 
 .topic-indicator {
-    width: 12px;
-    height: 12px;
+  width: 12px;
+  height: 12px;
 
-    border-radius: 50%;
+  border-radius: 50%;
 }
 
 .status-color-indicator.big {
-    width: 18px;
-    height: 18px;
+  width: 18px;
+  height: 18px;
 }
 
 .status-color-indicator.bg-white {
-    border: solid 1px #CECECE;
+  border: solid 1px #cecece;
 }
 
 .task-separator {
-    width: 32px;
-    height: 4px;
-    background-color: #CECECE;
-    border-radius: 2px;
+  width: 32px;
+  height: 4px;
+  background-color: #cecece;
+  border-radius: 2px;
 }
 
 .task-item .task-toolbar {
-    margin-left: -24px;
+  margin-left: -24px;
 }
 
 .task-item p {
-    margin-bottom: 5px;
+  margin-bottom: 5px;
 }
 
 .board-status-filter-button {
-    cursor:  pointer !important;
+  cursor: pointer !important;
 }
 
 .board-status-filter-button:hover {
-    background-color: #efefef !important;
+  background-color: #efefef !important;
 }
 
 .board-status-filter-button.active {
-    background-color: #CECECE !important;
+  background-color: #cecece !important;
 }
 
 .task-animation-appear-in {
-    animation: status-animation-appear 0.35s ease forwards;
-    transform: translate3d(0,-5px,0);
-    opacity: 0;
-    background-color: #CECECE;
+  animation: status-animation-appear 0.35s ease forwards;
+  transform: translate3d(0, -5px, 0);
+  opacity: 0;
+  background-color: #cecece;
 }
 
 .board-status-item {
-    animation: status-appear 0.35s ease forwards;
-    transform: translate3d(0,-5px,0);
-    opacity: 0;
+  animation: status-appear 0.35s ease forwards;
+  transform: translate3d(0, -5px, 0);
+  opacity: 0;
 }
 
 .task-modal-followups {
-    height: 62vh;
-    overflow-y: auto;
+  height: 62vh;
+  overflow-y: auto;
 }
 
 .task-modal-followups.is-documented {
-    height: 49vh;
+  height: 49vh;
 }
 
 .task-modal-followups.is-paginated {
-    height: 58vh;
+  height: 58vh;
 }
 
 .task-modal-followups.is-paginated-documented {
-    height: 42.5vh;
+  height: 42.5vh;
 }
 
 @keyframes status-animation-appear {
-    from {
-        opacity: 0;
-        transform: translate3d(0,-5px,0);
-        background-color: #CECECE;
-    }
-    to {
-        opacity: 1;
-        transform: translate3d(0,0,0);
-        background-color: white;
-    }
+  from {
+    opacity: 0;
+    transform: translate3d(0, -5px, 0);
+    background-color: #cecece;
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+    background-color: white;
+  }
 }
 
 .followups-wrapper {
-    opacity: 0;
+  opacity: 0;
 }
 
 .followups-wrapper.visible {
-    animation: status-appear 0.5s ease forwards;
+  animation: status-appear 0.5s ease forwards;
 }
 
 .task-modal-content {
-    opacity: 0;
+  opacity: 0;
 }
 
 .task-modal-content.visible {
-    animation: status-appear 0.5s ease forwards;
+  animation: status-appear 0.5s ease forwards;
 }
 
-
 @keyframes status-appear {
-    from {
-        opacity: 0;
-        transform: translate3d(0,-5px,0);
-    }
-    to {
-        opacity: 1;
-        transform: translate3d(0,0,0);
-    }
+  from {
+    opacity: 0;
+    transform: translate3d(0, -5px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
 }
 
 .followups-wrapper {
-    padding-top: 40px;
+  padding-top: 40px;
 }
 
 .is-new-followup {
-    position: relative;
-    border: solid 1px #0063CB;
-    background: #eaf4ff !important;
+  position: relative;
+  border: solid 1px #0063cb;
+  background: #eaf4ff !important;
 }
 
 .is-new-followup::before {
-    content: 'Nouveau';
-    position: absolute;
+  content: 'Nouveau';
+  position: absolute;
 
-    top: -10px;
-    right: -1px;
+  top: -10px;
+  right: -1px;
 
-    background-color: #0063CB;
+  background-color: #0063cb;
 
-    padding: 0.2rem 0.4rem;
-    color: white;
-    font-size: 8px;
-    text-transform: uppercase;
-    font-weight: 700;
-    border-radius: 2px;
+  padding: 0.2rem 0.4rem;
+  color: white;
+  font-size: 8px;
+  text-transform: uppercase;
+  font-weight: 700;
+  border-radius: 2px;
 }
 
 .is-new-followup-status .followup-status-message {
-    color: #0063CB;
-    font-weight: 500;
+  color: #0063cb;
+  font-weight: 500;
 }
 
 .is-new-followup-status .message {
-    position: relative;
-    border: solid 1px #0063CB;
-    background: #eaf4ff !important;
+  position: relative;
+  border: solid 1px #0063cb;
+  background: #eaf4ff !important;
 }
 
 .is-new-followup-status .message::after {
-    content: '';
-    position: absolute;
-    left: calc(50% - 5px);
-    top: -10px;
-    border-left: 10px solid transparent;
-    border-right: 10px solid transparent;
-    border-bottom: 10px solid #0063CB;
+  content: '';
+  position: absolute;
+  left: calc(50% - 5px);
+  top: -10px;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-bottom: 10px solid #0063cb;
 }
 
 .is-new-followup-status .message::before {
-    content: 'Nouveau';
-    position: absolute;
+  content: 'Nouveau';
+  position: absolute;
 
-    top: -10px;
-    right: -1px;
+  top: -10px;
+  right: -1px;
 
-    background-color: #0063CB;
+  background-color: #0063cb;
 
-    padding: 0.2rem 0.4rem;
-    color: white;
-    font-size: 8px;
-    text-transform: uppercase;
-    font-weight: 700;
-    border-radius: 2px;
+  padding: 0.2rem 0.4rem;
+  color: white;
+  font-size: 8px;
+  text-transform: uppercase;
+  font-weight: 700;
+  border-radius: 2px;
 }
 
 .icon-banner {
-    width: 65px;
-    height: 65px;
+  width: 65px;
+  height: 65px;
 }
