@@ -1,7 +1,7 @@
 # coding: utf-8
 
 """
-Production settings for urbanvitaliz-django
+Production settings for recoco-django
 """
 
 from .common import *  # noqa
@@ -49,5 +49,7 @@ CSRF_COOKIE_SAMESITE = "None"
 SESSION_COOKIE_SAMESITE = "None"
 
 X_FRAME_OPTIONS = "DENY"
+
+WAGTAILADMIN_BASE_URL = "recoconseil.fr"
 
 # eof

@@ -6,8 +6,9 @@
   "private": true,
   "scripts": {
     "test": "./node_modules/vitest/vitest.mjs",
-    "dev": "./node_modules/vite/bin/vite.js",
-    "build": "./node_modules/vite/bin/vite.js build"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview --port 3000"
   },
   "dependencies": {
     "@gouvfr/dsfr": "^1.11.2",
@@ -17,6 +18,9 @@
     "@tiptap/extension-link": "^2.0.0-beta.199",
     "@tiptap/pm": "^2.0.0-beta.218",
     "@tiptap/starter-kit": "^2.0.0-beta.218",
+    "ajv": "^8.13.0",
+    "ajv-errors": "^3.0.0",
+    "ajv-formats": "^3.0.1",
     "alpinejs": "^3.10.2",
     "axios": "^1.6.0",
     "bootstrap": "^5.3.3",

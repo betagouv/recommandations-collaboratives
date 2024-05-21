@@ -4,8 +4,8 @@ Dossier de tests : `frontend_tests/`
 
 ## Démarrer
 
-- Ajouter un fichier `frontend_tests.py` dans les settings de `django`, calqué sur le fichier `development.py` contenu dans le même dossier
-- Ajouter la clé `TEST` dans les configs de la BDD, et modifiez le nom de la bdd, pour utiliser la BDD de tests que vous venez de créer :
+-   Ajouter un fichier `frontend_tests.py` dans les settings de `django`, calqué sur le fichier `development.py` contenu dans le même dossier
+-   Ajouter la clé `TEST` dans les configs de la BDD, et modifiez le nom de la bdd, pour utiliser la BDD de tests que vous venez de créer :
 
     ```python
               DATABASES = {
@@ -23,15 +23,29 @@ Dossier de tests : `frontend_tests/`
           }
     ```
 
-Pour lancer les tests, il faut lancer plusiuers processus dans des consoles distinctes:
+## Lancer les tests
 
-- Console 1: Initialiser un server django en mode test avec la base de test et les différentes fixtures avec la commande : `npm run db:test:init`
-- Console 2:
-  - Dans le dossier `[root]/frontend_tests/` lancer la commande de mise à jour des permissions: `db:test:update_permissions`
-  - Dans le dossier `[root]/urbanvitaliz/frontend/` lancer la commande de dev front qui met les templates à disposition de Django:  `npm run dev`
-- Console 3: Vous pouvez maintenant exécuter les différents tests avec les commandes suivantes au choix :
-  - `npm run test_ui` -> pour lancer cypress avec une interface visuelle
-  - `npm run test` -> pour lancer cypress en ligne de commande
+### Lancement de la serie de tests Cypress
 
+```bash
+$ yarn test
+```
 
-TODO : continue doc
+Cela permettra de :
+
+-   Démarrer un serveur Vite (front end)
+-   Démarrer un serveur Django en mode test (back end)
+-   Lancer les tests Cypress
+-   Générer un rapport d'éxecution des tests dans le dossier `frontend_tests/cypress/reports`
+
+### Lancement de l'interface graphique de Cypress
+
+Pour lancer les tests, il faut lancer plusieurs processus dans des consoles distinctes:
+
+-   Console 1: Initialiser un server django en mode test avec la base de test et les différentes fixtures avec la commande : `yarn django:start-server`
+-   Console 2:
+    -   Lancer la commande de mise à jour des permissions: `yarn django:update-permissions`
+    -   Lancer la commande de dev front qui met les static et composants JS à disposition de Django: `yarn frontend:start-server`
+-   Console 3: Vous pouvez maintenant exécuter les différents tests avec les commandes suivantes au choix :
+    -   `yarn test_ui` -> pour lancer cypress avec une interface graphique
+    -   `yarn cy:run` -> pour lancer cypress en ligne de commande

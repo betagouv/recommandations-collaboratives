@@ -664,6 +664,7 @@ class Document(models.Model):
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
+        related_name="documents_uploaded",
     )
 
     content_type = models.ForeignKey(

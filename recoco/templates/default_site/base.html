@@ -6,10 +6,11 @@
 <html lang="fr">
   <head>
     <title>
-      {% block title %}{% endblock %}
+      {% block title %}{% endblock title %}
     - {{ request.site.name }}</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta property="og:title" content="{% block og_title %}{% endblock og_title %} - {{ request.site.name }}">
     {% vite_hmr_client %}
     {% vite_asset 'js/main.js' %}
     {% if not debug and request|cookie_group_accepted:"analytics" %}
@@ -94,7 +95,7 @@
       {% endif %}
       <!--             <div class="b-page-divider"></div> -->
       <div class="container-fluid bg-white">
-        <div class="row">
+        <div class="row background--grey-light">
           {% block content %}{% endblock %}
         </div>
         <div class="row justify-content-center">{% include 'footer.html' %}</div>

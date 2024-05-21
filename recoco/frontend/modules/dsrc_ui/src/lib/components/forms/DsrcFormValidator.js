@@ -4,7 +4,7 @@ import Ajv from 'ajv';
 import addFormats from 'ajv-formats';
 import addErrors from 'ajv-errors';
 
-const ajv = new Ajv({allErrors: true});
+const ajv = new Ajv({ allErrors: true });
 addFormats(ajv);
 addErrors(ajv);
 /**
@@ -14,72 +14,56 @@ addErrors(ajv);
  * @param {string} validationFunctionName The name of the AJV validation function to use. It should be generated into `ajv.validations.default.js` by the script `build:ajv` (`DsrcFormValidationFunction` is the default validation function for DsrcExampleForm). To Change the default validation function, add the schema for your form to `ajv.schema.forms.cjs` and run `npm run build:ajv`
  * @returns an Alpine component object containing the form data and methods to validate and handle form submission
  */
-function DsrcFormValidator (
-	formId,
-	formData,
-	actionButtonFormParam,
-  validationSchema,
-) {
+function DsrcFormValidator(formId, validationSchema, requestMethod = 'GET') {
 	return {
 		form: {},
 		errors: [],
-    actionButtonFormParam: {
-      submit: {
-        label: "Valider",
-      },
-      cancel: {
-        label: "Annuler",
-        href:""
-      }
-    },
-    schema: validationSchema,
+		schema: validationSchema,
+		submittedForm: requestMethod === 'POST',
 		async init() {
-			if (!formData) {
-				// We shouldn't reach this state: the data should be available, or the server should have returned an error before reaching this point and the form should not have been rendered
-				console.error('Error fetching form data');
+			if (!this.schema) {
+				console.error('Missing validation schema');
 			}
-			if (formData.errors) {
-				// We shouldn't reach this state: AJV validation should have prevented form submission
-				console.error('Error validating form data with AJV');
-			} else {
-				// There are no errors: This is a blank form
-				const fields = Object.keys(formData);
-				fields.forEach((field) => {
-					this.form[field] = {
-						message_group: {
-							messages: [],
-						},
-						errors: [],
-						touched: false,
-						changed: false,
-						...formData[field],
-					};
-				});
+
+			const currentForm = document.getElementById(formId);
+			const fields = Object.keys(this.schema.properties);
+			const fieldToCheck = [];
+
+			fields.forEach((field) => {
+				this.form[field] = {
+					message_group: {
+						messages: [],
+					},
+					errors: [],
+					touched: false,
+					changed: false,
+					value: currentForm[field].value,
+				};
+				if (currentForm[field].value) fieldToCheck.push(field);
+			});
+			fieldToCheck.forEach((field) => {
+				this.validateInput({ target: { name: field } });
+			});
+
+			// Display errors if the form was submitted with
+			if (this.submittedForm) {
+				this.validate();
+				this.displayErrorsAndValidation();
 			}
-      if(!actionButtonFormParam) {
-        // We have to get parameters to display action buttons in form
-        console.error('Error missing button parameters');
-      }
-      this.actionButtonFormParam = actionButtonFormParam;
+
 			this.$nextTick(() => {
 				// enable form validation for all submission types (click, keyboard, ...)
 				document
 					.getElementById(formId)
 					.addEventListener('submit', (event) => {
+						this.submittedForm = true;
 						this.validate();
 						if (
 							Array.isArray(this.errors) &&
 							this.errors.length > 0
 						) {
 							event.preventDefault();
-							// Set the focus on the first field with an error
-							const firstErrorField =
-								this.errors[0].instancePath.substring(1);
-							this.form[firstErrorField].is_valid = false;
-							this.form[firstErrorField].errors =
-								this.getFieldErrors(firstErrorField);
-							this.form[firstErrorField].valid_class = 'error';
-							this.$refs[firstErrorField].focus();
+							this.displayErrorsAndValidation();
 						}
 					});
 			});
@@ -88,15 +72,14 @@ function DsrcFormValidator (
 			// Let the server know that JS is enabled
 			document.getElementById(`${formId}_js_enabled`).value = 'true';
 		},
-		validate(event) {
-			// debug
+		validate() {
 			const fields = Object.keys(this.form);
 			const validateMap = {};
 			fields.forEach((field) => {
 				validateMap[field] = this.form[field].value;
 			});
-      const validate = ajv.compile(validationSchema)
-      const valid = validate(validateMap);
+			const validate = ajv.compile(validationSchema);
+			const valid = validate(validateMap);
 			if (valid) {
 				this.errors = [];
 			} else {
@@ -125,14 +108,17 @@ function DsrcFormValidator (
 				}));
 			} else {
 				// If the field has a message_group set by the server: match local messages with error messages and set the message type accordingly
-				filteredMessages = field.message_group.messages.reduce((updatedMessages, message) => {
-					if (field.errors.includes(message.text)) {
-						message.type = 'error';
-					} else {
-						message.type = 'valid';
-					}
-					return [...updatedMessages, message];
-				}, []);
+				filteredMessages = field.message_group.messages.reduce(
+					(updatedMessages, message) => {
+						if (field.errors.includes(message.text)) {
+							message.type = 'error';
+						} else {
+							message.type = 'valid';
+						}
+						return [...updatedMessages, message];
+					},
+					[]
+				);
 			}
 			field.message_group.messages = filteredMessages;
 		},
@@ -140,12 +126,33 @@ function DsrcFormValidator (
 			const field = this.form[fieldName];
 			return field.touched === true && field.errors.length > 0;
 		},
+		displayErrorsAndValidation() {
+			// Display error messages on each fields
+			for (const field in this.form) {
+				this.form[field].is_valid = true;
+				this.form[field].errors = [];
+				this.form[field].valid_class = 'valid';
+			}
+
+			this.errors.forEach((error, index) => {
+				const currentErrorField = error.instancePath.substring(1);
+				// Set the focus on the first field with an error
+				index === 0 && this.$refs[currentErrorField].focus();
+				// Set the error class on the field
+
+				this.form[currentErrorField].is_valid = false;
+				this.form[currentErrorField].errors =
+					this.getFieldErrors(currentErrorField);
+				this.form[currentErrorField].valid_class = 'error';
+			});
+		},
 		validateInput(event) {
 			const fieldName = event.target.name;
 			this.validate();
 			this.form[fieldName].errors = this.getFieldErrors(fieldName);
 			if (
-				this.form[fieldName].is_valid === false &&
+				(this.form[fieldName].is_valid === false ||
+					this.form[fieldName].is_valid === undefined) &&
 				this.form[fieldName].errors.length === 0
 			) {
 				this.form[fieldName].is_valid = true;
@@ -168,8 +175,6 @@ function DsrcFormValidator (
 			this.validateInput(event);
 		},
 	};
-};
-
-// Alpine.data('DsrcFormValidator', DsrcFormValidator);
+}
 
 export default DsrcFormValidator;

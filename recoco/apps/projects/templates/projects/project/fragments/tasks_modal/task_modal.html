@@ -40,7 +40,9 @@
                             <button type="button"
                                     class="btn-close"
                                     data-bs-dismiss="modal"
-                                    aria-label="Close"></button>
+                                    aria-label="Close"
+                                    @click="changeShowEdition()"
+                                    ></button>
                         </div>
                         <div class="d-flex flex-grow-1 align-items-stretch w-65 task-modal-content"
                              :class="!contentIsLoading && 'visible'"
@@ -181,9 +183,17 @@
                                     </template>
                                 </div>
                             </div>
-                            <div class="w-100 p-3" style="border-top: 1px solid #EEEEEE;">
-                                {% include 'tools/editor.html' with is_task_modal_comment=True %}
-                            </div>
+                            <template x-if="task.public || showEdition">
+                                <div class="w-100 p-3" style="border-top: 1px solid #EEEEEE;">
+                                    {% include 'tools/editor.html' with is_task_modal_comment=True %}
+                                </div>
+                            </template>
+                            <template x-if="!task.public">
+                                <div class="w-100 p-3" style="border-top: 1px solid #EEEEEE;">
+                                    <div class="text-center">
+                                        <span class="text-muted">Vous devez publier votre recommandation pour ajouter un commentaire</span>
+                                    </div>
+                            </template>
                         </div>
                     </div>
                 </div>

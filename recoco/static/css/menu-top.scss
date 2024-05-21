@@ -1,11 +1,10 @@
 .navbar-border-top {
-  border-top: solid 1px #E5E5E5;
+  border-top: solid 1px #e5e5e5;
 }
 
 .navbar-shadow {
   box-shadow: 0px 16px 16px -16px rgba(0, 0, 0, 0.32), 0px 8px 16px rgba(0, 0, 0, 0.1);
 }
-
 
 .main-menu {
   .nav-item {
@@ -20,13 +19,12 @@
   }
 }
 
-
 .project-selector-dropdown {
   width: 28vw;
 }
 
 .project-selector-dropdown li.inactive {
-  background-color: #F6F6F6;
+  background-color: #f6f6f6;
   color: #222;
   border: 2px solid #222;
 }
@@ -41,7 +39,7 @@
 }
 
 .project-card-top-information.inactive span {
-  background-color: #E5E5E5;
+  background-color: #e5e5e5;
   color: #222;
 }
 
@@ -61,8 +59,6 @@
   align-items: flex-start !important;
 }
 
-
-
 #user-info .dropdown-menu {
   transform: translate3d(-60px, 0, 0);
 }
@@ -73,7 +69,6 @@
   height: 2.75rem;
   overflow-y: hidden;
 }
-
 
 .nav-scroller .nav {
   display: flex;

@@ -45,3 +45,5 @@ dsrc_doc/*.md
 !dsrc_doc/README.md
 
 docker/docker-compose.local.yml
+**/.vite
+**/cypress/reports/*

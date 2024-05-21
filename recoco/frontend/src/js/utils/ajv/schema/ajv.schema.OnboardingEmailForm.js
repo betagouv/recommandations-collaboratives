@@ -6,8 +6,6 @@ export const schemaOnboardingEmailFormValidator = {
   properties: {
     email: { $ref: '#/definitions/email' },
   },
-  required: [
-    'email',
-  ],
+  required: ['email'],
   definitions: schemaFormInputs,
 };

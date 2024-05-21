@@ -7,28 +7,45 @@ author  : guillaume.libersat@beta.gouv.fr, raphael.marvie@beta.gouv.fr
 created : 2022-06-06 11:54:25 CEST
 """
 
-
 from django.urls import path
 
 from . import views
 
-# FIXME rename the following urls removing projects prefix -> OK
-
 urlpatterns = [
     path(
         r"onboarding/",
-        views.onboarding,
-        name="projects-onboarding",
+        views.OnboardingView.as_view(),
+        name="onboarding",
     ),
     path(
-        r"onboarding/prefill/",
-        views.create_project_prefilled,
-        name="projects-project-prefill",
+        r"onboarding/signup",
+        views.onboarding_signup,
+        name="onboarding-signup",
+    ),
+    path(
+        r"onboarding/project",
+        views.onboarding_project,
+        name="onboarding-project",
+    ),
+    path(
+        r"onboarding/summary/<int:project_id>",
+        views.onboarding_summary,
+        name="onboarding-summary",
+    ),
+    path(
+        r"onboarding/prefill/setuser",
+        views.prefill_project_set_user,
+        name="onboarding-prefill-set-user",
+    ),
+    path(
+        r"onboarding/prefill/project",
+        views.prefill_project_submit,
+        name="onboarding-prefill",
     ),
     path(
         r"onboarding/<int:project_id>/commune/",
         views.select_commune,
-        name="projects-onboarding-select-commune",
+        name="onboarding-select-commune",
     ),
 ]
 

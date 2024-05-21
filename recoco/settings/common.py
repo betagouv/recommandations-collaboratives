@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     "django.contrib.postgres",
     "django.contrib.sites",
     "multisite",
+    "reversion",
     "django.contrib.admin",
     "hijack",
     "hijack.contrib.admin",
@@ -52,6 +53,7 @@ INSTALLED_APPS = [
     "dbtemplates",
     "tagging",
     "taggit",
+    "modelcluster",
     "leaflet",
     "django_gravatar",
     "actstream",
@@ -65,8 +67,6 @@ INSTALLED_APPS = [
     "dynamic_forms",
     "watson",
     "phonenumber_field",
-    "reversion",
-    "reversion_compare",
     "cookie_consent",
     "recoco.apps.dsrc",
     "recoco.apps.onboarding",
@@ -82,7 +82,20 @@ INSTALLED_APPS = [
     "recoco.apps.invites",
     "recoco.apps.crm",
     "recoco.apps.training",
+    "recoco.apps.pages",
+    "recoco.apps.metrics",
     "crispy_forms",
+    "wagtail.contrib.forms",
+    "wagtail.contrib.redirects",
+    "wagtail.embeds",
+    "wagtail.sites",
+    "wagtail.users",
+    "wagtail.snippets",
+    "wagtail.documents",
+    "wagtail.images",
+    "wagtail.search",
+    "wagtail.admin",
+    "wagtail",
 ]
 
 SITE_ID = SiteID(default=1)
@@ -105,6 +118,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "watson.middleware.SearchContextMiddleware",
     "hijack.middleware.HijackUserMiddleware",
+    "wagtail.contrib.redirects.middleware.RedirectMiddleware",
 ]
 
 ROOT_URLCONF = "recoco.urls"
@@ -189,7 +203,6 @@ LANGUAGE_CODE = "fr-fr"
 TIME_ZONE = "Europe/Paris"
 
 USE_I18N = True
-USE_L10N = True
 USE_TZ = True
 
 
@@ -199,7 +212,9 @@ USE_TZ = True
 STATIC_URL = "/static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "..", "static")
 
-STATICFILES_DIRS = [BASE_DIR / "static"]
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+]
 
 
 STATICFILES_FINDERS = [
@@ -322,8 +337,20 @@ REST_FRAMEWORK = {
         "rest_framework.renderers.JSONRenderer",
         "rest_framework.renderers.BrowsableAPIRenderer",
         "rest_framework_xml.renderers.XMLRenderer",
-    ]
+    ],
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
 
+# WAGTAIL
+WAGTAIL_SITE_NAME = "Recommandations Collaboratives"
+WAGTAIL_PASSWORD_MANAGEMENT_ENABLED = False
+WAGTAIL_EMAIL_MANAGEMENT_ENABLED = False
+
+# WAGTAILADMIN_BASE_URL = define that
+
+# Materialized views
+MATERIALIZED_VIEWS_SPEC = []
+MATERIALIZED_VIEWS_SQL_DIR = BASE_DIR / "apps/metrics/sql_queries"
+MATERIALIZED_VIEWS_PREFIX = "mv"
 
 # eof

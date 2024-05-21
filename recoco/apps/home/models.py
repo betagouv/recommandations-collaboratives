@@ -122,6 +122,12 @@ class SiteConfiguration(models.Model):
     onboarding = models.ForeignKey(
         "onboarding.Onboarding", null=True, on_delete=models.SET_NULL
     )
+    onboarding_questions = models.ManyToManyField(
+        "survey.Question",
+        blank=True,
+        help_text="Question présentées lors de la saisine",
+    )
+
     sender_email = models.EmailField(
         help_text="Adresse de l'expéditeur pour les emails automatiques"
     )
@@ -134,6 +140,12 @@ class SiteConfiguration(models.Model):
     legal_address = models.CharField(
         verbose_name="Adresse postale",
         help_text="L'adresse postale est notamment affichée en bas des emails automatiques.",
+        null=True,
+        blank=True,
+        max_length=100,
+    )
+    legal_owner = models.CharField(
+        verbose_name="Propriétaire légal",
         null=True,
         blank=True,
         max_length=100,

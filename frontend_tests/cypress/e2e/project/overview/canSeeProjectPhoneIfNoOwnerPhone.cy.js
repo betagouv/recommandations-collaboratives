@@ -1,16 +1,16 @@
-import projects from '../../../fixtures/projects/projects.json'
+import projects from '../../../fixtures/projects/projects.json';
 
 const currentProject = projects[1];
 
 describe('I can go to overview tab', () => {
     beforeEach(() => {
-        cy.login("staff");
-    })
+        cy.login('staff');
+    });
 
     it('see the project phone if no project owner phone number', () => {
-        cy.visit(`/project/${currentProject.pk}`)
+        cy.visit(`/project/${currentProject.pk}`);
 
-        //Used to match +33phone logic returned from django
-        cy.contains(`+33${currentProject.fields.phone.replace(/\s/g, "").substring(1)}`);
-    })
-})
+        //Used to match phone logic returned from django
+        cy.contains(`${currentProject.fields.phone}`);
+    });
+});

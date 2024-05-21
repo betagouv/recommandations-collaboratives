@@ -1,18 +1,20 @@
-import { schemaFormInputs } from './ajv.schema.forms';
+import { minLengthErrorMessage, schemaFormInputs } from './ajv.schema.forms';
 
 /**
  * Validation schema for the form: DsrcFormValidator
  */
-export const schemaOnboardingStepProjectFormValidator = {
-  $id: '#/definitions/OnboardingStepProjectFormValidator',
+export const schemaOnboardingStep2ProjectFormValidator = {
+  $id: '#/definitions/OnboardingStep2ProjectFormValidator',
   type: 'object',
   properties: {
     name: { $ref: '#/definitions/text' },
     location: { $ref: '#/definitions/text' },
-    insee: { $ref: '#/definitions/text' },
-    description: { $ref: '#/definitions/textarea' },
-    response: { $ref: '#/definitions/textarea' },
+    description: {
+      type: 'string',
+      minLength: 3,
+      errorMessage: minLengthErrorMessage(3),
+    },
   },
-  required: ['name', 'location', 'insee', 'description', 'response'],
+  required: ['name', 'location', 'description'],
   definitions: schemaFormInputs,
 };
