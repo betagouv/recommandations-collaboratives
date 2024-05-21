@@ -91,8 +91,8 @@ class MaterializedView:
 
         try:
             queryset = module.get_queryset(site_id=self.site.id)
-        except AttributeError:
-            return None
+        except AttributeError as e:
+            raise e
 
         if isinstance(queryset, QuerySet):
             sql, params = queryset.query.sql_with_params()
