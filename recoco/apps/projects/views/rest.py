@@ -18,7 +18,12 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from recoco import verbs
-from recoco.utils import TrigramSimilaritySearchFilter, get_group_for_site
+from recoco.utils import (
+    TrigramSimilaritySearchFilter,
+    get_group_for_site,
+    has_perm,
+    has_perm_or_403,
+)
 
 from .. import models, signals
 from ..serializers import (
@@ -47,12 +52,18 @@ class ProjectDetail(APIView):
 
     def get(self, request, pk, format=None):
         p = self.get_object(pk)
+        has_perm(request.user, "list_projects", request.site) or has_perm_or_403(
+            request.user, "view_project", p
+        )
         context = {"request": request}
         serializer = ProjectSerializer(p, context=context)
         return Response(serializer.data)
 
     def patch(self, request, pk, format=None):
         p = self.get_object(pk)
+        has_perm(request.user, "list_projects", request.site) or has_perm_or_403(
+            request.user, "projects.change_location", p
+        )  # need at least one write perm
         context = {"request": request, "view": self, "format": format}
         serializer = ProjectSerializer(
             p, context=context, data=request.data, partial=True
@@ -240,7 +251,7 @@ def fetch_the_site_project_statuses_for_user(site, user):
 
     Here we face a n+1 fetching problem that happens at multiple levels
     implying an explosition of requests (order of 400+ request for 30+ projects)
-    The intent is to fetch each kind of objecst in on request and then to
+    The intent is to fetch each kind of objects in on request and then to
     reattache the information to the appropriate object.
     """
     project_statuses = models.UserProjectStatus.objects.filter(
@@ -405,6 +416,8 @@ def fetch_site_projects_with_ids(site, ids):
 class TopicViewSet(viewsets.ReadOnlyModelViewSet):
     """API endpoint that allows searching for topics"""
 
+    permission_classes = [permissions.IsAuthenticated]
+
     search_fields = ["name"]
 
     filter_backends = [TrigramSimilaritySearchFilter]
@@ -412,9 +425,9 @@ class TopicViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = TopicSerializer
 
     def get_queryset(self):
-        """Return a list of all organizations."""
+        """Return a list of all topics."""
         restrict_to = self.request.query_params.get("restrict_to", None)
-        topics = models.Topic.objects.all()
+        topics = models.Topic.objects.none()
         if restrict_to:
             # Warning : make sure the models mapping here have a "deleted" field or change the code below ;)
             # If not, a django.core.exceptions.FieldError will be throw.
@@ -424,7 +437,9 @@ class TopicViewSet(viewsets.ReadOnlyModelViewSet):
             }
             try:
                 topics = (
-                    topics.filter(**{f"{models_mapping[restrict_to]}__deleted": None})
+                    models.Topic.objects.filter(
+                        **{f"{models_mapping[restrict_to]}__deleted": None}
+                    )
                     .annotate(ntag=Count(models_mapping[restrict_to]))
                     .exclude(ntag=0)
                 )

@@ -3,13 +3,20 @@ from django import template
 from .. import utils
 from ..models import Choice, Answer
 
-
 register = template.Library()
 
 
 @register.simple_tag
 def question_set_completion(session, question_set):
     return utils.compute_qs_completion(session, question_set)
+
+
+@register.simple_tag
+def question_answer(session, question):
+    try:
+        return Answer.objects.get(question=question, session=session)
+    except Answer.DoesNotExist:
+        return None
 
 
 @register.simple_tag

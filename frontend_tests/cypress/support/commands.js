@@ -44,7 +44,6 @@ Cypress.Commands.add('login', (role) => {
     const regExp = /\=([^=]+)\;/;
     const matches = regExp.exec(setCookieValue);
     const token = matches[1];
-    cy.log('USERNAME ', username);
     cy.request({
       method: 'POST',
       url: '/accounts/login/',

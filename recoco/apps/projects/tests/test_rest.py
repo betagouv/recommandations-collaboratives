@@ -182,6 +182,21 @@ def test_anonymous_cannot_use_project_detail_api(request, client):
 
 
 @pytest.mark.django_db
+def test_simple_user_cannot_use_project_detail_api(request, client):
+    site = get_current_site(request)
+    user = baker.make(auth_models.User, email="me@example.com")
+    project = create_project_with_notifications(site, user)
+
+    client = APIClient()
+    client.force_authenticate(user=user)
+
+    url = reverse("projects-detail", args=[project.id])
+    response = client.get(url)
+
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
 def test_project_detail_contains_project_info(request, client):
     site = get_current_site(request)
     user = baker.make(auth_models.User, email="me@example.com")
@@ -326,6 +341,27 @@ def test_bad_project_is_reported_by_project_patch_api(client):
 #     response = client.patch(url, data={"unknown": "UNKNOWN"})
 #
 #     assert response.status_code == 400
+
+
+@pytest.mark.django_db
+def test_project_simple_user_cannot_update_by_project_patch_api(request, client):
+    old_status = "DRAFT"
+    new_status = "READY"
+
+    site = get_current_site(request)
+    user = baker.make(auth_models.User, email="me@example.com")
+    project = baker.make(models.Project, sites=[site], status=old_status)
+
+    client = APIClient()
+    client.force_authenticate(user)
+
+    url = reverse("projects-detail", args=[project.id])
+    response = client.patch(url, data={"status": new_status})
+
+    assert response.status_code == 403
+
+    project.refresh_from_db()
+    assert project.status == old_status
 
 
 @pytest.mark.django_db
@@ -703,14 +739,14 @@ def test_project_status_patch_updates_object_and_log(request):
 
 
 @pytest.mark.django_db
-def test_anonymous_can_use_topic_api(client):
+def test_anonymous_cannot_use_topic_api(client):
     url = reverse("topics-list")
     response = client.get(url)
-    assert response.status_code == 200
+    assert response.status_code == 403
 
 
 @pytest.mark.django_db
-def test_anonymous_can_search_topic_api(client, request):
+def test_anonymous_cannot_search_topic_api(client, request):
     current_site = get_current_site(request)
 
     topic = baker.make(models.Topic, name="acme topic", site=current_site)
@@ -720,13 +756,15 @@ def test_anonymous_can_search_topic_api(client, request):
     url = reverse("topics-list")
     response = client.get(url, {"search": "acme"}, format="json")
 
-    assert response.status_code == 200
-    assert len(response.data) > 0
+    assert response.status_code == 403
 
 
 @pytest.mark.django_db
-def test_unused_topics_are_not_suggested_via_rest_api(client, request):
+def test_unused_topics_are_not_suggested_via_rest_api(request):
     current_site = get_current_site(request)
+    user = baker.make(auth_models.User)
+    client = APIClient()
+    client.force_authenticate(user=user)
 
     baker.make(models.Topic, name="acme topic", site=current_site)
 
@@ -740,8 +778,11 @@ def test_unused_topics_are_not_suggested_via_rest_api(client, request):
 
 
 @pytest.mark.django_db
-def test_topics_on_deleted_task_are_not_suggested_via_rest_api(client, request):
+def test_topics_on_deleted_task_are_not_suggested_via_rest_api(request):
     current_site = get_current_site(request)
+    user = baker.make(auth_models.User)
+    client = APIClient()
+    client.force_authenticate(user=user)
 
     topic = baker.make(models.Topic, name="acme topic", site=current_site)
     task = baker.make(tasks_models.Task, deleted=timezone.now())
@@ -757,8 +798,11 @@ def test_topics_on_deleted_task_are_not_suggested_via_rest_api(client, request):
 
 
 @pytest.mark.django_db
-def test_topics_on_deleted_project_are_not_suggested_via_rest_api(client, request):
+def test_topics_on_deleted_project_are_not_suggested_via_rest_api(request):
     current_site = get_current_site(request)
+    user = baker.make(auth_models.User)
+    client = APIClient()
+    client.force_authenticate(user=user)
 
     topic = baker.make(models.Topic, name="acme topic", site=current_site)
     project = baker.make(models.Project, deleted=timezone.now())
@@ -774,8 +818,11 @@ def test_topics_on_deleted_project_are_not_suggested_via_rest_api(client, reques
 
 
 @pytest.mark.django_db
-def test_topics_are_restricted_to_projects_via_rest_api(client, request):
+def test_topics_are_restricted_to_projects_via_rest_api(request):
     current_site = get_current_site(request)
+    user = baker.make(auth_models.User)
+    client = APIClient()
+    client.force_authenticate(user=user)
 
     topic = baker.make(models.Topic, name="acme topic", site=current_site)
     task = baker.make(tasks_models.Task)
@@ -791,8 +838,11 @@ def test_topics_are_restricted_to_projects_via_rest_api(client, request):
 
 
 @pytest.mark.django_db
-def test_topics_are_restricted_to_recommendations_via_rest_api(client, request):
+def test_topics_are_restricted_to_recommendations_via_rest_api(request):
     current_site = get_current_site(request)
+    user = baker.make(auth_models.User)
+    client = APIClient()
+    client.force_authenticate(user=user)
 
     topic = baker.make(models.Topic, name="acme topic", site=current_site)
     project = baker.make(models.Project)
@@ -808,8 +858,11 @@ def test_topics_are_restricted_to_recommendations_via_rest_api(client, request):
 
 
 @pytest.mark.django_db
-def test_topics_are_restricted_to_nonexistent_via_rest_api(client, request):
+def test_topics_are_restricted_to_nonexistent_via_rest_api(request):
     current_site = get_current_site(request)
+    user = baker.make(auth_models.User)
+    client = APIClient()
+    client.force_authenticate(user=user)
 
     baker.make(models.Topic, name="acme topic", site=current_site)
 
@@ -819,7 +872,7 @@ def test_topics_are_restricted_to_nonexistent_via_rest_api(client, request):
     )
 
     assert response.status_code == 200
-    assert len(response.data) == 1
+    assert len(response.data) == 0
 
 
 # eof
