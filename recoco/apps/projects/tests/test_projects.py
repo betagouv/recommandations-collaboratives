@@ -214,7 +214,9 @@ def test_draft_project_list_available_for_staff(request, client):
 # Overview
 @pytest.mark.django_db
 def test_project_overview_not_available_for_unprivileged_user(request, client):
-    project = Recipe(models.Project, sites=[get_current_site(request)]).make()
+    current_site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=current_site)
+    project = Recipe(models.Project, sites=[current_site]).make()
     url = reverse("projects-project-detail-overview", args=[project.id])
     with login(client):
         response = client.get(url)
@@ -1474,6 +1476,7 @@ def test_non_regional_switchtender_can_observe_project(request, client):
 @pytest.mark.django_db
 def test_switchtender_visits_project_without_interest(request, client):
     current_site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=current_site)
 
     commune = Recipe(geomatics.Commune).make()
     project = Recipe(models.Project, commune=commune, sites=[current_site]).make()
@@ -1495,6 +1498,7 @@ def test_switchtender_visits_project_without_interest(request, client):
 @pytest.mark.django_db
 def test_switchtender_visits_new_project(request, client):
     current_site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=current_site)
 
     commune = Recipe(geomatics.Commune).make()
     project = Recipe(models.Project, commune=commune, sites=[current_site]).make()
@@ -1524,6 +1528,7 @@ def test_switchtender_visits_new_project(request, client):
 @pytest.mark.django_db
 def test_switchtender_observes_project_shows_interest(request, client):
     current_site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=current_site)
 
     commune = Recipe(geomatics.Commune).make()
     project = Recipe(models.Project, commune=commune, sites=[current_site]).make()
@@ -1549,6 +1554,7 @@ def test_switchtender_observes_project_shows_interest(request, client):
 @pytest.mark.django_db
 def test_switchtender_advises_project_shows_interest(request, client):
     current_site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=current_site)
 
     commune = Recipe(geomatics.Commune).make()
     project = Recipe(models.Project, commune=commune, sites=[current_site]).make()
@@ -1576,6 +1582,7 @@ def test_switchtender_stop_advising_or_observing_project_shows_no_interest(
     request, client
 ):
     current_site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=current_site)
 
     commune = Recipe(geomatics.Commune).make()
     project = Recipe(models.Project, commune=commune, sites=[current_site]).make()
