@@ -145,7 +145,6 @@ main {
 
 a {
   color: $blue;
-  color: $blue;
 }
 
 a:not(.fr-btn):not(.btn-outline-primary):not(.btn-primary):not(.btn-outline-secondary):hover {
@@ -263,5 +262,13 @@ p {
     background-color: white;
     border-radius: 0.2rem;
     width: 100%;
+  }
+
+  &>input.fr-input {
+    border: none
+  }
+
+  &>input[type="checkbox"] {
+    width: auto;
   }
 }

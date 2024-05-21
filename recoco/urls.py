@@ -14,92 +14,24 @@ from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from django.urls import include, path
 from magicauth.urls import urlpatterns as magicauth_urls
-from rest_framework import routers
 from wagtail import urls as wagtail_urls
 from wagtail.admin import urls as wagtailadmin_urls
 from wagtail.documents import urls as wagtaildocs_urls
+from recoco.rest_api.urls import urlpatterns as rest_api_urls
 
-from recoco.apps.addressbook import rest as addressbook_rest
 from recoco.apps.addressbook.urls import urlpatterns as addressbook_urls
 from recoco.apps.crm.urls import urlpatterns as crm_urls
-from recoco.apps.geomatics import rest as geomatics_rest
 from recoco.apps.home.urls import urlpatterns as home_urls
 from recoco.apps.invites.urls import urlpatterns as invites_urls
 from recoco.apps.onboarding.urls import urlpatterns as onboarding_urls
 from recoco.apps.projects.urls import urlpatterns as projects_urls
-from recoco.apps.projects.views import rest as projects_rest
-from recoco.apps.resources import views as resources_views
-from recoco.apps.resources.urls import urlpatterns as resources_urls
-from recoco.apps.resources import rest as resources_rest
-from recoco.apps.survey.urls import urlpatterns as survey_urls
 from recoco.apps.tasks.urls import urlpatterns as tasks_urls
-from recoco.apps.tasks.views import rest as tasks_rest
-from recoco.apps.training import rest as training_rest
+from recoco.apps.resources.urls import urlpatterns as resources_urls
+from recoco.apps.survey.urls import urlpatterns as survey_urls
 
-# Rest
-router = routers.DefaultRouter()
-
-router.register(
-    r"projects/(?P<project_id>[^/.]+)/tasks/(?P<task_id>[^/.]+)/followups",
-    tasks_rest.TaskFollowupViewSet,
-    basename="project-tasks-followups",
-)
-
-router.register(
-    r"projects/(?P<project_id>[^/.]+)/tasks",
-    tasks_rest.TaskViewSet,
-    basename="project-tasks",
-)
-
-router.register(
-    r"projects/(?P<project_id>[^/.]+)/tasks/(?P<task_id>[^/.]+)/notifications",
-    tasks_rest.TaskNotificationViewSet,
-    basename="project-tasks-notifications",
-)
-
-router.register(r"resources", resources_rest.ResourceViewSet, basename="resources")
-router.register(
-    r"departments", geomatics_rest.DepartmentViewSet, basename="departments"
-)
-router.register(r"regions", geomatics_rest.RegionViewSet, basename="regions")
-router.register(r"communes", geomatics_rest.CommuneViewSet, basename="communes")
-router.register(
-    r"organizations", addressbook_rest.OrganizationViewSet, basename="organizations"
-)
-router.register(r"topics", projects_rest.TopicViewSet, basename="topics")
-router.register(
-    r"challenges/definitions",
-    training_rest.ChallengeDefinitionViewSet,
-    basename="challenge-definitions",
-)
 
 urlpatterns = [
-    path("api/", include(router.urls)),
-    path(
-        "api/projects/<int:pk>/",
-        projects_rest.ProjectDetail.as_view(),
-        name="projects-detail",
-    ),
-    path(
-        "api/projects/",
-        projects_rest.ProjectList.as_view(),
-        name="projects-list",
-    ),
-    path(
-        "api/userprojectstatus/<int:pk>/",
-        projects_rest.UserProjectStatusDetail.as_view(),
-        name="userprojectstatus-detail",
-    ),
-    path(
-        "api/userprojectstatus/",
-        projects_rest.UserProjectStatusList.as_view(),
-        name="userprojectstatus-list",
-    ),
-    path(
-        "api/challenges/<str:slug>/",
-        training_rest.ChallengeView.as_view(),
-        name="challenges-challenge",
-    ),
+    path("api/", include(rest_api_urls)),
     path("accounts/", include("allauth.urls")),
     path("logout/", auth_views.LogoutView.as_view(), name="logout"),
     path("markdownx/", include("markdownx.urls")),
@@ -111,7 +43,6 @@ urlpatterns = [
     path("documents/", include(wagtaildocs_urls)),
     path("p/", include(wagtail_urls)),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-
 
 urlpatterns.extend(magicauth_urls)
 urlpatterns.extend(home_urls)
