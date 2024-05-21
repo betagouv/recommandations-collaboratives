@@ -264,4 +264,12 @@ p {
     border-radius: 0.2rem;
     width: 100%;
   }
+
+  &>input.fr-input {
+    border: none
+  }
+
+  &>input[type="checkbox"] {
+    width: auto;
+  }
 }
