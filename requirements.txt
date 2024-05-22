@@ -59,5 +59,8 @@ django-reversion-compare==0.17.0
 
 wagtail==6.1.2
 
+celery==5.4.0
+redis==5.0.4
+
 # Django webhook fork
 django-webhook @ git+https://github.com/etchegom/django-webhook.git@feat/open-for-extension
