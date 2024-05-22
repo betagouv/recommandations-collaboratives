@@ -57,6 +57,6 @@ runserver:
 	@python manage.py runserver 0.0.0.0:8000
 
 runworker:
-	@celery -A recoco.worker worker -l info -Q webhooks
+	@celery -A recoco.worker worker -l info -Q webhooks --concurrency=1
 
 # eof

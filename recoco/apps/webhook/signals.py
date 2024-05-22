@@ -1,6 +1,7 @@
 from django_webhook.signals import SignalListener
-from recoco.apps.projects.models import Project
 from django_webhook.models import Webhook
+from recoco.apps.projects.models import Project
+from recoco.apps.projects.serializers import ProjectSerializer
 from typing import Any
 
 
@@ -22,13 +23,5 @@ class WebhookSignalListener(SignalListener):
             ).values_list("id", "uuid")
         )
 
-    def model_dict(self, instance):
-        # TODO: use DRF serializer?
-        if isinstance(instance, Project):
-            return {
-                "id": instance.id,
-                "name": instance.name,
-                "status": instance.status,
-            }
-
-        return super().model_dict(instance)
+    def model_dict(self, instance: Any) -> dict[str, Any]:
+        return ProjectSerializer(instance).data

@@ -28,7 +28,7 @@ from recoco.utils import (
 from .. import models, signals
 from ..serializers import (
     ProjectForListSerializer,
-    ProjectSerializer,
+    UserProjectSerializer,
     TopicSerializer,
     UserProjectStatusForListSerializer,
     UserProjectStatusSerializer,
@@ -56,7 +56,7 @@ class ProjectDetail(APIView):
             request.user, "view_project", p
         )
         context = {"request": request}
-        serializer = ProjectSerializer(p, context=context)
+        serializer = UserProjectSerializer(p, context=context)
         return Response(serializer.data)
 
     def patch(self, request, pk, format=None):
@@ -65,7 +65,7 @@ class ProjectDetail(APIView):
             request.user, "projects.change_location", p
         )  # need at least one write perm
         context = {"request": request, "view": self, "format": format}
-        serializer = ProjectSerializer(
+        serializer = UserProjectSerializer(
             p, context=context, data=request.data, partial=True
         )
         if serializer.is_valid():

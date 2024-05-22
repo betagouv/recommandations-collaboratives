@@ -1,9 +1,12 @@
 import pytest
 from django.contrib.sites.models import Site
 from django_webhook.models import WebhookTopic
+
 from model_bakery import baker
+from freezegun import freeze_time
 
 from recoco.apps.projects.models import Project
+from recoco.apps.geomatics.models import Commune
 
 from ..models import WebhookSite
 from ..signals import WebhookSignalListener
@@ -21,10 +24,31 @@ def webhook():
 
 
 @pytest.fixture
-def project():
-    project = baker.make("projects.Project")
-    project.sites.add(Site.objects.first())
-    yield project
+def commune():
+    return baker.make(
+        Commune,
+        name="Bayonne",
+        insee="64102",
+        postal="64100",
+        latitude=43.4933,
+        longitude=-1.4753,
+        department__code="64",
+        department__name="Pyrénées-Atlantiques",
+    )
+
+
+@pytest.fixture
+def project(commune):
+    with freeze_time("2024-05-22"):
+        project = baker.make(
+            "projects.Project",
+            status="READY",
+            name="My project",
+            org_name="My organization",
+            commune=commune,
+        )
+        project.sites.add(Site.objects.first())
+        yield project
 
 
 def build_listener():
@@ -65,15 +89,26 @@ def test_find_webhooks_no_project():
     assert build_listener().find_webhooks("topic", task) == []
 
 
-@pytest.mark.skip(reason="TODO")
+@pytest.mark.django_db
 def test_model_dict(project):
-    assert (
-        build_listener().model_dict(
-            Project(
-                id=1,
-                name="name",
-                status="status",
-            )
-        )
-        == {}
-    )
+    assert build_listener().model_dict(project) == {
+        "id": project.id,
+        "name": "My project",
+        "status": "READY",
+        "inactive_since": None,
+        "created_on": "2024-05-22T02:00:00+02:00",
+        "updated_on": "2024-05-22T02:00:00+02:00",
+        "org_name": "My organization",
+        "switchtenders": [],
+        "commune": {
+            "name": "Bayonne",
+            "insee": "64102",
+            "postal": "64100",
+            "department": {"name": "Pyrénées-Atlantiques", "code": "64"},
+            "latitude": 43.4933,
+            "longitude": -1.4753,
+        },
+        "recommendation_count": 0,
+        "public_message_count": 0,
+        "private_message_count": 0,
+    }
