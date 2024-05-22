@@ -33,7 +33,6 @@ venv
 screenshots
 .idea
 .tool-versions
-.python-version
 .env
 
 ## Ignore Jupyter Notebooks files
