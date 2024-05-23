@@ -2,7 +2,7 @@
 
 from django.db import migrations
 from django.contrib.auth import models as auth_models
-from recoco.apps.home.utils import make_group_name_for_site
+from recoco.utils import make_group_name_for_site
 from django.contrib.sites.management import create_default_site
 
 from .. import models
