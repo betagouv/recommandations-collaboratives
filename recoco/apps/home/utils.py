@@ -8,12 +8,12 @@ created: 2021-06-08 09:56:53 CEST
 """
 
 from django.conf import settings
-from django.contrib.auth import models as auth_models
 from django.contrib.sites.models import Site
-from recoco.apps.onboarding import models as onboarding_models
-from recoco.apps.survey import models as survey_models
+from django.db import transaction
+from guardian.shortcuts import assign_perm
 
-from recoco.utils import make_group_name_for_site
+from recoco.apps.survey import models as survey_models
+from recoco.utils import get_group_for_site
 
 from . import models
 
@@ -40,22 +40,20 @@ def get_current_site_sender_email():
     return f"{site_config.sender_email}"
 
 
-def make_new_site(name: str, domain: str, sender_email: str, sender_name: str) -> Site:
+def make_new_site(
+    name: str,
+    domain: str,
+    sender_email: str,
+    sender_name: str,
+    contact_form_recipient: str,
+    legal_address: str,
+) -> Site:
     """Return a new site with given name/domain or None if exists"""
     if Site.objects.filter(domain=domain).count():
-        return
+        raise Exception(f"The domain {domain} already used")
 
-    site, created = Site.objects.get_or_create(domain=domain, defaults={"name": name})
-
-    try:
-        models.SiteConfiguration.objects.get(site=site)
-    except models.SiteConfiguration.DoesNotExist:
-        onboarding = onboarding_models.Onboarding.objects.create(
-            form="[{'type': 'header', 'subtype': 'h1', 'label': 'Header'}, {'type':"
-            "'text', 'required': False, 'label': '<br>',"
-            "'className': 'form-control', 'name':"
-            "'text-1660055681026-0', 'subtype': 'text'}]"
-        )
+    with transaction.atomic():
+        site = Site.objects.create(name=name, domain=domain)
 
         survey, created = survey_models.Survey.objects.get_or_create(
             site=site,
@@ -76,17 +74,21 @@ def make_new_site(name: str, domain: str, sender_email: str, sender_name: str) -
         models.SiteConfiguration.objects.create(
             site=site,
             project_survey=survey,
-            onboarding=onboarding,
             sender_email=sender_email,
             sender_name=sender_name,
+            contact_form_recipient=contact_form_recipient,
+            legal_address=legal_address,
         )
 
-    for name, permissions in models.SITE_GROUP_PERMISSIONS.items():
-        group_name = make_group_name_for_site(name, site)
-        auth_models.Group.objects.create(name=group_name)
-        # TODO add permission for group
+        with settings.SITE_ID.override(site.pk):
+            for group_name, permissions in models.SITE_GROUP_PERMISSIONS.items():
+                group = get_group_for_site(group_name, site, create=True)
+                for perm_name in permissions:
+                    assign_perm(perm_name, group, obj=site)
 
-    return site
+        return site
+
+    return None
 
 
 # eof
