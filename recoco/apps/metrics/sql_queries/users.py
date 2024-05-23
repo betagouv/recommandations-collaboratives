@@ -48,5 +48,5 @@ def get_queryset(site_id: int) -> QuerySet:
                 output_field=TextField(),
             )
         )
-        .values("hash", "date_joined", "is_advisor", "advisor_scope", "is_site_staff")
+        .values("hash", "date_joined", "is_advisor", "advisor_scope", "is_site_staff", "last_login")
     )
