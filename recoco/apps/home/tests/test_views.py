@@ -504,16 +504,17 @@ def test_guardian_supports_remove_bulk_perm_for_group_with_site_framework(
 def test_make_new_site_fails_for_existing_domain(client):
     before = models.SiteConfiguration.objects.count()
 
-    site = utils.make_new_site(
-        "Example",
-        "example.com",
-        "sender@example.com",
-        "Sender",
-        "contact@example.com",
-        "36 green street 75000 Paris",
-    )
+    with pytest.raises(Exception) as excinfo:
+        utils.make_new_site(
+            "Example",
+            "example.com",
+            "sender@example.com",
+            "Sender",
+            "contact@example.com",
+            "36 green street 75000 Paris",
+        )
 
-    assert site is None
+    assert str(excinfo.value) == "The domain example.com already used"
     assert models.SiteConfiguration.objects.count() == before
 
 
