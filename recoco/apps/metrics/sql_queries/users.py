@@ -50,3 +50,5 @@ def get_queryset(site_id: int) -> QuerySet:
         )
         .values("hash", "date_joined", "is_advisor", "advisor_scope", "is_site_staff", "last_login")
     )
+    .order_by("hash")
+    .distinct("hash")
