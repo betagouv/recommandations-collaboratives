@@ -16,6 +16,8 @@ from django.shortcuts import get_object_or_404, redirect, render, reverse
 from django.template.loader import render_to_string
 from django.utils.http import urlencode
 from django.views.generic import FormView
+from allauth.account.views import LoginView
+
 
 from recoco.apps.addressbook import models as addressbook
 from recoco.apps.communication import constants as communication_constants
@@ -43,6 +45,25 @@ from recoco.utils import (
 
 from . import forms, models
 
+
+class OnboardingLogin(LoginView):
+    """Allauth login view overriden to match onboarding style"""
+
+    template_name = "onboarding/onboarding-signin.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        current_site = self.request.site.name
+        # FIXME: is it possible to do it in a more dynamic way?
+        excluded_sites = ["Bac à Sable Recoconseil", "Reco-Conseil", current_site]
+        all_sites = sites.Site.objects.exclude(name__in=excluded_sites).values_list(
+            "name", flat=True
+        )
+
+        context["sites"] = all_sites
+        return context
+
+
 ########################################################################
 # User driven onboarding for a new project
 ########################################################################
@@ -60,22 +81,21 @@ class OnboardingView(FormView):
         return super().dispatch(request, *args, **kwargs)
 
     def get(self, request, *args, **kwargs):
-        return redirect(reverse("account_login"))
+        return redirect(reverse("onboarding-signin"))
 
     def form_valid(self, form):
         self.request.session["onboarding_email"] = form.cleaned_data["email"]
-
         try:
             auth.User.objects.get(email=form.cleaned_data["email"])
             next_args = urlencode({"next": reverse("onboarding-project")})
-            login_url = reverse("account_login")
+            login_url = reverse("onboarding-signin")
             return redirect(f"{login_url}?{next_args}")
         except auth.User.DoesNotExist:
             signup_url = reverse("onboarding-signup")
             return redirect(signup_url)
 
     def form_invalid(self, form):
-        return redirect(reverse("account_login"))
+        return redirect(reverse("onboarding-signin"))
 
 
 def onboarding_signup(request):
@@ -105,7 +125,8 @@ def onboarding_signup(request):
 
         if not is_new_user:
             # user exists but is not currently logged in,
-            login_url = reverse("account_login")
+            request.session["onboarding_email"] = email
+            login_url = reverse("onboarding-signin")
             next_args = urlencode({"next": reverse("onboarding-project")})
             return redirect(f"{login_url}?{next_args}")
 

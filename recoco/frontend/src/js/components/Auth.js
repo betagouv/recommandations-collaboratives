@@ -5,17 +5,23 @@ function Auth() {
   return {
     initLogin() {
       const loginInput = document.getElementById('id_login');
-      const forgotPasswordButton = document.getElementById('forgot-password');
+      if (loginInput.value.length > 0) {
+        this.changeForgotPasswrodButtonHref(loginInput);
+      }
 
       loginInput.addEventListener('change', (e) => {
-        const newUrlwithHash =
-          forgotPasswordButton.getAttribute('href') + '#' + e.target.value;
+        this.changeForgotPasswrodButtonHref(e.target);
+      });
+    },
+    changeForgotPasswrodButtonHref(target) {
+      const forgotPasswordButton = document.getElementById('forgot-password');
+      const newUrlwithHash =
+        forgotPasswordButton.getAttribute('href') + '#' + target.value;
 
-        forgotPasswordButton.addEventListener('click', (e) => {
-          e.preventDefault();
+      forgotPasswordButton.addEventListener('click', (e) => {
+        e.preventDefault();
 
-          location.href = escapeHtml(newUrlwithHash);
-        });
+        location.href = escapeHtml(newUrlwithHash);
       });
     },
     initResetPassword() {

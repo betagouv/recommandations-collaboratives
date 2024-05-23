@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+{% load django_vite %}
+{% load static %}
+{% load i18n %}
+{% load sass_tags %}
+{% load crispy_forms_tags %}
+{% load crispy_forms_field  %}
+{% block js %}
+    {% vite_asset 'js/apps/onboarding.js' %}
+    {% vite_asset 'js/apps/auth.js' %}
+{% endblock js %}
+{% block css %}
+    <link href="{% sass_src 'home/css/dsfr/custom-dsfr.scss' %}"
+          rel="stylesheet"
+          type="text/css">
+{% endblock css %}
+{% block title %}
+    Connexion | Solliciter l'équipe {{ request.site.name }}
+{% endblock title %}
+{% block og_title %}
+    Connexion | Solliciter l'équipe {{ request.site.name }}
+{% endblock og_title %}
+{% block page_title %}
+    Solliciter {{ request.site }}
+{% endblock page_title %}
+{% block tagline %}
+    Ces informations nous permettent de traiter votre demande dans les meilleures conditions.
+{% endblock tagline %}
+{% block content %}
+    <div x-data="Auth"
+    x-init="initLogin" class="container">
+        <div class="banner mt-6 mb-6 text-center">
+            {% if site_config.email_logo %}
+                <img src="{{ site_config.email_logo.url }}"
+                     width="10%"
+                     height="auto"
+                     alt="Logo {{ request.site.name }}" />
+            {% endif %}
+            <h1>
+                <strong>Déposer votre projet</strong> {{ request.site.name }}
+            </h1>
+        </div>
+        <div class="fr-stepper mb-3">
+            <h2 class="fr-stepper__title">
+                Identifiez-vous
+                <span class="fr-stepper__state">Étape 1 sur 2</span>
+            </h2>
+            <div class="fr-stepper__steps" data-fr-current-step="1" data-fr-steps="2"></div>
+            <p class="fr-stepper__details">
+                <span class="fr-text--bold">Étape suivante :</span> Localisez votre projet
+            </p>
+        </div>
+        <div class="container__form d-flex justify-content-center"
+             x-data="AjvValidationSchema('schemaOnboardingStep1SigninFormValidator')">
+            <div class="onboarding__form" x-data="DsrcFormValidator('onboarding-login-form', schemaValidator, '{{ request.method }}')" x-init="init">
+                <div class="container-fluid">
+                    <div class="fr-container fr-py-6w max-width-800"
+                        style="font-family: 'Marianne', arial, sans-serif">
+                        <form class="login fr-form-group"
+                            id="onboarding-login-form"
+                            method="post"
+                            action="{% url 'account_login' %}">
+                            {% csrf_token %}
+                            {% if redirect_field_value %}
+                                <input type="hidden"
+                                    name="{{ redirect_field_name }}"
+                                    value="{{ redirect_field_value }}" />
+                            {% endif %}
+                            <input type="hidden"
+                                        name="js_enabled"
+                                        id="onboarding-login-form_js_enabled"
+                                        value="false">
+                            <fieldset class="fr-fieldset">
+                                <legend class="fr-fieldset__legend" style="font-size:1.5rem">Vous avez dejà un compte ? Identifiez-vous !</legend>
+                                    <div class="mx-2 custom-callout-blue">
+                                        Pour vous connecter à {{ request.site.name }}, utilisez le même compte que sur
+                                        {% for site in sites %}
+                                            {% if not forloop.first and not forloop.last %}, {% endif %}
+                                            {% if forloop.last %}ou {% endif %}
+                                            {{ site }}
+                                    {% endfor %} si vous en avez un.
+                                    </div>
+                                    <div id="field_id_login" data-test="" class="fr-fieldset__element">
+                                        <div class="fr-input-group" :class="`fr-input-group--${form['login'].valid_class}`">
+                                            <label for="id_login" class="fr-label">E-mail</label>
+                                    <input value="{% if request.session.onboarding_email %}{{ request.session.onboarding_email }}{% else %}{% endif %}" x-ref="login" @input="changeInput" @focus="touchInput" @blur="validateInput" id="id_login" name="login" type="email" data-test="" class="fr-input fr-input--undefined" :class="`fr-input--${form['login'].valid_class}`" aria-describedby="id_login-desc-undefined" :aria-describedby="`id_login-desc-${form['login'].valid_class}`" required="" maxlength="320">
+                                          <ul x-show="fieldHasError('login')" class="fr-messages-group" id="id_login-desc-error" aria-live="polite">
+                                            <template x-for="(error, index) in form['login'].errors" :key="index">
+                                              <!-- Display client-side validation errors here -->
+                                              <li id="`error_${index}_id_login`" x-text="error" class="fr-error-text"></li>
+                                            </template>
+                                          </ul>
+                                        </div>
+                                    </div>
+
+                                    <div id="field_id_password" data-test="" class="fr-fieldset__element">
+                                        <div class="fr-password fr-input-group" id="id_password" data-test="" :class="`fr-input-group--${form['password'].valid_class}`" data-fr-js-password="true">
+                                            <label for="id_password" class="fr-label">Mot de passe :</label>
+                                            <div class="fr-input-wrap">
+                                                <input x-model="form['password'].value" @input="changeInput" @focus="touchInput" @blur="validateInput" id="id_password-input" name="password" x-ref="password" type="password" autocomplete="'new-password'" data-test="" class="fr-password__input fr-input" aria-describedby="" :class="`fr-input--${form['password'].valid_class}`" required="" data-fr-js-password-input="true">
+                                            </div>
+                                            <!-- Display client-side validation messages here -->
+                                            <ul x-show="form['password'].message_group" class="fr-messages-group" id="id_password-input-messages" aria-live="polite">
+                                                <p class="fr-message" id="id_password-input-message" x-text="form['password'].message_group.help_text"></p>
+                                                <template x-for="(message, index) in form['password'].message_group.messages" :key="index">
+                                                    <li :id="`${message.type}_${index}_password`" x-text="message.text" :class="`fr-${message.type}-text`"></li>
+                                                </template>
+                                            </ul>
+                                            <div class="fr-password__checkbox fr-checkbox-group ">
+                                                <input aria-label="Afficher le mot de passe" id="id_password-show" name="password-show" type="checkbox" aria-describedby="id_password-show-messages" data-fr-js-password-toggle="true">
+                                                <label class="fr-password__checkbox fr-label" for="id_password-show">Afficher</label>
+                                                <div class="fr-messages-group" id="id_password-show-messages" aria-live="assertive"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="px-2 w-100 d-flex justify-content-between align-items-start fr-mt-10v">
+                                        <div class="d-flex flex-column align-items-start">
+                                            {% comment %} TODO Add next {% endcomment %}
+                                            <a class="link-underline-primary" href="/login/" >Recevoir un lien de connexion par email</a>
+                                            <a id="forgot-password"
+                                            href="{% url 'account_reset_password' %}">{% trans "Forgot Password?" %}</a>
+                                        </div>
+                                        <div class="fr-input-group d-flex justify-content-end flex-column align-items-end">
+                                            <div class="fr-input-group">
+                                                <button class="fr-btn custom-login-button" type="submit">Connexion</button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                            </fieldset>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

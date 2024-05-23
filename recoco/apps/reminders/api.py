@@ -134,7 +134,9 @@ def make_or_update_new_recommendations_reminder(site, project, interval_in_days=
 
     if last_sent_reminder:
         if last_sent_reminder.sent_on > starting_point:
-            starting_point = last_sent_reminder.sent_on
+            # We've sent a reminder after any new actity. So, don't repeat it for this
+            # type of reminder.
+            return None
 
     interval = datetime.timedelta(days=interval_in_days)
     deadline = (starting_point + interval).date()

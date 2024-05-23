@@ -145,7 +145,6 @@ main {
 
 a {
   color: $blue;
-  color: $blue;
 }
 
 a:not(.fr-btn):not(.btn-outline-primary):not(.btn-primary):not(.btn-outline-secondary):hover {
@@ -255,6 +254,12 @@ progress::-moz-progress-bar {
   }
 }
 
+.custom-callout-blue {
+  background: rgba(96, 162, 228, 0.10);
+  color: #4285F4;
+  padding: 0.5rem;
+}
+
 p {
 
   &>input,
@@ -263,5 +268,13 @@ p {
     background-color: white;
     border-radius: 0.2rem;
     width: 100%;
+  }
+
+  &>input.fr-input {
+    border: none
+  }
+
+  &>input[type="checkbox"] {
+    width: auto;
   }
 }

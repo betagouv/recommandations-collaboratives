@@ -17,11 +17,10 @@ from model_bakery import baker
 from model_bakery.recipe import Recipe
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 from recoco.apps.geomatics import models as geomatics
-from recoco.apps.projects import models as projects
 from recoco.apps.projects import models as projects_models
 from recoco.utils import login
 
-from . import models
+from .. import models
 
 ########################################################################
 # resources
@@ -142,7 +141,7 @@ def test_resource_list_contains_only_resource_with_area(request, client):
     membership = baker.make(projects_models.ProjectMember)
     with login(client, user=membership.member):
         Recipe(
-            projects.Project,
+            projects_models.Project,
             sites=[current_site],
             projectmember_set=[membership],
             commune__department=departments[1],

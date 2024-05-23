@@ -51,7 +51,7 @@ export function searchOrganizationsUrl(search) {
   return `/api/organizations/?search=${search}`;
 }
 
-// Organization
+// Topic
 export function searchTopicsUrl(search, restrict_to) {
   return `/api/topics/?search=${search}&restrict_to=${restrict_to}`;
 }
@@ -99,7 +99,7 @@ export function challengeUrl(code) {
   return `/api/challenges/${code}/`;
 }
 
-// Challenges
+// Challenges Definitions
 export function challengeDefinitionUrl(code) {
   return `/api/challenges/definitions/${code}`;
 }
