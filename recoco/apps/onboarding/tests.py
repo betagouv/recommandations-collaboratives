@@ -1,6 +1,7 @@
 import pytest
 from django.contrib.auth import models as auth
 from django.contrib.sites.shortcuts import get_current_site
+from django.contrib.sites.models import Site
 from django.urls import reverse
 from model_bakery import baker
 from model_bakery.recipe import Recipe
@@ -56,10 +57,37 @@ def test_onboarding_with_existing_account_redirects_to_signin(request, client):
     )
 
     data = {
-        "email": "a@exAmpLe.Com",
+        "username": "a@exAmpLe.Com",
     }
 
-    baker.make(auth.User, email=data["email"].lower(), username=data["email"])
+    baker.make(auth.User, email=data["username"].lower(), username=data["username"])
+
+    response = client.post(reverse("onboarding"), data=data, follow=True)
+    last_url, status_code = response.redirect_chain[-1]
+    assert status_code == 302
+    assert last_url.startswith(reverse("onboarding-signin"))
+
+
+@pytest.mark.django_db
+def test_onboarding_with_account_on_other_site_redirects_to_signin(request, client):
+    onboarding = onboarding_models.Onboarding.objects.first()
+
+    other_site = baker.make(Site)
+
+    baker.make(
+        home_models.SiteConfiguration,
+        site=get_current_site(request),
+        onboarding=onboarding,
+    )
+
+    data = {
+        "username": "a@exAmpLe.Com",
+    }
+
+    user = baker.make(
+        auth.User, email=data["username"].lower(), username=data["username"]
+    )
+    user.profile.sites.add(other_site)
 
     response = client.post(reverse("onboarding"), data=data, follow=True)
     last_url, status_code = response.redirect_chain[-1]

@@ -53,14 +53,20 @@ class OnboardingLogin(LoginView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        current_site = self.request.site.name
-        # FIXME: is it possible to do it in a more dynamic way?
-        excluded_sites = ["Bac à Sable Recoconseil", "Reco-Conseil", current_site]
-        all_sites = sites.Site.objects.exclude(name__in=excluded_sites).values_list(
-            "name", flat=True
-        )
+        current_site = self.request.site
 
-        context["sites"] = all_sites
+        onboarding_email = self.request.session.get("onboarding_email", None)
+
+        context["user_other_sites"] = []
+        if onboarding_email:
+            try:
+                onboarding_user = auth.User.objects.get(username=onboarding_email)
+                context["user_other_sites"] = onboarding_user.profile.sites.exclude(
+                    id=current_site.id
+                )
+            except auth.User.DoesNotExist:
+                pass
+
         return context
 
 
@@ -86,7 +92,7 @@ class OnboardingView(FormView):
     def form_valid(self, form):
         self.request.session["onboarding_email"] = form.cleaned_data["email"]
         try:
-            auth.User.objects.get(email=form.cleaned_data["email"])
+            auth.User.objects.get(username=form.cleaned_data["email"])
             next_args = urlencode({"next": reverse("onboarding-project")})
             login_url = reverse("onboarding-signin")
             return redirect(f"{login_url}?{next_args}")
