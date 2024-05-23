@@ -16,24 +16,28 @@ class Command(BaseCommand):
             "--domain",
             type=str,
             help="The domain of the new site without protocol (Ex: example.com)",
+            required=True,
         )
         parser.add_argument(
             "-se",
             "--sender-email",
             type=str,
             help="The email address used as the sender for emails sent from the site",
+            required=True,
         )
         parser.add_argument(
             "-sn",
             "--sender-name",
             type=str,
             help="The name used as the sender for emails sent from the site",
+            required=True,
         )
         parser.add_argument(
             "-cr",
             "--contact-form-recipient",
             type=str,
             help="The email address where contact form messages should be sent",
+            required=True,
         )
         parser.add_argument(
             "-la",
@@ -49,7 +53,13 @@ class Command(BaseCommand):
             help="The username of existing user who should become administrator of the new site",
             default="",
         )
-        # TODO: add email logo
+        parser.add_argument(
+            "-el",
+            "--email-logo",
+            type=str,
+            help="The path to the logo image should be use in email template",
+            default="",
+        )
 
     def handle(self, *args, **options):
         name = options["name"]
@@ -58,6 +68,7 @@ class Command(BaseCommand):
         sender_name = options["sender_name"]
         contact_form_recipient = options["contact_form_recipient"]
         legal_address = options["legal_address"]
+        email_logo = options["email_logo"]
 
         try:
 
@@ -73,6 +84,7 @@ class Command(BaseCommand):
                 contact_form_recipient,
                 legal_address,
                 admin_user,
+                email_logo,
             )
 
             if site:

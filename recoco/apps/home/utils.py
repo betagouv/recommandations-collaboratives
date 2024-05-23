@@ -6,8 +6,10 @@ Utilities for home application
 authors: raphael@beta.gouv.fr, guillaume.libersat@beta.gouv.fr
 created: 2021-06-08 09:56:53 CEST
 """
+import os
 from typing import Optional
 from django.conf import settings
+from django.core.files import File
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.db import transaction
@@ -49,6 +51,7 @@ def make_new_site(
     contact_form_recipient: str,
     legal_address: str,
     admin_user: Optional[User] = None,
+    email_logo: Optional[str] = "",
 ) -> Site:
     """Return a new site with given name/domain or None if exists"""
     if Site.objects.filter(domain=domain).count():
@@ -73,7 +76,7 @@ def make_new_site(
                 question_set=question_set, text="Ceci est une question exemple"
             )
 
-        models.SiteConfiguration.objects.create(
+        site_config = models.SiteConfiguration.objects.create(
             site=site,
             project_survey=survey,
             sender_email=sender_email,
@@ -81,6 +84,12 @@ def make_new_site(
             contact_form_recipient=contact_form_recipient,
             legal_address=legal_address,
         )
+
+        if email_logo:
+            with open(email_logo, "rb") as email_logo_file:
+                dj_file = File(email_logo_file)
+                filename = os.path.basename(email_logo)
+                site_config.email_logo.save(f"{name}_{filename}", dj_file, save=True)
 
         with settings.SITE_ID.override(site.pk):
             for group_name, permissions in models.SITE_GROUP_PERMISSIONS.items():
