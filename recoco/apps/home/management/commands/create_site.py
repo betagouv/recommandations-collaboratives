@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand, CommandError
 
 from recoco.apps.home import utils
@@ -41,6 +42,13 @@ class Command(BaseCommand):
             help="The legal address of the company or entity that owns the site",
             default="",
         )
+        parser.add_argument(
+            "-au",
+            "--admin-user",
+            type=str,
+            help="The username of existing user who should become administrator of the new site",
+            default="",
+        )
         # TODO: add email logo
 
     def handle(self, *args, **options):
@@ -52,6 +60,11 @@ class Command(BaseCommand):
         legal_address = options["legal_address"]
 
         try:
+
+            admin_user = None
+            if options["admin_user"]:
+                admin_user = User.objects.get(username=options["admin_user"])
+
             site = utils.make_new_site(
                 name,
                 domain,
@@ -59,6 +72,7 @@ class Command(BaseCommand):
                 sender_name,
                 contact_form_recipient,
                 legal_address,
+                admin_user,
             )
 
             if site:

@@ -6,14 +6,15 @@ Utilities for home application
 authors: raphael@beta.gouv.fr, guillaume.libersat@beta.gouv.fr
 created: 2021-06-08 09:56:53 CEST
 """
-
+from typing import Optional
 from django.conf import settings
+from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.db import transaction
 from guardian.shortcuts import assign_perm
 
 from recoco.apps.survey import models as survey_models
-from recoco.utils import get_group_for_site
+from recoco.utils import assign_site_staff, get_group_for_site
 
 from . import models
 
@@ -47,6 +48,7 @@ def make_new_site(
     sender_name: str,
     contact_form_recipient: str,
     legal_address: str,
+    admin_user: Optional[User] = None,
 ) -> Site:
     """Return a new site with given name/domain or None if exists"""
     if Site.objects.filter(domain=domain).count():
@@ -85,6 +87,9 @@ def make_new_site(
                 group = get_group_for_site(group_name, site, create=True)
                 for perm_name in permissions:
                     assign_perm(perm_name, group, obj=site)
+
+        if admin_user:
+            assign_site_staff(site, admin_user)
 
         return site
 

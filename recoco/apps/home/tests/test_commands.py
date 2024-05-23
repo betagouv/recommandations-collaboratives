@@ -18,7 +18,7 @@ from django.core.management.base import CommandError
 from django.core.management import call_command
 from recoco.apps.addressbook import models as addressbook_models
 from recoco.apps.home.models import SiteConfiguration
-from recoco.utils import get_group_for_site
+from recoco.utils import get_group_for_site, is_staff_for_site
 
 
 from ..management.commands import cleanuporgs
@@ -106,11 +106,33 @@ def test_command_create_site_domain_already_exists(request):
     with pytest.raises(CommandError) as exc_error:
         call_command("create_site", **command_args)
 
-    assert f"The domain {existing_site.domain} already used" in str(exc_error.value)
+    assert f"The domain {existing_site.domain} already used" == str(exc_error.value)
+
+
+@pytest.mark.django_db
+def test_command_create_site_admin_user_doesnt_exists(request):
+    existing_site = Site.objects.first()
+
+    command_args = {
+        "name": "New site",
+        "domain": existing_site.domain,
+        "sender_email": "jdoe@example.org",
+        "sender_name": "jdoe",
+        "contact_form_recipient": "contact@example.org",
+        "legal_address": "36 green street 75000 Paris",
+        "admin_user": "nobody@example.org",
+    }
+
+    with pytest.raises(CommandError) as exc_error:
+        call_command("create_site", **command_args)
+
+    assert "User matching query does not exist." in str(exc_error.value)
 
 
 @pytest.mark.django_db
 def test_command_create_site(request):
+    admin = baker.make(auth_models.User)
+
     command_args = {
         "name": "New site",
         "domain": "example2.org",
@@ -118,6 +140,7 @@ def test_command_create_site(request):
         "sender_name": "jdoe",
         "contact_form_recipient": "contact@example2.org",
         "legal_address": "36 green street 75000 Paris",
+        "admin_user": admin.username,
     }
     out = StringIO()
     call_command("create_site", stdout=out, **command_args)
@@ -132,6 +155,8 @@ def test_command_create_site(request):
     assert site_config.sender_name == command_args["sender_name"]
     assert site_config.contact_form_recipient == command_args["contact_form_recipient"]
     assert site_config.legal_address == command_args["legal_address"]
+
+    assert is_staff_for_site(admin, new_site)
 
     # add user to check permissions
     group = get_group_for_site("advisor", new_site, create=False)
