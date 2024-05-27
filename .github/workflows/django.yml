@@ -88,5 +88,4 @@ jobs:
           DB_PORT: 5432
           DB_ENGINE: django.db.backends.postgresql
         run: |
-          python manage.py migrate
-          pytest --create-db
+          pytest
