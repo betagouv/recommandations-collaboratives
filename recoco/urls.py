@@ -16,7 +16,7 @@ from django.urls import include, path
 from magicauth.urls import urlpatterns as magicauth_urls
 from wagtail import urls as wagtail_urls
 
-# from wagtail.admin import urls as wagtailadmin_urls
+from wagtail.admin import urls as wagtailadmin_urls
 from wagtail.documents import urls as wagtaildocs_urls
 from recoco.rest_api.urls import urlpatterns as rest_api_urls
 
@@ -40,7 +40,7 @@ urlpatterns = [
     path("hijack/", include("hijack.urls")),
     path("nimda/", admin.site.urls),
     path("cookies/", include("cookie_consent.urls")),
-    # path("cms/", include(wagtailadmin_urls)),
+    path("cms/", include(wagtailadmin_urls)),
     path("documents/", include(wagtaildocs_urls)),
     path("p/", include(wagtail_urls)),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
