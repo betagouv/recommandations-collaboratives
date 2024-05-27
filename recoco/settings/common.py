@@ -349,7 +349,28 @@ WAGTAIL_EMAIL_MANAGEMENT_ENABLED = False
 # WAGTAILADMIN_BASE_URL = define that
 
 # Materialized views
-MATERIALIZED_VIEWS_SPEC = []
+MATERIALIZED_VIEWS_SPEC = [
+    {
+        "name": "projects",
+        "unique_indexes": ["hash"],
+        "indexes": ["created_on"],
+    },
+    {
+        "name": "recommendations",
+        "unique_indexes": ["hash"],
+        "indexes": ["created_on"],
+    },
+    {
+        "name": "resources",
+        "unique_indexes": ["hash"],
+    },
+    {
+        "name": "users",
+        "unique_indexes": ["hash"],
+        "indexes": ["last_login", "is_advisor"],
+    },
+]
+
 MATERIALIZED_VIEWS_SQL_DIR = BASE_DIR / "apps/metrics/sql_queries"
 MATERIALIZED_VIEWS_PREFIX = "mv"
 
