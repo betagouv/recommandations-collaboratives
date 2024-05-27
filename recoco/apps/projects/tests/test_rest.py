@@ -281,6 +281,7 @@ def check_project_content(project, data):
         "private_message_count",
         "public_message_count",
         "recommendation_count",
+        "topics",
     ]
     assert set(data.keys()) == set(expected)
 

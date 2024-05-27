@@ -111,4 +111,5 @@ def test_model_dict(project):
         "recommendation_count": 0,
         "public_message_count": 0,
         "private_message_count": 0,
+        "topics": [],
     }
