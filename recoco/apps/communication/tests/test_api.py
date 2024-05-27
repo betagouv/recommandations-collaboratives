@@ -185,6 +185,7 @@ def test_send_brevo_email_use_default_template(mocker, request):
         site=current_site,
         legal_address="here",
         legal_owner="Doe",
+        description="The short description",
         sender_email="doe@example.org",
     )
 
@@ -205,6 +206,7 @@ def test_send_brevo_email_use_default_template(mocker, request):
             "site_domain": current_site.domain,
             "legal_address": "here",
             "legal_owner": "Doe",
+            "description": "The short description",
             "sender_email": "doe@example.org",
         },
         test=False,
@@ -229,6 +231,7 @@ def test_send_brevo_email_use_overrided_template(mocker, request):
         site=current_site,
         legal_address="here",
         legal_owner="Doe",
+        description="The short description",
         sender_email="doe@example.org",
     )
 
@@ -252,6 +255,7 @@ def test_send_brevo_email_use_overrided_template(mocker, request):
             "site_domain": current_site.domain,
             "legal_address": "here",
             "legal_owner": "Doe",
+            "description": "The short description",
             "sender_email": "doe@example.org",
         },
         test=False,

@@ -150,6 +150,12 @@ class SiteConfiguration(models.Model):
         blank=True,
         max_length=100,
     )
+    description = models.TextField(
+        verbose_name="Description",
+        help_text="Description de 2 à 5 phrases, notamment utilisée dans les emails d'invitation",
+        default="",
+        blank=True,
+    )
 
     def logo_upload_path(self, filename):
         return f"images/{self.site.pk}/logo/{filename}"

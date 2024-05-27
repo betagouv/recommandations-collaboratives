@@ -60,6 +60,7 @@ def get_site_params():
     site_config = get_site_config_or_503(current_site)
     params["legal_address"] = site_config.legal_address or ""
     params["legal_owner"] = site_config.legal_owner or ""
+    params["description"] = site_config.description or ""
     params["sender_email"] = site_config.sender_email or ""
 
     if site_config.email_logo:
