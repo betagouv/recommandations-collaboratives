@@ -1,5 +1,6 @@
-<div style="{% if wide_margin %} margin-right:-10px;{% else %} margin-right:-5px {% endif %}">
-    <img class="align-middle rounded-circle d-inline-block  p-1 {% if not transparent_background %} bg-white {% endif %}"
+<div style="{% if wide_margin %} margin-right:-10px;
+            {% else %} margin-right:-5px {% endif %}">
+    <img class="align-middle rounded-circle d-inline-block  p-1 {% if not transparent_background %}bg-white{% endif %}"
          width="35px"
          :src="gravatar_url(switchtender.email, 25, switchtender.first_name + ' ' + switchtender.last_name)"
          data-bs-toggle="tooltip"

@@ -1,5 +1,4 @@
 {% load static %}
-
 <header class="d-flex mb-2 w-100 px-3 pt-4 mt-3">
     <div class="d-flex justify-content-between align-items-start w-100">
         <div class="d-flex flex-column">
@@ -22,7 +21,8 @@
                 </div>
                 <template x-if="nbNewProjects > 0">
                     <div class="d-flex align-items-center me-1 text-blue">
-                        <span class="fw-medium" x-text="nbNewProjects > 1 ? `(${nbNewProjects} nouveaux)` : `(${nbNewProjects} nouveau)`"></span>
+                        <span class="fw-medium"
+                              x-text="nbNewProjects > 1 ? `(${nbNewProjects} nouveaux)` : `(${nbNewProjects} nouveau)`"></span>
                     </div>
                 </template>
                 <template x-if="errors">
@@ -33,8 +33,10 @@
             </div>
         </div>
         <div class="d-flex align-items-center">
-            <a class="button filled blue small inherit" href="{% url 'onboarding-prefill-set-user' %}">Créer un projet</a>
-            <a class="button filled blue small inherit ms-2" href="{% url 'projects-project-list-export-csv' %}">Exporter en CSV</a>
+            <a class="button filled blue small inherit"
+               href="{% url 'onboarding-prefill-set-user' %}">Créer un projet</a>
+            <a class="button filled blue small inherit ms-2"
+               href="{% url 'projects-project-list-export-csv' %}">Exporter en CSV</a>
         </div>
     </div>
 </header>

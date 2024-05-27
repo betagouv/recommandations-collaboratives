@@ -1,2 +1,2 @@
-import '../components/ProjectEmailReminder'
-import '../../css/projectEmailReminder.css'
+import '../components/ProjectEmailReminder';
+import '../../css/projectEmailReminder.css';

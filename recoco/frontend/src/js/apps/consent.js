@@ -1,1 +1,1 @@
-import '../components/Consent'
+import '../components/Consent';

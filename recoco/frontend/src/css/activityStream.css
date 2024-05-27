@@ -1,19 +1,19 @@
 .activity-stream-actions-container {
-    position: relative;
-    padding-left: 10px;
-    margin-top: 0;
-    padding-top: 0;
+  position: relative;
+  padding-left: 10px;
+  margin-top: 0;
+  padding-top: 0;
 }
 
 .activity-stream-actions-container::before {
-    content: '';
-    position: absolute;
+  content: '';
+  position: absolute;
 
-    top: 0;
-    left: 0;
+  top: 0;
+  left: 0;
 
-    height: 100%;
-    width: 3px;
+  height: 100%;
+  width: 3px;
 
-    background-color: #0063CB;
+  background-color: #0063cb;
 }

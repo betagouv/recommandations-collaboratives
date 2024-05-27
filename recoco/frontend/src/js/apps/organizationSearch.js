@@ -1,2 +1,2 @@
-import '../components/OrganizationSearch'
-import '../../css/organizationSearch.css'
+import '../components/OrganizationSearch';
+import '../../css/organizationSearch.css';

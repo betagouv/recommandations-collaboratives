@@ -54,7 +54,7 @@ const config = {
         mapViewerStatic: resolve('./src/js/apps/mapViewerStatic.js'),
         mapViewerInteractive: resolve('./src/js/apps/mapViewerInteractive.js'),
         projectEmailReminder: resolve('./src/js/apps/projectEmailReminder.js'),
-        mapEditor: resolve('./src/js/apps/mapEditor.js')
+        mapEditor: resolve('./src/js/apps/mapEditor.js'),
       },
       output: {
         chunkFileNames: undefined,

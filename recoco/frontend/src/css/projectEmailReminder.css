@@ -1,11 +1,11 @@
 .email-reminder-popup {
-    display: none;
+  display: none;
 
-    max-width: 320px;
+  max-width: 320px;
 
-    z-index: 1000;
+  z-index: 1000;
 }
 
 .email-reminder-popup[data-show] {
-    display: block;
+  display: block;
 }

@@ -6,9 +6,7 @@
 <div class="d-flex mt-1 mb-4 mx-2 align-items-center justify-content-between">
     {% if advising %}
         <h2 class="text-secondary text-uppercase fw-bolder mb-0"
-            style="font-size: 12px">
-            Recommandations proposées à la collectivité
-        </h2>
+            style="font-size: 12px">Recommandations proposées à la collectivité</h2>
     {% endif %}
     <div class="d-flex align-items-center">
         <div class="d-flex align-items-center ms-2">
@@ -21,7 +19,7 @@
                      data-bs-toggle="tooltip"
                      data-bs-placement="bottom"
                      title="{{ switchtender.get_full_name|default:'Conseiller inconnu' }} - {{ switchtender.profile.organization.name|default:'Organisation iconnue' }}"
-                     tabindex="0"/>
+                     tabindex="0" />
             {% endfor %}
         </div>
         {% if "manage_tasks" in user_project_perms %}
@@ -38,8 +36,7 @@
         <div x-data class="ms-2" style="width: 24px; height: 24px;">
             <div x-show="$store.app.isLoading"
                  class="spinner-border spinner-border spinner-border-sm text-primary"
-                 role="status">
-            </div>
+                 role="status"></div>
         </div>
     </div>
 </div>

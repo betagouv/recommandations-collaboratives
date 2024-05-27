@@ -1,1 +1,1 @@
-import '../components/Auth'
+import '../components/Auth';

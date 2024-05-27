@@ -1,22 +1,20 @@
-import projects from '../../../../fixtures/projects/projects.json'
+import projects from '../../../../fixtures/projects/projects.json';
 const currentProject = projects[1];
 
 describe('I can read only recommandations', () => {
+  beforeEach(() => {
+    cy.login('jeannot');
+  });
 
-    beforeEach(() => {
-        cy.login("jeannot");
-    })
+  it('goes to recommandations and read only content', () => {
+    cy.visit('/projects');
 
-    it('goes to recommandations and read only content', () => {
+    cy.contains(currentProject.fields.name).click({ force: true });
 
-        cy.visit('/projects')
+    cy.contains('Recommandations').click({ force: true });
 
-        cy.contains(currentProject.fields.name).click({force:true});
+    cy.url().should('include', '/actions');
 
-        cy.contains("Recommandations").click({ force: true })
-
-        cy.url().should('include', '/actions')
-
-        cy.contains("Ajouter une recommandation").should('not.exist')
-    })
-})
+    cy.contains('Ajouter une recommandation').should('not.exist');
+  });
+});
