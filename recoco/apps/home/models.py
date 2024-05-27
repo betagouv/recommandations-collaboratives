@@ -153,7 +153,7 @@ class SiteConfiguration(models.Model):
     description = models.TextField(
         verbose_name="Description",
         help_text="Description de 2 à 5 phrases, notamment utilisée dans les emails d'invitation",
-        default="",
+        null=True,
         blank=True,
     )
 

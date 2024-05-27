@@ -14,7 +14,7 @@ class Migration(migrations.Migration):
             name="description",
             field=models.TextField(
                 blank=True,
-                default="",
+                null=True,
                 help_text="Description de 2 à 5 phrases, notamment utilisée dans les emails d'invitation",
                 verbose_name="Description",
             ),
