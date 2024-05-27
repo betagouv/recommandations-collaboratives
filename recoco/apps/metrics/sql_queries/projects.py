@@ -1,4 +1,5 @@
 from django.db.models import Count, F, Q, QuerySet
+from django.contrib.postgres.aggregates import StringAgg
 
 from recoco.apps.projects.models import Project
 
@@ -10,7 +11,7 @@ def get_queryset(site_id: int) -> QuerySet:
         Project.objects.exclude(exclude_stats=True)
         .prefetch_related("tasks", "switchtenders")
         .exclude(status="DRAFT")
-        .order_by("created_on")
+        .order_by("-created_on")
         .filter(sites__pk=site_id)
         .annotate(hash=hash_field("id", salt="project"))
         .annotate(
@@ -48,7 +49,9 @@ def get_queryset(site_id: int) -> QuerySet:
             )
         )
         .annotate(
-            crm_annotations_tags=StringAgg("crm_annotations__tags__name", delimiter=","),
+            crm_annotations_tags=StringAgg(
+                "crm_annotations__tags__name", delimiter=","
+            ),
             commune_insee=F("commune__insee"),
         )
         .values(
