@@ -39,6 +39,9 @@ def get_queryset(site_id: int) -> QuerySet:
                 distinct=True,
             ),
         )
+        .annotate(
+            topic_name=F("topic__name"),
+        )
         .values(
             "hash",
             "public",
@@ -51,6 +54,6 @@ def get_queryset(site_id: int) -> QuerySet:
             "advisor_comment_count",
             "visited",
             "has_resource",
-            "topic__name",
+            "topic_name",
         )
     )
