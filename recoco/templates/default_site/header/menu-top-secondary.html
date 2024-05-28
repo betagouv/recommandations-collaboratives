@@ -1,5 +1,6 @@
 {% load static %}
 {% load guardian_tags %}
+{% load gravatar %}
 {% with request.resolver_match.url_name as url_name %}
     {% if user.is_authenticated %}
         {% get_obj_perms request.user for request.site as "user_site_perms" %}
@@ -9,12 +10,7 @@
         style="padding-left: 15px">
         <!-- Dashboard -->
         {% if is_switchtender or is_administrating_project %}
-            <li class="nav-item dropdown nav-item-admin"
-                style="margin-right: 15px;
-                       margin-left: 15px;
-                       padding-bottom:20px;
-                       border-bottom:solid 2px transparent;
-                       {% if url_name == 'projects-project-list' %}border-bottom:solid 2px #0063CB;{% endif %}">
+            <li class="nav-item dropdown nav-item-admin {% if url_name == 'projects-project-list' %}activated{% endif %}">
                 <div x-data="{ open: false }" x-on:click.outside="open = false">
                     <div class="btn-group">
                         <a href="{% url 'projects-project-list' %}"
@@ -76,9 +72,7 @@
         <!-- Projects -->
         {% if active_project %}
             {% if not 'projects-project-list-advisor' in url_name %}
-                <li style="margin-right: 15px;
-                           padding-bottom:20px;
-                           border-bottom:solid 2px transparent">
+                <li>
                     <div id="project-selector" class="nav-item">
                         <div x-data="{ open: false }"
                              x-on:click.outside="open = false"
@@ -91,10 +85,7 @@
                     </div>
                 </li>
             {% endif %}
-            <li style="margin-right: 15px;
-                       padding-bottom:20px;
-                       border-bottom:solid 2px transparent;
-                       {% if 'projects-project-detail' in url_name %}border-bottom:solid 2px #0063CB;{% endif %}">
+            <li class="{% if 'projects-project-detail' in url_name %}activated{% endif %}">
                 <div id="project-selector" class="nav-item">
                     <div x-data="{ open: false }"
                          x-on:click.outside="open = false"
@@ -159,8 +150,7 @@
                                             </svg>
                                             <a href="{% url 'onboarding' %}"
                                                class="stretched-link text-reset text-decoration-none"
-                                               style="color: white !important"
-                                               href="">Créer un nouveau projet</a>
+                                               style="color: white !important">Créer un nouveau projet</a>
                                         </span>
                                     </li>
                                 {% endif %}
@@ -172,10 +162,7 @@
         {% endif %}
         <!-- Methodology -->
         {% if not user.is_authenticated and not hide_methodology %}
-            <li style="margin-right: 35px;
-                       padding-bottom:20px;
-                       border-bottom:solid 2px transparent;
-                       {% if 'methodology' in url_name %}border-bottom:solid 2px #0063CB;{% endif %}">
+            <li class="{% if 'methodology' in url_name %}activated{% endif %}">
                 <div class="btn-group">
                     <a href="{% url 'methodology' %}" class="nav-link link-dark">
                         <span class="me-2 ms-1 align-middle">Méthodologie</span>
@@ -184,10 +171,7 @@
             </li>
         {% endif %}
         <!-- Ressources -->
-        <li style="margin-right: 15px;
-                   padding-bottom:20px;
-                   border-bottom:solid 2px transparent;
-                   {% if url_name == 'resources-resource-search' %}border-bottom:solid 2px #0063CB;{% endif %}">
+        <li class="{% if url_name == 'resources-resource-search' %}activated{% endif %}">
             <div x-data="{ open: false }"
                  x-on:click.outside="open = false"
                  class="btn-group d-flex">
@@ -225,14 +209,72 @@
         </li>
         <!-- Address Book -->
         {% if "use_addressbook" in user_site_perms %}
-            <li style="margin-right: 35px;
-                       padding-bottom:20px;
-                       border-bottom:solid 2px transparent;
-                       {% if 'addressbook' in url_name %}border-bottom:solid 2px #0063CB;{% endif %}">
+            <li class="{% if 'addressbook' in url_name %}activated{% endif %}">
                 <a href="{% url 'addressbook-organization-list' %}"
                    class="nav-link link-dark {% if url_name == 'addressbook-organization-list' %}active{% endif %}">
                     <span class="ms-1 me-2 align-middle">Carnet d'adresses</span>
                 </a>
+            </li>
+        {% endif %}
+        <!-- Notifications -->
+        {% if user.is_authenticated %}
+            <li class="dropdown">
+                <a class="nav-link link-dark"
+                   href="#"
+                   role="button"
+                   data-bs-toggle="dropdown"
+                   aria-expanded="false">
+                    <span class="ms-1 me-2 align-middle">Notifications</span>
+                    {% if unread_notifications.count > 0 %}
+                        <span class="badge text-bg-danger">{{ unread_notifications.count }}</span>
+                    {% endif %}
+                </a>
+                <ul class="dropdown-menu notifications">
+                    <li>Notifications non lues</li>
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
+                    {% for date, notifications in grouped_notifications.items %}
+                        <div class="notification-date">le {{ date|date }}</div>
+                        {% for notification in notifications %}
+                            <li class="dropdown-item">
+                                {% comment %} {% include 'user/user_card.html' with user=notification.actor user_activity=True %} {% endcomment %}
+                                <div class="notification-verb">{{ notification.verb }}</div>
+                                <a class="notification-project"
+                                   href="{{ notification.target.get_absolute_url }}">{{ notification.target }}</a>
+                                {% if notification.action_object.comment %}
+                                    <div class="notification-message">
+                                        "{{ notification.action_object.comment }}" à propos de <a href=" {{ notification.action_object.task.get_absolute_url }}">{{ notification.action_object.task }}</a>
+                                    </div>
+                                {% endif %}
+                                {% comment %} {% if notification.actor %}
+                                <div class="align-middle mx-2 flex-shrink">
+                                    <img class="rounded-circle" src="{% gravatar_url notification.actor.email size=24 %}" alt="{{ notification.actor }}">
+                                    <span class="actor">
+                                        {{ notification.actor.first_name|default:notification.actor.email }}
+                                        {{ notification.actor.last_name|default:"" }}
+                                    </span>
+                                </div>
+                            {% endif %}
+                            {% if notification.actor %}
+                            {% else %}
+                                <span class="actor">(compte supprimé)</span>
+                            {% endif %}
+                                <a class="dropdown-item" href="#">Another action</a> {% endcomment %}
+                            </li>
+                        {% endfor %}
+                    {% empty %}
+                        <li>
+                            <span class="dropdown-item">Vous n'avez aucune notification ☀️</span>
+                        </li>
+                    {% endfor %}
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
+                    <li class="btn-container">
+                        <button class="dropdown-item">Marquer toutes les notifications commes lues</button>
+                    </li>
+                </ul>
             </li>
         {% endif %}
     </ul>
