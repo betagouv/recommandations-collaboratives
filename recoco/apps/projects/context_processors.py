@@ -9,6 +9,7 @@ from recoco.apps.projects import models as projects_models
 from recoco.apps.survey import models as survey_models
 from recoco.apps.tasks import models as tasks_models
 from recoco.utils import check_if_advisor, get_site_config_or_503
+from django.core.serializers import serialize
 
 from .utils import can_administrate_project, get_active_project
 
@@ -43,7 +44,8 @@ def unread_notifications_processor(request):
         print(grouped_notifications)
 
     return {
-        "unread_notifications": unread_notifications,
+        "unread_notifications": serialize("json", unread_notifications.all()),
+        "unread_notifications_count": unread_notifications.count(),
         "grouped_notifications": dict(grouped_notifications),
     }
 

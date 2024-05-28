@@ -221,23 +221,17 @@
             </li>
         {% endif %}
         <!-- Notifications -->
-        {% comment %} {{ grouped_notifications.items|json_script:"groupedNotifications" }} {% endcomment %}
-        {% comment %} {{ unread_notifications|json_script:"unreadNotifications" }} {% endcomment %}
-        {{ unread_notifications }}
-        <script>
-            {% comment %} const notifications = JSON.parse(document.getElementById(groupedNotifications).textContent); {% endcomment %}
-            {% comment %} const notifications = JSON.parse(document.getElementById("unreadNotifications").textContent); {% endcomment %}
-        </script>
         {% if user.is_authenticated %}
-            <li class="dropdown" x-data="MenuNotifications">
+            <li class="dropdown"
+                x-data="MenuNotifications({{ unread_notifications_count }})">
                 <a class="nav-link link-dark"
                    href="#"
                    role="button"
                    data-bs-toggle="dropdown"
                    aria-expanded="false">
                     <span class="ms-1 me-2 align-middle">Notifications</span>
-                    {% if unread_notifications.count > 0 %}
-                        <span class="badge text-bg-danger">{{ unread_notifications.count }}</span>
+                    {% if unread_notifications_count > 0 %}
+                        <span class="badge text-bg-danger" x-text="notificationNumber"></span>
                     {% endif %}
                 </a>
                 {% include "header/dropdown-menu-notifications.html" %}
