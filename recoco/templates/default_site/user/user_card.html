@@ -18,7 +18,7 @@
                 class="d-flex align-items-center flex-wrap user-info border-0 p-0 bg-transparent"
                 data-test-id="button-open-tooltip-user-card">
             <span class="me-1 d-flex align-items-center font-very-small">
-                <img class="rounded-circle me-1 {% if not user.is_active %}border-0{% elif position.is_advisor %}advisor-border border-2{% elif position.is_observer %}observer-border border-2{% endif %}"
+                <img class="rounded-circle me-1 {% if not user.is_active %}border-0{% elif position.is_advisor %}advisor-border border-2{% elif position.is_observer %}observer-border border-2{% else %}neutral-role-border border-2{% endif %}"
                      :src='gravatar_url("{{ user.email }}", 18, "{{ user.first_name }}" + " " + "{{ user.last_name }}")'
                      alt="{{ action.actor }}">
                 {% if user %}
@@ -54,7 +54,7 @@
          id="user-tooltip"
          @click.outside="onOutsideUserClick"
          data-test-id="tooltip-user-card"
-         class="user-card-popup flex-column {% if not user.is_active %}{% elif position.is_advisor %}advisor-border{% elif position.is_observer %}observer-border {% endif %}">
+         class="user-card-popup flex-column {% if not user.is_active %}coucou{% elif position.is_advisor %}advisor-border{% elif position.is_observer %}observer-border{% else %}neutral-role-border{% endif %}">
         {% if user.is_active and position.is_advisor %}
             <div class="user-role position-absolute">
                 <span class="py-1 px-2 fw-bold text-uppercase tiny advisor-background text-white"
@@ -68,7 +68,7 @@
         {% endif %}
         <div class="d-flex align-items-center flex-wrap">
             <span class="me-2 d-flex align-items-center font-very-small">
-                <img class="rounded-circle me-2 {% if not user.is_active %}border-0{% elif position.is_advisor %}advisor-border border-2{% elif position.is_observer %}observer-border border-2{% endif %}"
+                <img class="rounded-circle me-2 {% if not user.is_active %}border-0{% elif position.is_advisor %}advisor-border border-2{% elif position.is_observer %}observer-border border-2{% else %}neutral-role-border border-2{% endif %}"
                      :src='gravatar_url("{{ user.email }}", 25, "{{ user.first_name }}" + " " + "{{ user.last_name }}")'
                      alt="{{ action.actor }}">
                 <strong class="text-nowrap text-capitalize {% if not user.is_active %}inactive-status{% endif %}">
