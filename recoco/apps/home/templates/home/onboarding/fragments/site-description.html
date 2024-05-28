@@ -1,3 +1,3 @@
 <p class="modal-description">
-    {{ request.site.name }} est un service public gratuit. Il répond aux questions et aux blocages des acteurs publics en permettant de mettre en place un processus de collaboration et de conseil collectif.
+  {% if request.site.configuration %} {{ request.site.configuration.description }} {% else %} {{ request.site.name }} est un service public gratuit. Il répond aux questions et aux blocages des acteurs publics en permettant de mettre en place un processus de collaboration et de conseil collectif. {% endif %}
 </p>
