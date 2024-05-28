@@ -93,6 +93,15 @@ export function resourcePreviewUrl(resourceId) {
   return `/ressource/${resourceId}/embed`;
 }
 
+// Notifications (django-notifications-hq)
+export function djangoNotificationsUnreadListUrl() {
+  return '/notifications/api/unread_list';
+}
+
+export function djangoNotificationsMarkAsReadBySlugUrl(notificationSlug) {
+  return `/notifications/mark-as-read/${notificationSlug}/`;
+}
+
 // Regions :
 export function regionsUrl() {
   return `/api/regions/`;

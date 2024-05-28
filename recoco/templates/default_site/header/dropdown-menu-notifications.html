@@ -20,7 +20,7 @@
                 {% endif %}
                 <button class="notification__icon"
                         title="Supprimer la notification"
-                        @click="markNotificationAsRead({{ notification.target.id }}, {{ notification.action_object.task.id|default:"null" }}, $el)">
+                        @click="markNotificationAsRead({{ notification.id }}, $el)">
                     <svg class="bi me-1" width="16" height="16" fill="currentColor">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#x-lg" />
                     </svg>
