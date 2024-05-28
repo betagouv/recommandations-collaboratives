@@ -67,6 +67,6 @@ def get_queryset(site_id: int) -> QuerySet:
             "public_message_from_members_count",  # FIXME: wrong
             "public_message_from_advisors_count",  # FIXME: wrong
             "private_message_count",
-            "crm_annotations_tags",  # FIXME: wrong
+            "crm_annotations_tags",
         )
     )

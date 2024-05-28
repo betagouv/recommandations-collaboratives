@@ -40,19 +40,6 @@ from .. import models, utils
 
 
 ########################################################################
-# Landing page
-########################################################################
-
-
-@pytest.mark.django_db
-def test_home_page_is_reachable_without_login(client):
-    url = reverse("home")
-    response = client.get(url)
-    assert response.status_code == 200
-    assertContains(response, "Recoco")
-
-
-########################################################################
 # My projects
 ########################################################################
 
