@@ -52,12 +52,12 @@ body {
 }
 
 .project-card {
-  padding: 1rem;
+  /* padding: 1rem;
   border-radius: 4px;
   border: 1px solid #0063cb;
   box-shadow: 2px 2px 4px 0px rgba(0, 0, 0, 0.1);
+  position: relative; */
   margin: 0 0 2rem;
-  position: relative;
 }
 
 .project-card > span.icon {
