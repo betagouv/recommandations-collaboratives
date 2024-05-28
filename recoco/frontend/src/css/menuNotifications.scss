@@ -14,6 +14,14 @@
       margin-bottom: 0.3rem;
       padding-left: 0.625rem;
       width: auto;
+      position: relative;
+
+      &:active {
+        color: inherit;
+        text-decoration: none;
+        background-color: inherit;
+
+      }
     }
 
     &:first-child {
@@ -62,6 +70,20 @@
       font-weight: 400;
       // line-height: 16.5px;
       white-space: normal;
+    }
+
+    &__icon {
+      position: absolute;
+      right: 0;
+      top: 0.6rem;
+      cursor: pointer;
+      // display: flex;
+      // align-items: center;
+      // justify-content: center;
+      // width: 1.7rem;
+      // background: #0063CB;
+      // color: #fff;
+      // border-radius: 0.25rem 0 0 0.25rem;
     }
   }
 
