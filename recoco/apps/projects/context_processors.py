@@ -1,6 +1,10 @@
+from collections import defaultdict
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models import Q
+from django.utils.timezone import localtime
+
+from notifications import models as notifications_models
 from recoco.apps.projects import models as projects_models
 from recoco.apps.survey import models as survey_models
 from recoco.apps.tasks import models as tasks_models
@@ -15,6 +19,32 @@ def is_switchtender_processor(request):
         "is_administrating_project": can_administrate_project(
             project=None, user=request.user
         ),
+    }
+
+
+def unread_notifications_processor(request):
+    unread_notifications = []
+    grouped_notifications = []
+    if request.user.is_authenticated:
+        unread_notifications = (
+            notifications_models.Notification.on_site.unread()
+            .filter(recipient=request.user, public=True)
+            .prefetch_related("actor__profile__organization")
+            .prefetch_related("action_object")
+            .prefetch_related("target")
+            .order_by("-timestamp")[:100]
+        )
+
+        grouped_notifications = defaultdict(list)
+
+        for notification in unread_notifications:
+            date = localtime(notification.timestamp).date()
+            grouped_notifications[date].append(notification)
+        print(grouped_notifications)
+
+    return {
+        "unread_notifications": unread_notifications,
+        "grouped_notifications": dict(grouped_notifications),
     }
 
 
