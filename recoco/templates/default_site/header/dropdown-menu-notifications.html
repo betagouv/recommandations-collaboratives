@@ -9,7 +9,7 @@
         <div class="notification__date">le {{ date|date }}</div>
         {% for notification in notifications %}
             <li class="dropdown-item">
-                {% include 'user/user_card.html' with user=notification.actor project=notification.target user_activity=True %}
+                {% include 'user/user_card.html' with user=notification.actor project=notification.target %}
                 <div class="notification__verb">{{ notification.verb }} sur</div>
                 <a class="notification__project"
                    href="{{ notification.target.get_absolute_url }}">{{ notification.target }}</a>
