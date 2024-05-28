@@ -1,18 +1,16 @@
-import projects from '../../../../fixtures/projects/projects.json'
+import projects from '../../../../fixtures/projects/projects.json';
 const currentProject = projects[1];
 
 describe('I can read only overview page', () => {
+  beforeEach(() => {
+    cy.login('jeannot');
+  });
 
-    beforeEach(() => {
-        cy.login("jeannot");
-    })
+  it('goes to the overview page and not see the advisor note', () => {
+    cy.visit('/projects');
 
-    it('goes to the overview page and not see the advisor note', () => {
+    cy.contains(currentProject.fields.name).click({ force: true });
 
-        cy.visit('/projects')
-
-        cy.contains(currentProject.fields.name).click({force:true});
-
-        cy.contains("Note interne").should('not.exist')
-    })
-})
+    cy.contains('Note interne').should('not.exist');
+  });
+});

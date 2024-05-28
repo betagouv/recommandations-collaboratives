@@ -15,11 +15,11 @@ export default {
 			processor: () =>
 				postcss([
 					jitProps({
-						files: ['./dist/**/*.css']
+						files: ['./dist/**/*.css'],
 					}),
-					autoprefixer()
+					autoprefixer(),
 				]),
-			watch: 'src/lib/styles/scss/core/'
-		})
-	]
+			watch: 'src/lib/styles/scss/core/',
+		}),
+	],
 };

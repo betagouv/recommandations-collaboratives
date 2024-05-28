@@ -18,5 +18,6 @@ def get_queryset(site_id: int) -> QuerySet:
             "status_name",
             "created_on",
             "updated_on",
+            "created_by_hash",
         )
     )

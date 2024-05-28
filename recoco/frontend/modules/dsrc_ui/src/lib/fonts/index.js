@@ -41,5 +41,5 @@ export default {
 	seb_w,
 	seb_w2,
 	sr_w,
-	sr_w2
+	sr_w2,
 };

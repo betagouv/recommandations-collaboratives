@@ -1,21 +1,19 @@
-import projects from '../../../fixtures/projects/projects.json'
+import projects from '../../../fixtures/projects/projects.json';
 
 const currentProject = projects[1];
 
 describe('I can access the recommandations', () => {
+  beforeEach(() => {
+    cy.login('bob');
+  });
 
-    beforeEach(() => {
-        cy.login("bob");
-    })
+  it('goes to recommandations tab and see recommandations', () => {
+    cy.visit(`/project/${currentProject.pk}`);
 
-    it('goes to recommandations tab and see recommandations', () => {
+    cy.contains('Recommandations').click({ force: true });
 
-        cy.visit(`/project/${currentProject.pk}`)
+    cy.url().should('include', '/actions');
 
-        cy.contains("Recommandations").click({ force: true })
-
-        cy.url().should('include', '/actions')
-
-        cy.contains("Ajouter une recommandation").should('not.exist')
-    })
-})
+    cy.contains('Ajouter une recommandation').should('not.exist');
+  });
+});

@@ -1,8 +1,8 @@
 {% load static %}
 {% load phone_filters %}
-
 <!-- Horizontal Card -->
-<div class="card-resource card-resource-horizontal card h-100 w-100" style="min-height: 100px;">
+<div class="card-resource card-resource-horizontal card h-100 w-100"
+     style="min-height: 100px">
     <!-- <hr class="middle-hr" /> -->
     <div class="card-body">
         <div class="card-title mb-3">
@@ -17,52 +17,47 @@
                 -->
                 <div class="title">
                     <svg class="bi me-2 bg-color-darkgrey resource-icon">
-                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#person-badge"/>
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#person-badge" />
                     </svg>
-                    {{ contact.full_name|title }} {% if show_id and user.is_staff %}
-                    {% if user.is_staff %}
-                    <span class="text-secondary">(<a href="{% url 'addressbook-organization-contact-update' contact.id %}">editer</a>)</span>
-                    {% endif %}
-                    <span class="text-secondary">#contact-{{ contact.id }}</span>
+                    {{ contact.full_name|title }}
+                    {% if show_id and user.is_staff %}
+                        {% if user.is_staff %}
+                            <span class="text-secondary">(<a href="{% url 'addressbook-organization-contact-update' contact.id %}">editer</a>)</span>
+                        {% endif %}
+                        <span class="text-secondary">#contact-{{ contact.id }}</span>
                     {% endif %}
                 </div>
             </div>
         </div>
-
         <div class="card-text">
-            {% if contact.division %}
-            <div class="mb-2">
-                {{ contact.division }}
-            </div>
-            {% endif %}
-
+            {% if contact.division %}<div class="mb-2">{{ contact.division }}</div>{% endif %}
             <div class="small text-secondary subtitle">{{ contact.organization.name|truncatechars:120 }}</div>
             {% if contact.phone_no %}
-            <div class="small text-secondary">
-                <svg class="bi" width="12" height="12" >
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#telephone"/>
-                </svg>
-                &nbsp;
-                <a href="tel:{{contact.phone_no}}">{{ contact.phone_no|format_phone }}</a>
-            </div>
+                <div class="small text-secondary">
+                    <svg class="bi" width="12" height="12">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#telephone" />
+                    </svg>
+                    &nbsp;
+                    <a href="tel:{{ contact.phone_no }}">{{ contact.phone_no|format_phone }}</a>
+                </div>
             {% endif %}
             {% if contact.mobile_no %}
-            <div class="small text-secondary">
-                <svg class="bi" width="12" height="12" >
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#phone"/>
-                </svg>
-                &nbsp;
-                <a href="tel:{{contact.mobile_no}}">{{ contact.mobile_no }}</a>
-            </div>
+                <div class="small text-secondary">
+                    <svg class="bi" width="12" height="12">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#phone" />
+                    </svg>
+                    &nbsp;
+                    <a href="tel:{{ contact.mobile_no }}">{{ contact.mobile_no }}</a>
+                </div>
             {% endif %}
             {% if contact.email %}
-            <div class="small text-secondary">
-                <svg class="bi" width="12" height="12" >
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#envelope"/>
-                </svg>
-                &nbsp;
-                <a href="mailto:{{contact.email}}">{{ contact.email }}</a>
-            </div>
+                <div class="small text-secondary">
+                    <svg class="bi" width="12" height="12">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#envelope" />
+                    </svg>
+                    &nbsp;
+                    <a href="mailto:{{ contact.email }}">{{ contact.email }}</a>
+                </div>
             {% endif %}
         </div>
     </div>

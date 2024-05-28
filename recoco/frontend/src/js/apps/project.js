@@ -1,2 +1,2 @@
-import '../store/tasks'
-import '../components/Spinner'
+import '../store/tasks';
+import '../components/Spinner';

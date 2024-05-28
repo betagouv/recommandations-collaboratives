@@ -1,19 +1,18 @@
-import Alpine from 'alpinejs'
-import List from 'list.js'
+import Alpine from 'alpinejs';
+import List from 'list.js';
 
-Alpine.data("Files", Files)
+Alpine.data('Files', Files);
 
 function Files(nbDocuments) {
-    return {
-        init() {
+  return {
+    init() {
+      if (!nbDocuments > 0) return;
 
-            if (!nbDocuments > 0) return
+      const options = {
+        valueNames: ['name', 'description'],
+      };
 
-            const options = {
-                valueNames: ['name', 'description']
-            };
-
-            new List('filesId', options);
-        }
-    }
+      new List('filesId', options);
+    },
+  };
 }

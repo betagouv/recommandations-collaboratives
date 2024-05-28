@@ -1,4 +1,5 @@
 from django.db.models import Count, F, Q, QuerySet
+from django.contrib.postgres.aggregates import StringAgg
 
 from recoco.apps.projects.models import Project
 
@@ -10,7 +11,7 @@ def get_queryset(site_id: int) -> QuerySet:
         Project.objects.exclude(exclude_stats=True)
         .prefetch_related("tasks", "switchtenders")
         .exclude(status="DRAFT")
-        .order_by("created_on")
+        .order_by("-created_on")
         .filter(sites__pk=site_id)
         .annotate(hash=hash_field("id", salt="project"))
         .annotate(
@@ -47,12 +48,18 @@ def get_queryset(site_id: int) -> QuerySet:
                 distinct=True,
             )
         )
+        .annotate(
+            crm_annotations_tags=StringAgg(
+                "crm_annotations__tags__name", delimiter=","
+            ),
+            commune_insee=F("commune__insee"),
+        )
         .values(
             "hash",
             "status",
             "created_on",
             "inactive_since",
-            "commune__insee",
+            "commune_insee",
             "recommandation_count",
             "advisor_count",
             "member_count",
@@ -60,6 +67,6 @@ def get_queryset(site_id: int) -> QuerySet:
             "public_message_from_members_count",  # FIXME: wrong
             "public_message_from_advisors_count",  # FIXME: wrong
             "private_message_count",
-            "crm_annotations__tags__name",  # FIXME: wrong
+            "crm_annotations_tags",  # FIXME: wrong
         )
     )

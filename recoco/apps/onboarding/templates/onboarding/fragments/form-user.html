@@ -1,29 +1,29 @@
 {% load crispy_forms_tags %}
 <form id="{{ form.helper.form_id }}" method="post">
-  <input type="hidden"
-         name="js_enabled"
-         id="{{ form.helper.form_id }}_js_enabled"
-         value="false">
-  <fieldset class="fr-fieldset">
-    <legend class="fr-fieldset__legend--regular fr-fieldset__legend">
-      Les champs suivis d'un astérisque (*) sont obligatoires
-    </legend>
-    {% if form.captcha.errors %}
-      <div>
-        <p class="text-danger">Erreur : Le captcha est obligatoire</p>
-      </div>
-    {% endif %}
-    {% csrf_token %}
-    {{ form.first_name|as_crispy_field }}
-    {{ form.last_name|as_crispy_field }}
-    <div class="fr-fieldset__element">
-      {% include "tools/organization_search.html" with name=form.org_name.name label=form.org_name.label value=form.org_name.value id_for_label=form.org_name.id_for_label errors=form.org_name.errors dsfr=True isRequired=True %}
-    </div>
-    {{ form.role|as_crispy_field }}
-    {{ form.email|as_crispy_field }}
-    {{ form.phone|as_crispy_field }}
-    {% if include_password_field %}{{ form.password|as_crispy_field }}{% endif %}
-    {{ form.captcha }}
-  </fieldset>
-  {% include "dsrc/core/blocks/buttons/button_group.html" %}
+    <input type="hidden"
+           name="js_enabled"
+           id="{{ form.helper.form_id }}_js_enabled"
+           value="false">
+    <fieldset class="fr-fieldset">
+        <legend class="fr-fieldset__legend--regular fr-fieldset__legend">
+            Les champs suivis d'un astérisque (*) sont obligatoires
+        </legend>
+        {% if form.captcha.errors %}
+            <div>
+                <p class="text-danger">Erreur : Le captcha est obligatoire</p>
+            </div>
+        {% endif %}
+        {% csrf_token %}
+        {{ form.first_name|as_crispy_field }}
+        {{ form.last_name|as_crispy_field }}
+        <div class="fr-fieldset__element">
+            {% include "tools/organization_search.html" with name=form.org_name.name label=form.org_name.label value=form.org_name.value id_for_label=form.org_name.id_for_label errors=form.org_name.errors dsfr=True isRequired=True %}
+        </div>
+        {{ form.role|as_crispy_field }}
+        {{ form.email|as_crispy_field }}
+        {{ form.phone|as_crispy_field }}
+        {% if include_password_field %}{{ form.password|as_crispy_field }}{% endif %}
+        {{ form.captcha }}
+    </fieldset>
+    {% include "dsrc/core/blocks/buttons/button_group.html" %}
 </form>

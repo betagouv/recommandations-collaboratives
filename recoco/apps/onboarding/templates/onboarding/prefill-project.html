@@ -10,47 +10,44 @@
     Déposer un projet pour le compte de la collectivité {{ block.super }}
 {% endblock og_title %}
 {% block js %}
-  {% vite_asset 'js/apps/advisorCreateProject.js' %}
+    {% vite_asset 'js/apps/advisorCreateProject.js' %}
 {% endblock js %}
 {% block css %}
-
-  <link href="{% sass_src 'home/css/dsfr/custom-dsfr.scss' %}"
-        rel="stylesheet"
-        type="text/css">
-  <link href="{% sass_src 'home/css/dsfr/marianne.css' %}"
-        rel="stylesheet"
-        type="text/css">
+    <link href="{% sass_src 'home/css/dsfr/custom-dsfr.scss' %}"
+          rel="stylesheet"
+          type="text/css">
+    <link href="{% sass_src 'home/css/dsfr/marianne.css' %}"
+          rel="stylesheet"
+          type="text/css">
 {% endblock css %}
 {% block content %}
-<div class="container">
-  <div class="banner mt-6 mb-6 text-center">
-    {% if site_config.email_logo %}
-        <img src="{{ site_config.email_logo.url }}"
-              width="10%"
-              height="auto"
-              alt="Logo {{ request.site.name }}" />
-    {% endif %}
-    <h1>
-      <strong>Déposer votre projet</strong> {{ request.site.name }}
-    </h1>
-  </div>
-  <div class="fr-stepper mb-3">
-    <h2 class="fr-stepper__title">
-      Décrivez votre projet
-      <span class="fr-stepper__state">Étape 2 sur 2</span>
-    </h2>
-    <div class="fr-stepper__steps" data-fr-current-step="2" data-fr-steps="2"></div>
-    <p class="fr-stepper__details">
-      <span class="fr-text--bold">Étape suivante :</span> Localisez votre projet
-    </p>
-  </div>
-  <div class="container__form d-flex justify-content-center"
-       x-data="AjvValidationSchema('schemaPrefillProjectFormValidator')">
-    <div class="onboarding__form"
-         x-data="DsrcFormValidator('{{ form.helper.form_id }}', schemaValidator, '{{ request.method }}')"
-         x-init="init">
-         {% include "onboarding/fragments/form-project.html" %}
+    <div class="container">
+        <div class="banner mt-6 mb-6 text-center">
+            {% if site_config.email_logo %}
+                <img src="{{ site_config.email_logo.url }}"
+                     width="10%"
+                     height="auto"
+                     alt="Logo {{ request.site.name }}" />
+            {% endif %}
+            <h1>
+                <strong>Déposer votre projet</strong> {{ request.site.name }}
+            </h1>
+        </div>
+        <div class="fr-stepper mb-3">
+            <h2 class="fr-stepper__title">
+                Décrivez votre projet
+                <span class="fr-stepper__state">Étape 2 sur 2</span>
+            </h2>
+            <div class="fr-stepper__steps" data-fr-current-step="2" data-fr-steps="2"></div>
+            <p class="fr-stepper__details">
+                <span class="fr-text--bold">Étape suivante :</span> Localisez votre projet
+            </p>
+        </div>
+        <div class="container__form d-flex justify-content-center"
+             x-data="AjvValidationSchema('schemaPrefillProjectFormValidator')">
+            <div class="onboarding__form"
+                 x-data="DsrcFormValidator('{{ form.helper.form_id }}', schemaValidator, '{{ request.method }}')"
+                 x-init="init">{% include "onboarding/fragments/form-project.html" %}</div>
+        </div>
     </div>
-  </div>
-</div>
 {% endblock content %}

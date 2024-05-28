@@ -1,7 +1,7 @@
 [tool.djlint]
 # ignore = "W013"
 extension = "html"
-indent = "\t" # change indentation level
+indent = 4
 exclude = ".venv,venv,.eggs" # override the default set of excluded paths
 
 [tool.pytest.ini_options]

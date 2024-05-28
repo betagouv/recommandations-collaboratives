@@ -1,1 +1,1 @@
-import '../components/Tutorial'
+import '../components/Tutorial';

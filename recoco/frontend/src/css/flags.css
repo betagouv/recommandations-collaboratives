@@ -1,44 +1,44 @@
 .flag {
-    padding: 20px;
+  padding: 20px;
 }
 
 .flag.blue {
-    background-color: #E8EDFF;
+  background-color: #e8edff;
 }
 
 .flag.dark-blue {
-    background: #0063CB;
+  background: #0063cb;
 }
 
 .flag.grey {
-    background-color: #F6F6F6;
+  background-color: #f6f6f6;
 }
 
 .flag.red {
-    background-color: #FFE9E9;
+  background-color: #ffe9e9;
 }
 
 .flag.orange {
-    background-color: #ffeeb9;
+  background-color: #ffeeb9;
 }
 
 .flag.slim {
-    padding: 10px 20px;
+  padding: 10px 20px;
 }
 
 .flag.slim .title {
-    font-weight: bold;
-    margin-bottom: 0;
+  font-weight: bold;
+  margin-bottom: 0;
 }
 
 .flag.slim > p {
-    margin-bottom: 0;
+  margin-bottom: 0;
 }
 
 .flag.slim {
-    margin-block-start: -15px;
+  margin-block-start: -15px;
 }
 
 .flag.slim + * {
-    margin-block-start: 15px;
+  margin-block-start: 15px;
 }

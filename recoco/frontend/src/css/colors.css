@@ -1,22 +1,22 @@
 :root {
-    --color-topic-default: #0063CB;
-    --color-topic-1: #fbaff5;
-    --color-topic-2: #79e7d5;
-    --color-topic-3: #fcb0a2;
-    --color-topic-4: #B6cffb;
-    --color-topic-5: #fde39c;
+  --color-topic-default: #0063cb;
+  --color-topic-1: #fbaff5;
+  --color-topic-2: #79e7d5;
+  --color-topic-3: #fcb0a2;
+  --color-topic-4: #b6cffb;
+  --color-topic-5: #fde39c;
 }
 
 .bg-green {
-    background-color: #5BB5A7;
+  background-color: #5bb5a7;
 }
 
 .bg-green-dark {
-    background-color:#27A658;
+  background-color: #27a658;
 }
 
 .bg-grey {
-    background-color: #E5E5E5;
+  background-color: #e5e5e5;
 }
 
 /* .bg-grey-dark-light {
@@ -24,53 +24,53 @@
 } */
 
 .bg-grey-dark {
-    background-color: #929292;
+  background-color: #929292;
 }
 
 .bg-yellow {
-    background-color:#FDCD6D;
+  background-color: #fdcd6d;
 }
 
 .bg-grey-light {
-    background-color: #F6F6F6;
+  background-color: #f6f6f6;
 }
 
 .bg-orange {
-    background-color:#FA7A35;
+  background-color: #fa7a35;
 }
 
 .bg-orange-light {
-    background-color: #fff1e6;
+  background-color: #fff1e6;
 }
 
 .bg-red {
-    background-color: #FFE9E9;
+  background-color: #ffe9e9;
 }
 
 .bg-blue-light {
-    background-color: #E8EDFF;
+  background-color: #e8edff;
 }
 
 .bg-blue-light-hover:hover {
-    background-color: #103a78 !important;
+  background-color: #103a78 !important;
 }
 
 .bg-blue {
-    background: #0063CB;
+  background: #0063cb;
 }
 
 .bg-purple {
-    background-color: #667DCF
+  background-color: #667dcf;
 }
 
 .fill-blue {
-    fill: #0063CB;
+  fill: #0063cb;
 }
 
 .fill-grey {
-    fill: #929292;
+  fill: #929292;
 }
 
 .hover-bg-grey:hover {
-    background-color: #E5E5E5;
+  background-color: #e5e5e5;
 }

@@ -1,11 +1,11 @@
-import Alpine from 'alpinejs'
+import Alpine from 'alpinejs';
 
 function Spinner() {
-    return {
-        get isLoading() {
-            return this.$store.app.isLoading
-        }
-    }
+  return {
+    get isLoading() {
+      return this.$store.app.isLoading;
+    },
+  };
 }
 
-Alpine.data("Spinner", Spinner)
+Alpine.data('Spinner', Spinner);

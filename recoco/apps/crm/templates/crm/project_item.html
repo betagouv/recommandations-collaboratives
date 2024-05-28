@@ -1,14 +1,14 @@
 {% load static %}
-
 <li>
-    <a class="d-flex align-items-center" href="{% url 'crm-project-details' project.pk %}" >
+    <a class="d-flex align-items-center"
+       href="{% url 'crm-project-details' project.pk %}">
         <svg class="bi me-2" width="16" height="16" fill="currentColor">
-            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#folder-fill" />
+            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#folder-fill" />
         </svg>
         {% if project.deleted %}
-        <span style="text-decoration: line-through;">{{ project.name }}</span>
+            <span style="text-decoration: line-through;">{{ project.name }}</span>
         {% else %}
-        <span>{{ project.name }}</span>
+            <span>{{ project.name }}</span>
         {% endif %}
     </a>
 </li>

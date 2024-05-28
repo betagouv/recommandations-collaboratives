@@ -1,96 +1,124 @@
 {% load static %}
-
 <!-- Horizontal Card -->
-<div class="card-resource card-resource-horizontal card h-100 w-100" style="min-height: 100px;">
-
+<div class="card-resource card-resource-horizontal card h-100 w-100"
+     style="min-height: 100px">
     <div class="card-body">
         <div class="card-title mb-2">
             {% if resource.category and with_category %}
-            <div class="text-uppercase fw-bold small text-muted mb-3">
-                {{ resource.category.name }}
-            </div>
+                <div class="text-uppercase fw-bold small text-muted mb-3">{{ resource.category.name }}</div>
             {% endif %}
             <div class="d-flex">
                 <!-- Icon -->
-                <svg class="bi me-2 rounded-circle resource-icon bg-color-{{ resource.category.color|default:"darkgrey" }}" style="width:30px; height: 30px;" >
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#{{ resource.category.icon|default:"key" }}"/>
+                <svg class="bi me-2 rounded-circle resource-icon bg-color-{{ resource.category.color|default:"darkgrey" }}"
+                     style="width:30px;
+                            height: 30px">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#{{ resource.category.icon|default:"key" }}" />
                 </svg>
                 <!-- title -->
                 <h5 class="fw-bold">
-                    <a href="{% url 'resources-resource-detail' resource.id %}" class="text-break text-reset text-decoration-none stretched-link">
+                    <a href="{% url 'resources-resource-detail' resource.id %}"
+                       class="text-break text-reset text-decoration-none stretched-link">
                         {{ resource.title|capfirst }}
                     </a>
                 </h5>
             </div>
         </div>
-
         <div class="card-text">
-            <div class="subtitle" >{{ resource.subtitle|truncatechars:120 }}</div>
+            <div class="subtitle">{{ resource.subtitle|truncatechars:120 }}</div>
         </div>
     </div>
     {% if with_footer %}
-    <div class="card-footer" style="z-index: 10;">
-        <div class="btn-toolbar justify-content-between" role="toolbar" aria-label="Toolbar with button groups">
-            <div class="btn-group" role="group" aria-label="Etat">
-                {% if is_switchtender %}
-                {% if resource.public %}
-                <span class="align-baseline" data-bs-toggle="tooltip" data-bs-placement="top" title="Publiée">
-                    <svg class="bi" width="16" height="16" fill="currentColor">
-                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#eye-fill"/>
-                    </svg>
-                </span>
-                {% else %}
-                <span class="align-baseline" data-bs-toggle="tooltip" data-bs-placement="top" title="Non publiée">
-                    <svg class="bi" width="16" height="16" fill="currentColor">
-                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#eye-slash"/>
-                    </svg>
-                </span>
-                {% endif %}
-                {% endif %}
+        <div class="card-footer" style="z-index: 10;">
+            <div class="btn-toolbar justify-content-between"
+                 role="toolbar"
+                 aria-label="Toolbar with button groups">
+                <div class="btn-group" role="group" aria-label="Etat">
+                    {% if is_switchtender %}
+                        {% if resource.public %}
+                            <span class="align-baseline"
+                                  data-bs-toggle="tooltip"
+                                  data-bs-placement="top"
+                                  title="Publiée">
+                                <svg class="bi" width="16" height="16" fill="currentColor">
+                                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#eye-fill" />
+                                </svg>
+                            </span>
+                        {% else %}
+                            <span class="align-baseline"
+                                  data-bs-toggle="tooltip"
+                                  data-bs-placement="top"
+                                  title="Non publiée">
+                                <svg class="bi" width="16" height="16" fill="currentColor">
+                                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#eye-slash" />
+                                </svg>
+                            </span>
+                        {% endif %}
+                    {% endif %}
+                </div>
+                <!-- Action toolbar -->
+                <div class="btn-group" role="group" aria-label="Actions">
+                    <!-- Bookmark -->
+                    {% if resource.id in user.bookmarks.as_list %}
+                        <form method="POST"
+                              action="{% url "resources-bookmark-delete" resource.id %}">
+                            {% csrf_token %}
+                            <button type="submit"
+                                    class="btn btn-text p-0 m-0 me-2 text-reset text-decoration-none align-baseline"
+                                    data-bs-toggle="tooltip"
+                                    data-bs-placement="top"
+                                    title="Retirer de vos favoris">
+                                <svg class="bi text-warning align-baseline"
+                                     width="14"
+                                     height="14"
+                                     fill="currentColor">
+                                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#star-fill" />
+                                </svg>
+                            </button>
+                        </form>
+                    {% else %}
+                        <a class="me-2 align-baseline text-secondary"
+                           href="{% url "resources-bookmark-create" resource.id %}"
+                           data-bs-toggle="tooltip"
+                           data-bs-placement="top"
+                           title="Ajouter à vos favoris">
+                            <svg class="bi align-baseline" width="14" height="14" fill="currentColor">
+                                <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#star" />
+                            </svg>
+                        </a>
+                    {% endif %}
+                    <!-- Admin Actions -->
+                    {% if is_switchtender %}
+                        <!-- Push -->
+                        {% if "project_id" in request.session %}
+                            <a class="text-reset text-decoration-none align-baseline"
+                               href="{% url "projects-create-resource-action" resource.id %}"
+                               data-bs-toggle="tooltip"
+                               data-bs-placement="top"
+                               title="Pousser cette ressource">
+                                <svg class="bi text-success align-baseline"
+                                     width="14"
+                                     height="14"
+                                     fill="currentColor">
+                                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#layer-forward" />
+                                </svg>
+                            </a>
+                        {% else %}
+                            <span class="align-baseline"
+                                  href="{% url "projects-create-resource-action" resource.id %}"
+                                  data-bs-toggle="tooltip"
+                                  data-bs-placement="top"
+                                  title="Sélectionnez d'abord un projet pour pousser cette ressource">
+                                <svg class="bi  text-secondary align-baseline"
+                                     width="14"
+                                     height="14"
+                                     fill="currentColor">
+                                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#layer-forward" />
+                                </svg>
+                            </span>
+                        {% endif %}
+                    {% endif %}
+                </div>
             </div>
-
-            <!-- Action toolbar -->
-            <div class="btn-group" role="group" aria-label="Actions">
-                <!-- Bookmark -->
-                {% if resource.id in user.bookmarks.as_list %}
-                <form method="POST" action="{% url "resources-bookmark-delete" resource.id %}">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-text p-0 m-0 me-2 text-reset text-decoration-none align-baseline"   data-bs-toggle="tooltip" data-bs-placement="top" title="Retirer de vos favoris">
-                    <svg class="bi text-warning align-baseline" width="14" height="14" fill="currentColor">
-                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#star-fill"/>
-                    </svg>
-                    </button>
-                </form>
-                {% else %}
-                <a class="me-2 align-baseline text-secondary" href="{% url "resources-bookmark-create" resource.id %}"  data-bs-toggle="tooltip" data-bs-placement="top" title="Ajouter à vos favoris">
-                    <svg class="bi align-baseline" width="14" height="14" fill="currentColor">
-                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#star"/>
-                    </svg>
-                </a>
-                {% endif %}
-
-                <!-- Admin Actions -->
-                {% if is_switchtender %}
-
-                <!-- Push -->
-                {% if "project_id" in request.session %}
-                <a class="text-reset text-decoration-none align-baseline" href="{% url "projects-create-resource-action" resource.id %}"  data-bs-toggle="tooltip" data-bs-placement="top" title="Pousser cette ressource">
-                    <svg class="bi text-success align-baseline" width="14" height="14" fill="currentColor">
-                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#layer-forward"/>
-                    </svg>
-                </a>
-                {% else %}
-                <span class="align-baseline" href="{% url "projects-create-resource-action" resource.id %}"  data-bs-toggle="tooltip" data-bs-placement="top" title="Sélectionnez d'abord un projet pour pousser cette ressource">
-                    <svg class="bi  text-secondary align-baseline" width="14" height="14" fill="currentColor">
-                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#layer-forward"/>
-                    </svg>
-                </span>
-                {% endif %}
-
-                {% endif %}
-            </div>
-
         </div>
-    </div>
     {% endif %}
 </div>

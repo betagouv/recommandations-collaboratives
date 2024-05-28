@@ -1,3 +1,3 @@
 export function isPlural(singularString, pluralString, count) {
-    return count > 1 ? pluralString : singularString
+  return count > 1 ? pluralString : singularString;
 }

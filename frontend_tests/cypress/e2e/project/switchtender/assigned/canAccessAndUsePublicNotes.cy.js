@@ -1,34 +1,32 @@
-import projects from '../../../../fixtures/projects/projects.json'
-import editor from '../../../../support/tools/editor'
+import projects from '../../../../fixtures/projects/projects.json';
+import editor from '../../../../support/tools/editor';
 
 const currentProject = projects[1];
 
 describe('I can access and use public notes', () => {
+  beforeEach(() => {
+    cy.login('jean');
+  });
 
-    beforeEach(() => {
-        cy.login("jean");
-    })
+  it('goes to public notes', () => {
+    cy.visit('/projects');
 
-    it('goes to public notes', () => {
+    cy.contains(currentProject.fields.name).click({ force: true });
 
-        cy.visit('/projects')
+    cy.contains('Conversation').click({ force: true });
 
-        cy.contains(currentProject.fields.name).click({ force: true });
+    cy.url().should('include', '/conversations');
 
-        cy.contains("Conversation").click({ force: true })
+    const now = new Date();
 
-        cy.url().should('include', '/conversations')
+    cy.get('textarea')
+      .type(`test : ${now}`, { force: true })
+      .should('have.value', `test : ${now}`);
 
-        const now = new Date();
+    editor.writeMessage(`test : ${now}`);
 
-        cy.get('textarea')
-            .type(`test : ${now}`, { force: true })
-            .should('have.value', `test : ${now}`)
+    cy.contains('Envoyer').click({ force: true });
 
-        editor.writeMessage(`test : ${now}`)
-
-        cy.contains("Envoyer").click({ force: true })
-
-        cy.contains(`test : ${now}`)
-    })
-})
+    cy.contains(`test : ${now}`);
+  });
+});

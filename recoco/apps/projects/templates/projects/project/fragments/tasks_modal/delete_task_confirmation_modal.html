@@ -35,7 +35,9 @@
                           :action="deleteTaskUrl(currentDeletingTask.id)"
                           class="form mt-2">
                         {% csrf_token %}
-                        <button data-test-id="delete-task-modal-button" type="submit" class="button filled red">Supprimer</button>
+                        <button data-test-id="delete-task-modal-button"
+                                type="submit"
+                                class="button filled red">Supprimer</button>
                         <a class="button" data-bs-dismiss="modal" aria-label="Close">Annuler</a>
                     </form>
                 </div>

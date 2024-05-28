@@ -1,3 +1,3 @@
-import '../components/AccessUpdate'
-import '../components/ProjectShare'
-import '../../css/timeline.css'
+import '../components/AccessUpdate';
+import '../components/ProjectShare';
+import '../../css/timeline.css';

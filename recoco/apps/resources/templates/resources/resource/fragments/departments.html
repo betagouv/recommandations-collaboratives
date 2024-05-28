@@ -4,7 +4,9 @@
     </span>
     <ul class="d-flex flex-wrap list-unstyled">
         {% for department in resource.departments.all %}
-           <li class="mx-1">- <span class="small font-marianne fw-light text-grey-light">{{ department.name }}</span></li>
+            <li class="mx-1">
+                - <span class="small font-marianne fw-light text-grey-light">{{ department.name }}</span>
+            </li>
         {% endfor %}
     </ul>
 </div>
