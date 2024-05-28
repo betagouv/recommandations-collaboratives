@@ -1,6 +1,10 @@
 {% load static %}
 {% load guardian_tags %}
 {% load gravatar %}
+{% load django_vite %}
+{% block js %}
+    {% vite_asset 'js/apps/menuNotification.js' %}
+{% endblock js %}
 {% with request.resolver_match.url_name as url_name %}
     {% if user.is_authenticated %}
         {% get_obj_perms request.user for request.site as "user_site_perms" %}
@@ -217,8 +221,15 @@
             </li>
         {% endif %}
         <!-- Notifications -->
+        {% comment %} {{ grouped_notifications.items|json_script:"groupedNotifications" }} {% endcomment %}
+        {% comment %} {{ unread_notifications|json_script:"unreadNotifications" }} {% endcomment %}
+        {{ unread_notifications }}
+        <script>
+            {% comment %} const notifications = JSON.parse(document.getElementById(groupedNotifications).textContent); {% endcomment %}
+            {% comment %} const notifications = JSON.parse(document.getElementById("unreadNotifications").textContent); {% endcomment %}
+        </script>
         {% if user.is_authenticated %}
-            <li class="dropdown">
+            <li class="dropdown" x-data="MenuNotifications">
                 <a class="nav-link link-dark"
                    href="#"
                    role="button"
@@ -229,52 +240,7 @@
                         <span class="badge text-bg-danger">{{ unread_notifications.count }}</span>
                     {% endif %}
                 </a>
-                <ul class="dropdown-menu notifications">
-                    <li>Notifications non lues</li>
-                    <li>
-                        <hr class="dropdown-divider">
-                    </li>
-                    {% for date, notifications in grouped_notifications.items %}
-                        <div class="notification-date">le {{ date|date }}</div>
-                        {% for notification in notifications %}
-                            <li class="dropdown-item">
-                                {% comment %} {% include 'user/user_card.html' with user=notification.actor user_activity=True %} {% endcomment %}
-                                <div class="notification-verb">{{ notification.verb }}</div>
-                                <a class="notification-project"
-                                   href="{{ notification.target.get_absolute_url }}">{{ notification.target }}</a>
-                                {% if notification.action_object.comment %}
-                                    <div class="notification-message">
-                                        "{{ notification.action_object.comment }}" à propos de <a href=" {{ notification.action_object.task.get_absolute_url }}">{{ notification.action_object.task }}</a>
-                                    </div>
-                                {% endif %}
-                                {% comment %} {% if notification.actor %}
-                                <div class="align-middle mx-2 flex-shrink">
-                                    <img class="rounded-circle" src="{% gravatar_url notification.actor.email size=24 %}" alt="{{ notification.actor }}">
-                                    <span class="actor">
-                                        {{ notification.actor.first_name|default:notification.actor.email }}
-                                        {{ notification.actor.last_name|default:"" }}
-                                    </span>
-                                </div>
-                            {% endif %}
-                            {% if notification.actor %}
-                            {% else %}
-                                <span class="actor">(compte supprimé)</span>
-                            {% endif %}
-                                <a class="dropdown-item" href="#">Another action</a> {% endcomment %}
-                            </li>
-                        {% endfor %}
-                    {% empty %}
-                        <li>
-                            <span class="dropdown-item">Vous n'avez aucune notification ☀️</span>
-                        </li>
-                    {% endfor %}
-                    <li>
-                        <hr class="dropdown-divider">
-                    </li>
-                    <li class="btn-container">
-                        <button class="dropdown-item">Marquer toutes les notifications commes lues</button>
-                    </li>
-                </ul>
+                {% include "header/dropdown-menu-notifications.html" %}
             </li>
         {% endif %}
     </ul>

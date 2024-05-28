@@ -1,0 +1,47 @@
+{% load gravatar %}
+<ul class="dropdown-menu notifications">
+    <li>Notifications non lues</li>
+    <li>
+        <hr class="dropdown-divider">
+    </li>
+    {% for date, notifications in grouped_notifications.items %}
+        <div class="notification__date">le {{ date|date }}</div>
+        {% for notification in notifications %}
+            <li class="dropdown-item">
+                {% include 'user/user_card.html' with user=notification.actor project=notification.target user_activity=True %}
+                <div class="notification__verb">{{ notification.verb }}</div>
+                <a class="notification__project"
+                   href="{{ notification.target.get_absolute_url }}">{{ notification.target }}</a>
+                {% if notification.action_object.comment %}
+                    <div class="notification__message">
+                        "{{ notification.action_object.comment }}" à propos de <a href=" {{ notification.action_object.task.get_absolute_url }}">{{ notification.action_object.task }}</a>
+                    </div>
+                {% endif %}
+                {% comment %} {% if notification.actor %}
+                <div class="align-middle mx-2 flex-shrink">
+                    <img class="rounded-circle" src="{% gravatar_url notification.actor.email size=24 %}" alt="{{ notification.actor }}">
+                    <span class="actor">
+                        {{ notification.actor.first_name|default:notification.actor.email }}
+                        {{ notification.actor.last_name|default:"" }}
+                    </span>
+                </div>
+            {% endif %}
+            {% if notification.actor %}
+            {% else %}
+                <span class="actor">(compte supprimé)</span>
+            {% endif %}
+                <a class="dropdown-item" href="#">Another action</a> {% endcomment %}
+            </li>
+        {% endfor %}
+    {% empty %}
+        <li>
+            <span class="dropdown-item">Vous n'avez aucune notification ☀️</span>
+        </li>
+    {% endfor %}
+    <li>
+        <hr class="dropdown-divider">
+    </li>
+    <li class="btn-container">
+        <button class="dropdown-item">Marquer toutes les notifications commes lues</button>
+    </li>
+</ul>
