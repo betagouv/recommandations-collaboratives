@@ -1,6 +1,6 @@
 <meta name="description" content="{% block description %}{{ request.site.name }} est un outil pour aider les collectivités dans leurs projets{% endblock %}">
 <meta name="robots" content="index, archive" />
-<meta property="og:title" content="{{ request.site.name }}{% block og_title %}{% endblock %}" />
+<meta property="og:title" content="{% block og_title %}{% endblock %} - {{ request.site.name }}" />
 <meta property="og:locale" content="fr" />
 <meta property="og:site_name" content="{{ request.site.name }}" />
-<meta property="og:description" content="{% block og_description %}{{ request.site.name }} est un outil pour aider les collectivités dans leurs projets{% endblock %}" />
+<meta property="og:description" content="{% block og_description %}{% if request.site.configuration %}{{ request.site.configuration.description }} {% else %}{{ request.site.name }} est un outil pour aider les collectivités dans leurs projets{% endif %}{% endblock %}" />
