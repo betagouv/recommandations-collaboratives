@@ -1,14 +1,13 @@
-import Alpine from 'alpinejs'
-import api, { userProjectStatusUrl } from '../utils/api'
+import Alpine from 'alpinejs';
+import api, { userProjectStatusUrl } from '../utils/api';
 
 Alpine.store('projects', {
-    projects: [],
-    async getProjects() {
+  projects: [],
+  async getProjects() {
+    const json = await api.get(userProjectStatusUrl());
 
-        const json = await api.get(userProjectStatusUrl())
+    return (this.projects = json.data);
+  },
+});
 
-        return this.projects = json.data;
-    }
-})
-
-export default Alpine.store('projects')
+export default Alpine.store('projects');

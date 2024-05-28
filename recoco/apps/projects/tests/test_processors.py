@@ -16,6 +16,7 @@ from recoco.utils import login
 from notifications.signals import notify
 
 from recoco.apps.tasks import models as task_models
+from recoco.apps.home import models as home_models
 
 from .. import models, utils
 
@@ -23,6 +24,8 @@ from .. import models, utils
 @pytest.mark.django_db
 def test_active_project_processor(request, client):
     current_site = get_current_site(request)
+
+    baker.make(home_models.SiteConfiguration, site=current_site)
 
     project = baker.make(models.Project, sites=[current_site], status="READY")
 

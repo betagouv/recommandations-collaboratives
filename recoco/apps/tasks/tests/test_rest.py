@@ -149,17 +149,141 @@ def test_user_cannot_see_project_tasks_when_not_in_relation(request):
 
 
 #
+# create task
+
+
+@pytest.mark.django_db
+def test_project_simple_user_cannot_create_project_task(request):
+    user = baker.make(auth_models.User)
+    site = get_current_site(request)
+    project = baker.make(project_models.Project, sites=[site])
+
+    client = APIClient()
+    client.force_authenticate(user=user)
+    url = reverse("project-tasks-list", args=[project.id])
+    data = {
+        "status": 1,
+        "visited": False,
+        "public": True,
+        "priority": 9,
+        "order": 0,
+        "intent": "the intent",
+        "content": "the content",
+    }
+    response = client.post(url, data=data)
+
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_project_collaborator_cannot_create_project_task_for_site(request):
+    user = baker.make(auth_models.User)
+    site = get_current_site(request)
+    project = baker.make(project_models.Project, sites=[site])
+
+    utils.assign_collaborator(user, project)
+
+    client = APIClient()
+    client.force_authenticate(user=user)
+    url = reverse("project-tasks-list", args=[project.id])
+    data = {
+        "status": 1,
+        "visited": False,
+        "public": True,
+        "priority": 9,
+        "order": 0,
+        "intent": "the intent",
+        "content": "the content",
+    }
+    response = client.post(url, data=data)
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_project_advisor_can_create_project_task_for_site(request):
+    user = baker.make(auth_models.User)
+    site = get_current_site(request)
+    project = baker.make(project_models.Project, sites=[site])
+
+    utils.assign_advisor(user, project)
+
+    client = APIClient()
+    client.force_authenticate(user=user)
+    url = reverse("project-tasks-list", args=[project.id])
+    data = {
+        "status": 1,
+        "visited": False,
+        "public": True,
+        "priority": 9,
+        "order": 0,
+        "intent": "the intent",
+        "content": "the content",
+    }
+    response = client.post(url, data=data)
+    assert response.status_code == 201
+
+    created_task = models.Task.objects.filter(project=project).first()
+    assert created_task.site == site
+    assert created_task.project == project
+    assert created_task.created_by == user
+    assert created_task.intent == data["intent"]
+
+
+#
 # update tasks
 
 
 @pytest.mark.django_db
-def test_project_collaborator_can_update_project_task_for_site(request):
+def test_project_advisor_cannot_update_other_project_task_for_site(request):
+    user = baker.make(auth_models.User)
+    site = get_current_site(request)
+
+    # to test object level perm, user is collaborator on an other project
+    other_project = baker.make(project_models.Project, sites=[site])
+    utils.assign_advisor(user, other_project)
+
+    project = baker.make(project_models.Project, sites=[site])
+    task = baker.make(models.Task, project=project, site=site, public=False)
+
+    client = APIClient()
+    client.force_authenticate(user=user)
+    url = reverse("project-tasks-detail", args=[project.id, task.id])
+    response = client.patch(url, data={"public": True})
+
+    assert response.status_code == 403
+
+    task.refresh_from_db()
+    assert task.public is False
+
+
+@pytest.mark.django_db
+def test_project_collaborator_cannot_update_project_task_for_site(request):
     user = baker.make(auth_models.User)
     site = get_current_site(request)
     project = baker.make(project_models.Project, sites=[site])
     task = baker.make(models.Task, project=project, site=site, public=False)
 
     utils.assign_collaborator(user, project)
+
+    client = APIClient()
+    client.force_authenticate(user=user)
+    url = reverse("project-tasks-detail", args=[project.id, task.id])
+    response = client.patch(url, data={"public": True})
+
+    assert response.status_code == 403
+
+    task.refresh_from_db()
+    assert task.public is False
+
+
+@pytest.mark.django_db
+def test_project_advisor_can_update_project_task_for_site(request):
+    user = baker.make(auth_models.User)
+    site = get_current_site(request)
+    project = baker.make(project_models.Project, sites=[site])
+    task = baker.make(models.Task, project=project, site=site, public=False)
+
+    utils.assign_advisor(user, project)
 
     client = APIClient()
     client.force_authenticate(user=user)
@@ -194,12 +318,12 @@ def test_non_project_user_cannot_move_project_tasks_for_site(request):
 
 
 @pytest.mark.django_db
-def test_project_collaborator_cannot_move_unknown_tasks_for_site(request):
+def test_project_advisor_cannot_move_unknown_tasks_for_site(request):
     user = baker.make(auth_models.User)
     site = get_current_site(request)
     project = baker.make(project_models.Project, status="READY", sites=[site])
     task = baker.make(models.Task, project=project, site=site, public=True)
-    utils.assign_collaborator(user, project)
+    utils.assign_advisor(user, project)
 
     client = APIClient()
     client.force_authenticate(user=user)
@@ -303,14 +427,34 @@ def test_project_task_followup_list_closed_to_user_wo_permission(request):
 
 
 @pytest.mark.django_db
+def test_project_task_followup_list_closed_for_dissociate_task_and_project(request):
+    user = baker.make(auth_models.User)
+    site = get_current_site(request)
+    project1 = baker.make(project_models.Project, sites=[site])
+    _ = baker.make(models.Task, project=project1, site=site, public=True)
+    utils.assign_advisor(user, project1)
+
+    project2 = baker.make(project_models.Project, sites=[site])
+    task2 = baker.make(models.Task, project=project2, site=site, public=True)
+    _ = baker.make(models.TaskFollowup, task=task2, status=models.Task.PROPOSED)
+
+    client = APIClient()
+    client.force_authenticate(user=user)
+    url = reverse("project-tasks-followups-list", args=[project1.id, task2.id])
+    response = client.get(url)
+
+    assert response.status_code == 200
+    assert len(response.data) == 0
+
+
+@pytest.mark.django_db
 def test_project_task_followup_list_returns_followups_to_collaborator(request):
     user = baker.make(auth_models.User)
     site = get_current_site(request)
-    project = baker.make(project_models.Project, sites=[site])
+    project = baker.make(project_models.Project, status="TO_PROCESS", sites=[site])
     task = baker.make(models.Task, project=project, site=site, public=True)
     followup = baker.make(models.TaskFollowup, task=task, status=models.Task.PROPOSED)
 
-    # FIXME here the point should be to state the specific permission
     utils.assign_collaborator(user, project)
 
     client = APIClient()
@@ -352,7 +496,22 @@ def test_project_task_followup_create_closed_to_anonymous_user(request):
     assert response.status_code == 403
 
 
-# FIXME we should have permission checking on followup creation
+@pytest.mark.django_db
+def test_project_task_followup_create_not_allowed_for_simple_auth_user(request):
+    user = baker.make(auth_models.User)
+    site = get_current_site(request)
+    project = baker.make(project_models.Project, sites=[site])
+    task = baker.make(models.Task, project=project, site=site, public=True)
+
+    client = APIClient()
+    client.force_authenticate(user=user)
+    data = {"comment": "a new followup for tasks"}
+    url = reverse("project-tasks-followups-list", args=[project.id, task.id])
+    response = client.post(url, data=data)
+
+    assert response.status_code == 403
+
+
 @pytest.mark.django_db
 def test_project_task_followup_create_is_processed_for_auth_user(request):
     user = baker.make(auth_models.User)
@@ -362,6 +521,7 @@ def test_project_task_followup_create_is_processed_for_auth_user(request):
 
     client = APIClient()
     client.force_authenticate(user=user)
+    utils.assign_advisor(user, project)
     data = {"comment": "a new followup for tasks"}
     url = reverse("project-tasks-followups-list", args=[project.id, task.id])
     response = client.post(url, data=data)
@@ -409,11 +569,9 @@ def test_project_task_followup_update_is_processed_for_auth_user(request):
     task = baker.make(models.Task, project=project, site=site, public=True)
     followup = baker.make(models.TaskFollowup, task=task)
 
-    # FIXME should use specific permission
-    utils.assign_collaborator(user, project)
-
     client = APIClient()
     client.force_authenticate(user=user)
+    utils.assign_advisor(user, project)
     data = {"comment": "an updated comment for followup"}
     url = reverse(
         "project-tasks-followups-detail", args=[project.id, task.id, followup.id]
@@ -577,6 +735,7 @@ def test_last_members_activity_is_updated_by_member_followup_via_rest(request, c
 
     client = APIClient()
     client.force_authenticate(user=user)
+    utils.assign_advisor(user, project)
     data = {"comment": "an updated comment for followup"}
     url = reverse("project-tasks-followups-list", args=[project.id, task.id])
     before_update = timezone.now()

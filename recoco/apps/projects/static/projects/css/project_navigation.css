@@ -1,113 +1,113 @@
 .project-navigation {
-    border-bottom: 1px solid #E5E5E5;
-    list-style: none;
-    margin-bottom: 30px;
+  border-bottom: 1px solid #e5e5e5;
+  list-style: none;
+  margin-bottom: 30px;
 }
 
 .project-navigation a .has-notification {
-    position: absolute;
+  position: absolute;
 
-    top: -2px;
-    left: -1px;
+  top: -2px;
+  left: -1px;
 
-    color: white;
-    font-size: 9px !important;
+  color: white;
+  font-size: 9px !important;
 
-    border-bottom-right-radius: 5px;
-    background-color: #0063CB;
-    padding: 0 5px !important;
+  border-bottom-right-radius: 5px;
+  background-color: #0063cb;
+  padding: 0 5px !important;
 
-    width: auto !important;
-    height: auto !important;
+  width: auto !important;
+  height: auto !important;
 
-    border-top-left-radius:0 !important;
-    border-top-right-radius:0 !important;
-    border-bottom-left-radius:0 !important;
+  border-top-left-radius: 0 !important;
+  border-top-right-radius: 0 !important;
+  border-bottom-left-radius: 0 !important;
 }
 
 .project-navigation a {
-    display: flex;
-    padding: 10px 15px;
-    margin: 0 5px;
+  display: flex;
+  padding: 10px 15px;
+  margin: 0 5px;
 
-    text-decoration: none;
+  text-decoration: none;
 
-    box-sizing: border-box;
-    border-top: solid 2px transparent;
-    border-left: solid 1px transparent;
-    border-right: solid 1px transparent;
-    border-bottom: solid 1px #E8EDFF;
+  box-sizing: border-box;
+  border-top: solid 2px transparent;
+  border-left: solid 1px transparent;
+  border-right: solid 1px transparent;
+  border-bottom: solid 1px #e8edff;
 
-    transform: translate3d(0,1px,0);
-    background-color: #E8EDFF;
+  transform: translate3d(0, 1px, 0);
+  background-color: #e8edff;
 
-    color: #222;
-    font-weight: 500;
+  color: #222;
+  font-weight: 500;
 
-    font-size: 15px;
+  font-size: 15px;
 }
 
-.project-navigation a.active{
-    background-color: white;
-    font-weight: bold;
-    color: #0063CB;
+.project-navigation a.active {
+  background-color: white;
+  font-weight: bold;
+  color: #0063cb;
 
-    border-top: solid 2px #0063CB;
-    border-left: solid 1px #E5E5E5;
-    border-right: solid 1px #E5E5E5;
-    border-bottom: solid 1px white;
+  border-top: solid 2px #0063cb;
+  border-left: solid 1px #e5e5e5;
+  border-right: solid 1px #e5e5e5;
+  border-bottom: solid 1px white;
 }
 
-.project-navigation a.disabled{
-    background-color: #EEEEEE;
-    cursor: not-allowed;
-    user-select: none;
-    pointer-events: none;
+.project-navigation a.disabled {
+  background-color: #eeeeee;
+  cursor: not-allowed;
+  user-select: none;
+  pointer-events: none;
 
-    color: #929292;
-    border-top: solid 1px #EEEEEE;
-    border-bottom: solid 1px #EEEEEE;
+  color: #929292;
+  border-top: solid 1px #eeeeee;
+  border-bottom: solid 1px #eeeeee;
 }
 
 .project-navigation .survey-completion {
-    position: absolute;
-    display: flex;
-    align-items: center;
+  position: absolute;
+  display: flex;
+  align-items: center;
 
-    bottom: 2px;
-    left: 5%;
+  bottom: 2px;
+  left: 5%;
 
-    width: 90%;
+  width: 90%;
 }
 
 .project-navigation .survey-completion-progress-bar-container {
-    position: relative;
-    display: flex;
-    flex-grow: 1;
-    align-items: center;
-    height: 5px;
+  position: relative;
+  display: flex;
+  flex-grow: 1;
+  align-items: center;
+  height: 5px;
 
-    background-color: white;
-    overflow: hidden;
-    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
-    border-radius: 6px;
+  background-color: white;
+  overflow: hidden;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+  border-radius: 6px;
 }
 
 .project-navigation .survey-completion-progress-bar {
-    position: absolute;
-    left: 0;
-    top: 0;
-    height: 100%;
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
 }
 
 .project-navigation .survey-completion-number {
-    color: #222;
-    font-weight: 400;
-    font-size: 11px;
-    margin-left: 5px;
+  color: #222;
+  font-weight: 400;
+  font-size: 11px;
+  margin-left: 5px;
 }
 
 .project-navigation .survey p {
-    margin: 0;
-    transform: translate3d(0,-4px,0);
+  margin: 0;
+  transform: translate3d(0, -4px, 0);
 }

@@ -1,2 +1,2 @@
-import '../components/FileUploads'
-import '../components/Documents'
+import '../components/FileUploads';
+import '../components/Documents';

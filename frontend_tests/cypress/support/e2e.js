@@ -14,15 +14,13 @@
 // ***********************************************************
 import 'cypress-mochawesome-reporter/register';
 
-const url = require('url')
+const url = require('url');
 
 // reset baseUrl
-Cypress.config("baseUrl", 'http://example.localhost:8000/')
-
-
+Cypress.config('baseUrl', 'http://example.localhost:8000/');
 
 // Import commands.js using ES2015 syntax:
-import './commands'
+import './commands';
 
 // Alternatively you can use CommonJS syntax:
 // require('./commands')

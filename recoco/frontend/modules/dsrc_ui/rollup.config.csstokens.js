@@ -10,7 +10,7 @@ export default {
 	plugins: [
 		scss({
 			fileName: 'dsrc-csstokens.css',
-			watch: 'src/lib/styles/scss/tokens/'
-		})
-	]
+			watch: 'src/lib/styles/scss/tokens/',
+		}),
+	],
 };

@@ -7,47 +7,49 @@
      aria-labelledby="feedback-modal-label"
      aria-hidden="true"
      @open-feedback-modal.window="openFeedbackModal($event)">
-  <div class="modal-dialog">
-    <template x-if="currentFeedbackTask">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="reminder-modal-label">
-            <svg class="align-middle bi"
-                 width="20px"
-                 height="20px"
-                 fill="currentColor">
-              <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#lightbulb" />
-            </svg>
-            <template x-if="$store.taskModal.feedbackModalStatus === DONE_STATUS">
-              <span class="align-middle">Ça a été utile / C'est fait</span>
-            </template>
-            <template x-if="$store.taskModal.feedbackModalStatus != DONE_STATUS">
-              <span class="align-middle">Ça n'était pas applicable</span>
-            </template>
-          </h5>
-          <button type="button"
-                  class="btn-close"
-                  data-bs-dismiss="modal"
-                  aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <div class="mb-3">
-            <label class="form-label fw-bolder" for="invite-message">[FACULTATIF] Précisez pourquoi - pour garder une trace :</label>
-            <textarea x-model="feedbackComment"
-                      rows="4"
-                      class="form-control {% if form.message.errors %}is-invalid{% endif %}"
-                      placeholder="Précisions sur les recommandation faites, les points bloquants, etc."></textarea>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button"
-                  type="submit"
-                  class="btn btn-primary"
-                  :id="`${currentFeedbackTask.id}-${$store.taskModal.feedbackModalStatus}-button`"
-                  :data-test-id="`send-status-${$store.taskModal.feedbackModalStatus}-feedback-button`"
-                  @click="onSubmitFeedback">Archiver</button>
-        </div>
-      </div>
-    </template>
-  </div>
+    <div class="modal-dialog">
+        <template x-if="currentFeedbackTask">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="reminder-modal-label">
+                        <svg class="align-middle bi"
+                             width="20px"
+                             height="20px"
+                             fill="currentColor">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#lightbulb" />
+                        </svg>
+                        <template x-if="$store.taskModal.feedbackModalStatus === DONE_STATUS">
+                            <span class="align-middle">Ça a été utile / C'est fait</span>
+                        </template>
+                        <template x-if="$store.taskModal.feedbackModalStatus != DONE_STATUS">
+                            <span class="align-middle">Ça n'était pas applicable</span>
+                        </template>
+                    </h5>
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-bolder" for="invite-message">
+                            [FACULTATIF] Précisez pourquoi - pour garder une trace :
+                        </label>
+                        <textarea x-model="feedbackComment"
+                                  rows="4"
+                                  class="form-control {% if form.message.errors %}is-invalid{% endif %}"
+                                  placeholder="Précisions sur les recommandation faites, les points bloquants, etc."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button"
+                            type="submit"
+                            class="btn btn-primary"
+                            :id="`${currentFeedbackTask.id}-${$store.taskModal.feedbackModalStatus}-button`"
+                            :data-test-id="`send-status-${$store.taskModal.feedbackModalStatus}-feedback-button`"
+                            @click="onSubmitFeedback">Archiver</button>
+                </div>
+            </div>
+        </template>
+    </div>
 </div>

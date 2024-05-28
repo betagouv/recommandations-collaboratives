@@ -3,11 +3,7 @@
 {% load static %}
 {% load gravatar %}
 {% load guardian_tags %}
-
-{% block title %}
-    Fichiers et liens - {{ block.super }}
-{% endblock %}
-
+{% block title %}Fichiers et liens - {{ block.super }}{% endblock %}
 {% load django_vite %}
 {% block js %}
     {% vite_asset 'js/apps/documents.js' %}

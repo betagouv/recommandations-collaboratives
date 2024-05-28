@@ -1,117 +1,125 @@
-import axios from 'axios'
-import Cookies from 'js-cookie'
+import axios from 'axios';
+import Cookies from 'js-cookie';
 
-import appStore from '../store/app'
+import appStore from '../store/app';
 
 const instance = axios.create({
-    cache: "no-cache",
-    mode: "same-origin",
-    credentials: "same-origin",
-    headers: {
-        "Content-Type": "application/json",
-        "X-CSRFToken": Cookies.get("csrftoken"),
-    },
-})
+  cache: 'no-cache',
+  mode: 'same-origin',
+  credentials: 'same-origin',
+  headers: {
+    'Content-Type': 'application/json',
+    'X-CSRFToken': Cookies.get('csrftoken'),
+  },
+});
 
-instance.interceptors.request.use(function (config) {
-    appStore.isLoading = true
+instance.interceptors.request.use(
+  function (config) {
+    appStore.isLoading = true;
     return config;
-}, function (error) {
-    appStore.isLoading = false
+  },
+  function (error) {
+    appStore.isLoading = false;
     return Promise.reject(error);
-});
+  }
+);
 
-instance.interceptors.response.use((response) => {
-    appStore.isLoading = false
+instance.interceptors.response.use(
+  (response) => {
+    appStore.isLoading = false;
     return response;
-}, (error) => {
-    appStore.isLoading = false
+  },
+  (error) => {
+    appStore.isLoading = false;
     return Promise.reject(error);
-});
+  }
+);
 
-export default instance
+export default instance;
 
 // Projects :
 export function projectsUrl() {
-    return `/api/projects/`
+  return `/api/projects/`;
 }
 
 export function userProjectStatusUrl() {
-    return `/api/userprojectstatus/`
+  return `/api/userprojectstatus/`;
 }
 
 // Organization
 export function searchOrganizationsUrl(search) {
-    return `/api/organizations/?search=${search}`
+  return `/api/organizations/?search=${search}`;
 }
 
-// Organization
+// Topic
 export function searchTopicsUrl(search, restrict_to) {
-    return `/api/topics/?search=${search}&restrict_to=${restrict_to}`
+  return `/api/topics/?search=${search}&restrict_to=${restrict_to}`;
 }
 
 // Tasks :
 export function taskUrl(projectId, taskId) {
-    return `/api/projects/${projectId}/tasks/${taskId}/`
+  return `/api/projects/${projectId}/tasks/${taskId}/`;
 }
 
 export function tasksUrl(projectId) {
-    return `/api/projects/${projectId}/tasks/`
+  return `/api/projects/${projectId}/tasks/`;
 }
 
 export function moveTaskUrl(projectId, taskId) {
-    return `/api/projects/${projectId}/tasks/${taskId}/move/`
+  return `/api/projects/${projectId}/tasks/${taskId}/move/`;
 }
 
 export function taskNotificationsUrl(projectId, taskId) {
-    return `/api/projects/${projectId}/tasks/${taskId}/notifications/`
+  return `/api/projects/${projectId}/tasks/${taskId}/notifications/`;
 }
 
 export function markTaskNotificationsAsReadUrl(projectId, taskId) {
-    return `/api/projects/${projectId}/tasks/${taskId}/notifications/mark_all_as_read/`
+  return `/api/projects/${projectId}/tasks/${taskId}/notifications/mark_all_as_read/`;
 }
 
 export function followupsUrl(projectId, taskId) {
-    return `/api/projects/${projectId}/tasks/${taskId}/followups/`
+  return `/api/projects/${projectId}/tasks/${taskId}/followups/`;
 }
 
 export function followupUrl(projectId, taskId, followupId) {
-    return `/api/projects/${projectId}/tasks/${taskId}/followups/${followupId}/`
+  return `/api/projects/${projectId}/tasks/${taskId}/followups/${followupId}/`;
 }
 
 export function resourcePreviewUrl(resourceId) {
-    return `/ressource/${resourceId}/embed`;
+  return `/ressource/${resourceId}/embed`;
 }
 
 // Regions :
 export function regionsUrl() {
-    return `/api/regions/`
+  return `/api/regions/`;
 }
 
 // Challenges
 export function challengeUrl(code) {
-    return `/api/challenges/${code}/`
+  return `/api/challenges/${code}/`;
 }
 
-// Challenges
+// Challenges Definitions
 export function challengeDefinitionUrl(code) {
-    return `/api/challenges/definitions/${code}`
+  return `/api/challenges/definitions/${code}`;
 }
 
 // Non API routes
 // TODO : Make them into proper endpoints
 export function editTaskUrl(taskId, next = null) {
-    return next ? `/task/${taskId}/update/?next=${next}` : `/task/${taskId}/update/`;
+  return next
+    ? `/task/${taskId}/update/?next=${next}`
+    : `/task/${taskId}/update/`;
 }
 
 export function deleteTaskUrl(taskId) {
-    return `/task/${taskId}/delete/`;
+  return `/task/${taskId}/delete/`;
 }
 
 export function deleteTaskReminderUrl(taskId) {
-    return `/task/${taskId}/remind-delete/`;
+  return `/task/${taskId}/remind-delete/`;
 }
 
 export function editReminderUrl(taskId) {
-    return `/task/${taskId}/remind/`;
+  return `/task/${taskId}/remind/`;
 }

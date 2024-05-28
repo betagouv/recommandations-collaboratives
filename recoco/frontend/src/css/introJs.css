@@ -1,76 +1,78 @@
 .introjs-tooltip * {
-    font-family: 'Marianne', arial, sans-serif;
+  font-family: 'Marianne', arial, sans-serif;
 }
 
 .introjs-tooltip {
-    min-width: 40vw;
+  min-width: 40vw;
 }
 
-.introjs-tooltip .tutorial-first-step h3{
+.introjs-tooltip .tutorial-first-step h3 {
 }
 
 .introjs-helperLayer {
-    box-shadow: rgb(1 99 203) 0px 0px 1px 2px, rgba(33, 33, 33, 0.5) 0px 0px 0px 5000px !important;
+  box-shadow:
+    rgb(1 99 203) 0px 0px 1px 2px,
+    rgba(33, 33, 33, 0.5) 0px 0px 0px 5000px !important;
 }
 
 .introjs-button {
-    border: 1px solid #0063CB;
-    padding: 5px 10px !important;
-    border-radius: 2px;
-    font-size: 12px !important;
+  border: 1px solid #0063cb;
+  padding: 5px 10px !important;
+  border-radius: 2px;
+  font-size: 12px !important;
 
-    text-transform: uppercase;
-    font-size: 0.85rem;
-    color: #0063CB;
-    text-decoration: none;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  color: #0063cb;
+  text-decoration: none;
 
-    transition: all 0.25s ease;
-    background: transparent;
-    cursor: pointer !important;
-    text-shadow: none;
-    font-family: 'Marianne', arial, sans-serif;
+  transition: all 0.25s ease;
+  background: transparent;
+  cursor: pointer !important;
+  text-shadow: none;
+  font-family: 'Marianne', arial, sans-serif;
 }
 
 .introjs-button:hover {
-    background-color: #e2effc;
-    border: 1px solid #0063CB;
+  background-color: #e2effc;
+  border: 1px solid #0063cb;
 }
 
 .introjs-button:focus {
-    border: 1px solid #0063CB;
-    background-color: #e2effc;
-    box-shadow: none;
-    /* box-shadow: 0 0 1px 4px #e0ecf9; */
-    background-color: #0063CB;
-    color: white;
+  border: 1px solid #0063cb;
+  background-color: #e2effc;
+  box-shadow: none;
+  /* box-shadow: 0 0 1px 4px #e0ecf9; */
+  background-color: #0063cb;
+  color: white;
 }
 
 .introjs-button:focus:hover {
-    background-color: #e2effc;
+  background-color: #e2effc;
 }
 
 .introjs-tooltiptext {
-    font-family: 'Marianne', arial, sans-serif;
-    font-size: 14px;
-    padding: 5px 20px;
-    padding-top: 15px;
+  font-family: 'Marianne', arial, sans-serif;
+  font-size: 14px;
+  padding: 5px 20px;
+  padding-top: 15px;
 }
 
 .introjs-bullets ul li a.active {
-    background: #0063CB;
+  background: #0063cb;
 }
 
 .introjs-tooltip-header {
-    padding-bottom:5px;
-    display: block;
+  padding-bottom: 5px;
+  display: block;
 }
 
 .intro-tutorial .introjs-tooltip-header {
-    border-bottom:#0063CB solid 1px;
-    padding-bottom:8px;
+  border-bottom: #0063cb solid 1px;
+  padding-bottom: 8px;
 }
 
 .introjs-bullets {
-    padding-top: 5px;
-    padding-bottom: 5px;
+  padding-top: 5px;
+  padding-bottom: 5px;
 }

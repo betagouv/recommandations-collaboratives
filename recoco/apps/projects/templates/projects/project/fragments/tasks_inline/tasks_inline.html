@@ -1,5 +1,4 @@
 {% load django_vite %}
-
 <!-- Index of tasks inline app -->
 <div x-data="TasksInline({{ project.pk }})" class="mt-2">
     {% include 'projects/project/fragments/tasks_inline/status_list.html' %}

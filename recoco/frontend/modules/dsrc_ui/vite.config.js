@@ -10,11 +10,11 @@ const config = {
 		open: false,
 		watch: {
 			usePolling: true,
-			disableGlobbing: false
-		}
+			disableGlobbing: false,
+		},
 	},
 	resolve: {
-		extensions: ['.js', '.json']
+		extensions: ['.js', '.json'],
 	},
 	build: {
 		outDir: path.resolve('./dist'),
@@ -25,21 +25,18 @@ const config = {
 		lib: {
 			entry: path.resolve('./src/lib/index.js'),
 			name: 'DsrcUi',
-			fileName: 'dsrc-ui'
+			fileName: 'dsrc-ui',
 		},
 		rollupOptions: {
 			plugins: [commonjs({ transformMixedEsModules: true })],
-			external: [
-				"alpinejs",
-        "@gouvfr/dsfr/dist/dsfr.module"
-			],
+			external: ['alpinejs', '@gouvfr/dsfr/dist/dsfr.module'],
 			output: {
 				dir: path.resolve('./dist/js/'),
 				format: 'esm',
-				chunkFileNames: undefined
-			}
-		}
-	}
+				chunkFileNames: undefined,
+			},
+		},
+	},
 };
 
 export default config;

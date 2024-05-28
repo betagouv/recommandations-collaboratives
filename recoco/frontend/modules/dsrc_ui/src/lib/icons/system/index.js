@@ -5,5 +5,5 @@ import errorFill from './fr--error-fill.svg';
 export default {
 	warningFill,
 	infoFill,
-	errorFill
+	errorFill,
 };

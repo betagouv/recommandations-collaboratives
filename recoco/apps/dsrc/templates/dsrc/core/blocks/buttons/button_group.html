@@ -1,17 +1,17 @@
 <ul class="fr-btns-group fr-btns-group--inline-sm">
-  {% if form.helper.action_button.cancel %}
-    <li class="flex-grow-1">
-      <a role="button"
-         class="fr-btn dsrc-color--primary fr-btn--secondary w-100"
-         href="{{ form.helper.action_button.cancel.href }}">{{ form.helper.action_button.cancel.label }}</a>
-    </li>
-  {% endif %}
-  {% if form.helper.action_button.submit %}
-    <li class="flex-grow-1">
-      <button type="submit"
-              class="fr-btn dsrc-color--primary w-100"
-              x-on:click="validate"
-              {% if disabled %}disabled=""{% endif %}>{{ form.helper.action_button.submit.label }}</button>
-    </li>
-  {% endif %}
+    {% if form.helper.action_button.cancel %}
+        <li class="flex-grow-1">
+            <a role="button"
+               class="fr-btn dsrc-color--primary fr-btn--secondary w-100"
+               href="{{ form.helper.action_button.cancel.href }}">{{ form.helper.action_button.cancel.label }}</a>
+        </li>
+    {% endif %}
+    {% if form.helper.action_button.submit %}
+        <li class="flex-grow-1">
+            <button type="submit"
+                    class="fr-btn dsrc-color--primary w-100"
+                    x-on:click="validate"
+                    {% if disabled %}disabled=""{% endif %}>{{ form.helper.action_button.submit.label }}</button>
+        </li>
+    {% endif %}
 </ul>

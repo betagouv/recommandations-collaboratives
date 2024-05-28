@@ -2,11 +2,26 @@
     {% for title, content in onboarding_response.items %}
         {% if content %}
             {% include 'projects/project/fragments/information_card_description_details.html' %}
-            {% if forloop.counter != onboarding_response.items|length %}
-                <hr/>
-            {% endif %}
+            {% if forloop.counter != onboarding_response.items|length %}<hr />{% endif %}
         {% endif %}
     {% endfor %}
+{% elif new_onboarding %}
+    {% if multichoice %}
+        {% for choice in choices %}
+            {{ choice.conclusion|default:choice.text|capfirst }}
+        {% endfor %}
+    {% endif %}
 {% else %}
     {{ description|safe }}
+{% endif %}
+{% if answer.attachment %}
+    <div>
+        <span class="align-middle">
+            <a style="position: relative;
+                        z-index:2;
+                        color: {{ question_set.color|default:'black' }} !important"
+                target="_new"
+                href="{{ answer.attachment.url }}">Télécharger le fichier joint</a>
+        </span>
+    </div>
 {% endif %}

@@ -1,17 +1,11 @@
 {% extends "base.html" %}
-
 {% load sass_tags %}
 {% load static %}
 {% load django_vite %}
-
-{% block title %}
-    Emails de rappels à {{ crm_user.get_full_name }}
-{% endblock %}
-
+{% block title %}Emails de rappels à {{ crm_user.get_full_name }}{% endblock %}
 {% block js %}
-{% vite_asset 'js/apps/crm.js' %}
-
-<script type="text/javascript">
+    {% vite_asset 'js/apps/crm.js' %}
+    <script type="text/javascript">
  document.addEventListener('alpine:init', () => {
      Alpine.data('messagepopup', () => ({
          open: false,
@@ -27,112 +21,116 @@
          }
      })
  )})
-</script>
-
-
+    </script>
 {% endblock %}
-
 {% block css %}
-<link href="{% sass_src 'home/css/dsfr/marianne.css' %}" rel="stylesheet" type="text/css">
-<style>
+    <link href="{% sass_src 'home/css/dsfr/marianne.css' %}"
+          rel="stylesheet"
+          type="text/css">
+    <style>
  [x-cloak] { display: none !important;
      visibility: hidden;
      overflow: hidden}
-</style>
+    </style>
 {% endblock %}
-
 {% block content %}
-<div x-data="Crm" class="d-flex px-0" style="font-family: 'Marianne', arial, sans-serif;">
-    <aside class="w-25 crm-aside">
-        {% if active_project %}
-        <div x-ref="sidebar" class="d-flex flex-column justify-content-start crm-sticky">
-            {% else %}
-            <div x-ref="sidebar" class="d-flex flex-column justify-content-start crm-sticky no-project">
-                {% endif %}
-                {% include 'crm/back_button.html' %}
-                {% include 'crm/search.html' %}
-            </div>
-    </aside>
-    <div class="w-75 d-flex flex-column justify-content-start">
-        {% if active_project %}
-        <div class="crm-header px-4 py-4 mb-3">
-            {% else %}
-            <div class="crm-header no-project px-4 py-4">
-                {% endif %}
-                <h3 class="d-flex align-items-center">
-                    <svg class="bi me-2" width="16" height="16" fill="currentColor">
-                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#person-fill" />
-                    </svg>
-                    <span>{{ crm_user.get_full_name|default:crm_user.email }}</span>
-                </h3>
-                {% if crm_user.profile.organization %}
-                <a class="d-flex align-items-center"
-                   href="{% url 'crm-organization-details' crm_user.profile.organization.pk %}">
-                    <svg class="bi me-2" width="16" height="16" fill="currentColor">
-                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#arrow-left" />
-                    </svg>
-                    <span>Revenir aux détails de l'organisation : <strong>{{crm_user.profile.organization.name}}</strong></span>
-                </a>
-                {% endif %}
-            </div>
-            <div class="px-4 pt-4 bg-light crm-timeline-min-height">
-                <h4>
-                    <svg class="bi " width="24" height="24" fill="currentColor">
-                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#alarm" />
-                    </svg>&nbsp;
-                    Rappels de projets</h4>
-                <small>Sauter à <a href="#history"> l'historique</a></small>
-
-                <h5 class="mt-4" id="future"><svg class="bi " width="24" height="24" fill="currentColor">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#send" />
-                </svg>&nbsp;
-                Futurs rappels</h5>
-
-                {% for reminder in future_reminders.all %}
-                <ul>
-                    {% load humanize %}
-                    <li>{{ reminder.project }} -- <i>{{ reminder.get_kind_display }}</i>, le {{ reminder.deadline }} ({{ reminder.deadline|naturalday }})</li>
-                </ul>
-                {% empty %}
-                <span class="p-4"> -- Aucun rappel prévu --</span>
-                {% endfor %}
-
-                <hr class="m-5" />
-
-                <section id="history" x-data="messagepopup">
-                    <h5 class="mt-3"><svg class="bi " width="24" height="24" fill="currentColor">
-                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#clock-history" />
-                    </svg>&nbsp;
-                    Historique des rappels</h5>
-
-                    {% for reminder in sent_reminders.all %}
-                    {% with reminder.transactions.all.0 as transaction %}
-                    <div class="list-group">
-                        <a {% if transation %}href="{% url 'crm-user-reminder-details' crm_user.pk reminder.pk %}" @click="showMessage('{{ transaction.transaction_id }}')" {% endif %} class="list-group-item list-group-item-action flex-column align-items-start mb-2">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h5>
-                                    {% if transaction.faked %}
-                                    <span class="badge bg-secondary">Envoi test</span>&nbsp;
-                                    {% endif %}
-                                    {{ reminder.project }}</h5>
-
-                                <small>{{ transaction.sent_on|naturalday }}</small>
-                            </div>
-
-                            <p class="mb-1">
-                                <i>{{ reminder.get_kind_display }}</i>
-                                <br class="mb-1" />
-                            </p>
-                            <small class="text-muted" >initialement programmé pour le {{ reminder.deadline }}</small>
-                        </a>
+    <div x-data="Crm"
+         class="d-flex px-0"
+         style="font-family: 'Marianne', arial, sans-serif">
+        <aside class="w-25 crm-aside">
+            {% if active_project %}
+                <div x-ref="sidebar"
+                     class="d-flex flex-column justify-content-start crm-sticky">
+                {% else %}
+                    <div x-ref="sidebar"
+                         class="d-flex flex-column justify-content-start crm-sticky no-project">
+                    {% endif %}
+                    {% include 'crm/back_button.html' %}
+                    {% include 'crm/search.html' %}
+                </div>
+            </aside>
+            <div class="w-75 d-flex flex-column justify-content-start">
+                {% if active_project %}
+                    <div class="crm-header px-4 py-4 mb-3">
+                    {% else %}
+                        <div class="crm-header no-project px-4 py-4">
+                        {% endif %}
+                        <h3 class="d-flex align-items-center">
+                            <svg class="bi me-2" width="16" height="16" fill="currentColor">
+                                <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#person-fill" />
+                            </svg>
+                            <span>{{ crm_user.get_full_name|default:crm_user.email }}</span>
+                        </h3>
+                        {% if crm_user.profile.organization %}
+                            <a class="d-flex align-items-center"
+                               href="{% url 'crm-organization-details' crm_user.profile.organization.pk %}">
+                                <svg class="bi me-2" width="16" height="16" fill="currentColor">
+                                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#arrow-left" />
+                                </svg>
+                                <span>Revenir aux détails de l'organisation : <strong>{{ crm_user.profile.organization.name }}</strong></span>
+                            </a>
+                        {% endif %}
                     </div>
-                    {% endwith %}
-                    {% empty %}
-                    <span class="p-4"> -- Aucun rappel envoyé --</span>
-
-                    {% endfor %}
-                </section>
+                    <div class="px-4 pt-4 bg-light crm-timeline-min-height">
+                        <h4>
+                            <svg class="bi " width="24" height="24" fill="currentColor">
+                                <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#alarm" />
+                            </svg>
+                            &nbsp;
+                            Rappels de projets
+                        </h4>
+                        <small>Sauter à <a href="#history">l'historique</a></small>
+                        <h5 class="mt-4" id="future">
+                            <svg class="bi " width="24" height="24" fill="currentColor">
+                                <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#send" />
+                            </svg>
+                            &nbsp;
+                            Futurs rappels
+                        </h5>
+                        {% for reminder in future_reminders.all %}
+                            <ul>
+                                {% load humanize %}
+                                <li>
+                                    {{ reminder.project }} -- <i>{{ reminder.get_kind_display }}</i>, le {{ reminder.deadline }} ({{ reminder.deadline|naturalday }})
+                                </li>
+                            </ul>
+                        {% empty %}
+                            <span class="p-4">-- Aucun rappel prévu --</span>
+                        {% endfor %}
+                        <hr class="m-5" />
+                        <section id="history" x-data="messagepopup">
+                            <h5 class="mt-3">
+                                <svg class="bi " width="24" height="24" fill="currentColor">
+                                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#clock-history" />
+                                </svg>
+                                &nbsp;
+                                Historique des rappels
+                            </h5>
+                            {% for reminder in sent_reminders.all %}
+                                {% with reminder.transactions.all.0 as transaction %}
+                                    <div class="list-group">
+                                        <a {% if transation %}href="{% url 'crm-user-reminder-details' crm_user.pk reminder.pk %}" @click="showMessage('{{ transaction.transaction_id }}')" {% endif %}
+                                           class="list-group-item list-group-item-action flex-column align-items-start mb-2">
+                                            <div class="d-flex w-100 justify-content-between">
+                                                <h5>
+                                                    {% if transaction.faked %}<span class="badge bg-secondary">Envoi test</span>&nbsp;{% endif %}
+                                                    {{ reminder.project }}
+                                                </h5>
+                                                <small>{{ transaction.sent_on|naturalday }}</small>
+                                            </div>
+                                            <p class="mb-1">
+                                                <i>{{ reminder.get_kind_display }}</i>
+                                                <br class="mb-1" />
+                                            </p>
+                                            <small class="text-muted">initialement programmé pour le {{ reminder.deadline }}</small>
+                                        </a>
+                                    </div>
+                                {% endwith %}
+                            {% empty %}
+                                <span class="p-4">-- Aucun rappel envoyé --</span>
+                            {% endfor %}
+                        </section>
+                    </div>
+                </div>
             </div>
-        </div>
-    </div>
-    {% endblock %}
+        {% endblock %}

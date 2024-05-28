@@ -1,12 +1,14 @@
 <div class="d-flex align-items-center">
     <span class="text-custom-info text-grey-dark fw-light me-2">affiché par :</span>
     <div class="tasks-view-switcher">
-        <button data-test-id="list-tasks-switch-button" @click="$store.tasksView.switchView()"
+        <button data-test-id="list-tasks-switch-button"
+                @click="$store.tasksView.switchView()"
                 :class="{ 'active' : $store.tasksView.currentView === 'inline' }"
                 class="button">
             <span>Liste</span>
         </button>
-        <button data-test-id="kanban-tasks-switch-button" @click="$store.tasksView.switchView()"
+        <button data-test-id="kanban-tasks-switch-button"
+                @click="$store.tasksView.switchView()"
                 :class="{ 'active' : $store.tasksView.currentView === 'kanban' }"
                 class="button">
             <span>Tableau</span>

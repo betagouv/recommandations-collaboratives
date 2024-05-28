@@ -1,33 +1,21 @@
 {% extends "base.html" %}
-
 {% load static %}
 {% load humanize %}
 {% load gravatar %}
 {% load guardian_tags %}
-
 {% load sass_tags %}
-
-{% block title %}
-{{ resource.title }}
-{% endblock %}
-
-{% block og_title %}
-{{ resource.title }}
-{% endblock %}
-
+{% block title %}{{ resource.title }}{% endblock %}
+{% block og_title %}{{ resource.title }}{% endblock %}
 {% block description %}{{ resource.subtitle }}{% endblock %}
-
 {% block og_description %}{{ resource.subtitle }}{% endblock %}
-
 {% block css %}
-<link href="{% sass_src 'home/css/dsfr/dsfr.css' %}"
-      rel="stylesheet"
-      type="text/css">
-<link href="{% sass_src 'home/css/dsfr/custom-dsfr.scss' %}"
-      rel="stylesheet"
-      type="text/css">
-
-<style type="text/css">
+    <link href="{% sass_src 'home/css/dsfr/dsfr.css' %}"
+          rel="stylesheet"
+          type="text/css">
+    <link href="{% sass_src 'home/css/dsfr/custom-dsfr.scss' %}"
+          rel="stylesheet"
+          type="text/css">
+    <style type="text/css">
  /* minimal style for the diffs */
  pre.highlight {
      max-width: 900px;
@@ -40,33 +28,24 @@
  del { background-color: #ffe6e6; }
  ins { background-color: #e6ffe6; }
  sup.follow { color: #5555ff; }
-</style>
-
+    </style>
 {% endblock %}
-
 {% block content %}
-
-<div class="row py-5" id="resource-main-content">
-    <div class="col-9 px-5 mx-auto font-marianne" id="resource-main">
-
-        {% include 'resources/resource/fragments/breadcrumb.html' %}
-
-        <h2>Historique des modifications</h2>
-        <small>&larr; <a href="{% url 'resources-resource-detail' resource.pk %}">Retour à la dernière version</a></small>
-
-        <div class="text-justified font-marianne my-4">
-            {% include "reversion-compare/action_list_partial.html"  %}
-
-            <div class="p-4 my-4">
-            {% if version1 and version2 %}
-            {% include "reversion-compare/compare_partial.html"  %}
-            {% else %}
-            Veuillez sélectionner deux versions à comparer.
+    <div class="row py-5" id="resource-main-content">
+        <div class="col-9 px-5 mx-auto font-marianne" id="resource-main">
+            {% include 'resources/resource/fragments/breadcrumb.html' %}
+            <h2>Historique des modifications</h2>
+            <small>&larr; <a href="{% url 'resources-resource-detail' resource.pk %}">Retour à la dernière version</a></small>
+            <div class="text-justified font-marianne my-4">
+                {% include "reversion-compare/action_list_partial.html" %}
+                <div class="p-4 my-4">
+                    {% if version1 and version2 %}
+                        {% include "reversion-compare/compare_partial.html" %}
+                    {% else %}
+                        Veuillez sélectionner deux versions à comparer.
+                    </div>
+                {% endif %}
+                {% include "reversion-compare/compare_links_partial.html" %}
             </div>
-            {% endif %}
-
-            {% include "reversion-compare/compare_links_partial.html"  %}
         </div>
-</div>
-
-{% endblock %}
+    {% endblock %}

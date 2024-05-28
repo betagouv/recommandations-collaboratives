@@ -14,6 +14,8 @@ import os
 from pathlib import Path
 
 from multisite import SiteID
+from datetime import timedelta
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -59,6 +61,7 @@ INSTALLED_APPS = [
     "actstream",
     "notifications",
     "rest_framework",
+    "rest_framework_simplejwt",
     "generic_relations",
     "django_filters",
     "csvexport",
@@ -221,6 +224,7 @@ STATICFILES_FINDERS = [
     "django.contrib.staticfiles.finders.FileSystemFinder",
     "django.contrib.staticfiles.finders.AppDirectoriesFinder",
     "sass_processor.finders.CssFinder",
+    "compressor.finders.CompressorFinder",
 ]
 
 # UPLOAD
@@ -333,11 +337,25 @@ HIJACK_PERMISSION_CHECK = "hijack.permissions.superusers_and_staff"
 
 # Rest Framework
 REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.SessionAuthentication",
+        "rest_framework.authentication.BasicAuthentication",
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ],
     "DEFAULT_RENDERER_CLASSES": [
         "rest_framework.renderers.JSONRenderer",
         "rest_framework.renderers.BrowsableAPIRenderer",
         "rest_framework_xml.renderers.XMLRenderer",
-    ]
+    ],
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+}
+
+# https://django-rest-framework-simplejwt.readthedocs.io/en/latest/settings.html
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(hours=8) if DEBUG else timedelta(minutes=5),
+    "AUTH_HEADER_TYPES": ("Bearer",),
+    "AUTH_HEADER_NAME": "HTTP_AUTHORIZATION",
+    "TOKEN_OBTAIN_SERIALIZER": "recoco.rest_api.serializers.CustomTokenObtainPairSerializer",
 }
 
 # WAGTAIL
@@ -348,7 +366,28 @@ WAGTAIL_EMAIL_MANAGEMENT_ENABLED = False
 # WAGTAILADMIN_BASE_URL = define that
 
 # Materialized views
-MATERIALIZED_VIEWS_SPEC = []
+MATERIALIZED_VIEWS_SPEC = [
+    {
+        "name": "projects",
+        "unique_indexes": ["hash"],
+        "indexes": ["created_on"],
+    },
+    {
+        "name": "recommendations",
+        "unique_indexes": ["hash"],
+        "indexes": ["created_on"],
+    },
+    {
+        "name": "resources",
+        "unique_indexes": ["hash"],
+    },
+    {
+        "name": "users",
+        "unique_indexes": ["hash"],
+        "indexes": ["last_login", "is_advisor"],
+    },
+]
+
 MATERIALIZED_VIEWS_SQL_DIR = BASE_DIR / "apps/metrics/sql_queries"
 MATERIALIZED_VIEWS_PREFIX = "mv"
 

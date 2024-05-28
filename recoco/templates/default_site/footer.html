@@ -1,14 +1,13 @@
 {% load static %}
 <footer class="col-11 py-5">
-    <hr />
     <div class="row py-5">
         <div class="col-6">
             <img src="{% static 'home/img/home/logo_rf.png' %}" width="150px" alt="Logo république française" />
         </div>
         <div class="col-6 col-md">
-            <h5>UrbanVitaliz</h5>
+            <h5>{{ request.site.name }}</h5>
             <ul class="list-unstyled text-small">
-                <li>
+                <!-- <li>
                     <a class="link-secondary" href="{% url 'whoweare' %}">Qui sommes-nous ?</a>
                 </li>
                 <li>
@@ -20,14 +19,14 @@
 
                 <li>
                     <a class="link-secondary" href="https://drive.google.com/file/d/1Zd5sJZ_y1Hjj9H1H0JLuBymApgb2hjRn/view" target="_new">Plaquette de présentation</a>
-                </li>
+                </li> -->
                 <li>
                     <a class="link-secondary" href="{% url 'home-contact' %}">Nous contacter</a>
                 </li>
             </ul>
         </div>
         <div class="col-6 col-md">
-            <h5>UrbanVitaliz</h5>
+            <h5>{{ request.site.name }}</h5>
             <ul class="list-unstyled text-small">
                 <li>
                     <a class="link-secondary" href="{% url 'legals' %}">Mentions légales</a>
@@ -44,15 +43,20 @@
             </ul>
         </div>
         <div class="col-6 col-md">
-            <h5>Ressources</h5>
+            <!-- <h5>Ressources</h5>
             <ul class="list-unstyled text-small">
                 <li>
                     <a class="link-secondary" href="{% url 'statistics' %}">Statistiques d'impact</a>
                 </li>
-            </ul>
+            </ul> -->
             <h5>Logiciel Libre</h5>
             <ul class="list-unstyled text-small">
-                <a href="https://github.com/betagouv/urbanvitaliz-django" target="_new">Code Source</a>
+                <li>
+                    <a href="https://github.com/betagouv/recommandations-collaboratives" target="_new">Code Source</a>
+                </li>
+                <li class="spacing">
+                    Ce site est propulsé par <a href="https://recommandations-collaboratives.beta.gouv.fr/" target="_new">recommandations-collaboratives</a>
+                </li>
             </ul>
         </div>
     </div>

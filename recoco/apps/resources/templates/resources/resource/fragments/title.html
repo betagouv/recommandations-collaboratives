@@ -1,2 +1,4 @@
 {% if resource.title %}<h1 class="title-primary text-black">{{ resource.title|capfirst }}</h1>{% endif %}
-{% if resource.subtitle %}<span class="subtitle-primary text-black-secondary">{{ resource.subtitle|capfirst }}</span>{% endif %}
+{% if resource.subtitle %}
+    <span class="subtitle-primary text-black-secondary">{{ resource.subtitle|capfirst }}</span>
+{% endif %}
