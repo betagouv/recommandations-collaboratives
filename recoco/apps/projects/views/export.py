@@ -11,7 +11,6 @@ import csv
 import datetime
 
 from django.contrib.auth.decorators import login_required
-from django.contrib.contenttypes.models import ContentType
 from django.http import HttpResponse
 from django.urls import reverse
 from django.views.decorators.csrf import ensure_csrf_cookie
@@ -45,8 +44,6 @@ def project_list_export_csv(request):
         .order_by("-created_on")
         .prefetch_related("notes", "tasks")
     )
-
-    project_ct = ContentType.objects.get_for_model(models.Project)
 
     today = datetime.datetime.today().date()
 
@@ -85,9 +82,6 @@ def project_list_export_csv(request):
         "tags",
         "lien_projet",
         "exclude_stats",
-        "impact_edl",
-        "impact_diag",
-        "impact_mise_en_relation",
     ]
     site_config = get_site_config_or_503(request.site)
     tags_for_site = site_config.crm_available_tags.values_list("name", flat=True)
@@ -114,10 +108,6 @@ def project_list_export_csv(request):
         notes = project.notes.filter(
             created_by__in=switchtenders,
             created_by__is_staff=False,
-        )
-
-        crm_notes = crm_models.Note.objects.filter(
-            content_type_id=project_ct.pk, object_id=project.pk
         )
 
         conversations = project.notes.filter(public=True)
@@ -178,9 +168,6 @@ def project_list_export_csv(request):
             [tag for tag in project.tags.names()],
             build_absolute_url(reverse("projects-project-detail", args=[project.id])),
             project.exclude_stats,
-            crm_notes.filter(tags__name__in=["impact edl"]).count(),
-            crm_notes.filter(tags__name__in=["impact diag"]).count(),
-            crm_notes.filter(tags__name__in=["impact mise en relation"]).count(),
         ]
 
         try:
