@@ -11,6 +11,62 @@ from recoco.apps.projects import models as project_models
 
 
 @pytest.mark.django_db
+def test_user_notifications_try_mark_one_as_read_unauthorized(request):
+
+    site = get_current_site(request)
+    project = baker.make(project_models.Project, sites=[site])
+    user = baker.make(auth_models.User)
+
+    notify.send(sender=user, recipient=user, verb="a fake verb", target=project)
+    notify.send(sender=user, recipient=user, verb="other fake verb", target=project)
+
+    one_notification = user.notifications.first()
+
+    other_user = baker.make(auth_models.User)
+
+    client = APIClient()
+    client.force_authenticate(user=other_user)
+    url = reverse("notifications-mark-one-as-read", args=[one_notification.pk])
+    response = client.patch(url)
+
+    assert response.status_code == 404
+    assert user.notifications.unread().count() == 2
+
+
+@pytest.mark.django_db
+def test_user_notifications_mark_one_as_read(request):
+
+    site = get_current_site(request)
+    project = baker.make(project_models.Project, sites=[site])
+    user = baker.make(auth_models.User)
+
+    notify.send(sender=user, recipient=user, verb="a fake verb", target=project)
+    notify.send(sender=user, recipient=user, verb="other fake verb", target=project)
+
+    assert user.notifications.unread().count() == 2
+    one_notification = user.notifications.first()
+
+    client = APIClient()
+    client.force_authenticate(user=user)
+    url = reverse("notifications-mark-one-as-read", args=[one_notification.pk])
+
+    response = client.patch(url)
+    assert response.status_code == 200
+    assert response.data["marked_as_read"] == 1
+    one_notification.refresh_from_db()
+    assert not one_notification.unread
+    assert user.notifications.unread().count() == 1
+
+    # try to resend on same notification
+    response = client.patch(url)
+    assert response.status_code == 200
+    assert response.data["marked_as_read"] == 0
+    one_notification.refresh_from_db()
+    assert not one_notification.unread
+    assert user.notifications.unread().count() == 1
+
+
+@pytest.mark.django_db
 def test_user_notifications_mark_all_as_read(request):
 
     site = get_current_site(request)
@@ -29,7 +85,7 @@ def test_user_notifications_mark_all_as_read(request):
     client = APIClient()
     client.force_authenticate(user=user)
     url = reverse("notifications-mark-all-as-read")
-    response = client.post(url)
+    response = client.patch(url)
 
     assert response.status_code == 200
     assert response.data["marked_as_read"] == 2

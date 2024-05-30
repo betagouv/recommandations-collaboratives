@@ -92,6 +92,11 @@ api_urls = [
         name="challenges-challenge",
     ),
     path(
+        "notifications/mark-one-as-read/<int:pk>/",
+        home_rest.UserNotificationsMarkOneAsRead.as_view(),
+        name="notifications-mark-one-as-read",
+    ),
+    path(
         "notifications/mark-all-as-read",
         home_rest.UserNotificationsMarkAllAsRead.as_view(),
         name="notifications-mark-all-as-read",
