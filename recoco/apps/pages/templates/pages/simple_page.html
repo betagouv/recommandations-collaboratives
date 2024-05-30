@@ -11,10 +11,13 @@
     <link href="{% sass_src 'home/css/dsfr/custom-dsfr.scss' %}"
           rel="stylesheet"
           type="text/css">
+    <link href="{% sass_src 'home/css/cms/page-text.css' %}"
+          rel="stylesheet"
+          type="text/css">
 {% endblock %}
 {% block title %}{{ page.title }}{% endblock %}
 {% block content %}
-    <div class="col-8 mt-4 py-3 g-0 mx-auto font-marianne">
+    <div class="col-8 mt-4 py-3 g-0 mx-auto font-marianne" id="simple-text">
         <p>{{ page.body|richtext }}</p>
     </div>
 {% endblock %}
