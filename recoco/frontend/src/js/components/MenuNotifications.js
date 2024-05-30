@@ -1,9 +1,9 @@
+import { Dropdown } from 'bootstrap';
 import Alpine from 'alpinejs';
 import api, {
   djangoNotificationsMarkAsReadBySlugUrl,
   djangoNotificationsUnreadListUrl,
   markAllNotificationsAsReadUrl,
-  markTaskNotificationsAsReadUrl,
 } from '../utils/api';
 
 function MenuNotifications(notificationNumber) {
@@ -22,7 +22,6 @@ function MenuNotifications(notificationNumber) {
       const notificationToRead = reqListNotif.data.unread_list.find(
         (n) => n.id === notificationId
       );
-      console.log('notificationToRead', notificationToRead);
       if (!notificationToRead) {
         return;
       }
@@ -31,7 +30,6 @@ function MenuNotifications(notificationNumber) {
         djangoNotificationsMarkAsReadBySlugUrl(notificationToRead.slug),
         {}
       );
-      console.log('resp2', reqMarkNotifAsRead);
       if (reqMarkNotifAsRead.status != 200) {
         return;
       }
@@ -39,15 +37,21 @@ function MenuNotifications(notificationNumber) {
       this.removeNotificationInDom(el);
     },
     async markAllNotificationsAsRead() {
-      // console.log('markAllNotificationsAsRead');
       const resp = await api.post(markAllNotificationsAsReadUrl(), {});
       if (resp.status === 200) {
-        // delete all notifications in DOM
+        this.notificationNumber = 0;
       }
     },
     removeNotificationInDom(el) {
       this.notificationNumber -= 1;
       el.parentElement.remove();
+    },
+    closeNotificationsMenu() {
+      const notificationsMenu = document.querySelector(
+        '.dropdown-menu.notifications'
+      );
+      const dropdownInstance = new Dropdown(notificationsMenu);
+      dropdownInstance.hide();
     },
   };
 }

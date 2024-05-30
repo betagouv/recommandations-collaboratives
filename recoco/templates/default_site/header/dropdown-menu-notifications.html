@@ -1,37 +1,47 @@
 {% load gravatar %}
 {% load static %}
 <ul class="dropdown-menu notifications">
-    <li>Notifications non lues</li>
+    <li>
+        Notifications non lues
+        <button class="notification__icon"
+                title="Fermer le menu"
+                @click="closeNotificationsMenu">
+            <svg class="bi me-1" width="16" height="16" fill="currentColor">
+                <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#x-lg" />
+            </svg>
+        </button>
+    </li>
     <li>
         <hr class="dropdown-divider">
     </li>
-    {% for date, notifications in grouped_notifications.items %}
-        <div class="notification__date">le {{ date|date }}</div>
-        {% for notification in notifications %}
-            <li class="dropdown-item">
-                {% include 'user/user_card.html' with user=notification.actor project=notification.target %}
-                <div class="notification__verb">{{ notification.verb }} sur</div>
-                <a class="notification__project"
-                   href="{{ notification.target.get_absolute_url }}">{{ notification.target }}</a>
-                {% if notification.action_object.comment %}
-                    <div class="notification__message">
-                        "{{ notification.action_object.comment }}" à propos de <a href=" {{ notification.action_object.task.get_absolute_url }}">{{ notification.action_object.task }}</a>
-                    </div>
-                {% endif %}
-                <button class="notification__icon"
-                        title="Supprimer la notification"
-                        @click="markNotificationAsRead({{ notification.id }}, $el)">
-                    <svg class="bi me-1" width="16" height="16" fill="currentColor">
-                        <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#x-lg" />
-                    </svg>
-                </button>
-            </li>
+    <div x-show="notificationNumber > 0">
+        {% for date, notifications in grouped_notifications.items %}
+            <div class="notification__date">le {{ date|date }}</div>
+            {% for notification in notifications %}
+                <li class="dropdown-item">
+                    {% include 'user/user_card.html' with user=notification.actor project=notification.target %}
+                    <div class="notification__verb">{{ notification.verb }} sur</div>
+                    <a class="notification__project"
+                       href="{{ notification.target.get_absolute_url }}">{{ notification.target }}</a>
+                    {% if notification.action_object.comment %}
+                        <div class="notification__message">
+                            "{{ notification.action_object.comment }}" à propos de <a href=" {{ notification.action_object.task.get_absolute_url }}">{{ notification.action_object.task }}</a>
+                        </div>
+                    {% endif %}
+                    <button class="notification__icon"
+                            title="Supprimer la notification"
+                            @click="markNotificationAsRead({{ notification.id }}, $el)">
+                        <svg class="bi me-1" width="16" height="16" fill="currentColor">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#x-lg" />
+                        </svg>
+                    </button>
+                </li>
+            {% endfor %}
         {% endfor %}
-    {% empty %}
-        <li>
-            <span class="dropdown-item">Vous n'avez aucune notification ☀️</span>
-        </li>
-    {% endfor %}
+    </div>
+    <li x-show="notificationNumber == 0">
+        <span class="dropdown-item-text">Vous n'avez aucune notification ☀️</span>
+    </li>
     <li>
         <hr class="dropdown-divider">
     </li>

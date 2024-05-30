@@ -228,11 +228,12 @@
                    href="#"
                    role="button"
                    data-bs-toggle="dropdown"
+                   data-bs-auto-close="outside"
                    aria-expanded="false">
                     <span class="ms-1 me-2 align-middle">Notifications</span>
-                    {% if unread_notifications_count > 0 %}
-                        <span class="badge text-bg-danger" x-text="notificationNumber"></span>
-                    {% endif %}
+                    <span class="badge text-bg-danger"
+                          x-show="notificationNumber > 0"
+                          x-text="notificationNumber"></span>
                 </a>
                 {% include "header/dropdown-menu-notifications.html" %}
             </li>
