@@ -169,7 +169,7 @@ class OnboardingSignupForm(DsrcBaseForm):
     first_name = forms.CharField(label="Prénom *", initial="", required=True)
     last_name = forms.CharField(label="Nom *", initial="", required=True)
     org_name = forms.CharField(
-        label="Administration ou entreprise  *",
+        label="Nom de votre administration ou de votre entreprise  *",
         initial="",
     )
     role = forms.CharField(label="Fonction *", initial="", required=True)
@@ -278,7 +278,7 @@ class PrefillSetuserForm(DsrcBaseForm):
     first_name = forms.CharField(label="Prénom *", initial="", required=True)
     last_name = forms.CharField(label="Nom *", initial="", required=True)
     org_name = forms.CharField(
-        label="Administration ou entreprise *",
+        label="Nom de votre administration ou de votre entreprise *",
         initial="",
     )
     role = forms.CharField(label="Fonction *", initial="", required=True)
