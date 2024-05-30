@@ -24,24 +24,23 @@ def is_switchtender_processor(request):
 
 
 def unread_notifications_processor(request):
-    unread_notifications = []
-    grouped_notifications = []
-    if request.user.is_authenticated:
-        unread_notifications = (
-            notifications_models.Notification.on_site.unread()
-            .filter(recipient=request.user, public=True)
-            .prefetch_related("actor__profile__organization")
-            .prefetch_related("action_object")
-            .prefetch_related("target")
-            .order_by("-timestamp")[:100]
-        )
+    if not request.user.is_authenticated:
+        return {}
 
-        grouped_notifications = defaultdict(list)
+    unread_notifications = (
+        notifications_models.Notification.on_site.unread()
+        .filter(recipient=request.user, public=True)
+        .prefetch_related("actor__profile__organization")
+        .prefetch_related("action_object")
+        .prefetch_related("target")
+        .order_by("-timestamp")[:100]
+    )
 
-        for notification in unread_notifications:
-            date = localtime(notification.timestamp).date()
-            grouped_notifications[date].append(notification)
-        print(grouped_notifications)
+    grouped_notifications = defaultdict(list)
+
+    for notification in unread_notifications:
+        date = localtime(notification.timestamp).date()
+        grouped_notifications[date].append(notification)
 
     return {
         "unread_notifications": serialize("json", unread_notifications.all()),
