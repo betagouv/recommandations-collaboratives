@@ -7,7 +7,6 @@ author  : raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created : 2021-05-26 11:29:25 CEST
 """
 
-import notifications.urls
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
@@ -35,7 +34,6 @@ urlpatterns = [
     path("accounts/", include("allauth.urls")),
     path("logout/", auth_views.LogoutView.as_view(), name="logout"),
     path("markdownx/", include("markdownx.urls")),
-    path("notifications/", include(notifications.urls, namespace="notifications")),
     path("hijack/", include("hijack.urls")),
     path("nimda/", admin.site.urls),
     path("cookies/", include("cookie_consent.urls")),
