@@ -40,6 +40,16 @@ function MenuNotifications(notificationNumber) {
     },
     removeNotificationInDom(el) {
       this.notificationNumber -= 1;
+      const nextEl = el.parentElement.nextElementSibling;
+      const previousEl = el.parentElement.previousElementSibling;
+      if (
+        nextEl &&
+        previousEl &&
+        nextEl.classList.contains('notification__date') &&
+        previousEl.classList.contains('notification__date')
+      ) {
+        previousEl.remove();
+      }
       el.parentElement.remove();
     },
     closeNotificationsMenu() {
