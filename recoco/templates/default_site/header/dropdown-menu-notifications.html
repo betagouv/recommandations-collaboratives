@@ -15,7 +15,7 @@
     <li>
         <hr class="dropdown-divider">
     </li>
-    <div x-show="notificationNumber > 0">
+    <div class="notifications__container" x-show="notificationNumber > 0">
         {% for date, notifications in grouped_notifications.items %}
             <div class="notification__date">le {{ date|date }}</div>
             {% for notification in notifications %}
