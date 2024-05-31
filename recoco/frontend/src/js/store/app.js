@@ -12,4 +12,3 @@ Alpine.store('app', {
 });
 
 export default Alpine.store('app');
-export default Alpine.store('app');
