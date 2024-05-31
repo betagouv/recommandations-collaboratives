@@ -4,27 +4,38 @@ import api, {
   markAllNotificationsAsReadUrl,
   notificationsMarkAsReadByIdUrl,
 } from '../utils/api';
+import appStore from '../store/app';
+import { ToastType } from '../models/toastType';
 
 function MenuNotifications(notificationNumber) {
   console.log('notificationNumber', notificationNumber);
   return {
     notificationNumber: notificationNumber,
     async markNotificationAsRead(notificationId, el) {
-      const reqMarkNotifAsRead = await api.patch(
-        notificationsMarkAsReadByIdUrl(notificationId),
-        {}
-      );
-      if (reqMarkNotifAsRead.status != 200) {
+      try {
+        const reqMarkNotifAsRead = await api.patch(
+          notificationsMarkAsReadByIdUrl(notificationId),
+          {}
+        );
+        if (reqMarkNotifAsRead.data.marked_as_read > 0) {
+          this.removeNotificationInDom(el);
+        }
+      } catch (error) {
+        this.showToast(
+          'Erreur lors de la mise à jour de la notification. Merci de réessayer plus tard.'
+        );
         return;
-      }
-      if (reqMarkNotifAsRead.data.marked_as_read > 0) {
-        this.removeNotificationInDom(el);
       }
     },
     async markAllNotificationsAsRead() {
-      const resp = await api.patch(markAllNotificationsAsReadUrl(), {});
-      if (resp.status === 200) {
+      try {
+        await api.patch(markAllNotificationsAsReadUrl(), {});
         this.notificationNumber = 0;
+      } catch (error) {
+        this.showToast(
+          'Erreur lors de la mise à jour des notifications. Merci de réessayer plus tard.'
+        );
+        return;
       }
     },
     removeNotificationInDom(el) {
@@ -37,6 +48,12 @@ function MenuNotifications(notificationNumber) {
       );
       const dropdownInstance = new Dropdown(notificationsMenu);
       dropdownInstance.hide();
+    },
+    showToast(message, type) {
+      appStore.notification.message = message;
+      appStore.notification.timeout = 5000;
+      appStore.notification.isOpen = true;
+      appStore.notification.type = type || ToastType.error;
     },
   };
 }
