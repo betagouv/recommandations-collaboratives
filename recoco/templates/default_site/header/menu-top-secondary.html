@@ -229,11 +229,13 @@
                    role="button"
                    data-bs-toggle="dropdown"
                    data-bs-auto-close="outside"
-                   aria-expanded="false">
+                   aria-expanded="false"
+                   data-test-id="notification-menu-open">
                     <span class="ms-1 me-2 align-middle">Notifications</span>
                     <span class="badge text-bg-danger"
                           x-show="notificationNumber > 0"
-                          x-text="notificationNumber"></span>
+                          x-text="notificationNumber"
+                          data-test-id="notification-badge"></span>
                 </a>
                 {% include "header/dropdown-menu-notifications.html" %}
             </li>

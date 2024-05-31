@@ -5,7 +5,8 @@
         Notifications non lues
         <button class="notification__icon"
                 title="Fermer le menu"
-                @click="closeNotificationsMenu">
+                @click="closeNotificationsMenu"
+                data-test-id="notification-menu-close">
             <svg class="bi me-1" width="16" height="16" fill="currentColor">
                 <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#x-lg" />
             </svg>
@@ -30,6 +31,7 @@
                     {% endif %}
                     <button class="notification__icon"
                             title="Supprimer la notification"
+                            data-test-id="notification-mark-as-read-one"
                             @click="markNotificationAsRead({{ notification.id }}, $el)">
                         <svg class="bi me-1" width="16" height="16" fill="currentColor">
                             <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#x-lg" />
@@ -46,6 +48,9 @@
         <hr class="dropdown-divider">
     </li>
     <li class="btn-container">
-        <button @click="markAllNotificationsAsRead" class="dropdown-item">Marquer toutes les notifications commes lues</button>
+        <button @click="markAllNotificationsAsRead"
+                class="dropdown-item"
+                disabled="notificationNumber == 0"
+                data-test-id="notification-mark-all-as-read">Marquer toutes les notifications commes lues</button>
     </li>
 </ul>
