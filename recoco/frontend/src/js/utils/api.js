@@ -94,7 +94,7 @@ export function resourcePreviewUrl(resourceId) {
 }
 
 export function notificationsMarkAsReadByIdUrl(notificationId) {
-  return `api/notifications/mark-one-as-read/${notificationId}/`;
+  return `/api/notifications/mark-one-as-read/${notificationId}/`;
 }
 
 // Regions :
