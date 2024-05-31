@@ -28,6 +28,8 @@
                         <div class="notification__message">
                             "{{ notification.action_object.comment }}" à propos de <a href=" {{ notification.action_object.task.get_absolute_url }}">{{ notification.action_object.task }}</a>
                         </div>
+                    {% elif  notification.action_object.content and "message" in notification.verb %}
+                        <div class="notification__message">"{{ notification.action_object.content|truncatewords:100 }}"</div>
                     {% endif %}
                     <button class="notification__icon"
                             title="Supprimer la notification"
