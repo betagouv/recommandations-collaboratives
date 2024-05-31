@@ -1,44 +1,45 @@
 {% load gravatar %}
 {% load static %}
 {% load guardian_tags %}
-
 {% get_obj_perms request.user for request.site as "user_site_perms" %}
 {% get_obj_perms request.user for project as "user_project_perms" %}
-
 <div class="d-flex align-items-start justify-content-between mb-2">
     {% with advisor.switchtender as user %}
-    <div class="d-flex flex-column">
-        <span class="me-2 d-flex align-items-center">
-            <img class="rounded-circle me-2" src="{% gravatar_url user.email size=24 %}" alt="{{user}}">
-            {% if user.get_full_name %}
-                <strong class="text-nowrap text-capitalize">
-                    {{ user.get_full_name }}
-                </strong>
-                {% if 'use_crm' in user_site_perms %}
-                &nbsp;
-                <a class="small" href="{% url 'crm-user-details' user.pk %}">
-                    <svg class="bi me-1" width="16" height="16" fill="currentColor">
-                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#activity" />
-                    </svg>
-                </a>
+        <div class="d-flex flex-column">
+            <span class="me-2 d-flex align-items-center">
+                <img class="rounded-circle me-2"
+                     src="{% gravatar_url user.email size=24 %}"
+                     alt="{{ user }}">
+                {% if user.get_full_name %}
+                    <strong class="text-nowrap text-capitalize">{{ user.get_full_name }}</strong>
+                    {% if 'use_crm' in user_site_perms %}
+                        &nbsp;
+                        <a class="small" href="{% url 'crm-user-details' user.pk %}">
+                            <svg class="bi me-1" width="16" height="16" fill="currentColor">
+                                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#activity" />
+                            </svg>
+                        </a>
+                    {% endif %}
+                {% else %}
+                    <strong class="text-nowrap">{{ user.email }}</strong>
                 {% endif %}
-            {% else %}
-            <strong class="text-nowrap">
-                {{ user.email }}
-            </strong>
-            {% endif %}
-        </span>
-        <div class="d-flex align-items-center">
-            <span style="color: #666666; font-style: italic; font-weight: 300;">{{user.profile.organization.name}}</span>
-            {% if  user.profile.organization_position %}<span class="ms-1 text-lowercase" style="color: #666666; font-style: italic; font-weight: 300;">({{user.profile.organization_position}})</span> {% endif %}
+            </span>
+            <div class="d-flex align-items-center">
+                <span style="color: #666666; font-style: italic; font-weight: 300;">{{ user.profile.organization.name }}</span>
+                {% if  user.profile.organization_position %}
+                    <span class="ms-1 text-lowercase"
+                          style="color: #666666;
+                                 font-style: italic;
+                                 font-weight: 300">({{ user.profile.organization_position }})</span>
+                {% endif %}
+            </div>
         </div>
-    </div>
-    <div class="d-flex align-items-center">
-        {% if advisor.is_observer %}
-        <span class="small text-info">OBSERVATEUR</span>
-        {% else %}
-        <span class="small text-danger">CONSEILLER</span>
-        {% endif %}
-    </div>
+        <div class="d-flex align-items-center">
+            {% if advisor.is_observer %}
+                <span class="small text-info">OBSERVATEUR</span>
+            {% else %}
+                <span class="small text-danger">CONSEILLER</span>
+            {% endif %}
+        </div>
     {% endwith %}
 </div>

@@ -1,2 +1,2 @@
-import '../components/SearchableList'
-import '../../css/searchableList.css'
+import '../components/SearchableList';
+import '../../css/searchableList.css';

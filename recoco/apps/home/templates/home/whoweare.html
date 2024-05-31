@@ -1,20 +1,13 @@
 {% extends "base.html" %}
-
 {% load gravatar %}
-
 {% load sass_tags %}
 {% load static %}
-
-{% block title %}
-    Qui sommes-nous
-{% endblock %}
-
+{% block title %}Qui sommes-nous{% endblock %}
 {% block css %}
-<link href="{% sass_src 'home/css/home/home.scss' %}" rel="stylesheet" type="text/css">
+    <link href="{% sass_src 'home/css/home/home.scss' %}"
+          rel="stylesheet"
+          type="text/css">
 {% endblock %}
-
 {% block content %}
-
     {% include 'home/whoweare/content.html' %}
-
 {% endblock %}

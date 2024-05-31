@@ -5,11 +5,14 @@
         <span class="me-2 d-flex align-items-center font-very-small">
             <img class="rounded-circle me-2"
                  src="{% gravatar_url user_invited.email size=24 %}"
-                 alt="{{ action.actor }}"/>
+                 alt="{{ action.actor }}" />
             <strong class="text-nowrap">{{ user_invited.email }}</strong>
         </span>
     </div>
     <div class="d-flex align-items-center">
-        <span class="font-very-small" style="color: #666666; font-style: italic; font-weight: 300;">invité·e par {{ invite.inviter }}</span>
+        <span class="font-very-small"
+              style="color: #666666;
+                     font-style: italic;
+                     font-weight: 300">invité·e par {{ invite.inviter }}</span>
     </div>
 </div>

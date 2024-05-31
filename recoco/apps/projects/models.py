@@ -549,7 +549,7 @@ class Note(models.Model):
     on_site = NoteOnSiteManager()
 
     site = models.ForeignKey(
-        Site, on_delete=models.CASCADE, related_name="ptroject_notes"
+        Site, on_delete=models.CASCADE, related_name="project_notes"
     )
 
     project = models.ForeignKey(

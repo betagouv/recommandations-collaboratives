@@ -41,8 +41,7 @@
                                     class="btn-close"
                                     data-bs-dismiss="modal"
                                     aria-label="Close"
-                                    @click="changeShowEdition()"
-                                    ></button>
+                                    @click="changeShowEdition()"></button>
                         </div>
                         <div class="d-flex flex-grow-1 align-items-stretch w-65 task-modal-content"
                              :class="!contentIsLoading && 'visible'"
@@ -52,7 +51,9 @@
                                         :src="resourcePreviewUrl(task?.resource_id)"></iframe>
                             </template>
                             <template x-if="task && taskId && !task?.resource_id">
-                                <div class="w-100 text-break p-3" style="max-height: 90vh; overflow-y: scroll;">
+                                <div class="w-100 text-break p-3"
+                                     style="max-height: 90vh;
+                                            overflow-y: scroll">
                                     <div class="resource-details">
                                         <h1 x-text="task?.intent" class="mb-3"></h1>
                                     </div>
@@ -144,14 +145,18 @@
                                                                       style="line-height: 20px"></span>
                                                             </div>
                                                             <template x-if="$store.djangoData.canUseTasks && f.who.email === $store.djangoData.userEmail">
-                                                                <a data-test-id="task-edit-followup-button" class="text-muted cursor-pointer tiny" @click="onEditComment(f)">Editer</a>
+                                                                <a data-test-id="task-edit-followup-button"
+                                                                   class="text-muted cursor-pointer tiny"
+                                                                   @click="onEditComment(f)">Editer</a>
                                                             </template>
                                                         </div>
                                                     </div>
                                                 </template>
                                                 <template x-if="isStatusUpdate(f) && f.status || isStatusUpdate(f) && f.status == 0">
-                                                    <div class="my-3" :class="hasNotification(f.id) && 'is-new-followup-status'">
-                                                        <div class="mx-3 mb-1 text-center followup-status-message" style="font-size: 0.8em;">
+                                                    <div class="my-3"
+                                                         :class="hasNotification(f.id) && 'is-new-followup-status'">
+                                                        <div class="mx-3 mb-1 text-center followup-status-message"
+                                                             style="font-size: 0.8em">
                                                             <span class="ms-1 fst-italic"
                                                                   x-text="`${f.who.first_name} ${f.who.last_name}`"
                                                                   style="line-height: 20px"></span> a changé le statut de la recommandation en <span class="fw-bold" x-text="statusText(f.status)"></span>
@@ -193,11 +198,11 @@
                                     <div class="text-center">
                                         <span class="text-muted">Vous devez publier votre recommandation pour ajouter un commentaire</span>
                                     </div>
-                            </template>
+                                </template>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </template>
+                </template>
+            </div>
         </div>
     </div>
-</div>

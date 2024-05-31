@@ -1,32 +1,33 @@
-import projects from '../../../../fixtures/projects/projects.json'
+import projects from '../../../../fixtures/projects/projects.json';
 const currentProject = projects[1];
 
 describe('I can see and update an advisor note', () => {
+  beforeEach(() => {
+    cy.login('jean');
+  });
 
-    beforeEach(() => {
-        cy.login("jean");
-    })
+  it('goes to project overview and update advisor note', () => {
+    cy.visit('/projects');
 
-    it('goes to project overview and update advisor note', () => {
+    cy.contains(currentProject.fields.name).click({ force: true });
 
-        cy.visit('/projects')
+    cy.contains('Note interne');
 
-        cy.contains(currentProject.fields.name).click({force:true});
+    cy.contains('Non visible par la collectivité')
+      .parent()
+      .siblings('a')
+      .click({ force: true });
 
-        cy.contains("Note interne")
+    const now = new Date();
 
-        cy.contains('Non visible par la collectivité').parent().siblings('a').click({force:true})
+    cy.get('textarea').clear({ force: true });
 
-        const now = new Date();
+    cy.get('textarea')
+      .type(`test : ${now}`)
+      .should('have.value', `test : ${now}`);
 
-        cy.get('textarea').clear({ force: true })
+    cy.contains('Enregistrer').click({ force: true });
 
-        cy.get('textarea')
-            .type(`test : ${now}`)
-            .should('have.value', `test : ${now}`)
-
-        cy.contains("Enregistrer").click({ force: true })
-
-        cy.contains(`test : ${now}`)
-    })
-})
+    cy.contains(`test : ${now}`);
+  });
+});

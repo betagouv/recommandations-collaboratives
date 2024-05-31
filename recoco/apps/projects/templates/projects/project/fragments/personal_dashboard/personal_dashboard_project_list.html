@@ -33,31 +33,31 @@
                 <div :class="item.isLoading && 'project-item-is-loading'"
                      class="project-item d-flex flex-column justify-content-between align-items-start w-100">
                     <div class="project-card-top-information-container">
-                      <template x-if="item.project.inactive_since !== null">
-                          <div class="project-card-top-information inactive left-0">
-                              <div>Conseil en pause</div>
-                          </div>
-                      </template>
-                      <template x-if="item.project.inactive_since == null && item.status === 'NEW'">
-                          <div class="project-card-top-information new left-0">
-                              <div>Non consulté</div>
-                          </div>
-                      </template>
-                      <template x-if="item.project.inactive_since == null && item.project.is_observer">
-                          <div class="project-card-top-information observer left-0">
-                              <div>Observateur</div>
-                          </div>
-                      </template>
-                      <template x-if="item.project.inactive_since == null && item.project.is_switchtender && !item.project.is_observer">
-                          <div class="project-card-top-information advisor left-0">
-                              <div>Conseiller</div>
-                          </div>
-                      </template>
+                        <template x-if="item.project.inactive_since !== null">
+                            <div class="project-card-top-information inactive left-0">
+                                <div>Conseil en pause</div>
+                            </div>
+                        </template>
+                        <template x-if="item.project.inactive_since == null && item.status === 'NEW'">
+                            <div class="project-card-top-information new left-0">
+                                <div>Non consulté</div>
+                            </div>
+                        </template>
+                        <template x-if="item.project.inactive_since == null && item.project.is_observer">
+                            <div class="project-card-top-information observer left-0">
+                                <div>Observateur</div>
+                            </div>
+                        </template>
+                        <template x-if="item.project.inactive_since == null && item.project.is_switchtender && !item.project.is_observer">
+                            <div class="project-card-top-information advisor left-0">
+                                <div>Conseiller</div>
+                            </div>
+                        </template>
                     </div>
                     <header class="d-flex align-items-center justify-content-between w-100 mb-1">
                         <div class="d-flex align-items-center">
                             <a class="project-link d-flex align-items-center"
-                              data-test-id="project-link"
+                               data-test-id="project-link"
                                :href="makeProjectURL('{% url 'projects-project-detail' 0 %}', item.project.id)">
                                 <template x-if="item.project.commune">
                                     <span class="fw-bold title-info me-2 location"

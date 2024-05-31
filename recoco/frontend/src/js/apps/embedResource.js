@@ -1,1 +1,1 @@
-import '../components/PrintTaskResource'
+import '../components/PrintTaskResource';

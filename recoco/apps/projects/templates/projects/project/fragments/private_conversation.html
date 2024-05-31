@@ -1,40 +1,41 @@
 {% load static %}
 {% load humanize %}
 {% load gravatar %}
-
 {% regroup project.notes.private by created_on.date as notes_by_day %}
-            <div class="message-window flex-grow-1" style="overflow-y: auto; overflow-x: hidden; display:flex; flex-direction:column-reverse;">
-                <ul class="list-group">
-                    {% for date, notes in notes_by_day|slice:":20" %}
-                    <li class="list-group-item border-0 m-0 p-0">
-                        <div class="small my-2 text-center w-100">{{ date|naturalday|capfirst }}</div>
-                        {% for note in notes  %}
-                            {% if request.user == note.created_by %}
-                                <div class="rounded-3 p-3 bg-orange-light my-2" style="margin-left: 2vw;">
-                            {% else %}
-                                <div class="bg-orange-light rounded-3 p-3 my-2" style="margin-right: 2vw;">
+<div class="message-window flex-grow-1"
+     style="overflow-y: auto;
+            overflow-x: hidden;
+            display:flex;
+            flex-direction:column-reverse">
+    <ul class="list-group">
+        {% for date, notes in notes_by_day|slice:":20" %}
+            <li class="list-group-item border-0 m-0 p-0">
+                <div class="small my-2 text-center w-100">{{ date|naturalday|capfirst }}</div>
+                {% for note in notes %}
+                    {% if request.user == note.created_by %}
+                        <div class="rounded-3 p-3 bg-orange-light my-2" style="margin-left: 2vw;">
+                        {% else %}
+                            <div class="bg-orange-light rounded-3 p-3 my-2" style="margin-right: 2vw;">
                             {% endif %}
-                                <div class="overflow-hidden">
-                                    {{ note.content_rendered|safe }}
-                                </div>
-                                {% if note.document.count %}
-                                    {% for document in note.document.all %}
-                                            {% include 'projects/project/fragments/files_links/file_list_item_embedded.html' with document=document %}
-                                    {% endfor %}
-                                {% endif %}
+                            <div class="overflow-hidden">{{ note.content_rendered|safe }}</div>
+                            {% if note.document.count %}
+                                {% for document in note.document.all %}
+                                    {% include 'projects/project/fragments/files_links/file_list_item_embedded.html' with document=document %}
+                                {% endfor %}
+                            {% endif %}
                             {% if note.created_by %}
-                            <div class="d-flex align-items-center">
-                                {% include 'user/user_card.html' with user=note.created_by %}
-                                {% if note.created_by == request.user %}
-                                <span class="align-middle small text-dark ms-2">
-                                    - <a class="ms-1" href="{% url 'projects-update-note' note.pk %}">éditer</a>
-                                </span>
-                                {% endif %}
-                            </div>
+                                <div class="d-flex align-items-center">
+                                    {% include 'user/user_card.html' with user=note.created_by %}
+                                    {% if note.created_by == request.user %}
+                                        <span class="align-middle small text-dark ms-2">
+                                            - <a class="ms-1" href="{% url 'projects-update-note' note.pk %}">éditer</a>
+                                        </span>
+                                    {% endif %}
+                                </div>
                             {% endif %}
                         </div>
-                        {% endfor %}
-                    </li>
                     {% endfor %}
-                </ul>
-            </div>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>

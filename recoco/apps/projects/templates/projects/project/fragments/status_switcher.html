@@ -21,8 +21,7 @@
                                  !important;
                                  cursor: pointer"
                           class="m-3"
-                          x-text="openStatusWrapper ? 'Fermer' : 'Modifier le statut'">
-                    </span>
+                          x-text="openStatusWrapper ? 'Fermer' : 'Modifier le statut'"></span>
                 </div>
             {% else %}
                 <span class="status-switcher-item mx-3"
@@ -35,20 +34,15 @@
             <ul class="d-flex align-items-center status-switcher list-unstyled mt-0 m-3">
                 <li x-bind:style="activeStatus($store.taskModal.currentTask, STATUSES.PROPOSED) && { pointerEvents: 'none' }">
                     <a @click="handleStatusClick($store.taskModal.currentTask, STATUSES.PROPOSED)"
-                       :class="activeStatus($store.taskModal.currentTask, STATUSES.PROPOSED)">
-                        Nouveau
-                    </a>
+                       :class="activeStatus($store.taskModal.currentTask, STATUSES.PROPOSED)">Nouveau</a>
                 </li>
                 <li x-bind:style="activeStatus($store.taskModal.currentTask, STATUSES.INPROGRESS) && { pointerEvents: 'none' }">
                     <a @click="handleStatusClick($store.taskModal.currentTask, STATUSES.INPROGRESS)"
-                       :class="activeStatus($store.taskModal.currentTask, STATUSES.INPROGRESS)">
-                    En cours</a>
+                       :class="activeStatus($store.taskModal.currentTask, STATUSES.INPROGRESS)">En cours</a>
                 </li>
                 <li x-bind:style="activeStatus($store.taskModal.currentTask, STATUSES.BLOCKED) && { pointerEvents: 'none' }">
                     <a @click="handleStatusClick($store.taskModal.currentTask, STATUSES.BLOCKED)"
-                       :class="activeStatus($store.taskModal.currentTask, STATUSES.BLOCKED)">
-                        En Attente
-                    </a>
+                       :class="activeStatus($store.taskModal.currentTask, STATUSES.BLOCKED)">En Attente</a>
                 </li>
                 <li x-bind:style="activeStatus($store.taskModal.currentTask, STATUSES.DONE) && { pointerEvents: 'none' }">
                     <a @click="handleStatusWithCommentClick($store.taskModal.currentTask, STATUSES.DONE)"
@@ -58,9 +52,7 @@
                 </li>
                 <li x-bind:style="activeStatus($store.taskModal.currentTask, STATUSES.NOT_INTERESTED) && { pointerEvents: 'none' }">
                     <a @click="handleStatusWithCommentClick($store.taskModal.currentTask, STATUSES.NOT_INTERESTED)"
-                       :class="activeStatus($store.taskModal.currentTask, STATUSES.NOT_INTERESTED)">
-                        Non applicable
-                    </a>
+                       :class="activeStatus($store.taskModal.currentTask, STATUSES.NOT_INTERESTED)">Non applicable</a>
                 </li>
             </ul>
         </template>

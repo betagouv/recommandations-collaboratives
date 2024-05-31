@@ -1,13 +1,10 @@
 {% extends "base.html" %}
-
 {% load sass_tags %}
 {% load static %}
 {% load django_vite %}
-
 {% block js %}
-{% vite_asset 'js/apps/crm.js' %}
-
-<script type="text/javascript">
+    {% vite_asset 'js/apps/crm.js' %}
+    <script type="text/javascript">
  document.addEventListener('alpine:init', () => {
      Alpine.data('messagepopup', () => ({
          open: false,
@@ -23,76 +20,77 @@
          }
      })
  )})
-</script>
-
-
+    </script>
 {% endblock %}
-
 {% block css %}
-<link href="{% sass_src 'home/css/dsfr/marianne.css' %}" rel="stylesheet" type="text/css">
+    <link href="{% sass_src 'home/css/dsfr/marianne.css' %}"
+          rel="stylesheet"
+          type="text/css">
 {% endblock %}
-
 {% block content %}
-<div x-data="Crm" class="d-flex px-0" style="font-family: 'Marianne', arial, sans-serif;">
-    <aside class="w-25 crm-aside">
-        {% if active_project %}
-        <div x-ref="sidebar" class="d-flex flex-column justify-content-start crm-sticky">
-            {% else %}
-            <div x-ref="sidebar" class="d-flex flex-column justify-content-start crm-sticky no-project">
-                {% endif %}
-                {% include 'crm/back_button.html' %}
-                {% include 'crm/search.html' %}
-            </div>
-    </aside>
-    <div class="w-75 d-flex flex-column justify-content-start">
-        {% if active_project %}
-        <div class="crm-header px-4 py-4 mb-3">
-            {% else %}
-            <div class="crm-header no-project px-4 py-4">
-                {% endif %}
-                <h3 class="d-flex align-items-center">
-                    <svg class="bi me-2" width="16" height="16" fill="currentColor">
-                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#person-fill" />
-                    </svg>
-                    <span>{{ crm_user.get_full_name|default:crm_user.email }}</span>
-                </h3>
-                {% if crm_user.profile.organization %}
-                <a class="d-flex align-items-center"
-                   href="{% url 'crm-organization-details' crm_user.profile.organization.pk %}">
-                    <svg class="bi me-2" width="16" height="16" fill="currentColor">
-                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#arrow-left" />
-                    </svg>
-                    <span>Revenir aux détails de l'organisation : <strong>{{crm_user.profile.organization.name}}</strong></span>
-                </a>
-                {% endif %}
-            </div>
-            <div class="px-4 pt-4 bg-light crm-timeline-min-height">
-                <h4>
-                    <svg class="bi " width="24" height="24" fill="currentColor">
-                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#alarm" />
-                    </svg>&nbsp;
-                    Rappels de projets
-                </h4>
-                <small class="text-muted">&larr; retour aux <a href="{% url 'crm-user-reminders' crm_user.pk  %}">rappels de {{ crm_user.get_full_name }}</a></small>
-
-                <br class="mb-2" />
-
-
-                <strong>Envoyé à</strong> {{ email.email }} (<a href="{% url 'crm-user-details' crm_user.pk %}">{{ crm_user.get_full_name }}</a>)
-                <br>
-                <strong>Envoyé le</strong> {{ transaction.sent_on|date:"l j F Y" }}
-                <br>
-                <strong>Sujet</strong> : "{{ email.subject }}"
-                <br>
-
-                <div class="my-2">
-                {% for event in email.events %}
-                <span data-bs-toggle="tooltip" data-bs-placement="top" title="{{ event.time }}"  class="badge pill bg-primary">{{ event.name }}</span>&nbsp;
-                {% endfor %}
+    <div x-data="Crm"
+         class="d-flex px-0"
+         style="font-family: 'Marianne', arial, sans-serif">
+        <aside class="w-25 crm-aside">
+            {% if active_project %}
+                <div x-ref="sidebar"
+                     class="d-flex flex-column justify-content-start crm-sticky">
+                {% else %}
+                    <div x-ref="sidebar"
+                         class="d-flex flex-column justify-content-start crm-sticky no-project">
+                    {% endif %}
+                    {% include 'crm/back_button.html' %}
+                    {% include 'crm/search.html' %}
                 </div>
-
-                <iframe class="border w-100" height="800px" srcdoc="{{ email.body }}"></iframe>
+            </aside>
+            <div class="w-75 d-flex flex-column justify-content-start">
+                {% if active_project %}
+                    <div class="crm-header px-4 py-4 mb-3">
+                    {% else %}
+                        <div class="crm-header no-project px-4 py-4">
+                        {% endif %}
+                        <h3 class="d-flex align-items-center">
+                            <svg class="bi me-2" width="16" height="16" fill="currentColor">
+                                <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#person-fill" />
+                            </svg>
+                            <span>{{ crm_user.get_full_name|default:crm_user.email }}</span>
+                        </h3>
+                        {% if crm_user.profile.organization %}
+                            <a class="d-flex align-items-center"
+                               href="{% url 'crm-organization-details' crm_user.profile.organization.pk %}">
+                                <svg class="bi me-2" width="16" height="16" fill="currentColor">
+                                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#arrow-left" />
+                                </svg>
+                                <span>Revenir aux détails de l'organisation : <strong>{{ crm_user.profile.organization.name }}</strong></span>
+                            </a>
+                        {% endif %}
+                    </div>
+                    <div class="px-4 pt-4 bg-light crm-timeline-min-height">
+                        <h4>
+                            <svg class="bi " width="24" height="24" fill="currentColor">
+                                <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#alarm" />
+                            </svg>
+                            &nbsp;
+                            Rappels de projets
+                        </h4>
+                        <small class="text-muted">&larr; retour aux <a href="{% url 'crm-user-reminders' crm_user.pk %}">rappels de {{ crm_user.get_full_name }}</a></small>
+                        <br class="mb-2" />
+                        <strong>Envoyé à</strong> {{ email.email }} (<a href="{% url 'crm-user-details' crm_user.pk %}">{{ crm_user.get_full_name }}</a>)
+                        <br>
+                        <strong>Envoyé le</strong> {{ transaction.sent_on|date:"l j F Y" }}
+                        <br>
+                        <strong>Sujet</strong> : "{{ email.subject }}"
+                        <br>
+                        <div class="my-2">
+                            {% for event in email.events %}
+                                <span data-bs-toggle="tooltip"
+                                      data-bs-placement="top"
+                                      title="{{ event.time }}"
+                                      class="badge pill bg-primary">{{ event.name }}</span>&nbsp;
+                            {% endfor %}
+                        </div>
+                        <iframe class="border w-100" height="800px" srcdoc="{{ email.body }}"></iframe>
+                    </div>
+                </div>
             </div>
-        </div>
-    </div>
-    {% endblock %}
+        {% endblock %}

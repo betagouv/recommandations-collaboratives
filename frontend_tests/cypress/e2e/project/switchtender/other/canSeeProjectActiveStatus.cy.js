@@ -1,25 +1,23 @@
-import projects from '../../../../fixtures/projects/projects.json'
-import projectView from '../../../../support/views/project'
+import projects from '../../../../fixtures/projects/projects.json';
+import projectView from '../../../../support/views/project';
 
 const currentProject = projects[17];
 
 describe(`As project advisor, I can see a project's active status`, () => {
+  before(() => {
+    // First: login as owner and deactivate project
+    cy.login('staff');
+    cy.visit(`/project/${currentProject.pk}`);
 
-		before(() => {
-			// First: login as owner and deactivate project
-			cy.login("staff");
-			cy.visit(`/project/${currentProject.pk}`)
+    projectView.navigateToPreferencesTab();
+    projectView.deactivateProject();
+    cy.logout();
+  });
 
-			projectView.navigateToPreferencesTab()
-			projectView.deactivateProject()
-			cy.logout()
-		})
-
-    it('Displays a header banner when a project is paused', () => {
-
-			// Then: login as non referent project member and check banner
-			cy.login("jean");
-			cy.visit(`/project/${currentProject.pk}`)
-			projectView.checkProjectStatusBanner()
-		})
-})
+  it('Displays a header banner when a project is paused', () => {
+    // Then: login as non referent project member and check banner
+    cy.login('jean');
+    cy.visit(`/project/${currentProject.pk}`);
+    projectView.checkProjectStatusBanner();
+  });
+});

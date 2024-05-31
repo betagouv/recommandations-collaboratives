@@ -1,1 +1,1 @@
-import '../../css/projectDetails.css'
+import '../../css/projectDetails.css';

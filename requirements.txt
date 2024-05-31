@@ -33,6 +33,7 @@ djangorestframework==3.15.1
 djangorestframework-xml
 djangorestframework-simplejwt
 rest-framework-generic-relations
+drf-spectacular[sidecar]
 django-filter
 dynamic-django-forms
 django-crispy-forms==2.0

@@ -1,13 +1,13 @@
 {% load static %}
 {% if user.is_authenticated %}
-     <a href="{% url 'home' %}"
+     <!-- <a href="{% url 'home' %}"
         class="d-flex align-middle align-items-center">
           <img class="logo-uv"
                src="{% static 'img/logo-small.png' %}"
                width="auto"
                height="40px"
                alt="Logo UrbanVitaliz" />
-     </a>
+     </a> -->
 {% else %}
      <div class="navbar-logo">
           <button class="toggler-secondary"
@@ -22,7 +22,7 @@
           </button>
           <a href="{% url 'home' %}"
              class="d-flex align-middle p-3 align-items-center">
-               <img class="logo-rf"
+               <!-- <img class="logo-rf"
                     src="{% static 'home/img/home/logo_rf.png' %}"
                     width="100px"
                     alt="Logo république française">
@@ -34,7 +34,8 @@
                     src="{% static 'img/logo-uv.png' %}"
                     width="auto"
                     height="40px"
-                    alt="Logo UrbanVitaliz" />
+                    alt="Logo UrbanVitaliz" /> -->
+                    <span style="font-size: 30px; font-weight: bold;margin-left: 30px;">{{ request.site.name }}</span>
           </a>
      </div>
 {% endif %}

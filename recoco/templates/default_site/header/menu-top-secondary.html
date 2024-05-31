@@ -165,15 +165,15 @@
             </li>
         {% endif %}
         <!-- Methodology -->
-        {% if not user.is_authenticated and not hide_methodology %}
-            <li class="{% if 'methodology' in url_name %}activated{% endif %}">
+        <!-- {% if not user.is_authenticated and not hide_methodology %}
+            <li style="margin-right: 35px; padding-bottom:20px; border-bottom:solid 2px transparent; {% if 'methodology' in url_name %}border-bottom:solid 2px #0063CB;{% endif %}">
                 <div class="btn-group">
                     <a href="{% url 'methodology' %}" class="nav-link link-dark">
                         <span class="me-2 ms-1 align-middle">Méthodologie</span>
                     </a>
                 </div>
             </li>
-        {% endif %}
+        {% endif %} -->
         <!-- Ressources -->
         <li class="{% if url_name == 'resources-resource-search' %}activated{% endif %}">
             <div x-data="{ open: false }"

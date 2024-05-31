@@ -1,22 +1,21 @@
-import Alpine from 'alpinejs'
-import { Editor } from '@tiptap/core'
-import StarterKit from '@tiptap/starter-kit'
-import Link from '@tiptap/extension-link'
-import HardBreak from '@tiptap/extension-hard-break'
+import Alpine from 'alpinejs';
+import { Editor } from '@tiptap/core';
+import StarterKit from '@tiptap/starter-kit';
+import Link from '@tiptap/extension-link';
+import HardBreak from '@tiptap/extension-hard-break';
 import { createMarkdownEditor } from 'tiptap-markdown';
-import '../../css/tiptap.css'
+import '../../css/tiptap.css';
 
 const MarkdownEditor = createMarkdownEditor(Editor);
 
 Alpine.data('editor', (content) => {
-
-  let editor
+  let editor;
 
   return {
     updatedAt: Date.now(), // force Alpine to rerender on selection change
-    markdownContent: content ? content : "",
+    markdownContent: content ? content : '',
     init() {
-      const _this = this
+      const _this = this;
 
       editor = new MarkdownEditor({
         element: this.$refs.element,
@@ -25,86 +24,89 @@ Alpine.data('editor', (content) => {
           Link,
           HardBreak.extend({
             addKeyboardShortcuts() {
-              const handleEnter = () => this.editor.commands.first(({ commands }) => [
-                () => commands.newlineInCode(),
-                () => commands.createParagraphNear(),
-                () => commands.liftEmptyBlock(),
-                () => commands.splitBlock(),
-              ]);
+              const handleEnter = () =>
+                this.editor.commands.first(({ commands }) => [
+                  () => commands.newlineInCode(),
+                  () => commands.createParagraphNear(),
+                  () => commands.liftEmptyBlock(),
+                  () => commands.splitBlock(),
+                ]);
 
               return {
-                "Shift-Enter": handleEnter,
-                "Control-Enter": handleEnter,
-                "Cmd-Enter": handleEnter,
-              }
-            }
-          })
+                'Shift-Enter': handleEnter,
+                'Control-Enter': handleEnter,
+                'Cmd-Enter': handleEnter,
+              };
+            },
+          }),
         ],
         content: content,
         onCreate({ editor }) {
-          _this.updatedAt = Date.now()
+          _this.updatedAt = Date.now();
         },
         onUpdate({ editor }) {
-          _this.updatedAt = Date.now()
+          _this.updatedAt = Date.now();
           _this.renderMarkdown();
-          _this.$store.editor.setIsSubmitted(false)
+          _this.$store.editor.setIsSubmitted(false);
 
-          _this.$store.editor.isEditing = editor.getMarkdown() != ''
-          _this.$store.editor.currentMessage = editor.getMarkdown()
+          _this.$store.editor.isEditing = editor.getMarkdown() != '';
+          _this.$store.editor.currentMessage = editor.getMarkdown();
         },
         onSelectionUpdate({ editor }) {
-          _this.updatedAt = Date.now()
-        }
+          _this.updatedAt = Date.now();
+        },
       });
     },
     isLoaded() {
-      return editor
+      return editor;
     },
     isActive(type, opts = {}) {
-      return editor.isActive(type, opts)
+      return editor.isActive(type, opts);
     },
     toggleHeading(opts) {
-      editor.chain().toggleHeading(opts).focus().run()
+      editor.chain().toggleHeading(opts).focus().run();
     },
     toggleBold() {
-      editor.chain().toggleBold().focus().run()
+      editor.chain().toggleBold().focus().run();
     },
     toggleItalic() {
-      editor.chain().toggleItalic().focus().run()
+      editor.chain().toggleItalic().focus().run();
     },
     toggleBulletList() {
-      editor.chain().toggleBulletList().focus().run()
+      editor.chain().toggleBulletList().focus().run();
     },
     setLink() {
-
-      const previousUrl = editor.getAttributes('link').href
-      const url = window.prompt('URL', previousUrl)
+      const previousUrl = editor.getAttributes('link').href;
+      const url = window.prompt('URL', previousUrl);
 
       // cancelled
       if (url === null) {
-        return
+        return;
       }
 
       // empty
       if (url === '') {
-        editor.chain().focus().extendMarkRange('link').unsetLink()
-          .run()
+        editor.chain().focus().extendMarkRange('link').unsetLink().run();
 
-        return
+        return;
       }
 
       // update link
-      editor.chain().focus().extendMarkRange('link').setLink({ href: url })
-        .run()
+      editor
+        .chain()
+        .focus()
+        .extendMarkRange('link')
+        .setLink({ href: url })
+        .run();
     },
     unsetLink() {
-      editor.chain().focus().unsetLink().run()
+      editor.chain().focus().unsetLink().run();
     },
     setMarkdownContentFromTaskModal(event) {
       editor.commands.setContent(event.detail);
     },
     renderMarkdown() {
-      this.markdownContent = editor.getMarkdown().replaceAll("\\", "");
-    }
+      this.markdownContent = editor.getMarkdown().replaceAll('\\', '');
+    },
   };
 });

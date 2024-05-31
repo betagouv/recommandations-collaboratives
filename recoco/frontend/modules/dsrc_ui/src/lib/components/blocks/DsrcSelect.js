@@ -20,6 +20,6 @@ function DsrcSelect() {
 				.finally(() => {
 					this.isLoading = false;
 				});
-		}
+		},
 	};
 }

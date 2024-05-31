@@ -2,9 +2,7 @@
     {% for title, content in onboarding_response.items %}
         {% if content %}
             {% include 'projects/project/fragments/information_card_description_details.html' %}
-            {% if forloop.counter != onboarding_response.items|length %}
-                <hr/>
-            {% endif %}
+            {% if forloop.counter != onboarding_response.items|length %}<hr />{% endif %}
         {% endif %}
     {% endfor %}
 {% elif new_onboarding %}
