@@ -1,9 +1,6 @@
 import Alpine from 'alpinejs';
 import appStore from '../store/app';
 import '../../css/notification.css';
-import Alpine from 'alpinejs';
-import appStore from '../store/app';
-import '../../css/notification.css';
 
 function Notification() {
   return {
@@ -29,5 +26,4 @@ function Notification() {
   };
 }
 
-Alpine.data('Notification', Notification);
 Alpine.data('Notification', Notification);
