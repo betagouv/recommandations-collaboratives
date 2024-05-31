@@ -1,9 +1,8 @@
 import { Dropdown } from 'bootstrap';
 import Alpine from 'alpinejs';
 import api, {
-  djangoNotificationsMarkAsReadBySlugUrl,
-  djangoNotificationsUnreadListUrl,
   markAllNotificationsAsReadUrl,
+  notificationsMarkAsReadByIdUrl,
 } from '../utils/api';
 
 function MenuNotifications(notificationNumber) {
@@ -11,33 +10,19 @@ function MenuNotifications(notificationNumber) {
   return {
     notificationNumber: notificationNumber,
     async markNotificationAsRead(notificationId, el) {
-      const reqListNotif = await api.get(
-        djangoNotificationsUnreadListUrl(),
-        {}
-      );
-      if (reqListNotif.status != 200) {
-        return;
-      }
-
-      const notificationToRead = reqListNotif.data.unread_list.find(
-        (n) => n.id === notificationId
-      );
-      if (!notificationToRead) {
-        return;
-      }
-
-      const reqMarkNotifAsRead = await api.get(
-        djangoNotificationsMarkAsReadBySlugUrl(notificationToRead.slug),
+      const reqMarkNotifAsRead = await api.patch(
+        notificationsMarkAsReadByIdUrl(notificationId),
         {}
       );
       if (reqMarkNotifAsRead.status != 200) {
         return;
       }
-
-      this.removeNotificationInDom(el);
+      if (reqMarkNotifAsRead.data.marked_as_read > 0) {
+        this.removeNotificationInDom(el);
+      }
     },
     async markAllNotificationsAsRead() {
-      const resp = await api.post(markAllNotificationsAsReadUrl(), {});
+      const resp = await api.patch(markAllNotificationsAsReadUrl(), {});
       if (resp.status === 200) {
         this.notificationNumber = 0;
       }
