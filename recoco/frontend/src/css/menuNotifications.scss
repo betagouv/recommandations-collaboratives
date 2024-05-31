@@ -33,7 +33,7 @@
 
   .notifications {
     &__container {
-      height: 64vh;
+      max-height: 64vh;
       overflow-y: scroll;
     }
   }
