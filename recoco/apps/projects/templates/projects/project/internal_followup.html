@@ -7,6 +7,7 @@
 {% load guardian_tags %}
 {% load sass_tags %}
 {% block title %}Espace conseillers - {{ block.super }}{% endblock %}
+{% block og_title %}Espace conseillers - {{ block.super }}{% endblock %}
 {% block project_detail %}
     {% get_obj_perms request.user for request.site as "user_site_perms" %}
     {% get_obj_perms request.user for project as "user_project_perms" %}

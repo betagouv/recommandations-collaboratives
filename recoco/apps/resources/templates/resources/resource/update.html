@@ -3,6 +3,7 @@
 {% load humanize %}
 {% load sass_tags %}
 {% block title %}Modifier {{ resource.title }} {{ block.super }}{% endblock %}
+{% block og_title %}Modifier {{ resource.title }} {{ block.super }}{% endblock %}
 {% block css %}
     <link href="{% sass_src 'resources/resources.scss' %}"
           rel="stylesheet"

@@ -4,13 +4,13 @@
 {% load humanize %}
 {% load crm_tags %}
 {% block title %}Utilisation des tags sur les projets - CRM{% endblock %}
+{% block og_title %}Utilisation des tags sur les projets - CRM{% endblock %}
 {% block js %}
     {% vite_asset 'js/apps/crm.js' %}
     <script src="{% static "/js/d3.min.js" %}"></script>
     <script src="{% static "/js/nv.d3.min.js" %}"></script>
     <!-- Charts -->
     <script type="text/javascript">
-
  nv.addGraph(function() {
      var chart = nv.models.discreteBarChart()
                    .x(function(d) { return d.label })    //Specify the data accessors.

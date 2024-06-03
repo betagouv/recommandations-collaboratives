@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 {% block title %}Groupe de questions {{ question_set.survey.name }}{% endblock %}
+{% block og_title %}Groupe de questions {{ question_set.survey.name }}{% endblock %}
 {% block content %}
     <div class="col-11 py-5 mx-auto">
         <!-- Breadcrumb -->
@@ -123,65 +124,68 @@
                 <span class="text-secondary fw-bold d-inline-block">
                     {% if question.choices.count %}
                         {% if question.is_multiple %}
-                            Choix Multiples{% else %}Choix Unique{% endif %}
+                            Choix Multiples
                         {% else %}
-                            Question Ouverte
+                            Choix Unique
                         {% endif %}
-                        {% if question.upload_title %}avec fichier{% endif %}
-                    </span>
-                    {% if question.is_multiple and question.precondition %}avec{% endif %}
-                    {% if question.precondition %}
-                        <div class="text-secondary mt-2 mb-2 d-inline-block">
-                            <svg class="bi me-1 align-middle"
-                                 width="16"
-                                 height="16"
-                                 fill="currentColor">
-                                <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#alt" />
-                            </svg>
-                            Pré-condition :
-                            {% for tag in question.precondition_tags %}
-                                <span class="badge bg-dark rounded-pill">{{ tag }}</span>
-                                {% if not forloop.last %}+{% endif %}
-                            {% endfor %}
-                        </div>
+                    {% else %}
+                        Question Ouverte
                     {% endif %}
-                    <ul class="list-group list-group-numbered list-group-flush">
-                        {% for choice in question.choices.all %}
-                            <li class="list-group-item d-flex justify-content-between align-items-start">
-                                <div class="ms-2 me-auto">
-                                    <div>
-                                        {{ choice.text }}
-                                        {% if choice.conclusion %}(<span class="fw-bold">{{ choice.conclusion }}</span>){% endif %}
-                                        <span class="text-secondary small" style="font-size: 15px">
-                                            &nbsp;
-                                            <svg class="bi" width="15" height="15" fill="currentColor">
-                                                <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#sort-up" />
-                                            </svg>
-                                            &nbsp;{{ choice.priority }}
-                                        </span>
-                                    </div>
-                                    <a href="{% url 'survey-editor-choice-update' choice.pk %}">éditer</a>
-                                </div>
-                                {% if choice.tags %}
-                                    <div>
-                                        <svg class="bi me-1 align-middle"
-                                             width="16"
-                                             height="16"
-                                             fill="currentColor">
-                                            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#tags" />
-                                        </svg>
-                                        {% for tag in choice.tags %}<span class="badge bg-dark rounded-pill">{{ tag }}</span>{% endfor %}
-                                    </div>
-                                {% endif %}
-                            </li>
+                    {% if question.upload_title %}avec fichier{% endif %}
+                </span>
+                {% if question.is_multiple and question.precondition %}avec{% endif %}
+                {% if question.precondition %}
+                    <div class="text-secondary mt-2 mb-2 d-inline-block">
+                        <svg class="bi me-1 align-middle"
+                             width="16"
+                             height="16"
+                             fill="currentColor">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#alt" />
+                        </svg>
+                        Pré-condition :
+                        {% for tag in question.precondition_tags %}
+                            <span class="badge bg-dark rounded-pill">{{ tag }}</span>
+                            {% if not forloop.last %}+{% endif %}
                         {% endfor %}
-                    </ul>
-                    <span class="text-secondary">Titre du bloc commentaire : <em>{{ question.comment_title }}</em></span>
-                {% empty %}
-                    <div class="bd-callout bd-callout-info">
-                        Il n'y a pas de question pour l'instant.
-                        <a href="{% url 'survey-editor-question-create' question_set.id %}">Créez-en une</a>.
                     </div>
-                {% endfor %}
-            </div>
-        {% endblock %}
+                {% endif %}
+                <ul class="list-group list-group-numbered list-group-flush">
+                    {% for choice in question.choices.all %}
+                        <li class="list-group-item d-flex justify-content-between align-items-start">
+                            <div class="ms-2 me-auto">
+                                <div>
+                                    {{ choice.text }}
+                                    {% if choice.conclusion %}(<span class="fw-bold">{{ choice.conclusion }}</span>){% endif %}
+                                    <span class="text-secondary small" style="font-size: 15px">
+                                        &nbsp;
+                                        <svg class="bi" width="15" height="15" fill="currentColor">
+                                            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#sort-up" />
+                                        </svg>
+                                        &nbsp;{{ choice.priority }}
+                                    </span>
+                                </div>
+                                <a href="{% url 'survey-editor-choice-update' choice.pk %}">éditer</a>
+                            </div>
+                            {% if choice.tags %}
+                                <div>
+                                    <svg class="bi me-1 align-middle"
+                                         width="16"
+                                         height="16"
+                                         fill="currentColor">
+                                        <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#tags" />
+                                    </svg>
+                                    {% for tag in choice.tags %}<span class="badge bg-dark rounded-pill">{{ tag }}</span>{% endfor %}
+                                </div>
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+                <span class="text-secondary">Titre du bloc commentaire : <em>{{ question.comment_title }}</em></span>
+            {% empty %}
+                <div class="bd-callout bd-callout-info">
+                    Il n'y a pas de question pour l'instant.
+                    <a href="{% url 'survey-editor-question-create' question_set.id %}">Créez-en une</a>.
+                </div>
+            {% endfor %}
+        </div>
+    {% endblock %}

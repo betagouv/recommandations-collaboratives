@@ -3,6 +3,7 @@
 {% load static %}
 {% load django_vite %}
 {% block title %}Emails de notification à {{ crm_user.get_full_name }}{% endblock %}
+{% block og_title %}Emails de notification à {{ crm_user.get_full_name }}{% endblock %}
 {% block js %}
     {% vite_asset 'js/apps/crm.js' %}
 {% endblock %}

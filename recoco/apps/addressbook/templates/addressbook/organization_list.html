@@ -2,6 +2,7 @@
 {% load guardian_tags %}
 {% load static %}
 {% block title %}Organisations - Carnet d'adresses {{ block.super }}{% endblock %}
+{% block og_title %}Organisations - Carnet d'adresses {{ block.super }}{% endblock %}
 {% block content %}
     {% get_obj_perms request.user for request.site as "user_site_perms" %}
     <div class="col-11 py-5 mx-auto">

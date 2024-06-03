@@ -2,13 +2,14 @@
 {% load static %}
 {% load humanize %}
 {% block title %}Modifier la note - CRM{% endblock %}
+{% block og_title %}Modifier la note - CRM{% endblock %}
 {% block content %}
     <div class="col-11 py-5 mx-auto">
         <section>
             <form method="post">
                 {% csrf_token %}
                 <h2 class="mb-4 d-flex align-items-center">
-                    <svg class="bi me-2" width="20" height="20" fill="currentColor">
+                    <svg class="bi  me-2" width="20" height="20" fill="currentColor">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#activity" />
                     </svg>
                     <span>CRM</span>

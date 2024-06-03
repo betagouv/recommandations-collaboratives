@@ -3,6 +3,7 @@
 {% load humanize %}
 {% load sass_tags %}
 {% block title %}Créer une nouvelle fiche-ressource {{ block.super }}{% endblock %}
+{% block og_title %}Créer une nouvelle fiche-ressource {{ block.super }}{% endblock %}
 {% block css %}
     <link href="{% sass_src 'resources/resources.scss' %}"
           rel="stylesheet"

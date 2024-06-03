@@ -5,6 +5,7 @@
 {% load django_vite %}
 {% load projects_extra %}
 {% block title %}Paramètres - {{ block.super }}{% endblock %}
+{% block og_title %}Paramètres - {{ block.super }}{% endblock %}
 {% block js %}
     {% vite_asset 'js/apps/projectAdministration.js' %}
 {% endblock %}

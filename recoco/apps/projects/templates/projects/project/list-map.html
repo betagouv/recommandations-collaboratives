@@ -1,6 +1,7 @@
 {% extends "projects/project/list.html" %}
 {% load static %}
 {% block title %}Carte des projets {{ block.super }}{% endblock %}
+{% block og_title %}Carte des projets {{ block.super }}{% endblock %}
 {% block project_list_content %}
     <div x-data="Map">
         <div class="topbar d-flex justify-content-between bg-light border-bottom p-2">

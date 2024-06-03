@@ -6,6 +6,7 @@
 {% load django_vite %}
 {% load guardian_tags %}
 {% block title %}Recommandations - {{ block.super }}{% endblock %}
+{% block og_title %}Recommandations - {{ block.super }}{% endblock %}
 {% block js %}
     {% vite_asset 'js/apps/project.js' %}
 {% endblock %}

@@ -5,6 +5,7 @@
 {% load projects_extra %}
 {% load sass_tags %}
 {% block title %}{{ project.name }}{% endblock %}
+{% block og_title %}{{ project.name }}{% endblock %}
 {% block css %}
     <link href="{% sass_src 'resources/resources.scss' %}"
           rel="stylesheet"

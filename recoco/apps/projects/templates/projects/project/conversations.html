@@ -5,6 +5,7 @@
 {% load training %}
 {% load guardian_tags %}
 {% block title %}Conversation - {{ block.super }}{% endblock %}
+{% block og_title %}Conversation - {{ block.super }}{% endblock %}
 {% block project_detail %}
     {% challenge_for request.user "project-conversation-reader" as challenge %}
     {% if challenge and not challenge.acquired %}

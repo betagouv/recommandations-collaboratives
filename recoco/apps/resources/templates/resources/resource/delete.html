@@ -2,6 +2,7 @@
 {% load static %}
 {% load humanize %}
 {% block title %}Supprimer {{ resource.title }}{% endblock %}
+{% block og_title %}Supprimer {{ resource.title }}{% endblock %}
 {% load sass_tags %}
 {% block css %}
     <link href="{% sass_src 'resources/resources.scss' %}"

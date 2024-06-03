@@ -5,6 +5,7 @@
 {% load humanize %}
 {% load training %}
 {% block title %}Modifier {{ crm_user.get_full_name }}{% endblock %}
+{% block og_title %}Modifier {{ crm_user.get_full_name }}{% endblock %}
 {% block js %}
     {% vite_asset 'js/apps/crm.js' %}
 {% endblock %}
