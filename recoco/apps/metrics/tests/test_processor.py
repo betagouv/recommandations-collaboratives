@@ -28,12 +28,7 @@ class TestMaterializedView:
     def test_db_view_name(self, settings, stub_site):
         assert (
             MaterializedView(site=stub_site, name="view_test").db_view_name
-            == "mv_view_test"
-        )
-        settings.MATERIALIZED_VIEWS_PREFIX = "prefix"
-        assert (
-            MaterializedView(site=stub_site, name="view_test").db_view_name
-            == "prefix_view_test"
+            == "view_test"
         )
 
     def test_db_schema_name(self, stub_site):
@@ -77,7 +72,7 @@ class TestMaterializedView:
         view.set_cursor(mock_cursor)
         view.drop()
         mock_cursor.execute.assert_called_once_with(
-            sql="DROP MATERIALIZED VIEW IF EXISTS metrics_example_com.mv_view_test;"
+            sql="DROP MATERIALIZED VIEW IF EXISTS metrics_example_com.view_test;"
         )
 
     def test_refresh(self, stub_site):
@@ -86,7 +81,7 @@ class TestMaterializedView:
         view.set_cursor(mock_cursor)
         view.refresh()
         mock_cursor.execute.assert_called_once_with(
-            sql="REFRESH MATERIALIZED VIEW metrics_example_com.mv_view_test;"
+            sql="REFRESH MATERIALIZED VIEW metrics_example_com.view_test;"
         )
 
     def test_create_with_indexes(self, stub_site):
@@ -109,14 +104,14 @@ class TestMaterializedView:
             sql="CREATE SCHEMA IF NOT EXISTS metrics_example_com;",
         )
         assert calls[1] == call(
-            sql='CREATE MATERIALIZED VIEW metrics_example_com.mv_view_test_simple AS ( select Count(*) from FROM "projects_project" ) WITH NO DATA;',
+            sql='CREATE MATERIALIZED VIEW metrics_example_com.view_test_simple AS ( select Count(*) from FROM "projects_project" ) WITH NO DATA;',
             params=(9,),
         )
         assert calls[2] == call(
-            sql="CREATE INDEX ON metrics_example_com.mv_view_test_simple (idx);"
+            sql="CREATE INDEX ON metrics_example_com.view_test_simple (idx);"
         )
         assert calls[3] == call(
-            sql="CREATE UNIQUE INDEX ON metrics_example_com.mv_view_test_simple (unique_idx);"
+            sql="CREATE UNIQUE INDEX ON metrics_example_com.view_test_simple (unique_idx);"
         )
 
     @pytest.mark.django_db(transaction=True)
@@ -127,11 +122,11 @@ class TestMaterializedView:
 
         with connection.cursor() as cursor:
             cursor.execute(
-                "SELECT COUNT(*) FROM pg_matviews WHERE matviewname = 'mv_view_test_django_qs' AND schemaname = 'metrics_example_com';"
+                "SELECT COUNT(*) FROM pg_matviews WHERE matviewname = 'view_test_django_qs' AND schemaname = 'metrics_example_com';"
             )
             assert cursor.fetchone()[0] == 1
             cursor.execute(
-                "SELECT COUNT(*) FROM pg_matviews WHERE matviewname = 'mv_view_test_raw_sql' AND schemaname = 'metrics_example_com';"
+                "SELECT COUNT(*) FROM pg_matviews WHERE matviewname = 'view_test_raw_sql' AND schemaname = 'metrics_example_com';"
             )
             assert cursor.fetchone()[0] == 1
 
@@ -139,10 +134,10 @@ class TestMaterializedView:
 
         with connection.cursor() as cursor:
             cursor.execute(
-                "SELECT COUNT(*) FROM pg_matviews WHERE matviewname = 'mv_view_test_django_qs' AND schemaname = 'metrics_example_com';"
+                "SELECT COUNT(*) FROM pg_matviews WHERE matviewname = 'view_test_django_qs' AND schemaname = 'metrics_example_com';"
             )
             assert cursor.fetchone()[0] == 0
             cursor.execute(
-                "SELECT COUNT(*) FROM pg_matviews WHERE matviewname = 'mv_view_test_raw_sql' AND schemaname = 'metrics_example_com';"
+                "SELECT COUNT(*) FROM pg_matviews WHERE matviewname = 'view_test_raw_sql' AND schemaname = 'metrics_example_com';"
             )
             assert cursor.fetchone()[0] == 0
