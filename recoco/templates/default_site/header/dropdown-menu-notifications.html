@@ -52,7 +52,7 @@
     <li class="btn-container">
         <button @click="markAllNotificationsAsRead"
                 class="dropdown-item"
-                disabled="notificationNumber == 0"
+                :disabled="notificationNumber == 0"
                 data-test-id="notification-mark-all-as-read">Marquer toutes les notifications commes lues</button>
     </li>
 </ul>
