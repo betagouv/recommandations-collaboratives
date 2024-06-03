@@ -24,7 +24,6 @@
                     x-show="isNotificationShown[`${ {{ forloop.counter }}{{ forloop.parentloop.counter0 }} }`]"
                     x-transition.duration.400ms>
                     {% include 'user/user_card.html' with user=notification.actor project=notification.target %}
-                    {% comment %} <div x-text="`${ {{ forloop.counter }}+{{ forloop.parentloop.counter0 }} }`"></div> {% endcomment %}
                     <div class="notification__verb">{{ notification.verb }} sur</div>
                     <a class="notification__project"
                        href="{{ notification.target.get_absolute_url }}">{{ notification.target }}</a>
