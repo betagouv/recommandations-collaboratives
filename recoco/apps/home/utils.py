@@ -97,8 +97,8 @@ def make_new_site(
                 for perm_name in permissions:
                     assign_perm(perm_name, group, obj=site)
 
-        if admin_user:
-            assign_site_staff(site, admin_user)
+            if admin_user:
+                assign_site_staff(site, admin_user)
 
         return site
 
