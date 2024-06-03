@@ -360,6 +360,7 @@ def refresh_user_projects_in_session(request, user):
             "name": p.name,
             "id": p.id,
             "location": p.location,
+            "commune": p.commune.name if p.commune else None,
             "inactive": bool(p.inactive_since),
             "actions_open": p.tasks.open().count(),
         }
