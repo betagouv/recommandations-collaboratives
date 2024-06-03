@@ -8,17 +8,21 @@ import appStore from '../store/app';
 import { ToastType } from '../models/toastType';
 
 function MenuNotifications(notificationNumber) {
-  console.log('notificationNumber', notificationNumber);
   return {
     notificationNumber: notificationNumber,
-    async markNotificationAsRead(notificationId, el) {
+    notificationNextIndex: 0,
+    isNotificationShown: {},
+    initNewNotification(notificationIndex) {
+      this.isNotificationShown[notificationIndex] = true;
+    },
+    async markNotificationAsRead(notificationId, el, notificationIndex) {
       try {
         const reqMarkNotifAsRead = await api.patch(
           notificationsMarkAsReadByIdUrl(notificationId),
           {}
         );
         if (reqMarkNotifAsRead.data.marked_as_read > 0) {
-          this.removeNotificationInDom(el);
+          this.removeNotificationInDom(el, notificationIndex);
         }
       } catch (error) {
         this.showToast(
@@ -30,6 +34,11 @@ function MenuNotifications(notificationNumber) {
     async markAllNotificationsAsRead() {
       try {
         await api.patch(markAllNotificationsAsReadUrl(), {});
+        for (const key in this.isNotificationShown) {
+          if (Object.hasOwnProperty.call(this.isNotificationShown, key)) {
+            this.isNotificationShown[key] = false;
+          }
+        }
         this.notificationNumber = 0;
       } catch (error) {
         this.showToast(
@@ -38,19 +47,25 @@ function MenuNotifications(notificationNumber) {
         return;
       }
     },
-    removeNotificationInDom(el) {
+    removeNotificationInDom(el, notificationIndex) {
       this.notificationNumber -= 1;
       const nextEl = el.parentElement.nextElementSibling;
       const previousEl = el.parentElement.previousElementSibling;
+      this.isNotificationShown[notificationIndex] = false;
+      this.isNotificationShown = { ...this.isNotificationShown };
       if (
         nextEl &&
         previousEl &&
         nextEl.classList.contains('notification__date') &&
         previousEl.classList.contains('notification__date')
       ) {
-        previousEl.remove();
+        setTimeout(() => {
+          previousEl.remove();
+        }, 500);
       }
-      el.parentElement.remove();
+      setTimeout(() => {
+        el.parentElement.remove();
+      }, 500);
     },
     closeNotificationsMenu() {
       const notificationsMenu = document.querySelector(
