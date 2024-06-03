@@ -1,7 +1,8 @@
-from django.db.models import Count, F, Q, QuerySet
+from django.db.models import Count, F, Q, QuerySet, Subquery, OuterRef, Func
 from django.contrib.postgres.aggregates import StringAgg
 
-from recoco.apps.projects.models import Project
+from recoco.apps.projects.models import Project, ProjectSwitchtender
+from recoco.apps.tasks.models import Task
 
 from ..utils import hash_field
 
@@ -15,11 +16,23 @@ def get_queryset(site_id: int) -> QuerySet:
         .filter(sites__pk=site_id)
         .annotate(hash=hash_field("id", salt="project"))
         .annotate(
-            recommandation_count=Count(
-                "tasks", filter=Q(tasks__site__pk=site_id, tasks__public=True)
+            recommandation_count=Subquery(
+                Task.objects.filter(
+                    project_id=OuterRef("pk"), site_id=site_id, public=True
+                )
+                .order_by()
+                .annotate(count=Func(F("id"), function="Count"))
+                .values("count")
             ),
-            advisor_count=Count("switchtenders_on_site", distinct=True),
-            member_count=Count("projectmember", distinct=True),
+            advisor_count=Subquery(
+                ProjectSwitchtender.objects.filter(
+                    project_id=OuterRef("pk"), site_id=site_id
+                )
+                .order_by()
+                .annotate(count=Func(F("id"), function="Count"))
+                .values("count")
+            ),
+            member_count=Count("members", distinct=True),
         )
         .annotate(
             public_message_count=Count(
