@@ -65,7 +65,7 @@ class MaterializedView:
 
     @property
     def db_view_name(self) -> str:
-        return f"{settings.MATERIALIZED_VIEWS_PREFIX}_{self.name}"
+        return self.name
 
     @property
     def db_schema_name(self) -> str:
