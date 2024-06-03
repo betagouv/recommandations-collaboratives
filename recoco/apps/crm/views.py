@@ -14,9 +14,10 @@ from actstream.models import Action, actor_stream, target_stream
 from allauth.account.models import EmailAddress
 from allauth.account.utils import (
     filter_users_by_email,
-    setup_user_email,
     send_email_confirmation,
+    setup_user_email,
 )
+from django.urls import reverse_lazy
 from django import forms as django_forms
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -33,6 +34,7 @@ from django.utils import timezone
 from django.utils.safestring import mark_safe
 from django.views.decorators.http import require_http_methods
 from django.views.generic.base import TemplateView
+from django.views.generic.edit import UpdateView
 from guardian.shortcuts import get_users_with_perms
 from notifications import models as notifications_models
 from notifications import notify
@@ -145,6 +147,29 @@ def crm_search(request):
         search_results = list(filter(filter_current_site, all_sites_search_results))
 
     return render(request, "crm/search_results.html", locals())
+
+
+########################################################################
+# tenancy
+########################################################################
+class SiteConfigurationUpdateView(UpdateView):
+    model = home_models.SiteConfiguration
+    fields = [
+        "sender_email",
+        "sender_name",
+        "contact_form_recipient",
+        "legal_address",
+        "legal_owner",
+        "description",
+        "email_logo",
+        "crm_available_tags",
+        "reminder_interval",
+    ]
+    template_name = "crm/siteconfiguration_update.html"
+    success_url = reverse_lazy("crm-site-dashboard")
+
+    def get_object(self, queryset=None):
+        return self.request.site.configuration
 
 
 ########################################################################
@@ -376,7 +401,7 @@ def user_update(request, user_id=None):
                                 f'L\'utilisateur <a href="{user_link}">'
                                 f"{users[0].first_name} {users[0].last_name}</a>'"
                                 " utilise déjà cette adresse email."
-                            )
+                            )  # nosec
                             form.add_error(
                                 "username", django_forms.ValidationError(error_msg)
                             )

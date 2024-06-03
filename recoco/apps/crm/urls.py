@@ -43,6 +43,12 @@ urlpatterns = [
         views.crm_list_recommendation_without_resources,
         name="crm-reco-without-resources",
     ),
+    # tenancy
+    path(
+        "crm/site_config",
+        views.SiteConfigurationUpdateView.as_view(),
+        name="crm-site-configuration",
+    ),
     #
     # users
     path(
