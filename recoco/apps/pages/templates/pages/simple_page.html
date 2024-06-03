@@ -16,6 +16,7 @@
           type="text/css">
 {% endblock %}
 {% block title %}{{ page.title }}{% endblock %}
+{% block og_title %}{{ page.title }}{% endblock %}
 {% block content %}
     <div class="col-8 mt-4 py-3 g-0 mx-auto font-marianne" id="simple-text">
         <p>{{ page.body|richtext }}</p>
