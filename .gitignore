@@ -47,3 +47,6 @@ dsrc_doc/*.md
 docker/docker-compose.local.yml
 **/.vite
 **/cypress/reports/*
+
+# local scripts
+scripts/*_local.py

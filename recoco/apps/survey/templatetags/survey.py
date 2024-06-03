@@ -38,11 +38,3 @@ def lookup_choices_from_answer(answer):
             pass
 
     return choices
-
-
-@register.simple_tag
-def question_answer(session, question):
-    try:
-        return Answer.objects.get(question=question, session=session)
-    except Answer.DoesNotExist:
-        return None

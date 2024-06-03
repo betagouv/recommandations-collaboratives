@@ -29,7 +29,6 @@ from recoco.apps.addressbook import models as addressbook_models
 from recoco.apps.geomatics import models as geomatics_models
 from recoco.apps.projects import models as projects
 from recoco.utils import check_if_advisor, has_perm, has_perm_or_403, is_staff_for_site
-from rest_framework import permissions, viewsets
 from reversion_compare.views import HistoryCompareDetailView
 
 from . import models
