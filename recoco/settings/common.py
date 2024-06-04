@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     "django.contrib.sites",
     "multisite",
     "reversion",
+    "reversion_compare",
     "django.contrib.admin",
     "hijack",
     "hijack.contrib.admin",
