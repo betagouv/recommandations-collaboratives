@@ -37,18 +37,23 @@ def get_queryset(site_id: int) -> QuerySet:
         .annotate(
             public_message_count=Count(
                 "notes",
-                filter=Q(notes__public=True),
+                filter=Q(notes__public=True, notes__site_id=site_id),
                 distinct=True,
             ),
             public_message_from_members_count=Count(
                 "notes",
-                filter=Q(notes__public=True, notes__created_by__in=F("members")),
+                filter=Q(
+                    notes__public=True,
+                    notes__site_id=site_id,
+                    notes__created_by__in=F("members"),
+                ),
                 distinct=True,
             ),
             public_message_from_advisors_count=Count(
                 "notes",
                 filter=Q(
                     notes__public=True,
+                    notes__site_id=site_id,
                     notes__created_by__in=F("switchtenders_on_site__switchtender"),
                 ),
                 distinct=True,
@@ -57,7 +62,7 @@ def get_queryset(site_id: int) -> QuerySet:
         .annotate(
             private_message_count=Count(
                 "notes",
-                filter=Q(notes__public=False),
+                filter=Q(notes__public=False, notes__site_id=site_id),
                 distinct=True,
             )
         )
