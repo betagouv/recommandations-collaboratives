@@ -172,6 +172,27 @@ class DeletedProjectOnSiteManager(CurrentSiteManager, DeletedProjectManager):
     pass
 
 
+class ProjectSite(models.Model):
+    PROJECTSITE_STATES = (
+        ("TO_MODERATE", "En attente de modération"),
+        ("ACCEPTED", "Accepté"),
+        ("REFUSED", "Refusé"),
+    )
+
+    project = models.ForeignKey(
+        "Project",
+        on_delete=models.CASCADE,
+    )
+    site = models.ForeignKey(
+        Site,
+        on_delete=models.CASCADE,
+    )
+    status = models.CharField(
+        max_length=20, choices=PROJECTSITE_STATES, default="TO_MODERATE"
+    )
+    origin = models.BooleanField(default=False)
+
+
 class Project(models.Model):
     """Représente un project de suivi d'une collectivité"""
 
@@ -195,6 +216,9 @@ class Project(models.Model):
     all_on_site = ProjectOnSiteManager()
 
     sites = models.ManyToManyField(Site)
+    project_sites = models.ManyToManyField(
+        Site, through=ProjectSite, related_name="project_sites"
+    )
 
     topics = models.ManyToManyField("Topic", related_name="projects", blank=True)
 
