@@ -1,0 +1,36 @@
+.hero {
+  position: relative;
+  color: white;
+  text-align: center;
+  padding: 7rem 20px;
+  background-size: cover;
+  background-position: center;
+  height: 25rem;
+}
+.hero .overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+}
+.hero .content {
+  position: relative;
+  z-index: 1;
+}
+
+.hero span {
+  display: block;
+  margin: 20px 0;
+  font-size: 1.2em;
+}
+.colored-back-section {
+  background: #f5f5fe;
+}
+ul {
+  padding-left: 1rem !important;
+}
+.column-title {
+  padding-left: 0.5rem !important;
+}
