@@ -173,6 +173,9 @@ class DeletedProjectOnSiteManager(CurrentSiteManager, DeletedProjectManager):
 
 
 class ProjectSite(models.Model):
+    class Meta:
+        unique_together = (("project", "origin"),)
+
     PROJECTSITE_STATES = (
         ("TO_MODERATE", "En attente de modération"),
         ("ACCEPTED", "Accepté"),
@@ -215,8 +218,7 @@ class Project(models.Model):
 
     all_on_site = ProjectOnSiteManager()
 
-    sites = models.ManyToManyField(Site)
-    project_sites = models.ManyToManyField(
+    sites = models.ManyToManyField(
         Site, through=ProjectSite, related_name="project_sites"
     )
 

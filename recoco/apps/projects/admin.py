@@ -96,6 +96,16 @@ class ProjectSwitchtenderTabularInline(admin.TabularInline):
     extra = 1
 
 
+class ProjectSiteTabularInline(admin.TabularInline):
+    model = models.ProjectSite
+    fields = (
+        "site",
+        "status",
+        "origin",
+    )
+    extra = 1
+
+
 @admin.register(models.Project)
 class ProjectAdmin(OrderedInlineModelAdminMixin, admin.ModelAdmin):
     search_fields = ["name"]
@@ -111,6 +121,7 @@ class ProjectAdmin(OrderedInlineModelAdminMixin, admin.ModelAdmin):
     list_display = ["created_on", "name", "location"]
     actions = [csvexport]
     inlines = (
+        ProjectSiteTabularInline,
         ProjectMemberTabularInline,
         ProjectSwitchtenderTabularInline,
         ProjectTaskTabularInline,
