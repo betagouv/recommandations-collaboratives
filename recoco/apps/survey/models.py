@@ -251,7 +251,7 @@ class Question(CloneMixin, models.Model):
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = (
-                slugify(self.text_short) if self.text_short else slugify(self.text)
+                slugify(self.text_short) if len(self.text_short) else slugify(self.text)
             )
         super().save(*args, **kwargs)
 

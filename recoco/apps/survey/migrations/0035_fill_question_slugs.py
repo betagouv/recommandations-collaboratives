@@ -10,7 +10,7 @@ def fill_question_slug_values(apps, schema_editor):
     for question in Question.objects.using(db_alias).filter(slug__isnull=True):
         question.slug = (
             slugify(question.text_short)
-            if question.text_short
+            if len(question.text_short)
             else slugify(question.text)
         )
         question.save()
