@@ -249,6 +249,21 @@ def test_question_precondition_fails():
     assert q.check_precondition(session) is False
 
 
+@pytest.mark.django_db
+def test_question_slug():
+    q = Recipe(
+        models.Question, text="Description précise de l'Action ?", text_short=None
+    ).make()
+    assert q.slug == "description-precise-de-laction"
+
+    q = Recipe(
+        models.Question,
+        text="Description précise de l'Action ?",
+        text_short="Description précise",
+    ).make()
+    assert q.slug == "description-precise"
+
+
 ########################################################################
 # Choices
 ########################################################################
