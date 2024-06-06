@@ -25,11 +25,14 @@
     <div class="container-fluid me-2">
       {% include 'header/menu-top-logo.html' %}
       <div>
+        {% include "header/menu-top-secondary.html" %}
+      </div>
+      <div style="margin-left: auto; margin-right: 0;">
         <div class="bg-white">{% include 'header/menu-top-user-tools.html' %}</div>
       </div>
     </div>
-    <div class="secondary-navbar container-fluid me-2 navbar-border-top navbar-shadow">
-      <div id="secondary-navbar" class="collapse pt-3 collapsed">{% include "header/menu-top-secondary.html" %}</div>
-    </div>
+    <!-- <div class="secondary-navbar container-fluid me-2 navbar-border-top navbar-shadow">
+      <div id="secondary-navbar" class="collapse pt-3 collapsed"></div>
+    </div> -->
   {% endif %}
 </nav>
