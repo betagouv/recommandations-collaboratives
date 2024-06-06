@@ -10,6 +10,7 @@ created : 2021-12-14 10:36:20 CEST
 
 from django import forms
 from markdownx.fields import MarkdownxFormField
+
 from recoco.apps.resources import models as resources_models
 
 from . import models

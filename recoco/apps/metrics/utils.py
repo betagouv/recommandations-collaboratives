@@ -1,6 +1,6 @@
-from django.db.models.functions import MD5, Cast, Concat
-from django.db.models import F, Value, TextField, When, Case, CharField
 from django.conf import settings
+from django.db.models import Case, CharField, F, TextField, Value, When
+from django.db.models.functions import MD5, Cast, Concat
 
 
 def hash_field(name: str, salt: str = ""):

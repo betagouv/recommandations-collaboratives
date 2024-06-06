@@ -16,6 +16,7 @@ from django.urls import reverse
 from model_bakery import baker
 from model_bakery.recipe import Recipe
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
+
 from recoco.apps.geomatics import models as geomatics
 from recoco.apps.projects import models as projects_models
 from recoco.utils import login

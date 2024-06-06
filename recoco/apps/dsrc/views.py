@@ -7,8 +7,8 @@ authors: patricia.boh@beta.gouv.fr
 created: 2024-02-05 17:36:35 CEST
 """
 
-from django.shortcuts import render
 from django.http import HttpResponseRedirect
+from django.shortcuts import render
 
 from . import forms
 

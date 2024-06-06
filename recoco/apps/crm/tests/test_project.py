@@ -4,6 +4,7 @@ from django.contrib.sites import models as site_models
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.text import capfirst, slugify
 from model_bakery import baker
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
@@ -13,7 +14,6 @@ from recoco.apps.projects import models as projects_models
 from recoco.utils import login
 
 from .. import models
-from django.utils.text import slugify, capfirst
 
 ########################################################################
 # list

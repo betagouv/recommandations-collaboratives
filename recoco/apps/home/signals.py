@@ -7,11 +7,10 @@ created: 2023-06-27 08:06:10 CEST
 
 from actstream import action
 from allauth.account.signals import user_logged_in as allauth_user_logged_in
-from magicauth.signals import user_logged_in as magicauth_user_logged_in
-
 from django.contrib.auth.models import update_last_login
 from django.contrib.auth.signals import user_logged_in
 from django.dispatch import receiver
+from magicauth.signals import user_logged_in as magicauth_user_logged_in
 
 from recoco import verbs
 

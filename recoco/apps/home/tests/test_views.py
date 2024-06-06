@@ -21,6 +21,7 @@ from guardian.shortcuts import assign_perm, remove_perm
 from magicauth import models as magicauth_models
 from model_bakery import baker
 from pytest_django.asserts import assertRedirects
+
 from recoco.apps.home import models as home_models
 from recoco.apps.onboarding import models as onboarding_models
 from recoco.apps.projects import models as projects_models

@@ -7,17 +7,16 @@ authors : raphael.marvie@beta.gouv.fr, guillaume.libersat@beta.gouv.fr
 created : 2021-06-01 09:54:36 CEST
 """
 
+import json
 import os
 from distutils.core import run_setup
 
-from dotenv import load_dotenv
 import requests
-import json
+from dotenv import load_dotenv
 from fabric import task
 from invoke import run as local
 
 import recoco
-
 
 load_dotenv()
 

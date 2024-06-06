@@ -8,10 +8,11 @@ created: 2021-06-08 09:56:53 CEST
 """
 import os
 from typing import Optional
+
 from django.conf import settings
-from django.core.files import File
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
+from django.core.files import File
 from django.db import transaction
 from guardian.shortcuts import assign_perm
 

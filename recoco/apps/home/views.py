@@ -18,20 +18,20 @@ from django.shortcuts import redirect, render
 from django.utils.decorators import method_decorator
 from django.views.generic import View
 from django.views.generic.base import TemplateView
+
+from recoco.apps.onboarding.forms import OnboardingEmailForm
 from recoco.apps.projects import models as projects
 from recoco.apps.projects.utils import (
     can_administrate_project,
     get_active_project,
 )
-from recoco.apps.tasks import models as tasks
 from recoco.apps.resources import models as resources_models
+from recoco.apps.tasks import models as tasks
 from recoco.utils import check_if_advisor
 
 from . import models
 from .forms import ContactForm, UserPasswordFirstTimeSetupForm
 from .utils import get_current_site_sender_email
-
-from recoco.apps.onboarding.forms import OnboardingEmailForm
 
 
 class HomePageView(TemplateView):
@@ -184,7 +184,7 @@ def send_message_to_team(request, data):
         name = data.get("name")
         email = data.get("email")
         content += f"\n\nfrom: {name} {email}"
-    content += "\nsource: " + request.META.get("HTTP_REFERER", "")
+    content += "\nsource: " + request.headers.get("referer", "")
 
     try:
         site_config = request.site.configuration

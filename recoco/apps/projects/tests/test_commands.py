@@ -8,16 +8,17 @@ created: 2024-01-22 15:26:00 CEST
 """
 
 import logging
+from datetime import datetime, timedelta
 
 import pytest
 from django.contrib.auth import models as auth_models
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.management import call_command
+from django.utils import timezone
 from model_bakery import baker
+
 from recoco.apps.projects import models as projects_models
 from recoco.utils import get_group_for_site
-from datetime import datetime, timedelta
-from django.utils import timezone
 
 
 @pytest.mark.django_db

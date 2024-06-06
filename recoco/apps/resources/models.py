@@ -21,10 +21,11 @@ from django.dispatch import receiver
 from django.shortcuts import reverse
 from django.utils import timezone
 from markdownx.utils import markdownify
-from recoco.apps.addressbook import models as addressbook_models
-from recoco.apps.geomatics import models as geomatics_models
 from taggit.managers import TaggableManager
 from watson import search as watson
+
+from recoco.apps.addressbook import models as addressbook_models
+from recoco.apps.geomatics import models as geomatics_models
 
 from . import apps
 

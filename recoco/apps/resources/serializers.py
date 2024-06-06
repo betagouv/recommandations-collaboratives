@@ -1,6 +1,6 @@
 from django.contrib.auth import models as auth_models
 from rest_framework import serializers
-from taggit.serializers import TaggitSerializer, TagListSerializerField
+from taggit.serializers import TagListSerializerField, TaggitSerializer
 
 from .models import Resource
 

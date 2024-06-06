@@ -16,9 +16,8 @@ projects = Project.objects.all()
 
 # %%
 
+from IPython.display import HTML, display
 from django.template import Context, Template
-from IPython.display import display, HTML
-
 
 # %%
 from notebooks.dsrc_doc.dsrc_utils import load_asset
@@ -32,8 +31,8 @@ component = load_asset("js/components/DsrcButton.js")
 # print(csscore.data)
 
 # %%
-from ipywidgets import widgets
 from IPython.display import Javascript, Markdown
+from ipywidgets import widgets
 
 out = widgets.Output(layout={"border": "1px solid black"})
 

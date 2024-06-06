@@ -1,13 +1,15 @@
-import pytest
-from django.core.management import call_command
 from unittest.mock import Mock, call
+
+import pytest
+from django.contrib.sites.models import Site
+from django.core.management import call_command
+from django.db import connection
 from django.db.backends.utils import CursorWrapper
+
 from recoco.apps.metrics.processor import (
     MaterializedView,
     MaterializedViewSpecError,
 )
-from django.contrib.sites.models import Site
-from django.db import connection
 
 
 class TestMaterializedView:

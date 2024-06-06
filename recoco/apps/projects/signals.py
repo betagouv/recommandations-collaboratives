@@ -2,25 +2,25 @@ import datetime
 
 import django.dispatch
 from actstream import action
-from django.db.models.signals import pre_delete, pre_save
 from actstream.models import action_object_stream
 from django.contrib.contenttypes.models import ContentType
+from django.db.models.signals import pre_delete, pre_save
 from django.dispatch import receiver
 from django.utils import timezone
 from notifications import models as notifications_models
 from notifications.signals import notify
+
 from recoco import verbs
 from recoco.apps.survey import signals as survey_signals
 from recoco.apps.training import utils as training_utils
 from recoco.utils import is_staff_for_site
 
 from . import models
-
 from .utils import (
+    get_advisors_for_project,
     get_notification_recipients_for_project,
     get_project_moderators,
     get_regional_actors_for_project,
-    get_advisors_for_project,
 )
 
 ########################################################################

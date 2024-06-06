@@ -16,7 +16,6 @@ from magicauth.urls import urlpatterns as magicauth_urls
 from wagtail import urls as wagtail_urls
 from wagtail.admin import urls as wagtailadmin_urls
 from wagtail.documents import urls as wagtaildocs_urls
-from recoco.rest_api.urls import urlpatterns as rest_api_urls
 
 from recoco.apps.addressbook.urls import urlpatterns as addressbook_urls
 from recoco.apps.crm.urls import urlpatterns as crm_urls
@@ -24,10 +23,10 @@ from recoco.apps.home.urls import urlpatterns as home_urls
 from recoco.apps.invites.urls import urlpatterns as invites_urls
 from recoco.apps.onboarding.urls import urlpatterns as onboarding_urls
 from recoco.apps.projects.urls import urlpatterns as projects_urls
-from recoco.apps.tasks.urls import urlpatterns as tasks_urls
 from recoco.apps.resources.urls import urlpatterns as resources_urls
 from recoco.apps.survey.urls import urlpatterns as survey_urls
-
+from recoco.apps.tasks.urls import urlpatterns as tasks_urls
+from recoco.rest_api.urls import urlpatterns as rest_api_urls
 
 urlpatterns = [
     path("api/", include(rest_api_urls)),

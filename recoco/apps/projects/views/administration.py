@@ -19,16 +19,17 @@ from django.utils import timezone
 from django.views.decorators.http import require_http_methods
 from guardian.shortcuts import get_perms
 from notifications import models as notifications_models
+from notifications.signals import notify
+
 from recoco import verbs
 from recoco.apps.geomatics import models as geomatics_models
 from recoco.apps.invites import models as invites_models
-from notifications.signals import notify
 from recoco.apps.invites.api import (
+    InviteAlreadyInvitedException,
+    InviteAlreadyMemberException,
     invite_collaborator_on_project,
     invite_resend,
     invite_revoke,
-    InviteAlreadyMemberException,
-    InviteAlreadyInvitedException,
 )
 from recoco.apps.invites.forms import InviteForm
 from recoco.utils import (
@@ -39,11 +40,11 @@ from recoco.utils import (
 
 from .. import forms, models
 from ..utils import (
+    get_advisors_for_project,
     is_regional_actor_for_project,
     refresh_user_projects_in_session,
     unassign_advisor,
     unassign_collaborator,
-    get_advisors_for_project,
 )
 
 ########################################################################

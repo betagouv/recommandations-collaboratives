@@ -1,5 +1,5 @@
-from django.db.models import Count, F, Q, QuerySet, Subquery, OuterRef, Func
 from django.contrib.postgres.aggregates import StringAgg
+from django.db.models import Count, F, Func, OuterRef, Q, QuerySet, Subquery
 
 from recoco.apps.projects.models import Project, ProjectSwitchtender
 from recoco.apps.tasks.models import Task

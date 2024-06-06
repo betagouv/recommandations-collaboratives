@@ -10,6 +10,7 @@ created: 2022-05-16 17:44:55 CET
 
 from django.contrib.auth import models as auth_models
 from rest_framework import serializers
+
 from recoco.apps.addressbook.serializers import OrganizationSerializer
 
 from .models import UserProfile

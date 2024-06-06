@@ -1,5 +1,4 @@
 import pytest
-
 from django.contrib.auth import models as auth_models
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
