@@ -28,6 +28,8 @@
   --display-spacing: ;
   // --display-spacing: 0 0 2rem;
   --background-action-high-blue-france: #0063CB;
+  --text-active-blue-france: #0063CB;
+  --border-active-blue-france: #0063CB;
   --bs-link-color-rgb: 51, 91, 126;
 }
 
@@ -456,4 +458,12 @@ a.fr-btn {
 .btn-outline-secondary:hover,
 .btn-outline-primary:hover {
   color: inherit;
+}
+
+.fr-segmented__element input:checked+label {
+  font-weight: 700;
+}
+
+.fr-segmented__legend .inline {
+  display: inline;
 }

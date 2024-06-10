@@ -53,7 +53,7 @@
     {% get_obj_perms request.user for request.site as "user_site_perms" %}
     <div class="col-11 py-5 mx-auto">
         <div class="row">
-            <div class="d-flex flex-column border p-0 m-0">
+            <div class="d-flex flex-column p-0 m-0">
                 {% block project_list_content %}{% endblock %}
             </div>
         </div>
