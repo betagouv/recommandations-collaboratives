@@ -58,3 +58,5 @@ django-reversion==5.0.2
 django-reversion-compare==0.17.0
 
 wagtail==6.1.2
+
+metabase-api==3.4

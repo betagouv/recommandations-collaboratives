@@ -391,4 +391,8 @@ MATERIALIZED_VIEWS_SPEC = [
 MATERIALIZED_VIEWS_SQL_DIR = BASE_DIR / "apps/metrics/sql_queries"
 MATERIALIZED_VIEWS_PREFIX = "mv"
 
+# Metabase
+METABASE_HOST = os.environ.get("METABASE_HOST")
+METABASE_API_KEY = os.environ.get("METABASE_API_KEY")
+
 # eof
