@@ -22,6 +22,7 @@ services:
       SECRET_KEY: SECRET_KEY
     ports:
       - 8000:8000
+
   front:
     build:
       context: ..
@@ -35,6 +36,7 @@ services:
     command: bash -c "yarn install && yarn dev"
     ports:
       - 3000:3000
+
   db:
     image: postgres:13.5
     restart: unless-stopped
@@ -46,6 +48,12 @@ services:
       POSTGRES_PASSWORD: postgres
     ports:
       - 5432:5432
+
+  broker:
+    image: redis:7-alpine
+    restart: unless-stopped
+    ports:
+      - 6379:6379
 
 volumes:
   postgres-data:
