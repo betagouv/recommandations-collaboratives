@@ -28,6 +28,10 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
+        source_collection_id = options["source_collection_id"]
+        new_collection_name = options["new_collection_name"]
+        target_schema = options["target_schema"]
+
         # https://pypi.org/project/metabase-api/
         # https://www.metabase.com/docs/latest/api-documentation
         # authentication using API key (is_admin=False is set to avoid friendly table name alert)
@@ -46,44 +50,35 @@ class Command(BaseCommand):
 
             self.table_ids[schema][table["name"]] = table["id"]
 
-        # launch duplication
-        self.duplicate_cards_from_collection(
-            mb,
-            options["source_collection_id"],
-            options["new_collection_name"],
-            options["target_schema"],
+        # fetch source dashboard to get dashcards info
+        dashboards = mb.get(
+            f"/api/collection/{options['source_collection_id']}/items?models=dashboard"
         )
-
-    def duplicate_cards_from_collection(
-        self,
-        mb: Metabase_API,
-        source_collection_id: int,
-        new_collection_name: str,
-        target_schema: str,
-    ):
-        """Create new collection and iterate on all cards, if collection match source_collection_id, clone the card
-
-        Args:
-            mb (Metabase_API): Metabase Client
-            source_collection_id (int): id of collection to duplicate
-            new_collection_name (str): name of new collection to create
-            target_schema (str): schema of new collection to create
-        """
+        source_dashboard_data = mb.get_item_info(
+            "dashboard", dashboards["data"][0]["id"]
+        )
 
         # create new collection
         new_collection = mb.create_collection(
             new_collection_name, parent_collection_name="Root", return_results=True
         )
+        self.stdout.write(
+            self.style.SUCCESS(f"The collection '{new_collection_name}' was created")
+        )
 
-        cards = mb.get(f"/api/collection/{source_collection_id}/items?models=card")
-        for source_card in cards["data"]:
+        # duplicate cards from source collection to new one
+        source_cards = mb.get(
+            f"/api/collection/{source_collection_id}/items?models=card"
+        )
+        cards_old_vs_new_ids = {}
+        for source_card in source_cards["data"]:
             # get needed card data like table_id
             source_card_data = mb.get_item_info("card", source_card["id"])
 
             # TODO: can be optimized by calling only once per table with cache
             table_source = mb.get(f"/api/table/{source_card_data['table_id']}")
             table_name = table_source["name"]
-            self.clone_card(
+            new_card = self.clone_card(
                 mb=mb,
                 db_id=table_source["db_id"],
                 card_id=source_card["id"],
@@ -94,6 +89,59 @@ class Command(BaseCommand):
                 target_table_id=self.table_ids[target_schema][table_name],
                 new_card_collection_id=new_collection["id"],
             )
+            # keep ids mapping to get dashcard info
+            cards_old_vs_new_ids[source_card["id"]] = new_card["id"]
+
+            self.stdout.write(
+                self.style.SUCCESS(f"The card '{new_card['name']}' was created")
+            )
+
+        # create new dashboard
+        new_dashboard_data = {
+            "name": new_collection_name,  # same name as collection
+            "collection_id": new_collection["id"],
+        }
+        new_dashboard = mb.post("/api/dashboard/", json=new_dashboard_data)
+        self.stdout.write(
+            self.style.SUCCESS(f"The dashboard '{new_collection_name}' was created")
+        )
+
+        dashcards = []
+        for dashcard in source_dashboard_data["dashcards"]:
+
+            # init new card with id card switch
+            new_dashcard = {
+                "id": -1,
+                "card_id": cards_old_vs_new_ids[dashcard["card_id"]],
+            }
+            # add same position keys
+            for key_to_duplicate in [
+                "visualization_settings",
+                "size_x",
+                "size_y",
+                "col",
+                "row",
+                "parameter_mappings",
+            ]:
+                new_dashcard[key_to_duplicate] = dashcard[key_to_duplicate]
+            dashcards.append(new_dashcard)
+
+            # dashcard creation need to send one by one with id -1
+            res_dashcard_creation = mb.put(
+                f"/api/dashboard/{new_dashboard['id']}",
+                "raw",
+                json={"id": new_dashboard["id"], "dashcards": dashcards},
+            )
+            if res_dashcard_creation.ok:
+                dashcard_creation = res_dashcard_creation.json()
+                dashcards = dashcard_creation["dashcards"]
+                self.stdout.write(
+                    self.style.SUCCESS(
+                        f"The card '{dashcards[-1]['card']['name']}' has been added to thee dashboard"
+                    )
+                )
+            else:
+                self.stdout.write(self.style.ERROR(res_dashcard_creation.text))
 
     def clone_card(
         self,
