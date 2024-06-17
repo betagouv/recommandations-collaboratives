@@ -1,5 +1,6 @@
 from django.urls import path
 
+from notifications import views as notifications_views
 from rest_framework import routers
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
@@ -100,6 +101,11 @@ api_urls = [
         "notifications/mark-all-as-read",
         home_rest.UserNotificationsMarkAllAsRead.as_view(),
         name="notifications-mark-all-as-read",
+    ),
+    path(
+        "notifications/unread_list",
+        notifications_views.live_unread_notification_list,
+        name="notifications-unread-list",
     ),
 ]
 
