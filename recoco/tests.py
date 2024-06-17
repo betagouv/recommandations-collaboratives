@@ -8,6 +8,7 @@ from guardian.shortcuts import assign_perm
 from rest_framework.test import APIClient
 from model_bakery.recipe import Recipe
 from model_bakery import baker
+from autoslug import AutoSlugField
 
 from recoco.apps.projects import models as projects_models
 from recoco.apps.resources import models as resources_models
@@ -178,3 +179,12 @@ def test_assign_site_staff(client, request):
     staff_group = utils.get_group_for_site("staff", site)
     assert user in staff_group.user_set.all()
     assert site in user.profile.sites.all()
+
+
+class CustomBaker(baker.Baker):
+    def get_fields(self):
+        return [
+            field
+            for field in super(CustomBaker, self).get_fields()
+            if not isinstance(field, AutoSlugField)
+        ]
