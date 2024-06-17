@@ -303,6 +303,17 @@ def get_active_project_id(request):
     return request.session.get("active_project", None)
 
 
+def get_projects_for_user(user, site):
+    memberships = models.ProjectMember.objects.filter(
+        Q(project__sites=site),
+        Q(project__deleted=None),
+        Q(member=user),
+        Q(is_owner=True) | Q(~Q(project__projectsite__status="DRAFT"), is_owner=False),
+    )
+
+    return [m.project for m in memberships.all()]
+
+
 def get_active_project(request):
     """Return the active project for a given user"""
     if not request.user.is_authenticated:
@@ -318,15 +329,10 @@ def get_active_project(request):
             pass
     else:
         try:
-            memberships = models.ProjectMember.objects.filter(
-                Q(project__sites=get_current_site(request)),
-                Q(project__deleted=None),
-                Q(member=request.user),
-                Q(is_owner=True) | Q(~Q(project__status="DRAFT"), is_owner=False),
-            )
+            projects = get_projects_for_user(request.user, request.site)
 
-            if memberships.first():
-                project = memberships.first().project
+            if projects:
+                project = projects[0]
 
         except models.Project.DoesNotExist:
             pass
@@ -342,18 +348,7 @@ def set_active_project_id(request, project_id: int):
 def refresh_user_projects_in_session(request, user):
     """store the user projects in the session"""
 
-    memberships = models.ProjectMember.objects.filter(
-        Q(project__sites=get_current_site(request)),
-        Q(project__deleted=None),
-        Q(member=user),
-        Q(is_owner=True) | Q(~Q(project__status="DRAFT"), is_owner=False),
-    )
-
-    projects = [m.project for m in memberships.all()]
-
-    # projects = models.Project.objects.filter(deleted=None).filter(
-    #    Q(members=user) | Q(~Q(status="DRAFT"), members=user)
-    # )
+    projects = get_projects_for_user(user, request.site)
 
     request.session["projects"] = list(
         {

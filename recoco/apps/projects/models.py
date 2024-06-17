@@ -174,12 +174,22 @@ class DeletedProjectOnSiteManager(CurrentSiteManager, DeletedProjectManager):
 
 class ProjectSite(models.Model):
     class Meta:
-        unique_together = (("project", "origin"),)
+        constraints = [
+            models.UniqueConstraint(
+                fields=["project", "site", "origin"],
+                condition=Q(origin=True),
+                name="unique_origin_site",
+            )
+        ]
 
     PROJECTSITE_STATES = (
-        ("TO_MODERATE", "En attente de modération"),
-        ("ACCEPTED", "Accepté"),
-        ("REFUSED", "Refusé"),
+        ("DRAFT", "Brouillon"),
+        ("TO_PROCESS", "A traiter"),
+        ("READY", "En attente"),  # FIXME A renommer en validé ?
+        ("IN_PROGRESS", "En cours"),
+        ("DONE", "Traité"),
+        ("STUCK", "Conseil Interrompu"),
+        ("REJECTED", "Refusé"),
     )
 
     project = models.ForeignKey(
@@ -189,26 +199,16 @@ class ProjectSite(models.Model):
     site = models.ForeignKey(
         Site,
         on_delete=models.CASCADE,
+        limit_choices_to={"is_staff": True},
     )
     status = models.CharField(
-        max_length=20, choices=PROJECTSITE_STATES, default="TO_MODERATE"
+        max_length=20, choices=PROJECTSITE_STATES, default="DRAFT"
     )
     origin = models.BooleanField(default=False)
 
 
 class Project(models.Model):
     """Représente un project de suivi d'une collectivité"""
-
-    PROJECT_STATES = (
-        ("DRAFT", "Brouillon"),
-        ("TO_PROCESS", "A traiter"),
-        ("READY", "En attente"),  # FIXME A renommer en validé ?
-        ("IN_PROGRESS", "En cours"),
-        ("DONE", "Traité"),
-        ("STUCK", "Conseil Interrompu"),
-        # ^ replace by:("STANDBY", "En attente"), FIXME
-        ("REJECTED", "Rejeté"),
-    )
 
     objects = ActiveProjectManager()
     objects_deleted = DeletedProjectManager()
@@ -250,8 +250,6 @@ class Project(models.Model):
         verbose_name="Déposé par",
         related_name="projects_submitted",
     )
-
-    status = models.CharField(max_length=20, choices=PROJECT_STATES, default="DRAFT")
 
     members = models.ManyToManyField(auth_models.User, through="ProjectMember")
 

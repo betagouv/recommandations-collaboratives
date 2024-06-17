@@ -115,7 +115,6 @@ class ProjectAdmin(OrderedInlineModelAdminMixin, admin.ModelAdmin):
         "exclude_stats",
         "publish_to_cartofriches",
         RecommendationListFilter,
-        "status",
         "tags",
     ]
     list_display = ["created_on", "name", "location"]
@@ -130,7 +129,7 @@ class ProjectAdmin(OrderedInlineModelAdminMixin, admin.ModelAdmin):
 
 @admin.register(models.UserProjectStatus)
 class UserProjectStatusAdmin(admin.ModelAdmin):
-    list_display = ["project", "user", "status"]
+    list_display = ["project", "status", "user"]
 
     list_filter = ["site"]
     list_select_related = ("project__commune", "user")
