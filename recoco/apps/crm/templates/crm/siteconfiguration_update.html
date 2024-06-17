@@ -5,6 +5,8 @@
 {% load humanize %}
 {% load training %}
 {% load hijack %}
+{% load crispy_forms_tags %}
+{% load crispy_forms_field %}
 {% block title %}Configuration du Site - CRM{% endblock %}
 {% block js %}
     {% vite_asset 'js/apps/crm.js' %}
@@ -30,13 +32,11 @@
                     <h3>Paramètres du Site</h3>
                 </div>
             </div>
-
             <form method="POST" enctype="multipart/form-data">
                 {% csrf_token %}
-                {{ form.as_p }}
+                {{ form|crispy }}
                 <button type="submit">Sauvegarder</button>
             </form>
-
         </div>
     </div>
 {% endblock %}
