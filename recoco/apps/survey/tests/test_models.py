@@ -251,21 +251,27 @@ def test_question_precondition_fails():
 
 @pytest.mark.django_db
 def test_question_slug():
-    q = Recipe(
-        models.Question,
-        slug=None,
-        text="Description précise de l'Action ?",
-    ).make()
+    q_set = Recipe(models.QuestionSet).make()
+
+    q = models.Question.objects.create(
+        question_set=q_set, text="Description précise de l'Action ?"
+    )
     assert q.text_short == ""
     assert q.slug == "description-precise-de-laction"
 
-    q = Recipe(
-        models.Question,
-        slug=None,
+    q = models.Question.objects.create(
+        question_set=q_set,
         text="Description précise de l'Action ?",
         text_short="Description précise",
-    ).make()
+    )
     assert q.slug == "description-precise"
+
+    q = models.Question.objects.create(
+        question_set=q_set,
+        text="Description précise de l'Action ?",
+        text_short="Description précise",
+    )
+    assert q.slug == "description-precise-2"
 
 
 ########################################################################
