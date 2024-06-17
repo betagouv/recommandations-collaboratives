@@ -457,3 +457,12 @@ a.fr-btn {
 .btn-outline-primary:hover {
   color: inherit;
 }
+
+/**
+ * UTILS
+ **/
+
+.no-pointer {
+  cursor: default !important;
+  text-decoration: none !important;
+}

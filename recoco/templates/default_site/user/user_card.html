@@ -14,8 +14,8 @@
     <div class="position-relative d-flex align-items-center justify-content-between {% if user_activity %}w-100{% endif %}">
         <button x-ref="user"
                 type="button"
-                @click="onUserClick"
-                class="d-flex align-items-center flex-wrap user-info border-0 p-0 bg-transparent"
+                {% if user_popup_activate %}@click="onUserClick"{% endif %}
+                class="d-flex align-items-center flex-wrap user-info border-0 p-0 bg-transparent {% if not user_popup_activate %}no-pointer{% endif %}"
                 data-test-id="button-open-tooltip-user-card">
             <span class="me-1 d-flex align-items-center font-very-small">
                 <img class="rounded-circle me-1 {% if not user.is_active %}border-0{% elif position.is_advisor %}advisor-border border-2{% elif position.is_observer %}observer-border border-2{% else %}neutral-role-border border-2{% endif %}"
@@ -42,11 +42,19 @@
             {% endif %}
         </button>
         {% if 'use_crm' in user_site_perms and user_activity %}
-            <a class="small ms-1" href="{% url 'crm-user-details' user.pk %}">
-                <svg class="bi me-1" width="16" height="16" fill="currentColor">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#activity" />
-                </svg>
-            </a>
+            {% if not disable_links %}
+                <a class="small ms-1" href="{% url 'crm-user-details' user.pk %}">
+                    <svg class="bi me-1" width="16" height="16" fill="currentColor">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#activity" />
+                    </svg>
+                </a>
+            {% else %}
+                <span class="small ms-1">
+                    <svg class="bi me-1" width="16" height="16" fill="currentColor">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#activity" />
+                    </svg>
+                </span>
+            {% endif %}
         {% endif %}
     </div>
     <div x-cloak
@@ -113,7 +121,11 @@
                              fill="currentColor">
                             <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#link-45deg" />
                         </svg>
-                        <a class="text-decoration-none text-blue" href="mailto:{{ user.email }}">{{ user.email }}</a>
+                        {% if not disable_links %}
+                            <a class="text-decoration-none text-blue" href="mailto:{{ user.email }}">{{ user.email }}</a>
+                        {% else %}
+                            {{ user.email }}
+                        {% endif %}
                     </div>
                     <button class="ms-4 px-2 py-0 btn small btn-outline-primary"
                             @click="clipboardCopy(`L'email`, '{{ user.email }}')">
@@ -132,8 +144,12 @@
                              fill="currentColor">
                             <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#telephone" />
                         </svg>
-                        <a class="text-decoration-none text-blue"
-                           href="tel:{{ user.profile.phone_no }}">{{ user.profile.phone_no|format_phone }}</a>
+                        {% if not disable_links %}
+                            <a class="text-decoration-none text-blue"
+                               href="tel:{{ user.profile.phone_no }}">{{ user.profile.phone_no|format_phone }}</a>
+                        {% else %}
+                            {{ user.profile.phone_no|format_phone }}
+                        {% endif %}
                     </div>
                     <button class="ms-4 px-2 py-0 btn small btn-outline-primary"
                             @click="clipboardCopy('Le numéro de téléphone', '{{ user.profile.phone_no }}')">
