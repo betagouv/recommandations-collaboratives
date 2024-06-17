@@ -8,14 +8,7 @@ def populate_multisite_m2m(apps, schema_editor):
 
     for p in Project.objects.all():
         for s in p.sites.all():
-            if p.status == "DRAFT":
-                status = "TO_MODERATE"
-            elif p.status == "REJECTED":
-                status = "REJECTED"
-            else:
-                status = "ACCEPTED"
-
-            p.projectsite_set.create(site=s, status=status)
+            p.projectsite_set.create(site=s, status=p.status)
 
         first_site = p.projectsite_set.first()
         if first_site:
