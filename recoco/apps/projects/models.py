@@ -172,12 +172,34 @@ class DeletedProjectOnSiteManager(CurrentSiteManager, DeletedProjectManager):
     pass
 
 
+class ProjectSiteQuerySet(models.QuerySet):
+    """Specific filters for Project Sites"""
+
+    def current(self):
+        """Return the data associated with the current site"""
+        current_site = Site.objects.get_current()
+
+        return self.get(site=current_site)
+
+    def origin(self):
+        """Return the site where the project was originally submitted"""
+        return self.get(is_origin=True)
+
+    def moderated(self):
+        """Filter out sites where this project is not yet validated"""
+        return self.exclude(status="DRAFT")
+
+    def to_moderate(self):
+        """List only sites where this project needs moderation"""
+        return self.filter(status="DRAFT")
+
+
 class ProjectSite(models.Model):
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=["project", "site", "origin"],
-                condition=Q(origin=True),
+                fields=["project", "site", "is_origin"],
+                condition=Q(is_origin=True),
                 name="unique_origin_site",
             )
         ]
@@ -192,19 +214,22 @@ class ProjectSite(models.Model):
         ("REJECTED", "Refusé"),
     )
 
+    objects = ProjectSiteQuerySet.as_manager()
+
     project = models.ForeignKey(
-        "Project",
-        on_delete=models.CASCADE,
+        "Project", on_delete=models.CASCADE, related_name="project_sites"
     )
+
     site = models.ForeignKey(
         Site,
         on_delete=models.CASCADE,
-        limit_choices_to={"is_staff": True},
     )
+
     status = models.CharField(
         max_length=20, choices=PROJECTSITE_STATES, default="DRAFT"
     )
-    origin = models.BooleanField(default=False)
+
+    is_origin = models.BooleanField(default=False)
 
 
 class Project(models.Model):
