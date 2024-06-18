@@ -96,17 +96,17 @@
                                 <span>Configuration</span>
                             </h5>
                             <ul class="d-flex m-0 p-0 align-items-center list-unstyled row">
-                                {% if is_staff %}
+                                {% if "manage_configuration" in user_site_perms %}
                                     <li class="me-2 col-2">
                                         {% url 'crm-site-configuration' as url %}
                                         {% include "crm/fragments/crm_icon_button.html" with link_url=url name="Réglages du Site" icon="gear" %}
                                     </li>
+                                {% endif %}
                                     <li class="me-2 col-2">
                                         {% url 'projects-task-recommendation-list' as url %}
                                         {% include "crm/fragments/crm_icon_button.html" with link_url=url name="Pré-fléchage" icon="signpost-fill" %}
                                     </li>
 
-                                    {% endif %}
                                 {% if request.site.configuration.project_survey and "manage_surveys" in user_site_perms %}
                                     <li class="me-2 col-2">
                                         {% url 'survey-editor-survey-details' request.site.configuration.project_survey_id as url %}

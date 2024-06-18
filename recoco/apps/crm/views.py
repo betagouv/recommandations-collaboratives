@@ -152,7 +152,7 @@ def crm_search(request):
 ########################################################################
 # tenancy
 ########################################################################
-class SiteConfigurationUpdateView(UpdateView):
+class SiteConfigurationUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = home_models.SiteConfiguration
     fields = [
         "sender_email",
@@ -169,6 +169,11 @@ class SiteConfigurationUpdateView(UpdateView):
     ]
     template_name = "crm/siteconfiguration_update.html"
     success_url = reverse_lazy("crm-site-dashboard")
+
+    def test_func(self):
+        return has_perm(
+            self.request.user, "sites.manage_configuration", self.request.site
+        )
 
     def get_object(self, queryset=None):
         return self.request.site.configuration

@@ -9,11 +9,13 @@ created: 2021-11-15 14:44:55 CET
 
 from actstream.managers import ActionManager
 from django.contrib.auth import models as auth
+from django.contrib.auth import models as auth_models
 from django.contrib.auth.models import Permission
+from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.managers import CurrentSiteManager
 from django.contrib.sites.models import Site
 from django.db import models
-from django.db.models.signals import post_save
+from django.db.models.signals import post_migrate, post_save
 from django.dispatch import receiver
 from django.utils.encoding import force_str
 from guardian.core import ObjectPermissionChecker
@@ -27,9 +29,11 @@ from guardian.models import (
     UserObjectPermissionBase,
 )
 from phonenumber_field.modelfields import PhoneNumberField
-from taggit.managers import TaggableManager
 from recoco.apps.addressbook import models as addressbook_models
 from recoco.apps.geomatics import models as geomatics
+from taggit.managers import TaggableManager
+
+from . import apps
 
 SITE_GROUP_PERMISSIONS = {
     "staff": (
@@ -41,9 +45,23 @@ SITE_GROUP_PERMISSIONS = {
         "sites.use_addressbook",
         "sites.use_project_tags",
     ),
-    "admin": ("sites.manage_surveys",),
+    "admin": ("sites.manage_surveys", "sites.manage_configuration"),
     "advisor": ("sites.list_projects",),
 }
+
+
+# We need the permission to be associated to the site and not to the surveys
+@receiver(post_migrate)
+def create_site_permissions(sender, **kwargs):
+    if sender.name != apps.HomeConfig.name:
+        return
+
+    site_ct = ContentType.objects.get(app_label="sites", model="site")
+    auth_models.Permission.objects.get_or_create(
+        codename="manage_configuration",
+        name="Can manage the configuration",
+        content_type=site_ct,
+    )
 
 
 class SiteActionManager(CurrentSiteManager, ActionManager):
@@ -338,7 +356,7 @@ def get_user_perms(self, obj):
 
     ctype = get_content_type(obj)
 
-    if uv_utils.is_staff_for_site(self.user):
+    if uv_utils.is_admin_for_site(self.user):
         return list(
             Permission.objects.filter(
                 content_type=ctype,

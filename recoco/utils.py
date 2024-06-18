@@ -80,6 +80,15 @@ def is_staff_for_site(user, site=None):
     return user.groups.filter(name=group_name).exists()
 
 
+def is_admin_for_site(user, site=None):
+    if user.is_superuser:
+        return True
+
+    site = site or Site.objects.get_current()
+    group_name = make_group_name_for_site("admin", site)
+    return user.groups.filter(name=group_name).exists()
+
+
 def is_staff_for_site_or_403(user, site=None):
     """Raise a 403 error is user is not a staff member"""
     if not is_staff_for_site(user, site):
