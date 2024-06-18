@@ -61,3 +61,4 @@ wagtail==6.1.2
 
 celery==5.4.0
 redis==5.0.4
+django-autoslug==1.9.9

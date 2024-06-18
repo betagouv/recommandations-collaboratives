@@ -15,7 +15,7 @@ from recoco.apps.projects import models as projects_models
 from django.contrib.contenttypes.models import ContentType
 from django.db.models.signals import post_migrate
 from django.dispatch import receiver
-
+from autoslug import AutoSlugField
 from model_clone import CloneMixin
 
 from .utils import compute_qs_completion
@@ -158,6 +158,11 @@ class Question(CloneMixin, models.Model):
     text_short = models.CharField(
         max_length=32, verbose_name="Texte court de la question", default=""
     )
+
+    def _populate_slug(self) -> str:
+        return self.text_short if len(self.text_short) else self.text
+
+    slug = AutoSlugField(unique=True, populate_from=_populate_slug)
 
     how = models.TextField(default="", blank=True, verbose_name="Comment ?")
 

@@ -392,4 +392,8 @@ MATERIALIZED_VIEWS_SPEC = [
 
 MATERIALIZED_VIEWS_SQL_DIR = BASE_DIR / "apps/metrics/sql_queries"
 
+# Baker
+# https://model-bakery.readthedocs.io/en/latest/how_bakery_behaves.html#customizing-baker
+BAKER_CUSTOM_CLASS = "recoco.tests.CustomBaker"
+
 # eof
