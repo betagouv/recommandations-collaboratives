@@ -7,19 +7,19 @@ authors: guillaume.libersat@beta.gouv.fr, raphael.marvie@beta.gouv.fr
 created: 2023-07-10 14:07:17 CEST
 """
 
-import pytest
-from model_bakery import baker
 from io import StringIO
 
+import pytest
 from django.conf import settings
 from django.contrib.auth import models as auth_models
 from django.contrib.sites.models import Site
-from django.core.management.base import CommandError
 from django.core.management import call_command
+from django.core.management.base import CommandError
+from model_bakery import baker
+
 from recoco.apps.addressbook import models as addressbook_models
 from recoco.apps.home.models import SiteConfiguration
 from recoco.utils import get_group_for_site, is_staff_for_site
-
 
 from ..management.commands import cleanuporgs
 

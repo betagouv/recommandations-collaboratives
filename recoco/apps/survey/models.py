@@ -2,25 +2,25 @@ import math
 import statistics
 from datetime import timedelta
 
+from autoslug import AutoSlugField
 from django.contrib.auth import models as auth_models
+from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.managers import CurrentSiteManager
 from django.contrib.sites.models import Site
 from django.db import models
+from django.db.models.signals import post_migrate
+from django.dispatch import receiver
 from django.utils import timezone
 from markdownx.utils import markdownify
+from model_clone import CloneMixin
 from tagging.fields import TagField
 from tagging.models import Tag
 from tagging.registry import register as tagging_register
-from recoco.apps.projects import models as projects_models
-from django.contrib.contenttypes.models import ContentType
-from django.db.models.signals import post_migrate
-from django.dispatch import receiver
-from autoslug import AutoSlugField
-from model_clone import CloneMixin
 
-from .utils import compute_qs_completion
+from recoco.apps.projects import models as projects_models
 
 from . import apps
+from .utils import compute_qs_completion
 
 
 # We need the permission to be associated to the site and not to the surveys

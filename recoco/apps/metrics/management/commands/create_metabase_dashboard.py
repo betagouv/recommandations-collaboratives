@@ -1,4 +1,5 @@
 from django.core.management.base import BaseCommand
+
 from recoco.apps.metrics.metabase import clone_collection
 
 

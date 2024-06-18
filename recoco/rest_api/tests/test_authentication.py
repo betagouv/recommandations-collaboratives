@@ -1,9 +1,9 @@
-import pytest
-from django.urls import reverse
-from django.contrib.auth import get_user_model
-from django.conf import settings
-from model_bakery import baker
 import jwt
+import pytest
+from django.conf import settings
+from django.contrib.auth import get_user_model
+from django.urls import reverse
+from model_bakery import baker
 
 
 @pytest.mark.django_db

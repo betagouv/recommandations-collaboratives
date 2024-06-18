@@ -16,6 +16,7 @@ from django.utils import timezone
 from model_bakery import baker
 from notifications.signals import notify
 from rest_framework.test import APIClient
+
 from recoco import verbs
 from recoco.apps.projects import models as project_models
 from recoco.apps.projects import utils

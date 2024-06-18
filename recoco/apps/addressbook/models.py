@@ -16,6 +16,7 @@ from django.db import models
 from django.db.models.functions import Lower
 from django.db.models.signals import post_migrate
 from django.dispatch import receiver
+
 from recoco.apps.geomatics import models as geomatics_models
 
 from . import apps

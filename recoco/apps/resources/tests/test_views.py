@@ -9,16 +9,17 @@ created: 2021-06-16 17:56:10 CEST
 
 from datetime import datetime
 
-from reversion.models import Version
-import reversion
-from django.db import transaction
 import pytest
+import reversion
 from django.contrib.sites.models import Site
 from django.contrib.sites.shortcuts import get_current_site
+from django.db import transaction
 from django.urls import reverse
 from model_bakery import baker
 from model_bakery.recipe import Recipe
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
+from reversion.models import Version
+
 from recoco.apps.geomatics import models as geomatics
 from recoco.apps.projects import models as projects_models
 from recoco.utils import login

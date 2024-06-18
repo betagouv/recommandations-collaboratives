@@ -1,6 +1,7 @@
 import django.dispatch
 from actstream import action
 from django.dispatch import receiver
+
 from recoco import verbs
 
 survey_session_started = django.dispatch.Signal()

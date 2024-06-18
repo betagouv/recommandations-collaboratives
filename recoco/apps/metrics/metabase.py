@@ -1,5 +1,5 @@
-import re
 import ast
+import re
 
 from django.conf import settings
 from metabase_api import Metabase_API

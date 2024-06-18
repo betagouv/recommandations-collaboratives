@@ -1,15 +1,16 @@
 from collections import defaultdict
+
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ImproperlyConfigured
+from django.core.serializers import serialize
 from django.db.models import Q
 from django.utils.timezone import localtime
-
 from notifications import models as notifications_models
+
 from recoco.apps.projects import models as projects_models
 from recoco.apps.survey import models as survey_models
 from recoco.apps.tasks import models as tasks_models
 from recoco.utils import check_if_advisor, get_site_config_or_503
-from django.core.serializers import serialize
 
 from .utils import can_administrate_project, get_active_project
 

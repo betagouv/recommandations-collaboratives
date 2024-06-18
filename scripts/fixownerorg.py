@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.contrib.sites.models import Site
+
 from recoco.apps.addressbook import models as addressbook_models
 from recoco.apps.projects import models as projects_models
 

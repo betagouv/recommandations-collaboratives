@@ -1,11 +1,12 @@
-from pathlib import Path
-from django.db.backends.utils import CursorWrapper
-from django.contrib.sites.models import Site
 import importlib
-from django.db.models import QuerySet
-from typing import Any
-from django.conf import settings
 from dataclasses import dataclass
+from pathlib import Path
+from typing import Any
+
+from django.conf import settings
+from django.contrib.sites.models import Site
+from django.db.backends.utils import CursorWrapper
+from django.db.models import QuerySet
 
 from recoco.utils import make_site_slug
 

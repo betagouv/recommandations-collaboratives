@@ -12,30 +12,33 @@ import reversion
 from django import forms
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.contrib.auth.mixins import (
+    LoginRequiredMixin,
+    PermissionRequiredMixin,
+    UserPassesTestMixin,
+)
 from django.contrib.sites.shortcuts import get_current_site
 from django.contrib.syndication.views import Feed
-from django.db.models import Q
 from django.db import transaction
+from django.db.models import Q
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.template import TemplateDoesNotExist
 from django.template.loader import get_template
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
-from django.views.generic.detail import View, DetailView
+from django.views.generic.detail import DetailView, View
 from django.views.generic.edit import DeleteView
 from markdownx.fields import MarkdownxFormField
+from reversion.models import Version
+from reversion_compare.views import HistoryCompareDetailView
+
 from recoco.apps.addressbook import models as addressbook_models
 from recoco.apps.geomatics import models as geomatics_models
 from recoco.apps.projects import models as projects
 from recoco.utils import check_if_advisor, has_perm, has_perm_or_403, is_staff_for_site
-from reversion_compare.views import HistoryCompareDetailView
-from reversion.models import Version
 
 from . import models
-
 
 ########################################################################
 # Searching resources

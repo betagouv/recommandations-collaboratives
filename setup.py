@@ -6,8 +6,7 @@ Setup for recoco deployment
 For sdist deployments, do not forget MANIFEST.in file to include all the data files.
 """
 
-from setuptools import setup
-from setuptools import find_packages
+from setuptools import find_packages, setup
 
 import recoco
 

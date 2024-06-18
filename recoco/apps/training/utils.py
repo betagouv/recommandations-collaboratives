@@ -8,6 +8,7 @@ created: 2023-08-21 14:28:45 CEST
 """
 
 import datetime
+
 from django.utils import timezone
 
 from . import models

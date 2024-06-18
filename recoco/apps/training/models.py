@@ -15,7 +15,6 @@ from django.contrib.sites import models as site_models
 from django.contrib.sites.managers import CurrentSiteManager
 from django.db import models
 
-
 ########################################################################
 # Challenges definitions
 ########################################################################

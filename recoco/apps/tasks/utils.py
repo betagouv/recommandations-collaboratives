@@ -10,6 +10,7 @@ created: <2021-09-13 lun. 15:38>
 
 
 from django.urls import reverse
+
 from recoco import utils as uv_utils
 from recoco.apps.reminders import api
 

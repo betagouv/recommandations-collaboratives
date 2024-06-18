@@ -14,8 +14,8 @@ from actstream.models import Action, actor_stream, target_stream
 from allauth.account.models import EmailAddress
 from allauth.account.utils import (
     filter_users_by_email,
-    setup_user_email,
     send_email_confirmation,
+    setup_user_email,
 )
 from django import forms as django_forms
 from django.contrib import messages
@@ -36,6 +36,8 @@ from django.views.generic.base import TemplateView
 from guardian.shortcuts import get_users_with_perms
 from notifications import models as notifications_models
 from notifications import notify
+from watson import search as watson
+
 from recoco import verbs
 from recoco.apps.addressbook import models as addressbook_models
 from recoco.apps.addressbook.models import Organization
@@ -52,7 +54,6 @@ from recoco.utils import (
     has_perm_or_403,
     make_group_name_for_site,
 )
-from watson import search as watson
 
 from . import filters, forms, models
 

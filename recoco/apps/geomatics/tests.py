@@ -7,12 +7,11 @@ authors: guillaume.libersat@beta.gouv.fr, raphael.marvie@beta.gouv.fr
 created: 2021-10-11 19:06:54 CEST
 """
 
-from unittest.mock import patch, mock_open
+from unittest.mock import mock_open, patch
 
 import pytest
-
-from django.core.management.base import CommandError
 from django.core.management import call_command
+from django.core.management.base import CommandError
 
 from . import models
 
