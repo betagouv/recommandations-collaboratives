@@ -356,6 +356,7 @@ def get_user_perms(self, obj):
 
     ctype = get_content_type(obj)
 
+    # if we're admin of site, allow everything!
     if uv_utils.is_admin_for_site(self.user):
         return list(
             Permission.objects.filter(
