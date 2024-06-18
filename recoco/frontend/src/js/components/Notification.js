@@ -12,13 +12,16 @@ function Notification() {
         setTimeout(() => {
           appStore.notification.isOpen = false;
           appStore.notification.message = '';
-        }, 2000);
+        }, appStore.notification.timeout);
       }
 
       return this.$store.app.notification.isOpen;
     },
     get message() {
       return this.$store.app.notification.message;
+    },
+    get type() {
+      return this.$store.app.notification.type;
     },
   };
 }

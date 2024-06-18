@@ -68,7 +68,9 @@ def get_queryset(site_id: int) -> QuerySet:
         )
         .annotate(
             crm_annotations_tags=StringAgg(
-                "crm_annotations__tags__name", delimiter=","
+                "crm_annotations__tags__name",
+                delimiter=",",
+                distinct=True,
             ),
             commune_insee=F("commune__insee"),
         )

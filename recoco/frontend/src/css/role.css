@@ -33,6 +33,10 @@
   background-color: #929292;
 }
 
+.neutral-role-border {
+  border: solid 1px #ffffff00;
+}
+
 .border-2 {
   border-width: 2px;
 }

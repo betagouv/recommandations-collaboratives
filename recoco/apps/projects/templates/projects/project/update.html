@@ -4,7 +4,7 @@
     <div class="col-11 py-5 mx-auto">
         <!-- Breadcrumb -->
         <nav aria-label="breadcrumb">
-            <ol class="breadcrumb">
+            <ul class="breadcrumb">
                 <li class="breadcrumb-item">
                     <svg class="bi align-middle" width="18" height="18" fill="currentColor">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#building" />
@@ -15,7 +15,7 @@
                 <li class="breadcrumb-item">
                     <a href="{% url 'projects-project-detail' project.id %}">{{ project.name|title|truncatechars:20 }}</a>
                 </li>
-            </ol>
+            </ul>
         </nav>
         <h1 class=" align-items-center">
             <svg class="bi" width="40" height="40" fill="currentColor">
