@@ -46,6 +46,7 @@ function MenuNotifications(notificationNumber, listNofification) {
           }
         }
         this.notificationNumber = 0;
+        window.location.reload();
       } catch (error) {
         this.showToast(
           'Erreur lors de la mise à jour des notifications. Merci de réessayer plus tard.'
