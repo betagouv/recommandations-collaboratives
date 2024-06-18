@@ -180,7 +180,7 @@ Cypress.Commands.add('becomeAdvisor', () => {
 
 Cypress.Commands.add(
   'createTask',
-  (label, topic = '', withResource = false) => {
+  (label, topic = '', withResource = false, draft = false) => {
     cy.get('body').then((body) => {
       if (body.find('[data-test-id="submit-task-button"]').length > 0) {
         cy.contains('Émettre une recommandation').click({
@@ -214,7 +214,13 @@ Cypress.Commands.add(
             .should('have.value', `${topic}`);
         }
 
-        cy.get('[type=submit]').click({ force: true });
+        if (draft) {
+          cy.get('[data-test-id="publish-draft-task-button"]')
+            .trigger('click')
+            .click();
+        } else {
+          cy.get('[type=submit]').click({ force: true });
+        }
 
         cy.url().should('include', '/actions');
 
@@ -232,7 +238,13 @@ Cypress.Commands.add(
           .type(`reco test from action description`, { force: true })
           .should('have.value', `reco test from action description`);
 
-        cy.get('[type=submit]').click({ force: true });
+        if (draft) {
+          cy.get('[data-test-id="publish-draft-task-button"]')
+            .trigger('click')
+            .click();
+        } else {
+          cy.get('[type=submit]').click({ force: true });
+        }
 
         cy.url().should('include', '/actions');
 

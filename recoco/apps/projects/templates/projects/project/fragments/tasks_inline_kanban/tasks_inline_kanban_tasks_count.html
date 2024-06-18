@@ -1,4 +1,4 @@
 <div class="d-flex align-items-center me-1 mb-2">
-    <span class="fw-bold custom-info-title"
-          x-text="$store.tasksData.tasks.length > 1 ? `${$store.tasksData.tasks.length} recommandations` :  `${$store.tasksData.tasks.length} recommandation`"></span>
+    <span class="fw-bold custom-info-title" data-test-id="tasks-count"
+          x-text="$store.tasksData.validatedTasks.length > 1 ? `${$store.tasksData.validatedTasks.length} recommandations` :  `${$store.tasksData.validatedTasks.length} recommandation`"></span>
 </div>
