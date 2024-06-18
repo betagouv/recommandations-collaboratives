@@ -62,7 +62,7 @@
                                                          @dragenter="onDragEnter(event)"
                                                          @dragleave="onDragLeave(event)">
                                                         <div class="kanban-card rounded p-2 w-100 position-relative"
-                                                             :class="{'kanban-card--border__is-switchtender': t.is_switchtender}"
+                                                             :class="{'kanban-card--border__is-switchtender': t.is_switchtender, 'kanban-card--border__is-observer': t.is_observer}"
                                                              draggable="true"
                                                              @dragstart="onDragStart(event, t.uuid)"
                                                              @dragend="onDragEnd(event)"

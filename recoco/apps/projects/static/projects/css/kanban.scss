@@ -15,11 +15,10 @@
 }
 
 .kanban {
-
   &-container {
     overflow-x: auto;
     overflow-y: hidden;
-    height: 70vh
+    height: 70vh;
   }
 
   &-column-container {
@@ -45,10 +44,9 @@
   }
 
   &-card {
-
-    border: solid 1px #E5E5E5;
-    background-color: #FAFAFA;
-    box-shadow: 2px 2px 4px 0px #0000001A;
+    border: solid 1px #e5e5e5;
+    background-color: #fafafa;
+    box-shadow: 2px 2px 4px 0px #0000001a;
 
     &--state {
       &-container {
@@ -64,8 +62,8 @@
         text-transform: uppercase;
         font-weight: 700;
         border-radius: 2px;
-        background-color: #E5E5E5;
-        color: #222
+        background-color: #e5e5e5;
+        color: #222;
       }
     }
 
@@ -74,11 +72,16 @@
         border: 1px solid #0063cb;
         background-color: white;
       }
+
+      &__is-observer {
+        border: 1px solid #27a658;
+        background-color: white;
+      }
     }
 
     &--notification {
       &-container {
-        transform: translate(-65%, -75%) !important
+        transform: translate(-65%, -75%) !important;
       }
     }
 
@@ -92,7 +95,7 @@
         font-size: 14px;
         font-weight: 700;
         font-family: 'Marianne';
-        color: #3A3A3A;
+        color: #3a3a3a;
       }
     }
 
@@ -112,6 +115,4 @@
       }
     }
   }
-
-
 }
