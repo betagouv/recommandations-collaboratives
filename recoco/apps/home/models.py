@@ -157,15 +157,43 @@ class SiteConfiguration(models.Model):
         blank=True,
     )
 
-    def logo_upload_path(self, filename):
-        return f"images/{self.site.pk}/logo/{filename}"
+    def logo_email_upload_path(self, filname):
+        self._logo_upload_path(filname, prefix="email")
+
+    def logo_large_upload_path(self, filname):
+        self._logo_upload_path(filname, prefix="large")
+
+    def logo_small_upload_path(self, filname):
+        self._logo_upload_path(filname, prefix="small")
+
+    def _logo_upload_path(self, filename, prefix=None):
+        if prefix:
+            prefix.append("-")
+
+        return f"images/{self.site.pk}/logo/{prefix}{filename}"
+
+    logo_large = models.ImageField(
+        verbose_name="Logo complet",
+        help_text="Utilisé par exemple pour la barre de navigation. Veuillez fournir une image avec un fond transparent (png)",
+        null=True,
+        blank=True,
+        upload_to=logo_large_upload_path,
+    )
+
+    logo_small = models.ImageField(
+        verbose_name="Logo réduit",
+        help_text="Utilisé en cas de manque d'espace. Format carré recommandé, avec un fond transparent (png)",
+        null=True,
+        blank=True,
+        upload_to=logo_small_upload_path,
+    )
 
     email_logo = models.ImageField(
         verbose_name="Logo utilisé pour les emails automatiques",
         help_text="Veuillez fournir une image d'une largeur maximale de 600 pixels et d'un ratio de 4:3.",
         null=True,
         blank=True,
-        upload_to=logo_upload_path,
+        upload_to=logo_email_upload_path,
     )
 
     crm_available_tags = TaggableManager(

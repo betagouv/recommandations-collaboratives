@@ -161,6 +161,8 @@ class SiteConfigurationUpdateView(UpdateView):
         "legal_address",
         "legal_owner",
         "description",
+        "logo_large",
+        "logo_small",
         "email_logo",
         "crm_available_tags",
         "reminder_interval",

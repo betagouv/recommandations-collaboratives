@@ -27,16 +27,17 @@
         <div class="w-75 d-flex flex-column justify-content-start">
             <div class="crm-header px-4 py-4 mb-3">
                 <div class="d-flex justify-content-between align-items-center mb-2">
-                    <h3>Paramètres du Site</h3>
+                    <h3>Paramètres du Site "{{ request.site.name }}"</h3>
                 </div>
-            </div>
 
-            <form method="POST" enctype="multipart/form-data">
+
+            <form method="POST" enctype="multipart/form-data" class="fr-form">
                 {% csrf_token %}
                 {{ form.as_p }}
-                <button type="submit">Sauvegarder</button>
+                <button class="fr-btn" type="submit">Sauvegarder</button>
             </form>
 
+            </div>
         </div>
     </div>
 {% endblock %}
