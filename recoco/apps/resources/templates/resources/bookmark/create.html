@@ -11,7 +11,7 @@
     <div class="col-11 py-5 mx-auto">
         <!-- Breadcrumb -->
         <nav aria-label="breadcrumb">
-            <ol class="breadcrumb">
+            <ul class="breadcrumb">
                 <li class="breadcrumb-item">
                     <svg class="bi align-middle" width="18" height="18" fill="currentColor">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#book" />
@@ -23,7 +23,7 @@
                     <a href="{% url 'resources-resource-detail' resource.id %}">{{ resource.title|title|truncatechars:20 }}</a>
                 </li>
                 <li class="breadcrumb-item active">Mettre en favori</li>
-            </ol>
+            </ul>
         </nav>
         <h2>
             <svg class="bi me-1 " width="32" height="32" fill="currentColor">
