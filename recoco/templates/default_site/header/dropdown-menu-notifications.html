@@ -25,7 +25,8 @@
                     x-init='initNewNotification(`${ {{ forloop.counter }}{{ forloop.parentloop.counter0 }} }`)'
                     x-show="isNotificationShown[`${ {{ forloop.counter }}{{ forloop.parentloop.counter0 }} }`]"
                     x-transition.duration.400ms>
-                    <a @click="clickConsummeNotificationAndRedirect({{ notification.pk }}, '{% if notification.verb == verbs.Recommendation.COMMENTED %}{{ notification.action_object.task.get_absolute_url }} {% else %}{{ notification.action_object.get_absolute_url }} {% endif %}')">
+                    <a class="cursor-pointer"
+                       @click="clickConsummeNotificationAndRedirect({{ notification.pk }}, '{% if notification.verb == verbs.Recommendation.COMMENTED %}{{ notification.action_object.task.get_absolute_url }} {% else %}{{ notification.action_object.get_absolute_url }} {% endif %}')">
                         {% include "user/user_card.html" with user=notification.actor project=notification.target user_popup_activate=False user_activity=False disable_links=True %}
                         {% if notification.verb == verbs.Project.VALIDATED %}
                             <div class="notification__project">{{ notification.target }}</div>
