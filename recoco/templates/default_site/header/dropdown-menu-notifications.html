@@ -21,7 +21,7 @@
         {% for date, notifications in grouped_notifications.items %}
             <div class="notification__date">le {{ date|date }}</div>
             {% for notification in notifications %}
-                <li class="dropdown-item"
+                <li class="dropdown-item cursor-pointer"
                     x-init='initNewNotification(`${ {{ forloop.counter }}{{ forloop.parentloop.counter0 }} }`)'
                     x-show="isNotificationShown[`${ {{ forloop.counter }}{{ forloop.parentloop.counter0 }} }`]"
                     x-transition.duration.400ms
