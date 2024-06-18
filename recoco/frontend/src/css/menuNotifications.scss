@@ -53,6 +53,13 @@
       font-size: 12px;
       font-weight: 400;
       white-space: normal;
+
+      &--no-margin {
+        color: #666;
+        font-size: 12px;
+        font-weight: 400;
+        margin: 0;
+      }
     }
 
     &__date {
