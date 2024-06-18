@@ -11,8 +11,10 @@
     <link href="{% sass_src 'projects/css/temp_style.scss' %}"
           rel="stylesheet"
           type="text/css">
-{% endblock %}
-{% block title %}Tableau de bord administrateur {{ block.super }}{% endblock %}
+{% endblock css %}
+{% block title %}
+    Tableau de bord administrateur {{ block.super }}
+{% endblock title %}
 {% block project_list_content %}
     <div x-data="KanbanProjects()">
         <div class="topbar d-flex justify-content-between p-2">
@@ -22,28 +24,22 @@
                     <span class="visually-hidden">Loading...</span>
                 </div>
             </div>
-            {% include 'projects/project/fragments/region_filter.html' %}
-            {% include 'projects/project/fragments/list-toolbars.html' %}
+            {% include "projects/project/fragments/region_filter.html" %}
+            {% include "projects/project/fragments/list-toolbars.html" %}
         </div>
         <div x-init="getData()" x-cloak class="d-flex">
-            <div class="flex-grow-1"
-                 style="overflow-x: auto;
-                        overflow-y: hidden;
-                        height: 70vh">
+            <div class="flex-grow-1 kanban-container">
                 <div class="py-4 md-py-8">
                     <div class="d-flex pb-2">
                         <template x-for="(board, index) in boards" :key="board.code">
-                            <div class="px-2 flex-shrink-0" style="min-width: 220px; width: 20%;">
-                                <div class="pb-4 rounded border-4"
+                            <div class="px-2 flex-shrink-0 kanban-column-container">
+                                <div class="pb-4 rounded border-4 kanban-column"
                                      :class="board.color_class"
-                                     style="min-height: 100px"
                                      :data-test-id="`board-targetable-${index}`">
-                                    <div class="d-flex justify-content-between justify-items-center px-2 py-2 bg-light sticky top-0" style="border-top-left-radius: 4px;
-                                    border-top-right-radius: 4px;">
-                                        <h5 x-text="board.title" class="font-medium text-gray-800"></h5>
+                                    <div class="d-flex justify-content-between justify-items-center px-2 py-2 bg-light sticky top-0">
+                                        <h5 x-text="board.title" class="font-medium text-gray-800 mb-0"></h5>
                                     </div>
-                                    <div style="height: 60vh; overflow-x: hidden; overflow-y: auto; border-bottom-right-radius: 4px;
-                                    border-bottom-left-radius: 4px;">
+                                    <div class="kanban-column--content">
                                         <div class="px-2 py-1 pb-1 bg-light shadow-sm">
                                             <template x-if="column(board.code).length === 0">
                                                 <div class="drag-targetable py-2"
@@ -58,79 +54,62 @@
                                             </template>
                                             <!-- Task Template -->
                                             <template x-for="(t, taskIndex) in column(board.code)" :key="t.id">
-                                                <a
-                                                :href="makeProjectURL(t.id)">
-                                                <div :id="t.id"
-                                                     class="drag-targetable py-2 my-2"
-                                                     @dragover="onDragOver(event)"
-                                                     @drop="onDrop(event, board.code, t.uuid)"
-                                                     @dragenter="onDragEnter(event)"
-                                                     @dragleave="onDragLeave(event)">
-                                                    <div class="rounded p-2 w-100 position-relative"
-                                                         :class="{'border-blue': t.is_switchtender}"
-                                                         draggable="true"
-                                                         @dragstart="onDragStart(event, t.uuid)"
-                                                         @dragend="onDragEnd(event)"
-                                                         :data-test-id="`item-draggable-${taskIndex}`"
-                                                         style="border: solid 1px #E5E5E5; background-color: #FAFAFA; box-shadow: 2px 2px 4px 0px #0000001A;
-                                                         ">
-                                                        <template x-if="t.inactive_since !== null">
-                                                            <div style="display: flex; position: absolute; top: -15px; gap: 0.8rem">
-                                                                <div class="left-0">
-                                                                    <div style="padding: 0.25rem 0.5rem;
-                                                                                font-size: 12px;
-                                                                                text-transform: uppercase;
-                                                                                font-weight: 700;
-                                                                                border-radius: 2px;
-                                                                                background-color: #E5E5E5;
-                                                                                color: #222">En pause</div>
-                                                                </div>
-                                                            </div>
-                                                        </template>
-                                                        <template x-if="t.notifications.count > 0">
-                                                            <span class="position-absolute top-25 start-100 badge bg-info"
-                                                                  :class="{'bg-danger': t.notifications.has_collaborator_activity == true}" style="transform: translate(-65%, -75%) !important;"><span x-text="t.notifications.count"></span> <span class="visually-hidden">nouvelle activité</span></span>
-                                                        </template>
-                                                        <template x-if="t.commune">
-                                                            <div class="fw-bold" style="margin-top: 2px;">
-                                                                <spa class="not-a-link" x-text="t.commune.name" style="font-size: 14px;
-                                                                font-weight: 700;
-                                                                font-family: 'Marianne';
-                                                                color: #3A3A3A"></span>
-                                                                <span class="not-a-link" x-text="`(${t.commune.postal})`" style="font-size: 14px;
-                                                                font-weight: 700;
-                                                                font-family: 'Marianne';
-                                                                color: #3A3A3A"></span>
-                                                            </div>
-                                                        </template>
-                                                        <div class="fw-semibold" style="margin-top: -5px;">
-                                                            <span class="project-link not-a-link"
-                                                               x-text="truncate(t.name)" style="font-size: 14px;
-                                                               font-weight: 400;
-                                                               font-family: 'Marianne';"></span>
-                                                        </div>
-                                                        <div>
-                                                            <span x-text="truncate(t.org_name)" class="mini"></span>
-                                                        </div>
-                                                        <div class="mini">
-                                                            <span class="mini not-a-link">INSEE: </span><span x-text="truncate(t.commune.insee)" class="mini not-a-link"></span>
-                                                        </div>
-                                                        <div class="d-flex justify-content-between">
-                                                            <div class="mini text-secondary" style="margin-top: -1px;">
-                                                                <span x-text="`Déposé le ${formatDateDisplay(t.created_on)}`"
-                                                                      class="align-middle not-a-link">
-                                                                </span>
-                                                            </div>
-                                                            <div class="d-flex justify-content-end me-1 gotMy">
-                                                                <template x-for="switchtender in t.switchtenders">
-                                                                    <div class="got-my-style">
-                                                                        {% include 'projects/project/fragments/advisor_gravatar_list_item.html' with wide_margin=True transparent_background=True %}
+                                                <a :href="makeProjectURL(t.id)">
+                                                    <div :id="t.id"
+                                                         class="drag-targetable py-2 my-2"
+                                                         @dragover="onDragOver(event)"
+                                                         @drop="onDrop(event, board.code, t.uuid)"
+                                                         @dragenter="onDragEnter(event)"
+                                                         @dragleave="onDragLeave(event)">
+                                                        <div class="kanban-card rounded p-2 w-100 position-relative"
+                                                             :class="{'kanban-card--border__is-switchtender': t.is_switchtender}"
+                                                             draggable="true"
+                                                             @dragstart="onDragStart(event, t.uuid)"
+                                                             @dragend="onDragEnd(event)"
+                                                             :data-test-id="`item-draggable-${taskIndex}`">
+                                                            <template x-if="t.inactive_since !== null">
+                                                                <div class="kanban-card--state-container">
+                                                                    <div class="left-0">
+                                                                        <div class="kanban-card--state__pause">En pause</div>
                                                                     </div>
-                                                                </template>
+                                                                </div>
+                                                            </template>
+                                                            <template x-if="t.notifications.count > 0">
+                                                                <span class="kanban-card--notification-container position-absolute top-25 start-100 badge bg-info"
+                                                                      :class="{'bg-danger': t.notifications.has_collaborator_activity == true}"><span x-text="t.notifications.count"></span> <span class="visually-hidden">nouvelle activité</span></span>
+                                                            </template>
+                                                            <template x-if="t.commune">
+                                                                <div class="kanban-card--commune-container fw-bold">
+                                                                    <span class="kanban-card--commune-name not-a-link" x-text="t.commune.name"></span>
+                                                                    <span class="kanban-card--commune-postal not-a-link"
+                                                                          x-text="`(${t.commune.postal})`"></span>
+                                                                </div>
+                                                            </template>
+                                                            <div class="kanban-card--project-container fw-semibold">
+                                                                <span class="kanban-card--project-name project-link not-a-link"
+                                                                      x-text="truncate(t.name)"></span>
+                                                            </div>
+                                                            <div>
+                                                                <span x-text="truncate(t.org_name)" class="mini"></span>
+                                                            </div>
+                                                            <div class="mini">
+                                                                <span class="mini not-a-link">INSEE:</span><span x-text="truncate(t.commune.insee)" class="mini not-a-link"></span>
+                                                            </div>
+                                                            <div class="d-flex justify-content-between">
+                                                                <div class="kanban-card--project-date-container mini text-secondary">
+                                                                    <span x-text="`Déposé le ${formatDateDisplay(t.created_on)}`"
+                                                                          class="align-middle not-a-link"></span>
+                                                                </div>
+                                                                <div class="d-flex justify-content-end me-1 gotMy">
+                                                                    <template x-for="switchtender in t.switchtenders">
+                                                                        <div class="got-my-style">
+                                                                            {% include "projects/project/fragments/advisor_gravatar_list_item.html" with wide_margin=True transparent_background=True %}
+                                                                        </div>
+                                                                    </template>
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                </div>
                                                 </a>
                                             </template>
                                         </div>
@@ -143,4 +122,4 @@
             </div>
         </div>
     </div>
-{% endblock %}
+{% endblock project_list_content %}
