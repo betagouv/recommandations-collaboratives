@@ -7,13 +7,19 @@ import api, {
 import appStore from '../store/app';
 import { ToastType } from '../models/toastType';
 
-function MenuNotifications(notificationNumber) {
+function MenuNotifications(notificationNumber, listNofification) {
   return {
     notificationNumber: notificationNumber,
     notificationNextIndex: 0,
     isNotificationShown: {},
+    listNofification: listNofification,
     initNewNotification(notificationIndex) {
       this.isNotificationShown[notificationIndex] = true;
+    },
+    async clickConsummeNotificationAndRedirect(notificationId, targetUrl) {
+      await api.patch(notificationsMarkAsReadByIdUrl(notificationId), {});
+      // redirect to the notification target
+      window.location.href = targetUrl;
     },
     async markNotificationAsRead(notificationId, el, notificationIndex) {
       try {
@@ -22,7 +28,7 @@ function MenuNotifications(notificationNumber) {
           {}
         );
         if (reqMarkNotifAsRead.data.marked_as_read > 0) {
-          this.removeNotificationInDom(el, notificationIndex);
+          this.removeNotificationInDomByIndex(el, notificationIndex);
         }
       } catch (error) {
         this.showToast(
@@ -47,7 +53,7 @@ function MenuNotifications(notificationNumber) {
         return;
       }
     },
-    removeNotificationInDom(el, notificationIndex) {
+    removeNotificationInDomByIndex(el, notificationIndex) {
       this.notificationNumber -= 1;
       const nextEl = el.parentElement.nextElementSibling;
       const previousEl = el.parentElement.previousElementSibling;
