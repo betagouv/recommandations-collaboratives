@@ -12,7 +12,7 @@ def populate_multisite_m2m(apps, schema_editor):
 
         first_site = p.projectsite_set.first()
         if first_site:
-            first_site.origin = True
+            first_site.is_origin = True
             first_site.save()
 
 
