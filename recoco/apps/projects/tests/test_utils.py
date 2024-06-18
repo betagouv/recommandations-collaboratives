@@ -74,16 +74,37 @@ def test_check_if_switchtends_any_project(request, client):
     assert not utils.can_administrate_project(project=None, user=userB)
 
 
+# get_projects_for_users
 @pytest.mark.django_db
-def test_get_active_project_honors_multisite(request, client):
+def test_get_projects_for_user_honors_draft(request):
     current_site = get_current_site(request)
     another_site = baker.make(sites_models.Site)
 
     userA = baker.make(auth.User)
-    project = baker.make(models.Project, sites=[current_site, another_site])
+    userB = baker.make(auth.User)
+    project = baker.make(models.Project, sites=[another_site])
+    project.project_sites.create(site=current_site, is_origin=True, status="DRAFT")
     assign_collaborator(userA, project, is_owner=True)
+    assign_collaborator(userB, project)
 
-    assert len(utils.get_projects_for_user(userA, current_site)) == 0
+    assert len(utils.get_projects_for_user(userA, current_site)) == 1
+    assert len(utils.get_projects_for_user(userB, current_site)) == 0
+
+
+@pytest.mark.django_db
+def test_get_projects_for_user_honors_multisite(request):
+    current_site = get_current_site(request)
+    another_site = baker.make(sites_models.Site)
+
+    user = baker.make(auth.User)
+    project = baker.make(models.Project, sites=[another_site])
+    project.project_sites.create(site=current_site, status="READY")
+    project.project_sites.create(site=another_site, status="DRAFT")
+
+    assign_collaborator(user, project)
+
+    assert len(utils.get_projects_for_user(user, current_site)) == 1
+    assert len(utils.get_projects_for_user(user, another_site)) == 0
 
 
 @pytest.mark.django_db

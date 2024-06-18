@@ -198,7 +198,7 @@ class ProjectSite(models.Model):
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=["project", "site", "is_origin"],
+                fields=["project", "is_origin"],
                 condition=Q(is_origin=True),
                 name="unique_origin_site",
             )

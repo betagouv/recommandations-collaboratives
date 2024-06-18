@@ -27,7 +27,7 @@ def assign_collaborator(user, project, is_owner=False):
     """Make someone becomes a project collaborator and assign permissions"""
 
     permissions = models.COLLABORATOR_DRAFT_PERMISSIONS
-    if project.status != "DRAFT":
+    if project.project_sites.origin().status != "DRAFT":
         permissions += models.COLLABORATOR_PERMISSIONS
 
     for perm in permissions:
@@ -177,7 +177,7 @@ def can_administrate_project(project, user):
 def is_member(user, project, allow_draft):
     """return true if user is member of the project"""
     return (user in project.members.all()) and (
-        (project.status != "DRAFT") or allow_draft
+        (project.project_sites.current().status != "DRAFT") or allow_draft
     )  # noqa: F841
 
 
@@ -308,7 +308,8 @@ def get_projects_for_user(user, site):
         Q(project__sites=site),
         Q(project__deleted=None),
         Q(member=user),
-        Q(is_owner=True) | Q(~Q(project__projectsite__status="DRAFT"), is_owner=False),
+        Q(is_owner=True)
+        | Q(~Q(project__project_sites__status="DRAFT"), is_owner=False),
     )
 
     return [m.project for m in memberships.all()]
@@ -318,6 +319,8 @@ def get_active_project(request):
     """Return the active project for a given user"""
     if not request.user.is_authenticated:
         return None
+
+    current_site = get_current_site(request)
 
     project_id = get_active_project_id(request)
     project = None
@@ -329,7 +332,7 @@ def get_active_project(request):
             pass
     else:
         try:
-            projects = get_projects_for_user(request.user, request.site)
+            projects = get_projects_for_user(request.user, current_site)
 
             if projects:
                 project = projects[0]
@@ -348,7 +351,9 @@ def set_active_project_id(request, project_id: int):
 def refresh_user_projects_in_session(request, user):
     """store the user projects in the session"""
 
-    projects = get_projects_for_user(user, request.site)
+    site = get_current_site(request)
+
+    projects = get_projects_for_user(user, site)
 
     request.session["projects"] = list(
         {
