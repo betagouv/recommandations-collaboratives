@@ -24,26 +24,27 @@
                 <li class="dropdown-item cursor-pointer"
                     x-init='initNewNotification(`${ {{ forloop.counter }}{{ forloop.parentloop.counter0 }} }`)'
                     x-show="isNotificationShown[`${ {{ forloop.counter }}{{ forloop.parentloop.counter0 }} }`]"
-                    x-transition.duration.400ms
-                    @click="clickConsummeNotificationAndRedirect({{ notification.pk }}, '{% if notification.verb == verbs.Recommendation.COMMENTED %}{{ notification.action_object.task.get_absolute_url }} {% else %}{{ notification.action_object.get_absolute_url }} {% endif %}')">
-                    {% include "user/user_card.html" with user=notification.actor project=notification.target user_popup_activate=False user_activity=False disable_links=True %}
-                    {% if notification.verb == verbs.Project.VALIDATED %}
-                        <div class="notification__project">{{ notification.target }}</div>
-                    {% endif %}
-                    <div class="notification__verb">{{ notification.verb }}</div>
-                    {% if notification.action_object.comment %}
-                        <span class="notification__project">{{ notification.action_object.task.resource.title }}</span>
-                        <div class="notification__message">"{{ notification.action_object.comment }}"</div>
-                    {% elif "projet" in notification.verb %}
-                        <div class="notification__project">{{ notification.target }}</div>
-                    {% elif notification.action_object.content and "message" in notification.verb %}
-                        <div class="notification__message">"{{ notification.action_object.content|truncatewords:100 }}"</div>
-                    {% endif %}
-                    {% if notification.verb == verbs.Recommendation.COMMENTED or notification.verb == verbs.Conversation.POST_MESSAGE or notification.verb == verbs.Document.ADDED_FILE %}
-                        <div class="notification__project">
-                            <span class="notification__verb--no-margin">sur</span> {{ notification.target }}
-                        </div>
-                    {% endif %}
+                    x-transition.duration.400ms>
+                    <a @click="clickConsummeNotificationAndRedirect({{ notification.pk }}, '{% if notification.verb == verbs.Recommendation.COMMENTED %}{{ notification.action_object.task.get_absolute_url }} {% else %}{{ notification.action_object.get_absolute_url }} {% endif %}')">
+                        {% include "user/user_card.html" with user=notification.actor project=notification.target user_popup_activate=False user_activity=False disable_links=True %}
+                        {% if notification.verb == verbs.Project.VALIDATED %}
+                            <div class="notification__project">{{ notification.target }}</div>
+                        {% endif %}
+                        <div class="notification__verb">{{ notification.verb }}</div>
+                        {% if notification.action_object.comment %}
+                            <span class="notification__project">{{ notification.action_object.task.resource.title }}</span>
+                            <div class="notification__message">"{{ notification.action_object.comment }}"</div>
+                        {% elif "projet" in notification.verb %}
+                            <div class="notification__project">{{ notification.target }}</div>
+                        {% elif notification.action_object.content and "message" in notification.verb %}
+                            <div class="notification__message">"{{ notification.action_object.content|truncatewords:100 }}"</div>
+                        {% endif %}
+                        {% if notification.verb == verbs.Recommendation.COMMENTED or notification.verb == verbs.Conversation.POST_MESSAGE or notification.verb == verbs.Document.ADDED_FILE %}
+                            <div class="notification__project">
+                                <span class="notification__verb--no-margin">sur</span> {{ notification.target }}
+                            </div>
+                        {% endif %}
+                    </a>
                     <button class="notification__icon"
                             title="Supprimer la notification"
                             data-test-id="notification-mark-as-read-one"
