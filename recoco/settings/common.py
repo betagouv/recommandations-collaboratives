@@ -100,6 +100,7 @@ INSTALLED_APPS = [
     "wagtail.search",
     "wagtail.admin",
     "wagtail",
+    "django_celery_results",
 ]
 
 SITE_ID = SiteID(default=1)
@@ -395,5 +396,8 @@ MATERIALIZED_VIEWS_SQL_DIR = BASE_DIR / "apps/metrics/sql_queries"
 # Baker
 # https://model-bakery.readthedocs.io/en/latest/how_bakery_behaves.html#customizing-baker
 BAKER_CUSTOM_CLASS = "recoco.tests.CustomBaker"
+
+# CELERY
+CELERY_RESULT_BACKEND = "django-db"
 
 # eof

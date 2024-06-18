@@ -60,5 +60,6 @@ django-reversion-compare==0.17.0
 wagtail==6.1.2
 
 celery==5.4.0
+django-celery-results==2.5.1
 redis==5.0.4
 django-autoslug==1.9.9
