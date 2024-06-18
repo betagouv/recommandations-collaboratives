@@ -31,7 +31,6 @@ function FieldValidator(
       });
     },
     validateData(submittedForm = false) {
-      console.log('validateData', this.value);
       if (this.isRequired && (this.requestMethod === 'POST' || submittedForm)) {
         if (this.value) {
           addClassIfNotExists(

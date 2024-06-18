@@ -12,6 +12,21 @@
   }
 }
 
+nav ul:not(.dropdown-menu)>li {
+  margin-right: 15px;
+  padding-bottom: 20px;
+  border-bottom: solid 2px transparent;
+
+  &:first-child {
+    margin-left: 15px;
+  }
+
+  &.activated {
+    border-bottom: solid 2px #0063CB;
+  }
+}
+
+
 .navbar>.navbar-collapse {
   &>* {
     padding-top: 4px !important;
@@ -133,6 +148,8 @@
 #user-info .dropdown-menu {
   transform: translate3d(-60px, 0, 0);
 }
+
+
 
 @media (max-width: 1200px) {
   #user-info .dropdown-menu {

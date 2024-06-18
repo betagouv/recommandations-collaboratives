@@ -1,18 +1,16 @@
 #notification {
   position: fixed;
-
   bottom: 28px;
   right: 25px;
+  padding: 15px;
+  z-index: 99999999;
+  border-radius: 4px;
+}
 
+.toast-notification,
+.info {
   background-color: white;
   color: #222;
-  padding: 15px;
-
-  box-shadow: 0 3px 0 rgba(0, 0, 0, 0.5);
-
-  z-index: 99999999;
-  border-radius: 6px;
-  border: solid 1px #222;
 }
 
 .has-notification {
@@ -32,4 +30,18 @@
   width: 9px;
   border-radius: 50%;
   font-size: 10px;
+}
+
+.success {
+  background-color: #1f8d49;
+  color: white;
+}
+
+.error {
+  background-color: #ce0500;
+  color: white;
+}
+.warning {
+  background-color: #d64d00;
+  color: white;
 }

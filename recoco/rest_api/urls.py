@@ -1,14 +1,17 @@
 from django.urls import path
 
+from notifications import views as notifications_views
 from rest_framework import routers
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 from recoco.apps.addressbook import rest as addressbook_rest
 from recoco.apps.geomatics import rest as geomatics_rest
+from recoco.apps.home import rest as home_rest
 from recoco.apps.projects.views import rest as projects_rest
+from recoco.apps.resources import rest as resources_rest
 from recoco.apps.tasks.views import rest as tasks_rest
 from recoco.apps.training import rest as training_rest
-from recoco.apps.resources import rest as resources_rest
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+
 
 router = routers.DefaultRouter()
 
@@ -88,6 +91,21 @@ api_urls = [
         "challenges/<str:slug>/",
         training_rest.ChallengeView.as_view(),
         name="challenges-challenge",
+    ),
+    path(
+        "notifications/mark-one-as-read/<int:pk>/",
+        home_rest.UserNotificationsMarkOneAsRead.as_view(),
+        name="notifications-mark-one-as-read",
+    ),
+    path(
+        "notifications/mark-all-as-read",
+        home_rest.UserNotificationsMarkAllAsRead.as_view(),
+        name="notifications-mark-all-as-read",
+    ),
+    path(
+        "notifications/unread_list",
+        notifications_views.live_unread_notification_list,
+        name="notifications-unread-list",
     ),
 ]
 
