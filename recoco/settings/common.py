@@ -400,4 +400,8 @@ BAKER_CUSTOM_CLASS = "recoco.tests.CustomBaker"
 # CELERY
 CELERY_RESULT_BACKEND = "django-db"
 
+# Metabase
+METABASE_HOST = os.environ.get("METABASE_HOST")
+METABASE_API_KEY = os.environ.get("METABASE_API_KEY")
+
 # eof
