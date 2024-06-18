@@ -39,10 +39,7 @@ def upgrade(cnx, site=None):
         "./requirements.txt",
         remote=f"./recoco-{site}/requirements.txt",
     )
-    cnx.run(
-        f"cd recoco-{site} "
-        "&& ./.venv/bin/uv pip install --upgrade -r requirements.txt"
-    )
+    cnx.run(f"cd recoco-{site} " "&& ./.venv/bin/uv pip install -r requirements.txt")
 
 
 @task

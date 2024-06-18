@@ -2,4 +2,4 @@ from .worker import app as celery_app
 
 __all__ = ("celery_app",)
 
-VERSION = "2.31.0"
+VERSION = "2.31.0dev0"
