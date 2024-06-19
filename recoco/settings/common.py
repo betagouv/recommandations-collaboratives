@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
+    "allauth.socialaccount.providers.openid_connect",
     "guardian",
     "magicauth",
     "sass_processor",
@@ -88,6 +89,7 @@ INSTALLED_APPS = [
     "recoco.apps.pages",
     "recoco.apps.metrics",
     "recoco.apps.demarches_simplifiees",
+    "recoco.apps.proconnect",
     "crispy_forms",
     "wagtail.contrib.forms",
     "wagtail.contrib.redirects",
@@ -121,6 +123,7 @@ MIDDLEWARE = [
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "sesame.middleware.AuthenticationMiddleware",
+    "allauth.account.middleware.AccountMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "watson.middleware.SearchContextMiddleware",
@@ -326,6 +329,34 @@ ACCOUNT_FORMS = {
     "reset_password": "recoco.apps.home.forms.UVResetPasswordForm",
     "reset_password_from_key": "recoco.apps.home.forms.UVResetPasswordKeyForm",
     "disconnect": "allauth.socialaccount.forms.DisconnectForm",
+}
+
+SOCIALACCOUNT_ADAPTER = "recoco.apps.proconnect.adapters.SocialAccountAdapter"
+
+SOCIALACCOUNT_OPENID_CONNECT_URL_PREFIX = "oidc"
+
+SOCIALACCOUNT_PROVIDERS = {
+    # https://docs.allauth.org/en/latest/socialaccount/providers/openid_connect.html
+    "agentconnect": {
+        "APPS": [
+            {
+                "provider_id": "agentconnect",
+                "name": "AgentConnect",
+                "client_id": os.getenv("AGENTCONNECT_CLIENT_ID", ""),
+                "secret": os.getenv("AGENTCONNECT_SECRET", ""),
+                "settings": {
+                    "server_url": "https://fca.integ01.dev-agentconnect.fr/api/v2/.well-known/openid-configuration",
+                    "token_auth_method": "client_secret_post",
+                },
+            },
+        ],
+        "SCOPE": [
+            "openid",
+        ],
+        "AUTH_PARAMS": {
+            "acr_values": "eidas1",
+        },
+    },
 }
 
 # Django vite
