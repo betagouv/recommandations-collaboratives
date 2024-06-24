@@ -14,14 +14,6 @@ from recoco.apps.metrics.processor import (
 class Command(BaseCommand):
     help = "Update materialized view used for metrics"
 
-    def add_arguments(self, parser):
-        parser.add_argument(
-            "--drop-only",
-            default=False,
-            action="store_true",
-            help="Runs only drop operation",
-        )
-
     def _create_views_for_site(self, site: Site, **options: Any):
         self.stdout.write(
             f"Updating materialized views for site {site.name} (#{site.id})"
@@ -41,20 +33,10 @@ class Command(BaseCommand):
                     materialized_view.set_cursor(cursor)
 
                     self.stdout.write(
-                        f"Dropping materialized view '{materialized_view.db_view_name}'"
+                        f"  >> Refreshing materialized view '{materialized_view.db_schema_name}.{materialized_view.db_view_name}'"
                     )
-                    materialized_view.drop()
-
-                    if not options["drop_only"]:
-                        self.stdout.write(
-                            f"Creating materialized view '{materialized_view.db_view_name}'"
-                        )
-                        materialized_view.create()
-
-                        self.stdout.write(
-                            f"Refreshing materialized view '{materialized_view.db_view_name}'"
-                        )
-                        materialized_view.refresh()
+                    materialized_view.create()
+                    materialized_view.refresh()
 
     def handle(self, *args, **options):
         for site in Site.objects.order_by("id"):
