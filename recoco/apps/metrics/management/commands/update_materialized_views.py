@@ -1,13 +1,14 @@
-from django.core.management.base import BaseCommand
+from typing import Any
 
+from django.conf import settings
+from django.contrib.sites.models import Site
+from django.core.management.base import BaseCommand
 from django.db import connection, transaction
+
 from recoco.apps.metrics.processor import (
     MaterializedView,
     MaterializedViewSpecError,
 )
-from django.conf import settings
-from django.contrib.sites.models import Site
-from typing import Any
 
 
 class Command(BaseCommand):

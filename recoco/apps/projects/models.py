@@ -24,8 +24,8 @@ from guardian.shortcuts import get_objects_for_user
 from markdownx.utils import markdownify
 from notifications import models as notifications_models
 from taggit.managers import TaggableManager
-from recoco.apps.geomatics import models as geomatics_models
 
+from recoco.apps.geomatics import models as geomatics_models
 from recoco.utils import CastedGenericRelation, check_if_advisor, has_perm
 
 from . import apps

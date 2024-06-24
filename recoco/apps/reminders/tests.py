@@ -10,15 +10,16 @@ created: 2021-09-28 13:17:53 CEST
 import datetime
 
 import pytest
-from django.contrib.sites.shortcuts import get_current_site
+from django.contrib.auth import models as auth_models
 from django.contrib.sites import models as sites_models
+from django.contrib.sites.shortcuts import get_current_site
 from django.utils import timezone
 from model_bakery import baker
-from django.contrib.auth import models as auth_models
+
+from recoco.apps.home import models as home_models
 from recoco.apps.projects import models as projects_models
 from recoco.apps.projects.utils import assign_collaborator
 from recoco.apps.tasks import models as tasks_models
-from recoco.apps.home import models as home_models
 
 from . import api, models
 

@@ -5,6 +5,7 @@ Migrate ProjectTopic to Topic into project.topics
 
 from django.conf import settings
 from django.contrib.sites.models import Site
+
 from recoco.apps.projects import models as projects_models
 
 # pour chaque site

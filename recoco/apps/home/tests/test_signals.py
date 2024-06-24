@@ -8,11 +8,11 @@ created: 2024-02-06 10:33:33 CEST
 """
 
 import pytest
-from recoco.utils import login
-from model_bakery import baker
 from django.contrib.auth import models as auth_models
-
 from django.utils import timezone
+from model_bakery import baker
+
+from recoco.utils import login
 
 
 @pytest.mark.django_db

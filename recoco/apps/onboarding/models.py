@@ -1,5 +1,6 @@
 from django.db import models
 from dynamic_forms.models import FormField, ResponseField
+
 from recoco.apps.projects import models as projects_models
 
 

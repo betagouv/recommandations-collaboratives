@@ -14,6 +14,7 @@ from django.urls import reverse
 from django.utils import timezone
 from model_bakery import baker
 from model_bakery.recipe import Recipe
+
 from recoco.apps.geomatics import models as geomatics
 from recoco.apps.home import models as home_models
 from recoco.apps.invites import models as invites_models

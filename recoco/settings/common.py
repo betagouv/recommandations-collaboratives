@@ -11,11 +11,10 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
 import os
+from datetime import timedelta
 from pathlib import Path
 
 from multisite import SiteID
-from datetime import timedelta
-
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -399,5 +398,9 @@ BAKER_CUSTOM_CLASS = "recoco.tests.CustomBaker"
 
 # CELERY
 CELERY_RESULT_BACKEND = "django-db"
+
+# Metabase
+METABASE_HOST = os.environ.get("METABASE_HOST")
+METABASE_API_KEY = os.environ.get("METABASE_API_KEY")
 
 # eof

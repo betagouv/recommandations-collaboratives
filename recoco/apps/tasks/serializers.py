@@ -1,16 +1,15 @@
 from django.contrib.auth import models as auth_models
-from django.utils import timezone
 from django.contrib.contenttypes.models import ContentType
+from django.utils import timezone
 from generic_relations.relations import GenericRelatedField
 from notifications import models as notifications_models
 from ordered_model.serializers import OrderedModelSerializer
 from rest_framework import serializers
 
-from recoco.apps.projects.serializers import TopicSerializer
 from recoco.apps.home.serializers import UserSerializer
-from recoco.apps.projects.serializers import DocumentSerializer
-from recoco.apps.resources.serializers import ResourceSerializer
+from recoco.apps.projects.serializers import DocumentSerializer, TopicSerializer
 from recoco.apps.projects.utils import get_collaborators_for_project
+from recoco.apps.resources.serializers import ResourceSerializer
 
 from .models import Task, TaskFollowup
 

@@ -28,10 +28,10 @@ from recoco.utils import (
 from .. import models
 from ..forms import (
     PrivateNoteForm,
+    ProjectLocationForm,
     ProjectTagsForm,
     ProjectTopicsForm,
     PublicNoteForm,
-    ProjectLocationForm,
     TopicForm,
 )
 from ..utils import (

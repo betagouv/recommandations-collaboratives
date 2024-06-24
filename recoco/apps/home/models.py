@@ -28,6 +28,7 @@ from guardian.models import (
 )
 from phonenumber_field.modelfields import PhoneNumberField
 from taggit.managers import TaggableManager
+
 from recoco.apps.addressbook import models as addressbook_models
 from recoco.apps.geomatics import models as geomatics
 

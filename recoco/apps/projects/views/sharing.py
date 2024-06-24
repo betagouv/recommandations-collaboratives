@@ -8,6 +8,7 @@ created : 2022-12-19 11:56:20 CEST
 """
 from django.http import Http404
 from django.shortcuts import render
+
 from recoco import utils
 from recoco.apps.survey import models as survey_models
 

@@ -12,6 +12,7 @@ from django import forms
 from django.core.exceptions import ValidationError
 from phonenumber_field.formfields import PhoneNumberField
 from phonenumber_field.widgets import PhoneNumberInternationalFallbackWidget
+
 from recoco.apps.addressbook import models as addressbook_models
 
 
