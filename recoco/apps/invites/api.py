@@ -1,4 +1,5 @@
 from django.contrib.auth import models as auth_models
+
 from recoco import utils
 from recoco.apps.communication import api as communication_api
 from recoco.apps.communication import constants as communication_constants

@@ -7,7 +7,7 @@ class HeroBlock(blocks.StructBlock):
     Partly Stolen from betagouv/content-manager
     """
 
-    bg_image = ImageChooserBlock(label="Image d’arrière plan")
+    bg_image = ImageChooserBlock(label="Image d’arrière plan", required=False)
     bg_color = blocks.RegexBlock(
         label="Couleur d’arrière plan au format hexa (Ex: #f5f5fe)",
         regex=r"^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$",
@@ -28,12 +28,12 @@ class ColumnBlock(blocks.StructBlock):
 
 
 class MultiColumnsBlock(blocks.StreamBlock):
-    title = blocks.CharBlock(label="Titre")
+    title = blocks.CharBlock(label="Titre", required=False)
     columns = ColumnBlock(label="Colonne")
 
     class Meta:
         block_counts = {
-            "title": {"min_num": 1, "max_num": 1},
+            "title": {"min_num": 0, "max_num": 1},
         }
 
 

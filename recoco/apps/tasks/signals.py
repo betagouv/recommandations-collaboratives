@@ -12,8 +12,8 @@ from notifications.signals import notify
 
 from recoco import verbs
 from recoco.apps.projects.utils import (
-    get_notification_recipients_for_project,
     get_advisors_for_project,
+    get_notification_recipients_for_project,
 )
 from recoco.utils import is_staff_for_site
 

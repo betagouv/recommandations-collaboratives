@@ -1,10 +1,9 @@
-from django.db.models import BooleanField, Case, QuerySet, TextField, Value, When
-
-
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
+from django.db.models import BooleanField, Case, QuerySet, TextField, Value, When
 
 from recoco.utils import make_group_name_for_site
+
 from ..utils import hash_field
 
 

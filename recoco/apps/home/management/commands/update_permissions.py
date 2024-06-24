@@ -11,6 +11,7 @@ from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.management.base import BaseCommand
 from guardian.shortcuts import assign_perm
+
 from recoco.apps.home.models import SITE_GROUP_PERMISSIONS
 from recoco.apps.projects.models import Project, ProjectSwitchtender
 from recoco.apps.projects.utils import (

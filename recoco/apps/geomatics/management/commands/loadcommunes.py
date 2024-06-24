@@ -16,9 +16,8 @@ created: 2021-07-13 09:08:25 CEST
 
 import csv
 
-from django.db import transaction
-
 from django.core.management.base import BaseCommand
+from django.db import transaction
 
 from recoco.apps.geomatics import models
 

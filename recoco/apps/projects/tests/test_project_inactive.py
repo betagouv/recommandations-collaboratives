@@ -16,6 +16,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 from django.utils import timezone
 from model_bakery import baker
+
 from recoco import verbs
 from recoco.apps.home import models as home_models
 from recoco.apps.invites.api import invite_collaborator_on_project

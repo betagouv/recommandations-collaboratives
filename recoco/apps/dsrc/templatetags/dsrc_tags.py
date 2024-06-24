@@ -21,9 +21,9 @@ authors: patricia.boh@beta.gouv.fr
 created: 2024-01-31 11:19:06 CEST
 """
 
+from crispy_forms.layout import HTML
 from django import template
 from django.template.context import Context
-from crispy_forms.layout import HTML
 
 from recoco.apps.dsrc.utils import generate_random_id
 

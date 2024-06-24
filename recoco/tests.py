@@ -1,18 +1,18 @@
 import pytest
+from autoslug import AutoSlugField
 from django.conf import settings
-from django.shortcuts import reverse
 from django.contrib.auth import models as auth
 from django.contrib.sites import models as sites_models
 from django.contrib.sites.shortcuts import get_current_site
+from django.shortcuts import reverse
 from guardian.shortcuts import assign_perm
-from rest_framework.test import APIClient
-from model_bakery.recipe import Recipe
 from model_bakery import baker
+from model_bakery.recipe import Recipe
+from rest_framework.test import APIClient
 
 from recoco.apps.projects import models as projects_models
 from recoco.apps.resources import models as resources_models
 from recoco.utils import login
-
 
 from . import utils
 
@@ -96,7 +96,7 @@ def test_has_perm_considers_current_site():
 
 
 @pytest.mark.django_db
-def test_site_staff_bypass_has_perm_for_her_site_objects(client, request):
+def test_site_staff_bypass_has_perm_for_sub_site_objects(client, request):
     project = Recipe(projects_models.Project).make()
 
     site = get_current_site(request)
@@ -115,12 +115,29 @@ def test_site_staff_bypass_has_perm_for_her_site_objects(client, request):
 
 
 @pytest.mark.django_db
-def test_site_staff_bypass_has_perm_for_her_site(client, request):
+def test_site_staff_cannot_bypass_has_perm_for_the_site_objects(client, request):
+    site = get_current_site(request)
+    site2 = Recipe(sites_models.Site).make()
+
+    perm_name = "sites.manage_configuration"
+
+    with login(client, groups=["example_com_staff"]) as user:
+        # Shouldn't be present on current site
+        with settings.SITE_ID.override(site.pk):
+            assert not utils.has_perm(user, perm_name, site)
+
+        # Shoudn't be present on another site
+        with settings.SITE_ID.override(site2.pk):
+            assert not utils.has_perm(user, perm_name, site2)
+
+
+@pytest.mark.django_db
+def test_site_admin_bypass_has_perm_for_her_site(client, request):
     site = get_current_site(request)
 
     perm_name = "sites.list_projects"
 
-    with login(client, groups=["example_com_staff"]) as user:
+    with login(client, groups=["example_com_admin"]) as user:
         # Should be present on current site
         with settings.SITE_ID.override(site.pk):
             assert utils.has_perm(user, perm_name, site)
@@ -178,3 +195,12 @@ def test_assign_site_staff(client, request):
     staff_group = utils.get_group_for_site("staff", site)
     assert user in staff_group.user_set.all()
     assert site in user.profile.sites.all()
+
+
+class CustomBaker(baker.Baker):
+    def get_fields(self):
+        return [
+            field
+            for field in super(CustomBaker, self).get_fields()
+            if not isinstance(field, AutoSlugField)
+        ]

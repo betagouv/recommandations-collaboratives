@@ -16,6 +16,7 @@ from django.urls import reverse
 from django.utils import timezone
 from model_bakery.recipe import Recipe
 from pytest_django.asserts import assertRedirects
+
 from recoco.apps.home import models as home_models
 from recoco.apps.onboarding import models as onboarding_models
 from recoco.apps.projects import models as projects

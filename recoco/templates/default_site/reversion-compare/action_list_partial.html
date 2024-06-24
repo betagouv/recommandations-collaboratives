@@ -1,52 +1,67 @@
 {% load i18n l10n %}
 {% if compare_view %}<form method="GET" action="{{ action }}">{% endif %}
-<div class="fr-table fr-table--no-caption">
-  <table id="change-history">
-    <thead>
-        <tr>
-            {% if compare_view %}
-                <th scope="col">
-                    {% if comparable %}
-                        <input type="submit" class="fr-btn" value="{% trans 'compare' %}">
-                    {% else %}
+    <div class="fr-table">
+        <p>Merci de sélectionner deux versions à comparer :</p>
+        <table id="change-history">
+            <thead>
+                <tr>
+                    {% if compare_view %}
+                        <th scope="col" colspan="2" class="text-center p-2">
+                            {% if comparable %}
+                                <input type="submit" class="fr-btn" value="{% trans 'compare' %}">
+                            {% else %}
+                            {% endif %}
+                        </th>
                     {% endif %}
-                </th>
-            {% endif %}
-            <th scope="col">Date/heure</th>
-            <th scope="col">Utilisateur·rice</th>
-            <th scope="col">Commentaire</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for action in action_list %}
-            <tr>
-                {% if compare_view %}
-                <td scope="row">
-                    {% if comparable %}
-                       <input type="radio" name="version_id1" value="{{ action.version.pk|unlocalize }}" {% if action.first %}style="visibility:hidden" {% endif %}{% if version1.pk|unlocalize == action.version.pk|unlocalize or action.second %}checked="checked"{% endif%}/>
-                       <input type="radio" name="version_id2" value="{{ action.version.pk|unlocalize }}" {% if version2.pk|unlocalize == action.version.pk|unlocalize or action.first == 1 %}checked="checked"{% endif%}/>
-                    {% else %}
-                       <i>-</i>
-                    {% endif %}
-                </td>
-                {% endif %}
-                <th scope="row">
-                    {% if action.url %}
-                        <a href="{{action.url}}">{{action.revision.date_created|date:_("DATETIME_FORMAT")}}</a>
-                    {% else %}
-                        {{action.revision.date_created|date:_("DATETIME_FORMAT")}}
-                    {% endif %}
-                </th>
-                <td>
-                    {% if action.revision.user %}
-                        {{action.revision.user.get_username}}
-                        {% if action.revision.user.get_full_name %} ({{action.revision.user.get_full_name}}){% endif %}
-                    {% endif %}
-                </td>
-                <td>{{action.revision.comment|default:""}}</td>
-            </tr>
-            {% endfor %}
-    </tbody>
-</table>
-{% if compare_view %}</form>{% endif %}
+                    <th class="p-2"></th>
+                    <th class="p-2"></th>
+                    <th class="p-2"></th>
+                </tr>
+                <tr>
+                    <th scope="col">Version 1</th>
+                    <th scope="col">Version 2</th>
+                    <th scope="col">Date/heure</th>
+                    <th scope="col">Utilisateur·rice</th>
+                    <th scope="col">Commentaire</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for action in action_list %}
+                    <tr>
+                        {% if compare_view %}
+                            <td scope="row" class="text-center">
+                                {% if comparable %}
+                                    <input type="radio"
+                                           name="version_id1"
+                                           value="{{ action.version.pk|unlocalize }}"
+                                           {% if action.first %}style="visibility:hidden"{% endif %}
+                                           {% if version1.pk|unlocalize == action.version.pk|unlocalize or action.second %}checked="checked"{% endif %} />
+                                {% else %}
+                                    <i>-</i>
+                                {% endif %}
+                            </td>
+                            <td scope="row" class="text-center">
+                                {% if comparable %}
+                                    <input type="radio"
+                                           name="version_id2"
+                                           value="{{ action.version.pk|unlocalize }}"
+                                           {% if version2.pk|unlocalize == action.version.pk|unlocalize or action.first == 1 %}checked="checked"{% endif %} />
+                                {% else %}
+                                    <i>-</i>
+                                {% endif %}
+                            </td>
+                        {% endif %}
+                        <th scope="row">Modification du {{ action.revision.date_created|date:_("DATETIME_FORMAT") }}</th>
+                        <td>
+                            {% if action.revision.user %}
+                                {{ action.revision.user.get_username }}
+                                {% if action.revision.user.get_full_name %}({{ action.revision.user.get_full_name }}){% endif %}
+                            {% endif %}
+                        </td>
+                        <td>{{ action.revision.comment|default:"" }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% if compare_view %}</form>{% endif %}
 </div>

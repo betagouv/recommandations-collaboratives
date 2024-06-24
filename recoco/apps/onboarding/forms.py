@@ -11,10 +11,11 @@ import os
 
 from captcha.fields import ReCaptchaField
 from captcha.widgets import ReCaptchaV2Checkbox
+from crispy_forms.layout import Fieldset, Layout
 from django import forms
-from crispy_forms.layout import Layout, Fieldset
-from recoco.apps.dsrc.forms import DsrcBaseForm
 from django.shortcuts import reverse
+
+from recoco.apps.dsrc.forms import DsrcBaseForm
 
 from . import models
 

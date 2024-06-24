@@ -8,12 +8,13 @@ created: 2021-11-15 14:44:55 CET
 """
 
 from actstream.managers import ActionManager
-from django.contrib.auth import models as auth
+from django.contrib.auth import models as auth_models
 from django.contrib.auth.models import Permission
+from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.managers import CurrentSiteManager
 from django.contrib.sites.models import Site
 from django.db import models
-from django.db.models.signals import post_save
+from django.db.models.signals import post_migrate, post_save
 from django.dispatch import receiver
 from django.utils.encoding import force_str
 from guardian.core import ObjectPermissionChecker
@@ -28,8 +29,11 @@ from guardian.models import (
 )
 from phonenumber_field.modelfields import PhoneNumberField
 from taggit.managers import TaggableManager
+
 from recoco.apps.addressbook import models as addressbook_models
 from recoco.apps.geomatics import models as geomatics
+
+from . import apps
 
 SITE_GROUP_PERMISSIONS = {
     "staff": (
@@ -41,9 +45,23 @@ SITE_GROUP_PERMISSIONS = {
         "sites.use_addressbook",
         "sites.use_project_tags",
     ),
-    "admin": ("sites.manage_surveys",),
+    "admin": ("sites.manage_surveys", "sites.manage_configuration"),
     "advisor": ("sites.list_projects",),
 }
+
+
+# We need the permission to be associated to the site and not to the surveys
+@receiver(post_migrate)
+def create_site_permissions(sender, **kwargs):
+    if sender.name != apps.HomeConfig.name:
+        return
+
+    site_ct = ContentType.objects.get(app_label="sites", model="site")
+    auth_models.Permission.objects.get_or_create(
+        codename="manage_configuration",
+        name="Can manage the configuration",
+        content_type=site_ct,
+    )
 
 
 class SiteActionManager(CurrentSiteManager, ActionManager):
@@ -78,7 +96,7 @@ class UserProfile(models.Model):
     deleted_objects = DeletedUserProfileManager()
 
     user = models.OneToOneField(
-        auth.User, on_delete=models.CASCADE, related_name="profile"
+        auth_models.User, on_delete=models.CASCADE, related_name="profile"
     )
 
     departments = models.ManyToManyField(
@@ -157,15 +175,43 @@ class SiteConfiguration(models.Model):
         blank=True,
     )
 
-    def logo_upload_path(self, filename):
-        return f"images/{self.site.pk}/logo/{filename}"
+    def logo_email_upload_path(self, filname):
+        self._logo_upload_path(filname, prefix="email")
+
+    def logo_large_upload_path(self, filname):
+        self._logo_upload_path(filname, prefix="large")
+
+    def logo_small_upload_path(self, filname):
+        self._logo_upload_path(filname, prefix="small")
+
+    def _logo_upload_path(self, filename, prefix=None):
+        if prefix:
+            prefix.append("-")
+
+        return f"images/{self.site.pk}/logo/{prefix}{filename}"
+
+    logo_large = models.ImageField(
+        verbose_name="Logo complet",
+        help_text="Utilisé par exemple pour la barre de navigation. Veuillez fournir une image avec un fond transparent (png)",
+        null=True,
+        blank=True,
+        upload_to=logo_large_upload_path,
+    )
+
+    logo_small = models.ImageField(
+        verbose_name="Logo réduit",
+        help_text="Utilisé en cas de manque d'espace. Format carré recommandé, avec un fond transparent (png)",
+        null=True,
+        blank=True,
+        upload_to=logo_small_upload_path,
+    )
 
     email_logo = models.ImageField(
         verbose_name="Logo utilisé pour les emails automatiques",
         help_text="Veuillez fournir une image d'une largeur maximale de 600 pixels et d'un ratio de 4:3.",
         null=True,
         blank=True,
-        upload_to=logo_upload_path,
+        upload_to=logo_email_upload_path,
     )
 
     crm_available_tags = TaggableManager(
@@ -185,7 +231,7 @@ class SiteConfiguration(models.Model):
         return f"SiteConfiguration for '{self.site}'"
 
 
-@receiver(post_save, sender=auth.User)
+@receiver(post_save, sender=auth_models.User)
 def create_user_profile(sender, instance, created, **kwargs):
     """register user profile creation when a user is created"""
     if created:
@@ -310,12 +356,22 @@ def get_user_perms(self, obj):
 
     ctype = get_content_type(obj)
 
-    if uv_utils.is_staff_for_site(self.user):
+    # if we're admin of site, allow everything!
+    if uv_utils.is_admin_for_site(self.user):
         return list(
             Permission.objects.filter(
                 content_type=ctype,
             ).values_list("codename", flat=True)
         )
+
+    # if we're staff, bypass only for project objects
+    if uv_utils.is_staff_for_site(self.user):
+        if ctype != get_content_type(Site):
+            return list(
+                Permission.objects.filter(
+                    content_type=ctype,
+                ).values_list("codename", flat=True)
+            )
 
     return ObjectPermissionChecker.original_get_user_perms(self, obj)
 

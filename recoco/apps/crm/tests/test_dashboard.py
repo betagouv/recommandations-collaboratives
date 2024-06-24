@@ -9,9 +9,10 @@ from model_bakery import baker
 from notifications.signals import notify
 from pytest_django.asserts import assertContains, assertNotContains
 
+from recoco import verbs
+from recoco.apps.home import models as home_models
 from recoco.apps.projects import models as project_models
 from recoco.utils import login
-from recoco import verbs
 
 
 @pytest.mark.django_db
@@ -68,6 +69,50 @@ def test_site_dashboard_hides_other_site_project_notifications(request, client):
     assert response.status_code == 200
 
     assertNotContains(response, verb)
+
+
+# -- Site configuration
+@pytest.mark.django_db
+def test_site_configuration_not_available_for_non_admin_users(request, client):
+    site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=site)
+
+    url = reverse("crm-site-configuration")
+
+    with login(client):
+        response = client.get(url)
+    assert response.status_code == 403
+
+
+# -- Site configuration
+@pytest.mark.django_db
+def test_site_configuration_not_available_for_staff_users(request, client):
+    site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=site)
+    user = baker.make(auth_models.User)
+
+    url = reverse("crm-site-configuration")
+
+    with login(client, user=user, groups=["example_com_staff"]):
+        from recoco.utils import has_perm
+
+        print(has_perm(user, "sites.manage_configuration", site))
+
+        response = client.get(url)
+
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_site_configuration_available_for_admin_users(request, client):
+    site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=site)
+    user = baker.make(auth_models.User)
+
+    url = reverse("crm-site-configuration")
+    with login(client, user=user, groups=["example_com_admin"]):
+        response = client.get(url)
+    assert response.status_code == 200
 
 
 # eof

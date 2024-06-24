@@ -8,17 +8,18 @@ created : 2022-11-28 14:14:20 CEST
 """
 
 from django.contrib import messages
-from django.db.utils import IntegrityError
 from django.contrib.auth.decorators import login_required
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import PermissionDenied
+from django.db.utils import IntegrityError
 from django.shortcuts import get_object_or_404, redirect, render, reverse
 from django.utils import timezone
+
 from recoco.utils import has_perm_or_403
 
 from .. import models, signals
 from ..forms import DocumentUploadForm
-from ..utils import set_active_project_id, get_collaborators_for_project
+from ..utils import get_collaborators_for_project, set_active_project_id
 
 
 @login_required

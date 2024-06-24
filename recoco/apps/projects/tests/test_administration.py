@@ -28,7 +28,6 @@ from recoco.apps.projects import models as projects_models
 from recoco.apps.projects.utils import assign_advisor, assign_collaborator
 from recoco.utils import login
 
-
 from .. import models
 
 ########################################################################

@@ -7,6 +7,7 @@ authors: guillaume.libersat@beta.gouv.fr, raphael.marvie@beta.gouv.fr
 created: 2023-07-17 20:39:35 CEST
 """
 
+from allauth.account.views import LoginView
 from django.contrib import messages
 from django.contrib.auth import login as log_user
 from django.contrib.auth import models as auth
@@ -16,8 +17,6 @@ from django.shortcuts import get_object_or_404, redirect, render, reverse
 from django.template.loader import render_to_string
 from django.utils.http import urlencode
 from django.views.generic import FormView
-from allauth.account.views import LoginView
-
 
 from recoco.apps.addressbook import models as addressbook
 from recoco.apps.communication import constants as communication_constants
@@ -34,9 +33,8 @@ from recoco.apps.projects.utils import (
     generate_ro_key,
     refresh_user_projects_in_session,
 )
-from recoco.apps.survey.forms import AnswerForm
 from recoco.apps.survey import models as survey_models
-
+from recoco.apps.survey.forms import AnswerForm
 from recoco.utils import (
     build_absolute_url,
     get_site_config_or_503,

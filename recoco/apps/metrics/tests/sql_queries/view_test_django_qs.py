@@ -1,5 +1,6 @@
-from recoco.apps.projects.models import Project
 from django.db.models import Count, QuerySet
+
+from recoco.apps.projects.models import Project
 
 
 def get_queryset(site_id: int) -> QuerySet:

@@ -4,11 +4,12 @@ from django.http import HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
+
 from recoco.apps.addressbook import models as addressbook_models
 from recoco.apps.projects import signals as projects_signals
 from recoco.apps.projects.utils import (
-    assign_collaborator,
     assign_advisor,
+    assign_collaborator,
     assign_observer,
 )
 
