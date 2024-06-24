@@ -1,7 +1,8 @@
 {% load static %}
-<a class="fr-btn{% if variant %} fr-btn--{{ variant }}{% endif %}{% if size %} fr-btn--{{ size }}{% endif %}{% if variant %} fr-btn--{{ variant }}{% endif %}{% if align %} fr-btn--icon-{{ align }}{% endif %}{% if icon %} {{ icon }}{% endif %} {% if classes %}{{ classes }}{% endif %}"
-   href="{{ href | default:'#' }}"
+<a class="fr-btn{% if variant %} fr-btn--{{ variant }}{% endif %}{% if size %} fr-btn--{{ size }}{% endif %}{% if align %} fr-btn--icon-{{ align }}{% endif %}{% if icon %} {{ icon }}{% endif %} {% if classes %}{{ classes }}{% endif %}"
+   {% if href_url %} href="{% url href_url %}" {% elif href %} href="{{ href }}" {% else %} href="#" {% endif %}
    {% if disabled %}disabled=""{% endif %}
-   type="{{ type | default:'submit' }}"
+   {% if type %}type="{{ type }}"{% endif %}
+   {% if role %}role="{{ role }}"{% endif %}
    {% if title %}title="{{ label }}"{% endif %}
    {% if name %}name="{{ name }}"{% endif %}>{{ label }}</a>

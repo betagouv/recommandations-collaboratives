@@ -1,23 +1,5 @@
 {% load static %}
 <div class="btn-group ms-4" role="group" aria-label="Admin actions">
-    <a class="fr-btn"
-       href="{% url 'onboarding-prefill-set-user' %}"
-       role="button"
-       style="margin: 0 5px;
-              padding-top: 0px">
-        <!-- <svg class="bi me-1" width="16" height="16" fill="currentColor">
-            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#plus-circle" />
-        </svg> -->
-        <span class="align-middle" style="padding-top:0.3rem">Déposer un projet</span>
-    </a>
-    <a class="fr-btn fr-btn--secondary"
-       href="{% url 'projects-project-list-export-csv' %}"
-       role="button"
-       style="padding-top: 0px;
-              box-shadow: inset 0 0 0 1px #0063CB">
-        <!-- <svg class="bi me-1" width="16" height="16" fill="currentColor">
-            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#filetype-csv" />
-        </svg> -->
-        <span class="align-middle" style="padding-top: 0.3rem; color: #0063CB;">Exporter en CSV</span>
-    </a>
+    {% include "dsrc/core/blocks/buttons/button_link.html" with label="Déposer un projet" href_url="onboarding-prefill-set-user" role="button" classes="me-1" %}
+    {% include "dsrc/core/blocks/buttons/button_link.html" with label="Exporter en CSV" href_url="projects-project-list-export-csv" role="button" variant="secondary" classes="me-1" %}
 </div>
