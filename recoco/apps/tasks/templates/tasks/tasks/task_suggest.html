@@ -2,7 +2,7 @@
 {% load static %}
 {% block title %}Examiner les recommandations suggérées automatiquement{% endblock %}
 {% block content %}
-    <div class="col-11 py-5 mx-auto">
+    <div class="col-12 p-4 mx-auto">
         <h2>Recommandations suggérées</h2>
         <p class="text-secondary mb-4">Nb de recos : {{ tasks|length }}</p>
         {% for task in tasks %}
