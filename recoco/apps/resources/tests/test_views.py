@@ -9,6 +9,9 @@ created: 2021-06-16 17:56:10 CEST
 
 from datetime import datetime
 
+from reversion.models import Version
+import reversion
+from django.db import transaction
 import pytest
 from django.contrib.sites.models import Site
 from django.contrib.sites.shortcuts import get_current_site
@@ -455,6 +458,70 @@ def test_resource_history_available_for_authorized_user(request, client):
     with login(client, groups=["example_com_staff"]):
         response = client.get(url)
         assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_resource_history_reversion_not_available_for_common_user(request, client):
+    resource = Recipe(models.Resource, sites=[get_current_site(request)]).make()
+    url = reverse("resources-resource-history-restore", args=[resource.id, 2])
+    with login(client):
+        response = client.get(url)
+        assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_resource_history_creates_revision(request, client):
+    resource = Recipe(
+        models.Resource,
+        category__sites=[get_current_site(request)],
+        sites=[get_current_site(request)],
+    ).make()
+
+    url = reverse("resources-resource-update", args=[resource.id])
+
+    data = {
+        "title": "a title",
+        "subtitle": "a sub title",
+        "status": 0,
+        "summary": "a summary",
+        "tags": "#tag",
+        "content": "this is some content",
+    }
+
+    with login(client, groups=["example_com_staff"]):
+        client.post(url, data=data)
+
+    assert Version.objects.get_for_object(resource).count() == 1
+
+
+@pytest.mark.django_db
+def test_resource_history_reversion_available_for_authorized_user(request, client):
+    resource = Recipe(
+        models.Resource,
+        title="first",
+        category__sites=[get_current_site(request)],
+        sites=[get_current_site(request)],
+    ).make()
+
+    with transaction.atomic(), reversion.create_revision():
+        resource.save()
+
+    with transaction.atomic(), reversion.create_revision():
+        resource.title = "hello"
+        resource.save()
+
+    assert Version.objects.get_for_object(resource).count() == 2
+    version = Version.objects.get_for_object(resource).last()
+
+    url = reverse("resources-resource-history-restore", args=[resource.id, version.pk])
+    with login(client, groups=["example_com_staff"]):
+        response = client.post(url)
+        assert response.status_code == 302
+
+    resource.refresh_from_db()
+
+    assert resource.title == "first"
+    assert Version.objects.get_for_object(resource).count() == 3
 
 
 ########################################################################

@@ -1108,6 +1108,10 @@ def test_switchtender_joins_and_leaves_on_the_same_12h_should_not_notify(
 def test_switchtender_exports_csv(request, client):
     site = get_current_site(request)
 
+    site_config = baker.make(home_models.SiteConfiguration, site=site)
+    site_config.crm_available_tags.add("a crm tag")
+    site_config.crm_available_tags.add("other crm tag")
+
     # Expected project
     p1 = Recipe(
         models.Project,

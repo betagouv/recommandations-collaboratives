@@ -56,7 +56,7 @@ class QuestionSetAdmin(admin.ModelAdmin):
 
 @admin.register(models.Question)
 class QuestionAdmin(admin.ModelAdmin):
-    list_display = ["text", "question_set"]
+    list_display = ["text", "text_short", "slug", "question_set"]
     list_select_related = ("question_set",)
 
 
