@@ -8,7 +8,6 @@ created: 2021-11-15 14:44:55 CET
 """
 
 from actstream.managers import ActionManager
-from django.contrib.auth import models as auth
 from django.contrib.auth import models as auth_models
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
@@ -97,7 +96,7 @@ class UserProfile(models.Model):
     deleted_objects = DeletedUserProfileManager()
 
     user = models.OneToOneField(
-        auth.User, on_delete=models.CASCADE, related_name="profile"
+        auth_models.User, on_delete=models.CASCADE, related_name="profile"
     )
 
     departments = models.ManyToManyField(
@@ -232,7 +231,7 @@ class SiteConfiguration(models.Model):
         return f"SiteConfiguration for '{self.site}'"
 
 
-@receiver(post_save, sender=auth.User)
+@receiver(post_save, sender=auth_models.User)
 def create_user_profile(sender, instance, created, **kwargs):
     """register user profile creation when a user is created"""
     if created:
@@ -364,6 +363,15 @@ def get_user_perms(self, obj):
                 content_type=ctype,
             ).values_list("codename", flat=True)
         )
+
+    # if we're staff, bypass only for project objects
+    if uv_utils.is_staff_for_site(self.user):
+        if ctype != get_content_type(Site):
+            return list(
+                Permission.objects.filter(
+                    content_type=ctype,
+                ).values_list("codename", flat=True)
+            )
 
     return ObjectPermissionChecker.original_get_user_perms(self, obj)
 
