@@ -1,37 +1,10 @@
 {% load static %}
-<!-- {% with request.resolver_match.url_name as url_name %} -->
-    <!-- <div class="btn-group mx-1" role="group" aria-label="Type de vues">
-        <a class="btn btn-secondary btn-sm {% if not 'map' in url_name %}active{% endif %}"
-           href="{% url 'projects-project-list' %}"
-           role="button">
-            <svg class="bi me-1" width="16" height="16" fill="currentColor">
-                <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#columns-gap" />
-            </svg>
-            <span class="align-middle">Tableau</span>
-        </a>
-        <a class="btn btn-secondary btn-sm {% if 'map' in url_name %}active{% endif %}"
-           href="{% url 'projects-project-list-map' %}"
-           role="button">
-            <svg class="bi me-1" width="16" height="16" fill="currentColor">
-                <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#map" />
-            </svg>
-            <span class="align-middle">Carte</span>
-        </a>
-        <a class="btn btn-secondary btn-sm bg-blue"
-           href="{% url 'projects-project-list-advisor' %}"
-           role="button">
-            <svg class="bi me-1" width="16" height="16" fill="currentColor">
-                <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#file" />
-            </svg>
-            <span class="align-middle">Nouveau tableau de bord</span>
-        </a>
-    </div> -->
-<!-- {% endwith %} -->
 <div class="btn-group" role="group" aria-label="Admin actions">
     <a class="fr-btn"
        href="{% url 'onboarding-prefill-set-user' %}"
        role="button"
-       style="margin: 0 5px;padding-top: 0px;">
+       style="margin: 0 5px;
+              padding-top: 0px">
         <!-- <svg class="bi me-1" width="16" height="16" fill="currentColor">
             <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#plus-circle" />
         </svg> -->
@@ -40,7 +13,8 @@
     <a class="fr-btn fr-btn--secondary"
        href="{% url 'projects-project-list-export-csv' %}"
        role="button"
-       style="padding-top: 0px; box-shadow: inset 0 0 0 1px #0063CB;">
+       style="padding-top: 0px;
+              box-shadow: inset 0 0 0 1px #0063CB">
         <!-- <svg class="bi me-1" width="16" height="16" fill="currentColor">
             <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#filetype-csv" />
         </svg> -->
