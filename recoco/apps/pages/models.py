@@ -1,10 +1,8 @@
 from wagtail.admin.panels import FieldPanel
-from wagtail.fields import RichTextField
-from wagtail.models import Page
-
-from wagtail.fields import StreamField
 from wagtail.blocks import RichTextBlock
+from wagtail.fields import RichTextField, StreamField
 from wagtail.images.blocks import ImageChooserBlock
+from wagtail.models import Page
 
 from .blocks import HeroBlock, MultiColumnsBlock, QuoteBlock
 
@@ -30,6 +28,7 @@ class ShowcasePage(Page):
         min_num=1,
         max_num=3,
         verbose_name="Gallerie",
+        blank=True,
     )
 
     content = StreamField(
@@ -40,7 +39,9 @@ class ShowcasePage(Page):
         verbose_name="Contenu",
     )
 
-    quote = StreamField([("quote", QuoteBlock(label="Citation"))], blank=False)
+    quote = StreamField(
+        [("quote", QuoteBlock(label="Citation"))], min_num=0, max_num=1, blank=True
+    )
 
     content_panels = Page.content_panels + [
         FieldPanel("heading"),
