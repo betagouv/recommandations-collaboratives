@@ -12,8 +12,13 @@ from django.http import Http404, HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
-from recoco.apps.projects.utils import get_active_project_id
+
 from recoco.apps.projects import models as project_models
+from recoco.apps.projects.forms import DocumentUploadForm
+from recoco.apps.projects.utils import (
+    get_active_project_id,
+    get_collaborators_for_project,
+)
 from recoco.apps.resources import models as resources
 from recoco.apps.survey import models as survey_models
 from recoco.utils import (
@@ -23,14 +28,10 @@ from recoco.utils import (
 )
 
 from .. import models, signals
-
-from recoco.apps.projects.forms import DocumentUploadForm
-from recoco.apps.projects.utils import get_collaborators_for_project
-
 from ..forms import (
-    CreateActionsFromResourcesForm,
-    CreateActionWithoutResourceForm,
     CreateActionWithResourceForm,
+    CreateActionWithoutResourceForm,
+    CreateActionsFromResourcesForm,
     PushTypeActionForm,
     RsvpTaskFollowupForm,
     TaskFollowupForm,

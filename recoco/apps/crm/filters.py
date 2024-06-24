@@ -13,8 +13,8 @@ from django.contrib.auth import models as auth_models
 from django.contrib.sites import models as site_models
 from watson import search as watson
 
-from recoco.apps.projects import models as projects_models
 from recoco.apps.addressbook import models as addressbook_models
+from recoco.apps.projects import models as projects_models
 from recoco.utils import make_group_name_for_site
 
 

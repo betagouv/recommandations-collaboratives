@@ -12,6 +12,7 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
 from model_bakery.recipe import Recipe
 from pytest_django.asserts import assertContains, assertRedirects
+
 from recoco.utils import login
 
 from .. import models

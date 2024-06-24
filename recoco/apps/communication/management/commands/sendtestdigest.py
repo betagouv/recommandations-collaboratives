@@ -11,6 +11,7 @@ created: 2022-01-24 22:39:27 CEST
 import json
 
 from django.core.management.base import BaseCommand
+
 from recoco.apps.communication.api import brevo_email
 from recoco.apps.communication.models import EmailTemplate
 

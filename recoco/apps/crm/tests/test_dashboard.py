@@ -9,10 +9,10 @@ from model_bakery import baker
 from notifications.signals import notify
 from pytest_django.asserts import assertContains, assertNotContains
 
-from recoco.apps.projects import models as project_models
-from recoco.apps.home import models as home_models
-from recoco.utils import login
 from recoco import verbs
+from recoco.apps.home import models as home_models
+from recoco.apps.projects import models as project_models
+from recoco.utils import login
 
 
 @pytest.mark.django_db

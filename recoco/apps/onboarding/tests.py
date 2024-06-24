@@ -1,16 +1,17 @@
 import pytest
 from django.contrib.auth import models as auth
-from django.contrib.sites.shortcuts import get_current_site
 from django.contrib.sites.models import Site
+from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
 from model_bakery import baker
 from model_bakery.recipe import Recipe
+
 from recoco.apps.geomatics import models as geomatics
 from recoco.apps.home import models as home_models
-from recoco.apps.onboarding import models as onboarding_models
-from recoco.apps.survey import models as survey_models
-from recoco.apps.projects import models as projects_models
 from recoco.apps.invites import models as invites_models
+from recoco.apps.onboarding import models as onboarding_models
+from recoco.apps.projects import models as projects_models
+from recoco.apps.survey import models as survey_models
 from recoco.utils import login
 
 

@@ -8,15 +8,16 @@ created: 2022-01-24 22:39:27 CEST
 """
 
 
+import logging
+
 from django.conf import settings
 from django.contrib.auth import models as auth_models
 from django.contrib.sites.models import Site
 from django.core.management.base import BaseCommand
+
 from recoco.apps.communication import digests
 from recoco.apps.projects import models as project_models
 from recoco.utils import get_group_for_site
-
-import logging
 
 logger = logging.getLogger("main")
 

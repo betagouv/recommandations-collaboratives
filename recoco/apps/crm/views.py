@@ -17,7 +17,6 @@ from allauth.account.utils import (
     send_email_confirmation,
     setup_user_email,
 )
-from django.urls import reverse_lazy
 from django import forms as django_forms
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -30,6 +29,7 @@ from django.db import transaction
 from django.db.models import Count, Q
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render, reverse
+from django.urls import reverse_lazy
 from django.utils import timezone
 from django.utils.safestring import mark_safe
 from django.views.decorators.http import require_http_methods
@@ -38,6 +38,8 @@ from django.views.generic.edit import UpdateView
 from guardian.shortcuts import get_users_with_perms
 from notifications import models as notifications_models
 from notifications import notify
+from watson import search as watson
+
 from recoco import verbs
 from recoco.apps.addressbook import models as addressbook_models
 from recoco.apps.addressbook.models import Organization
@@ -54,7 +56,6 @@ from recoco.utils import (
     has_perm_or_403,
     make_group_name_for_site,
 )
-from watson import search as watson
 
 from . import filters, forms, models
 

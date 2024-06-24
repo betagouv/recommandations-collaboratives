@@ -8,12 +8,13 @@ created : 2021-09-28 12:40:54 CEST
 """
 
 
-from django.contrib.sites.managers import CurrentSiteManager
-from django.contrib.sites.models import Site
 from django.contrib.auth import models as auth_models
 from django.contrib.contenttypes.fields import GenericRelation
+from django.contrib.sites.managers import CurrentSiteManager
+from django.contrib.sites.models import Site
 from django.db import models
 from django.utils import timezone
+
 from recoco.apps.communication import models as comm_models
 from recoco.apps.projects import models as projects_models
 

@@ -10,11 +10,16 @@ import datetime
 
 import reversion
 from django import forms
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.contrib.auth.mixins import (
+    LoginRequiredMixin,
+    PermissionRequiredMixin,
+    UserPassesTestMixin,
+)
 from django.contrib.sites.shortcuts import get_current_site
 from django.contrib.syndication.views import Feed
+from django.db import transaction
 from django.db.models import Q
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
@@ -22,17 +27,18 @@ from django.template import TemplateDoesNotExist
 from django.template.loader import get_template
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
-from django.views.generic.detail import DetailView
+from django.views.generic.detail import DetailView, View
 from django.views.generic.edit import DeleteView
 from markdownx.fields import MarkdownxFormField
+from reversion.models import Version
+from reversion_compare.views import HistoryCompareDetailView
+
 from recoco.apps.addressbook import models as addressbook_models
 from recoco.apps.geomatics import models as geomatics_models
 from recoco.apps.projects import models as projects
 from recoco.utils import check_if_advisor, has_perm, has_perm_or_403, is_staff_for_site
-from reversion_compare.views import HistoryCompareDetailView
 
 from . import models
-
 
 ########################################################################
 # Searching resources
@@ -382,6 +388,35 @@ class EditResourceForm(forms.ModelForm):
 
 
 # History/Reversion
+class ResourceHistoryRestoreView(LoginRequiredMixin, PermissionRequiredMixin, View):
+    permission_required = "sites.manage_resources"
+    http_method_names = ["post"]
+
+    def has_permission(self):
+        site = get_current_site(self.request)
+        return self.request.user.has_perm(self.permission_required, site)
+
+    def post(self, request, *args, **kwargs):
+        resource_id = self.kwargs.get("pk")
+
+        resource = get_object_or_404(models.Resource, pk=resource_id)
+
+        rev_id = self.kwargs.get("rev_pk")
+
+        version = get_object_or_404(Version.objects.get_for_object(resource), pk=rev_id)
+        with transaction.atomic(), reversion.create_revision():
+            version.revert()
+            reversion.set_user(request.user)
+            reversion.set_comment("Restauration de version")
+
+        messages.add_message(
+            request,
+            messages.SUCCESS,
+            f"La version du {version.revision.date_created} a bien été restaurée.",
+        )
+        return redirect(reverse("resources-resource-detail", args=(resource.pk,)))
+
+
 class ResourceHistoryCompareView(
     LoginRequiredMixin, PermissionRequiredMixin, HistoryCompareDetailView
 ):

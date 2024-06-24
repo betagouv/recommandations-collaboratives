@@ -1,7 +1,7 @@
 from django import template
 
 from .. import utils
-from ..models import Choice, Answer
+from ..models import Answer, Choice
 
 register = template.Library()
 

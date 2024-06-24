@@ -21,6 +21,7 @@ from model_bakery import baker
 from model_bakery.recipe import Recipe
 from notifications import notify
 from pytest_django.asserts import assertContains, assertRedirects
+
 from recoco import verbs
 from recoco.apps.geomatics import models as geomatics
 from recoco.apps.projects import models as project_models

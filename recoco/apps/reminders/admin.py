@@ -1,8 +1,9 @@
 from django.contrib import admin, messages
-from recoco.apps.communication import digests
 from django.contrib.contenttypes.admin import GenericTabularInline
 
+from recoco.apps.communication import digests
 from recoco.apps.communication import models as communication_models
+
 from . import models
 
 

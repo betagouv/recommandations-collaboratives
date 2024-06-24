@@ -15,6 +15,7 @@ from datetime import timedelta
 from django.core.management.base import BaseCommand
 from django.db.models import Max, Q
 from django.utils import timezone
+
 from recoco.apps.projects import models as project_models
 
 logger = logging.getLogger("main")

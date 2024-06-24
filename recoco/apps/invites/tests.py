@@ -15,11 +15,12 @@ from django.urls import reverse
 from django.utils import timezone
 from model_bakery import baker
 from model_bakery.recipe import Recipe
-from pytest_django.asserts import assertRedirects, assertNotContains, assertContains
+from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
+
 from recoco.apps.addressbook import models as addressbook_models
 from recoco.apps.home import models as home_models
 from recoco.apps.projects import models as projects_models
-from recoco.apps.projects.utils import assign_collaborator, assign_advisor
+from recoco.apps.projects.utils import assign_advisor, assign_collaborator
 from recoco.utils import has_perm, login
 
 from . import api, models

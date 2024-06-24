@@ -1,9 +1,8 @@
-from django.db.models import When, Case, QuerySet, Count, Q, F, BooleanField
-
+from django.db.models import BooleanField, Case, Count, F, Q, QuerySet, When
 
 from recoco.apps.tasks.models import Task
 
-from ..utils import hash_field, display_value
+from ..utils import display_value, hash_field
 
 
 def get_queryset(site_id: int) -> QuerySet:

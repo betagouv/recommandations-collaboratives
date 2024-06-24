@@ -13,6 +13,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404, redirect, render, reverse
 from django.utils import timezone
 from django.views.generic import DetailView, RedirectView
+
 from recoco.apps.projects import models as projects_models
 from recoco.apps.projects.utils import get_collaborators_for_project
 from recoco.utils import get_site_config_or_503, has_perm_or_403

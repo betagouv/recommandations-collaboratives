@@ -20,7 +20,7 @@ celles-ci.
 
 Son code est couvert par la licence AGPL v3.0.
 
-En savoir plus sur http://recoconseil.fr
+En savoir plus sur https://recommandations-collaboratives.beta.gouv.fr/
 
 ## Installation
 

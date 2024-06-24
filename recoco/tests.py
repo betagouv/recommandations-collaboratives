@@ -1,18 +1,18 @@
 import pytest
+from autoslug import AutoSlugField
 from django.conf import settings
-from django.shortcuts import reverse
 from django.contrib.auth import models as auth
 from django.contrib.sites import models as sites_models
 from django.contrib.sites.shortcuts import get_current_site
+from django.shortcuts import reverse
 from guardian.shortcuts import assign_perm
-from rest_framework.test import APIClient
-from model_bakery.recipe import Recipe
 from model_bakery import baker
+from model_bakery.recipe import Recipe
+from rest_framework.test import APIClient
 
 from recoco.apps.projects import models as projects_models
 from recoco.apps.resources import models as resources_models
 from recoco.utils import login
-
 
 from . import utils
 
@@ -178,3 +178,12 @@ def test_assign_site_staff(client, request):
     staff_group = utils.get_group_for_site("staff", site)
     assert user in staff_group.user_set.all()
     assert site in user.profile.sites.all()
+
+
+class CustomBaker(baker.Baker):
+    def get_fields(self):
+        return [
+            field
+            for field in super(CustomBaker, self).get_fields()
+            if not isinstance(field, AutoSlugField)
+        ]

@@ -15,14 +15,14 @@ updated: 2022-02-03 16:19:24 CET
 
 import logging
 
-from django.utils import timezone
 from django.conf import settings
-from django.core.mail import mail_admins
-from django.core.mail import send_mail as django_send_mail
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
+from django.core.mail import mail_admins
+from django.core.mail import send_mail as django_send_mail
+from django.utils import timezone
 
-from recoco.utils import get_site_config_or_503, build_absolute_url
+from recoco.utils import build_absolute_url, get_site_config_or_503
 
 from .brevo import Brevo
 from .models import EmailTemplate, TransactionRecord

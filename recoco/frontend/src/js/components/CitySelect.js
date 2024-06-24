@@ -37,7 +37,6 @@ function CitySearch(required = false, requestMethod = 'GET', dsfr = false) {
 
       ['change'].forEach((event) => {
         this.$refs.insee.addEventListener(event, (e) => {
-          console.log('insee change event', e.target.value);
           const errors = required && e.target.value == '';
           removeAndAddClassConditionaly(
             errors,

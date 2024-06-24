@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import ChallengeDefinition, Challenge
+from .models import Challenge, ChallengeDefinition
 
 
 class ChallengeDefinitionSerializer(serializers.ModelSerializer):

@@ -1,8 +1,8 @@
 from django import forms
 from markdownx.fields import MarkdownxFormField
 
-from recoco.apps.home import models as home_models
 from recoco.apps.addressbook import models as addressbook_models
+from recoco.apps.home import models as home_models
 
 from . import models
 

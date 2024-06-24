@@ -1,6 +1,5 @@
 # global personal configuration of pytest
 import pytest
-
 from django.core.management import call_command
 
 

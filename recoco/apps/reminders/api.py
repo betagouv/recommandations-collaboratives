@@ -11,9 +11,9 @@ import datetime
 import logging
 
 from django.utils import timezone
-from recoco.apps.tasks.models import Task
-from recoco.apps.home.models import SiteConfiguration
 
+from recoco.apps.home.models import SiteConfiguration
+from recoco.apps.tasks.models import Task
 
 from . import models
 
