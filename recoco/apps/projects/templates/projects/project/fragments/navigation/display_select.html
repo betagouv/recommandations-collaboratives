@@ -1,3 +1,9 @@
+{% load sass_tags %}
+{% block css %}
+    <link href="{% sass_src 'projects/css/segmented_ctrl.scss' %}"
+          rel="stylesheet"
+          type="text/css">
+{% endblock css %}
 {% with request.resolver_match.url_name as url_name %}
     <fieldset class="fr-segmented">
         <legend class="fr-segmented__legend inline" style="white-space: nowrap;">Vue :</legend>
