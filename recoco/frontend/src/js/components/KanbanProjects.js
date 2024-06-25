@@ -162,8 +162,7 @@ function boardProjectsApp() {
           return currentRegions.push(currentRegion);
         }
       });
-
-      return (this.regions = currentRegions);
+      this.regions = currentRegions;
     },
     handleTerritorySelectAll() {
       this.territorySelectAll = !this.territorySelectAll;
