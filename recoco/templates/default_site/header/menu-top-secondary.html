@@ -176,14 +176,8 @@
             </li>
         {% endif %} -->
         <!-- Ressources -->
-        {% if not user.is_authenticated %}
-            <li>
-            {% else %}
-                <li style="margin-right: 15px;
-                           padding-bottom:20px;
-                           border-bottom:solid 2px transparent;
-                           {% if url_name == 'resources-resource-search' %}activated{% endif %}">
-                {% endif %}
+                <li style="{% if url_name == 'resources-resource-search' %}activated{% endif %}">
+
                 <div x-data="{ open: false }"
                      x-on:click.outside="open = false"
                      class="btn-group d-flex">
