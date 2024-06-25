@@ -142,6 +142,7 @@ TEMPLATES = [
                 "recoco.apps.projects.context_processors.is_switchtender_processor",
                 "recoco.apps.projects.context_processors.active_project_processor",
                 "recoco.apps.projects.context_processors.unread_notifications_processor",
+                "recoco.apps.projects.context_processors.inject_site_config_processor",
             ],
             "loaders": [
                 "dbtemplates.loader.Loader",
