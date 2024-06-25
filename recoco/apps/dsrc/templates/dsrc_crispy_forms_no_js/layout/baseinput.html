@@ -1,11 +1,13 @@
-{% if field.field.widget.input_type == "text" %}
+{% if field.field.widget.attrs.data_role == "tagsinput" %}
+    {{ field }}
+{% elif field.field.widget.input_type == "text" %}
     {% include "dsrc/core/blocks/inputs/input_text.html" with js_validation=False %}
 {% elif field.field.widget.input_type == "password" %}
     {% include "dsrc/core/blocks/inputs/input_text.html" with js_validation=False %}
 {% elif field.field.widget.input_type == "email" %}
     {% include "dsrc/core/blocks/inputs/input_text.html" with js_validation=False %}
 {% elif field.field.widget.input_type == "file" %}
-    {% include "dsrc/core/blocks/inputs/input_text.html" with js_validation=False %}
+    {{ field }}
 {% elif field.field.widget.input_type == "number" %}
     {% include "dsrc/core/blocks/inputs/input_number.html" with js_validation=False %}
 {% elif field.field.widget.input_type == "select" %}

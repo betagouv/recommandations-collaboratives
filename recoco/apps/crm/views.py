@@ -58,6 +58,7 @@ from recoco.utils import (
 )
 
 from . import filters, forms, models
+from .forms import SiteConfigurationForm
 
 
 class CRMSiteDashboardView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
@@ -153,21 +154,10 @@ def crm_search(request):
 ########################################################################
 # tenancy
 ########################################################################
+
+
 class SiteConfigurationUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
-    model = home_models.SiteConfiguration
-    fields = [
-        "sender_email",
-        "sender_name",
-        "contact_form_recipient",
-        "legal_address",
-        "legal_owner",
-        "description",
-        "logo_large",
-        "logo_small",
-        "email_logo",
-        "crm_available_tags",
-        "reminder_interval",
-    ]
+    form_class = SiteConfigurationForm
     template_name = "crm/siteconfiguration_update.html"
     success_url = reverse_lazy("crm-site-dashboard")
 
