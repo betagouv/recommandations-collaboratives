@@ -4,6 +4,10 @@
     {% include "dsrc/core/blocks/inputs/input_text.html" %}
 {% elif field.field.widget.input_type == "email" %}
     {% include "dsrc/core/blocks/inputs/input_text.html" %}
+{% elif field.field.widget.input_type == "file" %}
+    {% include "dsrc/core/blocks/inputs/input_text.html" %}
+{% elif field.field.widget.input_type == "number" %}
+    {% include "dsrc/core/blocks/inputs/input_number.html" %}
 {% elif field.field.widget.input_type == "select" %}
     {% include "dsrc/core/blocks/inputs/select.html" %}
 {% elif field.field.widget.attrs.cols != None and field.field.widget.attrs.rows != None %}
