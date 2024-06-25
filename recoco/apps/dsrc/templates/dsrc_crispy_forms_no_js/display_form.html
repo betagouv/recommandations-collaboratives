@@ -1,0 +1,11 @@
+{% if form.form_html %}
+    {% if form_show_errors %}
+        {% include "dsrc_crispy_forms_no_js/errors.html" %}
+    {% endif %}
+    {{ form.form_html }}
+{% else %}
+    {% include "dsrc_crispy_forms_no_js/uni_form.html" %}
+{% endif %}
+{% if form.helper.form_button != False %}
+    {% include "dsrc/core/blocks/buttons/button_group.html" %}
+{% endif %}

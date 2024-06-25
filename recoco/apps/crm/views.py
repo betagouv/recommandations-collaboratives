@@ -40,10 +40,12 @@ from django.db.models import (
 from django.db.models.functions import Cast
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render, reverse
+from django.urls import reverse_lazy
 from django.utils import timezone
 from django.utils.safestring import mark_safe
 from django.views.decorators.http import require_http_methods
 from django.views.generic.base import TemplateView
+from django.views.generic.edit import UpdateView
 from guardian.shortcuts import get_users_with_perms
 from notifications import models as notifications_models
 from notifications import notify
@@ -67,6 +69,7 @@ from recoco.utils import (
 )
 
 from . import filters, forms, models
+from .forms import SiteConfigurationForm
 
 
 class CRMSiteDashboardView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
@@ -157,6 +160,25 @@ def crm_search(request):
         search_results = list(filter(filter_current_site, all_sites_search_results))
 
     return render(request, "crm/search_results.html", locals())
+
+
+########################################################################
+# tenancy
+########################################################################
+
+
+class SiteConfigurationUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    form_class = SiteConfigurationForm
+    template_name = "crm/siteconfiguration_update.html"
+    success_url = reverse_lazy("crm-site-dashboard")
+
+    def test_func(self):
+        return has_perm(
+            self.request.user, "sites.manage_configuration", self.request.site
+        )
+
+    def get_object(self, queryset=None):
+        return self.request.site.configuration
 
 
 ########################################################################

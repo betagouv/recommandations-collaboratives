@@ -48,6 +48,12 @@ urlpatterns = [
         views.crm_list_projects_with_low_reach,
         name="crm-list-projects-low-reach",
     ),
+    # tenancy
+    path(
+        "crm/site_config",
+        views.SiteConfigurationUpdateView.as_view(),
+        name="crm-site-configuration",
+    ),
     #
     # users
     path(
