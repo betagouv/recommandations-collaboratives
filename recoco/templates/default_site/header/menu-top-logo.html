@@ -1,13 +1,13 @@
 {% load static %}
 {% if user.is_authenticated %}
-     <!-- <a href="{% url 'home' %}"
+     <a href="{% url 'home' %}"
         class="d-flex align-middle align-items-center">
-          <img class="logo-uv"
-               src="{% static 'img/logo-small.png' %}"
+          <img class="logo-{{ request.site.name|lower }}"
+               src="{{ site_config.logo_small.url }}"
                width="auto"
                height="40px"
-               alt="Logo UrbanVitaliz" />
-     </a> -->
+               alt="logo {{ request.site.name }} - lien retour page accueil" />
+     </a>
 {% else %}
      <div class="navbar-logo">
           <button class="toggler-secondary"
@@ -29,12 +29,12 @@
                <img class="mx-4 logo-cerema"
                     src="{% static 'img/partners/logo_cerema.png' %}"
                     width="120px"
-                    alt="Logo du Cerema">
-               <img class="logo-uv"
-                    src="{% static 'img/logo-uv.png' %}"
+                    alt="Logo du Cerema">  -->
+               <img class="logo-{{ request.site.name|lower }}"
+                    src="{{ site_config.logo_large.url }}"
                     width="auto"
                     height="40px"
-                    alt="Logo UrbanVitaliz" /> -->
+                    alt="logo {{ request.site.name }} - lien retour page accueil" />
                     <span style="font-size: 30px; font-weight: bold;margin-left: 30px;">{{ request.site.name }}</span>
           </a>
      </div>
