@@ -955,7 +955,7 @@ def crm_list_projects_with_low_reach(request):
     projects = (
         Project.on_site.filter(status__in=("READY", "IN_PROGRESS", "DONE"))
         .exclude(exclude_stats=True)
-        .prefetch_related("tasks")
+        .prefetch_related("tasks", "notes")
         .annotate(
             reco_total=Count(Case(When(tasks__public=True, then=Value(1)))),
             reco_unread=Count(
@@ -968,14 +968,24 @@ def crm_list_projects_with_low_reach(request):
                 Cast(F("reco_unread"), FloatField()) / F("reco_total") * Value(100.0),
                 output_field=FloatField(),
             ),  # Pc of unread reco
-            last_reco_at=Max("tasks__created_on"),
+            last_reco_at=Max("tasks__created_on", filter=Q(tasks__public=True)),
+            last_public_msg_at=Max(
+                "notes__created_on",
+                filter=Q(notes__public=True, notes__created_by__in=F("members__id")),
+            ),
         )
         .exclude(reco_read_ratio__gte=99.9)  # Not interested if everything was read
         .exclude(
             last_reco_at__lte=datetime.now()
             - timedelta(days=site_config.reminder_interval)
         )
-        .order_by("reco_read_ratio", "last_members_activity_at")
+        .order_by(
+            "reco_read_ratio",
+            "last_members_activity_at",
+            "last_reco_at",
+            "last_public_msg_at",
+        )
+        .distinct()
     )
 
     return render(request, "crm/projects_low_reach.html", locals())

@@ -3,7 +3,7 @@
 {% load static %}
 {% load humanize %}
 {% load crm_tags %}
-{% block title %}Projets à faible impact - CRM{% endblock %}
+{% block title %}Projets à faible répondant - CRM{% endblock %}
 
 {% block content %}
     <div x-data="Crm"
@@ -24,6 +24,7 @@
                         <th>% d'accès aux recos</th>
                         <th>Dernière activité collectivité</th>
                         <th>Dernière reco publiée</th>
+                        <th>Dernier msg conversation</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -52,7 +53,8 @@
                             <td>
                                 {{ project.last_members_activity_at|timesince }}
                             </td>
-                            <td>{{ project.last_reco_at|timesince }}</td>
+                            <td>{{ project.last_reco_at|timesince|default:"-" }}</td>
+                            <td>{{ project.last_public_msg_at|timesince|default:"-" }}</td>
                         </tr>
                     {% endfor %}
                 </tbody>

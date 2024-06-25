@@ -74,6 +74,10 @@
                                 {% include "crm/fragments/crm_icon_button.html" with link_url=url name="Tags / Projects" icon="tag-fill" %}
                             </li>
                             <li class="me-2 col-2 ">
+                                {% url 'crm-list-projects-low-reach' as url %}
+                                {% include "crm/fragments/crm_icon_button.html" with link_url=url name="Projets à faible répondant" icon="chat-square-dots" %}
+                            </li>
+                            <li class="me-2 col-2 ">
                                 {% url 'crm-list-tags' as url %}
                                 {% include "crm/fragments/crm_icon_button.html" with link_url=url name="Index des tags du crm" icon="activity" %}
                             </li>
