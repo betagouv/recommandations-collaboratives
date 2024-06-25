@@ -13,7 +13,8 @@
                        {% if url_name == 'projects-project-list-staff' %}checked{% endif %}
                        type="radio"
                        id="table-display"
-                       name="display-select-radio">
+                       name="display-select-radio"
+                       @click="window.location.href='{% url "projects-project-list-staff" %}'">
                 <label class="fr-label" for="table-display">
                     <a href="{% url "projects-project-list-staff" %}">Tableau</a>
                 </label>
@@ -23,7 +24,8 @@
                        {% if url_name == 'projects-project-list-advisor' %}checked{% endif %}
                        type="radio"
                        id="list-display"
-                       name="display-select-radio">
+                       name="display-select-radio"
+                       @click="window.location.href='{% url "projects-project-list-advisor" %}'">
                 <label class="fr-label" for="list-display">
                     <a href="{% url "projects-project-list-advisor" %}">Liste</a>
                 </label>
@@ -33,7 +35,8 @@
                        {% if url_name == 'projects-project-list-map' %}checked{% endif %}
                        type="radio"
                        id="map-display"
-                       name="display-select-radio">
+                       name="display-select-radio"
+                       @click="window.location.href='{% url "projects-project-list-map" %}'">
                 <label class="fr-label" for="map-display">
                     <a href="{% url "projects-project-list-map" %}">Carte</a>
                 </label>
