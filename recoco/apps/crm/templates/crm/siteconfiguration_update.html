@@ -33,7 +33,7 @@
                 </div>
                 <form method="POST" enctype="multipart/form-data" class="fr-form">
                     {% csrf_token %}
-                    {{ form.as_p }}
+                    {% crispy form "dsrc_crispy_forms_no_js" %}
                     <button class="fr-btn" type="submit">Sauvegarder</button>
                 </form>
             </div>
