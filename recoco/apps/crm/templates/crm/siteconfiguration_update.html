@@ -5,6 +5,8 @@
 {% load humanize %}
 {% load training %}
 {% load hijack %}
+{% load crispy_forms_tags %}
+{% load crispy_forms_field %}
 {% block title %}Configuration du Site - CRM{% endblock %}
 {% block js %}
     {% vite_asset 'js/apps/crm.js' %}
@@ -29,14 +31,11 @@
                 <div class="d-flex justify-content-between align-items-center mb-2">
                     <h3>Paramètres du Site "{{ request.site.name }}"</h3>
                 </div>
-
-
-            <form method="POST" enctype="multipart/form-data" class="fr-form">
-                {% csrf_token %}
-                {{ form.as_p }}
-                <button class="fr-btn" type="submit">Sauvegarder</button>
-            </form>
-
+                <form method="POST" enctype="multipart/form-data" class="fr-form">
+                    {% csrf_token %}
+                    {% crispy form "dsrc_crispy_forms_no_js" %}
+                    <button class="fr-btn" type="submit">Sauvegarder</button>
+                </form>
             </div>
         </div>
     </div>
