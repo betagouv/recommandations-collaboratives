@@ -162,7 +162,7 @@ DBTEMPLATES_USE_CODEMIRROR = True
 # MULTISITE
 MULTISITE_DEFAULT_TEMPLATE_DIR = "default_site/"
 
-CRISPY_ALLOWED_TEMPLATE_PACKS = "dsrc_crispy_forms"
+CRISPY_ALLOWED_TEMPLATE_PACKS = ["dsrc_crispy_forms", "dsrc_crispy_forms_no_js"]
 CRISPY_TEMPLATE_PACK = "dsrc_crispy_forms"
 
 WSGI_APPLICATION = "recoco.wsgi.application"

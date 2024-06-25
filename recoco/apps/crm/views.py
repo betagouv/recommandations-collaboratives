@@ -6,8 +6,8 @@ created : 2022-07-20 12:27:25 CEST
 """
 
 import csv
-import datetime
 from collections import Counter, OrderedDict, defaultdict
+from datetime import datetime, timedelta
 
 from actstream import action
 from actstream.models import Action, actor_stream, target_stream
@@ -26,13 +26,26 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 from django.contrib.syndication.views import Feed
 from django.db import transaction
-from django.db.models import Count, Q
+from django.db.models import (
+    Case,
+    Count,
+    ExpressionWrapper,
+    F,
+    FloatField,
+    Max,
+    Q,
+    Value,
+    When,
+)
+from django.db.models.functions import Cast
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render, reverse
+from django.urls import reverse_lazy
 from django.utils import timezone
 from django.utils.safestring import mark_safe
 from django.views.decorators.http import require_http_methods
 from django.views.generic.base import TemplateView
+from django.views.generic.edit import UpdateView
 from guardian.shortcuts import get_users_with_perms
 from notifications import models as notifications_models
 from notifications import notify
@@ -56,6 +69,7 @@ from recoco.utils import (
 )
 
 from . import filters, forms, models
+from .forms import SiteConfigurationForm
 
 
 class CRMSiteDashboardView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
@@ -146,6 +160,25 @@ def crm_search(request):
         search_results = list(filter(filter_current_site, all_sites_search_results))
 
     return render(request, "crm/search_results.html", locals())
+
+
+########################################################################
+# tenancy
+########################################################################
+
+
+class SiteConfigurationUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    form_class = SiteConfigurationForm
+    template_name = "crm/siteconfiguration_update.html"
+    success_url = reverse_lazy("crm-site-dashboard")
+
+    def test_func(self):
+        return has_perm(
+            self.request.user, "sites.manage_configuration", self.request.site
+        )
+
+    def get_object(self, queryset=None):
+        return self.request.site.configuration
 
 
 ########################################################################
@@ -377,7 +410,7 @@ def user_update(request, user_id=None):
                                 f'L\'utilisateur <a href="{user_link}">'
                                 f"{users[0].first_name} {users[0].last_name}</a>'"
                                 " utilise déjà cette adresse email."
-                            )
+                            )  # nosec
                             form.add_error(
                                 "username", django_forms.ValidationError(error_msg)
                             )
@@ -933,6 +966,54 @@ def crm_list_recommendation_without_resources(request):
 
 
 @login_required
+def crm_list_projects_with_low_reach(request):
+    """List projects that don't get a good impact"""
+    has_perm_or_403(request.user, "use_crm", request.site)
+
+    site_config = get_site_config_or_503(request.site)
+
+    search_form = forms.CRMSearchForm()
+
+    projects = (
+        Project.on_site.filter(status__in=("READY", "IN_PROGRESS", "DONE"))
+        .exclude(exclude_stats=True)
+        .prefetch_related("tasks", "notes")
+        .annotate(
+            reco_total=Count(Case(When(tasks__public=True, then=Value(1)))),
+            reco_unread=Count(
+                Case(When(tasks__public=True, tasks__visited=False, then=Value(1)))
+            ),
+        )
+        .exclude(reco_total=0)
+        .annotate(
+            reco_read_ratio=ExpressionWrapper(
+                Cast(F("reco_unread"), FloatField()) / F("reco_total") * Value(100.0),
+                output_field=FloatField(),
+            ),  # Pc of unread reco
+            last_reco_at=Max("tasks__created_on", filter=Q(tasks__public=True)),
+            last_public_msg_at=Max(
+                "notes__created_on",
+                filter=Q(notes__public=True, notes__created_by__in=F("members__id")),
+            ),
+        )
+        .exclude(reco_read_ratio__gte=99.9)  # Not interested if everything was read
+        .exclude(
+            last_reco_at__lte=datetime.now()
+            - timedelta(days=site_config.reminder_interval)
+        )
+        .order_by(
+            "reco_read_ratio",
+            "last_members_activity_at",
+            "last_reco_at",
+            "last_public_msg_at",
+        )
+        .distinct()
+    )
+
+    return render(request, "crm/projects_low_reach.html", locals())
+
+
+@login_required
 def crm_list_tags(request):
     """Return a page containing all tags with their count"""
     has_perm_or_403(request.user, "use_crm", request.site)
@@ -1024,7 +1105,7 @@ def crm_list_topics_as_csv(request):
 
     topics = compute_topics_occurences(request.site)
 
-    today = datetime.datetime.today().date()
+    today = datetime.today().date()
 
     content_disposition = (
         f'attachment; filename="topics-for-projects-and-recos-{today}.csv"'
@@ -1089,7 +1170,7 @@ def project_list_by_tags_as_csv(request):
         .distinct()
     )
 
-    today = datetime.datetime.today().date()
+    today = datetime.today().date()
 
     content_disposition = f'attachment; filename="tags-for-projects-{today}.csv"'
     response = HttpResponse(

@@ -96,7 +96,7 @@ def test_has_perm_considers_current_site():
 
 
 @pytest.mark.django_db
-def test_site_staff_bypass_has_perm_for_her_site_objects(client, request):
+def test_site_staff_bypass_has_perm_for_sub_site_objects(client, request):
     project = Recipe(projects_models.Project).make()
 
     site = get_current_site(request)
@@ -115,12 +115,29 @@ def test_site_staff_bypass_has_perm_for_her_site_objects(client, request):
 
 
 @pytest.mark.django_db
-def test_site_staff_bypass_has_perm_for_her_site(client, request):
+def test_site_staff_cannot_bypass_has_perm_for_the_site_objects(client, request):
+    site = get_current_site(request)
+    site2 = Recipe(sites_models.Site).make()
+
+    perm_name = "sites.manage_configuration"
+
+    with login(client, groups=["example_com_staff"]) as user:
+        # Shouldn't be present on current site
+        with settings.SITE_ID.override(site.pk):
+            assert not utils.has_perm(user, perm_name, site)
+
+        # Shoudn't be present on another site
+        with settings.SITE_ID.override(site2.pk):
+            assert not utils.has_perm(user, perm_name, site2)
+
+
+@pytest.mark.django_db
+def test_site_admin_bypass_has_perm_for_her_site(client, request):
     site = get_current_site(request)
 
     perm_name = "sites.list_projects"
 
-    with login(client, groups=["example_com_staff"]) as user:
+    with login(client, groups=["example_com_admin"]) as user:
         # Should be present on current site
         with settings.SITE_ID.override(site.pk):
             assert utils.has_perm(user, perm_name, site)
