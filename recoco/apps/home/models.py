@@ -175,14 +175,14 @@ class SiteConfiguration(models.Model):
         blank=True,
     )
 
-    def logo_email_upload_path(self, filname):
-        self._logo_upload_path(filname, prefix="email")
+    def logo_email_upload_path(self, filename):
+        return self._logo_upload_path(filename, prefix="email")
 
-    def logo_large_upload_path(self, filname):
-        self._logo_upload_path(filname, prefix="large")
+    def logo_large_upload_path(self, filename):
+        return self._logo_upload_path(filename, prefix="large")
 
-    def logo_small_upload_path(self, filname):
-        self._logo_upload_path(filname, prefix="small")
+    def logo_small_upload_path(self, filename):
+        return self._logo_upload_path(filename, prefix="small")
 
     def _logo_upload_path(self, filename, prefix=None):
         if prefix:
