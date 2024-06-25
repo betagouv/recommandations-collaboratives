@@ -186,7 +186,7 @@ class SiteConfiguration(models.Model):
 
     def _logo_upload_path(self, filename, prefix=None):
         if prefix:
-            prefix.append("-")
+            prefix = f"{prefix}-"
 
         return f"images/{self.site.pk}/logo/{prefix}{filename}"
 
