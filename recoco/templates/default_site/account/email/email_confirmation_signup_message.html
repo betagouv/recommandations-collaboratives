@@ -6,7 +6,7 @@
   <head>
     <meta name="viewport" content="width=device-width" />
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <title>Confirmez votre adresse email sur UrbanVitaliz</title>
+    <title>Confirmez votre adresse email sur {{ request.site.name }}</title>
     <style>
       /* -------------------------------------
           GLOBAL RESETS
@@ -337,7 +337,7 @@
                             </strong>
                           </p>
                           <p>Bonne journée,</p>
-                          <p>L'équipe UrbanVitaliz</p>
+                          <p>L'équipe {{ request.site.name }}</p>
                         </div>
                       </td>
                     </tr>

@@ -1,3 +1,3 @@
 {% autoescape off %}
-Confirmez votre adresse email sur UrbanVitaliz
+Confirmez votre adresse email sur {{ request.site.name }}
 {% endautoescape %}
