@@ -1,9 +1,9 @@
 {% load static %}
 <div class="d-flex align-items-center ms-4">
-    <span class="text-custom-info text-grey-dark fw-light me-2">Filtrer :</span>
+    <span class="fr-segmented__legend inline" style="white-space: nowrap;">Filtrer :</span>
     <div class="input-item position-relative active"
          x-data="{ open: false }"
-         x-on:click.outside="open = false">
+         x-on:click.outside="open = false" style="border: solid 1px #E5E5E5;">
         <div class="d-flex align-items-center pe-4 bg-white"
              x-on:click="open = !open"
              type="button"

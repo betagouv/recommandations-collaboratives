@@ -1,0 +1,37 @@
+{% with request.resolver_match.url_name as url_name %}
+    <fieldset class="fr-segmented">
+        <legend class="fr-segmented__legend inline" style="white-space: nowrap;">Vue :</legend>
+        <div class="fr-segmented__elements">
+            <div class="fr-segmented__element">
+                <input value="table"
+                       {% if url_name == 'projects-project-list-staff' %}checked{% endif %}
+                       type="radio"
+                       id="table-display"
+                       name="display-select-radio">
+                <label class="fr-label" for="table-display">
+                    <a href="{% url "projects-project-list-staff" %}">Tableau</a>
+                </label>
+            </div>
+            <div class="fr-segmented__element">
+                <input value="list"
+                       {% if url_name == 'projects-project-list-advisor' %}checked{% endif %}
+                       type="radio"
+                       id="list-display"
+                       name="display-select-radio">
+                <label class="fr-label" for="list-display">
+                    <a href="{% url "projects-project-list-advisor" %}">Liste</a>
+                </label>
+            </div>
+            <div class="fr-segmented__element">
+                <input value="map"
+                       {% if url_name == 'projects-project-list-map' %}checked{% endif %}
+                       type="radio"
+                       id="map-display"
+                       name="display-select-radio">
+                <label class="fr-label" for="map-display">
+                    <a href="{% url "projects-project-list-map" %}">Carte</a>
+                </label>
+            </div>
+        </div>
+    </fieldset>
+{% endwith %}
