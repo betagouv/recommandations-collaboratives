@@ -87,6 +87,7 @@ INSTALLED_APPS = [
     "recoco.apps.training",
     "recoco.apps.pages",
     "recoco.apps.metrics",
+    "recoco.apps.demarches_simplifies",
     "crispy_forms",
     "wagtail.contrib.forms",
     "wagtail.contrib.redirects",
@@ -402,5 +403,12 @@ CELERY_RESULT_BACKEND = "django-db"
 # Metabase
 METABASE_HOST = os.environ.get("METABASE_HOST")
 METABASE_API_KEY = os.environ.get("METABASE_API_KEY")
+
+
+# Démarches simplifiées
+DS_API_BASE_URL = os.environ.get(
+    "DS_API_URL",
+    default="https://demarches-simplifiees.fr/api/public/v1/",
+)
 
 # eof
