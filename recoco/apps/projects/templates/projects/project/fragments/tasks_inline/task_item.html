@@ -60,6 +60,11 @@
                 <div x-html="truncate(renderMarkdown(task.content),100)"
                      class="text-info-custom fw-light font-small text-dark mb-2 p-0"></div>
             </template>
+
+            <template x-if="task.ds_folder">
+                <a x-bind:href="task.ds_folder.dossier_url">Démarche simplifiée pré-remplie</a>
+            </template>
+
         </article>
         <template x-if="task.resource">
             <article class="mb-3">{% include 'projects/project/fragments/task/task_comment.html' %}</article>
