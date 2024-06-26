@@ -29,7 +29,7 @@ django-gravatar2
 psycopg[binary]>3
 django-leaflet
 django-admin-csvexport==2.2
-djangorestframework==3.15.1
+djangorestframework==3.15.2
 djangorestframework-xml
 djangorestframework-simplejwt
 rest-framework-generic-relations
