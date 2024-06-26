@@ -10,6 +10,7 @@ from recoco.apps.projects.views import rest as projects_rest
 from recoco.apps.resources import rest as resources_rest
 from recoco.apps.tasks.views import rest as tasks_rest
 from recoco.apps.training import rest as training_rest
+from recoco.apps.survey.views import rest as survey_rest
 
 router = routers.DefaultRouter()
 
@@ -120,4 +121,17 @@ auth_urls = [
     ),
 ]
 
-urlpatterns = router.urls + api_urls + auth_urls
+survey_urls = [
+    path(
+        "survey/sessions/",
+        survey_rest.SessionView.as_view(),
+        name="api-survey-sessions",
+    ),
+    path(
+        "survey/sessions/<int:session_id>/answers/",
+        survey_rest.SessionAnswersView.as_view(),
+        name="api-survey-session-answers",
+    ),
+]
+
+urlpatterns = router.urls + api_urls + auth_urls + survey_urls
