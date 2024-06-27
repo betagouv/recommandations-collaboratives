@@ -1,14 +1,15 @@
 {% load static %}
-{% if user.is_authenticated %}
+{% if user.is_authenticated and request.site.configuration.logo_small %}
      <a href="{% url 'home' %}"
         class="d-flex align-middle align-items-center">
           <img class="logo-{{ request.site.name|lower }}"
-               src="{{ site_config.logo_small.url }}"
+               src="{{ request.site.configuration.logo_small.url }}"
                width="auto"
                height="40px"
                alt="logo {{ request.site.name }} - lien retour page accueil" />
      </a>
-{% else %}
+{% elif user.is_authenticated %}
+{% elif not user.is_authenticated and request.site.configuration.logo_large %}
      <div class="navbar-logo">
           <button class="toggler-secondary"
                   type="button"
@@ -31,11 +32,27 @@
                     width="120px"
                     alt="Logo du Cerema">  -->
                <img class="logo-{{ request.site.name|lower }}"
-                    src="{{ site_config.logo_large.url }}"
+                    src="{{ request.site.configuration.logo_large.url }}"
                     width="auto"
                     height="40px"
                     alt="logo {{ request.site.name }} - lien retour page accueil" />
                     <span style="font-size: 30px; font-weight: bold;margin-left: 30px;">{{ request.site.name }}</span>
+          </a>
+     </div>
+{% else %}
+     <div class="navbar-logo">
+          <button class="toggler-secondary"
+               type="button"
+               data-bs-toggle="collapse"
+               data-bs-target="#secondary-navbar"
+               aria-controls="secondary-navbar"
+               aria-expanded="false"
+               aria-label="Ouvrir le Menu"
+               data-test-id="toggler-secondary-menu">
+               <span class="navbar-toggler-icon"></span>
+          </button>
+          <a href="{% url 'home' %}" class="d-flex align-middle p-3 align-items-center">
+               <span style="font-size: 30px; font-weight: bold;margin-left: 30px;">{{ request.site.name }}</span>
           </a>
      </div>
 {% endif %}

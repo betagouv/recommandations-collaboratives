@@ -147,10 +147,4 @@ def active_project_processor(request):
     return context
 
 
-def inject_site_config_processor(request):
-    return {
-        "site_config": get_site_config_or_503(request.site),
-    }
-
-
 # eof
