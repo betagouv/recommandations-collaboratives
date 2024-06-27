@@ -99,5 +99,5 @@ class Command(BaseCommand):
                         )
                     )
 
-        except Exception as e:
-            raise CommandError(e)
+        except Exception as exc:
+            raise CommandError(exc) from exc

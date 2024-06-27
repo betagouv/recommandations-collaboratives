@@ -188,10 +188,10 @@ def send_message_to_team(request, data):
 
     try:
         site_config = request.site.configuration
-    except models.SiteConfiguration.DoesNotExist:
+    except models.SiteConfiguration.DoesNotExist as exc:
         raise ImproperlyConfigured(
             f"Please create the SiteConfiguration for this site '{request.site}'"
-        )
+        ) from exc
 
     recipient = site_config.contact_form_recipient
 

@@ -52,10 +52,10 @@ class MaterializedView:
     ) -> "MaterializedView":
         try:
             materialized_view = MaterializedView(site, **spec)
-        except TypeError:
+        except TypeError as exc:
             raise MaterializedViewSpecError(
                 f"Invalid materialized view specification '{spec}'"
-            )
+            ) from exc
 
         if check_sql_query and materialized_view.get_sql_query() is None:
             raise MaterializedViewSpecError(

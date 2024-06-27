@@ -13,8 +13,8 @@ class UserNotificationsMarkOneAsRead(APIView):
     def patch(self, request, pk):
         try:
             notification = request.user.notifications.get(pk=pk)
-        except notifications_models.Notification.DoesNotExist:
-            raise Http404
+        except notifications_models.Notification.DoesNotExist as exc:
+            raise Http404 from exc
 
         count = 0
         is_hijacked = getattr(request.user, "is_hijacked", False)
