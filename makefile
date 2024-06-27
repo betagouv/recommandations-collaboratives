@@ -22,7 +22,7 @@ tags:
 	@find ./recoco -name \*.py | etags --language=python -
 
 nice:
-	pre-commit run --all-files ruff
+	pre-commit run --all-files
 
 lint:
 	pylint --django-settings-module=$(SETTINGS) $(which)

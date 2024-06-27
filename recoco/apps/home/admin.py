@@ -42,10 +42,9 @@ class CustomUserAdmin(UserAdmin):
 
     list_select_related = ("profile",)
 
+    @admin.display(description="Organization")
     def organization(self, instance):
         return instance.profile.organization
-
-    organization.short_description = "Organization"
 
     def get_inline_instances(self, request, obj=None):
         if not obj:
