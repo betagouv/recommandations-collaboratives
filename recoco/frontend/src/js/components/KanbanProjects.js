@@ -35,7 +35,6 @@ function boardProjectsApp() {
     fuse: null,
     searchText: '',
     async getData(postProcess = true) {
-      console.log('get data');
       const json = await api.get('/api/projects/');
 
       const data = json.data.map((d) =>
@@ -105,7 +104,6 @@ function boardProjectsApp() {
         .forEach((e) => e.classList.add('drop-highlight'));
     },
     onDragEnd(event) {
-      console.log('drag end');
       event.target.classList.remove('drag-dragging');
       document
         .querySelectorAll('.drop-column')
