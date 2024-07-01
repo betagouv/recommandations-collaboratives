@@ -130,9 +130,9 @@ def test_project_list_includes_only_projects_in_switchtender_departments(
     response = client.get(url)
 
     assert response.status_code == 200
-    assert len(response.data) == 1
+    assert response.data["count"] == 1
 
-    data = response.data[0]
+    data = response.data["results"][0]
 
     # project fields: not ideal
     expected = [
@@ -464,9 +464,9 @@ def test_user_project_status_contains_only_my_projects(request):
     response = client.get(url)
 
     assert response.status_code == 200
-    assert len(response.data) == 1
+    assert response.data["count"] == 1
 
-    first = response.data[0]
+    first = response.data["results"][0]
     assert first["id"] == mine.id
     assert first["project"]["id"] == mine.project.id
 
@@ -521,8 +521,9 @@ def test_user_project_status_contains_only_my_projects_for_site(request):
     response = client.get(url)
 
     assert response.status_code == 200
-    assert len(response.data) == 1
-    first = response.data[0]
+    assert response.data["count"] == 1
+
+    first = response.data["results"][0]
     assert first["id"] == local.id
     assert first["project"]["id"] == local.project.id
 
@@ -544,11 +545,11 @@ def test_user_project_status_dont_list_unmoderated_projects_for_regional_advisor
 
     client = APIClient()
     client.force_authenticate(user=user)
-    url = reverse("userprojectstatus-list")
-    response = client.get(url)
+
+    response = client.get(reverse("userprojectstatus-list"))
 
     assert response.status_code == 200
-    assert len(response.data) == 0
+    assert len(response.data["results"]) == 0
 
 
 @pytest.mark.django_db
@@ -570,9 +571,10 @@ def test_advisor_access_new_regional_project_status(request):
     response = client.get(url)
 
     assert response.status_code == 200
-    ups = response.data
-    assert len(ups) == 1
-    assert ups[0]["project"]["id"] == project.id
+    assert response.data["count"] == 1
+
+    first = response.data["results"][0]
+    assert first["project"]["id"] == project.id
 
 
 @pytest.mark.django_db
@@ -598,10 +600,12 @@ def test_advisor_access_makes_no_user_project_status_duplicate(request):
     client.force_authenticate(user=user)
     url = reverse("userprojectstatus-list")
     response = client.get(url)
+
     assert response.status_code == 200
-    ups = response.data
-    assert len(ups) == 1
-    assert ups[0]["project"]["id"] == project.id
+    assert response.data["count"] == 1
+
+    first = response.data["results"][0]
+    assert first["project"]["id"] == project.id
 
 
 ########################################################################
@@ -764,18 +768,20 @@ def test_anonymous_cannot_search_topic_api(client, request):
 def test_unused_topics_are_not_suggested_via_rest_api(request):
     current_site = get_current_site(request)
     user = baker.make(auth_models.User)
-    client = APIClient()
-    client.force_authenticate(user=user)
 
     baker.make(models.Topic, name="acme topic", site=current_site)
 
-    url = reverse("topics-list")
+    client = APIClient()
+    client.force_authenticate(user=user)
+
     response = client.get(
-        url, {"search": "acme", "restrict_to": "projects"}, format="json"
+        reverse("topics-list"),
+        data={"search": "acme", "restrict_to": "projects"},
+        format="json",
     )
 
     assert response.status_code == 200
-    assert len(response.data) == 0
+    assert len(response.data["results"]) == 0
 
 
 @pytest.mark.django_db
@@ -789,13 +795,14 @@ def test_topics_on_deleted_task_are_not_suggested_via_rest_api(request):
     task = baker.make(tasks_models.Task, deleted=timezone.now())
     topic.tasks.add(task)
 
-    url = reverse("topics-list")
     response = client.get(
-        url, {"search": "acm topc", "restrict_to": "recommendations"}, format="json"
+        reverse("topics-list"),
+        data={"search": "acm topc", "restrict_to": "recommendations"},
+        format="json",
     )
 
     assert response.status_code == 200
-    assert len(response.data) == 0
+    assert len(response.data["results"]) == 0
 
 
 @pytest.mark.django_db
@@ -809,13 +816,14 @@ def test_topics_on_deleted_project_are_not_suggested_via_rest_api(request):
     project = baker.make(models.Project, deleted=timezone.now())
     topic.projects.add(project)
 
-    url = reverse("topics-list")
     response = client.get(
-        url, {"search": "acm topc", "restrict_to": "projects"}, format="json"
+        reverse("topics-list"),
+        data={"search": "acm topc", "restrict_to": "projects"},
+        format="json",
     )
 
     assert response.status_code == 200
-    assert len(response.data) == 0
+    assert len(response.data["results"]) == 0
 
 
 @pytest.mark.django_db
@@ -829,13 +837,14 @@ def test_topics_are_restricted_to_projects_via_rest_api(request):
     task = baker.make(tasks_models.Task)
     topic.tasks.add(task)
 
-    url = reverse("topics-list")
     response = client.get(
-        url, {"search": "acm topc", "restrict_to": "projects"}, format="json"
+        reverse("topics-list"),
+        data={"search": "acm topc", "restrict_to": "projects"},
+        format="json",
     )
 
     assert response.status_code == 200
-    assert len(response.data) == 0
+    assert len(response.data["results"]) == 0
 
 
 @pytest.mark.django_db
@@ -849,13 +858,14 @@ def test_topics_are_restricted_to_recommendations_via_rest_api(request):
     project = baker.make(models.Project)
     topic.projects.add(project)
 
-    url = reverse("topics-list")
     response = client.get(
-        url, {"search": "acm topc", "restrict_to": "recommendations"}, format="json"
+        reverse("topics-list"),
+        data={"search": "acm topc", "restrict_to": "recommendations"},
+        format="json",
     )
 
     assert response.status_code == 200
-    assert len(response.data) == 0
+    assert len(response.data["results"]) == 0
 
 
 @pytest.mark.django_db
@@ -867,13 +877,14 @@ def test_topics_are_restricted_to_nonexistent_via_rest_api(request):
 
     baker.make(models.Topic, name="acme topic", site=current_site)
 
-    url = reverse("topics-list")
     response = client.get(
-        url, {"search": "acme topic", "restrict_to": "gne"}, format="json"
+        reverse("topics-list"),
+        data={"search": "acme topic", "restrict_to": "gne"},
+        format="json",
     )
 
     assert response.status_code == 200
-    assert len(response.data) == 0
+    assert len(response.data["results"]) == 0
 
 
 # eof

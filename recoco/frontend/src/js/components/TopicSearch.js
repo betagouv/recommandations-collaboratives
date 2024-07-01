@@ -11,11 +11,11 @@ function TopicSearch(currentTopic, restrict_to = null) {
       this.topic = currentTopic;
       this.restrict_to = restrict_to;
       if (currentTopic) {
-        const results = await api.get(
+        const json = await api.get(
           searchTopicsUrl(currentTopic, this.restrict_to)
         );
-        if (results && results.data) {
-          return (this.results = results.data);
+        if (json.data.count > 0) {
+          return (this.results = results.data.results);
         }
       }
     },
@@ -24,12 +24,12 @@ function TopicSearch(currentTopic, restrict_to = null) {
 
       try {
         if (e.target.value.length > 2) {
-          const results = await api.get(
+          const json = await api.get(
             searchTopicsUrl(e.target.value, this.restrict_to)
           );
 
-          if (results && results.data) {
-            return (this.results = results.data);
+          if (json.data.count > 0) {
+            return (this.results = results.data.results);
           }
         } else {
           return (this.results = []);
