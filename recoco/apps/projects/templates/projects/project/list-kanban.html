@@ -47,6 +47,8 @@
                                                      @drop="onDrop(event, board.code, null)"
                                                      @dragenter="onDragEnter(event)"
                                                      @dragleave="onDragLeave(event)"
+                                                     @dragstart="onDragStart(event, t.uuid)"
+                                                     @dragend="onDragEnd(event)"
                                                      data-test-id="drag-target">
                                                     <div class="drag-placeholder"></div>
                                                     <span x-text=board.status></span>
@@ -59,13 +61,13 @@
                                                      @dragover="onDragOver(event)"
                                                      @drop="onDrop(event, board.code, t.uuid)"
                                                      @dragenter="onDragEnter(event)"
-                                                     @dragleave="onDragLeave(event)">
+                                                     @dragleave="onDragLeave(event)"
+                                                     @dragstart="onDragStart(event, t.uuid)"
+                                                     @dragend="onDragEnd(event)">
                                                     <a :href="makeProjectURL(t.id)">
                                                         <div class="kanban-card rounded p-2 w-100 position-relative"
                                                              :class="{'kanban-card--border__is-switchtender': t.is_switchtender, 'kanban-card--border__is-observer': t.is_observer}"
                                                              draggable="true"
-                                                             @dragstart="onDragStart(event, t.uuid)"
-                                                             @dragend="onDragEnd(event)"
                                                              :data-test-id="`item-draggable-${taskIndex}`">
                                                             <template x-if="t.inactive_since !== null">
                                                                 <div class="kanban-card--state-container">
