@@ -1,4 +1,6 @@
 import Alpine from 'alpinejs';
+import { communeListUrl } from '../utils/api';
+
 import {
   addClassIfNotExists,
   removeAndAddClassConditionaly,
@@ -78,11 +80,11 @@ function CitySearch(required = false, requestMethod = 'GET', dsfr = false) {
       if (this.postal == '') return;
 
       this.isLoading = true;
-      fetch(`/api/communes/?postal=${this.postal}`)
+      fetch(communeListUrl(this.postal))
         .then((res) => res.json())
         .then((data) => {
           this.isLoading = false;
-          this.cities = data;
+          this.cities = data.results;
           if (dsfr && this.cities.length == 1) {
             removeAndAddClassConditionaly(
               true,

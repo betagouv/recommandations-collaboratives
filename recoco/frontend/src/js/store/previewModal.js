@@ -102,13 +102,13 @@ document.addEventListener('alpine:init', () => {
       const { data } = await api.get(followupsUrl(this.projectId, this.taskId));
       Alpine.store('tasksData').markAllAsRead(this.taskId);
       await Alpine.store('tasksView').updateView();
-      this.followups = data;
+      this.followups = data.resuts;
     },
     async loadNotifications() {
       const { data } = await api.get(
         taskNotificationsUrl(this.projectId, this.taskId)
       );
-      this.notifications = data;
+      this.notifications = data.results;
     },
     async setTaskIsVisited() {
       if (!Alpine.store('djangoData').isAdvisor) {

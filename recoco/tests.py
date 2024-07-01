@@ -177,11 +177,14 @@ def test_rest_api_responds_to_xml_content_type(client, request):
     client.force_authenticate(user=user)
 
     url = reverse("resources-list")
-    response = client.get(f"{url}?format=xml")
 
+    response = client.get(f"{url}?format=xml")
     assert response.status_code == 200
     assert "application/xml" in response.headers["content-type"]
-    assert len(response.data) == 1
+
+    response = client.get(f"{url}?format=json")
+    assert response.status_code == 200
+    assert "application/json" in response.headers["content-type"]
 
 
 @pytest.mark.django_db

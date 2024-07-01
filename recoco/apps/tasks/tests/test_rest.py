@@ -44,11 +44,12 @@ def test_project_collaborator_can_see_project_tasks_for_site(request, project):
 
     client = APIClient()
     client.force_authenticate(user=user)
-    url = reverse("project-tasks-list", args=[project.id])
-    response = client.get(url)
+
+    response = client.get(reverse("project-tasks-list", args=[project.id]))
 
     assert response.status_code == 200
-    assert set(e["id"] for e in response.data) == set(t.id for t in tasks)
+    assert response.data["count"] == 2
+    assert set(e["id"] for e in response.data["results"]) == set(t.id for t in tasks)
 
 
 @pytest.mark.django_db
@@ -61,13 +62,14 @@ def test_task_includes_resource_content_bug_fix(request, project):
 
     client = APIClient()
     client.force_authenticate(user=user)
-    url = reverse("project-tasks-list", args=[project.id])
-    response = client.get(url)
+
+    response = client.get(reverse("project-tasks-list", args=[project.id]))
 
     assert response.status_code == 200
+    assert response.data["count"] == 1
 
-    task = response.data[0]
-    assert task["resource"] is not None
+    first = response.data["results"][0]
+    assert first["resource"] is not None
 
 
 @pytest.mark.django_db
@@ -82,11 +84,12 @@ def test_project_observer_can_see_project_tasks_for_site(request, project):
 
     client = APIClient()
     client.force_authenticate(user=user)
-    url = reverse("project-tasks-list", args=[project.id])
-    response = client.get(url)
+
+    response = client.get(reverse("project-tasks-list", args=[project.id]))
 
     assert response.status_code == 200
-    assert set(e["id"] for e in response.data) == set(t.id for t in tasks)
+    assert response.data["count"] == 2
+    assert set(e["id"] for e in response.data["results"]) == set(t.id for t in tasks)
 
 
 @pytest.mark.django_db
@@ -107,7 +110,8 @@ def test_regional_actor_can_see_project_tasks_for_site(request, project):
         response = client.get(url)
 
     assert response.status_code == 200
-    assert set(e["id"] for e in response.data) == set(t.id for t in tasks)
+    assert response.data["count"] == 2
+    assert set(e["id"] for e in response.data["results"]) == set(t.id for t in tasks)
 
 
 @pytest.mark.django_db
@@ -122,11 +126,12 @@ def test_project_advisor_can_see_project_tasks_for_site(request, project):
 
     client = APIClient()
     client.force_authenticate(user=user)
-    url = reverse("project-tasks-list", args=[project.id])
-    response = client.get(url)
+
+    response = client.get(reverse("project-tasks-list", args=[project.id]))
 
     assert response.status_code == 200
-    assert set(e["id"] for e in response.data) == set(t.id for t in tasks)
+    assert response.data["count"] == 2
+    assert set(e["id"] for e in response.data["results"]) == set(t.id for t in tasks)
 
 
 @pytest.mark.django_db
@@ -137,8 +142,8 @@ def test_user_cannot_see_project_tasks_when_not_in_relation(request, project):
 
     client = APIClient()
     client.force_authenticate(user=user)
-    url = reverse("project-tasks-list", args=[project.id])
-    response = client.get(url)
+
+    response = client.get(reverse("project-tasks-list", args=[project.id]))
 
     assert response.status_code == 403
 
@@ -512,11 +517,13 @@ def test_project_task_followup_list_closed_for_dissociate_task_and_project(
 
     client = APIClient()
     client.force_authenticate(user=user)
-    url = reverse("project-tasks-followups-list", args=[project1.id, task2.id])
-    response = client.get(url)
+
+    response = client.get(
+        reverse("project-tasks-followups-list", args=[project1.id, task2.id])
+    )
 
     assert response.status_code == 200
-    assert len(response.data) == 0
+    assert len(response.data["results"]) == 0
 
 
 @pytest.mark.django_db
@@ -530,13 +537,15 @@ def test_project_task_followup_list_returns_followups_to_collaborator(request, p
 
     client = APIClient()
     client.force_authenticate(user=user)
-    url = reverse("project-tasks-followups-list", args=[project.id, task.id])
-    response = client.get(url)
+
+    response = client.get(
+        reverse("project-tasks-followups-list", args=[project.id, task.id])
+    )
 
     assert response.status_code == 200
-    assert len(response.data) == 1
+    assert response.data["count"] == 1
 
-    first = response.data[0]
+    first = response.data["results"][0]
     expected_fields = [
         "comment",
         "id",
@@ -701,13 +710,15 @@ def test_project_task_notifications_list_returns_notifications_of_advisor(
 
     client = APIClient()
     client.force_authenticate(user=user)
-    url = reverse("project-tasks-notifications-list", args=[project.id, task.id])
-    response = client.get(url)
+
+    response = client.get(
+        reverse("project-tasks-notifications-list", args=[project.id, task.id])
+    )
 
     assert response.status_code == 200
-    assert len(response.data) == 1
+    assert response.data["count"] == 1
 
-    first = response.data[0]
+    first = response.data["results"][0]
     expected_fields = [
         "action_object",
         "actor",

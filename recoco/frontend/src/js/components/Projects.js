@@ -1,5 +1,5 @@
 import Alpine from 'alpinejs';
-import api from '../utils/api';
+import api, { userProjectStatusUrl } from '../utils/api';
 import { formatDate } from '../utils/date';
 import { gravatar_url } from '../utils/gravatar';
 import { makeProjectURL } from '../utils/createProjectUrl';
@@ -120,7 +120,7 @@ function AdvisorDashboard() {
       const data = this.data.find((d) => d.id === JSON.parse(id));
 
       try {
-        await api.patch(`/api/userprojectstatus/${data.id}/`, {
+        await api.patch(userProjectStatusUrl(data.id), {
           status: status,
         });
       } catch (err) {

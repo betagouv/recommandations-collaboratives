@@ -37,17 +37,21 @@ instance.interceptors.response.use(
 
 export default instance;
 
-// Projects :
-export function projectsUrl() {
-  return '/api/projects/';
+// Projects
+export function projectListUrl() {
+  return `/api/projects/?limit=1000`;
 }
 
-export function projectsProjectSitesUrl() {
-  return '/api/projects/projectsites/';
+export function projectUrl(projectId) {
+  return `/api/projects/${projectId}/`;
 }
 
-export function userProjectStatusUrl() {
-  return '/api/userprojectstatus/';
+export function userProjectStatusListUrl() {
+  return `/api/userprojectstatus/?limit=1000`;
+}
+
+export function userProjectStatusUrl(userProjectStatusId) {
+  return `/api/userprojectstatus/${userProjectStatusId}/`;
 }
 
 // Sites :
@@ -57,21 +61,22 @@ export function sitesConfigUrl() {
 
 // Organization
 export function searchOrganizationsUrl(search) {
-  return `/api/organizations/?search=${search}`;
+  return `/api/organizations/?search=${search}&limit=1000`;
 }
 
 // Topic
 export function searchTopicsUrl(search, restrict_to) {
-  return `/api/topics/?search=${search}&restrict_to=${restrict_to}`;
+  return `/api/topics/?search=${search}&restrict_to=${restrict_to}&limit=1000`;
 }
 
-// Tasks :
+// Tasks
 export function taskUrl(projectId, taskId) {
   return `/api/projects/${projectId}/tasks/${taskId}/`;
 }
 
+// FIXME: dead code ?
 export function tasksUrl(projectId) {
-  return `/api/projects/${projectId}/tasks/`;
+  return `/api/projects/${projectId}/tasks/?limit=1000`;
 }
 
 export function moveTaskUrl(projectId, taskId) {
@@ -79,7 +84,7 @@ export function moveTaskUrl(projectId, taskId) {
 }
 
 export function taskNotificationsUrl(projectId, taskId) {
-  return `/api/projects/${projectId}/tasks/${taskId}/notifications/`;
+  return `/api/projects/${projectId}/tasks/${taskId}/notifications/?limit=1000`;
 }
 
 export function markTaskNotificationsAsReadUrl(projectId, taskId) {
@@ -99,7 +104,7 @@ export function markAllNotificationsAsReadUrl() {
 }
 
 export function followupsUrl(projectId, taskId) {
-  return `/api/projects/${projectId}/tasks/${taskId}/followups/`;
+  return `/api/projects/${projectId}/tasks/${taskId}/followups/?limit=1000`;
 }
 
 export function followupUrl(projectId, taskId, followupId) {
@@ -110,9 +115,18 @@ export function resourcePreviewUrl(resourceId) {
   return `/ressource/${resourceId}/embed`;
 }
 
-// Regions :
-export function regionsUrl() {
-  return `/api/regions/`;
+export function resourceListUrl() {
+  return `/api/ressources/?limit=1000`;
+}
+
+// Regions
+export function regionListUrl() {
+  return `/api/regions/?limit=1000`;
+}
+
+// Communes
+export function communeListUrl(postal) {
+  return `/api/communes/?postal=${postal}&limit=1000`;
 }
 
 // Challenges

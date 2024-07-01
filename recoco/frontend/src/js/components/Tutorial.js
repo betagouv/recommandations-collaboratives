@@ -58,7 +58,7 @@ function Tutorial(challengeCode, autoStart = false) {
     async getChallengeDefinition(code) {
       try {
         const json = await api.get(challengeDefinitionUrl(code));
-        return json.data;
+        return json.data.results;
       } catch (err) {
         console.warn(err);
       }

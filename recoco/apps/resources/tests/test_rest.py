@@ -33,8 +33,12 @@ def test_anonymous_can_see_resources_list_api(request):
     url = reverse("resources-list")
     client = APIClient()
     response = client.get(url)
+
     assert response.status_code == 200
-    assert response.data[0]["title"] == resource.title
+    assert response.data["count"] == 1
+
+    first = response.data["results"][0]
+    assert first["title"] == resource.title
 
 
 @pytest.mark.django_db
@@ -46,11 +50,11 @@ def test_anonymous_cannot_see_unpublished_resource_in_list_api(request):
         title=" to review resource",
     ).make()
 
-    url = reverse("resources-list")
     client = APIClient()
-    response = client.get(url)
+    response = client.get(reverse("resources-list"))
+
     assert response.status_code == 200
-    assert len(response.data) == 0
+    assert len(response.data["results"]) == 0
 
 
 @pytest.mark.django_db
@@ -68,13 +72,16 @@ def test_staff_can_see_unpublished_resource_in_list_api(request):
     gstaff = auth_models.Group.objects.get(name="example_com_staff")
     staff.groups.add(gstaff)
 
-    url = reverse("resources-list")
     client = APIClient()
     client.force_authenticate(user=staff)
-    response = client.get(url)
+
+    response = client.get(reverse("resources-list"))
+
     assert response.status_code == 200
-    assert len(response.data) == 1
-    assert response.data[0]["title"] == resource.title
+    assert response.data["count"] == 1
+
+    first = response.data["results"][0]
+    assert first["title"] == resource.title
 
 
 @pytest.mark.django_db
