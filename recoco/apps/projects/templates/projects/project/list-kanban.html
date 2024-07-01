@@ -25,7 +25,8 @@
     <div x-data="KanbanProjects()">
         <div x-show="isBusy"
              x-transition
-             class="position-absolute text-center w-100">
+             class="position-absolute text-center w-100"
+             data-cy="loader">
             <div class="spinner-border" role="status">
                 <span class="visually-hidden">Loading...</span>
             </div>
@@ -35,7 +36,7 @@
             <div class="ms-4 flex-grow-1">
                 {% include "projects/project/fragments/search_bar.html" with action_search="onSearch(event)" %}
             </div>
-            {% include "projects/project/fragments/region_filter.html" with filter_by_regions=False %}
+            {% include "projects/project/fragments/region_filter.html" with filter_by_regions=True %}
             {% include "projects/project/fragments/list-toolbars.html" %}
         </div>
         <div x-init="getData()" x-cloak class="d-flex">
@@ -67,6 +68,7 @@
                                             <template x-for="(t, taskIndex) in column(board.code)" :key="t.id">
                                                 <div :id="t.id"
                                                      class="drag-targetable kanban-card-container"
+                                                     data-cy="card-project"
                                                      @dragover="onDragOver(event)"
                                                      @drop="onDrop(event, board.code, t.uuid)"
                                                      @dragenter="onDragEnter(event)"

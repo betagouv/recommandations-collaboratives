@@ -5,6 +5,7 @@
           type="text/css">
 {% endblock css %}
 <input type="search"
+       data-cy="search-bar-project"
        class="fr-icon-search-line"
        placeholder="{{ placeholder|default:"Rechercher" }}"
        @input="{{ action_search }}"

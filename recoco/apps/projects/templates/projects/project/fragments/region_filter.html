@@ -10,7 +10,8 @@
              type="button"
              :class="{'input-active':open}"
              style="border-radius: 20px">
-            <button class="input-field bg-transparent px-3 fw-normal text-dark appearance-none">
+            <button class="input-field bg-transparent px-3 fw-normal text-dark appearance-none"
+                    data-cy="check-display-project">
                 Projets de mon
                 territoire
             </button>
@@ -29,6 +30,7 @@
                     <input x-on:input.change="handleTerritorySelectAll"
                            class="form-check-input fw-normal ms-2 px-2 py-2 me-2"
                            type="checkbox"
+                           data-cy="check-all-territory"
                            :value="territorySelectAll"
                            :checked="territorySelectAll"
                            id="allTerritory" />
