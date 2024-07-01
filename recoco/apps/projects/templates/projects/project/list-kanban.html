@@ -5,6 +5,12 @@
 {% load gravatar %}
 {% load sass_tags %}
 {% block css %}
+    <link href="{% sass_src 'home/css/dsfr/dsfr.css' %}"
+          rel="stylesheet"
+          type="text/css">
+    <link href="{% sass_src 'home/css/dsfr/custom-dsfr.scss' %}"
+          rel="stylesheet"
+          type="text/css">
     <link href="{% sass_src 'projects/css/kanban.scss' %}"
           rel="stylesheet"
           type="text/css">
@@ -29,7 +35,7 @@
             <div class="ms-4 flex-grow-1">
                 {% include "projects/project/fragments/search_bar.html" with action_search="onSearch(event)" %}
             </div>
-            {% include "projects/project/fragments/region_filter.html" %}
+            {% include "projects/project/fragments/region_filter.html" with filter_by_regions=False %}
             {% include "projects/project/fragments/list-toolbars.html" %}
         </div>
         <div x-init="getData()" x-cloak class="d-flex">
