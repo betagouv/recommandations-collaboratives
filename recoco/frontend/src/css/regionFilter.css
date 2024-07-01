@@ -1,7 +1,7 @@
 .region-filter {
   position: absolute;
   width: auto;
-  z-index: 100;
+  z-index: 101;
 
   left: 0;
   top: 112%;

@@ -1,10 +1,16 @@
 {% load static %}
-<header class="d-flex justify-content-between p-2 ">
-    <span class="fs-5 flex-grow-1">{% include "projects/project/fragments/navigation/display_select.html" %}</span>
-    <div x-show="isBusy" x-transition class="mx-5 justify-content-center">
-        <div class="spinner-border" role="status">
-            <span class="visually-hidden">Loading...</span>
-        </div>
+<div x-show="isBusy"
+     x-transition
+     class="position-absolute text-center w-100">
+    <div class="spinner-border" role="status">
+        <span class="visually-hidden">Loading...</span>
     </div>
+</div>
+<header class="d-flex justify-content-between p-2 ">
+    <span class="fs-5">{% include "projects/project/fragments/navigation/display_select.html" %}</span>
+    <div class="ms-4 flex-grow-1">
+        {% include "projects/project/fragments/search_bar.html" with action_search="handleProjectsSearch" x_model="search" %}
+    </div>
+    {% include "projects/project/fragments/region_filter.html"  with filter_by_regions=False %}
     {% include "projects/project/fragments/list-toolbars.html" %}
 </header>
