@@ -1,0 +1,11 @@
+{% load sass_tags %}
+{% block css %}
+    <link href="{% sass_src 'projects/css/searchbar.scss' %}"
+          rel="stylesheet"
+          type="text/css">
+{% endblock css %}
+<input type="search"
+       class="fr-icon-search-line"
+       placeholder="{{ placeholder|default:"Rechercher" }}"
+       @input="{{ action_search }}"
+       {% if x_model %}x-model="{{ x_model }}"{% endif %}>

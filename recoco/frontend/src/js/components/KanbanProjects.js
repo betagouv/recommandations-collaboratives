@@ -1,5 +1,6 @@
 import Alpine from 'alpinejs';
 import { generateUUID } from '../utils/uuid';
+import Fuse from 'fuse.js';
 
 import api, { regionsUrl } from '../utils/api';
 
@@ -8,6 +9,7 @@ Alpine.data('KanbanProjects', boardProjectsApp);
 function boardProjectsApp() {
   const app = {
     data: [],
+    rawData: [],
     get isBusy() {
       return this.$store.app.isLoading;
     },
@@ -30,7 +32,10 @@ function boardProjectsApp() {
         color_class: 'border-dark',
       },
     ],
+    fuse: null,
+    searchText: '',
     async getData(postProcess = true) {
+      console.log('get data');
       const json = await api.get('/api/projects/');
 
       const data = json.data.map((d) =>
@@ -42,8 +47,22 @@ function boardProjectsApp() {
       if (postProcess) {
         await this.postProcessData(data);
       }
-
-      this.data = data;
+      this.data = [...data];
+      this.rawData = [...data];
+      const fuseOptions = {
+        threshold: 0.0,
+        keys: [
+          'name',
+          'commune.name',
+          'commune.insee',
+          'commune.department.name',
+        ],
+      };
+      this.fuse = new Fuse(data, fuseOptions);
+      if (this.searchText) {
+        this.filterProject(this.searchText);
+      }
+      return data;
     },
     async onDrop(event, status, targetUuid) {
       event.preventDefault();
@@ -86,6 +105,7 @@ function boardProjectsApp() {
         .forEach((e) => e.classList.add('drop-highlight'));
     },
     onDragEnd(event) {
+      console.log('drag end');
       event.target.classList.remove('drag-dragging');
       document
         .querySelectorAll('.drop-column')
@@ -109,6 +129,18 @@ function boardProjectsApp() {
     onDragOver(event) {
       event.preventDefault();
       event.dataTransfer.dropEffect = 'move';
+    },
+    onSearch(event) {
+      this.searchText = event.target.value;
+      this.filterProject(this.searchText);
+    },
+    filterProject(search) {
+      if (search === '') {
+        this.data = [...this.rawData];
+        return;
+      }
+      const filtered = this.fuse.search(search).map((r) => r.item);
+      this.data = [...filtered];
     },
     async postProcessData(data) {
       const departments = this.extractAndCreateAdvisorDepartments(data);
