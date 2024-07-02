@@ -70,17 +70,15 @@ class DSFolder(TimeStampedModel):
         self.content_hash = hash_data(dict(self.content))
         super().save(*args, **kwargs)
 
-    def update_or_create_action(self):
-        # FIXME: figure out how is the author of this action
-        author = User.objects.filter(is_staff=True).first()
-
+    def update_or_create_action(self, created_by: User):
+        # TODO: complete the action content
         content = f"[Lien vers la démarche simplifiée pré-remplie]({self.dossier_url})"
 
         action_data = {
             "site": self.project.sites.first(),
             "project": self.project,
             "resource": self.ds_resource.resource,
-            "created_by": author,
+            "created_by": created_by,
             "content": content,
             "status": Task.DONE,
         }

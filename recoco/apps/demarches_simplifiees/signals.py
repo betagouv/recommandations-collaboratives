@@ -32,5 +32,5 @@ def trigger_ds_from_answer(sender: Any, instance: Answer, created: bool, **kwarg
 def trigger_load_ds_resource_schema(
     sender: Any, instance: DSResource, created: bool, **kwargs
 ):
-    if len(instance.schema) == 0:
+    if created:
         load_ds_resource_schema(ds_resource_id=instance.id)

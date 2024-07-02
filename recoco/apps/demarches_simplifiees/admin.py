@@ -63,7 +63,7 @@ class DSFolderAdmin(admin.ModelAdmin):
         self, request: HttpRequest, queryset: QuerySet[DSResource]
     ):
         for ds_folder in queryset:
-            ds_folder.update_or_create_action()
+            ds_folder.update_or_create_action(author=request.user)
             self.message_user(
                 request,
                 f"Action créée ou mise à jour pour le dossier '{ds_folder.dossier_id}'.",
