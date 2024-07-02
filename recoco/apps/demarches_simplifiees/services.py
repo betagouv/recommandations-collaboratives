@@ -15,16 +15,6 @@ def find_ds_resource_for_project(project: Project) -> DSResource | None:
     ).first()
 
 
-def _resolve_lookup(project: Project, lookup: str) -> str | None:
-    lookup_parts = lookup.split("__")
-    if len(lookup_parts) == 1:
-        return getattr(project, lookup)
-
-    # TODO: implement the lookup resolution mechanism
-
-    return None
-
-
 def build_ds_data_from_project(
     project: Project, ds_resource: DSResource
 ) -> dict[str, Any]:
@@ -34,3 +24,13 @@ def build_ds_data_from_project(
         if value is not None:
             data[ds_field_name] = value
     return data
+
+
+def _resolve_lookup(project: Project, lookup: str) -> str | None:
+    lookup_parts = lookup.split("__")
+    if len(lookup_parts) == 1:
+        return getattr(project, lookup)
+
+    # TODO: implement the lookup resolution mechanism
+
+    return None
