@@ -293,6 +293,9 @@ class Choice(CloneMixin, models.Model):
         Question, related_name="choices", on_delete=models.CASCADE
     )
 
+    def __str__(self):
+        return f"{self.value} / {self.text}"
+
 
 tagging_register(Choice, tag_descriptor_attr="tags")
 
