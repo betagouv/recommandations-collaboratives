@@ -172,19 +172,68 @@ class DeletedProjectOnSiteManager(CurrentSiteManager, DeletedProjectManager):
     pass
 
 
-class Project(models.Model):
-    """Représente un project de suivi d'une collectivité"""
+class ProjectSiteQuerySet(models.QuerySet):
+    """Specific filters for Project Sites"""
 
-    PROJECT_STATES = (
+    def current(self):
+        """Return the data associated with the current site"""
+        current_site = Site.objects.get_current()
+
+        return self.get(site=current_site)
+
+    def origin(self):
+        """Return the site where the project was originally submitted"""
+        return self.get(is_origin=True)
+
+    def moderated(self):
+        """Filter out sites where this project is not yet validated"""
+        return self.exclude(status="DRAFT")
+
+    def to_moderate(self):
+        """List only sites where this project needs moderation"""
+        return self.filter(status="DRAFT")
+
+
+class ProjectSite(models.Model):
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["project", "is_origin"],
+                condition=Q(is_origin=True),
+                name="unique_origin_site",
+            )
+        ]
+
+    PROJECTSITE_STATES = (
         ("DRAFT", "Brouillon"),
         ("TO_PROCESS", "A traiter"),
         ("READY", "En attente"),  # FIXME A renommer en validé ?
         ("IN_PROGRESS", "En cours"),
         ("DONE", "Traité"),
         ("STUCK", "Conseil Interrompu"),
-        # ^ replace by:("STANDBY", "En attente"), FIXME
-        ("REJECTED", "Rejeté"),
+        ("REJECTED", "Refusé"),
     )
+
+    objects = ProjectSiteQuerySet.as_manager()
+
+    project = models.ForeignKey(
+        "Project", on_delete=models.CASCADE, related_name="project_sites"
+    )
+
+    site = models.ForeignKey(
+        Site,
+        on_delete=models.CASCADE,
+    )
+
+    status = models.CharField(
+        max_length=20, choices=PROJECTSITE_STATES, default="DRAFT"
+    )
+
+    is_origin = models.BooleanField(default=False)
+
+
+class Project(models.Model):
+    """Représente un project de suivi d'une collectivité"""
 
     objects = ActiveProjectManager()
     objects_deleted = DeletedProjectManager()
@@ -194,7 +243,9 @@ class Project(models.Model):
 
     all_on_site = ProjectOnSiteManager()
 
-    sites = models.ManyToManyField(Site)
+    sites = models.ManyToManyField(
+        Site, through=ProjectSite, related_name="project_sites"
+    )
 
     topics = models.ManyToManyField("Topic", related_name="projects", blank=True)
 
@@ -224,8 +275,6 @@ class Project(models.Model):
         verbose_name="Déposé par",
         related_name="projects_submitted",
     )
-
-    status = models.CharField(max_length=20, choices=PROJECT_STATES, default="DRAFT")
 
     members = models.ManyToManyField(auth_models.User, through="ProjectMember")
 

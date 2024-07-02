@@ -93,4 +93,22 @@ def test_project_all_topics_exclude_deleted_tasks():
     assert all_topics == []
 
 
+# ProjectSite QuerySet
+@pytest.mark.django_db
+def test_projectsite_queryset():
+    site = baker.make(sites.Site)
+    site2 = baker.make(sites.Site)
+    project = baker.make(models.Project)
+    project.project_sites.create(site=site, status="DRAFT")
+    project.project_sites.create(site=site2, status="READY", is_origin=True)
+
+    assert project.project_sites.count() == 2
+    assert project.project_sites.moderated().count() == 1
+    assert project.project_sites.to_moderate().count() == 1
+    assert project.project_sites.origin().site == site2
+
+    with settings.SITE_ID.override(site.id):
+        assert project.project_sites.current().site == site
+
+
 # eof

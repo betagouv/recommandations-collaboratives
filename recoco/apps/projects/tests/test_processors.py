@@ -27,7 +27,8 @@ def test_active_project_processor(request, client):
 
     baker.make(home_models.SiteConfiguration, site=current_site)
 
-    project = baker.make(models.Project, sites=[current_site], status="READY")
+    project = baker.make(models.Project)
+    project.project_sites.create(site=current_site, status="READY", is_origin=True)
 
     objects = (
         baker.make(models.Document, project=project, the_link="http://nowhe.re"),

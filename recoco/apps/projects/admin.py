@@ -96,6 +96,16 @@ class ProjectSwitchtenderTabularInline(admin.TabularInline):
     extra = 1
 
 
+class ProjectSiteTabularInline(admin.TabularInline):
+    model = models.ProjectSite
+    fields = (
+        "site",
+        "status",
+        "origin",
+    )
+    extra = 1
+
+
 @admin.register(models.Project)
 class ProjectAdmin(OrderedInlineModelAdminMixin, admin.ModelAdmin):
     search_fields = ["name"]
@@ -105,12 +115,12 @@ class ProjectAdmin(OrderedInlineModelAdminMixin, admin.ModelAdmin):
         "exclude_stats",
         "publish_to_cartofriches",
         RecommendationListFilter,
-        "status",
         "tags",
     ]
     list_display = ["created_on", "name", "location"]
     actions = [csvexport]
     inlines = (
+        ProjectSiteTabularInline,
         ProjectMemberTabularInline,
         ProjectSwitchtenderTabularInline,
         ProjectTaskTabularInline,
@@ -119,7 +129,7 @@ class ProjectAdmin(OrderedInlineModelAdminMixin, admin.ModelAdmin):
 
 @admin.register(models.UserProjectStatus)
 class UserProjectStatusAdmin(admin.ModelAdmin):
-    list_display = ["project", "user", "status"]
+    list_display = ["project", "status", "user"]
 
     list_filter = ["site"]
     list_select_related = ("project__commune", "user")

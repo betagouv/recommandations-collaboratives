@@ -11,6 +11,7 @@ created: 2022-01-18 10:11:56 CEST
 import pytest
 from django.contrib.auth import models as auth
 from django.contrib.sites.shortcuts import get_current_site
+from django.contrib.sites import models as sites_models
 from model_bakery import baker
 
 from recoco.apps.geomatics import models as geomatics
@@ -72,6 +73,39 @@ def test_check_if_switchtends_any_project(request, client):
 
     assert utils.can_administrate_project(project=None, user=userA)
     assert not utils.can_administrate_project(project=None, user=userB)
+
+
+# get_projects_for_users
+@pytest.mark.django_db
+def test_get_projects_for_user_honors_draft(request):
+    current_site = get_current_site(request)
+    another_site = baker.make(sites_models.Site)
+
+    userA = baker.make(auth.User)
+    userB = baker.make(auth.User)
+    project = baker.make(models.Project, sites=[another_site])
+    project.project_sites.create(site=current_site, is_origin=True, status="DRAFT")
+    assign_collaborator(userA, project, is_owner=True)
+    assign_collaborator(userB, project)
+
+    assert len(utils.get_projects_for_user(userA, current_site)) == 1
+    assert len(utils.get_projects_for_user(userB, current_site)) == 0
+
+
+@pytest.mark.django_db
+def test_get_projects_for_user_honors_multisite(request):
+    current_site = get_current_site(request)
+    another_site = baker.make(sites_models.Site)
+
+    user = baker.make(auth.User)
+    project = baker.make(models.Project, sites=[another_site])
+    project.project_sites.create(site=current_site, status="READY")
+    project.project_sites.create(site=another_site, status="DRAFT")
+
+    assign_collaborator(user, project)
+
+    assert len(utils.get_projects_for_user(user, current_site)) == 1
+    assert len(utils.get_projects_for_user(user, another_site)) == 0
 
 
 @pytest.mark.django_db
