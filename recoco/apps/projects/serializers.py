@@ -34,36 +34,20 @@ class ProjectSerializer(serializers.HyperlinkedModelSerializer):
         fields = [
             "id",
             "name",
+            "description",
             "status",
             "inactive_since",
             "created_on",
             "updated_on",
             "org_name",
             "switchtenders",
-            "is_switchtender",
-            "is_observer",
             "commune",
-            "notifications",
             "recommendation_count",
             "public_message_count",
             "private_message_count",
         ]
 
     switchtenders = UserSerializer(read_only=True, many=True)
-    is_switchtender = serializers.SerializerMethodField()
-
-    def get_is_switchtender(self, obj):
-        # FIXME check that we should reduce switchteders to current site
-        request = self.context.get("request")
-        return request.user in obj.switchtenders.all()
-
-    is_observer = serializers.SerializerMethodField()
-
-    def get_is_observer(self, obj):
-        request = self.context.get("request")
-        return request.user.pk in obj.switchtenders_on_site.filter(
-            is_observer=True
-        ).values_list("switchtender__id", flat=True)
 
     recommendation_count = serializers.SerializerMethodField()
 
@@ -81,6 +65,30 @@ class ProjectSerializer(serializers.HyperlinkedModelSerializer):
         return Note.on_site.private().filter(project=obj).count()
 
     commune = CommuneSerializer(read_only=True)
+
+
+class UserProjectSerializer(ProjectSerializer):
+    class Meta(ProjectSerializer.Meta):
+        fields = ProjectSerializer.Meta.fields + [
+            "is_switchtender",
+            "is_observer",
+            "notifications",
+        ]
+
+    is_switchtender = serializers.SerializerMethodField()
+
+    def get_is_switchtender(self, obj):
+        # FIXME check that we should reduce switchteders to current site
+        request = self.context.get("request")
+        return request.user in obj.switchtenders.all()
+
+    is_observer = serializers.SerializerMethodField()
+
+    def get_is_observer(self, obj):
+        request = self.context.get("request")
+        return request.user.pk in obj.switchtenders_on_site.filter(
+            is_observer=True
+        ).values_list("switchtender__id", flat=True)
 
     notifications = serializers.SerializerMethodField()
 
@@ -137,6 +145,7 @@ class ProjectForListSerializer(serializers.BaseSerializer):
         return {
             "id": data.id,
             "name": data.name,
+            "description": data.description,
             "org_name": data.org_name,
             "status": data.status,
             "inactive_since": data.inactive_since,
@@ -155,7 +164,7 @@ class UserProjectStatusSerializer(serializers.HyperlinkedModelSerializer):
         model = UserProjectStatus
         fields = ["id", "project", "status"]
 
-    project = ProjectSerializer(read_only=True)
+    project = UserProjectSerializer(read_only=True)
 
 
 class UserProjectStatusForListSerializer(serializers.BaseSerializer):
@@ -216,9 +225,9 @@ def format_switchtenders(project):
             "email": s.email,
             "profile": {
                 "organization": {
-                    "name": s.profile.organization.name
-                    if s.profile.organization
-                    else "",
+                    "name": (
+                        s.profile.organization.name if s.profile.organization else ""
+                    ),
                 }
             },
         }

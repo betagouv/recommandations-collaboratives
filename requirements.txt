@@ -65,3 +65,6 @@ redis==5.0.4
 
 django-autoslug==1.9.9
 metabase-api==3.4
+
+# Django webhook fork
+django-webhook @ git+https://github.com/etchegom/django-webhook.git@feat/open-for-extension
