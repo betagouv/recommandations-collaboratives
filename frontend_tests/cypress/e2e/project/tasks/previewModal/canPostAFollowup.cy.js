@@ -9,22 +9,20 @@ const currentUser = users[1];
 describe('I can go tasks tab', () => {
   beforeEach(() => {
     cy.login('jean');
-    cy.createTask(task3.fields.intent);
   });
 
   it('posts a followup', () => {
     cy.visit(`/project/${currentProject.pk}`);
     cy.contains('Recommandations').click({ force: true });
     cy.url().should('include', '/actions');
+    cy.createTask(task3.fields.intent);
 
     cy.get('[data-test-id="list-tasks-switch-button"]').should(
       'have.class',
       'active'
     );
 
-    cy.createTask(task3.fields.intent);
     cy.contains(task3.fields.intent).click({ force: true });
-    cy.contains(task3.fields.intent);
 
     const now = new Date();
 

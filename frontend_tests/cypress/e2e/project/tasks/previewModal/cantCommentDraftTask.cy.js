@@ -4,7 +4,6 @@ const currentProject = projects[1];
 describe('I can not comment a draft task', () => {
   beforeEach(() => {
     cy.login('jean');
-    cy.declineCookies();
   });
 
   it('should create task and opens a modal with the task', () => {

@@ -14,14 +14,14 @@ describe('I can go tasks tab', () => {
     cy.contains('Recommandations').click({ force: true });
     cy.url().should('include', '/actions');
 
+    cy.createTask(task1.fields.intent);
+    cy.contains(task1.fields.intent).click({ force: true });
+    cy.contains(task1.fields.intent);
+
     cy.get('[data-test-id="list-tasks-switch-button"]').should(
       'have.class',
       'active'
     );
-
-    cy.createTask(task1.fields.intent);
-    cy.contains(task1.fields.intent).click({ force: true });
-    cy.contains(task1.fields.intent);
 
     const now = new Date();
 
