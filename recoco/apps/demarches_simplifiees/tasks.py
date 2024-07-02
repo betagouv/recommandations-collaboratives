@@ -22,7 +22,7 @@ def load_ds_resource_schema(ds_resource_id: int):
     except DSResource.DoesNotExist:
         return
 
-    if len(ds_resource.schema) == 0:
+    if len(ds_resource.schema) > 0:
         return
 
     resp = requests.get(
@@ -47,7 +47,9 @@ def load_ds_resource_schema(ds_resource_id: int):
 )
 def update_or_create_ds_action(project_id: int):
     try:
-        project = Project.objects.get(id=project_id)
+        project = Project.objects.select_related("commune__department").get(
+            id=project_id
+        )
     except Project.DoesNotExist:
         # TODO: handle error
         return

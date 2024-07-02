@@ -12,7 +12,7 @@ class DSResourceAdmin(admin.ModelAdmin):
     list_display = ("name",)
     search_fields = ("name",)
 
-    actions = ("load_schema",)
+    actions = ("load_schema_action",)
 
     formfield_overrides = {
         JSONField: {"widget": JSONEditorWidget},

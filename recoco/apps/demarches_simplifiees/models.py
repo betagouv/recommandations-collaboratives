@@ -2,10 +2,12 @@ from django.contrib.auth.models import User
 from django.db import models, transaction
 from model_utils.models import TimeStampedModel
 
+from recoco.apps.geomatics.models import Department
 from recoco.apps.projects.models import Project
 from recoco.apps.resources.models import Resource
 from recoco.apps.tasks.models import Task
 
+from .choices import DSType
 from .utils import hash_data
 
 
@@ -15,6 +17,13 @@ class DSResource(TimeStampedModel):
     resource = models.ForeignKey(
         Resource, null=True, blank=True, on_delete=models.SET_NULL
     )
+    type = models.CharField(
+        max_length=50, choices=DSType.choices, default=DSType.DETR_DSIL
+    )
+    department = models.ForeignKey(
+        Department, on_delete=models.SET_NULL, null=True, blank=True
+    )
+    field_mapping = models.JSONField(default=dict, null=True, blank=True)
 
     class Meta:
         verbose_name = "Démarche simplifiée"
@@ -49,8 +58,10 @@ class DSFolder(TimeStampedModel):
     dossier_id = models.CharField(max_length=255)
     dossier_url = models.URLField()
     dossier_number = models.IntegerField()
-    dossier_prefill_token = models.CharField(max_length=255)
-    state = models.CharField(max_length=255)
+
+    # FIXME: these 2 fields could be not nullable
+    dossier_prefill_token = models.CharField(max_length=255, null=True, blank=True)
+    state = models.CharField(max_length=255, null=True, blank=True)
 
     content = models.JSONField()
     content_hash = models.CharField(max_length=255)

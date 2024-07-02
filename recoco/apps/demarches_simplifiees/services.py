@@ -2,28 +2,35 @@ from typing import Any
 
 from recoco.apps.projects.models import Project
 
+from .choices import DSType
 from .models import DSResource
 
 
 def find_ds_resource_for_project(project: Project) -> DSResource | None:
-    # FIXME: find a DS resource elligible for the given project
-    # for the moment, we return the only one for testing purpose
+    if not project.commune:
+        return None
+
     return DSResource.objects.filter(
-        name="demande-de-subvention-detr-dsil-2024-en-moselle"
+        type=DSType.DETR_DSIL, department=project.commune.department
     ).first()
 
-    # conditions:
-    # EDL à 100% ?
-    # code postal correspond au département de la DS DETR  ?
+
+def _resolve_lookup(project: Project, lookup: str) -> str | None:
+    lookup_parts = lookup.split("__")
+    if len(lookup_parts) == 1:
+        return getattr(project, lookup)
+
+    # TODO: implement the lookup resolution mechanism
+
+    return None
 
 
 def build_ds_data_from_project(
     project: Project, ds_resource: DSResource
 ) -> dict[str, Any]:
-    # TODO: build the data to send to DS API
-    if ds_resource.name == "demande-de-subvention-detr-dsil-2024-en-moselle":
-        return {
-            "champ_Q2hhbXAtMjk3MTQ0NA": project.name,
-        }
-
-    return {}
+    data = {}
+    for ds_field_name, lookup in ds_resource.field_mapping.items():
+        value = _resolve_lookup(project=project, lookup=lookup)
+        if value is not None:
+            data[ds_field_name] = value
+    return data
