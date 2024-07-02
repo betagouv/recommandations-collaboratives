@@ -19,6 +19,7 @@ class TaskAdmin(admin.ModelAdmin):
     search_fields = ["content", "tags"]
     list_filter = ["site", "deadline", "tags"]
     list_display = ["created_on", "deadline", "project_name", "tags", "topic"]
+    readonly_fields = ["created_by", "project"]
 
     actions = [csvexport]
 

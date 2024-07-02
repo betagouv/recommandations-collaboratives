@@ -502,6 +502,9 @@ class Topic(models.Model):
     class Meta:
         unique_together = ("name", "site")
 
+    def __str__(self):
+        return self.name
+
 
 # TODO ProjectTopic are intented to be removed after proper integration of Topic
 
