@@ -1,5 +1,4 @@
 import projects from '../../../fixtures/projects/projects.json';
-import tasks from '../../../fixtures/projects/tasks.json';
 
 const currentProject = projects[1];
 
@@ -10,8 +9,10 @@ describe('I can go to tasks tab', () => {
 
   it('list all kanban tasks', () => {
     cy.visit(`/project/${currentProject.pk}`);
+    cy.becomeAdvisor();
     cy.contains('Recommandations').click({ force: true });
     cy.url().should('include', '/actions');
+    cy.createTask('test');
 
     cy.get('[data-test-id="kanban-tasks-switch-button"]').click({
       force: true,
