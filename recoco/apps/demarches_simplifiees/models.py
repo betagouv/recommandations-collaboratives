@@ -74,12 +74,14 @@ class DSFolder(TimeStampedModel):
         # FIXME: figure out how is the author of this action
         author = User.objects.filter(is_staff=True).first()
 
+        content = f"[Lien vers la démarche simplifiée pré-remplie]({self.dossier_url})"
+
         action_data = {
             "site": self.project.sites.first(),
             "project": self.project,
             "resource": self.ds_resource.resource,
             "created_by": author,
-            "content": "TEMPHHH",
+            "content": content,
             "status": Task.DONE,
         }
 
