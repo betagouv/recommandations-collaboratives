@@ -14,6 +14,7 @@ from django.db.models import Count, F, Q
 from django.http import Http404
 from notifications import models as notifications_models
 from rest_framework import permissions, status, viewsets
+from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -79,17 +80,14 @@ class ProjectDetail(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class ProjectList(APIView):
+class ProjectList(ListAPIView):
     """List all user project status"""
 
     permission_classes = [permissions.IsAuthenticated]
+    serializer_class = ProjectForListSerializer
 
-    def get(self, request, format=None):
-        projects = fetch_the_site_projects(request.site, request.user)
-        context = {"request": request}
-
-        serializer = ProjectForListSerializer(projects, context=context, many=True)
-        return Response(serializer.data)
+    def get_queryset(self):
+        return fetch_the_site_projects(self.request.site, self.request.user)
 
 
 def fetch_the_site_projects(site, user):
@@ -233,17 +231,16 @@ class UserProjectStatusDetail(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class UserProjectStatusList(APIView):
+class UserProjectStatusList(ListAPIView):
     """List all user project status"""
 
     permission_classes = [permissions.IsAuthenticated]
+    serializer_class = UserProjectStatusForListSerializer
 
-    def get(self, request, format=None):
-        ups = fetch_the_site_project_statuses_for_user(request.site, request.user)
-        context = {"request": request}
-
-        serializer = UserProjectStatusForListSerializer(ups, context=context, many=True)
-        return Response(serializer.data)
+    def get_queryset(self):
+        return fetch_the_site_project_statuses_for_user(
+            self.request.site, self.request.user
+        )
 
 
 def fetch_the_site_project_statuses_for_user(site, user):

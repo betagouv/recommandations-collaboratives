@@ -1,7 +1,7 @@
 import Alpine from 'alpinejs';
 import { generateUUID } from '../utils/uuid';
 
-import api, { regionsUrl } from '../utils/api';
+import api, { regionListUrl, projectListUrl, projectUrl } from '../utils/api';
 
 Alpine.data('KanbanProjects', boardProjectsApp);
 
@@ -31,9 +31,8 @@ function boardProjectsApp() {
       },
     ],
     async getData(postProcess = true) {
-      const json = await api.get('/api/projects/');
-
-      const data = json.data.map((d) =>
+      const json = await api.get(projectListUrl());
+      const data = json.data.results.map((d) =>
         Object.assign(d, {
           uuid: generateUUID(),
         })
@@ -54,7 +53,7 @@ function boardProjectsApp() {
       const uuid = event.dataTransfer.getData('application/uuid');
       const data = this.data.find((d) => d.uuid === uuid);
 
-      await api.patch(`/api/projects/${data.id}/`, { status: status });
+      await api.patch(projectUrl(data.id), { status: status });
 
       await this.getData(false);
     },
@@ -112,8 +111,8 @@ function boardProjectsApp() {
     },
     async postProcessData(data) {
       const departments = this.extractAndCreateAdvisorDepartments(data);
-      const regionsData = await api.get(regionsUrl());
-      this.constructRegionsFilter(departments, regionsData.data);
+      const regionsData = await api.get(regionListUrl());
+      this.constructRegionsFilter(departments, regionsData.data.results);
     },
     extractAndCreateAdvisorDepartments(projects) {
       const departments = [];
