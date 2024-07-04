@@ -7,21 +7,21 @@ Dossier de tests : `frontend_tests/`
 -   Ajouter un fichier `frontend_tests.py` dans les settings de `django`, calqué sur le fichier `development.py` contenu dans le même dossier
 -   Ajouter la clé `TEST` dans les configs de la BDD, et modifiez le nom de la bdd, pour utiliser la BDD de tests que vous venez de créer :
 
-    ```python
-              DATABASES = {
-              'default': {
-                  'ENGINE': 'django.db.backends.postgresql',
-                  'NAME': os.environ.get('POSTGRES_NAME'), # ex. 'test_urbanvitaliz'
-                  'USER': os.environ.get('POSTGRES_USER'),
-                  'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
-                  'HOST': 'localhost',
-                  'PORT': 5432,
-                  'TEST': {
-                      'NAME':'test_urbanvitaliz'
-                  }
-              }
-          }
-    ```
+```python
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.environ.get('POSTGRES_NAME'), # ex 'test_urbanvitaliz'
+        'USER': os.environ.get('POSTGRES_USER'),
+        'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
+        'HOST': 'localhost',
+        'PORT': 5432,
+        'TEST': {
+            'NAME':'test_urbanvitaliz'
+        }
+    }
+}
+```
 
 ## Lancer les tests
 

@@ -350,6 +350,11 @@ REST_FRAMEWORK = {
         "rest_framework_xml.renderers.XMLRenderer",
     ],
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    "DEFAULT_FILTER_BACKENDS": [
+        "django_filters.rest_framework.DjangoFilterBackend",
+    ],
+    # "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
+    "PAGE_SIZE": 50,
 }
 
 # https://django-rest-framework-simplejwt.readthedocs.io/en/latest/settings.html
@@ -397,6 +402,10 @@ MATERIALIZED_VIEWS_SQL_DIR = BASE_DIR / "apps/metrics/sql_queries"
 BAKER_CUSTOM_CLASS = "recoco.tests.CustomBaker"
 
 # CELERY
+CELERY_TIMEZONE = "Europe/Paris"
+CELERY_TASK_TRACK_STARTED = True
+CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL", default="redis://localhost:6379/0")
+CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
 CELERY_RESULT_BACKEND = "django-db"
 
 # Metabase

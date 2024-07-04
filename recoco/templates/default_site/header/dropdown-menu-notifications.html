@@ -21,11 +21,11 @@
         {% for date, notifications in grouped_notifications.items %}
             <div class="notification__date">le {{ date|date }}</div>
             {% for notification in notifications %}
-                <li class="dropdown-item cursor-pointer"
+                <li class="dropdown-item"
                     x-init='initNewNotification(`${ {{ forloop.counter }}{{ forloop.parentloop.counter0 }} }`)'
                     x-show="isNotificationShown[`${ {{ forloop.counter }}{{ forloop.parentloop.counter0 }} }`]"
                     x-transition.duration.400ms>
-                    <a class="cursor-pointer"
+                    <a href="javascript:void(0);"
                        @click="clickConsummeNotificationAndRedirect({{ notification.pk }}, '{% if notification.verb == verbs.Recommendation.COMMENTED %}{{ notification.action_object.task.get_absolute_url }} {% else %}{{ notification.action_object.get_absolute_url }} {% endif %}')">
                         {% include "user/user_card.html" with user=notification.actor project=notification.target user_popup_activate=False user_activity=False disable_links=True %}
                         {% if notification.verb == verbs.Project.VALIDATED %}

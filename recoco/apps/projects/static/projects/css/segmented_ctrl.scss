@@ -1,0 +1,15 @@
+.fr-segmented__legend.inline {
+  font-size: 0.9rem;
+  font-weight: 400;
+  color: #666;
+  margin: 0;
+  margin-right: 0.25em;
+}
+
+.fr-segmented__element {
+  .fr-label {
+    a {
+      color: inherit;
+    }
+  }
+}

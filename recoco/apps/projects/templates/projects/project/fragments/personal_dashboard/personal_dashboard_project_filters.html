@@ -1,19 +1,6 @@
 {% load static %}
 <div class="d-flex align-items-center mb-4 mt-4 w-100 justify-content-between projects-filters-container">
     <div class="d-flex align-items-center">
-        <div class="input-item projects-filters-search">
-            <svg class="input-icon bi align-baseline me-2"
-                 width="17"
-                 height="17"
-                 fill="#222">
-                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#search" />
-            </svg>
-            <input class="input-field bg-white"
-                   type="search"
-                   x-model="search"
-                   x-on:input.change="handleProjectsSearch"
-                   placeholder="Rechercher" />
-        </div>
         <div class="d-flex align-items-center ms-4 projects-filters-territory">
             <span class="text-custom-info text-grey-dark fw-light me-2">Filtrer :</span>
             <div class="input-item position-relative active"

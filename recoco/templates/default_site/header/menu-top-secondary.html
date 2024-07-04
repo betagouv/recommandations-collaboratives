@@ -99,6 +99,7 @@
                             <span class="ms-1 align-middle">Mes projets</span>
                             <button x-on:click="open = !open"
                                     type="button"
+                                    data-cy="projects-selector"
                                     class="border-0 btn py-0 px-1">
                                 <svg data-toggle="tooltip"
                                      data-placement="top"
@@ -114,7 +115,7 @@
                             </button>
                             <ul x-show="open"
                                 :class="{'show':open}"
-                                class="project-selector-dropdown dropdown-menu py-0 mt-2 top-100"
+                                class="project-selector-dropdown dropdown-menu py-0 mt-2 top-100 overflow-y-scroll"
                                 data-test-id="project-selector-dropdown">
                                 {% for project in request.session.projects %}
                                     <li class="list-group-item px-3 py-2 my-0 list-group-item-action dropdown-item border-0 border-bottom"
@@ -176,76 +177,70 @@
             </li>
         {% endif %} -->
         <!-- Ressources -->
-        {% if not user.is_authenticated %}
-            <li>
-            {% else %}
-                <li style="margin-right: 15px;
-                           border-bottom:solid 2px transparent;
-                           {% if url_name == 'resources-resource-search' %}activated{% endif %}">
+        <li style="{% if url_name == 'resources-resource-search' %}activated{% endif %}">
+            <div x-data="{ open: false }"
+                 x-on:click.outside="open = false"
+                 class="btn-group d-flex">
+                <a href="{% url 'resources-resource-search' %}"
+                   class="nav-link link-dark {% if url_name == 'resources-resource-search' %}active{% endif %}"
+                   data-test-id="link-ressources">
+                    <span class="ms-1 align-middle">Ressources</span>
+                </a>
+                {% if "manage_resources" in user_site_perms %}
+                    <button x-on:click="open = !open"
+                            type="button"
+                            class="border-0 btn py-0 px-1">
+                        <svg data-toggle="tooltip"
+                             data-placement="top"
+                             title="Notifications désactivées"
+                             class="align-middle bi"
+                             width="20px"
+                             height="20px"
+                             fill="currentColor"
+                             stroke="currentColor"
+                             style="padding: 3px">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#chevron-down" />
+                        </svg>
+                    </button>
+                    <ul x-show="open"
+                        :class="{'show':open}"
+                        class="dropdown-menu py-0 mt-2 top-100">
+                        <li>
+                            <a class="dropdown-item px-4 py-2"
+                               href="{% url 'resources-resource-create' %}">Créer</a>
+                        </li>
+                    </ul>
                 {% endif %}
-                <div x-data="{ open: false }"
-                     x-on:click.outside="open = false"
-                     class="btn-group d-flex">
-                    <a href="{% url 'resources-resource-search' %}"
-                       class="nav-link link-dark {% if url_name == 'resources-resource-search' %}active{% endif %}"
-                       data-test-id="link-ressources">
-                        <span class="ms-1 align-middle">Ressources</span>
-                    </a>
-                    {% if "manage_resources" in user_site_perms %}
-                        <button x-on:click="open = !open"
-                                type="button"
-                                class="border-0 btn py-0 px-1">
-                            <svg data-toggle="tooltip"
-                                 data-placement="top"
-                                 title="Notifications désactivées"
-                                 class="align-middle bi"
-                                 width="20px"
-                                 height="20px"
-                                 fill="currentColor"
-                                 stroke="currentColor"
-                                 style="padding: 3px">
-                                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#chevron-down" />
-                            </svg>
-                        </button>
-                        <ul x-show="open"
-                            :class="{'show':open}"
-                            class="dropdown-menu py-0 mt-2 top-100">
-                            <li>
-                                <a class="dropdown-item px-4 py-2"
-                                   href="{% url 'resources-resource-create' %}">Créer</a>
-                            </li>
-                        </ul>
-                    {% endif %}
-                </div>
+            </div>
+        </li>
+        <!-- Address Book -->
+        {% if "use_addressbook" in user_site_perms %}
+            <li class="{% if 'addressbook' in url_name %}activated{% endif %}">
+                <a href="{% url 'addressbook-organization-list' %}"
+                   class="nav-link link-dark {% if url_name == 'addressbook-organization-list' %}active{% endif %}">
+                    <span class="ms-1 me-2 align-middle">Carnet d'adresses</span>
+                </a>
             </li>
-            <!-- Address Book -->
-            {% if "use_addressbook" in user_site_perms %}
-                <li class="{% if 'addressbook' in url_name %}activated{% endif %}">
-                    <a href="{% url 'addressbook-organization-list' %}"
-                       class="nav-link link-dark {% if url_name == 'addressbook-organization-list' %}active{% endif %}">
-                        <span class="ms-1 me-2 align-middle">Carnet d'adresses</span>
-                    </a>
-                </li>
-            {% endif %}
-            <!-- Notifications -->
-            {% if user.is_authenticated %}
-                <li class="dropdown"
-                    x-data="MenuNotifications({{ unread_notifications_count }})">
-                    <a class="nav-link link-dark"
-                       href="#"
-                       role="button"
-                       data-bs-toggle="dropdown"
-                       data-bs-auto-close="outside"
-                       aria-expanded="false"
-                       data-test-id="notification-menu-open">
-                        <span class="ms-1 me-2 align-middle">Notifications</span>
-                        <span class="badge text-bg-danger"
-                              x-show="notificationNumber > 0"
-                              x-text="notificationNumber"
-                              data-test-id="notification-badge"></span>
-                    </a>
-                    {% include "header/dropdown-menu-notifications.html" %}
-                </li>
-            {% endif %}
-        </ul>
-    {% endwith %}
+        {% endif %}
+        <!-- Notifications -->
+        {% if user.is_authenticated %}
+            <li class="dropdown"
+                x-data="MenuNotifications({{ unread_notifications_count }})">
+                <a class="nav-link link-dark"
+                   href="#"
+                   role="button"
+                   data-bs-toggle="dropdown"
+                   data-bs-auto-close="outside"
+                   aria-expanded="false"
+                   data-test-id="notification-menu-open">
+                    <span class="ms-1 me-2 align-middle">Notifications</span>
+                    <span class="badge text-bg-danger"
+                          x-show="notificationNumber > 0"
+                          x-text="notificationNumber"
+                          data-test-id="notification-badge"></span>
+                </a>
+                {% include "header/dropdown-menu-notifications.html" %}
+            </li>
+        {% endif %}
+    </ul>
+{% endwith %}

@@ -22,6 +22,7 @@ class SurveyAdmin(CloneModelAdmin):
 @admin.register(models.Session)
 class SessionAdmin(admin.ModelAdmin):
     list_display = ["answers_count", "survey"]
+    readonly_fields = ("survey", "project")
 
     @admin.display(description="Answers count")
     def answers_count(self, obj):

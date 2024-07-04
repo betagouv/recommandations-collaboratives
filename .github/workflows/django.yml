@@ -43,9 +43,17 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - uses: actions/setup-node@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: 20
+
+      - name: Setup Pre-commit
+        uses: pre-commit/action@v3.0.1
+
+      - name: Run Pre-commit checks
+        uses: pre-commit-ci/lite-action@v1.0.2
+        if: always()
 
       - uses: borales/actions-yarn@v3.0.0
 

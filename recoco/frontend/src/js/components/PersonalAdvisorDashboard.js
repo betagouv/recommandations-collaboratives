@@ -9,10 +9,12 @@ import 'leaflet-control-geocoder';
 import 'leaflet-providers';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-control-geocoder/dist/Control.Geocoder.css';
+import Fuse from 'fuse.js';
 
 function PersonalAdvisorDashboard() {
   return {
     data: [],
+    rawData: [],
     displayedData: [],
     nbNewProjects: 0,
     errors: null,
@@ -23,6 +25,7 @@ function PersonalAdvisorDashboard() {
     currentSort: this.sortProjectDate,
     search: '',
     select: '',
+    fuse: null,
     //departments
     departments: [],
     territorySelectAll: true,
@@ -44,6 +47,10 @@ function PersonalAdvisorDashboard() {
       this.extractAndCreateAdvisorDepartments(projects);
       this.data = projects.map((project) => ({ ...project, isLoading: false }));
       this.data = this.createProjectListWithNewActivities(projects);
+      this.rawData = [...this.data];
+      this.fuse = new Fuse(this.rawData, {
+        keys: ['project.name', 'project.commune.name', 'project.commune.insee'],
+      });
 
       this.displayedData = this.data.sort(this.sortProjectDate);
       const { map, markersLayer } = initMap(projects);
@@ -200,6 +207,7 @@ function PersonalAdvisorDashboard() {
 
       return (this.departments = departments.sort(this.sortDepartments));
     },
+
     handleTerritorySelectAll() {
       this.territorySelectAll = !this.territorySelectAll;
 
@@ -237,7 +245,7 @@ function PersonalAdvisorDashboard() {
         (item) =>
           this.departments.find(
             (department) =>
-              department.code === item.project.commune.department.code
+              department.code === item.project.commune?.department?.code
           )?.active
       );
     },
