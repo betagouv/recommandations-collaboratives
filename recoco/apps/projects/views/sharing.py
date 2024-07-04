@@ -27,7 +27,7 @@ def project_detail_from_sharing_link(request, project_ro_key):
         session, created = survey_models.Session.objects.get_or_create(
             project=project, survey=site_config.project_survey
         )
-    except Exception:
+    except Exception:  # nosec
         pass
 
     return render(request, "projects/project/detail-ro.html", locals())
