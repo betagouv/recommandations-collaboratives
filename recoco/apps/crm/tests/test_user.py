@@ -1,5 +1,5 @@
-import pytest
 import django.core.mail
+import pytest
 from allauth.account.models import EmailAddress
 from django.contrib.auth import models as auth_models
 from django.contrib.sites import models as site_models
@@ -10,8 +10,8 @@ from model_bakery import baker
 from pytest_django.asserts import assertContains, assertNotContains
 
 from recoco.apps.addressbook import models as addressbook_models
-from recoco.apps.reminders import models as reminders_models
 from recoco.apps.geomatics import models as geomatics
+from recoco.apps.reminders import models as reminders_models
 from recoco.utils import get_group_for_site, login
 
 ########################################################################

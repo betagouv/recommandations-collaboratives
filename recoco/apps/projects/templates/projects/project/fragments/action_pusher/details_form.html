@@ -63,6 +63,7 @@
                     <div class="buttons d-flex flex-row justify-content-between">
                         {% if not disable_draft %}
                             <button @click="set_draft(true)"
+                                    data-test-id="publish-draft-task-button"
                                     class="button small"
                                     :disabled="!selected_resource">Enregistrer comme Brouillon</button>
                         {% endif %}
@@ -77,6 +78,7 @@
                         {% if not disable_draft %}
                             <button data-test-id="publish-draft-task-button"
                                     @click="set_draft(true)"
+                                    data-test-id="publish-draft-task-button"
                                     class="button small">Enregister comme Brouillon</button>
                         {% endif %}
                         <button data-test-id="publish-task-button"
@@ -111,6 +113,7 @@
 <template x-if="push_type == 'multiple'">
     <div>
         <button @click="set_draft(true)"
+        data-test-id="publish-draft-task-button"
                 class="btn btn-secondary"
                 :disabled="!selected_resources.length">Enregistrer comme Brouillon</button>
         <span class="ms-2"

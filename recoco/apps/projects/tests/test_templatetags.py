@@ -12,6 +12,7 @@ import pytest
 from django.contrib.auth import models as auth
 from django.contrib.sites.shortcuts import get_current_site
 from model_bakery import baker
+
 from recoco import utils
 
 from .. import models

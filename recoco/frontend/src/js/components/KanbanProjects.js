@@ -1,5 +1,6 @@
 import Alpine from 'alpinejs';
 import { generateUUID } from '../utils/uuid';
+import Fuse from 'fuse.js';
 
 import api, { regionsUrl } from '../utils/api';
 
@@ -8,6 +9,7 @@ Alpine.data('KanbanProjects', boardProjectsApp);
 function boardProjectsApp() {
   const app = {
     data: [],
+    rawData: [],
     get isBusy() {
       return this.$store.app.isLoading;
     },
@@ -30,6 +32,8 @@ function boardProjectsApp() {
         color_class: 'border-dark',
       },
     ],
+    fuse: null,
+    searchText: '',
     async getData(postProcess = true) {
       const json = await api.get('/api/projects/');
 
@@ -42,8 +46,24 @@ function boardProjectsApp() {
       if (postProcess) {
         await this.postProcessData(data);
       }
-
-      this.data = data;
+      this.data = [...data];
+      this.rawData = [...data];
+      const fuseOptions = {
+        isCaseSensitive: false,
+        minMatchCharLength: 2,
+        threshold: 0.0,
+        keys: [
+          'name',
+          'commune.name',
+          'commune.insee',
+          'commune.department.name',
+        ],
+      };
+      this.fuse = new Fuse(data, fuseOptions);
+      if (this.searchText) {
+        this.filterProject(this.searchText);
+      }
+      return data;
     },
     async onDrop(event, status, targetUuid) {
       event.preventDefault();
@@ -110,6 +130,17 @@ function boardProjectsApp() {
       event.preventDefault();
       event.dataTransfer.dropEffect = 'move';
     },
+    onSearch() {
+      this.filterProject(this.searchText);
+    },
+    filterProject(search) {
+      if (search === '') {
+        this.data = [...this.rawData];
+        return;
+      }
+      const filtered = this.fuse.search(search).map((r) => r.item);
+      this.data = [...filtered];
+    },
     async postProcessData(data) {
       const departments = this.extractAndCreateAdvisorDepartments(data);
       const regionsData = await api.get(regionsUrl());
@@ -162,8 +193,7 @@ function boardProjectsApp() {
           return currentRegions.push(currentRegion);
         }
       });
-
-      return (this.regions = currentRegions);
+      this.regions = currentRegions;
     },
     handleTerritorySelectAll() {
       this.territorySelectAll = !this.territorySelectAll;

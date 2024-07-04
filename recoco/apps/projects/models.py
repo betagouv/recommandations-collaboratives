@@ -24,8 +24,8 @@ from guardian.shortcuts import get_objects_for_user
 from markdownx.utils import markdownify
 from notifications import models as notifications_models
 from taggit.managers import TaggableManager
-from recoco.apps.geomatics import models as geomatics_models
 
+from recoco.apps.geomatics import models as geomatics_models
 from recoco.utils import CastedGenericRelation, check_if_advisor, has_perm
 
 from . import apps
@@ -550,6 +550,9 @@ class Topic(models.Model):
 
     class Meta:
         unique_together = ("name", "site")
+
+    def __str__(self):
+        return self.name
 
 
 # TODO ProjectTopic are intented to be removed after proper integration of Topic

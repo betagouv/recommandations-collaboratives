@@ -12,10 +12,10 @@
 {% block content %}
     {% get_obj_perms request.user for request.site as "user_site_perms" %}
     {% get_obj_perms request.user for project as "user_project_perms" %}
-    <div class="col-11 py-5 mx-auto">
+    <div class="col-12 p-4 mx-auto">
         <!-- Breadcrumb -->
         <nav aria-label="breadcrumb">
-            <ol class="breadcrumb">
+            <ul class="breadcrumb">
                 <li class="breadcrumb-item">
                     <svg class="bi align-middle" width="18" height="18" fill="currentColor">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#building" />
@@ -28,7 +28,7 @@
                         <a href="{% url 'projects-project-detail' project.pk %}">{{ project.name|capfirst }}</a>
                     </span>
                 </li>
-            </ol>
+            </ul>
         </nav>
         <h2>
             <svg class="bi" width="28" height="28" fill="currentColor">

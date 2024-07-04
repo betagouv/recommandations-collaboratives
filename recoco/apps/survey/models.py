@@ -2,25 +2,25 @@ import math
 import statistics
 from datetime import timedelta
 
+from autoslug import AutoSlugField
 from django.contrib.auth import models as auth_models
+from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.managers import CurrentSiteManager
 from django.contrib.sites.models import Site
 from django.db import models
+from django.db.models.signals import post_migrate
+from django.dispatch import receiver
 from django.utils import timezone
 from markdownx.utils import markdownify
+from model_clone import CloneMixin
 from tagging.fields import TagField
 from tagging.models import Tag
 from tagging.registry import register as tagging_register
+
 from recoco.apps.projects import models as projects_models
-from django.contrib.contenttypes.models import ContentType
-from django.db.models.signals import post_migrate
-from django.dispatch import receiver
-
-from model_clone import CloneMixin
-
-from .utils import compute_qs_completion
 
 from . import apps
+from .utils import compute_qs_completion
 
 
 # We need the permission to be associated to the site and not to the surveys
@@ -159,6 +159,11 @@ class Question(CloneMixin, models.Model):
         max_length=32, verbose_name="Texte court de la question", default=""
     )
 
+    def _populate_slug(self) -> str:
+        return self.text_short if len(self.text_short) else self.text
+
+    slug = AutoSlugField(unique=True, populate_from=_populate_slug)
+
     how = models.TextField(default="", blank=True, verbose_name="Comment ?")
 
     @property
@@ -287,6 +292,9 @@ class Choice(CloneMixin, models.Model):
     question = models.ForeignKey(
         Question, related_name="choices", on_delete=models.CASCADE
     )
+
+    def __str__(self):
+        return f"{self.value} / {self.text}"
 
 
 tagging_register(Choice, tag_descriptor_attr="tags")

@@ -22,11 +22,11 @@ from ordered_model.models import OrderedModel, OrderedModelManager, OrderedModel
 from tagging.fields import TagField
 from tagging.models import TaggedItem
 from tagging.registry import register as tagging_register
+
 from recoco.apps.addressbook import models as addressbook_models
 from recoco.apps.geomatics import models as geomatics_models
 from recoco.apps.projects import models as projects_models
 from recoco.apps.resources import models as resources
-
 
 FEED_LABEL_MAX_LENGTH = 50
 
@@ -128,7 +128,11 @@ class Task(OrderedModel):
     site = models.ForeignKey(Site, on_delete=models.CASCADE)
 
     topic = models.ForeignKey(
-        projects_models.Topic, on_delete=models.CASCADE, null=True, related_name="tasks"
+        projects_models.Topic,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="tasks",
     )
 
     @property

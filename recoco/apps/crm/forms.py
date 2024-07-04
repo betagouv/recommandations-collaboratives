@@ -1,10 +1,42 @@
 from django import forms
 from markdownx.fields import MarkdownxFormField
+from taggit.forms import TagWidget
 
-from recoco.apps.home import models as home_models
 from recoco.apps.addressbook import models as addressbook_models
+from recoco.apps.home import models as home_models
 
 from . import models
+
+
+class SiteConfigurationForm(forms.ModelForm):
+    class Meta:
+        model = home_models.SiteConfiguration
+
+        fields = [
+            "sender_email",
+            "sender_name",
+            "contact_form_recipient",
+            "legal_address",
+            "legal_owner",
+            "description",
+            "logo_large",
+            "logo_small",
+            "email_logo",
+            "crm_available_tags",
+            "reminder_interval",
+        ]
+
+        widgets = {
+            "crm_available_tags": TagWidget(
+                attrs={
+                    "class": "form-control",
+                    "id": "crm_available_tags",
+                    "placeholder": "Enter tags by comma separated",
+                    "data-role": "tagsinput",
+                    "data_role": "tagsinput",
+                }
+            )
+        }
 
 
 class CRMProfileForm(forms.ModelForm):

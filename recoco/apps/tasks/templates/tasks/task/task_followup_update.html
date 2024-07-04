@@ -1,15 +1,15 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
-    <div class="col-11 py-5 mx-auto">
+    <div class="col-12 p-4 mx-auto">
         <!-- Breadcrumb -->
         <nav aria-label="breadcrumb">
-            <ol class="breadcrumb">
+            <ul class="breadcrumb">
                 <li class="breadcrumb-item">
                     <a href="{% url 'projects-project-detail' followup.task.project.id %}">{{ followup.task.project.name|title|truncatechars:20 }}</a>
                 </li>
                 <li class="breadcrumb-item active">{{ followup.task.intent|truncatechars:20 }}</li>
-            </ol>
+            </ul>
         </nav>
         <h1 class=" align-items-center">
             <svg class="bi" width="40" height="40" fill="currentColor">

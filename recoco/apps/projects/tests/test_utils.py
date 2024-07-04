@@ -13,6 +13,7 @@ from django.contrib.auth import models as auth
 from django.contrib.sites.shortcuts import get_current_site
 from django.contrib.sites import models as sites_models
 from model_bakery import baker
+
 from recoco.apps.geomatics import models as geomatics
 from recoco.apps.projects.utils import assign_advisor, assign_collaborator
 

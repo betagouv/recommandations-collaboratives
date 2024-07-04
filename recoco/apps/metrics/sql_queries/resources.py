@@ -1,9 +1,8 @@
 from django.db.models import QuerySet
 
-
 from recoco.apps.resources.models import Resource
 
-from ..utils import hash_field, display_value
+from ..utils import display_value, hash_field
 
 
 def get_queryset(site_id: int) -> QuerySet:

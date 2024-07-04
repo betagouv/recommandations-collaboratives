@@ -133,6 +133,7 @@ class UserProjectStatusAdmin(admin.ModelAdmin):
 
     list_filter = ["site"]
     list_select_related = ("project__commune", "user")
+    readonly_fields = ("site", "project", "user")
 
 
 @admin.register(models.Topic)

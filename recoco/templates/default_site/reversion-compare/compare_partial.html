@@ -1,4 +1,14 @@
 {% load i18n %}
+
+<form method="POST" action="{% url 'resources-resource-history-restore' resource.pk version1.pk %}">
+    {% csrf_token %}
+    <button class="btn btn-secondary">Restaurer la version du {{ version1.revision.date_created }} par {{ version1.revision.user }}</button>
+
+<form method="POST" action="{% url 'resources-resource-history-restore' resource.pk version2.pk %}">
+    {% csrf_token %}
+    <button class="btn btn-secondary">Restaurer la version du {{ version2.revision.date_created }} par {{ version2.revision.user }}</button>
+</form>
+
 {% for field_diff in compare_data %}
 <h3>{% firstof field_diff.field.verbose_name field_diff.field.related_name %}{% if field_diff.is_related and not field_diff.follow %}<sup class="follow">*</sup>{% endif %}</h3>
 {% if field_diff.field.help_text %}<p class="help">{{ field_diff.field.help_text }}</p>{% endif %}

@@ -28,8 +28,8 @@ from recoco.utils import (
 from .. import models, signals
 from ..serializers import (
     ProjectForListSerializer,
-    ProjectSerializer,
     TopicSerializer,
+    UserProjectSerializer,
     UserProjectStatusForListSerializer,
     UserProjectStatusSerializer,
 )
@@ -47,8 +47,8 @@ class ProjectDetail(APIView):
     def get_object(self, pk):
         try:
             return models.Project.on_site.get(pk=pk)
-        except models.Project.DoesNotExist:
-            raise Http404
+        except models.Project.DoesNotExist as exc:
+            raise Http404 from exc
 
     def get(self, request, pk, format=None):
         p = self.get_object(pk)
@@ -56,7 +56,7 @@ class ProjectDetail(APIView):
             request.user, "view_project", p
         )
         context = {"request": request}
-        serializer = ProjectSerializer(p, context=context)
+        serializer = UserProjectSerializer(p, context=context)
         return Response(serializer.data)
 
     def patch(self, request, pk, format=None):
@@ -65,7 +65,7 @@ class ProjectDetail(APIView):
             request.user, "projects.change_location", p
         )  # need at least one write perm
         context = {"request": request, "view": self, "format": format}
-        serializer = ProjectSerializer(
+        serializer = UserProjectSerializer(
             p, context=context, data=request.data, partial=True
         )
         if serializer.is_valid():
@@ -203,8 +203,8 @@ class UserProjectStatusDetail(APIView):
     def get_object(self, pk):
         try:
             return models.UserProjectStatus.objects.get(pk=pk)
-        except models.UserProjectStatus.DoesNotExist:
-            raise Http404
+        except models.UserProjectStatus.DoesNotExist as exc:
+            raise Http404 from exc
 
     def get(self, request, pk, format=None):
         ups = self.get_object(pk)

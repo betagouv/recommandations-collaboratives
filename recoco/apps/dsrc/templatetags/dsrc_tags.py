@@ -21,9 +21,9 @@ authors: patricia.boh@beta.gouv.fr
 created: 2024-01-31 11:19:06 CEST
 """
 
+from crispy_forms.layout import HTML
 from django import template
 from django.template.context import Context
-from crispy_forms.layout import HTML
 
 from recoco.apps.dsrc.utils import generate_random_id
 
@@ -305,7 +305,7 @@ def dsrc_select(*args, **kwargs) -> dict:
 @register.inclusion_tag(
     "dsrc/core/compositions/navs/breadcrumb.html", takes_context=True
 )
-def dsrc_breadcrumb(context: Context, tag_data: dict = {}) -> dict:
+def dsrc_breadcrumb(context: Context, tag_data: dict | None = None) -> dict:
     """
     Returns a breadcrumb item. Takes a dict as parameter, with the following structure:
 

@@ -43,11 +43,11 @@ def get_group_for_site(name: str, site: Site, create=False) -> auth.Group:
     group_name = make_group_name_for_site(name, site)
     try:
         return auth.Group.objects.get(name=group_name)
-    except auth.Group.DoesNotExist:
+    except auth.Group.DoesNotExist as exc:
         if not create:
             raise ImproperlyConfigured(
                 f"Please create the required groups for site'{site}'"
-            )
+            ) from exc
 
         return auth.Group.objects.create(name=group_name)
 
@@ -77,6 +77,15 @@ def is_staff_for_site(user, site=None):
 
     site = site or Site.objects.get_current()
     group_name = make_group_name_for_site("staff", site)
+    return user.groups.filter(name=group_name).exists()
+
+
+def is_admin_for_site(user, site=None):
+    if user.is_superuser:
+        return True
+
+    site = site or Site.objects.get_current()
+    group_name = make_group_name_for_site("admin", site)
     return user.groups.filter(name=group_name).exists()
 
 
@@ -165,11 +174,11 @@ def login(
 def get_site_config_or_503(site):
     try:
         return SiteConfiguration.objects.get(site=site)
-    except SiteConfiguration.DoesNotExist:
+    except SiteConfiguration.DoesNotExist as exc:
         raise ImproperlyConfigured(
             f"Please create a SiteConfiguration for '{site}'"
             " before using this feature.",
-        )
+        ) from exc
 
 
 #######################################################################

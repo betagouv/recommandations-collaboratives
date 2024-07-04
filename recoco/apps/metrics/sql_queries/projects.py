@@ -1,5 +1,5 @@
-from django.db.models import Count, F, Q, QuerySet, Subquery, OuterRef, Func
 from django.contrib.postgres.aggregates import StringAgg
+from django.db.models import Count, F, Func, OuterRef, Q, QuerySet, Subquery
 
 from recoco.apps.projects.models import Project, ProjectSwitchtender
 from recoco.apps.tasks.models import Task
@@ -37,18 +37,23 @@ def get_queryset(site_id: int) -> QuerySet:
         .annotate(
             public_message_count=Count(
                 "notes",
-                filter=Q(notes__public=True),
+                filter=Q(notes__public=True, notes__site_id=site_id),
                 distinct=True,
             ),
             public_message_from_members_count=Count(
                 "notes",
-                filter=Q(notes__public=True, notes__created_by__in=F("members")),
+                filter=Q(
+                    notes__public=True,
+                    notes__site_id=site_id,
+                    notes__created_by__in=F("members"),
+                ),
                 distinct=True,
             ),
             public_message_from_advisors_count=Count(
                 "notes",
                 filter=Q(
                     notes__public=True,
+                    notes__site_id=site_id,
                     notes__created_by__in=F("switchtenders_on_site__switchtender"),
                 ),
                 distinct=True,
@@ -57,13 +62,15 @@ def get_queryset(site_id: int) -> QuerySet:
         .annotate(
             private_message_count=Count(
                 "notes",
-                filter=Q(notes__public=False),
+                filter=Q(notes__public=False, notes__site_id=site_id),
                 distinct=True,
             )
         )
         .annotate(
             crm_annotations_tags=StringAgg(
-                "crm_annotations__tags__name", delimiter=","
+                "crm_annotations__tags__name",
+                delimiter=",",
+                distinct=True,
             ),
             commune_insee=F("commune__insee"),
         )

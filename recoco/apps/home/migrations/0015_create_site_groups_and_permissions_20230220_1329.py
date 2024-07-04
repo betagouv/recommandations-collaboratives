@@ -2,7 +2,7 @@
 
 from django.db import migrations
 from django.contrib.auth import models as auth_models
-from recoco.apps.home.utils import make_group_name_for_site
+from recoco.utils import make_group_name_for_site
 from django.contrib.sites.management import create_default_site
 
 from .. import models
@@ -19,7 +19,7 @@ def upgrade_site_groups(apps, schema_editor):
     )
 
     for site in Site.objects.using(db_alias).all():
-        for name, permissions in models.SITE_GROUP_PERMISSIONS.items():
+        for name, _ in models.SITE_GROUP_PERMISSIONS.items():
             group_name = make_group_name_for_site(name, site)
             auth_models.Group.objects.using(db_alias).get_or_create(name=group_name)
 

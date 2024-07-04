@@ -7,6 +7,7 @@ authors: guillaume.libersat@beta.gouv.fr, raphael.marvie@beta.gouv.fr
 updated: 2022-02-03 16:16:37 CET
 """
 
+import logging
 from dataclasses import asdict, dataclass
 from itertools import groupby
 
@@ -15,20 +16,18 @@ from django.contrib.sites.models import Site
 from django.urls import reverse
 
 from recoco import utils, verbs
-from recoco.apps.tasks import models as tasks_models
 from recoco.apps.projects import models as projects_models
 from recoco.apps.projects import utils as projects_utils
 from recoco.apps.reminders.api import (
-    make_or_update_new_recommendations_reminder,
-    make_or_update_whatsup_reminder,
     get_due_new_recommendations_reminder_for_project,
     get_due_whatsup_reminder_for_project,
+    make_or_update_new_recommendations_reminder,
+    make_or_update_whatsup_reminder,
 )
+from recoco.apps.tasks import models as tasks_models
 
-from .api import send_email
 from . import constants as communication_constants
-
-import logging
+from .api import send_email
 
 logger = logging.getLogger("main")
 

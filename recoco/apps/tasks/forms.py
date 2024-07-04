@@ -10,6 +10,7 @@ created : 2021-12-14 10:36:20 CEST
 
 from django import forms
 from markdownx.fields import MarkdownxFormField
+
 from recoco.apps.resources import models as resources_models
 
 from . import models
@@ -100,7 +101,7 @@ class CreateActionWithResourceForm(CreateActionWithoutResourceForm):
             ).get(pk=resource.pk)
         except resources_models.Resource.DoesNotExist:
             self.add_error("resource_unknown", "Cette ressource n'existe pas")
-            raise None
+            raise
 
         return resource
 
@@ -126,7 +127,7 @@ class CreateActionsFromResourcesForm(forms.ModelForm):
 
         if resources.count() == 0:
             self.add_error("no_valid_resource", "Aucune ressource")
-            raise None
+            raise ValueError("Aucune ressource")
 
         return resources
 

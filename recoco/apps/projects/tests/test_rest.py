@@ -18,9 +18,10 @@ from model_bakery import baker
 from notifications.signals import notify
 from pytest_django.asserts import assertContains
 from rest_framework.test import APIClient
+
 from recoco import verbs
-from recoco.utils import login
 from recoco.apps.tasks import models as tasks_models
+from recoco.utils import login
 
 from .. import models, utils
 
@@ -281,6 +282,7 @@ def check_project_content(project, data):
         "private_message_count",
         "public_message_count",
         "recommendation_count",
+        "description",
     ]
     assert set(data.keys()) == set(expected)
 

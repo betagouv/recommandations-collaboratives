@@ -9,17 +9,29 @@ from model_bakery import baker
 from notifications.signals import notify
 from pytest_django.asserts import assertContains, assertNotContains
 
+from recoco import verbs
+from recoco.apps.home import models as home_models
 from recoco.apps.projects import models as project_models
 from recoco.utils import login
-from recoco import verbs
 
 
 @pytest.mark.django_db
-def test_site_dashboard_not_available_for_non_staff_users(client):
-    url = reverse("crm-site-dashboard")
+def test_low_reach_not_available_for_non_staff_users(client):
+    url = reverse("crm-list-projects-low-reach")
     with login(client):
         response = client.get(url)
     assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_low_reach_available_for_staff_users(request, client):
+    url = reverse("crm-list-projects-low-reach")
+
+    baker.make(home_models.SiteConfiguration, site=get_current_site(request))
+
+    with login(client, groups=["example_com_staff"]):
+        response = client.get(url)
+    assert response.status_code == 200
 
 
 @pytest.mark.django_db

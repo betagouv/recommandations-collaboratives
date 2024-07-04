@@ -22,6 +22,7 @@ class SurveyAdmin(CloneModelAdmin):
 @admin.register(models.Session)
 class SessionAdmin(admin.ModelAdmin):
     list_display = ["answers_count", "survey"]
+    readonly_fields = ("survey", "project")
 
     @admin.display(description="Answers count")
     def answers_count(self, obj):
@@ -56,7 +57,7 @@ class QuestionSetAdmin(admin.ModelAdmin):
 
 @admin.register(models.Question)
 class QuestionAdmin(admin.ModelAdmin):
-    list_display = ["text", "question_set"]
+    list_display = ["text", "text_short", "slug", "question_set"]
     list_select_related = ("question_set",)
 
 
