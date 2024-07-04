@@ -9,6 +9,9 @@
                alt="logo {{ request.site.name }} - lien retour page accueil" />
      </a>
 {% elif user.is_authenticated %}
+     <a href="{% url 'home' %}" class="d-flex align-middle align-items-center">
+          <span style="font-size: 30px; font-weight: bold;margin-left: 30px;">{{ request.site.name }}</span>
+     </a>
 {% elif not user.is_authenticated and request.site.configuration.logo_large %}
      <div class="navbar-logo">
           <button class="toggler-secondary"
