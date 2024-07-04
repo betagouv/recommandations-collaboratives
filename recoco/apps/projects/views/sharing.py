@@ -19,12 +19,12 @@ def project_detail_from_sharing_link(request, project_ro_key):
     """Return a special view of the project using the sharing link"""
     try:
         project = models.Project.on_site.get(ro_key=project_ro_key)
-    except Exception:
-        raise Http404()
+    except models.Project.DoesNotExist as exc:
+        raise Http404 from exc
 
     try:
         site_config = utils.get_site_config_or_503(request.site)
-        session, created = survey_models.Session.objects.get_or_create(
+        survey_models.Session.objects.get_or_create(
             project=project, survey=site_config.project_survey
         )
     except Exception:  # nosec

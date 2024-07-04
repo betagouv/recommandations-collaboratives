@@ -47,8 +47,8 @@ class ProjectDetail(APIView):
     def get_object(self, pk):
         try:
             return models.Project.on_site.get(pk=pk)
-        except models.Project.DoesNotExist:
-            raise Http404
+        except models.Project.DoesNotExist as exc:
+            raise Http404 from exc
 
     def get(self, request, pk, format=None):
         p = self.get_object(pk)
@@ -203,8 +203,8 @@ class UserProjectStatusDetail(APIView):
     def get_object(self, pk):
         try:
             return models.UserProjectStatus.objects.get(pk=pk)
-        except models.UserProjectStatus.DoesNotExist:
-            raise Http404
+        except models.UserProjectStatus.DoesNotExist as exc:
+            raise Http404 from exc
 
     def get(self, request, pk, format=None):
         ups = self.get_object(pk)
