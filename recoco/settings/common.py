@@ -354,7 +354,7 @@ REST_FRAMEWORK = {
         "django_filters.rest_framework.DjangoFilterBackend",
     ],
     # "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
-    "PAGE_SIZE": 50,
+    # "PAGE_SIZE": 50, # XXX Disabled until pagination is activated on all endpoints
 }
 
 # https://django-rest-framework-simplejwt.readthedocs.io/en/latest/settings.html
