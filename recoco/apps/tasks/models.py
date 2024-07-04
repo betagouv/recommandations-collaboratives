@@ -128,7 +128,11 @@ class Task(OrderedModel):
     site = models.ForeignKey(Site, on_delete=models.CASCADE)
 
     topic = models.ForeignKey(
-        projects_models.Topic, on_delete=models.CASCADE, null=True, related_name="tasks"
+        projects_models.Topic,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="tasks",
     )
 
     @property
