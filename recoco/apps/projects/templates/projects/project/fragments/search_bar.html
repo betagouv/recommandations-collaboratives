@@ -1,12 +1,12 @@
 {% load sass_tags %}
 {% block css %}
-    <link href="{% sass_src 'projects/css/searchbar.scss' %}"
-          rel="stylesheet"
-          type="text/css">
+<link href="{% sass_src 'projects/css/searchbar.scss' %}"
+      rel="stylesheet"
+      type="text/css">
 {% endblock css %}
 <input type="search"
        data-cy="search-bar-project"
        class="fr-icon-search-line"
        placeholder="{{ placeholder|default:"Rechercher" }}"
-       @input="{{ action_search }}"
+       @input.debounce.500ms="{{ action_search }}"
        {% if x_model %}x-model="{{ x_model }}"{% endif %}>

@@ -49,6 +49,8 @@ function boardProjectsApp() {
       this.data = [...data];
       this.rawData = [...data];
       const fuseOptions = {
+        isCaseSensitive: false,
+        minMatchCharLength: 2,
         threshold: 0.0,
         keys: [
           'name',
@@ -128,8 +130,7 @@ function boardProjectsApp() {
       event.preventDefault();
       event.dataTransfer.dropEffect = 'move';
     },
-    onSearch(event) {
-      this.searchText = event.target.value;
+    onSearch() {
       this.filterProject(this.searchText);
     },
     filterProject(search) {
