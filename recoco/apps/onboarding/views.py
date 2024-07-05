@@ -13,6 +13,7 @@ from django.contrib.auth import login as log_user
 from django.contrib.auth import models as auth
 from django.contrib.auth.decorators import login_required
 from django.contrib.sites import models as sites
+from django.db import transaction
 from django.shortcuts import get_object_or_404, redirect, render, reverse
 from django.template.loader import render_to_string
 from django.utils.http import urlencode
@@ -183,7 +184,10 @@ def onboarding_project(request):
 
         if all_forms_valid:
             project = create_project_for_user(
-                user=request.user, data=form.cleaned_data, status="DRAFT"
+                site=request.site,
+                user=request.user,
+                data=form.cleaned_data,
+                status="DRAFT",
             )
 
             project.sites.add(request.site)
@@ -316,6 +320,7 @@ def prefill_project_submit(request):
 
             # Project creation
             project = create_project_for_user(
+                site=request.site,
                 user=user,
                 submitted_by=request.user,
                 data=form.cleaned_data,
@@ -370,8 +375,9 @@ def select_commune(request, project_id=None):
     return render(request, "onboarding/select-commune.html", locals())
 
 
+@transaction.atomic
 def create_project_for_user(
-    user: auth.User, data: dict, status: str, submitted_by: auth.User = None
+    site, user: auth.User, data: dict, status: str, submitted_by: auth.User = None
 ) -> projects.Project:
     """Use data from form to create and return a new project for user"""
 
@@ -390,9 +396,10 @@ def create_project_for_user(
         description=data.get("description"),
         location=data.get("location"),
         commune=commune,
-        status=status,
         ro_key=generate_ro_key(),
     )
+
+    project.project_sites.create(site=site, status=status, is_origin=True)
 
     return project
 
