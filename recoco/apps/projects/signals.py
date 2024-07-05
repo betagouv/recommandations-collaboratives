@@ -76,7 +76,7 @@ def log_project_validated(sender, site, moderator, project, **kwargs):
         target=project,
     )
 
-    if project.status == "DRAFT" or project.muted:
+    if project.project_sites.current().status == "DRAFT" or project.muted:
         return
 
     # prevent crashing on misconfigured object
@@ -117,7 +117,7 @@ def log_project_switchtender_joined(sender, project, **kwargs):
 
 @receiver(project_switchtender_joined)
 def notify_project_switchtender_joined(sender, project, **kwargs):
-    if project.status == "DRAFT" or project.muted:
+    if project.project_sites.current().status == "DRAFT" or project.muted:
         return
 
     if project.inactive_since:
@@ -148,7 +148,7 @@ def log_project_observer_joined(sender, project, **kwargs):
 
 @receiver(project_observer_joined)
 def notify_project_observer_joined(sender, project, **kwargs):
-    if project.status == "DRAFT" or project.muted:
+    if project.project_sites.current().status == "DRAFT" or project.muted:
         return
 
     if project.inactive_since:
@@ -205,7 +205,7 @@ def log_project_member_joined(sender, project, **kwargs):
 
 @receiver(project_member_joined)
 def notify_project_member_joined(sender, project, **kwargs):
-    if project.status == "DRAFT" or project.muted:
+    if project.project_sites.current().status == "DRAFT" or project.muted:
         return
 
     if project.inactive_since:
@@ -291,7 +291,7 @@ def notify_note_created(sender, note, project, user, **kwargs):
             target=project,
         )
 
-    if project.status == "DRAFT" or project.muted:
+    if project.project_sites.current().status == "DRAFT" or project.muted:
         return
 
     notify.send(
@@ -336,7 +336,7 @@ def project_userproject_trace_status_changes(sender, old_one, new_one, **kwargs)
 @receiver(document_uploaded)
 def project_document_uploaded(sender, instance, **kwargs):
     project = instance.project
-    if project.status == "DRAFT" or project.muted:
+    if project.project_sites.current().status == "DRAFT" or project.muted:
         return
 
     # Add a trace
