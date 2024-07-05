@@ -52,6 +52,11 @@ class ProjectSerializer(serializers.HyperlinkedModelSerializer):
 
     switchtenders = UserSerializer(read_only=True, many=True)
 
+    status = serializers.SerializerMethodField()
+
+    def get_status(self, obj):
+        return obj.project_sites.current().status
+
     recommendation_count = serializers.SerializerMethodField()
 
     def get_recommendation_count(self, obj):
@@ -149,7 +154,7 @@ class ProjectForListSerializer(serializers.BaseSerializer):
             "id": data.id,
             "name": data.name,
             "org_name": data.org_name,
-            "status": data.status,
+            "status": data.project_sites.current().status,
             "inactive_since": data.inactive_since,
             "created_on": data.created_on,
             "updated_on": data.updated_on,
@@ -186,7 +191,7 @@ class UserProjectStatusForListSerializer(serializers.BaseSerializer):
                 "id": data.project.id,
                 "name": data.project.name,
                 "org_name": data.project.org_name,
-                "status": data.project.status,
+                "status": data.project.project_sites.current().status,
                 "created_on": data.project.created_on,
                 "updated_on": data.project.updated_on,
                 "switchtenders": format_switchtenders(data.project),
