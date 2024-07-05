@@ -126,7 +126,9 @@ class ProjectManager(models.Manager):
         site = Site.objects.get_current()
 
         if has_perm(user, "sites.list_projects", site):
-            projects = self.filter(sites=site, deleted=None).exclude(status="DRAFT")
+            projects = self.filter(sites=site, deleted=None).exclude(
+                project_sites__site=site, project_sites__status="DRAFT"
+            )
         else:
             projects = self.none()
 
@@ -135,7 +137,7 @@ class ProjectManager(models.Manager):
             actor_departments = user.profile.departments.values_list("code", flat=True)
             projects = self._filter_by_departments(projects, actor_departments)
             projects = projects.exclude(
-                status="DRAFT"
+                project_sites__status="DRAFT", project_sites__site=site
             )  # don't list unmoderated projects
 
         # Extend scope of projects to those where you're member or invited advisor

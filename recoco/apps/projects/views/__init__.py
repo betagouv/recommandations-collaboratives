@@ -132,9 +132,9 @@ def project_list_for_staff(request):
 
     draft_projects = []
     if project_moderator:
-        draft_projects = models.Project.on_site.filter(status="DRAFT").order_by(
-            "-created_on"
-        )
+        draft_projects = models.Project.on_site.filter(
+            project_sites__status="DRAFT"
+        ).order_by("-created_on")
 
     unread_notifications = (
         notifications_models.Notification.on_site.unread()
@@ -191,7 +191,7 @@ def project_accept(request, project_id=None):
 
     project = get_object_or_404(models.Project, pk=project_id)
     if request.method == "POST":
-        project.status = "TO_PROCESS"
+        project.project_sites.filter(site=request.site).update(status="TO_PROCESS")
         project.updated_on = timezone.now()
         project.save()
 
