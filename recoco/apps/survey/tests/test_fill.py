@@ -31,9 +31,8 @@ from .. import models
 
 
 @pytest.mark.django_db
-def test_new_survey_session_is_created(request, client):
+def test_new_survey_session_is_created(request, client, project):
     current_site = get_current_site(request)
-    project = Recipe(projects.Project, sites=[current_site]).make()
     survey = Recipe(models.Survey, site=current_site).make()
 
     onboarding = onboarding_models.Onboarding.objects.first()
@@ -56,10 +55,9 @@ def test_new_survey_session_is_created(request, client):
 
 
 @pytest.mark.django_db
-def test_new_survey_session_makes_500_if_no_siteconfiguration(request, client):
+def test_new_survey_session_makes_500_if_no_siteconfiguration(request, client, project):
     current_site = get_current_site(request)
 
-    project = Recipe(projects.Project, sites=[current_site]).make()
     Recipe(models.Survey, site=current_site).make()
 
     url = reverse("survey-project-session", args=(project.id,))
@@ -69,9 +67,8 @@ def test_new_survey_session_makes_500_if_no_siteconfiguration(request, client):
 
 
 @pytest.mark.django_db
-def test_existing_survey_session_is_reused(request, client):
+def test_existing_survey_session_is_reused(request, client, project):
     current_site = get_current_site(request)
-    project = Recipe(projects.Project, sites=[current_site]).make()
     survey = Recipe(models.Survey, site=current_site).make()
 
     onboarding = onboarding_models.Onboarding.objects.first()
@@ -108,9 +105,10 @@ def test_on_survey_creation_signal_is_sent(client):
 
 
 @pytest.mark.django_db
-def test_answered_question_with_comment_only_is_saved_to_session(request, client):
+def test_answered_question_with_comment_only_is_saved_to_session(
+    request, client, project
+):
     current_site = get_current_site(request)
-    project = Recipe(projects.Project, sites=[current_site]).make()
     survey = Recipe(models.Survey, site=current_site).make()
     session = Recipe(models.Session, survey=survey, project=project).make()
 
@@ -525,11 +523,10 @@ def test_refresh_signals(request, client):
 
 # -- Project reactivation
 @pytest.mark.django_db
-def test_answered_question_reactivates_inactive_project(request, client):
+def test_answered_question_reactivates_inactive_project(request, client, make_project):
     current_site = get_current_site(request)
-    project = Recipe(
-        projects.Project, sites=[current_site], inactive_since=timezone.now()
-    ).make()
+    project = make_project(site=current_site, inactive_since=timezone.now())
+
     survey = Recipe(models.Survey, site=current_site).make()
     session = Recipe(models.Session, survey=survey, project=project).make()
 
@@ -552,12 +549,11 @@ def test_answered_question_reactivates_inactive_project(request, client):
 # -- Project activity flags
 @pytest.mark.django_db
 def test_last_members_activity_is_updated_by_survey_edition_from_member(
-    request, client
+    request, client, make_project
 ):
     current_site = get_current_site(request)
-    project = Recipe(
-        projects.Project, sites=[current_site], inactive_since=timezone.now()
-    ).make()
+    project = make_project(site=current_site, inactive_since=timezone.now())
+
     survey = Recipe(models.Survey, site=current_site).make()
     session = Recipe(models.Session, survey=survey, project=project).make()
 

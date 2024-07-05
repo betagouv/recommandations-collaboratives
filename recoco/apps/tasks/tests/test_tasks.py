@@ -31,18 +31,6 @@ from recoco.utils import login
 
 from .. import models
 
-
-# FIXTURES
-@pytest.fixture
-def project_ready(request):
-    """Create a project on the current site with status READY"""
-    current_site = get_current_site(request)
-    project = baker.make(project_models.Project)
-    project.project_sites.create(site=current_site, status="READY", is_origin=True)
-
-    return project
-
-
 ########################################################################
 # Task Recommendation
 ########################################################################

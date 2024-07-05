@@ -2,12 +2,10 @@ from unittest.mock import ANY
 
 import pytest
 from django.contrib.auth.models import User
-from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
 from model_bakery import baker
 
 from recoco.apps.projects import utils
-from recoco.apps.projects.models import Project
 from recoco.apps.survey.models import Answer, Question, Session
 
 
@@ -19,9 +17,7 @@ def api_client():
 
 
 @pytest.mark.django_db
-def test_session_view(request, api_client):
-    site = get_current_site(request)
-    project = baker.make(Project, sites=[site])
+def test_session_view(request, api_client, project):
     user = baker.make(User)
     utils.assign_collaborator(user, project)
 
@@ -43,9 +39,7 @@ def test_session_view(request, api_client):
 
 
 @pytest.mark.django_db
-def test_session_answers_view(request, api_client):
-    site = get_current_site(request)
-    project = baker.make(Project, sites=[site])
+def test_session_answers_view(request, api_client, project):
     user = baker.make(User)
     utils.assign_collaborator(user, project)
 
