@@ -577,9 +577,10 @@ def test_project_detail_contains_informations(request, client, project):
 
     task = Recipe(task_models.Task, project=project).make()
     note = Recipe(models.Note, project=project).make()
-    url = reverse("projects-project-detail-knowledge", args=[project.id])
+    url = reverse("projects-project-detail-overview", args=[project.id])
     with login(client, groups=["example_com_advisor"]):
         response = client.get(url)
+
     assertContains(response, project.description)
     assertContains(response, task.content)
     assertContains(response, note.content)

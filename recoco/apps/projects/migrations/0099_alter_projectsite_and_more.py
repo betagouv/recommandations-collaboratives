@@ -21,10 +21,6 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AlterUniqueTogether(
-            name="projectsite",
-            unique_together={("project", "origin")},
-        ),
         migrations.RemoveField(
             model_name="project",
             name="sites",
@@ -54,10 +50,6 @@ class Migration(migrations.Migration):
                 default="TO_MODERATE",
                 max_length=20,
             ),
-        ),
-        migrations.AlterUniqueTogether(
-            name="projectsite",
-            unique_together=set(),
         ),
         migrations.AlterField(
             model_name="projectsite",
