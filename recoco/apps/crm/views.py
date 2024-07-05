@@ -81,7 +81,9 @@ class CRMSiteDashboardView(LoginRequiredMixin, UserPassesTestMixin, TemplateView
     def get_context_data(self, *orgs, **kwargs):
         context = super().get_context_data(*orgs, **kwargs)
         context["search_form"] = forms.CRMSearchForm()
-        context["projects_waiting"] = Project.on_site.filter(status="DRAFT").count()
+        context["projects_waiting"] = Project.on_site.filter(
+            project_sites__status="DRAFT", project_sites__site=self.request.site
+        ).count()
         context["project_model"] = Project
         context["user_model"] = User
 
@@ -975,7 +977,10 @@ def crm_list_projects_with_low_reach(request):
     search_form = forms.CRMSearchForm()
 
     projects = (
-        Project.on_site.filter(status__in=("READY", "IN_PROGRESS", "DONE"))
+        Project.on_site.filter(
+            project_sites__status__in=("READY", "IN_PROGRESS", "DONE"),
+            project_sites__site=request.site,
+        )
         .exclude(exclude_stats=True)
         .prefetch_related("tasks", "notes")
         .annotate(

@@ -106,11 +106,13 @@ class StatisticsView(TemplateView):
         staff_users = auth.User.objects.filter(is_staff=True)
         the_projects = projects.Project.on_site.exclude(
             Q(members__in=staff_users)
-            | Q(status="DRAFT")
-            | Q(status="STUCK")
             # FIXME ^ replace w/: | Q(status="STANDBY") -> OK
             | Q(exclude_stats=True)
+        ).exclude(
+            project_sites__site=self.request.site,
+            project_sites__status__in=["DRAFT", "STUCK"],
         )
+
         context = super().get_context_data(**kwargs)
         context["reco_following_pc"] = 78
         context["collectivity_supported"] = the_projects.count()
@@ -120,10 +122,12 @@ class StatisticsView(TemplateView):
             )
             .exclude(
                 Q(project__members__in=staff_users)
-                | Q(project__status="DRAFT")
-                | Q(project__status="STUCK")
                 # FIXME ^ replace w/: | Q(project__status="STANDBY")
                 | Q(project__exclude_stats=True)
+            )
+            .exclude(
+                project__project_sites__status__in=["DRAFT", "STUCK"],
+                project__project_sites__site=self.request.site,
             )
             .order_by("project_id")
             .values("project_id")

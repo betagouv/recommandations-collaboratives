@@ -18,7 +18,14 @@ def setup_db(django_db_setup, django_db_blocker):
 @pytest.fixture
 def make_project():
     def _make_project(site, status="READY", **kwargs):
-        project = baker.make(Project, **kwargs)
+        default_data = {
+            "description": "Super description",
+            "location": "SomeWhere",
+        }
+
+        default_data.update(**kwargs)
+
+        project = baker.make(Project, **default_data)
         if site:
             project.project_sites.create(site=site, status=status, is_origin=True)
 
