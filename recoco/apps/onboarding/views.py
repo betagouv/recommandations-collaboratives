@@ -225,16 +225,20 @@ def onboarding_summary(request, project_id=None):
 
     project = get_object_or_404(projects.Project, sites=request.site, pk=project_id)
 
-    if site_config.project_survey:
-        next_args_for_project_location = urlencode(
-            {"next": reverse("survey-project-session", args=(project.pk,))}
-        )
+    if not project.location:
+        next_url = f"{reverse('survey-project-session' if site_config.project_survey else 'projects-project-detail', args=(project.pk,))}"
     else:
         next_args_for_project_location = urlencode(
-            {"next": reverse("projects-project-detail", args=(project.pk,))}
+            {
+                "next": reverse(
+                    "survey-project-session"
+                    if site_config.project_survey
+                    else "projects-project-detail",
+                    args=(project.pk,),
+                )
+            }
         )
-
-    next_url = f"{reverse('projects-project-location', args=(project.pk,))}?{next_args_for_project_location}"
+        next_url = f"{reverse('projects-project-location', args=(project.pk,))}?{next_args_for_project_location}"
 
     context = {"project": project, "next_url": next_url, "site_config": site_config}
 
