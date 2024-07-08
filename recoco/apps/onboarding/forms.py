@@ -229,8 +229,8 @@ class OnboardingProject(DsrcBaseForm):
 
     name = forms.CharField(label="Nom du projet *", initial="", required=True)
     location = forms.CharField(
-        label="Adresse *",
-        required=True,
+        label="Adresse",
+        required=False,
         help_text="Si le projet n'a pas d'adresse exacte, donnez-nous une indication proche.",
         initial="",
     )
