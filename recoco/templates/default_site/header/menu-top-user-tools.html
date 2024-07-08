@@ -52,7 +52,45 @@
             <hr class="dropdown-divider">
           </li>
           <li>
-            <a class="small  dropdown-item" href="{% url 'admin:index' %}">Administration Reco-co</a>
+            <a class="small dropdown-item" href="{% url 'admin:index' %}">Administration Reco-co</a>
+          </li>
+          <li>
+            <hr class="dropdown-divider">
+          </li>
+        {% endif %}
+        <!-- Address Book -->
+        {% if "use_addressbook" in user_site_perms %}
+          <li class="{% if 'addressbook' in url_name %}activated{% endif %}">
+            <a href="{% url 'addressbook-organization-list' %}" class="small dropdown-item">Carnet d'adresses</a>
+          </li>
+          <li>
+            <hr class="dropdown-divider">
+          </li>
+        {% endif %}
+        {% if user.is_staff %}
+          <li>
+            <a class="small dropdown-item" href="https://app.gitbook.com/o/nS3kWPp33JdseoHho2Gv/s/ERzX4YZ3RcvyxL3VUccS/pour-les-administrateurs-dun-portail">Documentation</a>
+          </li>
+          <li>
+            <hr class="dropdown-divider">
+          </li>
+        {% elif user.is_advisor %}
+          <li>
+            <a class="small dropdown-item" href="https://reco-co.gitbook.io/reco-co/pour-les-acteurs-publics-qui-conseillent-les-collectivites">Documentation</a>
+          </li>
+          <li>
+            <hr class="dropdown-divider">
+          </li>
+        {% elif crm_user_is_advisor %}
+          <li>
+            <a class="small dropdown-item" href="https://reco-co.gitbook.io/reco-co/pour-les-acteurs-publics-qui-conseillent-les-collectivites">Yes I am</a>
+          </li>
+          <li>
+            <hr class="dropdown-divider">
+          </li>
+        {% elif position.is_advisor %}
+          <li>
+            <a class="small dropdown-item" href="https://reco-co.gitbook.io/reco-co/pour-les-acteurs-publics-qui-conseillent-les-collectivites">Yes I am</a>
           </li>
           <li>
             <hr class="dropdown-divider">
