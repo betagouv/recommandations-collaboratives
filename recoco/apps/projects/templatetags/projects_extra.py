@@ -33,6 +33,12 @@ def is_staff_for_current_site(user):
 
 
 @register.simple_tag
+def is_admin_for_current_site(user):
+    """Return True if the given user is admin for the active site"""
+    return uv_utils.is_admin_for_site(user)
+
+
+@register.simple_tag
 def get_advising_position(user, project):
     """Return position of user for project on current site as dict
 
