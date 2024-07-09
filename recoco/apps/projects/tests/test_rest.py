@@ -15,6 +15,7 @@ from django.contrib.sites import models as sites_models
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
 from django.utils import timezone
+from guardian.shortcuts import assign_perm
 from model_bakery import baker
 from notifications.signals import notify
 from pytest_django.asserts import assertContains
@@ -299,7 +300,7 @@ def test_anonymous_cannot_use_project_patch_api(request, client, project_draft):
     client = APIClient()
 
     url = reverse("projects-detail", args=[project_draft.id])
-    response = client.patch(url, data={"status": "DONE"})
+    response = client.patch(url, data={"name": "lalala"})
 
     assert response.status_code == 403
 
@@ -312,7 +313,7 @@ def test_bad_project_is_reported_by_project_patch_api(client):
     client.force_authenticate(user)
 
     url = reverse("projects-detail", args=[0])
-    response = client.patch(url, data={"status": "DONE"})
+    response = client.patch(url, data={"name": "lalala"})
 
     assert response.status_code == 404
 
@@ -343,7 +344,7 @@ def test_project_simple_user_cannot_update_by_project_patch_api(
     client.force_authenticate(user)
 
     url = reverse("projects-detail", args=[project_draft.id])
-    response = client.patch(url, data={"status": "READY"})
+    response = client.patch(url, data={"name": "allala"})
 
     assert response.status_code == 403
 
@@ -358,19 +359,97 @@ def test_project_is_updated_by_project_patch_api(request, client, project_draft)
 
     utils.assign_advisor(user, project_draft, site)
 
-    new_status = "READY"
+    new_name = "new name"
 
     client = APIClient()
     client.force_authenticate(user)
 
     url = reverse("projects-detail", args=[project_draft.id])
+    response = client.patch(url, data={"name": new_name})
+
+    assert response.status_code == 200
+    assert response.data["status"] == new_name
+
+    project_draft.refresh_from_db()
+    assert project_draft.name == new_name
+
+
+################
+# Project Site Status
+################
+
+
+@pytest.mark.django_db
+def test_list_project_statuses_for_non_moderator(request, project, project_draft):
+    site = get_current_site(request)
+    user = baker.make(auth_models.User, email="me@example.com")
+    assign_perm("list_projects", user, site)
+
+    client = APIClient()
+    client.force_authenticate(user=user)
+
+    url = reverse("projects-status-list")
+    response = client.get(url)
+
+    ps = project.project_sites.current()
+
+    # we are only expecting project and not project_draft
+    expected = [
+        {
+            "id": ps.id,
+            "project": ps.project_id,
+            "site": ps.site_id,
+            "is_origin": ps.is_origin,
+            "status": ps.status,
+        }
+    ]
+
+    assert response.status_code == 200
+    assert response.data == expected
+
+
+@pytest.mark.django_db
+def test_list_project_statuses_for_moderators(request, project, project_draft):
+    site = get_current_site(request)
+    user = baker.make(auth_models.User, email="me@example.com")
+    assign_perm("list_projects", user, site)
+    assign_perm("moderate_projects", user, site)
+
+    client = APIClient()
+    client.force_authenticate(user=user)
+
+    url = reverse("projects-status-list")
+    response = client.get(url)
+
+    # we are expecting project and project_draft
+    expected_ids = set([project.pk, project_draft.pk])
+    actual_ids = set(e["project"] for e in response.data)
+
+    assert response.status_code == 200
+    assert len(response.data) == 2
+    assert actual_ids == expected_ids
+
+
+@pytest.mark.django_db
+def test_project_status_is_updated_by_patch_api(request, client, project):
+    site = get_current_site(request)
+    user = baker.make(auth_models.User, email="me@example.com")
+
+    utils.assign_advisor(user, project, site)
+
+    new_status = "DONE"
+
+    client = APIClient()
+    client.force_authenticate(user)
+
+    url = reverse("projects-project-status-update", args=[project.id])
     response = client.patch(url, data={"status": new_status})
 
     assert response.status_code == 200
     assert response.data["status"] == new_status
 
-    project_draft.refresh_from_db()
-    assert project_draft.project_sites.current().status == new_status
+    project.refresh_from_db()
+    assert project.project_sites.current().status == new_status
 
 
 ########################################################################

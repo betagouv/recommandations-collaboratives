@@ -8,7 +8,7 @@ from recoco.apps.home.serializers import UserSerializer
 from recoco.apps.tasks import models as task_models
 from recoco.utils import get_group_for_site
 
-from .models import Document, Note, Project, Topic, UserProjectStatus
+from .models import Document, Note, Project, ProjectSite, Topic, UserProjectStatus
 
 
 class DocumentSerializer(serializers.HyperlinkedModelSerializer):
@@ -28,6 +28,13 @@ class DocumentSerializer(serializers.HyperlinkedModelSerializer):
     uploaded_by = UserSerializer(read_only=True, many=False)
 
 
+class ProjectSiteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProjectSite
+        fields = ["id", "project", "site", "is_origin", "status"]
+        read_only_fields = ["id", "project", "site", "is_origin"]
+
+
 class ProjectSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Project
@@ -35,7 +42,6 @@ class ProjectSerializer(serializers.HyperlinkedModelSerializer):
             "id",
             "name",
             "description",
-            "status",
             "inactive_since",
             "created_on",
             "updated_on",
@@ -51,11 +57,6 @@ class ProjectSerializer(serializers.HyperlinkedModelSerializer):
         ]
 
     switchtenders = UserSerializer(read_only=True, many=True)
-
-    status = serializers.SerializerMethodField()
-
-    def get_status(self, obj):
-        return obj.project_sites.current().status
 
     recommendation_count = serializers.SerializerMethodField()
 

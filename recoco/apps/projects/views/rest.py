@@ -9,11 +9,14 @@ created : 2021-05-26 15:56:20 CEST
 
 from copy import copy
 
+from django.contrib.auth.mixins import UserPassesTestMixin
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import Count, F, Q
 from django.http import Http404
+from django.shortcuts import get_object_or_404
 from notifications import models as notifications_models
 from rest_framework import permissions, status, viewsets
+from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -28,6 +31,7 @@ from recoco.utils import (
 from .. import models, signals
 from ..serializers import (
     ProjectForListSerializer,
+    ProjectSiteSerializer,
     TopicSerializer,
     UserProjectSerializer,
     UserProjectStatusForListSerializer,
@@ -447,6 +451,66 @@ class TopicViewSet(viewsets.ReadOnlyModelViewSet):
                 pass
 
         return topics
+
+
+########################################################################
+# Project Site API (status on given site)
+########################################################################
+
+# /project/:X/moderate (POST)
+# /projects/status (GET => list)
+# /projects/status/:X (PATCH => "status")
+
+
+class ProjectSiteStatusViewSet(viewsets.GenericViewSet):
+    """
+    API endpoint for listing project status relative to a site
+    """
+
+    serializer_class = ProjectSiteSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        qs = models.ProjectSite.objects.filter(site=self.request.site)
+
+        if not has_perm(self.request.user, "moderate_projects", self.request.site):
+            qs = qs.exclude(status__in=["DRAFT", "PROPOSED"])
+
+        return qs
+
+    @action(methods=["get"], detail=False)
+    def list(self, request):
+        has_perm_or_403(self.request.user, "list_projects", self.request.site)
+
+        serializer = self.get_serializer_class()
+        data = serializer(self.get_queryset(), many=True).data
+
+        return Response(data, status=status.HTTP_200_OK)
+
+
+class ProjectSiteStatusUpdateView(UserPassesTestMixin, APIView):
+
+    permission_classes = [permissions.IsAuthenticated]
+
+    def test_func(self):
+        return has_perm(self.request.user, "list_projects", self.request.site)
+
+    def patch(self, request, pk):
+        project_site = get_object_or_404(
+            models.ProjectSite,
+            ~Q(status__in=["DRAFT", "PROPOSED"]),
+            project_id=pk,
+            site=request.site,
+        )
+
+        serializer = ProjectSiteSerializer(
+            project_site, data=request.data, partial=True
+        )
+        if serializer.is_valid():
+            serializer.save()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+
+        return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 # eof

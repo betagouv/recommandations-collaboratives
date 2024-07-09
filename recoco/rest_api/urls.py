@@ -106,6 +106,16 @@ api_urls = [
         notifications_views.live_unread_notification_list,
         name="notifications-unread-list",
     ),
+    path(
+        "projects/status",
+        projects_rest.ProjectSiteStatusViewSet.as_view({"get": "list"}),
+        name="projects-status-list",
+    ),
+    path(
+        "projects/project/<int:pk>/status",
+        projects_rest.ProjectSiteStatusUpdateView.as_view(),
+        name="projects-project-status-update",
+    ),
 ]
 
 auth_urls = [
