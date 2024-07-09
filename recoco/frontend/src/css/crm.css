@@ -144,6 +144,9 @@ body {
   border-bottom: 1px solid #e1e1e1;
   margin-bottom: 0 !important;
 }
+.crm-header > div:first-child {
+  max-width: 70%;
+}
 
 .crm-region-tag {
   background-color: #baddff;
