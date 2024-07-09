@@ -118,6 +118,23 @@ class TaskViewSet(viewsets.ModelViewSet):
 
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
+    @action(
+        methods=["post"],
+        detail=True,
+    )
+    def mark_visited(self, request, project_id, pk):
+        task = self.get_object()
+
+        has_perm_or_403(self.request.user, "projects.use_tasks", task.project)
+
+        if not task.public:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+
+        task.visited = True
+        task.save()
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 ########################################################################
 # Task notification
