@@ -150,7 +150,6 @@ TEMPLATES = [
             ],
             "libraries": {
                 "common_tags": "recoco.templatetags.common_extra",
-                "dsrc_tags": "recoco.apps.dsrc.templatetags.dsrc_tags",
             },
         },
     },

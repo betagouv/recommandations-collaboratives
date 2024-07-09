@@ -1,6 +1,8 @@
 {% load gravatar %}
 {% load static %}
 {% load guardian_tags %}
+{% load projects_extra %}
+{% is_staff_for_current_site request.user as is_staff %}
 <!-- User -->
 <div id="user-info" class="pe-2 ps-2 ms-2 me-2">
   {% if user.is_authenticated %}
@@ -47,11 +49,11 @@
           <li>
             <a class="dropdown-item small " href="{% url 'crm-site-dashboard' %}">CRM</a>
           </li>
-        {% endif %}
-        {% if user.is_staff %}
           <li>
             <hr class="dropdown-divider">
           </li>
+        {% endif %}
+        {% if user.is_staff %}
           <li>
             <a class="small dropdown-item" href="{% url 'admin:index' %}">Administration Reco-co</a>
           </li>
@@ -72,7 +74,7 @@
             <hr class="dropdown-divider">
           </li>
         {% endif %}
-        {% if user.is_staff %}
+        {% if is_staff %}
           <li>
             <a class="small dropdown-item"
             href="https://app.gitbook.com/o/nS3kWPp33JdseoHho2Gv/s/ERzX4YZ3RcvyxL3VUccS/pour-les-administrateurs-dun-portail"
@@ -81,25 +83,11 @@
           <li>
             <hr class="dropdown-divider">
           </li>
-        {% elif user.is_advisor %}
+        {% elif is_switchtender or is_administrating_project %}
           <li>
             <a class="small dropdown-item"
             href="https://reco-co.gitbook.io/reco-co/pour-les-acteurs-publics-qui-conseillent-les-collectivites"
             data-test-id="documentation-button-advisor">Documentation</a>
-          </li>
-          <li>
-            <hr class="dropdown-divider">
-          </li>
-        {% elif crm_user_is_advisor %}
-          <li>
-            <a class="small dropdown-item" href="https://reco-co.gitbook.io/reco-co/pour-les-acteurs-publics-qui-conseillent-les-collectivites">Yes I am</a>
-          </li>
-          <li>
-            <hr class="dropdown-divider">
-          </li>
-        {% elif position.is_advisor %}
-          <li>
-            <a class="small dropdown-item" href="https://reco-co.gitbook.io/reco-co/pour-les-acteurs-publics-qui-conseillent-les-collectivites">Yes I am</a>
           </li>
           <li>
             <hr class="dropdown-divider">
