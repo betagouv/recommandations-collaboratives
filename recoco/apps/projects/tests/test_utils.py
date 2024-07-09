@@ -91,17 +91,16 @@ def test_get_projects_for_user_honors_draft_if_owner(request, make_project):
 @pytest.mark.django_db
 def test_get_projects_for_user_honors_multisite(request, make_project):
     current_site = get_current_site(request)
-    another_site = baker.make(sites_models.Site)
+    other_site = baker.make(sites_models.Site)
 
     user = baker.make(auth.User)
-    project = make_project(site=None)
-    project.project_sites.create(site=current_site, status="READY", is_origin=True)
-    project.project_sites.create(site=another_site, status="DRAFT")
+    project = make_project(status="READY")
+    project.project_sites.create(site=other_site, status="DRAFT")
 
     assign_collaborator(user, project)
 
     assert len(utils.get_projects_for_user(user, current_site)) == 1
-    assert len(utils.get_projects_for_user(user, another_site)) == 0
+    assert len(utils.get_projects_for_user(user, other_site)) == 0
 
 
 @pytest.mark.django_db

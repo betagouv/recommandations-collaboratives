@@ -1084,6 +1084,7 @@ def test_switchtender_joins_and_leaves_on_the_same_12h_should_not_notify(
 @pytest.mark.django_db
 def test_switchtender_exports_csv(request, client, make_project):
     site = get_current_site(request)
+    other_site = baker.make(sites.Site, name="other site")
 
     site_config = baker.make(home_models.SiteConfiguration, site=site)
     site_config.crm_available_tags.add("a crm tag")
@@ -1100,7 +1101,7 @@ def test_switchtender_exports_csv(request, client, make_project):
     p1.save()
 
     # Project that should not appear
-    make_project(site=None, name="Projet 2")
+    make_project(site=other_site, name="Projet 2")
 
     # Make a task
     Recipe(task_models.Task, public=True, project=p1).make()
@@ -1569,7 +1570,6 @@ def test_project_list_excludes_non_site_projects_for_user(make_project):
     project = make_project(site=current_site, commune__name="one")
 
     make_project(site=other_site, commune__name="dos")
-    make_project(site=None, commune__name="tres")
 
     user = Recipe(auth.User).make()
     group = get_group_for_site("advisor", site=current_site)

@@ -16,8 +16,8 @@ def setup_db(django_db_setup, django_db_blocker):
 
 # -- Project Fixtures
 @pytest.fixture
-def make_project():
-    def _make_project(site, status="READY", **kwargs):
+def make_project(request):
+    def _make_project(site=None, status="READY", **kwargs):
         default_data = {
             "description": "Super description",
             "location": "SomeWhere",
@@ -26,8 +26,10 @@ def make_project():
         default_data.update(**kwargs)
 
         project = baker.make(Project, **default_data)
-        if site:
-            project.project_sites.create(site=site, status=status, is_origin=True)
+        if not site:
+            site = get_current_site(request)
+
+        project.project_sites.create(site=site, status=status, is_origin=True)
 
         return project
 
@@ -37,22 +39,19 @@ def make_project():
 @pytest.fixture
 def project_draft(request, make_project):
     """Create a project on the current site with status PROPOSED"""
-    site = get_current_site(request)
-    yield make_project(site=site, status="DRAFT")
+    yield make_project(status="DRAFT")
 
 
 @pytest.fixture
 def project_proposed(request, make_project):
     """Create a project on the current site with status PROPOSED"""
-    site = get_current_site(request)
-    yield make_project(site=site, status="PROPOSED")
+    yield make_project(status="PROPOSED")
 
 
 @pytest.fixture
 def project(request, make_project):
     """Create a project on the current site with status READY"""
-    site = get_current_site(request)
-    yield make_project(site=site, status="READY")
+    yield make_project(status="READY")
 
 
 project_ready = project

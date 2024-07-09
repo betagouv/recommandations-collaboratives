@@ -11,6 +11,7 @@ created: 2021-06-01 10:11:56 CEST
 import pytest
 from actstream.models import user_stream
 from django.contrib.auth import models as auth_models
+from django.contrib.sites import models as sites_models
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
 from django.utils import timezone
@@ -496,10 +497,9 @@ def test_user_project_status_contains_only_my_projects_for_site(
 ):
     user = baker.make(auth_models.User)
     site = get_current_site(request)
+    other = baker.make(sites_models.Site, name="other site")
     local = baker.make(models.UserProjectStatus, project=project, user=user, site=site)
-    baker.make(
-        models.UserProjectStatus, project=make_project(site=None), user=user
-    )  # noqa
+    baker.make(models.UserProjectStatus, project=make_project(site=other), user=user)
 
     client = APIClient()
     client.force_authenticate(user=user)
