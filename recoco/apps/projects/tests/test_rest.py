@@ -268,7 +268,6 @@ def check_project_content(project, data):
         "name",
         "notifications",
         "org_name",
-        "status",
         "switchtenders",
         "updated_on",
         "private_message_count",
@@ -368,7 +367,7 @@ def test_project_is_updated_by_project_patch_api(request, client, project_draft)
     response = client.patch(url, data={"name": new_name})
 
     assert response.status_code == 200
-    assert response.data["status"] == new_name
+    assert response.data["name"] == new_name
 
     project_draft.refresh_from_db()
     assert project_draft.name == new_name
@@ -388,7 +387,7 @@ def test_list_project_statuses_for_non_moderator(request, project, project_draft
     client = APIClient()
     client.force_authenticate(user=user)
 
-    url = reverse("projects-status-list")
+    url = reverse("projects-projectsites-list")
     response = client.get(url)
 
     ps = project.project_sites.current()
@@ -418,7 +417,7 @@ def test_list_project_statuses_for_moderators(request, project, project_draft):
     client = APIClient()
     client.force_authenticate(user=user)
 
-    url = reverse("projects-status-list")
+    url = reverse("projects-projectsites-list")
     response = client.get(url)
 
     # we are expecting project and project_draft
@@ -434,19 +433,19 @@ def test_list_project_statuses_for_moderators(request, project, project_draft):
 def test_project_status_is_updated_by_patch_api(request, client, project):
     site = get_current_site(request)
     user = baker.make(auth_models.User, email="me@example.com")
-
-    utils.assign_advisor(user, project, site)
+    assign_perm("list_projects", user, site)
 
     new_status = "DONE"
 
     client = APIClient()
     client.force_authenticate(user)
 
-    url = reverse("projects-project-status-update", args=[project.id])
+    ps = project.project_sites.current()
+
+    url = reverse("projects-projectsites-detail", args=[ps.id])
     response = client.patch(url, data={"status": new_status})
 
-    assert response.status_code == 200
-    assert response.data["status"] == new_status
+    assert response.status_code == 204
 
     project.refresh_from_db()
     assert project.project_sites.current().status == new_status

@@ -64,6 +64,12 @@ router.register(
     training_rest.ChallengeDefinitionViewSet,
     basename="challenge-definitions",
 )
+router.register(
+    r"projects/projectsites",
+    projects_rest.ProjectSiteViewSet,
+    basename="projects-projectsites",
+)
+
 
 api_urls = [
     path(
@@ -105,16 +111,6 @@ api_urls = [
         "notifications/unread_list",
         notifications_views.live_unread_notification_list,
         name="notifications-unread-list",
-    ),
-    path(
-        "projects/status",
-        projects_rest.ProjectSiteStatusViewSet.as_view({"get": "list"}),
-        name="projects-status-list",
-    ),
-    path(
-        "projects/project/<int:pk>/status",
-        projects_rest.ProjectSiteStatusUpdateView.as_view(),
-        name="projects-project-status-update",
     ),
 ]
 

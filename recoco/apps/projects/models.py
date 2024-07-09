@@ -252,6 +252,11 @@ class Project(models.Model):
     topics = models.ManyToManyField("Topic", related_name="projects", blank=True)
 
     @property
+    def status(self):
+        """Shortcut for the current site's status"""
+        return self.project_sites.current().status
+
+    @property
     def all_topics(self):
         """Return all topics associated w/ project or its tasks"""
         task_topics = Topic.objects.filter(tasks__project=self, tasks__deleted=None)
