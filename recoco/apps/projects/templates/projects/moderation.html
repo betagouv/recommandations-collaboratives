@@ -1,1 +1,13 @@
-<h1>8 project entrants à examiner</h1>
+{% load static %}
+{% load gravatar %}
+{% load django_vite %}
+{% load sass_tags %}
+{% block js %}
+    {% comment %} {% vite_asset 'js/apps/.js' %} {% endcomment %}
+{% endblock js %}
+{% block css %}
+    <link href="{% sass_src 'home/css/dsfr/marianne.css' %}"
+          rel="stylesheet"
+          type="text/css">
+{% endblock css %}
+<h2>8 project entrants à examiner</h2>
