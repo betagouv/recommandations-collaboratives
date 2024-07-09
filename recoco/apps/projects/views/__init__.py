@@ -7,7 +7,6 @@ author  : raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created : 2021-05-26 15:56:20 CEST
 """
 
-
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.signals import user_logged_in
 from django.contrib.contenttypes.models import ContentType
@@ -74,6 +73,12 @@ def project_list(request):
         return redirect("projects-project-list-advisor")
 
     raise PermissionDenied("Vous n'avez pas le droit d'accéder à ceci.")
+
+
+@login_required
+def projects_moderation(request):
+    if can_administrate_project(project=None, user=request.user):
+        return render(request, "projects/moderation.html", locals())
 
 
 @login_required
