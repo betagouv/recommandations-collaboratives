@@ -190,8 +190,6 @@ def onboarding_project(request):
                 status="DRAFT",
             )
 
-            project.sites.add(request.site)
-
             # Save survey questions
             if site_config.project_survey:
                 session, _ = survey_models.Session.objects.get_or_create(

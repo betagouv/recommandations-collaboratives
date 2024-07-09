@@ -40,7 +40,7 @@ def project_list_export_csv(request):
 
     projects = (
         models.Project.on_site.for_user(request.user)
-        .exclude(project_sites__site=request.site, project_sites__status="DRAFT")
+        .exclude(project_sites__status="DRAFT")
         .order_by("-created_on")
         .prefetch_related("notes", "tasks")
     )

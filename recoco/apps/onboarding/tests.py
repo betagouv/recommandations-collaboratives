@@ -244,6 +244,7 @@ def test_performing_onboarding_creates_a_new_project(request, client):
     assert project
     assert project.name == data["name"]
     assert project.project_sites.current().status == "DRAFT"
+    assert project.project_sites.current().is_origin is True
     assert len(project.ro_key) == 32
 
 
@@ -537,6 +538,8 @@ def test_create_prefilled_project_creates_a_new_project(request, client):
     assert project.description == project_data["description"]
 
     assert project.project_sites.current().status == "TO_PROCESS"
+    assert project.project_sites.current().is_origin is True
+
     assert len(project.ro_key) == 32
 
     # User
