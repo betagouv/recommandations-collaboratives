@@ -227,7 +227,12 @@ class OnboardingProject(DsrcBaseForm):
             )
         )
 
-    name = forms.CharField(label="Nom du projet *", initial="", required=True)
+    name = forms.CharField(
+        label="Nom du projet *",
+        initial="",
+        required=True,
+        help_text="Indiquez un nom court qui décrit le projet. Inutile d'ajouter le nom de la commune, l'adresse ou le programme.",
+    )
     location = forms.CharField(
         label="Adresse *",
         required=True,
@@ -243,9 +248,10 @@ class OnboardingProject(DsrcBaseForm):
     )
 
     description = forms.CharField(
-        label="Description *",
+        label="Résumé du projet *",
         initial="",
         required=True,
+        help_text="Décrivez votre projet et son contexte en quelques mots.",
         widget=forms.Textarea(attrs={"rows": 3}),
     )
 

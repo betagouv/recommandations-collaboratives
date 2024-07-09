@@ -66,12 +66,12 @@
                                                        id="id_tag" />
                                                 <div class="crm-form-check form-check form-check-inline">
                                                     <!-- djlint:off -->
-                                                                                                                                                            <input class="form-check-input"
-                                                                                                                                                                   type="checkbox"
-                                                                                                                                                                   name="checkbox-{{ crm_tag.name|slugify }}"
-                                                                                                                                                                   onchange="document.getElementById('checkbox-{{ crm_tag.name|slugify }}').closest('form').submit()"
-                                                                                                                                                                   id="checkbox-{{ crm_tag.name|slugify }}" {% if crm_tag.name in active_tags %}checked{% endif %}>
-                                                                                                                                                    <label class="form-check-label" for="checkbox-{{ crm_tag.name|slugify }}">{{ crm_tag.name| capfirst }}</label>
+                                                                                                                                                                                                                <input class="form-check-input"
+                                                                                                                                                                                                                       type="checkbox"
+                                                                                                                                                                                                                       name="checkbox-{{ crm_tag.name|slugify }}"
+                                                                                                                                                                                                                       onchange="document.getElementById('checkbox-{{ crm_tag.name|slugify }}').closest('form').submit()"
+                                                                                                                                                                                                                       id="checkbox-{{ crm_tag.name|slugify }}" {% if crm_tag.name in active_tags %}checked{% endif %}>
+                                                                                                                                                                                                    <label class="form-check-label" for="checkbox-{{ crm_tag.name|slugify }}">{{ crm_tag.name| capfirst }}</label>
                                                 <!-- djlint:on -->
                                             </div>
                                         </form>
