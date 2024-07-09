@@ -14,7 +14,7 @@ describe('I can access documentation', () => {
     // cy.logout();
   });
 
-  xit('displays as advisor', () => {
+  it('displays as advisor', () => {
     cy.login('jean');
     cy.hideCookieBannerAndDjango();
     cy.visit(`/`);
