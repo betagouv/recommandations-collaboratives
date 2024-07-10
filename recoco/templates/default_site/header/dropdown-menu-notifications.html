@@ -27,7 +27,7 @@
                     x-transition.duration.400ms>
                     <a href="javascript:void(0);"
                        @click="clickConsummeNotificationAndRedirect({{ notification.pk }}, '{% if notification.verb == verbs.Recommendation.COMMENTED %}{{ notification.action_object.task.get_absolute_url }} {% else %}{{ notification.action_object.get_absolute_url }} {% endif %}')">
-                        {% include "user/user_card.html" with user=notification.actor project=notification.target user_popup_activate=False user_activity=False disable_links=True %}
+                        {% include "user/user_card.html" with user=notification.actor project=notification.target user_popup_deactivate=True user_activity=False disable_links=True %}
                         {% if notification.verb == verbs.Project.VALIDATED %}
                             <div class="notification__project">{{ notification.target }}</div>
                         {% endif %}

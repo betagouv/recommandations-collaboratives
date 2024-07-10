@@ -213,15 +213,6 @@
                 {% endif %}
             </div>
         </li>
-        <!-- Address Book -->
-        {% if "use_addressbook" in user_site_perms %}
-            <li class="{% if 'addressbook' in url_name %}activated{% endif %}">
-                <a href="{% url 'addressbook-organization-list' %}"
-                   class="nav-link link-dark {% if url_name == 'addressbook-organization-list' %}active{% endif %}">
-                    <span class="ms-1 me-2 align-middle">Carnet d'adresses</span>
-                </a>
-            </li>
-        {% endif %}
         <!-- Notifications -->
         {% if user.is_authenticated %}
             <li class="dropdown"

@@ -8,14 +8,15 @@ export const schemaPrefillProjectFormValidator = {
   type: 'object',
   properties: {
     name: { $ref: '#/definitions/text' },
-    location: { $ref: '#/definitions/text' },
-    // postcode: { $ref: '#/definitions/text' },
+    location: {
+      type: 'string',
+    },
     description: {
       type: 'string',
       minLength: 3,
       errorMessage: minLengthErrorMessage(3),
     },
   },
-  required: ['name', 'location', 'description'],
+  required: ['name', 'description'],
   definitions: schemaFormInputs,
 };
