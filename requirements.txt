@@ -58,7 +58,7 @@ django-clone==5.3.3
 django-reversion==5.0.2
 django-reversion-compare==0.17.0
 
-wagtail==6.1.2
+wagtail==6.1.3
 
 celery==5.4.0
 django-celery-results==2.5.1
