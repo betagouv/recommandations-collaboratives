@@ -1,5 +1,9 @@
 import Alpine from 'alpinejs';
-import api, { followupsUrl, taskNotificationsUrl } from '../utils/api';
+import api, {
+  followupsUrl,
+  markTaskNotificationAsVisited,
+  taskNotificationsUrl,
+} from '../utils/api';
 import { Modal } from 'bootstrap';
 
 document.addEventListener('alpine:init', () => {
@@ -104,9 +108,9 @@ document.addEventListener('alpine:init', () => {
     },
     async setTaskIsVisited() {
       if (!Alpine.store('djangoData').isAdvisor) {
-        await Alpine.store('tasksData').patchTask(this.taskId, {
-          visited: true,
-        });
+        await api.post(
+          markTaskNotificationAsVisited(this.projectId, this.taskId)
+        );
         await Alpine.store('tasksView').updateView();
       }
     },
