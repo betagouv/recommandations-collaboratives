@@ -26,17 +26,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 from django.contrib.syndication.views import Feed
 from django.db import transaction
-from django.db.models import (
-    Case,
-    Count,
-    ExpressionWrapper,
-    F,
-    FloatField,
-    Max,
-    Q,
-    Value,
-    When,
-)
+from django.db.models import Count, ExpressionWrapper, F, FloatField, Max, Q, Value
 from django.db.models.functions import Cast
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render, reverse
@@ -979,15 +969,21 @@ def crm_list_projects_with_low_reach(request):
         .exclude(exclude_stats=True)
         .prefetch_related("tasks", "notes")
         .annotate(
-            reco_total=Count(Case(When(tasks__public=True, then=Value(1)))),
-            reco_unread=Count(
-                Case(When(tasks__public=True, tasks__visited=False, then=Value(1)))
+            reco_total=Count(
+                "tasks",
+                filter=Q(tasks__public=True, tasks__deleted=None),
+                distinct=True,
+            ),
+            reco_read=Count(
+                "tasks",
+                filter=Q(tasks__public=True, tasks__visited=True, tasks__deleted=None),
+                distinct=True,
             ),
         )
         .exclude(reco_total=0)
         .annotate(
             reco_read_ratio=ExpressionWrapper(
-                Cast(F("reco_unread"), FloatField()) / F("reco_total") * Value(100.0),
+                Cast(F("reco_read"), FloatField()) / F("reco_total") * Value(100.0),
                 output_field=FloatField(),
             ),  # Pc of unread reco
             last_reco_at=Max("tasks__created_on", filter=Q(tasks__public=True)),
