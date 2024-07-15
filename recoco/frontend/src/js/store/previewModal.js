@@ -25,15 +25,15 @@ document.addEventListener('alpine:init', () => {
       return Alpine.store('tasksData').newTasks;
     },
 
-    async init() {
+    init() {
       const element = document.getElementById('task-modal');
       const body = document.querySelector('body');
       this.handle = new Modal(element);
 
-      const cleanup = async () => {
+      const cleanup = () => {
         location.hash = '';
         if (!this.currentTask.visited) {
-          await this.setTaskIsVisited();
+          this.setTaskIsVisited();
         }
 
         // Restore scroll position
