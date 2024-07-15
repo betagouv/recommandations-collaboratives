@@ -1,5 +1,7 @@
 # Recoco (Recommendations Collaboratives)
 
+![Recoco](logo.png)
+
 ## Mission
 
 Le logiciel Recoco est un commun numérique permettant d'outiller une méthodologie de Recommandations Collaboratives se focalisant sur les problématiques complexes et nécessitant de multiples expertises sur des temps longs.
