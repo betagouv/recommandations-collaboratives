@@ -147,29 +147,31 @@ class SiteConfiguration(models.Model):
     )
 
     sender_email = models.EmailField(
-        help_text="Adresse de l'expéditeur pour les emails automatiques"
+        verbose_name="Adresse de contact affichée dans les emails automatiques"
     )
     sender_name = models.CharField(
-        help_text="Nom de l'expéditeur pour les emails automatiques", max_length=30
+        verbose_name="Expéditeur des emails automatiques",
+        help_text="Nom du service affiché comme expéditeur des emails",
+        max_length=30,
     )
     contact_form_recipient = models.EmailField(
-        help_text="Adresse d'expédition pour le formulaire de contact"
+        verbose_name="Adresse de contact affichée sur le site"
     )
     legal_address = models.CharField(
         verbose_name="Adresse postale",
-        help_text="L'adresse postale est notamment affichée en bas des emails automatiques.",
+        help_text="L'adresse postale est notamment affichée en bas des emails automatiques et dans les pages légales.",
         null=True,
         blank=True,
         max_length=100,
     )
     legal_owner = models.CharField(
-        verbose_name="Propriétaire légal",
+        verbose_name="Entité responsable légalement du service",
         null=True,
         blank=True,
         max_length=100,
     )
     description = models.TextField(
-        verbose_name="Description",
+        verbose_name="Description du service",
         help_text="Description de 2 à 5 phrases, notamment utilisée dans les emails d'invitation",
         null=True,
         blank=True,
@@ -192,7 +194,7 @@ class SiteConfiguration(models.Model):
 
     logo_large = models.ImageField(
         verbose_name="Logo complet",
-        help_text="Utilisé par exemple pour la barre de navigation. Veuillez fournir une image avec un fond transparent (png)",
+        help_text="Utilisé par exemple pour la barre de navigation. Format rectangulaire recommandé, avec un fond transparent (png)",
         null=True,
         blank=True,
         upload_to=logo_large_upload_path,
@@ -208,7 +210,7 @@ class SiteConfiguration(models.Model):
 
     email_logo = models.ImageField(
         verbose_name="Logo utilisé pour les emails automatiques",
-        help_text="Veuillez fournir une image d'une largeur maximale de 600 pixels et d'un ratio de 4:3.",
+        help_text="Format rectangulaire recommandé, avec un fond transparent (png)",
         null=True,
         blank=True,
         upload_to=logo_email_upload_path,
@@ -216,15 +218,17 @@ class SiteConfiguration(models.Model):
 
     crm_available_tags = TaggableManager(
         blank=True,
-        verbose_name="Étiquettes projets disponibles dans le CRM",
+        verbose_name="Tags d'impact disponibles sur les projets dans le CRM",
         help_text=(
-            "Liste de tags séparés par une virgule. "
+            "Liste de tags séparés par une virgule. Si le tag contient plusieurs mots les encadrer par des guillemets."
             "Attention, veillez à ne pas retirer un tag utilisé dans un projet, "
-            "celui-ci ne pourra plus être retiré depuis le CRM"
+            'celui-ci ne pourra plus être retiré depuis le CRM. ex: "signature convention", diagnostic, "lancement travaux"'
         ),
     )
     reminder_interval = models.IntegerField(
-        default=6 * 7, verbose_name="Interval des rappels", help_text="en jours"
+        default=6 * 7,
+        verbose_name="Fréquence des emails de rappel",
+        help_text="en jours",
     )
 
     def __str__(self):
