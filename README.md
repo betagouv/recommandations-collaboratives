@@ -4,7 +4,9 @@
 
 ## Mission
 
-Le logiciel Recoco est un commun numérique permettant d'outiller une méthodologie de Recommandations Collaboratives se focalisant sur les problématiques complexes et nécessitant de multiples expertises sur des temps longs.
+Le logiciel Recoco est un outil numérique permettant d'épauler une méthodologie de
+Recommandations Collaboratives se focalisant sur les problématiques complexes et nécessitant
+ de multiples expertises sur des temps longs.
 
 
 Historiquement, le logiciel Recoco est issu de la mission UrbanVitaliz (équipe-projet portée
@@ -23,6 +25,8 @@ celles-ci.
 Son code est couvert par la licence AGPL v3.0.
 
 En savoir plus sur https://recommandations-collaboratives.beta.gouv.fr/
+
+Vous pouvez trouver notre carnet de route ici: https://github.com/orgs/betagouv/projects/89/views/9
 
 ## Installation
 
