@@ -35,6 +35,9 @@ Cypress.Commands.add('login', (role) => {
     case 'nonactive':
       username = users[8].fields.username;
       break;
+    case 'national':
+      username = users[7].fields.username;
+      break;
     default:
       break;
   }
