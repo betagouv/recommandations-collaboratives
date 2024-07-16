@@ -384,7 +384,11 @@ def make_digest_for_new_site(notification, user):
         ),
         "project": {
             "name": project.name,
-            "org_name": project.org_name,
+            "org_name": (
+                project.owner.profile.organization.name
+                if project.owner.profile.organization
+                else ""
+            ),
             "url": project_link,
             "commune": {
                 "postal": project.commune.postal,
