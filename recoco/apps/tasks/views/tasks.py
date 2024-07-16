@@ -12,6 +12,7 @@ from django.http import Http404, HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.text import slugify
 
 from recoco.apps.projects import models as project_models
 from recoco.apps.projects.forms import DocumentUploadForm
@@ -387,7 +388,9 @@ def presuggest_task(request, project_id):
     has_perm_or_403(request.user, "projects.manage_tasks", project)
 
     try:
-        survey = survey_models.Survey.on_site.get(pk=1)  # XXX Hardcoded survey ID
+        survey = survey_models.Survey.on_site.get(
+            pk=request.site.configuration.project_survey.pk
+        )
         session, created = survey_models.Session.objects.get_or_create(
             project=project, survey=survey
         )
@@ -396,8 +399,13 @@ def presuggest_task(request, project_id):
 
     tasks = []
 
+    # Make signals from project thematics
+    project_signals = set()
+    for topic in project.topics.all():
+        project_signals.add(f"project_topic:{slugify(topic.name)}")
+
     if session:
-        session_signals = session.signals
+        signals = session.signals.union(project_signals)
 
         for recommandation in models.TaskRecommendation.on_site.all():
             if not project.commune:
@@ -413,7 +421,7 @@ def presuggest_task(request, project_id):
             reco_tags = set(
                 recommandation.condition_tags.values_list("name", flat=True)
             )
-            if reco_tags.issubset(session_signals):
+            if reco_tags.issubset(signals):
                 tasks.append(
                     models.Task(
                         id=0,
