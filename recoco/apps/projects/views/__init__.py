@@ -344,7 +344,7 @@ def project_delete(request, project_id=None):
     if request.method == "POST":
         project.deleted = project.updated_on = timezone.now()
         project.save()
-    return redirect(reverse("projects-project-list"))
+    return redirect(reverse("projects-moderation"))
 
 
 ########################################################################

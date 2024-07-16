@@ -28,30 +28,55 @@
                 <div class="col-12">
                     <h2>8 project entrants à examiner</h2>
                     {% for project in draft_projects %}
-                        <div class="card mb-3 d-flex flex-row project-card">
-                            <div class="flex-grow-1">
+                        <div class="card mb-3 d-flex flex-row project-card p-3 row">
+                            <div class="flex-grow-1 col-4">
                                 <h3 class="project-card--title">
-                                    <span class="project-card--city">{{ project.commune.name }}({{ project.commune.postal|slice:2 }})</span> <span class="project-card--name">{{ project.name }}</span>
+                                    <a href="{% url 'projects-project-detail' project.id %}">
+                                        {% if project.commune %}<span class="project-card--city">{{ project.commune.name }}({{ project.commune.postal|slice:2 }})</span>{% endif %} <span class="project-card--name">{{ project.name }}</span>
+                                    </a>
                                 </h3>
                                 <p class="project-card--keyinfo">
-                                    <span class="fr-icon-map-pin-2-line">{{ project.commune.insee }}</span>
+                                    {% if project.commune %}<span class="fr-icon-map-pin-2-line">INSEE: {{ project.commune.insee }}</span>{% endif %}
                                     <span class="fr-icon-calendar-event-line">déposé depuis {{ project.created_on|timesince }}</span>
                                 </p>
                                 <h4 class="text-uppercase project-card--address">Localisation</h4>
-                                <p>
-                                    <span class="fr-icon-map-pin-2-line">{{ project.location }}</span>
-                                </p>
+                                {% if project.location and project.commune %}
+                                    <p>
+                                        <span class="fr-icon-map-pin-2-line project-card--location" id="no-margin">{{ project.location }}</span>
+                                    </p>
+                                    <p>
+                                        <span class="project-card--communename">{{ project.commune.postal }} {{ project.commune.name }}</span>
+                                    </p>
+                                {% elif project.location %}
+                                    <p>
+                                        <span class="fr-icon-map-pin-2-line project-card--location">{{ project.location }}</span>
+                                    </p>
+                                {% elif project.commune %}
+                                    <p>
+                                        <span class="fr-icon-map-pin-2-line project-card--location">{{ project.commune.postal }} {{ project.commune.name }}</span>
+                                    </p>
+                                {% else %}
+                                    <p>
+                                        <span class="fr-icon-map-pin-2-line project-card--location">Non renseigné</span>
+                                    </p>
+                                {% endif %}
                                 <h4 class="text-uppercase project-card--team">Équipe collectivité</h4>
                                 <p>
                                     {% include "projects/project/fragments/project_owner.html" with project=project %}
                                     {% include "projects/project/fragments/owner/owner-details.html" with project=project %}
                                 </p>
-                                <div class="flex-column ">
-                                    {% include "dsrc/core/blocks/buttons/button.html" with label="Refuser"  role="button" variant="secondary black" classes="me-1" %}
-                                    {% include "dsrc/core/blocks/buttons/button.html" with label="Accepter"  role="button" variant="secondary" classes="me-1" %}
+                                <div style="justify-content:space-between;display:flex;">
+                                    <form method="POST" action="{% url "projects-project-delete" project.id %}">
+                                        {% csrf_token %}
+                                        {% include "dsrc/core/blocks/buttons/button.html" with label="Refuser"  role="submit" variant="secondary black" classes="me-1" %}
+                                    </form>
+                                    <form method="POST" action="{% url "projects-project-accept" project.id %}">
+                                        {% csrf_token %}
+                                        {% include "dsrc/core/blocks/buttons/button.html" with label="Accepter"  role="submit" variant="secondary" classes="me-1 float-end" %}
+                                    </form>
                                 </div>
                             </div>
-                            <div class="flex-grow-1">
+                            <div class="flex-grow-1 col-6">
                                 {% include "projects/project/fragments/information_card.html" with full_width=True project=project title="Contexte" description=project.description updated_on=project.created_on card_user=project.submitted_by display_user=False data_test="context" %}
                                 {% for question in site_config.onboarding_questions.all %}
                                     {% question_answer active_project_survey_session question as answer %}
