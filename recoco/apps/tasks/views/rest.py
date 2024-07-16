@@ -130,10 +130,14 @@ class TaskViewSet(viewsets.ModelViewSet):
         if not task.public:
             return Response(status=status.HTTP_403_FORBIDDEN)
 
-        task.visited = True
-        task.save()
+        is_hijacked = getattr(request.user, "is_hijacked", False)
 
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        if not is_hijacked:
+            task.visited = True
+            task.save()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+
+        return Response(status=status.HTTP_304_NOT_MODIFIED)
 
 
 ########################################################################
