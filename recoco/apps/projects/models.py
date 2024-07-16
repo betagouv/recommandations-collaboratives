@@ -203,7 +203,10 @@ class ProjectSite(models.Model):
                 fields=["project", "is_origin"],
                 condition=Q(is_origin=True),
                 name="unique_origin_site",
-            )
+            ),
+            models.UniqueConstraint(
+                fields=["project", "site"], name="unique_site_per_project"
+            ),
         ]
 
     PROJECTSITE_STATES = (

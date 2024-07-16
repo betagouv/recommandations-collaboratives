@@ -52,4 +52,13 @@ def get_advising_position(user, project):
         return {"is_observer": False, "is_advisor": False}
 
 
+@register.simple_tag
+def get_projectsite_for_site(project, site):
+    """Return the ProjectSite for the given site"""
+    try:
+        return project.project_sites.get(site=site)
+    except models.ProjectSite.DoesNotExist:
+        return None
+
+
 # eof

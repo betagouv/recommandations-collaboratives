@@ -7,13 +7,9 @@ def populate_multisite_m2m(apps, schema_editor):
     Project = apps.get_model("projects", "Project")
 
     for p in Project.objects.all():
-        for s in p.sites.all():
-            p.projectsite_set.create(site=s, status=p.status)
-
-        first_site = p.projectsite_set.first()
-        if first_site:
-            first_site.is_origin = True
-            first_site.save()
+        for idx, s in enumerate(p.sites.all()):
+            is_origin = True if idx == 0 else False
+            p.projectsite_set.create(site=s, status=p.status, origin=is_origin)
 
 
 def repopulate_sites_m2m(apps, schema_editor):
