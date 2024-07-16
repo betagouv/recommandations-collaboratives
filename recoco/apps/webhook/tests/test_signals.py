@@ -37,17 +37,14 @@ def commune():
 
 
 @pytest.fixture
-def project(commune):
+def project(commune, make_project):
     with freeze_time("2024-05-22"):
-        project = baker.make(
-            "projects.Project",
-            status="READY",
+        project = make_project(
             name="My project",
             org_name="My organization",
             commune=commune,
             description="My description",
         )
-        project.sites.add(Site.objects.first())
         yield project
 
 
