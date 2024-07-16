@@ -225,10 +225,7 @@ class ProjectSite(models.Model):
         "Project", on_delete=models.CASCADE, related_name="project_sites"
     )
 
-    site = models.ForeignKey(
-        Site,
-        on_delete=models.CASCADE,
-    )
+    site = models.ForeignKey(Site, on_delete=models.CASCADE)
 
     status = models.CharField(
         max_length=20, choices=PROJECTSITE_STATES, default="DRAFT"

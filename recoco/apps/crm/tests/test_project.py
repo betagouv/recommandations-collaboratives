@@ -563,4 +563,70 @@ def test_toggle_off_project_annotation(request, client):
         assertRedirects(response, url)
 
 
+#### Handover
+@pytest.mark.django_db
+def test_crm_project_handover_is_not_reachable_by_nonstaff(request, client, project):
+    url = reverse("crm-project-handover", args=[project.id])
+
+    with login(client):
+        response = client.get(url)
+
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_crm_project_handover_is_reachable(request, client, project):
+    url = reverse("crm-project-handover", args=[project.id])
+
+    with login(client, groups=["example_com_staff"]):
+        response = client.get(url)
+
+    assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_crm_project_handover(request, client, project):
+    url = reverse("crm-project-handover", args=[project.id])
+    other_site = baker.make(
+        site_models.Site, name="other site", configuration__accept_handover=True
+    )
+
+    with login(client, groups=["example_com_staff"]):
+        response = client.post(url, data={"site": other_site.pk})
+        assert response.status_code == 302
+
+    project.refresh_from_db()
+
+    assert len(project.project_sites.all()) == 2
+
+
+@pytest.mark.django_db
+def test_crm_project_handover_on_existing_site(request, client, project):
+    url = reverse("crm-project-handover", args=[project.id])
+
+    with login(client, groups=["example_com_staff"]):
+        response = client.post(url, data={"site": get_current_site(request).pk})
+        assert response.status_code == 200
+
+    project.refresh_from_db()
+
+    assert len(project.project_sites.all()) == 1
+
+
+@pytest.mark.django_db
+def test_crm_project_handover_is_refused_if_not_authorized(request, client, project):
+    url = reverse("crm-project-handover", args=[project.id])
+    other_site = baker.make(
+        site_models.Site, name="other site", configuration__accept_handover=False
+    )
+
+    with login(client, groups=["example_com_staff"]):
+        response = client.post(url, data={"site": other_site.pk})
+        assert response.status_code == 200
+
+    project.refresh_from_db()
+
+    assert len(project.project_sites.all()) == 1
+
+
 # eof
