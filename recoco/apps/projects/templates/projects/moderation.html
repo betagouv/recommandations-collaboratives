@@ -1,7 +1,15 @@
+{% extends "base.html" %}
 {% load static %}
 {% load gravatar %}
 {% load django_vite %}
 {% load sass_tags %}
+{% load survey %}
+{% block title %}
+    Projets à examiner
+{% endblock title %}
+{% block og_title %}
+    Projets à examiner
+{% endblock og_title %}
 {% block js %}
     {% comment %} {% vite_asset 'js/apps/.js' %} {% endcomment %}
 {% endblock js %}
@@ -9,5 +17,58 @@
     <link href="{% sass_src 'home/css/dsfr/marianne.css' %}"
           rel="stylesheet"
           type="text/css">
+    <link href="{% sass_src 'projects/css/project_moderation.scss' %}"
+          rel="stylesheet"
+          type="text/css">
 {% endblock css %}
-<h2>8 project entrants à examiner</h2>
+{% block content %}
+    <div class="col-11 pt-3 pb-5 mx-auto">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12">
+                    <h2>8 project entrants à examiner</h2>
+                    {% for project in draft_projects %}
+                        <div class="card mb-3 d-flex flex-row project-card">
+                            <div class="flex-grow-1">
+                                <h3 class="project-card--title">
+                                    <span class="project-card--city">{{ project.commune.name }}({{ project.commune.postal|slice:2 }})</span> <span class="project-card--name">{{ project.name }}</span>
+                                </h3>
+                                <p class="project-card--keyinfo">
+                                    <span class="fr-icon-map-pin-2-line">{{ project.commune.insee }}</span>
+                                    <span class="fr-icon-calendar-event-line">déposé depuis {{ project.created_on|timesince }}</span>
+                                </p>
+                                <h4 class="text-uppercase project-card--address">Localisation</h4>
+                                <p>
+                                    <span class="fr-icon-map-pin-2-line">{{ project.location }}</span>
+                                </p>
+                                <h4 class="text-uppercase project-card--team">Équipe collectivité</h4>
+                                <p>
+                                    {% include "projects/project/fragments/project_owner.html" with project=project %}
+                                    {% include "projects/project/fragments/owner/owner-details.html" with project=project %}
+                                </p>
+                                <div class="flex-column ">
+                                    {% include "dsrc/core/blocks/buttons/button.html" with label="Refuser"  role="button" variant="secondary black" classes="me-1" %}
+                                    {% include "dsrc/core/blocks/buttons/button.html" with label="Accepter"  role="button" variant="secondary" classes="me-1" %}
+                                </div>
+                            </div>
+                            <div class="flex-grow-1">
+                                {% include "projects/project/fragments/information_card.html" with full_width=True project=project title="Contexte" description=project.description updated_on=project.created_on card_user=project.submitted_by display_user=False data_test="context" %}
+                                {% for question in site_config.onboarding_questions.all %}
+                                    {% question_answer active_project_survey_session question as answer %}
+                                    {% if answer.values %}
+                                        {% lookup_choices_from_answer answer as choices %}
+                                        {% if answer.comment %}
+                                            {% include "projects/project/fragments/information_card.html" with full_width=True project=project title=answer.question.text description=answer.comment updated_on=project.created_on card_user=project.submitted_by org_name=project.submitted_by.profile.organization.name %}
+                                        {% elif not answer.comment %}
+                                            {% include "projects/project/fragments/information_card.html" with full_width=True project=project title=answer.question.text description=answer.comment updated_on=project.created_on card_user=project.submitted_by org_name=project.submitted_by.profile.organization.name new_onboarding=True multichoice=True %}
+                                        {% endif %}
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

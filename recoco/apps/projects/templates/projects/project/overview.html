@@ -82,16 +82,13 @@
                                 {% question_answer active_project_survey_session question as answer %}
                                 {% if answer.values %}
                                     {% lookup_choices_from_answer answer as choices %}
-
                                     {% if answer.comment %}
                                         {% include "projects/project/fragments/information_card.html" with full_width=True project=project title=answer.question.text description=answer.comment updated_on=project.created_on card_user=project.submitted_by org_name=project.submitted_by.profile.organization.name %}
                                     {% elif not answer.comment %}
                                         {% include "projects/project/fragments/information_card.html" with full_width=True project=project title=answer.question.text description=answer.comment updated_on=project.created_on card_user=project.submitted_by org_name=project.submitted_by.profile.organization.name new_onboarding=True multichoice=True %}
                                     {% endif %}
-
                                 {% endif %}
                             {% endfor %}
-
                             {% if onboarding_response %}
                                 {% include 'projects/project/fragments/information_card.html' with full_width=True project=project onboarding_information=True updated_on=project.created_on card_user=project.submitted_by org_name=project.submitted_by.profile.organization.name %}
                             {% elif project.impediments %}
@@ -116,41 +113,7 @@
                         <div class="d-flex flex-column">
                             <h6 style="font-size: 14px;" class="text-uppercase fw-bold d-block mb-3">Référent collectivité</h6>
                             {% include 'projects/project/fragments/project_owner.html' with project=project %}
-                            {% if project.owner %}
-                                <a class="d-flex align-items-center mb-1"
-                                   style="font-size: 14px;
-                                          color: #0063CB;
-                                          text-decoration: none"
-                                   href="mailto:{{ project.owner.email }}">
-                                    <svg class="bi align-middle" width="18" height="18" fill="currentColor">
-                                        <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#link-45deg" />
-                                    </svg>
-                                    &nbsp;
-                                    {{ project.owner.email }}
-                                </a>
-                            {% endif %}
-                            {% if project.owner.profile.phone_no or project.phone %}
-                                <span style="font-size: 14px;
-                                             color: #0063CB"
-                                      class="d-flex align-items-center">
-                                    <svg class="bi align-middle me-2"
-                                         width="15"
-                                         height="15"
-                                         fill="currentColor">
-                                        <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#telephone" />
-                                    </svg>
-                                    <a style="font-size: 14px;
-                                              color: #0063CB;
-                                              text-decoration: none"
-                                       href="tel:{{ project.owner.profile.phone_no }}">
-                                        {% if project.owner.profile.phone_no %}
-                                            {{ project.owner.profile.phone_no|format_phone }}
-                                        {% elif project.phone %}
-                                            {{ project.phone|format_phone }}
-                                        {% endif %}
-                                    </a>
-                                </span>
-                            {% endif %}
+                            {% include "projects/project/fragments/owner/owner-details.html" with project=project %}
                         </div>
                         {% include 'projects/project/fragments/positioning.html' %}
                     </div>

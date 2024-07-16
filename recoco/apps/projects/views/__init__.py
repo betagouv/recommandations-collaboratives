@@ -77,8 +77,22 @@ def project_list(request):
 
 @login_required
 def projects_moderation(request):
-    if can_administrate_project(project=None, user=request.user):
-        return render(request, "projects/moderation.html", locals())
+    if not (
+        check_if_advisor(request.user, request.site)
+        or can_administrate_project(project=None, user=request.user)
+        or is_staff_for_site(request.user, request.site)
+    ):
+        raise PermissionDenied("Vous n'avez pas le droit d'accéder à ceci.")
+
+    project_moderator = is_project_moderator(request.user, request.site)
+
+    draft_projects = []
+    if project_moderator:
+        draft_projects = models.Project.on_site.filter(status="DRAFT").order_by(
+            "-created_on"
+        )
+
+    return render(request, "projects/moderation.html", locals())
 
 
 @login_required
