@@ -5,14 +5,15 @@
 ## Mission
 
 Le logiciel Recoco est un outil numérique permettant d'épauler une méthodologie de
-Recommandations Collaboratives se focalisant sur les problématiques complexes et nécessitant
+Recommendations Collaboratives se focalisant sur les problématiques complexes et nécessitant
  de multiples expertises sur des temps longs.
 
-
 Historiquement, le logiciel Recoco est issu de la mission UrbanVitaliz (équipe-projet portée
-par le Cerema), en partenariat avec Beta.gouv.fr et sponsorisé par le Ministère
+par le CEREMA), en partenariat avec Beta.gouv.fr et sponsorisé par le Ministère
 de la Transition Ecologique et l'Etablissement Public Foncier du
 Nord-Pas-de-Calais.
+
+Nos sponsors: CEREMA, DGALN et ANCT.
 
 ## Logiciel
 
