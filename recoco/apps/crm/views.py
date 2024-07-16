@@ -668,6 +668,8 @@ def project_details(request, project_id):
 
     site_config = get_site_config_or_503(request.site)
 
+    site_origin = project.project_sites.get(is_origin=True)
+
     actions = target_stream(project)
 
     user_ct = ContentType.objects.get_for_model(User)
