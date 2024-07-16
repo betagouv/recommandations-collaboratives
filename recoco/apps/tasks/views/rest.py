@@ -16,6 +16,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from recoco.apps.projects import models as projects_models
+from recoco.apps.projects.utils import is_member
 from recoco.utils import has_perm, has_perm_or_403
 
 from .. import models, signals
@@ -132,7 +133,9 @@ class TaskViewSet(viewsets.ModelViewSet):
 
         is_hijacked = getattr(request.user, "is_hijacked", False)
 
-        if not is_hijacked:
+        if (not is_hijacked) and is_member(
+            request.user, task.project, allow_draft=False
+        ):
             task.visited = True
             task.save()
             return Response(status=status.HTTP_204_NO_CONTENT)
