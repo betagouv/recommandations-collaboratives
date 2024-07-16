@@ -28,3 +28,4 @@ notebook==6.4.12
 traitlets==5.9.0
 jupytext==1.16.1
 graphviz==0.20.1
+freezegun

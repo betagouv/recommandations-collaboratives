@@ -75,6 +75,7 @@ def test_session_answers_view(request, api_client, project):
             "id": question.id,
             "text": "question text",
             "text_short": "question text short",
+            "slug": "question-text-short",
             "is_multiple": False,
             "choices": [],
         },

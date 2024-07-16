@@ -285,6 +285,98 @@ def test_project_advisor_can_update_project_task_for_site(request, project):
     assert task.public is True
 
 
+##################
+# mark task as visited
+##################
+@pytest.mark.django_db
+def test_project_collaborator_can_mark_task_as_visited(request):
+    user = baker.make(auth_models.User)
+    site = get_current_site(request)
+    project = baker.make(project_models.Project, status="READY", sites=[site])
+    task = baker.make(
+        models.Task, project=project, site=site, public=True, visited=False
+    )
+
+    utils.assign_collaborator(user, project)
+
+    client = APIClient()
+    client.force_authenticate(user=user)
+    url = reverse("project-tasks-mark-visited", args=[project.id, task.id])
+    response = client.post(url)
+
+    assert response.status_code == 204
+
+    task.refresh_from_db()
+    assert task.visited is True
+
+
+@pytest.mark.django_db
+def test_project_collaborator_cannot_mark_task_as_visited_if_draft(request):
+    user = baker.make(auth_models.User)
+    site = get_current_site(request)
+    project = baker.make(project_models.Project, status="READY", sites=[site])
+    task = baker.make(
+        models.Task, project=project, site=site, public=False, visited=False
+    )
+
+    utils.assign_collaborator(user, project)
+
+    client = APIClient()
+    client.force_authenticate(user=user)
+    url = reverse("project-tasks-mark-visited", args=[project.id, task.id])
+    response = client.post(url)
+
+    assert response.status_code == 403
+
+    task.refresh_from_db()
+    assert task.visited is False
+
+
+@pytest.mark.django_db
+def test_project_hijacked_collaborator_cannot_mark_task_as_visited(request):
+    user = baker.make(auth_models.User)
+    site = get_current_site(request)
+    project = baker.make(project_models.Project, status="READY", sites=[site])
+    task = baker.make(
+        models.Task, project=project, site=site, public=True, visited=False
+    )
+
+    utils.assign_collaborator(user, project)
+
+    client = APIClient()
+    user.is_hijacked = True
+    client.force_authenticate(user=user)
+    url = reverse("project-tasks-mark-visited", args=[project.id, task.id])
+    response = client.post(url)
+
+    assert response.status_code == 304
+
+    task.refresh_from_db()
+    assert task.visited is False
+
+
+@pytest.mark.django_db
+def test_project_task_not_marked_as_visited_if_not_collaborator(request):
+    user = baker.make(auth_models.User)
+    site = get_current_site(request)
+    project = baker.make(project_models.Project, status="READY", sites=[site])
+    task = baker.make(
+        models.Task, project=project, site=site, public=True, visited=False
+    )
+
+    utils.assign_advisor(user, project, site)
+
+    client = APIClient()
+    client.force_authenticate(user=user)
+    url = reverse("project-tasks-mark-visited", args=[project.id, task.id])
+    response = client.post(url)
+
+    assert response.status_code == 304
+
+    task.refresh_from_db()
+    assert task.visited is False
+
+
 #
 # move tasks
 

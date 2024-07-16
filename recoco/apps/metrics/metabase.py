@@ -146,7 +146,11 @@ def clone_card(
         card_source_id = int(query_data["source-table"].replace("card__", ""))
         query_data["source-table"] = f"card__{cards_old_vs_new_ids[card_source_id]}"
     else:
-        query_data["source-table"] = table_ids[target_schema][table_name]
+        try:
+            query_data["source-table"] = table_ids[target_schema][table_name]
+        except KeyError as e:
+            print("Unable to find target_schema, available: ", table_ids.keys())
+            raise e
 
     if "joins" in query_data:
         for join in query_data["joins"]:

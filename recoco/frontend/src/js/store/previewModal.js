@@ -1,10 +1,15 @@
 import Alpine from 'alpinejs';
-import api, { followupsUrl, taskNotificationsUrl } from '../utils/api';
+import api, {
+  followupsUrl,
+  markTaskNotificationAsVisited,
+  taskNotificationsUrl,
+} from '../utils/api';
 import { Modal } from 'bootstrap';
 
 document.addEventListener('alpine:init', () => {
   Alpine.store('previewModal', {
     taskId: null,
+    currentTask: null,
     handle: null,
     followups: null,
 
@@ -20,14 +25,16 @@ document.addEventListener('alpine:init', () => {
       return Alpine.store('tasksData').newTasks;
     },
 
-    async init() {
+    init() {
       const element = document.getElementById('task-modal');
       const body = document.querySelector('body');
       this.handle = new Modal(element);
 
-      const cleanup = async () => {
+      const cleanup = () => {
         location.hash = '';
-        await this.setTaskIsVisited();
+        if (!this.currentTask.visited) {
+          this.setTaskIsVisited();
+        }
 
         // Restore scroll position
         window.scrollTo(0, this.scrollY);
@@ -60,9 +67,10 @@ document.addEventListener('alpine:init', () => {
         this.open(parseInt(urlFromHash[1], 10));
       }
     },
-    open(taskId) {
+    open(task) {
       this.isPaginated = false;
-      this.setLocation(taskId);
+      this.setLocation(task.id);
+      this.currentTask = task;
       this.handle.show();
     },
 
@@ -104,9 +112,9 @@ document.addEventListener('alpine:init', () => {
     },
     async setTaskIsVisited() {
       if (!Alpine.store('djangoData').isAdvisor) {
-        await Alpine.store('tasksData').patchTask(this.taskId, {
-          visited: true,
-        });
+        await api.post(
+          markTaskNotificationAsVisited(this.projectId, this.taskId)
+        );
         await Alpine.store('tasksView').updateView();
       }
     },

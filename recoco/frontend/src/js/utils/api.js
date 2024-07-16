@@ -77,6 +77,10 @@ export function markTaskNotificationsAsReadUrl(projectId, taskId) {
   return `/api/projects/${projectId}/tasks/${taskId}/notifications/mark_all_as_read/`;
 }
 
+export function markTaskNotificationAsVisited(projectId, taskId) {
+  return `/api/projects/${projectId}/tasks/${taskId}/mark_visited/`;
+}
+
 export function notificationsMarkAsReadByIdUrl(notificationId) {
   return `/api/notifications/mark-one-as-read/${notificationId}/`;
 }

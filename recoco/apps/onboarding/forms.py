@@ -234,8 +234,8 @@ class OnboardingProject(DsrcBaseForm):
         help_text="Indiquez un nom court qui décrit le projet. Inutile d'ajouter le nom de la commune, l'adresse ou le programme.",
     )
     location = forms.CharField(
-        label="Adresse *",
-        required=True,
+        label="Adresse",
+        required=False,
         help_text="Si le projet n'a pas d'adresse exacte, donnez-nous une indication proche.",
         initial="",
     )
@@ -343,9 +343,9 @@ class PrefillProjectForm(DsrcBaseForm):
         help_text="Indiquez un nom court qui décrit le projet. Inutile d'ajouter le nom de la commune, l'adresse ou le programme.",
     )
     location = forms.CharField(
-        label="Adresse *",
+        label="Adresse",
         initial="",
-        required=True,
+        required=False,
         help_text="Si le projet n'a pas d'adresse exacte, donnez-nous une indication proche.",
     )
     postcode = forms.CharField(label="Code postal", initial="", required=True)
