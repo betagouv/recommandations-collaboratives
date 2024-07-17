@@ -76,23 +76,23 @@
                     </div>
                     <div class="mt-4">
                         <div class="d-flex w-full flex-wrap">
-                            {% include "projects/project/fragments/information_card.html" with full_width=True project=project title="Contexte" description=project.description updated_on=project.created_on card_user=project.submitted_by org_name=project.submitted_by.profile.organization.name data_test="context" %}
+                            {% include "projects/project/fragments/information_card.html" with full_width=True full_height=True project=project title="Contexte" description=project.description updated_on=project.created_on card_user=project.submitted_by org_name=project.submitted_by.profile.organization.name data_test="context" %}
                             {% comment %} FIXME {% endcomment %}
                             {% for question in site_config.onboarding_questions.all %}
                                 {% question_answer active_project_survey_session question as answer %}
                                 {% if answer.values %}
                                     {% lookup_choices_from_answer answer as choices %}
                                     {% if answer.comment %}
-                                        {% include "projects/project/fragments/information_card.html" with full_width=True project=project title=answer.question.text description=answer.comment updated_on=project.created_on card_user=project.submitted_by org_name=project.submitted_by.profile.organization.name %}
+                                        {% include "projects/project/fragments/information_card.html" with full_width=True full_height=True project=project title=answer.question.text description=answer.comment updated_on=project.created_on card_user=project.submitted_by org_name=project.submitted_by.profile.organization.name %}
                                     {% elif not answer.comment %}
-                                        {% include "projects/project/fragments/information_card.html" with full_width=True project=project title=answer.question.text description=answer.comment updated_on=project.created_on card_user=project.submitted_by org_name=project.submitted_by.profile.organization.name new_onboarding=True multichoice=True %}
+                                        {% include "projects/project/fragments/information_card.html" with full_width=True full_height=True project=project title=answer.question.text description=answer.comment updated_on=project.created_on card_user=project.submitted_by org_name=project.submitted_by.profile.organization.name new_onboarding=True multichoice=True %}
                                     {% endif %}
                                 {% endif %}
                             {% endfor %}
                             {% if onboarding_response %}
-                                {% include 'projects/project/fragments/information_card.html' with full_width=True project=project onboarding_information=True updated_on=project.created_on card_user=project.submitted_by org_name=project.submitted_by.profile.organization.name %}
+                                {% include 'projects/project/fragments/information_card.html' with full_width=True full_height=True project=project onboarding_information=True updated_on=project.created_on card_user=project.submitted_by org_name=project.submitted_by.profile.organization.name %}
                             {% elif project.impediments %}
-                                {% include 'projects/project/fragments/information_card.html' with full_width=True project=project title="Difficultés rencontrées" description=project.impediments updated_on=project.created_on card_user=project.submitted_by org_name=project.submitted_by.profile.organization.name %}
+                                {% include 'projects/project/fragments/information_card.html' with full_width=True full_height=True project=project title="Difficultés rencontrées" description=project.impediments updated_on=project.created_on card_user=project.submitted_by org_name=project.submitted_by.profile.organization.name %}
                             {% endif %}
                         </div>
                         {% if 'use_private_notes' in user_project_perms %}

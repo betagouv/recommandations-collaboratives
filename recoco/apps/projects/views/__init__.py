@@ -25,7 +25,12 @@ from recoco.apps.communication import constants as communication_constants
 from recoco.apps.communication import digests
 from recoco.apps.communication.api import send_email
 from recoco.apps.communication.digests import normalize_user_name
-from recoco.utils import check_if_advisor, has_perm_or_403, is_staff_for_site
+from recoco.utils import (
+    check_if_advisor,
+    get_site_config_or_503,
+    has_perm_or_403,
+    is_staff_for_site,
+)
 
 from .. import models, signals
 from ..utils import (
@@ -84,6 +89,7 @@ def projects_moderation(request):
     ):
         raise PermissionDenied("Vous n'avez pas le droit d'accéder à ceci.")
 
+    site_config = get_site_config_or_503(request.site)
     project_moderator = is_project_moderator(request.user, request.site)
 
     draft_projects = []
@@ -92,7 +98,7 @@ def projects_moderation(request):
             "-created_on"
         )
 
-    return render(request, "projects/moderation.html", locals())
+    return render(request, "projects/projects_moderation.html", locals())
 
 
 @login_required
