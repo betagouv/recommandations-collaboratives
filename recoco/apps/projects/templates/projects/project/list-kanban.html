@@ -22,7 +22,7 @@
     Tableau de bord administrateur {{ block.super }}
 {% endblock title %}
 {% block project_list_content %}
-    <div x-data="KanbanProjects()">
+    <div x-data="KanbanProjects({{ request.site.id }})">
         <div x-show="isBusy"
              x-transition
              class="position-absolute text-center w-100"
@@ -104,6 +104,12 @@
                                                                 <span class="kanban-card--project-name project-link not-a-link"
                                                                       x-text="truncate(t.name)"></span>
                                                             </div>
+                                                            {% comment %} TODO {% endcomment %}
+                                                            {% comment %} <div class="mini">
+                                                                <img src="{{ site_config.email_logo.url }}" width="18px" height="auto" alt="Logo {{ request.site.name }}" />
+                                                                <span class="not-a-link">Project envoyé par</span>
+                                                                <span x-text="t.origin"></span>
+                                                            </div> {% endcomment %}
                                                             <div class="mini">
                                                                 <span x-text="truncate(t.org_name)" class="mini"></span>
                                                             </div>
