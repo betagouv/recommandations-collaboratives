@@ -151,7 +151,9 @@ def test_project_list_available_for_switchtender_user(request, client):
 
 @pytest.mark.django_db
 def test_project_list_available_for_staff(request, client):
-    get_current_site(request)
+    current_site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=current_site)
+
     url = reverse("projects-project-list")
     with login(client, groups=["example_com_staff", "example_com_advisor"]):
         response = client.get(url, follow=True)
@@ -168,6 +170,7 @@ def test_project_list_excludes_project_not_in_switchtender_departments(
 ):
     department = Recipe(geomatics.Department, code="00").make()
     site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=site)
 
     project = make_project(
         site=site,
@@ -186,6 +189,9 @@ def test_project_list_excludes_project_not_in_switchtender_departments(
 
 @pytest.mark.django_db
 def test_draft_project_list_available_for_staff(request, client, project_draft):
+    site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=site)
+
     url = reverse("projects-project-list-staff")
     with login(client, groups=["example_com_staff"]):
         response = client.get(url, follow=True)
