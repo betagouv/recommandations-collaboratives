@@ -69,6 +69,11 @@ router.register(
     projects_rest.ProjectSiteViewSet,
     basename="projects-projectsites",
 )
+router.register(
+    r"sites",
+    home_rest.SiteViewSet,
+    basename="sites",
+)
 
 
 api_urls = [
