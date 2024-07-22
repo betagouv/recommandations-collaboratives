@@ -196,6 +196,11 @@ urlpatterns = [
         name="crm-project-note-update",
     ),
     path(
+        r"crm/project/<int:project_id>/handover",
+        views.project_site_handover,
+        name="crm-project-handover",
+    ),
+    path(
         r"crm/projects/by_tags",
         views.project_list_by_tags,
         name="crm-project-list-by-tags",

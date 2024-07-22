@@ -17,6 +17,16 @@
     <div x-data="Crm" class="d-flex px-0 crm-font">
         {% include "crm/fragments/sidebar.html" with search=True back_button=True project_advisors=True project_members=True %}
         <div class="w-75 d-flex flex-column justify-content-start">
+            {% if request.site != site_origin.site %}
+            <div class="fr-notice fr-notice--info">
+                <div class="fr-container">
+                    <div class="fr-notice__body">
+                        <span class="fr-notice__title">Il s'agit d'un projet provenant d'un autre portail ({{ site_origin.site.name }}).</span>
+                        <span class="fr-notice__description">Les notes de CRM ne sont pas partagées, vous ne verrez donc pas celles rédigées par les autres portails. Vous pouvez néanmoins en ajouter pour vous.</span>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
             {% if project.deleted %}
                 <div class="d-block mx-4">
                     <div class="alert alert-danger mt-4" role="alert">
@@ -32,9 +42,9 @@
             {% endif %}
             {% if active_project %}
                 <div class="crm-header px-4 py-4 mb-3 d-flex justify-content-between align-items-center">
-                {% else %}
-                    <div class="crm-header no-project px-4 py-4 d-flex justify-content-between align-items-center">
-                    {% endif %}
+             {% else %}
+                <div class="crm-header no-project px-4 py-4 d-flex justify-content-between align-items-center">
+             {% endif %}
                     <div>
                         <h3 class="d-flex mb-0 align-items-center">
                             <svg class="bi me-2" width="16" height="16" fill="currentColor">
@@ -42,7 +52,10 @@
                             </svg>
                             <span>{{ project.name }}</span>
                         </h3>
-                        <div class="mt-1 d-flex flex-wrap small">
+
+
+
+                            <div class="mt-1 d-flex flex-wrap small">
                             {% for tag in project.tags.all %}<span class="crm-project-tag mx-1">#{{ tag }}</span>{% endfor %}
                         </div>
                         <hr />

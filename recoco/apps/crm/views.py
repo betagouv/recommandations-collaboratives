@@ -668,6 +668,8 @@ def project_details(request, project_id):
 
     site_config = get_site_config_or_503(request.site)
 
+    site_origin = project.project_sites.get(is_origin=True)
+
     actions = target_stream(project)
 
     user_ct = ContentType.objects.get_for_model(User)
@@ -1225,6 +1227,45 @@ def projects_activity_feed(request):
     search_form = forms.CRMSearchForm()
 
     return render(request, "crm/projects_activity_feed.html", locals())
+
+
+################
+# Project Handover to another Site
+################
+
+
+@login_required
+def project_site_handover(request, project_id):
+    has_perm_or_403(request.user, "use_crm", request.site)
+
+    project = get_object_or_404(
+        Project,
+        Q(project_sites__site=request.site) & ~Q(project_sites__status="DRAFT"),
+        pk=project_id,
+    )
+
+    available_sites = (
+        (Site.objects.filter(configuration__accept_handover=True) | project.sites.all())
+        .distinct()
+        .order_by("name")
+    )
+
+    if request.method == "POST":
+        form = forms.ProjectHandover(request.POST)
+        if form.is_valid():
+            site = form.cleaned_data["site"]
+
+            project.project_sites.create(site=site, is_origin=False, status="DRAFT")
+
+            messages.add_message(
+                request,
+                messages.SUCCESS,
+                f"Le projet {project.name} a bien été proposé au portail '{site.name}'",
+            )
+
+            return redirect(reverse("crm-project-handover", args=(project.pk,)))
+
+    return render(request, "crm/project_site_handover.html", locals())
 
 
 ########################################################################

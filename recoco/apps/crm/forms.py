@@ -1,4 +1,5 @@
 from django import forms
+from django.contrib.sites import models as sites_models
 from markdownx.fields import MarkdownxFormField
 from taggit.forms import TagWidget
 
@@ -24,6 +25,7 @@ class SiteConfigurationForm(forms.ModelForm):
             "email_logo",
             "crm_available_tags",
             "reminder_interval",
+            "accept_handover",
         ]
 
         widgets = {
@@ -115,6 +117,14 @@ class CRMProjectForm(forms.Form):
 
 class ProjectAnnotationForm(forms.Form):
     tag = forms.CharField(required=True)
+
+
+class ProjectHandover(forms.Form):
+    """Hand over a project to another Site"""
+
+    site = forms.ModelChoiceField(
+        queryset=sites_models.Site.objects.filter(configuration__accept_handover=True)
+    )
 
 
 # eof
