@@ -7,6 +7,7 @@ authors: raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created: 2021-08-16 15:40:08 CEST
 """
 
+
 import django.core.mail
 from django.contrib import messages
 from django.contrib.auth import login as log_user

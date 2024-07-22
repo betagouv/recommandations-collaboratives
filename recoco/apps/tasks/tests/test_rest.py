@@ -289,10 +289,9 @@ def test_project_advisor_can_update_project_task_for_site(request, project):
 # mark task as visited
 ##################
 @pytest.mark.django_db
-def test_project_collaborator_can_mark_task_as_visited(request):
+def test_project_collaborator_can_mark_task_as_visited(request, project):
     user = baker.make(auth_models.User)
     site = get_current_site(request)
-    project = baker.make(project_models.Project, status="READY", sites=[site])
     task = baker.make(
         models.Task, project=project, site=site, public=True, visited=False
     )
@@ -311,10 +310,9 @@ def test_project_collaborator_can_mark_task_as_visited(request):
 
 
 @pytest.mark.django_db
-def test_project_collaborator_cannot_mark_task_as_visited_if_draft(request):
+def test_project_collaborator_cannot_mark_task_as_visited_if_draft(request, project):
     user = baker.make(auth_models.User)
     site = get_current_site(request)
-    project = baker.make(project_models.Project, status="READY", sites=[site])
     task = baker.make(
         models.Task, project=project, site=site, public=False, visited=False
     )
@@ -333,10 +331,9 @@ def test_project_collaborator_cannot_mark_task_as_visited_if_draft(request):
 
 
 @pytest.mark.django_db
-def test_project_hijacked_collaborator_cannot_mark_task_as_visited(request):
+def test_project_hijacked_collaborator_cannot_mark_task_as_visited(request, project):
     user = baker.make(auth_models.User)
     site = get_current_site(request)
-    project = baker.make(project_models.Project, status="READY", sites=[site])
     task = baker.make(
         models.Task, project=project, site=site, public=True, visited=False
     )
@@ -356,10 +353,9 @@ def test_project_hijacked_collaborator_cannot_mark_task_as_visited(request):
 
 
 @pytest.mark.django_db
-def test_project_task_not_marked_as_visited_if_not_collaborator(request):
+def test_project_task_not_marked_as_visited_if_not_collaborator(request, project):
     user = baker.make(auth_models.User)
     site = get_current_site(request)
-    project = baker.make(project_models.Project, status="READY", sites=[site])
     task = baker.make(
         models.Task, project=project, site=site, public=True, visited=False
     )
