@@ -7,7 +7,6 @@ author  : raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created : 2021-05-26 13:55:23 CEST
 """
 
-
 from csvexport.actions import csvexport
 from django.contrib import admin
 from django.db.models import Count, F, Q

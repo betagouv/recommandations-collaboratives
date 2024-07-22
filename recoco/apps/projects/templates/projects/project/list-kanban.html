@@ -104,17 +104,18 @@
                                                                 <span class="kanban-card--project-name project-link not-a-link"
                                                                       x-text="truncate(t.name)"></span>
                                                             </div>
-                                                            <div class="mini">
-                                                                <img x-show="t.origin.siteConfig.configuration.logo_small"
-                                                                     :src="t.origin.siteConfig.configuration.logo_small"
+                                                            <div class="mini"
+                                                                 x-show="t.origin && {{ site_config.id }} !== t.origin?.site">
+                                                                <img x-show="t.origin.siteInfo.configuration.logo_small"
+                                                                     :src="t.origin.siteInfo.configuration.logo_small"
                                                                      width="16px"
                                                                      height="auto"
-                                                                     :alt="`Logo ${t.origin.siteConfig.name}`" />
-                                                                <span x-show="!t.origin.siteConfig.configuration.logo_small"
+                                                                     :alt="`Logo ${t.origin.siteInfo.name}`" />
+                                                                <span x-show="!t.origin.siteInfo.configuration.logo_small"
                                                                       class="fr-icon--sm fr-icon-window-line"
                                                                       aria-hidden="true"></span>
                                                                 <span class="not-a-link">Projet envoyé par</span>
-                                                                <span x-text="t.origin.siteConfig.name"></span>
+                                                                <span x-text="t.origin.siteInfo.name"></span>
                                                             </div>
                                                             <div class="mini" x-show="t.org_name">
                                                                 <span x-text="truncate(t.org_name)"
