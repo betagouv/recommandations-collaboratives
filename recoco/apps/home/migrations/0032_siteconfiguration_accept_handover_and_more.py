@@ -9,7 +9,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ("taggit", "0005_auto_20220424_2025"),
-        ("home", "0030_siteconfiguration_logo_large_and_more"),
+        ("home", "0031_alter_siteconfiguration_contact_form_recipient_and_more"),
     ]
 
     operations = [
