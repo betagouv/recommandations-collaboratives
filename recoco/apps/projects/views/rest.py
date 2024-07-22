@@ -106,6 +106,7 @@ def fetch_the_site_projects(site, user):
         models.Project.on_site.for_user(user)
         .order_by("-created_on", "-updated_on")
         .prefetch_related("commune")
+        .prefetch_related("project_sites")
         .prefetch_related("commune__department")
         .prefetch_related("switchtenders__profile__organization")
     )
@@ -385,6 +386,7 @@ def fetch_site_projects_with_ids(site, ids):
         models.Project.objects.filter(id__in=ids)
         .prefetch_related("commune__department")
         .prefetch_related("switchtenders__profile")
+        .prefetch_related("project_sites")
         .prefetch_related("switchtenders__profile__organization")
         .annotate(
             recommendation_count=Count(

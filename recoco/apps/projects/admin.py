@@ -101,7 +101,7 @@ class ProjectSiteTabularInline(admin.TabularInline):
     fields = (
         "site",
         "status",
-        "origin",
+        "is_origin",
     )
     extra = 1
 
