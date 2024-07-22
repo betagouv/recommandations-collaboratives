@@ -50,6 +50,11 @@ export function userProjectStatusUrl() {
   return '/api/userprojectstatus/';
 }
 
+// Sites :
+export function sitesConfigUrl() {
+  return '/api/sites/';
+}
+
 // Organization
 export function searchOrganizationsUrl(search) {
   return `/api/organizations/?search=${search}`;

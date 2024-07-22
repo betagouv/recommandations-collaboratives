@@ -104,22 +104,29 @@
                                                                 <span class="kanban-card--project-name project-link not-a-link"
                                                                       x-text="truncate(t.name)"></span>
                                                             </div>
-                                                            {% comment %} TODO {% endcomment %}
-                                                            {% comment %} <div class="mini">
-                                                                <img src="{{ site_config.email_logo.url }}" width="18px" height="auto" alt="Logo {{ request.site.name }}" />
-                                                                <span class="not-a-link">Project envoyé par</span>
-                                                                <span x-text="t.origin"></span>
-                                                            </div> {% endcomment %}
                                                             <div class="mini">
-                                                                <span x-text="truncate(t.org_name)" class="mini"></span>
+                                                                <img x-show="t.origin.siteConfig.configuration.logo_small"
+                                                                     :src="t.origin.siteConfig.configuration.logo_small"
+                                                                     width="16px"
+                                                                     height="auto"
+                                                                     :alt="`Logo ${t.origin.siteConfig.name}`" />
+                                                                <span x-show="!t.origin.siteConfig.configuration.logo_small"
+                                                                      class="fr-icon--sm fr-icon-window-line"
+                                                                      aria-hidden="true"></span>
+                                                                <span class="not-a-link">Projet envoyé par</span>
+                                                                <span x-text="t.origin.siteConfig.name"></span>
+                                                            </div>
+                                                            <div class="mini" x-show="t.org_name">
+                                                                <span x-text="truncate(t.org_name)"
+                                                                      class="fr-icon--sm fr-icon-group-line mini"></span>
                                                             </div>
                                                             <div class="mini">
-                                                                <span class="mini not-a-link">INSEE:</span><span x-text="truncate(t.commune.insee)" class="mini not-a-link"></span>
+                                                                <span class="fr-icon--sm fr-icon-map-pin-2-line mini not-a-link">INSEE:</span> <span x-text="truncate(t.commune.insee)" class="mini not-a-link"></span>
                                                             </div>
                                                             <div class="d-flex justify-content-between">
                                                                 <div class="kanban-card--project-date-container mini text-secondary">
                                                                     <span x-text="`Déposé le ${formatDateDisplay(t.created_on)}`"
-                                                                          class="align-middle not-a-link"></span>
+                                                                          class="fr-icon--sm fr-icon-calendar-event-line align-middle not-a-link"></span>
                                                                 </div>
                                                                 <div class="d-flex justify-content-end me-1 gotMy">
                                                                     <template x-for="switchtender in t.switchtenders">

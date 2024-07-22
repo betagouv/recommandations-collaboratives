@@ -42,19 +42,16 @@ function boardProjectsApp(currentSiteId) {
     async getData(postProcess = true) {
       const projects = await api.get(projectsUrl());
       const projectSites = await api.get(projectsProjectSitesUrl());
-
-      projects.data.forEach((project) => {
-        project.project_sites = projectSites.data.filter(
-          (site) => site.project === project.id
-        );
-      });
+      await this.$store.projects.mapperProjetsProjectSites(
+        projects.data,
+        projectSites.data
+      );
 
       const projectList = projects.data.map((d) =>
         Object.assign(d, {
           uuid: generateUUID(),
         })
       );
-      console.log('projectList', projectList);
       if (postProcess) {
         await this.postProcessData(projectList);
       }
