@@ -51,11 +51,14 @@ class ProjectSerializer(serializers.HyperlinkedModelSerializer):
             "recommendation_count",
             "public_message_count",
             "private_message_count",
+            "project_sites",
         ]
 
     switchtenders = UserSerializer(read_only=True, many=True)
 
     recommendation_count = serializers.SerializerMethodField()
+
+    project_sites = ProjectSiteSerializer(read_only=True, many=True)
 
     def get_recommendation_count(self, obj):
         return task_models.Task.on_site.published().filter(project=obj).count()
@@ -162,6 +165,7 @@ class ProjectForListSerializer(serializers.BaseSerializer):
             "is_observer": data.is_observer,
             "commune": commune_data,
             "notifications": data.notifications,
+            "project_sites": format_sites(data),
         }
 
 
@@ -238,6 +242,18 @@ def format_switchtenders(project):
             },
         }
         for s in project.switchtenders.all()
+    ]
+
+
+def format_sites(project):
+    return [
+        {
+            "id": ps.id,
+            "site": ps.site_id,
+            "is_origin": ps.is_origin,
+            "status": ps.status,
+        }
+        for ps in project.project_sites.all()
     ]
 
 
