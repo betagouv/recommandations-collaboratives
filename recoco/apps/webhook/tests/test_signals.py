@@ -37,17 +37,14 @@ def commune():
 
 
 @pytest.fixture
-def project(commune):
+def project(commune, make_project):
     with freeze_time("2024-05-22"):
-        project = baker.make(
-            "projects.Project",
-            status="READY",
+        project = make_project(
             name="My project",
             org_name="My organization",
             commune=commune,
             description="My description",
         )
-        project.sites.add(Site.objects.first())
         yield project
 
 
@@ -91,12 +88,10 @@ def test_find_webhooks_no_project():
 
 @pytest.mark.django_db
 def test_model_dict(project):
-    print(build_listener().model_dict(project))
     assert build_listener().model_dict(project) == {
-        "id": project.id,
+        "id": project.pk,
         "name": "My project",
         "description": "My description",
-        "status": "READY",
         "inactive_since": None,
         "created_on": "2024-05-22T02:00:00+02:00",
         "updated_on": "2024-05-22T02:00:00+02:00",

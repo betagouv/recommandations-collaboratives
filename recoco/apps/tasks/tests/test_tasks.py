@@ -24,6 +24,7 @@ from pytest_django.asserts import assertContains, assertRedirects
 
 from recoco import verbs
 from recoco.apps.geomatics import models as geomatics
+from recoco.apps.home import models as home_models
 from recoco.apps.projects import models as project_models
 from recoco.apps.projects import utils
 from recoco.apps.resources import models as resources
@@ -132,7 +133,11 @@ def test_task_recommendation_is_updated(request, client):
 def test_task_suggestion_not_available_for_non_switchtender(
     request, client, project_ready
 ):
+    current_site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=current_site)
+
     url = reverse("projects-project-tasks-suggest", args=(project_ready.pk,))
+
     with login(client):
         response = client.get(url)
     assert response.status_code == 403
@@ -141,8 +146,9 @@ def test_task_suggestion_not_available_for_non_switchtender(
 @pytest.mark.django_db
 def test_task_suggestion_when_no_survey(request, client, project_ready):
     current_site = get_current_site(request)
-
     url = reverse("projects-project-tasks-suggest", args=(project_ready.pk,))
+    baker.make(home_models.SiteConfiguration, site=current_site, project_survey=None)
+
     with login(client) as user:
         utils.assign_observer(user, project_ready, current_site)
         response = client.get(url)
@@ -154,8 +160,11 @@ def test_task_suggestion_available_with_bare_project(request, client, project_re
     current_site = get_current_site(request)
 
     Recipe(models.TaskRecommendation, condition="").make()
-
     url = reverse("projects-project-tasks-suggest", args=(project_ready.pk,))
+    baker.make(
+        home_models.SiteConfiguration, site=current_site, project_survey__name="edl"
+    )
+
     with login(client) as user:
         utils.assign_observer(user, project_ready, current_site)
         response = client.get(url)
@@ -171,6 +180,8 @@ def test_task_suggestion_available_with_filled_project(request, client):
     project = Recipe(
         project_models.Project, sites=[current_site], commune=commune
     ).make()
+    baker.make(home_models.SiteConfiguration, site=current_site)
+
     url = reverse("projects-project-tasks-suggest", args=(project.pk,))
     with login(client) as user:
         utils.assign_observer(user, project, current_site)
@@ -194,6 +205,8 @@ def test_task_suggestion_available_with_localized_reco(request, client):
     project = Recipe(
         project_models.Project, sites=[current_site], commune=commune
     ).make()
+    baker.make(home_models.SiteConfiguration, site=current_site)
+
     url = reverse("projects-project-tasks-suggest", args=(project.pk,))
     with login(client) as user:
         utils.assign_observer(user, project, current_site)
