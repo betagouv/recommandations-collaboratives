@@ -45,6 +45,8 @@ def project(commune, make_project):
             commune=commune,
             description="My description",
         )
+        project.sites.add(Site.objects.first())
+        project.tags.add("my_tag")
         yield project
 
 
@@ -88,7 +90,6 @@ def test_find_webhooks_no_project():
 
 @pytest.mark.django_db
 def test_model_dict(project):
-    print(build_listener().model_dict(project))
     assert build_listener().model_dict(project) == {
         "id": project.pk,
         "name": "My project",
@@ -116,5 +117,8 @@ def test_model_dict(project):
                 "is_origin": True,
                 "status": "READY",
             }
+        ],
+        "tags": [
+            "my_tag",
         ],
     }

@@ -1,6 +1,7 @@
 from django.contrib.contenttypes.models import ContentType
 from notifications import models as notifications_models
 from rest_framework import serializers
+from taggit.serializers import TagListSerializerField, TaggitSerializer
 
 from recoco import verbs
 from recoco.apps.geomatics.serializers import CommuneSerializer
@@ -42,7 +43,7 @@ class ProjectSiteSerializer(serializers.ModelSerializer):
         read_only_fields = ["id", "project", "site", "is_origin"]
 
 
-class ProjectSerializer(serializers.HyperlinkedModelSerializer):
+class ProjectSerializer(TaggitSerializer, serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Project
         fields = [
@@ -59,9 +60,11 @@ class ProjectSerializer(serializers.HyperlinkedModelSerializer):
             "public_message_count",
             "private_message_count",
             "project_sites",
+            "tags",
         ]
 
     switchtenders = UserSerializer(read_only=True, many=True)
+    tags = TagListSerializerField()
 
     recommendation_count = serializers.SerializerMethodField()
 
@@ -173,6 +176,7 @@ class ProjectForListSerializer(serializers.BaseSerializer):
             "commune": commune_data,
             "notifications": data.notifications,
             "project_sites": format_sites(data),
+            "tags": data.tags.names(),
         }
 
 
