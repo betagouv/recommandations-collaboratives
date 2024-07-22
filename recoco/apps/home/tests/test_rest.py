@@ -92,4 +92,40 @@ def test_user_notifications_mark_all_as_read(request):
     assert other_user.notifications.unread().count() == 2
 
 
+@pytest.mark.django_db
+def test_anonymous_user_cannot_use_site_api(request, client, make_project):
+    client = APIClient()
+
+    url = reverse("sites-list")
+    response = client.get(url)
+
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_site_list_contains_sites_info(request, client, make_project):
+    user = baker.make(auth_models.User, email="me@example.com")
+
+    client = APIClient()
+    client.force_authenticate(user=user)
+
+    url = reverse("sites-list")
+    response = client.get(url)
+
+    assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_site_list_cant_be_modified(request, client, make_project):
+    user = baker.make(auth_models.User, email="me@example.com")
+
+    client = APIClient()
+    client.force_authenticate(user=user)
+
+    url = reverse("sites-list")
+    response = client.post(url)
+
+    assert response.status_code == 405
+
+
 # eof
