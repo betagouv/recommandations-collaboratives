@@ -88,6 +88,7 @@ def test_find_webhooks_no_project():
 
 @pytest.mark.django_db
 def test_model_dict(project):
+    print(build_listener().model_dict(project))
     assert build_listener().model_dict(project) == {
         "id": project.pk,
         "name": "My project",
@@ -108,4 +109,12 @@ def test_model_dict(project):
         "recommendation_count": 0,
         "public_message_count": 0,
         "private_message_count": 0,
+        "project_sites": [
+            {
+                "id": project.project_sites.current().pk,
+                "site": 1,
+                "is_origin": True,
+                "status": "READY",
+            }
+        ],
     }
