@@ -28,6 +28,13 @@ class DocumentSerializer(serializers.HyperlinkedModelSerializer):
     uploaded_by = UserSerializer(read_only=True, many=False)
 
 
+class InlineProjectSiteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProjectSite
+        fields = ["id", "site", "is_origin", "status"]
+        read_only_fields = ["id", "site", "is_origin"]
+
+
 class ProjectSiteSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProjectSite
@@ -58,7 +65,7 @@ class ProjectSerializer(serializers.HyperlinkedModelSerializer):
 
     recommendation_count = serializers.SerializerMethodField()
 
-    project_sites = ProjectSiteSerializer(read_only=True, many=True)
+    project_sites = InlineProjectSiteSerializer(read_only=True, many=True)
 
     def get_recommendation_count(self, obj):
         return task_models.Task.on_site.published().filter(project=obj).count()
