@@ -26,10 +26,10 @@
         <div class="container-fluid">
             <div class="row">
                 <div class="col-12">
-                    {% if draft_projects.count > 0 %}
-                        <h2>{{ draft_projects.count }} projet entrant à examiner</h2>
-                    {% elif draft_projects.count > 1 %}
+                    {% if draft_projects.count > 1 %}
                         <h2>{{ draft_projects.count }} projets entrants à examiner</h2>
+                    {% elif draft_projects.count > 0 %}
+                        <h2>{{ draft_projects.count }} projet entrant à examiner</h2>
                     {% else %}
                         <h2>Aucun projet à examiner</h2>
                     {% endif %}
