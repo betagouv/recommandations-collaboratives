@@ -7,7 +7,6 @@ author  : raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created : 2021-05-26 15:54:25 CEST
 """
 
-
 from django.urls import path
 
 from . import views
@@ -23,6 +22,9 @@ from .views import (
 
 urlpatterns = [
     path(r"projects/", views.project_list, name="projects-project-list"),
+    path(
+        r"projects/moderation/", views.projects_moderation, name="projects-moderation"
+    ),
     # projects for switchtenders
     path(
         r"projects/advisor/",

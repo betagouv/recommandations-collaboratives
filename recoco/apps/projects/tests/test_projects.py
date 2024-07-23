@@ -775,7 +775,7 @@ def test_delete_project_and_redirect(request, client):
     assert project.deleted
     assert project.updated_on > updated_on_before
 
-    list_url = reverse("projects-project-list")
+    list_url = reverse("projects-moderation")
     assert response.url == list_url
 
 

@@ -7,7 +7,6 @@ author  : raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created : 2021-05-26 15:56:20 CEST
 """
 
-
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.signals import user_logged_in
 from django.contrib.contenttypes.models import ContentType
@@ -26,7 +25,12 @@ from recoco.apps.communication import constants as communication_constants
 from recoco.apps.communication import digests
 from recoco.apps.communication.api import send_email
 from recoco.apps.communication.digests import normalize_user_name
-from recoco.utils import check_if_advisor, has_perm_or_403, is_staff_for_site
+from recoco.utils import (
+    check_if_advisor,
+    get_site_config_or_503,
+    has_perm_or_403,
+    is_staff_for_site,
+)
 
 from .. import models, signals
 from ..utils import (
@@ -74,6 +78,27 @@ def project_list(request):
         return redirect("projects-project-list-advisor")
 
     raise PermissionDenied("Vous n'avez pas le droit d'accéder à ceci.")
+
+
+@login_required
+def projects_moderation(request):
+    if not (
+        check_if_advisor(request.user, request.site)
+        or can_administrate_project(project=None, user=request.user)
+        or is_staff_for_site(request.user, request.site)
+    ):
+        raise PermissionDenied("Vous n'avez pas le droit d'accéder à ceci.")
+
+    site_config = get_site_config_or_503(request.site)
+    project_moderator = is_project_moderator(request.user, request.site)
+
+    draft_projects = []
+    if project_moderator:
+        draft_projects = models.Project.on_site.filter(status="DRAFT").order_by(
+            "-created_on"
+        )
+
+    return render(request, "projects/projects_moderation.html", locals())
 
 
 @login_required
@@ -325,7 +350,7 @@ def project_delete(request, project_id=None):
     if request.method == "POST":
         project.deleted = project.updated_on = timezone.now()
         project.save()
-    return redirect(reverse("projects-project-list"))
+    return redirect(reverse("projects-moderation"))
 
 
 ########################################################################
