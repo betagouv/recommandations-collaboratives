@@ -53,11 +53,11 @@
             </template>
         </div>
         <template x-if="currentUser.is_active && currentUser.profile.organization_position">
-            <span class="d-flex align-items-center justify-content-between text-blue font-very-small"
+            <span class="d-flex align-items-center justify-content-between text-blue font-very-small tmp-refacto"
                   style="margin-bottom: 0.35rem;
                          margin-top: 0.75rem">
                 <div class="d-flex align-items-center">
-                    <svg class="bi align-middle me-2"
+                    <svg class="bi align-middle me-2 tmp-refacto"
                          width="18"
                          height="18"
                          fill="currentColor"
@@ -113,7 +113,7 @@
             </template>
             <template x-if="!currentUser.is_active">
                 <span style="border-radius: 2px"
-                      class="p-1 px-2 font-very-small bg-grey-light w-100 d-flex mt-1 text-nowrap">Compte desactivé depuis le {{ user.profile.deleted }}</span>
+                      class="p-1 px-2 font-very-small bg-grey-light w-100 d-flex mt-1 text-nowrap tmp-refacto">Compte desactivé depuis le {{ user.profile.deleted }}</span>
             </template>
         </div>
     </div>

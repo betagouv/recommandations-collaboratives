@@ -2,7 +2,7 @@
 {% load projects_extra %}
 {% is_staff_for_current_site request.user as is_staff %}
 <!-- Card -->
-<div class="card-resource card h-100" style="min-height: 300px;">
+<div class="card-resource card h-100 tmp-refacto-height" style="min-height: 300px;">
     <!-- <hr class="middle-hr" /> -->
     <div class="card-body">
         <div class="card-title mb-4">
@@ -35,7 +35,7 @@
             <div class="small text-secondary subtitle">{{ resource.subtitle|truncatechars:120 }}</div>
         </div>
     </div>
-    <div class="card-footer" style="z-index: 10;">
+    <div class="card-footer z-2">
         <div class="btn-toolbar justify-content-between"
              role="toolbar"
              aria-label="Toolbar with button groups">

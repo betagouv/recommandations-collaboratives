@@ -26,7 +26,7 @@
         <div class="row">
             <div class="col" id="qs-heading">
                 <h2>
-                    <svg class="bi rounded-circle p-2"
+                    <svg class="bi rounded-circle p-2 tmp-refacto-background"
                          width="40"
                          height="40"
                          style="background-color: {{ question.question_set.color }}">
@@ -101,7 +101,7 @@
                     <!-- Comment -->
                     <div class="mt-3 mb-3">
                         <label class="mb-1" for="input-project-comment">{{ question_comment_title|default:'Commentaire' }}</label>
-                        <textarea class="form-control {% if form.comment.errors %}is-invalid{% endif %}"
+                        <textarea class="form-control {% if form.comment.errors %}is-invalid{% endif %} tmp-refacto-height"
                                   style="height: 100px"
                                   id="input-project-comment"
                                   name="{{ form.comment.name }}"
@@ -173,9 +173,9 @@
                         &nbsp;
                         <h5 class="d-inline-block">Pourquoi c'est important</h5>
                         <p class="text-secondary">
-                            <div id="excerpt-why" style="display: inline;">{{ question.why_rendered|safe|truncatechars_html:150 }}</div>
+                            <div id="excerpt-why d-iline">{{ question.why_rendered|safe|truncatechars_html:150 }}</div>
                             {% if question.why_rendered|safe|truncatechars_html:151|length > 150 %}
-                                <span id="more-why" style="display: none;">{{ question.why_rendered|safe }}</span>
+                                <span id="more-why d-none">{{ question.why_rendered|safe }}</span>
                                 <a class=""
                                    href="javascript:void(0);"
                                    onclick="textFoldToggle('why')"
@@ -197,7 +197,7 @@
                         <p class="text-secondary">
                             <div id="excerpt-how">{{ question.how_rendered|safe|truncatechars_html:500 }}</div>
                             {% if question.how_rendered|safe|truncatechars_html:501|length > 500 %}
-                                <span id="more-how" style="display: none;">{{ question.how_rendered|safe }}</span>
+                                <span id="more-how d-none">{{ question.how_rendered|safe }}</span>
                                 <a class=""
                                    href="javascript:void(0);"
                                    onclick="textFoldToggle('how')"

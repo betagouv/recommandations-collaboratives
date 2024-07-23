@@ -32,6 +32,7 @@
                             <td scope="row" class="text-center">
                                 {% if comparable %}
                                     <input type="radio"
+                                           class="tmp-refacto"
                                            name="version_id1"
                                            value="{{ action.version.pk|unlocalize }}"
                                            {% if action.first %}style="visibility:hidden"{% endif %}

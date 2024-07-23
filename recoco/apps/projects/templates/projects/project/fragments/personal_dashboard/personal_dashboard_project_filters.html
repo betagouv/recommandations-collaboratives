@@ -6,11 +6,10 @@
             <div class="input-item position-relative active"
                  x-data="{ open: false }"
                  x-on:click.outside="open = false">
-                <div class="d-flex align-items-center pe-4 bg-white"
+                <div class="d-flex align-items-center pe-4 bg-white rounded-pill"
                      x-on:click="open = !open"
                      type="button"
-                     :class="{'input-active':open}"
-                     style="border-radius: 20px">
+                     :class="{'input-active':open}">
                     <button class="input-field bg-white px-3 fw-normal text-dark appearance-none">
                         Projets de mon
                         territoire
@@ -66,11 +65,10 @@
         <div class="input-item bg-white">
             <select x-model="select"
                     x-on:input.change="handleProjectsSelect"
-                    class="input-field px-3 fw-normal text-dark appearance-none"
+                    class="input-field px-3 fw-normal text-dark appearance-none z-2 tmp-refacto"
                     name="projects-select"
                     id="projects-select"
                     style="padding-right: 40px !important;
-                           z-index: 2;
                            background-color: transparent">
                 <option value="date">Date de dépôt</option>
                 <option value="commune-name">Nom de la commune</option>
@@ -79,10 +77,10 @@
                 <option value="role">Rôle</option>
             </select>
             <svg class="input-icon right black bi align-baseline me-2"
+                 class="z-1"
                  width="15"
                  height="15"
-                 fill="#000000"
-                 style="z-index:1">
+                 fill="#000000">
                 <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#chevron-down" />
             </svg>
         </div>

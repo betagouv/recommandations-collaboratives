@@ -11,25 +11,25 @@
      @dragleave="onDragLeave(event)"
      data-test-id="draggable">
     <div x-show="task.isLoading"
-         class="ms-2 item-loader z-index-1"
+         class="ms-2 item-loader z-1 tmp-refacto"
          style="width: 24px;
                 height: 24px">
         <div class="spinner-border spinner-border spinner-border-sm text-primary"
              role="status"></div>
     </div>
-    <div class="medium-border-radius bg-white border-grey-dark position-relative hover-border-blue hover-shadow transition-all"
+    <div class="medium-border-radius bg-white border-grey-dark position-relative hover-border-blue hover-shadow transition-all tmp-refacto"
          :style="task.isLoading && 'opacity:0.3';"
          :draggable="true"
          @dragstart="onDragStart(event, task.uuid)"
          @dragend="onDragEnd(event)">
         <template x-if="currentTask.notifications.count > 0">
-            <span class="position-absolute translate-middle top-0 start-100 badge rounded-circle bg-danger fw-bold"
+            <span class="position-absolute translate-middle top-0 start-100 badge rounded-circle bg-danger fw-bold tmp-refacto"
                   style="font-size: 0.7em"
                   x-text="currentTask.notifications.count"></span>
         </template>
         <div class="p-2">
             <div class="d-flex flex-row">
-                <div class="flex-fill mt-1 ms-2"
+                <div class="flex-fill mt-1 ms-2 tmp-refacto"
                      @click="handleOpenPreviewModal()"
                      style="cursor: pointer;
                             font-size: 0.9em"
@@ -47,7 +47,7 @@
                     <div class="pt-2 my-2"
                          :class="canAdministrate && currentTask.content === '' && 'border border-warning'">
                         <div class="d-flex flex-column">
-                            <span class="align-middle text-grey-dark tiny"
+                            <span class="align-middle text-grey-dark tiny tmp-refacto"
                                   x-text="`Émis le ${formatDate(currentTask.created_on)}`"
                                   style="line-height: 20px"></span>
                             {% include 'projects/project/fragments/task/task_user_card.html' %}

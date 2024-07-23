@@ -49,7 +49,7 @@
                 <div class="fr-consent-service">
                   <fieldset aria-labelledby="finality-1-legend finality-1-desc"
                             role="group"
-                            class="fr-fieldset fr-fieldset--inline"
+                            class="fr-fieldset fr-fieldset--inline tmp-refacto"
                             style="margin-top: 15px !important;
                                    padding-top: 0 !important">
                     <div class="d-flex align-items-center justify-content-between w-100">
@@ -110,11 +110,11 @@
                       <div class="d-flex flex-column">
                         {% for cookie in cookie_group.cookie_set.all %}
                           <div class="d-flex align-items-center justify-content-between">
-                            <div style="width: 60%;">
+                            <div style="width: 60%;" class="tmp-refacto-width">
                               <strong>{{ cookie.name }}</strong>
                               {% if cookie.domain %}({{ cookie.domain }}){% endif %}
                             </div>
-                            <div style="width: 40%;">
+                            <div style="width: 40%;" class="tmp-refacto-width">
                               {% if cookie.description %}{{ cookie.description }}{% endif %}
                             </div>
                           </div>

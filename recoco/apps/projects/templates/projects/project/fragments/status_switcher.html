@@ -5,33 +5,30 @@
 <div x-data="StatusSwitcher($refs.commentTextRef, $refs.commentTextFormRef)">
     <div @issue-followup="handleIssueFollowup($event)">
         <div class="d-flex flex-column">
-            <h2 class="text-secondary text-uppercase fw-bolder m-3"
+            <h2 class="text-secondary text-uppercase fw-bolder m-3 tmp-refacto"
                 style="font-size: 12px">État d'avancement actuel</h2>
             {% if "use_tasks" in user_project_perms %}
-                <span class="status-switcher-item mx-3"
+                <span class="status-switcher-item mx-3 text-white tmp-refacto"
                       style="background-color: #14A2F1;
-                             color: white;
                              cursor: pointer"
                       @click="handleStatusWrapper"
                       x-text="statusText($store.taskModal.currentTask.status)"></span>
                 <div class="d-flex align-items-center justify-content-center">
-                    <span class="py-2 tiny fw-bold text-center text-decoration-underline"
+                    <span class="py-2 tiny fw-bold text-center text-decoration-underline tmp-refacto"
                           @click="handleStatusWrapper"
                           style="color: #335B7E;
-                                 !important;
                                  cursor: pointer"
                           class="m-3"
                           x-text="openStatusWrapper ? 'Fermer' : 'Modifier le statut'"></span>
                 </div>
             {% else %}
-                <span class="status-switcher-item mx-3"
-                      style="background-color: #14A2F1;
-                             color: white"
+                <span class="status-switcher-item mx-3 text-white tmp-refacto"
+                      style="background-color: #14A2F1;"
                       x-text="statusText($store.taskModal.currentTask.status)"></span>
             {% endif %}
         </div>
         <template x-if="openStatusWrapper">
-            <ul class="d-flex align-items-center status-switcher list-unstyled mt-0 m-3">
+            <ul class="d-flex align-items-center status-switcher list-unstyled mt-0 m-3 tmp-refacto">
                 <li x-bind:style="activeStatus($store.taskModal.currentTask, STATUSES.PROPOSED) && { pointerEvents: 'none' }">
                     <a @click="handleStatusClick($store.taskModal.currentTask, STATUSES.PROPOSED)"
                        :class="activeStatus($store.taskModal.currentTask, STATUSES.PROPOSED)">Nouveau</a>

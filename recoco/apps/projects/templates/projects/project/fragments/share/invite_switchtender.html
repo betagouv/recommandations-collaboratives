@@ -8,7 +8,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h6 style="font-size: 14px;" class="text-uppercase fw-bold d-block mb-0">Inviter un conseiller</h6>
+                <h6 style="font-size: 14px;" class="text-uppercase fw-bold d-block mb-0 tmp-refacto">Inviter un conseiller</h6>
             </div>
             <div class="modal-body">
                 <form class="form"
@@ -16,7 +16,7 @@
                       action="{% url 'projects-project-access-advisor-invite' project.pk %}"
                       method="post">
                     <div class="mb-3">
-                        <label class="form-label"
+                        <label class="form-label tmp-refacto"
                                style="font-size: 16px;
                                       color: #666666"
                                for="invite-email">Saisissez l'adresse email de la personne à inviter</label>
@@ -35,7 +35,7 @@
                     <div class="mb-3">
                         <label style="font-size: 16px;
                                       color: #666666"
-                               class="form-label"
+                               class="form-label tmp-refacto"
                                for="invite-message">Message d'invitation (optionnel)</label>
                         <textarea id="invite-message"
                                   rows="8"

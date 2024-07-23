@@ -16,15 +16,15 @@
          data-test-id="open-dropdown-profil-option-button">
         <img src="{% gravatar_url user.email 16 %}"
              alt="{{ user.get_full_name }}"
-             class="me-2 rounded-circle"
+             class="me-2 rounded-circle tmp-refacto-size"
              style="width: 16px;
                     height: 16px" />
-        <span style="color: #0063CB;" class="d-none d-lg-none d-xl-block">{{ user.get_full_name|default:user.email }}</span>
+        <span style="color: #0063CB;" class="d-none d-lg-none d-xl-block tmp-refacto-color">{{ user.get_full_name|default:user.email }}</span>
         <button id="user-menu-button" type="button" class="border-0 btn py-0 px-1">
           <svg data-toggle="tooltip"
                data-placement="top"
                title="Notifications désactivées"
-               class="align-middle bi"
+               class="align-middle bi tmp-refacto-padding"
                width="20px"
                height="20px"
                fill="#0063CB"

@@ -13,7 +13,7 @@
                 <div class="d-flex flex-column">
                     <!-- Pagination -->
                     <template x-if="$store.previewModal.isPaginated">
-                        <div class="bg-blue d-flex align-items-center justify-content-between p-2 rounded"
+                        <div class="bg-blue d-flex align-items-center justify-content-between p-2 rounded tmp-refacto"
                              style="border-bottom-left-radius: 0 !important;
                                     border-bottom-right-radius: 0!important">
                             <button class="p-1 button filled white small"
@@ -35,8 +35,7 @@
                     <div x-effect="taskId && $store.previewModal.loadFollowups() && $store.previewModal.loadNotifications() && followupScrollToLastMessage(true)"
                          class="d-flex w-100 align-items-stretch position-relative">
                         <!-- Modal resource / content preview -->
-                        <div class="position-absolute top-0 end-0 px-3 py-2"
-                             style="z-index: 1000 !important">
+                        <div class="position-absolute top-0 end-0 px-3 py-2 z-3">
                             <button type="button"
                                     class="btn-close"
                                     data-bs-dismiss="modal"
@@ -51,7 +50,7 @@
                                         :src="resourcePreviewUrl(task?.resource_id)"></iframe>
                             </template>
                             <template x-if="task && taskId && !task?.resource_id">
-                                <div class="w-100 text-break p-3"
+                                <div class="w-100 text-break p-3 tmp-refacto"
                                      style="max-height: 90vh;
                                             overflow-y: scroll">
                                     <div class="resource-details">
@@ -63,7 +62,7 @@
                             </template>
                         </div>
                         <!-- Modal followups -->
-                        <div class="position-relative flex-column justify-content-between w-35"
+                        <div class="position-relative flex-column justify-content-between w-35 tmp-refacto"
                              style="border-left: 1px solid #EEEEEE">
                             <div class="w-100">
                                 <div class="border-bottom-grey"
@@ -82,7 +81,7 @@
                                 </div>
                                 <div class="position-absolute d-flex justify-content-center align-items-center w-100 h-100">
                                     <div x-show="followupsIsLoading"
-                                         class="ms-2"
+                                         class="ms-2 tmp-refacto"
                                          style="width: 24px;
                                                 height: 24px">
                                         <div class="spinner-border spinner-border spinner-border-sm text-primary"
@@ -100,11 +99,11 @@
                                             <template x-if="task?.content === ''">
                                                 <p class="fst-italic">Aucun commentaire initial n'a été ajouté</p>
                                             </template>
-                                            <div class="d-flex justify-content-between align-items-center"
+                                            <div class="d-flex justify-content-between align-items-center tmp-refacto"
                                                  style="font-size: 0.9em">
                                                 <div class="d-flex flex-column">
                                                     {% include 'projects/project/fragments/task/task_user_card.html' %}
-                                                    <span class="text-muted tiny"
+                                                    <span class="text-muted tiny tmp-refacto"
                                                           x-text="`le ${formatDate(task?.created_on)}`"
                                                           style="line-height: 20px"></span>
                                                 </div>
@@ -116,11 +115,11 @@
                                     </template>
                                     <template x-if="!task?.resource_id">
                                         <div class="my-3">
-                                            <div class="mx-3 mb-1 text-center" style="font-size: 0.8em;">
-                                                <span class="ms-1 fst-italic"
+                                            <div class="mx-3 mb-1 text-center tmp-refacto" style="font-size: 0.8em;">
+                                                <span class="ms-1 fst-italic tmp-refacto-lineheight"
                                                       x-text="`${task?.created_by.first_name} ${task?.created_by.last_name}`"
                                                       style="line-height: 20px"></span> a créé cette recommandation sans ressource
-                                                <span class="text-muted"
+                                                <span class="text-muted tmp-refacto-lineheight"
                                                       x-text="`le ${formatDate(task?.created_on)}`"
                                                       style="line-height: 20px"></span>
                                             </div>
@@ -136,11 +135,11 @@
                                                     <div class="rounded bg-light p-2 m-3 message"
                                                          :class="hasNotification(f.id) && 'is-new-followup'">
                                                         <p x-html="renderMarkdown(f.comment)" class="mb-2 text-break"></p>
-                                                        <div class="d-flex justify-content-between align-items-center"
+                                                        <div class="d-flex justify-content-between align-items-center tmp-refacto"
                                                              style="font-size: 0.9em">
                                                             <div class="d-flex flex-column">
                                                                 {% include 'projects/project/fragments/task/task_followup_user_card.html' %}
-                                                                <span class="text-muted tiny"
+                                                                <span class="text-muted tiny tmp-refacto-lineheight"
                                                                       x-text="`le ${formatDate(f.timestamp)}`"
                                                                       style="line-height: 20px"></span>
                                                             </div>
@@ -155,12 +154,12 @@
                                                 <template x-if="isStatusUpdate(f) && f.status || isStatusUpdate(f) && f.status == 0">
                                                     <div class="my-3"
                                                          :class="hasNotification(f.id) && 'is-new-followup-status'">
-                                                        <div class="mx-3 mb-1 text-center followup-status-message"
+                                                        <div class="mx-3 mb-1 text-center followup-status-message tmp-refacto-fontsize"
                                                              style="font-size: 0.8em">
-                                                            <span class="ms-1 fst-italic"
+                                                            <span class="ms-1 fst-italic tmp-refacto-lineheight"
                                                                   x-text="`${f.who.first_name} ${f.who.last_name}`"
                                                                   style="line-height: 20px"></span> a changé le statut de la recommandation en <span class="fw-bold" x-text="statusText(f.status)"></span>
-                                                            <span class="text-muted"
+                                                            <span class="text-muted tmp-refacto-lineheight"
                                                                   x-text="`le ${formatDate(f.timestamp)}`"
                                                                   style="line-height: 20px"></span>
                                                         </div>
@@ -168,10 +167,10 @@
                                                             <div class="rounded bg-light p-2 m-3 message">
                                                                 <p x-html="renderMarkdown(f.comment)"
                                                                    class="mb-2 text-break overflow-hidden"></p>
-                                                                <div class="d-flex justify-content-between" style="font-size: 0.9em;">
+                                                                <div class="d-flex justify-content-between tmp-refacto-fontsize" style="font-size: 0.9em;">
                                                                     <div class="d-flex flex-column">
                                                                         {% include 'projects/project/fragments/task/task_followup_user_card.html' %}
-                                                                        <span class="text-muted tiny"
+                                                                        <span class="text-muted tiny tmp-refacto-lineheight"
                                                                               x-text="`le ${formatDate(f.timestamp)}`"
                                                                               style="line-height: 20px"></span>
                                                                     </div>
@@ -189,12 +188,12 @@
                                 </div>
                             </div>
                             <template x-if="task.public || showEdition">
-                                <div class="w-100 p-3" style="border-top: 1px solid #EEEEEE;">
+                                <div class="w-100 p-3 tmp-refacto-border" style="border-top: 1px solid #EEEEEE;">
                                     {% include 'tools/editor.html' with is_task_modal_comment=True %}
                                 </div>
                             </template>
                             <template x-if="!task.public">
-                                <div class="w-100 p-3" style="border-top: 1px solid #EEEEEE;">
+                                <div class="w-100 p-3 tmp-refacto-border" style="border-top: 1px solid #EEEEEE;">
                                     <div class="text-center">
                                         <span class="text-muted">Vous devez publier votre recommandation pour ajouter un commentaire</span>
                                     </div>

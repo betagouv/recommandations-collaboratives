@@ -27,7 +27,7 @@
                     style=""
                     x-ref="insee"
                     name="insee"
-                    class="form-select">
+                    class="form-select tmp-refacto">
                 <template x-if="cities && cities.length > 0">
                     <template x-for="city in cities" :key="city.insee">
                         <option :value="city.insee" x-text="city.name"></option>

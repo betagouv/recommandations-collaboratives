@@ -24,7 +24,7 @@
                 </a>
             {% endif %}
         </span>
-        <span style="color: #666666; font-style: italic; font-weight: 300;">
+        <span class="fst-italic fw-light tmp-refacto" style="color: #666666;">
             {% if project.owner.profile.organization.name %}
                 {{ project.owner.profile.organization.name }}
             {% else %}
@@ -43,6 +43,6 @@
                 {{ project.last_name }}
             </strong>
         </span>
-        <span style="color: #666666; font-style: italic; font-weight: 300;">{{ project.org_name }}</span>
+        <span class="fst-italic fw-light tmp-refacto" style="color: #666666;">{{ project.org_name }}</span>
     </div>
 {% endif %}

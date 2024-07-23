@@ -6,19 +6,19 @@
      @drop="onDrop(event, board.code)"
      @dragenter="onDragEnter(event)"
      @dragleave="onDragLeave(event)">
-    <div class="bg-white border rounded border-1 px-3 py-3 position-relative draggable"
+    <div class="bg-white border rounded border-1 px-3 py-3 position-relative draggable tmp-refacto"
          :style="`border-color:${getProjectRoleColor(p.project)} !important`"
          draggable="true"
          @dragstart="onDragStart(event, p.id)"
          @dragend="onDragEnd(event)">
         <div class="d-flex align-items-center">
             <template x-if="p.status === 'NEW' ">
-                <i style="background-color: #0063CB" class="status-color-indicator me-2"></i>
+                <i style="background-color: #0063CB" class="status-color-indicator me-2 tmp-refacto"></i>
             </template>
             <a style="cursor:pointer;
                       font-size: 18px"
                :href="makeProjectURL('{% url 'projects-project-detail' 0 %}', p.project.id)"
-               class="fw-bold mt-0 pt-0 font-normal mb-0 text-decoration-none pe-4 text-dark"
+               class="fw-bold mt-0 pt-0 font-normal mb-0 text-decoration-none pe-4 text-dark tmp-refacto"
                x-text="p.project.name"></a>
         </div>
         <template x-if="p.project.notifications.count > 0">
@@ -50,7 +50,7 @@
         <div class="d-flex mt-3 justify-content-between align-items-center">
             <div class="d-flex">
                 <span :style="`color:${getProjectRoleColor(p.project)} !important`"
-                      class="text-uppercase small fw-medium text-muted d-flex my-0"
+                      class="text-uppercase small fw-medium text-muted d-flex my-0 tmp-refacto"
                       x-text="p.project.recommendation_count > 0 ? `${p.project.recommendation_count} recommandations` : `${p.project.recommendation_count} recommandation`">
                 </span>
             </div>

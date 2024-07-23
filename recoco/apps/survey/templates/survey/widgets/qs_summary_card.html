@@ -14,12 +14,12 @@
 <div class="survey-card text-black rounded-3">
     <div class="card-body m-1">
         <div>
-            <div class="mb-0 mb-2 d-flex justify-content-between align-items-start"
+            <div class="mb-0 mb-2 d-flex justify-content-between align-items-start tmp-refacto-color"
                  style="color: {{ question_set.color|default:'black' }}">
                 <h5 class="card-title align-middle d-inline mb-0">{{ question_set.heading }}</h5>
                 <span class="card-completion">{{ completion }}%</span>
             </div>
-            <!-- <h6 style="color: {{ question_set.color|default:'black' }};" class="text-uppercase fw-bolder small">
+            <!-- <h6 style="color: {{ question_set.color|default:'black' }};" class="text-uppercase fw-bolder small tmp-refacto-color">
                 {% if completion < 100 %}
 
                 {% if answers %}
@@ -93,9 +93,8 @@
                                 {% if answer.attachment %}
                                     <div>
                                         <span class="align-middle">
-                                            <a style="position: relative;
-                                                      z-index:2;
-                                                      color: {{ question_set.color|default:'black' }} !important"
+                                            <a class="position-relative z-2 tmp-refacto-color"
+                                                style="color: {{ question_set.color|default:'black' }} !important"
                                                target="_new"
                                                href="{{ answer.attachment.url }}">Télécharger le fichier joint</a>
                                         </span>
@@ -112,7 +111,7 @@
                                             <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#asterisk" />
                                         </svg>
                                     {% endif %}
-                                    <svg class="align-middle bi"
+                                    <svg class="align-middle bi tmp-refacto-color"
                                          width="26px"
                                          height="26px"
                                          fill="currentColor"
@@ -136,7 +135,7 @@
         </div>
         {% if "use_surveys" in user_project_perms and completion < 100 %}
             <a href="{% url 'survey-question-details' session.pk question_set.questions.all.0.pk %}"
-               class="border-0 btn btn-primary w-100 mt-1 fw-bold py-2"
+               class="border-0 btn btn-primary w-100 mt-1 fw-bold py-2 tmp-refacto-background"
                data-test-id="link-fill-survey"
                style="background-color: {{ question_set.color|default:'black' }} !important">Compléter cette section</a>
         {% endif %}

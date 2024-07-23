@@ -46,7 +46,7 @@
 <div id="action-{{ task.id }}"
      class="accordion border border-1 rounded-3 mb-4 position-relative {% if task.id in actions_with_notifications %}bg-light-yellow{% endif %}">
     {% if not task.visited and task.public %}
-        <span class="position-absolute top-0 start-0 translate-middle badge rounded-pill bg-primary"
+        <span class="position-absolute top-0 start-0 translate-middle badge rounded-pill bg-primary tmp-refacto"
               style="margin-left: 60px">NOUVEAU</span>
     {% endif %}
     {% if task.id in actions_with_notifications %}
@@ -61,7 +61,7 @@
         </span>
     {% endif %}
     {% if not task.public %}
-        <span class="position-absolute top-0 start-0 translate-middle badge rounded-pill bg-warning"
+        <span class="position-absolute top-0 start-0 translate-middle badge rounded-pill bg-warning tmp-refacto"
               style="margin-left: 60px">BROUILLON</span>
     {% endif %}
     <div class="accordion-header d-flex justify-content-between border-bottom">
@@ -70,7 +70,7 @@
                 <div class="d-flex fw-bold fs-5 task-title mb-2 {% if task.closed %}text-decoration-line-through{% endif %}">
                     {% if task.resource %}
                         <!-- Icon -->
-                        <svg class="bi me-2 rounded-circle resource-icon bg-color-{{ task.resource.category.color|default:"darkgrey" }}"
+                        <svg class="bi me-2 rounded-circle resource-icon bg-color-{{ task.resource.category.color|default:"darkgrey" }} tmp-refacto"
                              style="width:30px;
                                     height: 30px">
                             <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#{{ task.resource.category.icon|default:"key" }}" />
@@ -307,7 +307,7 @@
                                         <textarea name="comment"
                                                   style="min-height: 100px;
                                                          border-color: #ccc"
-                                                  class="w-100 p-2 rounded rounded-4 my-1 border"
+                                                  class="w-100 p-2 rounded rounded-4 my-1 border tmp-refacto"
                                                   placeholder="Votre message..."></textarea>
                                         <button type="submit" class="btn btn-primary">Envoyer</button>
                                     </form>

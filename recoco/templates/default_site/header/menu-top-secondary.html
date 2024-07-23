@@ -9,7 +9,7 @@
     {% if user.is_authenticated %}
         {% get_obj_perms request.user for request.site as "user_site_perms" %}
     {% endif %}
-    <ul class="list-unstyled mb-0 d-flex align-items-center"
+    <ul class="list-unstyled mb-0 d-flex align-items-center tmp-refacto-padding"
         data-test-id="secondary-menu"
         style="padding-left: 15px;
                {% if not user.is_authenticated %}border-left: 0.1rem solid #d5d5d5;{% endif %}">
@@ -29,7 +29,7 @@
                             <svg data-toggle="tooltip"
                                  data-placement="top"
                                  title="Notifications désactivées"
-                                 class="align-middle bi"
+                                 class="align-middle bi tmp-refacto-padding"
                                  width="20px"
                                  height="20px"
                                  fill="currentColor"
@@ -49,13 +49,13 @@
                                     </span>
                                 </div>
                             </li>
-                            <li class="text-white bg-blue-light-hover list-group-item px-3 py-2 list-group-item-action dropdown-item border-0 d-flex align-items-center"
+                            <li class="text-white bg-blue-light-hover list-group-item px-3 py-2 list-group-item-action dropdown-item border-0 d-flex align-items-center tmp-refacto-background"
                                 style="background: #0063CB">
                                 <span class="text-break text-truncate">
                                     <svg data-toggle="tooltip"
                                          data-placement="top"
                                          title="Notifications désactivées"
-                                         class="align-middle bi"
+                                         class="align-middle bi tmp-refacto-padding"
                                          width="20px"
                                          height="20px"
                                          fill="currentColor"
@@ -64,7 +64,7 @@
                                         <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#plus" />
                                     </svg>
                                     <a href="{% url 'onboarding-prefill-set-user' %}"
-                                       class="stretched-link text-reset text-decoration-none"
+                                       class="stretched-link text-reset text-decoration-none tmp-refacto-color"
                                        style="color: white !important"
                                        href="">Créer un nouveau projet</a>
                                 </span>
@@ -82,9 +82,8 @@
                         <div x-data="{ open: false }"
                              x-on:click.outside="open = false"
                              class="btn-group">
-                            <a style="text-decoration: none;
-                                      color: inherit"
-                               class="ms-1 align-middle"
+                            <a style="color: inherit"
+                               class="ms-1 align-middle text-decoration-none tmp-refacto-color"
                                href="{% url 'projects-project-detail' active_project.pk %}"><strong>{{ active_project.name }}</strong><span class="text-secondary small ms-2 text-break text-truncate">({{ active_project.commune.name }})</span></strong></a>
                         </div>
                     </div>
@@ -104,7 +103,7 @@
                                 <svg data-toggle="tooltip"
                                      data-placement="top"
                                      title="Notifications désactivées"
-                                     class="align-middle bi"
+                                     class="align-middle bi tmp-refacto-padding"
                                      width="20px"
                                      height="20px"
                                      fill="currentColor"
@@ -140,13 +139,13 @@
                                     </li>
                                 {% endfor %}
                                 {% if not is_switchtender %}
-                                    <li class="text-white bg-blue-light-hover list-group-item px-3 py-2 list-group-item-action dropdown-item border-0 d-flex align-items-center"
+                                    <li class="text-white bg-blue-light-hover list-group-item px-3 py-2 list-group-item-action dropdown-item border-0 d-flex align-items-center tmp-refacto-background"
                                         style="background: #0063CB">
                                         <span class="text-break text-truncate">
                                             <svg data-toggle="tooltip"
                                                  data-placement="top"
                                                  title="Notifications désactivées"
-                                                 class="align-middle bi"
+                                                 class="align-middle bi tmp-refacto-padding"
                                                  width="20px"
                                                  height="20px"
                                                  fill="currentColor"
@@ -155,7 +154,7 @@
                                                 <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#plus" />
                                             </svg>
                                             <a href="{% url 'onboarding' %}"
-                                               class="stretched-link text-reset text-decoration-none"
+                                               class="stretched-link text-reset text-decoration-none tmp-refacto-color"
                                                style="color: white !important">Créer un nouveau projet</a>
                                         </span>
                                     </li>
@@ -166,18 +165,8 @@
                 </div>
             </li>
         {% endif %}
-        <!-- Methodology -->
-        <!-- {% if not user.is_authenticated and not hide_methodology %}
-            <li style="margin-right: 35px; padding-bottom:20px; border-bottom:solid 2px transparent; {% if 'methodology' in url_name %}border-bottom:solid 2px #0063CB;{% endif %}">
-                <div class="btn-group">
-                    <a href="{% url 'methodology' %}" class="nav-link link-dark">
-                        <span class="me-2 ms-1 align-middle">Méthodologie</span>
-                    </a>
-                </div>
-            </li>
-        {% endif %} -->
         <!-- Ressources -->
-        <li style="{% if url_name == 'resources-resource-search' %}activated{% endif %}">
+        <li style="{% if url_name == 'resources-resource-search' %}activated{% endif %}" class="tmp-refacto">
             <div x-data="{ open: false }"
                  x-on:click.outside="open = false"
                  class="btn-group d-flex">
@@ -193,7 +182,7 @@
                         <svg data-toggle="tooltip"
                              data-placement="top"
                              title="Notifications désactivées"
-                             class="align-middle bi"
+                             class="align-middle bi tmp-refacto"
                              width="20px"
                              height="20px"
                              fill="currentColor"

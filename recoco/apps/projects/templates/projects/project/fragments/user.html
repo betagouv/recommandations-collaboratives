@@ -37,12 +37,10 @@
             </span>
         {% endif %}
         <div class="d-flex align-items-center">
-            <span style="color: #666666; font-style: italic; font-weight: 300;">{{ member.profile.organization.name }}</span>
+            <span class="fst-italic fw-light tmp-refacto" style="color: #666666;">{{ member.profile.organization.name }}</span>
             {% if  member.profile.organization_position %}
-                <span class="ms-1 text-lowercase"
-                      style="color: #666666;
-                             font-style: italic;
-                             font-weight: 300">({{ member.profile.organization_position }})</span>
+                <span class="ms-1 text-lowercase fst-italic fw-light tmp-refacto"
+                      style="color: #666666;">({{ member.profile.organization_position }})</span>
             {% endif %}
         </div>
     {% endif %}

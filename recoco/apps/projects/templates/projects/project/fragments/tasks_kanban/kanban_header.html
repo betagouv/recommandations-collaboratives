@@ -5,7 +5,7 @@
 {% get_obj_perms request.user for project as "user_project_perms" %}
 <div class="d-flex mt-1 mb-4 mx-2 align-items-center justify-content-between">
     {% if advising %}
-        <h2 class="text-secondary text-uppercase fw-bolder mb-0"
+        <h2 class="text-secondary text-uppercase fw-bolder mb-0 tmp-refacto"
             style="font-size: 12px">Recommandations proposées à la collectivité</h2>
     {% endif %}
     <div class="d-flex align-items-center">
@@ -33,7 +33,7 @@
                 </a>
             </span>
         {% endif %}
-        <div x-data class="ms-2" style="width: 24px; height: 24px;">
+        <div x-data class="ms-2 tmp-refacto" style="width: 24px; height: 24px;">
             <div x-show="$store.app.isLoading"
                  class="spinner-border spinner-border spinner-border-sm text-primary"
                  role="status"></div>

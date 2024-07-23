@@ -48,19 +48,19 @@
                                     </div>
                                 </div>
                             </template>
-                            <div class="border border-top-0 border-bottom-0 border-right-0 flex-shrink-0 d-flex flex-column justify-content-between"
+                            <div class="border border-top-0 border-bottom-0 border-right-0 flex-shrink-0 d-flex flex-column justify-content-between tmp-refacto"
                                  style="width: 33%">
                                 <div class="d-flex flex-column flex-fill overflow-hidden">
                                     {% include 'projects/project/fragments/status_switcher.html' %}
                                     <div x-show="$store.taskModal.currentTask.document && $store.taskModal.currentTask.document.length > 0">
-                                        <h2 class="text-secondary text-uppercase fw-bolder m-3"
+                                        <h2 class="text-secondary text-uppercase fw-bolder m-3 tmp-refacto"
                                             style="font-size: 12px">Fichier(s) partagé(s)</h2>
                                         <template x-for="document in $store.taskModal.currentTask.document"
                                                   x-key="document.id">
                                             <div class="px-3">{% include 'projects/project/fragments/files_links/file_list_item_api.html' %}</div>
                                         </template>
                                     </div>
-                                    <h2 class="text-secondary text-uppercase fw-bolder m-3"
+                                    <h2 class="text-secondary text-uppercase fw-bolder m-3 tmp-refacto"
                                         style="font-size: 12px">Conversation</h2>
                                     <div id="followups-scroll-container" class="flex-fill overflow-auto h-100">
                                         <template x-if="$store.taskModal.currentTask.resource_id">
@@ -73,41 +73,40 @@
                                                 <template x-if="$store.taskModal.currentTask.content === ''">
                                                     <p class="fst-italic">Aucun commentaire initial n'a été ajouté</p>
                                                 </template>
-                                                <div class="d-flex justify-content-between" style="font-size: 0.9em;">
+                                                <div class="d-flex justify-content-between tmp-refacto" style="font-size: 0.9em;">
                                                     <div>
-                                                        <img class="rounded-circle d-inline-block"
+                                                        <img class="rounded-circle d-inline-block z-3"
                                                              width="18px"
                                                              height="18px"
                                                              :src="gravatar_url($store.taskModal.currentTask.created_by.email, 18)"
                                                              data-bs-toggle="tooltip"
                                                              data-bs-placement="bottom"
                                                              :title="`${$store.taskModal.currentTask.created_by.first_name} ${$store.taskModal.currentTask.created_by.last_name}`"
-                                                             style="z-index: 1000"
                                                              tabindex="0" />
-                                                        <span class="ms-1 fw-bold"
+                                                        <span class="ms-1 fw-bold tmp-refacto"
                                                               x-text="`${$store.taskModal.currentTask.created_by.first_name} ${$store.taskModal.currentTask.created_by.last_name}`"
                                                               style="line-height: 20px"></span>
                                                         <template x-if="$store.taskModal.currentTask.created_by.profile.organization">
                                                             <span x-text="$store.taskModal.currentTask.created_by.profile.organization.name"
                                                                   class="fst-italic text-muted"></span>
                                                         </template>
-                                                        <span class="ms-2 text-muted"
+                                                        <span class="ms-2 text-muted tmp-refacto"
                                                               x-text="`le ${formatDate($store.taskModal.currentTask.created_on)}`"
                                                               style="line-height: 20px"></span>
                                                     </div>
                                                     <template x-if="canAdministrate">
-                                                        <a class="text-muted" style="cursor: pointer;" @click="onEditContent()">Editer</a>
+                                                        <a class="text-muted tmp-refacto-pointer" style="cursor: pointer;" @click="onEditContent()">Editer</a>
                                                     </template>
                                                 </div>
                                             </div>
                                         </template>
                                         <template x-if="!$store.taskModal.currentTask.resource_id">
                                             <div class="my-3">
-                                                <div class="mx-3 mb-1 text-center" style="font-size: 0.8em;">
-                                                    <span class="ms-1 fst-italic"
+                                                <div class="mx-3 mb-1 text-center tmp-refacto" style="font-size: 0.8em;">
+                                                    <span class="ms-1 fst-italic tmp-refacto"
                                                           x-text="`${$store.taskModal.currentTask.created_by.first_name} ${$store.taskModal.currentTask.created_by.last_name}`"
                                                           style="line-height: 20px"></span> a créé cette recommandation sans ressource
-                                                    <span class="ms-1 text-muted"
+                                                    <span class="ms-1 text-muted tmp-refacto"
                                                           x-text="`le ${formatDate($store.taskModal.currentTask.created_on)}`"
                                                           style="line-height: 20px"></span>
                                                 </div>
@@ -123,25 +122,24 @@
                                                         <div class="rounded bg-light p-2 m-3 message"
                                                              :class="hasNotification(f.id) && 'border border-warning'">
                                                             <p x-html="renderMarkdown(f.comment)" class="mb-2 text-break"></p>
-                                                            <div class="d-flex justify-content-between" style="font-size: 0.9em;">
+                                                            <div class="d-flex justify-content-between tmp-refacto" style="font-size: 0.9em;">
                                                                 <div>
-                                                                    <img class="rounded-circle d-inline-block"
+                                                                    <img class="rounded-circle d-inline-block z-3"
                                                                          width="20px"
                                                                          height="20px"
                                                                          :src="gravatar_url(f.who.email, 25)"
                                                                          data-bs-toggle="tooltip"
                                                                          data-bs-placement="bottom"
                                                                          :title="`${f.who.first_name} ${f.who.last_name}`"
-                                                                         style="z-index: 1000"
                                                                          tabindex="0" />
-                                                                    <span class="ms-1 fst-italic"
+                                                                    <span class="ms-1 fst-italic tmp-refacto"
                                                                           x-text="`${f.who.first_name} ${f.who.last_name}`"
                                                                           style="line-height: 20px"></span>
                                                                     <template x-if="f.who.profile.organization">
                                                                         <span x-text="f.who.profile.organization.name"
                                                                               class="fst-italic text-muted"></span>
                                                                     </template>
-                                                                    <span class="ms-2 text-muted"
+                                                                    <span class="ms-2 text-muted tmp-refacto"
                                                                           x-text="`le ${formatDate(f.timestamp)}`"
                                                                           style="line-height: 20px"></span>
                                                                 </div>
@@ -153,41 +151,40 @@
                                                     </template>
                                                     <template x-if="isStatusUpdate(f) && f.status || isStatusUpdate(f) && f.status == 0">
                                                         <div class="my-3" :class="hasNotification(f.id) && 'text-warning'">
-                                                            <div class="mx-3 mb-1 text-center" style="font-size: 0.8em;">
-                                                                <span class="ms-1 fst-italic"
+                                                            <div class="mx-3 mb-1 text-center tmp-refacto" style="font-size: 0.8em;">
+                                                                <span class="ms-1 fst-italic tmp-refacto"
                                                                       x-text="`${f.who.first_name} ${f.who.last_name}`"
                                                                       style="line-height: 20px"></span> a changé le statut de la recommandation en <span class="fw-bold" x-text="statusText(f.status)"></span>
-                                                                <span class="text-muted"
+                                                                <span class="text-muted tmp-refacto"
                                                                       x-text="`le ${formatDate(f.timestamp)}`"
                                                                       style="line-height: 20px"></span>
                                                             </div>
                                                             <template x-if="f.comment !== ''">
                                                                 <div class="rounded bg-light p-2 m-3 message">
                                                                     <p x-html="renderMarkdown(f.comment)" class="mb-2 text-break"></p>
-                                                                    <div class="d-flex justify-content-between" style="font-size: 0.9em;">
+                                                                    <div class="d-flex justify-content-between tmp-refacto" style="font-size: 0.9em;">
                                                                         <div>
-                                                                            <img class="rounded-circle d-inline-block"
+                                                                            <img class="rounded-circle d-inline-block z-3"
                                                                                  width="20px"
                                                                                  height="20px"
                                                                                  :src="gravatar_url(f.who.email, 25)"
                                                                                  data-bs-toggle="tooltip"
                                                                                  data-bs-placement="bottom"
                                                                                  :title="`${f.who.first_name} ${f.who.last_name}`"
-                                                                                 style="z-index: 1000"
                                                                                  tabindex="0" />
-                                                                            <span class="ms-1 fst-italic"
+                                                                            <span class="ms-1 fst-italic tmp-refacto"
                                                                                   x-text="`${f.who.first_name} ${f.who.last_name}`"
                                                                                   style="line-height: 20px"></span>
                                                                             <template x-if="f.who.profile.organization">
                                                                                 <span x-text="f.who.profile.organization.name"
                                                                                       class="fst-italic text-muted"></span>
                                                                             </template>
-                                                                            <span class="ms-2 text-muted"
+                                                                            <span class="ms-2 text-muted tmp-refacto"
                                                                                   x-text="`le ${formatDate(f.timestamp)}`"
                                                                                   style="line-height: 20px"></span>
                                                                         </div>
                                                                         <template x-if="$store.tasksData.canUseTasks && f.who.email === userEmail">
-                                                                            <a class="text-muted" style="cursor: pointer;" @click="onEditComment(f)">Editer</a>
+                                                                            <a class="text-muted tmp-refacto-pointer" style="cursor: pointer;" @click="onEditComment(f)">Editer</a>
                                                                         </template>
                                                                     </div>
                                                                 </div>
@@ -215,7 +212,7 @@
                                                       name="comment"
                                                       style="min-height: 100px;
                                                              border-color: #ccc"
-                                                      class="w-100 p-2 rounded rounded-4 my-2 mb-3 border"
+                                                      class="w-100 p-2 rounded rounded-4 my-2 mb-3 border tmp-refacto"
                                                       placeholder="Votre message..."
                                                       x-model="pendingComment"></textarea>
                                             <button x-bind:disabled="pendingComment.length == 0"
