@@ -34,8 +34,8 @@
                         <h2>Aucun projet à examiner</h2>
                     {% endif %}
                     {% for project in draft_projects %}
-                        <div class="card mb-3 d-flex flex-row project-card p-3 row">
-                            <div class="col-4 d-flex flex-column">
+                        <div class="card mb-3 d-flex flex-row project-card row">
+                            <div class="project-card--col__padding col-4 d-flex flex-column">
                                 <h3 class="project-card--title">
                                     <a href="{% url 'projects-project-detail' project.id %}">
                                         {% if project.commune %}
@@ -70,10 +70,10 @@
                                     </p>
                                 {% endif %}
                                 <h4 class="text-uppercase project-card--team">Équipe collectivité</h4>
-                                <p>
+                                <div>
                                     {% include "projects/project/fragments/project_owner.html" with project=project %}
                                     {% include "projects/project/fragments/owner/owner-details.html" with project=project %}
-                                </p>
+                                </div>
                                 <div class="d-flex justify-content-between flex-grow-1 align-items-end">
                                     <form method="POST"
                                           action="{% url "projects-moderation-refuse" project.id %}">
@@ -93,16 +93,18 @@
                                     </form>
                                 </div>
                             </div>
-                            <div class="col-8">
+                            <div class="col-8 p-0">
                                 {% for question in site_config.onboarding_questions.all %}
                                     {% project_session_for_survey project site_config.project_survey as session %}
                                     {% question_answer session question as answer %}
                                     {% if answer.values %}
                                         {% lookup_choices_from_answer answer as choices %}
                                         {% if answer.comment %}
-                                            {% include "projects/project/fragments/information_card.html" with full_width=True project=project title=answer.question.text description=answer.comment updated_on=project.created_on card_user=project.submitted_by org_name=project.submitted_by.profile.organization.name display_user=False %}
+                                            {% include "projects/project/fragments/information_card.html" with full_width=True padding_end=False padding_top=False project=project title=answer.question.text description=answer.comment updated_on=project.created_on card_user=project.submitted_by org_name=project.submitted_by.profile.organization.name display_user=False %}
                                         {% elif not answer.comment %}
-                                            {% include "projects/project/fragments/information_card.html" with full_width=True project=project title=answer.question.text description=answer.comment updated_on=project.created_on card_user=project.submitted_by org_name=project.submitted_by.profile.organization.name new_onboarding=True multichoice=True display_user=False %}
+                                            <div class="pt-2">
+                                                {% include "projects/project/fragments/information_card.html" with full_width=True project=project title=answer.question.text description=answer.comment updated_on=project.created_on card_user=project.submitted_by org_name=project.submitted_by.profile.organization.name new_onboarding=True multichoice=True display_user=False %}
+                                            </div>
                                         {% endif %}
                                     {% endif %}
                                 {% endfor %}

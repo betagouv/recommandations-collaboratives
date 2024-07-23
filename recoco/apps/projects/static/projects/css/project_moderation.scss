@@ -2,6 +2,12 @@
   box-shadow: 2px 2px 4px 0px #0000001a;
   border: 1px solid #e5e5e5;
   font-family: Marianne;
+  padding: 12px;
+  &--col {
+    &__padding {
+      padding: 0px 12px 0px 0px !important;
+    }
+  }
   &--title {
     font-size: 16px;
     text-align: left;
