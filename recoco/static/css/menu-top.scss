@@ -35,7 +35,7 @@ nav ul:not(.dropdown-menu) > li {
 
 .project-selector-dropdown {
   width: 28vw;
-  height: 90vh;
+  max-height: 90vh;
 }
 
 .project-selector-dropdown li.inactive {
