@@ -78,12 +78,12 @@
                                     <form method="POST"
                                           action="{% url "projects-moderation-refuse" project.id %}">
                                         {% csrf_token %}
-                                        {% include "dsrc/core/blocks/buttons/button.html" with label="Refuser"  role="submit" variant="secondary black" classes="me-1" %}
+                                        {% include "dsrc/core/blocks/buttons/button.html" with label="Refuser"  role="submit" variant="secondary black" classes="me-1" data_test_id="refuse-project" %}
                                     </form>
                                     <form method="POST"
                                           action="{% url "projects-moderation-accept" project.id %}">
                                         {% csrf_token %}
-                                        {% include "dsrc/core/blocks/buttons/button.html" with label="Accepter"  role="submit" variant="secondary" classes="me-1 float-end" %}
+                                        {% include "dsrc/core/blocks/buttons/button.html" with label="Accepter"  role="submit" variant="secondary" classes="me-1 float-end" data_test_id="accept-project" %}
                                     </form>
                                     <form method="POST"
                                           action="{% url "projects-moderation-accept" project.id %}">
