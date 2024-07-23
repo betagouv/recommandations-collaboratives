@@ -52,4 +52,10 @@ def get_advising_position(user, project):
         return {"is_observer": False, "is_advisor": False}
 
 
+@register.simple_tag
+def project_to_examine_count():
+    """Return the number of projects to examine for the current site"""
+    return models.Project.on_site.filter(status="DRAFT", deleted=None).count()
+
+
 # eof

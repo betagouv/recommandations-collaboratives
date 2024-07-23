@@ -2,12 +2,16 @@
 {% load guardian_tags %}
 {% load gravatar %}
 {% load django_vite %}
+{% load projects_extra %}
 {% block js %}
     {% vite_asset 'js/apps/menuNotification.js' %}
 {% endblock js %}
 {% with request.resolver_match.url_name as url_name %}
     {% if user.is_authenticated %}
         {% get_obj_perms request.user for request.site as "user_site_perms" %}
+    {% endif %}
+    {% if 'moderate_projects' in user_site_perms %}
+        {% project_to_examine_count as project_to_examine_count %}
     {% endif %}
     <ul class="list-unstyled mb-0 d-flex align-items-center"
         data-test-id="secondary-menu"
@@ -166,11 +170,11 @@
                 </div>
             </li>
         {% endif %}
-        {% comment %} TODO Update with project_moderator {% endcomment %}
-        {% if True %}
+        {% if project_to_examine_count > 0 %}
+            <!-- Projects moderation -->
             <li style="{% if url_name == 'projects-moderation-list' %}activated{% endif %}">
                 <a href="{% url "projects-moderation-list" %}"
-                   class="nav-link link-dark {% if url_name == 'resources-resource-search' %}active{% endif %}">Projets à examiner</a>
+                   class="nav-link link-dark {% if url_name == 'resources-resource-search' %}active{% endif %}">Projets à examiner <span class="badge text-bg-danger">{{ project_to_examine_count }}</span></a>
             </li>
         {% endif %}
         <!-- Ressources -->
