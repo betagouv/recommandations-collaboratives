@@ -22,7 +22,7 @@
         {% for block in page.heading %}
             {% if block.block_type == 'hero' %}
                 {% image block.value.bg_image fill-1200x800 as bg_image %}
-                <div class="hero" style="
+                <div class="hero tmp-refacto" style="
                     background-image: url('{{ bg_image.url }}');background-color: {{ block.value.bg_color }}">
                     {% if block.value.darken %}
                         <div class="overlay"></div>

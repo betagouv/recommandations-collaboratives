@@ -73,7 +73,7 @@
                 {% for error in form.subject.errors %}<div class="text-danger text-end">{{ error }}</div>{% endfor %}
             </div>
             <div class="mb-3">
-                <textarea class="form-control {% if form.content.errors %}is-invalid{% endif %}"
+                <textarea class="form-control {% if form.content.errors %}is-invalid{% endif %} tmp-refacto"
                           style="height: 100px"
                           id="input-project-content"
                           name="{{ form.content.name }}"
