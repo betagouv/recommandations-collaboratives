@@ -11,6 +11,7 @@ from pytest_django.asserts import assertContains, assertNotContains, assertRedir
 from recoco.apps.home import models as home_models
 from recoco.apps.onboarding import models as onboarding_models
 from recoco.apps.projects import models as projects_models
+from recoco.apps.projects import utils as projects_utils
 from recoco.utils import login
 
 from .. import models
@@ -579,6 +580,8 @@ def test_crm_project_handover(request, client, project):
     other_site = baker.make(
         site_models.Site, name="other site", configuration__accept_handover=True
     )
+    john = baker.make(auth_models.User, first_name="John", last_name="DOE")
+    projects_utils.assign_collaborator(john, project, is_owner=True)
 
     with login(client, groups=["example_com_staff"]):
         response = client.post(url, data={"site": other_site.pk})

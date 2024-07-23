@@ -47,6 +47,7 @@ from recoco.apps.addressbook.models import Organization
 from recoco.apps.communication import api
 from recoco.apps.geomatics import models as geomatics
 from recoco.apps.home import models as home_models
+from recoco.apps.onboarding import utils as onboarding_utils
 from recoco.apps.projects.models import Project, Topic
 from recoco.apps.reminders import models as reminders_models
 from recoco.apps.tasks.models import Task
@@ -1256,6 +1257,9 @@ def project_site_handover(request, project_id):
             site = form.cleaned_data["site"]
 
             project.project_sites.create(site=site, is_origin=False, status="DRAFT")
+            onboarding_utils.notify_new_project(
+                site=site, project=project, owner=project.owner
+            )
 
             messages.add_message(
                 request,
