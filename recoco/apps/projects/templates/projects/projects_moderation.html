@@ -75,20 +75,25 @@
                                     {% include "projects/project/fragments/owner/owner-details.html" with project=project %}
                                 </p>
                                 <div class="d-flex justify-content-between">
-                                    <form method="POST" action="{% url "projects-project-delete" project.id %}">
+                                    <form method="POST" action="{% url "projects-moderation-refuse" project.id %}">
                                         {% csrf_token %}
                                         {% include "dsrc/core/blocks/buttons/button.html" with label="Refuser"  role="submit" variant="secondary black" classes="me-1" %}
                                     </form>
-                                    <form method="POST" action="{% url "projects-project-accept" project.id %}">
+                                    <form method="POST" action="{% url "projects-moderation-accept" project.id %}">
                                         {% csrf_token %}
                                         {% include "dsrc/core/blocks/buttons/button.html" with label="Accepter"  role="submit" variant="secondary" classes="me-1 float-end" %}
+                                    </form>
+                                    <form method="POST" action="{% url "projects-moderation-accept" project.id %}">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="join" value="1">
+                                        {% include "dsrc/core/blocks/buttons/button.html" with label="Accepter et rejoindre"  role="submit" variant="secondary" classes="me-1 float-end" %}
                                     </form>
                                 </div>
                             </div>
                             <div class="col-8">
-                                {% include "projects/project/fragments/information_card.html" with full_width=True project=project title="Contexte" description=project.description updated_on=project.created_on card_user=project.submitted_by display_user=False data_test="context" display_user=False %}
                                 {% for question in site_config.onboarding_questions.all %}
-                                    {% question_answer active_project_survey_session question as answer %}
+                                {% project_session_for_survey project site_config.project_survey as session %}
+                                    {% question_answer session question as answer %}
                                     {% if answer.values %}
                                         {% lookup_choices_from_answer answer as choices %}
                                         {% if answer.comment %}
