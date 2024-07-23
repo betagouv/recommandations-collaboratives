@@ -79,6 +79,7 @@
     &--commune {
       &-container {
         margin-top: 2px;
+        color: #3a3a3a;
       }
 
       &-name,
@@ -95,7 +96,17 @@
         margin-top: -5px;
       }
 
+      &-push-by-container,
+      &-org-name,
+      &-insee,
+      &-date {
+        color: #666666;
+        font-size: 10px;
+        line-height: 24px;
+      }
+
       &-name {
+        color: #666666;
         font-size: 14px;
         font-weight: 400;
         font-family: 'Marianne';
@@ -109,12 +120,8 @@
 }
 
 h5 {
-  font-weight: 700 !important;
+  font-weight: 700;
 }
-
-// div div {
-//   margin-right: 0px !important;
-// }
 
 .got-my-style img {
   width: 30px !important;
@@ -125,12 +132,4 @@ h5 {
 .not-a-link {
   text-decoration: none;
   color: #666666;
-}
-
-.fw-bold span {
-  color: #3a3a3a;
-}
-
-.mini {
-  font-size: 10px;
 }
