@@ -35,7 +35,7 @@
                     {% endif %}
                     {% for project in draft_projects %}
                         <div class="card mb-3 d-flex flex-row project-card p-3 row">
-                            <div class="col-4">
+                            <div class="col-4 d-flex flex-column">
                                 <h3 class="project-card--title">
                                     <a href="{% url 'projects-project-detail' project.id %}">
                                         {% if project.commune %}
@@ -74,16 +74,19 @@
                                     {% include "projects/project/fragments/project_owner.html" with project=project %}
                                     {% include "projects/project/fragments/owner/owner-details.html" with project=project %}
                                 </p>
-                                <div class="d-flex justify-content-between">
-                                    <form method="POST" action="{% url "projects-moderation-refuse" project.id %}">
+                                <div class="d-flex justify-content-between flex-grow-1 align-items-end">
+                                    <form method="POST"
+                                          action="{% url "projects-moderation-refuse" project.id %}">
                                         {% csrf_token %}
                                         {% include "dsrc/core/blocks/buttons/button.html" with label="Refuser"  role="submit" variant="secondary black" classes="me-1" %}
                                     </form>
-                                    <form method="POST" action="{% url "projects-moderation-accept" project.id %}">
+                                    <form method="POST"
+                                          action="{% url "projects-moderation-accept" project.id %}">
                                         {% csrf_token %}
                                         {% include "dsrc/core/blocks/buttons/button.html" with label="Accepter"  role="submit" variant="secondary" classes="me-1 float-end" %}
                                     </form>
-                                    <form method="POST" action="{% url "projects-moderation-accept" project.id %}">
+                                    <form method="POST"
+                                          action="{% url "projects-moderation-accept" project.id %}">
                                         {% csrf_token %}
                                         <input type="hidden" name="join" value="1">
                                         {% include "dsrc/core/blocks/buttons/button.html" with label="Accepter et rejoindre"  role="submit" variant="secondary" classes="me-1 float-end" %}
@@ -92,7 +95,7 @@
                             </div>
                             <div class="col-8">
                                 {% for question in site_config.onboarding_questions.all %}
-                                {% project_session_for_survey project site_config.project_survey as session %}
+                                    {% project_session_for_survey project site_config.project_survey as session %}
                                     {% question_answer session question as answer %}
                                     {% if answer.values %}
                                         {% lookup_choices_from_answer answer as choices %}
