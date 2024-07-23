@@ -700,13 +700,15 @@ def test_project_moderation_notifies_regional_actors_when_accepted(
 
     project = make_project(
         site=current_site,
+        status="DRAFT",
         commune=commune,
         projectmember_set=[membership],
     )
 
     with login(client, groups=["example_com_advisor", "example_com_staff"]) as user:
         user.profile.sites.add(current_site)
-        client.post(reverse("projects-moderation-accept", args=[project.id]))
+        response = client.post(reverse("projects-moderation-accept", args=[project.id]))
+        assert response.status_code == 302
 
     assert regional_actor.notifications.count() == 1
 

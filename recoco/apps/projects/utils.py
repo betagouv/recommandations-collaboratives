@@ -223,6 +223,7 @@ def get_regional_actors_for_project(site, project, allow_national=False):
         area_filter = area_filter | Q(profile__departments=None)
 
     users = users.filter(area_filter)
+    print(users)
 
     return users.distinct()
 
