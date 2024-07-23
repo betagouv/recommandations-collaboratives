@@ -41,7 +41,6 @@ from ..utils import (
     can_administrate_project,
     get_active_project,
     is_advisor_for_project,
-    is_project_moderator,
     is_project_moderator_or_403,
     is_regional_actor_for_project_or_403,
     refresh_user_projects_in_session,
@@ -77,7 +76,7 @@ def project_moderation_list(request):
     site_config = get_site_config_or_503(request.site)
 
     draft_projects = models.Project.on_site.filter(
-        status="DRAFT", deleted=None
+        project_sites__status="DRAFT", project_sites__site=request.site, deleted=None
     ).order_by("-created_on")
 
     return render(request, "projects/projects_moderation.html", locals())
@@ -242,13 +241,6 @@ def project_list_for_staff(request):
         raise PermissionDenied("Vous n'avez pas le droit d'accéder à ceci.")
 
     site_config = get_site_config_or_503(request.site)
-    project_moderator = is_project_moderator(request.user, request.site)
-
-    draft_projects = []
-    if project_moderator:
-        draft_projects = models.Project.on_site.filter(
-            project_sites__status="DRAFT"
-        ).order_by("-created_on")
 
     unread_notifications = (
         notifications_models.Notification.on_site.unread()
@@ -273,18 +265,6 @@ def project_maplist(request):
         or can_administrate_project(project=None, user=request.user)
     ):
         raise PermissionDenied("Vous n'avez pas le droit d'accéder à ceci.")
-
-    project_moderator = is_project_moderator(request.user, request.site)
-
-    draft_projects = []
-    if is_project_moderator:
-        draft_projects = (
-            models.Project.on_site.in_departments(
-                request.user.profile.departments.all()
-            )
-            .filter(status="DRAFT")
-            .order_by("-created_on")
-        )
 
     unread_notifications = (
         notifications_models.Notification.on_site.unread()

@@ -8,6 +8,7 @@ created: 2021-06-29 11:30:42 CEST
 """
 
 from django import template
+from django.contrib.sites.models import Site
 
 from recoco import utils as uv_utils
 
@@ -61,6 +62,16 @@ def get_projectsite_for_site(project, site):
         return project.project_sites.get(site=site)
     except models.ProjectSite.DoesNotExist:
         return None
+
+
+@register.simple_tag
+def get_project_moderation_count():
+    """Return the number of projects to moderate for the current site"""
+    return models.Project.on_site.filter(
+        project_sites__status="DRAFT",
+        project_sites__site=Site.objects.get_current(),
+        deleted=None,
+    ).count()
 
 
 # eof

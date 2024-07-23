@@ -192,7 +192,7 @@ def test_draft_project_list_available_for_staff(request, client, project_draft):
     site = get_current_site(request)
     baker.make(home_models.SiteConfiguration, site=site)
 
-    url = reverse("projects-project-list-staff")
+    url = reverse("projects-moderation-list")
     with login(client, groups=["example_com_staff"]):
         response = client.get(url, follow=True)
 
