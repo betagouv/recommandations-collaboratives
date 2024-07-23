@@ -168,8 +168,8 @@
         {% endif %}
         {% comment %} TODO Update with project_moderator {% endcomment %}
         {% if True %}
-            <li style="{% if url_name == 'projects-moderation' %}activated{% endif %}">
-                <a href="{% url "projects-moderation" %}"
+            <li style="{% if url_name == 'projects-moderation-list' %}activated{% endif %}">
+                <a href="{% url "projects-moderation-list" %}"
                    class="nav-link link-dark {% if url_name == 'resources-resource-search' %}active{% endif %}">Projets à examiner</a>
             </li>
         {% endif %}

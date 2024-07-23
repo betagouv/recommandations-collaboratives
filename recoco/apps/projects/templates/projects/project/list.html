@@ -91,7 +91,7 @@
                                     <td>
                                         {% if "moderate_projects" in user_site_perms %}
                                             <div class="btn-group" role="group" aria-label="actions">
-                                                <form method="POST" action="{% url "projects-project-accept" project.id %}">
+                                                <form method="POST" action="{% url "projects-moderation-accept" project.id %}">
                                                     {% csrf_token %}
                                                     <button class="btn btn-primary btn-sm" data-cy="btn-accept-project">
                                                         <svg class="bi" width="16" height="16" fill="currentColor">
