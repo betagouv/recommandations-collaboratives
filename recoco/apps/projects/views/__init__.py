@@ -7,6 +7,7 @@ author  : raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created : 2021-05-26 15:56:20 CEST
 """
 
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.signals import user_logged_in
 from django.contrib.contenttypes.models import ContentType
@@ -32,7 +33,7 @@ from recoco.utils import (
     is_staff_for_site,
 )
 
-from .. import models, signals
+from .. import forms, models, signals
 from ..utils import (
     assign_advisor,
     assign_collaborator,
@@ -50,11 +51,10 @@ from ..utils import (
 
 __all__ = ["rest", "feeds", "notes", "sharing", "tasks", "documents"]
 
-########################################################################
-# Switchtender
-########################################################################
 
-
+# ----
+# Utils
+# ----
 def mark_general_notifications_as_seen(user):
     # Mark some notifications as seen
     project_ct = ContentType.objects.get_for_model(models.Project)
@@ -67,6 +67,107 @@ def mark_general_notifications_as_seen(user):
     notifications.mark_all_as_read()
 
 
+# -----
+# Project Moderation
+# -----
+@login_required
+def project_moderation_list(request):
+    is_project_moderator_or_403(request.user, request.site)
+
+    site_config = get_site_config_or_503(request.site)
+
+    draft_projects = models.Project.on_site.filter(
+        status="DRAFT", deleted=None
+    ).order_by("-created_on")
+
+    return render(request, "projects/projects_moderation.html", locals())
+
+
+@login_required
+def project_moderation_refuse(request, project_pk):
+    is_project_moderator_or_403(request.user, request.site)
+
+    project = get_object_or_404(
+        models.Project.on_site, status="DRAFT", deleted=None, pk=project_pk
+    )
+
+    if request.method == "POST":
+        project.status = "REJECTED"
+        project.updated_on = timezone.now()
+        project.save()
+
+        messages.add_message(
+            request, messages.INFO, f"Le projet '{project.name}' a été refusé."
+        )
+
+    return redirect(reverse("projects-moderation-list"))
+
+
+@login_required
+def project_moderation_accept(request, project_pk):
+    is_project_moderator_or_403(request.user, request.site)
+
+    project = get_object_or_404(
+        models.Project.on_site, status="DRAFT", deleted=None, pk=project_pk
+    )
+
+    if request.method == "POST":
+        project.status = "TO_PROCESS"
+        project.updated_on = timezone.now()
+        project.save()
+
+        messages.add_message(
+            request, messages.SUCCESS, f"Le projet '{project.name}' a été accepté."
+        )
+
+        signals.project_validated.send(
+            sender=models.Project,
+            site=request.site,
+            moderator=request.user,
+            project=project,
+        )
+
+        owner = project.owner
+        if owner:
+            # Update owner permissions now the project is no in DRAFT state anymore
+            assign_collaborator(owner, project, is_owner=True)
+
+            # Send an email to the project owner
+            params = {
+                "project": digests.make_project_digest(project, owner),
+            }
+            send_email(
+                template_name=communication_constants.TPL_PROJECT_ACCEPTED,
+                recipients=[
+                    {
+                        "name": normalize_user_name(owner),
+                        "email": project.owner.email,
+                    }
+                ],
+                params=params,
+            )
+
+        form = forms.ProjectModerationForm(request.POST)
+        if form.is_valid():
+            join = form.cleaned_data["join"]
+
+            if join:
+                # Assign current user as observer if requested
+                assign_observer(request.user, project, request.site)
+                messages.add_message(
+                    request,
+                    messages.INFO,
+                    f"Vous êtes maintenant observateur·rice du projet '{project.name}'.",
+                )
+
+        return redirect(reverse("projects-project-detail-overview", args=(project.pk,)))
+
+    return redirect(reverse("projects-moderation-list"))
+
+
+# ----
+# List, dashboards
+# ----
 @login_required
 def project_list(request):
     if is_staff_for_site(request.user, request.site):
@@ -78,27 +179,6 @@ def project_list(request):
         return redirect("projects-project-list-advisor")
 
     raise PermissionDenied("Vous n'avez pas le droit d'accéder à ceci.")
-
-
-@login_required
-def projects_moderation(request):
-    if not (
-        check_if_advisor(request.user, request.site)
-        or can_administrate_project(project=None, user=request.user)
-        or is_staff_for_site(request.user, request.site)
-    ):
-        raise PermissionDenied("Vous n'avez pas le droit d'accéder à ceci.")
-
-    site_config = get_site_config_or_503(request.site)
-    project_moderator = is_project_moderator(request.user, request.site)
-
-    draft_projects = []
-    if project_moderator:
-        draft_projects = models.Project.on_site.filter(status="DRAFT").order_by(
-            "-created_on"
-        )
-
-    return render(request, "projects/projects_moderation.html", locals())
 
 
 @login_required
@@ -209,47 +289,9 @@ def project_maplist(request):
     return render(request, "projects/project/list-map.html", locals())
 
 
-@login_required
-def project_accept(request, project_id=None):
-    """Update project as accepted for processing"""
-    is_project_moderator_or_403(request.user, request.site)
-
-    project = get_object_or_404(models.Project, pk=project_id)
-    if request.method == "POST":
-        project.status = "TO_PROCESS"
-        project.updated_on = timezone.now()
-        project.save()
-
-        signals.project_validated.send(
-            sender=models.Project,
-            site=request.site,
-            moderator=request.user,
-            project=project,
-        )
-
-        owner = project.owner
-        if owner:
-            # Update owner permissions now the project is no in DRAFT state anymore
-            assign_collaborator(owner, project, is_owner=True)
-
-            # Send an email to the project owner
-            params = {
-                "project": digests.make_project_digest(project, owner),
-            }
-            send_email(
-                template_name=communication_constants.TPL_PROJECT_ACCEPTED,
-                recipients=[
-                    {
-                        "name": normalize_user_name(owner),
-                        "email": project.owner.email,
-                    }
-                ],
-                params=params,
-            )
-
-    return redirect(reverse("projects-project-detail", args=[project_id]))
-
-
+# ----
+# Joining projects
+# ----
 @login_required
 def project_switchtender_join(request, project_id=None):
     """Join as switchtender"""
@@ -350,7 +392,7 @@ def project_delete(request, project_id=None):
     if request.method == "POST":
         project.deleted = project.updated_on = timezone.now()
         project.save()
-    return redirect(reverse("projects-moderation"))
+    return redirect(reverse("projects-project-list"))
 
 
 ########################################################################
