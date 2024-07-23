@@ -420,6 +420,7 @@ DJANGO_WEBHOOK = {
     "MODELS": [
         "projects.Project",
         "survey.Answer",
+        "taggit.TaggedItem",
     ],
     "SIGNAL_LISTENER": "recoco.apps.webhook.signals.WebhookSignalListener",
     "USE_CACHE": False,
