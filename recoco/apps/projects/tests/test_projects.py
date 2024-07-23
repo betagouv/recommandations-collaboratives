@@ -609,25 +609,30 @@ def test_project_detail_contains_actions_for_assigned_advisor(request, client, p
 
 
 ########################################################################
-# accept project
+# Project moderation
 ########################################################################
 
 
 @pytest.mark.django_db
-def test_accept_project_not_available_for_non_staff_users(
+def test_project_moderation_not_available_for_non_moderators(
     request, client, project_draft
 ):
     current_site = get_current_site(request)
     baker.make(home_models.SiteConfiguration, site=current_site)
+    project = Recipe(models.Project, sites=[current_site]).make()
 
-    url = reverse("projects-project-accept", args=[project_draft.id])
     with login(client):
-        response = client.get(url)
-    assert response.status_code == 403
+        for url in [
+            reverse("projects-moderation-list"),
+            reverse("projects-moderation-refuse", args=[project.id]),
+            reverse("projects-moderation-accept", args=[project.id]),
+        ]:
+            response = client.get(url)
+            assert response.status_code == 403
 
 
 @pytest.mark.django_db
-def test_accept_project_and_redirect(request, client, project_draft):
+def test_project_moderation_accept_and_redirect(request, client, project_draft):
     current_site = get_current_site(request)
     baker.make(home_models.SiteConfiguration, site=current_site)
     owner = Recipe(auth.User, username="owner@owner.co").make()
@@ -635,7 +640,7 @@ def test_accept_project_and_redirect(request, client, project_draft):
     baker.make(models.ProjectMember, project=project_draft, member=owner, is_owner=True)
 
     updated_on_before = project_draft.updated_on
-    url = reverse("projects-project-accept", args=[project_draft.id])
+    url = reverse("projects-moderation-accept", args=[project_draft.id])
 
     with login(client, groups=["example_com_staff"]) as moderator:
         moderator.profile.sites.add(current_site)
@@ -652,12 +657,14 @@ def test_accept_project_and_redirect(request, client, project_draft):
 
 
 @pytest.mark.django_db
-def test_accept_project_without_owner_and_redirect(request, client, project_draft):
+def test_project_moderation_accept_without_owner_and_redirect(
+    request, client, project_draft
+):
     current_site = get_current_site(request)
     baker.make(home_models.SiteConfiguration, site=current_site)
 
     updated_on_before = project_draft.updated_on
-    url = reverse("projects-project-accept", args=[project_draft.id])
+    url = reverse("projects-moderation-accept", args=[project_draft.id])
 
     with login(client, groups=["example_com_staff"]) as moderator:
         moderator.profile.sites.add(current_site)
@@ -671,7 +678,9 @@ def test_accept_project_without_owner_and_redirect(request, client, project_draf
 
 
 @pytest.mark.django_db
-def test_accept_project_notifies_regional_actors(request, client, make_project):
+def test_project_moderation_notifies_regional_actors_when_accepted(
+    request, client, make_project
+):
     current_site = get_current_site(request)
     baker.make(home_models.SiteConfiguration, site=current_site)
 
@@ -697,13 +706,15 @@ def test_accept_project_notifies_regional_actors(request, client, make_project):
 
     with login(client, groups=["example_com_advisor", "example_com_staff"]) as user:
         user.profile.sites.add(current_site)
-        client.post(reverse("projects-project-accept", args=[project.id]))
+        client.post(reverse("projects-moderation-accept", args=[project.id]))
 
     assert regional_actor.notifications.count() == 1
 
 
 @pytest.mark.django_db
-def test_accept_project_does_not_notify_non_regional_actors(request, client):
+def test_project_moderation_does_not_notify_non_regional_actors_on_accept(
+    request, client
+):
     current_site = get_current_site(request)
     baker.make(home_models.SiteConfiguration, site=current_site)
     group = auth.Group.objects.get(name="example_com_advisor")
@@ -732,9 +743,31 @@ def test_accept_project_does_not_notify_non_regional_actors(request, client):
     ).make()
 
     with login(client, user=nr_membership.member, groups=["example_com_advisor"]):
-        client.post(reverse("projects-project-accept", args=[project.id]))
+        client.post(reverse("projects-moderation-accept", args=[project.id]))
 
     assert non_regional_actor.notifications.count() == 0
+
+
+@pytest.mark.django_db
+def test_project_moderation_refuse_and_redirect(request, client):
+    current_site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=current_site)
+    owner = Recipe(auth.User, username="owner@owner.co").make()
+    project = Recipe(models.Project, sites=[current_site]).make()
+    baker.make(models.ProjectMember, project=project, member=owner, is_owner=True)
+
+    updated_on_before = project.updated_on
+    url = reverse("projects-moderation-refuse", args=[project.id])
+
+    with login(client, groups=["example_com_staff"]) as moderator:
+        moderator.profile.sites.add(current_site)
+        response = client.post(url)
+
+    project = models.Project.on_site.get(id=project.id)
+    assert project.status == "REJECTED"
+    assert project.updated_on > updated_on_before
+
+    assert response.status_code == 302
 
 
 ########################################################################
