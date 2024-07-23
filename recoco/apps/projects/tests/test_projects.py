@@ -979,8 +979,8 @@ def test_switchtender_joins_project(request, client, make_project):
     project = models.Project.on_site.get(pk=project.pk)
 
     assert response.status_code == 302
-    assert project.switchtenders_on_site.count() == 1
-    assert project.switchtenders_on_site.first().switchtender == user
+    assert project.switchtender_sites.on_site().count() == 1
+    assert project.switchtender_sites.on_site().first().switchtender == user
 
 
 @pytest.mark.django_db
@@ -1001,7 +1001,7 @@ def test_switchtender_leaves_project(request, client, make_project):
     with login(client) as user:
         utils.assign_advisor(user, project, site)
 
-        assert project.switchtenders_on_site.count() == 1
+        assert project.switchtender_sites.on_site().count() == 1
 
         # Then POST to leave project
         response = client.post(url)

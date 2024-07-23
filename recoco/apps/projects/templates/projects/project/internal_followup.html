@@ -49,7 +49,7 @@
             <div class="col-4">
                 <h5>Équipe de suivi</h5>
                 <ul class="d-flex flex-column list-unstyled mb-0">
-                    {% for advisor in project.switchtenders_on_site.all %}
+                    {% for advisor in project.switchtender_sites.all %}
                         {% if advisor.switchtender.is_active %}
                             <li>{% include 'user/user_card.html' with user=advisor.switchtender user_activity=True %}</li>
                         {% endif %}

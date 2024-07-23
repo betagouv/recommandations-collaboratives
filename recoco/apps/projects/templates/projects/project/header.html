@@ -5,7 +5,7 @@
 {% block js %}
     {% vite_asset 'js/apps/projectShare.js' %}
 {% endblock %}
-{% get_advising_position request.user project as position %}
+{% get_advising_position request.user project request.site as position %}
 {% get_obj_perms request.user for request.site as "user_site_perms" %}
 {% get_obj_perms request.user for project as "user_project_perms" %}
 {% with request.resolver_match.url_name as url_name %}

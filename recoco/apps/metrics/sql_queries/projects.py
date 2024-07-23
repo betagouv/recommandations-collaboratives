@@ -54,7 +54,7 @@ def get_queryset(site_id: int) -> QuerySet:
                 filter=Q(
                     notes__public=True,
                     notes__site_id=site_id,
-                    notes__created_by__in=F("switchtenders_on_site__switchtender"),
+                    notes__created_by__in=F("switchtenders_sites__switchtender"),
                 ),
                 distinct=True,
             ),
