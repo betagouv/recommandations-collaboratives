@@ -74,7 +74,9 @@ def get_queryset(site_id: int) -> QuerySet:
             ),
             commune_insee=F("commune__insee"),
         )
-        .annotate(status=F("project_sites__status"))
+        .annotate(
+            status=F("project_sites__status"), filter=Q(project_sites__site__pk=site_id)
+        )
         .values(
             "hash",
             "status",
