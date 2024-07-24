@@ -11,7 +11,7 @@ def get_queryset(site_id: int) -> QuerySet:
     return (
         Project.objects.exclude(exclude_stats=True)
         .prefetch_related("tasks", "switchtenders")
-        .exclude(status="DRAFT")
+        .exclude(project_sites__status="DRAFT", project_sites__site__pk=site_id)
         .order_by("-created_on")
         .filter(sites__pk=site_id)
         .annotate(hash=hash_field("id", salt="project"))
@@ -74,6 +74,7 @@ def get_queryset(site_id: int) -> QuerySet:
             ),
             commune_insee=F("commune__insee"),
         )
+        .annotate(status=F("project_sites__status"))
         .values(
             "hash",
             "status",
