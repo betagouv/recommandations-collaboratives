@@ -133,6 +133,7 @@ def test_project_list_includes_only_projects_in_switchtender_departments(
     # project fields: not ideal
     expected = [
         "commune",
+        "location",
         "created_on",
         "id",
         "inactive_since",
@@ -262,6 +263,7 @@ def check_project_content(project, data):
     # project fields: not ideal
     expected = [
         "commune",
+        "location",
         "created_on",
         "id",
         "inactive_since",
