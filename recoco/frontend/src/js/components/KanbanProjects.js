@@ -57,15 +57,17 @@ function boardProjectsApp(currentSiteId) {
       this.projectList = [...projectList];
       this.rawProjectList = [...projectList];
       const fuseOptions = {
-        isCaseSensitive: false,
-        minMatchCharLength: 2,
-        threshold: 0.0,
         keys: [
           'name',
           'commune.name',
           'commune.insee',
           'commune.department.name',
         ],
+        isCaseSensitive: false,
+        minMatchCharLength: 2,
+        threshold: 0.3,
+        findAllMatches: true,
+        ignoreLocation: true,
       };
       this.fuse = new Fuse(projectList, fuseOptions);
       if (this.searchText) {
