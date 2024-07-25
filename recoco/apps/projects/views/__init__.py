@@ -173,7 +173,7 @@ def project_maplist(request):
             models.Project.on_site.in_departments(
                 request.user.profile.departments.all()
             )
-            .filter(status="DRAFT")
+            .filter(project_sites__status="DRAFT")
             .order_by("-created_on")
         )
 
