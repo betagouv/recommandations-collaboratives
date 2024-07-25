@@ -2,11 +2,7 @@ import Alpine from 'alpinejs';
 import { generateUUID } from '../utils/uuid';
 import Fuse from 'fuse.js';
 
-import api, {
-  projectsProjectSitesUrl,
-  projectsUrl,
-  regionsUrl,
-} from '../utils/api';
+import api, { regionListUrl, projectListUrl, projectUrl } from '../utils/api';
 
 Alpine.data('KanbanProjects', boardProjectsApp);
 
@@ -40,13 +36,13 @@ function boardProjectsApp(currentSiteId) {
     fuse: null,
     searchText: '',
     async getData(postProcess = true) {
-      const projects = await api.get(projectsUrl());
+      const projects = await api.get(projectListUrl());
       await this.$store.projects.mapperProjetsProjectSites(
-        projects.data,
+        projects.data.results,
         this.currentSiteId
       );
 
-      const projectList = projects.data.map((d) =>
+      const projectList = projects.data.results.map((d) =>
         Object.assign(d, {
           uuid: generateUUID(),
         })

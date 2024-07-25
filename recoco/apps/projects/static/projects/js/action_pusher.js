@@ -1,3 +1,6 @@
+import api, { resourceListUrl } from '../utils/api';
+
+
 function action_pusher_app() {
 	return {
 		isBusy: true,
@@ -108,12 +111,10 @@ function action_pusher_app() {
 		},
 
 		async getResources() {
-			var tasksFromApi = [];
-
 			this.isBusy = true;
 
-			const response = await fetch('/api/resources/');
-			resourcesFromApi = await response.json(); //extract JSON from the http response
+			const json = await api.get(resourceListUrl());
+			const resourcesFromApi = json.data.results;
 
 			resourcesFromApi.forEach((t) => {
 				let entry = {

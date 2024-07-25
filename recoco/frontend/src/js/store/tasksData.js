@@ -48,7 +48,7 @@ document.addEventListener('alpine:init', () => {
     async loadTasks() {
       const json = await api.get(tasksUrl(this.projectId));
 
-      const data = json.data.map((d) =>
+      const data = json.data.results.map((d) =>
         Object.assign(d, {
           // TODO: Virer les UUID
           uuid: generateUUID(),
