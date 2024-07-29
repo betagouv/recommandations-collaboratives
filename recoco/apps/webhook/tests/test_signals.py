@@ -43,6 +43,7 @@ def project(commune, make_project):
             name="My project",
             org_name="My organization",
             commune=commune,
+            location="rue des basques",
             description="My description",
         )
         yield project
@@ -88,7 +89,6 @@ def test_find_webhooks_no_project():
 
 @pytest.mark.django_db
 def test_model_dict(project):
-    print(build_listener().model_dict(project))
     assert build_listener().model_dict(project) == {
         "id": project.pk,
         "name": "My project",
@@ -106,6 +106,7 @@ def test_model_dict(project):
             "latitude": 43.4933,
             "longitude": -1.4753,
         },
+        "location": "rue des basques",
         "recommendation_count": 0,
         "public_message_count": 0,
         "private_message_count": 0,

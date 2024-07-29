@@ -55,6 +55,7 @@ class ProjectSerializer(serializers.HyperlinkedModelSerializer):
             "org_name",
             "switchtenders",
             "commune",
+            "location",
             "recommendation_count",
             "public_message_count",
             "private_message_count",
@@ -171,6 +172,7 @@ class ProjectForListSerializer(serializers.BaseSerializer):
             "is_switchtender": data.is_switchtender,
             "is_observer": data.is_observer,
             "commune": commune_data,
+            "location": data.location,
             "notifications": data.notifications,
             "project_sites": format_sites(data),
         }
