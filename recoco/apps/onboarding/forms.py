@@ -171,7 +171,7 @@ class OnboardingSignupForm(DsrcBaseForm):
     last_name = forms.CharField(label="Nom *", initial="", required=True)
     org_name = forms.CharField(
         label="Nom de votre organisation *",
-        help_text="Si vous êtes un particulier, indiquez votre nom.Votre administration, entreprise, association. Si vous êtes un particulier, écrivez 'Particulier'.",
+        help_text="Si vous êtes un particulier, indiquez votre nom. Votre administration, entreprise, association. Si vous êtes un particulier, écrivez 'Particulier'.",
         initial="",
     )
     role = forms.CharField(label="Fonction *", initial="", required=True)
@@ -287,7 +287,7 @@ class PrefillSetuserForm(DsrcBaseForm):
     last_name = forms.CharField(label="Nom *", initial="", required=True)
     org_name = forms.CharField(
         label="Nom de votre organisation *",
-        help_text="Si vous êtes un particulier, indiquez votre nom.Votre administration, entreprise, association. Si vous êtes un particulier, écrivez 'Particulier'.",
+        help_text="Si vous êtes un particulier, indiquez votre nom. Votre administration, entreprise, association. Si vous êtes un particulier, écrivez 'Particulier'.",
         initial="",
     )
     role = forms.CharField(label="Fonction *", initial="", required=True)
