@@ -4,8 +4,12 @@
   font-family: Marianne;
   padding: 12px;
   &--col {
-    &__padding {
+    &__left {
       padding: 0px 12px 0px 0px !important;
+      min-width: 30%;
+    }
+    &__rgight {
+      min-width: 70%;
     }
   }
   &--title {
@@ -34,6 +38,8 @@
     text-align: left;
   }
   &--keyinfo {
+    display: flex;
+    flex-direction: column;
     font-weight: 400;
     line-height: 24px;
   }
@@ -60,7 +66,7 @@
   &--location {
   }
   &--communename {
-    margin-left: 24px;
+    margin-left: 20px;
   }
   &--projectowner {
     font-size: 14px;
@@ -92,4 +98,8 @@
     text-align: left;
     color: #3a3a3a;
   }
+}
+
+.fr-icon--sm:before {
+  margin-right: 0.25rem;
 }
