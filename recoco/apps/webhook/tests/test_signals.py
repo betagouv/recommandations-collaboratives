@@ -49,6 +49,40 @@ def project(commune, make_project):
         yield project
 
 
+@pytest.fixture
+def serialized_project(project):
+    return {
+        "id": project.id,
+        "name": "My project",
+        "description": "My description",
+        "inactive_since": None,
+        "created_on": "2024-05-22T02:00:00+02:00",
+        "updated_on": "2024-05-22T02:00:00+02:00",
+        "org_name": "My organization",
+        "switchtenders": [],
+        "location": "rue des basques",
+        "commune": {
+            "name": "Bayonne",
+            "insee": "64102",
+            "postal": "64100",
+            "department": {"name": "Pyrénées-Atlantiques", "code": "64"},
+            "latitude": 43.4933,
+            "longitude": -1.4753,
+        },
+        "recommendation_count": 0,
+        "public_message_count": 0,
+        "private_message_count": 0,
+        "project_sites": [
+            {
+                "id": project.project_sites.current().pk,
+                "site": 1,
+                "is_origin": True,
+                "status": "READY",
+            }
+        ],
+    }
+
+
 def build_listener():
     return WebhookSignalListener(
         signal=None, signal_name="post_save", model_cls=Project
@@ -88,34 +122,47 @@ def test_find_webhooks_no_project():
 
 
 @pytest.mark.django_db
-def test_model_dict(project):
-    assert build_listener().model_dict(project) == {
-        "id": project.pk,
-        "name": "My project",
-        "description": "My description",
-        "inactive_since": None,
+def test_model_dict_project(project, serialized_project):
+    assert build_listener().model_dict(project) == serialized_project
+
+
+@pytest.mark.django_db
+def test_model_dict_taggeditem(project, serialized_project):
+    tagged_item = baker.make("taggit.TaggedItem", content_object=project)
+    assert build_listener().model_dict(tagged_item) == serialized_project
+
+
+@pytest.mark.django_db
+def test_model_dict_answer(project):
+    with freeze_time("2024-05-22"):
+        answer = baker.make(
+            "survey.Answer",
+            question__text="question",
+            session__project=project,
+        )
+
+    assert build_listener().model_dict(answer) == {
+        "id": answer.id,
         "created_on": "2024-05-22T02:00:00+02:00",
         "updated_on": "2024-05-22T02:00:00+02:00",
-        "org_name": "My organization",
-        "switchtenders": [],
-        "commune": {
-            "name": "Bayonne",
-            "insee": "64102",
-            "postal": "64100",
-            "department": {"name": "Pyrénées-Atlantiques", "code": "64"},
-            "latitude": 43.4933,
-            "longitude": -1.4753,
+        "question": {
+            "id": answer.question_id,
+            "text": "question",
+            "text_short": "",
+            "slug": "question",
+            "is_multiple": False,
+            "choices": [],
         },
-        "location": "rue des basques",
-        "recommendation_count": 0,
-        "public_message_count": 0,
-        "private_message_count": 0,
-        "project_sites": [
-            {
-                "id": project.project_sites.current().pk,
-                "site": 1,
-                "is_origin": True,
-                "status": "READY",
-            }
-        ],
+        "session": answer.session_id,
+        "project": project.id,
+        "choices": [],
+        "values": [],
+        "comment": "",
+        "signals": "",
+        "updated_by": None,
+        "attachment": None,
     }
+
+
+def test_model_dict_other():
+    assert build_listener().model_dict(instance="dummy") == {}

@@ -2,6 +2,7 @@ from typing import Any
 
 from django_webhook.models import Webhook
 from django_webhook.signals import SignalListener
+from taggit.models import TaggedItem
 
 from recoco.apps.projects.models import Project
 from recoco.apps.projects.serializers import ProjectSerializer
@@ -15,6 +16,11 @@ class WebhookSignalListener(SignalListener):
             return list(instance.sites.values_list("id", flat=True))
         if isinstance(instance, Answer):
             return list(instance.session.project.sites.values_list("id", flat=True))
+        if isinstance(instance, TaggedItem):
+            if isinstance(project := instance.content_object, Project):
+                return list(project.sites.values_list("id", flat=True))
+            return []
+
         return []
 
     def find_webhooks(self, topic: str, instance: Any) -> list[tuple[int, str]]:
@@ -34,4 +40,7 @@ class WebhookSignalListener(SignalListener):
             return ProjectSerializer(instance).data
         if isinstance(instance, Answer):
             return AnswerSerializer(instance).data
+        if isinstance(instance, TaggedItem):
+            if isinstance(project := instance.content_object, Project):
+                return ProjectSerializer(project).data
         return {}
