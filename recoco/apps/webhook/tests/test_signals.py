@@ -45,6 +45,7 @@ def project(commune, make_project):
             commune=commune,
             location="rue des basques",
             description="My description",
+            tags=["my_tag"],
         )
         yield project
 
@@ -79,6 +80,9 @@ def serialized_project(project):
                 "is_origin": True,
                 "status": "READY",
             }
+        ],
+        "tags": [
+            "my_tag",
         ],
     }
 

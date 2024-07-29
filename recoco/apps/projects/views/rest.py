@@ -6,19 +6,24 @@ Views for projects application
 author  : raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created : 2021-05-26 15:56:20 CEST
 """
+from __future__ import annotations
 
 from copy import copy
 
+from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
-from django.db.models import Count, F, Q
+from django.contrib.sites.models import Site
+from django.db.models import Count, F, Q, QuerySet
 from django.http import Http404
 from django.shortcuts import get_object_or_404
 from notifications import models as notifications_models
 from rest_framework import permissions, status, viewsets
+from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from recoco import verbs
+from recoco.rest_api.filters import TagsFilterbackend
 from recoco.utils import (
     TrigramSimilaritySearchFilter,
     get_group_for_site,
@@ -81,116 +86,127 @@ class ProjectDetail(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class ProjectList(APIView):
-    """List all user project status"""
+class ProjectList(ListAPIView):
+    """List all user projects"""
 
     permission_classes = [permissions.IsAuthenticated]
+    serializer_class = ProjectForListSerializer
+    filter_backends = [TagsFilterbackend]
 
-    def get(self, request, format=None):
-        projects = fetch_the_site_projects(request.site, request.user)
-        context = {"request": request}
+    def get_queryset(self):
+        return (
+            models.Project.on_site.for_user(self.request.user)
+            .order_by("-created_on", "-updated_on")
+            .prefetch_related("commune")
+            .prefetch_related("commune__department")
+            .prefetch_related("switchtenders__profile__organization")
+            .prefetch_related("project_sites")
+        )
 
-        serializer = ProjectForListSerializer(projects, context=context, many=True)
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+
+        projects = self._update_the_site_projects(
+            queryset=queryset, site=request.site, user=request.user
+        )
+
+        serializer = self.get_serializer(projects, many=True)
         return Response(serializer.data)
 
+    def _update_the_site_projects(
+        self, queryset: QuerySet[models.Project], site: Site, user: User
+    ) -> list[models.Project]:
+        """Returns the complete project list of site for advisor user
 
-def fetch_the_site_projects(site, user):
-    """Returns the complete project list of site for advisor user
+        Here we face a n+1 fetching problem that happens at multiple levels
+        implying an explosition of requests
+        The intent is to fetch each kind of objects in one request and then to
+        reattach the information to the appropriate object.
+        """
+        projects = list(queryset)
 
-    Here we face a n+1 fetching problem that happens at multiple levels
-    implying an explosition of requests
-    The intent is to fetch each kind of objects in one request and then to
-    reattach the information to the appropriate object.
-    """
-    projects = list(
-        models.Project.on_site.for_user(user)
-        .order_by("-created_on", "-updated_on")
-        .prefetch_related("commune")
-        .prefetch_related("project_sites")
-        .prefetch_related("commune__department")
-        .prefetch_related("switchtenders__profile__organization")
-    )
+        ids = [p.id for p in projects]
 
-    ids = [p.id for p in projects]
+        # fetch all related site project switchtender to annotate furthemore the project
+        switchtendering = {
+            ps["project_id"]: ps["is_observer"]
+            for ps in models.ProjectSwitchtender.objects.filter(
+                site=site, switchtender=user, project_id__in=ids
+            ).values("project_id", "is_observer")
+        }
 
-    # fetch all related site project switchtender to annotate furthemore the project
-    switchtendering = {
-        ps["project_id"]: ps["is_observer"]
-        for ps in models.ProjectSwitchtender.objects.filter(
-            site=site, switchtender=user, project_id__in=ids
-        ).values("project_id", "is_observer")
-    }
+        # update project statuses with the right project and switchtendering statuses
+        for p in projects:
+            p.is_switchtender = p.id in switchtendering
+            p.is_observer = switchtendering.get(p.id, False)
 
-    # update project statuses with the right project and switchtendering statuses
-    for p in projects:
-        p.is_switchtender = p.id in switchtendering
-        p.is_observer = switchtendering.get(p.id, False)
+        # associate related notification to their projects
+        self._update_projects_with_their_notifications(site, user, projects)
 
-    # associate related notification to their projects
-    update_projects_with_their_notifications(site, user, projects)
+        return projects
 
-    return projects
+    def _update_projects_with_their_notifications(self, site, user, projects):
+        """Fetch all the related notifications and associate them w/ their projects"""
 
+        project_ct = ContentType.objects.get_for_model(models.Project)
 
-def update_projects_with_their_notifications(site, user, projects):
-    """Fetch all the related notifications and associate them w/ their projects"""
+        advisor_group = get_group_for_site("advisor", site)
+        advisors = [
+            int(advisor)
+            for advisor in advisor_group.user_set.values_list("id", flat=True)
+        ]
 
-    project_ct = ContentType.objects.get_for_model(models.Project)
+        unread_notifications = (
+            notifications_models.Notification.on_site.filter(recipient=user)
+            .filter(target_content_type=project_ct.pk)
+            .unread()
+            .order_by("target_object_id")
+        )
 
-    advisor_group = get_group_for_site("advisor", site)
-    advisors = [
-        int(advisor) for advisor in advisor_group.user_set.values_list("id", flat=True)
-    ]
-
-    unread_notifications = (
-        notifications_models.Notification.on_site.filter(recipient=user)
-        .filter(target_content_type=project_ct.pk)
-        .unread()
-        .order_by("target_object_id")
-    )
-
-    # fetch the related notifications
-    all_unread_notifications = (
-        unread_notifications.values(project_id=F("target_object_id"))
-        .annotate(count=Count("id", distinct=True))
-        .annotate(
-            unread_public_messages=Count(
-                "id", filter=Q(verb=verbs.Conversation.PUBLIC_MESSAGE)
+        # fetch the related notifications
+        all_unread_notifications = (
+            unread_notifications.values(project_id=F("target_object_id"))
+            .annotate(count=Count("id", distinct=True))
+            .annotate(
+                unread_public_messages=Count(
+                    "id", filter=Q(verb=verbs.Conversation.PUBLIC_MESSAGE)
+                )
+            )
+            .annotate(
+                unread_private_messages=Count(
+                    "id", filter=Q(verb=verbs.Conversation.PRIVATE_MESSAGE)
+                )
+            )
+            .annotate(
+                new_recommendations=Count(
+                    "id", filter=Q(verb=verbs.Recommendation.CREATED)
+                )
             )
         )
-        .annotate(
-            unread_private_messages=Count(
-                "id", filter=Q(verb=verbs.Conversation.PRIVATE_MESSAGE)
-            )
+        notifications = {n["project_id"]: n for n in all_unread_notifications}
+
+        # Specific request for collaborator activity as it relies on exclusion
+        collaborator_activity = (
+            unread_notifications.exclude(actor_object_id__in=advisors)
+            .values(project_id=F("target_object_id"))
+            .annotate(activity=Count("id", disctint=True))
         )
-        .annotate(
-            new_recommendations=Count("id", filter=Q(verb=verbs.Recommendation.CREATED))
-        )
-    )
-    notifications = {n["project_id"]: n for n in all_unread_notifications}
+        collaborators = {n["project_id"]: n["activity"] for n in collaborator_activity}
 
-    # Specific request for collaborator activity as it relies on exclusion
-    collaborator_activity = (
-        unread_notifications.exclude(actor_object_id__in=advisors)
-        .values(project_id=F("target_object_id"))
-        .annotate(activity=Count("id", disctint=True))
-    )
-    collaborators = {n["project_id"]: n["activity"] for n in collaborator_activity}
+        # the empty dict is going to be used read only, so sharing same object
+        empty = {
+            "count": 0,
+            "has_collaborator_activity": False,
+            "unread_public_messages": 0,
+            "unread_private_messages": 0,
+            "new_recommendations": 0,
+        }
 
-    # the empty dict is going to be used read only, so sharing same object
-    empty = {
-        "count": 0,
-        "has_collaborator_activity": False,
-        "unread_public_messages": 0,
-        "unread_private_messages": 0,
-        "new_recommendations": 0,
-    }
-
-    # for each project associate the corresponding notifications
-    for p in projects:
-        p.notifications = notifications.get(str(p.id), empty)
-        active = bool(collaborators.get(str(p.id)))
-        p.notifications["has_collaborator_activity"] = active
+        # for each project associate the corresponding notifications
+        for p in projects:
+            p.notifications = notifications.get(str(p.id), empty)
+            active = bool(collaborators.get(str(p.id)))
+            p.notifications["has_collaborator_activity"] = active
 
 
 ########################################################################

@@ -147,6 +147,7 @@ def test_project_list_includes_only_projects_in_switchtender_departments(
         "updated_on",
         "description",
         "project_sites",
+        "tags",
     ]
     assert set(data.keys()) == set(expected)
 
@@ -161,6 +162,39 @@ def test_project_list_includes_only_projects_in_switchtender_departments(
         "unread_public_messages": 1,
         "project_id": str(project.id),
     }
+
+
+@pytest.mark.django_db
+def test_project_list_tags_filter(request, client):
+    site = get_current_site(request)
+    user = baker.make(auth_models.User, is_superuser=True)
+
+    project_1 = baker.make(models.Project, sites=[site])
+    project_1.tags.add("tag1", "tag2")
+
+    project_2 = baker.make(models.Project, sites=[site])
+    project_2.tags.add("tag3")
+
+    client = APIClient()
+    client.force_authenticate(user=user)
+
+    url = reverse("projects-list")
+
+    response = client.get(url)
+    assert response.status_code == 200
+    assert len(response.data) == 2
+
+    response = client.get(f"{url}?tags=tag1,tag3")
+    assert response.status_code == 200
+    assert len(response.data) == 2
+
+    response = client.get(f"{url}?tags=tag3")
+    assert response.status_code == 200
+    assert len(response.data) == 1
+
+    response = client.get(f"{url}?tags=tag5,tag6")
+    assert response.status_code == 200
+    assert len(response.data) == 0
 
 
 ########################################################################
@@ -279,6 +313,7 @@ def check_project_content(project, data):
         "recommendation_count",
         "description",
         "project_sites",
+        "tags",
     ]
     assert set(data.keys()) == set(expected)
 
