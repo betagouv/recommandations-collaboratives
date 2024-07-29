@@ -19,7 +19,7 @@
           type="text/css">
 {% endblock css %}
 {% block title %}
-    Tableau de bord adstrateur {{ block.super }}
+    Tableau de bord administrateur {{ block.super }}
 {% endblock title %}
 {% block project_list_content %}
     <div x-data="KanbanProjects({{ request.site.id }})">
