@@ -51,7 +51,6 @@
             {% endif %}
         </div>
         <article class="mt-1 mb-2">
-            <span>via <span x-text="task.site.name"></span></span>
             <template x-if="task.resource_id && task.resource && task.resource.subtitle">
                 <div x-html="truncate(renderMarkdown(task.resource.subtitle),100)"
                      class="text-info-custom fw-light font-small text-dark m-0 p-0">
