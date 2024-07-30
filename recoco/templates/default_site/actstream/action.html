@@ -5,12 +5,11 @@
 {% get_verbs as verbs %}
 <div class="d-block font-marianne">
   <div class="d-flex align-items-start mb-2">
-    <img class="mt-1 align-middle rounded-circle d-inline-block {% if not transparent_background %}bg-white{% endif %}"
+    <img class="mt-1 z-3 align-middle rounded-circle d-inline-block {% if not transparent_background %}bg-white{% endif %}"
          width="18px"
          :src='$store.utils.gravatar_url("{{ action.actor }}", 18, "{{ action.actor.first_name }}" + " " + "{{ action.actor.last_name }}")'
          data-bs-toggle="tooltip"
          data-bs-placement="bottom"
-         style="z-index: 1000"
          tabindex="0">
     <div class="mt-1 ms-1 font-very-small"
          data-test-id="project-activity-notification">
