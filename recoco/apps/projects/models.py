@@ -603,6 +603,11 @@ class NoteManager(models.Manager):
         return self.get_queryset().filter(public=False)
 
 
+class AllNotesManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().order_by("-created_on", "-updated_on")
+
+
 class NoteOnSiteManager(CurrentSiteManager, NoteManager):
     pass
 
@@ -612,6 +617,7 @@ class Note(models.Model):
 
     objects = NoteManager()
     on_site = NoteOnSiteManager()
+    all_notes = AllNotesManager()
 
     site = models.ForeignKey(
         Site, on_delete=models.CASCADE, related_name="project_notes"
