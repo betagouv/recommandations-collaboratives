@@ -519,11 +519,17 @@ class UserProjectStatus(models.Model):
 
 
 class ProjectSwitchtenderOnSiteManager(CurrentSiteManager):
-    use_for_related_fields = True
+    pass
+
+
+class ProjectSwitchtenderQuerySet(models.QuerySet):
+    def on_site(self):
+        site = Site.objects.get_current()
+        return self.filter(site=site)
 
 
 class ProjectSwitchtender(models.Model):
-    objects = ProjectSwitchtenderOnSiteManager()
+    objects = ProjectSwitchtenderQuerySet.as_manager()
 
     class Meta:
         unique_together = ("site", "project", "switchtender")
@@ -531,10 +537,10 @@ class ProjectSwitchtender(models.Model):
     switchtender = models.ForeignKey(
         auth_models.User,
         on_delete=models.CASCADE,
-        related_name="projects_switchtended_on_site",
+        related_name="projects_switchtended_per_site",
     )
     project = models.ForeignKey(
-        Project, on_delete=models.CASCADE, related_name="switchtenders_on_site"
+        Project, on_delete=models.CASCADE, related_name="switchtender_sites"
     )
     is_observer = models.BooleanField(default=False)
     site = models.ForeignKey(Site, on_delete=models.CASCADE)

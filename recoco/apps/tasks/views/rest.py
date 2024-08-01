@@ -53,7 +53,7 @@ class TaskViewSet(viewsets.ModelViewSet):
     API endpoint for project tasks
     """
 
-    queryset = models.Task.on_site
+    queryset = models.Task.objects
     serializer_class = TaskSerializer
     permission_classes = [permissions.IsAuthenticated, IsTaskViewerOrManagerToWrite]
 
