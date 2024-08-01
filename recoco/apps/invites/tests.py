@@ -353,7 +353,7 @@ def test_logged_in_user_accepts_invite_advisor_with_matching_existing_account(
     assert invite.accepted_on is not None
     assert current_site in user.profile.sites.all()
     assert user not in invite.project.members.all()
-    switchtending = invite.project.switchtenders_on_site.first()
+    switchtending = invite.project.switchtender_sites.first()
     assert user == switchtending.switchtender
     assert switchtending.is_observer is False
     assert has_perm(user, "view_project", invite.project)
@@ -382,7 +382,7 @@ def test_logged_in_user_accepts_invite_observer_with_matching_existing_account(
     assert invite.accepted_on is not None
     assert current_site in user.profile.sites.all()
     assert user not in invite.project.members.all()
-    switchtending = invite.project.switchtenders_on_site.first()
+    switchtending = invite.project.switchtender_sites.first()
     assert user == switchtending.switchtender
     assert switchtending.is_observer is True
     assert has_perm(user, "view_project", invite.project)
@@ -530,7 +530,7 @@ def test_anonymous_accepts_invite_as_switchtender(request, client, project):
     invite = models.Invite.on_site.get(pk=invite.pk)
     assert invite.accepted_on is not None
     assert invite.project.members.count() == 0
-    assert invite.project.switchtenders_on_site.count() == 1
+    assert invite.project.switchtender_sites.count() == 1
 
     user = auth_models.User.objects.get(email=invite.email)
     assert user.username == invite.email
@@ -568,7 +568,7 @@ def test_anonymous_accepts_invite_as_collaborator(request, client, project):
     invite = models.Invite.on_site.get(pk=invite.pk)
     assert invite.accepted_on is not None
     assert invite.project.members.count() == 1
-    assert invite.project.switchtenders_on_site.count() == 0
+    assert invite.project.switchtender_sites.count() == 0
 
     user = auth_models.User.objects.get(email=invite.email)
     assert user.username == invite.email

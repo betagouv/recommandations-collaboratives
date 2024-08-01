@@ -1,0 +1,105 @@
+.project-card {
+  box-shadow: 2px 2px 4px 0px #0000001a;
+  border: 1px solid #e5e5e5;
+  font-family: Marianne;
+  padding: 12px;
+  &--col {
+    &__left {
+      padding: 0px 12px 0px 0px !important;
+      min-width: 30%;
+    }
+    &__rgight {
+      min-width: 70%;
+    }
+  }
+  &--title {
+    font-size: 16px;
+    text-align: left;
+  }
+  &--city {
+    font-weight: 700;
+    line-height: 24px;
+    color: #3a3a3a;
+    text-decoration: underline;
+    text-decoration-color: #3a3a3a;
+  }
+  &--name {
+    font-weight: 400;
+    line-height: 22px;
+    color: #666666;
+    text-decoration: underline;
+    text-decoration-color: #666666;
+  }
+  &--keyinfo,
+  &--address,
+  &--team {
+    font-size: 12px;
+    color: #666666;
+    text-align: left;
+  }
+  &--keyinfo {
+    display: flex;
+    flex-direction: column;
+    font-weight: 400;
+    line-height: 24px;
+  }
+  &--address,
+  &--team {
+    font-weight: 700;
+    line-height: 22px;
+  }
+  &--address {
+  }
+  &--team {
+  }
+  &--location,
+  &--communename {
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 18px;
+    text-align: left;
+    color: #666666;
+  }
+  p:has(#no-margin) {
+    margin-bottom: 0px;
+  }
+  &--location {
+  }
+  &--communename {
+    margin-left: 20px;
+  }
+  &--projectowner {
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 24px;
+    text-align: left;
+  }
+  &--orgname {
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 24px;
+    text-align: left;
+  }
+  &--subtitle {
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 22px;
+    text-align: left;
+    color: #666666;
+  }
+  &--description {
+    padding: 12px 0px 0px 0px;
+    border-radius: 4px;
+    opacity: 0px;
+    background: #f6f6f6;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 21px;
+    text-align: left;
+    color: #3a3a3a;
+  }
+}
+
+.fr-icon--sm:before {
+  margin-right: 0.25rem;
+}

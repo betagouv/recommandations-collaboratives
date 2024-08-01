@@ -106,7 +106,7 @@ class UserProjectSerializer(ProjectSerializer):
 
     def get_is_observer(self, obj):
         request = self.context.get("request")
-        return request.user.pk in obj.switchtenders_on_site.filter(
+        return request.user.pk in obj.switchtender_sites.on_site().filter(
             is_observer=True
         ).values_list("switchtender__id", flat=True)
 
