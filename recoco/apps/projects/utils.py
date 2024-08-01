@@ -170,7 +170,7 @@ def can_administrate_project(project, user):
 
     # FIXME replace by checking permissions
     if project:
-        return project.switchtenders_on_site.filter(switchtender=user).exists()
+        return project.switchtender_sites.on_site().filter(switchtender=user).exists()
     else:
         return models.Project.on_site.filter(switchtenders=user).exists()
 
@@ -263,8 +263,8 @@ def get_switchtenders_for_project(project):
 def get_advisors_for_project(project):
     """Return all the switchtenders for a given project"""
     return auth_models.User.objects.filter(
-        projects_switchtended_on_site__project=project,
-        projects_switchtended_on_site__site=get_current_site(request=None),
+        projects_switchtended_per_site__project=project,
+        projects_switchtended_per_site__site=get_current_site(request=None),
     ).distinct()
 
 

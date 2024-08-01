@@ -4,22 +4,16 @@ describe('I can go to the dashboard and see the pending projects, and approve on
   });
 
   it('approves a project', () => {
-    cy.visit('/projects');
-    cy.contains("Projets en attente d'acceptation");
+    cy.visit('/projects/moderation');
+    cy.contains('projet entrant à examiner');
     cy.contains('Friche numéro 4');
-    cy.get('#draft-projects')
-      .siblings()
-      .contains('Friche numéro 4')
-      .parents('tr')
+    cy.get('[data_test_id="accept-project"]')
       .contains('Accepter')
       .click({ force: true });
     cy.url().should('include', '/project/');
     cy.contains('Friche numéro 4');
 
-    cy.visit('/projects');
-    cy.get('#draft-projects')
-      .siblings()
-      .contains('Friche numéro 4')
-      .should('not.exist');
+    cy.visit('/projects/moderation');
+    cy.contains('Friche numéro 4').should('not.exist');
   });
 });

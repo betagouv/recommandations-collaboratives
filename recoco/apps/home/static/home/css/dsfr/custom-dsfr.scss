@@ -36,6 +36,8 @@
   --border-active-blue-france: #0063cb;
 
   --bs-link-color-rgb: 51, 91, 126;
+
+  --variant-secondary-black: #3a3a3a;
 }
 
 * {
@@ -76,6 +78,15 @@ a.fr-btn {
     &.fr-btn--secondary {
       color: #000091 !important;
     }
+  }
+}
+.fr-btn--secondary {
+  &:is(.black) {
+    box-shadow: inset 0 0 0 1px var(--variant-secondary-black);
+  }
+  &.black {
+    color: var(--variant-secondary-black);
+    background-color: transparent;
   }
 }
 

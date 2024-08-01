@@ -2,12 +2,16 @@
 {% load guardian_tags %}
 {% load gravatar %}
 {% load django_vite %}
+{% load projects_extra %}
 {% block js %}
     {% vite_asset 'js/apps/menuNotification.js' %}
 {% endblock js %}
 {% with request.resolver_match.url_name as url_name %}
     {% if user.is_authenticated %}
         {% get_obj_perms request.user for request.site as "user_site_perms" %}
+    {% endif %}
+    {% if 'moderate_projects' in user_site_perms %}
+        {% get_project_moderation_count as projects_to_moderate_count %}
     {% endif %}
     <ul class="list-unstyled mb-0 d-flex align-items-center"
         data-test-id="secondary-menu"
@@ -166,16 +170,13 @@
                 </div>
             </li>
         {% endif %}
-        <!-- Methodology -->
-        <!-- {% if not user.is_authenticated and not hide_methodology %}
-            <li style="margin-right: 35px; padding-bottom:20px; border-bottom:solid 2px transparent; {% if 'methodology' in url_name %}border-bottom:solid 2px #0063CB;{% endif %}">
-                <div class="btn-group">
-                    <a href="{% url 'methodology' %}" class="nav-link link-dark">
-                        <span class="me-2 ms-1 align-middle">Méthodologie</span>
-                    </a>
-                </div>
+        {% if projects_to_moderate_count > 0 %}
+            <!-- Projects moderation -->
+            <li style="{% if url_name == 'projects-moderation-list' %}activated{% endif %}">
+                <a href="{% url "projects-moderation-list" %}"
+                   class="nav-link link-dark {% if url_name == 'resources-resource-search' %}active{% endif %}">Projets à examiner <span class="badge text-bg-danger">{{ projects_to_moderate_count }}</span></a>
             </li>
-        {% endif %} -->
+        {% endif %}
         <!-- Ressources -->
         <li style="{% if url_name == 'resources-resource-search' %}activated{% endif %}">
             <div x-data="{ open: false }"

@@ -1,7 +1,7 @@
 from django import template
 
 from .. import utils
-from ..models import Answer, Choice
+from ..models import Answer, Choice, Session
 
 register = template.Library()
 
@@ -38,3 +38,11 @@ def lookup_choices_from_answer(answer):
             pass
 
     return choices
+
+
+@register.simple_tag
+def project_session_for_survey(project, survey):
+    try:
+        return Session.objects.get(project=project, survey=survey)
+    except Session.DoesNotExist:
+        return None
