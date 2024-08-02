@@ -334,7 +334,7 @@ def test_create_resource_available_for_authorized_users(client):
 
 
 @pytest.mark.django_db
-def test_create_new_resource_and_redirect(client):
+def test_create_new_resource_and_redirect(request, client):
     data = {
         "title": "a title",
         "subtitle": "a sub title",
@@ -347,6 +347,7 @@ def test_create_new_resource_and_redirect(client):
         response = client.post(reverse("resources-resource-create"), data=data)
     resource = models.Resource.on_site.all()[0]
     assert resource.content == data["content"]
+    assert resource.site_origin == get_current_site(request)
     assert response.status_code == 302
 
 

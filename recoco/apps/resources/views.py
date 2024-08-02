@@ -313,6 +313,7 @@ def resource_create(request):
         if form.is_valid():
             resource = form.save(commit=False)
             resource.created_by = request.user
+            resource.site_origin = request.site
             with reversion.create_revision():
                 reversion.set_user(request.user)
                 resource.save()
