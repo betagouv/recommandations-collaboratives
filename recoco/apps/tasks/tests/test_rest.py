@@ -39,7 +39,6 @@ def test_project_collaborator_can_see_project_tasks_for_site(request, project):
     tasks = baker.make(
         models.Task, project=project, site=site, public=True, _quantity=2
     )
-    baker.make(models.Task, project=project, public=True)
     utils.assign_collaborator(user, project)
 
     client = APIClient()
@@ -77,7 +76,7 @@ def test_project_observer_can_see_project_tasks_for_site(request, project):
     tasks = baker.make(
         models.Task, project=project, site=site, public=True, _quantity=2
     )
-    baker.make(models.Task, project=project, public=True)
+
     utils.assign_observer(user, project, site)
 
     client = APIClient()
@@ -98,7 +97,6 @@ def test_regional_actor_can_see_project_tasks_for_site(request, project):
     tasks = baker.make(
         models.Task, project=project, site=site, public=True, _quantity=2
     )
-    baker.make(models.Task, project=project, public=True)
     utils.assign_observer(user, project, site)
 
     client = APIClient()
@@ -117,7 +115,6 @@ def test_project_advisor_can_see_project_tasks_for_site(request, project):
     tasks = baker.make(
         models.Task, project=project, site=site, public=True, _quantity=2
     )
-    baker.make(models.Task, project=project, public=True)
     utils.assign_advisor(user, project, site)
 
     client = APIClient()
