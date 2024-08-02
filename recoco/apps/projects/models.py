@@ -394,6 +394,7 @@ class Project(models.Model):
     location = models.CharField(
         max_length=256,
         verbose_name="Localisation",
+        null=True,
         blank=True,
     )
     location_x = models.FloatField(
