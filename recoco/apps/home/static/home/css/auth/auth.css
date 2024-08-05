@@ -8,3 +8,14 @@
 .max-width-800 {
   max-width: 800px;
 }
+
+.hr-style {
+  height: 1px;
+  margin-bottom: 20px;
+  background-color: grey !important;
+  background-image: none;
+}
+
+.span-padding {
+  padding: 11px 10px;
+}

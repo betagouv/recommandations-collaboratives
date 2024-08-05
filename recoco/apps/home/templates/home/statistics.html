@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load leaflet_tags %}
+{% load sass_tags %}
 {% load l10n %}
 {% load static %}
 {% block title %}Statistiques d'impact{% endblock %}
@@ -70,13 +71,15 @@
     {% leaflet_css %}
     <link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/leaflet.fullscreen.css'
           rel='stylesheet' />
+    <link href="{% sass_src 'home/css/statistics/statistics.scss' %}"
+          rel="stylesheet"
+          type="text/css">
 {% endblock %}
 {% block content %}
     <div class="col-9 py-5 mx-auto">
         <h2>Quel est l'impact d'UrbanVitaliz ?</h2>
         <p>Mis à jour en continu</p>
-        <div class="border border-1 p-4 rounded-4 text-center text-white mb-4 tmp-refacto"
-             style="background-color: #04466c">
+        <div class="border border-1 p-4 rounded-4 text-center text-white mb-4 bg-color">
             <h2 class="text-white mb-2">
                 <strong>{{ reco_following_pc }}%</strong>
                 <br />
@@ -105,7 +108,7 @@
                 <div class="rounded-4 border border-1 p-4 mb-4 text-center w-100">
                     <h4 class="fw-bold mb-2">Sollicitations de nouvelles friches</h4>
                     <div id="chart-new">
-                        <svg class="w-100 tmp-refacto"  style="min-height: 300px;">
+                        <svg class="w-100 min-height">
                             >
                         </svg>
                     </div>

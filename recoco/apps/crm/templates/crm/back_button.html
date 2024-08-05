@@ -1,10 +1,14 @@
 {% load static %}
-<div class="d-flex ps-4 p-1 tmp-refacto" style="background-color: #8cb0fa;">
+{% load sass_tags %}
+{% block css %}
+    <link href="{% sass_src 'crm/css/button.scss' %}"
+          rel="stylesheet"
+          type="text/css" />
+{% endblock %}
+<div class="d-flex ps-4 p-1 div-background">
     <a x-data="Crm"
        @click="goBack"
-       class="my-2 tmp-refacto"
-       style="cursor: pointer;
-              color: #222">
+       class="my-2 button-style">
         <svg class="bi me-2" width="16" height="16" fill="currentColor">
             <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#arrow-return-left" />
         </svg>

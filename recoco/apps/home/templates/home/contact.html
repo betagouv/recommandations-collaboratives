@@ -11,6 +11,9 @@
     <link href="{% sass_src 'home/css/dsfr/custom-dsfr.scss' %}"
           rel="stylesheet"
           type="text/css">
+    <link href="{% sass_src 'home/css/contact/contact.scss' %}"
+          rel="stylesheet"
+          type="text/css">
 {% endblock css %}
 {% block content %}
     <div class="col-9 py-5 mx-auto">
@@ -73,8 +76,7 @@
                 {% for error in form.subject.errors %}<div class="text-danger text-end">{{ error }}</div>{% endfor %}
             </div>
             <div class="mb-3">
-                <textarea class="form-control {% if form.content.errors %}is-invalid{% endif %} tmp-refacto"
-                          style="height: 100px"
+                <textarea class="form-control {% if form.content.errors %}is-invalid{% endif %} text-area-size"
                           id="input-project-content"
                           name="{{ form.content.name }}"
                           value="{{ form.content.value|default:'' }}"

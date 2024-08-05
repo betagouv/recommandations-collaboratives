@@ -11,6 +11,9 @@
     <link href="{% sass_src 'home/css/dsfr/custom-dsfr.scss' %}"
           rel="stylesheet"
           type="text/css">
+    <link href="{% sass_src 'home/css/privacy/privacy.scss' %}"
+          rel="stylesheet"
+          type="text/css">
 {% endblock %}
 {% block content %}
     <div class="col-8 mt-4 py-3 g-0 mx-auto font-marianne">
@@ -168,26 +171,26 @@
             RGPD et qu’ils apportent des garanties suffisantes en matière de sécurité.
         </p>
         <div class="d-flex border mt-4">
-            <div class="d-flex flex-column tmp-refacto" style="border-right: 1px solid #dee2e6;">
-                <p class="p-2 tmp-refacto" style="border-bottom: 1px solid #dee2e6;height: 70px;">Sous-traitant</p>
-                <p class="p-2 tmp-refacto"style="border-bottom: 1px solid #dee2e6;height: 200px">[Nom]</p>
-                <p class="p-2 tmp-refacto">AlwaysData</p>
+            <div class="d-flex flex-column privacy-div">
+                <p class="p-2 p-in-dev-1">Sous-traitant</p>
+                <p class="p-2 p-in-dev-2">[Nom]</p>
+                <p class="p-2 ">AlwaysData</p>
             </div>
-            <div class="d-flex flex-column tmp-refacto" style="border-right: 1px solid #dee2e6;">
-                <p class="p-2 tmp-refacto" style="border-bottom: 1px solid #dee2e6;height: 70px;">Pays destinataire</p>
-                <p class="p-2 tmp-refacto" style="border-bottom: 1px solid #dee2e6;height: 200px">[Lieu de manipulatio n des données]</p>
+            <div class="d-flex flex-column privacy-div">
+                <p class="p-2 p-in-dev-1">Pays destinataire</p>
+                <p class="p-2 p-in-dev-2">[Lieu de manipulatio n des données]</p>
                 <p class="p-2">France</p>
             </div>
-            <div class="d-flex flex-column tmp-refacto" style="border-right: 1px solid #dee2e6;">
-                <p class="p-2 tmp-refacto"style="border-bottom: 1px solid #dee2e6; height: 70px;">Traitement réalisé</p>
-                <p class="p-2 tmp-refacto"style="border-bottom: 1px solid #dee2e6;height: 200px">
+            <div class="d-flex flex-column privacy-div">
+                <p class="p-2 p-in-dev-1">Traitement réalisé</p>
+                <p class="p-2 p-in-dev-2">
                     [Mission du sous-traitant : hébergement , envoi d&#39;emails, création de formulaire, cookies…]
                 </p>
                 <p class="p-2">Hébergement des données</p>
             </div>
-            <div class="d-flex flex-column tmp-refacto" style="border-right: 1px solid #dee2e6;">
-                <p class="p-2 tmp-refacto" style="border-bottom: 1px solid #dee2e6;height: 70px;">Garanties</p>
-                <p class="p-2 tmp-refacto" style="border-bottom: 1px solid #dee2e6;height: 200px">
+            <div class="d-flex flex-column privacy-div">
+                <p class="p-2 p-in-dev-1">Garanties</p>
+                <p class="p-2 p-in-dev-2">
                     [Lien vers la politique de confidentialité du sous-traitant, vers un contrat, ou vers toute mesure qui prouve sa conformité au RGPD]
                 </p>
                 <p class="p-2">https://www.alwaysdata.com/en/contract/16/</p>
@@ -232,97 +235,33 @@
             <br />
         </p>
         <div class="d-flex border mt-4">
-            <div class="d-flex flex-column w-25 tmp-refacto"
-                 style="border-right: 1px solid #dee2e6">
-                <p class="p-2 bg-light tmp-refacto"
-                   style="border-bottom: 1px solid #dee2e6;
-                          height: 70px;
-                          word-break: break-all">Nom du cookie</p>
-                <p class="p-2 tmp-refacto"
-                   style="border-bottom: 1px solid #dee2e6;
-                          height: 100px;
-                          word-break: break-all">SessionId</p>
-                <p class="p-2 tmp-refacto"
-                   style="border-bottom: 1px solid #dee2e6;
-                          height: 100px;
-                          word-break: break-all">Csrftoken</p>
-                <p class="p-2 tmp-refacto"
-                   style="border-bottom: 1px solid #dee2e6;
-                          height: 100px;
-                          word-break: break-all">Posthog</p>
-                <p class="p-2 tmp-refacto"
-                   style="border-bottom: 1px solid #dee2e6;
-                          height: 100px;
-                          word-break: break-all">www.youtube.com</p>
+            <div class="d-flex flex-column w-25 privacy-div">
+                <p class="p-2 bg-light text-break p-in-dev-1">Nom du cookie</p>
+                <p class="p-2 text-break p-in-dev-3">SessionId</p>
+                <p class="p-2 text-break p-in-dev-3">Csrftoken</p>
+                <p class="p-2 text-break p-in-dev-3">Posthog</p>
+                <p class="p-2 text-break p-in-dev-3">www.youtube.com</p>
             </div>
-            <div class="d-flex flex-column w-25 tmp-refacto"
-                 style="border-right: 1px solid #dee2e6">
-                <p class="p-2 bg-light tmp-refacto"
-                   style="border-bottom: 1px solid #dee2e6;
-                          height: 70px;
-                          word-break: break-all">Finalités</p>
-                <p class="p-2 tmp-refacto"
-                   style="border-bottom: 1px solid #dee2e6;
-                          height: 100px;
-                          word-break: break-all">Identifiant de session</p>
-                <p class="p-2 tmp-refacto"
-                   style="border-bottom: 1px solid #dee2e6;
-                          height: 100px;
-                          word-break: break-all">Cross Site Request Forgery cookie</p>
-                <p class="p-2 tmp-refacto"
-                   style="border-bottom: 1px solid #dee2e6;
-                          height: 100px;
-                          word-break: break-all">Plateforme moderne de tracking numérique</p>
-                <p class="p-2 tmp-refacto"
-                   style="border-bottom: 1px solid #dee2e6;
-                          height: 100px;
-                          word-break: break-all">tracking de média</p>
+            <div class="d-flex flex-column w-25 privacy-div">
+                <p class="p-2 bg-light text-break p-in-dev-1">Finalités</p>
+                <p class="p-2 text-break p-in-dev-3">Identifiant de session</p>
+                <p class="p-2 text-break p-in-dev-3">Cross Site Request Forgery cookie</p>
+                <p class="p-2 text-break p-in-dev-3">Plateforme moderne de tracking numérique</p>
+                <p class="p-2 text-break p-in-dev-3">tracking de média</p>
             </div>
-            <div class="d-flex flex-column w-25 tmp-refacto"
-                 style="border-right: 1px solid #dee2e6">
-                <p class="p-2 bg-light tmp-refacto"
-                   style="border-bottom: 1px solid #dee2e6;
-                          height: 70px;
-                          word-break: break-all">Hébergement</p>
-                <p class="p-2 tmp-refacto"
-                   style="border-bottom: 1px solid #dee2e6;
-                          height: 100px;
-                          word-break: break-all">{{ request.site.name }}</p>
-                <p class="p-2 tmp-refacto"
-                   style="border-bottom: 1px solid #dee2e6;
-                          height: 100px;
-                          word-break: break-all">{{ request.site.name }}</p>
-                <p class="p-2 tmp-refacto"
-                   style="border-bottom: 1px solid #dee2e6;
-                          height: 100px;
-                          word-break: break-all">USA</p>
-                <p class="p-2 tmp-refacto"
-                   style="border-bottom: 1px solid #dee2e6;
-                          height: 100px;
-                          word-break: break-all">USA</p>
+            <div class="d-flex flex-column w-25 privacy-div">
+                <p class="p-2 bg-light text-break p-in-dev-1">Hébergement</p>
+                <p class="p-2 text-break p-in-dev-3">{{ request.site.name }}</p>
+                <p class="p-2 text-break p-in-dev-3">{{ request.site.name }}</p>
+                <p class="p-2 text-break p-in-dev-3">USA</p>
+                <p class="p-2 text-break p-in-dev-3">USA</p>
             </div>
-            <div class="d-flex flex-column w-25 tmp-refacto"
-                 style="border-right: 1px solid #dee2e6">
-                <p class="p-2 bg-light tmp-refacto"
-                   style="border-bottom: 1px solid #dee2e6;
-                          height: 70px;
-                          word-break: break-all">Garanties</p>
-                <p class="p-2 tmp-refacto"
-                   style="border-bottom: 1px solid #dee2e6;
-                          height: 100px;
-                          word-break: break-all">{{ request.site.name }}</p>
-                <p class="p-2 tmp-refacto"
-                   style="border-bottom: 1px solid #dee2e6;
-                          height: 100px;
-                          word-break: break-all">{{ request.site.name }}</p>
-                <p class="p-2 tmp-refacto"
-                   style="border-bottom: 1px solid #dee2e6;
-                          height: 100px;
-                          word-break: break-all">https://app.posthog.com</p>
-                <p class="p-2 tmp-refacto"
-                   style="border-bottom: 1px solid #dee2e6;
-                          height: 100px;
-                          word-break: break-all">https://policies.google.com/privacy</p>
+            <div class="d-flex flex-column w-25 privacy-div">
+                <p class="p-2 bg-light p-in-dev-1 text-break">Garanties</p>
+                <p class="p-2 p-in-dev-3 text-break">{{ request.site.name }}</p>
+                <p class="p-2 p-in-dev-3 text-break">{{ request.site.name }}</p>
+                <p class="p-2 p-in-dev-3 text-break">https://app.posthog.com</p>
+                <p class="p-2 p-in-dev-3 text-break">https://policies.google.com/privacy</p>
             </div>
         </div>
     </div>
