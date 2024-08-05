@@ -133,7 +133,7 @@
                         Projets conseillés <strong>({{ crm_user.projects_switchtended_per_site.all|length }})</strong>
                     </h5>
                     <ul class="list-unstyled">
-                        {% for switchtending in crm_user.projects_switchtended_on_site.all %}
+                        {% for switchtending in crm_user.projects_switchtended_per_site.all %}
                             {% include 'crm/project_item.html' with project=switchtending.project %}
                         {% empty %}
                             - aucun -
