@@ -231,6 +231,11 @@ class SiteConfiguration(models.Model):
         help_text="en jours",
     )
 
+    accept_handover = models.BooleanField(
+        default=True,
+        verbose_name="Accepter des propositions de projets venant d'autres portails",
+    )
+
     def __str__(self):
         return f"SiteConfiguration for '{self.site}'"
 

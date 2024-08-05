@@ -7,10 +7,11 @@ author  : raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created : 2021-05-26 13:55:23 CEST
 """
 
-
 from csvexport.actions import csvexport
 from django.contrib import admin
 from django.db.models import Count, F, Q
+from django.db.models.query import QuerySet
+from django.http import HttpRequest
 from ordered_model.admin import OrderedInlineModelAdminMixin, OrderedTabularInline
 
 from recoco.apps.tasks import models as task_models
@@ -96,6 +97,16 @@ class ProjectSwitchtenderTabularInline(admin.TabularInline):
     extra = 1
 
 
+class ProjectSiteTabularInline(admin.TabularInline):
+    model = models.ProjectSite
+    fields = (
+        "site",
+        "status",
+        "is_origin",
+    )
+    extra = 1
+
+
 @admin.register(models.Project)
 class ProjectAdmin(OrderedInlineModelAdminMixin, admin.ModelAdmin):
     search_fields = ["name"]
@@ -105,12 +116,12 @@ class ProjectAdmin(OrderedInlineModelAdminMixin, admin.ModelAdmin):
         "exclude_stats",
         "publish_to_cartofriches",
         RecommendationListFilter,
-        "status",
         "tags",
     ]
     list_display = ["created_on", "name", "location"]
     actions = [csvexport]
     inlines = (
+        ProjectSiteTabularInline,
         ProjectMemberTabularInline,
         ProjectSwitchtenderTabularInline,
         ProjectTaskTabularInline,
@@ -119,7 +130,7 @@ class ProjectAdmin(OrderedInlineModelAdminMixin, admin.ModelAdmin):
 
 @admin.register(models.UserProjectStatus)
 class UserProjectStatusAdmin(admin.ModelAdmin):
-    list_display = ["project", "user", "status"]
+    list_display = ["project", "status", "user"]
 
     list_filter = ["site"]
     list_select_related = ("project__commune", "user")
@@ -136,15 +147,57 @@ class TopicAdmin(admin.ModelAdmin):
         return o.project.name
 
 
+class ShowDeletedFilter(admin.SimpleListFilter):
+    title = "Is deleted"
+    parameter_name = "deleted"
+
+    def lookups(self, request, model_admin):
+        return (
+            ("yes", "Yes"),
+            ("no", "No"),
+        )
+
+    def queryset(self, request, queryset):
+        return queryset.filter(deleted__isnull=not (self.value() == "yes"))
+
+
 @admin.register(models.Note)
 class NoteAdmin(admin.ModelAdmin):
-    search_fields = ["content", "tags", "project__name"]
-    list_filter = ["tags", "created_on"]
-    list_display = ["created_on", "project_name", "tags"]
+    search_fields = [
+        "content",
+        "tags",
+        "project__name",
+    ]
+    list_filter = [
+        "project__sites",
+        ShowDeletedFilter,
+        "tags",
+        "created_on",
+    ]
+    list_display = [
+        "created_on",
+        "project_name",
+        "created_by",
+        "is_deleted",
+        "tags",
+    ]
     list_select_related = ("project",)
+    readonly_fields = (
+        "site",
+        "project",
+        "created_by",
+    )
 
-    def project_name(self, o):
-        return o.project.name
+    @admin.display(description="Projet")
+    def project_name(self, obj: models.Note) -> str:
+        return obj.project.name
+
+    @admin.display(description="Deleted")
+    def is_deleted(self, obj: models.Note) -> bool:
+        return obj.deleted is not None
+
+    def get_queryset(self, request: HttpRequest) -> QuerySet[models.Note]:
+        return models.Note.all_notes.all()
 
 
 @admin.register(models.Document)

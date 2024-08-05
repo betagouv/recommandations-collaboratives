@@ -40,7 +40,7 @@ def project_list_export_csv(request):
 
     projects = (
         models.Project.on_site.for_user(request.user)
-        .exclude(status="DRAFT")
+        .exclude(project_sites__status="DRAFT")
         .order_by("-created_on")
         .prefetch_related("notes", "tasks")
     )
@@ -126,7 +126,7 @@ def project_list_export_csv(request):
             [m.email for m in project.members.all()],
             project.phone,
             switchtenders_txt,
-            project.status,
+            project.project_sites.current().status,
             first_reco.created_on.date() if first_reco else "",  # First reco date
             published_tasks.exclude(status=task_models.Task.NOT_INTERESTED).count(),
             published_tasks.exclude(status=task_models.Task.NOT_INTERESTED)

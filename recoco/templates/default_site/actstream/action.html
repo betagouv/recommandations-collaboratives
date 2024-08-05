@@ -5,7 +5,7 @@
 {% get_verbs as verbs %}
 <div class="d-block font-marianne">
   <div class="d-flex align-items-start mb-2">
-    <img class="mt-1 align-middle rounded-circle d-inline-block {% if not transparent_background %}bg-white{% endif %} z-3"
+    <img class="mt-1 z-3 align-middle rounded-circle d-inline-block {% if not transparent_background %}bg-white{% endif %}"
          width="18px"
          :src='$store.utils.gravatar_url("{{ action.actor }}", 18, "{{ action.actor.first_name }}" + " " + "{{ action.actor.last_name }}")'
          data-bs-toggle="tooltip"

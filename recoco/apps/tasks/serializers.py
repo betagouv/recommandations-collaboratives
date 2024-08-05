@@ -85,6 +85,7 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer, OrderedModelSeriali
             "followups_count",
             "comments_count",
             "topic",
+            "site",
         ]
         read_only_fields = ["created_on", "updated_on", "created_by"]
 
@@ -98,6 +99,11 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer, OrderedModelSeriali
     followups_count = serializers.SerializerMethodField()
     comments_count = serializers.SerializerMethodField()
     topic = TopicSerializer(read_only=True)
+
+    site = serializers.SerializerMethodField()
+
+    def get_site(self, obj):
+        return {"name": obj.site.name, "id": obj.site.id}
 
     def get_notifications(self, obj):
         request = self.context.get("request")

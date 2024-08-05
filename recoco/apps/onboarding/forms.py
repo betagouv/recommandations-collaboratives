@@ -170,7 +170,8 @@ class OnboardingSignupForm(DsrcBaseForm):
     first_name = forms.CharField(label="Prénom *", initial="", required=True)
     last_name = forms.CharField(label="Nom *", initial="", required=True)
     org_name = forms.CharField(
-        label="Nom de votre administration ou de votre entreprise  *",
+        label="Nom de votre organisation *",
+        help_text="Si vous êtes un particulier, indiquez votre nom. Votre administration, entreprise, association. Si vous êtes un particulier, écrivez 'Particulier'.",
         initial="",
     )
     role = forms.CharField(label="Fonction *", initial="", required=True)
@@ -236,7 +237,7 @@ class OnboardingProject(DsrcBaseForm):
     location = forms.CharField(
         label="Adresse",
         required=False,
-        help_text="Si le projet n'a pas d'adresse exacte, donnez-nous une indication proche.",
+        help_text="Indiquez une adresse ou une indication pour localiser le lieu, ou laissez vide si ça n'est pas applicable.",
         initial="",
     )
     postcode = forms.CharField(label="Code postal *", initial="", required=True)
@@ -285,7 +286,8 @@ class PrefillSetuserForm(DsrcBaseForm):
     first_name = forms.CharField(label="Prénom *", initial="", required=True)
     last_name = forms.CharField(label="Nom *", initial="", required=True)
     org_name = forms.CharField(
-        label="Nom de votre administration ou de votre entreprise *",
+        label="Nom de votre organisation *",
+        help_text="Si vous êtes un particulier, indiquez votre nom. Votre administration, entreprise, association. Si vous êtes un particulier, écrivez 'Particulier'.",
         initial="",
     )
     role = forms.CharField(label="Fonction *", initial="", required=True)
@@ -346,7 +348,7 @@ class PrefillProjectForm(DsrcBaseForm):
         label="Adresse",
         initial="",
         required=False,
-        help_text="Si le projet n'a pas d'adresse exacte, donnez-nous une indication proche.",
+        help_text="Indiquez une adresse ou une indication pour localiser le lieu, ou laissez vide si ça n'est pas applicable.",
     )
     postcode = forms.CharField(label="Code postal", initial="", required=True)
 

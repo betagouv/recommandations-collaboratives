@@ -11,7 +11,7 @@
 {% block project_detail %}
     {% get_obj_perms request.user for request.site as "user_site_perms" %}
     {% get_obj_perms request.user for project as "user_project_perms" %}
-    {% get_advising_position request.user project as position %}
+    {% get_advising_position request.user project request.site as position %}
     {% is_staff_for_current_site request.user as is_staff %}
     {% include 'projects/project/navigation.html' with administration_panel=True %}
     {{ project_form.postcode.value|json_script:"projectPostcode" }}
@@ -132,7 +132,7 @@
                         <span>Inviter un conseiller</span>
                     </button>
                 {% endif %}
-                {% if project.switchtenders_on_site.all.count == 0 %}
+                {% if project.switchtender_sites.all.count == 0 %}
                     <div class="bg-light d-flex flex-column justify-content-center align-items-center py-4 rounded">
                         <p class="m-0 text-info-custom text-grey fw-normal pb-3">Le projet n'est pas encore suivi</p>
                         <svg class="bi align-baseline me-2 mt-1"
@@ -144,7 +144,7 @@
                     </div>
                 {% else %}
                     <ul class="d-flex flex-column list-unstyled mb-0">
-                        {% for advisor in project.switchtenders_on_site.all %}
+                        {% for advisor in project.switchtender_sites.all %}
                             <li class="d-flex align-items-start justify-content-between mb-1">
                                 {% include 'user/user_card.html' with user=advisor.switchtender user_activity=True %}
                                 {% if request.user == advisor.switchtender %}

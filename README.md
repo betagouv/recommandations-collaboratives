@@ -6,7 +6,7 @@
 
 Le logiciel Recoco est un outil numérique permettant d'épauler une méthodologie de
 Recommandations Collaboratives se focalisant sur les problématiques complexes et nécessitant
- de multiples expertises sur des temps longs.
+de multiples expertises sur des temps longs.
 
 Historiquement, le logiciel Recoco est issu de la mission UrbanVitaliz (équipe-projet portée
 par le CEREMA), en partenariat avec Beta.gouv.fr et sponsorisé par le Ministère
@@ -41,6 +41,7 @@ Deux choix :
 Commencez par installer `uv` sur votre machine avec pip ou votre gestionnaire de paquets. Si vous n'avez pas de moyen connu, référez vous à la page de `uv` ( https://github.com/astral-sh/uv ).
 
 Créez et sourcez l'environnement:
+
 ```sh
 uv venv
 source .venv/bin/activate
@@ -50,6 +51,7 @@ source .venv/bin/activate
 uv pip install -r requirements.txt
 uv pip install -r requirements-dev.txt
 ```
+
 #### Configuration de l'applicatif
 
 Copiez le fichier de configuration d'exemple :
@@ -75,8 +77,6 @@ DATABASES = {
 
 Vous pouvez aussi renseigner les valeurs dans le fichier si vous préférez ne pas utiliser des variables d'environnement.
 
-
-
 ### Docker
 
 Les fichiers docker se trouvent à la racine dans le dossier `docker`.
@@ -95,7 +95,6 @@ docker-compose up -d
 
 Après quelques minutes d'installation, vous devriez avoir un environnement prêt.
 
-
 #### Création de la base de donnnées
 
 Entrez dans le container `app` en tapant :
@@ -112,7 +111,7 @@ Initialisez ou synchronisez la base de données en tapant :
 
 ## Lancement de l'applicatif
 
-*Les commandes suivantes ne sont pas nécessaire si vous êtes avec Docker.*
+_Les commandes suivantes ne sont pas nécessaire si vous êtes avec Docker._
 
 Pour lancer l'applicatif en mode `développement`:
 
@@ -147,7 +146,6 @@ Puis, exécutez le backend :
 
 Vous devriez pouvoir vous connecter sur http://localhost:8000 !
 
-
 ## Chargement des données de démo
 
 ```bash
@@ -155,6 +153,7 @@ Vous devriez pouvoir vous connecter sur http://localhost:8000 !
 ```
 
 Création du premier site
+
 ```bash
 ./manage.py shell
 ```
@@ -163,6 +162,20 @@ Création du premier site
 from recoco.apps.home import utils
 site = utils.make_new_site("Example", "example.com", "sender@example.com", "Sender")
 site.aliases.create(domain="localhost", redirect_to_canonical=False)
+```
+
+## Tests
+
+### Tests Front End
+
+Merci de trouver la documentation de tests front end [ici](./frontend_tests/README.md).
+
+### Tests Back End
+
+Pour lancer les tests back end, vous pouvez utiliser la commande suivante :
+
+```sh
+pytest --create-db
 ```
 
 ## En cas de difficultés

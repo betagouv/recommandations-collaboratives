@@ -2,37 +2,32 @@
 {% load gravatar %}
 {% load sass_tags %}
 {% block css %}
-  <link href="{% sass_src 'home/css/dsfr/marianne.css' %}"
-        rel="stylesheet"
-        type="text/css">
+    <link href="{% sass_src 'home/css/dsfr/marianne.css' %}"
+          rel="stylesheet"
+          type="text/css">
 {% endblock %}
 {% load projects_extra %}
 <nav class="navbar navbar-expand-lg sticky-top navbar-light bg-white shadow-sm flex-column"
      aria-label="Main navigation"
      style="font-family: 'Marianne', arial, sans-serif;
             padding: 0">
-  {% if user.is_authenticated %}
-    <div class="navbar-border-top navbar-shadow w-100 py-2">
-      <div class="d-flex align-items-center justify-content-between w-100">
-        <div class="d-flex align-items-center ms-4">
-          {% include 'header/menu-top-logo.html' %}
-          <div>{% include "header/menu-top-secondary.html" %}</div>
+    {% if user.is_authenticated %}
+        <div class="navbar-border-top navbar-shadow w-100 py-2">
+            <div class="d-flex align-items-center justify-content-between w-100">
+                <div class="d-flex align-items-center ms-4">
+                    {% include 'header/menu-top-logo.html' %}
+                    <div>{% include "header/menu-top-secondary.html" %}</div>
+                </div>
+                <div class="bg-white">{% include 'header/menu-top-user-tools.html' %}</div>
+            </div>
         </div>
-        <div class="bg-white">{% include 'header/menu-top-user-tools.html' %}</div>
-      </div>
-    </div>
-  {% else %}
-    <div class="container-fluid me-2">
-      {% include 'header/menu-top-logo.html' %}
-      <div>
-        {% include "header/menu-top-secondary.html" %}
-      </div>
-      <div class="ms-auto me-0">
-        <div class="bg-white">{% include 'header/menu-top-user-tools.html' %}</div>
-      </div>
-    </div>
-    <!-- <div class="secondary-navbar container-fluid me-2 navbar-border-top navbar-shadow">
-      <div id="secondary-navbar" class="collapse p-2 collapsed"></div>
-    </div> -->
-  {% endif %}
+    {% else %}
+        <div class="container-fluid me-2">
+            {% include 'header/menu-top-logo.html' %}
+            <div>{% include "header/menu-top-secondary.html" %}</div>
+            <div class="ms-auto me-0">
+                <div class="bg-white">{% include 'header/menu-top-user-tools.html' %}</div>
+            </div>
+        </div>
+    {% endif %}
 </nav>

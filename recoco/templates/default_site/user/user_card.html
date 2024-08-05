@@ -6,7 +6,7 @@
 {% endblock %}
 {% load guardian_tags %}
 {% load projects_extra %}
-{% get_advising_position user project as position %}
+{% get_advising_position user project request.site as position %}
 {% get_obj_perms request.user for request.site as "user_site_perms" %}
 {% get_obj_perms request.user for project as "user_project_perms" %}
 <div x-data="User()"

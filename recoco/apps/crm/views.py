@@ -47,6 +47,7 @@ from recoco.apps.addressbook.models import Organization
 from recoco.apps.communication import api
 from recoco.apps.geomatics import models as geomatics
 from recoco.apps.home import models as home_models
+from recoco.apps.onboarding import utils as onboarding_utils
 from recoco.apps.projects.models import Project, Topic
 from recoco.apps.reminders import models as reminders_models
 from recoco.apps.tasks.models import Task
@@ -71,7 +72,9 @@ class CRMSiteDashboardView(LoginRequiredMixin, UserPassesTestMixin, TemplateView
     def get_context_data(self, *orgs, **kwargs):
         context = super().get_context_data(*orgs, **kwargs)
         context["search_form"] = forms.CRMSearchForm()
-        context["projects_waiting"] = Project.on_site.filter(status="DRAFT").count()
+        context["projects_waiting"] = Project.on_site.filter(
+            project_sites__status="DRAFT", project_sites__site=self.request.site
+        ).count()
         context["project_model"] = Project
         context["user_model"] = User
 
@@ -666,6 +669,8 @@ def project_details(request, project_id):
 
     site_config = get_site_config_or_503(request.site)
 
+    site_origin = project.project_sites.get(is_origin=True)
+
     actions = target_stream(project)
 
     user_ct = ContentType.objects.get_for_model(User)
@@ -965,7 +970,10 @@ def crm_list_projects_with_low_reach(request):
     search_form = forms.CRMSearchForm()
 
     projects = (
-        Project.on_site.filter(status__in=("READY", "IN_PROGRESS", "DONE"))
+        Project.on_site.filter(
+            project_sites__status__in=("READY", "IN_PROGRESS", "DONE"),
+            project_sites__site=request.site,
+        )
         .exclude(exclude_stats=True)
         .prefetch_related("tasks", "notes")
         .annotate(
@@ -1220,6 +1228,48 @@ def projects_activity_feed(request):
     search_form = forms.CRMSearchForm()
 
     return render(request, "crm/projects_activity_feed.html", locals())
+
+
+################
+# Project Handover to another Site
+################
+
+
+@login_required
+def project_site_handover(request, project_id):
+    has_perm_or_403(request.user, "use_crm", request.site)
+
+    project = get_object_or_404(
+        Project,
+        Q(project_sites__site=request.site) & ~Q(project_sites__status="DRAFT"),
+        pk=project_id,
+    )
+
+    available_sites = (
+        (Site.objects.filter(configuration__accept_handover=True) | project.sites.all())
+        .distinct()
+        .order_by("name")
+    )
+
+    if request.method == "POST":
+        form = forms.ProjectHandover(request.POST)
+        if form.is_valid():
+            site = form.cleaned_data["site"]
+
+            project.project_sites.create(site=site, is_origin=False, status="DRAFT")
+            onboarding_utils.notify_new_project(
+                site=site, project=project, owner=project.owner
+            )
+
+            messages.add_message(
+                request,
+                messages.SUCCESS,
+                f"Le projet {project.name} a bien été proposé au portail '{site.name}'",
+            )
+
+            return redirect(reverse("crm-project-handover", args=(project.pk,)))
+
+    return render(request, "crm/project_site_handover.html", locals())
 
 
 ########################################################################
