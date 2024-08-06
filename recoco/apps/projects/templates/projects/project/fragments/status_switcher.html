@@ -1,34 +1,33 @@
 {% load static %}
 {% load guardian_tags %}
+{% load sass_tags %}
+{% block css %}
+    <link href="{% sass_src 'projects/css/fragments/status_switcher.scss' %}"
+          rel="stylesheet"
+          type="text/css">
+{% endblock %}
 {% get_obj_perms request.user for request.site as "user_site_perms" %}
 {% get_obj_perms request.user for project as "user_project_perms" %}
 <div x-data="StatusSwitcher($refs.commentTextRef, $refs.commentTextFormRef)">
     <div @issue-followup="handleIssueFollowup($event)">
         <div class="d-flex flex-column">
-            <h2 class="text-secondary text-uppercase fw-bolder m-3 tmp-refacto"
-                style="font-size: 12px">État d'avancement actuel</h2>
+            <h2 class="text-secondary text-uppercase fw-bolder m-3 h2-fontsize">État d'avancement actuel</h2>
             {% if "use_tasks" in user_project_perms %}
-                <span class="status-switcher-item mx-3 text-white tmp-refacto"
-                      style="background-color: #14A2F1;
-                             cursor: pointer"
+                <span class="status-switcher-item mx-3 text-white specific-bgcolor need-cursor"
                       @click="handleStatusWrapper"
                       x-text="statusText($store.taskModal.currentTask.status)"></span>
                 <div class="d-flex align-items-center justify-content-center">
-                    <span class="py-2 tiny fw-bold text-center text-decoration-underline tmp-refacto"
+                    <span class="py-2 m-3 tiny fw-bold text-center text-decoration-underline need-cursor specific-color"
                           @click="handleStatusWrapper"
-                          style="color: #335B7E;
-                                 cursor: pointer"
-                          class="m-3"
                           x-text="openStatusWrapper ? 'Fermer' : 'Modifier le statut'"></span>
                 </div>
             {% else %}
-                <span class="status-switcher-item mx-3 text-white tmp-refacto"
-                      style="background-color: #14A2F1;"
+                <span class="status-switcher-item mx-3 text-white specific-bgcolor"
                       x-text="statusText($store.taskModal.currentTask.status)"></span>
             {% endif %}
         </div>
         <template x-if="openStatusWrapper">
-            <ul class="d-flex align-items-center status-switcher list-unstyled mt-0 m-3 tmp-refacto">
+            <ul class="d-flex align-items-center status-switcher list-unstyled mt-0 m-3 tmp-usevar">
                 <li x-bind:style="activeStatus($store.taskModal.currentTask, STATUSES.PROPOSED) && { pointerEvents: 'none' }">
                     <a @click="handleStatusClick($store.taskModal.currentTask, STATUSES.PROPOSED)"
                        :class="activeStatus($store.taskModal.currentTask, STATUSES.PROPOSED)">Nouveau</a>

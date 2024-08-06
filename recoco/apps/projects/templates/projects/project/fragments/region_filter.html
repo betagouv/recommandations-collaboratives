@@ -1,10 +1,15 @@
 {% load static %}
+{% load sass_tags %}
+{% block css %}
+    <link href="{% sass_src 'projects/css/region_filter.scss' %}"
+          rel="stylesheet"
+          type="text/css">
+{% endblock %}
 <div class="d-flex align-items-center ms-4">
     <span class="fr-segmented__legend inline text-nowrap">Filtrer :</span>
-    <div class="input-item position-relative active tmp-refacto"
+    <div class="input-item position-relative active specific-border"
          x-data="{ open: false }"
-         x-on:click.outside="open = false"
-         style="border: solid 1px #E5E5E5">
+         x-on:click.outside="open = false">
         <div class="d-flex align-items-center pe-4 bg-white rounded-pill"
              x-on:click="open = !open"
              type="button"

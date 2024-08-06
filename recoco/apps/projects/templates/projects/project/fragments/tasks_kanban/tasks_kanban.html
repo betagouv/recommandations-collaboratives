@@ -1,4 +1,10 @@
 {% load static %}
+{% load sass_tags %}
+{% block css %}
+    <link href="{% sass_src 'projects/css/fragments/tasks_kanban/kanban_header.scss' %}"
+          rel="stylesheet"
+          type="text/css" />
+{% endblock %}
 <!-- Index of tasks kanban app -->
 <div x-data="KanbanTasks({{ project.id }})"
      x-init="initTooltips(); loadCanAdministrate(); loadUserProjectPerms(); loadIsSwitchtender(); loadUserId();"
@@ -13,8 +19,7 @@
                         <h5 x-text="board.title" class="fs-6 fw-normal text-gray-800 mb-0"></h5>
                     </div>
                 </div>
-                <div style="height: 80vh;"
-                     class="px-2 pt-2 mt-2 pb-1 overflow-auto position-relative tmp-refacto">
+                <div class="px-2 pt-2 mt-2 pb-1 overflow-auto position-relative specific-height">
                     <template x-if="column(board.status).length === 0">
                         <div class="drag-targetable py-3"
                              @dragover="onDragOver(event, null)"
@@ -22,9 +27,7 @@
                              @dragenter="onDragEnter(event)"
                              @dragleave="onDragLeave(event)"
                              data-test-id="drag-target">
-                            <div class="drag-placeholder rounded d-flex align-items-center justify-content-center text-uppercase tmp-refacto"
-                                 style="height: 100px;
-                                        font-size: 0.8em">Glissez et déposez une fiche ici</div>
+                            <div class="drag-placeholder rounded d-flex align-items-center justify-content-center text-uppercase specific-fontsize3 specific-height2">Glissez et déposez une fiche ici</div>
                         </div>
                     </template>
                     <template x-for="(task, i) in column(board.status)" :key="task.id">

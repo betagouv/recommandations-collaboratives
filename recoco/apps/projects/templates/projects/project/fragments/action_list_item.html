@@ -1,6 +1,12 @@
 {% load static %}
 {% load gravatar %}
 {% load humanize %}
+{% load sass_tags %}
+{% block css %}
+    <link href="{% sass_src 'projects/css/action_list.scss' %}"
+          rel="stylesheet"
+          type="text/css">
+{% endblock %}
 <div id="modal-action-{{ task.id }}" class="modal fade" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content text-center">
@@ -46,8 +52,7 @@
 <div id="action-{{ task.id }}"
      class="accordion border border-1 rounded-3 mb-4 position-relative {% if task.id in actions_with_notifications %}bg-light-yellow{% endif %}">
     {% if not task.visited and task.public %}
-        <span class="position-absolute top-0 start-0 translate-middle badge rounded-pill bg-primary tmp-refacto"
-              style="margin-left: 60px">NOUVEAU</span>
+        <span class="position-absolute top-0 start-0 translate-middle badge rounded-pill bg-primary specific-margin">NOUVEAU</span>
     {% endif %}
     {% if task.id in actions_with_notifications %}
         <span class="position-absolute top-0 start-50 translate-middle badge rounded-pill bg-danger">
@@ -61,8 +66,7 @@
         </span>
     {% endif %}
     {% if not task.public %}
-        <span class="position-absolute top-0 start-0 translate-middle badge rounded-pill bg-warning tmp-refacto"
-              style="margin-left: 60px">BROUILLON</span>
+        <span class="position-absolute top-0 start-0 translate-middle badge rounded-pill bg-warning specific-margin">BROUILLON</span>
     {% endif %}
     <div class="accordion-header d-flex justify-content-between border-bottom">
         <div class="task-opening d-flex ps-4 pt-4 justify-content-between flew-grow-1 w-100 position-relative pb-4">
@@ -70,9 +74,7 @@
                 <div class="d-flex fw-bold fs-5 task-title mb-2 {% if task.closed %}text-decoration-line-through{% endif %}">
                     {% if task.resource %}
                         <!-- Icon -->
-                        <svg class="bi me-2 rounded-circle resource-icon bg-color-{{ task.resource.category.color|default:"darkgrey" }} tmp-refacto"
-                             style="width:30px;
-                                    height: 30px">
+                        <svg class="bi me-2 rounded-circle resource-icon bg-color-{{ task.resource.category.color|default:"darkgrey" }} svg-size">
                             <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#{{ task.resource.category.icon|default:"key" }}" />
                         </svg>
                     {% elif task.contact %}
@@ -305,9 +307,7 @@
                                           action="{% url 'projects-followup-task' task.id %}">
                                         {% csrf_token %}
                                         <textarea name="comment"
-                                                  style="min-height: 100px;
-                                                         border-color: #ccc"
-                                                  class="w-100 p-2 rounded rounded-4 my-1 border tmp-refacto"
+                                                  class="w-100 p-2 rounded rounded-4 my-1 border textarea-style"
                                                   placeholder="Votre message..."></textarea>
                                         <button type="submit" class="btn btn-primary">Envoyer</button>
                                     </form>

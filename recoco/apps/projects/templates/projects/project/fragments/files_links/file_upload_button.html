@@ -15,12 +15,11 @@
          x-ref="popover"
          id="popover"
          @click.outside="onOutsideClick"
-         class="rounded bg-white shadow tmp-refacto"
-         style="width: 420px">
+         class="rounded bg-white shadow specific-width">
         <form method="post" action="{{ action }}" enctype="multipart/form-data">
             {% csrf_token %}
             <div class="p-3">
-                <h6 class="text-uppercase tmp-refacto" style="font-size: 1em;">Ajouter un fichier</h6>
+                <h6 class="text-uppercase h6-fontsize">Ajouter un fichier</h6>
                 <p class="mb-2 text-info-custom text-grey-dark small">
                     Vous pouvez joindre un fichier à votre <span x-text="getString(`types.${type}`)"></span>, d'une taille maximum de 20Mo
                 </p>

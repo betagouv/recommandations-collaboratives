@@ -1,12 +1,16 @@
 {% load gravatar %}
+{% load sass_tags %}
+{% block css %}
+    <link href="{% sass_src 'projects/css/fragments/switchtender-list.scss' %}"
+          rel="stylesheet"
+          type="text/css">
+{% endblock %}
 {% for switchtender in switchtenders %}
     <div class="bg-light mt-3 p-4 d-flex flex-row align-items-center">
         <span class="align-items-center link-dark text-decoration-none flex-shrink-1">
             <img src="{% gravatar_url switchtender.email 32 %}"
                  alt="{{ switchtender.get_full_name|default:'Conseiller inconnu' }}"
-                 class="me-2 rounded-circle tmp-refacto"
-                 style="width: 32px;
-                        height: 32px" />
+                 class="me-2 rounded-circle img-size" />
         </span>
         <span class="align-middle d-flex align-items-start flex-column flex-grow-1">
             <div>

@@ -1,6 +1,12 @@
 {% load static %}
 {% load humanize %}
 {% load guardian_tags %}
+{% load sass_tags %}
+{% block css %}
+    <link href="{% sass_src 'projects/css/fragments/files_links/file_list_item.scss' %}"
+          rel="stylesheet"
+          type="text/css">
+{% endblock %}
 {% get_obj_perms request.user for request.site as "user_site_perms" %}
 {% get_obj_perms request.user for project as "user_project_perms" %}
 {% if document %}
@@ -43,8 +49,7 @@
                           action="{% url 'projects-documents-delete-document' project.pk document.pk %}">
                         {% csrf_token %}
                         <button id="file-delete-button"
-                                class="d-flex border-0 tmp-refacto"
-                                style="background: 0">
+                                class="d-flex border-0 btn-background0">
                             <svg class="bi align-baseline fill-grey" width="20" height="20">
                                 <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#trash" />
                             </svg>

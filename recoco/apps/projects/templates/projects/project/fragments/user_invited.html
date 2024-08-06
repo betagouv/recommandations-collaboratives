@@ -1,5 +1,11 @@
 {% load gravatar %}
 {% load static %}
+{% load sass_tags %}
+{% block css %}
+    <link href="{% sass_src 'projects/css/fragments/user_invited.scss' %}"
+          rel="stylesheet"
+          type="text/css">
+{% endblock %}
 <div class="d-flex flex-column align-items-start mb-2">
     <div class="w-100 d-flex align-items-center justify-content-between">
         <span class="me-2 d-flex align-items-center font-very-small">
@@ -10,7 +16,6 @@
         </span>
     </div>
     <div class="d-flex align-items-center">
-        <span class="font-very-small fst-italic fw-light tmp-refacto"
-              style="color: #666666;">invité·e par {{ invite.inviter }}</span>
+        <span class="font-very-small fst-italic fw-light specific-color">invité·e par {{ invite.inviter }}</span>
     </div>
 </div>

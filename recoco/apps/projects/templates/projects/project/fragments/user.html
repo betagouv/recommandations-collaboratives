@@ -1,6 +1,12 @@
 {% load gravatar %}
 {% load static %}
 {% load guardian_tags %}
+{% load sass_tags %}
+{% block css %}
+    <link href="{% sass_src 'projects/css/fragments/user.scss' %}"
+          rel="stylesheet"
+          type="text/css">
+{% endblock %}
 {% get_obj_perms request.user for request.site as "user_site_perms" %}
 {% get_obj_perms request.user for project as "user_project_perms" %}
 <div class="d-flex flex-column align-items-start mb-2">
@@ -37,10 +43,11 @@
             </span>
         {% endif %}
         <div class="d-flex align-items-center">
-            <span class="fst-italic fw-light tmp-refacto" style="color: #666666;">{{ member.profile.organization.name }}</span>
+            <span class="fst-italic fw-light specific-color">{{ member.profile.organization.name }}</span>
             {% if  member.profile.organization_position %}
-                <span class="ms-1 text-lowercase fst-italic fw-light tmp-refacto"
-                      style="color: #666666;">({{ member.profile.organization_position }})</span>
+                <span class="ms-1 text-lowercase fst-italic fw-light specific-color">
+                    ({{ member.profile.organization_position }})
+                </span>
             {% endif %}
         </div>
     {% endif %}

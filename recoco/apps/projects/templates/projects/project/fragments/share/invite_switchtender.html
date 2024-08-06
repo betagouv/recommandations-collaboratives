@@ -1,4 +1,10 @@
 {% load static %}
+{% load sass_tags %}
+{% block css %}
+    <link href="{% sass_src 'projects/css/fragments/share/invite.scss' %}"
+          rel="stylesheet"
+          type="text/css" />
+{% endblock %}
 <div class="modal fade"
      id="invite-switchtender-modal"
      tabindex="-1"
@@ -8,7 +14,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h6 style="font-size: 14px;" class="text-uppercase fw-bold d-block mb-0 tmp-refacto">Inviter un conseiller</h6>
+                <h6 class="text-uppercase fw-bold d-block mb-0 h6-fontsize2">Inviter un conseiller</h6>
             </div>
             <div class="modal-body">
                 <form class="form"
@@ -16,9 +22,7 @@
                       action="{% url 'projects-project-access-advisor-invite' project.pk %}"
                       method="post">
                     <div class="mb-3">
-                        <label class="form-label tmp-refacto"
-                               style="font-size: 16px;
-                                      color: #666666"
+                        <label class="form-label specific-fontsize specific-color"
                                for="invite-email">Saisissez l'adresse email de la personne à inviter</label>
                         <input id="invite-email"
                                type="email"
@@ -33,9 +37,7 @@
                            value="OBSERVER">
                     {% if source %}<input type="hidden" name="source" id="source" value="{{ source }}">{% endif %}
                     <div class="mb-3">
-                        <label style="font-size: 16px;
-                                      color: #666666"
-                               class="form-label tmp-refacto"
+                        <label class="form-label specific-fontsize specific-color"
                                for="invite-message">Message d'invitation (optionnel)</label>
                         <textarea id="invite-message"
                                   rows="8"

@@ -1,4 +1,10 @@
 {% load static %}
+{% load sass_tags %}
+{% block css %}
+    <link href="{% sass_src 'projects/css/fragments/task_inline_kanban/task_inline.scss' %}"
+          rel="stylesheet"
+          type="text/css" />
+{% endblock %}
 <template x-if="$store.tasksData.newTasks.length > 0 && !$store.djangoData.isAdvisor">
     <div data-test-id="banner-new-tasks"
          class="py-1 flag dark-blue mb-2 d-flex align-items-center justify-content-start text-white small-border-radius mt-4">
@@ -13,8 +19,7 @@
                 <span x-text="`(sur ${$store.tasksData.tasks.length} au total).`"></span>
             </h6>
             <button @click="$store.previewModal.openWithPagination()"
-                    style="color: #0063cb !important"
-                    class="button filled white small inherit fw-bold tmp-refacto">Consultez les recommandations</button>
+                    class="button filled white small inherit fw-bold specific-color">Consultez les recommandations</button>
         </div>
     </div>
 </template>

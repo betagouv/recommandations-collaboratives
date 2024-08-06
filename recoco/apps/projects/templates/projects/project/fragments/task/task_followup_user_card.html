@@ -1,5 +1,11 @@
 {% load static %}
 {% load django_vite %}
+{% load sass_tags %}
+{% block css %}
+    <link href="{% sass_src 'projects/css/fragments/task/task.scss' %}"
+          rel="stylesheet"
+          type="text/css" />
+{% endblock %}
 {% block js %}
     {% vite_asset 'js/apps/user.js' %}
 {% endblock %}
@@ -53,15 +59,12 @@
             </template>
         </div>
         <template x-if="f.who.is_active && f.who.profile.organization_position">
-            <span class="d-flex align-items-center justify-content-between text-blue font-very-small tmp-refacto"
-                  style="margin-bottom: 0.35rem;
-                         margin-top: 0.75rem">
+            <span class="d-flex align-items-center justify-content-between text-blue font-very-small specific-margin-y">
                 <div class="d-flex align-items-center">
-                    <svg class="bi align-middle me-2 tmp-refacto"
+                    <svg class="bi align-middle me-2 specific-ml"
                          width="18"
                          height="18"
-                         fill="currentColor"
-                         style="margin-left: 0.12rem">
+                         fill="currentColor">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#briefcase" />
                     </svg>
                     <span class="text-decoration-none text-blue"
@@ -112,8 +115,7 @@
                 </span>
             </template>
             <template x-if="!f.who.is_active">
-                <span style="border-radius: 2px"
-                      class="p-1 px-2 font-very-small bg-grey-light w-100 d-flex mt-1 text-nowrap tmp-refacto">Compte desactivé depuis le {{ user.profile.deleted }}</span>
+                <span class="p-1 px-2 font-very-small bg-grey-light w-100 d-flex mt-1 text-nowrap specific-border-radius">Compte desactivé depuis le {{ user.profile.deleted }}</span>
             </template>
         </div>
     </div>

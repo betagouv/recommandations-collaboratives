@@ -1,10 +1,15 @@
 {% load static %}
+{% load sass_tags %}
+{% block css %}
+    <link href="{% sass_src 'projects/css/fragments/task/task.scss' %}"
+          rel="stylesheet"
+          type="text/css" />
+{% endblock %}
 <div class="d-flex align-items-center position-relative">
     <template x-if="i > 0">
         <button id="task-move-above"
-                class="border tiny d-flex align-items-center justify-content-center px-2 py-2 me-1 hover-bg-grey tmp-refacto-pointer"
-                @click.stop="handleMove('above',task, column(board.status)[i - 1])"
-                style="cursor: pointer">
+                class="border tiny d-flex align-items-center justify-content-center px-2 py-2 me-1 hover-bg-grey need-cursor"
+                @click.stop="handleMove('above',task, column(board.status)[i - 1])">
             <svg class="bi" width="13px" height="13px" fill="#929292">
                 <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#arrow-up" />
             </svg>
@@ -12,10 +17,9 @@
     </template>
     <template x-if="i < column(board.status).length - 1">
         <button id="task-move-below"
-                class="border tiny d-flex align-items-center justify-content-center px-2 py-2 me-1 hover-bg-grey tmp-refacto-pointer"
+                class="border tiny d-flex align-items-center justify-content-center px-2 py-2 me-1 hover-bg-grey need-cursor"
                 @click.stop="handleMove('below',task, column(board.status)[i + 1])"
-                :class="{'active':open}"
-                style="cursor: pointer">
+                :class="{'active':open}">
             <svg class="bi" width="13px" height="13px" fill="#929292">
                 <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#arrow-down" />
             </svg>

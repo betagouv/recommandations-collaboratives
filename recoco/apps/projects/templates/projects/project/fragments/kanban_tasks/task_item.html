@@ -1,5 +1,11 @@
 {% load static %}
 {% load guardian_tags %}
+{% load sass_tags %}
+{% block css %}
+    <link href="{% sass_src 'projects/css/fragments/kanban_tasks/task_item.scss' %}"
+          rel="stylesheet"
+          type="text/css" />
+{% endblock %}
 {% get_obj_perms request.user for request.site as "user_site_perms" %}
 {% get_obj_perms request.user for project as "user_project_perms" %}
 <div :id="t.uuid"
@@ -13,27 +19,21 @@
          @dragstart="onDragStart(event, t.uuid)"
          @dragend="onDragEnd(event)">
         <template x-if="t.notifications.count > 0">
-            <span class="position-absolute translate-middle top-0 start-100 badge rounded-circle bg-danger fw-bold tmp-refacto"
-                  style="font-size: 0.7em"
+            <span class="position-absolute translate-middle top-0 start-100 badge rounded-circle bg-danger fw-bold specific-fontsize"
                   x-text="t.notifications.count"></span>
         </template>
-        <div class="position-absolute top-0 left-0 d-flex tmp-refacto"
-             style="margin: -10px 0 0 5px">
+        <div class="position-absolute top-0 left-0 d-flex specific-margin">
             <template x-if="!t.public && !isArchivedStatus(t.status)">
-                <span class="rounded-pill px-2 bg-warning z-index-dropdown text-uppercase fw-bold text-white tmp-refacto"
-                      style="font-size: 0.7em">Brouillon</span>
+                <span class="rounded-pill px-2 bg-warning z-index-dropdown text-uppercase fw-bold text-white specific-fontsize">Brouillon</span>
             </template>
             <template x-if="t.public && !t.visited && !isArchivedStatus(t.status)">
-                <span class="rounded-pill px-2 bg-primary z-index-dropdown text-uppercase fw-bold text-white tmp-refacto"
-                      style="font-size: 0.7em">Nouveau</span>
+                <span class="rounded-pill px-2 bg-primary z-index-dropdown text-uppercase fw-bold text-white specific-fontsize">Nouveau</span>
             </template>
             <template x-if="t.status === STATUSES.DONE || t.status === STATUSES.ALREADY_DONE">
-                <span class="rounded-pill px-2 bg-success z-index-dropdown text-uppercase fw-bold text-white tmp-refacto"
-                      style="font-size: 0.7em">Fait</span>
+                <span class="rounded-pill px-2 bg-success z-index-dropdown text-uppercase fw-bold text-white specific-fontsize">Fait</span>
             </template>
             <template x-if="t.status === STATUSES.NOT_INTERESTED">
-                <span class="rounded-pill px-2 bg-secondary z-index-dropdown text-uppercase fw-bold text-white tmp-refacto"
-                      style="font-size: 0.7em">Non applicable</span>
+                <span class="rounded-pill px-2 bg-secondary z-index-dropdown text-uppercase fw-bold text-white specific-fontsize">Non applicable</span>
             </template>
         </div>
         <div class="p-2">
@@ -42,9 +42,8 @@
                     {% if "use_tasks" in user_project_perms and not disable_edit %}
                         <div>
                             <template x-if="i > 0">
-                                <a class="d-block p-1 tmp-refacto"
-                                   @click="$store.tasksData.moveAbove(t, column(board.status)[i - 1])"
-                                   style="cursor: pointer">
+                                <a class="d-block p-1 need-cursor"
+                                   @click="$store.tasksData.moveAbove(t, column(board.status)[i - 1])">
                                     <svg class="aling-middle bi ms-1"
                                          width="12px"
                                          height="12px"
@@ -54,9 +53,8 @@
                                 </a>
                             </template>
                             <template x-if="i < (column(board.status).length - 1)">
-                                <a class="d-block p-1 tmp-refacto"
-                                   @click="$store.tasksData.moveBelow(t, column(board.status)[i + 1])"
-                                   style="cursor: pointer">
+                                <a class="d-block p-1 need-cursor"
+                                   @click="$store.tasksData.moveBelow(t, column(board.status)[i + 1])">
                                     <svg class="aling-middle bi ms-1"
                                          width="12px"
                                          height="12px"
@@ -68,10 +66,7 @@
                         </div>
                         {% if is_switchtender %}
                             <template x-if="t.status < 3 && t.public">
-                                <div class="me-2 text-danger d-flex d-flex flex-column justify-content-center align-items-center archive-cta tmp-refacto"
-                                     style="background-color: rgba(0, 0, 0, 0.05);
-                                            border-radius: 5px;
-                                            cursor: pointer"
+                                <div class="me-2 text-danger d-flex d-flex flex-column justify-content-center align-items-center archive-cta need-cursor div-style"
                                      data-bs-toggle="tooltip"
                                      data-bs-placement="bottom"
                                      :title="toArchiveTooltip()"
@@ -79,8 +74,7 @@
                                     <svg class="aling-middle bi" width="25px" height="25px" fill="green">
                                         <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#check" />
                                     </svg>
-                                    <svg class="aling-middle bi tmp-refacto"
-                                         style="margin: 3px 0"
+                                    <svg class="aling-middle bi svg-specific-margin"
                                          width="16px"
                                          height="16px"
                                          fill="currentColor">
@@ -91,10 +85,8 @@
                         {% endif %}
                     {% endif %}
                 </div>
-                <div class="flex-fill mt-1 ms-2 tmp-refacto"
-                     @click="onPreviewClick(t.id)"
-                     style="cursor: pointer;
-                            font-size: 0.9em">
+                <div class="flex-fill mt-1 ms-2 need-cursor specific-fontsize2"
+                     @click="onPreviewClick(t.id)">
                     <h6 class="mb-0 fw-bold" x-text="t.intent"></h6>
                     <div class="rounded bg-light p-2 my-2"
                          :class="canAdministrate && t.content === '' && 'border border-warning'">
@@ -115,28 +107,24 @@
                                      :title="`${t.created_by.first_name} ${t.created_by.last_name}`"
                                      tabindex="0" />
                                 <span :class="!t.created_by.is_active && 'inactive-status'"
-                                      class="ms-1 fst-italic tmp-refacto"
-                                      x-text="`${t.created_by.first_name} ${t.created_by.last_name}`"
-                                      style="line-height: 20px"></span>
+                                      class="ms-1 fst-italic specific-lineheight"
+                                      x-text="`${t.created_by.first_name} ${t.created_by.last_name}`"></span>
                                 <template x-if="t.created_by.profile.organization">
                                     <span x-text="t.created_by.profile.organization.name"
                                           class="fst-italic text-muted"></span>
                                 </template>
-                                <span class="ms-2 text-muted tmp-refacto"
-                                      x-text="`le ${formatDate(t.created_on)}`"
-                                      style="line-height: 20px"></span>
+                                <span class="ms-2 text-muted specific-lineheight"
+                                      x-text="`le ${formatDate(t.created_on)}`"></span>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="border-top p-2 d-flex justify-content-between tmp-refacto"
-             style="font-size: 0.8em">
+        <div class="border-top p-2 d-flex justify-content-between specific-fontsize3">
             <div class="d-flex align-items-center">
-                <div class="text-primary position-relative tmp-refacto"
-                     @click="onPreviewClick(t.id)"
-                     style="cursor: pointer">
+                <div class="text-primary position-relative need-cursor"
+                     @click="onPreviewClick(t.id)">
                     <svg class="bi ms-1" width="16px" height="16px" fill="currentColor">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#chat" />
                     </svg>
@@ -145,14 +133,13 @@
             </div>
             <div class="d-flex align-items-center"
                  x-data="{ hasReminders: t.reminders.length > 0, reminder: t.reminders[0] }">
-                <div class="me-2 tmp-refacto"
+                <div class="me-2 tmp-usevar need-cursor"
                      :class="hasReminders ? 'text-primary' : 'text-muted'"
                      :style="isOldReminder(t.reminders[0]) ? 'color:#6c757d !important;' : ''"
                      data-bs-toggle="tooltip"
                      data-bs-placement="bottom"
                      :title="reminderTooltip(t)"
-                     @click="onReminderClick(t.id)"
-                     style="cursor: pointer">
+                     @click="onReminderClick(t.id)">
                     <svg class="aling-middle bi ms-1"
                          width="16px"
                          height="16px"
@@ -175,15 +162,13 @@
                             </li>
                             <template x-if="t.content !== '' && !t.public">
                                 <li>
-                                    <a class="dropdown-item tmp-refacto"
-                                       style="cursor: pointer"
+                                    <a class="dropdown-item need-cursor"
                                        @click="onSetTaskPublic(t.id, true)">Publier</a>
                                 </li>
                             </template>
                             <template x-if="t.public">
                                 <li>
-                                    <a class="dropdown-item tmp-refacto"
-                                       style="cursor: pointer"
+                                    <a class="dropdown-item need-cursor"
                                        @click="onSetTaskPublic(t.id, false)">Passer en
                                     brouillon</a>
                                 </li>
@@ -199,8 +184,7 @@
                                    task-
                                    t.id
                                    -delete-button
-                                   class="dropdown-item text-danger tmp-refacto"
-                                   style="cursor: pointer"
+                                   class="dropdown-item text-danger need-cursor"
                                    @click="openDeleteTaskConfirmationModal(t)">Supprimer</a>
                             </li>
                         </ul>

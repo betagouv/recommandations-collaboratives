@@ -1,4 +1,10 @@
 {% load static %}
+{% load sass_tags %}
+{% block css %}
+    <link href="{% sass_src 'projects/css/fragments/share/invite.scss' %}"
+          rel="stylesheet"
+          type="text/css" />
+{% endblock %}
 <div class="modal fade"
      id="invite-member-modal"
      tabindex="-1"
@@ -8,7 +14,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h6 style="font-size: 22px;" class="fw-bold d-block mb-0 tmp-refacto">Inviter un membre de la collectivité</h6>
+                <h6 class="fw-bold d-block mb-0 h6-fontsize">Inviter un membre de la collectivité</h6>
             </div>
             <div class="modal-body">
                 <form class="form"
@@ -16,9 +22,7 @@
                       action="{% url 'projects-project-access-collectivity-invite' project.pk %}"
                       method="post">
                     <div class="mb-3">
-                        <label class="form-label tmp-refacto"
-                               style="font-size: 16px;
-                                      color: #666666"
+                        <label class="form-label specific-fontsize specific-color"
                                for="invite-email">Saisissez l'adresse email de la personne à inviter</label>
                         <input id="invite-email"
                                type="email"
@@ -35,7 +39,7 @@
                     <div class="mb-3">
                         <label style="font-size: 16px;
                                       color: #666666"
-                               class="form-label tmp-refacto"
+                               class="form-label specific-fontsize specific-color"
                                for="invite-message">Message d'invitation (optionnel)</label>
                         <textarea id="invite-message"
                                   rows="8"

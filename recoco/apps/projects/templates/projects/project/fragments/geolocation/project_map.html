@@ -1,4 +1,10 @@
 {% load static %}
+{% load sass_tags %}
+{% block css %}
+    <link href="{% sass_src 'projects/css/fragments/geolocation/project_map.scss' %}"
+          rel="stylesheet"
+          type="text/css" />
+{% endblock %}
 {% load django_vite %}
 {{ project.name|json_script:"nameProject" }}
 {{ project.status|json_script:"status" }}
@@ -42,9 +48,8 @@
         </div>
         {% if controls == True %}
             <div class="map-overlay">
-                <a style="cursor: pointer"
-                   @click="openProjectMapModal"
-                   class="open-map-modal-button tmp-refacto"
+                <a @click="openProjectMapModal"
+                   class="open-map-modal-button need-cursor"
                    data-test-id="toggle-open-map-modal">
                     <svg width="32"
                          height="32"

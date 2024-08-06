@@ -1,6 +1,12 @@
 {% load static %}
 {% load gravatar %}
 {% load guardian_tags %}
+{% load sass_tags %}
+{% block css %}
+    <link href="{% sass_src 'projects/css/project_owner.scss' %}"
+          rel="stylesheet"
+          type="text/css">
+{% endblock %}
 {% get_obj_perms request.user for request.site as "user_site_perms" %}
 {% get_obj_perms request.user for project as "user_project_perms" %}
 {% if project.owner %}
@@ -18,7 +24,7 @@
                 </strong>
             </div>
         </span>
-        <span class="project-card--orgname fw-light tmp-refacto" style="color: #666666;">
+        <span class="project-card--orgname fw-light specific-color">
             {% if project.owner.profile.organization.name %}
                 {{ project.owner.profile.organization.name }}
             {% else %}
@@ -44,6 +50,6 @@
                 {{ project.last_name }}
             </strong>
         </span>
-        <span class="project-card--orgname fw-light tmp-refacto-color" style="color: #666666;">{{ project.org_name }}</span>
+        <span class="project-card--orgname fw-light specific-color">{{ project.org_name }}</span>
     </div>
 {% endif %}

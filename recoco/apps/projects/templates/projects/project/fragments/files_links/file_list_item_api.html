@@ -1,6 +1,12 @@
 {% load static %}
 {% load humanize %}
 {% load guardian_tags %}
+{% load sass_tags %}
+{% block css %}
+    <link href="{% sass_src 'projects/css/fragments/files_links/file_list_item.scss' %}"
+          rel="stylesheet"
+          type="text/css">
+{% endblock %}
 {% get_obj_perms request.user for request.site as "user_site_perms" %}
 {% get_obj_perms request.user for project as "user_project_perms" %}
 <div class="mb-3">
@@ -13,8 +19,8 @@
                 <svg class="bi align-baseline me-2" width="17" height="17" fill="#222">
                     <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#file-earmark" />
                 </svg>
-                <span class="text-info-custom text-black fw-medium text-truncate tmp-refacto"
-                      style="max-width: 200px"
+                <span class="text-info-custom text-black fw-medium text-truncate specific-maxwidth"
+                      style=""
                       x-text="document.filename"></span>
             </a>
         </div>

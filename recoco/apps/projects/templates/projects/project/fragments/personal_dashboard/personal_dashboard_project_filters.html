@@ -1,4 +1,10 @@
 {% load static %}
+{% load sass_tags %}
+{% block css %}
+    <link href="{% sass_src 'projects/css/fragments/personnal_dashboard/personnal_dashboard.scss' %}"
+          rel="stylesheet"
+          type="text/css" />
+{% endblock %}
 <div class="d-flex align-items-center mb-4 mt-4 w-100 justify-content-between projects-filters-container">
     <div class="d-flex align-items-center">
         <div class="d-flex align-items-center ms-4 projects-filters-territory">
@@ -65,11 +71,9 @@
         <div class="input-item bg-white">
             <select x-model="select"
                     x-on:input.change="handleProjectsSelect"
-                    class="input-field px-3 fw-normal text-dark appearance-none z-2 tmp-refacto"
+                    class="input-field px-3 fw-normal text-dark appearance-none z-2 specific-background specific-pr"
                     name="projects-select"
-                    id="projects-select"
-                    style="padding-right: 40px !important;
-                           background-color: transparent">
+                    id="projects-select">
                 <option value="date">Date de dépôt</option>
                 <option value="commune-name">Nom de la commune</option>
                 <option value="insee">Code INSEE</option>

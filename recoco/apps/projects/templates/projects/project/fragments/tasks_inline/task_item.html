@@ -1,6 +1,12 @@
 {% load static %}
 {% load gravatar %}
 {% load guardian_tags %}
+{% load sass_tags %}
+{% block css %}
+    <link href="{% sass_src 'projects/css/fragments/task_inline/task.scss' %}"
+          rel="stylesheet"
+          type="text/css" />
+{% endblock %}
 {% get_obj_perms request.user for request.site as "user_site_perms" %}
 {% get_obj_perms request.user for project as "user_project_perms" %}
 <div x-data="Task(task)"
@@ -9,13 +15,11 @@
      @click="handleOpenPreviewModal()"
      :id="task.id">
     <div x-show="task.isLoading"
-         class="ms-2 item-loader z-1 tmp-refacto"
-         style="width: 24px;
-                height: 24px">
+         class="ms-2 item-loader z-1 specific-size">
         <div class="spinner-border spinner-border spinner-border-sm text-primary"
              role="status"></div>
     </div>
-    <div class="d-flex flex-column flex-grow-1 ease-transition tmp-refacto"
+    <div class="d-flex flex-column flex-grow-1 ease-transition tmp-usevar"
          :style="task.isLoading && 'opacity:0.3';">
         <div class="card-top-information d-flex align-items-center">
             <template x-if="!task.visited && task.public">
@@ -87,9 +91,8 @@
                 </div>
             </div>
             <div class="tiny d-flex align-items-center">
-                <span class="text-muted me-1 tmp-refacto"
-                      x-text="`Émis le ${formatDate(task.created_on)}`"
-                      style="line-height: 20px"></span>
+                <span class="text-muted me-1 specific-lineheight"
+                      x-text="`Émis le ${formatDate(task.created_on)}`"></span>
                 {% include 'projects/project/fragments/task/task_user_card.html' %}
             </div>
         </footer>

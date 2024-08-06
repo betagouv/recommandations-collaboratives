@@ -1,6 +1,12 @@
 {% load static %}
 {% load humanize %}
 {% load guardian_tags %}
+{% load sass_tags %}
+{% block css %}
+    <link href="{% sass_src 'projects/css/fragments/sidebar.scss' %}"
+          rel="stylesheet"
+          type="text/css">
+{% endblock %}
 {% get_obj_perms request.user for request.site as "user_site_perms" %}
 {% get_obj_perms request.user for project as "user_project_perms" %}
 <div class="project-header-sidebar d-grid gap-2">
@@ -47,12 +53,11 @@
     {% endif %}
     {% if 'actions' not in url_name and 'conversations' not in url_name and 'internal-followup' not in url_name %}
         {% if project.status == 'DRAFT' %}
-            <button style="cursor: pointer"
-                    @click="openPublicShareModal"
+            <button @click="openPublicShareModal"
                     data-toggle="modal"
                     data-target="#publicShareModal"
                     disabled
-                    class="button btn btn-outline-primary btn-sm btn-sm--header disabled tmp-refacto">
+                    class="button btn btn-outline-primary btn-sm btn-sm--header disabled need-cursor">
                 <svg class="bi align-middle" width="18" height="18" fill="currentColor">
                     <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#lock-fill" />
                 </svg>
@@ -60,11 +65,10 @@
                 <span>Partager l'état des lieux</span>
             </button>
         {% else %}
-            <button style="cursor: pointer"
-                    @click="openPublicShareModal"
+            <button @click="openPublicShareModal"
                     data-toggle="modal"
                     data-target="#publicShareModal"
-                    class="button btn btn-outline-primary btn-sm btn-sm--header tmp-refacto">
+                    class="button btn btn-outline-primary btn-sm btn-sm--header need-cursor">
                 <span>Partager l'état des lieux</span>
             </button>
         {% endif %}

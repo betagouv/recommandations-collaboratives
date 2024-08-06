@@ -8,6 +8,11 @@
 {% block js %}
     {% vite_asset 'js/apps/projectAdministration.js' %}
 {% endblock %}
+{% block css %}
+    <link href="{% sass_src 'projects/css/administration.scss' %}"
+          rel="stylesheet"
+          type="text/css">
+{% endblock css %}
 {% block project_detail %}
     {% get_obj_perms request.user for request.site as "user_site_perms" %}
     {% get_obj_perms request.user for project as "user_project_perms" %}
@@ -60,8 +65,7 @@
                             <label class="text-info-custom text-grey-dark"
                                    for="input-project-description">{{ project_form.description.label }}</label>
                             <textarea maxlength="500"
-                                      class="placeholder-grey form-control {% if project_form.description.errors %}is-invalid{% endif %} tmp-refacto"
-                                      style="height: 100px"
+                                      class="placeholder-grey form-control {% if project_form.description.errors %}is-invalid{% endif %} textarea-size"
                                       id="input-project-description"
                                       name="{{ project_form.description.name }}"
                                       placeholder="">{{ project_form.description.value|default:'' }}</textarea>
@@ -92,10 +96,9 @@
                             <label class="text-info-custom text-grey-dark" for="input-project-address">{{ project_form.insee.label }}</label>
                             <select required
                                     :style="cities && cities.length == 0 && postal ? 'background-color:#e9ecef;pointer-events:none;padding: 12px 10px; border-radius: 0.25rem;min-width: 170px;padding-right: 30px;' : 'padding: 12px 10px; border-radius: 0.25rem;min-width: 170px;padding-right: 30px;' "
-                                    style=""
                                     x-ref="insee"
                                     name="insee"
-                                    class="form-select tmp-refacto">
+                                    class="form-select tmp-usevar">
                                 <template x-if="cities && cities.length > 0">
                                     <template x-for="city in cities" :key="city.insee">
                                         <option :value="city.insee" x-text="city.name"></option>
@@ -118,11 +121,10 @@
             <div class="col">
                 <p class="text-info-custom mb-2">Équipe de suivi</p>
                 {% if "invite_advisors" in user_project_perms %}
-                    <button style="cursor: pointer"
-                            @click="openInviteSwitchtenderModal"
+                    <button @click="openInviteSwitchtenderModal"
                             data-toggle="modal"
                             data-target="#InviteSwitchtenderModal"
-                            class="{% if project.status == 'DRAFT' %} disabled{% endif %} button d-inline-flex justify-content-center w-100 mb-4 tmp-refacto">
+                            class="{% if project.status == 'DRAFT' %} disabled{% endif %} button d-inline-flex justify-content-center w-100 mb-4 need-cursor">
                         {% if project.status == 'DRAFT' %}
                             <svg class="bi align-middle" width="18" height="18" fill="currentColor">
                                 <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#lock-fill" />
@@ -180,11 +182,10 @@
             <div class="col">
                 <p class="text-info-custom mb-2">Membres de la collectivité</p>
                 {% if "invite_collaborators" in user_project_perms %}
-                    <button style="cursor: pointer"
-                            @click="openInviteMemberModal"
+                    <button @click="openInviteMemberModal"
                             data-toggle="modal"
                             data-target="#InviteMemberModal"
-                            class="{% if project.status == 'DRAFT' %} disabled{% endif %} button d-inline-flex justify-content-center w-100 mb-4 tmp-refacto">
+                            class="{% if project.status == 'DRAFT' %} disabled{% endif %} button d-inline-flex justify-content-center w-100 mb-4 need-cursor">
                         {% if project.status == 'DRAFT' %}
                             <svg class="bi align-middle" width="18" height="18" fill="currentColor">
                                 <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#lock-fill" />
@@ -198,8 +199,7 @@
                         {% if pm.is_owner %}
                             <li class="d-flex align-items-start justify-content-between mb-1">
                                 {% include 'user/user_card.html' with user=pm.member project_owner=True user_activity=True %}
-                                <span class="ms-1 text-lowercase fst-italic font-weight-light tmp-refacto"
-                                      style="color: #666666;">Référent du projet</span>
+                                <span class="ms-1 text-lowercase fst-italic font-weight-light specific-color">Référent du projet</span>
                             </li>
                         {% else %}
                             <li class="d-flex align-items-start justify-content-between mb-1">

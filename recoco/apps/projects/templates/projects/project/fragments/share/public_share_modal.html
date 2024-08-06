@@ -1,4 +1,10 @@
 {% load static %}
+{% load sass_tags %}
+{% block css %}
+    <link href="{% sass_src 'projects/css/fragments/share/invite.scss' %}"
+          rel="stylesheet"
+          type="text/css" />
+{% endblock %}
 <div class="modal fade"
      id="public-share-modal"
      tabindex="-1"
@@ -8,11 +14,11 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h6 style="font-size: 14px;" class="text-uppercase fw-bold d-block mb-0 tmp-refacto">Partager l'état des lieux</h6>
+                <h6 class="text-uppercase fw-bold d-block mb-0 h6-fontsize2">Partager l'état des lieux</h6>
             </div>
             <div class="modal-body">
                 <div>
-                    <p class="fw-light tmp-refacto" style="color: #929292;">
+                    <p class="fw-light specific-color2">
                         Partagez ce lien pour donner accès en lecture seule à la page État des lieux
                     </p>
                     <div x-data="AccessUpdate('{{ request.scheme }}://{{ request.get_host }}{% url 'projects-project-sharing-link' project.ro_key %}')"

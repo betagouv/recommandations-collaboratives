@@ -13,12 +13,11 @@
          x-ref="popover"
          id="link-popover"
          @click.outside="onOutsideClick"
-         class="rounded bg-white shadow tmp-refacto"
-         style="width: 420px">
+         class="rounded bg-white shadow specific-width">
         <form method="post" action="{{ action }}" enctype="multipart/form-data">
             {% csrf_token %}
             <div class="p-3">
-                <h6 class="text-uppercase tmp-refacto" style="font-size: 1em;">Épingler un lien</h6>
+                <h6 class="text-uppercase h6-fontsize">Épingler un lien</h6>
                 <div class="mb-2 pt-3">
                     <label class="d-block">
                         <span class="mb-1 d-block text-info-custom text-grey-dark">Titre du lien</span>

@@ -4,9 +4,13 @@
 {% endblock %}
 {% load survey %}
 {% load static %}
-<span style="font-size: 16px;
-             margin-top: 50px"
-      class="d-block text-uppercase fw-bold mb-2 knowledge-title tmp-refacto">Éléments renseignés par la collectivité</span>
+{% load sass_tags %}
+{% block css %}
+    <link href="{% sass_src 'projects/css/fragments/survey_grid.scss' %}"
+          rel="stylesheet"
+          type="text/css">
+{% endblock %}
+<span class="d-block text-uppercase fw-bold mb-2 knowledge-title specific-mt span-fontsize">Éléments renseignés par la collectivité</span>
 <div class="row g-0 masonry-wrapper"
      data-masonry='{"percentPosition": true, "transitionDuration": 0 }'>
     <div class="col-12 col-xl-4 col-md-6 p-2 masonry-item">
