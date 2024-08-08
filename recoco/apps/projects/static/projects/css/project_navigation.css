@@ -111,3 +111,7 @@
   margin: 0;
   transform: translate3d(0, -4px, 0);
 }
+
+.specific-padding {
+  padding: 0;
+}

@@ -1,8 +1,13 @@
 {% load static %}
+{% load sass_tags %}
+{% block css %}
+  <link href="{% sass_src 'css/user/card_contact_horizontal.scss' %}"
+        rel="stylesheet"
+        type="text/css">
+{% endblock %}
 {% load phone_filters %}
 <!-- Horizontal Card -->
-<div class="card-resource card-resource-horizontal card h-100 w-100"
-     style="min-height: 100px">
+<div class="card-resource card-resource-horizontal card h-100 w-100 specific-minheight">
     <!-- <hr class="middle-hr" /> -->
     <div class="card-body">
         <div class="card-title mb-3">

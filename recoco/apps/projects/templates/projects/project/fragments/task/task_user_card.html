@@ -115,8 +115,7 @@
                 </span>
             </template>
             <template x-if="!currentUser.is_active">
-                <span style="border-radius: 2px"
-                      class="p-1 px-2 font-very-small bg-grey-light w-100 d-flex mt-1 text-nowrap specific-border-radius">Compte desactivé depuis le {{ user.profile.deleted }}</span>
+                <span class="p-1 px-2 font-very-small bg-grey-light w-100 d-flex mt-1 text-nowrap specific-border-radius">Compte desactivé depuis le {{ user.profile.deleted }}</span>
             </template>
         </div>
     </div>

@@ -8,6 +8,12 @@
 {% load guardian_tags %}
 {% load projects_extra %}
 {% load common_tags %}
+{% block css %}
+    <link href="{% sass_src 'crm/css/site_dashboard.scss' %}"
+          rel="stylesheet"
+          type="text/css">
+    <style>
+{% endblock %}
 {% block js %}
     {% vite_asset 'js/apps/crm.js' %}
 {% endblock %}
@@ -30,9 +36,7 @@
                         <span class="fs-3">
                             <img src="{% gravatar_url user.email 40 %}"
                                  alt="{{ user.get_full_name }}"
-                                 class="me-2 rounded-circle align-middle"
-                                 style="width: 40px;
-                                        height: 40px" />
+                                 class="me-2 rounded-circle align-middle img-specific-size" />
                             <span class="align-middle">Salut, {{ request.user.first_name|default:request.user.username }} !</span>
                         </span>
                     </h3>

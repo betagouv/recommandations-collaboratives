@@ -6,7 +6,7 @@
     <div class="d-flex align-items-center">
         {% if obj.deleted %}
             <a href="{% url 'crm-project-details' obj.pk %}"
-               style="text-decoration: line-through">{{ obj.name }}</a>
+               class="text-decoration-line-through">{{ obj.name }}</a>
         {% elif obj.inactive_since %}
             <a href="{% url 'crm-project-details' obj.pk %}">[EN PAUSE] {{ obj.name }}</a>
         {% else %}

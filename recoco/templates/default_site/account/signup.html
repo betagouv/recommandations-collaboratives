@@ -6,11 +6,13 @@
   {% trans "Signup" %}
 {% endblock %}
 {% block css %}
-
   <link href="{% sass_src 'home/css/dsfr/custom-dsfr.scss' %}"
         rel="stylesheet"
         type="text/css">
   <link href="{% sass_src 'home/css/auth/auth.css' %}"
+        rel="stylesheet"
+        type="text/css">
+  <link href="{% sass_src 'css/account/login.css' %}"
         rel="stylesheet"
         type="text/css">
 {% endblock %}
@@ -84,11 +86,7 @@
         </div>
       </fieldset>
     </form>
-    <hr class="tmp-refacto"
-        style="height: 1px;
-               margin-top: 45px;
-               background-color: grey!important;
-               background-image: none" />
+    <hr class="specific-hr" />
     <div class="fr-form-group fr-mt-14v">
       <fieldset class="fr-fieldset d-flex flex-column align-items-center justify-content-center">
         <h4 class="fr-mb-2w d-block ">Vous avez déjà un compte chez nous ?</h4>
@@ -102,9 +100,5 @@
       </fieldset>
     </div>
   </div>
-  <hr class="tmp-refacto"
-      style="height: 1px;
-             margin-bottom: 20px;
-             background-color: grey!important;
-             background-image: none" />
+  <hr class="specific-hr2" />
 {% endblock %}

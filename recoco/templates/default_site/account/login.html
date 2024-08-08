@@ -7,17 +7,18 @@
 {% endblock head_title %}
 {% block title %}Connexion{% endblock title %}
 {% block og_title %}Connexion{% endblock og_title %}
-
 {% load django_vite %}
 {% block js %}
   {% vite_asset 'js/apps/auth.js' %}
 {% endblock js %}
 {% block css %}
-
   <link href="{% sass_src 'home/css/dsfr/custom-dsfr.scss' %}"
         rel="stylesheet"
         type="text/css">
   <link href="{% sass_src 'home/css/auth/auth.css' %}"
+        rel="stylesheet"
+        type="text/css">
+  <link href="{% sass_src 'css/account/login.css' %}"
         rel="stylesheet"
         type="text/css">
 {% endblock %}
@@ -67,11 +68,7 @@
           </div>
         </fieldset>
       </form>
-      <hr class="tmp-refacto"
-          style="height: 1px;
-                 margin-top: 45px;
-                 background-color: grey!important;
-                 background-image: none" />
+      <hr class="specific-hr" />
       <div class="d-flex justify-content-center align-items-center fr-mt-14v">
         <div class="fr-form-group text-center">
           <fieldset class="fr-fieldset">
@@ -87,9 +84,5 @@
       </div>
     </div>
   </div>
-  <hr class="tmp-refacto"
-      style="height: 1px;
-             margin-bottom: 20px;
-             background-color: grey!important;
-             background-image: none" />
+  <hr class="specific-hr2" />
 {% endblock %}

@@ -1,4 +1,10 @@
 {% load static %}
+{% load sass_tags %}
+{% block css %}
+  <link href="{% sass_src 'css/header/header.scss' %}"
+        rel="stylesheet"
+        type="text/css">
+{% endblock %}
 {% if user.is_authenticated and request.site.configuration.logo_small %}
      <a href="{% url 'home' %}"
         class="d-flex align-middle align-items-center">
@@ -10,7 +16,7 @@
      </a>
 {% elif user.is_authenticated %}
      <a href="{% url 'home' %}" class="d-flex align-middle align-items-center">
-          <span class="fw-bold tmp-refacto" style="font-size: 30px;margin-left: 30px;">{{ request.site.name }}</span>
+          <span class="fw-bold span-specific-fontsize specific-ml">{{ request.site.name }}</span>
      </a>
 {% elif not user.is_authenticated and request.site.configuration.logo_large %}
      <div class="navbar-logo">
@@ -39,7 +45,7 @@
                     width="auto"
                     height="40px"
                     alt="logo {{ request.site.name }} - lien retour page accueil" />
-                    <span class="fw-bold tmp-refacto" style="font-size: 30px;margin-left: 30px;">{{ request.site.name }}</span>
+                    <span class="fw-bold span-specific-fontsize specific-ml">{{ request.site.name }}</span>
           </a>
      </div>
 {% else %}
@@ -55,7 +61,7 @@
                <span class="navbar-toggler-icon"></span>
           </button>
           <a href="{% url 'home' %}" class="d-flex align-middle p-3 align-items-center">
-               <span class="fw-bold tmp-refacto" style="font-size: 30px;margin-left: 30px;">{{ request.site.name }}</span>
+               <span class="fw-bold span-specific-fontsize specific-ml">{{ request.site.name }}</span>
           </a>
      </div>
 {% endif %}

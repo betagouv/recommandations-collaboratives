@@ -2,6 +2,12 @@
 {% load static %}
 {% load gravatar %}
 {% load activity_tags %}
+{% load sass_tags %}
+{% block css %}
+    <link href="{% sass_src 'projects/css/fragments/timeline/timeline.scss' %}"
+          rel="stylesheet"
+          type="text/css" />
+{% endblock %}
 {% activity_stream "target" project %}
 {% regroup stream by timestamp.date as stream_by_day %}
 <ul class="list-group">
@@ -14,9 +20,7 @@
                         <span class="align-items-center link-dark text-decoration-none">
                             <img src="{% gravatar_url action.actor.email 32 %}"
                                  alt="{{ action.actor.get_full_name }}"
-                                 class="me-1 rounded-circle tmp-refacto-size"
-                                 style="width: 16px;
-                                        height: 16px" />
+                                 class="me-1 rounded-circle img-specific-size" />
                         </span>
                         <span class="align-middle small">
                             {{ action.actor.get_full_name|capfirst|default:action.actor }}

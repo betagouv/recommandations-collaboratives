@@ -12,6 +12,9 @@
     <link href="{% sass_src 'projects/css/project.scss' %}"
           rel="stylesheet"
           type="text/css">
+    <link href="{% sass_src 'tasks/css/task/rsvp_followup.scss' %}"
+          rel="stylesheet"
+          type="text/css">
 {% endblock %}
 {% block content %}
     <div class="col-12 p-4 mx-auto">
@@ -47,9 +50,7 @@
             </div>
             <span class="text-secondary">Souhaitez-vous laisser un commentaire de suivi ?</span>
             <textarea name="comment"
-                      style="min-height: 100px;
-                             border-color: #ccc"
-                      class="w-100 p-2 rounded rounded-4 my-1 border tmp-refacto"
+                      class="w-100 p-2 rounded rounded-4 my-1 border specific-bordercolor specific-minheight"
                       placeholder="Cette note est privée et ne sera consultée que par votre équipe et UrbanVitaliz"></textarea>
         </div>
     </form>

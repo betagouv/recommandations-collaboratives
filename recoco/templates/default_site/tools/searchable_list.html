@@ -1,5 +1,11 @@
 {% load static %}
 {% load django_vite %}
+{% load sass_tags %}
+{% block css %}
+  <link href="{% sass_src 'css/tools/searchable_list.scss' %}"
+        rel="stylesheet"
+        type="text/css">
+{% endblock %}
 {% block js %}
     {% vite_asset 'js/apps/searchableList.js' %}
 {% endblock %}
@@ -64,8 +70,7 @@
                 x-ref="selectList" id="{{search_list_id}}-list">
                 {% for id, value in list.field.choices %}
                     {% if value != '' %}
-                        <li class="m-0 p-0 tmp-refacto-pointer"
-                            style="cursor: pointer"
+                        <li class="m-0 p-0 need-cursor"
                             @click='handleAddItem(event, "{{ id }}","{{ value|lower }}")'>
                             <p class="border-bottom px-3 py-2 m-0 hover-bg-grey name fw-medium font-small">{{ value|lower }}</p>
                         </li>

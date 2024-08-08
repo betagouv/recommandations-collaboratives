@@ -4,6 +4,13 @@
 {% load humanize %}
 {% load crm_tags %}
 {% block title %}Utilisation des tags sur les projets - CRM{% endblock %}
+{% load sass_tags %}
+{% block css %}
+    <link href="{% sass_src 'crm/css/tags.scss' %}"
+          rel="stylesheet"
+          type="text/css">
+    <style>
+{% endblock %}
 {% block js %}
     {% vite_asset 'js/apps/crm.js' %}
     <script src="{% static "/js/d3.min.js" %}"></script>
@@ -67,7 +74,7 @@
                    class="btn btn-primary">Export CSV</a>
             </div>
             <div id="chart-new">
-                <svg class="w-100" style=" min-height: 300px">
+                <svg class="w-100 specific-minheight">
                 </svg>
             </div>
             <table class="table table-striped">

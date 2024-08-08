@@ -46,7 +46,7 @@
         <div class="fr-container fr-pt-2w">
             <div class="fr-grid-row fr-grid-row--gutters">
                 <div class="fr-col-12 fr-col-sm-3 text-center">
-                    <img src="{% static 'home/img/home/human_cooperation.png' %}" width="100%" style="max-width: 160px" alt="Image de coopération humaine">
+                    <img src="{% static 'home/img/home/human_cooperation.png' %}" width="100%"  alt="Image de coopération humaine">
                 </div>
                 <div class="fr-col-12 fr-col-sm-9 fr-text--lg">
                     <h3>Conseillers</h3>
@@ -65,7 +65,7 @@
             <div class="fr-grid-row fr-grid-row--gutters">
                 <div class="fr-col-12 fr-col-sm-6 fr-col-md-3">
                     <div class="fr-p-2w fr-background-default--grey h-100">
-                        <div class="w-100 fr-p-2w fr-m-auto div-max-width">
+                        <div class="w-100 fr-p-2w fr-m-auto specific-maxwidth">
                             <img src="{% static 'home/img/home/search.png' %}"
                                  width="100%"
                                  height="100%"
@@ -77,7 +77,7 @@
                 </div>
                 <div class="fr-col-12 fr-col-sm-6 fr-col-md-3">
                     <div class="fr-p-2w fr-background-default--grey h-100">
-                        <div class="w-100 fr-p-2w fr-m-auto" style="max-width: 160px;">
+                        <div class="w-100 fr-p-2w fr-m-auto specific-maxwidth">
                             <img src="{% static 'home/img/home/form.png' %}"
                                  width="100%"
                                  height="100%"
@@ -89,7 +89,7 @@
                 </div>
                 <div class="fr-col-12 fr-col-sm-6 fr-col-md-3">
                     <div class="fr-p-2w fr-background-default--grey h-100">
-                        <div class="w-100 fr-p-2w fr-m-auto" style="max-width: 160px;">
+                        <div class="w-100 fr-p-2w fr-m-auto specific-maxwidth">
                             <img src="{% static 'home/img/home/community.png' %}"
                                  width="100%"
                                  height="100%"
@@ -101,7 +101,7 @@
                 </div>
                 <div class="fr-col-12 fr-col-sm-6 fr-col-md-3">
                     <div class="fr-p-2w fr-background-default--grey h-100">
-                        <div class="w-100 fr-p-2w fr-m-auto" style="max-width: 160px;">
+                        <div class="w-100 fr-p-2w fr-m-auto specific-maxwidth">
                             <img src="{% static 'home/img/home/progress.png' %}"
                                  width="100%"
                                  height="100%"
@@ -151,7 +151,7 @@
                     </div>
                 </div>
                 <div class="fr-col-12 fr-col-md-6">
-                    <div class="fr-border-default-grey border fr-p-2w fr-text-inverted--grey h-100" style="background-color:#1B1B35;">
+                    <div class="fr-border-default-grey border fr-p-2w fr-text-inverted--grey h-100">
                         <h6 class="fr-mb-13v fr-text-inverted--grey">Faites-vous accompagner</h6>
                         {% if user.is_authenticated %}
                             <a href="{% url 'onboarding-project' %}" class="fr-btn fr-btn--tertiary fr-text-inverted--grey fr-btn-custom-hover">Solliciter {{ request.site.name }}</a>
@@ -165,7 +165,7 @@
     </div> -->
     <!-- <div class="fr-container fr-mt-8v">
         <p class="fr-text--sm fr-mb-1v">Nos partenaires :</p>
-        <div class="fr-mt-2v fr-mb-4w fr-grid-row fr-grid-row--middle" style="justify-content: center">
+        <div class="fr-mt-2v fr-mb-4w fr-grid-row fr-grid-row--middle">
             <div class="fr-col-6 fr-col-sm-3 fr-col-md-2 fr-pr-2v fr-pr-md-4v">
                 <img src="{% static 'img/partners/logo_cerema.png' %}" width="100%" alt="Logo du Cerema">
             </div>

@@ -1,6 +1,11 @@
 {% extends "base.html" %}
 {% load static %}
 {% load sass_tags %}
+{% block css %}
+    <link href="{% sass_src 'survey/css/survey.scss' %}"
+          rel="stylesheet"
+          type="text/css" />
+{% endblock %}
 {% load humanize %}
 {% load django_vite %}
 {% block title %}{{ question.text }} - {{ request.site.name }}{% endblock %}
@@ -26,7 +31,7 @@
         <div class="row">
             <div class="col" id="qs-heading">
                 <h2>
-                    <svg class="bi rounded-circle p-2 tmp-refacto-background"
+                    <svg class="bi rounded-circle p-2 tmp-usevar"
                          width="40"
                          height="40"
                          style="background-color: {{ question.question_set.color }}">
@@ -101,8 +106,7 @@
                     <!-- Comment -->
                     <div class="mt-3 mb-3">
                         <label class="mb-1" for="input-project-comment">{{ question_comment_title|default:'Commentaire' }}</label>
-                        <textarea class="form-control {% if form.comment.errors %}is-invalid{% endif %} tmp-refacto-height"
-                                  style="height: 100px"
+                        <textarea class="form-control {% if form.comment.errors %}is-invalid{% endif %} specific-height"
                                   id="input-project-comment"
                                   name="{{ form.comment.name }}"
                                   placeholder="{{ question.comment_title }}">{{ form.comment.value|default:'' }}</textarea>

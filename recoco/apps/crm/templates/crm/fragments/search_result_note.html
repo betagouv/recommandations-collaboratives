@@ -1,4 +1,10 @@
 {% load static %}
+{% load sass_tags %}
+{% block css %}
+    <link href="{% sass_src 'crm/css/fragments/search_result_note.scss' %}"
+          rel="stylesheet"
+          type="text/css">
+{% endblock %}
 <div class="d-flex align-items-center justify-content-between mb-2">
     <div class="d-flex justify-content-center align-items-center">
         <svg class="bi" width="16" height="16" fill="currentColor">
@@ -44,18 +50,13 @@
         </a>
     </div>
     <div class="d-flex justify-content-center align-items-center">
-        <span class="d-flex align-items-center {% if note.title %} ms-3 {% else %} ms-0{% endif %} "
-              style="font-size: 0.8rem;
-                     color: grey">
+        <span class="d-flex align-items-center {% if note.title %} ms-3 {% else %} ms-0{% endif %} specific-fontsize specific-color">
             <svg class="bi me-1" width="15" height="15" fill="currentColor">
                 <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#person-fill" />
             </svg>
             {{ note.created_by.get_full_name|default:note.created_by.email }}
         </span>
-        <span class="d-flex align-items-center"
-              style="margin-left: 15px;
-                     font-size: 0.8rem;
-                     color: grey">
+        <span class="d-flex align-items-center specific-fontsize specific-color specific-ml">
             <svg class="bi me-1" width="15" height="15" fill="currentColor">
                 <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#clock-fill" />
             </svg>

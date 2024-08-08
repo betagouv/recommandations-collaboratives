@@ -1,5 +1,11 @@
 {% extends "base.html" %}
 {% load static %}
+{% load sass_tags %}
+{% block css %}
+    <link href="{% sass_src 'survey/css/editor/question_set.scss' %}"
+          rel="stylesheet"
+          type="text/css" />
+{% endblock %}
 {% block title %}Groupe de questions {{ question_set.survey.name }}{% endblock %}
 {% block content %}
     <div class="col-12 p-4 mx-auto">
@@ -24,7 +30,7 @@
         <div class="row resource-details mb-3">
             <div class="col-sm-12 col-lg-8 col-xl-9">
                 <h2>
-                    <svg class="bi rounded-circle p-2 tmp-refacto-background"
+                    <svg class="bi rounded-circle p-2 tmp-usevar"
                          width="40"
                          height="40"
                          style="background-color: {{ question_set.color }}">
@@ -85,7 +91,7 @@
                     <span class="align-middle">{{ question.text }}
                         {% if question.text_short %}<span class="text-secondary small">({{ question.text_short }}){% endif %}
                         </span></span>
-                        <span class="text-secondary small tmp-refacto-fontsize" style="font-size: 15px">
+                        <span class="text-secondary small span-specific-fontsize">
                             &nbsp;
                             <svg class="bi" width="15" height="15" fill="currentColor">
                                 <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#sort-up" />
@@ -155,7 +161,7 @@
                                 <div>
                                     {{ choice.text }}
                                     {% if choice.conclusion %}(<span class="fw-bold">{{ choice.conclusion }}</span>){% endif %}
-                                    <span class="text-secondary small tmp-refacto-fontsize" style="font-size: 15px">
+                                    <span class="text-secondary small span-specific-fontsize">
                                         &nbsp;
                                         <svg class="bi" width="15" height="15" fill="currentColor">
                                             <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#sort-up" />

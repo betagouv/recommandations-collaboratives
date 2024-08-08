@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load cookie_consent_tags %}
 {% load django_vite %}
-{% load static%}
+{% load static %}
 {% block js %}
   {% vite_asset 'js/apps/consent.js' %}
 {% endblock %}
@@ -10,7 +10,9 @@
   <link href="{% sass_src 'home/css/dsfr/custom-dsfr.scss' %}"
         rel="stylesheet"
         type="text/css">
-
+  <link href="{% sass_src 'css/cookie_consent/cookiegroup.scss' %}"
+        rel="stylesheet"
+        type="text/css">
 {% endblock %}
 {% block content %}
   <div class="fr-container fr-container--fluid fr-container-md">
@@ -49,9 +51,7 @@
                 <div class="fr-consent-service">
                   <fieldset aria-labelledby="finality-1-legend finality-1-desc"
                             role="group"
-                            class="fr-fieldset fr-fieldset--inline tmp-refacto"
-                            style="margin-top: 15px !important;
-                                   padding-top: 0 !important">
+                            class="fr-fieldset fr-fieldset--inline specific-mt specific-pt">
                     <div class="d-flex align-items-center justify-content-between w-100">
                       <legend id="finality-{{ cookie_group.varname }}-legend"
                               class="fr-consent-service__title mt-0 pt-0">{{ cookie_group.name }}</legend>
@@ -110,11 +110,11 @@
                       <div class="d-flex flex-column">
                         {% for cookie in cookie_group.cookie_set.all %}
                           <div class="d-flex align-items-center justify-content-between">
-                            <div style="width: 60%;" class="tmp-refacto-width">
+                            <div class="specific-width">
                               <strong>{{ cookie.name }}</strong>
                               {% if cookie.domain %}({{ cookie.domain }}){% endif %}
                             </div>
-                            <div style="width: 40%;" class="tmp-refacto-width">
+                            <div class="specific-width2">
                               {% if cookie.description %}{{ cookie.description }}{% endif %}
                             </div>
                           </div>

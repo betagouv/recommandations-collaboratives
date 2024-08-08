@@ -542,7 +542,7 @@ function markerPopupTemplate(item) {
   }
 
   return `
-        <div class="dashboard-marker-popup ${item.status === 'NEW' && 'new-project'} tmp-refacto-border" style="${item.status === 'NEW' ? 'border:solid 1px #FDCD6D' : 'border:solid 1px #222'}">
+        <div class="dashboard-marker-popup ${item.status === 'NEW' && 'new-project'} tmp-usevar" style="${item.status === 'NEW' ? 'border:solid 1px #FDCD6D' : 'border:solid 1px #222'}">
             ${roleTemplate != null ? roleTemplate : ''}
             <a class="text-nowrap project-link d-flex align-items-center" href="/project/${item.project.id}/presentation">
                 <span class="text-nowrap fw-bold title-info text-dark me-2 location">${item.project.commune.name}</span>

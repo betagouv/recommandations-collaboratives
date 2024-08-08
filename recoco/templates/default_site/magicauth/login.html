@@ -2,8 +2,10 @@
 {% load sass_tags %}
 {% load static %}
 {% block css %}
-
   <link href="{% sass_src 'home/css/dsfr/custom-dsfr.scss' %}"
+        rel="stylesheet"
+        type="text/css">
+  <link href="{% sass_src 'css/magicauth/login.scss' %}"
         rel="stylesheet"
         type="text/css">
 {% endblock %}
@@ -49,10 +51,9 @@
         {% for error in form.email.errors %}<div class="alert alert-danger text-center">{{ error }}</div>{% endfor %}
       </div>
       <button type="submit" class="fr-btn custom-login-button">
-        <svg class="bi me-2 align-middle tmp-refacto"
+        <svg class="bi me-2 align-middle svg-specific-fill"
              width="20"
-             height="20"
-             style="fill: white">
+             height="20">
           <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#envelope" />
         </svg>
         Recevoir mon lien de connexion

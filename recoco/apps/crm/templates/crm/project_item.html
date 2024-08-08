@@ -6,7 +6,7 @@
             <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#folder-fill" />
         </svg>
         {% if project.deleted %}
-            <span style="text-decoration: line-through;">{{ project.name }}</span>
+            <span class="text-decoration-line-through">{{ project.name }}</span>
         {% else %}
             <span>{{ project.name }}</span>
         {% endif %}

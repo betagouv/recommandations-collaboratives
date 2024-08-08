@@ -3,6 +3,12 @@
 {% load gravatar %}
 {% load django_vite %}
 {% load projects_extra %}
+{% load sass_tags %}
+{% block css %}
+  <link href="{% sass_src 'css/header/header.scss' %}"
+        rel="stylesheet"
+        type="text/css">
+{% endblock %}
 {% block js %}
     {% vite_asset 'js/apps/menuNotification.js' %}
 {% endblock js %}
@@ -13,10 +19,9 @@
     {% if 'moderate_projects' in user_site_perms %}
         {% get_project_moderation_count as projects_to_moderate_count %}
     {% endif %}
-    <ul class="list-unstyled mb-0 d-flex align-items-center tmp-refacto-padding"
+    <ul class="list-unstyled mb-0 d-flex align-items-center specific-pl tmp-usevar"
         data-test-id="secondary-menu"
-        style="padding-left: 15px;
-               {% if not user.is_authenticated %}border-left: 0.1rem solid #d5d5d5;{% endif %}">
+        style="{% if not user.is_authenticated %}border-left: 0.1rem solid #d5d5d5;{% endif %}">
         <!-- Dashboard -->
         {% if is_switchtender or is_administrating_project %}
             <li class="nav-item dropdown nav-item-admin {% if url_name == 'projects-project-list' %}activated{% endif %}">
@@ -33,12 +38,11 @@
                             <svg data-toggle="tooltip"
                                  data-placement="top"
                                  title="Notifications désactivées"
-                                 class="align-middle bi tmp-refacto-padding"
+                                 class="align-middle bi specific-padding"
                                  width="20px"
                                  height="20px"
                                  fill="currentColor"
-                                 stroke="currentColor"
-                                 style="padding: 3px">
+                                 stroke="currentColor">
                                 <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#chevron-down" />
                             </svg>
                         </button>
@@ -53,23 +57,20 @@
                                     </span>
                                 </div>
                             </li>
-                            <li class="text-white bg-blue-light-hover list-group-item px-3 py-2 list-group-item-action dropdown-item border-0 d-flex align-items-center tmp-refacto-background"
-                                style="background: #0063CB">
+                            <li class="text-white bg-blue-light-hover list-group-item px-3 py-2 list-group-item-action dropdown-item border-0 d-flex align-items-center specific-background">
                                 <span class="text-break text-truncate">
                                     <svg data-toggle="tooltip"
                                          data-placement="top"
                                          title="Notifications désactivées"
-                                         class="align-middle bi tmp-refacto-padding"
+                                         class="align-middle bi specific-padding"
                                          width="20px"
                                          height="20px"
                                          fill="currentColor"
-                                         stroke="currentColor"
-                                         style="padding: 3px">
+                                         stroke="currentColor">
                                         <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#plus" />
                                     </svg>
                                     <a href="{% url 'onboarding-prefill-set-user' %}"
-                                       class="stretched-link text-reset text-decoration-none tmp-refacto-color"
-                                       style="color: white !important"
+                                       class="stretched-link text-reset text-decoration-none specific-color"
                                        href="">Créer un nouveau projet</a>
                                 </span>
                             </li>
@@ -86,8 +87,7 @@
                         <div x-data="{ open: false }"
                              x-on:click.outside="open = false"
                              class="btn-group">
-                            <a style="color: inherit"
-                               class="ms-1 align-middle text-decoration-none tmp-refacto-color"
+                            <a class="ms-1 align-middle text-decoration-none specific-color2"
                                href="{% url 'projects-project-detail' active_project.pk %}"><strong>{{ active_project.name }}</strong><span class="text-secondary small ms-2 text-break text-truncate">({{ active_project.commune.name }})</span></strong></a>
                         </div>
                     </div>
@@ -107,12 +107,11 @@
                                 <svg data-toggle="tooltip"
                                      data-placement="top"
                                      title="Notifications désactivées"
-                                     class="align-middle bi tmp-refacto-padding"
+                                     class="align-middle bi specific-padding"
                                      width="20px"
                                      height="20px"
                                      fill="currentColor"
-                                     stroke="currentColor"
-                                     style="padding: 3px">
+                                     stroke="currentColor">
                                     <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#chevron-down" />
                                 </svg>
                             </button>
@@ -143,23 +142,20 @@
                                     </li>
                                 {% endfor %}
                                 {% if not is_switchtender %}
-                                    <li class="text-white bg-blue-light-hover list-group-item px-3 py-2 list-group-item-action dropdown-item border-0 d-flex align-items-center tmp-refacto-background"
-                                        style="background: #0063CB">
+                                    <li class="text-white bg-blue-light-hover list-group-item px-3 py-2 list-group-item-action dropdown-item border-0 d-flex align-items-center specific-background">
                                         <span class="text-break text-truncate">
                                             <svg data-toggle="tooltip"
                                                  data-placement="top"
                                                  title="Notifications désactivées"
-                                                 class="align-middle bi tmp-refacto-padding"
+                                                 class="align-middle bi specific-padding"
                                                  width="20px"
                                                  height="20px"
                                                  fill="currentColor"
-                                                 stroke="currentColor"
-                                                 style="padding: 3px">
+                                                 stroke="currentColor">
                                                 <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#plus" />
                                             </svg>
                                             <a href="{% url 'onboarding' %}"
-                                               class="stretched-link text-reset text-decoration-none tmp-refacto-color"
-                                               style="color: white !important">Créer un nouveau projet</a>
+                                               class="stretched-link text-reset text-decoration-none specific-color">Créer un nouveau projet</a>
                                         </span>
                                     </li>
                                 {% endif %}
@@ -171,13 +167,13 @@
         {% endif %}
         {% if projects_to_moderate_count > 0 %}
             <!-- Projects moderation -->
-            <li style="{% if url_name == 'projects-moderation-list' %}activated{% endif %}">
+            <li style="{% if url_name == 'projects-moderation-list' %}activated{% endif %}" class="tmp-usevar">
                 <a href="{% url "projects-moderation-list" %}"
                    class="nav-link link-dark {% if url_name == 'resources-resource-search' %}active{% endif %}">Projets à examiner <span class="badge text-bg-danger">{{ projects_to_moderate_count }}</span></a>
             </li>
         {% endif %}
         <!-- Ressources -->
-        <li style="{% if url_name == 'resources-resource-search' %}activated{% endif %}" class="tmp-refacto">
+        <li style="{% if url_name == 'resources-resource-search' %}activated{% endif %}" class="tmp-usevar">
             <div x-data="{ open: false }"
                  x-on:click.outside="open = false"
                  class="btn-group d-flex">
@@ -193,12 +189,11 @@
                         <svg data-toggle="tooltip"
                              data-placement="top"
                              title="Notifications désactivées"
-                             class="align-middle bi tmp-refacto"
+                             class="align-middle bi specific-padding"
                              width="20px"
                              height="20px"
                              fill="currentColor"
-                             stroke="currentColor"
-                             style="padding: 3px">
+                             stroke="currentColor">
                             <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#chevron-down" />
                         </svg>
                     </button>

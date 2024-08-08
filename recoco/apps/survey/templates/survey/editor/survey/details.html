@@ -1,5 +1,11 @@
 {% extends "base.html" %}
 {% load static %}
+{% load sass_tags %}
+{% block css %}
+    <link href="{% sass_src 'survey/css/editor/survey.scss' %}"
+          rel="stylesheet"
+          type="text/css" />
+{% endblock %}
 {% block title %}Configurer le questionnaire d'état des lieux{% endblock %}
 {% block content %}
     <div class="col-12 p-4 mx-auto">
@@ -46,7 +52,7 @@
                 <li class="list-group-item d-flex justify-content-between align-items-start">
                     <div class="ms-2 me-auto">
                         {% if question_set.icon %}
-                            <svg class="bi me-1 d-inline rounded-circle align-middle p-1 tmp-refacto-background"
+                            <svg class="bi me-1 d-inline rounded-circle align-middle p-1 tmp-usevar"
                                  width="24"
                                  height="24"
                                  style="background-color: {{ question_set.color }}">
@@ -56,7 +62,7 @@
                         <div class="d-inline align-middle fw-bold me-2">
                             <a href="{% url 'survey-editor-question-set-details' question_set.pk %}">{{ question_set.heading }}</a>
                             <!-- Priority -->
-                            <span class="text-secondary small tmp-refacto-fontsize" style="font-size: 15px">
+                            <span class="text-secondary small span-specific-fontsize">
                                 &nbsp;
                                 <svg class="bi" width="15" height="15" fill="currentColor">
                                     <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#sort-up" />

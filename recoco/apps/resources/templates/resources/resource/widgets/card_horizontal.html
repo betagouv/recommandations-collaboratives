@@ -1,7 +1,12 @@
 {% load static %}
+{% load sass_tags %}
+{% block css %}
+    <link href="{% sass_src 'resources/widget/card.scss' %}"
+          rel="stylesheet"
+          type="text/css" />
+{% endblock %}
 <!-- Horizontal Card -->
-<div class="card-resource card-resource-horizontal card h-100 w-100 tmp-refacto-height"
-     style="min-height: 100px">
+<div class="card-resource card-resource-horizontal card h-100 w-100 specific-minheight">
     <div class="card-body">
         <div class="card-title mb-2">
             {% if resource.category and with_category %}
@@ -9,9 +14,7 @@
             {% endif %}
             <div class="d-flex">
                 <!-- Icon -->
-                <svg class="bi me-2 rounded-circle resource-icon bg-color-{{ resource.category.color|default:"darkgrey" }} tmp-refacto-size"
-                     style="width:30px;
-                            height: 30px">
+                <svg class="bi me-2 rounded-circle resource-icon bg-color-{{ resource.category.color|default:"darkgrey" }} svg-specific-size">
                     <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#{{ resource.category.icon|default:"key" }}" />
                 </svg>
                 <!-- title -->
