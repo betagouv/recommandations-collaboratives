@@ -7,6 +7,9 @@
     <link href="{% sass_src 'survey/css/survey.scss' %}"
           rel="stylesheet"
           type="text/css">
+    <link href="{% sass_src 'survey/css/widget/qs_summary_card.scss' %}"
+          rel="stylesheet"
+          type="text/css">
 {% endblock %}
 {% get_obj_perms request.user for request.site as "user_site_perms" %}
 {% get_obj_perms request.user for project as "user_project_perms" %}
@@ -41,7 +44,7 @@
                 <ul class="list-unstyled">
                     {% for answer in answers %}
                         <li class="answer mb-2 mt-4 d-flex justify-content-between position-relative">
-                            <div class="flex-grow-1">
+                            <div class="flex-grow-1 specific-width">
                                 {% lookup_choices_from_answer answer as choices %}
                                 {% if show_question or not choices %}
                                     <div>
