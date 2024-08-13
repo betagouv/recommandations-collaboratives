@@ -22,8 +22,8 @@
          data-test-id="open-dropdown-profil-option-button">
         <img src="{% gravatar_url user.email 16 %}"
              alt="{{ user.get_full_name }}"
-             class="me-2 rounded-circle img-specific-size" />
-        <span class="d-none d-lg-none d-xl-block specific-color3">{{ user.get_full_name|default:user.email }}</span>
+             class="me-2 rounded-circle header-img-specific-size" />
+        <span class="d-none d-lg-none d-xl-block specific-color-0063CB">{{ user.get_full_name|default:user.email }}</span>
         <button id="user-menu-button" type="button" class="border-0 btn py-0 px-1">
           <svg data-toggle="tooltip"
                data-placement="top"

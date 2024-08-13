@@ -12,7 +12,7 @@
     {% vite_asset 'js/apps/tutorial.js' %}
 {% endblock %}
 {% block css %}
-    <link href="{% sass_src 'projects/css/overview.scss' %}"
+    <link href="{% static 'projects/css/overview.scss' %}"
           rel="stylesheet"
           type="text/css">
 {% endblock %}
@@ -102,13 +102,13 @@
                 <div class="col-4">
                     <div class="mb-3">
                         <div class="d-flex flex-column">
-                            <h6 class="text-uppercase fw-bold d-block mb-1 lh-base h6-fontsize">Localisation</h6>
+                            <h6 class="text-uppercase fw-bold d-block mb-1 lh-base h6-specific-fontsize-14">Localisation</h6>
                             {% include 'projects/project/fragments/geolocation/location_overview.html' %}
                         </div>
                     </div>
                     <div class="mb-4">
                         <div class="d-flex flex-column">
-                            <h6 class="text-uppercase fw-bold d-block mb-3 h6-fontsize">Référent collectivité</h6>
+                            <h6 class="text-uppercase fw-bold d-block mb-3 h6-specific-fontsize-14">Référent collectivité</h6>
                             {% include 'projects/project/fragments/project_owner.html' with project=project %}
                             {% include "projects/project/fragments/owner/owner-details.html" with project=project %}
                         </div>
@@ -118,7 +118,7 @@
                     <div class="d-flex flex-column my-4">
                         <!-- Collectivity -->
                         <div>
-                            <h6 class="text-uppercase fw-bold d-block mb-3 h6-fontsize">Membres de la collectivité</h6>
+                            <h6 class="text-uppercase fw-bold d-block mb-3 h6-specific-fontsize-14">Membres de la collectivité</h6>
                             <ul class="flex-column list-unstyled mb-0">
                                 {% for projectmember in project.projectmember_set.all %}
                                     {% if projectmember.is_owner and projectmember.member.is_active %}
@@ -134,7 +134,7 @@
                                         data-toggle="modal"
                                         data-target="#InviteMemberModal"
                                         data-cy="invite-advisor-button"
-                                        class="{% if project.status == 'DRAFT' or not "invite_collaborators" in user_project_perms %} disabled{% endif %} button d-inline-flex justify-content-center w-100 need-cursor"
+                                        class="{% if project.status == 'DRAFT' or not "invite_collaborators" in user_project_perms %} disabled{% endif %} button d-inline-flex justify-content-center w-100 specific-cursor-pointer"
                                         {% if project.status == 'DRAFT' or not "invite_collaborators" in user_project_perms %}disabled{% endif %}>
                                     {% if project.status == 'DRAFT' or not "invite_collaborators" in user_project_perms %}
                                         <svg class="bi align-middle" width="18" height="18" fill="currentColor">
@@ -148,7 +148,7 @@
                         </div>
                         <!-- Advisors -->
                         <div class="mt-4">
-                            <h6 class="text-uppercase fw-bold d-block mb- h6-fontsize">Équipe de suivi</h6>
+                            <h6 class="text-uppercase fw-bold d-block mb- h6-specific-fontsize-14">Équipe de suivi</h6>
                             <ul class="d-flex flex-column list-unstyled mb-0">
                                 {% for advisor in project.switchtender_sites.all %}
                                     {% if advisor.switchtender.is_active %}
@@ -161,7 +161,7 @@
                                     <button @click="openInviteSwitchtenderModal"
                                             data-toggle="modal"
                                             data-target="#InviteSwitchtenderModal"
-                                            class="{% if project.status == 'DRAFT' %} disabled{% endif %} button d-inline-flex justify-content-center w-100 need-cursor">
+                                            class="{% if project.status == 'DRAFT' %} disabled{% endif %} button d-inline-flex justify-content-center w-100 specific-cursor-pointer">
                                         {% if project.status == 'DRAFT' %}
                                             <svg class="bi align-middle" width="18" height="18" fill="currentColor">
                                                 <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#lock-fill" />

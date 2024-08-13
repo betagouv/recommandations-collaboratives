@@ -67,7 +67,7 @@
                     {% if is_switchtender %}
                         <select id="limit_area"
                                 name="limit_area"
-                                class="form-select specific-minwidth specific-flex"
+                                class="form-select specific-minwidth-200 specific-flex"
                                 aria-label="Limiter la zone géographique">
                             <option {% if not limit_area %}selected{% endif %} value="">France entière</option>
                             <option {% if limit_area == 'AUTO' %}selected{% endif %} value="AUTO">Mes départements</option>
@@ -79,7 +79,7 @@
                     {% elif limit_area != '' and user.is_authenticated %}
                         <select id="limit_area"
                                 name="limit_area"
-                                class="form-select specific-flex specific-minwidth specific-flex"
+                                class="form-select specific-flex specific-minwidth-200 specific-flex"
                                 aria-label="Limiter la zone géographique">
                             <option {% if not limit_area %}selected{% endif %} value="">France entière</option>
                             <option {% if limit_area == 'AUTO' %}selected{% endif %} value="AUTO">

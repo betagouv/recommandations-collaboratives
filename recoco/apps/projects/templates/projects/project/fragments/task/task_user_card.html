@@ -59,9 +59,9 @@
             </template>
         </div>
         <template x-if="currentUser.is_active && currentUser.profile.organization_position">
-            <span class="d-flex align-items-center justify-content-between text-blue font-very-small specific-margin-y">
+            <span class="d-flex align-items-center justify-content-between text-blue font-very-small specific-my">
                 <div class="d-flex align-items-center">
-                    <svg class="bi align-middle me-2 specific-ml"
+                    <svg class="bi align-middle me-2 specific-ml-012"
                          width="18"
                          height="18"
                          fill="currentColor">
@@ -115,7 +115,7 @@
                 </span>
             </template>
             <template x-if="!currentUser.is_active">
-                <span class="p-1 px-2 font-very-small bg-grey-light w-100 d-flex mt-1 text-nowrap specific-border-radius">Compte desactivé depuis le {{ user.profile.deleted }}</span>
+                <span class="p-1 px-2 font-very-small bg-grey-light w-100 d-flex mt-1 text-nowrap specific-border-radius-2px">Compte desactivé depuis le {{ user.profile.deleted }}</span>
             </template>
         </div>
     </div>

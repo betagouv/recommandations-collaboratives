@@ -71,11 +71,11 @@
          class="user-card-popup flex-column {% if not user.is_active %}coucou{% elif position.is_advisor %}advisor-border{% elif position.is_observer %}observer-border{% else %}neutral-role-border{% endif %}">
         {% if user.is_active and position.is_advisor %}
             <div class="user-role position-absolute">
-                <span class="py-1 px-2 fw-bold text-uppercase tiny advisor-background text-white specific-borderradius">Conseiller</span>
+                <span class="py-1 px-2 fw-bold text-uppercase tiny advisor-background text-white specific-borderradius-2px">Conseiller</span>
             </div>
         {% elif user.is_active and position.is_observer %}
             <div class="user-role position-absolute">
-                <span class="py-1 px-2 fw-bold text-uppercase tiny observer-background text-white specific-borderradius">Observateur</span>
+                <span class="py-1 px-2 fw-bold text-uppercase tiny observer-background text-white specific-borderradius-2px">Observateur</span>
             </div>
         {% endif %}
         <div class="d-flex align-items-center flex-wrap">
@@ -101,9 +101,9 @@
             {% endif %}
         </div>
         {% if user.profile.organization_position %}
-            <span class="d-flex align-items-center justify-content-between text-blue font-very-small specific-marginy">
+            <span class="d-flex align-items-center justify-content-between text-blue font-very-small specific-my">
                 <div class="d-flex align-items-center">
-                    <svg class="bi align-middle me-2 specific-ml"
+                    <svg class="bi align-middle me-2 specific-ml-012"
                          width="18"
                          height="18"
                          fill="currentColor">
@@ -162,10 +162,10 @@
             {% endif %}
             {% if user and not user.is_active %}
                 <span data-test-id="deactivated-user-details"
-                      class="p-1 px-2 font-very-small bg-grey-light w-100 d-flex mt-1 text-nowrap specific-borderradius">Compte desactivé depuis {{ user.last_login.date|date:"F" }}  {{ user.last_login.date|date:"Y" }}</span>
+                      class="p-1 px-2 font-very-small bg-grey-light w-100 d-flex mt-1 text-nowrap specific-borderradius-2px">Compte desactivé depuis {{ user.last_login.date|date:"F" }}  {{ user.last_login.date|date:"Y" }}</span>
             {% elif not user %}
                 <span data-test-id="deleted-user-details"
-                      class="p-1 px-2 font-very-small bg-grey-light w-100 d-flex mt-1 text-nowrap specific-borderradius">Compte desactivé</span>
+                      class="p-1 px-2 font-very-small bg-grey-light w-100 d-flex mt-1 text-nowrap specific-borderradius-2px">Compte desactivé</span>
             {% endif %}
         </div>
     </div>

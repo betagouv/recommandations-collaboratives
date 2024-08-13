@@ -51,13 +51,13 @@
             </span>
         </div>
         <div class="d-flex justify-content-center align-items-center">
-            <span class="d-flex align-items-center {% if note.title %} ms-3 {% else %} ms-0{% endif %} specific-fontsize specific-color">
+            <span class="d-flex align-items-center {% if note.title %} ms-3 {% else %} ms-0{% endif %} specific-fontsize-08 specific-color-grey">
                 <svg class="bi me-1" width="15" height="15" fill="currentColor">
                     <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#person-fill" />
                 </svg>
                 {{ note.created_by.get_full_name|default:note.created_by.email }}
             </span>
-            <span class="d-flex align-items-center specific-fontsize specific-color specific-ml">
+            <span class="d-flex align-items-center specific-fontsize-08 specific-color-grey specific-ml-15px">
                 <svg class="bi me-1" width="15" height="15" fill="currentColor">
                     <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#clock-fill" />
                 </svg>
@@ -67,7 +67,7 @@
                     {{ note.created_on }}
                 {% endif %}
             </span>
-            <span class="d-flex align-items-center position-relative specific-fontsize specific-color specific-ml">
+            <span class="d-flex align-items-center position-relative specific-fontsize-08 specific-color-grey specific-ml-15px">
                 <svg class="bi me-1" width="15" height="15" fill="currentColor">
                     <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#pencil-fill" />
                 </svg>

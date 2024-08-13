@@ -19,7 +19,7 @@
         <form method="post" action="{{ action }}" enctype="multipart/form-data">
             {% csrf_token %}
             <div class="p-3">
-                <h6 class="text-uppercase h6-fontsize">Ajouter un fichier</h6>
+                <h6 class="text-uppercase h6-specific-fontsize-1">Ajouter un fichier</h6>
                 <p class="mb-2 text-info-custom text-grey-dark small">
                     Vous pouvez joindre un fichier à votre <span x-text="getString(`types.${type}`)"></span>, d'une taille maximum de 20Mo
                 </p>

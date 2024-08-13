@@ -14,7 +14,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h6 class="fw-bold d-block mb-0 h6-fontsize">Inviter un membre de la collectivité</h6>
+                <h6 class="fw-bold d-block mb-0 h6-specific-fontsize-22">Inviter un membre de la collectivité</h6>
             </div>
             <div class="modal-body">
                 <form class="form"
@@ -22,7 +22,7 @@
                       action="{% url 'projects-project-access-collectivity-invite' project.pk %}"
                       method="post">
                     <div class="mb-3">
-                        <label class="form-label specific-fontsize specific-color"
+                        <label class="form-label specific-fontsize-16 specific-color-666"
                                for="invite-email">Saisissez l'adresse email de la personne à inviter</label>
                         <input id="invite-email"
                                type="email"
@@ -37,7 +37,7 @@
                            value="COLLABORATOR">
                     {% if source %}<input type="hidden" name="source" id="source" value="{{ source }}">{% endif %}
                     <div class="mb-3">
-                        <label class="form-label specific-fontsize specific-color"
+                        <label class="form-label specific-fontsize-16 specific-color-666"
                                for="invite-message">Message d'invitation (optionnel)</label>
                         <textarea id="invite-message"
                                   rows="8"

@@ -27,12 +27,12 @@
          @dragstart="onDragStart(event, task.uuid)"
          @dragend="onDragEnd(event)">
         <template x-if="currentTask.notifications.count > 0">
-            <span class="position-absolute translate-middle top-0 start-100 badge rounded-circle bg-danger fw-bold specific-fontsize"
+            <span class="position-absolute translate-middle top-0 start-100 badge rounded-circle bg-danger fw-bold specific-fontsize-07"
                   x-text="currentTask.notifications.count"></span>
         </template>
         <div class="p-2">
             <div class="d-flex flex-row">
-                <div class="flex-fill mt-1 ms-2 specific-fontsize2 need-cursor"
+                <div class="flex-fill mt-1 ms-2 specific-fontsize-09 specific-cursor-pointer"
                      @click="handleOpenPreviewModal()"
                      data-test-id="task-kanban-topic">
                     <template x-if="task.topic && task.topic.name">

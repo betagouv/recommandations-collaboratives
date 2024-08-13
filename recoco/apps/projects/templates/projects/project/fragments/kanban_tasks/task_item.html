@@ -19,21 +19,21 @@
          @dragstart="onDragStart(event, t.uuid)"
          @dragend="onDragEnd(event)">
         <template x-if="t.notifications.count > 0">
-            <span class="position-absolute translate-middle top-0 start-100 badge rounded-circle bg-danger fw-bold specific-fontsize"
+            <span class="position-absolute translate-middle top-0 start-100 badge rounded-circle bg-danger fw-bold specific-fontsize-07"
                   x-text="t.notifications.count"></span>
         </template>
         <div class="position-absolute top-0 left-0 d-flex specific-margin">
             <template x-if="!t.public && !isArchivedStatus(t.status)">
-                <span class="rounded-pill px-2 bg-warning z-index-dropdown text-uppercase fw-bold text-white specific-fontsize">Brouillon</span>
+                <span class="rounded-pill px-2 bg-warning z-index-dropdown text-uppercase fw-bold text-white specific-fontsize-07">Brouillon</span>
             </template>
             <template x-if="t.public && !t.visited && !isArchivedStatus(t.status)">
-                <span class="rounded-pill px-2 bg-primary z-index-dropdown text-uppercase fw-bold text-white specific-fontsize">Nouveau</span>
+                <span class="rounded-pill px-2 bg-primary z-index-dropdown text-uppercase fw-bold text-white specific-fontsize-07">Nouveau</span>
             </template>
             <template x-if="t.status === STATUSES.DONE || t.status === STATUSES.ALREADY_DONE">
-                <span class="rounded-pill px-2 bg-success z-index-dropdown text-uppercase fw-bold text-white specific-fontsize">Fait</span>
+                <span class="rounded-pill px-2 bg-success z-index-dropdown text-uppercase fw-bold text-white specific-fontsize-07">Fait</span>
             </template>
             <template x-if="t.status === STATUSES.NOT_INTERESTED">
-                <span class="rounded-pill px-2 bg-secondary z-index-dropdown text-uppercase fw-bold text-white specific-fontsize">Non applicable</span>
+                <span class="rounded-pill px-2 bg-secondary z-index-dropdown text-uppercase fw-bold text-white specific-fontsize-07">Non applicable</span>
             </template>
         </div>
         <div class="p-2">
@@ -42,7 +42,7 @@
                     {% if "use_tasks" in user_project_perms and not disable_edit %}
                         <div>
                             <template x-if="i > 0">
-                                <a class="d-block p-1 need-cursor"
+                                <a class="d-block p-1 specific-cursor-pointer"
                                    @click="$store.tasksData.moveAbove(t, column(board.status)[i - 1])">
                                     <svg class="aling-middle bi ms-1"
                                          width="12px"
@@ -53,7 +53,7 @@
                                 </a>
                             </template>
                             <template x-if="i < (column(board.status).length - 1)">
-                                <a class="d-block p-1 need-cursor"
+                                <a class="d-block p-1 specific-cursor-pointer"
                                    @click="$store.tasksData.moveBelow(t, column(board.status)[i + 1])">
                                     <svg class="aling-middle bi ms-1"
                                          width="12px"
@@ -66,7 +66,7 @@
                         </div>
                         {% if is_switchtender %}
                             <template x-if="t.status < 3 && t.public">
-                                <div class="me-2 text-danger d-flex d-flex flex-column justify-content-center align-items-center archive-cta need-cursor div-style"
+                                <div class="me-2 text-danger d-flex d-flex flex-column justify-content-center align-items-center archive-cta specific-cursor-pointer div-style"
                                      data-bs-toggle="tooltip"
                                      data-bs-placement="bottom"
                                      :title="toArchiveTooltip()"
@@ -85,7 +85,7 @@
                         {% endif %}
                     {% endif %}
                 </div>
-                <div class="flex-fill mt-1 ms-2 need-cursor specific-fontsize2"
+                <div class="flex-fill mt-1 ms-2 specific-cursor-pointer specific-fontsize-09"
                      @click="onPreviewClick(t.id)">
                     <h6 class="mb-0 fw-bold" x-text="t.intent"></h6>
                     <div class="rounded bg-light p-2 my-2"
@@ -121,9 +121,9 @@
                 </div>
             </div>
         </div>
-        <div class="border-top p-2 d-flex justify-content-between specific-fontsize3">
+        <div class="border-top p-2 d-flex justify-content-between specific-fontsize-08">
             <div class="d-flex align-items-center">
-                <div class="text-primary position-relative need-cursor"
+                <div class="text-primary position-relative specific-cursor-pointer"
                      @click="onPreviewClick(t.id)">
                     <svg class="bi ms-1" width="16px" height="16px" fill="currentColor">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#chat" />
@@ -133,7 +133,7 @@
             </div>
             <div class="d-flex align-items-center"
                  x-data="{ hasReminders: t.reminders.length > 0, reminder: t.reminders[0] }">
-                <div class="me-2 tmp-usevar need-cursor"
+                <div class="me-2 tmp-usevar specific-cursor-pointer"
                      :class="hasReminders ? 'text-primary' : 'text-muted'"
                      :style="isOldReminder(t.reminders[0]) ? 'color:#6c757d !important;' : ''"
                      data-bs-toggle="tooltip"
@@ -149,7 +149,7 @@
                 </div>
                 {% if "manage_tasks" in user_project_perms and not disable_edit %}
                     <div class="dropdown">
-                        <a :id=`task-${t.id}-edit-button` class="btn btn-sm btn-info dropdown-toggle specific-fontsize3" href="#" role="button"
+                        <a :id=`task-${t.id}-edit-button` class="btn btn-sm btn-info dropdown-toggle specific-fontsize-08" href="#" role="button"
                         id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">Éditer</a>
                         <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
                             <li>
@@ -162,13 +162,13 @@
                             </li>
                             <template x-if="t.content !== '' && !t.public">
                                 <li>
-                                    <a class="dropdown-item need-cursor"
+                                    <a class="dropdown-item specific-cursor-pointer"
                                        @click="onSetTaskPublic(t.id, true)">Publier</a>
                                 </li>
                             </template>
                             <template x-if="t.public">
                                 <li>
-                                    <a class="dropdown-item need-cursor"
+                                    <a class="dropdown-item specific-cursor-pointer"
                                        @click="onSetTaskPublic(t.id, false)">Passer en
                                     brouillon</a>
                                 </li>
@@ -184,7 +184,7 @@
                                    task-
                                    t.id
                                    -delete-button
-                                   class="dropdown-item text-danger need-cursor"
+                                   class="dropdown-item text-danger specific-cursor-pointer"
                                    @click="openDeleteTaskConfirmationModal(t)">Supprimer</a>
                             </li>
                         </ul>

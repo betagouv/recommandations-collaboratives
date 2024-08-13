@@ -11,7 +11,7 @@
 {% get_obj_perms request.user for project as "user_project_perms" %}
 <div class="{% if padding_end is True %}pe-4{% endif %} {% if padding_top is True %}pt-4{% endif %}  {% if full_width %}w-100{% else %}w-50{% endif %} {% if full_height %}h-100{% endif %}"
      data-test-id="project-information-card-{{ data_test }}">
-    <div class="d-flex align-items-center justify-content-between specific-margin">
+    <div class="d-flex align-items-center justify-content-between specific-mb-6">
         <h6 class="text-uppercase fw-bold m-0 p-0 project-card--subtitle">
             {% if onboarding_information %}
                 Compléments

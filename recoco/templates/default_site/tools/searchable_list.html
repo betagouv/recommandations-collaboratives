@@ -70,7 +70,7 @@
                 x-ref="selectList" id="{{search_list_id}}-list">
                 {% for id, value in list.field.choices %}
                     {% if value != '' %}
-                        <li class="m-0 p-0 need-cursor"
+                        <li class="m-0 p-0 specific-cursor-pointer"
                             @click='handleAddItem(event, "{{ id }}","{{ value|lower }}")'>
                             <p class="border-bottom px-3 py-2 m-0 hover-bg-grey name fw-medium font-small">{{ value|lower }}</p>
                         </li>

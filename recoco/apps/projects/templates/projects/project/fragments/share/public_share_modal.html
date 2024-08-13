@@ -14,11 +14,11 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h6 class="text-uppercase fw-bold d-block mb-0 h6-fontsize2">Partager l'état des lieux</h6>
+                <h6 class="text-uppercase fw-bold d-block mb-0 h6-specific-fontsize-14">Partager l'état des lieux</h6>
             </div>
             <div class="modal-body">
                 <div>
-                    <p class="fw-light specific-color2">
+                    <p class="fw-light specific-color-929292">
                         Partagez ce lien pour donner accès en lecture seule à la page État des lieux
                     </p>
                     <div x-data="AccessUpdate('{{ request.scheme }}://{{ request.get_host }}{% url 'projects-project-sharing-link' project.ro_key %}')"

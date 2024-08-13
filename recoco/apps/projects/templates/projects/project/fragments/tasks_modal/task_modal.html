@@ -19,7 +19,7 @@
                 <div class="d-flex flex-column">
                     <!-- Pagination -->
                     <template x-if="$store.previewModal.isPaginated">
-                        <div class="bg-blue d-flex align-items-center justify-content-between p-2 rounded specific-border-radius">
+                        <div class="bg-blue d-flex align-items-center justify-content-between p-2 rounded specific-border-radiusy-0">
                             <button class="p-1 button filled white small"
                                     @click="$store.previewModal.previous()">
                                 <svg class="bi align-middle" width="25" height="25" fill="#0063CB">
@@ -54,7 +54,7 @@
                                         :src="resourcePreviewUrl(task?.resource_id)"></iframe>
                             </template>
                             <template x-if="task && taskId && !task?.resource_id">
-                                <div class="w-100 text-break p-3 specific-maxheight scroll-gestion">
+                                <div class="w-100 text-break p-3 specific-maxheight-90vh scroll-gestion">
                                     <div class="resource-details">
                                         <h1 x-text="task?.intent" class="mb-3"></h1>
                                     </div>
@@ -64,7 +64,7 @@
                             </template>
                         </div>
                         <!-- Modal followups -->
-                        <div class="position-relative flex-column justify-content-between w-35 specific-border-left">
+                        <div class="position-relative flex-column justify-content-between w-35 specific-border-left-solid1pxEEE">
                             <div class="w-100">
                                 <div class="border-bottom-grey"
                                      x-show="task?.document && task?.document.length > 0">
@@ -98,7 +98,7 @@
                                             <template x-if="task?.content === ''">
                                                 <p class="fst-italic">Aucun commentaire initial n'a été ajouté</p>
                                             </template>
-                                            <div class="d-flex justify-content-between align-items-center specific-fontsize">
+                                            <div class="d-flex justify-content-between align-items-center specific-fontsize-09">
                                                 <div class="d-flex flex-column">
                                                     {% include 'projects/project/fragments/task/task_user_card.html' %}
                                                     <span class="text-muted tiny specific-lineheight"
@@ -112,7 +112,7 @@
                                     </template>
                                     <template x-if="!task?.resource_id">
                                         <div class="my-3">
-                                            <div class="mx-3 mb-1 text-center specific-fontsize2">
+                                            <div class="mx-3 mb-1 text-center specific-fontsize-08">
                                                 <span class="ms-1 fst-italic specific-lineheight"
                                                       x-text="`${task?.created_by.first_name} ${task?.created_by.last_name}`"></span> a créé cette recommandation sans ressource
                                                 <span class="text-muted specific-lineheight"
@@ -130,7 +130,7 @@
                                                     <div class="rounded bg-light p-2 m-3 message"
                                                          :class="hasNotification(f.id) && 'is-new-followup'">
                                                         <p x-html="renderMarkdown(f.comment)" class="mb-2 text-break"></p>
-                                                        <div class="d-flex justify-content-between align-items-center specific-fontsize">
+                                                        <div class="d-flex justify-content-between align-items-center specific-fontsize-09">
                                                             <div class="d-flex flex-column">
                                                                 {% include 'projects/project/fragments/task/task_followup_user_card.html' %}
                                                                 <span class="text-muted tiny specific-lineheight"
@@ -147,7 +147,7 @@
                                                 <template x-if="isStatusUpdate(f) && f.status || isStatusUpdate(f) && f.status == 0">
                                                     <div class="my-3"
                                                          :class="hasNotification(f.id) && 'is-new-followup-status'">
-                                                        <div class="mx-3 mb-1 text-center followup-status-message specific-fontsize2">
+                                                        <div class="mx-3 mb-1 text-center followup-status-message specific-fontsize-08">
                                                             <span class="ms-1 fst-italic specific-lineheight"
                                                                   x-text="`${f.who.first_name} ${f.who.last_name}`"></span> a changé le statut de la recommandation en <span class="fw-bold" x-text="statusText(f.status)"></span>
                                                             <span class="text-muted specific-lineheight"
@@ -157,7 +157,7 @@
                                                             <div class="rounded bg-light p-2 m-3 message">
                                                                 <p x-html="renderMarkdown(f.comment)"
                                                                    class="mb-2 text-break overflow-hidden"></p>
-                                                                <div class="d-flex justify-content-between specific-fontsize">
+                                                                <div class="d-flex justify-content-between specific-fontsize-09">
                                                                     <div class="d-flex flex-column">
                                                                         {% include 'projects/project/fragments/task/task_followup_user_card.html' %}
                                                                         <span class="text-muted tiny specific-lineheight"
@@ -177,12 +177,12 @@
                                 </div>
                             </div>
                             <template x-if="task.public || showEdition">
-                                <div class="w-100 p-3 specific-border-top">
+                                <div class="w-100 p-3 specific-border-top-solid1pxEEE">
                                     {% include 'tools/editor.html' with is_task_modal_comment=True %}
                                 </div>
                             </template>
                             <template x-if="!task.public">
-                                <div class="w-100 p-3 specific-border-top">
+                                <div class="w-100 p-3 specific-border-top-solid1pxEEE">
                                     <div class="text-center">
                                         <span class="text-muted">Vous devez publier votre recommandation pour ajouter un commentaire</span>
                                     </div>

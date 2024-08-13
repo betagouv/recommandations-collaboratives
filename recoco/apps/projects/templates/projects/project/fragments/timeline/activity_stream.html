@@ -20,7 +20,7 @@
                         <span class="align-items-center link-dark text-decoration-none">
                             <img src="{% gravatar_url action.actor.email 32 %}"
                                  alt="{{ action.actor.get_full_name }}"
-                                 class="me-1 rounded-circle img-specific-size" />
+                                 class="me-1 rounded-circle activity-img-specific-size" />
                         </span>
                         <span class="align-middle small">
                             {{ action.actor.get_full_name|capfirst|default:action.actor }}

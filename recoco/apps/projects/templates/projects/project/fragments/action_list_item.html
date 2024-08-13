@@ -52,7 +52,7 @@
 <div id="action-{{ task.id }}"
      class="accordion border border-1 rounded-3 mb-4 position-relative {% if task.id in actions_with_notifications %}bg-light-yellow{% endif %}">
     {% if not task.visited and task.public %}
-        <span class="position-absolute top-0 start-0 translate-middle badge rounded-pill bg-primary specific-margin">NOUVEAU</span>
+        <span class="position-absolute top-0 start-0 translate-middle badge rounded-pill bg-primary specific-ml-60">NOUVEAU</span>
     {% endif %}
     {% if task.id in actions_with_notifications %}
         <span class="position-absolute top-0 start-50 translate-middle badge rounded-pill bg-danger">
@@ -66,7 +66,7 @@
         </span>
     {% endif %}
     {% if not task.public %}
-        <span class="position-absolute top-0 start-0 translate-middle badge rounded-pill bg-warning specific-margin">BROUILLON</span>
+        <span class="position-absolute top-0 start-0 translate-middle badge rounded-pill bg-warning specific-ml-60">BROUILLON</span>
     {% endif %}
     <div class="accordion-header d-flex justify-content-between border-bottom">
         <div class="task-opening d-flex ps-4 pt-4 justify-content-between flew-grow-1 w-100 position-relative pb-4">

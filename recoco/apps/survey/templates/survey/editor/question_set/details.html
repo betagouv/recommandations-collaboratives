@@ -91,7 +91,7 @@
                     <span class="align-middle">{{ question.text }}
                         {% if question.text_short %}<span class="text-secondary small">({{ question.text_short }}){% endif %}
                         </span></span>
-                        <span class="text-secondary small span-specific-fontsize">
+                        <span class="text-secondary small span-specific-fontsize-15">
                             &nbsp;
                             <svg class="bi" width="15" height="15" fill="currentColor">
                                 <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#sort-up" />
@@ -161,7 +161,7 @@
                                 <div>
                                     {{ choice.text }}
                                     {% if choice.conclusion %}(<span class="fw-bold">{{ choice.conclusion }}</span>){% endif %}
-                                    <span class="text-secondary small span-specific-fontsize">
+                                    <span class="text-secondary small span-specific-fontsize-15">
                                         &nbsp;
                                         <svg class="bi" width="15" height="15" fill="currentColor">
                                             <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#sort-up" />

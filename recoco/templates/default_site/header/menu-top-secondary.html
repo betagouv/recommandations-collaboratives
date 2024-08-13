@@ -3,9 +3,8 @@
 {% load gravatar %}
 {% load django_vite %}
 {% load projects_extra %}
-{% load sass_tags %}
 {% block css %}
-  <link href="{% sass_src 'css/header/header.scss' %}"
+  <link href="{% static 'css/header/header.scss' %}"
         rel="stylesheet"
         type="text/css">
 {% endblock %}
@@ -19,7 +18,7 @@
     {% if 'moderate_projects' in user_site_perms %}
         {% get_project_moderation_count as projects_to_moderate_count %}
     {% endif %}
-    <ul class="list-unstyled mb-0 d-flex align-items-center specific-pl tmp-usevar"
+    <ul class="list-unstyled mb-0 d-flex align-items-center header-specific-pl-15 tmp-usevar"
         data-test-id="secondary-menu"
         style="{% if not user.is_authenticated %}border-left: 0.1rem solid #d5d5d5;{% endif %}">
         <!-- Dashboard -->
@@ -57,7 +56,7 @@
                                     </span>
                                 </div>
                             </li>
-                            <li class="text-white bg-blue-light-hover list-group-item px-3 py-2 list-group-item-action dropdown-item border-0 d-flex align-items-center specific-background">
+                            <li class="text-white bg-blue-light-hover list-group-item px-3 py-2 list-group-item-action dropdown-item border-0 d-flex align-items-center specific-background-0063CB">
                                 <span class="text-break text-truncate">
                                     <svg data-toggle="tooltip"
                                          data-placement="top"
@@ -70,7 +69,7 @@
                                         <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#plus" />
                                     </svg>
                                     <a href="{% url 'onboarding-prefill-set-user' %}"
-                                       class="stretched-link text-reset text-decoration-none specific-color"
+                                       class="stretched-link text-reset text-decoration-none specific-color-white"
                                        href="">Créer un nouveau projet</a>
                                 </span>
                             </li>
@@ -87,7 +86,7 @@
                         <div x-data="{ open: false }"
                              x-on:click.outside="open = false"
                              class="btn-group">
-                            <a class="ms-1 align-middle text-decoration-none specific-color2"
+                            <a class="ms-1 align-middle text-decoration-none specific-color-inherit"
                                href="{% url 'projects-project-detail' active_project.pk %}"><strong>{{ active_project.name }}</strong><span class="text-secondary small ms-2 text-break text-truncate">({{ active_project.commune.name }})</span></strong></a>
                         </div>
                     </div>
@@ -142,7 +141,7 @@
                                     </li>
                                 {% endfor %}
                                 {% if not is_switchtender %}
-                                    <li class="text-white bg-blue-light-hover list-group-item px-3 py-2 list-group-item-action dropdown-item border-0 d-flex align-items-center specific-background">
+                                    <li class="text-white bg-blue-light-hover list-group-item px-3 py-2 list-group-item-action dropdown-item border-0 d-flex align-items-center specific-background-0063CB">
                                         <span class="text-break text-truncate">
                                             <svg data-toggle="tooltip"
                                                  data-placement="top"
@@ -155,7 +154,7 @@
                                                 <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#plus" />
                                             </svg>
                                             <a href="{% url 'onboarding' %}"
-                                               class="stretched-link text-reset text-decoration-none specific-color">Créer un nouveau projet</a>
+                                               class="stretched-link text-reset text-decoration-none specific-color-white">Créer un nouveau projet</a>
                                         </span>
                                     </li>
                                 {% endif %}

@@ -124,7 +124,7 @@
                     <button @click="openInviteSwitchtenderModal"
                             data-toggle="modal"
                             data-target="#InviteSwitchtenderModal"
-                            class="{% if project.status == 'DRAFT' %} disabled{% endif %} button d-inline-flex justify-content-center w-100 mb-4 need-cursor">
+                            class="{% if project.status == 'DRAFT' %} disabled{% endif %} button d-inline-flex justify-content-center w-100 mb-4 specific-cursor-pointer">
                         {% if project.status == 'DRAFT' %}
                             <svg class="bi align-middle" width="18" height="18" fill="currentColor">
                                 <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#lock-fill" />
@@ -185,7 +185,7 @@
                     <button @click="openInviteMemberModal"
                             data-toggle="modal"
                             data-target="#InviteMemberModal"
-                            class="{% if project.status == 'DRAFT' %} disabled{% endif %} button d-inline-flex justify-content-center w-100 mb-4 need-cursor">
+                            class="{% if project.status == 'DRAFT' %} disabled{% endif %} button d-inline-flex justify-content-center w-100 mb-4 specific-cursor-pointer">
                         {% if project.status == 'DRAFT' %}
                             <svg class="bi align-middle" width="18" height="18" fill="currentColor">
                                 <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#lock-fill" />
@@ -199,7 +199,7 @@
                         {% if pm.is_owner %}
                             <li class="d-flex align-items-start justify-content-between mb-1">
                                 {% include 'user/user_card.html' with user=pm.member project_owner=True user_activity=True %}
-                                <span class="ms-1 text-lowercase fst-italic font-weight-light specific-color">Référent du projet</span>
+                                <span class="ms-1 text-lowercase fst-italic font-weight-light specific-color-666">Référent du projet</span>
                             </li>
                         {% else %}
                             <li class="d-flex align-items-start justify-content-between mb-1">
