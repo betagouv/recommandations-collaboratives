@@ -9,10 +9,19 @@
   max-width: 800px;
 }
 
-.hr-style {
+.specific-height-1px {
   height: 1px;
+}
+
+.specific-mb-20px {
   margin-bottom: 20px;
+}
+
+.specific-backgroundcolor-grey {
   background-color: grey !important;
+}
+
+.specific-backgroundimage-none {
   background-image: none;
 }
 

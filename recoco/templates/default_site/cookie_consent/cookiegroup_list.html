@@ -110,11 +110,11 @@
                       <div class="d-flex flex-column">
                         {% for cookie in cookie_group.cookie_set.all %}
                           <div class="d-flex align-items-center justify-content-between">
-                            <div class="specific-width">
+                            <div class="specific-width-60pct">
                               <strong>{{ cookie.name }}</strong>
                               {% if cookie.domain %}({{ cookie.domain }}){% endif %}
                             </div>
-                            <div class="specific-width2">
+                            <div class="specific-width-40pct">
                               {% if cookie.description %}{{ cookie.description }}{% endif %}
                             </div>
                           </div>

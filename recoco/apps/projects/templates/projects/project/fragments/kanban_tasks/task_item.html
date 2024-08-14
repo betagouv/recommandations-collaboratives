@@ -107,13 +107,13 @@
                                      :title="`${t.created_by.first_name} ${t.created_by.last_name}`"
                                      tabindex="0" />
                                 <span :class="!t.created_by.is_active && 'inactive-status'"
-                                      class="ms-1 fst-italic specific-lineheight"
+                                      class="ms-1 fst-italic specific-lineheight-20"
                                       x-text="`${t.created_by.first_name} ${t.created_by.last_name}`"></span>
                                 <template x-if="t.created_by.profile.organization">
                                     <span x-text="t.created_by.profile.organization.name"
                                           class="fst-italic text-muted"></span>
                                 </template>
-                                <span class="ms-2 text-muted specific-lineheight"
+                                <span class="ms-2 text-muted specific-lineheight-20"
                                       x-text="`le ${formatDate(t.created_on)}`"></span>
                             </div>
                         </div>

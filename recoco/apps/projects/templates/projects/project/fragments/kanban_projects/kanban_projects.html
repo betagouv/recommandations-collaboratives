@@ -54,7 +54,7 @@
             <div class="px-2 bg-light border-top border-4 me-3 tmp-usevar"
                  :style="`border-color:${board.color}!important;width:30%`">
                 <h5 x-text="board.title" class="font-medium text-gray-800 mt-2"></h5>
-                <div class="position-relative overflow-auto specific-height">
+                <div class="position-relative overflow-auto specific-height-80vh">
                     <div class="drag-targetable py-3 h-100 position-absolute t-0 l-0 w-100 h-100"
                          @dragover="onDragOver(event, null)"
                          @drop="onDrop(event, board.code)"

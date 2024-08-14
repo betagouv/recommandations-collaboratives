@@ -1,13 +1,19 @@
-.specific-hr {
+.specific-height-1px {
   height: 1px;
-  margin-top: 45px;
-  background-color: grey !important;
-  background-image: none;
 }
 
-.specific-hr2 {
-  height: 1px;
+.specific-mt-45px {
+  margin-top: 45px;
+}
+
+.specific-mb-20px {
   margin-bottom: 20px;
+}
+
+.specific-backgroundcolor-grey {
   background-color: grey !important;
+}
+
+.specific-backgroundimage-none {
   background-image: none;
 }

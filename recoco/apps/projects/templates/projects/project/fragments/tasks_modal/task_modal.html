@@ -101,7 +101,7 @@
                                             <div class="d-flex justify-content-between align-items-center specific-fontsize-09">
                                                 <div class="d-flex flex-column">
                                                     {% include 'projects/project/fragments/task/task_user_card.html' %}
-                                                    <span class="text-muted tiny specific-lineheight"
+                                                    <span class="text-muted tiny specific-lineheight-20"
                                                           x-text="`le ${formatDate(task?.created_on)}`"></span>
                                                 </div>
                                                 <template x-if="$store.djangoData.canManageTasks">
@@ -113,9 +113,9 @@
                                     <template x-if="!task?.resource_id">
                                         <div class="my-3">
                                             <div class="mx-3 mb-1 text-center specific-fontsize-08">
-                                                <span class="ms-1 fst-italic specific-lineheight"
+                                                <span class="ms-1 fst-italic specific-lineheight-20"
                                                       x-text="`${task?.created_by.first_name} ${task?.created_by.last_name}`"></span> a créé cette recommandation sans ressource
-                                                <span class="text-muted specific-lineheight"
+                                                <span class="text-muted specific-lineheight-20"
                                                       x-text="`le ${formatDate(task?.created_on)}`"></span>
                                             </div>
                                         </div>
@@ -133,7 +133,7 @@
                                                         <div class="d-flex justify-content-between align-items-center specific-fontsize-09">
                                                             <div class="d-flex flex-column">
                                                                 {% include 'projects/project/fragments/task/task_followup_user_card.html' %}
-                                                                <span class="text-muted tiny specific-lineheight"
+                                                                <span class="text-muted tiny specific-lineheight-20"
                                                                       x-text="`le ${formatDate(f.timestamp)}`"></span>
                                                             </div>
                                                             <template x-if="$store.djangoData.canUseTasks && f.who.email === $store.djangoData.userEmail">
@@ -148,9 +148,9 @@
                                                     <div class="my-3"
                                                          :class="hasNotification(f.id) && 'is-new-followup-status'">
                                                         <div class="mx-3 mb-1 text-center followup-status-message specific-fontsize-08">
-                                                            <span class="ms-1 fst-italic specific-lineheight"
+                                                            <span class="ms-1 fst-italic specific-lineheight-20"
                                                                   x-text="`${f.who.first_name} ${f.who.last_name}`"></span> a changé le statut de la recommandation en <span class="fw-bold" x-text="statusText(f.status)"></span>
-                                                            <span class="text-muted specific-lineheight"
+                                                            <span class="text-muted specific-lineheight-20"
                                                                   x-text="`le ${formatDate(f.timestamp)}`"></span>
                                                         </div>
                                                         <template x-if="f.comment !== ''">
@@ -160,7 +160,7 @@
                                                                 <div class="d-flex justify-content-between specific-fontsize-09">
                                                                     <div class="d-flex flex-column">
                                                                         {% include 'projects/project/fragments/task/task_followup_user_card.html' %}
-                                                                        <span class="text-muted tiny specific-lineheight"
+                                                                        <span class="text-muted tiny specific-lineheight-20"
                                                                               x-text="`le ${formatDate(f.timestamp)}`"></span>
                                                                     </div>
                                                                     <template x-if="$store.djangoData.canUseTasks && f.who.email === $store.djangoData.userEmail">

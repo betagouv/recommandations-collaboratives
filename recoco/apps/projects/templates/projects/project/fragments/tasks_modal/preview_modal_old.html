@@ -54,7 +54,7 @@
                                     </div>
                                 </div>
                             </template>
-                            <div class="border border-top-0 border-bottom-0 border-right-0 flex-shrink-0 d-flex flex-column justify-content-between specific-width">
+                            <div class="border border-top-0 border-bottom-0 border-right-0 flex-shrink-0 d-flex flex-column justify-content-between specific-width-33pct">
                                 <div class="d-flex flex-column flex-fill overflow-hidden">
                                     {% include 'projects/project/fragments/status_switcher.html' %}
                                     <div x-show="$store.taskModal.currentTask.document && $store.taskModal.currentTask.document.length > 0">
@@ -86,13 +86,13 @@
                                                              data-bs-placement="bottom"
                                                              :title="`${$store.taskModal.currentTask.created_by.first_name} ${$store.taskModal.currentTask.created_by.last_name}`"
                                                              tabindex="0" />
-                                                        <span class="ms-1 fw-bold specific-lineheight"
+                                                        <span class="ms-1 fw-bold specific-lineheight-20"
                                                               x-text="`${$store.taskModal.currentTask.created_by.first_name} ${$store.taskModal.currentTask.created_by.last_name}`"></span>
                                                         <template x-if="$store.taskModal.currentTask.created_by.profile.organization">
                                                             <span x-text="$store.taskModal.currentTask.created_by.profile.organization.name"
                                                                   class="fst-italic text-muted"></span>
                                                         </template>
-                                                        <span class="ms-2 text-muted specific-lineheight"
+                                                        <span class="ms-2 text-muted specific-lineheight-20"
                                                               x-text="`le ${formatDate($store.taskModal.currentTask.created_on)}`"></span>
                                                     </div>
                                                     <template x-if="canAdministrate">
@@ -104,9 +104,9 @@
                                         <template x-if="!$store.taskModal.currentTask.resource_id">
                                             <div class="my-3">
                                                 <div class="mx-3 mb-1 text-center specific-fontsize-08">
-                                                    <span class="ms-1 fst-italic specific-lineheight"
+                                                    <span class="ms-1 fst-italic specific-lineheight-20"
                                                           x-text="`${$store.taskModal.currentTask.created_by.first_name} ${$store.taskModal.currentTask.created_by.last_name}`"></span> a créé cette recommandation sans ressource
-                                                    <span class="ms-1 text-muted specific-lineheight"
+                                                    <span class="ms-1 text-muted specific-lineheight-20"
                                                           x-text="`le ${formatDate($store.taskModal.currentTask.created_on)}`"></span>
                                                 </div>
                                             </div>
@@ -131,13 +131,13 @@
                                                                          data-bs-placement="bottom"
                                                                          :title="`${f.who.first_name} ${f.who.last_name}`"
                                                                          tabindex="0" />
-                                                                    <span class="ms-1 fst-italic specific-lineheight"
+                                                                    <span class="ms-1 fst-italic specific-lineheight-20"
                                                                           x-text="`${f.who.first_name} ${f.who.last_name}`"></span>
                                                                     <template x-if="f.who.profile.organization">
                                                                         <span x-text="f.who.profile.organization.name"
                                                                               class="fst-italic text-muted"></span>
                                                                     </template>
-                                                                    <span class="ms-2 text-muted specific-lineheight"
+                                                                    <span class="ms-2 text-muted specific-lineheight-20"
                                                                           x-text="`le ${formatDate(f.timestamp)}`"></span>
                                                                 </div>
                                                                 <template x-if="$store.tasksData.canUseTasks && f.who.email === userEmail">
@@ -149,9 +149,9 @@
                                                     <template x-if="isStatusUpdate(f) && f.status || isStatusUpdate(f) && f.status == 0">
                                                         <div class="my-3" :class="hasNotification(f.id) && 'text-warning'">
                                                             <div class="mx-3 mb-1 text-center specific-fontsize-08">
-                                                                <span class="ms-1 fst-italic specific-lineheight"
+                                                                <span class="ms-1 fst-italic specific-lineheight-20"
                                                                       x-text="`${f.who.first_name} ${f.who.last_name}`"></span> a changé le statut de la recommandation en <span class="fw-bold" x-text="statusText(f.status)"></span>
-                                                                <span class="text-muted specific-lineheight"
+                                                                <span class="text-muted specific-lineheight-20"
                                                                       x-text="`le ${formatDate(f.timestamp)}`"></span>
                                                             </div>
                                                             <template x-if="f.comment !== ''">
@@ -167,13 +167,13 @@
                                                                                  data-bs-placement="bottom"
                                                                                  :title="`${f.who.first_name} ${f.who.last_name}`"
                                                                                  tabindex="0" />
-                                                                            <span class="ms-1 fst-italic specific-lineheight"
+                                                                            <span class="ms-1 fst-italic specific-lineheight-20"
                                                                                   x-text="`${f.who.first_name} ${f.who.last_name}`"></span>
                                                                             <template x-if="f.who.profile.organization">
                                                                                 <span x-text="f.who.profile.organization.name"
                                                                                       class="fst-italic text-muted"></span>
                                                                             </template>
-                                                                            <span class="ms-2 text-muted specific-lineheight"
+                                                                            <span class="ms-2 text-muted specific-lineheight-20"
                                                                                   x-text="`le ${formatDate(f.timestamp)}`"></span>
                                                                         </div>
                                                                         <template x-if="$store.tasksData.canUseTasks && f.who.email === userEmail">

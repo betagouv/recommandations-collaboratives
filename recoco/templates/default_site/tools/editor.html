@@ -13,7 +13,7 @@
     <div class="tiptap-menu">
       <button @click.stop.prevent="toggleHeading({ level: 3 })"
               :class="{ 'is-active': isActive('heading', { level: 3 }, updatedAt) }">
-        <span class="specific-fontweight">Titre</span>
+        <span class="specific-fontweight-500">Titre</span>
       </button>
       <button @click.stop.prevent="toggleBold()"
               :class="{ 'is-active' : isActive('bold', updatedAt) }">
@@ -74,13 +74,13 @@
       {% for error in errors %}<div class="text-danger text-start mb-2">{{ error }}</div>{% endfor %}
     {% endif %}
     {% if not is_task_comment and not is_task_modal_comment and is_task %}
-      <textarea class="position-absolute top-0 opacity-0 specific-height"
+      <textarea class="position-absolute top-0 opacity-0 specific-height-0"
                 x-model="markdownContent"
                 name="{{input_name}}"
                 :required="push_type == 'noresource' || (push_type == 'single' && public)"
                 {% if input_required %} required {% endif %}></textarea>
     {% else %}
-      <textarea class="position-absolute top-0 opacity-0 specific-height"
+      <textarea class="position-absolute top-0 opacity-0 specific-height-0"
                 x-model="markdownContent"
                 name="{{input_name}}"
                 {% if input_required %} required {% endif %}></textarea>

@@ -19,7 +19,7 @@
                         <h5 x-text="board.title" class="fs-6 fw-normal text-gray-800 mb-0"></h5>
                     </div>
                 </div>
-                <div class="px-2 pt-2 mt-2 pb-1 overflow-auto position-relative specific-height">
+                <div class="px-2 pt-2 mt-2 pb-1 overflow-auto position-relative specific-height-80vh">
                     <template x-if="column(board.status).length === 0">
                         <div class="drag-targetable py-3"
                              @dragover="onDragOver(event, null)"
@@ -27,7 +27,7 @@
                              @dragenter="onDragEnter(event)"
                              @dragleave="onDragLeave(event)"
                              data-test-id="drag-target">
-                            <div class="drag-placeholder rounded d-flex align-items-center justify-content-center text-uppercase specific-fontsize-08 specific-height2">Glissez et déposez une fiche ici</div>
+                            <div class="drag-placeholder rounded d-flex align-items-center justify-content-center text-uppercase specific-fontsize-08 specific-height-100px">Glissez et déposez une fiche ici</div>
                         </div>
                     </template>
                     <template x-for="(task, i) in column(board.status)" :key="task.id">
