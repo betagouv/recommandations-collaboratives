@@ -32,11 +32,11 @@ def document_list(request, project_id=None):
     # Set this project as active
     set_active_project_id(request, project.pk)
 
-    all_files = models.Document.on_site.filter(project_id=project.pk).exclude(
+    all_files = models.Document.objects.filter(project_id=project.pk).exclude(
         the_file__in=["", None]
     )
     pinned_files = all_files.filter(pinned=True)
-    links = models.Document.on_site.filter(project_id=project.pk).exclude(the_link=None)
+    links = models.Document.objects.filter(project_id=project.pk).exclude(the_link=None)
 
     # Mark this project document notifications as read
     if not request.user.is_hijacked:
@@ -97,8 +97,8 @@ def document_upload(request, project_id):
 @login_required
 def document_delete(request, project_id, document_id):
     """Delete a document for a project"""
-    project = get_object_or_404(models.Project, pk=project_id, sites=request.site)
-    document = get_object_or_404(models.Document, pk=document_id, site=request.site)
+    project = get_object_or_404(models.Project, pk=project_id)
+    document = get_object_or_404(models.Document, pk=document_id)
 
     has_perm_or_403(request.user, "manage_documents", project)
 
@@ -119,8 +119,8 @@ def document_delete(request, project_id, document_id):
 @login_required
 def document_pin_unpin(request, project_id, document_id):
     """Delete a document for a project"""
-    project = get_object_or_404(models.Project, pk=project_id, sites=request.site)
-    document = get_object_or_404(models.Document, pk=document_id, site=request.site)
+    project = get_object_or_404(models.Project, pk=project_id)
+    document = get_object_or_404(models.Document, pk=document_id)
 
     has_perm_or_403(request.user, "manage_documents", project)
 

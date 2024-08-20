@@ -57,6 +57,10 @@
                         {% url 'projects-project-administration' project.pk as url %}
                         {% include 'crm/fragments/crm_icon_button.html' with name="Gérer les membres" icon="person" link_url=url anchor="#user-management" %}
                     </li>
+                    <li class="me-2 col-2">
+                        {% url 'crm-project-handover' project.pk as url %}
+                        {% include 'crm/fragments/crm_icon_button.html' with name="Proposer à un autre portail" icon="broadcast" link_url=url anchor="#project-handover" %}
+                    </li>
                 </ul>
             </div>
             <div class="px-4 pt-4 mb-3">

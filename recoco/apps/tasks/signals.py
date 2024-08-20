@@ -56,7 +56,7 @@ def notify_action_created(sender, task, project, user, **kwargs):
     if task.public is False:
         return
 
-    if project.status == "DRAFT" or project.muted:
+    if project.project_sites.current().status == "DRAFT" or project.muted:
         return
 
     if project.inactive_since:
@@ -156,7 +156,7 @@ def log_action_undone(sender, task, project, user, **kwargs):
 
 @receiver(action_commented)
 def log_action_commented(sender, task, project, user, **kwargs):
-    if project.status == "DRAFT" or project.muted:
+    if project.project_sites.current().status == "DRAFT" or project.muted:
         return
 
     action.send(
@@ -169,7 +169,7 @@ def log_action_commented(sender, task, project, user, **kwargs):
 
 @receiver(action_commented)
 def notify_action_commented(sender, task, project, user, **kwargs):
-    if project.status == "DRAFT" or project.muted:
+    if project.project_sites.current().status == "DRAFT" or project.muted:
         return
 
     if project.inactive_since:
@@ -258,7 +258,7 @@ def set_task_status_when_followup_is_issued(sender, instance, created, **kwargs)
         models.Task.BLOCKED: action_blocked,
     }
 
-    muted = (project.status == "DRAFT") or project.muted
+    muted = (project.project_sites.current().status == "DRAFT") or project.muted
 
     # Notify about status change
     if instance.status is not None and instance.status != instance.task.status:

@@ -34,12 +34,7 @@ def test_project_documents_not_available_for_non_switchtender(request, client):
 
 
 @pytest.mark.django_db
-def test_project_documents_available_for_owner(request, client):
-    current_site = get_current_site(request)
-
-    # project email is same as test user to be logged in
-    project = Recipe(models.Project, status="READY", sites=[current_site]).make()
-
+def test_project_documents_available_for_owner(request, client, project):
     with login(client) as user:
         assign_collaborator(user, project, is_owner=True)
         url = reverse("projects-project-detail-documents", args=[project.id])
@@ -49,38 +44,28 @@ def test_project_documents_available_for_owner(request, client):
 
 
 @pytest.mark.django_db
-def test_draft_project_documents_not_available_for_owner(request, client):
-    current_site = get_current_site(request)
-
-    # project email is same as test user to be logged in
-    project = Recipe(models.Project, status="DRAFT", sites=[current_site]).make()
-
+def test_draft_project_documents_not_available_for_owner(
+    request, client, project_draft
+):
     with login(client) as user:
-        assign_collaborator(user, project, is_owner=True)
-        url = reverse("projects-project-detail-documents", args=[project.id])
+        assign_collaborator(user, project_draft, is_owner=True)
+        url = reverse("projects-project-detail-documents", args=[project_draft.id])
         response = client.get(url)
 
     assert response.status_code == 403
 
 
 @pytest.mark.django_db
-def test_upload_document_not_available_for_non_logged_users(client, request):
-    project = baker.make(models.Project, sites=[get_current_site(request)])
+def test_upload_document_not_available_for_non_logged_users(client, request, project):
     url = reverse("projects-documents-upload-document", args=[project.id])
     response = client.get(url)
     assert response.status_code == 302
 
 
 @pytest.mark.django_db
-def test_upload_file_available_for_project_collaborators(client, request):
+def test_upload_file_available_for_project_collaborators(client, request, project):
     png = SimpleUploadedFile("img.png", b"file_content", content_type="image/png")
     data = {"description": "this is some content", "the_file": png}
-
-    project = baker.make(
-        models.Project,
-        sites=[get_current_site(request)],
-        status="READY",
-    )
 
     with login(client) as user:
         assign_collaborator(user, project, is_owner=True)
@@ -97,16 +82,11 @@ def test_upload_file_available_for_project_collaborators(client, request):
 
 
 @pytest.mark.django_db
-def test_upload_document_is_either_link_or_file(client, request):
+def test_upload_document_is_either_link_or_file(client, request, project):
     data = {"description": "this is some content"}
 
     membership = baker.make(models.ProjectMember, is_owner=True, member__is_staff=False)
-    project = baker.make(
-        models.Project,
-        sites=[get_current_site(request)],
-        projectmember_set=[membership],
-        status="READY",
-    )
+    project.projectmember_set.add(membership)
 
     with login(client, user=membership.member):
         url = reverse("projects-documents-upload-document", args=[project.id])
@@ -117,17 +97,12 @@ def test_upload_document_is_either_link_or_file(client, request):
 
 
 @pytest.mark.django_db
-def test_upload_file_triggers_notifications(client, request):
+def test_upload_file_triggers_notifications(client, request, project):
     png = SimpleUploadedFile("img.png", b"file_content", content_type="image/png")
     data = {"description": "this is some content", "the_file": png}
 
     other_user = baker.make(auth_models.User)
 
-    project = baker.make(
-        models.Project,
-        sites=[get_current_site(request)],
-        status="READY",
-    )
     assign_collaborator(other_user, project, is_owner=False)
 
     with login(client) as user:
@@ -146,21 +121,14 @@ def test_upload_file_triggers_notifications(client, request):
 
 
 @pytest.mark.django_db
-def test_delete_document_not_available_for_non_logged_users(client, request):
-    project = Recipe(models.Project, sites=[get_current_site(request)]).make()
+def test_delete_document_not_available_for_non_logged_users(client, request, project):
     url = reverse("projects-documents-delete-document", args=[project.id, 1])
     response = client.get(url)
     assert response.status_code == 302
 
 
 @pytest.mark.django_db
-def test_delete_document_available_for_owner(client, request):
-    project = baker.make(
-        models.Project,
-        sites=[get_current_site(request)],
-        status="READY",
-    )
-
+def test_delete_document_available_for_owner(client, request, project):
     with login(client) as user:
         document = baker.make(
             models.Document,
@@ -182,12 +150,7 @@ def test_delete_document_available_for_owner(client, request):
 
 
 @pytest.mark.django_db
-def test_delete_document_not_available_for_others(client, request):
-    project = baker.make(
-        models.Project,
-        sites=[get_current_site(request)],
-        status="READY",
-    )
+def test_delete_document_not_available_for_others(client, request, project):
     document = baker.make(
         models.Document,
         project=project,
@@ -210,16 +173,7 @@ def test_delete_document_not_available_for_others(client, request):
 
 
 @pytest.mark.django_db
-def test_project_pin_document(request, client):
-    current_site = get_current_site(request)
-
-    # project email is same as test user to be logged in
-    project = Recipe(
-        models.Project,
-        status="READY",
-        sites=[current_site],
-    ).make()
-
+def test_project_pin_document(request, client, project):
     with login(client) as user:
         document = baker.make(
             models.Document,
@@ -241,16 +195,7 @@ def test_project_pin_document(request, client):
 
 
 @pytest.mark.django_db
-def test_project_unpin_document(request, client):
-    current_site = get_current_site(request)
-
-    # project email is same as test user to be logged in
-    project = Recipe(
-        models.Project,
-        status="READY",
-        sites=[current_site],
-    ).make()
-
+def test_project_unpin_document(request, client, project):
     with login(client) as user:
         document = baker.make(
             models.Document,

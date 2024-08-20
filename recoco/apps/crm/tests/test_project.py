@@ -11,6 +11,7 @@ from pytest_django.asserts import assertContains, assertNotContains, assertRedir
 from recoco.apps.home import models as home_models
 from recoco.apps.onboarding import models as onboarding_models
 from recoco.apps.projects import models as projects_models
+from recoco.apps.projects import utils as projects_utils
 from recoco.utils import login
 
 from .. import models
@@ -138,7 +139,7 @@ def test_crm_project_list_filters_by_commune_name(request, client):
 
 
 @pytest.mark.django_db
-def test_crm_project_details_available_for_staff(request, client):
+def test_crm_project_details_available_for_staff(request, client, project):
     site = get_current_site(request)
     onboarding = onboarding_models.Onboarding.objects.first()
     baker.make(
@@ -146,7 +147,6 @@ def test_crm_project_details_available_for_staff(request, client):
         site=site,
         onboarding=onboarding,
     )
-    project = baker.make(projects_models.Project, sites=[site])
 
     url = reverse("crm-project-details", args=[project.pk])
     with login(client, groups=["example_com_staff"]):
@@ -160,10 +160,7 @@ def test_crm_project_details_available_for_staff(request, client):
 
 
 @pytest.mark.django_db
-def test_crm_project_update_not_available_for_non_staff(request, client):
-    site = get_current_site(request)
-    project = baker.make(projects_models.Project, sites=[site])
-
+def test_crm_project_update_not_available_for_non_staff(request, client, project):
     url = reverse("crm-project-update", args=[project.id])
     with login(client):
         response = client.get(url)
@@ -172,9 +169,9 @@ def test_crm_project_update_not_available_for_non_staff(request, client):
 
 
 @pytest.mark.django_db
-def test_crm_project_update_not_available_for_other_site(request, client):
+def test_crm_project_update_not_available_for_other_site(request, client, make_project):
     site = baker.make(site_models.Site)
-    project = baker.make(projects_models.Project, sites=[site])
+    project = make_project(site=site)
 
     url = reverse("crm-project-update", args=[project.id])
     with login(client, groups=["example_com_staff"]):
@@ -184,10 +181,7 @@ def test_crm_project_update_not_available_for_other_site(request, client):
 
 
 @pytest.mark.django_db
-def test_crm_project_update_available_for_staff(request, client):
-    site = get_current_site(request)
-    project = baker.make(projects_models.Project, sites=[site])
-
+def test_crm_project_update_available_for_staff(request, client, project):
     url = reverse("crm-project-update", args=[project.id])
     with login(client, groups=["example_com_staff"]):
         response = client.get(url)
@@ -400,7 +394,7 @@ def test_crm_search_by_user_name_on_current_site(request, client):
 
 
 @pytest.mark.django_db
-def test_toggle_unauthorized_project_annotation(request, client):
+def test_toggle_unauthorized_project_annotation(request, client, project):
     site = get_current_site(request)
     onboarding = onboarding_models.Onboarding.objects.first()
     baker.make(
@@ -408,7 +402,6 @@ def test_toggle_unauthorized_project_annotation(request, client):
         site=site,
         onboarding=onboarding,
     )
-    project = baker.make(models.projects_models.Project, sites=[site])
 
     url = reverse("crm-project-toggle-annotation", args=[project.id])
     data = {"tag": "a nice tag"}
@@ -424,7 +417,7 @@ def test_toggle_unauthorized_project_annotation(request, client):
 
 
 @pytest.mark.django_db
-def test_toggle_missing_project_annotation(request, client):
+def test_toggle_missing_project_annotation(request, client, project):
     test_tag = "a nice tag"
     site = get_current_site(request)
     onboarding = onboarding_models.Onboarding.objects.first()
@@ -434,7 +427,6 @@ def test_toggle_missing_project_annotation(request, client):
         onboarding=onboarding,
     )
     site_config.crm_available_tags.add(test_tag)
-    project = baker.make(models.projects_models.Project, sites=[site])
 
     url = reverse("crm-project-toggle-annotation", args=[project.id])
     data = {"tag": test_tag}
@@ -450,7 +442,7 @@ def test_toggle_missing_project_annotation(request, client):
 
 
 @pytest.mark.django_db
-def test_toggle_on_project_annotation(request, client):
+def test_toggle_on_project_annotation(request, client, project):
     site = get_current_site(request)
     onboarding = onboarding_models.Onboarding.objects.first()
     test_tag = "a nice tag"
@@ -463,7 +455,6 @@ def test_toggle_on_project_annotation(request, client):
     site_config.crm_available_tags.add(test_tag)
     site_config.crm_available_tags.add(other_tag)
 
-    project = baker.make(models.projects_models.Project, sites=[site])
     annotation = baker.make(models.ProjectAnnotations, site=site, project=project)
     detail_url = reverse("crm-project-details", args=[annotation.project.id])
 
@@ -510,7 +501,7 @@ def test_toggle_on_project_annotation(request, client):
 
 
 @pytest.mark.django_db
-def test_toggle_off_project_annotation(request, client):
+def test_toggle_off_project_annotation(request, client, project):
     site = get_current_site(request)
     onboarding = onboarding_models.Onboarding.objects.first()
     test_tag = "a nice tag"
@@ -523,7 +514,6 @@ def test_toggle_off_project_annotation(request, client):
     site_config.crm_available_tags.add(test_tag)
     site_config.crm_available_tags.add(other_tag)
 
-    project = baker.make(models.projects_models.Project, sites=[site])
     annotation = baker.make(models.ProjectAnnotations, site=site, project=project)
     detail_url = reverse("crm-project-details", args=[annotation.project.id])
 
@@ -561,6 +551,74 @@ def test_toggle_off_project_annotation(request, client):
 
         url = reverse("crm-project-details", args=[annotation.project.id])
         assertRedirects(response, url)
+
+
+#### Handover
+@pytest.mark.django_db
+def test_crm_project_handover_is_not_reachable_by_nonstaff(request, client, project):
+    url = reverse("crm-project-handover", args=[project.id])
+
+    with login(client):
+        response = client.get(url)
+
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_crm_project_handover_is_reachable(request, client, project):
+    url = reverse("crm-project-handover", args=[project.id])
+
+    with login(client, groups=["example_com_staff"]):
+        response = client.get(url)
+
+    assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_crm_project_handover(request, client, project):
+    url = reverse("crm-project-handover", args=[project.id])
+    other_site = baker.make(
+        site_models.Site, name="other site", configuration__accept_handover=True
+    )
+    john = baker.make(auth_models.User, first_name="John", last_name="DOE")
+    projects_utils.assign_collaborator(john, project, is_owner=True)
+
+    with login(client, groups=["example_com_staff"]):
+        response = client.post(url, data={"site": other_site.pk})
+        assert response.status_code == 302
+
+    project.refresh_from_db()
+
+    assert len(project.project_sites.all()) == 2
+
+
+@pytest.mark.django_db
+def test_crm_project_handover_on_existing_site(request, client, project):
+    url = reverse("crm-project-handover", args=[project.id])
+
+    with login(client, groups=["example_com_staff"]):
+        response = client.post(url, data={"site": get_current_site(request).pk})
+        assert response.status_code == 200
+
+    project.refresh_from_db()
+
+    assert len(project.project_sites.all()) == 1
+
+
+@pytest.mark.django_db
+def test_crm_project_handover_is_refused_if_not_authorized(request, client, project):
+    url = reverse("crm-project-handover", args=[project.id])
+    other_site = baker.make(
+        site_models.Site, name="other site", configuration__accept_handover=False
+    )
+
+    with login(client, groups=["example_com_staff"]):
+        response = client.post(url, data={"site": other_site.pk})
+        assert response.status_code == 200
+
+    project.refresh_from_db()
+
+    assert len(project.project_sites.all()) == 1
 
 
 # eof

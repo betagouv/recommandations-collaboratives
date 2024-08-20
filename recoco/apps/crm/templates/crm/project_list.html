@@ -84,7 +84,7 @@
                         <tr>
                             <th scope="col">Nom</th>
                             <th scope="col">Commune</th>
-                            <th scope="col">Déposé le</th>
+                            <th scope="col">Dépôts</th>
                             <th scope="col">État</th>
                             <th scope="col"></th>
                         </tr>
@@ -95,8 +95,22 @@
                                 <td>
                                     <a href="{% url 'crm-project-details' project.pk %}">{{ project.name|truncatechars:48 }}</a>
                                 </td>
-                                <td>{{ project.commune }}</td>
-                                <td>{{ project.created_on|date }}</td>
+                                <td>
+                                    {{ project.commune }}
+                                </td>
+                                <td>
+                                    <span class="small">le {{ project.created_on|date }}</span>
+                                    <br/>
+                                    {% for ps in project.project_sites.all %}
+                                    {% if ps.site != request.site %}
+                                    {% with ps.site.configuration as conf %}
+                                    {% if conf.logo_small %} <img height="24px" src="{{ conf.logo_small.url }}" alt="{{ ps.site.name }}" title="Multipublié sur {{ ps.site.name }}">
+                                    {% else %} <span class="small">[{{ ps.site.name }}]</span>&nbsp;
+                                    {% endif %}
+                                    {% endwith %}
+                                    {% endif %}
+                                    {% endfor %}
+                                </td>
                                 <td>{{ project.get_status_display }}</td>
                                 <td>
                                     {% if project.muted %}

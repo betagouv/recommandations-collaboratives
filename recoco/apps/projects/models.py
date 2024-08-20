@@ -126,7 +126,9 @@ class ProjectManager(models.Manager):
         site = Site.objects.get_current()
 
         if has_perm(user, "sites.list_projects", site):
-            projects = self.filter(sites=site, deleted=None).exclude(status="DRAFT")
+            projects = self.filter(sites=site, deleted=None).exclude(
+                project_sites__site=site, project_sites__status="DRAFT"
+            )
         else:
             projects = self.none()
 
@@ -135,7 +137,7 @@ class ProjectManager(models.Manager):
             actor_departments = user.profile.departments.values_list("code", flat=True)
             projects = self._filter_by_departments(projects, actor_departments)
             projects = projects.exclude(
-                status="DRAFT"
+                project_sites__status="DRAFT", project_sites__site=site
             )  # don't list unmoderated projects
 
         # Extend scope of projects to those where you're member or invited advisor
@@ -172,19 +174,68 @@ class DeletedProjectOnSiteManager(CurrentSiteManager, DeletedProjectManager):
     pass
 
 
-class Project(models.Model):
-    """Représente un project de suivi d'une collectivité"""
+class ProjectSiteQuerySet(models.QuerySet):
+    """Specific filters for Project Sites"""
 
-    PROJECT_STATES = (
+    def current(self):
+        """Return the data associated with the current site"""
+        current_site = Site.objects.get_current()
+
+        return self.get(site=current_site)
+
+    def origin(self):
+        """Return the site where the project was originally submitted"""
+        return self.get(is_origin=True)
+
+    def moderated(self):
+        """Filter out sites where this project is not yet validated"""
+        return self.exclude(status="DRAFT")
+
+    def to_moderate(self):
+        """List only sites where this project needs moderation"""
+        return self.filter(status="DRAFT")
+
+
+class ProjectSite(models.Model):
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["project", "is_origin"],
+                condition=Q(is_origin=True),
+                name="unique_origin_site",
+            ),
+            models.UniqueConstraint(
+                fields=["project", "site"], name="unique_site_per_project"
+            ),
+        ]
+
+    PROJECTSITE_STATES = (
         ("DRAFT", "Brouillon"),
         ("TO_PROCESS", "A traiter"),
         ("READY", "En attente"),  # FIXME A renommer en validé ?
         ("IN_PROGRESS", "En cours"),
         ("DONE", "Traité"),
         ("STUCK", "Conseil Interrompu"),
-        # ^ replace by:("STANDBY", "En attente"), FIXME
-        ("REJECTED", "Rejeté"),
+        ("REJECTED", "Refusé"),
     )
+
+    objects = ProjectSiteQuerySet.as_manager()
+
+    project = models.ForeignKey(
+        "Project", on_delete=models.CASCADE, related_name="project_sites"
+    )
+
+    site = models.ForeignKey(Site, on_delete=models.CASCADE)
+
+    status = models.CharField(
+        max_length=20, choices=PROJECTSITE_STATES, default="DRAFT"
+    )
+
+    is_origin = models.BooleanField(default=False)
+
+
+class Project(models.Model):
+    """Représente un project de suivi d'une collectivité"""
 
     objects = ActiveProjectManager()
     objects_deleted = DeletedProjectManager()
@@ -194,9 +245,16 @@ class Project(models.Model):
 
     all_on_site = ProjectOnSiteManager()
 
-    sites = models.ManyToManyField(Site)
+    sites = models.ManyToManyField(
+        Site, through=ProjectSite, related_name="project_sites"
+    )
 
     topics = models.ManyToManyField("Topic", related_name="projects", blank=True)
+
+    @property
+    def status(self):
+        """Shortcut for the current site's status"""
+        return self.project_sites.current().status
 
     @property
     def all_topics(self):
@@ -224,8 +282,6 @@ class Project(models.Model):
         verbose_name="Déposé par",
         related_name="projects_submitted",
     )
-
-    status = models.CharField(max_length=20, choices=PROJECT_STATES, default="DRAFT")
 
     members = models.ManyToManyField(auth_models.User, through="ProjectMember")
 
@@ -463,11 +519,17 @@ class UserProjectStatus(models.Model):
 
 
 class ProjectSwitchtenderOnSiteManager(CurrentSiteManager):
-    use_for_related_fields = True
+    pass
+
+
+class ProjectSwitchtenderQuerySet(models.QuerySet):
+    def on_site(self):
+        site = Site.objects.get_current()
+        return self.filter(site=site)
 
 
 class ProjectSwitchtender(models.Model):
-    objects = ProjectSwitchtenderOnSiteManager()
+    objects = ProjectSwitchtenderQuerySet.as_manager()
 
     class Meta:
         unique_together = ("site", "project", "switchtender")
@@ -475,10 +537,10 @@ class ProjectSwitchtender(models.Model):
     switchtender = models.ForeignKey(
         auth_models.User,
         on_delete=models.CASCADE,
-        related_name="projects_switchtended_on_site",
+        related_name="projects_switchtended_per_site",
     )
     project = models.ForeignKey(
-        Project, on_delete=models.CASCADE, related_name="switchtenders_on_site"
+        Project, on_delete=models.CASCADE, related_name="switchtender_sites"
     )
     is_observer = models.BooleanField(default=False)
     site = models.ForeignKey(Site, on_delete=models.CASCADE)
@@ -541,6 +603,11 @@ class NoteManager(models.Manager):
         return self.get_queryset().filter(public=False)
 
 
+class AllNotesManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().order_by("-created_on", "-updated_on")
+
+
 class NoteOnSiteManager(CurrentSiteManager, NoteManager):
     pass
 
@@ -550,6 +617,7 @@ class Note(models.Model):
 
     objects = NoteManager()
     on_site = NoteOnSiteManager()
+    all_notes = AllNotesManager()
 
     site = models.ForeignKey(
         Site, on_delete=models.CASCADE, related_name="project_notes"
