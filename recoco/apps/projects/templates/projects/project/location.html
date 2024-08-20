@@ -43,7 +43,7 @@
     {% block content %}
         <div x-data='MapEditor(projectOptions)'
              data-test-id="location-edit"
-             class="location-edit col-11 py-4 fr-mx-auto">
+             class="location-edit col-11 fr-py-2w fr-mx-auto">
             <!-- Breadcrumb -->
             <nav aria-label="breadcrumb">
                 <ul class="breadcrumb">
@@ -83,7 +83,7 @@
                             </div>
                         </div>
                         <div x-show="!$store.geolocation.isLoading"
-                             class="p-0 project-map-container"
+                             class="fr-p-0 project-map-container"
                              data-test-id="project-location-edit">
                             <div x-ref="map-edit" id="map-edit" class="h-100 w-100"></div>
                         </div>

@@ -17,7 +17,7 @@
         </svg>
         {{ label }}
     </h5>
-    <!-- <div class="border rounded px-3 py-2">
+    <!-- <div class="border rounded px-3 fr-py-2v">
         <div class="d-flex align-items-center mb-2">
             <svg class="bi align-baseline me-2" width="17" height="17" fill="#222">
                 <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#search" />
@@ -25,7 +25,7 @@
             <span>{{ item_label }} selectionnés</span>
         </div>
     </div> -->
-    <div class="rounded py-2 position-relative">
+    <div class="rounded fr-py-2v position-relative">
         <div class="pb-2">
             <!-- <div class="d-flex align-items-center mb-2">
                 <svg class="bi align-baseline me-2" width="17" height="17" fill="#222">
@@ -47,9 +47,9 @@
                         @blur="handleBlurList(event)"/>
             </div>
         </div>
-        <ul class="list-unstyled m-0 d-flex flex-column"  id="{{search_list_id}}-selected-list">
+        <ul class="list-unstyled fr-m-0 d-flex flex-column"  id="{{search_list_id}}-selected-list">
             <template x-for="item in selectedList">
-                <li class="border d-inline-flex rounded justify-content-between align-items-center px-3 py-1 bg-grey-light d-flex align-items-center mb-1">
+                <li class="border d-inline-flex rounded justify-content-between align-items-center px-3 fr-py-1v bg-grey-light d-flex align-items-center mb-1">
                     <p class="mb-0 pb-0 fw-bold font-small" x-text="item.name"></p>
                     <span @click='handleRemoveItem(event, item)'
                           class="btn btn-outline-danger btn-sm ms-2">
@@ -70,9 +70,9 @@
                 x-ref="selectList" id="{{search_list_id}}-list">
                 {% for id, value in list.field.choices %}
                     {% if value != '' %}
-                        <li class="m-0 p-0 specific-cursor-pointer"
+                        <li class="fr-m-0 fr-p-0 specific-cursor-pointer"
                             @click='handleAddItem(event, "{{ id }}","{{ value|lower }}")'>
-                            <p class="border-bottom px-3 py-2 m-0 hover-bg-grey name fw-medium font-small">{{ value|lower }}</p>
+                            <p class="border-bottom px-3 fr-py-2v fr-m-0 hover-bg-grey name fw-medium font-small">{{ value|lower }}</p>
                         </li>
                     {% endif %}
                 {% endfor %}

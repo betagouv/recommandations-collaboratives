@@ -7,7 +7,7 @@
           type="text/css" />
 {% endblock %}
 <div :id="p.project.id"
-     class="drag-targetable py-1 my-1"
+     class="drag-targetable fr-py-1v fr-my-1v"
      @dragover="onDragOver(event)"
      @drop="onDrop(event, board.code)"
      @dragenter="onDragEnter(event)"
@@ -30,7 +30,7 @@
             </template>
         </figure>
         <template x-if="p.project.commune">
-            <div class="fw-normal text-uppercase small d-flex align-items-center my-1">
+            <div class="fw-normal text-uppercase small d-flex align-items-center fr-my-1v">
                 <svg class="align-middle bi me-2"
                      width="18px"
                      height="18px"
@@ -54,7 +54,7 @@
         <div class="d-flex mt-3 justify-content-between align-items-center">
             <div class="d-flex">
                 <span :style="`color:${getProjectRoleColor(p.project)} !important`"
-                      class="text-uppercase small fw-medium text-muted d-flex my-0 tmp-usevar"
+                      class="text-uppercase small fw-medium text-muted d-flex fr-my-0 tmp-usevar"
                       x-text="p.project.recommendation_count > 0 ? `${p.project.recommendation_count} recommandations` : `${p.project.recommendation_count} recommandation`">
                 </span>
             </div>

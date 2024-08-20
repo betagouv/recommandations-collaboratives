@@ -57,7 +57,7 @@
                         </div>
                         <div class="row">
                             <div class="col-6">
-                                <div class="my-2">
+                                <div class="fr-my-2v">
                                     <label class="form-label" for="input-organization">Organisation</label>
                                     <input type="text"
                                            class="form-control {% if form.organization.errors %}is-invalid{% endif %}"
@@ -70,7 +70,7 @@
                                 </div>
                             </div>
                             <div class="col-6">
-                                <div class="my-2">
+                                <div class="fr-my-2v">
                                     <label class="form-label" for="input-position">Fonction</label>
                                     <input type="text"
                                            class="form-control {% if form.position.errors %}is-invalid{% endif %}"
@@ -84,7 +84,7 @@
                             </div>
                         </div>
                     {% endif %}
-                    <button class="my-2 btn btn-primary" type="submit">Accepter l'invitation</button>
+                    <button class="fr-my-2v btn btn-primary" type="submit">Accepter l'invitation</button>
                 </form>
             </div>
             <div class="col-4">
@@ -95,7 +95,7 @@
                         <p>-- {{ invite.inviter.get_full_name }}</p>
                     </div>
                 {% endif %}
-                <div class="bg-light p-3 my-2">
+                <div class="bg-light p-3 fr-my-2v">
                     <h6 class="fw-bolder">Qu'est ce que {{ request.site.name }} ?</h6>
                     {% include "invites/invite_site_message.html" %}
                     <p>

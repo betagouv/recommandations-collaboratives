@@ -4,24 +4,24 @@
 {% get_obj_perms request.user for project as "user_project_perms" %}
 <div class="d-flex justify-content-between mt-3 mb-2">
     <div class="d-inline-flex overflow-hidden">
-        <!-- <div x-on:click="handlePublicFilterClick()" class="border rounded bg-white px-2 py-2 d-flex align-items-center board-status-filter-button" :class=" filterIsPublic ? 'active' : '' ">
+        <!-- <div x-on:click="handlePublicFilterClick()" class="border rounded bg-white fr-px-2v fr-py-2v d-flex align-items-center board-status-filter-button" :class=" filterIsPublic ? 'active' : '' ">
             <i style="background-color:#0d6efd" class="status-color-indicator me-2 tmp-comment"></i>
-            <h3 class="title-info m-0 p-0">Toutes</h3>
+            <h3 class="title-info fr-m-0 fr-p-0">Toutes</h3>
         </div> -->
-        <!-- <div x-on:click="handlePublicFilterClick()" class="ms-2 rounded-pill px-2 bg-warning z-index-dropdown text-uppercase tiny fw-bold text-white px-2 py-2 d-flex align-items-center board-status-filter-button" :class=" !filterIsPublic ? 'active' : '' ">
+        <!-- <div x-on:click="handlePublicFilterClick()" class="ms-2 rounded-pill fr-px-2v bg-warning z-index-dropdown text-uppercase tiny fw-bold text-white fr-px-2v fr-py-2v d-flex align-items-center board-status-filter-button" :class=" !filterIsPublic ? 'active' : '' ">
             <div class="form-check form-switch d-flex align-items-center">
                 <input class="form-check-input" type="checkbox" id="flexSwitchCheckDefault">
                 <label class="form-check-label ms-2 me-2" for="flexSwitchCheckDefault">Brouillon</label>
               </div>
         </div> -->
-        <!-- <div x-on:click="handleStatusFilterClick('all')" class="border rounded bg-white px-2 py-2 d-flex align-items-center board-status-filter-button" :class="currentStatus === 'all' ? 'active' : '' ">
+        <!-- <div x-on:click="handleStatusFilterClick('all')" class="border rounded bg-white fr-px-2v fr-py-2v d-flex align-items-center board-status-filter-button" :class="currentStatus === 'all' ? 'active' : '' ">
             <i style="background-color:#222" class="status-color-indicator me-2 tmp-comment"></i>
-            <h3 class="title-info m-0 p-0">Toutes</h3>
+            <h3 class="title-info fr-m-0 fr-p-0">Toutes</h3>
         </div> -->
         <!-- <template x-for="board in boards">
-            <div x-on:click='handleStatusFilterClick(board.status)' class="ms-2 border rounded bg-white px-2 py-2 d-flex align-items-center board-status-filter-button" :class="currentStatus === board.status ? 'active' : '' ">
+            <div x-on:click='handleStatusFilterClick(board.status)' class="ms-2 border rounded bg-white fr-px-2v fr-py-2v d-flex align-items-center board-status-filter-button" :class="currentStatus === board.status ? 'active' : '' ">
                 <i :style="`background-color: ${board.color}`" class="status-color-indicator me-2 tmp-comment"></i>
-                <h3 x-text="board.title" class="title-info m-0 p-0"></h3>
+                <h3 x-text="board.title" class="title-info fr-m-0 fr-p-0"></h3>
             </div>
         </template> -->
     </div>

@@ -8,7 +8,7 @@
           type="text/css">
 {% endblock %}
 {% block content %}
-    <div class="col-12 p-4 fr-mx-auto">
+    <div class="col-12 fr-p-2w fr-mx-auto">
         <section>
             <h2 class="mb-4 d-flex align-items-center">
                 <span class="font-weight-light">
@@ -27,7 +27,7 @@
                 <div class="d-flex flex-column mt-4">
                     <div class="common-input">{{ form.tags }}</div>
                     <div class="mt-2 flag grey mb-4 d-flex align-items-center justify-content-start">
-                        <p class="text-info-custom font-small text-grey-dark my-0 ">{{ form.tags.help_text }}</p>
+                        <p class="text-info-custom font-small text-grey-dark fr-my-0 ">{{ form.tags.help_text }}</p>
                     </div>
                 </div>
                 {% csrf_token %}

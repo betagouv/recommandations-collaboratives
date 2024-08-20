@@ -2,11 +2,11 @@
 {% load static %}
 {% block title %}Configuration des suggestions automatiques{% endblock %}
 {% block content %}
-    <div class="col-12 p-4 fr-mx-auto">
+    <div class="col-12 fr-p-2w fr-mx-auto">
         <div class="row recommendation-list mb-3">
             <div class="col-sm-12 col-lg-8 col-xl-9 mb-5">
                 <h2>
-                    <svg class="bi rounded-circle p-2" width="40" height="40">
+                    <svg class="bi rounded-circle fr-p-2v" width="40" height="40">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#signpost-fill" />
                     </svg>
                     &nbsp;
@@ -78,7 +78,7 @@
                                 </div>
                             </div>
                             <div class="d-block w-100 pe-4">
-                                <div class="text-secondary my-2">Message aiguilleuse : "{{ recommendation.text }}"</div>
+                                <div class="text-secondary fr-my-2v">Message aiguilleuse : "{{ recommendation.text }}"</div>
                                 {% include 'projects/project/fragments/action_list_item.html' with task=recommendation hide_comments=True disable_tracking=True disable_edit=True %}
                             </div>
                         </div>

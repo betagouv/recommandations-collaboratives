@@ -7,7 +7,7 @@
 {% endblock %}
 <template x-if="$store.tasksData.newTasks.length > 0 && !$store.djangoData.isAdvisor">
     <div data-test-id="banner-new-tasks"
-         class="py-1 flag dark-blue mb-2 d-flex align-items-center justify-content-start text-white small-border-radius mt-4">
+         class="fr-py-1v flag dark-blue mb-2 d-flex align-items-center justify-content-start text-white small-border-radius mt-4">
         <img src="{% static 'projects/img/icon_new_task.svg'  %}"
              alt=""
              data-test-id="img-presentation"

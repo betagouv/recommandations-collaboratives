@@ -107,14 +107,14 @@ function markerPopupTemplate(project) {
         <div class="marker-popup">
             <header><h3><a href="/project/${project.id}/presentation">${project.name}</a></h3></header>
             <main class="d-flex flex-column">
-                <p class="m-0 mb-2 fs-6 fw-bold">Organisation</p>
-                <p class="m-0 fs-7">${project.org_name}</p>
+                <p class="fr-m-0 mb-2 fs-6 fw-bold">Organisation</p>
+                <p class="fr-m-0 fs-7">${project.org_name}</p>
                 <hr/>
-                <p class="m-0 mb-2 fs-6 fw-bold">Lieu</p>
-                <p class="m-0 fs-7 text-capitalize">${project?.commune?.name} (${project?.commune?.postal})</p>
+                <p class="fr-m-0 mb-2 fs-6 fw-bold">Lieu</p>
+                <p class="fr-m-0 fs-7 text-capitalize">${project?.commune?.name} (${project?.commune?.postal})</p>
                 <hr/>
-                <p class="m-0 mb-2 fs-6 fw-bold">Date de dépot</p>
-                <p class="m-0 fs-7">${date}</p>
+                <p class="fr-m-0 mb-2 fs-6 fw-bold">Date de dépot</p>
+                <p class="fr-m-0 fs-7">${date}</p>
             </main>
         </div>
     `;

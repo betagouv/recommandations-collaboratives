@@ -16,12 +16,12 @@
 {% get_obj_perms request.user for request.site as "user_site_perms" %}
 {% get_obj_perms request.user for project as "user_project_perms" %}
 <div x-data="User()"
-     class="user-card position-relative d-flex my-1 flex-column justify-content-between align-items-start">
+     class="user-card position-relative d-flex fr-my-1v flex-column justify-content-between align-items-start">
     <div class="position-relative d-flex align-items-center justify-content-between {% if user_activity %}w-100{% endif %}">
         <button x-ref="user"
                 type="button"
                 {% if not user_popup_deactivate %}@click="onUserClick"{% endif %}
-                class="d-flex align-items-center flex-wrap user-info border-0 p-0 bg-transparent {% if user_popup_deactivate %}no-underline{% endif %}"
+                class="d-flex align-items-center flex-wrap user-info border-0 fr-p-0 bg-transparent {% if user_popup_deactivate %}no-underline{% endif %}"
                 data-test-id="button-open-tooltip-user-card">
             <span class="me-1 d-flex align-items-center font-very-small">
                 <img class="rounded-circle me-1 {% if not user.is_active %}border-0{% elif position.is_advisor %}advisor-border border-2{% elif position.is_observer %}observer-border border-2{% else %}neutral-role-border border-2{% endif %}"
@@ -71,11 +71,11 @@
          class="user-card-popup flex-column {% if not user.is_active %}coucou{% elif position.is_advisor %}advisor-border{% elif position.is_observer %}observer-border{% else %}neutral-role-border{% endif %}">
         {% if user.is_active and position.is_advisor %}
             <div class="user-role position-absolute">
-                <span class="py-1 px-2 fw-bold text-uppercase tiny advisor-background text-white specific-borderradius-2px">Conseiller</span>
+                <span class="fr-py-1v fr-px-2v fw-bold text-uppercase tiny advisor-background text-white specific-borderradius-2px">Conseiller</span>
             </div>
         {% elif user.is_active and position.is_observer %}
             <div class="user-role position-absolute">
-                <span class="py-1 px-2 fw-bold text-uppercase tiny observer-background text-white specific-borderradius-2px">Observateur</span>
+                <span class="fr-py-1v fr-px-2v fw-bold text-uppercase tiny observer-background text-white specific-borderradius-2px">Observateur</span>
             </div>
         {% endif %}
         <div class="d-flex align-items-center flex-wrap">
@@ -128,7 +128,7 @@
                             {{ user.email }}
                         {% endif %}
                     </div>
-                    <button class="ms-4 px-2 py-0 btn small btn-outline-primary"
+                    <button class="ms-4 fr-px-2v fr-py-0 btn small btn-outline-primary"
                             @click="clipboardCopy(`L'email`, '{{ user.email }}')">
                         <svg class="bi align-baseline" width="10" height="10" fill="currentColor">
                             <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#clipboard" />
@@ -152,7 +152,7 @@
                             {{ user.profile.phone_no|format_phone }}
                         {% endif %}
                     </div>
-                    <button class="ms-4 px-2 py-0 btn small btn-outline-primary"
+                    <button class="ms-4 fr-px-2v fr-py-0 btn small btn-outline-primary"
                             @click="clipboardCopy('Le numéro de téléphone', '{{ user.profile.phone_no }}')">
                         <svg class="bi align-baseline" width="10" height="10" fill="currentColor">
                             <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#clipboard" />
@@ -162,10 +162,10 @@
             {% endif %}
             {% if user and not user.is_active %}
                 <span data-test-id="deactivated-user-details"
-                      class="p-1 px-2 font-very-small bg-grey-light w-100 d-flex mt-1 text-nowrap specific-borderradius-2px">Compte desactivé depuis {{ user.last_login.date|date:"F" }}  {{ user.last_login.date|date:"Y" }}</span>
+                      class="fr-p-1v fr-px-2v font-very-small bg-grey-light w-100 d-flex mt-1 text-nowrap specific-borderradius-2px">Compte desactivé depuis {{ user.last_login.date|date:"F" }}  {{ user.last_login.date|date:"Y" }}</span>
             {% elif not user %}
                 <span data-test-id="deleted-user-details"
-                      class="p-1 px-2 font-very-small bg-grey-light w-100 d-flex mt-1 text-nowrap specific-borderradius-2px">Compte desactivé</span>
+                      class="fr-p-1v fr-px-2v font-very-small bg-grey-light w-100 d-flex mt-1 text-nowrap specific-borderradius-2px">Compte desactivé</span>
             {% endif %}
         </div>
     </div>

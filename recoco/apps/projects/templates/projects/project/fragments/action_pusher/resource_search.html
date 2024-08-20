@@ -31,7 +31,7 @@
         class="cards d-flex row row-cols-3 g-4 ps-0 ms-0 mt-1">
         <template x-for="resource in resultsAndSelected()" :key="resource.id">
             <li class="col">
-                <div class="resource-card card p-2 ps-5 rounded">
+                <div class="resource-card card fr-p-2v ps-5 rounded">
                     <div class="card-body position-relative">
                         <template x-if="push_type == 'single'">
                             <input :id="'resource-' + resource.id"

@@ -99,7 +99,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="project-card--col__right p-0">
+                            <div class="project-card--col__right fr-p-0">
                                 {% for question in site_config.onboarding_questions.all %}
                                     {% project_session_for_survey project site_config.project_survey as session %}
                                     {% question_answer session question as answer %}

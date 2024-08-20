@@ -12,7 +12,7 @@
 {% block content %}
     {% get_obj_perms request.user for request.site as "user_site_perms" %}
     {% get_obj_perms request.user for project as "user_project_perms" %}
-    <div class="col-12 p-4 fr-mx-auto">
+    <div class="col-12 fr-p-2w fr-mx-auto">
         <!-- Breadcrumb -->
         <nav aria-label="breadcrumb">
             <ul class="breadcrumb">

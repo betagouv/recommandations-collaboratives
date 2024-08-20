@@ -20,10 +20,10 @@
     </style>
 {% endblock %}
 {% block content %}
-    <div x-data="Crm" class="d-flex px-0" style="">
+    <div x-data="Crm" class="d-flex fr-px-0" style="">
         {% include "crm/fragments/sidebar.html" with search=True back_button=True organization_members=True followed_projects=True unfollowed_projects=True %}
         <div class="w-75 d-flex flex-column justify-content-start">
-            <div class="crm-header px-4 py-3 pt-4 {% if active_project %}mb-3{% else %}no-project{% endif %}">
+            <div class="crm-header fr-px-2w py-3 pt-4 {% if active_project %}mb-3{% else %}no-project{% endif %}">
                 <div class="d-flex justify-content-between">
                     <div>
                         <h3 class="d-flex align-items-center">
@@ -51,7 +51,7 @@
                 </div>
             </div>
             {% if unread_notifications %}
-                <div class="px-4 py-4 bg-light">
+                <div class="fr-px-2w fr-py-2w bg-light">
                     <h4>
                         <svg class="align-middle bi text-warning"
                              width="20px"
@@ -68,7 +68,7 @@
                     </ul>
                 </div>
             {% endif %}
-            <div class="px-4 pt-4 crm-notes-wrapper relative">
+            <div class="fr-px-2w pt-4 crm-notes-wrapper relative">
                 <a class="btn btn-primary mb-4"
                    href="{% url 'crm-organization-note-create' organization.pk %}">créer une note</a>
                 {% for note in sticky_notes.all %}
@@ -78,7 +78,7 @@
                     {% include 'crm/note.html' with update_url_name='crm-organization-note-update' get_user_profile=True %}
                 {% endfor %}
             </div>
-            <div class="px-4 pt-4 bg-light crm-timeline-min-height">
+            <div class="fr-px-2w pt-4 bg-light crm-timeline-min-height">
                 <h4>Activité</h4>
                 {% include 'crm/timeline.html' %}
             </div>

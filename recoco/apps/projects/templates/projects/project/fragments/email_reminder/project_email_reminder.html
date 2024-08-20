@@ -24,7 +24,7 @@
                  @click.outside="onOutsideEmailReminderButtonClick"
                  data-test-id="tooltip-reminder-settings"
                  class="bg-white email-reminder-popup border medium-border-radius border-blue box-shadow-popup">
-                <div class="d-flex align-items-center justify-content-between border-bottom-grey p-2">
+                <div class="d-flex align-items-center justify-content-between border-bottom-grey fr-p-2v">
                     <span class="tiny fw-medium">Paramètres de notification</span>
                     <button class="appearance-none bg-white"
                             aria-label="Fermer la popupde rappel"
@@ -36,7 +36,7 @@
                 </div>
                 {% if request.user == project.owner %}
                     <div data-test-id="message-reminder-settings"
-                         class="border-bottom-grey p-2 d-flex flex-column">
+                         class="border-bottom-grey fr-p-2v d-flex flex-column">
                         <span class="tiny fw-medium">Rappels</span>
                         <span class="tiny fw-normal mb-2">Vous recevez un rappel par email toutes les 6 à 12 semaines pour consulter et mettre à jour votre avancement sur les recommandations.</span>
                         {% if project.next_reminder %}
@@ -46,11 +46,11 @@
                         {% endif %}
                     </div>
                 {% endif %}
-                <div class="border-bottom-grey p-2 d-flex flex-column">
+                <div class="border-bottom-grey fr-p-2v d-flex flex-column">
                     <span class="tiny fw-medium">Activité du projet</span>
                     <span class="tiny fw-normal mb-2">Vous recevez une notification par email à chaque nouvelle activité sur le projet dans un récapitulatif journalier.</span>
                 </div>
-                <div class="border-bottom-grey p-2 d-flex flex-column">
+                <div class="border-bottom-grey fr-p-2v d-flex flex-column">
                     {% if request.user == project.owner %}
                         <span class="tiny fw-normal mb-1">Pour couper les notifications vous pouvez mettre le projet en pause depuis l’onglet <a href="{% url 'projects-project-administration' project.pk %}#project-status-settings">Paramètres</a></span>
                     {% else %}

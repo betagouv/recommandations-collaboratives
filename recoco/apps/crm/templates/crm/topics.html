@@ -8,11 +8,11 @@
 {% endblock %}
 {% block content %}
     {{ topics_wc|json_script:"topicsArray" }}
-    <div x-data="Crm" class="d-flex px-0" style="">
+    <div x-data="Crm" class="d-flex fr-px-0" style="">
         {% include "crm/fragments/sidebar.html" with back_button=True map=True tools=True search=True %}
         <div class="w-75 d-flex flex-column justify-content-start">
             {% url 'crm-search' as crmSearchUrl %}
-            <div class="d-flex flex-column font-marianne pt-4 px-4 ">
+            <div class="d-flex flex-column font-marianne pt-4 fr-px-2w ">
                 <h2 class="">
                     <svg class="bi align-middle" width="25" height="25" fill="currentColor">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#tags" />
@@ -29,7 +29,7 @@
             </div>
             <section class="w-100 d-flex flex-column justify-content-center font-marianne">
                 <div class="d-flex justify-content-center">
-                    <table class="w-100 my-auto table table-striped table-hover">
+                    <table class="w-100 fr-my-auto table table-striped table-hover">
                         <thead>
                             <tr>
                                 <th scope="col">Nom</th>

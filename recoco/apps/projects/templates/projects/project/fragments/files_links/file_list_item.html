@@ -11,7 +11,7 @@
 {% get_obj_perms request.user for project as "user_project_perms" %}
 {% if document %}
     <div class="mb-3">
-        <div class="rounded border py-2 px-3 mb-2 d-flex align-items-center justify-content-between">
+        <div class="rounded border fr-py-2v px-3 mb-2 d-flex align-items-center justify-content-between">
             <div class="d-flex align-items-center">
                 <a href="{{ document.the_file.url }}"
                    class="d-flex align-items-center text-decoration-none"
@@ -32,7 +32,7 @@
                     <form method="POST"
                           action="{% url 'projects-documents-pin-unpin' project.pk document.pk %}">
                         {% csrf_token %}
-                        <button class="btn btn-link d-flex p-0 me-2">
+                        <button class="btn btn-link d-flex fr-p-0 me-2">
                             <svg class="bi align-baseline fill-blue" width="20" height="20">
                                 {% if document.pinned == True %}
                                     <use id="file-is-bookmarked" xlink:href="{% static 'svg/bootstrap-icons.svg' %}#star-fill" />

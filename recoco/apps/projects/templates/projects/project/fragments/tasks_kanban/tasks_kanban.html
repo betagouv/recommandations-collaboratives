@@ -10,16 +10,16 @@
      x-init="initTooltips(); loadCanAdministrate(); loadUserProjectPerms(); loadIsSwitchtender(); loadUserId();"
      class="row pt-3">
     <template x-for="(board, index) in boards">
-        <div class="col px-2">
+        <div class="col fr-px-2v">
             <div class="medium-border-radius drop-column bg-grey-light"
                  :data-test-id="`board-targetable-${index}`">
-                <div class="d-flex align-items-center justify-content-between px-2 pt-2 pb-0">
+                <div class="d-flex align-items-center justify-content-between fr-px-2v pt-2 pb-0">
                     <div class="d-flex align-items-center">
                         <span :class="board.color_class" class="status-color-indicator me-2"></span>
                         <h5 x-text="board.title" class="fs-6 fw-normal text-gray-800 mb-0"></h5>
                     </div>
                 </div>
-                <div class="px-2 pt-2 mt-2 pb-1 overflow-auto position-relative specific-height-80vh">
+                <div class="fr-px-2v pt-2 mt-2 pb-1 overflow-auto position-relative specific-height-80vh">
                     <template x-if="column(board.status).length === 0">
                         <div class="drag-targetable py-3"
                              @dragover="onDragOver(event, null)"

@@ -19,15 +19,15 @@
                 <div class="d-flex flex-column">
                     <!-- Pagination -->
                     <template x-if="$store.previewModal.isPaginated">
-                        <div class="bg-blue d-flex align-items-center justify-content-between p-2 rounded specific-border-radiusy-0">
-                            <button class="p-1 button filled white small"
+                        <div class="bg-blue d-flex align-items-center justify-content-between fr-p-2v rounded specific-border-radiusy-0">
+                            <button class="fr-p-1v button filled white small"
                                     @click="$store.previewModal.previous()">
                                 <svg class="bi align-middle" width="25" height="25" fill="#0063CB">
                                     <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#arrow-left-short" />
                                 </svg>
                             </button>
                             <span class="text-white fw-normal" x-text="newTasksNavigationText()"></span>
-                            <button class="p-1 button filled white small"
+                            <button class="fr-p-1v button filled white small"
                                     @click="$store.previewModal.next()">
                                 <svg class="bi align-middle" width="25" height="25" fill="#0063CB">
                                     <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#arrow-right-short" />
@@ -39,7 +39,7 @@
                     <div x-effect="taskId && $store.previewModal.loadFollowups() && $store.previewModal.loadNotifications() && followupScrollToLastMessage(true)"
                          class="d-flex w-100 align-items-stretch position-relative">
                         <!-- Modal resource / content preview -->
-                        <div class="position-absolute top-0 end-0 px-3 py-2 z-3">
+                        <div class="position-absolute top-0 end-0 px-3 fr-py-2v z-3">
                             <button type="button"
                                     class="btn-close"
                                     data-bs-dismiss="modal"
@@ -68,7 +68,7 @@
                             <div class="w-100">
                                 <div class="border-bottom-grey"
                                      x-show="task?.document && task?.document.length > 0">
-                                    <span class="py-2 d-block px-3 fw-medium title-info text-dark">Fichier(s) partagé(s)</span>
+                                    <span class="fr-py-2v d-block px-3 fw-medium title-info text-dark">Fichier(s) partagé(s)</span>
                                     <template x-for="document in task?.document" x-key="document.id">
                                         <div class="px-3">{% include 'projects/project/fragments/files_links/file_list_item_api.html' %}</div>
                                     </template>
@@ -77,7 +77,7 @@
                             <div class="task-modal-followups position-relative"
                                  :class="getTypeOfModalClass(task?.document && task?.document.length > 0)"
                                  id="followups-scroll-container">
-                                <div class="py-2 px-3 position-sticky top-0 d-flex justify-content-between bg-white z-index-100 border-bottom-grey">
+                                <div class="fr-py-2v px-3 position-sticky top-0 d-flex justify-content-between bg-white z-index-100 border-bottom-grey">
                                     <span class="fw-medium title-info text-dark">Échanges & notes</span>
                                 </div>
                                 <div class="position-absolute d-flex justify-content-center align-items-center w-100 h-100">
@@ -89,7 +89,7 @@
                                 </div>
                                 <div :class="!followupsIsLoading && 'visible'" class="followups-wrapper">
                                     <template x-if="task?.resource_id">
-                                        <div class="rounded bg-light p-2 m-3 message"
+                                        <div class="rounded bg-light fr-p-2v m-3 message"
                                              :class="$store.djangoData.canManageTasks && task?.content === '' && 'border border-warning'">
                                             <template x-if="task && taskId && task?.content !== ''">
                                                 <p x-html="task && renderMarkdown(task?.content)"
@@ -127,7 +127,7 @@
                                                   id="followups-container">
                                             <div class="position-relative">
                                                 <template x-if="!isStatusUpdate(f)">
-                                                    <div class="rounded bg-light p-2 m-3 message"
+                                                    <div class="rounded bg-light fr-p-2v m-3 message"
                                                          :class="hasNotification(f.id) && 'is-new-followup'">
                                                         <p x-html="renderMarkdown(f.comment)" class="mb-2 text-break"></p>
                                                         <div class="d-flex justify-content-between align-items-center specific-fontsize-09">
@@ -154,7 +154,7 @@
                                                                   x-text="`le ${formatDate(f.timestamp)}`"></span>
                                                         </div>
                                                         <template x-if="f.comment !== ''">
-                                                            <div class="rounded bg-light p-2 m-3 message">
+                                                            <div class="rounded bg-light fr-p-2v m-3 message">
                                                                 <p x-html="renderMarkdown(f.comment)"
                                                                    class="mb-2 text-break overflow-hidden"></p>
                                                                 <div class="d-flex justify-content-between specific-fontsize-09">

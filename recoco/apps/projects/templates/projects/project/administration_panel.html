@@ -84,7 +84,7 @@
                                        @change.debounce="fetchCities()"
                                        x-model="postal"
                                        type="text"
-                                       class="py-4 placeholder-grey form-control {% if project_form.postcode.errors %}is-invalid{% endif %}"
+                                       class="fr-py-2w placeholder-grey form-control {% if project_form.postcode.errors %}is-invalid{% endif %}"
                                        id="input-project-address"
                                        name="{{ project_form.postcode.name }}"
                                        placeholder="Code Postal"
@@ -135,8 +135,8 @@
                     </button>
                 {% endif %}
                 {% if project.switchtender_sites.all.count == 0 %}
-                    <div class="bg-light d-flex flex-column justify-content-center align-items-center py-4 rounded">
-                        <p class="m-0 text-info-custom text-grey fw-normal pb-3">Le projet n'est pas encore suivi</p>
+                    <div class="bg-light d-flex flex-column justify-content-center align-items-center fr-py-2w rounded">
+                        <p class="fr-m-0 text-info-custom text-grey fw-normal pb-3">Le projet n'est pas encore suivi</p>
                         <svg class="bi align-baseline me-2 mt-1"
                              width="30"
                              height="30"
@@ -154,7 +154,7 @@
                                           action="{% url 'projects-project-switchtender-leave' project.pk %}"
                                           method="post">
                                         {% csrf_token %}
-                                        <button class="ms-2 p-1 btn btn-outline-danger btn-sm">
+                                        <button class="ms-2 fr-p-1v btn btn-outline-danger btn-sm">
                                             <svg class="bi align-middle" width="18" height="18" fill="currentColor">
                                                 <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#x" />
                                             </svg>
@@ -166,7 +166,7 @@
                                               action="{% url 'projects-project-access-advisor-delete' project.pk advisor.switchtender.email %}"
                                               method="post">
                                             {% csrf_token %}
-                                            <button class="ms-2 p-1 btn btn-outline-danger btn-sm">
+                                            <button class="ms-2 fr-p-1v btn btn-outline-danger btn-sm">
                                                 <svg class="bi align-middle" width="18" height="18" fill="currentColor">
                                                     <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#x" />
                                                 </svg>
@@ -213,7 +213,7 @@
                                             {% csrf_token %}
                                             <button data-bs-toggle="tooltip"
                                                     data-bs-title="Promouvoir en tant que référent·e"
-                                                    class="btn btn-outline-primary btn-sm p-1">
+                                                    class="btn btn-outline-primary btn-sm fr-p-1v">
                                                 <svg class="bi align-middle" width="18" height="18" fill="currentColor">
                                                     <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#award" />
                                                 </svg>
@@ -225,7 +225,7 @@
                                             {% csrf_token %}
                                             <button data-bs-toggle="tooltip"
                                                     data-bs-title="Retirer l'accès"
-                                                    class="btn btn-outline-danger btn-sm p-1">
+                                                    class="btn btn-outline-danger btn-sm fr-p-1v">
                                                 <svg class="bi align-middle" width="18" height="18" fill="currentColor">
                                                     <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#x" />
                                                 </svg>
@@ -243,10 +243,10 @@
         </div>
         <div class="row">
             <div class="col">
-                <hr class="my-4" />
+                <hr class="fr-my-2w" />
                 {% if pending_invites|length == 0 %}
-                    <div class="bg-light d-flex flex-column justify-content-center align-items-center py-4 rounded">
-                        <p class="m-0 text-info-custom text-grey fw-normal pb-3">Aucune invitation conseiller·e en cours</p>
+                    <div class="bg-light d-flex flex-column justify-content-center align-items-center fr-py-2w rounded">
+                        <p class="fr-m-0 text-info-custom text-grey fw-normal pb-3">Aucune invitation conseiller·e en cours</p>
                         <svg class="bi align-baseline me-2 mt-1"
                              width="30"
                              height="30"
@@ -268,7 +268,7 @@
                                                   action="{% url 'projects-project-access-revoke-invite' project.pk invite.pk %}"
                                                   method="post">
                                                 {% csrf_token %}
-                                                <button class="btn btn-outline-danger btn-sm p-1"
+                                                <button class="btn btn-outline-danger btn-sm fr-p-1v"
                                                         id="revoke-invite-switchtender">
                                                     <svg class="bi align-middle" width="18" height="18" fill="currentColor">
                                                         <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#trash" />
@@ -280,7 +280,7 @@
                                             <form action="{% url 'projects-project-access-advisor-resend-invite' project.pk invite.pk %}"
                                                   method="post">
                                                 {% csrf_token %}
-                                                <button class="btn btn-outline-primary btn-sm p-1"
+                                                <button class="btn btn-outline-primary btn-sm fr-p-1v"
                                                         id="resend-invite-switchtender">
                                                     <svg class="bi align-middle" width="18" height="18" fill="currentColor">
                                                         <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#envelope-plus" />
@@ -296,10 +296,10 @@
                 {% endif %}
             </div>
             <div class="col">
-                <hr class="my-4" />
+                <hr class="fr-my-2w" />
                 {% if pending_invites|length == 0 %}
-                    <div class="bg-light d-flex flex-column justify-content-center align-items-center py-4 rounded">
-                        <p class="m-0 text-info-custom text-grey fw-normal pb-3">Aucune invitation membre en cours</p>
+                    <div class="bg-light d-flex flex-column justify-content-center align-items-center fr-py-2w rounded">
+                        <p class="fr-m-0 text-info-custom text-grey fw-normal pb-3">Aucune invitation membre en cours</p>
                         <svg class="bi align-baseline me-2 mt-1"
                              width="30"
                              height="30"
@@ -321,7 +321,7 @@
                                                   action="{% url 'projects-project-access-revoke-invite' project.pk invite.pk %}"
                                                   method="post">
                                                 {% csrf_token %}
-                                                <button class="btn btn-outline-danger btn-sm p-1" id="revoke-invite-member">
+                                                <button class="btn btn-outline-danger btn-sm fr-p-1v" id="revoke-invite-member">
                                                     <svg class="bi align-middle" width="18" height="18" fill="currentColor">
                                                         <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#trash" />
                                                     </svg>
@@ -332,7 +332,7 @@
                                             <form action="{% url 'projects-project-access-collectivity-resend-invite' project.pk invite.pk %}"
                                                   method="post">
                                                 {% csrf_token %}
-                                                <button class="btn btn-outline-primary btn-sm p-1" id="resend-invite-member">
+                                                <button class="btn btn-outline-primary btn-sm fr-p-1v" id="resend-invite-member">
                                                     <svg class="bi align-middle" width="18" height="18" fill="currentColor">
                                                         <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#envelope-plus" />
                                                     </svg>
@@ -348,7 +348,7 @@
             </div>
         </div>
         <section id="project-status-settings" class="col">
-            <hr class="my-4" />
+            <hr class="fr-my-2w" />
             {% include 'projects/project/fragments/administration/quit_project.html' %}
             {% include 'projects/project/fragments/administration/activate_project.html' with position=position %}
             {% include 'projects/project/fragments/administration/stand_by_project.html' with position=position %}

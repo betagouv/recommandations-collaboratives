@@ -14,7 +14,7 @@
           type="text/css" />
 {% endblock css %}
 {% block content %}
-    <div x-data="Crm" class="d-flex px-0 crm-font">
+    <div x-data="Crm" class="d-flex fr-px-0 crm-font">
         {% include "crm/fragments/sidebar.html" with search=True back_button=True project_advisors=True project_members=True %}
         <div class="w-75 d-flex flex-column justify-content-start">
             {% if request.site != site_origin.site %}
@@ -41,9 +41,9 @@
                 </div>
             {% endif %}
             {% if active_project %}
-                <div class="crm-header px-4 py-4 mb-3 d-flex justify-content-between align-items-center">
+                <div class="crm-header fr-px-2w fr-py-2w mb-3 d-flex justify-content-between align-items-center">
              {% else %}
-                <div class="crm-header no-project px-4 py-4 d-flex justify-content-between align-items-center">
+                <div class="crm-header no-project fr-px-2w fr-py-2w d-flex justify-content-between align-items-center">
              {% endif %}
                     <div>
                         <h3 class="d-flex mb-0 align-items-center">
@@ -103,7 +103,7 @@
                        aria-current="page">Gérer le projet</a>
                 </div>
             </div>
-            <div class="px-4 pt-4 crm-notes-wrapper">
+            <div class="fr-px-2w pt-4 crm-notes-wrapper">
                 <div class="d-flex justify-content-between align-items-start">
                     <a class="btn btn-primary mb-4"
                        href="{% url 'crm-project-note-create' project.pk %}">créer une note</a>
@@ -115,7 +115,7 @@
                     {% include "crm/note.html" with update_url_name="crm-project-note-update" get_user_profile=True %}
                 {% endfor %}
             </div>
-            <div class="px-4 pt-4 bg-light crm-timeline-min-height">
+            <div class="fr-px-2w pt-4 bg-light crm-timeline-min-height">
                 <h4>Activité</h4>
                 {% include "crm/timeline.html" %}
             </div>

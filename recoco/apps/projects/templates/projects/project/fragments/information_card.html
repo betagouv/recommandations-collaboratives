@@ -12,7 +12,7 @@
 <div class="{% if padding_end is True %}pe-4{% endif %} {% if padding_top is True %}pt-4{% endif %}  {% if full_width %}w-100{% else %}w-50{% endif %} {% if full_height %}h-100{% endif %}"
      data-test-id="project-information-card-{{ data_test }}">
     <div class="d-flex align-items-center justify-content-between specific-mb-6">
-        <h6 class="text-uppercase fw-bold m-0 p-0 project-card--subtitle">
+        <h6 class="text-uppercase fw-bold fr-m-0 fr-p-0 project-card--subtitle">
             {% if onboarding_information %}
                 Compléments
             {% else %}
@@ -38,7 +38,7 @@
             </a>
         {% endif %}
     </div>
-    <div class="project-card-details h-100 p-4 d-flex flex-column justify-content-between project-card--description">
+    <div class="project-card-details h-100 fr-p-2w d-flex flex-column justify-content-between project-card--description">
         <article class="overflow-hidden">{% include 'projects/project/fragments/information_card_description.html' %}</article>
         <footer class="d-flex mt-4 justify-content-between {% if full_width %}align-items-center{% else %}flex-column{% endif %}">
             {% include 'user/user_card.html' with user=card_user %}

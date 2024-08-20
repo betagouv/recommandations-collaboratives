@@ -12,7 +12,7 @@
             class="fr-input fr-input--error {% if errors %}fr-input--error{% endif %}"
             x-ref="organization"
         {% else %}
-            class="{% if small_padding %} py-2 {% else %}py-4 {% endif %}placeholder-grey form-control {% if errors %} is-invalid {% endif %} {% if disabled %} input-disabled {% endif %}"
+            class="{% if small_padding %} fr-py-2v {% else %}py-4 {% endif %}placeholder-grey form-control {% if errors %} is-invalid {% endif %} {% if disabled %} input-disabled {% endif %}"
         {% endif %}
             id="{{ id_for_label }}" name="{{ name }}" placeholder="{{ placeholder }}"
             value="organization" {% if not disabled %} required {% endif %} />

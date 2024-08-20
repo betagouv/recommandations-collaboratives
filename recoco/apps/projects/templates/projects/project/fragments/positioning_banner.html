@@ -15,7 +15,7 @@
                   id="positioning-form">
                 {% csrf_token %}
                 <button data-test-id="button-join-as-advisor"
-                        class="button py-2 px-1 green d-flex justify-content-center align-items-center my-2 w-100">
+                        class="button fr-py-2v fr-px-1v green d-flex justify-content-center align-items-center fr-my-2v w-100">
                     <span>Conseiller le projet</span>
                     <div class="hover-trigger">
                         <svg class="ms-2 bi align-middle"
@@ -45,7 +45,7 @@
                   action="{% url 'projects-project-observer-join' project.id %}">
                 {% csrf_token %}
                 <button data-test-id="button-join-as-observer"
-                        class="button py-2 px-2 d-flex justify-content-center align-items-center my-2 w-100">
+                        class="button fr-py-2v fr-px-2v d-flex justify-content-center align-items-center fr-my-2v w-100">
                     <span>Observer le projet</span>
                     <div class="hover-trigger">
                         <svg class="bi ms-2 align-middle"

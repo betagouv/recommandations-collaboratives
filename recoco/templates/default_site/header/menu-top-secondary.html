@@ -33,7 +33,7 @@
                         </a>
                         <button x-on:click="open = !open"
                                 type="button"
-                                class="border-0 btn py-0 px-1">
+                                class="border-0 btn fr-py-0 fr-px-1v">
                             <svg data-toggle="tooltip"
                                  data-placement="top"
                                  title="Notifications désactivées"
@@ -47,8 +47,8 @@
                         </button>
                         <ul x-show="open"
                             :class="{'show':open}"
-                            class="dropdown-menu py-0 top-100 mt-2">
-                            <li class="list-group-item px-3 py-2 my-0 list-group-item-action dropdown-item border-0 border-bottom">
+                            class="dropdown-menu fr-py-0 top-100 mt-2">
+                            <li class="list-group-item px-3 fr-py-2v fr-my-0 list-group-item-action dropdown-item border-0 border-bottom">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <span class="text-break text-truncate">
                                         <a class="stretched-link text-reset text-decoration-none"
@@ -56,7 +56,7 @@
                                     </span>
                                 </div>
                             </li>
-                            <li class="text-white bg-blue-light-hover list-group-item px-3 py-2 list-group-item-action dropdown-item border-0 d-flex align-items-center specific-background-0063CB">
+                            <li class="text-white bg-blue-light-hover list-group-item px-3 fr-py-2v list-group-item-action dropdown-item border-0 d-flex align-items-center specific-background-0063CB">
                                 <span class="text-break text-truncate">
                                     <svg data-toggle="tooltip"
                                          data-placement="top"
@@ -102,7 +102,7 @@
                             <button x-on:click="open = !open"
                                     type="button"
                                     data-cy="projects-selector"
-                                    class="border-0 btn py-0 px-1">
+                                    class="border-0 btn fr-py-0 fr-px-1v">
                                 <svg data-toggle="tooltip"
                                      data-placement="top"
                                      title="Notifications désactivées"
@@ -116,10 +116,10 @@
                             </button>
                             <ul x-show="open"
                                 :class="{'show':open}"
-                                class="project-selector-dropdown dropdown-menu py-0 mt-2 top-100 overflow-y-scroll"
+                                class="project-selector-dropdown dropdown-menu fr-py-0 mt-2 top-100 overflow-y-scroll"
                                 data-test-id="project-selector-dropdown">
                                 {% for project in request.session.projects %}
-                                    <li class="list-group-item px-3 py-2 my-0 list-group-item-action dropdown-item border-0 border-bottom"
+                                    <li class="list-group-item px-3 fr-py-2v fr-my-0 list-group-item-action dropdown-item border-0 border-bottom"
                                         :class="{'inactive': '{{ project.inactive }}' === 'True'}">
                                         <div class="d-flex flex-wrap justify-content-between align-items-center">
                                             <span class="text-break text-truncate">
@@ -141,7 +141,7 @@
                                     </li>
                                 {% endfor %}
                                 {% if not is_switchtender %}
-                                    <li class="text-white bg-blue-light-hover list-group-item px-3 py-2 list-group-item-action dropdown-item border-0 d-flex align-items-center specific-background-0063CB">
+                                    <li class="text-white bg-blue-light-hover list-group-item px-3 fr-py-2v list-group-item-action dropdown-item border-0 d-flex align-items-center specific-background-0063CB">
                                         <span class="text-break text-truncate">
                                             <svg data-toggle="tooltip"
                                                  data-placement="top"
@@ -184,7 +184,7 @@
                 {% if "manage_resources" in user_site_perms %}
                     <button x-on:click="open = !open"
                             type="button"
-                            class="border-0 btn py-0 px-1">
+                            class="border-0 btn fr-py-0 fr-px-1v">
                         <svg data-toggle="tooltip"
                              data-placement="top"
                              title="Notifications désactivées"
@@ -198,9 +198,9 @@
                     </button>
                     <ul x-show="open"
                         :class="{'show':open}"
-                        class="dropdown-menu py-0 mt-2 top-100">
+                        class="dropdown-menu fr-py-0 mt-2 top-100">
                         <li>
-                            <a class="dropdown-item px-4 py-2"
+                            <a class="dropdown-item fr-px-2w fr-py-2v"
                                href="{% url 'resources-resource-create' %}">Créer</a>
                         </li>
                     </ul>

@@ -30,7 +30,7 @@
                 {{ is_switchtender|json_script:"isSwitchtender" }}
                 {{ user.email|json_script:"userEmail" }}
                 {% if is_switchtender and project.tasks.all.count == 0 %}
-                    <div data-test-id="no-tasks-banner" class="bg-light p-4 rounded-2">
+                    <div data-test-id="no-tasks-banner" class="bg-light fr-p-2w rounded-2">
                         <h3 class="fw-light">Pas encore de recommandations à la collectivité ?</h3>
                         <p class="fst-italic fw-light">
                             Soyez la première personne à proposer des recommandations ou des ressources à la collectivité !
@@ -54,7 +54,7 @@
                         {% endif %}
                     </div>
                 {% elif not is_switchtender and project.tasks.public.count == 0 %}
-                    <div class="bg-light p-4 rounded-2">
+                    <div class="bg-light fr-p-2w rounded-2">
                         <h3 class="fw-light">Vous n'avez pas de recommandations en cours</h3>
                         <p class="fst-italic fw-light">Des recommandations vous seront proposées par notre équipe dès que possible.</p>
                         <p class="fst-italic fw-light">

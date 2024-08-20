@@ -10,7 +10,7 @@
     {% vite_asset 'js/apps/user.js' %}
 {% endblock %}
 <div x-data="User(f.who)"
-     class="w-100 user-card position-relative d-flex my-1 flex-column justify-content-between align-items-start">
+     class="w-100 user-card position-relative d-flex fr-my-1v flex-column justify-content-between align-items-start">
     <div class="position-relative d-flex align-items-center justify-content-between">
         <div x-ref="user"
              @click="onUserClick"
@@ -85,7 +85,7 @@
                            href="mailto:f.who.email"
                            x-text="truncate(f.who.email,30)"></a>
                     </div>
-                    <button class="ms-4 px-2 py-0 btn small btn-outline-primary"
+                    <button class="ms-4 fr-px-2v fr-py-0 btn small btn-outline-primary"
                             @click="clipboardCopy(`L'email`, f.who.email)">
                         <svg class="bi align-baseline" width="10" height="10" fill="currentColor">
                             <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#clipboard" />
@@ -106,7 +106,7 @@
                            href="tel:{{ user.profile.phone_no }}"
                            x-text="f.who.profile.phone_no"></a>
                     </div>
-                    <button class="ms-4 px-2 py-0 btn small btn-outline-primary"
+                    <button class="ms-4 fr-px-2v fr-py-0 btn small btn-outline-primary"
                             @click="clipboardCopy('Le numéro de téléphone', '{{ user.profile.phone_no }}')">
                         <svg class="bi align-baseline" width="10" height="10" fill="currentColor">
                             <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#clipboard" />
@@ -115,7 +115,7 @@
                 </span>
             </template>
             <template x-if="!f.who.is_active">
-                <span class="p-1 px-2 font-very-small bg-grey-light w-100 d-flex mt-1 text-nowrap specific-border-radius-2px">Compte desactivé depuis le {{ user.profile.deleted }}</span>
+                <span class="fr-p-1v fr-px-2v font-very-small bg-grey-light w-100 d-flex mt-1 text-nowrap specific-border-radius-2px">Compte desactivé depuis le {{ user.profile.deleted }}</span>
             </template>
         </div>
     </div>

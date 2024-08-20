@@ -12,7 +12,7 @@
           type="text/css">
 {% endblock %}
 {% block content %}
-    <div x-data="Crm" class="d-flex px-0" style="">
+    <div x-data="Crm" class="d-flex fr-px-0" style="">
         <aside class="w-25 crm-aside">
             {% if active_project %}
                 <div x-ref="sidebar"
@@ -27,9 +27,9 @@
             </aside>
             <div class="w-75 d-flex flex-column justify-content-start">
                 {% if active_project %}
-                    <div class="crm-header px-4 py-4 mb-3">
+                    <div class="crm-header fr-px-2w fr-py-2w mb-3">
                     {% else %}
-                        <div class="crm-header no-project px-4 py-4">
+                        <div class="crm-header no-project fr-px-2w fr-py-2w">
                         {% endif %}
                         <h3 class="d-flex align-items-center">
                             <svg class="bi me-2" width="16" height="16" fill="currentColor">
@@ -47,7 +47,7 @@
                             </a>
                         {% endif %}
                     </div>
-                    <div class="px-4 pt-4 bg-light crm-timeline-min-height">
+                    <div class="fr-px-2w pt-4 bg-light crm-timeline-min-height">
                         <h4>Notifications envoyées par email</h4>
                         {% for notification in notifications %}
                             <ul>

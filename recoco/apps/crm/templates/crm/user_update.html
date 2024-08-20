@@ -19,10 +19,10 @@
     </style>
 {% endblock %}
 {% block content %}
-    <div x-data="Crm" class="d-flex px-0" style="">
+    <div x-data="Crm" class="d-flex fr-px-0" style="">
         {% include "crm/fragments/sidebar.html" with search=True back_button=True user_advised_projects=False user_projects=False %}
         <div class="w-75 d-flex flex-column justify-content-start">
-            <div class="crm-header px-4 py-4 mb-3">
+            <div class="crm-header fr-px-2w fr-py-2w mb-3">
                 <div class="d-flex justify-content-between align-items-center mb-2">
                     <h3>Gérer le compte « {{ crm_user.username }} »</h3>
                 </div>
@@ -45,7 +45,7 @@
                     </div>
                 {% endif %}
             </div>
-            <div class="px-4 pt-4 mb-3">
+            <div class="fr-px-2w pt-4 mb-3">
                 <span class="me-2">Type de compte</span>
                 <div class="btn-group btn-group-sm">
                     {% if crm_user_is_advisor %}
@@ -97,7 +97,7 @@
                 {% endif %}
             </div>
             <hr />
-            <div class="px-4 pt-4 mb-3">
+            <div class="fr-px-2w pt-4 mb-3">
                 <form method="POST" action="{% url 'crm-user-update' crm_user.pk %}">
                     {% csrf_token %}
                     {{ form.non_field_errors }}

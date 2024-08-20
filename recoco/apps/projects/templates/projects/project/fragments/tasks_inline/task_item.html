@@ -57,12 +57,12 @@
         <article class="mt-1 mb-2">
             <template x-if="task.resource_id && task.resource && task.resource.subtitle">
                 <div x-html="truncate(renderMarkdown(task.resource.subtitle),100)"
-                     class="text-info-custom fw-light font-small text-dark m-0 p-0">
+                     class="text-info-custom fw-light font-small text-dark fr-m-0 fr-p-0">
                 </div>
             </template>
             <template x-if="!task.resource_id && task.content">
                 <div x-html="truncate(renderMarkdown(task.content),100)"
-                     class="text-info-custom fw-light font-small text-dark mb-2 p-0"></div>
+                     class="text-info-custom fw-light font-small text-dark mb-2 fr-p-0"></div>
             </template>
         </article>
         <template x-if="task.resource">

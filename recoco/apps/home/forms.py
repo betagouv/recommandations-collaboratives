@@ -159,13 +159,13 @@ class UserPasswordFirstTimeSetupForm(forms.Form):
     password1 = forms.CharField(
         label="Mot de passe",
         widget=forms.PasswordInput(
-            attrs={"class": "form-control py-2 fr-mt-2v fr-mb-4v"}
+            attrs={"class": "form-control fr-py-2v fr-mt-2v fr-mb-4v"}
         ),
     )
     password2 = forms.CharField(
         label="Confirmation du mot de passe",
         widget=forms.PasswordInput(
-            attrs={"class": "form-control py-2 fr-mt-2v fr-mb-4v"}
+            attrs={"class": "form-control fr-py-2v fr-mt-2v fr-mb-4v"}
         ),
     )
     next = forms.CharField(widget=forms.HiddenInput())

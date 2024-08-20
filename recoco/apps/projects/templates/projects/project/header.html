@@ -33,8 +33,8 @@
             </div>
             {% if "use_project_tags" in user_site_perms %}
                 <div class="d-flex justify-content-between">
-                    <ul class="d-flex list-unstyled m-0 p-0 flex-wrap mb-3">
-                        {% for tag in project.tags.all %}<li class="mx-1 my-1 badge rounded-pill bg-dark">{{ tag }}</li>{% endfor %}
+                    <ul class="d-flex list-unstyled fr-m-0 fr-p-0 flex-wrap mb-3">
+                        {% for tag in project.tags.all %}<li class="fr-mx-1v fr-my-1v badge rounded-pill bg-dark">{{ tag }}</li>{% endfor %}
                         <a class="d-flex align-items-center"
                            href="{% url "projects-project-tags" project.id %}">
                             <svg class="bi ms-2 " width="15" height="15" fill="currentColor">

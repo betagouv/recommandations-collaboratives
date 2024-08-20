@@ -21,7 +21,7 @@
                 </span>
             {% endif %}
             {% if get_user_profile and note.related and note.content_type.name == "utilisateur" %}
-                <div class="position-relative d-flex justify-content-center align-items-center me-3 border border-dark rounded bg-white px-2 py-1">
+                <div class="position-relative d-flex justify-content-center align-items-center me-3 border border-dark rounded bg-white fr-px-2v fr-py-1v">
                     <svg class="bi me-2" width="18" height="18" fill="currentColor">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#person-circle" />
                     </svg>
@@ -76,7 +76,7 @@
         </div>
     </div>
     <div class="d-flex mb-2">
-        {% for tag in note.tags.all %}<span class="mx-1 badge rounded-pill bg-dark">{{ tag }}</span>{% endfor %}
+        {% for tag in note.tags.all %}<span class="fr-mx-1v badge rounded-pill bg-dark">{{ tag }}</span>{% endfor %}
     </div>
     <article>
         {{ note.content_rendered|safe }}

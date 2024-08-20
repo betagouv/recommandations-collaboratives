@@ -10,7 +10,7 @@
 {% get_obj_perms request.user for project as "user_project_perms" %}
 <div x-data="Task(task)"
      :id="task.uuid"
-     class="drag-targetable py-1 position-relative"
+     class="drag-targetable fr-py-1v position-relative"
      @dragover="onDragOver(event)"
      @drop="onDrop(event, board.status, task.uuid)"
      @dragenter="onDragEnter(event)"
@@ -30,7 +30,7 @@
             <span class="position-absolute translate-middle top-0 start-100 badge rounded-circle bg-danger fw-bold specific-fontsize-07"
                   x-text="currentTask.notifications.count"></span>
         </template>
-        <div class="p-2">
+        <div class="fr-p-2v">
             <div class="d-flex flex-row">
                 <div class="flex-fill mt-1 ms-2 specific-fontsize-09 specific-cursor-pointer"
                      @click="handleOpenPreviewModal()"
@@ -45,7 +45,7 @@
                     </template>
                     <h6 class="mb-0 fw-bold title-info text-transform-none text-blue text-decoration-underline"
                         x-text="currentTask.intent"></h6>
-                    <div class="pt-2 my-2"
+                    <div class="pt-2 fr-my-2v"
                          :class="canAdministrate && currentTask.content === '' && 'border border-warning'">
                         <div class="d-flex flex-column">
                             <span class="align-middle text-grey-dark tiny specific-lineheight-20"

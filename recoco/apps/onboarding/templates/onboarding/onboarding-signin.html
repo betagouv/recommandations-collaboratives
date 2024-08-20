@@ -76,7 +76,7 @@
                             <fieldset class="fr-fieldset">
                                 <legend class="fr-fieldset__legend legend-specific-fontsize-1--5">Vous avez dejà un compte ? Identifiez-vous !</legend>
                                 {% if user_other_sites %}
-                                    <div class="mx-2 mb-4 custom-callout-blue">
+                                    <div class="fr-mx-2v mb-4 custom-callout-blue">
                                         Pour vous connecter à {{ request.site.name }}, utilisez le même compte que sur
                                         {% for site in user_other_sites %}
                                             {% if not forloop.first and not forloop.last %},{% endif %}
@@ -167,7 +167,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="px-2 w-100 d-flex justify-content-between align-items-start fr-mt-10v">
+                                <div class="fr-px-2v w-100 d-flex justify-content-between align-items-start fr-mt-10v">
                                     <div class="d-flex flex-column align-items-start">
                                         {% comment %} TODO Add next {% endcomment %}
                                         <a class="link-underline-primary" href="/login/">Recevoir un lien de connexion par email</a>

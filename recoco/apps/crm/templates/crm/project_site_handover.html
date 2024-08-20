@@ -20,11 +20,11 @@
 {% endblock %}
 {% block content %}
     <div x-data="Crm"
-         class="d-flex px-0"
+         class="d-flex fr-px-0"
          style="font-family: 'Marianne', arial, sans-serif">
         {% include "crm/fragments/sidebar.html" with search=True back_button=True user_advised_projects=False user_projects=False %}
         <div class="w-75 d-flex flex-column justify-content-start">
-            <div class="crm-header px-4 py-4 mb-3">
+            <div class="crm-header fr-px-2w fr-py-2w mb-3">
                 <div class="d-flex justify-content-between align-items-center mb-2">
                     <h3>Proposer le projet « {{ project.name }} » à un autre portail</h3>
                 </div>

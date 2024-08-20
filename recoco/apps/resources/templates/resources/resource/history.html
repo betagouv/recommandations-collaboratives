@@ -36,9 +36,9 @@
             {% include 'resources/resource/fragments/breadcrumb.html' %}
             <h2>Historique des modifications</h2>
             <small>&larr; <a href="{% url 'resources-resource-detail' resource.pk %}">Retour à la dernière version</a></small>
-            <div class="text-justified font-marianne my-4">
+            <div class="text-justified font-marianne fr-my-2w">
                 {% include "reversion-compare/action_list_partial.html" %}
-                <div class="p-4 my-4">
+                <div class="fr-p-2w fr-my-2w">
                     {% if version1 and version2 %}
                         {% include "reversion-compare/compare_partial.html" %}
                     {% else %}
