@@ -51,8 +51,8 @@
 {% endblock %}
 {% block content %}
     {% get_obj_perms request.user for request.site as "user_site_perms" %}
-    <div class="col-12 p-4 mx-auto">
-        <div class="row mx-0">
+    <div class="col-12 p-4 fr-mx-auto">
+        <div class="row fr-mx-0">
             <div class="d-flex flex-column p-0 m-0">
                 {% block project_list_content %}{% endblock %}
             </div>

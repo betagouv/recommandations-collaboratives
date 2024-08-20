@@ -28,7 +28,7 @@
             </div>
             {% endif %}
             {% if project.deleted %}
-                <div class="d-block mx-4">
+                <div class="d-block fr-mx-4v">
                     <div class="alert alert-danger mt-4" role="alert">
                         <span>Ce projet a été supprimé. Ceci signifie qu'il n'est plus visible sur {{ request.site.name }}. Vous pouvez néanmoins le réactiver si vous le souhaitez.</span>
                         <div class="d-flex justify-content-end mt-2">
@@ -56,7 +56,7 @@
 
 
                             <div class="mt-1 d-flex flex-wrap small">
-                            {% for tag in project.tags.all %}<span class="crm-project-tag mx-1">#{{ tag }}</span>{% endfor %}
+                            {% for tag in project.tags.all %}<span class="crm-project-tag fr-mx-1v">#{{ tag }}</span>{% endfor %}
                         </div>
                         <hr />
                         <div class="d-flex align-items-center small">

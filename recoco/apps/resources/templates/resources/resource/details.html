@@ -87,7 +87,7 @@
 {% endblock %}
 {% block content %}
     <div class="row py-5" id="resource-main-content">
-        <div class="col-9 px-5 mx-auto font-marianne" id="resource-main">
+        <div class="col-9 px-5 fr-mx-auto font-marianne" id="resource-main">
             {% include 'resources/resource/fragments/breadcrumb.html' %}
             <div class="d-flex align-items-center mb-3" id="resource-details">
                 {% include 'resources/resource/fragments/category_list.html' %}
@@ -103,7 +103,7 @@
             Un problème sur cette ressource ? Un doute, des questions ? N'hésitez pas à <a href="{% url 'home-contact' %}?next={{ request.get_full_path }}&subject=Une question sur la ressource '{{ resource.title|truncatewords:4 }}'">nous interpeller</a>.
             </div> {% endcomment %}
         </div>
-        <div class="col-3 mx-auto" id="resource-footer">
+        <div class="col-3 fr-mx-auto" id="resource-footer">
             <!-- Sidebar -->
             <div class="admin-sidebar">
                 <!-- User actions -->

@@ -20,7 +20,7 @@
 {% block project_detail %}
     {% get_obj_perms request.user for request.site as "user_site_perms" %}
     {% get_obj_perms request.user for project as "user_project_perms" %}
-    <div class="col-12 mx-auto">
+    <div class="col-12 fr-mx-auto">
         {% include 'projects/project/navigation.html' with recommandations=True %}
         <div class="mb-2 d-flex align-items-center justify-content-between">
             <div>

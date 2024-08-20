@@ -98,7 +98,7 @@
                         {% if task.resource %}
                             {{ task.resource.summary }}
                         {% elif task.contact %}
-                            <div class="d-flex mx-4">
+                            <div class="d-flex fr-mx-4v">
                                 {% include "addressbook/widgets/card_contact_horizontal.html" with contact=task.contact %}
                             </div>
                         {% endif %}
@@ -187,7 +187,7 @@
                             </div>
                         {% endif %}
                         {% if can_administrate and not disable_edit %}
-                            <div class="dropdown mx-2 align-middle">
+                            <div class="dropdown fr-mx-2v align-middle">
                                 <a class="btn btn-sm btn-info dropdown-toggle"
                                    href="#"
                                    role="button"

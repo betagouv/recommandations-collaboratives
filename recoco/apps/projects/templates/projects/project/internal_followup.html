@@ -10,7 +10,7 @@
 {% block project_detail %}
     {% get_obj_perms request.user for request.site as "user_site_perms" %}
     {% get_obj_perms request.user for project as "user_project_perms" %}
-    <div class="col-12 mx-auto">
+    <div class="col-12 fr-mx-auto">
         {% include 'projects/project/navigation.html' with internal_followup=True full_page=True %}
         <div class="row">
             <div class="col-8">

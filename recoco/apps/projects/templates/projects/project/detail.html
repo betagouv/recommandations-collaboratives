@@ -21,7 +21,7 @@
 {% endblock %}
 {% block content %}
     {% is_staff_for_current_site request.user as is_staff %}
-    <div class="col-11 pt-3 pb-5 mx-auto">
+    <div class="col-11 pt-3 pb-5 fr-mx-auto">
         <div class="row" style="font-family: 'Marianne', arial, sans-serif;">
             {% block banner %}{% endblock %}
             {% include 'projects/project/header.html' %}

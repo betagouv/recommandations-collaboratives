@@ -13,7 +13,7 @@
           type="text/css">
 {% endblock %}
 {% block content %}
-    <div class="col-12 p-4 mx-auto">
+    <div class="col-12 p-4 fr-mx-auto">
         <!-- Breadcrumb -->
         <nav aria-label="breadcrumb" class="pb-4">
             <ul class="breadcrumb">
@@ -81,7 +81,7 @@
                                             <div class="topic-choice-list l-stack ">
                                                 <template x-for="result in results">
                                                     <button @click.prevent="handleResultClick(result.name)"
-                                                            class="btn-select btn secondary tiny mx-1 mt-1 w-100"
+                                                            class="btn-select btn secondary tiny fr-mx-1v mt-1 w-100"
                                                             x-text="result.name"></button>
                                                 </template>
                                             </div>

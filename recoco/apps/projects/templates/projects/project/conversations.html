@@ -18,7 +18,7 @@
     {% challenge_for request.user "project-conversation-writer" as challenge %}
     {% get_obj_perms request.user for request.site as "user_site_perms" %}
     {% get_obj_perms request.user for project as "user_project_perms" %}
-    <div class="col-12 mx-auto">
+    <div class="col-12 fr-mx-auto">
         {% include 'projects/project/navigation.html' with conversation=True %}
         <div class="row">
             <div class="col-12 col-lg-8">
@@ -82,7 +82,7 @@
                         </div>
                     {% endif %}
                 </div>
-                <div class="col mx-auto col-lg-4 col-md-12">
+                <div class="col fr-mx-auto col-lg-4 col-md-12">
                     <h6 class="text-uppercase fw-bold d-block mb-3 h6-specific-fontsize-14">Participants</h6>
                     <div>
                         <p class="text-info-custom">Membres de la collectivité</p>
