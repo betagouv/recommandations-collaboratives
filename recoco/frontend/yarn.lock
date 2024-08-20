@@ -192,7 +192,7 @@
   resolved "https://registry.yarnpkg.com/@eslint/js/-/js-8.57.0.tgz#a5417ae8427873f1dd08b70b3574b453e67b5f7f"
   integrity sha512-Ys+3g2TaW7gADOJzPt83SJtCDhMjndcDMFVQ/Tj9iA1BfJzFKD9mAUXT3OenpuPHbI6P/myECxRJrofUsDx/5g==
 
-"@gouvfr/dsfr@^1.11.0", "@gouvfr/dsfr@^1.11.2":
+"@gouvfr/dsfr@^1.11.2":
   version "1.11.2"
   resolved "https://registry.yarnpkg.com/@gouvfr/dsfr/-/dsfr-1.11.2.tgz#aa815e458b266acd8e457bdad35b7e3ad5e6c2ab"
   integrity sha512-S7idT4rCCw6M1pqxJS8y4nUSq/Rus+Kucoifmv0CrZD/eoBA34HWqWYzR9GIxvtAX/TQ1XC7Hz+54THtVzMeqQ==
@@ -485,7 +485,7 @@ ajv@^8.0.1:
     require-from-string "^2.0.2"
     uri-js "^4.2.2"
 
-alpinejs@^3.10.1, alpinejs@^3.10.2:
+alpinejs@^3.10.2:
   version "3.13.9"
   resolved "https://registry.yarnpkg.com/alpinejs/-/alpinejs-3.13.9.tgz#beb1309cf155ee11a08d235297fc58d4f0cfce4b"
   integrity sha512-BTEJ3fcUpqKlB+aFYSWGVEp8IP3vA96x7wUaNSdb5SJxV5i7s+/Bduxy9D6TokcqpW5MygsnG1eBEFfr4AnQSw==
@@ -1016,12 +1016,6 @@ doctrine@^3.0.0:
   integrity sha512-yS+Q5i3hBf7GBkd4KG8a7eBNNWNGLTaEwwYWUijIYM7zrlYDM0BFXHjjPWlWZ1Rg7UaddZeIDmi9jF3HmqiQ2w==
   dependencies:
     esutils "^2.0.2"
-
-"dsrc_ui@file:./modules/dsrc_ui":
-  version "0.1.0"
-  dependencies:
-    "@gouvfr/dsfr" "^1.11.0"
-    alpinejs "^3.10.1"
 
 emoji-regex@^8.0.0:
   version "8.0.0"

@@ -11,9 +11,7 @@
           type="text/css">
 {% endblock %}
 {% block content %}
-    <div x-data="Crm"
-         class="d-flex px-0"
-         style="font-family: 'Marianne', arial, sans-serif">
+    <div x-data="Crm" class="d-flex px-0" style="">
         {% include "crm/fragments/sidebar.html" with search=True back_button=True %}
         <div class="w-75 d-flex flex-column justify-content-start px-4 bg-light">
             <h3 class="mt-3 mb-4">

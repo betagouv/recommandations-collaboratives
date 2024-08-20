@@ -20,9 +20,7 @@
     </style>
 {% endblock %}
 {% block content %}
-    <div x-data="Crm"
-         class="d-flex px-0"
-         style="font-family: 'Marianne', arial, sans-serif">
+    <div x-data="Crm" class="d-flex px-0" style="">
         {% include "crm/fragments/sidebar.html" with search=True back_button=True organization_members=True followed_projects=True unfollowed_projects=True %}
         <div class="w-75 d-flex flex-column justify-content-start">
             <div class="crm-header px-4 py-3 pt-4 {% if active_project %}mb-3{% else %}no-project{% endif %}">

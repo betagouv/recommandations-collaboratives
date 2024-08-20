@@ -21,9 +21,7 @@
     {% get_obj_perms request.user for request.site as "user_site_perms" %}
     {% is_staff_for_current_site request.user as is_staff %}
     {% get_verbs as verbs %}
-    <div x-data="Crm"
-         class="d-flex px-0"
-         style="font-family: 'Marianne', arial, sans-serif">
+    <div x-data="Crm" class="d-flex px-0" style="">
         {% include "crm/fragments/sidebar.html" with search=True back_button=True map=True tools=True %}
         <div class="w-75 d-flex flex-column justify-content-start">
             {% if active_project %}
@@ -94,7 +92,6 @@
                             </li>
                         </ul>
                     </div>
-
                     {% if is_staff or "manage_surveys" in user_site_perms or perms.wagtailadmin.can_access %}
                         <div class="pb-3 px-4">
                             <h5 class="d-flex align-items-center relative pb-2 text-info-custom text-grey-dark">
@@ -110,25 +107,22 @@
                                         {% include "crm/fragments/crm_icon_button.html" with link_url=url name="Réglages du Site" icon="gear" %}
                                     </li>
                                 {% endif %}
-                                    {% if perms.wagtailadmin.can_access %}
+                                {% if perms.wagtailadmin.can_access %}
                                     <li class="me-2 col-2">
                                         {% url 'wagtailadmin_home' as url %}
                                         {% include "crm/fragments/crm_icon_button.html" with link_url=url name="Pages Statiques" icon="pen" %}
                                     </li>
-                                    {% endif %}
-
-                                    <li class="me-2 col-2">
-                                        {% url 'projects-task-recommendation-list' as url %}
-                                        {% include "crm/fragments/crm_icon_button.html" with link_url=url name="Pré-fléchage" icon="signpost-fill" %}
-                                    </li>
-
+                                {% endif %}
+                                <li class="me-2 col-2">
+                                    {% url 'projects-task-recommendation-list' as url %}
+                                    {% include "crm/fragments/crm_icon_button.html" with link_url=url name="Pré-fléchage" icon="signpost-fill" %}
+                                </li>
                                 {% if request.site.configuration.project_survey and "manage_surveys" in user_site_perms %}
                                     <li class="me-2 col-2">
                                         {% url 'survey-editor-survey-details' request.site.configuration.project_survey_id as url %}
                                         {% include "crm/fragments/crm_icon_button.html" with link_url=url name="Questionnaire" icon="question-circle" %}
                                     </li>
                                 {% endif %}
-
                             </ul>
                         </div>
                     {% endif %}

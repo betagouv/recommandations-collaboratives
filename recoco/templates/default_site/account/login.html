@@ -3,13 +3,13 @@
 {% load static %}
 {% load i18n %}
 {% block head_title %}
-  {% trans "Sign In" %}
+    {% trans "Sign In" %}
 {% endblock head_title %}
 {% block title %}Connexion{% endblock title %}
 {% block og_title %}Connexion{% endblock og_title %}
 {% load django_vite %}
 {% block js %}
-  {% vite_asset 'js/apps/auth.js' %}
+    {% vite_asset 'js/apps/auth.js' %}
 {% endblock js %}
 {% block css %}
   <link href="{% sass_src 'home/css/dsfr/custom-dsfr.scss' %}"
@@ -26,8 +26,7 @@
   <div class="container-fluid">
     <div x-data="Auth"
          x-init="initLogin"
-         class="fr-container fr-py-6w max-width-800"
-         style="font-family: 'Marianne', arial, sans-serif">
+         class="fr-container fr-py-6w max-width-800">
       <div class="d-flex justify-content-between align-items-start">
         <h1 class="fr-mb-6w d-flex align-items-center">
           <svg class="bi me-2" width="28" height="28">

@@ -3,7 +3,7 @@
 {% load static %}
 {% load i18n %}
 {% block head_title %}
-  {% trans "Signup" %}
+    {% trans "Signup" %}
 {% endblock %}
 {% block css %}
   <link href="{% sass_src 'home/css/dsfr/custom-dsfr.scss' %}"
@@ -17,8 +17,7 @@
         type="text/css">
 {% endblock %}
 {% block content %}
-  <div class="fr-container fr-py-6w max-width-800"
-       style="font-family: 'Marianne', arial, sans-serif">
+  <div class="fr-container fr-py-6w max-width-800">
     <h1 class="fr-mb-6w">
       <svg class="bi me-2" width="28" height="28">
         <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#person-circle" />
