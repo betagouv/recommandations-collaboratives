@@ -229,8 +229,6 @@ class ResourceDetailView(UserPassesTestMixin, BaseResourceDetailView):
         context = super().get_context_data(**kwargs)
         resource = self.get_object()
 
-        context["is_dsresource"] = resource.dsresource_set.exists()
-
         if check_if_advisor(self.request.user):
             context["projects_used_by"] = (
                 projects.Project.on_site.filter(
@@ -249,6 +247,18 @@ class EmbededResourceDetailView(BaseResourceDetailView):
     model = models.Resource
     template_name = "resources/resource/details_embeded.html"
     pk_url_kwarg = "resource_id"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        if task_id := self.request.GET.get("task_id"):
+            context["task"] = (
+                self.object.task_set.filter(pk=task_id)
+                .select_related("ds_folder")
+                .first()
+            )
+
+        return context
 
 
 ########################################################################

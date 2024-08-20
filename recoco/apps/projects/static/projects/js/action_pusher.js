@@ -108,8 +108,6 @@ function action_pusher_app() {
 		},
 
 		async getResources() {
-			var tasksFromApi = [];
-
 			this.isBusy = true;
 
 			const response = await fetch('/api/resources/');
@@ -122,7 +120,9 @@ function action_pusher_app() {
 					subtitle: t.subtitle,
 					tags: t.tags,
 					url: t.web_url,
-					url_embeded: t.embeded_url
+					url_embeded: t.embeded_url,
+					is_dsresource: t.is_dsresource,
+					category: t.category,
 				};
 
 				this.resources.push(entry);

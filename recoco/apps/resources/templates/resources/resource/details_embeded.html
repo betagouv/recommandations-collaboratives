@@ -37,18 +37,16 @@
 <div class="row">
     <div class="col-11 px-2 mx-auto" x-data="PrintTaskResource">
         <div class="d-flex justify-content-end pb-2 mb-2 task-preview-cta mt-2">
-            {% comment %} TODO
-            - Add a dynamic link to the resource
-            - Show only if the resource is a DS resource
-            {% endcomment %}
-            <a class="fr-btn fr-btn--secondary fr-btn--sm fr-mr-1w"
-               :href="resource.ds_folder.dossier_url">
-                <img height="31px"
-                     width="32px"
-                     src="{% static 'svg/picto-demarches_simplifiees.svg' %}"
-                     alt="Pictogramme Démarches Simpliffiées">
-                Voir mon dossier
-            </button>
+            {% if task and task.ds_folder %}
+                <a class="fr-btn fr-btn--secondary fr-btn--sm fr-mr-1w" href="{{ task.ds_folder.dossier_url }}" target="blank">
+                    <img height="31px"
+                        width="32px"
+                        src="{% static 'svg/picto-demarches_simplifiees.svg' %}"
+                        alt="Pictogramme Démarches Simpliffiées">
+                    Voir mon dossier
+                </a>
+            {% endif %}
+
             {% if contacts.count > 0 %}
                 <a style="border: solid 1px #222;
                           border-bottom-left-radius: 2px;

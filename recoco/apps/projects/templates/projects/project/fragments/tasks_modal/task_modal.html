@@ -48,7 +48,7 @@
                              x-effect="taskId && loadContent()">
                             <template x-if="task && taskId && task?.resource_id">
                                 <iframe class="w-100 d-flex flex-column rounded"
-                                        :src="resourcePreviewUrl(task?.resource_id)"></iframe>
+                                        :src="resourcePreviewUrl(task?.resource_id, taskId)"></iframe>
                             </template>
                             <template x-if="task && taskId && !task?.resource_id">
                                 <div class="w-100 text-break p-3"

@@ -67,17 +67,12 @@
         <hr>
         <template x-if="task.ds_folder">
             <div>
-                {% comment %} TODO
-                - Show only if the resource is a DS resource
-                - Show badge when DS folder is in draft
-                {% endcomment %}
                 <p class="fw-bolder">
                     <img height="31px"
                          width="32px"
                          src="{% static 'svg/picto-demarches_simplifiees.svg' %}"
-                         alt="Pictogramme Démarches Simpliffiées">
+                         alt="Pictogramme Démarches Simplifiées">
                     Dossier Démarches Simplifiées
-                    <span class="fr-badge fr-badge--sm fr-badge--purple-glycine">Brouillon</span>
                 </p>
                 <p class="fr-text-mention--grey fr-text--sm fr-my-3v">
                     Complétez l’état des lieux pour pré-remplir automatiquement le dossier de candidature.
@@ -85,21 +80,6 @@
                 <a class="fr-btn fr-btn--secondary fr-btn--sm"
                    @click.stop=""
                    x-bind:href="task.ds_folder.dossier_url">Voir mon dossier</a>
-                {% comment %} TODO
-                - Complete the tooltip
-                - Fix the tooltip behavior
-                - Get number of pre-filled data
-                {% endcomment %}
-                <span class="fr-ml-2w fr-text-label--blue-france fr-text--xs">8 données pré-remplies</span>
-                <button class="fr-btn--tooltip fr-btn"
-                        type="button"
-                        @click.stop=""
-                        id="button-2995"
-                        aria-describedby="tooltip-2994">Information contextuelle</button>
-                <span class="fr-tooltip fr-placement"
-                      id="tooltip-2994"
-                      role="tooltip"
-                      aria-hidden="true">Lorem [...] elit ut.</span>
             </div>
         </template>
         <hr class="fr-mb-3w">
