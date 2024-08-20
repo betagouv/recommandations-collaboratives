@@ -6,9 +6,7 @@
     {% vite_asset 'js/apps/crm.js' %}
 {% endblock %}
 {% block content %}
-    <div x-data="Crm"
-         class="d-flex px-0"
-         style="font-family: 'Marianne', arial, sans-serif">
+    <div x-data="Crm" class="d-flex px-0" style="">
         <aside class="w-25 crm-aside">
             {% if active_project %}
                 <div x-ref="sidebar"
