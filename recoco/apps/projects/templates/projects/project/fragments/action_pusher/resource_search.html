@@ -32,7 +32,7 @@
         <template x-for="resource in resultsAndSelected()" :key="resource.id">
             <li class="col">
                 <div class="resource-card card p-2 ps-5 rounded">
-                    <div class="card-body position-relative">
+                    <div class="card-body position-relative fr-pb-1w">
                         <template x-if="push_type == 'single'">
                             <input :id="'resource-' + resource.id"
                                    type="radio"
@@ -48,11 +48,11 @@
                                    :value="resource.id"
                                    x-model="selected_resources">
                         </template>
-                        <label :for="'resource-' + resource.id" x-text="resource.title"></label>
-                        <h5 x-text="resource.title"></h5>
-                        <p x-text="resource.subtitle" class="mb-0"></p>
+                        <label class="fs-6" :for="'resource-' + resource.id" x-text="resource.title"></label>
+                        <h5 class="fs-6" x-text="resource.title"></h5>
+                        <p x-text="resource.subtitle" class="fr-text--sm mb-0"></p>
                     </div>
-                    <div class="card-body">
+                    <div class="card-body fr-pt-1w">
                         <!-- Full screen modal -->
                         <div class="modal fade"
                              :id="`resource-preview-`+resource.id"
@@ -62,8 +62,7 @@
                             <div class="modal-dialog modal-fullscreen">
                                 <div class="modal-content">
                                     <div class="modal-header">
-                                        <h5 class="modal-title"">Prévisualisation de la ressource
-                                        </h5>
+                                        <h5 class="modal-title">Prévisualisation de la ressource</h5>
                                         <button type="button"
                                                 class="btn-close"
                                                 data-bs-dismiss="modal"
@@ -75,10 +74,36 @@
                                 </div>
                             </div>
                         </div>
+                        {% comment %} TODO
+                        - Show only if the resource is a DS resource
+                        - Add category name to resource object in api endpoint
+                        {% endcomment %}
+                        <div>
+                            <ul class="fr-badge-group fr-p-0">
+                                <li>
+                                    {% comment %}resource.category.name{% endcomment %}
+                                    <span class="fr-badge fr-badge--sm fr-badge--green-menthe">Exemple badge long</span>
+                                </li>
+                                {% comment %} {% if is_dsresource %} {% endcomment %}
+                                <li>
+                                    <span class="fr-badge fr-badge--sm text-transform-none">
+                                        <img height="8px"
+                                             width="18px"
+                                             src="{% static 'svg/picto-demarches_simplifiees--no-border.svg' %}"
+                                             alt="Pictogramme Démarches Simpliffiées"
+                                             class="fr-pr-1v">
+                                    Démarches Simplifiées</span>
+                                </li>
+                                {% comment %} {% endif %} {% endcomment %}
+                            </ul>
+                        </div>
+                        <hr>
                         <button @click.prevent
                                 data-bs-toggle="modal"
                                 :data-bs-target="`#resource-preview-`+resource.id"
-                                class="btn btn-sm btn-secondary">Prévisualiser cette ressource</button>
+                                class="fr-btn fr-btn--tertiary-no-outline fr-btn--icon-left fr-icon-eye-line">
+                            Prévisualiser
+                        </button>
                     </div>
                 </div>
             </li>

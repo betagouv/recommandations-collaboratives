@@ -6,6 +6,7 @@ Views for resources application
 author  : raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created : 2021-06-16 10:59:08 CEST
 """
+
 import datetime
 
 import reversion
@@ -227,6 +228,8 @@ class ResourceDetailView(UserPassesTestMixin, BaseResourceDetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         resource = self.get_object()
+
+        context["is_dsresource"] = resource.dsresource_set.exists()
 
         if check_if_advisor(self.request.user):
             context["projects_used_by"] = (
