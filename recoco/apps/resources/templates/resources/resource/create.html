@@ -39,7 +39,7 @@
                     </svg>
                     &nbsp;
                     Veuillez utiliser un titre qui reprend le problème de l'utilisateur, court et parlant.
-                    <p class="mb-0">
+                    <p class="fr-mb-0">
                         Par ex : <em class="text-secondary">"Financer des travaux de récupération des eaux pluviales"</em> plutôt que <em class="text-secondary">"Financements de l'Agence de l'eau"</em>
                     </p>
                 </div>
@@ -74,12 +74,12 @@
                     {{ form.category }}
                 </p>
                 <hr />
-                <div class="d-flex mt-4 mb-4">
-                    <div class="w-50 d-flex flex-column select-custom border-end pe-4 fr-py-2w">
+                <div class="d-flex fr-mt-2w fr-mb-2w">
+                    <div class="w-50 d-flex flex-column select-custom border-end fr-pr-2w fr-py-2w">
                         {{ form.departments.errors }}
                         {% include 'tools/searchable_list.html' with list=form.departments label=form.departments.label search_list_id=form.departments.id_for_label search_options="['name']" item_label="département" %}
                     </div>
-                    <div class="w-50 d-flex flex-column select-custom ms-2 ms-4 fr-py-2w">
+                    <div class="w-50 d-flex flex-column select-custom fr-ml-2v fr-ml-2w fr-py-2w">
                         {{ form.contacts.errors }}
                         {% include 'tools/searchable_list.html' with list=form.contacts label=form.contacts.label search_list_id=form.contacts.id_for_label search_options="['name']" item_label="contact" %}
                     </div>

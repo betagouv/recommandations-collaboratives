@@ -17,9 +17,9 @@
 <div class="survey-card text-black rounded-3">
     <div class="card-body fr-m-1v">
         <div>
-            <div class="mb-0 mb-2 d-flex justify-content-between align-items-start tmp-usevar"
+            <div class="fr-mb-0 fr-mb-2v d-flex justify-content-between align-items-start tmp-usevar"
                  style="color: {{ question_set.color|default:'black' }}">
-                <h5 class="card-title align-middle d-inline mb-0">{{ question_set.heading }}</h5>
+                <h5 class="card-title align-middle d-inline fr-mb-0">{{ question_set.heading }}</h5>
                 <span class="card-completion">{{ completion }}%</span>
             </div>
             <!-- <h6 style="color: {{ question_set.color|default:'black' }};" class="text-uppercase fw-bolder small tmp-usevar">
@@ -43,7 +43,7 @@
             <p class="card-text">
                 <ul class="list-unstyled">
                     {% for answer in answers %}
-                        <li class="answer mb-2 mt-4 d-flex justify-content-between position-relative">
+                        <li class="answer fr-mb-2v fr-mt-2w d-flex justify-content-between position-relative">
                             <div class="flex-grow-1">
                                 {% lookup_choices_from_answer answer as choices %}
                                 {% if show_question or not choices %}
@@ -73,7 +73,7 @@
                                 {% endif %}
                                 {% if show_comment and answer.comment or not choices %}
                                     <div>
-                                        <svg class="bi me-1 align-middle"
+                                        <svg class="bi fr-mr-1v align-middle"
                                              width="16"
                                              height="16"
                                              fill="currentColor">
@@ -84,7 +84,7 @@
                                 {% endif %}
                                 {% if show_tags and answer.tags %}
                                     <div>
-                                        <svg class="bi me-1 align-middle"
+                                        <svg class="bi fr-mr-1v align-middle"
                                              width="16"
                                              height="16"
                                              fill="currentColor">
@@ -138,7 +138,7 @@
         </div>
         {% if "use_surveys" in user_project_perms and completion < 100 %}
             <a href="{% url 'survey-question-details' session.pk question_set.questions.all.0.pk %}"
-               class="border-0 btn btn-primary w-100 mt-1 fw-bold fr-py-2v tmp-usevar"
+               class="border-0 btn btn-primary w-100 fr-mt-1v fw-bold fr-py-2v tmp-usevar"
                data-test-id="link-fill-survey"
                style="background-color: {{ question_set.color|default:'black' }} !important">Compléter cette section</a>
         {% endif %}

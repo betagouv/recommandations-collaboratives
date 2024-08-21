@@ -38,13 +38,13 @@
         </div>
         <div class="fr-p-2v">
             <div class="d-flex flex-row">
-                <div class="mt-1 d-flex flex-column justify-content-between">
+                <div class="fr-mt-1v d-flex flex-column justify-content-between">
                     {% if "use_tasks" in user_project_perms and not disable_edit %}
                         <div>
                             <template x-if="i > 0">
                                 <a class="d-block fr-p-1v specific-cursor-pointer"
                                    @click="$store.tasksData.moveAbove(t, column(board.status)[i - 1])">
-                                    <svg class="aling-middle bi ms-1"
+                                    <svg class="aling-middle bi fr-ml-1v"
                                          width="12px"
                                          height="12px"
                                          fill="currentColor">
@@ -55,7 +55,7 @@
                             <template x-if="i < (column(board.status).length - 1)">
                                 <a class="d-block fr-p-1v specific-cursor-pointer"
                                    @click="$store.tasksData.moveBelow(t, column(board.status)[i + 1])">
-                                    <svg class="aling-middle bi ms-1"
+                                    <svg class="aling-middle bi fr-ml-1v"
                                          width="12px"
                                          height="12px"
                                          fill="currentColor">
@@ -66,7 +66,7 @@
                         </div>
                         {% if is_switchtender %}
                             <template x-if="t.status < 3 && t.public">
-                                <div class="me-2 text-danger d-flex d-flex flex-column justify-content-center align-items-center archive-cta specific-cursor-pointer div-style"
+                                <div class="fr-mr-2v text-danger d-flex d-flex flex-column justify-content-center align-items-center archive-cta specific-cursor-pointer div-style"
                                      data-bs-toggle="tooltip"
                                      data-bs-placement="bottom"
                                      :title="toArchiveTooltip()"
@@ -85,9 +85,9 @@
                         {% endif %}
                     {% endif %}
                 </div>
-                <div class="flex-fill mt-1 ms-2 specific-cursor-pointer specific-fontsize-09"
+                <div class="flex-fill fr-mt-1v fr-ml-2v specific-cursor-pointer specific-fontsize-09"
                      @click="onPreviewClick(t.id)">
-                    <h6 class="mb-0 fw-bold" x-text="t.intent"></h6>
+                    <h6 class="fr-mb-0 fw-bold" x-text="t.intent"></h6>
                     <div class="rounded bg-light fr-p-2v fr-my-2v"
                          :class="canAdministrate && t.content === '' && 'border border-warning'">
                         <template x-if="canAdministrate && t.content === ''">
@@ -107,13 +107,13 @@
                                      :title="`${t.created_by.first_name} ${t.created_by.last_name}`"
                                      tabindex="0" />
                                 <span :class="!t.created_by.is_active && 'inactive-status'"
-                                      class="ms-1 fst-italic specific-lineheight-20"
+                                      class="fr-ml-1v fst-italic specific-lineheight-20"
                                       x-text="`${t.created_by.first_name} ${t.created_by.last_name}`"></span>
                                 <template x-if="t.created_by.profile.organization">
                                     <span x-text="t.created_by.profile.organization.name"
                                           class="fst-italic text-muted"></span>
                                 </template>
-                                <span class="ms-2 text-muted specific-lineheight-20"
+                                <span class="fr-ml-2v text-muted specific-lineheight-20"
                                       x-text="`le ${formatDate(t.created_on)}`"></span>
                             </div>
                         </div>
@@ -125,7 +125,7 @@
             <div class="d-flex align-items-center">
                 <div class="text-primary position-relative specific-cursor-pointer"
                      @click="onPreviewClick(t.id)">
-                    <svg class="bi ms-1" width="16px" height="16px" fill="currentColor">
+                    <svg class="bi fr-ml-1v" width="16px" height="16px" fill="currentColor">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#chat" />
                     </svg>
                     <span x-text="t.resource_id ? t.comments_count + 1  : t.comments_count"></span>
@@ -133,14 +133,14 @@
             </div>
             <div class="d-flex align-items-center"
                  x-data="{ hasReminders: t.reminders.length > 0, reminder: t.reminders[0] }">
-                <div class="me-2 tmp-usevar specific-cursor-pointer"
+                <div class="fr-mr-2v tmp-usevar specific-cursor-pointer"
                      :class="hasReminders ? 'text-primary' : 'text-muted'"
                      :style="isOldReminder(t.reminders[0]) ? 'color:#6c757d !important;' : ''"
                      data-bs-toggle="tooltip"
                      data-bs-placement="bottom"
                      :title="reminderTooltip(t)"
                      @click="onReminderClick(t.id)">
-                    <svg class="aling-middle bi ms-1"
+                    <svg class="aling-middle bi fr-ml-1v"
                          width="16px"
                          height="16px"
                          fill="currentColor">

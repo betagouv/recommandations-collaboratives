@@ -27,7 +27,7 @@
             {% endif %}
         </div>
         <template x-if="openStatusWrapper">
-            <ul class="d-flex align-items-center status-switcher list-unstyled mt-0 m-3 tmp-usevar">
+            <ul class="d-flex align-items-center status-switcher list-unstyled fr-mt-0 m-3 tmp-usevar">
                 <li x-bind:style="activeStatus($store.taskModal.currentTask, STATUSES.PROPOSED) && { pointerEvents: 'none' }">
                     <a @click="handleStatusClick($store.taskModal.currentTask, STATUSES.PROPOSED)"
                        :class="activeStatus($store.taskModal.currentTask, STATUSES.PROPOSED)">Nouveau</a>

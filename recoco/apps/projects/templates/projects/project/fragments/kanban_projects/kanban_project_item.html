@@ -19,10 +19,10 @@
          @dragend="onDragEnd(event)">
         <div class="d-flex align-items-center">
             <template x-if="p.status === 'NEW' ">
-                <i class="status-color-indicator me-2 specific-background-0063CB"></i>
+                <i class="status-color-indicator fr-mr-2v specific-background-0063CB"></i>
             </template>
             <a :href="makeProjectURL('{% url 'projects-project-detail' 0 %}', p.project.id)"
-               class="fw-bold mt-0 pt-0 font-normal mb-0 text-decoration-none pe-4 text-dark specific-cursor-pointer specific-fontsize-18"
+               class="fw-bold fr-mt-0 fr-pt-0 font-normal fr-mb-0 text-decoration-none fr-pr-2w text-dark specific-cursor-pointer specific-fontsize-18"
                x-text="p.project.name"></a>
         </div>
         <template x-if="p.project.notifications.count > 0">
@@ -31,18 +31,18 @@
         </figure>
         <template x-if="p.project.commune">
             <div class="fw-normal text-uppercase small d-flex align-items-center fr-my-1v">
-                <svg class="align-middle bi me-2"
+                <svg class="align-middle bi fr-mr-2v"
                      width="18px"
                      height="18px"
                      fill="currentColor">
                     <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#geo-alt" />
                 </svg>
-                <span class="me-1" x-text="p.project.commune.name"></span>
+                <span class="fr-mr-1v" x-text="p.project.commune.name"></span>
                 <span x-text="`(${p.project.commune.postal})`"></span>
             </div>
         </template>
         <div class="font-small text-dark d-flex align-items-center">
-            <svg class="align-middle bi me-2"
+            <svg class="align-middle bi fr-mr-2v"
                  width="18px"
                  height="15px"
                  fill="currentColor">

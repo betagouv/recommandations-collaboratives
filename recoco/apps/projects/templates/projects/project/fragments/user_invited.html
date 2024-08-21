@@ -6,10 +6,10 @@
           rel="stylesheet"
           type="text/css">
 {% endblock %}
-<div class="d-flex flex-column align-items-start mb-2">
+<div class="d-flex flex-column align-items-start fr-mb-2v">
     <div class="w-100 d-flex align-items-center justify-content-between">
-        <span class="me-2 d-flex align-items-center font-very-small">
-            <img class="rounded-circle me-2"
+        <span class="fr-mr-2v d-flex align-items-center font-very-small">
+            <img class="rounded-circle fr-mr-2v"
                  src="{% gravatar_url user_invited.email size=24 %}"
                  alt="{{ action.actor }}" />
             <strong class="text-nowrap">{{ user_invited.email }}</strong>

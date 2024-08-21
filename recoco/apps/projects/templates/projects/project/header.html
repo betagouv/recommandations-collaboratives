@@ -14,10 +14,10 @@
     {% endblock %}
     <div x-data="ProjectShare"
          class="col-12 d-flex justify-content-between align-items-start">
-        <div class=" d-flex flex-column mb-2">
+        <div class=" d-flex flex-column fr-mb-2v">
             <div class="d-flex align-items-center">
                 <div class="project-link d-flex align-items-center">
-                    <span class="fw-bold title-info text-dark me-2 location">{{ project.commune.name }}</span>
+                    <span class="fw-bold title-info text-dark fr-mr-2v location">{{ project.commune.name }}</span>
                     <span class="text-info-custom text-grey-dark name">{{ project.name }}</span>
                 </div>
             </div>
@@ -37,7 +37,7 @@
                         {% for tag in project.tags.all %}<li class="fr-mx-1v fr-my-1v badge rounded-pill bg-dark">{{ tag }}</li>{% endfor %}
                         <a class="d-flex align-items-center"
                            href="{% url "projects-project-tags" project.id %}">
-                            <svg class="bi ms-2 " width="15" height="15" fill="currentColor">
+                            <svg class="bi fr-ml-2v " width="15" height="15" fill="currentColor">
                                 <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#pencil-fill" />
                             </svg>
                         </a>
@@ -45,10 +45,10 @@
                 </div>
             {% endif %}
         </div>
-        <div class="flex-grow-1 ps-2">
+        <div class="flex-grow-1 fr-pl-2v">
             {% include "projects/project/fragments/email_reminder/project_email_reminder.html" with position=position %}
         </div>
-        <div class="project-header-actions flex-shrink-0 ps-2">
+        <div class="project-header-actions flex-shrink-0 fr-pl-2v">
             {% include "projects/project/fragments/sidebar.html" with disable_can_share=True disable_add_recommendation=True disable_add_recommendation=True disable_administration=True url_name=url_name %}
         </div>
     </div>

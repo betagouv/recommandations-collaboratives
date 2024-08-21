@@ -7,21 +7,21 @@
 {% endblock %}
 </script>
 <div x-data="AdvisorDashboard" x-init="getData();">
-    <header class="d-flex mb-2 w-100">
+    <header class="d-flex fr-mb-2v w-100">
         <div class="d-flex justify-content-between align-items-start w-100">
             <div class="d-flex flex-column">
                 <div class="d-flex align-items-center">
-                    <h2 class="mb-1 d-flex align-items-center">Mon tableau de bord</h2>
-                    <span class="text-muted fw-normal mt-0 ms-2"
+                    <h2 class="fr-mb-1v d-flex align-items-center">Mon tableau de bord</h2>
+                    <span class="text-muted fw-normal fr-mt-0 fr-ml-2v"
                           x-text="`${data.length} projets`"></span>
-                    <div x-show="isBusy" class="ms-2 specific-size">
+                    <div x-show="isBusy" class="fr-ml-2v specific-size">
                         <div class="spinner-border spinner-border spinner-border-sm text-primary"
                              role="status"></div>
                     </div>
                 </div>
-                <div class="d-flex align-items-center mb-4 text-muted text-small">
-                    <div class="d-flex align-items-center me-2">
-                        <svg class="align-middle bi me-2"
+                <div class="d-flex align-items-center fr-mb-2w text-muted text-small">
+                    <div class="d-flex align-items-center fr-mr-2v">
+                        <svg class="align-middle bi fr-mr-2v"
                              width="18px"
                              height="18px"
                              fill="currentColor">
@@ -29,8 +29,8 @@
                         </svg>
                         <span x-text="totalNotifications > 0 ? `${totalNotifications} Notifications` : `${totalNotifications} Notification`"></span>
                     </div>
-                    <div class="d-flex align-items-center me-2">
-                        <svg class="align-middle bi me-2"
+                    <div class="d-flex align-items-center fr-mr-2v">
+                        <svg class="align-middle bi fr-mr-2v"
                              width="18px"
                              height="18px"
                              fill="currentColor">
@@ -39,7 +39,7 @@
                         <span x-text="nbNewProjects > 0 ? `${nbNewProjects} Nouveaux projets` : `${nbNewProjects} Nouveau projet`"></span>
                     </div>
                     <template x-if="errors">
-                        <div class="d-flex align-items-center me-2">
+                        <div class="d-flex align-items-center fr-mr-2v">
                             <span class="text-danger" x-text="errors"></span>>
                         </div>
                     </template>
@@ -53,7 +53,7 @@
                   :key="board.code instanceof Array ? board.code[0] : board.code">
             <div class="fr-px-2v bg-light border-top border-4 me-3 tmp-usevar"
                  :style="`border-color:${board.color}!important;width:30%`">
-                <h5 x-text="board.title" class="font-medium text-gray-800 mt-2"></h5>
+                <h5 x-text="board.title" class="font-medium text-gray-800 fr-mt-2v"></h5>
                 <div class="position-relative overflow-auto specific-height-80vh">
                     <div class="drag-targetable py-3 h-100 position-absolute t-0 l-0 w-100 h-100"
                          @dragover="onDragOver(event, null)"

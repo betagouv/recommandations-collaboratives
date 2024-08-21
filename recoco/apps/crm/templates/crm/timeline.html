@@ -37,7 +37,7 @@
                                 <a href="{{ action.target.get_absolute_url }}">{{ action.target }}</a>
                             </span>
                         {% endif %}
-                        <span class="ms-1 small text-secondary">il y a {{ action.timestamp|timesince }}</span>
+                        <span class="fr-ml-1v small text-secondary">il y a {{ action.timestamp|timesince }}</span>
                     </div>
                     {% if action.action_object.resource %}
                         <div class="border fr-p-2v rounded bg-white w-100">{{ action.action_object.resource.title }}</div>

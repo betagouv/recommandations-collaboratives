@@ -9,11 +9,11 @@
 {% endblock %}
 {% get_obj_perms request.user for request.site as "user_site_perms" %}
 {% get_obj_perms request.user for project as "user_project_perms" %}
-<div class="d-flex align-items-start justify-content-between mb-2">
+<div class="d-flex align-items-start justify-content-between fr-mb-2v">
     {% with advisor.switchtender as user %}
         <div class="d-flex flex-column">
-            <span class="me-2 d-flex align-items-center">
-                <img class="rounded-circle me-2"
+            <span class="fr-mr-2v d-flex align-items-center">
+                <img class="rounded-circle fr-mr-2v"
                      src="{% gravatar_url user.email size=24 %}"
                      alt="{{ user }}">
                 {% if user.get_full_name %}
@@ -21,7 +21,7 @@
                     {% if 'use_crm' in user_site_perms %}
                         &nbsp;
                         <a class="small" href="{% url 'crm-user-details' user.pk %}">
-                            <svg class="bi me-1" width="16" height="16" fill="currentColor">
+                            <svg class="bi fr-mr-1v" width="16" height="16" fill="currentColor">
                                 <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#activity" />
                             </svg>
                         </a>
@@ -33,7 +33,7 @@
             <div class="d-flex align-items-center">
                 <span class="fw-light fst-italic specific-color-666">{{ user.profile.organization.name }}</span>
                 {% if  user.profile.organization_position %}
-                    <span class="ms-1 text-lowercase fw-light fst-italic specific-color-666">({{ user.profile.organization_position }})</span>
+                    <span class="fr-ml-1v text-lowercase fw-light fst-italic specific-color-666">({{ user.profile.organization_position }})</span>
                 {% endif %}
             </div>
         </div>

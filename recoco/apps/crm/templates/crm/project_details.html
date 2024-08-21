@@ -29,9 +29,9 @@
             {% endif %}
             {% if project.deleted %}
                 <div class="d-block fr-mx-4v">
-                    <div class="alert alert-danger mt-4" role="alert">
+                    <div class="alert alert-danger fr-mt-2w" role="alert">
                         <span>Ce projet a été supprimé. Ceci signifie qu'il n'est plus visible sur {{ request.site.name }}. Vous pouvez néanmoins le réactiver si vous le souhaitez.</span>
-                        <div class="d-flex justify-content-end mt-2">
+                        <div class="d-flex justify-content-end fr-mt-2v">
                             <form method="post" action="{% url 'crm-project-undelete' project.pk %}">
                                 {% csrf_token %}
                                 <button type="submit" class="btn btn-danger">Réactiver ce projet</button>
@@ -46,8 +46,8 @@
                 <div class="crm-header no-project fr-px-2w fr-py-2w d-flex justify-content-between align-items-center">
              {% endif %}
                     <div>
-                        <h3 class="d-flex mb-0 align-items-center">
-                            <svg class="bi me-2" width="16" height="16" fill="currentColor">
+                        <h3 class="d-flex fr-mb-0 align-items-center">
+                            <svg class="bi fr-mr-2v" width="16" height="16" fill="currentColor">
                                 <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#folder-fill" />
                             </svg>
                             <span>{{ project.name }}</span>
@@ -55,7 +55,7 @@
 
 
 
-                            <div class="mt-1 d-flex flex-wrap small">
+                            <div class="fr-mt-1v d-flex flex-wrap small">
                             {% for tag in project.tags.all %}<span class="crm-project-tag fr-mx-1v">#{{ tag }}</span>{% endfor %}
                         </div>
                         <hr />
@@ -68,7 +68,7 @@
                                 <div class="crm-group-checkbox">
                                     {% with project.crm_annotations.tags.names as active_tags %}
                                         {% for crm_tag in site_config.crm_available_tags.all %}
-                                            <form class="me-2"
+                                            <form class="fr-mr-2v"
                                                   action="{% url 'crm-project-toggle-annotation' project.pk %}"
                                                   method="post">
                                                 {% csrf_token %}
@@ -103,9 +103,9 @@
                        aria-current="page">Gérer le projet</a>
                 </div>
             </div>
-            <div class="fr-px-2w pt-4 crm-notes-wrapper">
+            <div class="fr-px-2w fr-pt-2w crm-notes-wrapper">
                 <div class="d-flex justify-content-between align-items-start">
-                    <a class="btn btn-primary mb-4"
+                    <a class="btn btn-primary fr-mb-2w"
                        href="{% url 'crm-project-note-create' project.pk %}">créer une note</a>
                 </div>
                 {% for note in sticky_notes.all %}
@@ -115,7 +115,7 @@
                     {% include "crm/note.html" with update_url_name="crm-project-note-update" get_user_profile=True %}
                 {% endfor %}
             </div>
-            <div class="fr-px-2w pt-4 bg-light crm-timeline-min-height">
+            <div class="fr-px-2w fr-pt-2w bg-light crm-timeline-min-height">
                 <h4>Activité</h4>
                 {% include "crm/timeline.html" %}
             </div>

@@ -69,7 +69,7 @@
             {% if request.user in project.members.all %}
                 {% if "use_surveys" in user_project_perms and session and session.next_question and session.completion < 80 %}
                     <div class="bg-light d-flex flex-column justify-content-center align-items-center fr-py-2w rounded">
-                        <h4 class="pt-2">
+                        <h4 class="fr-pt-2v">
                             {% if session.completion == 0 %}
                                 Prochaine étape : Remplissez le parcours d’état des lieux
                             {% else %}
@@ -79,7 +79,7 @@
                         <p class="fr-m-0 text-info-custom fw-normal pb-3">
                             Pour faire le point sur votre avancement et recevoir des conseils pertinents.
                         </p>
-                        <a class="button filled pb-2"
+                        <a class="button filled fr-pb-2v"
                            data-test-id="link-fill-survey"
                            href="{% url 'survey-session-start' session.id %}">Compléter l'état des lieux</a>
                     </div>

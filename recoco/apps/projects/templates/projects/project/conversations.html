@@ -44,8 +44,8 @@
                                                 <div class="d-flex align-items-center">
                                                     {% include 'user/user_card.html' with user=note.created_by %}
                                                     {% if note.created_by == request.user %}
-                                                        <span class="align-middle small text-dark ms-2">
-                                                            - <a class="ms-1 "href="{% url 'projects-update-note' note.pk %}">éditer</a>
+                                                        <span class="align-middle small text-dark fr-ml-2v">
+                                                            - <a class="fr-ml-1v "href="{% url 'projects-update-note' note.pk %}">éditer</a>
                                                         </span>
                                                     {% endif %}
                                                 </div>
@@ -59,7 +59,7 @@
                     {% if "use_public_notes" in user_project_perms %}
                         <hr />
                         <!-- Post message -->
-                        <div class="message-form mt-4 p-3 bg-light border-form">
+                        <div class="message-form fr-mt-2w p-3 bg-light border-form">
                             <form class="form"
                                   method="POST"
                                   action="{% url 'projects-conversation-create-message' project.pk %}"
@@ -70,7 +70,7 @@
                                 <label class="visually-hidden" for="input-project-content">{{ public_note_form.content.label }}</label>
                                 {% for error in public_note_form.content.errors %}<div class="text-danger text-end">{{ error }}</div>{% endfor %}
                                 {% include 'projects/project/fragments/files_links/file_upload_input_standalone.html' %}
-                                <div class="d-flex justify-content-end mt-4">
+                                <div class="d-flex justify-content-end fr-mt-2w">
                                     <button data-test-id="send-message-conversation"
                                             x-data
                                             :disabled="$store.editor.currentMessage === '' "
@@ -86,7 +86,7 @@
                     <h6 class="text-uppercase fw-bold d-block mb-3 h6-specific-fontsize-14">Participants</h6>
                     <div>
                         <p class="text-info-custom">Membres de la collectivité</p>
-                        <ul class="flex-column list-unstyled mb-0">
+                        <ul class="flex-column list-unstyled fr-mb-0">
                             {% for pm in project.projectmember_set.all %}
                                 {% if pm.member.is_active %}
                                     {% if pm.is_owner %}
@@ -98,9 +98,9 @@
                             {% endfor %}
                         </ul>
                     </div>
-                    <div class="d-block mt-4">
+                    <div class="d-block fr-mt-2w">
                         <p class="text-info-custom">Équipe de suivi</p>
-                        <ul class="d-flex flex-column list-unstyled mb-0">
+                        <ul class="d-flex flex-column list-unstyled fr-mb-0">
                             {% for advisor in project.switchtender_sites.all %}
                                 {% if advisor.switchtender.is_active %}
                                     <li>{% include 'user/user_card.html' with user=advisor.switchtender user_activity=True %}</li>

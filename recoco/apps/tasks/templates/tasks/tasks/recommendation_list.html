@@ -32,9 +32,9 @@
             <!-- main content -->
             <div>
                 {% for recommendation in recommendations %}
-                    <div class="d-flex mb-4">
+                    <div class="d-flex fr-mb-2w">
                         <div class="col-8" id="q-{{ recommendation.id }}">
-                            <div class="mt-3 d-flex justify-content-between pe-4">
+                            <div class="mt-3 d-flex justify-content-between fr-pr-2w">
                                 <div>
                                     <svg class="bi align-middle" width="20" height="20" fill="currentColor">
                                         <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#signpost" />
@@ -51,8 +51,8 @@
                                             Toute la France
                                         {% endif %}
                                     </span>
-                                    <div class="ms-4 text-secondary align-middle d-inline-block">
-                                        <svg class="bi me-1 align-middle"
+                                    <div class="fr-ml-2w text-secondary align-middle d-inline-block">
+                                        <svg class="bi fr-mr-1v align-middle"
                                              width="16"
                                              height="16"
                                              fill="currentColor">
@@ -68,23 +68,23 @@
                                     </div>
                                 </div>
                                 <div class="btn-group ms-5 align-middle" role="group" aria-label="actions">
-                                    <a class="btn btn-light mb-1 d-inline-block btn-outline-primary btn-sm"
+                                    <a class="btn btn-light fr-mb-1v d-inline-block btn-outline-primary btn-sm"
                                        href="{% url 'projects-task-recommendation-update' recommendation.pk %}">
-                                        <svg class="bi me-1" width="16" height="16" fill="currentColor">
+                                        <svg class="bi fr-mr-1v" width="16" height="16" fill="currentColor">
                                             <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#pen" />
                                         </svg>
                                         Éditer
                                     </a>
                                 </div>
                             </div>
-                            <div class="d-block w-100 pe-4">
+                            <div class="d-block w-100 fr-pr-2w">
                                 <div class="text-secondary fr-my-2v">Message aiguilleuse : "{{ recommendation.text }}"</div>
                                 {% include 'projects/project/fragments/action_list_item.html' with task=recommendation hide_comments=True disable_tracking=True disable_edit=True %}
                             </div>
                         </div>
-                        <div class="col-4 border-start ps-4 pt-3">
+                        <div class="col-4 border-start fr-pl-2w pt-3">
                             <div class="small">
-                                <svg class="bi me-1 align-middle"
+                                <svg class="bi fr-mr-1v align-middle"
                                      width="16"
                                      height="16"
                                      fill="currentColor">

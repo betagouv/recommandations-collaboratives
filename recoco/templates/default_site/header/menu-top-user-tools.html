@@ -10,7 +10,7 @@
 {% endblock %}
 {% is_staff_for_current_site request.user as is_staff %}
 <!-- User -->
-<div id="user-info" class="pe-2 ps-2 ms-2 me-2">
+<div id="user-info" class="fr-pr-2v fr-pl-2v fr-ml-2v fr-mr-2v">
   {% if user.is_authenticated %}
     {% get_obj_perms request.user for request.site as "user_site_perms" %}
     <div x-data="{ open: false }"
@@ -22,7 +22,7 @@
          data-test-id="open-dropdown-profil-option-button">
         <img src="{% gravatar_url user.email 16 %}"
              alt="{{ user.get_full_name }}"
-             class="me-2 rounded-circle header-img-specific-size" />
+             class="fr-mr-2v rounded-circle header-img-specific-size" />
         <span class="d-none d-lg-none d-xl-block specific-color-0063CB">{{ user.get_full_name|default:user.email }}</span>
         <button id="user-menu-button" type="button" class="border-0 btn fr-py-0 fr-px-1v">
           <svg data-toggle="tooltip"
@@ -39,7 +39,7 @@
       </a>
       <ul x-show="open"
           :class="{'show':open}"
-          class="dropdown-menu text-small shadow mt-2 top-100">
+          class="dropdown-menu text-small shadow fr-mt-2v top-100">
         {% if is_switchtender or is_administrating_project %}
           <li>
             <a class="dropdown-item small " href="{% url 'projects-project-list' %}">Accueil</a>
@@ -103,7 +103,7 @@
     </div>
   {% else %}
     <a href="{% url 'account_login' %}" class="btn">
-      <svg class="bi me-2 align-middle" width="16" height="16">
+      <svg class="bi fr-mr-2v align-middle" width="16" height="16">
         <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#person-circle" />
       </svg>
       <span class="align-middle">Se connecter</span>

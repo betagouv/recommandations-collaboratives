@@ -18,20 +18,20 @@
             {% endif %}
             <div class="fr-px-2w py-3">
                 <ul class="fr-m-0 fr-p-0">
-                    <li class="dropdown-item border-0 d-inline-block position-relative mb-1">
-                        <svg class="bi me-2 d-inline" width="16" height="16">
+                    <li class="dropdown-item border-0 d-inline-block position-relative fr-mb-1v">
+                        <svg class="bi fr-mr-2v d-inline" width="16" height="16">
                             <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#person-circle" />
                         </svg>
                         <a href="{% url 'crm-user-list' %}">Utilisateur·trice·s</a>
                     </li>
-                    <li class="dropdown-item border-0 d-inline-block position-relative mb-1">
-                        <svg class="bi me-2 d-inline" width="16" height="16">
+                    <li class="dropdown-item border-0 d-inline-block position-relative fr-mb-1v">
+                        <svg class="bi fr-mr-2v d-inline" width="16" height="16">
                             <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#folder-fill" />
                         </svg>
                         <a href="{% url 'crm-project-list' %}">Projets</a>
                     </li>
-                    <li class="dropdown-item border-0 d-inline-block position-relative mb-1">
-                        <svg class="bi me-2 d-inline" width="16" height="16">
+                    <li class="dropdown-item border-0 d-inline-block position-relative fr-mb-1v">
+                        <svg class="bi fr-mr-2v d-inline" width="16" height="16">
                             <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#building" />
                         </svg>
                         <a href="{% url 'crm-organization-list' %}">Organisations</a>
@@ -56,7 +56,7 @@
                 </div>
             {% endif %}
             {% if followed_projects %}
-                <div class="fr-px-2w mt-4 crm-border crm-border-bottom pb-2">
+                <div class="fr-px-2w fr-mt-2w crm-border crm-border-bottom fr-pb-2v">
                     <h5 class="crm-project-decoration d-inline-block">
                         Projets suivis <strong>({{ advised_projects|length }})</strong>
                     </h5>
@@ -70,7 +70,7 @@
                 </div>
             {% endif %}
             {% if unfollowed_projects %}
-                <div class="fr-px-2w mt-4 crm-border-bottom pb-2">
+                <div class="fr-px-2w fr-mt-2w crm-border-bottom fr-pb-2v">
                     <h5 class="crm-project-decoration d-inline-block relative">
                         Projets régionaux non suivis <strong>({{ unadvised_projects|length }})</strong>
                     </h5>
@@ -84,24 +84,24 @@
                 </div>
             {% endif %}
             {% if project_advisors %}
-                <div class="pt-3 mb-4 fr-px-2w crm-border-bottom">
+                <div class="pt-3 fr-mb-2w fr-px-2w crm-border-bottom">
                     <h5 class="crm-user-decoration d-inline-block relative">
                         Conseiller·es <strong>({{ project.switchtenders.all|length }})</strong>
                     </h5>
-                    <ul class="mb-2 fr-px-0" class="list-unstyled">
+                    <ul class="fr-mb-2v fr-px-0" class="list-unstyled">
                         {% regroup project.switchtenders.all by profile.organization as grouped_st %}
                         {% for group in grouped_st %}
-                            <div class="mb-4">
+                            <div class="fr-mb-2w">
                                 {% if group.grouper %}
                                     <a class="d-flex align-items-center"
                                        href="{% url 'crm-organization-details' group.grouper.pk %}">
-                                        <svg class="bi me-2" width="16" height="16" fill="currentColor">
+                                        <svg class="bi fr-mr-2v" width="16" height="16" fill="currentColor">
                                             <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#building" />
                                         </svg>
                                         <strong>{{ group.grouper }}</strong>
                                     </a>
                                 {% endif %}
-                                <ul class="list-unstyled fr-mx-4v mb-4">
+                                <ul class="list-unstyled fr-mx-4v fr-mb-2w">
                                     {% for switchtender in group.list %}
                                         {% include 'crm/user_item.html' with user=switchtender %}
                                     {% endfor %}
@@ -114,7 +114,7 @@
                 </div>
             {% endif %}
             {% if project_members %}
-                <div class="fr-px-2w crm-border-bottom pb-2">
+                <div class="fr-px-2w crm-border-bottom fr-pb-2v">
                     <h5 class="crm-user-decoration d-inline-block relative">
                         Collectivité <strong>({{ project.members.all|length }})</strong>
                     </h5>
@@ -128,7 +128,7 @@
                 </div>
             {% endif %}
             {% if user_advised_projects %}
-                <div class="pt-3 crm-border-bottom pb-2 fr-px-2w">
+                <div class="pt-3 crm-border-bottom fr-pb-2v fr-px-2w">
                     <h5 class="crm-project-decoration d-inline-block relative">
                         Projets conseillés <strong>({{ crm_user.projects_switchtended_per_site.all|length }})</strong>
                     </h5>
@@ -142,7 +142,7 @@
                 </div>
             {% endif %}
             {% if user_projects %}
-                <div class="pt-3 crm-border-bottom pb-2 fr-px-2w">
+                <div class="pt-3 crm-border-bottom fr-pb-2v fr-px-2w">
                     <h5 class="crm-project-decoration d-inline-block relative">
                         Participe aux projets <strong>({{ crm_user.projectmember_set.all|length }})</strong>
                     </h5>

@@ -69,23 +69,23 @@
                         <div class="toast" role="alert" aria-live="assertive" aria-atomic="true">
                             <div class="toast-header {% if message.level == DEFAULT_MESSAGE_LEVELS.SUCCESS %}bg-success text-white{% endif %} {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}bg-error text-white{% endif %}">
                                 {% if "email" in message.tags %}
-                                    <strong class="me-auto">
-                                        <svg class="bi me-1" width="16" height="16" fill="currentColor">
+                                    <strong class="fr-mr-auto">
+                                        <svg class="bi fr-mr-1v" width="16" height="16" fill="currentColor">
                                             <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#envelope" />
                                         </svg>
                                         &nbsp;
                                         <span class="align-middle">Courriel envoyé !</span>
                                     </strong>
                                 {% elif "auth" in message.tags %}
-                                    <strong class="me-auto">
-                                        <svg class="bi me-1" width="16" height="16" fill="currentColor">
+                                    <strong class="fr-mr-auto">
+                                        <svg class="bi fr-mr-1v" width="16" height="16" fill="currentColor">
                                             <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#lock" />
                                         </svg>
                                         &nbsp;
                                         <span class="align-middle">Gestion des droits</span>
                                     </strong>
                                 {% else %}
-                                    <strong class="me-auto">Notification</strong>
+                                    <strong class="fr-mr-auto">Notification</strong>
                                 {% endif %}
                                 <small></small>
                                 <button type="button"

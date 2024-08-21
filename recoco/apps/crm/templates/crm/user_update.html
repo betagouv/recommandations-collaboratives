@@ -23,7 +23,7 @@
         {% include "crm/fragments/sidebar.html" with search=True back_button=True user_advised_projects=False user_projects=False %}
         <div class="w-75 d-flex flex-column justify-content-start">
             <div class="crm-header fr-px-2w fr-py-2w mb-3">
-                <div class="d-flex justify-content-between align-items-center mb-2">
+                <div class="d-flex justify-content-between align-items-center fr-mb-2v">
                     <h3>Gérer le compte « {{ crm_user.username }} »</h3>
                 </div>
                 {% if crm_user.is_active %}
@@ -35,7 +35,7 @@
                     <div class="alert alert-danger" role="alert">
                         Ce compte a été suspendu. Ceci signifie que la personne ne peut plus se connecter à {{ request.site.name }}.
                         Vous pouvez néanmoins le réactiver si vous le souhaitez.
-                        <div class="d-flex justify-content-end mt-2">
+                        <div class="d-flex justify-content-end fr-mt-2v">
                             <form method="POST" action="{% url 'crm-user-reactivate' crm_user.pk %}">
                                 {% csrf_token %}
                                 <button type="submit" class="btn btn-danger">
@@ -45,8 +45,8 @@
                     </div>
                 {% endif %}
             </div>
-            <div class="fr-px-2w pt-4 mb-3">
-                <span class="me-2">Type de compte</span>
+            <div class="fr-px-2w fr-pt-2w mb-3">
+                <span class="fr-mr-2v">Type de compte</span>
                 <div class="btn-group btn-group-sm">
                     {% if crm_user_is_advisor %}
                         <div class="dropdown">
@@ -85,7 +85,7 @@
                     {% endif %}
                 </div>
                 {% if crm_user_is_advisor %}
-                    <div class="mt-2">
+                    <div class="fr-mt-2v">
                         <i>Départements de conseil :</i>
                         {% for dpt in crm_user.profile.departments.all %}
                             {{ dpt }} ({{ dpt.code }})
@@ -97,7 +97,7 @@
                 {% endif %}
             </div>
             <hr />
-            <div class="fr-px-2w pt-4 mb-3">
+            <div class="fr-px-2w fr-pt-2w mb-3">
                 <form method="POST" action="{% url 'crm-user-update' crm_user.pk %}">
                     {% csrf_token %}
                     {{ form.non_field_errors }}

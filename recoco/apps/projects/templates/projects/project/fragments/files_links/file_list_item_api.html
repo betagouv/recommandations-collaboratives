@@ -10,13 +10,13 @@
 {% get_obj_perms request.user for request.site as "user_site_perms" %}
 {% get_obj_perms request.user for project as "user_project_perms" %}
 <div class="mb-3">
-    <div class="rounded border fr-py-2v px-3 mb-2 d-flex align-items-center justify-content-between">
+    <div class="rounded border fr-py-2v px-3 fr-mb-2v d-flex align-items-center justify-content-between">
         <div class="d-flex flex-column align-items-start">
             <a x-bind:href="document.the_file"
                class="d-flex align-items-center text-decoration-none"
                target="_new"
                download>
-                <svg class="bi align-baseline me-2" width="17" height="17" fill="#222">
+                <svg class="bi align-baseline fr-mr-2v" width="17" height="17" fill="#222">
                     <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#file-earmark" />
                 </svg>
                 <span class="text-info-custom text-black fw-medium text-truncate specific-maxwidth-200"
@@ -25,9 +25,9 @@
         </div>
         <div class="d-flex align-items-center">
             {% if "manage_documents" in user_project_perms %}
-                <a class="d-flex me-2"
+                <a class="d-flex fr-mr-2v"
                    href="{% url 'projects-project-detail-documents' project.pk %}">
-                    <svg class="bi me-1 fill-blue" width="20" height="20">
+                    <svg class="bi fr-mr-1v fill-blue" width="20" height="20">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#pencil-square" />
                     </svg>
                 </a>
@@ -39,14 +39,14 @@
             </a>
         </div>
     </div>
-    <div class="ps-4 ms-4 d-flex align-items-center">
+    <div class="fr-pl-2w fr-ml-2w d-flex align-items-center">
     <span class="tiny"><strong x-text="document.uploaded_by.first_name + ' ' + document.uploaded_by.last_name"></strong>
     <span x-show="document.uploaded_by.profile.organization"
           class="tiny text-grey-dark"
           x-text="document.uploaded_by.profile.organization.name"></span>
 </span>
-<span class="ms-4 tiny d-flex align-items-center">
-    <svg class="bi align-baseline me-2" width="12" height="12" fill="#222">
+<span class="fr-ml-2w tiny d-flex align-items-center">
+    <svg class="bi align-baseline fr-mr-2v" width="12" height="12" fill="#222">
         <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#calendar" />
     </svg>
     <strong x-text="`${formatDate(document.created_on)}`"></strong></span>

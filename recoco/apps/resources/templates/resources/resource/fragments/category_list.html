@@ -1,12 +1,12 @@
 <div id="category-list"
-     class="d-flex align-items-center list-unstyled mb-0 me-2">
-    <li class="bg-green me-2 fr-px-2v fr-py-1v">
+     class="d-flex align-items-center list-unstyled fr-mb-0 fr-mr-2v">
+    <li class="bg-green fr-mr-2v fr-px-2v fr-py-1v">
         <span class="text-white fw-normal">{{ resource.category.name }}</span>
     </li>
     {% if user.is_staff %}
-        <ul class="d-flex align-items-center list-unstyled mb-0">
+        <ul class="d-flex align-items-center list-unstyled fr-mb-0">
             {% for tag in resource.tags.all %}
-                <li class="bg-grey me-2 fr-px-2v fr-py-1v">
+                <li class="bg-grey fr-mr-2v fr-px-2v fr-py-1v">
                     <a class="text-grey fw-normal text-decoration-none"
                        href="{% url 'resources-resource-search' %}?query={{ tag.name }}">{{ tag }}</a>
                 </li>

@@ -28,28 +28,28 @@
             </ul>
         </nav>
         <h3 class="d-flex align-items-center">
-            <svg class="bi align-middle me-2" width="25" height="25">
+            <svg class="bi align-middle fr-mr-2v" width="25" height="25">
                 <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#trash" />
             </svg>
             Êtes-vous sûr de vouloir supprimer cette ressource ?
         </h3>
-        <div class="flag red d-block mt-4">
-            <span class="title text-red text-uppercase fw-bold mb-2 d-block d-flex align-items-center">
-                <svg class="bi align-middle me-2" width="20" height="20" fill="#CE0500">
+        <div class="flag red d-block fr-mt-2w">
+            <span class="title text-red text-uppercase fw-bold fr-mb-2v d-block d-flex align-items-center">
+                <svg class="bi align-middle fr-mr-2v" width="20" height="20" fill="#CE0500">
                     <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#exclamation-triangle-fill" />
                 </svg>
                 Supression de ressource
             </span>
-            <p class="content mb-0">
-                <a class="mb-0" href="{% url 'resources-resource-detail' resource.id %}">{{ resource.title|title }}</a>
+            <p class="content fr-mb-0">
+                <a class="fr-mb-0" href="{% url 'resources-resource-detail' resource.id %}">{{ resource.title|title }}</a>
             </p>
             <form id="form-resource-delete"
                   method="post"
                   action="{% url 'resources-resource-delete' resource.pk %}"
-                  class="form mt-2">
+                  class="form fr-mt-2v">
                 {% csrf_token %}
                 {{ form.as_p }}
-                <button type="submit" class="button red filled mt-2">Oui, je supprime cette ressource</button>
+                <button type="submit" class="button red filled fr-mt-2v">Oui, je supprime cette ressource</button>
             </form>
         </div>
     </div>

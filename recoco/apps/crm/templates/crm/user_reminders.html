@@ -54,7 +54,7 @@
                         <div class="crm-header no-project fr-px-2w fr-py-2w">
                         {% endif %}
                         <h3 class="d-flex align-items-center">
-                            <svg class="bi me-2" width="16" height="16" fill="currentColor">
+                            <svg class="bi fr-mr-2v" width="16" height="16" fill="currentColor">
                                 <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#person-fill" />
                             </svg>
                             <span>{{ crm_user.get_full_name|default:crm_user.email }}</span>
@@ -62,14 +62,14 @@
                         {% if crm_user.profile.organization %}
                             <a class="d-flex align-items-center"
                                href="{% url 'crm-organization-details' crm_user.profile.organization.pk %}">
-                                <svg class="bi me-2" width="16" height="16" fill="currentColor">
+                                <svg class="bi fr-mr-2v" width="16" height="16" fill="currentColor">
                                     <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#arrow-left" />
                                 </svg>
                                 <span>Revenir aux détails de l'organisation : <strong>{{ crm_user.profile.organization.name }}</strong></span>
                             </a>
                         {% endif %}
                     </div>
-                    <div class="fr-px-2w pt-4 bg-light crm-timeline-min-height">
+                    <div class="fr-px-2w fr-pt-2w bg-light crm-timeline-min-height">
                         <h4>
                             <svg class="bi " width="24" height="24" fill="currentColor">
                                 <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#alarm" />
@@ -78,7 +78,7 @@
                             Rappels de projets
                         </h4>
                         <small>Sauter à <a href="#history">l'historique</a></small>
-                        <h5 class="mt-4" id="future">
+                        <h5 class="fr-mt-2w" id="future">
                             <svg class="bi " width="24" height="24" fill="currentColor">
                                 <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#send" />
                             </svg>
@@ -108,7 +108,7 @@
                                 {% with reminder.transactions.all.0 as transaction %}
                                     <div class="list-group">
                                         <a {% if transation %}href="{% url 'crm-user-reminder-details' crm_user.pk reminder.pk %}" @click="showMessage('{{ transaction.transaction_id }}')" {% endif %}
-                                           class="list-group-item list-group-item-action flex-column align-items-start mb-2">
+                                           class="list-group-item list-group-item-action flex-column align-items-start fr-mb-2v">
                                             <div class="d-flex w-100 justify-content-between">
                                                 <h5>
                                                     {% if transaction.faked %}<span class="badge bg-secondary">Envoi test</span>&nbsp;{% endif %}
@@ -116,9 +116,9 @@
                                                 </h5>
                                                 <small>{{ transaction.sent_on|naturalday }}</small>
                                             </div>
-                                            <p class="mb-1">
+                                            <p class="fr-mb-1v">
                                                 <i>{{ reminder.get_kind_display }}</i>
-                                                <br class="mb-1" />
+                                                <br class="fr-mb-1v" />
                                             </p>
                                             <small class="text-muted">initialement programmé pour le {{ reminder.deadline }}</small>
                                         </a>

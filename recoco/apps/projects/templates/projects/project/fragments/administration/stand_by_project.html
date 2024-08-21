@@ -6,9 +6,9 @@
     {% if project.inactive_since == None %}
         <div x-data="StandByProject()"
              data-test-id="admin-banner-deactivate-project"
-             class="flag medium-border-radius border-red mb-4 d-flex align-items-start justify-content-between">
+             class="flag medium-border-radius border-red fr-mb-2w d-flex align-items-start justify-content-between">
             <div class="d-flex align-items-start">
-                <svg class="me-4"
+                <svg class="fr-mr-2w"
                      xmlns="http://www.w3.org/2000/svg"
                      width="48"
                      height="48"
@@ -24,7 +24,7 @@
                 </svg>
                 <div class="d-flex flex-column w-65">
                     <span class="font-medium fw-medium">Mettre le projet en pause</span>
-                    <p class="font-small fw-normal text-black-secondary mb-0">
+                    <p class="font-small fw-normal text-black-secondary fr-mb-0">
                         Vous ne recevrez plus de rappel ni de notification par email sur l'activité du projet. Les notifications seront désactivées pour tous les membres collectivité du projet. Vous pourrez réactiver le projet en retournant dans l’administration du projet.
                     </p>
                 </div>

@@ -31,7 +31,7 @@
 {% endblock tagline %}
 {% block content %}
     <div x-data="Auth" x-init="initLogin" class="container">
-        <div class="banner mt-6 mb-6 text-center">
+        <div class="banner  text-center">
             {% if site_config.email_logo %}
                 <img src="{{ site_config.email_logo.url }}"
                      width="10%"
@@ -76,7 +76,7 @@
                             <fieldset class="fr-fieldset">
                                 <legend class="fr-fieldset__legend legend-specific-fontsize-1--5">Vous avez dejà un compte ? Identifiez-vous !</legend>
                                 {% if user_other_sites %}
-                                    <div class="fr-mx-2v mb-4 custom-callout-blue">
+                                    <div class="fr-mx-2v fr-mb-2w custom-callout-blue">
                                         Pour vous connecter à {{ request.site.name }}, utilisez le même compte que sur
                                         {% for site in user_other_sites %}
                                             {% if not forloop.first and not forloop.last %},{% endif %}

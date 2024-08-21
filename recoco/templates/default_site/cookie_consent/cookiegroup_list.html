@@ -18,8 +18,8 @@
   <div class="fr-container fr-container--fluid fr-container-md">
     <div class="fr-grid-row fr-grid-row--center">
       <div class="fr-col-12 fr-col-md-10 fr-col-lg-8">
-        <div class="border mt-4">
-          <div class="mt-4 d-flex justify-content-end fr-mx-4v">
+        <div class="border fr-mt-2w">
+          <div class="fr-mt-2w d-flex justify-content-end fr-mx-4v">
             <a href="{% url 'home' %}"
                class="text-decoration-underline text-blue"
                aria-controls="fr-consent-modal"
@@ -37,7 +37,7 @@
                     <form class="cookie-consent-accept"
                           action="{% url 'cookie_consent_accept_all' %}"
                           method="POST">
-                      <button class="me-2 button filled small" title="Autoriser tous les cookies">Tout accepter</button>
+                      <button class="fr-mr-2v button filled small" title="Autoriser tous les cookies">Tout accepter</button>
                     </form>
                     <form class="cookie-consent-accept"
                           action="{% url 'cookie_consent_decline_all' %}"
@@ -54,12 +54,12 @@
                             class="fr-fieldset fr-fieldset--inline specific-mt-15 specific-pt-0">
                     <div class="d-flex align-items-center justify-content-between w-100">
                       <legend id="finality-{{ cookie_group.varname }}-legend"
-                              class="fr-consent-service__title mt-0 pt-0">{{ cookie_group.name }}</legend>
+                              class="fr-consent-service__title fr-mt-0 fr-pt-0">{{ cookie_group.name }}</legend>
                       <div class="flex-grow-1">
                         {% if cookie_group.is_required %}
                           <div class="fr-radio-group d-flex align-items-center justify-content-end flex-grow-1">
                             <input checked type="radio">
-                            <label class="fr-label me-0">Accepté</label>
+                            <label class="fr-label fr-mr-0">Accepté</label>
                           </div>
                         {% else %}
                           {% if not cookie_group.is_required %}
@@ -75,7 +75,7 @@
                                            for="consent-finality-{{ cookie_group.varname }}-accept">Accepté</label>
                                   </div>
                                 {% else %}
-                                  <form class="cookie-consent-accept me-2"
+                                  <form class="cookie-consent-accept fr-mr-2v"
                                         action="{% url "cookie_consent_accept" cookie_group.varname %}"
                                         method="POST">
                                     {% csrf_token %}
@@ -88,7 +88,7 @@
                                            type="radio"
                                            id="consent-finality-{{ cookie_group.varname }}-declined"
                                            name="consent-finality-{{ cookie_group.varname }}">
-                                    <label class="fr-label me-0"
+                                    <label class="fr-label fr-mr-0"
                                            for="consent-finality-{{ cookie_group.varname }}-declined">Refusé</label>
                                   </div>
                                 {% else %}

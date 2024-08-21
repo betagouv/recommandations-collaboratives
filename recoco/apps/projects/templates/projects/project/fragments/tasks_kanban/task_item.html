@@ -17,7 +17,7 @@
      @dragleave="onDragLeave(event)"
      data-test-id="draggable">
     <div x-show="task.isLoading"
-         class="ms-2 item-loader z-1 specific-size">
+         class="fr-ml-2v item-loader z-1 specific-size">
         <div class="spinner-border spinner-border spinner-border-sm text-primary"
              role="status"></div>
     </div>
@@ -32,27 +32,27 @@
         </template>
         <div class="fr-p-2v">
             <div class="d-flex flex-row">
-                <div class="flex-fill mt-1 ms-2 specific-fontsize-09 specific-cursor-pointer"
+                <div class="flex-fill fr-mt-1v fr-ml-2v specific-fontsize-09 specific-cursor-pointer"
                      @click="handleOpenPreviewModal()"
                      data-test-id="task-kanban-topic">
                     <template x-if="task.topic && task.topic.name">
-                        <div class="d-flex align-items-center mb-1 mt-1">
-                            <span class="topic-indicator bg-green me-2"></span>
+                        <div class="d-flex align-items-center fr-mb-1v fr-mt-1v">
+                            <span class="topic-indicator bg-green fr-mr-2v"></span>
                             <h5 data-test-id="task-kanban-topic"
                                 x-text="task.topic.name"
-                                class="fw-medium tiny text-gray-800 mb-0"></h5>
+                                class="fw-medium tiny text-gray-800 fr-mb-0"></h5>
                         </div>
                     </template>
-                    <h6 class="mb-0 fw-bold title-info text-transform-none text-blue text-decoration-underline"
+                    <h6 class="fr-mb-0 fw-bold title-info text-transform-none text-blue text-decoration-underline"
                         x-text="currentTask.intent"></h6>
-                    <div class="pt-2 fr-my-2v"
+                    <div class="fr-pt-2v fr-my-2v"
                          :class="canAdministrate && currentTask.content === '' && 'border border-warning'">
                         <div class="d-flex flex-column">
                             <span class="align-middle text-grey-dark tiny specific-lineheight-20"
                                   x-text="`Émis le ${formatDate(currentTask.created_on)}`"></span>
                             {% include 'projects/project/fragments/task/task_user_card.html' %}
-                            <div class="text-grey-dark d-flex align-items-center tiny me-3 responsive-flex-column mt-1">
-                                <svg class="align-middle bi me-1"
+                            <div class="text-grey-dark d-flex align-items-center tiny me-3 responsive-flex-column fr-mt-1v">
+                                <svg class="align-middle bi fr-mr-1v"
                                      width="18px"
                                      height="15px"
                                      fill="currentColor">

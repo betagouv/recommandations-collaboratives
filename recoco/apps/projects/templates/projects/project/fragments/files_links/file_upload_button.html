@@ -20,14 +20,14 @@
             {% csrf_token %}
             <div class="p-3">
                 <h6 class="text-uppercase h6-specific-fontsize-1">Ajouter un fichier</h6>
-                <p class="mb-2 text-info-custom text-grey-dark small">
+                <p class="fr-mb-2v text-info-custom text-grey-dark small">
                     Vous pouvez joindre un fichier à votre <span x-text="getString(`types.${type}`)"></span>, d'une taille maximum de 20Mo
                 </p>
-                <div class="mb-2 mt-3">
+                <div class="fr-mb-2v mt-3">
                     {% include 'projects/project/fragments/files_links/file_upload_input_standalone.html' with required=True %}
                 </div>
                 <label class="d-block mt-3">
-                    <span class="mb-1 d-block text-info-custom text-grey-dark">Donnez un nom au fichier</span>
+                    <span class="fr-mb-1v d-block text-info-custom text-grey-dark">Donnez un nom au fichier</span>
                     <input id="document-description"
                            required
                            name="description"

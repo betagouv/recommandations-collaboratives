@@ -9,9 +9,9 @@
           type="text/css" />
 {% endblock %}
 {% activity_stream "target" project %}
-<div class="pt-4 pe-4 w-100 h-100"
+<div class="fr-pt-2w fr-pr-2w w-100 h-100"
      data-test-id="project-activity-tracking-observer">
-    <div class="d-flex align-items-center justify-content-between mb-2">
+    <div class="d-flex align-items-center justify-content-between fr-mb-2v">
         <h6 class="text-uppercase fw-bold fr-m-0 fr-p-0 h6-specific-fontsize-14">Activité du projet</h6>
     </div>
     <div class="fr-p-0 h-100 w-100 d-inline-flex flex-column justify-content-between align-items-center">
@@ -20,7 +20,7 @@
             <ul class="list-group fr-m-0 fr-p-0 activity-stream-container">
                 {% for date, actions in stream_by_day|slice:":1" %}
                     <li class="{% if cropped %}mb-0 {% endif %} list-group-item border-0 d-flex flex-column mb-3 fr-mx-0 fr-px-0">
-                        <span class="small text-info-custom text-grey-dark mb-2">{{ date|naturalday|capfirst }}</span>
+                        <span class="small text-info-custom text-grey-dark fr-mb-2v">{{ date|naturalday|capfirst }}</span>
                         <div class="activity-stream-actions-container d-flex flex-column">
                             {% for action in actions|slice:":6" %}
                                 {% display_action action %}
@@ -28,7 +28,7 @@
                         </div>
                     </li>
                 {% empty %}
-                    <span class="text-custom-info text-grey-dark fw-light mb-4">Vous trouverez ici l'activité de vos projets suivis</span>
+                    <span class="text-custom-info text-grey-dark fw-light fr-mb-2w">Vous trouverez ici l'activité de vos projets suivis</span>
                 {% endfor %}
             </ul>
         </article>

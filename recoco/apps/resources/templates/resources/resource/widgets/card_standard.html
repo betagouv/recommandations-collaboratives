@@ -11,7 +11,7 @@
 <div class="card-resource card h-100 specific-minheight-300">
     <!-- <hr class="middle-hr" /> -->
     <div class="card-body">
-        <div class="card-title mb-4">
+        <div class="card-title fr-mb-2w">
             <div class="row">
                 <!-- <div class="icon-placeholder  d-inline"> -->
                 <!--</div> -->
@@ -22,7 +22,7 @@
                      </span>
                 -->
                 <div class="title">
-                    <svg class="bi me-2 rounded-circle resource-icon bg-color-{{ resource.category.color|default:"darkgrey" }}">
+                    <svg class="bi fr-mr-2v rounded-circle resource-icon bg-color-{{ resource.category.color|default:"darkgrey" }}">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#{{ resource.category.icon|default:"key" }}" />
                     </svg>
                     <a href="{% url 'resources-resource-detail' resource.id %}"
@@ -32,7 +32,7 @@
         </div>
         <div class="card-text">
             <!--
-                 <div class="mb-2">
+                 <div class="fr-mb-2v">
                  {% for tag in  resource.tags_as_list  %}
                  <span class="badge rounded-pill bg-light text-dark">#{{ tag }}</span>
                  {% endfor %}
@@ -67,11 +67,11 @@
                         </span>
                     {% endif %}
                     {% if resource.task_recommendations.count and is_staff %}
-                        <span class="ms-1 align-middle"
+                        <span class="fr-ml-1v align-middle"
                               data-bs-toggle="tooltip"
                               data-bs-placement="top"
                               title="Voir les préfléchages">
-                            <a class="ms-1 text-reset text-decoration-none"
+                            <a class="fr-ml-1v text-reset text-decoration-none"
                                href="{% url "projects-task-recommendation-list" %}">
                                 {% if request.user.email == "anouk.jeanneau@beta.gouv.fr" %}
                                     {# Easter egg for Anouk, the only true artist! #}
@@ -96,7 +96,7 @@
                           action="{% url "resources-bookmark-delete" resource.id %}">
                         {% csrf_token %}
                         <button type="submit"
-                                class="btn btn-text fr-p-0 fr-m-0 me-2 text-reset text-decoration-none align-baseline"
+                                class="btn btn-text fr-p-0 fr-m-0 fr-mr-2v text-reset text-decoration-none align-baseline"
                                 data-bs-toggle="tooltip"
                                 data-bs-placement="top"
                                 title="Retirer de vos favoris">
@@ -109,7 +109,7 @@
                         </button>
                     </form>
                 {% else %}
-                    <a class="me-2 align-baseline text-secondary"
+                    <a class="fr-mr-2v align-baseline text-secondary"
                        href="{% url "resources-bookmark-create" resource.id %}"
                        data-bs-toggle="tooltip"
                        data-bs-placement="top"

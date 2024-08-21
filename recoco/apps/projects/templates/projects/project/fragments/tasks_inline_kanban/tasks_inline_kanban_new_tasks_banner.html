@@ -7,13 +7,13 @@
 {% endblock %}
 <template x-if="$store.tasksData.newTasks.length > 0 && !$store.djangoData.isAdvisor">
     <div data-test-id="banner-new-tasks"
-         class="fr-py-1v flag dark-blue mb-2 d-flex align-items-center justify-content-start text-white small-border-radius mt-4">
+         class="fr-py-1v flag dark-blue fr-mb-2v d-flex align-items-center justify-content-start text-white small-border-radius fr-mt-2w">
         <img src="{% static 'projects/img/icon_new_task.svg'  %}"
              alt=""
              data-test-id="img-presentation"
              class="icon-banner" />
-        <div class="ms-4 d-flex justify-content-between align-items-center w-100">
-            <h6 class="mb-0 fw-bold">
+        <div class="fr-ml-2w d-flex justify-content-between align-items-center w-100">
+            <h6 class="fr-mb-0 fw-bold">
                 Vous avez
                 <span x-text="$store.utils.isPlural(`1 recommandation non lue`, `${$store.tasksData.newTasks.length} recommandations non lues`, $store.tasksData.newTasks.length)"></span>
                 <span x-text="`(sur ${$store.tasksData.tasks.length} au total).`"></span>

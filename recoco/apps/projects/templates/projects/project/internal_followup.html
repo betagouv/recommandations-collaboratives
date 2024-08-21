@@ -14,8 +14,8 @@
         {% include 'projects/project/navigation.html' with internal_followup=True full_page=True %}
         <div class="row">
             <div class="col-8">
-                <div class="flag orange mb-4 d-flex align-items-center justify-content-start">
-                    <svg class="bi align-middle me-4 ms-2"
+                <div class="flag orange fr-mb-2w d-flex align-items-center justify-content-start">
+                    <svg class="bi align-middle fr-mr-2w fr-ml-2v"
                          width="25"
                          height="25"
                          fill="currentColor">
@@ -36,7 +36,7 @@
                         {% include 'tools/editor.html' with input_name=private_note_form.content.name input_value=private_note_form.content.value|default:'' input_required=True %}
                         <label class="visually-hidden" for="input-project-content">{{ private_note_form.content.label }}</label>
                         {% for error in private_note_form.content.errors %}<div class="text-danger text-end">{{ error }}</div>{% endfor %}
-                        <div class="d-flex justify-content-end mt-2">
+                        <div class="d-flex justify-content-end fr-mt-2v">
                             <button x-data
                                     :disabled="$store.editor.currentMessage === ''"
                                     class="button filled"
@@ -48,7 +48,7 @@
             </div>
             <div class="col-4">
                 <h5>Équipe de suivi</h5>
-                <ul class="d-flex flex-column list-unstyled mb-0">
+                <ul class="d-flex flex-column list-unstyled fr-mb-0">
                     {% for advisor in project.switchtender_sites.all %}
                         {% if advisor.switchtender.is_active %}
                             <li>{% include 'user/user_card.html' with user=advisor.switchtender user_activity=True %}</li>

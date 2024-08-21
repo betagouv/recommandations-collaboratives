@@ -50,7 +50,7 @@
     </div>
 </div>
 <div id="action-{{ task.id }}"
-     class="accordion border border-1 rounded-3 mb-4 position-relative {% if task.id in actions_with_notifications %}bg-light-yellow{% endif %}">
+     class="accordion border border-1 rounded-3 fr-mb-2w position-relative {% if task.id in actions_with_notifications %}bg-light-yellow{% endif %}">
     {% if not task.visited and task.public %}
         <span class="position-absolute top-0 start-0 translate-middle badge rounded-pill bg-primary specific-ml-60">NOUVEAU</span>
     {% endif %}
@@ -69,16 +69,16 @@
         <span class="position-absolute top-0 start-0 translate-middle badge rounded-pill bg-warning specific-ml-60">BROUILLON</span>
     {% endif %}
     <div class="accordion-header d-flex justify-content-between border-bottom">
-        <div class="task-opening d-flex ps-4 pt-4 justify-content-between flew-grow-1 w-100 position-relative pb-4">
+        <div class="task-opening d-flex fr-pl-2w fr-pt-2w justify-content-between flew-grow-1 w-100 position-relative fr-pb-2w">
             <div class="d-flex flex-column flex-grow-1">
-                <div class="d-flex fw-bold fs-5 task-title mb-2 {% if task.closed %}text-decoration-line-through{% endif %}">
+                <div class="d-flex fw-bold fs-5 task-title fr-mb-2v {% if task.closed %}text-decoration-line-through{% endif %}">
                     {% if task.resource %}
                         <!-- Icon -->
-                        <svg class="bi me-2 rounded-circle resource-icon bg-color-{{ task.resource.category.color|default:"darkgrey" }} svg-size">
+                        <svg class="bi fr-mr-2v rounded-circle resource-icon bg-color-{{ task.resource.category.color|default:"darkgrey" }} svg-size">
                             <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#{{ task.resource.category.icon|default:"key" }}" />
                         </svg>
                     {% elif task.contact %}
-                        <svg class="align-middle bi me-2 rounded-circle"
+                        <svg class="align-middle bi fr-mr-2v rounded-circle"
                              width="30px"
                              height="30px"
                              fill="currentColor">
@@ -135,7 +135,7 @@
                                     data-bs-toggle="modal"
                                     data-bs-target="#modal-action-{{ task.id }}">
                                 <span data-bs-toggle="tooltip" title="Rejeter cette recommandation">
-                                    <svg class="bi me-1 align-middle text-danger"
+                                    <svg class="bi fr-mr-1v align-middle text-danger"
                                          width="16px"
                                          height="16px"
                                          fill="currentColor">
@@ -174,7 +174,7 @@
                     </div>
                 {% endif %}
             </div>
-            <div class="action-list-item accordion-item pt-2 pb-2 border-0">
+            <div class="action-list-item accordion-item fr-pt-2v fr-pb-2v border-0">
                 <div id="action-{{ task.id }}-header" class="accordion-header d-flex">
                     <div class="d-flex justify-content-between w-100 fr-px-2w">
                         {% if not hide_comments %}
@@ -300,9 +300,9 @@
                                 {% endif %}
                             {% endfor %}
                             {% if can_manage and task.public %}
-                                <div class="fr-m-2v comment mt-4">
+                                <div class="fr-m-2v comment fr-mt-2w">
                                     <span class="">Répondre</span>
-                                    <form class="mt-2 form d-flex flex-column align-items-end"
+                                    <form class="fr-mt-2v form d-flex flex-column align-items-end"
                                           method="POST"
                                           action="{% url 'projects-followup-task' task.id %}">
                                         {% csrf_token %}

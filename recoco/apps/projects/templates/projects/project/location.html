@@ -59,16 +59,16 @@
             </nav>
             <div class="row">
                 <header class="location-header qs-heading">
-                    <h2 id="location-edit-label" class="fw-bold d-block mb-0">Où se situe votre projet ?</h2>
+                    <h2 id="location-edit-label" class="fw-bold d-block fr-mb-0">Où se situe votre projet ?</h2>
                 </header>
             </div>
-            <div class="location-body row mt-2">
+            <div class="location-body row fr-mt-2v">
                 <div class="col col-lg-9 pe-5">
                     <p class="location-label">Adresse du projet</p>
                     <p class="location-address text-muted">
                         {{ project.location }}
                         {% if project.commune %}, {{ project.commune.postal|default:"" }} {{ project.commune.name|default:"" }}{% endif %}
-                        <svg class="bi me-1" width="15" height="15" fill="currentColor">
+                        <svg class="bi fr-mr-1v" width="15" height="15" fill="currentColor">
                             <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#lock" />
                         </svg>
                     </p>
@@ -119,7 +119,7 @@
                 </div>
                 <div class="col col-lg-3">
                     <div id="section-why" class="mb-5">
-                        <svg class="d-inline-block bi me-1"
+                        <svg class="d-inline-block bi fr-mr-1v"
                              width="18"
                              height="18"
                              fill="currentColor">

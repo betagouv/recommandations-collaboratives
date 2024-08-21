@@ -25,7 +25,7 @@
             {% if "manage_tasks" in user_project_perms %}
                 <a class="btn btn-outline-primary w-100 btn-sm btn-sm--header"
                    href="{% url 'projects-project-create-task' project.id %}">
-                    <svg class="bi me-1" width="16" height="16" fill="currentColor">
+                    <svg class="bi fr-mr-1v" width="16" height="16" fill="currentColor">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#journal-plus" />
                     </svg>
                     Ajouter une recommandation
@@ -36,7 +36,7 @@
     {% if "use_crm" in user_site_perms and not disable_crm %}
         <a class="btn btn-outline-primary w-100 btn-sm btn-sm--header"
            href="{% url 'crm-project-details' project.pk %}">
-            <svg class="bi me-1" width="16" height="16" fill="currentColor">
+            <svg class="bi fr-mr-1v" width="16" height="16" fill="currentColor">
                 <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#activity" />
             </svg>
             CRM
@@ -45,7 +45,7 @@
     {% if user.is_staff and not disable_administration %}
         <a class="btn btn-outline-primary w-100 btn-sm btn-sm--header"
            href="{% url 'projects-project-administration' project.pk %}">
-            <svg class="bi me-1" width="16" height="16" fill="currentColor">
+            <svg class="bi fr-mr-1v" width="16" height="16" fill="currentColor">
                 <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#lock" />
             </svg>
             Administration

@@ -1,7 +1,7 @@
 {% if resource.expires_on %}
     {% if not resource.expired %}
         <div data-test-id="non-expired-resource-banner"
-             class="flag blue mb-4 d-flex align-items-center justify-content-start">
+             class="flag blue fr-mb-2w d-flex align-items-center justify-content-start">
             <span class="title-info text-blue text-uppercase fr-my-0 me-3">Attention</span>
             <p class="text-info-custom text-blue fr-my-0 ">
                 Cette ressource a une date limite fixée au <strong>{{ resource.expires_on }}</strong>
@@ -9,7 +9,7 @@
         </div>
     {% else %}
         <div data-test-id="expired-resource-banner"
-             class="flag red mb-4 d-flex align-items-center justify-content-start">
+             class="flag red fr-mb-2w d-flex align-items-center justify-content-start">
             <span class="title-info text-red text-uppercase fr-my-0 me-3">Attention</span>
             <p class="text-info-custom text-red fr-my-0">
                 Cette ressource a expiré, les informations ne sont probablement plus à jour !
@@ -20,7 +20,7 @@
 <!-- Show banner if draft -->
 {% if is_switchtender %}
     {% if not resource.public %}
-        <div class="flag orange mb-4 d-flex align-items-center justify-content-start">
+        <div class="flag orange fr-mb-2w d-flex align-items-center justify-content-start">
             <span class="title-info text-uppercase fr-my-0 me-3">Édition</span>
             <p class="text-info-custom fr-my-0">
                 Cette ressource est en cours d'écriture. Pensez à la

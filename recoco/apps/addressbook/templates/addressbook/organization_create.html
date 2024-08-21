@@ -31,7 +31,7 @@
                         {% include "tools/organization_search.html" with name=form.name.name label=form.name.label value=form.name.value id_for_label=form.name.id_for_label placeholder="Nom" errors=form.name.errors small_padding=True %}
                     </p>
                 </div>
-                <div class="w-100 d-flex flex-column select-custom mt-2">
+                <div class="w-100 d-flex flex-column select-custom fr-mt-2v">
                     {{ form.departments.errors }}
                     {% include 'tools/searchable_list.html' with list=form.departments label=form.departments.label search_list_id=form.departments.id_for_label search_options="['name']" item_label="département" %}
                 </div>

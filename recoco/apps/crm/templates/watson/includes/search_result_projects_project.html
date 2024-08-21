@@ -1,6 +1,6 @@
 {% load static %}
 <div class="d-flex align-items-center">
-    <svg class="bi me-2" width="16" height="16" fill="currentColor">
+    <svg class="bi fr-mr-2v" width="16" height="16" fill="currentColor">
         <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#folder-fill" />
     </svg>
     <div class="d-flex align-items-center">
@@ -12,13 +12,13 @@
         {% else %}
             <a href="{% url 'crm-project-details' obj.pk %}">{{ obj.name }}</a>
         {% endif %}
-        <span class="me-2 ms-2">|</span>
-        <svg class="bi me-2" width="16" height="16" fill="currentColor">
+        <span class="fr-mr-2v fr-ml-2v">|</span>
+        <svg class="bi fr-mr-2v" width="16" height="16" fill="currentColor">
             <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#geo-alt-fill" />
         </svg>
         {{ obj.commune }} ({{ obj.commune.postal }})
     </div>
 </div>
-<div class="mt-1 d-flex small">
+<div class="fr-mt-1v d-flex small">
     {% for tag in obj.tags.all %}<span class="fr-mx-1v badge rounded-pill bg-dark">{{ tag }}</span>{% endfor %}
 </div>

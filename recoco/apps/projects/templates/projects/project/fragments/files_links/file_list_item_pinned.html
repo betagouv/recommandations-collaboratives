@@ -4,10 +4,10 @@
 {% get_obj_perms request.user for request.site as "user_site_perms" %}
 {% get_obj_perms request.user for project as "user_project_perms" %}
 {% if document %}
-    <div class="mb-1">
-        <div class="rounded border fr-py-2v px-3 mb-2 d-flex align-items-center justify-content-between">
+    <div class="fr-mb-1v">
+        <div class="rounded border fr-py-2v px-3 fr-mb-2v d-flex align-items-center justify-content-between">
             <div class="d-flex align-items-start">
-                <svg class="bi align-baseline me-2 mt-1"
+                <svg class="bi align-baseline fr-mr-2v fr-mt-1v"
                      width="17"
                      height="17"
                      fill="#222">
@@ -21,7 +21,7 @@
                     <div>
                         <span class="text-info-custom text-black">{{ document.filename|truncatechars:15 }}</span>
                         {% if document and document.the_file.size %}
-                            <span class="text-info-custom text-black ms-2">({{ document.the_file.size|filesizeformat }})</span>
+                            <span class="text-info-custom text-black fr-ml-2v">({{ document.the_file.size|filesizeformat }})</span>
                         {% endif %}
                     </div>
                 </a>
@@ -31,7 +31,7 @@
                     <form method="POST"
                           action="{% url 'projects-documents-pin-unpin' project.pk document.pk %}">
                         {% csrf_token %}
-                        <button id="file-bookmark" class="btn btn-link d-flex fr-p-0 me-0 mb-2">
+                        <button id="file-bookmark" class="btn btn-link d-flex fr-p-0 fr-mr-0 fr-mb-2v">
                             <svg class="bi align-baseline fill-blue" width="20" height="20">
                                 <use id="file-is-bookmarked" xlink:href="{% static 'svg/bootstrap-icons.svg' %}#star-fill" />
                             </svg>

@@ -29,8 +29,8 @@
                                 <div class="d-flex align-items-center">
                                     {% include 'user/user_card.html' with user=note.created_by %}
                                     {% if note.created_by == request.user %}
-                                        <span class="align-middle small text-dark ms-2">
-                                            - <a class="ms-1" href="{% url 'projects-update-note' note.pk %}">éditer</a>
+                                        <span class="align-middle small text-dark fr-ml-2v">
+                                            - <a class="fr-ml-1v" href="{% url 'projects-update-note' note.pk %}">éditer</a>
                                         </span>
                                     {% endif %}
                                 </div>

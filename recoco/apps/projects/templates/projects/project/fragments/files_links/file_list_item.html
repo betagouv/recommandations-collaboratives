@@ -11,19 +11,19 @@
 {% get_obj_perms request.user for project as "user_project_perms" %}
 {% if document %}
     <div class="mb-3">
-        <div class="rounded border fr-py-2v px-3 mb-2 d-flex align-items-center justify-content-between">
+        <div class="rounded border fr-py-2v px-3 fr-mb-2v d-flex align-items-center justify-content-between">
             <div class="d-flex align-items-center">
                 <a href="{{ document.the_file.url }}"
                    class="d-flex align-items-center text-decoration-none"
                    target="_new"
                    download>
-                    <svg class="bi align-baseline me-2" width="17" height="17" fill="#222">
+                    <svg class="bi align-baseline fr-mr-2v" width="17" height="17" fill="#222">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#file-earmark" />
                     </svg>
                     <span class="text-info-custom text-black fw-medium description">{{ document.description|truncatechars:33 }}</span>
-                    <span class="text-info-custom text-black ms-2 name">{{ document.filename|truncatechars:15 }}</span>
+                    <span class="text-info-custom text-black fr-ml-2v name">{{ document.filename|truncatechars:15 }}</span>
                     {% if document and document.the_file.size %}
-                        <span class="text-info-custom text-black ms-2">({{ document.the_file.size|filesizeformat }})</span>
+                        <span class="text-info-custom text-black fr-ml-2v">({{ document.the_file.size|filesizeformat }})</span>
                     {% endif %}
                 </a>
             </div>
@@ -32,7 +32,7 @@
                     <form method="POST"
                           action="{% url 'projects-documents-pin-unpin' project.pk document.pk %}">
                         {% csrf_token %}
-                        <button class="btn btn-link d-flex fr-p-0 me-2">
+                        <button class="btn btn-link d-flex fr-p-0 fr-mr-2v">
                             <svg class="bi align-baseline fill-blue" width="20" height="20">
                                 {% if document.pinned == True %}
                                     <use id="file-is-bookmarked" xlink:href="{% static 'svg/bootstrap-icons.svg' %}#star-fill" />
@@ -44,7 +44,7 @@
                     </form>
                 {% endif %}
                 {% if document.uploaded_by == user and "manage_documents" in user_project_perms %}
-                    <form class="me-2"
+                    <form class="fr-mr-2v"
                           method="post"
                           action="{% url 'projects-documents-delete-document' project.pk document.pk %}">
                         {% csrf_token %}
@@ -68,15 +68,15 @@
                 {% endif %}
             </div>
         </div>
-        <div class="ps-4 ms-4 d-flex align-items-center">
+        <div class="fr-pl-2w fr-ml-2w d-flex align-items-center">
             {% include 'user/user_card.html' with user=document.uploaded_by %}
-            <span class="ms-4 tiny d-flex align-items-center">
-                <svg class="bi align-baseline me-2" width="12" height="12" fill="#222">
+            <span class="fr-ml-2w tiny d-flex align-items-center">
+                <svg class="bi align-baseline fr-mr-2v" width="12" height="12" fill="#222">
                     <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#calendar" />
                 </svg>
             {{ document.created_on|naturalday }}</span>
             {% if document.attached_object %}
-            <span class="ms-4 tiny d-flex">De :  <a href="{{ document.attached_object.get_absolute_url }}">{{ document.attached_object }}</a>
+            <span class="fr-ml-2w tiny d-flex">De :  <a href="{{ document.attached_object.get_absolute_url }}">{{ document.attached_object }}</a>
         {% endif %}
     </div>
 </div>

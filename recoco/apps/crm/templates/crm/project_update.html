@@ -23,7 +23,7 @@
         {% include "crm/fragments/sidebar.html" with search=True back_button=True user_advised_projects=False user_projects=False %}
         <div class="w-75 d-flex flex-column justify-content-start">
             <div class="crm-header fr-px-2w fr-py-2w mb-3">
-                <div class="d-flex justify-content-between align-items-center mb-2">
+                <div class="d-flex justify-content-between align-items-center fr-mb-2v">
                     <h3>Gérer le projet « {{ project.name }} »</h3>
                 </div>
                 {% if not project.deleted %}
@@ -35,7 +35,7 @@
                     <div class="alert alert-danger" role="alert">
                         Ce projet a été supprimé. Ceci signifie qu'il n'apparait plus sur aucun portail.
                         Vous pouvez néanmoins le réactiver si vous le souhaitez.
-                        <div class="d-flex justify-content-end mt-2">
+                        <div class="d-flex justify-content-end fr-mt-2v">
                             <form method="POST" action="{% url 'crm-user-undelete' project.pk %}">
                                 {% csrf_token %}
                                 <button type="submit" class="btn btn-danger">
@@ -45,28 +45,28 @@
                     </div>
                 {% endif %}
             </div>
-            <div class="fr-px-2w pt-4 mb-3">
+            <div class="fr-px-2w fr-pt-2w mb-3">
                 <ul class="d-flex fr-m-0 fr-p-0 align-items-center list-unstyled row">
-                    <li class="me-2 col-2">
+                    <li class="fr-mr-2v col-2">
                         {% url 'projects-project-administration' project.pk as url %}
                         {% include 'crm/fragments/crm_icon_button.html' with name="Éditer les informations" icon="pencil" link_url=url %}
                     </li>
-                    <li class="me-2 col-2">
+                    <li class="fr-mr-2v col-2">
                         {% url 'projects-project-administration' project.pk as url %}
                         {% include 'crm/fragments/crm_icon_button.html' with name="Gérer les membres" icon="person" link_url=url anchor="#user-management" %}
                     </li>
-                    <li class="me-2 col-2">
+                    <li class="fr-mr-2v col-2">
                         {% url 'crm-project-handover' project.pk as url %}
                         {% include 'crm/fragments/crm_icon_button.html' with name="Proposer à un autre portail" icon="broadcast" link_url=url anchor="#project-handover" %}
                     </li>
                 </ul>
             </div>
-            <div class="fr-px-2w pt-4 mb-3">
+            <div class="fr-px-2w fr-pt-2w mb-3">
                 <form method="POST"
                       class="form"
                       action="{% url 'crm-project-update' project.pk %}">
                     {% csrf_token %}
-                    <h4 class="mb-2">Réglages internes</h4>
+                    <h4 class="fr-mb-2v">Réglages internes</h4>
                     <!-- Notification -->
                     <div class="form-check form-switch">
                         <label class="form-check-label" for="{{ form.notifications.name }}">
@@ -76,7 +76,7 @@
                                  fill="currentColor">
                                 <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#bell-fill" />
                             </svg>
-                            <span class="align-middle me-2">Notifications</span>
+                            <span class="align-middle fr-mr-2v">Notifications</span>
                             <p class="text-secondary small">
                                 Détermine si les notifications internes et les courriels seront envoyés en cas d'événéments sur le projet.
                             </p>
@@ -98,7 +98,7 @@
                                  fill="currentColor">
                                 <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#clipboard-data-fill" />
                             </svg>
-                            <span class="align-middle me-2">Inclu dans les statistiques</span>
+                            <span class="align-middle fr-mr-2v">Inclu dans les statistiques</span>
                         </label>
                         <input @click="$event.target.form.submit();"
                                class="form-check-input"
@@ -114,7 +114,7 @@
                 </form>
             </div>
             <hr />
-            <div class="fr-px-2w pt-4 mb-3">
+            <div class="fr-px-2w fr-pt-2w mb-3">
                 <form method="POST" action="{% url 'crm-project-update' project.pk %}">
                     {% csrf_token %}
                     {{ form.non_field_errors }}

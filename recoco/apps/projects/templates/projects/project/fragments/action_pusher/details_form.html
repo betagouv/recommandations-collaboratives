@@ -7,14 +7,14 @@
 <template x-if="push_type != 'multiple'">
     <div class="message d-flex flex-row justify-content-between">
         <div id="action-details"
-             class="form w-50 pe-4 flex-fill d-flex flex-column">
+             class="form w-50 fr-pr-2w flex-fill d-flex flex-column">
             <div class="bg-light p-3 border-form">
                 <h4>
-                    <span class="text-muted me-1"
+                    <span class="text-muted fr-mr-1v"
                           x-text="push_type == 'noresource' ? '2.' : '3.'"></span>Décrivez votre recommandation
                 </h4>
-                <div class="mt-2">
-                    <label class="mb-2 text-info-custom text-grey-dark" for="intent">Titre</label>
+                <div class="fr-mt-2v">
+                    <label class="fr-mb-2v text-info-custom text-grey-dark" for="intent">Titre</label>
                     <div class="input-group mb-3">
                         <input class="form-control"
                                type="text"
@@ -27,8 +27,8 @@
                     </div>
                 </div>
                 <div x-data='TopicSearch("{{ form.topic_name.value|default:"" }}", "recommendations")'
-                     class="mt-2 mb-3">
-                    <label class="mb-2 text-info-custom text-grey-dark" for="topic_name">Thématique</label>
+                     class="fr-mt-2v mb-3">
+                    <label class="fr-mb-2v text-info-custom text-grey-dark" for="topic_name">Thématique</label>
                     <div class="input-group">
                         <input class="form-control"
                                type="text"
@@ -39,10 +39,10 @@
                         {% for error in form.topic.errors %}<div class="text-danger text-end">{{ error }}</div>{% endfor %}
                     </div>
                     <template x-if="results.length > 0">
-                        <div class="d-flex align-items-center flex-wrap mb-2 mt-1">
+                        <div class="d-flex align-items-center flex-wrap fr-mb-2v fr-mt-1v">
                             <span class="d-block text-blue text-info-custom text-grey-dark font-small fw-normal">Suggestions :</span>
                             <template x-for="result in results">
-                                <div class="d-flex align-item-center flex-wrap fr-mx-1v mt-1">
+                                <div class="d-flex align-item-center flex-wrap fr-mx-1v fr-mt-1v">
                                     <button @click.prevent="handleResultClick(result.name)"
                                             class="button secondary blue small"
                                             x-text="result.name"></button>
@@ -52,12 +52,12 @@
                     </template>
                 </div>
                 <div class="d-flex flex-column">
-                    <label class="mb-2 text-info-custom text-grey-dark" for="message">Message</label>
+                    <label class="fr-mb-2v text-info-custom text-grey-dark" for="message">Message</label>
                     {% include 'tools/editor.html' with input_name="content" input_value="content" errors=form.content.errors is_task=True %}
                 </div>
-                <div class="mb-4">
+                <div class="fr-mb-2w">
                     {% include 'projects/project/fragments/files_links/file_upload_input_standalone.html' %}
-                    {% for error in document_form.the_file.errors %}<div class="text-danger text-start mb-2">{{ error }}</div>{% endfor %}
+                    {% for error in document_form.the_file.errors %}<div class="text-danger text-start fr-mb-2v">{{ error }}</div>{% endfor %}
                 </div>
                 <template x-if="push_type == 'single'">
                     <div class="buttons d-flex flex-row justify-content-between">
@@ -116,7 +116,7 @@
         data-test-id="publish-draft-task-button"
                 class="btn btn-secondary"
                 :disabled="!selected_resources.length">Enregistrer comme Brouillon</button>
-        <span class="ms-2"
+        <span class="fr-ml-2v"
               x-text="`${selected_resources.length} ressource(s) sélectionnée(s)`"></span>
     </div>
 </template>

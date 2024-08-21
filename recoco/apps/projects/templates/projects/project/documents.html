@@ -14,7 +14,7 @@
     {% include 'projects/project/navigation.html' with files_links=True %}
     <div class="row">
         <div class="col-8">
-            <div class="d-flex align-items-center justify-content-between mb-4">
+            <div class="d-flex align-items-center justify-content-between fr-mb-2w">
                 <h6 class="text-uppercase small">
                     {% if all_files.count > 0 %}{{ all_files.count }}{% endif %}
                     fichier{{ all_files.count|pluralize }} partagé{{ all_files.count|pluralize }}
@@ -27,7 +27,7 @@
             {% include 'projects/project/fragments/files_links/file_list.html' with files=all_files %}
         </div>
         <div class="col-4">
-            <div class="d-flex align-items-center justify-content-between mb-4">
+            <div class="d-flex align-items-center justify-content-between fr-mb-2w">
                 <h6 class="text-uppercase small">Liens épinglés</h6>
                 {% if "manage_documents" in user_project_perms %}
                     {% url 'projects-documents-upload-document' project.pk as upload_action %}
@@ -37,7 +37,7 @@
             <!-- Liens épinglés -->
             {% include 'projects/project/fragments/files_links/link_list.html' with is_pinned=True %}
             <!-- Fichiers épinglés -->
-            <div class="d-flex align-items-center justify-content-between mb-2 mt-4 pt-2">
+            <div class="d-flex align-items-center justify-content-between fr-mb-2v fr-mt-2w fr-pt-2v">
                 <h6 class="text-uppercase small">Fichiers épinglés</h6>
             </div>
             {% include 'projects/project/fragments/files_links/file_list.html' with search=False files=pinned_files is_pinned=True %}

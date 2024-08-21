@@ -9,7 +9,7 @@
                 title="Fermer le menu"
                 @click="closeNotificationsMenu"
                 data-test-id="notification-menu-close">
-            <svg class="bi me-1" width="16" height="16" fill="currentColor">
+            <svg class="bi fr-mr-1v" width="16" height="16" fill="currentColor">
                 <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#x-lg" />
             </svg>
         </button>
@@ -53,7 +53,7 @@
                             title="Supprimer la notification"
                             data-test-id="notification-mark-as-read-one"
                             @click="markNotificationAsRead({{ notification.id }}, $el, `${ {{ forloop.counter }}{{ forloop.parentloop.counter0 }} }`)">
-                        <svg class="bi me-1" width="16" height="16" fill="currentColor">
+                        <svg class="bi fr-mr-1v" width="16" height="16" fill="currentColor">
                             <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#x-lg" />
                         </svg>
                     </button>

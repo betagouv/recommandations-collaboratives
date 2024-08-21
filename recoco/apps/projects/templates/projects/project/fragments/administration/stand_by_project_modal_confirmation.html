@@ -18,8 +18,8 @@
             <div class="modal-body">
                 <div class="d-flex flex-column">
                     <span class="text-info-custom fw-medium">Voulez-vous mettre le projet en pause ?</span>
-                    <span class="font-small text-grey-dark mt-1">Une fois le projet en pause :</span>
-                    <ul class="list-unstyled mt-2">
+                    <span class="font-small text-grey-dark fr-mt-1v">Une fois le projet en pause :</span>
+                    <ul class="list-unstyled fr-mt-2v">
                         <li class="bg-light fr-p-2v medium-border-radius fr-my-2v">
                             <span class="text-grey-dark">Vous ne recevrez plus de rappels.</span>
                         </li>
@@ -37,7 +37,7 @@
                 <form id="form__admin-deactivate-project"
                       method="POST"
                       action="{% url 'projects-project-set-inactive' project.pk %}"
-                      class="form mt-1 d-flex justify-content-between"
+                      class="form fr-mt-1v d-flex justify-content-between"
                       data-test-id="form-pause-project">
                     {% csrf_token %}
                     <a class="button grey filled text-nowrap inherit"

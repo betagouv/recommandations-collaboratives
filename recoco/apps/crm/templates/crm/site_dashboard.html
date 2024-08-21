@@ -25,15 +25,15 @@
         {% include "crm/fragments/sidebar.html" with search=True back_button=True map=True tools=True %}
         <div class="w-75 d-flex flex-column justify-content-start">
             {% if active_project %}
-                <div class="crm-header fr-px-2w py-3 pt-4 mb-3">
+                <div class="crm-header fr-px-2w py-3 fr-pt-2w mb-3">
                 {% else %}
-                    <div class="crm-header no-project fr-px-2w py-3 pt-4">
+                    <div class="crm-header no-project fr-px-2w py-3 fr-pt-2w">
                     {% endif %}
                     <h3 class="d-flex align-items-center">
                         <span class="fs-3">
                             <img src="{% gravatar_url user.email 40 %}"
                                  alt="{{ user.get_full_name }}"
-                                 class="me-2 rounded-circle align-middle img-specific-size" />
+                                 class="fr-mr-2v rounded-circle align-middle img-specific-size" />
                             <span class="align-middle">Salut, {{ request.user.first_name|default:request.user.username }} !</span>
                         </span>
                     </h3>
@@ -41,52 +41,52 @@
                 </div>
                 <div class="d-flex flex-column">
                     <div class="pt-3 fr-px-2w pb-3">
-                        <h5 class="d-flex align-items-center relative pb-2 text-info-custom text-grey-dark">
-                            <svg class="me-2 bi align-middle" width="18" height="18">
+                        <h5 class="d-flex align-items-center relative fr-pb-2v text-info-custom text-grey-dark">
+                            <svg class="fr-mr-2v bi align-middle" width="18" height="18">
                                 <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#pencil" />
                             </svg>
                             <span>Gestion</span>
                         </h5>
                         <ul class="d-flex fr-m-0 fr-p-0 align-items-center list-unstyled row">
-                            <li class="me-2 col-2">
+                            <li class="fr-mr-2v col-2">
                                 {% url 'crm-user-list' as url %}
                                 {% include "crm/fragments/crm_icon_button.html" with link_url=url name="Utilisateur·trice·s" icon="person-circle" %}
                             </li>
-                            <li class="me-2 col-2">
+                            <li class="fr-mr-2v col-2">
                                 {% url 'crm-project-list' as url %}
                                 {% include "crm/fragments/crm_icon_button.html" with link_url=url name="Projets" icon="folder-fill" %}
                             </li>
-                            <li class="me-2 col-2">
+                            <li class="fr-mr-2v col-2">
                                 {% url 'crm-organization-list' as url %}
                                 {% include "crm/fragments/crm_icon_button.html" with link_url=url name="Organisations" icon="building" %}
                             </li>
                         </ul>
                     </div>
                     <div class="fr-px-2w pb-3">
-                        <h5 class="d-flex align-items-center relative pb-2 text-info-custom text-grey-dark">
-                            <svg class="me-2 bi align-middle" width="18" height="18">
+                        <h5 class="d-flex align-items-center relative fr-pb-2v text-info-custom text-grey-dark">
+                            <svg class="fr-mr-2v bi align-middle" width="18" height="18">
                                 <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#bar-chart-fill" />
                             </svg>
                             <span>Métriques</span>
                         </h5>
                         <ul class="d-flex fr-m-0 fr-p-0 align-items-center list-unstyled row">
-                            <li class="me-2 col-2">
+                            <li class="fr-mr-2v col-2">
                                 {% url 'crm-project-list-by-tags' as url %}
                                 {% include "crm/fragments/crm_icon_button.html" with link_url=url name="Tags / Projects" icon="tag-fill" %}
                             </li>
-                            <li class="me-2 col-2 ">
+                            <li class="fr-mr-2v col-2 ">
                                 {% url 'crm-list-projects-low-reach' as url %}
                                 {% include "crm/fragments/crm_icon_button.html" with link_url=url name="Projets à faible répondant" icon="chat-square-dots" %}
                             </li>
-                            <li class="me-2 col-2 ">
+                            <li class="fr-mr-2v col-2 ">
                                 {% url 'crm-list-tags' as url %}
                                 {% include "crm/fragments/crm_icon_button.html" with link_url=url name="Index des tags du crm" icon="activity" %}
                             </li>
-                            <li class="me-2 col-2 ">
+                            <li class="fr-mr-2v col-2 ">
                                 {% url 'crm-list-topics' as url %}
                                 {% include "crm/fragments/crm_icon_button.html" with link_url=url name="Index des thématiques" icon="boxes" %}
                             </li>
-                            <li class="me-2 col-2 ">
+                            <li class="fr-mr-2v col-2 ">
                                 {% url 'crm-reco-without-resources' as url %}
                                 {% include "crm/fragments/crm_icon_button.html" with link_url=url name="Recos sans ressource" icon="suit-club" %}
                             </li>
@@ -94,31 +94,31 @@
                     </div>
                     {% if is_staff or "manage_surveys" in user_site_perms or perms.wagtailadmin.can_access %}
                         <div class="pb-3 fr-px-2w">
-                            <h5 class="d-flex align-items-center relative pb-2 text-info-custom text-grey-dark">
-                                <svg class="me-2 bi align-middle" width="18" height="18">
+                            <h5 class="d-flex align-items-center relative fr-pb-2v text-info-custom text-grey-dark">
+                                <svg class="fr-mr-2v bi align-middle" width="18" height="18">
                                     <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#sliders" />
                                 </svg>
                                 <span>Configuration</span>
                             </h5>
                             <ul class="d-flex fr-m-0 fr-p-0 align-items-center list-unstyled row">
                                 {% if "manage_configuration" in user_site_perms %}
-                                    <li class="me-2 col-2">
+                                    <li class="fr-mr-2v col-2">
                                         {% url 'crm-site-configuration' as url %}
                                         {% include "crm/fragments/crm_icon_button.html" with link_url=url name="Réglages du Site" icon="gear" %}
                                     </li>
                                 {% endif %}
                                 {% if perms.wagtailadmin.can_access %}
-                                    <li class="me-2 col-2">
+                                    <li class="fr-mr-2v col-2">
                                         {% url 'wagtailadmin_home' as url %}
                                         {% include "crm/fragments/crm_icon_button.html" with link_url=url name="Pages Statiques" icon="pen" %}
                                     </li>
                                 {% endif %}
-                                <li class="me-2 col-2">
+                                <li class="fr-mr-2v col-2">
                                     {% url 'projects-task-recommendation-list' as url %}
                                     {% include "crm/fragments/crm_icon_button.html" with link_url=url name="Pré-fléchage" icon="signpost-fill" %}
                                 </li>
                                 {% if request.site.configuration.project_survey and "manage_surveys" in user_site_perms %}
-                                    <li class="me-2 col-2">
+                                    <li class="fr-mr-2v col-2">
                                         {% url 'survey-editor-survey-details' request.site.configuration.project_survey_id as url %}
                                         {% include "crm/fragments/crm_icon_button.html" with link_url=url name="Questionnaire" icon="question-circle" %}
                                     </li>
@@ -127,7 +127,7 @@
                         </div>
                     {% endif %}
                 </div>
-                <div class="fr-px-2w pt-1 bg-light crm-timeline-min-height">
+                <div class="fr-px-2w fr-pt-1v bg-light crm-timeline-min-height">
                     <h3 class="mt-3">
                         <svg class="bi align-middle" width="24" height="24">
                             <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#lightning-fill" />
@@ -143,7 +143,7 @@
                                     -- Pas encore d'activité de la part du staff --
                                 {% endfor %}
                             </article>
-                            <a class="button filled grey small inherit fw-bold mt-4 mb-4"
+                            <a class="button filled grey small inherit fw-bold fr-mt-2w fr-mb-2w"
                                href="{% url 'projects-activity-feed' %}">Voir plus d'activité</a>
                         </div>
                     </ul>
@@ -158,7 +158,7 @@
                         {% for action in stream|slice:":200" %}
                             {% if action.verb == verbs.User.LOGIN %}
                                 <li class="list-group-item">
-                                    <span class="text-info-custom text-grey-dark me-2 text-nowrap font-small">{{ action.timestamp|naturalday|capfirst }}</span>
+                                    <span class="text-info-custom text-grey-dark fr-mr-2v text-nowrap font-small">{{ action.timestamp|naturalday|capfirst }}</span>
                                     <a class="font-small"
                                        href="{% url 'crm-user-details' action.actor.pk %}">{{ action.actor.first_name|default:action.actor }}
                                     {{ action.actor.last_name|default:"" }}</a>

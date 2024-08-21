@@ -3,7 +3,7 @@
 {% load humanize %}
 {% load gravatar %}
 <li class="d-flex fr-mx-0 fr-px-0 d-flex align-items-center fr-py-1v">
-    <span class="small text-info-custom text-grey-dark me-2 text-nowrap font-small">{{ action.timestamp|naturalday|capfirst }}</span>
+    <span class="small text-info-custom text-grey-dark fr-mr-2v text-nowrap font-small">{{ action.timestamp|naturalday|capfirst }}</span>
     <div class="activity-stream-actions-container d-flex flex-column">
         {% load i18n %}
         {% load static %}
@@ -76,7 +76,7 @@
                                     {% endif %}
                                     {% if action.target %}
                                         {% if action.verb != verbs.Project.SUBMITTED_BY and action.verb != verbs.Project.VALIDATED_BY and action.verb != verbs.Project.LEFT_ADVISING and action.verb != verbs.Project.JOINED and action.verb != verbs.Project.BECAME_ADVISOR and action.verb != verbs.Project.BECAME_OBSERVER %}
-                                            <div class="d-inline-block ms-1">
+                                            <div class="d-inline-block fr-ml-1v">
                                                 {% if action.verb == verbs.Conversation.PUBLIC_MESSAGE or  action.verb == verbs.Conversation.PRIVATE_MESSAGE %}
                                                     <span>à propos de</span>
                                                 {% else %}

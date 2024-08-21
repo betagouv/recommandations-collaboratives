@@ -13,7 +13,7 @@
         {% if "change_topics" in user_project_perms and project.all_topics.count != 0 %}
             <a href='{% url "projects-project-topics" project.id %}'>
                 <span class="tiny">Modifier</span>
-                <svg class="bi ms-2 " width="10" height="10" fill="currentColor">
+                <svg class="bi fr-ml-2v " width="10" height="10" fill="currentColor">
                     <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#pencil-fill" />
                 </svg>
             </a>

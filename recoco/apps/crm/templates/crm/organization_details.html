@@ -23,18 +23,18 @@
     <div x-data="Crm" class="d-flex fr-px-0" style="">
         {% include "crm/fragments/sidebar.html" with search=True back_button=True organization_members=True followed_projects=True unfollowed_projects=True %}
         <div class="w-75 d-flex flex-column justify-content-start">
-            <div class="crm-header fr-px-2w py-3 pt-4 {% if active_project %}mb-3{% else %}no-project{% endif %}">
+            <div class="crm-header fr-px-2w py-3 fr-pt-2w {% if active_project %}mb-3{% else %}no-project{% endif %}">
                 <div class="d-flex justify-content-between">
                     <div>
                         <h3 class="d-flex align-items-center">
-                            <svg class="bi me-2" width="16" height="16" fill="currentColor">
+                            <svg class="bi fr-mr-2v" width="16" height="16" fill="currentColor">
                                 <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#building" />
                             </svg>
                             <span>{{ organization.name }}</span>
                         </h3>
                         <ul class="d-flex align-items-center list-unstyled flex-wrap organization-specific-pl-0">
                             {% for department in org_departments %}
-                                <li class="me-2 crm-region-tag">
+                                <li class="fr-mr-2v crm-region-tag">
                                     <span class="">{{ department.name }}</span>
                                     <strong>({{ department.code }})</strong>
                                 </li>
@@ -68,8 +68,8 @@
                     </ul>
                 </div>
             {% endif %}
-            <div class="fr-px-2w pt-4 crm-notes-wrapper relative">
-                <a class="btn btn-primary mb-4"
+            <div class="fr-px-2w fr-pt-2w crm-notes-wrapper relative">
+                <a class="btn btn-primary fr-mb-2w"
                    href="{% url 'crm-organization-note-create' organization.pk %}">créer une note</a>
                 {% for note in sticky_notes.all %}
                     {% include 'crm/note.html' with pinned=True update_url_name='crm-organization-note-update' get_user_profile=True %}
@@ -78,7 +78,7 @@
                     {% include 'crm/note.html' with update_url_name='crm-organization-note-update' get_user_profile=True %}
                 {% endfor %}
             </div>
-            <div class="fr-px-2w pt-4 bg-light crm-timeline-min-height">
+            <div class="fr-px-2w fr-pt-2w bg-light crm-timeline-min-height">
                 <h4>Activité</h4>
                 {% include 'crm/timeline.html' %}
             </div>

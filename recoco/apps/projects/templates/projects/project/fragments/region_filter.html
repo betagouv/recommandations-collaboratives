@@ -5,12 +5,12 @@
           rel="stylesheet"
           type="text/css">
 {% endblock %}
-<div class="d-flex align-items-center ms-4">
+<div class="d-flex align-items-center fr-ml-2w">
     <span class="fr-segmented__legend inline text-nowrap">Filtrer :</span>
     <div class="input-item position-relative active specific-border-solid1pxE5E5E5"
          x-data="{ open: false }"
          x-on:click.outside="open = false">
-        <div class="d-flex align-items-center pe-4 bg-white rounded-pill"
+        <div class="d-flex align-items-center fr-pr-2w bg-white rounded-pill"
              x-on:click="open = !open"
              type="button"
              :class="{'input-active':open}">
@@ -19,7 +19,7 @@
                 Projets de mon
                 territoire
             </button>
-            <svg class="input-icon right black bi align-baseline me-2"
+            <svg class="input-icon right black bi align-baseline fr-mr-2v"
                  width="15"
                  height="15"
                  fill="#000000">
@@ -32,13 +32,13 @@
             <li class="bg-white appearance-none w-100 d-flex justify-content-start align-items-center border-bottom department-item">
                 <div class="form-check w-100 d-flex align-items-center fr-p-0">
                     <input x-on:input.change="handleTerritorySelectAll"
-                           class="form-check-input fw-normal ms-2 fr-px-2v fr-py-2v me-2"
+                           class="form-check-input fw-normal fr-ml-2v fr-px-2v fr-py-2v fr-mr-2v"
                            type="checkbox"
                            data-cy="check-all-territory"
                            :value="territorySelectAll"
                            :checked="territorySelectAll"
                            id="allTerritory" />
-                    <label class=" w-100 pe-2 fr-py-2v d-flex align-items-center" for="allTerritory">
+                    <label class=" w-100 fr-pr-2v fr-py-2v d-flex align-items-center" for="allTerritory">
                         <span class="fw-normal">Tout (dé)sélectionner</span>
                     </label>
                 </div>
@@ -50,12 +50,12 @@
                             class="bg-white appearance-none w-100 d-flex justify-content-start align-items-center department-item pe-3">
                             <div class="form-check w-100 d-flex align-items-center fr-px-0">
                                 <input x-on:input.change="handleRegionFilter(region)"
-                                       class="region-checkbox form-check-input fw-normal ms-2 fr-px-2v fr-py-2v me-2"
+                                       class="region-checkbox form-check-input fw-normal fr-ml-2v fr-px-2v fr-py-2v fr-mr-2v"
                                        type="checkbox"
                                        :value="region.active"
                                        :checked="region.active"
                                        :id="`region-${region.code}`" />
-                                <label class="w-100 pe-2 fr-py-2v d-flex align-items-center"
+                                <label class="w-100 fr-pr-2v fr-py-2v d-flex align-items-center"
                                        :for="`region-${region.code}`">
                                     <span class="fw-light text-grey-dark text-nowrap" x-text="region.name"></span>
                                 </label>
@@ -66,17 +66,17 @@
                                 <li class="bg-white appearance-none w-100 d-flex justify-content-start align-items-center department-item">
                                     <div class="form-check w-100 d-flex align-items-center fr-p-0">
                                         <input x-on:input.change="handleDepartmentFilter(department)"
-                                               class="form-check-input fw-normal ms-2 fr-px-2v fr-py-2v me-2"
+                                               class="form-check-input fw-normal fr-ml-2v fr-px-2v fr-py-2v fr-mr-2v"
                                                type="checkbox"
                                                :value="department.active"
                                                :checked="department.active"
                                                :id="department.code" />
-                                        <label class=" w-100 pe-2 fr-py-1v d-flex align-items-center"
+                                        <label class=" w-100 fr-pr-2v fr-py-1v d-flex align-items-center"
                                                :for="department.code">
                                             <span class="fw-normal" x-text="department.code"></span>
                                             <span class="fr-mx-1v fw-light">-</span>
                                             <span class="fw-light text-grey-dark text-nowrap" x-text="department.name"></span>
-                                            <span class="fw-light text-dark ms-1" x-text="`(${department.nbProjects})`"></span>
+                                            <span class="fw-light text-dark fr-ml-1v" x-text="`(${department.nbProjects})`"></span>
                                         </label>
                                     </div>
                                 </li>
@@ -86,20 +86,20 @@
                 </template>
             {% else %}
                 <template x-for="department in departments">
-                    <li class="bg-white appearance-none w-100 d-flex justify-content-start align-items-center department-item pe-4">
+                    <li class="bg-white appearance-none w-100 d-flex justify-content-start align-items-center department-item fr-pr-2w">
                         <div class="form-check w-100 d-flex align-items-center fr-p-0">
                             <input x-on:input.change="handleTerritoryFilter(department)"
-                                   class="form-check-input fw-normal ms-2 fr-px-2v fr-py-2v me-2"
+                                   class="form-check-input fw-normal fr-ml-2v fr-px-2v fr-py-2v fr-mr-2v"
                                    type="checkbox"
                                    :value="department.active"
                                    :checked="department.active"
                                    :id="department.code" />
-                            <label class=" w-100 pe-2 fr-py-1v d-flex align-items-center"
+                            <label class=" w-100 fr-pr-2v fr-py-1v d-flex align-items-center"
                                    :for="department.code">
                                 <span class="fw-normal" x-text="department.code"></span>
                                 <span class="fr-mx-1v fw-light">-</span>
                                 <span class="fw-light text-grey-dark text-nowrap" x-text="department.name"></span>
-                                <span class="fw-light text-dark ms-1" x-text="`(${department.nbProjects})`"></span>
+                                <span class="fw-light text-dark fr-ml-1v" x-text="`(${department.nbProjects})`"></span>
                             </label>
                         </div>
                     </li>

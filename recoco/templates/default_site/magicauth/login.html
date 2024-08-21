@@ -13,7 +13,7 @@
   <div class="fr-container fr-py-6w">
     <div class="d-flex justify-content-between align-items-start">
       <h1 class="fr-mb-6w">
-        <svg class="bi me-2" width="28" height="28">
+        <svg class="bi fr-mr-2v" width="28" height="28">
           <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#person-circle" />
         </svg>
         Se connecter ou créer un compte
@@ -50,7 +50,7 @@
         {% for error in form.email.errors %}<div class="alert alert-danger text-center">{{ error }}</div>{% endfor %}
       </div>
       <button type="submit" class="fr-btn custom-login-button">
-        <svg class="bi me-2 align-middle svg-specific-fill-white"
+        <svg class="bi fr-mr-2v align-middle svg-specific-fill-white"
              width="20"
              height="20">
           <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#envelope" />

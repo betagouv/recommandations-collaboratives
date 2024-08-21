@@ -8,7 +8,7 @@
 <div class="d-flex align-items-center position-relative">
     <template x-if="i > 0">
         <button id="task-move-above"
-                class="border tiny d-flex align-items-center justify-content-center fr-px-2v fr-py-2v me-1 hover-bg-grey specific-cursor-pointer"
+                class="border tiny d-flex align-items-center justify-content-center fr-px-2v fr-py-2v fr-mr-1v hover-bg-grey specific-cursor-pointer"
                 @click.stop="handleMove('above',task, column(board.status)[i - 1])">
             <svg class="bi" width="13px" height="13px" fill="#929292">
                 <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#arrow-up" />
@@ -17,7 +17,7 @@
     </template>
     <template x-if="i < column(board.status).length - 1">
         <button id="task-move-below"
-                class="border tiny d-flex align-items-center justify-content-center fr-px-2v fr-py-2v me-1 hover-bg-grey specific-cursor-pointer"
+                class="border tiny d-flex align-items-center justify-content-center fr-px-2v fr-py-2v fr-mr-1v hover-bg-grey specific-cursor-pointer"
                 @click.stop="handleMove('below',task, column(board.status)[i + 1])"
                 :class="{'active':open}">
             <svg class="bi" width="13px" height="13px" fill="#929292">
@@ -42,7 +42,7 @@
                    class="appearance-none w-100 fr-py-2v fr-px-2v d-flex justify-content-start align-items-center border-bottom text-decoration-none"
                    @click.stop
                    :href="editTaskUrl(task.id, '{{ request.path }}')">
-                    <svg class="bi me-2" width="13" height="13" fill="#666666">
+                    <svg class="bi fr-mr-2v" width="13" height="13" fill="#666666">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#pencil-fill" />
                     </svg>
                     <span class="text-grey-dark text-info-custom tiny">Modifier</span>
@@ -53,7 +53,7 @@
                     <button id="unpublish-task-button"
                             @click.stop="onSetTaskPublic(task, false)"
                             class="bg-white appearance-none w-100 fr-py-2v fr-px-2v d-flex justify-content-start align-items-center border-bottom text-decoration-none">
-                        <svg class="bi me-2" width="13" height="13" fill="#666666">
+                        <svg class="bi fr-mr-2v" width="13" height="13" fill="#666666">
                             <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#pencil-square" />
                         </svg>
                         <span class="text-grey-dark text-info-custom tiny text-nowrap">Passer en brouillon</span>
@@ -65,7 +65,7 @@
                     <button id="publish-task-button"
                             @click.stop="onSetTaskPublic(task, true)"
                             class="bg-white appearance-none w-100 fr-py-2v fr-px-2v d-flex justify-content-start align-items-center border-bottom text-decoration-none">
-                        <svg class="bi me-2" width="13" height="13" fill="#666666">
+                        <svg class="bi fr-mr-2v" width="13" height="13" fill="#666666">
                             <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#pencil-square" />
                         </svg>
                         <span class="text-grey-dark text-info-custom tiny text-nowrap">Publier</span>
@@ -76,7 +76,7 @@
                 <button data-test-id="delete-task-action-button"
                         @click.stop="handleOpenDeleteModal()"
                         class="bg-white text-red-light appearance-none w-100 fr-py-2v fr-px-2v d-flex justify-content-start align-items-center border-bottom text-decoration-none">
-                    <svg class="bi text-red-light me-2" width="13" height="13" fill="#E1000F">
+                    <svg class="bi text-red-light fr-mr-2v" width="13" height="13" fill="#E1000F">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#trash" />
                     </svg>
                     <span class="text-red-light text-info-custom tiny text-nowrap">Supprimer</span>

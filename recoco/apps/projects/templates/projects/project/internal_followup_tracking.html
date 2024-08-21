@@ -13,8 +13,8 @@
     <div class="w-100 h-100">
         <div class="d-flex">
             <a href="{% url 'projects-project-detail' project.id %}"
-               class="button grey filled fr-my-2v mb-4 a-style">
-                <svg class="bi me-2" width="16" height="16" fill="currentColor">
+               class="button grey filled fr-my-2v fr-mb-2w a-style">
+                <svg class="bi fr-mr-2v" width="16" height="16" fill="currentColor">
                     <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#arrow-return-left" />
                 </svg>
                 <span>revenir au projet</span>
@@ -30,7 +30,7 @@
                 <ul class="list-group fr-m-0 fr-p-0 activity-stream-container">
                     {% for date, actions in stream_by_day %}
                         <li class="{% if cropped %}mb-0 {% endif %} list-group-item border-0 d-flex flex-column mb-3 fr-mx-0 fr-px-0">
-                            <span class="small text-info-custom text-grey-dark mb-2 ps-2">{{ date|naturalday|capfirst }}</span>
+                            <span class="small text-info-custom text-grey-dark fr-mb-2v fr-pl-2v">{{ date|naturalday|capfirst }}</span>
                             <div class="activity-stream-actions-container d-flex flex-column">
                                 {% for action in actions %}
                                     {% display_action action %}

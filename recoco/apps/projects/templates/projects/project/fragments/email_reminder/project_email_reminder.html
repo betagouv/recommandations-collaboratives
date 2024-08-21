@@ -38,7 +38,7 @@
                     <div data-test-id="message-reminder-settings"
                          class="border-bottom-grey fr-p-2v d-flex flex-column">
                         <span class="tiny fw-medium">Rappels</span>
-                        <span class="tiny fw-normal mb-2">Vous recevez un rappel par email toutes les 6 à 12 semaines pour consulter et mettre à jour votre avancement sur les recommandations.</span>
+                        <span class="tiny fw-normal fr-mb-2v">Vous recevez un rappel par email toutes les 6 à 12 semaines pour consulter et mettre à jour votre avancement sur les recommandations.</span>
                         {% if project.next_reminder %}
                             {% with project.next_reminder as reminder %}
                                 <span class="tiny fw-medium text-blue">Prochain rappel prévu le {{ reminder.deadline|default:"Aucun" }} ({{ reminder.get_kind_display }})</span>
@@ -48,13 +48,13 @@
                 {% endif %}
                 <div class="border-bottom-grey fr-p-2v d-flex flex-column">
                     <span class="tiny fw-medium">Activité du projet</span>
-                    <span class="tiny fw-normal mb-2">Vous recevez une notification par email à chaque nouvelle activité sur le projet dans un récapitulatif journalier.</span>
+                    <span class="tiny fw-normal fr-mb-2v">Vous recevez une notification par email à chaque nouvelle activité sur le projet dans un récapitulatif journalier.</span>
                 </div>
                 <div class="border-bottom-grey fr-p-2v d-flex flex-column">
                     {% if request.user == project.owner %}
-                        <span class="tiny fw-normal mb-1">Pour couper les notifications vous pouvez mettre le projet en pause depuis l’onglet <a href="{% url 'projects-project-administration' project.pk %}#project-status-settings">Paramètres</a></span>
+                        <span class="tiny fw-normal fr-mb-1v">Pour couper les notifications vous pouvez mettre le projet en pause depuis l’onglet <a href="{% url 'projects-project-administration' project.pk %}#project-status-settings">Paramètres</a></span>
                     {% else %}
-                        <span class="tiny fw-normal mb-1">Si vous ne souhaitez plus recevoir de notifications vous pouvez quitter le projet depuis l’onglet <a href="{% url 'projects-project-administration' project.pk %}#project-status-settings">Paramètres</a></span>
+                        <span class="tiny fw-normal fr-mb-1v">Si vous ne souhaitez plus recevoir de notifications vous pouvez quitter le projet depuis l’onglet <a href="{% url 'projects-project-administration' project.pk %}#project-status-settings">Paramètres</a></span>
                     {% endif %}
                 </div>
             </div>
@@ -62,7 +62,7 @@
         <div class="d-flex align-items-center">
             {% if project.next_reminder %}
                 {% with project.next_reminder as reminder %}
-                    <span class="tiny me-2">Le prochain rappel sera envoyé à <strong class="fw-medium" data-test-id="email-recipient">{{ project.owner }}</strong> le  <span data-test-id="email-date">{{ reminder.deadline|default:"Aucun" }}</span></span>
+                    <span class="tiny fr-mr-2v">Le prochain rappel sera envoyé à <strong class="fw-medium" data-test-id="email-recipient">{{ project.owner }}</strong> le  <span data-test-id="email-date">{{ reminder.deadline|default:"Aucun" }}</span></span>
                 {% endwith %}
             {% else %}
                 {% if request.user not in project.members.all and not position.is_advisor and not position.is_observer and request.user.is_staff and "change_project" in user_project_perms %}

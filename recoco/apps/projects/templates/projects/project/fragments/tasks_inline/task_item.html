@@ -15,7 +15,7 @@
      @click="handleOpenPreviewModal()"
      :id="task.id">
     <div x-show="task.isLoading"
-         class="ms-2 item-loader z-1 specific-size">
+         class="fr-ml-2v item-loader z-1 specific-size">
         <div class="spinner-border spinner-border spinner-border-sm text-primary"
              role="status"></div>
     </div>
@@ -36,7 +36,7 @@
                 </div>
             </template>
             <template x-if="task.topic && task.topic.name">
-                <div class="left-0 ms-2">
+                <div class="left-0 fr-ml-2v">
                     <span data-test-id="task-inline-topic"
                           class="bg-purple text-white"
                           x-text="task.topic.name"></span>
@@ -46,7 +46,7 @@
         <div class="d-flex align-items-center justify-content-between">
             <div class="d-flex w-100 justify-content-between align-items-center">
                 <div class="d-flex w-100 align-items-center">
-                    <span class="mt-0 pt-0 mb-0 fw-bold title-info text-transform-none text-blue text-decoration-underline"
+                    <span class="fr-mt-0 fr-pt-0 fr-mb-0 fw-bold title-info text-transform-none text-blue text-decoration-underline"
                           x-text="task.intent"></span>
                 </div>
             </div>
@@ -54,7 +54,7 @@
                 {% include 'projects/project/fragments/task/task_actions.html' %}
             {% endif %}
         </div>
-        <article class="mt-1 mb-2">
+        <article class="fr-mt-1v fr-mb-2v">
             <template x-if="task.resource_id && task.resource && task.resource.subtitle">
                 <div x-html="truncate(renderMarkdown(task.resource.subtitle),100)"
                      class="text-info-custom fw-light font-small text-dark fr-m-0 fr-p-0">
@@ -62,7 +62,7 @@
             </template>
             <template x-if="!task.resource_id && task.content">
                 <div x-html="truncate(renderMarkdown(task.content),100)"
-                     class="text-info-custom fw-light font-small text-dark mb-2 fr-p-0"></div>
+                     class="text-info-custom fw-light font-small text-dark fr-mb-2v fr-p-0"></div>
             </template>
         </article>
         <template x-if="task.resource">
@@ -74,7 +74,7 @@
                     {% include 'projects/project/fragments/tasks_inline_kanban/tasks_status_buttons.html' %}
                 </template>
                 <div class="text-grey-dark d-flex align-items-center tiny me-3 responsive-flex-column">
-                    <svg class="align-middle bi me-1"
+                    <svg class="align-middle bi fr-mr-1v"
                          width="18px"
                          height="15px"
                          fill="currentColor">
@@ -84,14 +84,14 @@
                           @click="handleOpenPreviewModal()"
                           x-text="task.resource_id ? getTaskMessageCountLabel(task.comments_count + 1) : getTaskMessageCountLabel(task.comments_count)"></span>
                     <template x-if="task.notifications.count > 0">
-                        <span class="tiny hover-underline cursor-pointer text-blue fw-medium ms-1"
+                        <span class="tiny hover-underline cursor-pointer text-blue fw-medium fr-ml-1v"
                               @click="handleOpenPreviewModal()"
                               x-text="task.resource_id ? getTaskNewMessageCountLabel(task.notifications.count) : getTaskNewMessageCountLabel(task.notifications.count)"></span>
                     </template>
                 </div>
             </div>
             <div class="tiny d-flex align-items-center">
-                <span class="text-muted me-1 specific-lineheight-20"
+                <span class="text-muted fr-mr-1v specific-lineheight-20"
                       x-text="`Émis le ${formatDate(task.created_on)}`"></span>
                 {% include 'projects/project/fragments/task/task_user_card.html' %}
             </div>

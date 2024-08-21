@@ -20,7 +20,7 @@
                      </span>
                 -->
                 <div class="title">
-                    <svg class="bi me-2 bg-color-darkgrey resource-icon">
+                    <svg class="bi fr-mr-2v bg-color-darkgrey resource-icon">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#person-badge" />
                     </svg>
                     {{ contact.full_name|title }}
@@ -34,7 +34,7 @@
             </div>
         </div>
         <div class="card-text">
-            {% if contact.division %}<div class="mb-2">{{ contact.division }}</div>{% endif %}
+            {% if contact.division %}<div class="fr-mb-2v">{{ contact.division }}</div>{% endif %}
             <div class="small text-secondary subtitle">{{ contact.organization.name|truncatechars:120 }}</div>
             {% if contact.phone_no %}
                 <div class="small text-secondary">

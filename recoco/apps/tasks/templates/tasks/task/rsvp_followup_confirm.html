@@ -18,12 +18,12 @@
 {% endblock %}
 {% block content %}
     <div class="col-12 fr-p-2w fr-mx-auto">
-        <h2 class="mb-4">
+        <h2 class="fr-mb-2w">
             <span class="align-middle">Mise à jour de votre avancement sur le projet {{ task.project.name }}</span>
         </h2>
         <form id="form-rsvp-followup-confirm" class="form" method="POST" action=".">
             {% csrf_token %}
-            <div class="d-flex flex-column fr-p-2w bg-light rounded rounded-4 mb-4">
+            <div class="d-flex flex-column fr-p-2w bg-light rounded rounded-4 fr-mb-2w">
                 <div class="d-flex justify-content-between">
                     <span class="fs-3 flex-grow-1">
                         <svg class="align-middle bi"
@@ -46,7 +46,7 @@
                         </span>.
                     </span>
                 </span>
-                <button type="submit" class="ms-2 btn btn-primary btn-lg">Confirmer</button>
+                <button type="submit" class="fr-ml-2v btn btn-primary btn-lg">Confirmer</button>
             </div>
             <span class="text-secondary">Souhaitez-vous laisser un commentaire de suivi ?</span>
             <textarea name="comment"

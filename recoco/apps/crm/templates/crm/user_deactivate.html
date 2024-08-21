@@ -23,7 +23,7 @@
         {% include "crm/fragments/sidebar.html" with search=True back_button=True user_advised_projects=False user_projects=False %}
         <div class="w-75 d-flex flex-column justify-content-start">
             <div class="crm-header fr-px-2w fr-py-2w mb-3">
-                <div class="d-flex justify-content-between align-items-center mb-2">
+                <div class="d-flex justify-content-between align-items-center fr-mb-2v">
                     <h3>Gérer le compte « {{ crm_user.username }} »</h3>
                 </div>
             </div>
@@ -41,7 +41,7 @@
                         <li>Il sera possible de réactiver le compte si nécessaire</li>
                     </ul>
                 </p>
-                <div class="mt-4">
+                <div class="fr-mt-2w">
                     <form method="POST" action="{% url 'crm-user-deactivate' crm_user.pk %}">
                         {% csrf_token %}
                         <button type="submit"

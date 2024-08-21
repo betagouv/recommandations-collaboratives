@@ -11,7 +11,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="reminder-modal-label">
-                    <svg class="bi align-middle me-2" width="25" height="25">
+                    <svg class="bi align-middle fr-mr-2v" width="25" height="25">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#trash" />
                     </svg>
                     Êtes-vous sûr de vouloir supprimer cette recommandation ?
@@ -23,8 +23,8 @@
             </div>
             <div class="modal-body">
                 <div class="flag red d-block">
-                    <span class="title text-red text-uppercase fw-bold mb-2 d-block d-flex align-items-center">
-                        <svg class="bi align-middle me-2" width="20" height="20" fill="#CE0500">
+                    <span class="title text-red text-uppercase fw-bold fr-mb-2v d-block d-flex align-items-center">
+                        <svg class="bi align-middle fr-mr-2v" width="20" height="20" fill="#CE0500">
                             <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#exclamation-triangle-fill" />
                         </svg>
                         Supression de recommandation
@@ -33,7 +33,7 @@
                     <form id="form-delete-task"
                           method="POST"
                           :action="deleteTaskUrl(currentDeletingTask.id)"
-                          class="form mt-2">
+                          class="form fr-mt-2v">
                         {% csrf_token %}
                         <button data-test-id="delete-task-modal-button"
                                 type="submit"

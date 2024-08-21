@@ -27,18 +27,18 @@
             </aside>
             <div class="w-75 d-flex flex-column justify-content-start">
                 {% if active_project %}
-                    <div class="crm-header fr-px-2w py-3 pt-4 mb-3">
+                    <div class="crm-header fr-px-2w py-3 fr-pt-2w mb-3">
                     {% else %}
-                        <div class="crm-header no-project fr-px-2w py-3 pt-4">
+                        <div class="crm-header no-project fr-px-2w py-3 fr-pt-2w">
                         {% endif %}
                         <h3 class="d-flex align-items-center">
-                            <svg class="bi me-2" width="16" height="16" fill="currentColor">
+                            <svg class="bi fr-mr-2v" width="16" height="16" fill="currentColor">
                                 <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#building" />
                             </svg>
                             <span>Résultats de recherche pour "{{ query }}"</span>
                         </h3>
                     </div>
-                    <div class="fr-px-2w pt-4 bg-light crm-timeline-min-height crm-results">
+                    <div class="fr-px-2w fr-pt-2w bg-light crm-timeline-min-height crm-results">
                         <h4>Résultats :</h4>
                         <ul class="list-group">
                             {% for result in search_results %}

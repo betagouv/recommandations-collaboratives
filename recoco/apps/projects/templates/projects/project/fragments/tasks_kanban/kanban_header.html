@@ -9,15 +9,15 @@
 {% endblock %}
 {% get_obj_perms request.user for request.site as "user_site_perms" %}
 {% get_obj_perms request.user for project as "user_project_perms" %}
-<div class="d-flex mt-1 mb-4 fr-mx-2v align-items-center justify-content-between">
+<div class="d-flex fr-mt-1v fr-mb-2w fr-mx-2v align-items-center justify-content-between">
     {% if advising %}
-        <h2 class="text-secondary text-uppercase fw-bolder mb-0 h2-specific-fontsize-12">Recommandations proposées à la collectivité</h2>
+        <h2 class="text-secondary text-uppercase fw-bolder fr-mb-0 h2-specific-fontsize-12">Recommandations proposées à la collectivité</h2>
     {% endif %}
     <div class="d-flex align-items-center">
-        <div class="d-flex align-items-center ms-2">
-            <span class="text-muted me-2">Équipe de suivi :</span>
+        <div class="d-flex align-items-center fr-ml-2v">
+            <span class="text-muted fr-mr-2v">Équipe de suivi :</span>
             {% for switchtender in project.switchtenders.all %}
-                <img class="rounded-circle d-inline-block ms-1"
+                <img class="rounded-circle d-inline-block fr-ml-1v"
                      width="20px"
                      height="20px"
                      src="{% gravatar_url switchtender.email 25 %}"
@@ -28,17 +28,17 @@
             {% endfor %}
         </div>
         {% if "manage_tasks" in user_project_perms %}
-            <span class="ms-4">
+            <span class="fr-ml-2w">
                 <a class="btn btn-outline-primary w-100 btn-sm"
                    href="{% url 'projects-project-create-task' project.id %}">
-                    <svg class="bi me-1" width="16" height="16" fill="currentColor">
+                    <svg class="bi fr-mr-1v" width="16" height="16" fill="currentColor">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#journal-plus" />
                     </svg>
                     Ajouter une recommandation
                 </a>
             </span>
         {% endif %}
-        <div x-data class="ms-2 specific-size">
+        <div x-data class="fr-ml-2v specific-size">
             <div x-show="$store.app.isLoading"
                  class="spinner-border spinner-border spinner-border-sm text-primary"
                  role="status"></div>
@@ -46,10 +46,10 @@
     </div>
 </div>
 {% if advising %}
-    <div class="mb-4 fr-mx-2v d-flex flex-column">
+    <div class="fr-mb-2w fr-mx-2v d-flex flex-column">
         <a href="{% url 'projects-project-tasks-suggest' project.pk %}">
             Examiner les recommandations suggérées automatiquement pour ce projet
         </a>
-        <span class="mb-4 ml-4 pl-4 text-muted">Pour éventuellement les proposer à la collectivité</span>
+        <span class="fr-mb-2w ml-4 pl-4 text-muted">Pour éventuellement les proposer à la collectivité</span>
     </div>
 {% endif %}

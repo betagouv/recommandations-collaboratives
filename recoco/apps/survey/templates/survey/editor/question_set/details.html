@@ -100,25 +100,25 @@
                         </span>
                     </h3>
                     <div class="btn-group ms-5 align-middle" role="group" aria-label="actions">
-                        <a class="btn btn-light mb-1 d-inline-block btn-outline-primary btn-sm"
+                        <a class="btn btn-light fr-mb-1v d-inline-block btn-outline-primary btn-sm"
                            href="{% url 'survey-editor-question-update' question.id %}">
-                            <svg class="bi me-1" width="16" height="16" fill="currentColor">
+                            <svg class="bi fr-mr-1v" width="16" height="16" fill="currentColor">
                                 <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#pen" />
                             </svg>
                             Éditer
                         </a>
-                        <a class="btn btn-light mb-1 d-inline-block btn-outline-primary btn-sm"
+                        <a class="btn btn-light fr-mb-1v d-inline-block btn-outline-primary btn-sm"
                            href="{% url 'survey-editor-choice-create' question.id %}">
-                            <svg class="bi me-1" width="16" height="16" fill="currentColor">
+                            <svg class="bi fr-mr-1v" width="16" height="16" fill="currentColor">
                                 <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#plus-circle" />
                             </svg>
                             Ajouter un choix de réponse
                         </a>
                         <!-- Answers -->
-                        <a class="btn btn-light mb-1 d-inline-block btn-outline-primary btn-sm"
+                        <a class="btn btn-light fr-mb-1v d-inline-block btn-outline-primary btn-sm"
                            href="{% url 'survey-editor-question-results' question.id %}"
                            role="button">
-                            <svg class="bi me-1" width="16" height="16" fill="currentColor">
+                            <svg class="bi fr-mr-1v" width="16" height="16" fill="currentColor">
                                 <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#bar-chart-line" />
                             </svg>
                             &nbsp;
@@ -140,8 +140,8 @@
                 </span>
                 {% if question.is_multiple and question.precondition %}avec{% endif %}
                 {% if question.precondition %}
-                    <div class="text-secondary mt-2 mb-2 d-inline-block">
-                        <svg class="bi me-1 align-middle"
+                    <div class="text-secondary fr-mt-2v fr-mb-2v d-inline-block">
+                        <svg class="bi fr-mr-1v align-middle"
                              width="16"
                              height="16"
                              fill="currentColor">
@@ -157,7 +157,7 @@
                 <ul class="list-group list-group-numbered list-group-flush">
                     {% for choice in question.choices.all %}
                         <li class="list-group-item d-flex justify-content-between align-items-start">
-                            <div class="ms-2 me-auto">
+                            <div class="fr-ml-2v fr-mr-auto">
                                 <div>
                                     {{ choice.text }}
                                     {% if choice.conclusion %}(<span class="fw-bold">{{ choice.conclusion }}</span>){% endif %}
@@ -173,7 +173,7 @@
                             </div>
                             {% if choice.tags %}
                                 <div>
-                                    <svg class="bi me-1 align-middle"
+                                    <svg class="bi fr-mr-1v align-middle"
                                          width="16"
                                          height="16"
                                          fill="currentColor">

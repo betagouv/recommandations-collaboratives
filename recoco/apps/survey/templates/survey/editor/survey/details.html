@@ -40,7 +40,7 @@
             <div class="col">
                 <a class="btn btn-light d-inline-block float-end"
                    href="{% url 'survey-editor-question-set-create' survey.id %}">
-                    <svg class="bi me-1" width="16" height="16" fill="currentColor">
+                    <svg class="bi fr-mr-1v" width="16" height="16" fill="currentColor">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#plus-circle" />
                     </svg>
                     Ajouter un groupe de questions
@@ -50,16 +50,16 @@
         <ul class="list-group list-group-numbered">
             {% for question_set in survey.question_sets.all|dictsortreversed:"priority" %}
                 <li class="list-group-item d-flex justify-content-between align-items-start">
-                    <div class="ms-2 me-auto">
+                    <div class="fr-ml-2v fr-mr-auto">
                         {% if question_set.icon %}
-                            <svg class="bi me-1 d-inline rounded-circle align-middle fr-p-1v tmp-usevar"
+                            <svg class="bi fr-mr-1v d-inline rounded-circle align-middle fr-p-1v tmp-usevar"
                                  width="24"
                                  height="24"
                                  style="background-color: {{ question_set.color }}">
                                 <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#{{ question_set.icon }}" />
                             </svg>
                         {% endif %}
-                        <div class="d-inline align-middle fw-bold me-2">
+                        <div class="d-inline align-middle fw-bold fr-mr-2v">
                             <a href="{% url 'survey-editor-question-set-details' question_set.pk %}">{{ question_set.heading }}</a>
                             <!-- Priority -->
                             <span class="text-secondary small span-specific-fontsize-15">

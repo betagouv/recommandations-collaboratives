@@ -11,36 +11,36 @@
 {% endblock %}
 <div x-data="SearchableList('{{ search_list_id }}', {{ list.field.choices|length }}, {{ search_options }})"
      id="{{ search_list_id }}">
-    <h5 class="mb-0 d-flex align-items-center justify-content-start">
-        <svg class="bi align-baseline me-2" width="17" height="17" fill="#222">
+    <h5 class="fr-mb-0 d-flex align-items-center justify-content-start">
+        <svg class="bi align-baseline fr-mr-2v" width="17" height="17" fill="#222">
             <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#list" />
         </svg>
         {{ label }}
     </h5>
     <!-- <div class="border rounded px-3 fr-py-2v">
-        <div class="d-flex align-items-center mb-2">
-            <svg class="bi align-baseline me-2" width="17" height="17" fill="#222">
+        <div class="d-flex align-items-center fr-mb-2v">
+            <svg class="bi align-baseline fr-mr-2v" width="17" height="17" fill="#222">
                 <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#search" />
             </svg>
             <span>{{ item_label }} selectionnés</span>
         </div>
     </div> -->
     <div class="rounded fr-py-2v position-relative">
-        <div class="pb-2">
-            <!-- <div class="d-flex align-items-center mb-2">
-                <svg class="bi align-baseline me-2" width="17" height="17" fill="#222">
+        <div class="fr-pb-2v">
+            <!-- <div class="d-flex align-items-center fr-mb-2v">
+                <svg class="bi align-baseline fr-mr-2v" width="17" height="17" fill="#222">
                     <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#list" />
                 </svg>
                 <span>Liste des {{ item_label }}s</span>
             </div> -->
             <div class="common-input with-icon d-flex align-items-center justify-content-center">
-                <svg class="input-icon bi align-baseline me-2"
+                <svg class="input-icon bi align-baseline fr-mr-2v"
                      width="17"
                      height="17"
                      fill="#222">
                     <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#search" />
                 </svg>
-                    <input id="{{search_list_id}}-input" type="search ms-4 ps-4"
+                    <input id="{{search_list_id}}-input" type="search fr-ml-2w fr-pl-2w"
                         class="search w-100"
                         placeholder="Ajouter un {{item_label}}"
                         @focus="handleFocusList"
@@ -49,10 +49,10 @@
         </div>
         <ul class="list-unstyled fr-m-0 d-flex flex-column"  id="{{search_list_id}}-selected-list">
             <template x-for="item in selectedList">
-                <li class="border d-inline-flex rounded justify-content-between align-items-center px-3 fr-py-1v bg-grey-light d-flex align-items-center mb-1">
-                    <p class="mb-0 pb-0 fw-bold font-small" x-text="item.name"></p>
+                <li class="border d-inline-flex rounded justify-content-between align-items-center px-3 fr-py-1v bg-grey-light d-flex align-items-center fr-mb-1v">
+                    <p class="fr-mb-0 fr-pb-0 fw-bold font-small" x-text="item.name"></p>
                     <span @click='handleRemoveItem(event, item)'
-                          class="btn btn-outline-danger btn-sm ms-2">
+                          class="btn btn-outline-danger btn-sm fr-ml-2v">
                         <svg class="bi align-middle" width="18" height="18" fill="currentColor">
                             <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#trash" />
                         </svg>
@@ -60,12 +60,12 @@
                 </li>
             </template>
             <template x-if="selectedList.length == 0">
-                <div class="ms-2 text-custom-info d-flex align-items-center">
+                <div class="fr-ml-2v text-custom-info d-flex align-items-center">
                     <span>Pas encore de <strong>{{ item_label }}</strong> selectionné</span>
                 </div>
             </template>
         </ul>
-        <div class="searchable-list-wrapper mt-4" :class="onFocus ? 'show' : 'hide'">
+        <div class="searchable-list-wrapper fr-mt-2w" :class="onFocus ? 'show' : 'hide'">
             <ul class="list d-flex flex-column list-unstyled border"
                 x-ref="selectList" id="{{search_list_id}}-list">
                 {% for id, value in list.field.choices %}
