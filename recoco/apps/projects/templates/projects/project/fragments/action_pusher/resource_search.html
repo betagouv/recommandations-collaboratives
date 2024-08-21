@@ -77,40 +77,40 @@
                         <div>
                             <ul class="fr-badge-group fr-p-0">
                                 <li>
-                                    <span class="fr-badge fr-badge--sm fr-badge--green-menthe" x-text="resource.category.name"</span>
-                                </li>
-                                <li x-show="resource.is_dsresource">
-                                    <span class="fr-badge fr-badge--sm text-transform-none">
-                                        <img height="8px"
-                                             width="18px"
-                                             src="{% static 'svg/picto-demarches_simplifiees--no-border.svg' %}"
-                                             alt="Pictogramme Démarches Simpliffiées"
-                                             class="fr-pr-1v">
-                                    Démarches Simplifiées</span>
-                                </li>
-                            </ul>
-                        </div>
-                        <hr>
-                        <button @click.prevent
-                                data-bs-toggle="modal"
-                                :data-bs-target="`#resource-preview-`+resource.id"
-                                class="fr-btn fr-btn--tertiary-no-outline fr-btn--icon-left fr-icon-eye-line">
-                            Prévisualiser
-                        </button>
+                                <span class="fr-badge fr-badge--sm fr-badge--green-menthe" x-text="resource.category.name"</span>
+                            </li>
+                            <li x-show="resource.is_dsresource">
+                                <span class="fr-badge fr-badge--sm text-transform-none">
+                                    <img height="8px"
+                                         width="18px"
+                                         src="{% static 'svg/picto-demarches_simplifiees--no-border.svg' %}"
+                                         alt="Pictogramme Démarches Simpliffiées"
+                                         class="fr-pr-1v">
+                                Démarches Simplifiées</span>
+                            </li>
+                        </ul>
                     </div>
+                    <hr>
+                    <button @click.prevent
+                            data-bs-toggle="modal"
+                            :data-bs-target="`#resource-preview-`+resource.id"
+                            class="fr-btn fr-btn--tertiary-no-outline fr-btn--icon-left fr-icon-eye-line">
+                        Prévisualiser
+                    </button>
                 </div>
-            </li>
-        </template>
-    </ul>
-    <div x-show="results.length <= 0 && search != ''"
-         class="p-3 w-100 text-center rounded bg-light">
-        <span class="fw-bolder">Aucune ressource correspondante</span>
-        <div x-show="suggestions.length">
-            Vous cherchez peut être : <template x-for="suggestion in suggestions">
-            <a href="#"
-               @click.prevent="search = suggestion.suggestion; searchResources();"
-               x-text="suggestion.suggestion"></a>&nbsp;
-        </template>
-    </div>
+            </div>
+        </li>
+    </template>
+</ul>
+<div x-show="results.length <= 0 && search != ''"
+     class="p-3 w-100 text-center rounded bg-light">
+    <span class="fw-bolder">Aucune ressource correspondante</span>
+    <div x-show="suggestions.length">
+        Vous cherchez peut être : <template x-for="suggestion in suggestions">
+        <a href="#"
+           @click.prevent="search = suggestion.suggestion; searchResources();"
+           x-text="suggestion.suggestion"></a>&nbsp;
+    </template>
+</div>
 </div>
 </div>

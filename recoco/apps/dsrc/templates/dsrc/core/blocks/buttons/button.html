@@ -1,5 +1,5 @@
 {% load static %}
-<button class="fr-btn{% if variant %} fr-btn--{{ variant }}{% endif %}{% if size %} fr-btn--{{ size }}{% endif %}{% if variant %} fr-btn--{{ variant }}{% endif %}{% if align %} fr-btn--icon-{{ align }}{% endif %}{% if icon %} {{ icon }}{% endif %} {% if classes %}{{ classes }}{% endif %}"
+<button class="fr-btn{% if variant %} fr-btn--{{ variant }}{% endif %}{% if size %} fr-btn--{{ size }}{% endif %}{% if align %} fr-btn--icon-{{ align }}{% endif %}{% if icon %} {{ icon }}{% endif %} {% if classes %}{{ classes }}{% endif %}"
         {% if onclick %}onclick="{{ onclick }}"{% endif %}
         {% if disabled %}disabled{% endif %}
         type="{{ type | default:'submit' }}"
