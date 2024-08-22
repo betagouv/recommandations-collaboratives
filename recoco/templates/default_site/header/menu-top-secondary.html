@@ -27,9 +27,7 @@
                             {% if unread_notifications_count %}<span class="has-notification">&nbsp;</span>{% endif %}
                             <span class="ms-1 align-middle">Accueil</span>
                         </a>
-                        <button x-on:click="open = !open"
-                                type="button"
-                                class="border-0 btn py-0 px-1">
+                        <button x-on:click="open = !open" type="button" class="border-0 py-0 px-1">
                             <svg data-toggle="tooltip"
                                  data-placement="top"
                                  title="Notifications désactivées"
@@ -104,7 +102,7 @@
                             <button x-on:click="open = !open"
                                     type="button"
                                     data-cy="projects-selector"
-                                    class="border-0 btn py-0 px-1">
+                                    class="border-0 py-0 px-1">
                                 <svg data-toggle="tooltip"
                                      data-placement="top"
                                      title="Notifications désactivées"
@@ -188,9 +186,7 @@
                     <span class="ms-1 align-middle">Ressources</span>
                 </a>
                 {% if "manage_resources" in user_site_perms %}
-                    <button x-on:click="open = !open"
-                            type="button"
-                            class="border-0 btn py-0 px-1">
+                    <button x-on:click="open = !open" type="button" class="border-0 py-0 px-1">
                         <svg data-toggle="tooltip"
                              data-placement="top"
                              title="Notifications désactivées"
