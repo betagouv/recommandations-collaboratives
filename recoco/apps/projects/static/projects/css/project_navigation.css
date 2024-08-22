@@ -47,6 +47,10 @@
   font-size: 15px;
 }
 
+.project-navigation h3 {
+  line-height: 24px;
+}
+
 .project-navigation a.active {
   background-color: white;
   font-weight: bold;
