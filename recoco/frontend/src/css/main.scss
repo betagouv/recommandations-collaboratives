@@ -18,16 +18,18 @@ $enable-shadows: true;
 @import 'bootstrap/scss/nav';
 @import 'bootstrap/scss/navbar';
 @import 'bootstrap/scss/dropdown';
-@import 'bootstrap/scss/tables';
 @import 'bootstrap/scss/forms';
-@import 'bootstrap/scss/type';
-@import 'bootstrap/scss/card';
 @import 'bootstrap/scss/tooltip';
 @import 'bootstrap/scss/spinners';
-@import 'bootstrap/scss/badge';
-@import 'bootstrap/scss/breadcrumb';
-@import 'bootstrap/scss/toasts';
 
+// Replacable by DSFR
+@import 'bootstrap/scss/type';
+@import 'bootstrap/scss/toasts';
+@import 'bootstrap/scss/badge';
+@import 'bootstrap/scss/card';
+@import 'bootstrap/scss/tables';
+@import 'bootstrap/scss/breadcrumb';
+@import 'bootstrap/scss/modal';
 @import 'bootstrap/scss/buttons';
 @import 'bootstrap/scss/button-group';
 
@@ -39,7 +41,6 @@ $enable-shadows: true;
 // @import 'bootstrap/scss/progress';
 // @import 'bootstrap/scss/list-group';
 // @import 'bootstrap/scss/close';
-// @import 'bootstrap/scss/modal';
 // @import 'bootstrap/scss/popover';
 // @import 'bootstrap/scss/carousel';
 // @import 'bootstrap/scss/offcanvas';
