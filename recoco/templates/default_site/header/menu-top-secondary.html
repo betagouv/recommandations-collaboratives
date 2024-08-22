@@ -172,7 +172,7 @@
             <!-- Projects moderation -->
             <li style="{% if url_name == 'projects-moderation-list' %}activated{% endif %}">
                 <a href="{% url "projects-moderation-list" %}"
-                   class="nav-link link-dark {% if url_name == 'resources-resource-search' %}active{% endif %}">Projets à examiner <span class="badge text-bg-danger">{{ projects_to_moderate_count }}</span></a>
+                   class="nav-link link-dark {% if url_name == 'projects-moderation-list' %}active{% endif %}">Projets à examiner <span class="badge text-bg-danger">{{ projects_to_moderate_count }}</span></a>
             </li>
         {% endif %}
         <!-- Ressources -->
