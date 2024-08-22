@@ -49,6 +49,7 @@
 
 .project-navigation h3 {
   line-height: 24px;
+  margin-bottom: 0;
 }
 
 .project-navigation a.active {
