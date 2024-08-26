@@ -11,31 +11,31 @@ Cypress.Commands.add('login', (role) => {
   let username = '';
 
   switch (role) {
-    case 'jean':
+    case 'jean': //conseiller
       username = users[1].fields.username;
       break;
-    case 'jeanne':
+    case 'jeanne': //conseiller
       username = users[2].fields.username;
       break;
-    case 'jeannot':
+    case 'jeannot': //conseiller
       username = users[3].fields.username;
       break;
-    case 'bob':
+    case 'bob': //collectivité
       username = users[4].fields.username;
       break;
-    case 'boba':
+    case 'boba': //collectivité
       username = users[5].fields.username;
       break;
-    case 'bobette':
+    case 'bobette': //collectivité
       username = users[6].fields.username;
       break;
-    case 'staff':
+    case 'staff': //staff
       username = users[0].fields.username;
       break;
-    case 'nonactive':
+    case 'nonactive': //non active user
       username = users[8].fields.username;
       break;
-    case 'national':
+    case 'national': // conseiller national
       username = users[7].fields.username;
       break;
     default:
@@ -62,34 +62,6 @@ Cypress.Commands.add('login', (role) => {
       cy.getCookie('csrftoken').should('exist');
     });
   });
-});
-
-Cypress.Commands.add('loginWithUi', (role) => {
-  const { username } = currentUser;
-  cy.visit('/accounts/login/');
-
-  cy.url().should('include', '/accounts/login/');
-
-  cy.get('#id_login')
-    .type(username, { force: true })
-    .should('have.value', username);
-
-  cy.get('#id_password')
-    .type('derpderp', { force: true })
-    .should('have.value', 'derpderp');
-
-  cy.get('[type=submit]').click({ force: true });
-  cy.visit('/');
-
-  cy.contains(`Connexion avec ${username} réussie.`);
-
-  // // we should be redirected to /dashboard
-  cy.url().should('include', '/projects');
-
-  // // our auth cookie should be present
-  cy.getCookie('sessionid').should('exist');
-
-  cy.acceptCookies();
 });
 
 Cypress.Commands.add('logout', () => {
