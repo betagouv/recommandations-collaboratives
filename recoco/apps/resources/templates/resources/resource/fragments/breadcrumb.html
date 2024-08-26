@@ -1,15 +1,15 @@
 <!-- Resource Breadcrumb -->
 <nav aria-label="breadcrumb" class="fr-mb-2w fr-pb-1v">
-    <ul class="breadcrumb">
-        <li class="breadcrumb-item">
+    <ul class="fr-breadcrumb__list">
+        <li class="fr-breadcrumb__link">
             <a class="small" href="{% url 'home' %}">Accueil</a>
         </li>
-        <li class="breadcrumb-item">
+        <li class="fr-breadcrumb__link">
             <span class="text-secondary small">
                 <a href="{% url 'resources-resource-search' %}">Ressources</a>
             </span>
         </li>
-        <li class="breadcrumb-item">
+        <li class="fr-breadcrumb__link">
             <span class="text-secondary small">{{ resource.title|capfirst|truncatewords:10 }}</span>
         </li>
     </ul>

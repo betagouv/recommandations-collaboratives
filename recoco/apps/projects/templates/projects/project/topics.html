@@ -16,15 +16,15 @@
     <div class="col-12 fr-p-2w fr-mx-auto">
         <!-- Breadcrumb -->
         <nav aria-label="breadcrumb" class="fr-pb-2w">
-            <ul class="breadcrumb">
-                <li class="breadcrumb-item">
+            <ul class="fr-breadcrumb__list">
+                <li class="fr-breadcrumb__link">
                     <svg class="bi align-middle" width="18" height="18" fill="currentColor">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#building" />
                     </svg>
                     &nbsp;
                     <a href="{% url 'projects-project-detail' project.id %}">{{ project.name|truncatechars:20 }}</a>
                 </li>
-                <li class="breadcrumb-item">Thématiques</li>
+                <li class="fr-breadcrumb__link">Thématiques</li>
             </ul>
         </nav>
         <form action='{% url "projects-project-topics" project.pk %}'

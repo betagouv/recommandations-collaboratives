@@ -5,20 +5,20 @@
     <div class="col-12 fr-p-2w fr-mx-auto">
         <!-- Breadcrumb -->
         <nav aria-label="breadcrumb">
-            <ul class="breadcrumb">
-                <li class="breadcrumb-item">
+            <ul class="fr-breadcrumb__list">
+                <li class="fr-breadcrumb__link">
                     <svg class="bi align-middle" width="18" height="18" fill="currentColor">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#person-lines-fill" />
                     </svg>
                     &nbsp;
                     <a href="{% url 'addressbook-organization-list' %}">Carnet d'adresses</a>
                 </li>
-                <li class="breadcrumb-item">
+                <li class="fr-breadcrumb__link">
                     <span class="text-secondary">
                         <a href="{% url "addressbook-organization-list" %}">Organisations</a>
                     </span>
                 </li>
-                <li class="breadcrumb-item">
+                <li class="fr-breadcrumb__link">
                     <span class="text-secondary">Mettre à jour</span>
                 </li>
             </ul>

@@ -11,18 +11,18 @@
     <div class="col-12 fr-p-2w fr-mx-auto">
         <!-- Breadcrumb -->
         <nav aria-label="breadcrumb">
-            <ul class="breadcrumb">
-                <li class="breadcrumb-item">
+            <ul class="fr-breadcrumb__list">
+                <li class="fr-breadcrumb__link">
                     <svg class="bi align-middle" width="18" height="18" fill="currentColor">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#book" />
                     </svg>
                     &nbsp;
                     <a href="{% url 'resources-resource-search' %}">Ressources</a>
                 </li>
-                <li class="breadcrumb-item">
+                <li class="fr-breadcrumb__link">
                     <a href="{% url 'resources-resource-detail' resource.id %}">{{ resource.title|title|truncatechars:20 }}</a>
                 </li>
-                <li class="breadcrumb-item active">Mettre en favori</li>
+                <li class="fr-breadcrumb__link active">Mettre en favori</li>
             </ul>
         </nav>
         <h2>

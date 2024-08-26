@@ -4,11 +4,11 @@
     <div class="col-12 fr-p-2w fr-mx-auto">
         <!-- Breadcrumb -->
         <nav aria-label="breadcrumb">
-            <ul class="breadcrumb">
-                <li class="breadcrumb-item">
+            <ul class="fr-breadcrumb__list">
+                <li class="fr-breadcrumb__link">
                     <a href="{% url 'projects-project-detail' followup.task.project.id %}">{{ followup.task.project.name|title|truncatechars:20 }}</a>
                 </li>
-                <li class="breadcrumb-item active">{{ followup.task.intent|truncatechars:20 }}</li>
+                <li class="fr-breadcrumb__link active">{{ followup.task.intent|truncatechars:20 }}</li>
             </ul>
         </nav>
         <h1 class=" align-items-center">

@@ -5,20 +5,20 @@
     <div class="col-12 fr-p-2w fr-mx-auto">
         <!-- Breadcrumb -->
         <nav aria-label="breadcrumb">
-            <ul class="breadcrumb">
-                <li class="breadcrumb-item">
+            <ul class="fr-breadcrumb__list">
+                <li class="fr-breadcrumb__link">
                     <svg class="bi align-middle" width="18" height="18" fill="currentColor">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#question-square-fill" />
                     </svg>
                     &nbsp;
                     Questionnaire
                 </li>
-                <li class="breadcrumb-item">
+                <li class="fr-breadcrumb__link">
                     <a href="{% url 'survey-editor-survey-details' survey.id %}">
                         {{ survey.name|default:"Questionnaire"|title|truncatechars:20 }}
                     </a>
                 </li>
-                <li class="breadcrumb-item active">Ajouter un groupe de questions</li>
+                <li class="fr-breadcrumb__link active">Ajouter un groupe de questions</li>
             </ul>
         </nav>
         <form method="POST" action=".">
