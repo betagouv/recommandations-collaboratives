@@ -6,7 +6,7 @@
           type="text/css">
 {% endblock %}
 {% for switchtender in switchtenders %}
-    <div class="bg-light mt-3 fr-p-2w d-flex flex-row align-items-center">
+    <div class="bg-light fr-mt-2w fr-p-3w d-flex flex-row align-items-center">
         <span class="align-items-center link-dark text-decoration-none flex-shrink-1">
             <img src="{% gravatar_url switchtender.email 32 %}"
                  alt="{{ switchtender.get_full_name|default:'Conseiller inconnu' }}"

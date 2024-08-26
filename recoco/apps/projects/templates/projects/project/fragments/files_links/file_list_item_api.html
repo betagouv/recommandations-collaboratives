@@ -9,8 +9,8 @@
 {% endblock %}
 {% get_obj_perms request.user for request.site as "user_site_perms" %}
 {% get_obj_perms request.user for project as "user_project_perms" %}
-<div class="mb-3">
-    <div class="rounded border fr-py-2v px-3 fr-mb-2v d-flex align-items-center justify-content-between">
+<div class="fr-mb-2w">
+    <div class="rounded border fr-py-2v fr-px-2w fr-mb-2v d-flex align-items-center justify-content-between">
         <div class="d-flex flex-column align-items-start">
             <a x-bind:href="document.the_file"
                class="d-flex align-items-center text-decoration-none"
@@ -39,13 +39,13 @@
             </a>
         </div>
     </div>
-    <div class="fr-pl-2w fr-ml-2w d-flex align-items-center">
+    <div class="fr-pl-3w fr-ml-3w d-flex align-items-center">
     <span class="tiny"><strong x-text="document.uploaded_by.first_name + ' ' + document.uploaded_by.last_name"></strong>
     <span x-show="document.uploaded_by.profile.organization"
           class="tiny text-grey-dark"
           x-text="document.uploaded_by.profile.organization.name"></span>
 </span>
-<span class="fr-ml-2w tiny d-flex align-items-center">
+<span class="fr-ml-3w tiny d-flex align-items-center">
     <svg class="bi align-baseline fr-mr-2v" width="12" height="12" fill="#222">
         <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#calendar" />
     </svg>

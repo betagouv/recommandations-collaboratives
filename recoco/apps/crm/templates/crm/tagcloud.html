@@ -12,7 +12,7 @@
         {% include "crm/fragments/sidebar.html" with back_button=True map=True tools=True search=True %}
         <div class="w-75 d-flex flex-column justify-content-start">
             {% url 'crm-search' as crmSearchUrl %}
-            <div class="d-flex flex-column font-marianne fr-pt-2w fr-px-2w ">
+            <div class="d-flex flex-column font-marianne fr-pt-3w fr-px-3w ">
                 <h2 class="">
                     <svg class="bi align-middle" width="25" height="25" fill="currentColor">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#tags" />
@@ -21,7 +21,7 @@
                     <span>Index des tags du CRM</span>
                 </h2>
                 <div id="wordCloud"
-                     class="fr-mb-2w fr-pt-2w fr-mx-auto fw-bold"
+                     class="fr-mb-3w fr-pt-3w fr-mx-auto fw-bold"
                      x-data="WordCloud(tagsArray, '{{ crmSearchUrl }}')"></div>
             </div>
             <section class="w-100 d-flex flex-column justify-content-center font-marianne">

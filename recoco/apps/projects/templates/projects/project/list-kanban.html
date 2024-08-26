@@ -33,7 +33,7 @@
         </div>
         <div class="topbar d-flex justify-content-between fr-p-2v">
             <span class="fs-5">{% include "projects/project/fragments/navigation/display_select.html" %}</span>
-            <div class="fr-ml-2w flex-grow-1">
+            <div class="fr-ml-3w flex-grow-1">
                 {% include "projects/project/fragments/search_bar.html" with action_search="onSearch(event)" x_model="searchText" %}
             </div>
             {% include "projects/project/fragments/region_filter.html" with filter_by_regions=True %}
@@ -41,7 +41,7 @@
         </div>
         <div x-init="getData()" x-cloak class="d-flex">
             <div class="flex-grow-1 kanban-container">
-                <div class="fr-py-2w md-py-8">
+                <div class="fr-py-3w md-py-8">
                     <div class="d-flex fr-pb-2v">
                         <template x-for="(board, index) in boards" :key="board.code">
                             <div class="fr-px-2v flex-shrink-0 kanban-column-container">

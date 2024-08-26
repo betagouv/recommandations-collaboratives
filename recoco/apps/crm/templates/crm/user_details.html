@@ -33,9 +33,9 @@
         {% include "crm/fragments/sidebar.html" with search=True back_button=True user_advised_projects=True user_projects=True %}
         <div class="w-75 d-flex flex-column justify-content-start">
             {% if active_project %}
-                <div class="crm-header fr-px-2w fr-py-2w mb-3">
+                <div class="crm-header fr-px-3w fr-py-3w fr-mb-2w">
                 {% else %}
-                    <div class="crm-header no-project fr-px-2w fr-py-2w">
+                    <div class="crm-header no-project fr-px-3w fr-py-3w">
                     {% endif %}
                     <div class="d-flex justify-content-between align-items-center fr-mb-2v">
                         <div class="d-flex align-items-start justify-content-between w-100">
@@ -147,7 +147,7 @@
                         </div>
                     </div>
                     {% if not crm_user.is_active %}
-                        <div class="alert alert-danger fr-mt-2w" role="alert">
+                        <div class="alert alert-danger fr-mt-3w" role="alert">
                             <span>Ce compte a été suspendu. Ceci signifie que la personne ne
                                 peut plus se connecter à {{ request.site.name }}.
                             Vous pouvez néanmoins le réactiver si vous le souhaitez.</span>
@@ -171,8 +171,8 @@
                         </div>
                     {% endif %}
                 </div>
-                <div class="fr-px-2w fr-pt-2w crm-notes-wrapper relative">
-                    <a class="btn btn-primary fr-mb-2w"
+                <div class="fr-px-3w fr-pt-3w crm-notes-wrapper relative">
+                    <a class="btn btn-primary fr-mb-3w"
                        href="{% url 'crm-user-note-create' crm_user.pk %}">créer une note</a>
                     {% for note in sticky_notes.all %}
                         {% include 'crm/note.html' with pinned=True update_url_name='crm-user-note-update' %}
@@ -181,7 +181,7 @@
                         {% include 'crm/note.html' with update_url_name='crm-user-note-update' %}
                     {% endfor %}
                 </div>
-                <div class="fr-px-2w fr-pt-2w bg-light crm-timeline-min-height">
+                <div class="fr-px-3w fr-pt-3w bg-light crm-timeline-min-height">
                     <h4>Activité</h4>
                     {% include 'crm/timeline.html' %}
                 </div>

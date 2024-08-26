@@ -30,9 +30,9 @@
                                 <div class="small fr-my-2v text-center w-100">{{ date|naturalday|capfirst }}</div>
                                 {% for note in notes reversed %}
                                     {% if request.user == note.created_by %}
-                                        <div class="rounded-3 p-3 bg-blue-light fr-my-2v me-5">
+                                        <div class="rounded-3 fr-p-2w bg-blue-light fr-my-2v fr-mr-6w">
                                         {% else %}
-                                            <div class="bg-grey-light rounded-3 p-3 fr-my-2v me-5">
+                                            <div class="bg-grey-light rounded-3 fr-p-2w fr-my-2v fr-mr-6w">
                                             {% endif %}
                                             {{ note.content_rendered|safe }}
                                             {% if note.document.count %}
@@ -59,7 +59,7 @@
                     {% if "use_public_notes" in user_project_perms %}
                         <hr />
                         <!-- Post message -->
-                        <div class="message-form fr-mt-2w p-3 bg-light border-form">
+                        <div class="message-form fr-mt-3w fr-p-2w bg-light border-form">
                             <form class="form"
                                   method="POST"
                                   action="{% url 'projects-conversation-create-message' project.pk %}"
@@ -70,7 +70,7 @@
                                 <label class="visually-hidden" for="input-project-content">{{ public_note_form.content.label }}</label>
                                 {% for error in public_note_form.content.errors %}<div class="text-danger text-end">{{ error }}</div>{% endfor %}
                                 {% include 'projects/project/fragments/files_links/file_upload_input_standalone.html' %}
-                                <div class="d-flex justify-content-end fr-mt-2w">
+                                <div class="d-flex justify-content-end fr-mt-3w">
                                     <button data-test-id="send-message-conversation"
                                             x-data
                                             :disabled="$store.editor.currentMessage === '' "
@@ -83,7 +83,7 @@
                     {% endif %}
                 </div>
                 <div class="col fr-mx-auto col-lg-4 col-md-12">
-                    <h6 class="text-uppercase fw-bold d-block mb-3 h6-specific-fontsize-14">Participants</h6>
+                    <h6 class="text-uppercase fw-bold d-block fr-mb-2w h6-specific-fontsize-14">Participants</h6>
                     <div>
                         <p class="text-info-custom">Membres de la collectivité</p>
                         <ul class="flex-column list-unstyled fr-mb-0">
@@ -98,7 +98,7 @@
                             {% endfor %}
                         </ul>
                     </div>
-                    <div class="d-block fr-mt-2w">
+                    <div class="d-block fr-mt-3w">
                         <p class="text-info-custom">Équipe de suivi</p>
                         <ul class="d-flex flex-column list-unstyled fr-mb-0">
                             {% for advisor in project.switchtender_sites.all %}

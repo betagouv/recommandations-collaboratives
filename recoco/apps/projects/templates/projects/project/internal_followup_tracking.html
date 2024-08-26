@@ -13,7 +13,7 @@
     <div class="w-100 h-100">
         <div class="d-flex">
             <a href="{% url 'projects-project-detail' project.id %}"
-               class="button grey filled fr-my-2v fr-mb-2w a-style">
+               class="button grey filled fr-my-2v fr-mb-3w a-style">
                 <svg class="bi fr-mr-2v" width="16" height="16" fill="currentColor">
                     <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#arrow-return-left" />
                 </svg>
@@ -23,13 +23,13 @@
         <div class="d-flex align-items-center justify-content-between specific-mb-6">
             <h6 class="text-uppercase fw-bold fr-m-0 fr-p-0 h6-specific-fontsize-14">Activité du projet</h6>
         </div>
-        <div class="project-card-details h-100 p-3 d-flex flex-column justify-content-between"
+        <div class="project-card-details h-100 fr-p-2w d-flex flex-column justify-content-between"
              data-test-id="project-activity-tracking-staff">
             <article class="overflow-hidden">
                 {% regroup stream by timestamp.date as stream_by_day %}
                 <ul class="list-group fr-m-0 fr-p-0 activity-stream-container">
                     {% for date, actions in stream_by_day %}
-                        <li class="{% if cropped %}mb-0 {% endif %} list-group-item border-0 d-flex flex-column mb-3 fr-mx-0 fr-px-0">
+                        <li class="{% if cropped %}mb-0 {% endif %} list-group-item border-0 d-flex flex-column fr-mb-2w fr-mx-0 fr-px-0">
                             <span class="small text-info-custom text-grey-dark fr-mb-2v fr-pl-2v">{{ date|naturalday|capfirst }}</span>
                             <div class="activity-stream-actions-container d-flex flex-column">
                                 {% for action in actions %}

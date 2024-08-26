@@ -16,9 +16,9 @@
          class="rounded bg-white shadow specific-width-420px">
         <form method="post" action="{{ action }}" enctype="multipart/form-data">
             {% csrf_token %}
-            <div class="p-3">
+            <div class="fr-p-2w">
                 <h6 class="text-uppercase h6-specific-fontsize-1">Épingler un lien</h6>
-                <div class="fr-mb-2v pt-3">
+                <div class="fr-mb-2v fr-pt-2w">
                     <label class="d-block">
                         <span class="fr-mb-1v d-block text-info-custom text-grey-dark">Titre du lien</span>
                         <input id="link-description"
@@ -29,7 +29,7 @@
                                type="text" />
                     </label>
                 </div>
-                <label class="d-block mt-3">
+                <label class="d-block fr-mt-2w">
                     <span class="fr-mb-1v d-block text-info-custom text-grey-dark">Url du lien</span>
                     <input placeholder="https://www.dropbox.com/.."
                            required
@@ -38,7 +38,7 @@
                            type="text" />
                 </label>
             </div>
-            <div class="p-3 fr-pt-0 d-flex justify-content-end">
+            <div class="fr-p-2w fr-pt-0 d-flex justify-content-end">
                 <button id="link-submit-button" class="button filled small" type="submit">Épingler</button>
             </div>
         </form>

@@ -44,10 +44,10 @@
                                         :src="resourcePreviewUrl($store.taskModal.currentTask.resource_id)"></iframe>
                             </template>
                             <template x-if="!$store.taskModal.currentTask.resource_id">
-                                <div class="flex-fill p-3 overflow-auto">
-                                    <div class="col-10 px-5 fr-mx-auto">
-                                        <div class="resource-details pb-3">
-                                            <h1 x-text="$store.taskModal.currentTask.intent" class="mb-3"></h1>
+                                <div class="flex-fill fr-p-2w overflow-auto">
+                                    <div class="col-10 fr-px-6w fr-mx-auto">
+                                        <div class="resource-details fr-pb-2w">
+                                            <h1 x-text="$store.taskModal.currentTask.intent" class="fr-mb-2w"></h1>
                                         </div>
                                         <p class="text-justified"
                                            x-html="renderMarkdown($store.taskModal.currentTask.content)"></p>
@@ -58,16 +58,16 @@
                                 <div class="d-flex flex-column flex-fill overflow-hidden">
                                     {% include 'projects/project/fragments/status_switcher.html' %}
                                     <div x-show="$store.taskModal.currentTask.document && $store.taskModal.currentTask.document.length > 0">
-                                        <h2 class="text-secondary text-uppercase fw-bolder m-3 h2-specific-fontsize-12">Fichier(s) partagé(s)</h2>
+                                        <h2 class="text-secondary text-uppercase fw-bolder fr-m-2w h2-specific-fontsize-12">Fichier(s) partagé(s)</h2>
                                         <template x-for="document in $store.taskModal.currentTask.document"
                                                   x-key="document.id">
-                                            <div class="px-3">{% include 'projects/project/fragments/files_links/file_list_item_api.html' %}</div>
+                                            <div class="fr-px-2w">{% include 'projects/project/fragments/files_links/file_list_item_api.html' %}</div>
                                         </template>
                                     </div>
-                                    <h2 class="text-secondary text-uppercase fw-bolder m-3 h2-specific-fontsize-12">Conversation</h2>
+                                    <h2 class="text-secondary text-uppercase fw-bolder fr-m-2w h2-specific-fontsize-12">Conversation</h2>
                                     <div id="followups-scroll-container" class="flex-fill overflow-auto h-100">
                                         <template x-if="$store.taskModal.currentTask.resource_id">
-                                            <div class="rounded bg-light fr-p-2v m-3 message"
+                                            <div class="rounded bg-light fr-p-2v fr-m-2w message"
                                                  :class="canAdministrate && $store.taskModal.currentTask.content === '' && 'border border-warning'">
                                                 <template x-if="$store.taskModal.currentTask.content !== ''">
                                                     <p x-html="renderMarkdown($store.taskModal.currentTask.content)"
@@ -102,8 +102,8 @@
                                             </div>
                                         </template>
                                         <template x-if="!$store.taskModal.currentTask.resource_id">
-                                            <div class="my-3">
-                                                <div class="mx-3 fr-mb-1v text-center specific-fontsize-08">
+                                            <div class="fr-my-2w">
+                                                <div class="fr-mx-2w fr-mb-1v text-center specific-fontsize-08">
                                                     <span class="fr-ml-1v fst-italic specific-lineheight-20"
                                                           x-text="`${$store.taskModal.currentTask.created_by.first_name} ${$store.taskModal.currentTask.created_by.last_name}`"></span> a créé cette recommandation sans ressource
                                                     <span class="fr-ml-1v text-muted specific-lineheight-20"
@@ -118,7 +118,7 @@
                                                       id="followups-container">
                                                 <div>
                                                     <template x-if="!isStatusUpdate(f)">
-                                                        <div class="rounded bg-light fr-p-2v m-3 message"
+                                                        <div class="rounded bg-light fr-p-2v fr-m-2w message"
                                                              :class="hasNotification(f.id) && 'border border-warning'">
                                                             <p x-html="renderMarkdown(f.comment)" class="fr-mb-2v text-break"></p>
                                                             <div class="d-flex justify-content-between specific-fontsize-09">
@@ -147,15 +147,15 @@
                                                         </div>
                                                     </template>
                                                     <template x-if="isStatusUpdate(f) && f.status || isStatusUpdate(f) && f.status == 0">
-                                                        <div class="my-3" :class="hasNotification(f.id) && 'text-warning'">
-                                                            <div class="mx-3 fr-mb-1v text-center specific-fontsize-08">
+                                                        <div class="fr-my-2w" :class="hasNotification(f.id) && 'text-warning'">
+                                                            <div class="fr-mx-2w fr-mb-1v text-center specific-fontsize-08">
                                                                 <span class="fr-ml-1v fst-italic specific-lineheight-20"
                                                                       x-text="`${f.who.first_name} ${f.who.last_name}`"></span> a changé le statut de la recommandation en <span class="fw-bold" x-text="statusText(f.status)"></span>
                                                                 <span class="text-muted specific-lineheight-20"
                                                                       x-text="`le ${formatDate(f.timestamp)}`"></span>
                                                             </div>
                                                             <template x-if="f.comment !== ''">
-                                                                <div class="rounded bg-light fr-p-2v m-3 message">
+                                                                <div class="rounded bg-light fr-p-2v fr-m-2w message">
                                                                     <p x-html="renderMarkdown(f.comment)" class="fr-mb-2v text-break"></p>
                                                                     <div class="d-flex justify-content-between specific-fontsize-09">
                                                                         <div>
@@ -190,7 +190,7 @@
                                     </div>
                                 </div>
                                 {% if "use_tasks" in user_project_perms and not disable_edit %}
-                                    <div class="p-3 border-top">
+                                    <div class="fr-p-2w border-top">
                                         <template x-if="currentlyEditing">
                                             <span>Editer un commentaire</span>
                                         </template>
@@ -203,7 +203,7 @@
                                             <textarea id="modal-textarea"
                                                       x-ref="commentTextRef"
                                                       name="comment"
-                                                      class="w-100 fr-p-2v rounded rounded-4 fr-my-2v mb-3 border specific-minheight-100 specific-bordercolor-ccc"
+                                                      class="w-100 fr-p-2v rounded rounded-4 fr-my-2v fr-mb-2w border specific-minheight-100 specific-bordercolor-ccc"
                                                       placeholder="Votre message..."
                                                       x-model="pendingComment"></textarea>
                                             <button x-bind:disabled="pendingComment.length == 0"

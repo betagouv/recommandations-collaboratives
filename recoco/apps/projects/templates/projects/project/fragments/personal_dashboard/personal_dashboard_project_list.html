@@ -9,8 +9,8 @@
     {% include 'projects/project/fragments/personal_dashboard/personal_dashboard_project_filters.html' %}
     <ul class="list-unstyled list d-flex flex-column">
         <template x-if="data.length == 0 && !isBusy">
-            <div class="rounded bg-white fr-mb-2w px-3 d-flex flex-column py-3 justify-content-between align-items-start task-item position-relative">
-                <div class="d-flex flex-column align-items-center justify-content-center w-100 fr-py-2w">
+            <div class="rounded bg-white fr-mb-3w fr-px-2w d-flex flex-column fr-py-2w justify-content-between align-items-start task-item position-relative">
+                <div class="d-flex flex-column align-items-center justify-content-center w-100 fr-py-3w">
                     <span class="text-info-custom text-grey-dark name fw-normal fr-mb-2v">Pas encore de projet</span>
                     <a class="button filled blue small inherit"
                        href="{% url 'onboarding-prefill-set-user' %}">Créer un projet</a>
@@ -18,7 +18,7 @@
             </div>
         </template>
         <template x-if="displayedData.length == 0 && !isBusy && data.length != 0">
-            <div class="rounded bg-white fr-mb-2w px-3 d-flex flex-column py-3 justify-content-between align-items-start task-item position-relative">
+            <div class="rounded bg-white fr-mb-3w fr-px-2w d-flex flex-column fr-py-2w justify-content-between align-items-start task-item position-relative">
                 <header>
                     <div class="d-flex align-items-center">
                         <span class="text-info-custom text-grey-dark name">Aucun projet trouvé, essayez peut-être de réduire vos critères de recherche ?</span>
@@ -27,7 +27,7 @@
             </div>
         </template>
         <template x-for="item in displayedData" :key="item.project.id">
-            <div :id=`project-${item.project.id}` class="project-card position-relative rounded fr-mb-2w px-3 d-flex flex-column py-3 justify-content-between align-items-start task-item position-relative cursor-pointer hover-shadow transition-all tmp-usevar" :style="(item.status === 'NEW') ? {'border':'solid 1px #FDCD6D'} : {'border':'solid 1px #dee2e6'}"
+            <div :id=`project-${item.project.id}` class="project-card position-relative rounded fr-mb-3w fr-px-2w d-flex flex-column fr-py-2w justify-content-between align-items-start task-item position-relative cursor-pointer hover-shadow transition-all tmp-usevar" :style="(item.status === 'NEW') ? {'border':'solid 1px #FDCD6D'} : {'border':'solid 1px #dee2e6'}"
                 :class="getProjectStatusClass(item)">
                 <div x-show="item.isLoading"
                      class="fr-ml-2v project-item-loader specific-size">
@@ -78,7 +78,7 @@
                     </header>
                     <div class="d-flex align-items-center">
                         <template x-if="item.project.commune">
-                            <div class="fw-normal text-uppercase small d-flex align-items-center me-3">
+                            <div class="fw-normal text-uppercase small d-flex align-items-center fr-mr-2w">
                                 <svg class="align-middle bi fr-mr-1v"
                                      width="18px"
                                      height="18px"
@@ -102,7 +102,7 @@
                     </div>
                     <footer class="d-flex align-items-center justify-content-between w-100">
                         <div class="d-flex align-items-center">
-                            <div class="d-flex align-items-center tiny me-3 responsive-flex-column">
+                            <div class="d-flex align-items-center tiny fr-mr-2w responsive-flex-column">
                                 <svg class="align-middle bi fr-mr-1v"
                                      width="18px"
                                      height="15px"
@@ -120,7 +120,7 @@
                                     </a>
                                 </template>
                             </div>
-                            <div class="d-flex align-items-center tiny me-3 responsive-flex-column">
+                            <div class="d-flex align-items-center tiny fr-mr-2w responsive-flex-column">
                                 <svg class="align-middle bi fr-mr-1v"
                                      width="18px"
                                      height="15px"

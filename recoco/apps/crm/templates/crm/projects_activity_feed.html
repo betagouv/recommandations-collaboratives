@@ -13,14 +13,14 @@
 {% block content %}
     <div x-data="Crm" class="d-flex fr-px-0" style="">
         {% include "crm/fragments/sidebar.html" with search=True back_button=True %}
-        <div class="w-75 d-flex flex-column justify-content-start fr-px-2w bg-light">
-            <h3 class="mt-3 fr-mb-2w">
+        <div class="w-75 d-flex flex-column justify-content-start fr-px-3w bg-light">
+            <h3 class="fr-mt-2w fr-mb-3w">
                 <svg class="bi align-middle" width="24" height="24">
                     <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#lightning-fill" />
                 </svg>
                 <span class="align-middle">Activité complète de l'ensemble des projets</span>
             </h3>
-            <ul class="bg-white pt-3 fr-px-2w border rounded crm-activity">
+            <ul class="bg-white fr-pt-2w fr-px-3w border rounded crm-activity">
                 <div class="fr-p-0 h-100 d-inline-flex flex-column justify-content-between align-items-center">
                     <article class="overflow-hidden">
                         {% for action in actions %}

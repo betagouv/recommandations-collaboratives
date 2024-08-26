@@ -1,5 +1,5 @@
 {% load static %}
-<div class="crm-search fr-pb-2w">
+<div class="crm-search fr-pb-3w">
     <form method="POST" action="{% url 'crm-search' %}" class="crm-form-search">
         {% csrf_token %}
         {{ search_form.as_p }}

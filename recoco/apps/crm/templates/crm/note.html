@@ -21,7 +21,7 @@
                 </span>
             {% endif %}
             {% if get_user_profile and note.related and note.content_type.name == "utilisateur" %}
-                <div class="position-relative d-flex justify-content-center align-items-center me-3 border border-dark rounded bg-white fr-px-2v fr-py-1v">
+                <div class="position-relative d-flex justify-content-center align-items-center fr-mr-2w border border-dark rounded bg-white fr-px-2v fr-py-1v">
                     <svg class="bi fr-mr-2v" width="18" height="18" fill="currentColor">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#person-circle" />
                     </svg>
@@ -51,7 +51,7 @@
             </span>
         </div>
         <div class="d-flex justify-content-center align-items-center">
-            <span class="d-flex align-items-center {% if note.title %} ms-3 {% else %} fr-ml-0{% endif %} specific-fontsize-08 specific-color-grey">
+            <span class="d-flex align-items-center {% if note.title %} fr-ml-2w {% else %} fr-ml-0{% endif %} specific-fontsize-08 specific-color-grey">
                 <svg class="bi fr-mr-1v" width="15" height="15" fill="currentColor">
                     <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#person-fill" />
                 </svg>

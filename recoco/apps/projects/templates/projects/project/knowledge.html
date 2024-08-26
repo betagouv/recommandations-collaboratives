@@ -68,7 +68,7 @@
             <!-- TODO PERMISSIONS -->
             {% if request.user in project.members.all %}
                 {% if "use_surveys" in user_project_perms and session and session.next_question and session.completion < 80 %}
-                    <div class="bg-light d-flex flex-column justify-content-center align-items-center fr-py-2w rounded">
+                    <div class="bg-light d-flex flex-column justify-content-center align-items-center fr-py-3w rounded">
                         <h4 class="fr-pt-2v">
                             {% if session.completion == 0 %}
                                 Prochaine étape : Remplissez le parcours d’état des lieux
@@ -76,7 +76,7 @@
                                 Continuez le parcours d’état des lieux
                             {% endif %}
                         </h4>
-                        <p class="fr-m-0 text-info-custom fw-normal pb-3">
+                        <p class="fr-m-0 text-info-custom fw-normal fr-pb-2w">
                             Pour faire le point sur votre avancement et recevoir des conseils pertinents.
                         </p>
                         <a class="button filled fr-pb-2v"

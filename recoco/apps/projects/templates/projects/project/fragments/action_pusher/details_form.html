@@ -7,15 +7,15 @@
 <template x-if="push_type != 'multiple'">
     <div class="message d-flex flex-row justify-content-between">
         <div id="action-details"
-             class="form w-50 fr-pr-2w flex-fill d-flex flex-column">
-            <div class="bg-light p-3 border-form">
+             class="form w-50 fr-pr-3w flex-fill d-flex flex-column">
+            <div class="bg-light fr-p-2w border-form">
                 <h4>
                     <span class="text-muted fr-mr-1v"
                           x-text="push_type == 'noresource' ? '2.' : '3.'"></span>Décrivez votre recommandation
                 </h4>
                 <div class="fr-mt-2v">
                     <label class="fr-mb-2v text-info-custom text-grey-dark" for="intent">Titre</label>
-                    <div class="input-group mb-3">
+                    <div class="input-group fr-mb-2w">
                         <input class="form-control"
                                type="text"
                                id="intent"
@@ -27,7 +27,7 @@
                     </div>
                 </div>
                 <div x-data='TopicSearch("{{ form.topic_name.value|default:"" }}", "recommendations")'
-                     class="fr-mt-2v mb-3">
+                     class="fr-mt-2v fr-mb-2w">
                     <label class="fr-mb-2v text-info-custom text-grey-dark" for="topic_name">Thématique</label>
                     <div class="input-group">
                         <input class="form-control"
@@ -55,7 +55,7 @@
                     <label class="fr-mb-2v text-info-custom text-grey-dark" for="message">Message</label>
                     {% include 'tools/editor.html' with input_name="content" input_value="content" errors=form.content.errors is_task=True %}
                 </div>
-                <div class="fr-mb-2w">
+                <div class="fr-mb-3w">
                     {% include 'projects/project/fragments/files_links/file_upload_input_standalone.html' %}
                     {% for error in document_form.the_file.errors %}<div class="text-danger text-start fr-mb-2v">{{ error }}</div>{% endfor %}
                 </div>
@@ -89,11 +89,11 @@
                 </template>
             </div>
         </div>
-        <div class="help w-50 p-3 bg-light rounded">
+        <div class="help w-50 fr-p-2w bg-light rounded">
             <h6>Comment écrire une recommandation</h6>
-            <img class="mt-3 img-fluid"
+            <img class="fr-mt-2w img-fluid"
                  src="{% static 'projects/img/push_example.png'  %}" />
-            <ol class="mt-3">
+            <ol class="fr-mt-2w">
                 <li>
                     <strong>Donnez un titre actionnable à votre recommandation</strong>
                     <p>

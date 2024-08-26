@@ -2,12 +2,12 @@
 <div x-data="TaskComment()">
     <template x-if="task.content !== '' && !isEditing">
         <div data-test-id="task-initial-comment"
-             class="position-relative p-3 bg-grey-light rounded-3 p-3">
+             class="position-relative fr-p-2w bg-grey-light rounded-3 fr-p-2w">
             <div x-html="truncate(renderMarkdown(task.content),100)"
-                 class="text-info-custom font-small text-dark mb-3"></div>
+                 class="text-info-custom font-small text-dark fr-mb-2w"></div>
             {% include 'projects/project/fragments/task/task_user_card.html' %}
             {% if "manage_tasks" in user_project_perms and not disable_edit %}
-                <button class="position-absolute bottom-0 mb-3 me-3 right-0 end-0 border tiny d-flex align-items-center justify-content-center fr-px-2v fr-py-2v fr-mr-1v hover-bg-grey"
+                <button class="position-absolute bottom-0 fr-mb-2w fr-mr-2w right-0 end-0 border tiny d-flex align-items-center justify-content-center fr-px-2v fr-py-2v fr-mr-1v hover-bg-grey"
                         @click.stop="isEditing = true;"
                         data-test-id="edit-comment-button">
                     <svg class="bi" width="12px" height="12px" fill="#929292">
@@ -18,8 +18,8 @@
         </div>
     </template>
     <template x-if="!isEditing && task.content === ''">
-        <div class="rounded bg-grey-light fr-mb-2w px-3 d-flex flex-column py-3 justify-content-between align-items-start task-item position-relative">
-            <div class="d-flex flex-column align-items-center justify-content-center w-100 fr-py-2w">
+        <div class="rounded bg-grey-light fr-mb-3w fr-px-2w d-flex flex-column fr-py-2w justify-content-between align-items-start task-item position-relative">
+            <div class="d-flex flex-column align-items-center justify-content-center w-100 fr-py-3w">
                 <span class="text-info-custom text-orange name fw-normal fr-mb-2v">Pas de commentaire initial</span>
                 <button class="button filled blue small inherit"
                         @click.stop="isEditing = true;">Ajouter un commentaire</button>
@@ -27,8 +27,8 @@
         </div>
     </template>
     <template x-if="isEditing">
-        <div class="py-3 px-3 fr-mb-2v border-blue task-comment medium-border-radius position-relative">
-            <button class="position-absolute top-0 mt-3 me-3 right-0 end-0 border tiny d-flex align-items-center justify-content-center fr-px-2v fr-py-2v fr-mr-1v hover-bg-grey"
+        <div class="fr-py-2w fr-px-2w fr-mb-2v border-blue task-comment medium-border-radius position-relative">
+            <button class="position-absolute top-0 fr-mt-2w fr-mr-2w right-0 end-0 border tiny d-flex align-items-center justify-content-center fr-px-2v fr-py-2v fr-mr-1v hover-bg-grey"
                     @click.stop="isEditing = false">
                 <svg class="bi" width="12px" height="12px" fill="#929292">
                     <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#x" />

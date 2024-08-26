@@ -17,7 +17,7 @@
         </svg>
         {{ label }}
     </h5>
-    <!-- <div class="border rounded px-3 fr-py-2v">
+    <!-- <div class="border rounded fr-px-2w fr-py-2v">
         <div class="d-flex align-items-center fr-mb-2v">
             <svg class="bi align-baseline fr-mr-2v" width="17" height="17" fill="#222">
                 <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#search" />
@@ -40,7 +40,7 @@
                      fill="#222">
                     <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#search" />
                 </svg>
-                    <input id="{{search_list_id}}-input" type="search fr-ml-2w fr-pl-2w"
+                    <input id="{{search_list_id}}-input" type="search fr-ml-3w fr-pl-3w"
                         class="search w-100"
                         placeholder="Ajouter un {{item_label}}"
                         @focus="handleFocusList"
@@ -49,7 +49,7 @@
         </div>
         <ul class="list-unstyled fr-m-0 d-flex flex-column"  id="{{search_list_id}}-selected-list">
             <template x-for="item in selectedList">
-                <li class="border d-inline-flex rounded justify-content-between align-items-center px-3 fr-py-1v bg-grey-light d-flex align-items-center fr-mb-1v">
+                <li class="border d-inline-flex rounded justify-content-between align-items-center fr-px-2w fr-py-1v bg-grey-light d-flex align-items-center fr-mb-1v">
                     <p class="fr-mb-0 fr-pb-0 fw-bold font-small" x-text="item.name"></p>
                     <span @click='handleRemoveItem(event, item)'
                           class="btn btn-outline-danger btn-sm fr-ml-2v">
@@ -65,14 +65,14 @@
                 </div>
             </template>
         </ul>
-        <div class="searchable-list-wrapper fr-mt-2w" :class="onFocus ? 'show' : 'hide'">
+        <div class="searchable-list-wrapper fr-mt-3w" :class="onFocus ? 'show' : 'hide'">
             <ul class="list d-flex flex-column list-unstyled border"
                 x-ref="selectList" id="{{search_list_id}}-list">
                 {% for id, value in list.field.choices %}
                     {% if value != '' %}
                         <li class="fr-m-0 fr-p-0 specific-cursor-pointer"
                             @click='handleAddItem(event, "{{ id }}","{{ value|lower }}")'>
-                            <p class="border-bottom px-3 fr-py-2v fr-m-0 hover-bg-grey name fw-medium font-small">{{ value|lower }}</p>
+                            <p class="border-bottom fr-px-2w fr-py-2v fr-m-0 hover-bg-grey name fw-medium font-small">{{ value|lower }}</p>
                         </li>
                     {% endif %}
                 {% endfor %}

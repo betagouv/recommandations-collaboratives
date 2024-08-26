@@ -21,7 +21,7 @@
                       id="form-projects-access-add-user"
                       action="{% url 'projects-project-access-collectivity-invite' project.pk %}"
                       method="post">
-                    <div class="mb-3">
+                    <div class="fr-mb-2w">
                         <label class="form-label specific-fontsize-16 specific-color-666"
                                for="invite-email">Saisissez l'adresse email de la personne à inviter</label>
                         <input id="invite-email"
@@ -36,7 +36,7 @@
                            id="role-collaborator"
                            value="COLLABORATOR">
                     {% if source %}<input type="hidden" name="source" id="source" value="{{ source }}">{% endif %}
-                    <div class="mb-3">
+                    <div class="fr-mb-2w">
                         <label class="form-label specific-fontsize-16 specific-color-666"
                                for="invite-message">Message d'invitation (optionnel)</label>
                         <textarea id="invite-message"

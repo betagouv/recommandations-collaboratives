@@ -9,7 +9,7 @@
 {% get_obj_perms request.user for request.site as "user_site_perms" %}
 {% get_obj_perms request.user for project as "user_project_perms" %}
 <div :id="t.uuid"
-     class="drag-targetable py-3"
+     class="drag-targetable fr-py-2w"
      @dragover="onDragOver(event)"
      @drop="onDrop(event, board.status, t.uuid)"
      @dragenter="onDragEnter(event)"
@@ -94,7 +94,7 @@
                             <p class="fst-italic">Aucun commentaire initial n'a été ajouté</p>
                         </template>
                         <template x-if="t.content !== ''">
-                            <p x-html="truncate(renderMarkdown(t.content), 200)" class="mb-3"></p>
+                            <p x-html="truncate(renderMarkdown(t.content), 200)" class="fr-mb-2w"></p>
                         </template>
                         <div class="d-flex justify-content-between">
                             <div>

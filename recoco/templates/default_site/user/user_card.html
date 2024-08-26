@@ -128,7 +128,7 @@
                             {{ user.email }}
                         {% endif %}
                     </div>
-                    <button class="fr-ml-2w fr-px-2v fr-py-0 btn small btn-outline-primary"
+                    <button class="fr-ml-3w fr-px-2v fr-py-0 btn small btn-outline-primary"
                             @click="clipboardCopy(`L'email`, '{{ user.email }}')">
                         <svg class="bi align-baseline" width="10" height="10" fill="currentColor">
                             <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#clipboard" />
@@ -152,7 +152,7 @@
                             {{ user.profile.phone_no|format_phone }}
                         {% endif %}
                     </div>
-                    <button class="fr-ml-2w fr-px-2v fr-py-0 btn small btn-outline-primary"
+                    <button class="fr-ml-3w fr-px-2v fr-py-0 btn small btn-outline-primary"
                             @click="clipboardCopy('Le numéro de téléphone', '{{ user.profile.phone_no }}')">
                         <svg class="bi align-baseline" width="10" height="10" fill="currentColor">
                             <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#clipboard" />

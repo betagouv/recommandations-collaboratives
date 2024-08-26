@@ -9,7 +9,7 @@
 {% get_obj_perms request.user for request.site as "user_site_perms" %}
 {% get_obj_perms request.user for project as "user_project_perms" %}
 {% if advising.is_observer %}
-    <div class="mt-3 pt-3 p-3 border specific-bgcolor">
+    <div class="fr-mt-2w fr-pt-2w fr-p-2w border specific-bgcolor">
         <h6 class="text-uppercase fw-bold h6-specific-fontsize-14">Vous êtes observateur sur ce projet</h6>
         <p class="fr-mb-0 fw-normal h6-specific-fontsize-14 specific-color-666">
             Vous recevez des notifications email quand le projet évolue. Vous pouvez le consulter en intégralité et participer aux échanges.
@@ -30,7 +30,7 @@
         </form>
     </div>
 {% elif advising %}
-    <div class="mt-3 pt-3 p-3 border specific-bgcolor">
+    <div class="fr-mt-2w fr-pt-2w fr-p-2w border specific-bgcolor">
         <h6 class="text-uppercase fw-bold h6-specific-fontsize-14">Vous êtes conseiller sur ce projet</h6>
         <p class="fr-mb-0 fw-normal h6-specific-fontsize-14 specific-color-666">
             Vous recevez des notifications email quand le projet évolue. Vous êtes un interlocuteur disponible et pouvez émettre des recommandations pour faire avancer ce projet.

@@ -86,10 +86,10 @@
     </style>
 {% endblock %}
 {% block content %}
-    <div class="row py-5" id="resource-main-content">
-        <div class="col-9 px-5 fr-mx-auto font-marianne" id="resource-main">
+    <div class="row fr-py-6w" id="resource-main-content">
+        <div class="col-9 fr-px-6w fr-mx-auto font-marianne" id="resource-main">
             {% include 'resources/resource/fragments/breadcrumb.html' %}
-            <div class="d-flex align-items-center mb-3" id="resource-details">
+            <div class="d-flex align-items-center fr-mb-2w" id="resource-details">
                 {% include 'resources/resource/fragments/category_list.html' %}
                 {% include 'resources/resource/fragments/author.html' %}
             </div>
@@ -107,7 +107,7 @@
             <!-- Sidebar -->
             <div class="admin-sidebar">
                 <!-- User actions -->
-                <div id="ask-question" class="d-grid gap-2 mt-3">
+                <div id="ask-question" class="d-grid gap-2 fr-mt-2w">
                     <a class="button blue d-flex justify-content-center align-items-center"
                        href="{% url 'home-contact' %}?next={{ request.get_full_path }}&subject=Une question sur la ressource {{ resource.title|truncatewords:4 }}"
                        role="button">
@@ -121,7 +121,7 @@
                 {% if is_switchtender %}
                     <!-- Switchtender actions -->
                     <!-- Push Resource -->
-                    <div id="push-resource" class="d-grid gap-2 mt-3">
+                    <div id="push-resource" class="d-grid gap-2 fr-mt-2w">
                         {% if active_project %}
                             {% if not resource.status == 0 %}
                                 <form action="{% url "projects-create-resource-action" resource.id %}"
@@ -150,7 +150,7 @@
                 <!-- Edit -->
                 {% get_obj_perms request.user for request.site as "user_site_perms" %}
                 {% if "manage_resources" in user_site_perms %}
-                    <div id="edit-resource" class="d-grid gap-2 mt-3">
+                    <div id="edit-resource" class="d-grid gap-2 fr-mt-2w">
                         <a class="btn btn-light btn-sm"
                            href="{% url 'resources-resource-update' resource.id %}"
                            role="button">
@@ -162,7 +162,7 @@
                         </a>
                     </div>
                 {% endif %}
-                <div class="fr-mt-2w">
+                <div class="fr-mt-3w">
                     {% if resource.departments.count %}
                         {% include 'resources/resource/fragments/departments.html' %}
                     {% endif %}
@@ -171,7 +171,7 @@
                     {% include 'resources/resource/fragments/contact_list.html' %}
                 {% endif %}
             </div>
-            <div id="project_used" class="fr-mt-2w">
+            <div id="project_used" class="fr-mt-3w">
                 {% if projects_used_by %}
                     {% include 'resources/resource/fragments/project_used.html' %}
                 {% endif %}

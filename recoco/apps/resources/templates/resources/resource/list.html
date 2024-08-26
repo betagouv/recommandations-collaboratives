@@ -26,26 +26,26 @@
     {% if user.is_authenticated %}
         {% get_obj_perms request.user for request.site as "user_site_perms" %}
     {% endif %}
-    <div class="col-12 fr-p-2w fr-mx-auto">
+    <div class="col-12 fr-p-3w fr-mx-auto">
         <div class="row">
             <div class="col">
-                <h1 class=" align-items-center mb-3">
+                <h1 class=" align-items-center fr-mb-2w">
                     <svg class="bi" width="38" height="38" fill="currentColor">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#key" />
                     </svg>
                     Ressources
                     {% if resources.count %}<span class="text-secondary">({{ resources.count }})</span>{% endif %}
                 </h1>
-                <div class="text-secondary small mb-3">
+                <div class="text-secondary small fr-mb-2w">
                     Nous créons des ressources en fonction des besoins que vous nous soumettez !
                 </div>
             </div>
             {% if "manage_resources" in user_site_perms %}
                 <!-- Sidebar -->
-                <div class="col-sm-4 col-lg-2 col-xl-2 align-content-top border-start mb-3">
+                <div class="col-sm-4 col-lg-2 col-xl-2 align-content-top border-start fr-mb-2w">
                     <span class="text-secondary small smallcaps">Administration</span>
                     <!-- Staff actions -->
-                    <div class="d-grid gap-2 mt-3">
+                    <div class="d-grid gap-2 fr-mt-2w">
                         <a class="btn btn-light btn-sm"
                            href="{% url 'resources-resource-create' %}"
                            role="button">
@@ -60,10 +60,10 @@
             {% endif %}
         </div>
         <!-- Search -->
-        <div class="quick-search mb-5">
+        <div class="quick-search fr-mb-6w">
             <form method="GET">
                 <input id='searching' type='hidden' value='on' name='searching'>
-                <div class="input-group mb-3">
+                <div class="input-group fr-mb-2w">
                     {% if is_switchtender %}
                         <select id="limit_area"
                                 name="limit_area"
@@ -155,7 +155,7 @@
         </div>
         <!-- Results -->
         {% if query %}
-            <div class="row align-center mb-3">
+            <div class="row align-center fr-mb-2w">
                 {% if not resources %}
                     <div class="col-6 offset-md-3 fs-5">
                         <svg class="bi" width="20" height="20" fill="currentColor">

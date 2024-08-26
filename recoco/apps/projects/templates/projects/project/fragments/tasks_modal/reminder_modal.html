@@ -31,7 +31,7 @@
                           :action="editReminderUrl(currentReminderTaskId)">
                         {% csrf_token %}
                         <input name="days" type="hidden" class="form-control" id="reminder-days">
-                        <div class="btn-group w-100 fr-mt-2w fr-mb-2v" role="group" aria-label="Shortcuts">
+                        <div class="btn-group w-100 fr-mt-3w fr-mb-2v" role="group" aria-label="Shortcuts">
                             <a @click="updatePendingReminderDate(15)"
                                class="btn btn-outline-secondary">Dans 15 jours</a>
                             <a @click="updatePendingReminderDate(30)"
@@ -39,7 +39,7 @@
                             <a @click="updatePendingReminderDate(30 * 6)"
                                class="btn btn-outline-secondary">Dans 6 mois</a>
                         </div>
-                        <div class="input-group fr-mt-2v mb-3">
+                        <div class="input-group fr-mt-2v fr-mb-2w">
                             <span class="input-group-text" id="date-input">Date :</span>
                             <input required
                                    aria-describedby="date-input"

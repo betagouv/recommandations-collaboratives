@@ -5,13 +5,13 @@
      x-init="getPostcode(projectPostcode,projectInsee)">
     <div class="row g-3">
         <div class="col-auto">
-            <div class="mb-3">
+            <div class="fr-mb-2w">
                 <label class="text-info-custom text-grey-dark" for="input-project-address">{{ form.postcode.label }}</label>
                 <input :disabled="isLoading"
                        @change.debounce="fetchCities()"
                        x-model="postal"
                        type="text"
-                       class="fr-py-2w placeholder-grey form-control {% if form.postcode.errors %}is-invalid{% endif %}"
+                       class="fr-py-3w placeholder-grey form-control {% if form.postcode.errors %}is-invalid{% endif %}"
                        id="input-project-address"
                        name="{{ form.postcode.name }}"
                        placeholder="Code Postal"
@@ -20,7 +20,7 @@
                 {% for error in form.postcode.errors %}<div class="text-danger text-end">{{ error }}</div>{% endfor %}
             </div>
         </div>
-        <div class="mb-3 col-auto">
+        <div class="fr-mb-2w col-auto">
             <label class="text-info-custom text-grey-dark" for="input-project-address">Commune</label>
             <select required
                     :style="cities && cities.length == 0 && postal ? 'background-color:#e9ecef;pointer-events:none;padding: 12px 10px; border-radius: 0.25rem;min-width: 170px;padding-right: 30px;' : 'padding: 12px 10px; border-radius: 0.25rem;min-width: 170px;padding-right: 30px;' "

@@ -50,7 +50,7 @@
     </div>
 </div>
 <div id="action-{{ task.id }}"
-     class="accordion border border-1 rounded-3 fr-mb-2w position-relative {% if task.id in actions_with_notifications %}bg-light-yellow{% endif %}">
+     class="accordion border border-1 rounded-3 fr-mb-3w position-relative {% if task.id in actions_with_notifications %}bg-light-yellow{% endif %}">
     {% if not task.visited and task.public %}
         <span class="position-absolute top-0 start-0 translate-middle badge rounded-pill bg-primary specific-ml-60">NOUVEAU</span>
     {% endif %}
@@ -69,7 +69,7 @@
         <span class="position-absolute top-0 start-0 translate-middle badge rounded-pill bg-warning specific-ml-60">BROUILLON</span>
     {% endif %}
     <div class="accordion-header d-flex justify-content-between border-bottom">
-        <div class="task-opening d-flex fr-pl-2w fr-pt-2w justify-content-between flew-grow-1 w-100 position-relative fr-pb-2w">
+        <div class="task-opening d-flex fr-pl-3w fr-pt-3w justify-content-between flew-grow-1 w-100 position-relative fr-pb-3w">
             <div class="d-flex flex-column flex-grow-1">
                 <div class="d-flex fw-bold fs-5 task-title fr-mb-2v {% if task.closed %}text-decoration-line-through{% endif %}">
                     {% if task.resource %}
@@ -98,7 +98,7 @@
                         {% if task.resource %}
                             {{ task.resource.summary }}
                         {% elif task.contact %}
-                            <div class="d-flex fr-mx-4v">
+                            <div class="d-flex fr-mx-3w">
                                 {% include "addressbook/widgets/card_contact_horizontal.html" with contact=task.contact %}
                             </div>
                         {% endif %}
@@ -117,7 +117,7 @@
                                    href="{% url 'resources-resource-detail' task.resource.id %}">
                                 {% endif %}
                             {% endif %}
-                            <div class="flex-shrink-1 px-3 arrow-link text-primary align-items-center">
+                            <div class="flex-shrink-1 fr-px-2w arrow-link text-primary align-items-center">
                                 <svg class="align-middle bi"
                                      width="26px"
                                      height="26px"
@@ -131,7 +131,7 @@
                 {% if can_manage and task.public %}
                     <div class="toolbar d-flex border-start flex-column justify-content-between">
                         {% if task.open %}
-                            <button class="fr-p-2w btn btn-text fr-m-0 border-bottom flex-grow-1"
+                            <button class="fr-p-3w btn btn-text fr-m-0 border-bottom flex-grow-1"
                                     data-bs-toggle="modal"
                                     data-bs-target="#modal-action-{{ task.id }}">
                                 <span data-bs-toggle="tooltip" title="Rejeter cette recommandation">
@@ -152,7 +152,7 @@
                                 <button title="Remettre la recommandation en cours"
                                         data-bs-toggle="tooltip"
                                         type="submit"
-                                        class="btn btn-text align-middle fr-p-2w">
+                                        class="btn btn-text align-middle fr-p-3w">
                                     <svg class="bi align-middle" width="24" height="24" fill="currentColor">
                                         <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#arrow-counterclockwise" />
                                     </svg>
@@ -161,7 +161,7 @@
                                 <button title="Marquer la recommandation comme terminée"
                                         data-bs-toggle="tooltip"
                                         type="submit"
-                                        class="btn btn-text align-middle fr-p-2w">
+                                        class="btn btn-text align-middle fr-p-3w">
                                     <svg class="bi align-middle text-success"
                                          width="16"
                                          height="16"
@@ -176,7 +176,7 @@
             </div>
             <div class="action-list-item accordion-item fr-pt-2v fr-pb-2v border-0">
                 <div id="action-{{ task.id }}-header" class="accordion-header d-flex">
-                    <div class="d-flex justify-content-between w-100 fr-px-2w">
+                    <div class="d-flex justify-content-between w-100 fr-px-3w">
                         {% if not hide_comments %}
                             <div class="align-middle flex-grow-1">
                                 <button class="align-middle justify-content-start fr-m-0 fr-px-0 d-flex text-left btn btn-text collapsed text-primary w-100"
@@ -300,7 +300,7 @@
                                 {% endif %}
                             {% endfor %}
                             {% if can_manage and task.public %}
-                                <div class="fr-m-2v comment fr-mt-2w">
+                                <div class="fr-m-2v comment fr-mt-3w">
                                     <span class="">Répondre</span>
                                     <form class="fr-mt-2v form d-flex flex-column align-items-end"
                                           method="POST"

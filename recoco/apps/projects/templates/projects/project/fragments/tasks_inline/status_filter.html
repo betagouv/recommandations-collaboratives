@@ -2,7 +2,7 @@
 {% load guardian_tags %}
 {% get_obj_perms request.user for request.site as "user_site_perms" %}
 {% get_obj_perms request.user for project as "user_project_perms" %}
-<div class="d-flex justify-content-between mt-3 fr-mb-2v">
+<div class="d-flex justify-content-between fr-mt-2w fr-mb-2v">
     <div class="d-inline-flex overflow-hidden">
         <!-- <div x-on:click="handlePublicFilterClick()" class="border rounded bg-white fr-px-2v fr-py-2v d-flex align-items-center board-status-filter-button" :class=" filterIsPublic ? 'active' : '' ">
             <i style="background-color:#0d6efd" class="status-color-indicator fr-mr-2v tmp-comment"></i>
