@@ -5,7 +5,7 @@
         class="positioning-dropdown list-unstyled flex-column">
         <li>
             <button @click="handlePositioningAction('{% url 'projects-project-switchtender-join' 0 %}', item.project.id)"
-                    class="bg-white appearance-none w-100 fr-py-2v fr-px-2v d-flex justify-content-start align-items-center border-bottom">
+                    class="fr-btn fr-p-2v d-flex justify-content-start align-items-center">
                 <svg class="align-middle bi fr-mr-2v"
                      width="18px"
                      height="18px"
@@ -17,7 +17,7 @@
         </li>
         <li>
             <button @click="handlePositioningAction('{% url 'projects-project-switchtender-leave' 0 %}', item.project.id)"
-                    class="bg-white appearance-none w-100 fr-py-2v fr-px-2v d-flex justify-content-start align-items-center border-bottom">
+                    class="bg-white appearance-none w-100 fr-p-2v d-flex justify-content-start align-items-center border-bottom">
                 <svg class="align-middle bi fr-mr-2v"
                      width="18px"
                      height="18px"
@@ -35,7 +35,7 @@
         class="positioning-dropdown list-unstyled flex-column">
         <li>
             <button @click="handlePositioningAction('{% url 'projects-project-observer-join' 0 %}', item.project.id)"
-                    class="bg-white appearance-none w-100 fr-py-2v fr-px-2v d-flex justify-content-start align-items-center border-bottom">
+                    class="bg-white appearance-none w-100 fr-p-2v d-flex justify-content-start align-items-center border-bottom">
                 <svg class="align-middle bi fr-mr-2v"
                      width="18px"
                      height="18px"
@@ -44,48 +44,48 @@
                 </svg>
                 <span class="text-grey-dark text-info-custom tiny">Devenir Observateur</span>
             </button>
-            <li>
-                <li>
-                    <button @click="handlePositioningAction('{% url 'projects-project-switchtender-leave' 0 %}', item.project.id)"
-                            class="bg-white appearance-none w-100 fr-py-2v fr-px-2v d-flex justify-content-start align-items-center border-bottom">
-                        <svg class="align-middle bi fr-mr-2v"
-                             width="18px"
-                             height="18px"
-                             fill="currentColor">
-                            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#heartbreak" />
-                        </svg>
-                        <span class="text-grey-dark text-info-custom tiny">Ne plus conseiller le projet</span>
-                    </button>
-                </li>
-            </ul>
-        </template>
-        <template x-if="!item.project.is_observer && !item.project.is_switchtender">
-            <ul x-show="open"
-                :class="{'show':open}"
-                class="positioning-dropdown list-unstyled flex-column">
-                <li>
-                    <button @click="handlePositioningAction('{% url 'projects-project-switchtender-join' 0 %}', item.project.id)"
-                            class="bg-white appearance-none w-100 fr-py-2v fr-px-2v d-flex justify-content-start align-items-center border-bottom">
-                        <svg class="align-middle bi fr-mr-2v"
-                             width="18px"
-                             height="18px"
-                             fill="currentColor">
-                            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#person-heart" />
-                        </svg>
-                        <span class="text-grey-dark text-info-custom tiny">Devenir conseiller</span>
-                    </button>
-                </li>
-                <li>
-                    <button @click="handlePositioningAction('{% url 'projects-project-observer-join' 0 %}', item.project.id)"
-                            class="bg-white appearance-none w-100 fr-py-2v fr-px-2v d-flex justify-content-start align-items-center">
-                        <svg class="align-middle bi fr-mr-2v"
-                             width="18px"
-                             height="18px"
-                             fill="currentColor">
-                            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#eye" />
-                        </svg>
-                        <span class="text-grey-dark text-info-custom tiny">Devenir observateur</span>
-                    </button>
-                </li>
-            </ul>
-        </template>
+        </li>
+        <li>
+            <button @click="handlePositioningAction('{% url 'projects-project-switchtender-leave' 0 %}', item.project.id)"
+                    class="bg-white appearance-none w-100 fr-p-2v d-flex justify-content-start align-items-center border-bottom">
+                <svg class="align-middle bi fr-mr-2v"
+                     width="18px"
+                     height="18px"
+                     fill="currentColor">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#heartbreak" />
+                </svg>
+                <span class="text-grey-dark text-info-custom tiny">Ne plus conseiller le projet</span>
+            </button>
+        </li>
+    </ul>
+</template>
+<template x-if="!item.project.is_observer && !item.project.is_switchtender">
+    <ul x-show="open"
+        :class="{'show':open}"
+        class="positioning-dropdown list-unstyled flex-column">
+        <li>
+            <button @click="handlePositioningAction('{% url 'projects-project-switchtender-join' 0 %}', item.project.id)"
+                    class="bg-white appearance-none w-100 fr-p-2v d-flex justify-content-start align-items-center border-bottom">
+                <svg class="align-middle bi fr-mr-2v"
+                     width="18px"
+                     height="18px"
+                     fill="currentColor">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#person-heart" />
+                </svg>
+                <span class="text-grey-dark text-info-custom tiny">Devenir conseiller</span>
+            </button>
+        </li>
+        <li>
+            <button @click="handlePositioningAction('{% url 'projects-project-observer-join' 0 %}', item.project.id)"
+                    class="bg-white appearance-none w-100 fr-p-2v d-flex justify-content-start align-items-center">
+                <svg class="align-middle bi fr-mr-2v"
+                     width="18px"
+                     height="18px"
+                     fill="currentColor">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#eye" />
+                </svg>
+                <span class="text-grey-dark text-info-custom tiny">Devenir observateur</span>
+            </button>
+        </li>
+    </ul>
+</template>
