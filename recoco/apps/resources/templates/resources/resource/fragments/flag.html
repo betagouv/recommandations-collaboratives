@@ -1,16 +1,16 @@
 {% if resource.expires_on %}
     {% if not resource.expired %}
         <div data-test-id="non-expired-resource-banner"
-             class="flag blue fr-mb-2w d-flex align-items-center justify-content-start">
-            <span class="title-info text-blue text-uppercase fr-my-0 me-3">Attention</span>
+             class="flag blue fr-mb-3w d-flex align-items-center justify-content-start">
+            <span class="title-info text-blue text-uppercase fr-my-0 fr-mr-2w">Attention</span>
             <p class="text-info-custom text-blue fr-my-0 ">
                 Cette ressource a une date limite fixée au <strong>{{ resource.expires_on }}</strong>
             </p>
         </div>
     {% else %}
         <div data-test-id="expired-resource-banner"
-             class="flag red fr-mb-2w d-flex align-items-center justify-content-start">
-            <span class="title-info text-red text-uppercase fr-my-0 me-3">Attention</span>
+             class="flag red fr-mb-3w d-flex align-items-center justify-content-start">
+            <span class="title-info text-red text-uppercase fr-my-0 fr-mr-2w">Attention</span>
             <p class="text-info-custom text-red fr-my-0">
                 Cette ressource a expiré, les informations ne sont probablement plus à jour !
             </p>
@@ -20,8 +20,8 @@
 <!-- Show banner if draft -->
 {% if is_switchtender %}
     {% if not resource.public %}
-        <div class="flag orange fr-mb-2w d-flex align-items-center justify-content-start">
-            <span class="title-info text-uppercase fr-my-0 me-3">Édition</span>
+        <div class="flag orange fr-mb-3w d-flex align-items-center justify-content-start">
+            <span class="title-info text-uppercase fr-my-0 fr-mr-2w">Édition</span>
             <p class="text-info-custom fr-my-0">
                 Cette ressource est en cours d'écriture. Pensez à la
                 <a href="{% url 'resources-resource-update' resource.id %}">rendre visible</a> en cochant <strong><em>Public</em></strong> si vous souhaitez que les visiteurs puissent la consulter !

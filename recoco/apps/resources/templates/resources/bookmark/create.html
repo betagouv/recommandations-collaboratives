@@ -8,7 +8,7 @@
           type="text/css">
 {% endblock %}
 {% block content %}
-    <div class="col-12 fr-p-2w fr-mx-auto">
+    <div class="col-12 fr-p-3w fr-mx-auto">
         <!-- Breadcrumb -->
         <nav aria-label="breadcrumb">
             <ul class="fr-breadcrumb__list">
@@ -36,7 +36,7 @@
               action="{% url "resources-bookmark-create" resource.id %}"
               method="POST">
             {% csrf_token %}
-            <div class="mb-3">
+            <div class="fr-mb-2w">
                 <label class="fr-mb-2v" for="input-project-comments">Vous pouvez ajouter une note privée si vous le souhaitez :</label>
                 <textarea class="form-control {% if form.comments.errors %}is-invalid{% endif %} specific-height-100px"
                           id="input-bookmark-comments"

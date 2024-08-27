@@ -22,12 +22,12 @@
     <div x-data="Crm" class="d-flex fr-px-0" style="">
         {% include "crm/fragments/sidebar.html" with search=True back_button=True user_advised_projects=False user_projects=False %}
         <div class="w-75 d-flex flex-column justify-content-start">
-            <div class="crm-header fr-px-2w fr-py-2w mb-3">
+            <div class="crm-header fr-px-3w fr-py-3w fr-mb-2w">
                 <div class="d-flex justify-content-between align-items-center fr-mb-2v">
                     <h3>Fusionner des organisations</h3>
                 </div>
             </div>
-            <div class="fr-m-2w">
+            <div class="fr-m-3w">
                 <p class="fw-bolder">Vous êtes sur le point de fusionner les organisations suivantes :</p>
                 <p>
                     <ul>
@@ -45,8 +45,8 @@
                         </li>
                     </ul>
                 </p>
-                <div class="fr-m-2w card fr-py-2w">
-                    <ul class="fr-mb-2w">
+                <div class="fr-m-3w card fr-py-3w">
+                    <ul class="fr-mb-3w">
                         <div class="fr-mb-2v">
                             <svg class="align-middle bi"
                                  width="18px"
@@ -57,9 +57,9 @@
                             <span class="align-middle">Contacts</span>
                         </div>
                         {% for contact in contacts.all %}
-                            <li class="fr-ml-2w">{{ contact }} ({{ contact.email }})</li>
+                            <li class="fr-ml-3w">{{ contact }} ({{ contact.email }})</li>
                         {% empty %}
-                            <li class="fr-ml-2w">-- Aucun --</li>
+                            <li class="fr-ml-3w">-- Aucun --</li>
                         {% endfor %}
                     </ul>
                     <ul>
@@ -73,9 +73,9 @@
                             <span class="align-middle">Utilisateur·trice·s</span>
                         </div>
                         {% for profile in profiles.all %}
-                            <li class="fr-ml-2w">{{ profile.user.get_full_name|default:profile.user.email }}</li>
+                            <li class="fr-ml-3w">{{ profile.user.get_full_name|default:profile.user.email }}</li>
                         {% empty %}
-                            <li class="fr-ml-2w">-- Aucun --</li>
+                            <li class="fr-ml-3w">-- Aucun --</li>
                         {% endfor %}
                     </ul>
                     <ul>
@@ -89,18 +89,18 @@
                             <span class="align-middle">Départements</span>
                         </div>
                         {% for dpt in departments.all %}
-                            <li class="fr-ml-2w">{{ dpt }} ({{ dpt.code }})</li>
+                            <li class="fr-ml-3w">{{ dpt }} ({{ dpt.code }})</li>
                         {% empty %}
-                            <li class="fr-ml-2w">-- Aucun --</li>
+                            <li class="fr-ml-3w">-- Aucun --</li>
                         {% endfor %}
                     </ul>
                 </div>
-                <div class="fr-mt-2w">
+                <div class="fr-mt-3w">
                     <form x-data="{name: '{{ organizations.0.name }}'}"
                           method="POST"
                           action="{% url 'crm-organization-merge' %}">
                         {% csrf_token %}
-                        <div class="fr-mb-2w">
+                        <div class="fr-mb-3w">
                             <div class="input-group">
                                 <label for="{{ merge_form.name.name }}" class="col-sm-2 col-form-label">Nouveau nom</label>
                                 <div class="col-sm-5">

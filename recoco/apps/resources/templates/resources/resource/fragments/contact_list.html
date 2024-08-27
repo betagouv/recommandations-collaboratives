@@ -4,7 +4,7 @@
     {% vite_asset 'js/apps/contactList.js' %}
 {% endblock %}
 {% if contacts.count %}
-    <div x-data="ContactList" id="contact-list" class="fr-mt-2w">
+    <div x-data="ContactList" id="contact-list" class="fr-mt-3w">
         {% if user.is_anonymous %}
             <div class="flag blue">
                 <span class="title text-blue text-uppercase fw-bold fr-mb-2v d-block">Contacts</span>
@@ -14,11 +14,11 @@
                 </p>
             </div>
         {% else %}
-            <div class="bg-grey-light fr-py-2w px-3 font-marianne">
-                <h6 class="fw-bold text-uppercase d-block mb-3">👩‍💼 Contacts</h6>
+            <div class="bg-grey-light fr-py-3w fr-px-2w font-marianne">
+                <h6 class="fw-bold text-uppercase d-block fr-mb-2w">👩‍💼 Contacts</h6>
                 {% for contact in contacts.all %}
                     <div :class="currentHash === '#contact-{{ contact.pk }}' && 'component-focus'"
-                         class="border fr-py-2v px-3 fr-mb-2v"
+                         class="border fr-py-2v fr-px-2w fr-mb-2v"
                          id="contact-{{ contact.pk }}">
                         <div>
                             <span class="text-black fw-medium fr-my-1v">{{ contact.full_name }}</span>

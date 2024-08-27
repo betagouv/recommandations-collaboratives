@@ -5,16 +5,16 @@
           rel="stylesheet"
           type="text/css">
 {% endblock %}
-<div class="d-flex align-items-center fr-ml-2w">
+<div class="d-flex align-items-center fr-ml-3w">
     <span class="fr-segmented__legend inline text-nowrap">Filtrer :</span>
     <div class="input-item position-relative active specific-border-solid1pxE5E5E5"
          x-data="{ open: false }"
          x-on:click.outside="open = false">
-        <div class="d-flex align-items-center fr-pr-2w bg-white rounded-pill"
+        <div class="d-flex align-items-center fr-pr-3w bg-white rounded-pill"
              x-on:click="open = !open"
              type="button"
              :class="{'input-active':open}">
-            <button class="input-field bg-transparent px-3 fw-normal text-dark appearance-none"
+            <button class="input-field bg-transparent fr-px-2w fw-normal text-dark appearance-none"
                     data-cy="check-display-project">
                 Projets de mon
                 territoire
@@ -47,7 +47,7 @@
                 <template x-for="region in regions">
                     <div class="region-filter-item">
                         <li :class="{'region-is-active':region.active}"
-                            class="bg-white appearance-none w-100 d-flex justify-content-start align-items-center department-item pe-3">
+                            class="bg-white appearance-none w-100 d-flex justify-content-start align-items-center department-item fr-pr-2w">
                             <div class="form-check w-100 d-flex align-items-center fr-px-0">
                                 <input x-on:input.change="handleRegionFilter(region)"
                                        class="region-checkbox form-check-input fw-normal fr-ml-2v fr-px-2v fr-py-2v fr-mr-2v"
@@ -86,7 +86,7 @@
                 </template>
             {% else %}
                 <template x-for="department in departments">
-                    <li class="bg-white appearance-none w-100 d-flex justify-content-start align-items-center department-item fr-pr-2w">
+                    <li class="bg-white appearance-none w-100 d-flex justify-content-start align-items-center department-item fr-pr-3w">
                         <div class="form-check w-100 d-flex align-items-center fr-p-0">
                             <input x-on:input.change="handleTerritoryFilter(department)"
                                    class="form-check-input fw-normal fr-ml-2v fr-px-2v fr-py-2v fr-mr-2v"

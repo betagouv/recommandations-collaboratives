@@ -39,7 +39,7 @@
                     <div x-effect="taskId && $store.previewModal.loadFollowups() && $store.previewModal.loadNotifications() && followupScrollToLastMessage(true)"
                          class="d-flex w-100 align-items-stretch position-relative">
                         <!-- Modal resource / content preview -->
-                        <div class="position-absolute top-0 end-0 px-3 fr-py-2v z-3">
+                        <div class="position-absolute top-0 end-0 fr-px-2w fr-py-2v z-3">
                             <button type="button"
                                     class="btn-close"
                                     data-bs-dismiss="modal"
@@ -54,9 +54,9 @@
                                         :src="resourcePreviewUrl(task?.resource_id)"></iframe>
                             </template>
                             <template x-if="task && taskId && !task?.resource_id">
-                                <div class="w-100 text-break p-3 specific-maxheight-90vh scroll-gestion">
+                                <div class="w-100 text-break fr-p-2w specific-maxheight-90vh scroll-gestion">
                                     <div class="resource-details">
-                                        <h1 x-text="task?.intent" class="mb-3"></h1>
+                                        <h1 x-text="task?.intent" class="fr-mb-2w"></h1>
                                     </div>
                                     <p class="text-justified overflow-hidden text-break"
                                        x-html="renderMarkdown(task?.content)"></p>
@@ -68,16 +68,16 @@
                             <div class="w-100">
                                 <div class="border-bottom-grey"
                                      x-show="task?.document && task?.document.length > 0">
-                                    <span class="fr-py-2v d-block px-3 fw-medium title-info text-dark">Fichier(s) partagé(s)</span>
+                                    <span class="fr-py-2v d-block fr-px-2w fw-medium title-info text-dark">Fichier(s) partagé(s)</span>
                                     <template x-for="document in task?.document" x-key="document.id">
-                                        <div class="px-3">{% include 'projects/project/fragments/files_links/file_list_item_api.html' %}</div>
+                                        <div class="fr-px-2w">{% include 'projects/project/fragments/files_links/file_list_item_api.html' %}</div>
                                     </template>
                                 </div>
                             </div>
                             <div class="task-modal-followups position-relative"
                                  :class="getTypeOfModalClass(task?.document && task?.document.length > 0)"
                                  id="followups-scroll-container">
-                                <div class="fr-py-2v px-3 position-sticky top-0 d-flex justify-content-between bg-white z-index-100 border-bottom-grey">
+                                <div class="fr-py-2v fr-px-2w position-sticky top-0 d-flex justify-content-between bg-white z-index-100 border-bottom-grey">
                                     <span class="fw-medium title-info text-dark">Échanges & notes</span>
                                 </div>
                                 <div class="position-absolute d-flex justify-content-center align-items-center w-100 h-100">
@@ -89,7 +89,7 @@
                                 </div>
                                 <div :class="!followupsIsLoading && 'visible'" class="followups-wrapper">
                                     <template x-if="task?.resource_id">
-                                        <div class="rounded bg-light fr-p-2v m-3 message"
+                                        <div class="rounded bg-light fr-p-2v fr-m-2w message"
                                              :class="$store.djangoData.canManageTasks && task?.content === '' && 'border border-warning'">
                                             <template x-if="task && taskId && task?.content !== ''">
                                                 <p x-html="task && renderMarkdown(task?.content)"
@@ -111,8 +111,8 @@
                                         </div>
                                     </template>
                                     <template x-if="!task?.resource_id">
-                                        <div class="my-3">
-                                            <div class="mx-3 fr-mb-1v text-center specific-fontsize-08">
+                                        <div class="fr-my-2w">
+                                            <div class="fr-mx-2w fr-mb-1v text-center specific-fontsize-08">
                                                 <span class="fr-ml-1v fst-italic specific-lineheight-20"
                                                       x-text="`${task?.created_by.first_name} ${task?.created_by.last_name}`"></span> a créé cette recommandation sans ressource
                                                 <span class="text-muted specific-lineheight-20"
@@ -127,7 +127,7 @@
                                                   id="followups-container">
                                             <div class="position-relative">
                                                 <template x-if="!isStatusUpdate(f)">
-                                                    <div class="rounded bg-light fr-p-2v m-3 message"
+                                                    <div class="rounded bg-light fr-p-2v fr-m-2w message"
                                                          :class="hasNotification(f.id) && 'is-new-followup'">
                                                         <p x-html="renderMarkdown(f.comment)" class="fr-mb-2v text-break"></p>
                                                         <div class="d-flex justify-content-between align-items-center specific-fontsize-09">
@@ -145,16 +145,16 @@
                                                     </div>
                                                 </template>
                                                 <template x-if="isStatusUpdate(f) && f.status || isStatusUpdate(f) && f.status == 0">
-                                                    <div class="my-3"
+                                                    <div class="fr-my-2w"
                                                          :class="hasNotification(f.id) && 'is-new-followup-status'">
-                                                        <div class="mx-3 fr-mb-1v text-center followup-status-message specific-fontsize-08">
+                                                        <div class="fr-mx-2w fr-mb-1v text-center followup-status-message specific-fontsize-08">
                                                             <span class="fr-ml-1v fst-italic specific-lineheight-20"
                                                                   x-text="`${f.who.first_name} ${f.who.last_name}`"></span> a changé le statut de la recommandation en <span class="fw-bold" x-text="statusText(f.status)"></span>
                                                             <span class="text-muted specific-lineheight-20"
                                                                   x-text="`le ${formatDate(f.timestamp)}`"></span>
                                                         </div>
                                                         <template x-if="f.comment !== ''">
-                                                            <div class="rounded bg-light fr-p-2v m-3 message">
+                                                            <div class="rounded bg-light fr-p-2v fr-m-2w message">
                                                                 <p x-html="renderMarkdown(f.comment)"
                                                                    class="fr-mb-2v text-break overflow-hidden"></p>
                                                                 <div class="d-flex justify-content-between specific-fontsize-09">
@@ -177,12 +177,12 @@
                                 </div>
                             </div>
                             <template x-if="task.public || showEdition">
-                                <div class="w-100 p-3 specific-border-top-solid1pxEEE">
+                                <div class="w-100 fr-p-2w specific-border-top-solid1pxEEE">
                                     {% include 'tools/editor.html' with is_task_modal_comment=True %}
                                 </div>
                             </template>
                             <template x-if="!task.public">
-                                <div class="w-100 p-3 specific-border-top-solid1pxEEE">
+                                <div class="w-100 fr-p-2w specific-border-top-solid1pxEEE">
                                     <div class="text-center">
                                         <span class="text-muted">Vous devez publier votre recommandation pour ajouter un commentaire</span>
                                     </div>

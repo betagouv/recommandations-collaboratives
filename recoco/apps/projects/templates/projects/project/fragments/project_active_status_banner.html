@@ -2,7 +2,7 @@
 {% if project.inactive_since != None %}
     <aside class="flag d-flex slim grey flex-grow-1"
            data-test-id="header-banner-project-inactive">
-        <svg class="fr-mr-2w"
+        <svg class="fr-mr-3w"
              width="48"
              height="46"
              viewBox="0 0 48 46"
@@ -16,7 +16,7 @@
             <path fill-rule="evenodd" clip-rule="evenodd" d="M36.8518 13.9867H47.1424C47.616 13.9867 48 14.3711 48 14.8451V21.7124L47.9942 21.8125C47.9447 22.2394 47.5822 22.5708 47.1424 22.5708H43.9146L40.6655 24.197L40.5747 24.2363C40.0266 24.4381 39.4244 24.0338 39.4244 23.4292V22.5708H36.8518C36.3782 22.5708 35.9942 22.1865 35.9942 21.7124V14.8451C35.9942 14.3711 36.3782 13.9867 36.8518 13.9867ZM37.7093 15.7036V20.854H40.282L40.382 20.8598C40.8085 20.9094 41.1395 21.2722 41.1395 21.7124V22.0403L43.3287 20.9446L43.4201 20.9053C43.5135 20.8715 43.6124 20.854 43.7122 20.854H46.2849V15.7036H37.7093Z" fill="#0063CB" />
             <path d="M37.5652 4.00879L1.92882 39.6452" stroke="#666666" stroke-width="2" stroke-linecap="round" />
         </svg>
-        <div class="fr-mr-2w w-100  flex-grow-1">
+        <div class="fr-mr-3w w-100  flex-grow-1">
             {% if user == project.owner %}
                 <p class="title">Le conseil est en pause</p>
                 <p>

@@ -11,7 +11,7 @@
             {% regroup action_stream by timestamp.date as stream_by_day %}
             <ul class="list-group fr-m-0 fr-p-0 activity-stream-container">
                 {% for date, actions in stream_by_day %}
-                    <li class="{% if cropped %}mb-0 {% endif %} list-group-item border-0 d-flex flex-column mb-3 fr-mx-0 fr-px-0">
+                    <li class="{% if cropped %}mb-0 {% endif %} list-group-item border-0 d-flex flex-column fr-mb-2w fr-mx-0 fr-px-0">
                         <span class="small text-info-custom text-grey-dark fr-mb-2v">{{ date|naturalday|capfirst }}</span>
                         <div class="activity-stream-actions-container d-flex flex-column">
                             {% for action in actions %}

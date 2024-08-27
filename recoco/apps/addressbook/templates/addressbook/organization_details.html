@@ -5,7 +5,7 @@
 {% block title %}{{ organization.name }} {{ block.super }}{% endblock %}
 {% block content %}
     {% get_obj_perms request.user for request.site as "user_site_perms" %}
-    <div class="col-12 fr-p-2w fr-mx-auto">
+    <div class="col-12 fr-p-3w fr-mx-auto">
         <!-- Breadcrumb -->
         <nav aria-label="breadcrumb">
             <ul class="fr-breadcrumb__list">
@@ -21,9 +21,9 @@
                 </li>
             </ul>
         </nav>
-        <div class="row resource-details mb-3">
+        <div class="row resource-details fr-mb-2w">
             <div class="col-sm-12 col-lg-8 col-xl-9">
-                <h2 class="mb-3 d-inline-block">
+                <h2 class="fr-mb-2w d-inline-block">
                     <svg class="bi" width="28" height="28" fill="currentColor">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#people" />
                     </svg>
@@ -33,7 +33,7 @@
             <!-- Sidebar -->
             <div class="col-sm-12 col-lg-4 col-xl-3 border-start">
                 <!-- Edit -->
-                <div class="d-grid gap-2 mb-3">
+                <div class="d-grid gap-2 fr-mb-2w">
                     <a class="btn btn-light btn-sm"
                        href="{% url 'addressbook-organization-update' organization.id %}"
                        role="button">
@@ -45,7 +45,7 @@
                     </a>
                 </div>
                 <!-- Add contact -->
-                <div class="d-grid gap-2 mb-3">
+                <div class="d-grid gap-2 fr-mb-2w">
                     <a class="btn btn-light btn-sm fr-mb-1v d-inline-block"
                        href="{% url 'addressbook-organization-contact-create' organization.id %}">
                         <svg class="bi fr-mr-1v" width="16" height="16" fill="currentColor">
@@ -55,7 +55,7 @@
                     </a>
                 </div>
                 {% if 'use_crm' in user_site_perms %}
-                    <div class="d-grid gap-2 mb-3">
+                    <div class="d-grid gap-2 fr-mb-2w">
                         <a class="btn btn-outline-primary w-100 btn-sm"
                            href="{% url 'crm-organization-details' organization.pk %}">
                             <svg class="bi fr-mr-1v" width="16" height="16" fill="currentColor">

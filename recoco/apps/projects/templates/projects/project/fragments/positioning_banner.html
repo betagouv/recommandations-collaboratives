@@ -1,15 +1,15 @@
 {% load static %}
 {% if not advising and is_regional_actor %}
     <div data-test-id="header-banner-advising-position"
-         class="flag blue fr-mb-2w d-flex align-items-start justify-content-between"
+         class="flag blue fr-mb-3w d-flex align-items-start justify-content-between"
          id="overview-step-5">
-        <div class="fr-pr-2w w-75">
+        <div class="fr-pr-3w w-75">
             <span class="title-info text-uppercase">Ce projet est en attente de positionnement de votre part</span>
             <p class="text-info-custom fr-mb-0 fr-mt-2v">
                 En suivant le projet, vous aurez accès aux discussions sur ce projet vous recevrez aussi des notifications sur les avancements de la collectivité.
             </p>
         </div>
-        <div class="fr-pl-2w w-25">
+        <div class="fr-pl-3w w-25">
             <form method="POST"
                   action="{% url 'projects-project-switchtender-join' project.id %}"
                   id="positioning-form">

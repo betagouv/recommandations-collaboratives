@@ -5,18 +5,18 @@
           rel="stylesheet"
           type="text/css" />
 {% endblock %}
-<div class="d-flex align-items-center fr-mb-2w fr-mt-2w w-100 justify-content-between projects-filters-container">
+<div class="d-flex align-items-center fr-mb-3w fr-mt-3w w-100 justify-content-between projects-filters-container">
     <div class="d-flex align-items-center">
-        <div class="d-flex align-items-center fr-ml-2w projects-filters-territory">
+        <div class="d-flex align-items-center fr-ml-3w projects-filters-territory">
             <span class="text-custom-info text-grey-dark fw-light fr-mr-2v">Filtrer :</span>
             <div class="input-item position-relative active"
                  x-data="{ open: false }"
                  x-on:click.outside="open = false">
-                <div class="d-flex align-items-center fr-pr-2w bg-white rounded-pill"
+                <div class="d-flex align-items-center fr-pr-3w bg-white rounded-pill"
                      x-on:click="open = !open"
                      type="button"
                      :class="{'input-active':open}">
-                    <button class="input-field bg-white px-3 fw-normal text-dark appearance-none">
+                    <button class="input-field bg-white fr-px-2w fw-normal text-dark appearance-none">
                         Projets de mon
                         territoire
                     </button>
@@ -44,7 +44,7 @@
                         </div>
                     </li>
                     <template x-for="department in departments">
-                        <li class="bg-white appearance-none w-100 d-flex justify-content-start align-items-center department-item fr-pr-2w">
+                        <li class="bg-white appearance-none w-100 d-flex justify-content-start align-items-center department-item fr-pr-3w">
                             <div class="form-check w-100 d-flex align-items-center fr-p-0">
                                 <input x-on:input.change="handleTerritoryFilter(department)"
                                        class="form-check-input fw-normal fr-ml-2v fr-px-2v fr-py-2v fr-mr-2v"
@@ -71,7 +71,7 @@
         <div class="input-item bg-white">
             <select x-model="select"
                     x-on:input.change="handleProjectsSelect"
-                    class="input-field px-3 fw-normal text-dark appearance-none z-2 specific-background-transparent specific-pr-40"
+                    class="input-field fr-px-2w fw-normal text-dark appearance-none z-2 specific-background-transparent specific-pr-40"
                     name="projects-select"
                     id="projects-select">
                 <option value="date">Date de dépôt</option>

@@ -19,7 +19,7 @@
                              role="status"></div>
                     </div>
                 </div>
-                <div class="d-flex align-items-center fr-mb-2w text-muted text-small">
+                <div class="d-flex align-items-center fr-mb-3w text-muted text-small">
                     <div class="d-flex align-items-center fr-mr-2v">
                         <svg class="align-middle bi fr-mr-2v"
                              width="18px"
@@ -51,11 +51,11 @@
     <div class="d-flex justify-content-start row flex-nowrap scroll-gestion">
         <template x-for="board in boards"
                   :key="board.code instanceof Array ? board.code[0] : board.code">
-            <div class="fr-px-2v bg-light border-top border-4 me-3 tmp-usevar"
+            <div class="fr-px-2v bg-light border-top border-4 fr-mr-2w tmp-usevar"
                  :style="`border-color:${board.color}!important;width:30%`">
                 <h5 x-text="board.title" class="font-medium text-gray-800 fr-mt-2v"></h5>
                 <div class="position-relative overflow-auto specific-height-80vh">
-                    <div class="drag-targetable py-3 h-100 position-absolute t-0 l-0 w-100 h-100"
+                    <div class="drag-targetable fr-py-2w h-100 position-absolute t-0 l-0 w-100 h-100"
                          @dragover="onDragOver(event, null)"
                          @drop="onDrop(event, board.code)"
                          @dragenter="onDragEnter(event)"

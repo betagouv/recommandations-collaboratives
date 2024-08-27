@@ -27,7 +27,7 @@
             <div class="row">
                 {% if not is_switchtender %}
                     {% if "use_surveys" in user_project_perms and session and session.next_question and session.completion < 80 %}
-                        <div class="col box-heading d-flex justify-content-between fr-mb-2w fr-mt-2w">
+                        <div class="col box-heading d-flex justify-content-between fr-mb-3w fr-mt-3w">
                             <div class="flex-grow-1">
                                 <h3>Complétez l'exploration du site !</h3>
                                 {% if session.completion > 0 %}
@@ -44,12 +44,12 @@
                             <div class="flex-shrink-1">
                                 {% if session.completion > 0 %}
                                     <a href="{% url 'survey-session-start' session.id %}"
-                                       class="btn btn-primary fw-bold fr-p-2v fr-m-2w">
+                                       class="btn btn-primary fw-bold fr-p-2v fr-m-3w">
                                         <span class="align-middle">Continuer le parcours</span><span class="align-middle">&#8594;</span>
                                     </a>
                                 {% else %}
                                     <a href="{% url 'survey-project-session' project.id %}"
-                                       class="btn btn-primary fw-bold fr-p-2v fr-m-2w">
+                                       class="btn btn-primary fw-bold fr-p-2v fr-m-3w">
                                         <span class="align-middle">Démarrer le parcours</span><span class="align-middle">&#8594;</span>
                                     </a>
                                 {% endif %}
@@ -76,10 +76,10 @@
                                 </div>
                             </div>
                         {% else %}
-                            <div class="fr-pr-2w w-100">{% include 'projects/project/fragments/topics/topic_list.html' %}</div>
+                            <div class="fr-pr-3w w-100">{% include 'projects/project/fragments/topics/topic_list.html' %}</div>
                         {% endif %}
                     </div>
-                    <div class="fr-mt-2w">
+                    <div class="fr-mt-3w">
                         <div class="d-flex w-full flex-wrap">
                             <!-- Contexte -->
                             {% include "projects/project/fragments/information_card.html" with full_width=True padding_end=True padding_top=True full_height=True project=project title="Résumé du projet" description=project.description updated_on=project.created_on card_user=project.submitted_by org_name=project.submitted_by.profile.organization.name data_test="context" %}
@@ -100,25 +100,25 @@
                     </div>
                 </div>
                 <div class="col-4">
-                    <div class="mb-3">
+                    <div class="fr-mb-2w">
                         <div class="d-flex flex-column">
                             <h6 class="text-uppercase fw-bold d-block fr-mb-1v lh-base h6-specific-fontsize-14">Localisation</h6>
                             {% include 'projects/project/fragments/geolocation/location_overview.html' %}
                         </div>
                     </div>
-                    <div class="fr-mb-2w">
+                    <div class="fr-mb-3w">
                         <div class="d-flex flex-column">
-                            <h6 class="text-uppercase fw-bold d-block mb-3 h6-specific-fontsize-14">Référent collectivité</h6>
+                            <h6 class="text-uppercase fw-bold d-block fr-mb-2w h6-specific-fontsize-14">Référent collectivité</h6>
                             {% include 'projects/project/fragments/project_owner.html' with project=project %}
                             {% include "projects/project/fragments/owner/owner-details.html" with project=project %}
                         </div>
                         {% include 'projects/project/fragments/positioning.html' %}
                     </div>
                     <!-- User lists -->
-                    <div class="d-flex flex-column fr-my-2w">
+                    <div class="d-flex flex-column fr-my-3w">
                         <!-- Collectivity -->
                         <div>
-                            <h6 class="text-uppercase fw-bold d-block mb-3 h6-specific-fontsize-14">Membres de la collectivité</h6>
+                            <h6 class="text-uppercase fw-bold d-block fr-mb-2w h6-specific-fontsize-14">Membres de la collectivité</h6>
                             <ul class="flex-column list-unstyled fr-mb-0">
                                 {% for projectmember in project.projectmember_set.all %}
                                     {% if projectmember.is_owner and projectmember.member.is_active %}
@@ -128,7 +128,7 @@
                                     {% endif %}
                                 {% endfor %}
                             </ul>
-                            <div class="d-block fr-mb-2v mt-3"
+                            <div class="d-block fr-mb-2v fr-mt-2w"
                                  {% if not "invite_collaborators" in user_project_perms %} data-bs-toggle="tooltip" data-bs-title="Vous devez être Conseiller ou Observateur pour cela" {% endif %}>
                                 <button @click="openInviteMemberModal"
                                         data-toggle="modal"
@@ -147,7 +147,7 @@
                             </div>
                         </div>
                         <!-- Advisors -->
-                        <div class="fr-mt-2w">
+                        <div class="fr-mt-3w">
                             <h6 class="text-uppercase fw-bold d-block h6-specific-fontsize-14">Équipe de suivi</h6>
                             <ul class="d-flex flex-column list-unstyled fr-mb-0">
                                 {% for advisor in project.switchtender_sites.all %}
@@ -157,7 +157,7 @@
                                 {% endfor %}
                             </ul>
                             {% if "invite_advisors" in user_project_perms or is_regional_actor %}
-                                <div class="d-block fr-mb-2v mt-3">
+                                <div class="d-block fr-mb-2v fr-mt-2w">
                                     <button @click="openInviteSwitchtenderModal"
                                             data-toggle="modal"
                                             data-target="#InviteSwitchtenderModal"

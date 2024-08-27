@@ -1,11 +1,11 @@
 {% load static %}
 <!-- resources -->
 <div id="resource-list"
-     class="fr-mb-2w grow"
+     class="fr-mb-3w grow"
      x-show="push_type != 'noresource'"
      x-transition:enter-start="grow-enter-start"
      x-transition:leave="grow-leave">
-    <h4 class="mb-3">
+    <h4 class="fr-mb-2w">
         <span class="text-muted fr-mr-1v">2.</span>Sélectionnez les ressources à publier
     </h4>
     <div class="search input-group-lg">
@@ -31,7 +31,7 @@
         class="cards d-flex row row-cols-3 g-4 fr-pl-0 fr-ml-0 fr-mt-1v">
         <template x-for="resource in resultsAndSelected()" :key="resource.id">
             <li class="col">
-                <div class="resource-card card fr-p-2v ps-5 rounded">
+                <div class="resource-card card fr-p-2v fr-pl-6w rounded">
                     <div class="card-body position-relative">
                         <template x-if="push_type == 'single'">
                             <input :id="'resource-' + resource.id"
@@ -85,7 +85,7 @@
         </template>
     </ul>
     <div x-show="results.length <= 0 && search != ''"
-         class="p-3 w-100 text-center rounded bg-light">
+         class="fr-p-2w w-100 text-center rounded bg-light">
         <span class="fw-bolder">Aucune ressource correspondante</span>
         <div x-show="suggestions.length">
             Vous cherchez peut être : <template x-for="suggestion in suggestions">

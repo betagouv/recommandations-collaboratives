@@ -15,7 +15,7 @@
         <li class="{% if cropped %}mb-0 {% endif %} list-group-item border-0">
             <span class="small text-secondary">{{ date|naturalday|capfirst }}</span>
             {% for action in actions %}
-                <div class="{% if cropped %}my-1 fr-mb-0 {% else %} my-3 fr-mb-2w {% endif %} fr-py-1v border-start border-4 ps-3">
+                <div class="{% if cropped %}my-1 fr-mb-0 {% else %} fr-my-2w fr-mb-3w {% endif %} fr-py-1v border-start border-4 fr-pl-2w">
                     {% if action.target %}
                         <span class="align-items-center link-dark text-decoration-none">
                             <img src="{% gravatar_url action.actor.email 32 %}"
@@ -41,7 +41,7 @@
             {% endfor %}
         </li>
     {% empty %}
-        <div class="fr-mt-2w bg-light d-flex flex-column justify-content-center align-items-center fr-py-2w rounded">
+        <div class="fr-mt-3w bg-light d-flex flex-column justify-content-center align-items-center fr-py-3w rounded">
             <p class="fr-m-0 text-info-custom text-grey text-center fw-normal">Quelles sont vos actualités sur le dossier ?</p>
         </div>
     {% endfor %}

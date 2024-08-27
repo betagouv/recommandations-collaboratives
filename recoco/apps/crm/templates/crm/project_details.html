@@ -28,8 +28,8 @@
             </div>
             {% endif %}
             {% if project.deleted %}
-                <div class="d-block fr-mx-4v">
-                    <div class="alert alert-danger fr-mt-2w" role="alert">
+                <div class="d-block fr-mx-3w">
+                    <div class="alert alert-danger fr-mt-3w" role="alert">
                         <span>Ce projet a été supprimé. Ceci signifie qu'il n'est plus visible sur {{ request.site.name }}. Vous pouvez néanmoins le réactiver si vous le souhaitez.</span>
                         <div class="d-flex justify-content-end fr-mt-2v">
                             <form method="post" action="{% url 'crm-project-undelete' project.pk %}">
@@ -41,9 +41,9 @@
                 </div>
             {% endif %}
             {% if active_project %}
-                <div class="crm-header fr-px-2w fr-py-2w mb-3 d-flex justify-content-between align-items-center">
+                <div class="crm-header fr-px-3w fr-py-3w fr-mb-2w d-flex justify-content-between align-items-center">
              {% else %}
-                <div class="crm-header no-project fr-px-2w fr-py-2w d-flex justify-content-between align-items-center">
+                <div class="crm-header no-project fr-px-3w fr-py-3w d-flex justify-content-between align-items-center">
              {% endif %}
                     <div>
                         <h3 class="d-flex fr-mb-0 align-items-center">
@@ -103,9 +103,9 @@
                        aria-current="page">Gérer le projet</a>
                 </div>
             </div>
-            <div class="fr-px-2w fr-pt-2w crm-notes-wrapper">
+            <div class="fr-px-3w fr-pt-3w crm-notes-wrapper">
                 <div class="d-flex justify-content-between align-items-start">
-                    <a class="btn btn-primary fr-mb-2w"
+                    <a class="btn btn-primary fr-mb-3w"
                        href="{% url 'crm-project-note-create' project.pk %}">créer une note</a>
                 </div>
                 {% for note in sticky_notes.all %}
@@ -115,7 +115,7 @@
                     {% include "crm/note.html" with update_url_name="crm-project-note-update" get_user_profile=True %}
                 {% endfor %}
             </div>
-            <div class="fr-px-2w fr-pt-2w bg-light crm-timeline-min-height">
+            <div class="fr-px-3w fr-pt-3w bg-light crm-timeline-min-height">
                 <h4>Activité</h4>
                 {% include "crm/timeline.html" %}
             </div>

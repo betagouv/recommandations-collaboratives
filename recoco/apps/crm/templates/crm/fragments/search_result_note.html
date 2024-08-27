@@ -11,7 +11,7 @@
             <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#stickies-fill" />
         </svg>  
         {% if get_user_profile and note.related and note.content_type.name == "utilisateur" %}
-            <div class="position-relative d-flex justify-content-center align-items-center me-3 border border-dark rounded bg-white fr-px-2v fr-py-1v">
+            <div class="position-relative d-flex justify-content-center align-items-center fr-mr-2w border border-dark rounded bg-white fr-px-2v fr-py-1v">
                 <svg class="bi fr-mr-2v" width="18" height="18" fill="currentColor">
                     <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#person-circle" />
                 </svg>
@@ -50,7 +50,7 @@
         </a>
     </div>
     <div class="d-flex justify-content-center align-items-center">
-        <span class="d-flex align-items-center {% if note.title %} ms-3 {% else %} fr-ml-0{% endif %} specific-fontsize-08 specific-color-grey">
+        <span class="d-flex align-items-center {% if note.title %} fr-ml-2w {% else %} fr-ml-0{% endif %} specific-fontsize-08 specific-color-grey">
             <svg class="bi fr-mr-1v" width="15" height="15" fill="currentColor">
                 <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#person-fill" />
             </svg>
@@ -71,6 +71,6 @@
 <div class="d-flex fr-mb-2v">
     {% for tag in note.tags.all %}<span class="fr-mx-1v badge rounded-pill small bg-dark">{{ tag }}</span>{% endfor %}
 </div>
-<article class="d-flex tiny crm-notes-wrapper pt-3 fr-pb-0 fr-mb-0 fr-px-2v">
+<article class="d-flex tiny crm-notes-wrapper fr-pt-2w fr-pb-0 fr-mb-0 fr-px-2v">
     <p>{{ note.content_rendered|safe|truncatechars_html:75 }}</p>
 </article>

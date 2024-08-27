@@ -85,7 +85,7 @@
                            href="mailto:currentUser.email"
                            x-text="truncate(currentUser.email,30)"></a>
                     </div>
-                    <button class="fr-ml-2w fr-px-2v fr-py-0 btn small btn-outline-primary"
+                    <button class="fr-ml-3w fr-px-2v fr-py-0 btn small btn-outline-primary"
                             @click.stop="clipboardCopy(`L'email`, currentUser.email)">
                         <svg class="bi align-baseline" width="10" height="10" fill="currentColor">
                             <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#clipboard" />
@@ -106,7 +106,7 @@
                            href="tel:{{ user.profile.phone_no }}"
                            x-text="currentUser.profile.phone_no"></a>
                     </div>
-                    <button class="fr-ml-2w fr-px-2v fr-py-0 btn small btn-outline-primary"
+                    <button class="fr-ml-3w fr-px-2v fr-py-0 btn small btn-outline-primary"
                             @click.stop="clipboardCopy('Le numéro de téléphone', '{{ user.profile.phone_no }}')">
                         <svg class="bi align-baseline" width="10" height="10" fill="currentColor">
                             <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#clipboard" />

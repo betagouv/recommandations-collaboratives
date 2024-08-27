@@ -1,7 +1,7 @@
 {% load static %}
 {% load l10n %}
 {% if 'change_location' in user_project_perms and project.location_x == None and project.location_y == None %}
-    <div class="card-text project-card-details map d-flex flex-column gap-1 text-muted px-3 fr-py-2v">
+    <div class="card-text project-card-details map d-flex flex-column gap-1 text-muted fr-px-2w fr-py-2v">
         <a href="{% url 'projects-project-location' project.pk %}"
            class="link-project-location-edit text-decoration-none"
            data-test-id="link-project-location-edit">Modifier la localisation du projet</a>

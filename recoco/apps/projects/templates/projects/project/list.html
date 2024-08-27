@@ -51,7 +51,7 @@
 {% endblock %}
 {% block content %}
     {% get_obj_perms request.user for request.site as "user_site_perms" %}
-    <div class="col-12 fr-p-2w fr-mx-auto">
+    <div class="col-12 fr-p-3w fr-mx-auto">
         <div class="row fr-mx-0">
             <div class="d-flex flex-column fr-p-0 fr-m-0">
                 {% block project_list_content %}{% endblock %}

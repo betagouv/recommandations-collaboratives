@@ -11,7 +11,7 @@
     </style>
 {% endblock %}
 {% block content %}
-    <div class="col-11 col-lg-9 py-5 fr-mx-auto">
+    <div class="col-11 col-lg-9 fr-py-6w fr-mx-auto">
         <h2>
             <svg class="bi fr-mr-2v" width="32" height="32">
                 <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#megaphone" />
@@ -21,7 +21,7 @@
         <h3 class="fr-py-2v">Merci ! Pourriez-vous nous préciser votre commune ?</h3>
         <form class="form" action="." method="POST">
             {% csrf_token %}
-            <span class="fr-mt-2w">Nous avons trouvé <strong>plusieurs communes</strong> correspondantes à ce code postal, laquelle est la vôtre ?</span>
+            <span class="fr-mt-3w">Nous avons trouvé <strong>plusieurs communes</strong> correspondantes à ce code postal, laquelle est la vôtre ?</span>
             <div class="commune-select">{{ form.as_p }}</div>
             <button class="btn btn-primary" type="submit">Valider</button>
         </form>

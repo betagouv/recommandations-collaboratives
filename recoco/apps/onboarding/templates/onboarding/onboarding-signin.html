@@ -42,7 +42,7 @@
                 <strong>Déposer votre projet</strong> {{ request.site.name }}
             </h1>
         </div>
-        <div class="fr-stepper mb-3">
+        <div class="fr-stepper fr-mb-2w">
             <h2 class="fr-stepper__title">
                 Identifiez-vous
                 <span class="fr-stepper__state">Étape 1 sur 2</span>
@@ -76,7 +76,7 @@
                             <fieldset class="fr-fieldset">
                                 <legend class="fr-fieldset__legend legend-specific-fontsize-1--5">Vous avez dejà un compte ? Identifiez-vous !</legend>
                                 {% if user_other_sites %}
-                                    <div class="fr-mx-2v fr-mb-2w custom-callout-blue">
+                                    <div class="fr-mx-2v fr-mb-3w custom-callout-blue">
                                         Pour vous connecter à {{ request.site.name }}, utilisez le même compte que sur
                                         {% for site in user_other_sites %}
                                             {% if not forloop.first and not forloop.last %},{% endif %}

@@ -64,7 +64,7 @@
             </div>
             {% if messages %}
                 <div id="notification-container"
-                     class="position-fixed bottom-0 end-0 p-3 z-2">
+                     class="position-fixed bottom-0 end-0 fr-p-2w z-2">
                     {% for message in messages %}
                         <div class="toast" role="alert" aria-live="assertive" aria-atomic="true">
                             <div class="toast-header {% if message.level == DEFAULT_MESSAGE_LEVELS.SUCCESS %}bg-success text-white{% endif %} {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}bg-error text-white{% endif %}">

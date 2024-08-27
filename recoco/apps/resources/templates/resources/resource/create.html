@@ -9,7 +9,7 @@
           type="text/css">
 {% endblock %}
 {% block content %}
-    <div class="col-12 fr-p-2w fr-mx-auto">
+    <div class="col-12 fr-p-3w fr-mx-auto">
         <!-- Breadcrumb -->
         <nav aria-label="breadcrumb">
             <ul class="fr-breadcrumb__list">
@@ -74,12 +74,12 @@
                     {{ form.category }}
                 </p>
                 <hr />
-                <div class="d-flex fr-mt-2w fr-mb-2w">
-                    <div class="w-50 d-flex flex-column select-custom border-end fr-pr-2w fr-py-2w">
+                <div class="d-flex fr-mt-3w fr-mb-3w">
+                    <div class="w-50 d-flex flex-column select-custom border-end fr-pr-3w fr-py-3w">
                         {{ form.departments.errors }}
                         {% include 'tools/searchable_list.html' with list=form.departments label=form.departments.label search_list_id=form.departments.id_for_label search_options="['name']" item_label="département" %}
                     </div>
-                    <div class="w-50 d-flex flex-column select-custom fr-ml-2v fr-ml-2w fr-py-2w">
+                    <div class="w-50 d-flex flex-column select-custom fr-ml-2v fr-ml-3w fr-py-3w">
                         {{ form.contacts.errors }}
                         {% include 'tools/searchable_list.html' with list=form.contacts label=form.contacts.label search_list_id=form.contacts.id_for_label search_options="['name']" item_label="contact" %}
                     </div>

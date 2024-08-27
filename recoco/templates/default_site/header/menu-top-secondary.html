@@ -48,7 +48,7 @@
                         <ul x-show="open"
                             :class="{'show':open}"
                             class="dropdown-menu fr-py-0 top-100 fr-mt-2v">
-                            <li class="list-group-item px-3 fr-py-2v fr-my-0 list-group-item-action dropdown-item border-0 border-bottom">
+                            <li class="list-group-item fr-px-2w fr-py-2v fr-my-0 list-group-item-action dropdown-item border-0 border-bottom">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <span class="text-break text-truncate">
                                         <a class="stretched-link text-reset text-decoration-none"
@@ -56,7 +56,7 @@
                                     </span>
                                 </div>
                             </li>
-                            <li class="text-white bg-blue-light-hover list-group-item px-3 fr-py-2v list-group-item-action dropdown-item border-0 d-flex align-items-center specific-background-0063CB">
+                            <li class="text-white bg-blue-light-hover list-group-item fr-px-2w fr-py-2v list-group-item-action dropdown-item border-0 d-flex align-items-center specific-background-0063CB">
                                 <span class="text-break text-truncate">
                                     <svg data-toggle="tooltip"
                                          data-placement="top"
@@ -119,7 +119,7 @@
                                 class="project-selector-dropdown dropdown-menu fr-py-0 fr-mt-2v top-100 overflow-y-scroll"
                                 data-test-id="project-selector-dropdown">
                                 {% for project in request.session.projects %}
-                                    <li class="list-group-item px-3 fr-py-2v fr-my-0 list-group-item-action dropdown-item border-0 border-bottom"
+                                    <li class="list-group-item fr-px-2w fr-py-2v fr-my-0 list-group-item-action dropdown-item border-0 border-bottom"
                                         :class="{'inactive': '{{ project.inactive }}' === 'True'}">
                                         <div class="d-flex flex-wrap justify-content-between align-items-center">
                                             <span class="text-break text-truncate">
@@ -141,7 +141,7 @@
                                     </li>
                                 {% endfor %}
                                 {% if not is_switchtender %}
-                                    <li class="text-white bg-blue-light-hover list-group-item px-3 fr-py-2v list-group-item-action dropdown-item border-0 d-flex align-items-center specific-background-0063CB">
+                                    <li class="text-white bg-blue-light-hover list-group-item fr-px-2w fr-py-2v list-group-item-action dropdown-item border-0 d-flex align-items-center specific-background-0063CB">
                                         <span class="text-break text-truncate">
                                             <svg data-toggle="tooltip"
                                                  data-placement="top"
@@ -200,7 +200,7 @@
                         :class="{'show':open}"
                         class="dropdown-menu fr-py-0 fr-mt-2v top-100">
                         <li>
-                            <a class="dropdown-item fr-px-2w fr-py-2v"
+                            <a class="dropdown-item fr-px-3w fr-py-2v"
                                href="{% url 'resources-resource-create' %}">Créer</a>
                         </li>
                     </ul>
