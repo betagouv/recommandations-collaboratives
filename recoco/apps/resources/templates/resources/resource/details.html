@@ -4,10 +4,18 @@
 {% load gravatar %}
 {% load guardian_tags %}
 {% load sass_tags %}
-{% block title %}{{ resource.title }}{% endblock %}
-{% block og_title %}{{ resource.title }}{% endblock %}
-{% block description %}{{ resource.subtitle }}{% endblock %}
-{% block og_description %}{{ resource.subtitle }}{% endblock %}
+{% block title %}
+    {{ resource.title }}
+{% endblock title %}
+{% block og_title %}
+    {{ resource.title }}
+{% endblock og_title %}
+{% block description %}
+    {{ resource.subtitle }}
+{% endblock description %}
+{% block og_description %}
+    {{ resource.subtitle }}
+{% endblock og_description %}
 {% block css %}
     <link href="{% sass_src 'resources/resources.scss' %}"
           rel="stylesheet"
@@ -84,17 +92,17 @@
         }
 	}
     </style>
-{% endblock %}
+{% endblock css %}
 {% block content %}
     <div class="row fr-py-6w" id="resource-main-content">
         <div class="col-9 fr-px-6w fr-mx-auto font-marianne" id="resource-main">
-            {% include 'resources/resource/fragments/breadcrumb.html' %}
+            {% include "resources/resource/fragments/breadcrumb.html" %}
             <div class="d-flex align-items-center fr-mb-2w" id="resource-details">
-                {% include 'resources/resource/fragments/category_list.html' %}
-                {% include 'resources/resource/fragments/author.html' %}
+                {% include "resources/resource/fragments/category_list.html" %}
+                {% include "resources/resource/fragments/author.html" %}
             </div>
-            {% include 'resources/resource/fragments/flag.html' %}
-            {% include 'resources/resource/fragments/resource_content.html' with resource=resource contacts=contacts %}
+            {% include "resources/resource/fragments/flag.html" %}
+            {% include "resources/resource/fragments/resource_content.html" with resource=resource contacts=contacts %}
             {% comment %} <div class="bd-callout ">
             <svg class="bi fr-mr-2v align-middle" width="24" height="24">
                 <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#question-circle-fill" />
@@ -125,7 +133,7 @@
                         {% if active_project %}
                             {% if not resource.status == 0 %}
                                 <form action="{% url "projects-create-resource-action" resource.id %}"
-                                      method="GET">
+                                      method="get">
                                     <button type="submit" class="button w-100 btn-sm" role="submit">Pousser la ressource</button>
                                 </form>
                             {% endif %}
@@ -141,7 +149,10 @@
                 {% endif %}
                 <div id="print" class="d-flex w-100 fr-mt-2v">
                     <a onclick="window.print()" class="button blue w-100 text-center">
-                        <svg class="bi align-middle fr-mr-2v" width="18" height="18" fill="#0063CB">
+                        <svg class="bi align-middle fr-mr-2v"
+                             width="18"
+                             height="18"
+                             fill="#0063CB">
                             <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#printer" />
                         </svg>
                         <span>Imprimer</span>
@@ -164,18 +175,18 @@
                 {% endif %}
                 <div class="fr-mt-3w">
                     {% if resource.departments.count %}
-                        {% include 'resources/resource/fragments/departments.html' %}
+                        {% include "resources/resource/fragments/departments.html" %}
                     {% endif %}
                 </div>
                 {% if request.user %}
-                    {% include 'resources/resource/fragments/contact_list.html' %}
+                    {% include "resources/resource/fragments/contact_list.html" %}
                 {% endif %}
             </div>
             <div id="project_used" class="fr-mt-3w">
                 {% if projects_used_by %}
-                    {% include 'resources/resource/fragments/project_used.html' %}
+                    {% include "resources/resource/fragments/project_used.html" %}
                 {% endif %}
             </div>
         </div>
     </div>
-{% endblock %}
+{% endblock content %}
