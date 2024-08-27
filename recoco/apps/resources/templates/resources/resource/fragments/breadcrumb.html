@@ -1,16 +1,22 @@
 <!-- Resource Breadcrumb -->
-<nav aria-label="breadcrumb" class="fr-mb-3w fr-pb-1v">
-    <ol class="fr-breadcrumb__list">
-        <li class="fr-breadcrumb__link">
-            <a class="small" href="{% url 'home' %}">Accueil</a>
-        </li>
-        <li class="fr-breadcrumb__link">
-            <span class="text-secondary small">
-                <a href="{% url 'resources-resource-search' %}">Ressources</a>
-            </span>
-        </li>
-        <li class="fr-breadcrumb__link">
-            <span class="text-secondary small">{{ resource.title|capfirst|truncatewords:10 }}</span>
-        </li>
-    </ol>
+<nav role="navigation"
+     class="fr-breadcrumb fr-mb-3w fr-pb-1v"
+     aria-label="vous êtes ici :">
+    <button class="fr-breadcrumb__button"
+            aria-expanded="false"
+            aria-controls="breadcrumb-1">Voir le fil d’Ariane</button>
+    <div class="fr-collapse" id="breadcrumb-1">
+        <ol class="fr-breadcrumb__list">
+            <li>
+                <a class="fr-breadcrumb__link" href="{% url 'home' %}">Accueil</a>
+            </li>
+            <li>
+                <a class="fr-breadcrumb__link"
+                   href="{% url 'resources-resource-search' %}">Ressources</a>
+            </li>
+            <li>
+                <a class="fr-breadcrumb__link" aria-current="page">{{ resource.title|capfirst|truncatewords:10 }}</a>
+            </li>
+        </ol>
+    </div>
 </nav>

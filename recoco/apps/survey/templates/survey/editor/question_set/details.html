@@ -10,22 +10,30 @@
 {% block content %}
     <div class="col-12 fr-p-3w fr-mx-auto">
         <!-- Breadcrumb -->
-        <nav aria-label="breadcrumb">
-            <ol class="fr-breadcrumb__list">
-                <li class="fr-breadcrumb__link">
-                    <svg class="bi align-middle" width="18" height="18" fill="currentColor">
-                        <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#question-square-fill" />
-                    </svg>
-                    &nbsp;
-                    Questionnaire
-                </li>
-                <li class="fr-breadcrumb__link">
-                    <a href="{% url 'survey-editor-survey-details' question_set.survey.id %}">
-                        {{ question_set.survey.name|default:"Questionnaire"|title|truncatechars:20 }}
-                    </a>
-                </li>
-                <li class="fr-breadcrumb__link active">{{ question_set.heading|default:"Groupe de Questions"|truncatechars:20 }}</li>
-            </ol>
+        <nav role="navigation" class="fr-breadcrumb" aria-label="vous êtes ici :">
+            <button class="fr-breadcrumb__button"
+                    aria-expanded="false"
+                    aria-controls="breadcrumb-1">Voir le fil d’Ariane</button>
+            <div class="fr-collapse" id="breadcrumb-1">
+                <ol class="fr-breadcrumb__list">
+                    <li>
+                        <svg class="bi align-top" width="18" height="18" fill="currentColor">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#question-square-fill" />
+                        </svg>
+                        &nbsp;
+                        Questionnaire
+                    </li>
+                    <li>
+                        <a class="fr-breadcrumb__link"
+                           href="{% url 'survey-editor-survey-details' question_set.survey.id %}">
+                            {{ question_set.survey.name|default:"Questionnaire"|title|truncatechars:20 }}
+                        </a>
+                    </li>
+                    <li>
+                        <a class="fr-breadcrumb__link" aria-current="page">{{ question_set.heading|default:"Groupe de Questions"|truncatechars:20 }}</a>
+                    </li>
+                </ol>
+            </div>
         </nav>
         <div class="row resource-details fr-mb-2w">
             <div class="col-sm-12 col-lg-8 col-xl-9">

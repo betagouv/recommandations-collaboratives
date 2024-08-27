@@ -3,13 +3,21 @@
 {% block content %}
     <div class="col-12 fr-p-3w fr-mx-auto">
         <!-- Breadcrumb -->
-        <nav aria-label="breadcrumb">
-            <ol class="fr-breadcrumb__list">
-                <li class="fr-breadcrumb__link">
-                    <a href="{% url 'projects-project-detail' followup.task.project.id %}">{{ followup.task.project.name|title|truncatechars:20 }}</a>
-                </li>
-                <li class="fr-breadcrumb__link active">{{ followup.task.intent|truncatechars:20 }}</li>
-            </ol>
+        <nav role="navigation" class="fr-breadcrumb" aria-label="vous êtes ici :">
+            <button class="fr-breadcrumb__button"
+                    aria-expanded="false"
+                    aria-controls="breadcrumb-1">Voir le fil d’Ariane</button>
+            <div class="fr-collapse" id="breadcrumb-1">
+                <ol class="fr-breadcrumb__list">
+                    <li>
+                        <a class="fr-breadcrumb__link"
+                           href="{% url 'projects-project-detail' followup.task.project.id %}">{{ followup.task.project.name|title|truncatechars:20 }}</a>
+                    </li>
+                    <li>
+                        <a class="fr-breadcrumb__link" aria-current="page">{{ followup.task.intent|truncatechars:20 }}</a>
+                    </li>
+                </ol>
+            </div>
         </nav>
         <h1 class=" align-items-center">
             <svg class="bi" width="40" height="40" fill="currentColor">
