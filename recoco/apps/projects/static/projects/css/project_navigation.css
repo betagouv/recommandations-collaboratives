@@ -52,6 +52,10 @@
   margin-bottom: 0;
 }
 
+.project-navigation li {
+  padding-bottom: 0;
+}
+
 .project-navigation a.active {
   background-color: white;
   font-weight: bold;
@@ -115,8 +119,4 @@
 .project-navigation .survey p {
   margin: 0;
   transform: translate3d(0, -4px, 0);
-}
-
-.specific-padding-0 {
-  padding: 0;
 }

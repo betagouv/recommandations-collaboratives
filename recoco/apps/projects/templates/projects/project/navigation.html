@@ -14,7 +14,7 @@
 {% get_obj_perms request.user for project as "user_project_perms" %}
 {% is_staff_for_current_site request.user as is_staff %}
 {% get_advising_position user project request.site as position %}
-<ul class="project-navigation d-flex align-items-center specific-padding-0">
+<ul class="project-navigation d-flex align-items-center fr-p-0">
     <div class="position-relative d-flex align-items-center"
          id="overview-step-1">
         {% if overview %}
