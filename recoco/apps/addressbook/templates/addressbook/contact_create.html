@@ -1,11 +1,13 @@
 {% extends "base.html" %}
 {% load static %}
-{% block title %}Ajouter un contact à {{ organization.name }} {{ block.super }}{% endblock %}
+{% block title %}
+    Ajouter un contact à {{ organization.name }} {{ block.super }}
+{% endblock title %}
 {% block content %}
     <div class="col-12 fr-p-3w fr-mx-auto">
         <!-- Breadcrumb -->
         <nav aria-label="breadcrumb">
-            <ul class="fr-breadcrumb__list">
+            <ol class="fr-breadcrumb__list">
                 <li class="fr-breadcrumb__link">
                     <svg class="bi align-middle" width="18" height="18" fill="currentColor">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#person-lines-fill" />
@@ -24,10 +26,10 @@
             </ol>
         </nav>
         <h2>Ajouter un contact à {{ organization.name }}</h2>
-        <form id="form-contact-create" class="form" method="POST">
+        <form id="form-contact-create" class="form" method="post">
             {% csrf_token %}
             {{ form.as_p }}
             <input class="btn btn-primary" type="submit" value="Créer">
         </form>
     </div>
-{% endblock %}
+{% endblock content %}

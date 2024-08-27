@@ -6,7 +6,7 @@
         <h2>Mise à jour d'un pré-fléchage</h2>
         <p>{{ recommendation.ressource.title }} / {{ recommendation.text }}</p>
         <form class="form"
-              method="POST"
+              method="post"
               action="{% url 'projects-task-recommendation-update' recommendation.pk %}">
             {% csrf_token %}
             {{ form.as_p }}

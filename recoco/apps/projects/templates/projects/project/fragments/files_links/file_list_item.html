@@ -29,7 +29,7 @@
             </div>
             <div class="d-flex align-items-center">
                 {% if "manage_documents" in user_project_perms %}
-                    <form method="POST"
+                    <form method="post"
                           action="{% url 'projects-documents-pin-unpin' project.pk document.pk %}">
                         {% csrf_token %}
                         <button class="btn btn-link d-flex fr-p-0 fr-mr-2v">
@@ -48,8 +48,7 @@
                           method="post"
                           action="{% url 'projects-documents-delete-document' project.pk document.pk %}">
                         {% csrf_token %}
-                        <button id="file-delete-button"
-                                class="d-flex border-0 btn-background0">
+                        <button id="file-delete-button" class="d-flex border-0 btn-background0">
                             <svg class="bi align-baseline fill-grey" width="20" height="20">
                                 <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#trash" />
                             </svg>

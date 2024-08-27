@@ -32,7 +32,7 @@
                 {% endwith %}
             </p>
         {% endif %}
-        <form method="POST" data-test-id="contact-form">
+        <form method="post" data-test-id="contact-form">
             {% csrf_token %}
             <input type="hidden" name="next" value="{{ request.GET.next }}" />
             {% if form.name %}

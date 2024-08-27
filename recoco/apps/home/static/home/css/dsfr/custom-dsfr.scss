@@ -1,22 +1,22 @@
 :root {
   --underline-img: ;
   // --underline-img: linear-gradient(0deg, currentColor, currentColor);
-  --link-blank-content: ;
-  // --link-blank-content: '';
-  --ul-type: ;
-  // --ul-type: disc;
-  --ol-type: ;
-  // --ol-type: decimal;
-  --ul-start: ;
-  // --ul-start: 1rem;
-  --ol-start: ;
-  // --ol-start: 1.5rem;
-  --xl-block: ;
-  // --xl-block: 0.5rem;
-  --li-bottom: ;
-  // --li-bottom: 0.25rem;
-  --xl-base: ;
-  // --xl-base: 1em;
+  // --link-blank-content: ;
+  --link-blank-content: '';
+  // --ul-type: ;
+  --ul-type: disc;
+  // --ol-type: ;
+  --ol-type: decimal;
+  // --ul-start: ;
+  --ul-start: 1rem;
+  // --ol-start: ;
+  --ol-start: 1.5rem;
+  // --xl-block: ;
+  --xl-block: 0.5rem;
+  // --li-bottom: ;
+  --li-bottom: 0.25rem;
+  // --xl-base: ;
+  --xl-base: 1em;
   // --ol-content: ;
   --ol-content: counters(li-counter, '.') '.\00a0\00a0';
   --text-spacing: ;
@@ -128,6 +128,13 @@ button.fr-text-inverted--grey {
   }
 }
 
+/* ¯¯¯ *\
+  FORMS
+\* ˍˍˍ */
+
+form > p {
+  margin-bottom: 1rem;
+}
 /* ¯¯¯¯¯¯¯¯¯ *\
   CONSENT MAIN
 \* ˍˍˍˍˍˍˍˍˍ */

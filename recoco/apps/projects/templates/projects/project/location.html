@@ -46,7 +46,7 @@
              class="location-edit col-11 fr-py-3w fr-mx-auto">
             <!-- Breadcrumb -->
             <nav aria-label="breadcrumb">
-                <ul class="fr-breadcrumb__list">
+                <ol class="fr-breadcrumb__list">
                     <li class="fr-breadcrumb__link">
                         <svg class="bi align-middle" width="18" height="18" fill="currentColor">
                             <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#building" />
@@ -55,7 +55,7 @@
                         <a href="{% url 'projects-project-detail' project.id %}">{{ project.name|truncatechars:20 }}</a>
                     </li>
                     <li class="fr-breadcrumb__link">Localisation</li>
-                </ul>
+                </ol>
             </nav>
             <div class="row">
                 <header class="location-header qs-heading">
@@ -89,7 +89,7 @@
                         </div>
                     </div>
                     <div class="location-footer bg-white">
-                        <form method="POST"
+                        <form method="post"
                               action=""
                               name="ProjectLocationForm"
                               class="d-flex form-coordinates text-muted flex-row-reverse">

@@ -31,7 +31,7 @@
             <div class="d-flex justify-content-end align-items-center">
                 <form id="form__banner-activate-project"
                       data-test-id="form__banner-activate-project"
-                      method="POST"
+                      method="post"
                       action="{% url 'projects-project-set-active' project.pk %}">
                     {% csrf_token %}
                     <button data-test-id="button-activate-project"

@@ -6,13 +6,18 @@
 {% load django_vite %}
 {% load phone_filters %}
 {% load survey %}
+{% load sass_tags %}
 {% block js %}
     {% vite_asset 'js/apps/projectDetails.js' %}
     {% vite_asset 'js/apps/projectShare.js' %}
     {% vite_asset 'js/apps/tutorial.js' %}
 {% endblock %}
 {% block css %}
-    <link href="{% static 'projects/css/overview.scss' %}"
+    <link href="{% sass_src 'projects/css/overview.scss' %}"
+          rel="stylesheet"
+          type="text/css">
+    {% comment %} TODO Check this css file load {% endcomment %}
+    <link href="{% sass_src 'projects/css/project.scss' %}"
           rel="stylesheet"
           type="text/css">
 {% endblock %}

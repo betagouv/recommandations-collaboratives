@@ -19,19 +19,16 @@
     </style>
 {% endblock %}
 {% block content %}
-    <div x-data="Crm"
-         class="d-flex fr-px-0">
+    <div x-data="Crm" class="d-flex fr-px-0">
         {% include "crm/fragments/sidebar.html" with search=True back_button=True user_advised_projects=False user_projects=False %}
         <div class="w-75 d-flex flex-column justify-content-start">
             <div class="crm-header fr-px-3w fr-py-3w fr-mb-2w">
                 <div class="d-flex justify-content-between align-items-center fr-mb-2v">
                     <h3>Proposer le projet « {{ project.name }} » à un autre portail</h3>
                 </div>
-
                 Proposer le projet à un autre portail pour obtenir le conseil d'expert·e·s d'autres thématiques.
                 Cette action est transparente pour la collectivité.
             </div>
-
             <div>
                 <table class="fr-table--sm fr-table fr-table">
                     <thead>
@@ -41,43 +38,44 @@
                             <th>Etat</th>
                         </tr>
                     </thead>
-
                     {% for site in available_sites %}
-                    {% get_projectsite_for_site project site as ps %}
-                    <tr>
-                        <td>
-                            {% if site.configuration.logo_small %}
-                            <img height="40px" src="{{ site.configuration.logo_small.url }}" alt="Logo {{ site.name }}">&nbsp;
-                            {% endif %}
-                            <strong>{{ site.name }}</strong>
-                            <br/>
-                            <span class="small"><a href="https://{{ site.domain }}" target="_blank">{{ site.domain }}</a></span>
-                            {% if ps.is_origin %}
-                            <br>
-                            <p class="fr-badge fr-badge--green-menthe">Site d'origine</p>
-                            {% endif %}
-                        </td>
-                        <td>{{ site.configuration.description|default:"-" }}</td>
-                        <td>
-                            {% if ps %}
-                              {% if ps.status == "REFUSED" %}
-                                <p class="fr-badge fr-badge--error"></p>
-                              {% elif ps.status == "DRAFT" %}
-                                <p class="fr-badge fr-badge--warning">{{ ps.get_status_display }}</p>
-                              {% else %}
-                                <p class="fr-badge fr-badge--success">{{ ps.get_status_display }}</p>
-                              {% endif %}
-                            {% else %}
-                                <form method="POST" action="{% url 'crm-project-handover' project.pk %}">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="site" value="{{ site.pk }}"/>
-                                    <button class="fr-btn">Proposer</button>
-                                </form>
-                            {% endif %}
-                        </td>
-                    </tr>
+                        {% get_projectsite_for_site project site as ps %}
+                        <tr>
+                            <td>
+                                {% if site.configuration.logo_small %}
+                                    <img height="40px"
+                                         src="{{ site.configuration.logo_small.url }}"
+                                         alt="Logo {{ site.name }}">
+                                    &nbsp;
+                                {% endif %}
+                                <strong>{{ site.name }}</strong>
+                                <br />
+                                <span class="small"><a href="https://{{ site.domain }}" target="_blank">{{ site.domain }}</a></span>
+                                {% if ps.is_origin %}
+                                    <br>
+                                    <p class="fr-badge fr-badge--green-menthe">Site d'origine</p>
+                                {% endif %}
+                            </td>
+                            <td>{{ site.configuration.description|default:"-" }}</td>
+                            <td>
+                                {% if ps %}
+                                    {% if ps.status == "REFUSED" %}
+                                        <p class="fr-badge fr-badge--error"></p>
+                                    {% elif ps.status == "DRAFT" %}
+                                        <p class="fr-badge fr-badge--warning">{{ ps.get_status_display }}</p>
+                                    {% else %}
+                                        <p class="fr-badge fr-badge--success">{{ ps.get_status_display }}</p>
+                                    {% endif %}
+                                {% else %}
+                                    <form method="post" action="{% url 'crm-project-handover' project.pk %}">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="site" value="{{ site.pk }}" />
+                                        <button class="fr-btn">Proposer</button>
+                                    </form>
+                                {% endif %}
+                            </td>
+                        </tr>
                     {% endfor %}
-
                 </table>
             </div>
         </div>

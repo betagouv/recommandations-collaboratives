@@ -4,6 +4,7 @@
 {% load gravatar %}
 {% load training %}
 {% load guardian_tags %}
+{% load sass_tags %}
 {% block title %}Conversation - {{ block.super }}{% endblock %}
 {% block css %}
     <link href="{% sass_src 'projects/css/conversations.scss' %}"
@@ -61,7 +62,7 @@
                         <!-- Post message -->
                         <div class="message-form fr-mt-3w fr-p-2w bg-light border-form">
                             <form class="form"
-                                  method="POST"
+                                  method="post"
                                   action="{% url 'projects-conversation-create-message' project.pk %}"
                                   enctype="multipart/form-data"
                                   id="conversation-form">

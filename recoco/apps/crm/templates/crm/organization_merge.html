@@ -97,7 +97,7 @@
                 </div>
                 <div class="fr-mt-3w">
                     <form x-data="{name: '{{ organizations.0.name }}'}"
-                          method="POST"
+                          method="post"
                           action="{% url 'crm-organization-merge' %}">
                         {% csrf_token %}
                         <div class="fr-mb-3w">

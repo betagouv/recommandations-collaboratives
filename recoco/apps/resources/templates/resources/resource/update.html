@@ -12,7 +12,7 @@
     <div class="col-12 fr-p-3w fr-mx-auto">
         <!-- Breadcrumb -->
         <nav aria-label="breadcrumb">
-            <ul class="fr-breadcrumb__list">
+            <ol class="fr-breadcrumb__list">
                 <li class="fr-breadcrumb__link">
                     <svg class="bi align-middle" width="18" height="18" fill="currentColor">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#book" />
@@ -25,7 +25,7 @@
                         <span class="badge bg-light text-dark align-middle">{{ resource.category.name|default:"Ressource" }}</span>
                     </a>
                 </li>
-            </ul>
+            </ol>
         </nav>
         <section>
             <form id="form-resource-update" method="post" action="." class="form">

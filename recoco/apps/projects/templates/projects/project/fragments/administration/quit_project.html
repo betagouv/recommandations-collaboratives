@@ -27,7 +27,7 @@
         <div class="flex-grow-1">
             <form id="form__admin-quit-project"
                   data-test-id="form__admin-quit-project"
-                  method="POST">
+                  method="post">
                 {% csrf_token %}
                 {% if position.is_advisor or position.is_observer %}
                     <button data-test-id="button-quit-project"

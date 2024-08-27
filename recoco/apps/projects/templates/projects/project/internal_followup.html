@@ -30,7 +30,7 @@
                 {% if "use_private_notes" in user_project_perms %}
                     <hr />
                     <form class="form d-flex align-items-end flex-column"
-                          method="POST"
+                          method="post"
                           action="{% url 'projects-create-note' project.pk %}">
                         {% csrf_token %}
                         {% include 'tools/editor.html' with input_name=private_note_form.content.name input_value=private_note_form.content.value|default:'' input_required=True %}

@@ -29,7 +29,7 @@
                 <div class="d-flex justify-content-between align-items-center fr-mb-2v">
                     <h3>Paramètres du Site "{{ request.site.name }}"</h3>
                 </div>
-                <form method="POST" enctype="multipart/form-data" class="fr-form">
+                <form method="post" enctype="multipart/form-data" class="fr-form">
                     {% csrf_token %}
                     {% crispy form "dsrc_crispy_forms_no_js" %}
                     <button class="fr-btn" type="submit">Sauvegarder</button>

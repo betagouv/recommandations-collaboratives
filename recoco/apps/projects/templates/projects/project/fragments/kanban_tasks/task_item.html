@@ -174,7 +174,7 @@
                                 </li>
                             </template>
                             <li>
-                                <form method="POST" :action="deleteTaskReminderUrl(t.id)">
+                                <form method="post" :action="deleteTaskReminderUrl(t.id)">
                                     {% csrf_token %}
                                     <button class="dropdown-item">Supprimer le rappel</button>
                                 </form>

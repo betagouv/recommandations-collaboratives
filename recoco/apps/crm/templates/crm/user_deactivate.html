@@ -42,7 +42,7 @@
                     </ul>
                 </p>
                 <div class="fr-mt-3w">
-                    <form method="POST" action="{% url 'crm-user-deactivate' crm_user.pk %}">
+                    <form method="post" action="{% url 'crm-user-deactivate' crm_user.pk %}">
                         {% csrf_token %}
                         <button type="submit"
                                 href="{% url 'crm-user-deactivate' crm_user.pk %}"

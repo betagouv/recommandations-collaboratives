@@ -28,7 +28,7 @@
             </div>
             <div class="d-flex justify-content-end">
                 <form id="admin-activate-project"
-                      method="POST"
+                      method="post"
                       action="{% url 'projects-project-set-active' project.pk %}">
                     {% csrf_token %}
                     <button data-test-id="button-activate-project"

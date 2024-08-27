@@ -69,7 +69,7 @@
                                         {{ crm_user.profile.organization.position }}
                                     {% endif %}
                                     {% if request.user|can_hijack:crm_user %}
-                                        <form action="{% url 'hijack:acquire' %}" method="POST">
+                                        <form action="{% url 'hijack:acquire' %}" method="post">
                                             {% csrf_token %}
                                             <input type="hidden" name="user_pk" value="{{ crm_user.pk }}">
                                             <button class="btn btn-link" type="submit" title="Usurper l'identité">
@@ -152,7 +152,7 @@
                                 peut plus se connecter à {{ request.site.name }}.
                             Vous pouvez néanmoins le réactiver si vous le souhaitez.</span>
                             <div class="d-flex justify-content-end fr-mt-2v">
-                                <form method="POST" action="{% url 'crm-user-reactivate' crm_user.pk %}">
+                                <form method="post" action="{% url 'crm-user-reactivate' crm_user.pk %}">
                                     {% csrf_token %}
                                     <button type="submit" class="btn btn-danger">Réactiver ce compte</button>
                                 </form>

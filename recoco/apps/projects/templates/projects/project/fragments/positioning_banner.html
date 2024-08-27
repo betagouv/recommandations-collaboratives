@@ -10,7 +10,7 @@
             </p>
         </div>
         <div class="fr-pl-3w w-25">
-            <form method="POST"
+            <form method="post"
                   action="{% url 'projects-project-switchtender-join' project.id %}"
                   id="positioning-form">
                 {% csrf_token %}
@@ -41,7 +41,7 @@
                     </div>
                 </button>
             </form>
-            <form method="POST"
+            <form method="post"
                   action="{% url 'projects-project-observer-join' project.id %}">
                 {% csrf_token %}
                 <button data-test-id="button-join-as-observer"

@@ -79,7 +79,7 @@
   display: flex;
   align-items: center;
 
-  bottom: 2px;
+  bottom: -2px;
   left: 5%;
 
   width: 90%;

@@ -19,7 +19,7 @@
             Solliciter l'équipe UrbanVitaliz
         </h2>
         <h3 class="fr-py-2v">Merci ! Pourriez-vous nous préciser votre commune ?</h3>
-        <form class="form" action="." method="POST">
+        <form class="form" action="." method="post">
             {% csrf_token %}
             <span class="fr-mt-3w">Nous avons trouvé <strong>plusieurs communes</strong> correspondantes à ce code postal, laquelle est la vôtre ?</span>
             <div class="commune-select">{{ form.as_p }}</div>

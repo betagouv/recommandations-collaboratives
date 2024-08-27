@@ -39,7 +39,7 @@
                     </ul>
                 </p>
                 <div class="fr-mt-3w">
-                    <form method="POST" action="{% url 'crm-project-delete' project.pk %}">
+                    <form method="post" action="{% url 'crm-project-delete' project.pk %}">
                         {% csrf_token %}
                         <button type="submit"
                                 href="{% url 'crm-project-delete' project.pk %}"

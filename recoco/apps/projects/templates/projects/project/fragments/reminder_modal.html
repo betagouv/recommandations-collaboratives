@@ -24,11 +24,13 @@
             <div class="modal-body">
                 En validant cette alerte, vous recevrez un courriel pour vous remémorer de prendre
                 une action sur cette recommandation.
-                <form method="POST"
+                <form method="post"
                       data-action-pattern="{% url 'projects-remind-task' 0 %}">
                     {% csrf_token %}
                     <input name="days" type="hidden" class="form-control" id="reminder-days">
-                    <div class="btn-group w-100 fr-mt-3w fr-mb-2v" role="group" aria-label="Shortcuts">
+                    <div class="btn-group w-100 fr-mt-3w fr-mb-2v"
+                         role="group"
+                         aria-label="Shortcuts">
                         <a href="javascript:setReminderDate(15);"
                            class="btn btn-outline-secondary">Dans 15 jours</a>
                         <a href="javascript:setReminderDate(30);"

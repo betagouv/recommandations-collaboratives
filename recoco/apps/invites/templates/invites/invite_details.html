@@ -18,7 +18,7 @@
                 {% if not existing_account %}<h5>Créez votre compte {{ site.name }}</h5>{% endif %}
                 <form class="form fr-mt-3w"
                       action="{% url 'invites-invite-accept' invite.pk %}"
-                      method="POST">
+                      method="post">
                     {% csrf_token %}
                     {% if not existing_account %}
                         <label class="form-label" for="email">Adresse courriel</label>

@@ -44,7 +44,7 @@
                         <strong>Attention, si vous ne sélectionnez aucun département, cette personne aura accès à tous les projets du portail (“conseiller·e France entière”).</strong>
                     </p>
                 </p>
-                <form method="POST" action="{% url 'crm-user-set-advisor' crm_user.pk %}">
+                <form method="post" action="{% url 'crm-user-set-advisor' crm_user.pk %}">
                     {% csrf_token %}
                     <div class="w-50 d-flex flex-column select-custom fr-mb-3w">
                         {{ form.departments.errors }}

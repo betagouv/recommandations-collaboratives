@@ -36,7 +36,7 @@
                         Ce projet a été supprimé. Ceci signifie qu'il n'apparait plus sur aucun portail.
                         Vous pouvez néanmoins le réactiver si vous le souhaitez.
                         <div class="d-flex justify-content-end fr-mt-2v">
-                            <form method="POST" action="{% url 'crm-user-undelete' project.pk %}">
+                            <form method="post" action="{% url 'crm-user-undelete' project.pk %}">
                                 {% csrf_token %}
                                 <button type="submit" class="btn btn-danger">
                                 Réactiver ce projet</a>
@@ -62,7 +62,7 @@
                 </ul>
             </div>
             <div class="fr-px-3w fr-pt-3w fr-mb-2w">
-                <form method="POST"
+                <form method="post"
                       class="form"
                       action="{% url 'crm-project-update' project.pk %}">
                     {% csrf_token %}
@@ -115,7 +115,7 @@
             </div>
             <hr />
             <div class="fr-px-3w fr-pt-3w fr-mb-2w">
-                <form method="POST" action="{% url 'crm-project-update' project.pk %}">
+                <form method="post" action="{% url 'crm-project-update' project.pk %}">
                     {% csrf_token %}
                     {{ form.non_field_errors }}
                     <div class="input-group small fr-mb-2w">

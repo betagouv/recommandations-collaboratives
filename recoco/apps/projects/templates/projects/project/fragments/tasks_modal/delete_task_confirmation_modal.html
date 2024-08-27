@@ -24,14 +24,17 @@
             <div class="modal-body">
                 <div class="flag red d-block">
                     <span class="title text-red text-uppercase fw-bold fr-mb-2v d-block d-flex align-items-center">
-                        <svg class="bi align-middle fr-mr-2v" width="20" height="20" fill="#CE0500">
+                        <svg class="bi align-middle fr-mr-2v"
+                             width="20"
+                             height="20"
+                             fill="#CE0500">
                             <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#exclamation-triangle-fill" />
                         </svg>
                         Supression de recommandation
                     </span>
                     <p class="content fr-mb-2w d-block" x-text="currentDeletingTask.intent"></p>
                     <form id="form-delete-task"
-                          method="POST"
+                          method="post"
                           :action="deleteTaskUrl(currentDeletingTask.id)"
                           class="form fr-mt-2v">
                         {% csrf_token %}
