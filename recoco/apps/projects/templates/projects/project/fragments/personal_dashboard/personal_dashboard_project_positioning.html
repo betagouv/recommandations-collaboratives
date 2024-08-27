@@ -3,28 +3,16 @@
     <ul x-show="open"
         :class="{'show':open}"
         class="positioning-dropdown list-unstyled flex-column">
-        <li>
+        <li class="fr-pb-1v">
             <button @click="handlePositioningAction('{% url 'projects-project-switchtender-join' 0 %}', item.project.id)"
-                    class="fr-btn fr-p-2v d-flex justify-content-start align-items-center">
-                <svg class="align-middle bi fr-mr-2v"
-                     width="18px"
-                     height="18px"
-                     fill="currentColor">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#person-heart" />
-                </svg>
-                <span class="text-grey-dark text-info-custom tiny">Devenir conseiller</span>
+                    class="fr-btn fr-btn--sm fr-btn--secondary fr-icon-user-heart-fill fr-btn--icon-left w-100 justify-content-center">
+                Devenir conseiller
             </button>
         </li>
-        <li>
+        <li class="fr-pb-0">
             <button @click="handlePositioningAction('{% url 'projects-project-switchtender-leave' 0 %}', item.project.id)"
-                    class="bg-white appearance-none w-100 fr-p-2v d-flex justify-content-start align-items-center border-bottom">
-                <svg class="align-middle bi fr-mr-2v"
-                     width="18px"
-                     height="18px"
-                     fill="currentColor">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#eye-slash" />
-                </svg>
-                <span class="text-grey-dark text-info-custom tiny">Ne plus observer le projet</span>
+                    class="fr-btn fr-btn--sm fr-btn--secondary fr-icon-eye-off-fill fr-btn--icon-left w-100 justify-content-center">
+                Ne plus observer le projet
             </button>
         </li>
     </ul>
@@ -33,28 +21,16 @@
     <ul x-show="open"
         :class="{'show':open}"
         class="positioning-dropdown list-unstyled flex-column">
-        <li>
+        <li class="fr-pb-1v">
             <button @click="handlePositioningAction('{% url 'projects-project-observer-join' 0 %}', item.project.id)"
-                    class="bg-white appearance-none w-100 fr-p-2v d-flex justify-content-start align-items-center border-bottom">
-                <svg class="align-middle bi fr-mr-2v"
-                     width="18px"
-                     height="18px"
-                     fill="currentColor">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#eye" />
-                </svg>
-                <span class="text-grey-dark text-info-custom tiny">Devenir Observateur</span>
+                    class="fr-btn fr-btn--sm fr-btn--secondary fr-icon-eye-fill fr-btn--icon-left w-100 justify-content-center">
+                Devenir Observateur
             </button>
         </li>
-        <li>
+        <li class="fr-pb-0">
             <button @click="handlePositioningAction('{% url 'projects-project-switchtender-leave' 0 %}', item.project.id)"
-                    class="bg-white appearance-none w-100 fr-p-2v d-flex justify-content-start align-items-center border-bottom">
-                <svg class="align-middle bi fr-mr-2v"
-                     width="18px"
-                     height="18px"
-                     fill="currentColor">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#heartbreak" />
-                </svg>
-                <span class="text-grey-dark text-info-custom tiny">Ne plus conseiller le projet</span>
+                    class="fr-btn fr-btn--sm fr-btn--secondary fr-icon-dislike-fill fr-btn--icon-left w-100 justify-content-center">
+                Ne plus conseiller le projet
             </button>
         </li>
     </ul>
@@ -63,28 +39,16 @@
     <ul x-show="open"
         :class="{'show':open}"
         class="positioning-dropdown list-unstyled flex-column">
-        <li>
+        <li class="fr-pb-1v">
             <button @click="handlePositioningAction('{% url 'projects-project-switchtender-join' 0 %}', item.project.id)"
-                    class="bg-white appearance-none w-100 fr-p-2v d-flex justify-content-start align-items-center border-bottom">
-                <svg class="align-middle bi fr-mr-2v"
-                     width="18px"
-                     height="18px"
-                     fill="currentColor">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#person-heart" />
-                </svg>
-                <span class="text-grey-dark text-info-custom tiny">Devenir conseiller</span>
+                    class="fr-btn fr-btn--sm fr-btn--secondary fr-icon-user-heart-fill fr-btn--icon-left w-100 justify-content-center">
+                Devenir conseiller
             </button>
         </li>
-        <li>
+        <li class="fr-pb-0">
             <button @click="handlePositioningAction('{% url 'projects-project-observer-join' 0 %}', item.project.id)"
-                    class="bg-white appearance-none w-100 fr-p-2v d-flex justify-content-start align-items-center">
-                <svg class="align-middle bi fr-mr-2v"
-                     width="18px"
-                     height="18px"
-                     fill="currentColor">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#eye" />
-                </svg>
-                <span class="text-grey-dark text-info-custom tiny">Devenir observateur</span>
+                    class="fr-btn fr-btn--sm fr-btn--secondary fr-icon-eye-fill fr-btn--icon-left w-100 justify-content-center">
+                Devenir observateur
             </button>
         </li>
     </ul>
