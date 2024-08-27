@@ -13,43 +13,22 @@
     {% if "change_project" in user_project_perms and not is_switchtender %}
         {% if not disable_can_edit %}
             <a href="{% url 'projects-project-administration' project.id %}"
-               class="btn btn-primary w-100 btn-sm btn-sm--header">
-                <svg class="bi" width="16" height="16" fill="currentColor">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#pencil" />
-                </svg>
-                &nbsp;
-                Éditer
-            </a>
+               class="fr-btn fr-btn--sm fr-btn--icon-left fr-icon-pencil-line justify-content-center w-100">Éditer</a>
         {% endif %}
         {% if not disable_add_recommendation %}
             {% if "manage_tasks" in user_project_perms %}
-                <a class="btn btn-outline-primary w-100 btn-sm btn-sm--header"
-                   href="{% url 'projects-project-create-task' project.id %}">
-                    <svg class="bi fr-mr-1v" width="16" height="16" fill="currentColor">
-                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#journal-plus" />
-                    </svg>
-                    Ajouter une recommandation
-                </a>
+                <a class="fr-btn fr-btn--sm fr-btn--secondary fr-btn--icon-left fr-icon-health-book-line justify-content-center w-100"
+                   href="{% url 'projects-project-create-task' project.id %}">Ajouter une recommandation</a>
             {% endif %}
         {% endif %}
     {% endif %}
     {% if "use_crm" in user_site_perms and not disable_crm %}
-        <a class="btn btn-outline-primary w-100 btn-sm btn-sm--header"
-           href="{% url 'crm-project-details' project.pk %}">
-            <svg class="bi fr-mr-1v" width="16" height="16" fill="currentColor">
-                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#activity" />
-            </svg>
-            CRM
-        </a>
+        <a class="fr-btn fr-btn--secondary fr-btn--sm fr-btn--icon-left fr-icon-pulse-line justify-content-center w-100"
+           href="{% url 'crm-project-details' project.pk %}">CRM</a>
     {% endif %}
     {% if user.is_staff and not disable_administration %}
-        <a class="btn btn-outline-primary w-100 btn-sm btn-sm--header"
-           href="{% url 'projects-project-administration' project.pk %}">
-            <svg class="bi fr-mr-1v" width="16" height="16" fill="currentColor">
-                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#lock" />
-            </svg>
-            Administration
-        </a>
+        <a class="fr-btn fr-btn--sm fr-btn--secondary fr-btn--icon-left fr-icon-lock-line justify-content-center w-100"
+           href="{% url 'projects-project-administration' project.pk %}">Administration</a>
     {% endif %}
     {% if 'actions' not in url_name and 'conversations' not in url_name and 'internal-followup' not in url_name %}
         {% if project.status == 'DRAFT' %}
@@ -57,20 +36,14 @@
                     data-toggle="modal"
                     data-target="#publicShareModal"
                     disabled
-                    class="button btn btn-outline-primary btn-sm btn-sm--header disabled specific-cursor-pointer">
-                <svg class="bi align-middle" width="18" height="18" fill="currentColor">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#lock-fill" />
-                </svg>
-                &nbsp;
-                <span>Partager l'état des lieux</span>
+                    class="fr-btn fr-btn--sm fr-btn--secondary fr-btn--icon-left fr-icon-lock-line disabled text-uppercase">
+                Partager l'état des lieux
             </button>
         {% else %}
             <button @click="openPublicShareModal"
                     data-toggle="modal"
                     data-target="#publicShareModal"
-                    class="button btn btn-outline-primary btn-sm btn-sm--header specific-cursor-pointer">
-                <span>Partager l'état des lieux</span>
-            </button>
+                    class="fr-btn fr-btn--sm fr-btn--secondary text-uppercase">Partager l'état des lieux</button>
         {% endif %}
     {% endif %}
 </div>

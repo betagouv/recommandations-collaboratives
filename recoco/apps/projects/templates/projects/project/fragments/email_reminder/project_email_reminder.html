@@ -14,11 +14,7 @@
                     data-bs-toggle="tooltip"
                     data-bs-title="Email de rappel"
                     data-test-id="button-open-reminder-settings"
-                    class="btn btn-outline-primary btn-sm button-icon-bell">
-                <svg class="bi align-middle" width="18" height="18" fill="currentColor">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#bell" />
-                </svg>
-            </button>
+                    class="fr-btn fr-btn--secondary fr-btn--sm fr-icon-notification-3-line"></button>
             <div x-cloak
                  x-ref="emailReminderTooltip"
                  @click.outside="onOutsideEmailReminderButtonClick"
@@ -26,13 +22,9 @@
                  class="bg-white email-reminder-popup border medium-border-radius border-blue box-shadow-popup">
                 <div class="d-flex align-items-center justify-content-between border-bottom-grey fr-p-2v">
                     <span class="tiny fw-medium">Paramètres de notification</span>
-                    <button class="appearance-none bg-white"
-                            aria-label="Fermer la popupde rappel"
-                            @click="onOutsideEmailReminderButtonClick">
-                        <svg class="bi align-middle" width="18" height="18" fill="currentColor">
-                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#x" />
-                        </svg>
-                    </button>
+                    <button class="fr-btn--close fr-btn"
+                            aria-label="Fermer la popup de rappel"
+                            @click="onOutsideEmailReminderButtonClick">Fermer</button>
                 </div>
                 {% if request.user == project.owner %}
                     <div data-test-id="message-reminder-settings"
