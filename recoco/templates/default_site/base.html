@@ -52,7 +52,7 @@
     </head>
     <body class="bg-light">
         {% include 'consent/banner.html' %}
-        <h1 class="visually-hidden">{{ site.name }}</h1>
+        <h1 class="visually-hidden">{{ request.site.name }}</h1>
         {% include "header/menu-top.html" %}
         <main class="main-content {% if not user.is_authenticated %}public-content{% endif %}">
             <div id="notification"
