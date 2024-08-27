@@ -39,22 +39,22 @@
                     <div class="project-card-top-information-container">
                         <template x-if="item.project.inactive_since !== null">
                             <div class="project-card-top-information inactive left-0">
-                                <div>Conseil en pause</div>
+                                <span>Conseil en pause</span>
                             </div>
                         </template>
                         <template x-if="item.project.inactive_since == null && item.status === 'NEW'">
                             <div class="project-card-top-information new left-0">
-                                <div>Non consulté</div>
+                                <span>Non consulté</span>
                             </div>
                         </template>
                         <template x-if="item.project.inactive_since == null && item.project.is_observer">
                             <div class="project-card-top-information observer left-0">
-                                <div>Observateur</div>
+                                <span>Observateur</span>
                             </div>
                         </template>
                         <template x-if="item.project.inactive_since == null && item.project.is_switchtender && !item.project.is_observer">
                             <div class="project-card-top-information advisor left-0">
-                                <div>Conseiller</div>
+                                <span>Conseiller</span>
                             </div>
                         </template>
                     </div>
@@ -163,7 +163,7 @@
                              x-on:click.outside="open = false"
                              class="btn-group position-relative">
                             <button :class="{'active':open}"
-                                    class="button grey small filled border fr-px-2v"
+                                    class="fr-btn fr-btn--tertiary fr-px-2v"
                                     x-on:click="open = !open"
                                     type="button">...</button>
                             {% include 'projects/project/fragments/personal_dashboard/personal_dashboard_project_positioning.html' %}

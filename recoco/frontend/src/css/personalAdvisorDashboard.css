@@ -281,7 +281,7 @@ main {
   gap: 0.8rem;
 }
 
-.project-card-top-information div {
+.project-card-top-information > * {
   padding: 0.25rem 0.5rem;
   color: white;
   font-size: 12px;
@@ -290,20 +290,20 @@ main {
   border-radius: 2px;
 }
 
-.project-card-top-information.advisor div {
+.project-card-top-information.advisor > * {
   background-color: #0063cb;
 }
 
-.project-card-top-information.observer div {
+.project-card-top-information.observer > * {
   background-color: #27a658;
 }
 
-.project-card-top-information.new div {
+.project-card-top-information.new > * {
   background-color: #fdcd6d;
   color: #222;
 }
 
-.project-card-top-information.inactive div {
+.project-card-top-information.inactive > * {
   background-color: #e5e5e5;
   color: #222;
 }
