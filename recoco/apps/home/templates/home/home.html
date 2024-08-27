@@ -27,10 +27,10 @@
                         <li>
                             {% if user.is_authenticated %}
                                 <a href="{% url 'onboarding-project' %}"
-                                   class="fr-btn fr-text--xl custom-button"
+                                   class="fr-btn fr-text--xl"
                                    data-test-id="button-need-help">Solliciter {{ request.site.name }}</a>
                             {% else %}
-                                <button class="fr-btn fr-text--xl custom-button"
+                                <button class="fr-btn fr-text--xl"
                                         data-fr-opened="false"
                                         aria-controls="onboarding-modal">Solliciter {{ request.site.name }}</button>
                             {% endif %}
