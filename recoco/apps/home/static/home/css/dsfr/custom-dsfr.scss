@@ -70,12 +70,14 @@ p a {
 a.fr-btn {
   &:hover {
     &:not(.fr-btn--secondary),
-    &:not(.fr-btn--tertiary) {
+    &:not(.fr-btn--tertiary),
+    &:not(.fr-btn--tertiary-no-outline) {
       color: white !important;
     }
 
     &.fr-btn--secondary,
-    &.fr-btn--tertiary {
+    &.fr-btn--tertiary,
+    &.fr-btn--tertiary-no-outline {
       color: var(--text-active-blue-france) !important;
     }
   }

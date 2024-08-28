@@ -11,12 +11,8 @@
     <header>
         <h6 class="font-small">Thématiques du projet</h6>
         {% if "change_topics" in user_project_perms and project.all_topics.count != 0 %}
-            <a href='{% url "projects-project-topics" project.id %}'>
-                <span class="tiny">Modifier</span>
-                <svg class="bi fr-ml-2v " width="10" height="10" fill="currentColor">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#pencil-fill" />
-                </svg>
-            </a>
+            <a class="fr-btn fr-btn--sm fr-btn--tertiary-no-outline fr-btn--icon-right fr-icon-pencil-line fr-text--xs"
+               href="{% url "projects-project-topics" project.id %}">Modifier</a>
         {% endif %}
     </header>
     {% if project.all_topics.count == 0 %}
