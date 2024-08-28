@@ -1,17 +1,25 @@
-<div class="d-flex align-items-center">
-    <span class="text-custom-info text-grey-dark fw-light fr-mr-2v">affiché par :</span>
-    <div class="tasks-view-switcher">
-        <button data-test-id="list-tasks-switch-button"
-                @click="$store.tasksView.switchView()"
-                :class="{ 'active' : $store.tasksView.currentView === 'inline' }"
-                class="button">
-            <span>Liste</span>
-        </button>
-        <button data-test-id="kanban-tasks-switch-button"
-                @click="$store.tasksView.switchView()"
-                :class="{ 'active' : $store.tasksView.currentView === 'kanban' }"
-                class="button">
-            <span>Tableau</span>
-        </button>
+<fieldset class="fr-segmented">
+    <legend class="fr-segmented__legend fr-my-0 fr-mr-1w fr-text--sm">Affiché par :</legend>
+    <div class="fr-segmented__elements">
+        <div class="fr-segmented__element">
+            <input data-test-id="list-tasks-switch-button"
+                   @click="$store.tasksView.switchView()"
+                   value="1"
+                   type="radio"
+                   :checked="$store.tasksView.currentView === 'inline'"
+                   id="segmented-2215-1"
+                   name="segmented-2215">
+            <label class="fr-label" for="segmented-2215-1">Liste</label>
+        </div>
+        <div class="fr-segmented__element">
+            <input data-test-id="kanban-tasks-switch-button"
+                   @click="$store.tasksView.switchView()"
+                   :checked="$store.tasksView.currentView === 'kanban'"
+                   value="2"
+                   type="radio"
+                   id="segmented-2215-2"
+                   name="segmented-2215">
+            <label class="fr-label" for="segmented-2215-2">Tableau</label>
+        </div>
     </div>
-</div>
+</fieldset>

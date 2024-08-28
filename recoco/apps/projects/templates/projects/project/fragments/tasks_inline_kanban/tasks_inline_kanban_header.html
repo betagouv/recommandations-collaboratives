@@ -3,24 +3,24 @@
         <template x-if="$store.djangoData.canManageTasks">
             <div class="d-flex align-items-center w-100 justify-content-between">
                 <div class="d-flex flex-column">
-                    {% include 'projects/project/fragments/tasks_inline_kanban/tasks_inline_kanban_tasks_count.html' %}
+                    {% include "projects/project/fragments/tasks_inline_kanban/tasks_inline_kanban_tasks_count.html" %}
                     <div>
                         <a data-test-id="create-task-button"
                            href="{% url 'projects-project-create-task' project.id %}"
-                           class="button filled blue small inherit">Créer une recommandation</a>
+                           class="fr-btn fr-btn--sm">Créer une recommandation</a>
                         <a href="{% url 'projects-project-tasks-suggest' project.pk %}"
-                           class="button blue small inherit">Voir les recommandations suggérées automatiquement</a>
+                           class="fr-btn fr-btn--secondary fr-btn--sm">Voir les recommandations suggérées automatiquement</a>
                     </div>
                 </div>
-                {% include 'projects/project/fragments/tasks_inline_kanban/tasks_inline_kanban_switcher.html' %}
+                {% include "projects/project/fragments/tasks_inline_kanban/tasks_inline_kanban_switcher.html" %}
             </div>
         </template>
         <template x-if="!$store.djangoData.canManageTasks">
             <div class="d-flex justify-content-between align-items-center w-100">
-                {% include 'projects/project/fragments/tasks_inline_kanban/tasks_inline_kanban_tasks_count.html' %}
-                {% include 'projects/project/fragments/tasks_inline_kanban/tasks_inline_kanban_switcher.html' %}
+                {% include "projects/project/fragments/tasks_inline_kanban/tasks_inline_kanban_tasks_count.html" %}
+                {% include "projects/project/fragments/tasks_inline_kanban/tasks_inline_kanban_switcher.html" %}
             </div>
         </template>
     </div>
-    {% include 'projects/project/fragments/tasks_inline_kanban/tasks_inline_kanban_new_tasks_banner.html' %}
+    {% include "projects/project/fragments/tasks_inline_kanban/tasks_inline_kanban_new_tasks_banner.html" %}
 </div>

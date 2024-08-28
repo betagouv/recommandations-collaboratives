@@ -6,11 +6,13 @@
 {% load django_vite %}
 {% block css %}
     {% vite_asset 'css/projectDetails.css' %}
-{% endblock %}
-{% block title %}État des lieux - {{ block.super }}{% endblock %}
+{% endblock css %}
+{% block title %}
+    État des lieux - {{ block.super }}
+{% endblock title %}
 {% block banner %}
-    {% include 'projects/project/fragments/positioning_banner.html' %}
-{% endblock %}
+    {% include "projects/project/fragments/positioning_banner.html" %}
+{% endblock banner %}
 {% block project_detail %}
     {% challenge_for request.user "project-knowledge-reader" as challenge %}
     {% if challenge and not challenge.acquired_on %}
@@ -63,7 +65,7 @@
 	}
     </style>
     <div class="col-12">
-        {% include 'projects/project/navigation.html' with state_of_play=True %}
+        {% include "projects/project/navigation.html" with state_of_play=True %}
         <div class="row">
             <!-- TODO PERMISSIONS -->
             {% if request.user in project.members.all %}
@@ -90,6 +92,6 @@
                 <div class="col"></div>
             {% endif %}
         </div>
-        {% include 'projects/project/fragments/survey_grid.html' %}
+        {% include "projects/project/fragments/survey_grid.html" %}
     </div>
-{% endblock %}
+{% endblock project_detail %}

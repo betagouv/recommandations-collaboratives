@@ -5,14 +5,12 @@
              class="position-relative fr-p-2w bg-grey-light rounded-3 fr-p-2w">
             <div x-html="truncate(renderMarkdown(task.content),100)"
                  class="text-info-custom font-small text-dark fr-mb-2w"></div>
-            {% include 'projects/project/fragments/task/task_user_card.html' %}
+            {% include "projects/project/fragments/task/task_user_card.html" %}
             {% if "manage_tasks" in user_project_perms and not disable_edit %}
-                <button class="position-absolute bottom-0 fr-mb-2w fr-mr-2w right-0 end-0 border tiny d-flex align-items-center justify-content-center fr-px-2v fr-py-2v fr-mr-1v hover-bg-grey"
+                <button class="fr-btn fr-btn--sm fr-btn--tertiary fr-icon-pencil-line position-absolute bottom-0 end-0 fr-m-2w"
                         @click.stop="isEditing = true;"
                         data-test-id="edit-comment-button">
-                    <svg class="bi" width="12px" height="12px" fill="#929292">
-                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#pencil-fill" />
-                    </svg>
+                    Modifier le commentaire initial de la recommandation
                 </button>
             {% endif %}
         </div>
@@ -28,13 +26,9 @@
     </template>
     <template x-if="isEditing">
         <div class="fr-py-2w fr-px-2w fr-mb-2v border-blue task-comment medium-border-radius position-relative">
-            <button class="position-absolute top-0 fr-mt-2w fr-mr-2w right-0 end-0 border tiny d-flex align-items-center justify-content-center fr-px-2v fr-py-2v fr-mr-1v hover-bg-grey"
-                    @click.stop="isEditing = false">
-                <svg class="bi" width="12px" height="12px" fill="#929292">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#x" />
-                </svg>
-            </button>
-            {% include 'tools/editor.html' with is_task_comment=True %}
+            <button class="fr-btn fr-btn--sm fr-btn--tertiary fr-icon-close-line position-absolute top-0 end-0 fr-m-2w"
+                    @click.stop="isEditing = false">Annuler la modification</button>
+            {% include "tools/editor.html" with is_task_comment=True %}
         </div>
     </template>
 </div>

@@ -131,6 +131,17 @@ button.fr-text-inverted--grey {
 }
 
 /* ¯¯¯ *\
+  LISTS
+\* ˍˍˍ */
+
+ul.item-no-space > li {
+  padding-bottom: 0px;
+  &:not(:last-child) {
+    margin-bottom: -1px;
+  }
+}
+
+/* ¯¯¯ *\
   FORMS
 \* ˍˍˍ */
 

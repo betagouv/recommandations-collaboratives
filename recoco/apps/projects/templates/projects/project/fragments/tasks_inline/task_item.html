@@ -6,7 +6,7 @@
     <link href="{% sass_src 'projects/css/fragments/task_inline/task.scss' %}"
           rel="stylesheet"
           type="text/css" />
-{% endblock %}
+{% endblock css %}
 {% get_obj_perms request.user for request.site as "user_site_perms" %}
 {% get_obj_perms request.user for project as "user_project_perms" %}
 <div x-data="Task(task)"
@@ -51,14 +51,13 @@
                 </div>
             </div>
             {% if "manage_tasks" in user_project_perms and not disable_edit %}
-                {% include 'projects/project/fragments/task/task_actions.html' %}
+                {% include "projects/project/fragments/task/task_actions.html" %}
             {% endif %}
         </div>
         <article class="fr-mt-1v fr-mb-2v">
             <template x-if="task.resource_id && task.resource && task.resource.subtitle">
                 <div x-html="truncate(renderMarkdown(task.resource.subtitle),100)"
-                     class="text-info-custom fw-light font-small text-dark fr-m-0 fr-p-0">
-                </div>
+                     class="text-info-custom fw-light font-small text-dark fr-m-0 fr-p-0"></div>
             </template>
             <template x-if="!task.resource_id && task.content">
                 <div x-html="truncate(renderMarkdown(task.content),100)"
@@ -66,20 +65,15 @@
             </template>
         </article>
         <template x-if="task.resource">
-            <article class="fr-mb-2w">{% include 'projects/project/fragments/task/task_comment.html' %}</article>
+            <article class="fr-mb-2w">{% include "projects/project/fragments/task/task_comment.html" %}</article>
         </template>
         <footer class="d-flex justify-content-between align-items-center">
             <div class="d-flex align-items-center">
                 <template x-if="task.public">
-                    {% include 'projects/project/fragments/tasks_inline_kanban/tasks_status_buttons.html' %}
+                    {% include "projects/project/fragments/tasks_inline_kanban/tasks_status_buttons.html" %}
                 </template>
                 <div class="text-grey-dark d-flex align-items-center tiny fr-mr-2w responsive-flex-column">
-                    <svg class="align-middle bi fr-mr-1v"
-                         width="18px"
-                         height="15px"
-                         fill="currentColor">
-                        <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#chat-square" />
-                    </svg>
+                    <span class="fr-icon-chat-2-line fr-icon--sm fr-mr-1v" aria-hidden="true"></span>
                     <span class="tiny hover-underline cursor-pointer"
                           @click="handleOpenPreviewModal()"
                           x-text="task.resource_id ? getTaskMessageCountLabel(task.comments_count + 1) : getTaskMessageCountLabel(task.comments_count)"></span>
@@ -93,7 +87,7 @@
             <div class="tiny d-flex align-items-center">
                 <span class="text-muted fr-mr-1v specific-lineheight-20"
                       x-text="`Émis le ${formatDate(task.created_on)}`"></span>
-                {% include 'projects/project/fragments/task/task_user_card.html' %}
+                {% include "projects/project/fragments/task/task_user_card.html" %}
             </div>
         </footer>
     </div>

@@ -163,10 +163,10 @@
                              x-on:click.outside="open = false"
                              class="btn-group position-relative">
                             <button :class="{'active':open}"
-                                    class="fr-btn fr-btn--tertiary fr-px-2v"
+                                    class="fr-btn fr-btn--sm fr-btn--tertiary fr-icon-more-fill"
                                     x-on:click="open = !open"
-                                    type="button">...</button>
-                            {% include 'projects/project/fragments/personal_dashboard/personal_dashboard_project_positioning.html' %}
+                                    type="button">Plus d'action</button>
+                            {% include "projects/project/fragments/personal_dashboard/personal_dashboard_project_positioning.html" %}
                         </div>
                     </footer>
                 </div>
