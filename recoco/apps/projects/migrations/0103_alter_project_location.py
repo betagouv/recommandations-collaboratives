@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("projects", "0101_projectsite_unique_site_per_project"),
+        ("projects", "0102_alter_projectswitchtender_managers_and_more"),
     ]
 
     operations = [
