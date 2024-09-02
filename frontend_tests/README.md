@@ -16,11 +16,28 @@ DATABASES = {
         'HOST': 'localhost',
         'PORT': 5432,
         'TEST': {
-            'NAME':'test_recoco'
+            'NAME':'test_recoco' # <-- ici
         }
     }
 }
 ```
+
+- Dupliquer le fichier `development.py` en `frontend_tests.py` et modifier les paramètres de la base de données pour qu'ils correspondent à la base de données de test.
+
+```python
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': test_recoco, # <-- ici
+        'USER': os.environ.get('POSTGRES_USER'),
+        'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
+        'HOST': 'localhost',
+        'PORT': 5432,
+    }
+}
+```
+
+Ce fichier de paramètres est seulement utilisé pour lancer la mise à jour des persmissions à l'aide du script update_permissions
 
 ## Lancer les tests
 
