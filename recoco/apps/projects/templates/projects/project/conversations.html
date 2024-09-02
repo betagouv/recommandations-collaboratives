@@ -27,7 +27,7 @@
             <div class="col-12 col-lg-8">
                 {% regroup project.notes.public by created_on.date as notes_by_day %}
                 <div class="message-window flex-grow-1 d-flex flex-column-reverse scroll-gestion">
-                    <ul class="list-group">
+                    <ul class="list-unstyled list-group">
                         {% for date, notes in notes_by_day|slice:":20" reversed %}
                             <li class="list-group-item border-0 fr-m-0 fr-p-0">
                                 <div class="small fr-my-2v text-center w-100">{{ date|naturalday|capfirst }}</div>
@@ -44,7 +44,8 @@
                                                 {% include "user/user_card.html" with user=note.created_by %}
                                                 {% if note.created_by == request.user %}
                                                     <span class="align-middle small text-dark fr-ml-2v">
-                                                        - <a class="fr-ml-1v "href="{% url 'projects-update-note' note.pk %}">éditer</a>
+                                                        - <a class="fr-btn fr-btn--sm fr-btn--tertiary-no-outline fr-ml-1v"
+    href="{% url 'projects-update-note' note.pk %}">éditer</a>
                                                     </span>
                                                 {% endif %}
                                             </div>
@@ -74,7 +75,7 @@
                                         x-data
                                         :disabled="$store.editor.currentMessage === '' "
                                         form="conversation-form"
-                                        class="button filled"
+                                        class="fr-btn"
                                         type="submit">Envoyer</button>
                             </div>
                         </form>
