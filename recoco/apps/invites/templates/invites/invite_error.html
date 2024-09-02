@@ -2,8 +2,11 @@
 {% load humanize %}
 {% load static %}
 {% load sass_tags %}
-{% block css %}{% endblock %}
-{% block title %}{{ site.name }} | Invitation à rejoindre le projet {{ invite.project.name }}{% endblock %}
+{% block css %}
+{% endblock css %}
+{% block title %}
+    {{ site.name }} | Invitation à rejoindre le projet {{ invite.project.name }}
+{% endblock title %}
 {% block content %}
     <div class="col-10 fr-py-6w fr-mx-auto">
         <h4 class="fw-bolder">Invitation à rejoindre {{ site.name }}</h4>
@@ -12,4 +15,4 @@
             Si vous n'êtes pas <span class="fw-bolder">{{ request.user.get_full_name }}</span>, vous pouvez <a href="{% url 'logout' %}">vous déconnecter</a>.
         </div>
     </div>
-{% endblock %}
+{% endblock content %}

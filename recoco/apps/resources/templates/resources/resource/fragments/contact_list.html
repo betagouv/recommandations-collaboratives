@@ -2,7 +2,7 @@
 {% load django_vite %}
 {% block js %}
     {% vite_asset 'js/apps/contactList.js' %}
-{% endblock %}
+{% endblock js %}
 {% if contacts.count %}
     <div x-data="ContactList" id="contact-list" class="fr-mt-3w">
         {% if user.is_anonymous %}

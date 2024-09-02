@@ -1,7 +1,9 @@
 {% extends "base.html" %}
 {% load static %}
 {% load tagging_tags %}
-{% block title %}Réponses à la question {{ question }}{% endblock %}
+{% block title %}
+    Réponses à la question {{ question }}
+{% endblock title %}
 {% block content %}
     <div class="col-12 fr-p-3w fr-mx-auto">
         <!-- Breadcrumb -->
@@ -69,4 +71,4 @@
             </table>
         </div>
     </div>
-{% endblock %}
+{% endblock content %}

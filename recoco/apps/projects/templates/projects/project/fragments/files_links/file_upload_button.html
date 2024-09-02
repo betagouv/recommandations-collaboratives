@@ -6,7 +6,7 @@
     <link href="{% sass_src 'projects/css/file_upload.scss' %}"
           rel="stylesheet"
           type="text/css" />
-{% endblock %}
+{% endblock css %}
 <div x-data="FileUpload('{{ type }}')">
     <button x-ref="button"
             class="button {% if filled == True %}filled{% endif %} {% if small == True %}small{% endif %}"
@@ -24,7 +24,7 @@
                     Vous pouvez joindre un fichier à votre <span x-text="getString(`types.${type}`)"></span>, d'une taille maximum de 20Mo
                 </p>
                 <div class="fr-mb-2v fr-mt-2w">
-                    {% include 'projects/project/fragments/files_links/file_upload_input_standalone.html' with required=True %}
+                    {% include "projects/project/fragments/files_links/file_upload_input_standalone.html" with required=True %}
                 </div>
                 <label class="d-block fr-mt-2w">
                     <span class="fr-mb-1v d-block text-info-custom text-grey-dark">Donnez un nom au fichier</span>

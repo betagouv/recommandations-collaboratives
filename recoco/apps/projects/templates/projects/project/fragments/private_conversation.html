@@ -6,7 +6,7 @@
     <link href="{% sass_src 'projects/css/private_conversation.scss' %}"
           rel="stylesheet"
           type="text/css">
-{% endblock %}
+{% endblock css %}
 {% regroup project.notes.private by created_on.date as notes_by_day %}
 <div class="message-window flex-grow-1 d-flex flex-column-reverse scroll-gestion">
     <ul class="list-group">
@@ -14,30 +14,26 @@
             <li class="list-group-item border-0 fr-m-0 fr-p-0">
                 <div class="small fr-my-2v text-center w-100">{{ date|naturalday|capfirst }}</div>
                 {% for note in notes %}
-                    {% if request.user == note.created_by %}
-                        <div class="rounded-3 fr-p-2w bg-orange-light fr-my-2v specific-ml-2vw">
-                        {% else %}
-                            <div class="bg-orange-light rounded-3 fr-p-2w fr-my-2v specific-mr-2vw">
-                            {% endif %}
-                            <div class="overflow-hidden">{{ note.content_rendered|safe }}</div>
-                            {% if note.document.count %}
-                                {% for document in note.document.all %}
-                                    {% include 'projects/project/fragments/files_links/file_list_item_embedded.html' with document=document %}
-                                {% endfor %}
-                            {% endif %}
-                            {% if note.created_by %}
-                                <div class="d-flex align-items-center">
-                                    {% include 'user/user_card.html' with user=note.created_by %}
-                                    {% if note.created_by == request.user %}
-                                        <span class="align-middle small text-dark fr-ml-2v">
-                                            - <a class="fr-ml-1v" href="{% url 'projects-update-note' note.pk %}">éditer</a>
-                                        </span>
-                                    {% endif %}
-                                </div>
-                            {% endif %}
-                        </div>
-                    {% endfor %}
-                </li>
-            {% endfor %}
-        </ul>
-    </div>
+                    <div class="bg-orange-light rounded-3 fr-p-2w fr-my-2v {% if request.user == note.created_by %}specific-ml-2vw {% else %} specific-mr-2vw {% endif %}">
+                        <div class="overflow-hidden">{{ note.content_rendered|safe }}</div>
+                        {% if note.document.count %}
+                            {% for document in note.document.all %}
+                                {% include "projects/project/fragments/files_links/file_list_item_embedded.html" with document=document %}
+                            {% endfor %}
+                        {% endif %}
+                        {% if note.created_by %}
+                            <div class="d-flex align-items-center">
+                                {% include "user/user_card.html" with user=note.created_by %}
+                                {% if note.created_by == request.user %}
+                                    <span class="align-middle small text-dark fr-ml-2v">
+                                        - <a class="fr-ml-1v" href="{% url 'projects-update-note' note.pk %}">éditer</a>
+                                    </span>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </li>
+        {% endfor %}
+    </ul>
+</div>

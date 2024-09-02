@@ -4,7 +4,7 @@
     <link href="{% sass_src 'projects/css/fragments/kanban_projects/kanban_project.scss' %}"
           rel="stylesheet"
           type="text/css" />
-{% endblock %}
+{% endblock css %}
 </script>
 <div x-data="AdvisorDashboard" x-init="getData();">
     <header class="d-flex fr-mb-2v w-100">
@@ -61,11 +61,13 @@
                          @dragenter="onDragEnter(event)"
                          @dragleave="onDragLeave(event)">
                         <template x-if="column(board.code).length === 0">
-                            <div class="text-grey drag-placeholder rounded d-flex align-items-center justify-content-center text-uppercase h-100 specific-fontsize-08">Glissez et déposez une carte ici</div>
+                            <div class="text-grey drag-placeholder rounded d-flex align-items-center justify-content-center text-uppercase h-100 specific-fontsize-08">
+                                Glissez et déposez une carte ici
+                            </div>
                         </template>
                     </div>
                     <template x-for="(p, taskIndex) in column(board.code)" :key="p.id" class="col">
-                        {% include 'projects/project/fragments/kanban_projects/kanban_project_item.html' %}
+                        {% include "projects/project/fragments/kanban_projects/kanban_project_item.html" %}
                     </template>
                 </div>
             </div>

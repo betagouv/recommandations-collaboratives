@@ -17,7 +17,7 @@
 {% block js %}
     {% vite_asset 'js/main.js' %}
     {% vite_asset 'js/apps/embedResource.js' %}
-{% endblock %}
+{% endblock js %}
 <style type="text/css">
 	@media print
     {
@@ -60,8 +60,8 @@
             </a>
         </div>
         {% if contacts.count == 0 %}<div class="fr-mt-3w"></div>{% endif %}
-        {% include 'resources/resource/fragments/flag.html' %}
-        {% include 'resources/resource/fragments/resource_content.html' with resource=resource %}
-        <div id="task-contacts">{% include 'resources/resource/fragments/contact_list.html' %}</div>
+        {% include "resources/resource/fragments/flag.html" %}
+        {% include "resources/resource/fragments/resource_content.html" with resource=resource %}
+        <div id="task-contacts">{% include "resources/resource/fragments/contact_list.html" %}</div>
     </div>
 </div>

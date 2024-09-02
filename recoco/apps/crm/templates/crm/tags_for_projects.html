@@ -3,14 +3,15 @@
 {% load static %}
 {% load humanize %}
 {% load crm_tags %}
-{% block title %}Utilisation des tags sur les projets - CRM{% endblock %}
+{% block title %}
+    Utilisation des tags sur les projets - CRM
+{% endblock title %}
 {% load sass_tags %}
 {% block css %}
     <link href="{% sass_src 'crm/css/tags.scss' %}"
           rel="stylesheet"
           type="text/css">
-    <style>
-{% endblock %}
+{% endblock css %}
 {% block js %}
     {% vite_asset 'js/apps/crm.js' %}
     <script src="{% static "/js/d3.min.js" %}"></script>
@@ -60,9 +61,9 @@
 
  }
     </script>
-{% endblock %}
+{% endblock js %}
 {% block content %}
-    <div x-data="Crm" class="d-flex fr-px-0" style="">
+    <div x-data="Crm" class="d-flex fr-px-0">
         {% include "crm/fragments/sidebar.html" with back_button=True map=True tools=True search=True %}
         <div class="w-75 d-flex flex-column justify-content-start">
             <div class="d-flex justify-content-between align-items-center fr-px-3w fr-pt-3w">
@@ -99,4 +100,4 @@
             </table>
         </div>
     </div>
-{% endblock %}
+{% endblock content %}

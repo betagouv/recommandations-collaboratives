@@ -4,7 +4,7 @@
     <link href="{% sass_src 'projects/css/fragments/owner/owner-details.scss' %}"
           rel="stylesheet"
           type="text/css">
-{% endblock %}
+{% endblock css %}
 {% load phone_filters %}
 {% if project.owner %}
     <a class="d-flex align-items-center fr-mb-1v text-decoration-none a-specific-fontsize-14 specific-color-335B7E"
@@ -24,8 +24,8 @@
              fill="currentColor">
             <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#telephone" />
         </svg>
-        <a  class="text-decoration-none a-specific-fontsize-14 specific-color-335B7E"
-            href="tel:{{ project.owner.profile.phone_no }}">
+        <a class="text-decoration-none a-specific-fontsize-14 specific-color-335B7E"
+           href="tel:{{ project.owner.profile.phone_no }}">
             {% if project.owner.profile.phone_no %}
                 {{ project.owner.profile.phone_no|format_phone }}
             {% elif project.phone %}

@@ -1,14 +1,14 @@
-<!-- prettier-ignore -->
 {% extends "base.html" %}
 {% load sass_tags %}
 {% load static %}
-{% block title %}Déclaration d'accessibilité{% endblock %}
+{% block title %}
+    Déclaration d'accessibilité
+{% endblock title %}
 {% block css %}
     <link href="{% sass_src 'home/css/home/home.scss' %}"
           rel="stylesheet"
           type="text/css" />
-{% endblock %}
-<!-- prettier-ignore -->
+{% endblock css %}
 {% block content %}
     <script>console.log("{{ request.sender_email }}");</script>
     <div class="col-8 fr-py-2w g-0 fr-mx-auto">
@@ -210,4 +210,4 @@
                rel="noopener">Générateur de Déclaration d’Accessibilité de BetaGouv</a>.
         </p>
     </div>
-{% endblock %}
+{% endblock content %}

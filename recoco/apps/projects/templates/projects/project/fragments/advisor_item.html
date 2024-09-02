@@ -6,7 +6,7 @@
     <link href="{% sass_src 'projects/css/advisor_item.scss' %}"
           rel="stylesheet"
           type="text/css">
-{% endblock %}
+{% endblock css %}
 {% get_obj_perms request.user for request.site as "user_site_perms" %}
 {% get_obj_perms request.user for project as "user_project_perms" %}
 <div class="d-flex align-items-start justify-content-between fr-mb-2v">
@@ -32,7 +32,7 @@
             </span>
             <div class="d-flex align-items-center">
                 <span class="fw-light fst-italic specific-color-666">{{ user.profile.organization.name }}</span>
-                {% if  user.profile.organization_position %}
+                {% if user.profile.organization_position %}
                     <span class="fr-ml-1v text-lowercase fw-light fst-italic specific-color-666">({{ user.profile.organization_position }})</span>
                 {% endif %}
             </div>

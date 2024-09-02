@@ -2,13 +2,13 @@
 {% load django_vite %}
 {% load sass_tags %}
 {% block css %}
-  <link href="{% sass_src 'css/tools/searchable_list.scss' %}"
-        rel="stylesheet"
-        type="text/css">
-{% endblock %}
+    <link href="{% sass_src 'css/tools/searchable_list.scss' %}"
+          rel="stylesheet"
+          type="text/css">
+{% endblock css %}
 {% block js %}
     {% vite_asset 'js/apps/searchableList.js' %}
-{% endblock %}
+{% endblock js %}
 <div x-data="SearchableList('{{ search_list_id }}', {{ list.field.choices|length }}, {{ search_options }})"
      id="{{ search_list_id }}">
     <h5 class="fr-mb-0 d-flex align-items-center justify-content-start">
@@ -17,22 +17,8 @@
         </svg>
         {{ label }}
     </h5>
-    <!-- <div class="border rounded fr-px-2w fr-py-2v">
-        <div class="d-flex align-items-center fr-mb-2v">
-            <svg class="bi align-baseline fr-mr-2v" width="17" height="17" fill="#222">
-                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#search" />
-            </svg>
-            <span>{{ item_label }} selectionnés</span>
-        </div>
-    </div> -->
     <div class="rounded fr-py-2v position-relative">
         <div class="fr-pb-2v">
-            <!-- <div class="d-flex align-items-center fr-mb-2v">
-                <svg class="bi align-baseline fr-mr-2v" width="17" height="17" fill="#222">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#list" />
-                </svg>
-                <span>Liste des {{ item_label }}s</span>
-            </div> -->
             <div class="common-input with-icon d-flex align-items-center justify-content-center">
                 <svg class="input-icon bi align-baseline fr-mr-2v"
                      width="17"
@@ -40,14 +26,16 @@
                      fill="#222">
                     <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#search" />
                 </svg>
-                    <input id="{{search_list_id}}-input" type="search fr-ml-3w fr-pl-3w"
-                        class="search w-100"
-                        placeholder="Ajouter un {{item_label}}"
-                        @focus="handleFocusList"
-                        @blur="handleBlurList(event)"/>
+                <input id="{{ search_list_id }}-input"
+                       type="search fr-ml-3w fr-pl-3w"
+                       class="search w-100"
+                       placeholder="Ajouter un {{ item_label }}"
+                       @focus="handleFocusList"
+                       @blur="handleBlurList(event)" />
             </div>
         </div>
-        <ul class="list-unstyled fr-m-0 d-flex flex-column"  id="{{search_list_id}}-selected-list">
+        <ul class="list-unstyled fr-m-0 d-flex flex-column"
+            id="{{ search_list_id }}-selected-list">
             <template x-for="item in selectedList">
                 <li class="border d-inline-flex rounded justify-content-between align-items-center fr-px-2w fr-py-1v bg-grey-light d-flex align-items-center fr-mb-1v">
                     <p class="fr-mb-0 fr-pb-0 fw-bold font-small" x-text="item.name"></p>
@@ -65,9 +53,11 @@
                 </div>
             </template>
         </ul>
-        <div class="searchable-list-wrapper fr-mt-3w" :class="onFocus ? 'show' : 'hide'">
+        <div class="searchable-list-wrapper fr-mt-3w"
+             :class="onFocus ? 'show' : 'hide'">
             <ul class="list d-flex flex-column list-unstyled border"
-                x-ref="selectList" id="{{search_list_id}}-list">
+                x-ref="selectList"
+                id="{{ search_list_id }}-list">
                 {% for id, value in list.field.choices %}
                     {% if value != '' %}
                         <li class="fr-m-0 fr-p-0 specific-cursor-pointer"

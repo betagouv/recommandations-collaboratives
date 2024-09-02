@@ -4,20 +4,17 @@
 {% load django_vite %}
 {% load humanize %}
 {% load projects_extra %}
-{% block title %}Proposer {{ project.name }} - CRM{% endblock %}
+{% block title %}
+    Proposer {{ project.name }} - CRM
+{% endblock title %}
 {% block js %}
     {% vite_asset 'js/apps/crm.js' %}
-{% endblock %}
+{% endblock js %}
 {% block css %}
     <link href="{% sass_src 'home/css/dsfr/marianne.css' %}"
           rel="stylesheet"
           type="text/css">
-    <style>
- html, body {
-     scroll-padding-top: 240px;
- }
-    </style>
-{% endblock %}
+{% endblock css %}
 {% block content %}
     <div x-data="Crm" class="d-flex fr-px-0">
         {% include "crm/fragments/sidebar.html" with search=True back_button=True user_advised_projects=False user_projects=False %}
@@ -80,4 +77,4 @@
             </div>
         </div>
     </div>
-{% endblock %}
+{% endblock content %}

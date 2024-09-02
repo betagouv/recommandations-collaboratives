@@ -1,13 +1,12 @@
 {% load account %}
 {% load i18n %}
-
-<!doctype html>
+<!DOCTYPE html>
 <html>
-  <head>
-    <meta name="viewport" content="width=device-width" />
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <title>Confirmez votre adresse email sur {{ request.site.name }}</title>
-    <style>
+    <head>
+        <meta name="viewport" content="width=device-width" />
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>Confirmez votre adresse email sur {{ request.site.name }}</title>
+        <style>
       /* -------------------------------------
           GLOBAL RESETS
       ------------------------------------- */
@@ -285,71 +284,68 @@
           background-color: #34495e !important;
           border-color: #34495e !important; } }
 
-    </style>
-  </head>
-  <body class="">
-    <table border="0" cellpadding="0" cellspacing="0" class="body">
-      <tr>
-        <td>&nbsp;</td>
-        <td class="container">
-          <div class="content">
-
-            <!-- START CENTERED WHITE CONTAINER -->
-            <table class="main">
-
-              <!-- START MAIN CONTENT AREA -->
-              <tr>
-                <td class="wrapper">
-                  <table border="0" cellpadding="6" cellspacing="0">
-                    <tr>
-                      <td>
-                        <p>Bonjour,</p>
-                        {% autoescape off %}
-                            {% user_display user as user_display %}
-                            <p class= align-center">Vous recevez cet e-mail parce que l'utilistateur·rice {{ user_display }} a donné ce mail pour l'enregistrement du compte sur {{ current_site.domain }}. Pour confirmer, cliquez sur le bouton suivant.</p>
-                        {% endautoescape %}
-                        </br>
-                        <table border="0" cellpadding="0" cellspacing="0" class="btn btn-primary">
-                          <tbody>
+        </style>
+    </head>
+    <body>
+        <table border="0" cellpadding="0" cellspacing="0" class="body">
+            <tr>
+                <td>&nbsp;</td>
+                <td class="container">
+                    <div class="content">
+                        <!-- START CENTERED WHITE CONTAINER -->
+                        <table class="main">
+                            <!-- START MAIN CONTENT AREA -->
                             <tr>
-                              <td align="center">
-                                <table border="0" cellpadding="0" cellspacing="0">
-                                  <tbody>
-                                    <tr>
-                                      <td align="center"> <a href="{{ activate_url }}">Confirmer mon email</a> </td>
+                                <td class="wrapper">
+                                    <table border="0" cellpadding="6" cellspacing="0">
+                                        <tr>
+                                            <td>
+                                                <p>Bonjour,</p>
+                                                {% autoescape off %}
+                                                    {% user_display user as user_display %}
+                                                    <p class= align-center">Vous recevez cet e-mail parce que l'utilistateur·rice {{ user_display }} a donné ce mail pour l'enregistrement du compte sur {{ current_site.domain }}. Pour confirmer, cliquez sur le bouton suivant.
+                                                    </p>
+                                                {% endautoescape %}
+                                            </br>
+                                            <table border="0" cellpadding="0" cellspacing="0" class="btn btn-primary">
+                                                <tbody>
+                                                    <tr>
+                                                        <td align="center">
+                                                            <table border="0" cellpadding="0" cellspacing="0">
+                                                                <tbody>
+                                                                    <tr>
+                                                                        <td align="center">
+                                                                            <a href="{{ activate_url }}">Confirmer mon email</a>
+                                                                        </td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                            <!-- <p>Ce lien n'est valable que 3 jours. Il est à usage unique.</p> -->
+                                            <hr>
+                                            <div>
+                                                <p>Des difficultés pour vous connecter ?</p>
+                                                <p>Nous vous recommandons de copier-coller ce lien dans un navigateur :</p>
+                                                <p class= align-center">
+                                                    <strong>{{ activate_url }}</strong>
+                                                </p>
+                                                <p>Bonne journée,</p>
+                                                <p>L'équipe {{ request.site.name }}</p>
+                                            </div>
+                                        </td>
                                     </tr>
-                                  </tbody>
                                 </table>
-                              </td>
-                            </tr>
-                          </tbody>
-                        </table>
-                        <!-- <p>Ce lien n'est valable que 3 jours. Il est à usage unique.</p> -->
-                        <hr>
-                        <div>
-                          <p>Des difficultés pour vous connecter ?</p>
-                          <p>
-                            Nous vous recommandons de copier-coller ce lien dans un navigateur :
-                          </p>
-                          <p class= align-center">
-                            <strong>
-                                {{ activate_url }}
-                            </strong>
-                          </p>
-                          <p>Bonne journée,</p>
-                          <p>L'équipe {{ request.site.name }}</p>
-                        </div>
-                      </td>
-                    </tr>
-                  </table>
-                </td>
-              </tr>
-            <!-- END MAIN CONTENT AREA -->
-            </table>
-          <!-- END CENTERED WHITE CONTAINER -->
-          </div>
-        </td>
-      </tr>
+                            </td>
+                        </tr>
+                        <!-- END MAIN CONTENT AREA -->
+                    </table>
+                    <!-- END CENTERED WHITE CONTAINER -->
+                </div>
+            </td>
+        </tr>
     </table>
-  </body>
+</body>
 </html>

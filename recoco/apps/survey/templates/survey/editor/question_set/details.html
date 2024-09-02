@@ -5,8 +5,10 @@
     <link href="{% sass_src 'survey/css/editor/question_set.scss' %}"
           rel="stylesheet"
           type="text/css" />
-{% endblock %}
-{% block title %}Groupe de questions {{ question_set.survey.name }}{% endblock %}
+{% endblock css %}
+{% block title %}
+    Groupe de questions {{ question_set.survey.name }}
+{% endblock title %}
 {% block content %}
     <div class="col-12 fr-p-3w fr-mx-auto">
         <!-- Breadcrumb -->
@@ -51,18 +53,6 @@
             </div>
             <!-- Sidebar -->
             <div class="col-sm-12 col-lg-4 col-xl-3 border-start">
-                <!-- Preview -->
-                <!--
-                 <div class="d-grid gap-2 fr-mb-2w">
-                 <a class="btn btn-primary btn-sm" href="#" role="button">
-                 <svg class="bi" width="16" height="16" fill="currentColor">
-                 <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#lightning" />
-                 </svg>
-                 &nbsp;
-                 Essayer ce questionnaire
-                 </a>
-                 </div>
--->
                 <!-- Edit -->
                 <div class="d-grid gap-2 fr-mb-2w">
                     <a class="btn btn-light btn-sm"
@@ -203,4 +193,4 @@
                 </div>
             {% endfor %}
         </div>
-    {% endblock %}
+    {% endblock content %}

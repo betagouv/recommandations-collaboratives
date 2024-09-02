@@ -5,7 +5,7 @@
     <link href="{% sass_src 'projects/css/fragments/tasks_modal/modal.scss' %}"
           rel="stylesheet"
           type="text/css" />
-{% endblock %}
+{% endblock css %}
 {% get_obj_perms request.user for request.site as "user_site_perms" %}
 {% get_obj_perms request.user for project as "user_project_perms" %}
 <script>
@@ -56,12 +56,12 @@
                             </template>
                             <div class="border border-top-0 border-bottom-0 border-right-0 flex-shrink-0 d-flex flex-column justify-content-between specific-width-33pct">
                                 <div class="d-flex flex-column flex-fill overflow-hidden">
-                                    {% include 'projects/project/fragments/status_switcher.html' %}
+                                    {% include "projects/project/fragments/status_switcher.html" %}
                                     <div x-show="$store.taskModal.currentTask.document && $store.taskModal.currentTask.document.length > 0">
                                         <h2 class="text-secondary text-uppercase fw-bolder fr-m-2w h2-specific-fontsize-12">Fichier(s) partagé(s)</h2>
                                         <template x-for="document in $store.taskModal.currentTask.document"
                                                   x-key="document.id">
-                                            <div class="fr-px-2w">{% include 'projects/project/fragments/files_links/file_list_item_api.html' %}</div>
+                                            <div class="fr-px-2w">{% include "projects/project/fragments/files_links/file_list_item_api.html" %}</div>
                                         </template>
                                     </div>
                                     <h2 class="text-secondary text-uppercase fw-bolder fr-m-2w h2-specific-fontsize-12">Conversation</h2>

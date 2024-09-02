@@ -3,7 +3,9 @@
 {% load sass_tags %}
 {% load cookie_consent_tags %}
 {% load static %}
-{% block title %}Politique de confidentialité{% endblock %}
+{% block title %}
+    Politique de confidentialité
+{% endblock title %}
 {% block css %}
     <link href="{% sass_src 'home/css/home/home.scss' %}"
           rel="stylesheet"
@@ -14,7 +16,7 @@
     <link href="{% sass_src 'home/css/privacy/privacy.scss' %}"
           rel="stylesheet"
           type="text/css">
-{% endblock %}
+{% endblock css %}
 {% block content %}
     <div class="col-8 fr-mt-3w fr-py-2w g-0 fr-mx-auto font-marianne">
         <h2>Politique de confidentialité de {{ request.site.name }}</h2>
@@ -184,7 +186,7 @@
             <div class="d-flex flex-column privacy-div">
                 <p class="fr-p-2v p-in-dev-1">Traitement réalisé</p>
                 <p class="fr-p-2v p-in-dev-2">
-                    [Mission du sous-traitant : hébergement , envoi d&#39;emails, création de formulaire, cookies…]
+                    [Mission du sous-traitant : hébergement , envoi d'emails, création de formulaire, cookies…]
                 </p>
                 <p class="fr-p-2v">Hébergement des données</p>
             </div>
@@ -218,9 +220,9 @@
             <br />
             <br />
             Ce consentement de la personne concernée pour une ou plusieurs finalités spécifiques
-            constitue une base légale au sens du RGPD et doit être entendu au sens de l&#39;article 6-a du
+            constitue une base légale au sens du RGPD et doit être entendu au sens de l'article 6-a du
             Règlement (UE) 2016/679 du Parlement européen et du Conseil du 27 avril 2016 relatif à la
-            protection des personnes physiques à l&#39;égard du traitement des données à caractère personnel
+            protection des personnes physiques à l'égard du traitement des données à caractère personnel
             et à la libre circulation de ces données.
             <br />
             <br />
@@ -265,4 +267,4 @@
             </div>
         </div>
     </div>
-{% endblock %}
+{% endblock content %}

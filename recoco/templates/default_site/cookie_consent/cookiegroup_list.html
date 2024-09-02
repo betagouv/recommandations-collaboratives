@@ -4,7 +4,7 @@
 {% load static %}
 {% block js %}
     {% vite_asset 'js/apps/consent.js' %}
-{% endblock %}
+{% endblock js %}
 {% load sass_tags %}
 {% block css %}
     <link href="{% sass_src 'home/css/dsfr/custom-dsfr.scss' %}"
@@ -13,7 +13,7 @@
     <link href="{% sass_src 'css/cookie_consent/cookiegroup.scss' %}"
           rel="stylesheet"
           type="text/css">
-{% endblock %}
+{% endblock css %}
 {% block content %}
     <div class="fr-container fr-container--fluid fr-container-md">
         <div class="fr-grid-row fr-grid-row--center">
@@ -137,4 +137,4 @@
             </div>
         </div>
     </div>
-{% endblock %}
+{% endblock content %}

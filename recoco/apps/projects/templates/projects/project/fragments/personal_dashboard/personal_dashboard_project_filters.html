@@ -4,7 +4,7 @@
     <link href="{% sass_src 'projects/css/fragments/personnal_dashboard/personnal_dashboard.scss' %}"
           rel="stylesheet"
           type="text/css" />
-{% endblock %}
+{% endblock css %}
 <div class="d-flex align-items-center fr-mb-3w fr-mt-3w w-100 justify-content-between projects-filters-container">
     {% comment %} <div class="d-flex align-items-center">
         <div class="d-flex align-items-center fr-ml-3w projects-filters-territory">
@@ -59,8 +59,7 @@
                 <option value="recent-activities">Activité récente</option>
                 <option value="role">Rôle</option>
             </select>
-            <svg class="input-icon right black bi align-baseline fr-mr-2v"
-                 class="z-1"
+            <svg class="input-icon right black bi align-baseline fr-mr-2v z-1"
                  width="15"
                  height="15"
                  fill="#000000">

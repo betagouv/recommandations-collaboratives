@@ -7,7 +7,7 @@
     <link href="{% static 'css/header/header.scss' %}"
           rel="stylesheet"
           type="text/css">
-{% endblock %}
+{% endblock css %}
 {% block js %}
     {% vite_asset 'js/apps/menuNotification.js' %}
 {% endblock js %}
@@ -87,7 +87,7 @@
                              x-on:click.outside="open = false"
                              class="btn-group">
                             <a class="fr-ml-1v align-middle text-decoration-none specific-color-inherit"
-                               href="{% url 'projects-project-detail' active_project.pk %}"><strong>{{ active_project.name }}</strong><span class="text-secondary small fr-ml-2v text-break text-truncate">({{ active_project.commune.name }})</span></strong></a>
+                               href="{% url 'projects-project-detail' active_project.pk %}"><strong>{{ active_project.name }}</strong><span class="text-secondary small fr-ml-2v text-break text-truncate">({{ active_project.commune.name }})</span></a>
                         </div>
                     </div>
                 </li>

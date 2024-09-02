@@ -1,6 +1,8 @@
 {% extends "base.html" %}
 {% load static %}
-{% block title %}Modifier le groupe de questions {{ question_set.survey.name }}{% endblock %}
+{% block title %}
+    Modifier le groupe de questions {{ question_set.survey.name }}
+{% endblock title %}
 {% block content %}
     <div class="col-12 fr-p-3w fr-mx-auto">
         <!-- Breadcrumb -->
@@ -49,4 +51,4 @@
             </form>
         </div>
     </div>
-{% endblock %}
+{% endblock content %}

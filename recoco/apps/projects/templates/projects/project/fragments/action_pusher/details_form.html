@@ -2,7 +2,7 @@
 {% load django_vite %}
 {% block js %}
     {% vite_asset 'js/apps/topicSearch.js' %}
-{% endblock %}
+{% endblock js %}
 <!-- Action details -->
 <template x-if="push_type != 'multiple'">
     <div class="message d-flex flex-row justify-content-between">
@@ -53,10 +53,10 @@
                 </div>
                 <div class="d-flex flex-column">
                     <label class="fr-mb-2v text-info-custom text-grey-dark" for="message">Message</label>
-                    {% include 'tools/editor.html' with input_name="content" input_value="content" errors=form.content.errors is_task=True %}
+                    {% include "tools/editor.html" with input_name="content" input_value="content" errors=form.content.errors is_task=True %}
                 </div>
                 <div class="fr-mb-3w">
-                    {% include 'projects/project/fragments/files_links/file_upload_input_standalone.html' %}
+                    {% include "projects/project/fragments/files_links/file_upload_input_standalone.html" %}
                     {% for error in document_form.the_file.errors %}
                         <div class="text-danger text-start fr-mb-2v">{{ error }}</div>
                     {% endfor %}
@@ -78,8 +78,7 @@
                 <template x-if="push_type == 'noresource'">
                     <div class="buttons d-flex flex-row justify-content-between">
                         {% if not disable_draft %}
-                            <button data-test-id="publish-draft-task-button"
-                                    @click="set_draft(true)"
+                            <button @click="set_draft(true)"
                                     data-test-id="publish-draft-task-button"
                                     class="button small">Enregister comme Brouillon</button>
                         {% endif %}

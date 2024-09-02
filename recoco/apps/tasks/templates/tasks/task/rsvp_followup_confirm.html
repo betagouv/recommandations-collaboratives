@@ -15,7 +15,7 @@
     <link href="{% sass_src 'tasks/css/task/rsvp_followup.scss' %}"
           rel="stylesheet"
           type="text/css">
-{% endblock %}
+{% endblock css %}
 {% block content %}
     <div class="col-12 fr-p-3w fr-mx-auto">
         <h2 class="fr-mb-3w">
@@ -54,6 +54,6 @@
                       placeholder="Cette note est privée et ne sera consultée que par votre équipe et UrbanVitaliz"></textarea>
         </div>
     </form>
-    {% include 'projects/project/fragments/action_list_item.html' with task=task show_comments=True %}
+    {% include "projects/project/fragments/action_list_item.html" with task=task show_comments=True %}
 </div>
-{% endblock %}
+{% endblock content %}

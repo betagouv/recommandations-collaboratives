@@ -2,7 +2,7 @@
 {% load django_vite %}
 {% block js %}
     {% vite_asset 'js/apps/consent.js' %}
-{% endblock %}
+{% endblock js %}
 {% load sass_tags %}
 {% block css %}
     <link href="{% sass_src 'home/css/dsfr/custom-dsfr.scss' %}"
@@ -11,7 +11,7 @@
     <link href="{% sass_src 'css/consent/banner.scss' %}"
           rel="stylesheet"
           type="text/css">
-{% endblock %}
+{% endblock css %}
 <div x-data="Consent">
     <template x-if="!userHasSelectedCookies">
         <div class="fr-consent-banner" data-test-id="fr-consent-banner">

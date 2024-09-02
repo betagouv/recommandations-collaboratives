@@ -1,7 +1,9 @@
 {% extends "base.html" %}
 {% load sass_tags %}
 {% load static %}
-{% block title %}Methodologie{% endblock %}
+{% block title %}
+    Methodologie
+{% endblock title %}
 {% block css %}
     <link href="{% sass_src 'home/css/home/home.scss' %}"
           rel="stylesheet"
@@ -9,7 +11,7 @@
     <link href="{% sass_src 'home/css/methodology/methodology.scss' %}"
           rel="stylesheet"
           type="text/css">
-{% endblock %}
+{% endblock css %}
 {% block content %}
     <div class="col-8 fr-py-2w g-0 fr-mx-auto fr-mt-6w">
         <h2>Quelle étape vous intéresse ?</h2>
@@ -43,4 +45,4 @@
             </ul>
         </p>
     </div>
-{% endblock %}
+{% endblock content %}

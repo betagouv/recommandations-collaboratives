@@ -6,7 +6,7 @@
     <link href="{% sass_src 'projects/css/fragments/files_links/file_list_item.scss' %}"
           rel="stylesheet"
           type="text/css">
-{% endblock %}
+{% endblock css %}
 {% get_obj_perms request.user for request.site as "user_site_perms" %}
 {% get_obj_perms request.user for project as "user_project_perms" %}
 {% if document %}
@@ -68,15 +68,15 @@
             </div>
         </div>
         <div class="fr-pl-3w fr-ml-3w d-flex align-items-center">
-            {% include 'user/user_card.html' with user=document.uploaded_by %}
+            {% include "user/user_card.html" with user=document.uploaded_by %}
             <span class="fr-ml-3w tiny d-flex align-items-center">
                 <svg class="bi align-baseline fr-mr-2v" width="12" height="12" fill="#222">
                     <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#calendar" />
                 </svg>
             {{ document.created_on|naturalday }}</span>
             {% if document.attached_object %}
-            <span class="fr-ml-3w tiny d-flex">De :  <a href="{{ document.attached_object.get_absolute_url }}">{{ document.attached_object }}</a>
-        {% endif %}
+                <span class="fr-ml-3w tiny d-flex">De :  <a href="{{ document.attached_object.get_absolute_url }}">{{ document.attached_object }}</a></span>
+            {% endif %}
+        </div>
     </div>
-</div>
 {% endif %}

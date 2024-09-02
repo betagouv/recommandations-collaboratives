@@ -3,7 +3,9 @@
 {% load sass_tags %}
 {% load l10n %}
 {% load static %}
-{% block title %}Statistiques d'impact{% endblock %}
+{% block title %}
+    Statistiques d'impact
+{% endblock title %}
 {% block js %}
     {% leaflet_js %}
     <script src="{% static "/js/d3.min.js" %}"></script>
@@ -66,7 +68,7 @@
 
     }
     </script>
-{% endblock %}
+{% endblock js %}
 {% block css %}
     {% leaflet_css %}
     <link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/leaflet.fullscreen.css'
@@ -74,7 +76,7 @@
     <link href="{% sass_src 'home/css/statistics/statistics.scss' %}"
           rel="stylesheet"
           type="text/css">
-{% endblock %}
+{% endblock css %}
 {% block content %}
     <div class="col-9 fr-py-6w fr-mx-auto">
         <h2>Quel est l'impact d'UrbanVitaliz ?</h2>
@@ -160,4 +162,4 @@
             </div>
         </div>
     </div>
-{% endblock %}
+{% endblock content %}

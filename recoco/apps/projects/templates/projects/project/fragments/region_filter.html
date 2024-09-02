@@ -4,7 +4,7 @@
     <link href="{% sass_src 'projects/css/region_filter.scss' %}"
           rel="stylesheet"
           type="text/css">
-{% endblock %}
+{% endblock css %}
 <div class="d-flex align-items-center fr-ml-3w">
     <span class="fr-segmented__legend inline text-nowrap">Filtrer :</span>
     <div class="input-item position-relative active specific-border-solid1pxE5E5E5"
@@ -38,7 +38,8 @@
                            :value="territorySelectAll"
                            :checked="territorySelectAll"
                            id="allTerritory" />
-                    <label class=" w-100 fr-pr-2v fr-py-2v d-flex align-items-center" for="allTerritory">
+                    <label class=" w-100 fr-pr-2v fr-py-2v d-flex align-items-center"
+                           for="allTerritory">
                         <span class="fw-normal">Tout (dé)sélectionner</span>
                     </label>
                 </div>
@@ -76,7 +77,8 @@
                                             <span class="fw-normal" x-text="department.code"></span>
                                             <span class="fr-mx-1v fw-light">-</span>
                                             <span class="fw-light text-grey-dark text-nowrap" x-text="department.name"></span>
-                                            <span class="fw-light text-dark fr-ml-1v" x-text="`(${department.nbProjects})`"></span>
+                                            <span class="fw-light text-dark fr-ml-1v"
+                                                  x-text="`(${department.nbProjects})`"></span>
                                         </label>
                                     </div>
                                 </li>
@@ -99,7 +101,8 @@
                                 <span class="fw-normal" x-text="department.code"></span>
                                 <span class="fr-mx-1v fw-light">-</span>
                                 <span class="fw-light text-grey-dark text-nowrap" x-text="department.name"></span>
-                                <span class="fw-light text-dark fr-ml-1v" x-text="`(${department.nbProjects})`"></span>
+                                <span class="fw-light text-dark fr-ml-1v"
+                                      x-text="`(${department.nbProjects})`"></span>
                             </label>
                         </div>
                     </li>

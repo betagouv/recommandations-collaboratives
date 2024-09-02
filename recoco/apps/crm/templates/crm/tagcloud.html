@@ -1,19 +1,21 @@
 {% extends "base.html" %}
 {% load django_vite %}
 {% load static %}
-{% block title %}Usage des tags dans le CRM - CRM{% endblock %}
+{% block title %}
+    Usage des tags dans le CRM - CRM
+{% endblock title %}
 {% block js %}
     {% vite_asset 'js/apps/crm.js' %}
     {% vite_asset 'js/apps/tagCloud.js' %}
-{% endblock %}
+{% endblock js %}
 {% block content %}
     {{ tags|json_script:"tagsArray" }}
-    <div x-data="Crm" class="d-flex fr-px-0" style="">
+    <div x-data="Crm" class="d-flex fr-px-0">
         {% include "crm/fragments/sidebar.html" with back_button=True map=True tools=True search=True %}
         <div class="w-75 d-flex flex-column justify-content-start">
             {% url 'crm-search' as crmSearchUrl %}
             <div class="d-flex flex-column font-marianne fr-pt-3w fr-px-3w ">
-                <h2 class="">
+                <h2>
                     <svg class="bi align-middle" width="25" height="25" fill="currentColor">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#tags" />
                     </svg>
@@ -39,15 +41,13 @@
                                     <td>
                                         <a href="{% url 'crm-search' %}?query={{ key }}">{{ key }}</a>
                                     </td>
-                                    <td>
-                                    {{ value }}</a>
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </section>
+                                    <td>{{ value }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
     </div>
-</div>
-{% endblock %}
+{% endblock content %}

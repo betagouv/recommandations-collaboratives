@@ -4,7 +4,7 @@
     <link href="{% sass_src 'projects/css/fragments/geolocation/project_map.scss' %}"
           rel="stylesheet"
           type="text/css" />
-{% endblock %}
+{% endblock css %}
 {% load django_vite %}
 {{ project.name|json_script:"nameProject" }}
 {{ project.status|json_script:"status" }}
@@ -34,7 +34,7 @@
         }
     </script>
     {% vite_asset 'js/apps/mapViewerStatic.js' %}
-{% endblock %}
+{% endblock js %}
 <div x-data='MapViewerStatic(projectOptions)'
      data-test-id="project-knogwledge-map">
     <div class="fr-p-0 project-map-container" :class="{'is-small':mapIsSmall}">

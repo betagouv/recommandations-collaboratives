@@ -1,7 +1,9 @@
 {% extends "base.html" %}
 {% load sass_tags %}
 {% load static %}
-{% block title %}Acteurs regionnaux{% endblock %}
+{% block title %}
+    Acteurs regionnaux
+{% endblock title %}
 {% block css %}
     <link href="{% sass_src 'home/css/dsfr/custom-dsfr.scss' %}"
           rel="stylesheet"
@@ -9,9 +11,9 @@
     <link href="{% sass_src 'home/css/actors/actors.scss' %}"
           rel="stylesheet"
           type="text/css">
-{% endblock %}
+{% endblock css %}
 {% block content %}
-    <div class="fr-container" style="">
+    <div class="fr-container">
         <div class="fr-mb-0w custom-background-actors-image">
             <div class="fr-grid-row">
                 <div class="fr-col-offset-md-2"></div>
@@ -111,7 +113,7 @@
             </div>
         </div>
     </div>
-    <div class="fr-py-6w" style=";">
+    <div class="fr-py-6w">
         <div class="fr-container fr-pt-3w fr-pb-6w">
             <div class="fr-m-auto">
                 <h3 class="text-center fr-pb-6w">A quoi les conseillers ont-ils accès ?</h3>
@@ -362,4 +364,4 @@
         })
     })
     </script>
-{% endblock %}
+{% endblock content %}

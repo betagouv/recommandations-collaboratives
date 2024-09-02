@@ -4,7 +4,7 @@
     <link href="{% sass_src 'projects/css/fragments/tasks_kanban/kanban_header.scss' %}"
           rel="stylesheet"
           type="text/css" />
-{% endblock %}
+{% endblock css %}
 <!-- Index of tasks kanban app -->
 <div x-data="KanbanTasks({{ project.id }})"
      x-init="initTooltips(); loadCanAdministrate(); loadUserProjectPerms(); loadIsSwitchtender(); loadUserId();"
@@ -27,11 +27,13 @@
                              @dragenter="onDragEnter(event)"
                              @dragleave="onDragLeave(event)"
                              data-test-id="drag-target">
-                            <div class="drag-placeholder rounded d-flex align-items-center justify-content-center text-uppercase specific-fontsize-08 specific-height-100px">Glissez et déposez une fiche ici</div>
+                            <div class="drag-placeholder rounded d-flex align-items-center justify-content-center text-uppercase specific-fontsize-08 specific-height-100px">
+                                Glissez et déposez une fiche ici
+                            </div>
                         </div>
                     </template>
                     <template x-for="(task, i) in column(board.status)" :key="task.id">
-                        {% include 'projects/project/fragments/tasks_kanban/task_item.html' %}
+                        {% include "projects/project/fragments/tasks_kanban/task_item.html" %}
                     </template>
                 </div>
             </div>

@@ -1,7 +1,7 @@
 {% load django_vite %}
 {% block js %}
     {% vite_asset 'js/apps/projectEmailReminder.js' %}
-{% endblock %}
+{% endblock js %}
 {% load static %}
 {% load guardian_tags %}
 {% get_obj_perms request.user for project as "user_project_perms" %}
@@ -58,7 +58,7 @@
                 {% endwith %}
             {% else %}
                 {% if request.user not in project.members.all and not position.is_advisor and not position.is_observer and request.user.is_staff and "change_project" in user_project_perms %}
-                    <span data-test-id ="no-reminders" class="tiny fw-medium text-blue">Aucun email de rappel programmé actuellement</span>
+                    <span data-test-id="no-reminders" class="tiny fw-medium text-blue">Aucun email de rappel programmé actuellement</span>
                 {% endif %}
             {% endif %}
         </div>

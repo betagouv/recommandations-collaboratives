@@ -6,12 +6,14 @@
 {% load gravatar %}
 {% load guardian_tags %}
 {% load sass_tags %}
-{% block title %}Espace conseillers - {{ block.super }}{% endblock %}
+{% block title %}
+    Espace conseillers - {{ block.super }}
+{% endblock title %}
 {% block project_detail %}
     {% get_obj_perms request.user for request.site as "user_site_perms" %}
     {% get_obj_perms request.user for project as "user_project_perms" %}
     <div class="col-12 fr-mx-auto">
-        {% include 'projects/project/navigation.html' with internal_followup=True full_page=True %}
+        {% include "projects/project/navigation.html" with internal_followup=True full_page=True %}
         <div class="row">
             <div class="col-8">
                 <div class="flag orange fr-mb-3w d-flex align-items-center justify-content-start">
@@ -33,7 +35,7 @@
                           method="post"
                           action="{% url 'projects-create-note' project.pk %}">
                         {% csrf_token %}
-                        {% include 'tools/editor.html' with input_name=private_note_form.content.name input_value=private_note_form.content.value|default:'' input_required=True %}
+                        {% include "tools/editor.html" with input_name=private_note_form.content.name input_value=private_note_form.content.value|default:'' input_required=True %}
                         <label class="visually-hidden" for="input-project-content">{{ private_note_form.content.label }}</label>
                         {% for error in private_note_form.content.errors %}<div class="text-danger text-end">{{ error }}</div>{% endfor %}
                         <div class="d-flex justify-content-end fr-mt-2v">
@@ -51,11 +53,11 @@
                 <ul class="d-flex flex-column list-unstyled fr-mb-0">
                     {% for advisor in project.switchtender_sites.all %}
                         {% if advisor.switchtender.is_active %}
-                            <li>{% include 'user/user_card.html' with user=advisor.switchtender user_activity=True %}</li>
+                            <li>{% include "user/user_card.html" with user=advisor.switchtender user_activity=True %}</li>
                         {% endif %}
                     {% endfor %}
                 </ul>
             </div>
         </div>
     </div>
-{% endblock %}
+{% endblock project_detail %}

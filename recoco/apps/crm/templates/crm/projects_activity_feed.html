@@ -4,14 +4,14 @@
 {% load django_vite %}
 {% block js %}
     {% vite_asset 'js/apps/crm.js' %}
-{% endblock %}
+{% endblock js %}
 {% block css %}
     <link href="{% sass_src 'home/css/dsfr/marianne.css' %}"
           rel="stylesheet"
           type="text/css">
-{% endblock %}
+{% endblock css %}
 {% block content %}
-    <div x-data="Crm" class="d-flex fr-px-0" style="">
+    <div x-data="Crm" class="d-flex fr-px-0">
         {% include "crm/fragments/sidebar.html" with search=True back_button=True %}
         <div class="w-75 d-flex flex-column justify-content-start fr-px-3w bg-light">
             <h3 class="fr-mt-2w fr-mb-3w">
@@ -33,4 +33,4 @@
             </ul>
         </div>
     </div>
-{% endblock %}
+{% endblock content %}

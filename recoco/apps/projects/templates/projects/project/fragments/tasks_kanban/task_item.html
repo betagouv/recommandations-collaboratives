@@ -5,7 +5,7 @@
     <link href="{% sass_src 'projects/css/fragments/tasks_kanban/kanban_header.scss' %}"
           rel="stylesheet"
           type="text/css" />
-{% endblock %}
+{% endblock css %}
 {% get_obj_perms request.user for request.site as "user_site_perms" %}
 {% get_obj_perms request.user for project as "user_project_perms" %}
 <div x-data="Task(task)"
@@ -50,7 +50,7 @@
                         <div class="d-flex flex-column">
                             <span class="align-middle text-grey-dark tiny specific-lineheight-20"
                                   x-text="`Émis le ${formatDate(currentTask.created_on)}`"></span>
-                            {% include 'projects/project/fragments/task/task_user_card.html' %}
+                            {% include "projects/project/fragments/task/task_user_card.html" %}
                             <div class="text-grey-dark d-flex align-items-center tiny fr-mr-2w responsive-flex-column fr-mt-1v">
                                 <svg class="align-middle bi fr-mr-1v"
                                      width="18px"

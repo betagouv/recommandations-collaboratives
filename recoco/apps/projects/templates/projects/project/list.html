@@ -27,7 +27,7 @@
     {% vite_asset 'js/apps/map.js' %}
     {% vite_asset 'js/apps/boardProjects.js' %}
     {% leaflet_js %}
-{% endblock %}
+{% endblock js %}
 {% block css %}
     <link href="{% sass_src 'projects/css/board.scss' %}"
           rel="stylesheet"
@@ -48,14 +48,15 @@
           crossorigin="" />
     <link rel="stylesheet"
           href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
-{% endblock %}
+{% endblock css %}
 {% block content %}
     {% get_obj_perms request.user for request.site as "user_site_perms" %}
     <div class="col-12 fr-p-3w fr-mx-auto">
         <div class="row fr-mx-0">
             <div class="d-flex flex-column fr-p-0 fr-m-0">
-                {% block project_list_content %}{% endblock %}
+                {% block project_list_content %}
+                {% endblock project_list_content %}
             </div>
         </div>
     </div>
-{% endblock %}
+{% endblock content %}

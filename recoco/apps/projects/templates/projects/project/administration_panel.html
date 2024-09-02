@@ -4,10 +4,12 @@
 {% load sass_tags %}
 {% load django_vite %}
 {% load projects_extra %}
-{% block title %}Paramètres - {{ block.super }}{% endblock %}
+{% block title %}
+    Paramètres - {{ block.super }}
+{% endblock title %}
 {% block js %}
     {% vite_asset 'js/apps/projectAdministration.js' %}
-{% endblock %}
+{% endblock js %}
 {% block css %}
     <link href="{% sass_src 'projects/css/administration.scss' %}"
           rel="stylesheet"
@@ -18,7 +20,7 @@
     {% get_obj_perms request.user for project as "user_project_perms" %}
     {% get_advising_position request.user project request.site as position %}
     {% is_staff_for_current_site request.user as is_staff %}
-    {% include 'projects/project/navigation.html' with administration_panel=True %}
+    {% include "projects/project/navigation.html" with administration_panel=True %}
     {{ project_form.postcode.value|json_script:"projectPostcode" }}
     {{ project_form.insee.value|json_script:"projectInsee" }}
     <div class="row">
@@ -148,7 +150,7 @@
                     <ul class="d-flex flex-column list-unstyled fr-mb-0">
                         {% for advisor in project.switchtender_sites.all %}
                             <li class="d-flex align-items-start justify-content-between fr-mb-1v">
-                                {% include 'user/user_card.html' with user=advisor.switchtender user_activity=True %}
+                                {% include "user/user_card.html" with user=advisor.switchtender user_activity=True %}
                                 {% if request.user == advisor.switchtender %}
                                     <form id="projects-project-switchtender-leave"
                                           action="{% url 'projects-project-switchtender-leave' project.pk %}"
@@ -198,12 +200,12 @@
                     {% for pm in project.projectmember_set.all %}
                         {% if pm.is_owner %}
                             <li class="d-flex align-items-start justify-content-between fr-mb-1v">
-                                {% include 'user/user_card.html' with user=pm.member project_owner=True user_activity=True %}
+                                {% include "user/user_card.html" with user=pm.member project_owner=True user_activity=True %}
                                 <span class="fr-ml-1v text-lowercase fst-italic font-weight-light specific-color-666">Référent du projet</span>
                             </li>
                         {% else %}
                             <li class="d-flex align-items-start justify-content-between fr-mb-1v">
-                                {% include 'user/user_card.html' with user=pm.member user_activity=True %}
+                                {% include "user/user_card.html" with user=pm.member user_activity=True %}
                                 <div class="d-flex align-items-center">
                                     {% if is_staff %}
                                         <form id="form-projects-access-promote-user"
@@ -261,7 +263,7 @@
                         {% for invite in pending_invites %}
                             {% if invite.role == "SWITCHTENDER" or invite.role == "OBSERVER" %}
                                 <li class="d-flex justify-content-between align-items-start fr-mb-1v">
-                                    {% include 'projects/project/fragments/user_invited.html' with user_invited=invite %}
+                                    {% include "projects/project/fragments/user_invited.html" with user_invited=invite %}
                                     <div class="d-flex align-items-center">
                                         {% if "manage_advisors" in user_project_perms %}
                                             <form class="fr-mr-2v"
@@ -314,14 +316,15 @@
                         {% for invite in pending_invites %}
                             {% if invite.role == "COLLABORATOR" %}
                                 <li class="d-flex justify-content-between align-items-start fr-mb-1v">
-                                    {% include 'projects/project/fragments/user_invited.html' with user_invited=invite %}
+                                    {% include "projects/project/fragments/user_invited.html" with user_invited=invite %}
                                     <div class="d-flex align-items-center">
                                         {% if "manage_collaborators" in user_project_perms %}
                                             <form class="fr-mr-2v"
                                                   action="{% url 'projects-project-access-revoke-invite' project.pk invite.pk %}"
                                                   method="post">
                                                 {% csrf_token %}
-                                                <button class="btn btn-outline-danger btn-sm fr-p-1v" id="revoke-invite-member">
+                                                <button class="btn btn-outline-danger btn-sm fr-p-1v"
+                                                        id="revoke-invite-member">
                                                     <svg class="bi align-middle" width="18" height="18" fill="currentColor">
                                                         <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#trash" />
                                                     </svg>
@@ -332,7 +335,8 @@
                                             <form action="{% url 'projects-project-access-collectivity-resend-invite' project.pk invite.pk %}"
                                                   method="post">
                                                 {% csrf_token %}
-                                                <button class="btn btn-outline-primary btn-sm fr-p-1v" id="resend-invite-member">
+                                                <button class="btn btn-outline-primary btn-sm fr-p-1v"
+                                                        id="resend-invite-member">
                                                     <svg class="bi align-middle" width="18" height="18" fill="currentColor">
                                                         <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#envelope-plus" />
                                                     </svg>
@@ -349,9 +353,9 @@
         </div>
         <section id="project-status-settings" class="col">
             <hr class="fr-my-3w" />
-            {% include 'projects/project/fragments/administration/quit_project.html' %}
-            {% include 'projects/project/fragments/administration/activate_project.html' with position=position %}
-            {% include 'projects/project/fragments/administration/stand_by_project.html' with position=position %}
+            {% include "projects/project/fragments/administration/quit_project.html" %}
+            {% include "projects/project/fragments/administration/activate_project.html" with position=position %}
+            {% include "projects/project/fragments/administration/stand_by_project.html" with position=position %}
         </section>
     </div>
-{% endblock %}
+{% endblock project_detail %}

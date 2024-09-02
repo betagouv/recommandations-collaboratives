@@ -1,6 +1,8 @@
 {% extends "projects/project/list.html" %}
 {% load static %}
-{% block title %}Carte des projets {{ block.super }}{% endblock %}
+{% block title %}
+    Carte des projets {{ block.super }}
+{% endblock title %}
 {% block project_list_content %}
     <div x-data="Map">
         <div class="topbar d-flex justify-content-between fr-p-2v">
@@ -39,10 +41,10 @@
                     <span class="visually-hidden">Loading...</span>
                 </div>
             </div>
-            {% include 'projects/project/fragments/list-toolbars.html' %}
+            {% include "projects/project/fragments/list-toolbars.html" %}
         </div>
         <div x-cloak class="fr-p-0 fr-pt-3w">
             <div x-ref="map" id="map"></div>
         </div>
     </div>
-{% endblock %}
+{% endblock project_list_content %}

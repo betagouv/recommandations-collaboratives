@@ -1,6 +1,8 @@
 {% extends "base.html" %}
 {% load static %}
-{% block title %}Configuration des suggestions automatiques{% endblock %}
+{% block title %}
+    Configuration des suggestions automatiques
+{% endblock title %}
 {% block content %}
     <div class="col-12 fr-p-3w fr-mx-auto">
         <div class="row recommendation-list fr-mb-2w">
@@ -67,7 +69,9 @@
                                         </span>
                                     </div>
                                 </div>
-                                <div class="btn-group fr-ml-6w align-middle" role="group" aria-label="actions">
+                                <div class="btn-group fr-ml-6w align-middle"
+                                     role="group"
+                                     aria-label="actions">
                                     <a class="btn btn-light fr-mb-1v d-inline-block btn-outline-primary btn-sm"
                                        href="{% url 'projects-task-recommendation-update' recommendation.pk %}">
                                         <svg class="bi fr-mr-1v" width="16" height="16" fill="currentColor">
@@ -79,7 +83,7 @@
                             </div>
                             <div class="d-block w-100 fr-pr-3w">
                                 <div class="text-secondary fr-my-2v">Message aiguilleuse : "{{ recommendation.text }}"</div>
-                                {% include 'projects/project/fragments/action_list_item.html' with task=recommendation hide_comments=True disable_tracking=True disable_edit=True %}
+                                {% include "projects/project/fragments/action_list_item.html" with task=recommendation hide_comments=True disable_tracking=True disable_edit=True %}
                             </div>
                         </div>
                         <div class="col-4 border-start fr-pl-3w fr-pt-2w">
@@ -121,4 +125,4 @@
             </div>
         </div>
     </div>
-{% endblock %}
+{% endblock content %}

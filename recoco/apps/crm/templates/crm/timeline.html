@@ -4,7 +4,7 @@
 <ul class="list-group">
     {% for action in actions %}
         {% if action.verb == verbs.Project.INVITATION %}
-            {% include 'crm/fragments/action_invite.html' %}
+            {% include "crm/fragments/action_invite.html" %}
         {% else %}
             <li class="d-flex flex-columns list-group-item">
                 {% if action.actor %}

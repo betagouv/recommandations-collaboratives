@@ -1,13 +1,15 @@
 {% extends "base.html" %}
 {% load static %}
 {% load humanize %}
-{% block title %}Supprimer {{ resource.title }}{% endblock %}
+{% block title %}
+    Supprimer {{ resource.title }}
+{% endblock title %}
 {% load sass_tags %}
 {% block css %}
     <link href="{% sass_src 'resources/resources.scss' %}"
           rel="stylesheet"
           type="text/css">
-{% endblock %}
+{% endblock css %}
 {% block content %}
     <div class="col-12 fr-p-3w fr-mx-auto">
         <!-- Breadcrumb -->
@@ -65,4 +67,4 @@
             </form>
         </div>
     </div>
-{% endblock %}
+{% endblock content %}

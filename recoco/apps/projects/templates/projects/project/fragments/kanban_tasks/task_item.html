@@ -5,7 +5,7 @@
     <link href="{% sass_src 'projects/css/fragments/kanban_tasks/task_item.scss' %}"
           rel="stylesheet"
           type="text/css" />
-{% endblock %}
+{% endblock css %}
 {% get_obj_perms request.user for request.site as "user_site_perms" %}
 {% get_obj_perms request.user for project as "user_project_perms" %}
 <div :id="t.uuid"

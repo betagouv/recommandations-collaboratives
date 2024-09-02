@@ -3,11 +3,9 @@
     <link href="{% static 'crm/css/button.scss' %}"
           rel="stylesheet"
           type="text/css" />
-{% endblock %}
+{% endblock css %}
 <div class="d-flex fr-pl-3w fr-p-1v div-background">
-    <a x-data="Crm"
-       @click="goBack"
-       class="fr-my-2v button-style">
+    <a x-data="Crm" @click="goBack" class="fr-my-2v button-style">
         <svg class="bi fr-mr-2v" width="16" height="16" fill="currentColor">
             <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#arrow-return-left" />
         </svg>

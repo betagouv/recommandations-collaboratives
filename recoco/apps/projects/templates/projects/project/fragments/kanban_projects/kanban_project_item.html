@@ -5,7 +5,7 @@
     <link href="{% sass_src 'projects/css/fragments/kanban_projects/kanban_project.scss' %}"
           rel="stylesheet"
           type="text/css" />
-{% endblock %}
+{% endblock css %}
 <div :id="p.project.id"
      class="drag-targetable fr-py-1v fr-my-1v"
      @dragover="onDragOver(event)"
@@ -60,7 +60,7 @@
             </div>
             <div class="d-flex align-items-center">
                 <template x-for="switchtender in p.project.switchtenders">
-                    {% include 'projects/project/fragments/advisor_gravatar_list_item.html' with wide_margin=True %}
+                    {% include "projects/project/fragments/advisor_gravatar_list_item.html" with wide_margin=True %}
                 </template>
             </div>
         </div>

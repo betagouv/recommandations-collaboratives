@@ -3,8 +3,12 @@
 {% load humanize %}
 {% load guardian_tags %}
 {% load sass_tags %}
-{% block title %}Liste des ressources{% endblock %}
-{% block og_title %}Liste des ressources{% endblock %}
+{% block title %}
+    Liste des ressources
+{% endblock title %}
+{% block og_title %}
+    Liste des ressources
+{% endblock og_title %}
 {% block css %}
     <link href="{% sass_src 'resources/resources.scss' %}"
           rel="stylesheet"
@@ -12,7 +16,7 @@
     <link href="{% sass_src 'resources/resource_card.scss' %}"
           rel="stylesheet"
           type="text/css">
-{% endblock %}
+{% endblock css %}
 {% block js %}
     <script type="text/javascript">
  $(document).ready(function() {
@@ -21,7 +25,7 @@
      $("#limit_area").change(function() { $(".quick-search form").submit(); });
  });
     </script>
-{% endblock %}
+{% endblock js %}
 {% block content %}
     {% if user.is_authenticated %}
         {% get_obj_perms request.user for request.site as "user_site_perms" %}
@@ -61,8 +65,8 @@
         </div>
         <!-- Search -->
         <div class="quick-search fr-mb-6w">
-            <form method="GET">
-                <input id='searching' type='hidden' value='on' name='searching'>
+            <form method="get">
+                <input id="searching" type="hidden" value="on" name="searching">
                 <div class="input-group fr-mb-2w">
                     {% if is_switchtender %}
                         <select id="limit_area"
@@ -185,4 +189,4 @@
             {% endfor %}
         </div>
     </div>
-{% endblock %}
+{% endblock content %}

@@ -4,7 +4,7 @@
     <link href="{% sass_src 'survey/css/survey.scss' %}"
           rel="stylesheet"
           type="text/css" />
-{% endblock %}
+{% endblock css %}
 {% block content %}
     <div class="col-12 fr-p-3w fr-mx-auto">
         <h1>Questionnaire</h1>
@@ -43,4 +43,4 @@
             <a href="{% url 'survey-session-start' session.id %}">Commençons !</a>
         {% endif %}
     </div>
-{% endblock %}
+{% endblock content %}

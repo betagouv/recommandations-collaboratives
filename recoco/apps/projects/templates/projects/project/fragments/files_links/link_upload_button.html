@@ -6,7 +6,7 @@
     <link href="{% sass_src 'projects/css/file_upload.scss' %}"
           rel="stylesheet"
           type="text/css" />
-{% endblock %}
+{% endblock css %}
 <div x-data="FileUpload('{{ type }}')">
     <button x-ref="button" class="button small" @click="onButtonClick">Épingler un lien</button>
     <div x-cloak

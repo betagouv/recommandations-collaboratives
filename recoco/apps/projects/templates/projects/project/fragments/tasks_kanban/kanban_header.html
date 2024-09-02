@@ -6,12 +6,14 @@
     <link href="{% sass_src 'projects/css/fragments/tasks_kanban/kanban_header.scss' %}"
           rel="stylesheet"
           type="text/css" />
-{% endblock %}
+{% endblock css %}
 {% get_obj_perms request.user for request.site as "user_site_perms" %}
 {% get_obj_perms request.user for project as "user_project_perms" %}
 <div class="d-flex fr-mt-1v fr-mb-3w fr-mx-2v align-items-center justify-content-between">
     {% if advising %}
-        <h2 class="text-secondary text-uppercase fw-bolder fr-mb-0 h2-specific-fontsize-12">Recommandations proposées à la collectivité</h2>
+        <h2 class="text-secondary text-uppercase fw-bolder fr-mb-0 h2-specific-fontsize-12">
+            Recommandations proposées à la collectivité
+        </h2>
     {% endif %}
     <div class="d-flex align-items-center">
         <div class="d-flex align-items-center fr-ml-2v">

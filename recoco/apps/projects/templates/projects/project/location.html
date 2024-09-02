@@ -3,7 +3,9 @@
 {% load projects_extra %}
 {% load django_vite %}
 {% load guardian_tags %}
-{% block title %}Modifier la localisation du projet - {{ request.site.name }}{% endblock %}
+{% block title %}
+    Modifier la localisation du projet - {{ request.site.name }}
+{% endblock title %}
 {% current_project request.session as project %}
 {% get_obj_perms request.user for project as "user_project_perms" %}
 {% if 'change_location' in user_project_perms %}
@@ -39,7 +41,7 @@
         }
         </script>
         {% vite_asset 'js/apps/mapEditor.js' %}
-    {% endblock %}
+    {% endblock js %}
     {% block content %}
         <div x-data='MapEditor(projectOptions)'
              data-test-id="location-edit"
@@ -145,5 +147,5 @@
                 </div>
             </div>
         </div>
-    {% endblock %}
+    {% endblock content %}
 {% endif %}

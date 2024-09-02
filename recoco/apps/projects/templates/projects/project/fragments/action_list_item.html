@@ -6,7 +6,7 @@
     <link href="{% sass_src 'projects/css/action_list.scss' %}"
           rel="stylesheet"
           type="text/css">
-{% endblock %}
+{% endblock css %}
 <div id="modal-action-{{ task.id }}" class="modal fade" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content text-center">
@@ -106,215 +106,206 @@
                 {% endif %}
             </div>
             {% if task.resource %}
-                {% if disable_tracking %}
-                    <a class="stretched-link"
-                       href="{% url 'resources-resource-detail' task.resource.id %}">
+                <a class="stretched-link"
+                   {% if disable_tracking %} href="{% url 'resources-resource-detail' task.resource.id %}" {% else %} {% if can_administrate %} href="{% url 'projects-visit-task' task.id %}"{% else %}href="{% url 'resources-resource-detail' task.resource.id %}"{% endif %}>
+                    <div class="flex-shrink-1 fr-px-2w arrow-link text-primary align-items-center">
+                        <svg class="align-middle bi"
+                             width="26px"
+                             height="26px"
+                             fill="currentColor">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#arrow-right-short" />
+                        </svg>
+                    </div>
+                </a>
+            {% endif %}
+        </div>
+        {% if can_manage and task.public %}
+            <div class="toolbar d-flex border-start flex-column justify-content-between">
+                {% if task.open %}
+                    <button class="fr-p-3w btn btn-text fr-m-0 border-bottom flex-grow-1"
+                            data-bs-toggle="modal"
+                            data-bs-target="#modal-action-{{ task.id }}">
+                        <span data-bs-toggle="tooltip" title="Rejeter cette recommandation">
+                            <svg class="bi fr-mr-1v align-middle text-danger"
+                                 width="16px"
+                                 height="16px"
+                                 fill="currentColor">
+                                <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#x-lg" />
+                            </svg>
+                        </span>
+                    </button>
+                {% endif %}
+                <form method="post"
+                      action="{% url 'projects-toggle-done-task' task.id %}"
+                      class="flex-grow-1 d-flex">
+                    {% csrf_token %}
+                    {% if task.closed %}
+                        <button title="Remettre la recommandation en cours"
+                                data-bs-toggle="tooltip"
+                                type="submit"
+                                class="btn btn-text align-middle fr-p-3w">
+                            <svg class="bi align-middle" width="24" height="24" fill="currentColor">
+                                <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#arrow-counterclockwise" />
+                            </svg>
+                        </button>
                     {% else %}
-                        {% if can_administrate %}
-                            <a class="stretched-link" href="{% url 'projects-visit-task' task.id %}">
-                            {% else %}
-                                <a class="stretched-link"
-                                   href="{% url 'resources-resource-detail' task.resource.id %}">
-                                {% endif %}
-                            {% endif %}
-                            <div class="flex-shrink-1 fr-px-2w arrow-link text-primary align-items-center">
-                                <svg class="align-middle bi"
-                                     width="26px"
-                                     height="26px"
-                                     fill="currentColor">
-                                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#arrow-right-short" />
-                                </svg>
-                            </div>
-                        </a>
+                        <button title="Marquer la recommandation comme terminée"
+                                data-bs-toggle="tooltip"
+                                type="submit"
+                                class="btn btn-text align-middle fr-p-3w">
+                            <svg class="bi align-middle text-success"
+                                 width="16"
+                                 height="16"
+                                 fill="currentColor">
+                                <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#check-lg" />
+                            </svg>
+                        </button>
                     {% endif %}
-                </div>
-                {% if can_manage and task.public %}
-                    <div class="toolbar d-flex border-start flex-column justify-content-between">
-                        {% if task.open %}
-                            <button class="fr-p-3w btn btn-text fr-m-0 border-bottom flex-grow-1"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#modal-action-{{ task.id }}">
-                                <span data-bs-toggle="tooltip" title="Rejeter cette recommandation">
-                                    <svg class="bi fr-mr-1v align-middle text-danger"
-                                         width="16px"
-                                         height="16px"
-                                         fill="currentColor">
-                                        <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#x-lg" />
-                                    </svg>
-                                </span>
-                            </button>
-                        {% endif %}
-                        <form method="post"
-                              action="{% url 'projects-toggle-done-task' task.id %}"
-                              class="flex-grow-1 d-flex">
-                            {% csrf_token %}
-                            {% if task.closed %}
-                                <button title="Remettre la recommandation en cours"
-                                        data-bs-toggle="tooltip"
-                                        type="submit"
-                                        class="btn btn-text align-middle fr-p-3w">
-                                    <svg class="bi align-middle" width="24" height="24" fill="currentColor">
-                                        <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#arrow-counterclockwise" />
-                                    </svg>
-                                </button>
-                            {% else %}
-                                <button title="Marquer la recommandation comme terminée"
-                                        data-bs-toggle="tooltip"
-                                        type="submit"
-                                        class="btn btn-text align-middle fr-p-3w">
-                                    <svg class="bi align-middle text-success"
-                                         width="16"
-                                         height="16"
-                                         fill="currentColor">
-                                        <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#check-lg" />
-                                    </svg>
-                                </button>
-                            {% endif %}
-                        </form>
+                </form>
+            </div>
+        {% endif %}
+    </div>
+    <div class="action-list-item accordion-item fr-pt-2v fr-pb-2v border-0">
+        <div id="action-{{ task.id }}-header" class="accordion-header d-flex">
+            <div class="d-flex justify-content-between w-100 fr-px-3w">
+                {% if not hide_comments %}
+                    <div class="align-middle flex-grow-1">
+                        <button class="align-middle justify-content-start fr-m-0 fr-px-0 d-flex text-left btn btn-text collapsed text-primary w-100"
+                                data-bs-toggle="collapse"
+                                data-bs-target="#action-{{ task.id }}-content"
+                                aria-expanded="false"
+                                aria-controls="action-{{ task.id }}-content">Lire les commentaires</button>
                     </div>
                 {% endif %}
-            </div>
-            <div class="action-list-item accordion-item fr-pt-2v fr-pb-2v border-0">
-                <div id="action-{{ task.id }}-header" class="accordion-header d-flex">
-                    <div class="d-flex justify-content-between w-100 fr-px-3w">
-                        {% if not hide_comments %}
-                            <div class="align-middle flex-grow-1">
-                                <button class="align-middle justify-content-start fr-m-0 fr-px-0 d-flex text-left btn btn-text collapsed text-primary w-100"
-                                        data-bs-toggle="collapse"
-                                        data-bs-target="#action-{{ task.id }}-content"
-                                        aria-expanded="false"
-                                        aria-controls="action-{{ task.id }}-content">Lire les commentaires</button>
-                            </div>
-                        {% endif %}
-                        {% if can_administrate and not disable_edit %}
-                            <div class="dropdown fr-mx-2v align-middle">
-                                <a class="btn btn-sm btn-info dropdown-toggle"
-                                   href="#"
-                                   role="button"
-                                   id="dropdownMenuLink"
-                                   data-bs-toggle="dropdown"
-                                   aria-expanded="false">Aiguillage</a>
-                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-                                    <li>
-                                        <a class="dropdown-item" href="{% url 'projects-update-task' task.id %}">Éditer</a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item"
-                                           href="{% url 'projects-sort-task' task.id 'up' %}?action=up">Remonter</a>
-                                    </li>
-                                    {% if task.priority > 0 %}
-                                        <li>
-                                            <a class="dropdown-item"
-                                               href="{% url 'projects-sort-task' task.id 'down' %}">Descendre</a>
-                                        </li>
+                {% if can_administrate and not disable_edit %}
+                    <div class="dropdown fr-mx-2v align-middle">
+                        <a class="btn btn-sm btn-info dropdown-toggle"
+                           href="#"
+                           role="button"
+                           id="dropdownMenuLink"
+                           data-bs-toggle="dropdown"
+                           aria-expanded="false">Aiguillage</a>
+                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                            <li>
+                                <a class="dropdown-item" href="{% url 'projects-update-task' task.id %}">Éditer</a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item"
+                                   href="{% url 'projects-sort-task' task.id 'up' %}?action=up">Remonter</a>
+                            </li>
+                            {% if task.priority > 0 %}
+                                <li>
+                                    <a class="dropdown-item"
+                                       href="{% url 'projects-sort-task' task.id 'down' %}">Descendre</a>
+                                </li>
+                            {% endif %}
+                            {% if task.public %}
+                                <li>
+                                    <form method="post"
+                                          action="{% url 'projects-remind-task-delete' task.id %}">
+                                        {% csrf_token %}
+                                        <button class="dropdown-item">Supprimer le rappel</button>
+                                    </form>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                {% endif %}
+                {% if task.public %}
+                    {% if not hide_details and can_manage %}
+                        <span class="align-middle fr-p-1v">
+                            <svg class="align-middle bi"
+                                 width="14px"
+                                 height="14px"
+                                 fill="currentColor">
+                                <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#alarm" />
+                            </svg>
+                            {% if task.reminders.to_send.count %}
+                                {% with reminder=task.reminders.to_send.0 %}
+                                    {% if reminder.origin == 1 %}
+                                        {# Set by user #}
+                                        <span class="text-secondary align-middle small">Rappel pour <strong>{{ project.email }}</strong> le {{ task.reminders.to_send.0.deadline }}</span>
+                                    {% elif user.is_staff %}
+                                        <span class="text-secondary align-middle small">Rappel <strong>auto</strong> le {{ task.reminders.to_send.0.deadline }}</span>
                                     {% endif %}
-                                    {% if task.public %}
-                                        <li>
-                                            <form method="post"
-                                                  action="{% url 'projects-remind-task-delete' task.id %}">
-                                                {% csrf_token %}
-                                                <button class="dropdown-item">Supprimer le rappel</button>
-                                            </form>
-                                        </li>
-                                    {% endif %}
-                                </ul>
-                            </div>
-                        {% endif %}
-                        {% if task.public %}
-                            {% if not hide_details and can_manage %}
-                                <span class="align-middle fr-p-1v">
-                                    <svg class="align-middle bi"
-                                         width="14px"
-                                         height="14px"
-                                         fill="currentColor">
-                                        <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#alarm" />
-                                    </svg>
-                                    {% if task.reminders.to_send.count %}
-                                        {% with reminder=task.reminders.to_send.0 %}
-                                            {% if reminder.origin == 1 %}
-                                                {# Set by user #}
-                                                <span class="text-secondary align-middle small">Rappel pour <strong>{{ project.email }}</strong> le {{ task.reminders.to_send.0.deadline }}</span>
-                                            {% elif user.is_staff %}
-                                                <span class="text-secondary align-middle small">Rappel <strong>auto</strong> le {{ task.reminders.to_send.0.deadline }}</span>
-                                            {% endif %}
-                                        {% endwith %}
-                                    {% endif %}
-                                    <a href="javascript:null;"
-                                       class="align-middle text-decoration-underline small btn btn-text btn-sm fr-p-0 fr-m-0 text-primary"
-                                       data-bs-toggle="modal"
-                                       data-bs-target="#reminder-modal"
-                                       data-bs-task-id="{{ task.id }}">
-                                        {% if not task.reminders.to_send.count %}
+                                {% endwith %}
+                            {% endif %}
+                            <a href="javascript:null;"
+                               class="align-middle text-decoration-underline small btn btn-text btn-sm fr-p-0 fr-m-0 text-primary"
+                               data-bs-toggle="modal"
+                               data-bs-target="#reminder-modal"
+                               data-bs-task-id="{{ task.id }}">
+                                {% if not task.reminders.to_send.count %}
+                                    Programmer un rappel
+                                {% else %}
+                                    {% with reminder=task.reminders.to_send.0 %}
+                                        {% if reminder.origin == 2 %}
+                                            {# Set by staff #}
                                             Programmer un rappel
                                         {% else %}
-                                            {% with reminder=task.reminders.to_send.0 %}
-                                                {% if reminder.origin == 2 %}
-                                                    {# Set by staff #}
-                                                    Programmer un rappel
-                                                {% else %}
-                                                    Changer
-                                                {% endif %}
-                                            {% endwith %}
+                                            Changer
                                         {% endif %}
-                                    </a>
-                                </span>
-                            {% endif %}
-                        {% endif %}
-                    </div>
-                </div>
-                {% if not hide_comments %}
-                    <div id="action-{{ task.id }}-content"
-                         class="accordion-collapse {% if task.visited and not show_comments %}collapse{% endif %}">
-                        <div class="accordion-body">
-                            <!-- Comments -->
-                            {% include "projects/project/fragments/action_comment.html" with comment=task.content_rendered author=task.created_by date=task.created_on %}
-                            <!-- Followups -->
-                            {% for followup in task.followups.all %}
-                                {% if followup.status %}
-                                    <div class="d-flex flex-column fr-m-2v fr-p-2v comment small">
-                                        <span class="align-middle"
-                                              data-bs-toggle="tooltip"
-                                              data-bs-placement="left"
-                                              title="{{ followup.who.get_full_name|default:followup.who.email }}">
-                                            <svg class="align-middle bi"
-                                                 width="12px"
-                                                 height="12px"
-                                                 fill="currentColor">
-                                                <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#arrow-left-right" />
-                                            </svg>
-                                            &nbsp;
-                                            <span class="align-middle text-secondary">
-                                                Recommandation indiquée comme <strong>{{ followup.status_txt }}</strong>
-                                            </span>
-                                            <span class="align-middle">&#8212;&nbsp;</span>
-                                            <small class="align-middle text-muted">{{ followup.timestamp|naturalday }}</small>
-                                        </span>
-                                        {% if followup.comment %}
-                                            <p class="fr-m-0 fr-p-0">
-                                                <q>&nbsp;{{ followup.comment|safe }}&nbsp;</q>
-                                            </p>
-                                        {% endif %}
-                                    </div>
-                                {% else %}
-                                    {% include "projects/project/fragments/action_comment.html" with followup=followup comment=followup.comment author=followup.who date=followup.timestamp %}
+                                    {% endwith %}
                                 {% endif %}
-                            {% endfor %}
-                            {% if can_manage and task.public %}
-                                <div class="fr-m-2v comment fr-mt-3w">
-                                    <span class="">Répondre</span>
-                                    <form class="fr-mt-2v form d-flex flex-column align-items-end"
-                                          method="post"
-                                          action="{% url 'projects-followup-task' task.id %}">
-                                        {% csrf_token %}
-                                        <textarea name="comment"
-                                                  class="w-100 fr-p-2v rounded rounded-4 fr-my-1v border textarea-style"
-                                                  placeholder="Votre message..."></textarea>
-                                        <button type="submit" class="btn btn-primary">Envoyer</button>
-                                    </form>
-                                </div>
-                            {% endif %}
-                        </div>
-                    </div>
+                            </a>
+                        </span>
+                    {% endif %}
                 {% endif %}
             </div>
         </div>
+        {% if not hide_comments %}
+            <div id="action-{{ task.id }}-content"
+                 class="accordion-collapse {% if task.visited and not show_comments %}collapse{% endif %}">
+                <div class="accordion-body">
+                    <!-- Comments -->
+                    {% include "projects/project/fragments/action_comment.html" with comment=task.content_rendered author=task.created_by date=task.created_on %}
+                    <!-- Followups -->
+                    {% for followup in task.followups.all %}
+                        {% if followup.status %}
+                            <div class="d-flex flex-column fr-m-2v fr-p-2v comment small">
+                                <span class="align-middle"
+                                      data-bs-toggle="tooltip"
+                                      data-bs-placement="left"
+                                      title="{{ followup.who.get_full_name|default:followup.who.email }}">
+                                    <svg class="align-middle bi"
+                                         width="12px"
+                                         height="12px"
+                                         fill="currentColor">
+                                        <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#arrow-left-right" />
+                                    </svg>
+                                    &nbsp;
+                                    <span class="align-middle text-secondary">
+                                        Recommandation indiquée comme <strong>{{ followup.status_txt }}</strong>
+                                    </span>
+                                    <span class="align-middle">&#8212;&nbsp;</span>
+                                    <small class="align-middle text-muted">{{ followup.timestamp|naturalday }}</small>
+                                </span>
+                                {% if followup.comment %}
+                                    <p class="fr-m-0 fr-p-0">
+                                        <q>&nbsp;{{ followup.comment|safe }}&nbsp;</q>
+                                    </p>
+                                {% endif %}
+                            </div>
+                        {% else %}
+                            {% include "projects/project/fragments/action_comment.html" with followup=followup comment=followup.comment author=followup.who date=followup.timestamp %}
+                        {% endif %}
+                    {% endfor %}
+                    {% if can_manage and task.public %}
+                        <div class="fr-m-2v comment fr-mt-3w">
+                            <span>Répondre</span>
+                            <form class="fr-mt-2v form d-flex flex-column align-items-end"
+                                  method="post"
+                                  action="{% url 'projects-followup-task' task.id %}">
+                                {% csrf_token %}
+                                <textarea name="comment"
+                                          class="w-100 fr-p-2v rounded rounded-4 fr-my-1v border textarea-style"
+                                          placeholder="Votre message..."></textarea>
+                                <button type="submit" class="btn btn-primary">Envoyer</button>
+                            </form>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>

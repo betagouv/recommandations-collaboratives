@@ -5,7 +5,7 @@
     <link href="{% sass_src 'projects/css/fragments/tasks_modal/modal.scss' %}"
           rel="stylesheet"
           type="text/css" />
-{% endblock %}
+{% endblock css %}
 {% get_obj_perms request.user for request.site as "user_site_perms" %}
 {% get_obj_perms request.user for project as "user_project_perms" %}
 <div x-data="PreviewModal()"
@@ -70,7 +70,7 @@
                                      x-show="task?.document && task?.document.length > 0">
                                     <span class="fr-py-2v d-block fr-px-2w fw-medium title-info text-dark">Fichier(s) partagé(s)</span>
                                     <template x-for="document in task?.document" x-key="document.id">
-                                        <div class="fr-px-2w">{% include 'projects/project/fragments/files_links/file_list_item_api.html' %}</div>
+                                        <div class="fr-px-2w">{% include "projects/project/fragments/files_links/file_list_item_api.html" %}</div>
                                     </template>
                                 </div>
                             </div>
@@ -81,8 +81,7 @@
                                     <span class="fw-medium title-info text-dark">Échanges & notes</span>
                                 </div>
                                 <div class="position-absolute d-flex justify-content-center align-items-center w-100 h-100">
-                                    <div x-show="followupsIsLoading"
-                                         class="fr-ml-2v specific-size">
+                                    <div x-show="followupsIsLoading" class="fr-ml-2v specific-size">
                                         <div class="spinner-border spinner-border spinner-border-sm text-primary"
                                              role="status"></div>
                                     </div>
@@ -100,7 +99,7 @@
                                             </template>
                                             <div class="d-flex justify-content-between align-items-center specific-fontsize-09">
                                                 <div class="d-flex flex-column">
-                                                    {% include 'projects/project/fragments/task/task_user_card.html' %}
+                                                    {% include "projects/project/fragments/task/task_user_card.html" %}
                                                     <span class="text-muted tiny specific-lineheight-20"
                                                           x-text="`le ${formatDate(task?.created_on)}`"></span>
                                                 </div>
@@ -132,7 +131,7 @@
                                                         <p x-html="renderMarkdown(f.comment)" class="fr-mb-2v text-break"></p>
                                                         <div class="d-flex justify-content-between align-items-center specific-fontsize-09">
                                                             <div class="d-flex flex-column">
-                                                                {% include 'projects/project/fragments/task/task_followup_user_card.html' %}
+                                                                {% include "projects/project/fragments/task/task_followup_user_card.html" %}
                                                                 <span class="text-muted tiny specific-lineheight-20"
                                                                       x-text="`le ${formatDate(f.timestamp)}`"></span>
                                                             </div>
@@ -159,7 +158,7 @@
                                                                    class="fr-mb-2v text-break overflow-hidden"></p>
                                                                 <div class="d-flex justify-content-between specific-fontsize-09">
                                                                     <div class="d-flex flex-column">
-                                                                        {% include 'projects/project/fragments/task/task_followup_user_card.html' %}
+                                                                        {% include "projects/project/fragments/task/task_followup_user_card.html" %}
                                                                         <span class="text-muted tiny specific-lineheight-20"
                                                                               x-text="`le ${formatDate(f.timestamp)}`"></span>
                                                                     </div>
@@ -178,7 +177,7 @@
                             </div>
                             <template x-if="task.public || showEdition">
                                 <div class="w-100 fr-p-2w specific-border-top-solid1pxEEE">
-                                    {% include 'tools/editor.html' with is_task_modal_comment=True %}
+                                    {% include "tools/editor.html" with is_task_modal_comment=True %}
                                 </div>
                             </template>
                             <template x-if="!task.public">
@@ -186,11 +185,12 @@
                                     <div class="text-center">
                                         <span class="text-muted">Vous devez publier votre recommandation pour ajouter un commentaire</span>
                                     </div>
-                                </template>
-                            </div>
+                                </div>
+                            </template>
                         </div>
                     </div>
-                </template>
-            </div>
+                </div>
+            </template>
         </div>
     </div>
+</div>

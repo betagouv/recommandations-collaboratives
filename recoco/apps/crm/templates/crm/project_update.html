@@ -4,22 +4,19 @@
 {% load django_vite %}
 {% load humanize %}
 {% load training %}
-{% block title %}Modifier {{ project.name }} - CRM{% endblock %}
+{% block title %}
+    Modifier {{ project.name }} - CRM
+{% endblock title %}
 {% block js %}
     {% vite_asset 'js/apps/crm.js' %}
-{% endblock %}
+{% endblock js %}
 {% block css %}
     <link href="{% sass_src 'home/css/dsfr/marianne.css' %}"
           rel="stylesheet"
           type="text/css">
-    <style>
- html, body {
-     scroll-padding-top: 240px;
- }
-    </style>
-{% endblock %}
+{% endblock css %}
 {% block content %}
-    <div x-data="Crm" class="d-flex fr-px-0" style="">
+    <div x-data="Crm" class="d-flex fr-px-0">
         {% include "crm/fragments/sidebar.html" with search=True back_button=True user_advised_projects=False user_projects=False %}
         <div class="w-75 d-flex flex-column justify-content-start">
             <div class="crm-header fr-px-3w fr-py-3w fr-mb-2w">
@@ -38,8 +35,7 @@
                         <div class="d-flex justify-content-end fr-mt-2v">
                             <form method="post" action="{% url 'crm-user-undelete' project.pk %}">
                                 {% csrf_token %}
-                                <button type="submit" class="btn btn-danger">
-                                Réactiver ce projet</a>
+                                <button type="submit" class="btn btn-danger">Réactiver ce projet</button>
                             </form>
                         </div>
                     </div>
@@ -49,15 +45,15 @@
                 <ul class="d-flex fr-m-0 fr-p-0 align-items-center list-unstyled row">
                     <li class="fr-mr-2v col-2">
                         {% url 'projects-project-administration' project.pk as url %}
-                        {% include 'crm/fragments/crm_icon_button.html' with name="Éditer les informations" icon="pencil" link_url=url %}
+                        {% include "crm/fragments/crm_icon_button.html" with name="Éditer les informations" icon="pencil" link_url=url %}
                     </li>
                     <li class="fr-mr-2v col-2">
                         {% url 'projects-project-administration' project.pk as url %}
-                        {% include 'crm/fragments/crm_icon_button.html' with name="Gérer les membres" icon="person" link_url=url anchor="#user-management" %}
+                        {% include "crm/fragments/crm_icon_button.html" with name="Gérer les membres" icon="person" link_url=url anchor="#user-management" %}
                     </li>
                     <li class="fr-mr-2v col-2">
                         {% url 'crm-project-handover' project.pk as url %}
-                        {% include 'crm/fragments/crm_icon_button.html' with name="Proposer à un autre portail" icon="broadcast" link_url=url anchor="#project-handover" %}
+                        {% include "crm/fragments/crm_icon_button.html" with name="Proposer à un autre portail" icon="broadcast" link_url=url anchor="#project-handover" %}
                     </li>
                 </ul>
             </div>
@@ -137,4 +133,4 @@
             </div>
         </div>
     </div>
-{% endblock %}
+{% endblock content %}

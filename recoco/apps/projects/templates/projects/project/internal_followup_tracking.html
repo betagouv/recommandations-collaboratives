@@ -7,7 +7,7 @@
     <link href="{% sass_src 'projects/css/internal_followup.scss' %}"
           rel="stylesheet"
           type="text/css">
-{% endblock %}
+{% endblock css %}
 {% block project_detail %}
     {% activity_stream "target" project %}
     <div class="w-100 h-100">
@@ -44,4 +44,4 @@
             </article>
         </div>
     </div>
-{% endblock %}
+{% endblock project_detail %}

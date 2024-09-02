@@ -5,13 +5,13 @@
     <link href="{% sass_src 'survey/css/survey.scss' %}"
           rel="stylesheet"
           type="text/css" />
-{% endblock %}
+{% endblock css %}
 {% load humanize %}
 {% load django_vite %}
-{% block title %}{{ question.text }} - {{ request.site.name }}{% endblock %}
+{% block title %}{{ question.text }} - {{ request.site.name }}{% endblock title %}
 {% block js %}
     {% vite_asset 'js/apps/tutorial.js' %}
-{% endblock %}
+{% endblock css %}
 {% block content %}
     <div x-data="Tutorial('survey', {{ active_project_survey_session.completion }} === 0)"
          class="col-11 fr-py-6w fr-mx-auto">
@@ -188,8 +188,7 @@
                             <div id="excerpt-why d-iline">{{ question.why_rendered|safe|truncatechars_html:150 }}</div>
                             {% if question.why_rendered|safe|truncatechars_html:151|length > 150 %}
                                 <span id="more-why d-none">{{ question.why_rendered|safe }}</span>
-                                <a class=""
-                                   href="javascript:void(0);"
+                                <a href="javascript:void(0);"
                                    onclick="textFoldToggle('why')"
                                    id="foldBtn-why">[Lire tout]</a>
                             {% endif %}
@@ -210,8 +209,7 @@
                             <div id="excerpt-how">{{ question.how_rendered|safe|truncatechars_html:500 }}</div>
                             {% if question.how_rendered|safe|truncatechars_html:501|length > 500 %}
                                 <span id="more-how d-none">{{ question.how_rendered|safe }}</span>
-                                <a class=""
-                                   href="javascript:void(0);"
+                                <a href="javascript:void(0);"
                                    onclick="textFoldToggle('how')"
                                    id="foldBtn-how">[Lire tout]</a>
                             {% endif %}
@@ -229,4 +227,4 @@
             </li>
         </ul>
     </div>
-{% endblock %}
+{% endblock content %}

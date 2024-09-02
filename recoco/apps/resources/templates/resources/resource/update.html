@@ -2,12 +2,14 @@
 {% load static %}
 {% load humanize %}
 {% load sass_tags %}
-{% block title %}Modifier {{ resource.title }} {{ block.super }}{% endblock %}
+{% block title %}
+    Modifier {{ resource.title }} {{ block.super }}
+{% endblock title %}
 {% block css %}
     <link href="{% sass_src 'resources/resources.scss' %}"
           rel="stylesheet"
           type="text/css">
-{% endblock %}
+{% endblock css %}
 {% block content %}
     <div class="col-12 fr-p-3w fr-mx-auto">
         <!-- Breadcrumb -->
@@ -72,16 +74,16 @@
                 <div class="d-flex">
                     <div class="w-50 d-flex flex-column select-custom border-end fr-pr-3w fr-py-3w">
                         {{ form.departments.errors }}
-                        {% include 'tools/searchable_list.html' with list=form.departments label=form.departments.label search_list_id=form.departments.id_for_label search_options="['name']" item_label="département" %}
+                        {% include "tools/searchable_list.html" with list=form.departments label=form.departments.label search_list_id=form.departments.id_for_label search_options="['name']" item_label="département" %}
                     </div>
                     <div class="w-50 fr-ml-2v d-flex flex-column select-custom fr-ml-2v fr-ml-3w fr-py-3w">
                         {{ form.contacts.errors }}
-                        {% include 'tools/searchable_list.html' with list=form.contacts label=form.contacts.label search_list_id=form.contacts.id_for_label search_options="['name']" item_label="contact" %}
+                        {% include "tools/searchable_list.html" with list=form.contacts label=form.contacts.label search_list_id=form.contacts.id_for_label search_options="['name']" item_label="contact" %}
                     </div>
                 </div>
                 <hr />
                 <div class="d-flex">
-                    {% include 'tools/editor.html' with input_name=form.content.name input_value=form.content.value|default:'' input_required=True escapejs=True %}
+                    {% include "tools/editor.html" with input_name=form.content.name input_value=form.content.value|default:'' input_required=True escapejs=True %}
                 </div>
                 <p>
                     {{ form.expires_on.label }}
@@ -102,4 +104,4 @@
             {{ form.media }}
         </section>
     </div>
-{% endblock %}
+{% endblock content %}

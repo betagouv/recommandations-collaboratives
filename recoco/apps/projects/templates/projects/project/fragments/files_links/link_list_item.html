@@ -6,7 +6,7 @@
     <link href="{% sass_src 'projects/css/fragments/files_links/file_list_item.scss' %}"
           rel="stylesheet"
           type="text/css">
-{% endblock %}
+{% endblock css %}
 {% get_obj_perms request.user for request.site as "user_site_perms" %}
 {% get_obj_perms request.user for project as "user_project_perms" %}
 <div class="fr-mb-2w">
@@ -33,12 +33,10 @@
         </div>
         <div class="d-flex align-items-center">
             {% if document.uploaded_by == user or "manage_documents" in user_project_perms %}
-                <form class=""
-                      method="post"
+                <form method="post"
                       action="{% url 'projects-documents-delete-document' project.pk document.pk %}">
                     {% csrf_token %}
-                    <button id="link-delete-button"
-                            class="d-flex border-0 btn-background0">
+                    <button id="link-delete-button" class="d-flex border-0 btn-background0">
                         <svg class="bi align-baseline fill-grey" width="20" height="20">
                             <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#trash" />
                         </svg>
