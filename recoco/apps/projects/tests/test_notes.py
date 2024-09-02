@@ -56,12 +56,9 @@ def test_create_conversation_message_not_available_for_outsiders(request, client
 
 @pytest.mark.django_db
 def test_create_conversation_message_available_for_project_collaborators(
-    request, client
+    request, client, project
 ):
     user = baker.make(auth_models.User)
-    project = Recipe(
-        models.Project, status="READY", sites=[get_current_site(request)]
-    ).make()
 
     assign_collaborator(user, project)
 
@@ -103,13 +100,9 @@ def test_create_note_available_for_advisor(request, client):
 
 
 @pytest.mark.django_db
-def test_create_private_note_not_available_for_project_collaborator(request, client):
-    project = Recipe(
-        models.Project,
-        sites=[get_current_site(request)],
-        status="READY",
-    ).make()
-
+def test_create_private_note_not_available_for_project_collaborator(
+    request, client, project
+):
     with login(client) as user:
         assign_collaborator(user, project)
 
@@ -147,15 +140,12 @@ def test_switchtender_creates_new_private_note_for_project_and_redirect(
 
 
 @pytest.mark.django_db
-def test_create_public_note_for_project_collaborator_and_redirect(request, client):
+def test_create_public_note_for_project_collaborator_and_redirect(
+    request, client, project
+):
     membership = baker.make(models.ProjectMember, member__is_staff=False)
 
-    project = Recipe(
-        models.Project,
-        sites=[get_current_site(request)],
-        status="READY",
-        projectmember_set=[membership],
-    ).make()
+    project.projectmember_set.add(membership)
 
     with login(client) as user:
         assign_collaborator(user, project)
@@ -178,14 +168,9 @@ def test_create_public_note_for_project_collaborator_and_redirect(request, clien
 
 
 @pytest.mark.django_db
-def test_private_note_hidden_from_project_members(request, client):
+def test_private_note_hidden_from_project_members(request, client, project):
     membership = baker.make(models.ProjectMember, member__is_staff=False)
-    project = baker.make(
-        models.Project,
-        sites=[get_current_site(request)],
-        status="READY",
-        projectmember_set=[membership],
-    )
+    project.projectmember_set.add(membership)
 
     note = baker.make(models.Note, project=project, content="short note", public=False)
 
@@ -197,12 +182,7 @@ def test_private_note_hidden_from_project_members(request, client):
 
 
 @pytest.mark.django_db
-def test_advisor_public_note_available_to_collaborators(request, client):
-    project = Recipe(
-        models.Project,
-        sites=[get_current_site(request)],
-        status="READY",
-    ).make()
+def test_advisor_public_note_available_to_collaborators(request, client, project):
     note_content = "this is a public note"
 
     with login(client, username="advisor") as user:
@@ -225,12 +205,8 @@ def test_advisor_public_note_available_to_collaborators(request, client):
 
 @pytest.mark.django_db
 def test_create_conversation_message_with_attachment_for_project_collaborator(
-    request, client
+    request, client, project
 ):
-    project = Recipe(
-        models.Project, sites=[get_current_site(request)], status="READY"
-    ).make()
-
     with login(client, username="collaborator") as user:
         assign_collaborator(user, project)
         png = SimpleUploadedFile("img.png", b"file_content", content_type="image/png")
@@ -295,12 +271,9 @@ def test_advisor_cant_update_other_advisor_note(request, client):
 
 
 @pytest.mark.django_db
-def test_collaborator_can_update_own_public_note(request, client):
+def test_collaborator_can_update_own_public_note(request, client, project):
     current_site = get_current_site(request)
-    project = Recipe(
-        models.Project,
-        sites=[current_site],
-    ).make()
+
     with login(client) as user:
         assign_collaborator(user, project)
 
@@ -324,12 +297,8 @@ def test_collaborator_can_update_own_public_note(request, client):
 
 
 @pytest.mark.django_db
-def test_collaborator_cannot_update_others_public_note(request, client):
+def test_collaborator_cannot_update_others_public_note(request, client, project):
     current_site = get_current_site(request)
-    project = Recipe(
-        models.Project,
-        sites=[current_site],
-    ).make()
 
     with login(client) as user:
         assign_collaborator(user, project)
@@ -346,8 +315,10 @@ def test_collaborator_cannot_update_others_public_note(request, client):
 
 
 @pytest.mark.django_db
-def test_collaborator_cant_update_private_note(request, client):
-    note = Recipe(models.Note, public=False, site=get_current_site(request)).make()
+def test_collaborator_cant_update_private_note(request, client, project):
+    note = Recipe(
+        models.Note, public=False, project=project, site=get_current_site(request)
+    ).make()
     with login(client) as user:
         assign_collaborator(user, note.project)
         url = reverse("projects-update-note", args=[note.id])
@@ -362,9 +333,9 @@ def test_collaborator_cant_update_private_note(request, client):
 
 
 @pytest.mark.django_db
-def test_advisor_can_delete_private_note_and_redirect(request, client):
+def test_advisor_can_delete_private_note_and_redirect(request, client, project):
     current_site = get_current_site(request)
-    project = Recipe(models.Project, sites=[current_site]).make()
+
     note = Recipe(models.Note, project=project, site=current_site, public=False).make()
     url = reverse("projects-delete-note", args=[note.id])
 
@@ -378,9 +349,8 @@ def test_advisor_can_delete_private_note_and_redirect(request, client):
 
 
 @pytest.mark.django_db
-def test_delete_my_public_note_for_collaborator_and_redirect(request, client):
+def test_delete_my_public_note_for_collaborator_and_redirect(request, client, project):
     current_site = get_current_site(request)
-    project = Recipe(models.Project, sites=[current_site]).make()
 
     with login(client) as user:
         note = Recipe(
@@ -414,9 +384,8 @@ def test_delete_my_public_note_for_collaborator_and_redirect(request, client):
 
 
 @pytest.mark.django_db
-def test_collaborator_cant_delete_other_people_public_note(request, client):
+def test_collaborator_cant_delete_other_people_public_note(request, client, project):
     current_site = get_current_site(request)
-    project = Recipe(models.Project, sites=[current_site]).make()
 
     with login(client) as user:
         note = Recipe(
@@ -437,9 +406,7 @@ def test_collaborator_cant_delete_other_people_public_note(request, client):
 
 
 @pytest.mark.django_db
-def test_delete_note_removes_activity(request, client):
-    project = Recipe(models.Project, sites=[get_current_site(request)]).make()
-
+def test_delete_note_removes_activity(request, client, project):
     with login(client, username="addman") as user:
         assign_advisor(user, project)
 

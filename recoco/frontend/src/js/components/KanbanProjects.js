@@ -2,14 +2,19 @@ import Alpine from 'alpinejs';
 import { generateUUID } from '../utils/uuid';
 import Fuse from 'fuse.js';
 
-import api, { regionsUrl } from '../utils/api';
+import api, {
+  projectsProjectSitesUrl,
+  projectsUrl,
+  regionsUrl,
+} from '../utils/api';
 
 Alpine.data('KanbanProjects', boardProjectsApp);
 
-function boardProjectsApp() {
-  const app = {
-    data: [],
-    rawData: [],
+function boardProjectsApp(currentSiteId) {
+  return {
+    projectList: [],
+    rawProjectList: [],
+    currentSiteId: currentSiteId,
     get isBusy() {
       return this.$store.app.isLoading;
     },
@@ -35,57 +40,75 @@ function boardProjectsApp() {
     fuse: null,
     searchText: '',
     async getData(postProcess = true) {
-      const json = await api.get('/api/projects/');
+      const projects = await api.get(projectsUrl());
+      await this.$store.projects.mapperProjetsProjectSites(
+        projects.data,
+        this.currentSiteId
+      );
 
-      const data = json.data.map((d) =>
+      const projectList = projects.data.map((d) =>
         Object.assign(d, {
           uuid: generateUUID(),
         })
       );
-
       if (postProcess) {
-        await this.postProcessData(data);
+        await this.postProcessData(projectList);
       }
-      this.data = [...data];
-      this.rawData = [...data];
+      this.projectList = [...projectList];
+      this.rawProjectList = [...projectList];
       const fuseOptions = {
-        isCaseSensitive: false,
-        minMatchCharLength: 2,
-        threshold: 0.0,
         keys: [
           'name',
           'commune.name',
           'commune.insee',
           'commune.department.name',
         ],
+        isCaseSensitive: false,
+        minMatchCharLength: 2,
+        threshold: 0.3,
+        findAllMatches: true,
+        ignoreLocation: true,
       };
-      this.fuse = new Fuse(data, fuseOptions);
+      this.fuse = new Fuse(projectList, fuseOptions);
       if (this.searchText) {
         this.filterProject(this.searchText);
       }
-      return data;
+      return projectList;
     },
-    async onDrop(event, status, targetUuid) {
+    async onDrop(event, status) {
       event.preventDefault();
 
       this.currentlyHoveredElement.classList.remove('drag-target');
       this.currentlyHoveredElement = null;
 
       const uuid = event.dataTransfer.getData('application/uuid');
-      const data = this.data.find((d) => d.uuid === uuid);
-
-      await api.patch(`/api/projects/${data.id}/`, { status: status });
+      if (!uuid) {
+        return;
+      }
+      const droppedProject = this.projectList.find((d) => d.uuid === uuid);
+      if (!droppedProject) {
+        return;
+      }
+      const projectSite = droppedProject.project_sites.find(
+        (project_site) => project_site.site === this.currentSiteId
+      );
+      if (!projectSite) {
+        return;
+      }
+      await api.patch(`${projectsProjectSitesUrl()}${projectSite.id}/`, {
+        status: status,
+      });
 
       await this.getData(false);
     },
     findByUuid(uuid) {
-      return this.data.find((d) => d.uuid === uuid);
+      return this.projectList.find((d) => d.uuid === uuid);
     },
     findById(id) {
-      return this.data.find((d) => d.id === id);
+      return this.projectList.find((d) => d.id === id);
     },
     get view() {
-      return this.data
+      return this.projectList
         .filter(this.filterProjectsByDepartments.bind(this))
         .sort(this.sortFn.bind(this));
     },
@@ -135,14 +158,14 @@ function boardProjectsApp() {
     },
     filterProject(search) {
       if (search === '') {
-        this.data = [...this.rawData];
+        this.projectList = [...this.rawProjectList];
         return;
       }
       const filtered = this.fuse.search(search).map((r) => r.item);
-      this.data = [...filtered];
+      this.projectList = [...filtered];
     },
-    async postProcessData(data) {
-      const departments = this.extractAndCreateAdvisorDepartments(data);
+    async postProcessData(projectList) {
+      const departments = this.extractAndCreateAdvisorDepartments(projectList);
       const regionsData = await api.get(regionsUrl());
       this.constructRegionsFilter(departments, regionsData.data);
     },
@@ -278,6 +301,4 @@ function boardProjectsApp() {
       return project.inactive_since;
     },
   };
-
-  return app;
 }

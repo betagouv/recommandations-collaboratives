@@ -6,8 +6,15 @@ exclude = ".venv,venv,.eggs" # override the default set of excluded paths
 
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "recoco.settings.development"
-addopts = "--reuse-db --tb=short -p no:warnings -n auto --maxprocesses 4"
-# addopts = "--cov=recoco --cov=test --cov-report=xml --reuse-db --tb=short -p no:warnings -n auto --maxprocesses 4"
+addopts = [
+        "-p no:warnings",
+        "--reuse-db",
+        "--tb=short",
+        "--numprocesses=auto",
+        "--maxprocesses=4",
+        "--cov=recoco",
+        "--cov-report=xml"
+        ]
 testpaths = ["recoco"]
 python_files = "tests.py test_*.py *_test.py *_tests.py"
 

@@ -35,7 +35,7 @@ from .. import digests
 
 
 @pytest.mark.django_db
-def test_send_digests_for_new_reco(client, request):
+def test_send_digests_for_new_reco(client, request, make_project):
     current_site = get_current_site(request)
     baker.make(home_models.SiteConfiguration, site=current_site)
     membership = baker.make(projects_models.ProjectMember)
@@ -44,9 +44,8 @@ def test_send_digests_for_new_reco(client, request):
         auth.User, username="advisor", email="advisor@example.com"
     ).make()
 
-    project = baker.make(
-        projects_models.Project,
-        sites=[current_site],
+    project = make_project(
+        site=current_site,
         status="DONE",
         projectmember_set=[membership],
     )
@@ -69,10 +68,11 @@ def test_send_digests_for_new_reco(client, request):
 
 
 @pytest.mark.django_db
-def test_send_digests_for_new_reco_empty(client):
+def test_send_digests_for_new_reco_empty(client, request, make_project):
+    site = get_current_site(request)
     membership = baker.make(projects_models.ProjectMember)
 
-    baker.make(projects_models.Project, status="DONE", projectmember_set=[membership])
+    make_project(site=site, status="DONE", projectmember_set=[membership])
 
     digests.send_digests_for_new_recommendations_by_user(
         membership.member, dry_run=False
@@ -87,7 +87,7 @@ def test_send_digests_for_new_reco_empty(client):
 
 
 @pytest.mark.django_db
-def test_send_digests_for_new_sites_by_user(request):
+def test_send_digests_for_new_sites_by_user(request, make_project):
     current_site = get_current_site(request)
     baker.make(home_models.SiteConfiguration, site=current_site)
 
@@ -117,12 +117,11 @@ def test_send_digests_for_new_sites_by_user(request):
     moderator = Recipe(auth.User).make()
 
     membership = baker.make(projects_models.ProjectMember, is_owner=True)
-    project = baker.make(
-        projects_models.Project,
+    project = make_project(
         projectmember_set=[membership],
         commune=commune,
         status="READY",
-        sites=[current_site],
+        site=current_site,
     )
 
     # Generate a notification
@@ -144,7 +143,7 @@ def test_send_digests_for_new_sites_by_user(request):
 
 
 @pytest.mark.django_db
-def test_send_digests_for_switchtender_by_user(request, client):
+def test_send_digests_for_switchtender_by_user(request, client, make_project):
     current_site = get_current_site(request)
     baker.make(home_models.SiteConfiguration, site=current_site)
 
@@ -180,10 +179,10 @@ def test_send_digests_for_switchtender_by_user(request, client):
     non_regional_actor.profile.sites.add(current_site)
 
     membership = baker.make(projects_models.ProjectMember, is_owner=True)
-    project = baker.make(
-        projects_models.Project,
+    project = make_project(
         projectmember_set=[membership],
         commune=commune,
+        site=current_site,
         status="READY",
     )
 
@@ -209,7 +208,7 @@ def test_send_digests_for_switchtender_by_user(request, client):
 
 
 @pytest.mark.django_db
-def test_notification_formatter():
+def test_notification_formatter(request, make_project):
     formatter = digests.NotificationFormatter()
 
     user = Recipe(auth.User, username="Bob", first_name="Bobi", last_name="Joe").make()
@@ -218,9 +217,11 @@ def test_notification_formatter():
     user.profile.save()
     recipient = Recipe(auth.User).make()
     resource = Recipe(resources_models.Resource, title="Belle Ressource").make()
+    project = make_project(site=get_current_site(request), name="Nice Project")
     task = Recipe(
         tasks_models.Task,
         intent="my intent",
+        project=project,
         content="A very nice content",
         resource=resource,
     ).make()
@@ -230,12 +231,6 @@ def test_notification_formatter():
     ).make()
 
     followup = Recipe(tasks_models.TaskFollowup, task=task, comment="Hello!").make()
-    project = Recipe(
-        projects_models.Project,
-        name="Nice Project",
-        description="Super description",
-        location="SomeWhere",
-    ).make()
 
     tests = [
         (

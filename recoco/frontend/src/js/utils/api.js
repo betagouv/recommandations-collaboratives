@@ -39,11 +39,20 @@ export default instance;
 
 // Projects :
 export function projectsUrl() {
-  return `/api/projects/`;
+  return '/api/projects/';
+}
+
+export function projectsProjectSitesUrl() {
+  return '/api/projects/projectsites/';
 }
 
 export function userProjectStatusUrl() {
-  return `/api/userprojectstatus/`;
+  return '/api/userprojectstatus/';
+}
+
+// Sites :
+export function sitesConfigUrl() {
+  return '/api/sites/';
 }
 
 // Organization

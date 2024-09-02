@@ -40,7 +40,7 @@ function PersonalAdvisorDashboard() {
       this.handleBodyTopPaddingScroll(this.bodyScrollTopPadding);
     },
     async getData(currentUser) {
-      const projects = await this.$store.projects.getProjects();
+      const projects = await this.$store.projects.getUserProjetsStatus();
 
       this.nbNewProjects = projects.filter((p) => p.status === 'NEW').length;
 
@@ -435,7 +435,8 @@ function PersonalAdvisorDashboard() {
         projectUpdated.isLoading = true;
 
         await api.post(url.replace('0', id));
-        const updatedProjects = await this.$store.projects.getProjects();
+        const updatedProjects =
+          await this.$store.projects.getUserProjetsStatus();
 
         const updatedProject = updatedProjects.find(
           ({ project }) => project.id === id
