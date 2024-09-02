@@ -11,7 +11,7 @@
 {% block project_detail %}
     {% get_obj_perms request.user for request.site as "user_site_perms" %}
     {% get_obj_perms request.user for project as "user_project_perms" %}
-    {% get_advising_position request.user project as position %}
+    {% get_advising_position request.user project request.site as position %}
     {% is_staff_for_current_site request.user as is_staff %}
     {% include 'projects/project/navigation.html' with administration_panel=True %}
     {{ project_form.postcode.value|json_script:"projectPostcode" }}
@@ -50,8 +50,7 @@
                                    id="input-project-address"
                                    name="{{ project_form.location.name }}"
                                    placeholder="Adresse"
-                                   value="{{ project_form.location.value|default:'' }}"
-                                   required />
+                                   value="{{ project_form.location.value|default:'' }}" />
                             {% for error in project_form.location.errors %}<div class="text-danger text-end">{{ error }}</div>{% endfor %}
                         </div>
                     </div>
@@ -80,7 +79,7 @@
                                        @change.debounce="fetchCities()"
                                        x-model="postal"
                                        type="text"
-                                       class="py-4 placeholder-grey form-control {% if project_form.postcode.errors %}is-invalid{% endif %}"
+                                       class="py-3 placeholder-grey form-control {% if project_form.postcode.errors %}is-invalid{% endif %}"
                                        id="input-project-address"
                                        name="{{ project_form.postcode.name }}"
                                        placeholder="Code Postal"
@@ -91,11 +90,14 @@
                         <div class="mb-3 col-auto">
                             <label class="text-info-custom text-grey-dark" for="input-project-address">{{ project_form.insee.label }}</label>
                             <select required
-                                    :style="cities && cities.length == 0 && postal ? 'background-color:#e9ecef;pointer-events:none;padding: 12px 10px; border-radius: 0.25rem;min-width: 170px;padding-right: 30px;' : 'padding: 12px 10px; border-radius: 0.25rem;min-width: 170px;padding-right: 30px;' "
-                                    style=""
+                                    :style="cities && cities.length == 0 && postal ? 'background-color:#e9ecef;pointer-events:none;' : '' "
+                                    style="padding: 12px 10px;
+                                           border-radius: 0.25rem;
+                                           min-width: 170px;
+                                           padding-right: 30px"
                                     x-ref="insee"
                                     name="insee"
-                                    class="form-select">
+                                    class="py-3 form-select">
                                 <template x-if="cities && cities.length > 0">
                                     <template x-for="city in cities" :key="city.insee">
                                         <option :value="city.insee" x-text="city.name"></option>
@@ -132,7 +134,7 @@
                         <span>Inviter un conseiller</span>
                     </button>
                 {% endif %}
-                {% if project.switchtenders_on_site.all.count == 0 %}
+                {% if project.switchtender_sites.all.count == 0 %}
                     <div class="bg-light d-flex flex-column justify-content-center align-items-center py-4 rounded">
                         <p class="m-0 text-info-custom text-grey fw-normal pb-3">Le projet n'est pas encore suivi</p>
                         <svg class="bi align-baseline me-2 mt-1"
@@ -144,7 +146,7 @@
                     </div>
                 {% else %}
                     <ul class="d-flex flex-column list-unstyled mb-0">
-                        {% for advisor in project.switchtenders_on_site.all %}
+                        {% for advisor in project.switchtender_sites.all %}
                             <li class="d-flex align-items-start justify-content-between mb-1">
                                 {% include 'user/user_card.html' with user=advisor.switchtender user_activity=True %}
                                 {% if request.user == advisor.switchtender %}

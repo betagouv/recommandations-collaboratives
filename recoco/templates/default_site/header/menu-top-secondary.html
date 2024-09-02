@@ -2,12 +2,16 @@
 {% load guardian_tags %}
 {% load gravatar %}
 {% load django_vite %}
+{% load projects_extra %}
 {% block js %}
     {% vite_asset 'js/apps/menuNotification.js' %}
 {% endblock js %}
 {% with request.resolver_match.url_name as url_name %}
     {% if user.is_authenticated %}
         {% get_obj_perms request.user for request.site as "user_site_perms" %}
+    {% endif %}
+    {% if 'moderate_projects' in user_site_perms %}
+        {% get_project_moderation_count as projects_to_moderate_count %}
     {% endif %}
     <ul class="list-unstyled mb-0 d-flex align-items-center"
         data-test-id="secondary-menu"
@@ -166,8 +170,14 @@
                 </div>
             </li>
         {% endif %}
-
-{% comment %} surcharge pour ajouter des éléments au menu top à gauche de ressources {% endcomment %}
+        {% if projects_to_moderate_count > 0 %}
+            <!-- Projects moderation -->
+            <li style="{% if url_name == 'projects-moderation-list' %}activated{% endif %}">
+                <a href="{% url "projects-moderation-list" %}"
+                   class="nav-link link-dark {% if url_name == 'resources-resource-search' %}active{% endif %}">Projets à examiner <span class="badge text-bg-danger">{{ projects_to_moderate_count }}</span></a>
+            </li>
+        {% endif %}
+        {% comment %} surcharge pour ajouter des éléments au menu top à gauche de ressources {% endcomment %}
         {% include 'header/menu-top-secondary-left.html' %}
 
         <!-- Ressources -->
