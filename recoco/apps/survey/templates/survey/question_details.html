@@ -8,10 +8,12 @@
 {% endblock css %}
 {% load humanize %}
 {% load django_vite %}
-{% block title %}{{ question.text }} - {{ request.site.name }}{% endblock title %}
+{% block title %}
+    {{ question.text }} - {{ request.site.name }}
+{% endblock title %}
 {% block js %}
     {% vite_asset 'js/apps/tutorial.js' %}
-{% endblock css %}
+{% endblock js %}
 {% block content %}
     <div x-data="Tutorial('survey', {{ active_project_survey_session.completion }} === 0)"
          class="col-11 fr-py-6w fr-mx-auto">
