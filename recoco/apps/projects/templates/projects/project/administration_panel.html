@@ -57,8 +57,7 @@
                                    id="input-project-address"
                                    name="{{ project_form.location.name }}"
                                    placeholder="Adresse"
-                                   value="{{ project_form.location.value|default:'' }}"
-                                   required />
+                                   value="{{ project_form.location.value|default:'' }}" />
                             {% for error in project_form.location.errors %}<div class="text-danger text-end">{{ error }}</div>{% endfor %}
                         </div>
                     </div>

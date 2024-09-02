@@ -44,7 +44,7 @@
                 <ul class="list-unstyled">
                     {% for answer in answers %}
                         <li class="answer fr-mb-2v fr-mt-3w d-flex justify-content-between position-relative">
-                            <div class="flex-grow-1">
+                            <div class="flex-grow-1 specific-width">
                                 {% lookup_choices_from_answer answer as choices %}
                                 {% if show_question or not choices %}
                                     <div>
