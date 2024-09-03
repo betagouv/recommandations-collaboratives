@@ -1057,7 +1057,7 @@ def compute_topics_occurences(site):
     project_topics = defaultdict(
         list,
         (
-            (topic.name, list(topic.projects.values_list("name", "id")))
+            (topic.name, list(topic.projects.all()))
             for topic in (
                 Topic.objects.filter(projects__sites=site, projects__deleted=None)
                 .prefetch_related("projects")
@@ -1069,10 +1069,11 @@ def compute_topics_occurences(site):
     task_topics = defaultdict(
         list,
         (
-            (topic.name, list(topic.tasks.values_list("intent", "id", "project__id")))
+            (topic.name, list(topic.tasks.all()))
             for topic in (
                 Topic.objects.filter(tasks__site=site, tasks__deleted=None)
                 .prefetch_related("tasks")
+                .prefetch_related("tasks__project")
                 .distinct()
             )
         ),
