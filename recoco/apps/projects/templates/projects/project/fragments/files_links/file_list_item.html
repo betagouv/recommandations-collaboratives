@@ -17,9 +17,10 @@
                    class="d-flex align-items-center text-decoration-none"
                    target="_new"
                    download>
-                    <svg class="bi align-baseline fr-mr-2v" width="17" height="17" fill="#222">
+                    {% comment %} <svg class="bi align-baseline " width="17" height="17" fill="#222">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#file-earmark" />
-                    </svg>
+                    </svg> {% endcomment %}
+                    <span class="fr-icon-file-line fr-icon--sm fr-mr-2v" aria-hidden="true"></span>
                     <span class="text-info-custom text-black fw-medium description">{{ document.description|truncatechars:33 }}</span>
                     <span class="text-info-custom text-black fr-ml-2v name">{{ document.filename|truncatechars:15 }}</span>
                     {% if document and document.the_file.size %}
@@ -32,14 +33,13 @@
                     <form method="post"
                           action="{% url 'projects-documents-pin-unpin' project.pk document.pk %}">
                         {% csrf_token %}
-                        <button class="btn btn-link d-flex fr-p-0 fr-mr-2v">
-                            <svg class="bi align-baseline fill-blue" width="20" height="20">
-                                {% if document.pinned == True %}
-                                    <use id="file-is-bookmarked" xlink:href="{% static 'svg/bootstrap-icons.svg' %}#star-fill" />
-                                {% else %}
-                                    <use id="file-is-not-bookmarked" xlink:href="{% static 'svg/bootstrap-icons.svg' %}#star" />
-                                {% endif %}
-                            </svg>
+                        <button class="fr-btn fr-btn--tertiary-no-outline {% if document.pinned == True %}fr-icon-star-fill {% else %} fr-icon-star-line {% endif %} fr-mr-2v"
+                                id="{% if document.pinned == True %}file-is-bookmarked{% else %}file-is-not-bookmarked{% endif %}">
+                            {% if document.pinned == True %}
+                                Désépingler le fichier
+                            {% else %}
+                                Épingler le fichier
+                            {% endif %}
                         </button>
                     </form>
                 {% endif %}
@@ -48,31 +48,25 @@
                           method="post"
                           action="{% url 'projects-documents-delete-document' project.pk document.pk %}">
                         {% csrf_token %}
-                        <button id="file-delete-button" class="d-flex border-0 btn-background0">
-                            <svg class="bi align-baseline fill-grey" width="20" height="20">
-                                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#trash" />
-                            </svg>
+                        <button id="file-delete-button"
+                                class="fr-btn fr-btn--tertiary-no-outline fr-icon-delete-line">
+                            Supprimer le fichier
                         </button>
                     </form>
                 {% endif %}
                 {% if "manage_documents" in user_project_perms %}
-                    <a class="d-flex"
+                    <a class="fr-btn fr-btn--tertiary-no-outline fr-icon-download-line"
                        href="{{ document.the_file.url }}"
                        target="_new"
-                       download>
-                        <svg class="bi align-baseline fill-blue" width="20" height="20">
-                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#download" />
-                        </svg>
-                    </a>
+                       download></a>
                 {% endif %}
             </div>
         </div>
         <div class="fr-pl-3w fr-ml-3w d-flex align-items-center">
             {% include "user/user_card.html" with user=document.uploaded_by %}
             <span class="fr-ml-3w tiny d-flex align-items-center">
-                <svg class="bi align-baseline fr-mr-2v" width="12" height="12" fill="#222">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#calendar" />
-                </svg>
+                <span class="fr-icon--sm fr-icon-calendar-event-line fr-mr-1v"
+                      aria-hidden="true"></span>
             {{ document.created_on|naturalday }}</span>
             {% if document.attached_object %}
                 <span class="fr-ml-3w tiny d-flex">De :  <a href="{{ document.attached_object.get_absolute_url }}">{{ document.attached_object }}</a></span>

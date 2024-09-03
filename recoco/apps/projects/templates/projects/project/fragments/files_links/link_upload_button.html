@@ -7,13 +7,15 @@
           rel="stylesheet"
           type="text/css" />
 {% endblock css %}
-<div x-data="FileUpload('{{ type }}')">
-    <button x-ref="button" class="button small" @click="onButtonClick">Épingler un lien</button>
+<div class="link-upload-btn" x-data="FileUpload('{{ type }}')">
+    <button x-ref="button"
+            class="fr-btn fr-btn--sm fr-btn--secondary"
+            @click="onButtonClick">Épingler un lien</button>
     <div x-cloak
          x-ref="popover"
          id="link-popover"
          @click.outside="onOutsideClick"
-         class="rounded bg-white shadow specific-width-420px">
+         class="link-upload-btn__modal rounded bg-white shadow">
         <form method="post" action="{{ action }}" enctype="multipart/form-data">
             {% csrf_token %}
             <div class="fr-p-2w">
@@ -25,7 +27,7 @@
                                placeholder="Dossier dropbox"
                                required
                                name="description"
-                               class="form-control form-control-sm fr-py-2v"
+                               class="fr-input fr-py-2v"
                                type="text" />
                     </label>
                 </div>
@@ -34,12 +36,12 @@
                     <input placeholder="https://www.dropbox.com/.."
                            required
                            name="the_link"
-                           class="form-control form-control-sm fr-py-2v"
+                           class="fr-input fr-py-2v"
                            type="text" />
                 </label>
             </div>
             <div class="fr-p-2w fr-pt-0 d-flex justify-content-end">
-                <button id="link-submit-button" class="button filled small" type="submit">Épingler</button>
+                <button id="link-submit-button" class="fr-btn" type="submit">Épingler</button>
             </div>
         </form>
         <div x-ref="arrow" class="popover-arrow"></div>

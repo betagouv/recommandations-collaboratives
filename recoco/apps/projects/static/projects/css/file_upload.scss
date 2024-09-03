@@ -32,10 +32,18 @@
   left: -4px;
 }
 
-.specific-width-420px {
-  width: 420px;
-}
-
 .h6-specific-fontsize-1 {
   font-size: 1em;
+}
+
+.file-upload-btn,
+.link-upload-btn {
+  &__modal {
+    z-index: 500;
+    width: 420px;
+  }
+}
+
+.project-file-search {
+  width: max-content;
 }

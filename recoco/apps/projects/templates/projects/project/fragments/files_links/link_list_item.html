@@ -12,12 +12,8 @@
 <div class="fr-mb-2w">
     <div class="rounded border fr-py-2v fr-px-2w fr-mb-2v d-flex align-items-center justify-content-between">
         <div class="d-flex align-items-start">
-            <svg class="bi align-baseline fr-mr-2v fr-mt-1v"
-                 width="17"
-                 height="17"
-                 fill="#222">
-                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#box-arrow-up-right" />
-            </svg>
+            <span class="fr-icon-links-line fr-icon--sm fr-mr-2v fr-mt-1v"
+                  aria-hidden="true"></span>
             <div class="flex-column align-items-start justify-content-start">
                 <a href="{{ document.the_link }}"
                    class="d-flex align-items-center text-decoration-none"
@@ -36,11 +32,8 @@
                 <form method="post"
                       action="{% url 'projects-documents-delete-document' project.pk document.pk %}">
                     {% csrf_token %}
-                    <button id="link-delete-button" class="d-flex border-0 btn-background0">
-                        <svg class="bi align-baseline fill-grey" width="20" height="20">
-                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#trash" />
-                        </svg>
-                    </button>
+                    <button id="link-delete-button"
+                            class="fr-btn fr-btn--tertiary-no-outline fr-icon-delete-line">Supprimer le lien</button>
                 </form>
             {% endif %}
         </div>

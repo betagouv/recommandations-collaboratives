@@ -1,17 +1,11 @@
-{% load static %}
-<div class="d-flex align-items-center fr-mb-3w">
-    <!-- <div class="input-item select">
-        <select class="input-field">
-            <option>Tout</option>
-        </select>
-    </div> -->
-    <div class="input-item fr-ml-2v">
-        <svg class="input-icon bi align-baseline fr-mr-2v"
-             width="17"
-             height="17"
-             fill="#222">
-            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#search" />
-        </svg>
-        <input type="search"class="search input-field" placeholder="Rechercher" />
-    </div>
+<div class="fr-search-bar project-file-search fr-mb-3w"
+     id="file-search"
+     role="search">
+    <label class="fr-label" for="search-file-input">Recherche</label>
+    <input class="search fr-input"
+           placeholder="Rechercher"
+           type="search"
+           id="search-file-input"
+           name="search-file-input">
+    <button class="fr-btn" title="Rechercher">Rechercher</button>
 </div>

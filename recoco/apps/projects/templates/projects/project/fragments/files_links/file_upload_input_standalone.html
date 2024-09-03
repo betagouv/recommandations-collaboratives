@@ -1,9 +1,10 @@
 <div>
-    <label class="d-block">
-        <span class="fr-mb-1v d-block text-info-custom text-grey-dark">Sélectionnez votre fichier</span>
-        <input {% if required %}required{% endif %}
+    <div class="fr-upload-group">
+        <label class="fr-label" for="file-upload">Sélectionnez votre fichier</label>
+        <input class="fr-upload"
+               type="file"
+               id="file-upload"
                name="the_file"
-               class="form-control form-control-sm"
-               type="file" />
-    </label>
+               {% if required %}required{% endif %}>
+    </div>
 </div>

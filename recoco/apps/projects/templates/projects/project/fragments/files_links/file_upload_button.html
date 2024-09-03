@@ -7,15 +7,15 @@
           rel="stylesheet"
           type="text/css" />
 {% endblock css %}
-<div x-data="FileUpload('{{ type }}')">
+<div class="file-upload-btn" x-data="FileUpload('{{ type }}')">
     <button x-ref="button"
-            class="button {% if filled == True %}filled{% endif %} {% if small == True %}small{% endif %}"
+            class="fr-btn fr-btn--sm fr-btn--secondary {% if filled == True %}filled{% endif %} {% if small == True %}small{% endif %}"
             @click="onButtonClick">Ajouter un fichier</button>
     <div x-cloak
          x-ref="popover"
          id="popover"
          @click.outside="onOutsideClick"
-         class="rounded bg-white shadow specific-width-420px">
+         class="file-upload-btn__modal rounded bg-white shadow">
         <form method="post" action="{{ action }}" enctype="multipart/form-data">
             {% csrf_token %}
             <div class="fr-p-2w">
@@ -23,21 +23,19 @@
                 <p class="fr-mb-2v text-info-custom text-grey-dark small">
                     Vous pouvez joindre un fichier à votre <span x-text="getString(`types.${type}`)"></span>, d'une taille maximum de 20Mo
                 </p>
-                <div class="fr-mb-2v fr-mt-2w">
+                <div class="fr-mb-3w fr-mt-2w">
                     {% include "projects/project/fragments/files_links/file_upload_input_standalone.html" with required=True %}
                 </div>
-                <label class="d-block fr-mt-2w">
-                    <span class="fr-mb-1v d-block text-info-custom text-grey-dark">Donnez un nom au fichier</span>
-                    <input id="document-description"
-                           required
-                           name="description"
-                           x-model="pendingTitle"
-                           class="form-control form-control-sm fr-py-2v"
-                           type="text" />
-                </label>
+                <label class="fr-label" for="document-description">Donnez un nom au fichier</label>
+                <input class="fr-input"
+                       id="document-description"
+                       required
+                       name="description"
+                       x-model="pendingTitle"
+                       type="text">
             </div>
             <div class="border-top border-light fr-p-2w d-flex justify-content-end">
-                <button id="document-submit-button" class="button filled small" type="submit">Envoyer</button>
+                <button id="document-submit-button" class="fr-btn" type="submit">Envoyer</button>
             </div>
         </form>
         <div x-ref="arrow" class="popover-arrow"></div>

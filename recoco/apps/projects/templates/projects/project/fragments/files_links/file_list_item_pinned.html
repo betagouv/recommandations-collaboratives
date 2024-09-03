@@ -7,12 +7,8 @@
     <div class="fr-mb-1v">
         <div class="rounded border fr-py-2v fr-px-2w fr-mb-2v d-flex align-items-center justify-content-between">
             <div class="d-flex align-items-start">
-                <svg class="bi align-baseline fr-mr-2v fr-mt-1v"
-                     width="17"
-                     height="17"
-                     fill="#222">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#file-earmark" />
-                </svg>
+                <span class="fr-icon-file-line fr-icon--sm fr-mr-2v fr-mt-1v"
+                      aria-hidden="true"></span>
                 <a href="{{ document.the_file.url }}"
                    class="d-flex flex-column align-items-start text-decoration-none"
                    target="_new"
@@ -31,22 +27,14 @@
                     <form method="post"
                           action="{% url 'projects-documents-pin-unpin' project.pk document.pk %}">
                         {% csrf_token %}
-                        <button id="file-bookmark"
-                                class="btn btn-link d-flex fr-p-0 fr-mr-0 fr-mb-2v">
-                            <svg class="bi align-baseline fill-blue" width="20" height="20">
-                                <use id="file-is-bookmarked" xlink:href="{% static 'svg/bootstrap-icons.svg' %}#star-fill" />
-                            </svg>
-                        </button>
+                        <button class="fr-btn fr-btn--tertiary-no-outline fr-icon-star-fill"
+                                id="file-bookmark">Désépingler le fichier</button>
                     </form>
                 {% endif %}
-                <a class="d-flex"
+                <a class="fr-btn fr-btn--tertiary-no-outline fr-icon-download-line"
                    href="{{ document.the_file.url }}"
                    target="_new"
-                   download>
-                    <svg class="bi align-baseline fill-blue" width="20" height="20">
-                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#download" />
-                    </svg>
-                </a>
+                   download></a>
             </div>
         </div>
     </div>
