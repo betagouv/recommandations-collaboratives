@@ -9,8 +9,8 @@
                alt="logo {{ request.site.name }} - lien retour page accueil" />
      </a>
 {% elif user.is_authenticated %}
-     <a href="{% url 'home' %}" class="d-flex align-middle align-items-center">
-          <span style="font-size: 30px; font-weight: bold;margin-left: 30px;">{{ request.site.name }}</span>
+     <a href="{% url 'home' %}" class="d-flex align-middle align-items-center text-dark">
+          <span class="fw-bold" style="font-size: 30px;">{{ request.site.name }}</span>
      </a>
 {% elif not user.is_authenticated and request.site.configuration.logo_large %}
      <div class="navbar-logo">
@@ -26,20 +26,12 @@
           </button>
           <a href="{% url 'home' %}"
              class="d-flex align-middle p-3 align-items-center">
-               <!-- <img class="logo-rf"
-                    src="{% static 'home/img/home/logo_rf.png' %}"
-                    width="100px"
-                    alt="Logo république française">
-               <img class="mx-4 logo-cerema"
-                    src="{% static 'img/partners/logo_cerema.png' %}"
-                    width="120px"
-                    alt="Logo du Cerema">  -->
+             {% include 'header/menu-top-logo-supp.html' %}
                <img class="logo-{{ request.site.name|lower }}"
                     src="{{ request.site.configuration.logo_large.url }}"
                     width="auto"
-                    height="40px"
+                    height="60px"
                     alt="logo {{ request.site.name }} - lien retour page accueil" />
-                    <span style="font-size: 30px; font-weight: bold;margin-left: 30px;">{{ request.site.name }}</span>
           </a>
      </div>
 {% else %}
@@ -54,8 +46,9 @@
                data-test-id="toggler-secondary-menu">
                <span class="navbar-toggler-icon"></span>
           </button>
-          <a href="{% url 'home' %}" class="d-flex align-middle p-3 align-items-center">
-               <span style="font-size: 30px; font-weight: bold;margin-left: 30px;">{{ request.site.name }}</span>
+          <a href="{% url 'home' %}" class="d-flex align-middle p-3 align-items-center text-dark">
+               {% include 'header/menu-top-logo-supp.html' %}
+               <span class="fw-bold" style="font-size: 30px;">{{ request.site.name }}</span>
           </a>
      </div>
 {% endif %}
