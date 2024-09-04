@@ -1,9 +1,8 @@
+import geolocUtils from './geolocation/';
+import GeocoderBAN from './geocoderBAN';
 import * as L from 'leaflet';
 import 'leaflet-control-geocoder';
 import 'leaflet-providers';
-
-import GeocoderBAN from './geocoderBAN';
-import geolocUtils from './geolocation/';
 
 function mapLayerStyles(className) {
   return {
@@ -17,7 +16,7 @@ function mapLayerStyles(className) {
 }
 
 function ignServiceURL(layer, env = 'decouverte', format = 'image/png') {
-  const url = `https://data.geopf.fr/wmts`;
+  const url = 'https://data.geopf.fr/wmts';
   const query =
     'service=WMTS&request=GetTile&version=1.0.0&tilematrixset=PM&tilematrix={z}&tilecol={x}&tilerow={y}&style=normal';
 
@@ -39,7 +38,17 @@ function getDefaultLatLngForLayers(project, geoData) {
   return [latitude, longitude];
 }
 
-function getDefaultLatLngForMap(project) {
+async function getDefaultLatLngForMap(project) {
+  // TODO Geocoder l'adresse du projet pour obtenir les coordonnées
+  const latLongProject = await addressGeocoder(
+    `${project.location} ${project.commune.name}`
+  );
+  if (latLongProject?.features[0]?.geometry?.coordinates) {
+    const [longitude, latitude] =
+      latLongProject.features[0].geometry.coordinates;
+    return [latitude, longitude];
+  }
+
   const longitude = project.location_x
     ? project.location_x
     : project.commune.longitude
@@ -54,9 +63,30 @@ function getDefaultLatLngForMap(project) {
   return [latitude, longitude];
 }
 
+async function addressGeocoder(address) {
+  const url = new URL('http://api-adresse.dat.gouv.fr/search');
+  const params = { q: address, limit: 1 };
+  Object.keys(params).forEach((key) =>
+    url.searchParams.append(key, params[key])
+  );
+  try {
+    const response = await fetch(url);
+
+    if (response.status < 200 || response.status >= 300) {
+      const error = new Error(response.statusText);
+      error.response = response;
+      throw error;
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    return undefined;
+  }
+}
+
 // Map creation shortcuts
-function makeMap(idMap, project, options, zoom) {
-  const [latitude, longitude] = getDefaultLatLngForMap(project);
+async function makeMap(idMap, project, options, zoom) {
+  const [latitude, longitude] = await getDefaultLatLngForMap(project);
 
   var map = new L.map(idMap, { ...options });
 

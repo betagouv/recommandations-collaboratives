@@ -1,5 +1,6 @@
+import * as L from 'leaflet';
 import Alpine from 'alpinejs';
-import mapUtils from '../utils/map/';
+import mapUtils from '../utils/map';
 
 function MapEditor(projectOptions) {
   return {
@@ -39,7 +40,12 @@ function MapEditor(projectOptions) {
     async initMap(project, geoData) {
       // Init map with base layer
       const options = mapUtils.mapOptions({ interactive: true });
-      const Map = mapUtils.makeMap('map-edit', project, options, this.zoom);
+      const Map = await mapUtils.makeMap(
+        'map-edit',
+        project,
+        options,
+        this.zoom
+      );
 
       // Add onclick behaviour for address input field (geocoderBAN)
       const onClick = (coordinates) => this.updateProjectLocation(coordinates);

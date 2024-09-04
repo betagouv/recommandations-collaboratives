@@ -61,7 +61,7 @@ function MapViewerInteractive(projectOptions) {
         })
         .addTo(map);
 
-      const [latitude, longitude] = mapUtils.getDefaultLatLngForMap(
+      const [latitude, longitude] = await mapUtils.getDefaultLatLngForMap(
         project,
         geoData
       );
