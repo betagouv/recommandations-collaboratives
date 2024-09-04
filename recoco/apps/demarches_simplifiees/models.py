@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db import models
 from model_utils.models import TimeStampedModel
 
@@ -6,7 +7,6 @@ from recoco.apps.projects.models import Project
 from recoco.apps.resources.models import Resource
 from recoco.apps.tasks.models import Task
 
-from .choices import DSType
 from .utils import hash_data
 
 
@@ -15,9 +15,6 @@ class DSResource(TimeStampedModel):
     schema = models.JSONField(default=dict, null=True, blank=True)
     resource = models.ForeignKey(
         Resource, null=True, blank=True, on_delete=models.SET_NULL
-    )
-    type = models.CharField(
-        max_length=50, choices=DSType.choices, default=DSType.DETR_DSIL
     )
     departments = models.ManyToManyField(
         Department,
@@ -37,6 +34,10 @@ class DSResource(TimeStampedModel):
     @property
     def number(self) -> int:
         return self.schema.get("number")
+
+    @property
+    def preremplir_url(self) -> str:
+        return f"{settings.DS_BASE_URL}/preremplir/{self.name}"
 
 
 class DSFolder(TimeStampedModel):

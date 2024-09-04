@@ -26,7 +26,7 @@ def load_ds_resource_schema(ds_resource_id: int):
         return
 
     resp = requests.get(
-        url=f"{settings.DS_BASE_URL}/preremplir/{ds_resource.name}/schema",
+        url=f"{ds_resource.preremplir_url}/schema",
         timeout=30,
     )
     if resp.status_code != 200:
@@ -54,7 +54,8 @@ def update_or_create_ds_folder(recommendation_id: int):
         return
 
     ds_resource: DSResource = find_ds_resource_for_project(
-        project=recommendation.project
+        project=recommendation.project,
+        resource=recommendation.resource,
     )
     if ds_resource is None or ds_resource.number is None:
         return

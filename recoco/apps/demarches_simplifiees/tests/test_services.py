@@ -2,6 +2,7 @@ import pytest
 from model_bakery import baker
 
 from recoco.apps.projects.models import Project
+from recoco.apps.resources.models import Resource
 
 from ..models import DSResource
 from ..services import (
@@ -33,21 +34,32 @@ class TestMakeDSDataFromProject(BaseTestMixin):
 class TestfindDSResourceForProject(BaseTestMixin):
     def test_no_commune(self):
         assert (
-            find_ds_resource_for_project(baker.prepare(Project, commune=None)) is None
+            find_ds_resource_for_project(
+                project=baker.prepare(Project, commune=None),
+                resource=baker.prepare(Resource),
+            )
+            is None
         )
 
     @pytest.mark.django_db
     def test_filter_dept(self):
-        ds_resource = baker.make(DSResource, type="DETR_DSIL", departments__code="64")
+        resource = baker.make(Resource)
+        ds_resource = baker.make(
+            DSResource,
+            resource=resource,
+            departments__code="64",
+        )
         assert (
             find_ds_resource_for_project(
-                baker.make(Project, commune__department__code="01")
+                project=baker.make(Project, commune__department__code="01"),
+                resource=resource,
             )
             is None
         )
         assert (
             find_ds_resource_for_project(
-                baker.make(Project, commune__department__code="64")
+                project=baker.make(Project, commune__department__code="64"),
+                resource=resource,
             )
             == ds_resource
         )

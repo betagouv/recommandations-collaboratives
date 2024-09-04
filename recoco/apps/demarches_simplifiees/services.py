@@ -5,18 +5,18 @@ from typing import Any
 from django.conf import settings
 
 from recoco.apps.projects.models import Project
+from recoco.apps.resources.models import Resource
 
-from .choices import DSType
 from .models import DSResource
 
 
-def find_ds_resource_for_project(project: Project) -> DSResource | None:
-    if not project.commune:
-        return None
-
-    return DSResource.objects.filter(
-        type=DSType.DETR_DSIL, departments=project.commune.department
-    ).first()
+def find_ds_resource_for_project(
+    project: Project, resource: Resource
+) -> DSResource | None:
+    if project.commune:
+        return resource.dsresource_set.filter(
+            departments=project.commune.department
+        ).first()
 
 
 def make_ds_data_from_project(

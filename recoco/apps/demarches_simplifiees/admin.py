@@ -9,10 +9,8 @@ from .tasks import load_ds_resource_schema
 
 @admin.register(DSResource)
 class DSResourceAdmin(admin.ModelAdmin):
-    list_display = ("name", "type")
+    list_display = ("name", "preremplir_url", "number")
     search_fields = ("name",)
-
-    list_filter = ("type",)
 
     actions = ("load_schema_action",)
 

@@ -5,6 +5,7 @@ import responses
 from django.conf import settings
 from model_bakery import baker
 
+from recoco.apps.resources.models import Resource
 from recoco.apps.tasks.models import Task
 
 from ..exceptions import DSAPIError
@@ -76,7 +77,8 @@ class TestUpdateOrCreateDSFolder(BaseTestMixin):
 
     @responses.activate
     def test_no_ds_resource_number(self):
-        recommendation = baker.make(Task)
+        resource = baker.make(Resource)
+        recommendation = baker.make(Task, resource=resource)
         ds_resource = baker.make(DSResource, schema={"foo": "bar"})
         assert ds_resource.number is None
 
@@ -89,14 +91,16 @@ class TestUpdateOrCreateDSFolder(BaseTestMixin):
             update_or_create_ds_folder(recommendation.id)
 
         mock_find_ds_resource_for_project.assert_called_once_with(
-            project=recommendation.project
+            project=recommendation.project,
+            resource=resource,
         )
         responses.assert_call_count(self.ds_url, 0)
         assert DSFolder.objects.count() == 0
 
     @responses.activate
     def test_bad_response(self, ds_schema_sample):
-        recommendation = baker.make(Task, project__name="my-project")
+        resource = baker.make(Resource)
+        recommendation = baker.make(Task, project__name="my-project", resource=resource)
         ds_resource = baker.make(DSResource, schema=ds_schema_sample)
 
         responses.post(url=self.ds_url, status=400)
@@ -109,14 +113,16 @@ class TestUpdateOrCreateDSFolder(BaseTestMixin):
                 update_or_create_ds_folder(recommendation.id)
 
         mock_find_ds_resource_for_project.assert_called_once_with(
-            project=recommendation.project
+            project=recommendation.project,
+            resource=resource,
         )
         responses.assert_call_count(self.ds_url, 1)
         assert DSFolder.objects.count() == 0
 
     @responses.activate
     def test_ds_folder_created(self, ds_schema_sample):
-        recommendation = baker.make(Task, project__name="my-project")
+        resource = baker.make(Resource)
+        recommendation = baker.make(Task, project__name="my-project", resource=resource)
         ds_resource = baker.make(DSResource, schema=ds_schema_sample)
 
         responses.post(
@@ -138,7 +144,8 @@ class TestUpdateOrCreateDSFolder(BaseTestMixin):
             update_or_create_ds_folder(recommendation.id)
 
         mock_find_ds_resource_for_project.assert_called_once_with(
-            project=recommendation.project
+            project=recommendation.project,
+            resource=resource,
         )
         responses.assert_call_count(self.ds_url, 1)
 
