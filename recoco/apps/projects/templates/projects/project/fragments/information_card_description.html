@@ -9,7 +9,8 @@
         {% endfor %}
     {% else %}
         {% for question in site_config.onboarding_questions.all %}
-            {% question_answer active_project_survey_session question as answer %}
+            {% project_session_for_survey project site_config.project_survey as session %}
+            {% question_answer session question as answer %}
             {% if answer.comment %}
                 <!--Texte libre-->
                 {% include 'projects/project/fragments/information_card_description_details.html' with title=answer.question.text_short content=answer.comment|safe %}
