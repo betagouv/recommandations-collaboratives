@@ -16,16 +16,21 @@
             {% else %}
                 <!--Choix multiples-->
                 {% lookup_choices_from_answer answer as choices %}
-                {% if question.is_multiple %}
-                    <!--Réponse multiples-->
-                    <ul>
-                        {% for choice in choices %}<li>{{ choice.conclusion|default:choice.text|capfirst }}</li>{% endfor %}
-                    </ul>
+                {% if choices %}
+                    {% if question.is_multiple %}
+                        <!--Réponse multiples-->
+                        <ul>
+                            {% for choice in choices %}<li>{{ choice.conclusion|default:choice.text|capfirst }}</li>{% endfor %}
+                        </ul>
+                    {% else %}
+                        <!--Réponse Unique-->
+                        {% for choice in choices %}
+                            {% include 'projects/project/fragments/information_card_description_details.html' with title=answer.question.text_short content=choice.conclusion|default:choice.text|capfirst %}
+                        {% endfor %}
+                    {% endif %}
                 {% else %}
-                    <!--Réponse Unique-->
-                    {% for choice in choices %}
-                        {% include 'projects/project/fragments/information_card_description_details.html' with title=answer.question.text_short content=choice.conclusion|default:choice.text|capfirst %}
-                    {% endfor %}
+                    <!--Réponse vide-->
+                    {% include 'projects/project/fragments/information_card_description_details.html' with title=answer.question.text_short content='Non renseigné' %}
                 {% endif %}
             {% endif %}
             {% if not forloop.last %}<hr class="mt-0">{% endif %}

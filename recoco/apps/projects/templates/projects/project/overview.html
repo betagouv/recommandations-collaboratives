@@ -80,13 +80,13 @@
                             {% include "projects/project/fragments/information_card.html" with full_width=True padding_end=True padding_top=True full_height=True project=project title="Résumé du projet" description=project.description updated_on=project.created_on card_user=project.submitted_by org_name=project.submitted_by.profile.organization.name data_test="context" %}
                             <!-- Onboarding -->
                             {% if not onboarding_response %}
-                                {% include "projects/project/fragments/information_card.html" with full_width=True padding_end=True padding_top=True full_height=True project=project onboarding_information=True updated_on=project.created_on card_user=project.submitted_by org_name=project.submitted_by.profile.organization.name old_project=True %}
+                                {% include "projects/project/fragments/information_card.html" with full_width=True padding_end=True padding_top=True full_height=True project=project onboarding_information=True updated_on=project.created_on card_user=project.submitted_by org_name=project.submitted_by.profile.organization.name %}
                             {% endif %}
                             <!-- Old onboarding project  -->
                             {% if onboarding_response %}
-                                {% include 'projects/project/fragments/information_card.html' with full_width=True padding_end=True padding_top=True full_height=True project=project onboarding_information=True updated_on=project.created_on card_user=project.submitted_by org_name=project.submitted_by.profile.organization.name %}
+                                {% include 'projects/project/fragments/information_card.html' with full_width=True padding_end=True padding_top=True full_height=True project=project onboarding_information=True updated_on=project.created_on card_user=project.submitted_by org_name=project.submitted_by.profile.organization.name old_project=True %}
                             {% elif project.impediments %}
-                                {% include 'projects/project/fragments/information_card.html' with full_width=True padding_end=True padding_top=True full_height=True project=project title="Difficultés rencontrées" description=project.impediments updated_on=project.created_on card_user=project.submitted_by org_name=project.submitted_by.profile.organization.name %}
+                                {% include 'projects/project/fragments/information_card.html' with full_width=True padding_end=True padding_top=True full_height=True project=project title="Difficultés rencontrées" description=project.impediments updated_on=project.created_on card_user=project.submitted_by org_name=project.submitted_by.profile.organization.name old_project=True %}
                             {% endif %}
                         </div>
                         {% if 'use_private_notes' in user_project_perms %}
