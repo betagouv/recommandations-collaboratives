@@ -16,8 +16,9 @@ class Migration(migrations.Migration):
                 .order_by("id")
                 .first()
             )
-            resource.site_origin_id = resource_site.site_id
-            resource.save()
+            if resource_site:
+                resource.site_origin_id = resource_site.site_id
+                resource.save()
 
     dependencies = [
         ("sites", "0002_alter_domain_unique"),
