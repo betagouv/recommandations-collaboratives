@@ -51,9 +51,9 @@ def test_compute_topics_tag_cloud(request):
         [
             (
                 "topic0",
-                (2, [("theproject", project.pk)], [("thetask", task.pk, project.pk)]),
+                (2, [project], [task]),
             ),
-            ("topic2", (1, [("theproject", project.pk)], [])),
+            ("topic2", (1, [project], [])),
         ]
     )
 
