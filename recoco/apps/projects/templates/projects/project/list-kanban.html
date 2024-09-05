@@ -103,7 +103,7 @@
                                                                 <span class="kanban-card--project-name project-link"
                                                                       x-text="truncate(t.name)"></span>
                                                             </div>
-                                                            <template x-if="t.origin">
+                                                            {% comment %} <template x-if="t.origin">
                                                                 <div class=" kanban-card--project-push-by-container"
                                                                      x-show="t.origin && {{ site_config.id }} !== t.origin?.site">
                                                                     <img x-show="t.origin.siteInfo.configuration.logo_small"
@@ -117,7 +117,7 @@
                                                                     <span class="not-a-link kanban">projet envoyé par</span>
                                                                     <span x-text="t.origin.siteInfo.name"></span>
                                                                 </div>
-                                                            </template>
+                                                            </template> {% endcomment %}
                                                             <div>
                                                                 <span class="kanban-card--project-insee fr-icon--sm fr-icon-map-pin-2-line not-a-link">INSEE: <span x-text="truncate(t.commune.insee)"></span></span>
                                                             </div>
