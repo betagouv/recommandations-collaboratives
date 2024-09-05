@@ -24,7 +24,7 @@ document.addEventListener('alpine:init', () => {
           geolocUtils.fetchGeolocationByAddress(`${this.project.location}`),
         ]);
 
-        [this.latitude, this.longitude] = mapUtils.getDefaultLatLngForMap(
+        [this.latitude, this.longitude] = await mapUtils.getDefaultLatLngForMap(
           this.project
         );
 
