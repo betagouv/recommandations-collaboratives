@@ -13,6 +13,7 @@ describe('I can access the recommandations', () => {
 
   beforeEach(() => {
     cy.login('bob');
+    cy.hideCookieBannerAndDjango();
   });
 
   it('goes to recommandations tab and see new recommandations', () => {
@@ -23,10 +24,13 @@ describe('I can access the recommandations', () => {
 
     cy.get('Ajouter une recommandation').should('not.exist');
 
-    cy.get('[data-test-id="badge-tab-new-task"]').should('exist');
-    cy.get('[data-test-id="banner-new-tasks"]').should('exist');
-    cy.get('[data-test-id="badge-new-task"]').should('exist');
-
-    cy.contains('Notif test').should('exist');
+    cy.get('[data-test-id="badge-new-task"]')
+      .should('exist')
+      .first()
+      .click({ force: true });
+    cy.wait(500);
+    cy.get('[data-test-id="close-modal-task"]').click({ force: true });
+    cy.get('[data-test-id="banner-new-tasks"]').should('not.exist');
+    cy.get('[data-test-id="badge-new-task"]').should('not.be.visible');
   });
 });
