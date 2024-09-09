@@ -64,7 +64,7 @@ async function getDefaultLatLngForMap(project) {
 }
 
 async function addressGeocoder(address) {
-  const url = new URL('http://api-adresse.data.gouv.fr/search');
+  const url = new URL('https://api-adresse.data.gouv.fr/search');
   const params = { q: address, limit: 1 };
   Object.keys(params).forEach((key) =>
     url.searchParams.append(key, params[key])
