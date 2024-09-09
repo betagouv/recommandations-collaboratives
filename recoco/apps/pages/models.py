@@ -1,5 +1,6 @@
 from wagtail.admin.panels import FieldPanel
 from wagtail.blocks import RichTextBlock
+from wagtail.contrib.table_block.blocks import TableBlock
 from wagtail.fields import RichTextField, StreamField
 from wagtail.images.blocks import ImageChooserBlock
 from wagtail.models import Page
@@ -35,6 +36,7 @@ class ShowcasePage(Page):
         [
             ("multicol", MultiColumnsBlock(label="Multi Colonnes")),
             ("richtext", RichTextBlock(label="Texte riche")),
+            ("table", TableBlock()),
         ],
         verbose_name="Contenu",
     )
