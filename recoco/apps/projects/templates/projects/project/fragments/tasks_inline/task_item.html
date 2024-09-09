@@ -17,7 +17,8 @@
     </div>
     <div class="d-flex flex-column flex-grow-1 ease-transition"
          :style="task.isLoading && 'opacity:0.3';">
-        <div class="card-top-information d-flex align-items-center">
+        <div data-test-id="badge-new-task"
+             class="card-top-information d-flex align-items-center">
             <template x-if="!task.visited && task.public">
                 <div class="left-0">
                     <span class="bg-blue text-white"
@@ -53,8 +54,7 @@
         <article class="mt-1 mb-2">
             <template x-if="task.resource_id && task.resource && task.resource.subtitle">
                 <div x-html="truncate(renderMarkdown(task.resource.subtitle),100)"
-                     class="text-info-custom fw-light font-small text-dark m-0 p-0">
-                </div>
+                     class="text-info-custom fw-light font-small text-dark m-0 p-0"></div>
             </template>
             <template x-if="!task.resource_id && task.content">
                 <div x-html="truncate(renderMarkdown(task.content),100)"
