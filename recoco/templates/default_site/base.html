@@ -53,6 +53,7 @@
     <body class="bg-light">
         {% include 'consent/banner.html' %}
         <h1 class="visually-hidden">{{ request.site.name }}</h1>
+        {% include "header/skip-links.html" %}
         {% include "header/menu-top.html" %}
         <main class="main-content {% if not user.is_authenticated %}public-content{% endif %}">
             <div id="notification"
@@ -100,11 +101,11 @@
                 </div>
             {% endif %}
             <!--             <div class="b-page-divider"></div> -->
-            <div class="container-fluid bg-white">
+            <div class="container-fluid bg-white" id="content">
                 <div class="row background--grey-light">
                     {% block content %}{% endblock %}
                 </div>
-                <div class="row justify-content-center">{% include 'footer.html' %}</div>
+                <div class="row justify-content-center" id="footer">{% include 'footer.html' %}</div>
             </div>
         </main>
         {% if not debug %}
