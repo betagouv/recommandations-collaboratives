@@ -69,3 +69,5 @@ metabase-api==3.4
 
 # Django webhook fork
 django-webhook @ git+https://github.com/etchegom/django-webhook.git@recoco
+
+django-json-widget==2.0.1
