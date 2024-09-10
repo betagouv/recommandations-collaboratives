@@ -5,7 +5,7 @@
     <link href="{% sass_src 'home/css/dsfr/marianne.css' %}"
           rel="stylesheet"
           type="text/css">
-    <link href="{% sass_src 'css/header/header.scss' %}"
+    <link href="{% sass_src 'css/menu-top.scss' %}"
           rel="stylesheet"
           type="text/css">
 {% endblock %}
@@ -15,7 +15,7 @@
      style="font-family: 'Marianne', arial, sans-serif;
             padding: 0">
     {% if user.is_authenticated %}
-        <div class="navbar-border-top w-100">
+        <div class="w-100">
             <div class="d-flex align-items-center justify-content-between w-100">
                 <div class="d-flex align-items-center ms-4">
                     <div class="navigation__menu-top-logo">{% include 'header/menu-top-logo.html' %}</div>
