@@ -42,8 +42,7 @@
         <div class="d-flex align-items-center justify-content-between">
             <div class="d-flex w-100 justify-content-between align-items-center">
                 <div class="d-flex w-100 align-items-center">
-                    <span class="mt-0 pt-0 mb-0 fw-bold title-info text-transform-none text-blue text-decoration-underline"
-                          x-text="task.intent"></span>
+                    <h4 class="mt-0 pt-0 mb-0 fw-bold" x-text="task.intent"></h4>
                 </div>
             </div>
             {% if "manage_tasks" in user_project_perms and not disable_edit %}
@@ -62,7 +61,35 @@
             </template>
         </article>
         <template x-if="task.resource">
-            <article class="mb-3">{% include 'projects/project/fragments/task/task_comment.html' %}</article>
+            <article>{% include 'projects/project/fragments/task/task_comment.html' %}</article>
+        </template>
+        <hr>
+        <template x-if="task.ds_folder">
+            <div>
+                <h4 class="fw-bolder">
+                    <img height="31px"
+                         width="32px"
+                         src="{% static 'svg/picto-demarches_simplifiees.svg' %}"
+                         alt="Pictogramme Démarches Simplifiées">
+                    Dossier Démarches Simplifiées
+                </h4>
+                <p class="fr-text-mention--grey fr-text--sm fr-my-3v">
+                    Complétez l’état des lieux pour pré-remplir automatiquement le dossier de candidature.
+                </p>
+                <a class="fr-btn fr-btn--secondary fr-btn--sm"
+                   @click.stop=""
+                   x-bind:href="task.ds_folder.dossier_url">Voir mon dossier</a>
+                <span class="fr-ml-2w fr-text-label--blue-france fr-text--xs">
+                    {% if task.ds_folder.prefilled_count > 1 %}
+                        {{ task.ds_folder.prefilled_count }} données pré-remplies
+                    {% elif task.ds_folder.prefilled_count > 0 %}
+                        1 donnée pré-remplie
+                    {% else %}
+                        aucune donnée pré-remplie
+                    {% endif %}
+                </span>
+                <hr class="fr-mb-3w">
+            </div>
         </template>
         <footer class="d-flex justify-content-between align-items-center">
             <div class="d-flex align-items-center">
