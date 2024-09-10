@@ -65,6 +65,7 @@ class Commune(models.Model):
     class Meta:
         verbose_name = "commune"
         verbose_name_plural = "communes"
+        unique_together = [["insee", "postal"]]
 
     def __str__(self):  # pragma: nocover
         return self.name
