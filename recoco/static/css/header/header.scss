@@ -1,0 +1,14 @@
+.navigation {
+  --padding-y-navigation: 8px 0;
+  border-bottom: solid 1px #ccc;
+  &__menu-top-logo {
+    padding: var(--padding-y-navigation);
+  }
+  &__menu-top-secondary {
+    li.navigation__item-dashboard {
+      padding: var(--padding-y-navigation);
+    }
+    li.navigation__item-dashboard {
+    }
+  }
+}
