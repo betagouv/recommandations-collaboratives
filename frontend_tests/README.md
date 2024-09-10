@@ -49,6 +49,18 @@ DJANGO_VITE = {"default": {"dev_mode": DEBUG, "dev_server_port": 3001}}
 
 ### Lancement de la serie de tests Cypress
 
+Installer les dépendances :
+
+```bash
+$ yarn install
+```
+
+> ⚠️ Attention
+>
+> S'assurer d'être dans son environnement virtuel Django.
+
+Lancer les tests :
+
 ```bash
 $ yarn test
 ```
