@@ -60,7 +60,7 @@
                            class="{% if recommandations %} active{% endif %} align-items-center"
                            href="{% url 'projects-project-detail-actions' project.pk %}">
                             {% if active_project_action_notifications_count %}
-                                <span class="has-notification">{{ active_project_action_notifications_count }}</span>
+                                <span data-test-id="badge-tab-new-task" class="has-notification">{{ active_project_action_notifications_count }}</span>
                             {% endif %}
                             <span>{{ label }}</span>
                         </a>
