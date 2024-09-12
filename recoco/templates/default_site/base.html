@@ -108,18 +108,10 @@
             </div>
         </main>
         {% if not debug %}
-            <script src="https://browser.sentry-cdn.com/6.19.4/bundle.min.js"
-                    integrity="sha384-l+UQ7KbPIcq6l4DoWCwMvaOJ0pdJ+oTVGD6GyROFzSriOH1F1f6dl90fOgcigkMX"
-                    crossorigin="anonymous"></script>
-            <script type="text/javascript">
-                try {
-                    Sentry.init({
-                        dsn: "https://94ca61f214804521ab3f4b80600dc837@o1107121.ingest.sentry.io/6133993",
-                    });
-                } catch (e) {
-                  // Sentry is not defined
-                }
-            </script>
+        <script
+            src="https://sentry.incubateur.net/js-sdk-loader/5b872cee93efddce4396cc52605838c1.min.js"
+            crossorigin="anonymous"
+        ></script>
         {% endif %}
         {% if debug %}
             <script src="{% static 'js/jquery-3.6.0.slim.min.js' %}"></script>
