@@ -16,13 +16,13 @@
          class="col-12 d-flex justify-content-between align-items-start">
         <div class=" d-flex flex-column fr-mb-2v">
             <div class="d-flex align-items-center">
-                <h2 class="project-link d-flex align-items-center">
+                <h2 class="project-link d-flex align-items-center fr-mb-0">
                     <span class="fw-bold title-info text-dark fr-mr-2v location">{{ project.commune.name }}</span>
                     <span class="text-info-custom text-grey-dark name">{{ project.name }}</span>
                 </h2>
             </div>
             <div class="d-flex">
-                <p class="tiny text-grey-dark">
+                <p class="tiny text-grey-dark fr-mb-0">
                     <span class="fr-icon-map-pin-2-line fr-icon--sm" aria-hidden="true"></span>
                     {% if project.commune %}
                         {{ project.commune.name }} —   {{ project.commune.postal }}, {{ project.commune.department }} - {{ project.commune.department.region }} - INSEE: {{ project.commune.insee }}

@@ -36,7 +36,7 @@
                     {% for project in draft_projects %}
                         <div class="card fr-mb-2w d-flex flex-row project-card">
                             <div class="project-card__col--left project-card__col__padding d-flex flex-column">
-                                <h3 class="project-card__title">
+                                <h3 class="project-card__title fr-mb-0">
                                     <a href="{% url 'projects-project-detail' project.id %}">
                                         {% if project.commune %}
                                             <span class="project-card__city">{{ project.commune.name }}({{ project.commune.postal|slice:2 }})</span>
@@ -44,35 +44,35 @@
                                         <span class="project-card__name">{{ project.name }}</span>
                                     </a>
                                 </h3>
-                                <p class="project-card__keyinfo">
+                                <p class="project-card__keyinfo fr-mb-2v">
                                     {% if project.commune %}
                                         <span class="fr-icon--sm fr-icon-map-pin-2-line">INSEE: {{ project.commune.insee }}</span>
                                     {% endif %}
                                     <span class="fr-icon--sm fr-icon-calendar-event-line">déposé depuis {{ project.created_on|timesince }}</span>
                                 </p>
-                                <h4 class="text-uppercase project-card__address">Localisation</h4>
+                                <h4 class="text-uppercase project-card__address fr-mb-0">Localisation</h4>
                                 {% if project.location and project.commune %}
                                     <p>
                                         <span class="fr-icon--sm fr-icon-map-pin-2-line project-card__location"
                                               id="no-margin">{{ project.location }}</span>
                                     </p>
-                                    <p>
+                                    <p class="fr-mb-2v">
                                         <span class="project-card__communename">{{ project.commune.postal }} {{ project.commune.name }}</span>
                                     </p>
                                 {% elif project.location %}
-                                    <p>
+                                    <p class="fr-mb-2v">
                                         <span class="fr-icon--sm fr-icon-map-pin-2-line project-card__location">{{ project.location }}</span>
                                     </p>
                                 {% elif project.commune %}
-                                    <p>
+                                    <p class="fr-mb-2v">
                                         <span class="fr-icon--sm fr-icon-map-pin-2-line project-card__location">{{ project.commune.postal }} {{ project.commune.name }}</span>
                                     </p>
                                 {% else %}
-                                    <p>
+                                    <p class="fr-mb-2v">
                                         <span class="fr-icon--sm fr-icon-map-pin-2-line project-card__location">Non renseigné</span>
                                     </p>
                                 {% endif %}
-                                <h4 class="text-uppercase project-card__team">Équipe collectivité</h4>
+                                <h4 class="text-uppercase project-card__team fr-mb-0">Équipe collectivité</h4>
                                 <div>
                                     {% include "projects/project/fragments/project_owner.html" with project=project %}
                                     {% include "projects/project/fragments/owner/owner-details.html" with project=project %}

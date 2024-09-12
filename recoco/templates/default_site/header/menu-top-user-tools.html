@@ -45,7 +45,7 @@
                         <a class="dropdown-item small " href="{% url 'projects-project-list' %}">Accueil</a>
                     </li>
                     <li>
-                        <hr class="dropdown-divider">
+                        <hr class="dropdown-divider fr-py-0">
                     </li>
                 {% endif %}
                 {% if "use_crm" in user_site_perms %}
@@ -53,7 +53,7 @@
                         <a class="dropdown-item small " href="{% url 'crm-site-dashboard' %}">CRM</a>
                     </li>
                     <li>
-                        <hr class="dropdown-divider">
+                        <hr class="dropdown-divider fr-py-0">
                     </li>
                 {% endif %}
                 {% if user.is_staff %}
@@ -61,7 +61,7 @@
                         <a class="small dropdown-item" href="{% url 'admin:index' %}">Administration Reco-co</a>
                     </li>
                     <li>
-                        <hr class="dropdown-divider">
+                        <hr class="dropdown-divider fr-py-0">
                     </li>
                 {% endif %}
                 <!-- Address Book -->
@@ -72,7 +72,7 @@
                            data-test-id="button-adress-book">Carnet d'adresses</a>
                     </li>
                     <li>
-                        <hr class="dropdown-divider">
+                        <hr class="dropdown-divider fr-py-0">
                     </li>
                 {% endif %}
                 {% if is_staff %}
@@ -83,7 +83,7 @@
                            target="_blank">Documentation</a>
                     </li>
                     <li>
-                        <hr class="dropdown-divider">
+                        <hr class="dropdown-divider fr-py-0">
                     </li>
                 {% elif is_switchtender or is_administrating_project %}
                     <li>
@@ -93,7 +93,7 @@
                            target="_blank">Documentation</a>
                     </li>
                     <li>
-                        <hr class="dropdown-divider">
+                        <hr class="dropdown-divider fr-py-0">
                     </li>
                 {% endif %}
                 <li>

@@ -34,7 +34,7 @@
                         </a>
                         <button x-on:click="open = !open"
                                 type="button"
-                                class="border-0 btn fr-py-0 fr-px-1v">
+                                class="border-0 fr-py-0 fr-px-1v">
                             <svg data-toggle="tooltip"
                                  data-placement="top"
                                  title="Notifications désactivées"
@@ -174,7 +174,6 @@
         {% endif %}
         {% comment %} surcharge pour ajouter des éléments au menu top à gauche de ressources {% endcomment %}
         {% include 'header/menu-top-secondary-left.html' %}
-
         <!-- Ressources -->
         <li style="{% if url_name == 'resources-resource-search' %}activated{% endif %}"
             class="tmp-usevar">
@@ -212,10 +211,8 @@
                 {% endif %}
             </div>
         </li>
-
-{% comment %} surcharge pour ajouter des éléments au menu top à droite de ressources {% endcomment %}
+        {% comment %} surcharge pour ajouter des éléments au menu top à droite de ressources {% endcomment %}
         {% include 'header/menu-top-secondary-right.html' %}
-
         <!-- Notifications -->
         {% if user.is_authenticated %}
             <li class="dropdown"

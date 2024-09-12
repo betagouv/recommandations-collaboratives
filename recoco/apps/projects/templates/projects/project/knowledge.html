@@ -71,7 +71,7 @@
             {% if request.user in project.members.all %}
                 {% if "use_surveys" in user_project_perms and session and session.next_question and session.completion < 80 %}
                     <div class="bg-light d-flex flex-column justify-content-center align-items-center fr-py-3w rounded">
-                        <h4 class="fr-pt-2v">
+                        <h4 class="fr-pt-2v fr-mb-0">
                             {% if session.completion == 0 %}
                                 Prochaine étape : Remplissez le parcours d’état des lieux
                             {% else %}
