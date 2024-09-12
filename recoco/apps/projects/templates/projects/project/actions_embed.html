@@ -5,26 +5,29 @@
 {% load sass_tags %}
 {% load django_vite %}
 {% load guardian_tags %}
-{% block title %}Recommandations - {{ block.super }}{% endblock %}
+{% block title %}
+    Recommandations - {{ block.super }}
+{% endblock title %}
 {% block js %}
     <script src="https://cdn.jsdelivr.net/npm/js-md5@0.7.3/src/md5.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-{% endblock %}
+    {% vite_asset 'js/apps/actionsEmbed.js' %}
+{% endblock js %}
 {% block css %}
     <link href="{% sass_src 'projects/css/board.scss' %}"
           rel="stylesheet"
           type="text/css" />
-{% endblock %}
+{% endblock css %}
 {% block banner %}
-    {% include 'projects/project/fragments/positioning_banner.html' %}
-{% endblock %}
+    {% include "projects/project/fragments/positioning_banner.html" %}
+{% endblock banner %}
 {% block project_detail %}
     {% get_obj_perms request.user for request.site as "user_site_perms" %}
     {% get_obj_perms request.user for project as "user_project_perms" %}
     <div class="col-12 mx-auto">
         <div class="row">
             <div class="col">
-                {% include 'projects/project/navigation.html' with recommandations=True %}
+                {% include "projects/project/navigation.html" with recommandations=True %}
                 {{ can_administrate|json_script:"canAdministrate" }}
                 {{ user_project_perms|json_script:"userProjectPerms" }}
                 {{ is_switchtender|json_script:"isSwitchtender" }}
@@ -66,9 +69,9 @@
                         questionnaire d'exploration</a>
                     </div>
                 {% else %}
-                    {% include 'projects/project/fragments/tasks_inline_kanban/tasks_inline_kanban.html' with embed_view=True %}
+                    {% include "projects/project/fragments/tasks_inline_kanban/tasks_inline_kanban.html" with embed_view=True %}
                 {% endif %}
             </div>
         </div>
     </div>
-{% endblock %}
+{% endblock project_detail %}
