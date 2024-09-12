@@ -172,6 +172,9 @@
                    class="nav-link link-dark {% if url_name == 'projects-moderation-list' %}active{% endif %}">Projets à examiner <span class="badge text-bg-danger">{{ projects_to_moderate_count }}</span></a>
             </li>
         {% endif %}
+        {% comment %} surcharge pour ajouter des éléments au menu top à gauche de ressources {% endcomment %}
+        {% include 'header/menu-top-secondary-left.html' %}
+
         <!-- Ressources -->
         <li style="{% if url_name == 'resources-resource-search' %}activated{% endif %}"
             class="tmp-usevar">
@@ -209,6 +212,10 @@
                 {% endif %}
             </div>
         </li>
+
+{% comment %} surcharge pour ajouter des éléments au menu top à droite de ressources {% endcomment %}
+        {% include 'header/menu-top-secondary-right.html' %}
+
         <!-- Notifications -->
         {% if user.is_authenticated %}
             <li class="dropdown"

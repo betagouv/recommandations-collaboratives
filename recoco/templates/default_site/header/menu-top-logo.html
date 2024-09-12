@@ -33,8 +33,7 @@
         </button>
         <a href="{% url 'home' %}"
            class="d-flex align-middle fr-p-2w align-items-center">
-            <!-- <img class="logo-rf" src="{% static 'home/img/home/logo_rf.png' %}" width="100px" alt="Logo république française">
-               <img class="fr-mx-3w logo-cerema" src="{% static 'img/partners/logo_cerema.png' %}" width="120px" alt="Logo du Cerema">  -->
+            {% include 'header/menu-top-logo-supp.html' %}
             <img class="logo-{{ request.site.name|lower }}"
                  src="{{ request.site.configuration.logo_large.url }}"
                  width="auto"
@@ -57,6 +56,7 @@
         </button>
         <a href="{% url 'home' %}"
            class="d-flex align-middle fr-p-2w align-items-center">
+            {% include 'header/menu-top-logo-supp.html' %}
             <span class="fw-bold span-specific-fontsize-30 specific-ml-30">{{ request.site.name }}</span>
         </a>
     </div>

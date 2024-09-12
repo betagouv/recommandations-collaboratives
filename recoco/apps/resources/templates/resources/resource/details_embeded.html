@@ -1,10 +1,6 @@
 {% load django_vite %}
 {% load static %}
 {% load sass_tags %}
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-      integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3"
-      crossorigin="anonymous">
 <link href="{% sass_src 'css/base.scss' %}"
       rel="stylesheet"
       type="text/css">
@@ -41,6 +37,18 @@
 <div class="row">
     <div class="col-11 fr-px-2v fr-mx-auto" x-data="PrintTaskResource">
         <div class="d-flex justify-content-end fr-pb-2v fr-mb-2v task-preview-cta fr-mt-2v">
+            {% if task and task.ds_folder %}
+                <a class="fr-btn fr-btn--secondary fr-btn--sm fr-mr-1w"
+                   href="{{ task.ds_folder.dossier_url }}"
+                   target="blank">
+                    <img height="25px"
+                         width="26px"
+                         src="{% static 'svg/picto-demarches_simplifiees.svg' %}"
+                         alt="Pictogramme Démarches Simpliffiées"
+                         class="fr-mr-1w">
+                    Voir mon dossier
+                </a>
+            {% endif %}
             {% if contacts.count > 0 %}
                 <a href="#task-contacts"
                    class="fr-mr-2v fr-px-2v fr-py-1v bg-white text-decoration-none d-flex align-items-center text-black fw-medium specific-border-solid2px222">

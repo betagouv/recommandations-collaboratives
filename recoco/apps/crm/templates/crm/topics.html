@@ -49,13 +49,13 @@
                                     <td>{{ value.0 }}</td>
                                     <td>
                                         {% for project in value.1 %}
-                                            <a href="{% url 'projects-project-detail-overview' project.1 %}">{{ project.0 }}</a>
+                                            <a href="{% url 'projects-project-detail-overview' project.pk %}">{{ project.commune }} - {{ project.name }}</a>
                                             {% if not forloop.last %}<br />{% endif %}
                                         {% endfor %}
                                     </td>
                                     <td>
                                         {% for task in value.2 %}
-                                            <a href="{% url 'projects-project-detail-actions' task.2 %}#action-{{ task.1 }}">{{ task.0 }}</a>
+                                            <a href="{% url 'projects-project-detail-overview' task.project.pk %}#action-{{ task.pk }}">{{ task.project.commune }} - {{ task.project.name }} / {{ task }} </a>
                                             {% if not forloop.last %}<br />{% endif %}
                                         {% endfor %}
                                     </td>

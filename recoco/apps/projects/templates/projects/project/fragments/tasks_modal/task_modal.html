@@ -43,6 +43,7 @@
                             <button type="button"
                                     class="btn-close"
                                     data-bs-dismiss="modal"
+                                    data-test-id="close-modal-task"
                                     aria-label="Close"
                                     @click="changeShowEdition()"></button>
                         </div>
@@ -51,7 +52,7 @@
                              x-effect="taskId && loadContent()">
                             <template x-if="task && taskId && task?.resource_id">
                                 <iframe class="w-100 d-flex flex-column rounded"
-                                        :src="resourcePreviewUrl(task?.resource_id)"></iframe>
+                                        :src="resourcePreviewUrl(task?.resource_id, taskId)"></iframe>
                             </template>
                             <template x-if="task && taskId && !task?.resource_id">
                                 <div class="w-100 text-break fr-p-2w specific-maxheight-90vh scroll-gestion">
@@ -59,7 +60,7 @@
                                         <h1 x-text="task?.intent" class="fr-mb-2w"></h1>
                                     </div>
                                     <p class="text-justified overflow-hidden text-break"
-                                       x-html="renderMarkdown(task?.content)"></p>
+                                       x-html="renderMarkdown(task?.content || '' )"></p>
                                 </div>
                             </template>
                         </div>

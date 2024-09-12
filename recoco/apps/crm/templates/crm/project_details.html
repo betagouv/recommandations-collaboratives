@@ -69,48 +69,48 @@
                                                    hidden
                                                    name="tag"
                                                    value="{{ crm_tag.name }}"
-                                                   id="id_tag" />
+                                                   id="id_tag_{{ crm_tag.name|slugify }}" />
                                             <div class="crm-form-check form-check form-check-inline">
-                                                <!-- djlint:off -->
-                                                                                                                                                                                                                                                                                                                                                                <input class="form-check-input"
-                                                                                                                                                                                                                                                                                                                                                                       type="checkbox"
-                                                                                                                                                                                                                                                                                                                                                                       name="checkbox-{{ crm_tag.name|slugify }}"
-                                                                                                                                                                                                                                                                                                                                                                       onchange="document.getElementById('checkbox-{{ crm_tag.name|slugify }}').closest('form').submit()"
-                                                                                                                                                                                                                                                                                                                                                                       id="checkbox-{{ crm_tag.name|slugify }}" {% if crm_tag.name in active_tags %}checked{% endif %}>
-                                                                                                                                                                                                                                                                                                                                        <label class="form-check-label" for="checkbox-{{ crm_tag.name|slugify }}">{{ crm_tag.name| capfirst }}</label>
-                                            <!-- djlint:on -->
-                                        </div>
-                                    </form>
-                                {% endfor %}
-                            {% endwith %}
-                        </div>
-                    </fieldset>
+                                                <input class="form-check-input"
+                                                       type="checkbox"
+                                                       name="checkbox-{{ crm_tag.name|slugify }}"
+                                                       onchange="document.getElementById('checkbox-{{ crm_tag.name|slugify }}').closest('form').submit()"
+                                                       id="checkbox-{{ crm_tag.name|slugify }}"
+                                                       {% if crm_tag.name in active_tags %}checked{% endif %}>
+                                                <label class="form-check-label" for="checkbox-{{ crm_tag.name|slugify }}">{{ crm_tag.name| capfirst }}</label>
+                                            </div>
+                                        </form>
+                                    {% endfor %}
+                                {% endwith %}
+                            </div>
+                        </fieldset>
+                    </div>
+                </div>
+                <div>
+                    <a class="btn btn-primary" href="{{ project.get_absolute_url }}">
+                        <span>Voir le projet</span>
+                    </a>
+                    <a href="{% url 'crm-project-update' project.pk %}"
+                       class="btn btn-outline-secondary"
+                       aria-current="page">Gérer le projet</a>
                 </div>
             </div>
-            <div>
-                <a class="btn btn-primary" href="{{ project.get_absolute_url }}">
-                    <span>Voir le projet</span>
-                </a>
-                <a href="{% url 'crm-project-update' project.pk %}"
-                   class="btn btn-outline-secondary"
-                   aria-current="page">Gérer le projet</a>
+            <div class="fr-px-3w fr-pt-3w crm-notes-wrapper">
+                <div class="d-flex justify-content-between align-items-start">
+                    <a class="btn btn-primary fr-mb-3w"
+                       href="{% url 'crm-project-note-create' project.pk %}">créer une note</a>
+                </div>
+                {% for note in sticky_notes.all %}
+                    {% include "crm/note.html" with pinned=True update_url_name="crm-project-note-update" get_user_profile=True %}
+                {% endfor %}
+                {% for note in notes.all %}
+                    {% include "crm/note.html" with update_url_name="crm-project-note-update" get_user_profile=True %}
+                {% endfor %}
             </div>
-        </div>
-        <div class="fr-px-3w fr-pt-3w crm-notes-wrapper">
-            <div class="d-flex justify-content-between align-items-start">
-                <a class="btn btn-primary fr-mb-3w"
-                   href="{% url 'crm-project-note-create' project.pk %}">créer une note</a>
+            <div class="fr-px-3w fr-pt-3w bg-light crm-timeline-min-height">
+                <h4>Activité</h4>
+                {% include "crm/timeline.html" %}
             </div>
-            {% for note in sticky_notes.all %}
-                {% include "crm/note.html" with pinned=True update_url_name="crm-project-note-update" get_user_profile=True %}
-            {% endfor %}
-            {% for note in notes.all %}
-                {% include "crm/note.html" with update_url_name="crm-project-note-update" get_user_profile=True %}
-            {% endfor %}
-        </div>
-        <div class="fr-px-3w fr-pt-3w bg-light crm-timeline-min-height">
-            <h4>Activité</h4>
-            {% include "crm/timeline.html" %}
         </div>
     </div>
 {% endblock content %}

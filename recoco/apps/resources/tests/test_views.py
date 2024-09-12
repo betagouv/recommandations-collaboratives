@@ -22,6 +22,7 @@ from reversion.models import Version
 
 from recoco.apps.geomatics import models as geomatics
 from recoco.apps.projects import models as projects_models
+from recoco.apps.tasks.models import Task
 from recoco.utils import login
 
 from .. import models
@@ -752,6 +753,30 @@ def test_deleted_bookmark_honors_multisite(request):
     result = models.Bookmark.deleted_on_site.all()
     assert my_bookmark in result
     assert other_bookmark not in result
+
+
+#
+# Embedded resource view
+
+
+@pytest.mark.django_db
+def test_embedded_resource_detail_view_with_task_context(client, request):
+    resource = Recipe(
+        models.Resource,
+        sites=[get_current_site(request)],
+        status=models.Resource.PUBLISHED,
+    ).make()
+
+    task = Recipe(Task, resource=resource).make()
+
+    response = client.get(
+        path="{}?task_id={}".format(
+            reverse("resources-resource-detail-embeded", args=[resource.id]),
+            task.id,
+        )
+    )
+    assert response.status_code == 200
+    assert response.context["task"] == task
 
 
 # eof

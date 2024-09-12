@@ -17,13 +17,13 @@
                      src="{% gravatar_url project.owner.email size=16 %}"
                      alt="{{ action.actor }}">
                 <strong data-test-id="project-owner-name-details"
-                        class="text-nowrap text-capitalize project-card--projectowner {% if not project.owner.is_active %}inactive-status{% endif %}">
+                        class="text-nowrap text-capitalize project-card__projectowner {% if not project.owner.is_active %}inactive-status{% endif %}">
                     {{ project.owner.first_name|default:project.owner.username }}
                     {{ project.owner.last_name|default:"(A renseigner)" }}
                 </strong>
             </div>
         </span>
-        <span class="project-card--orgname fw-light specific-color-666">
+        <span class="project-card__orgname fw-light specific-color-666">
             {% if project.owner.profile.organization.name %}
                 {{ project.owner.profile.organization.name }}
             {% else %}
@@ -45,11 +45,11 @@
             <img class="rounded-circle fr-mr-2v"
                  src="{% gravatar_url project.owner.email size=24 %}"
                  alt="{{ action.actor }}">
-            <strong class="text-nowrap text-capitalize project-card--projectowner">
+            <strong class="text-nowrap text-capitalize project-card__projectowner">
                 {{ project.first_name }}
                 {{ project.last_name }}
             </strong>
         </span>
-        <span class="project-card--orgname fw-light specific-color-666">{{ project.org_name }}</span>
+        <span class="project-card__orgname fw-light specific-color-666">{{ project.org_name }}</span>
     </div>
 {% endif %}

@@ -31,7 +31,11 @@
 
   // --text-active-blue-france: #0063cb;
   // --text-action-high-blue-france: #0063cb;
+  // --text-active-blue-france: #0063cb;
+  // --text-action-high-blue-france: #0063cb;
 
+  // --border-action-high-blue-france: #0063cb;
+  // --border-active-blue-france: #0063cb;
   // --border-action-high-blue-france: #0063cb;
   // --border-active-blue-france: #0063cb;
 
@@ -65,6 +69,15 @@ a {
 
 p a {
   text-decoration: underline;
+}
+
+p {
+  &:has(input),
+  &:has(select),
+  &:has(textarea) {
+    margin-top: 0;
+    margin-bottom: 1rem;
+  }
 }
 
 a.fr-btn {
@@ -524,4 +537,8 @@ form > p {
 
 .bg-white {
   background-color: white;
+}
+
+.text-transform-none {
+  text-transform: none !important;
 }
