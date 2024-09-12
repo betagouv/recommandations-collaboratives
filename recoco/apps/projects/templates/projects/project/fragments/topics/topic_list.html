@@ -7,33 +7,36 @@
 {% endblock js %}
 {% get_obj_perms request.user for request.site as "user_site_perms" %}
 {% get_obj_perms request.user for project as "user_project_perms" %}
-<section class="project-details-section l-stack h-100">
+<section class="project-details-section h-100">
     <header>
-        <h6 class="font-small">Thématiques du projet</h6>
+        <h6 class="font-small fr-mb-1v">Thématiques du projet</h6>
         {% if "change_topics" in user_project_perms and project.all_topics.count != 0 %}
             <a class="fr-btn fr-btn--sm fr-btn--tertiary-no-outline fr-btn--icon-right fr-icon-pencil-line fr-text--xs"
                href="{% url "projects-project-topics" project.id %}">Modifier</a>
         {% endif %}
     </header>
-    {% if project.all_topics.count == 0 %}
-        <article class="project-card-details l-stack empty">
+    {% if FALSE and project.all_topics.count == 0 %}
+        <article class="project-card-details empty">
             <p class="fr-m-0 text-info-custom text-grey fw-normal fr-pb-2w text-center">
                 Il n'y a aucune thématique associée pour le moment
             </p>
             {% if "change_topics" in user_project_perms %}
-                <a class="button btn-blue filled fr-mt-2w text-center w-auto"
+                <a {% comment %}
+                   class="button btn-blue filled fr-mt-2w text-center w-auto"
+                   {% endcomment %}
+                   class="fr-btn fr-btn--sm fr-mt-2w justify-content-center text-uppercase"
                    href='{% url "projects-project-topics" project.id %}'>Ajouter des thématiques</a>
             {% endif %}
         </article>
     {% else %}
-        <article class="l-stack">
+        <article>
             {% if project.topics.all.count == 0 and project.task_topics.all.count == 0 %}
-                <article class="project-card-details l-stack empty">
+                <article class="project-card-details empty">
                     <p class="fr-m-0 text-info-custom text-grey fw-normal fr-pb-2w text-center">
                         Il n'y a aucune thématique associée au projet pour le moment
                     </p>
                     {% if "change_topics" in user_project_perms %}
-                        <a class="button btn-blue filled fr-mt-2w text-center w-auto"
+                        <a class="fr-btn fr-btn--sm justify-content-center text-uppercase"
                            href='{% url "projects-project-topics" project.id %}'>Ajouter des thématiques</a>
                     {% endif %}
                 </article>
