@@ -228,7 +228,7 @@ def project_recommandations(request, project_id=None):
     #     target_object_id=project.pk,
     # )  # XXX Bug?
 
-    return render(request, "projects/project/actions-embed.html", locals())
+    return render(request, "projects/project/actions_embed.html", locals())
 
 
 @login_required
