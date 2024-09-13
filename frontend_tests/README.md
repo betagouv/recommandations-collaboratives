@@ -37,29 +37,11 @@ DATABASES = {
 }
 ```
 
-Ces paramètres sont seulement utilisés pour lancer la mise à jour des permissions à l'aide du script `update_permissions.py`
-
-- Dans le fichier `frontend_tests.py`, modifier le port d'accès du front end, cela permettra de lancer le serveur front end sur un port différent du serveur de développement Django et de pouvoir lancer les tests en parallèle.:
-
-```python
-DJANGO_VITE = {"default": {"dev_mode": DEBUG, "dev_server_port": 3001}}
-```
+Ce fichier de paramètres est seulement utilisé pour lancer la mise à jour des persmissions à l'aide du script update_permissions
 
 ## Lancer les tests
 
 ### Lancement de la serie de tests Cypress
-
-Installer les dépendances :
-
-```bash
-$ yarn install
-```
-
-> ⚠️ Attention
->
-> S'assurer d'être dans son environnement virtuel Django.
-
-Lancer les tests :
 
 ```bash
 $ yarn test

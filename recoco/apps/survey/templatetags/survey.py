@@ -22,8 +22,6 @@ def question_answer(session, question):
 @register.simple_tag
 def lookup_choices_from_answer(answer):
     """Return the choice object from an answer (rehydration)"""
-    if not answer:
-        return
     choices = []
 
     # XXX keep that?

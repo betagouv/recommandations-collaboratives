@@ -391,12 +391,7 @@ class Project(models.Model):
         related_name="advisors_notes",
     )
 
-    location = models.CharField(
-        max_length=256,
-        verbose_name="Localisation",
-        null=True,
-        blank=True,
-    )
+    location = models.CharField(max_length=256, verbose_name="Localisation")
     location_x = models.FloatField(
         null=True, blank=True, verbose_name="Coordonnées géographiques (X)"
     )

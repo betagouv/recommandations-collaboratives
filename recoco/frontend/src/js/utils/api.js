@@ -106,11 +106,8 @@ export function followupUrl(projectId, taskId, followupId) {
   return `/api/projects/${projectId}/tasks/${taskId}/followups/${followupId}/`;
 }
 
-export function resourcePreviewUrl(resourceId, taskId) {
-  if (taskId) {
-    return `/ressource/${resourceId}/embed?task_id=${taskId}`;
-  }
-  return `/ressource/${resourceId}/embed/`;
+export function resourcePreviewUrl(resourceId) {
+  return `/ressource/${resourceId}/embed`;
 }
 
 // Regions :

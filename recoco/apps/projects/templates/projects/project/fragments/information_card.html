@@ -7,7 +7,7 @@
      data-test-id="project-information-card-{{ data_test }}">
     <div class="d-flex align-items-center justify-content-between"
          style="margin-bottom: 6px">
-        <h6 class="text-uppercase fw-bold m-0 p-0 project-card__subtitle">
+        <h6 class="text-uppercase fw-bold m-0 p-0 project-card--subtitle">
             {% if onboarding_information %}
                 Compléments
             {% else %}
@@ -33,7 +33,7 @@
             </a>
         {% endif %}
     </div>
-    <div class="project-card-details h-100 p-4 d-flex flex-column justify-content-between project-card__description">
+    <div class="project-card-details h-100 p-4 d-flex flex-column justify-content-between project-card--description">
         <article class="overflow-hidden">{% include 'projects/project/fragments/information_card_description.html' %}</article>
         {% if display_user is not False %}
             <footer class="d-flex mt-4 justify-content-between {% if full_width %}align-items-center{% else %}flex-column{% endif %}">

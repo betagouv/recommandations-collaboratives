@@ -1057,7 +1057,7 @@ def compute_topics_occurences(site):
     project_topics = defaultdict(
         list,
         (
-            (topic.name, list(topic.projects.all()))
+            (topic.name, list(topic.projects.values_list("name", "id")))
             for topic in (
                 Topic.objects.filter(projects__sites=site, projects__deleted=None)
                 .prefetch_related("projects")
@@ -1069,11 +1069,10 @@ def compute_topics_occurences(site):
     task_topics = defaultdict(
         list,
         (
-            (topic.name, list(topic.tasks.all()))
+            (topic.name, list(topic.tasks.values_list("intent", "id", "project__id")))
             for topic in (
                 Topic.objects.filter(tasks__site=site, tasks__deleted=None)
                 .prefetch_related("tasks")
-                .prefetch_related("tasks__project")
                 .distinct()
             )
         ),
@@ -1137,8 +1136,8 @@ def crm_list_topics_as_csv(request):
             [
                 name,
                 usage[0],
-                [project.pk for project in usage[1]],
-                [task.pk for task in usage[2]],
+                [project[1] for project in usage[1]],
+                [task[1] for task in usage[2]],
             ]
         )
 

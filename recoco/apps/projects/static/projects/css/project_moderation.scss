@@ -3,54 +3,57 @@
   border: 1px solid #e5e5e5;
   font-family: Marianne;
   padding: 12px;
-  &__col {
-    &--left {
+  &--col {
+    &__left {
       padding: 0px 12px 0px 0px !important;
       min-width: 30%;
     }
-    &--right {
+    &__rgight {
       min-width: 70%;
     }
   }
-  &__title {
+  &--title {
     font-size: 16px;
     text-align: left;
   }
-  &__city {
+  &--city {
     font-weight: 700;
     line-height: 24px;
     color: #3a3a3a;
     text-decoration: underline;
     text-decoration-color: #3a3a3a;
   }
-  &__name {
+  &--name {
     font-weight: 400;
     line-height: 22px;
     color: #666666;
     text-decoration: underline;
     text-decoration-color: #666666;
   }
-  &__keyinfo,
-  &__address,
-  &__team {
+  &--keyinfo,
+  &--address,
+  &--team {
     font-size: 12px;
     color: #666666;
     text-align: left;
   }
-  &__keyinfo {
+  &--keyinfo {
     display: flex;
     flex-direction: column;
     font-weight: 400;
     line-height: 24px;
   }
-  &__address,
-  &__team {
+  &--address,
+  &--team {
     font-weight: 700;
     line-height: 22px;
   }
-
-  &__location,
-  &__communename {
+  &--address {
+  }
+  &--team {
+  }
+  &--location,
+  &--communename {
     font-size: 12px;
     font-weight: 400;
     line-height: 18px;
@@ -60,29 +63,31 @@
   p:has(#no-margin) {
     margin-bottom: 0px;
   }
-  &__communename {
+  &--location {
+  }
+  &--communename {
     margin-left: 20px;
   }
-  &__projectowner {
+  &--projectowner {
     font-size: 14px;
     font-weight: 700;
     line-height: 24px;
     text-align: left;
   }
-  &__orgname {
+  &--orgname {
     font-size: 14px;
     font-weight: 400;
     line-height: 24px;
     text-align: left;
   }
-  &__subtitle {
+  &--subtitle {
     font-size: 12px;
     font-weight: 700;
     line-height: 22px;
     text-align: left;
     color: #666666;
   }
-  &__description {
+  &--description {
     padding: 12px 0px 0px 0px;
     border-radius: 4px;
     opacity: 0px;

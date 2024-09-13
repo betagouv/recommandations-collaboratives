@@ -50,7 +50,8 @@
                                    id="input-project-address"
                                    name="{{ project_form.location.name }}"
                                    placeholder="Adresse"
-                                   value="{{ project_form.location.value|default:'' }}" />
+                                   value="{{ project_form.location.value|default:'' }}"
+                                   required />
                             {% for error in project_form.location.errors %}<div class="text-danger text-end">{{ error }}</div>{% endfor %}
                         </div>
                     </div>
@@ -79,7 +80,7 @@
                                        @change.debounce="fetchCities()"
                                        x-model="postal"
                                        type="text"
-                                       class="py-3 placeholder-grey form-control {% if project_form.postcode.errors %}is-invalid{% endif %}"
+                                       class="py-4 placeholder-grey form-control {% if project_form.postcode.errors %}is-invalid{% endif %}"
                                        id="input-project-address"
                                        name="{{ project_form.postcode.name }}"
                                        placeholder="Code Postal"
@@ -90,14 +91,11 @@
                         <div class="mb-3 col-auto">
                             <label class="text-info-custom text-grey-dark" for="input-project-address">{{ project_form.insee.label }}</label>
                             <select required
-                                    :style="cities && cities.length == 0 && postal ? 'background-color:#e9ecef;pointer-events:none;' : '' "
-                                    style="padding: 12px 10px;
-                                           border-radius: 0.25rem;
-                                           min-width: 170px;
-                                           padding-right: 30px"
+                                    :style="cities && cities.length == 0 && postal ? 'background-color:#e9ecef;pointer-events:none;padding: 12px 10px; border-radius: 0.25rem;min-width: 170px;padding-right: 30px;' : 'padding: 12px 10px; border-radius: 0.25rem;min-width: 170px;padding-right: 30px;' "
+                                    style=""
                                     x-ref="insee"
                                     name="insee"
-                                    class="py-3 form-select">
+                                    class="form-select">
                                 <template x-if="cities && cities.length > 0">
                                     <template x-for="city in cities" :key="city.insee">
                                         <option :value="city.insee" x-text="city.name"></option>

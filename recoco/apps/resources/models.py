@@ -169,10 +169,6 @@ class Resource(models.Model):
     def public(self):
         return self.status >= self.TO_REVIEW
 
-    @property
-    def is_dsresource(self):
-        return self.dsresource_set.exists()
-
     created_on = models.DateTimeField(
         default=timezone.now, verbose_name="date de création"
     )

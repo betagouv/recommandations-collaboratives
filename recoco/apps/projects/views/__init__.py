@@ -159,12 +159,12 @@ def project_moderation_accept(request, project_pk):
             join = form.cleaned_data["join"]
 
             if join:
-                # Assign current user as advisor if requested
-                assign_advisor(request.user, project, request.site)
+                # Assign current user as observer if requested
+                assign_observer(request.user, project, request.site)
                 messages.add_message(
                     request,
                     messages.INFO,
-                    f"Vous êtes maintenant conseiller·ère du projet '{project.name}'.",
+                    f"Vous êtes maintenant observateur·rice du projet '{project.name}'.",
                 )
 
         return redirect(reverse("projects-project-detail-overview", args=(project.pk,)))

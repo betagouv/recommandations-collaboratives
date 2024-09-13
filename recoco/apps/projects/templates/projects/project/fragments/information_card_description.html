@@ -9,29 +9,23 @@
         {% endfor %}
     {% else %}
         {% for question in site_config.onboarding_questions.all %}
-            {% project_session_for_survey project site_config.project_survey as session %}
-            {% question_answer session question as answer %}
+            {% question_answer active_project_survey_session question as answer %}
             {% if answer.comment %}
                 <!--Texte libre-->
                 {% include 'projects/project/fragments/information_card_description_details.html' with title=answer.question.text_short content=answer.comment|safe %}
             {% else %}
                 <!--Choix multiples-->
                 {% lookup_choices_from_answer answer as choices %}
-                {% if choices %}
-                    {% if question.is_multiple %}
-                        <!--Réponse multiples-->
-                        <ul>
-                            {% for choice in choices %}<li>{{ choice.conclusion|default:choice.text|capfirst }}</li>{% endfor %}
-                        </ul>
-                    {% else %}
-                        <!--Réponse Unique-->
-                        {% for choice in choices %}
-                            {% include 'projects/project/fragments/information_card_description_details.html' with title=answer.question.text_short content=choice.conclusion|default:choice.text|capfirst %}
-                        {% endfor %}
-                    {% endif %}
+                {% if question.is_multiple %}
+                    <!--Réponse multiples-->
+                    <ul>
+                        {% for choice in choices %}<li>{{ choice.conclusion|default:choice.text|capfirst }}</li>{% endfor %}
+                    </ul>
                 {% else %}
-                    <!--Réponse vide-->
-                    {% include 'projects/project/fragments/information_card_description_details.html' with title=answer.question.text_short content='Non renseigné' %}
+                    <!--Réponse Unique-->
+                    {% for choice in choices %}
+                        {% include 'projects/project/fragments/information_card_description_details.html' with title=answer.question.text_short content=choice.conclusion|default:choice.text|capfirst %}
+                    {% endfor %}
                 {% endif %}
             {% endif %}
             {% if not forloop.last %}<hr class="mt-0">{% endif %}
