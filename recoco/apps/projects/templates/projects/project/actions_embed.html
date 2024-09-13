@@ -27,7 +27,6 @@
     <div class="col-12 mx-auto">
         <div class="row">
             <div class="col">
-                {% include "projects/project/navigation.html" with recommandations=True %}
                 {{ can_administrate|json_script:"canAdministrate" }}
                 {{ user_project_perms|json_script:"userProjectPerms" }}
                 {{ is_switchtender|json_script:"isSwitchtender" }}

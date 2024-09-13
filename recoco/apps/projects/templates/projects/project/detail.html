@@ -24,11 +24,15 @@
     <div class="col-11 pt-3 pb-5 mx-auto">
         <div class="row" style="font-family: 'Marianne', arial, sans-serif;">
             {% block banner %}{% endblock %}
-            {% include 'projects/project/header.html' %}
-            {% if project.status == "DRAFT" and request.user in project.members.all %}
-                {% include 'projects/project/fragments/pending_confirmation_banner.html' %}
-            {% endif %}
-            {% block project_detail %}{% endblock %}
+            {% with request.resolver_match.url_name as url_name %}
+                {% if url_name != "projects-project-detail-recommandations-embed" %}
+                    {% include 'projects/project/header.html' %}
+                    {% if project.status == "DRAFT" and request.user in project.members.all %}
+                        {% include 'projects/project/fragments/pending_confirmation_banner.html' %}
+                    {% endif %}
+                {% endif %}
+                {% block project_detail %}{% endblock %}
+            {% endwith %}
         </div>
     </div>
 {% endblock %}
