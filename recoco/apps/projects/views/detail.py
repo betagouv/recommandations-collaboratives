@@ -12,6 +12,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.forms import formset_factory
 from django.shortcuts import get_object_or_404, redirect, render, reverse
 from django.utils import timezone
+from django.views.decorators.clickjacking import xframe_options_exempt
 
 from recoco import verbs
 from recoco.apps.invites.forms import InviteForm
@@ -201,6 +202,7 @@ def project_actions(request, project_id=None):
 
 
 @login_required
+@xframe_options_exempt
 def project_recommendations_embed(request, project_id=None):
     """Embed recommendation page for given project"""
     project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
