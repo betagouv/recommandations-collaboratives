@@ -201,32 +201,13 @@ def project_actions(request, project_id=None):
 
 
 @login_required
-def project_recommandations(request, project_id=None):
-    """Action page for given project"""
+def project_recommendations_embed(request, project_id=None):
+    """Embed recommendation page for given project"""
     project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
-
-    is_regional_actor = is_regional_actor_for_project(
-        request.site, project, request.user, allow_national=True
-    )
-
-    advising = get_advisor_for_project(request.user, project)
 
     has_perm(request.user, "list_projects", request.site) or has_perm_or_403(
         request.user, "view_tasks", project
     )
-
-    # Set this project as active
-    set_active_project_id(request, project.pk)
-
-    # FIXME check this really been deleted from develop
-    # Mark this project action notifications as read
-    # project_ct = ContentType.objects.get_for_model(project)
-    # task_ct = ContentType.objects.get_for_model(task_models.Task)
-    # task_notifications = request.user.notifications.unread().filter(
-    #     action_object_content_type=task_ct,
-    #     target_content_type=project_ct.pk,
-    #     target_object_id=project.pk,
-    # )  # XXX Bug?
 
     return render(request, "projects/project/actions_embed.html", locals())
 

@@ -107,7 +107,7 @@ urlpatterns = [
     ),
     path(
         r"project/<int:project_id>/recommandations/embed",
-        detail.project_recommandations,
+        detail.project_recommendations_embed,
         name="projects-project-detail-recommandations-embed",
     ),
     path(
