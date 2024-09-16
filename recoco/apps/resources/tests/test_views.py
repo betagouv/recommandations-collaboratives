@@ -410,36 +410,97 @@ def test_update_resource_and_redirect(request, client):
 
 @pytest.mark.django_db
 def test_delete_resource_not_available_for_non_staff_users(client, request):
-    resource = baker.make(models.Resource, sites=[get_current_site(request)])
+    resource = baker.make(models.Resource)
+    our_site = get_current_site(request)
+    resource.sites.add(our_site)
 
     url = reverse("resources-resource-delete", args=[resource.pk])
     with login(client):
         response = client.get(url)
+
     assert response.status_code == 403
 
 
 @pytest.mark.django_db
-def test_delete_resource_available_for_staff(client, request):
-    resource = baker.make(models.Resource, sites=[get_current_site(request)])
+def test_delete_resource_referenced_available_for_staff(client, request):
+    resource = baker.make(models.Resource)
+    our_site = get_current_site(request)
+    resource.sites.add(our_site)
 
     url = reverse("resources-resource-delete", args=(resource.pk,))
     with login(client, groups=["example_com_staff"]):
         response = client.get(url)
+
     assert response.status_code == 200
     assertContains(response, 'form id="form-resource-delete"')
 
 
 @pytest.mark.django_db
-def test_delete_resource_and_redirect(client, request):
-    resource = baker.make(models.Resource, sites=[get_current_site(request)])
+def test_delete_resource_not_referenced_not_available_for_staff(client, request):
+    resource = baker.make(models.Resource)
+    other_site = baker.make(Site)
+    resource.sites.add(other_site)
 
-    assert models.Resource.on_site.count() == 1
+    url = reverse("resources-resource-delete", args=(resource.pk,))
     with login(client, groups=["example_com_staff"]):
-        response = client.post(reverse("resources-resource-delete", args=[resource.pk]))
+        response = client.get(url)
+
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_delete_resource_not_referenced_not_possible_for_staff(client, request):
+    resource = baker.make(models.Resource)
+    other_site = baker.make(Site)
+    resource.sites.add(other_site)
+
+    url = reverse("resources-resource-delete", args=(resource.pk,))
+    with login(client, groups=["example_com_staff"]):
+        response = client.post(url)
+
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_delete_resource_shared_and_redirect(client, request):
+    resource = baker.make(models.Resource)
+    our_site = get_current_site(request)
+    other_site = baker.make(Site)
+    resource.sites.add(our_site)
+    resource.sites.add(other_site)
+
+    assert resource.sites.count() == 2
+
+    url = reverse("resources-resource-delete", args=(resource.pk,))
+    with login(client, groups=["example_com_staff"]):
+        response = client.post(url)
 
     assert response.status_code == 302
 
-    assert models.Resource.on_site.count() == 0
+    resource.refresh_from_db()
+    assert resource.sites.count() == 1
+    assert our_site not in resource.sites.all()
+    assert other_site in resource.sites.all()
+    assert resource.deleted is None
+
+
+@pytest.mark.django_db
+def test_delete_resource_non_shared_and_redirect(client, request):
+    resource = baker.make(models.Resource)
+    our_site = get_current_site(request)
+    resource.sites.add(our_site)
+
+    assert resource.sites.count() == 1
+
+    url = reverse("resources-resource-delete", args=(resource.pk,))
+    with login(client, groups=["example_com_staff"]):
+        response = client.post(url)
+
+    assert response.status_code == 302
+
+    resource.refresh_from_db()
+    assert resource.sites.count() == 0
+    assert resource.deleted is not None
 
 
 #

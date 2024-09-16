@@ -259,19 +259,30 @@ class ResourceDeleteView(UserPassesTestMixin, DeleteView):
     success_url = reverse_lazy("resources-resource-search")
     pk_url_kwarg = "resource_id"
 
-    def delete(self, request, *args, **kwargs):
+    def form_valid(self, form):
         """
-        Call the delete() method on the fetched object and then redirect to the
-        success URL.
+        Dereference the current site from the resource.
+        When no more sites are referenced on the resource
+        then mark it as deleted.
+        Then redirect to the success URL.
         """
-        self.object = self.get_object()
-        success_url = self.get_success_url()
-        self.object.deleted = timezone.now()
+        resource = self.object
+
+        resource.sites.remove(self.request.site)
+
+        if resource.sites.count() == 0:
+            self.object.deleted = timezone.now()
+
         self.object.save()
+        success_url = self.get_success_url()
         return HttpResponseRedirect(success_url)
 
     def test_func(self):
-        return has_perm(self.request.user, "sites.manage_resources", self.request.site)
+        user_has_permissions = has_perm(
+            self.request.user, "sites.manage_resources", self.request.site
+        )
+        site_is_referenced = self.request.site in self.get_object().sites.all()
+        return user_has_permissions and site_is_referenced
 
 
 ########################################################################
