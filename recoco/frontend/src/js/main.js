@@ -1,8 +1,9 @@
 //Bootstrap librairie
-import 'bootstrap/dist/css/bootstrap.min.css';
+// import 'bootstrap/dist/css/bootstrap.min.css';
+import '../css/main.scss';
 import '@gouvfr/dsfr/dist/dsfr.min.css';
 import '@gouvfr/dsfr/dist/utility/utility.min.css';
-import '@gouvfr/dsfr/dist/dsfr.module';
+import '@gouvfr/dsfr/dist/dsfr.module.min';
 
 import 'vite/modulepreload-polyfill';
 import './utils/globals';

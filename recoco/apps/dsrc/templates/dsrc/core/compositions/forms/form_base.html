@@ -3,7 +3,7 @@
 {% block js %}
     <script src="{% static 'assets/js/components/DsrcFormValidator.js' %}"
             type="module"></script>
-{% endblock %}
+{% endblock js %}
 <div x-data="DsrcFormValidator({{ form_id }}, formData)"  x-init="init">
     <form class="fr-mb-0" id="{{ form.id }}">
         {% csrf_token %}
@@ -13,7 +13,8 @@
             <legend class="fr-fieldset__legend" id="{{ form.id }}-fieldset-legend">
                 <h3 class="fr-h5">{{ form.legend }}</h3>
             </legend>
-            {% block form_content %}{% endblock %}
+            {% block form_content %}
+            {% endblock form_content %}
             {% for field in form.visible_fields %}
                 {% dsrc_form_field field %}
             {% endfor %}

@@ -2,6 +2,12 @@
 {% load static %}
 {% load gravatar %}
 {% load activity_tags %}
+{% load sass_tags %}
+{% block css %}
+    <link href="{% sass_src 'projects/css/fragments/timeline/timeline.scss' %}"
+          rel="stylesheet"
+          type="text/css" />
+{% endblock css %}
 {% activity_stream "target" project %}
 {% regroup stream by timestamp.date as stream_by_day %}
 <ul class="list-group">
@@ -9,14 +15,12 @@
         <li class="{% if cropped %}mb-0 {% endif %} list-group-item border-0">
             <span class="small text-secondary">{{ date|naturalday|capfirst }}</span>
             {% for action in actions %}
-                <div class="{% if cropped %}my-1 mb-0 {% else %} my-3 mb-4 {% endif %} py-1 border-start border-4 ps-3">
+                <div class="{% if cropped %}my-1 fr-mb-0 {% else %} fr-my-2w fr-mb-3w {% endif %} fr-py-1v border-start border-4 fr-pl-2w">
                     {% if action.target %}
                         <span class="align-items-center link-dark text-decoration-none">
                             <img src="{% gravatar_url action.actor.email 32 %}"
                                  alt="{{ action.actor.get_full_name }}"
-                                 class="me-1 rounded-circle"
-                                 style="width: 16px;
-                                        height: 16px" />
+                                 class="fr-mr-1v rounded-circle activity-img-specific-size" />
                         </span>
                         <span class="align-middle small">
                             {{ action.actor.get_full_name|capfirst|default:action.actor }}
@@ -37,8 +41,8 @@
             {% endfor %}
         </li>
     {% empty %}
-        <div class="mt-4 bg-light d-flex flex-column justify-content-center align-items-center py-4 rounded">
-            <p class="m-0 text-info-custom text-grey text-center fw-normal">Quelles sont vos actualités sur le dossier ?</p>
+        <div class="fr-mt-3w bg-light d-flex flex-column justify-content-center align-items-center fr-py-3w rounded">
+            <p class="fr-m-0 text-info-custom text-grey text-center fw-normal">Quelles sont vos actualités sur le dossier ?</p>
         </div>
     {% endfor %}
 </ul>

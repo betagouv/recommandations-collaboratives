@@ -26,7 +26,7 @@
 {% endblock tagline %}
 {% block content %}
     <div class="container">
-        <div class="banner mt-6 mb-6 text-center">
+        <div class="banner  text-center">
             {% if site_config.email_logo %}
                 <img src="{{ site_config.email_logo.url }}"
                      width="10%"
@@ -37,7 +37,7 @@
                 <strong>Déposer votre projet</strong> {{ request.site.name }}
             </h1>
         </div>
-        <div class="fr-stepper mb-3">
+        <div class="fr-stepper fr-mb-2w">
             <h2 class="fr-stepper__title">
                 Décrivez votre projet
                 <span class="fr-stepper__state">Étape 2 sur 2</span>

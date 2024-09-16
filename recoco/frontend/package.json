@@ -6,7 +6,7 @@
   "private": true,
   "scripts": {
     "test": "./node_modules/vitest/vitest.mjs",
-    "dev": "vite",
+    "dev": "vite --force",
     "test-server": "vite --port 3001",
     "build": "vite build",
     "preview": "vite preview --port 3000"
@@ -27,7 +27,6 @@
     "bootstrap": "^5.3.3",
     "d3": "^7.8.4",
     "d3-cloud": "^1.2.5",
-    "dsrc_ui": "file:./modules/dsrc_ui",
     "fuse.js": "^7.0.0",
     "intro.js": "^7.0.1",
     "js-cookie": "^3.0.1",

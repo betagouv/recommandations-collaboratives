@@ -4,11 +4,11 @@
 <ul class="list-group">
     {% for action in actions %}
         {% if action.verb == verbs.Project.INVITATION %}
-            {% include 'crm/fragments/action_invite.html' %}
+            {% include "crm/fragments/action_invite.html" %}
         {% else %}
             <li class="d-flex flex-columns list-group-item">
                 {% if action.actor %}
-                    <div class="align-middle mx-2 flex-shrink">
+                    <div class="align-middle fr-mx-2v flex-shrink">
                         <img class="rounded-circle"
                              src="{% gravatar_url action.actor.email size=24 %}"
                              alt="{{ action.actor }}">
@@ -37,13 +37,13 @@
                                 <a href="{{ action.target.get_absolute_url }}">{{ action.target }}</a>
                             </span>
                         {% endif %}
-                        <span class="ms-1 small text-secondary">il y a {{ action.timestamp|timesince }}</span>
+                        <span class="fr-ml-1v small text-secondary">il y a {{ action.timestamp|timesince }}</span>
                     </div>
                     {% if action.action_object.resource %}
-                        <div class="border p-2 rounded bg-white w-100">{{ action.action_object.resource.title }}</div>
+                        <div class="border fr-p-2v rounded bg-white w-100">{{ action.action_object.resource.title }}</div>
                     {% endif %}
                     {% if action.action_object.comment %}
-                        <div class="border p-2 rounded bg-white w-100">
+                        <div class="border fr-p-2v rounded bg-white w-100">
                             "{{ action.action_object.comment }}" à propos de <a href=" {{ action.action_object.task.get_absolute_url }}">{{
                         notification.action_object.task }}</a>
                     </div>

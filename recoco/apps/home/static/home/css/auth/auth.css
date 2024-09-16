@@ -8,3 +8,23 @@
 .max-width-800 {
   max-width: 800px;
 }
+
+.specific-height-1px {
+  height: 1px;
+}
+
+.specific-mb-20px {
+  margin-bottom: 20px;
+}
+
+.specific-backgroundcolor-grey {
+  background-color: grey !important;
+}
+
+.specific-backgroundimage-none {
+  background-image: none;
+}
+
+.span-padding {
+  padding: 11px 10px;
+}

@@ -2,15 +2,17 @@
 {% extends "base.html" %}
 {% load sass_tags %}
 {% load static %}
-{% block title %}Déclaration d'accessibilité{% endblock %}
+{% block title %}
+    Déclaration d'accessibilité
+{% endblock title %}
 {% block css %}
     <link href="{% sass_src 'home/css/home/home.scss' %}"
           rel="stylesheet"
           type="text/css" />
-{% endblock %}
+{% endblock css %}
 <!-- prettier-ignore -->
 {% block content %}
-    <div class="col-8 py-3 g-0 mx-auto">
+    <div class="col-8 fr-py-2w g-0 fr-mx-auto">
         <h1>Schéma pluri-annuel</h1>
         <p>
             <i>Établie le 2 février 2024.</i>
@@ -24,7 +26,7 @@
         </p>
         <ul>
             <li>
-                UrbanVitaliz (<a href="http://www.urbanvitaliz.fr">www.urbanvitaliz.fr</a>)
+                UrbanVitaliz (<a href="https://www.urbanvitaliz.fr">www.urbanvitaliz.fr</a>)
             </li>
             <li>
                 SOSPonts (<a href="https://sosponts.recoconseil.fr">https://sosponts.recoconseil.fr</a>)
@@ -116,4 +118,4 @@
             Enfin, des tests en interne seront menés tout au long des travaux pour valider les critères d’accessibilité prédéfinis, vérifiés sur au moins 2 navigateurs web. Des tests utilisateurs seront réalisés du point de vue de l’accessibilité. Les demandes des usagers sur ce sujet feront l’objet d’une prise en charge prioritaire.
         </p>
     </div>
-{% endblock %}
+{% endblock content %}

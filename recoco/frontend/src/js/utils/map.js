@@ -294,21 +294,21 @@ function markerPopupTemplate({
   title,
 }) {
   const lat = location_x
-    ? `<p data-test-id="project-coord-x-latitude" class="m-0 fs-7 text-capitalize">Lat: ${Number.parseFloat(location_x).toFixed(2)}</p>`
+    ? `<p data-test-id="project-coord-x-latitude" class="fr-m-0 fs-7 text-capitalize">Lat: ${Number.parseFloat(location_x).toFixed(2)}</p>`
     : '';
   const lng = location_y
-    ? `<p data-test-id="project-coord-y-longitude" class="m-0 fs-7 text-capitalize">Lng: ${Number.parseFloat(location_y).toFixed(2)}</p>`
+    ? `<p data-test-id="project-coord-y-longitude" class="fr-m-0 fs-7 text-capitalize">Lng: ${Number.parseFloat(location_y).toFixed(2)}</p>`
     : '';
 
   let popupAddress = '';
   if (address) {
-    popupAddress = `<p class="m-0 fs-7">${address}</p>`;
+    popupAddress = `<p class="fr-m-0 fs-7">${address}</p>`;
   } else if (location) {
-    popupAddress = `<p class="m-0 fs-7">${location}</p>`;
+    popupAddress = `<p class="fr-m-0 fs-7">${location}</p>`;
   }
 
   if (commune) {
-    popupAddress = `${popupAddress}<p class="m-0 fs-7 text-capitalize">${commune.name} (${commune.postal})</p>`;
+    popupAddress = `${popupAddress}<p class="fr-m-0 fs-7 text-capitalize">${commune.name} (${commune.postal})</p>`;
   }
 
   const popupTitle = title ? title : name;

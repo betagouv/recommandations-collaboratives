@@ -22,15 +22,15 @@ main {
   position: absolute;
   z-index: 100;
 
-  left: -200px;
-  top: 112%;
+  width: max-content;
+  right: 0px;
+  top: 80%;
 
   background-color: white;
   box-shadow:
     0px 1px 1px rgba(0, 0, 0, 0.16),
     0px 1px 0px -2px rgba(0, 0, 0, 0.16),
     0px 1px 4px rgba(0, 0, 0, 0.23);
-  border-radius: 4px;
 
   overflow: hidden;
 }
@@ -281,7 +281,7 @@ main {
   gap: 0.8rem;
 }
 
-.project-card-top-information div {
+.project-card-top-information > * {
   padding: 0.25rem 0.5rem;
   color: white;
   font-size: 12px;
@@ -290,20 +290,20 @@ main {
   border-radius: 2px;
 }
 
-.project-card-top-information.advisor div {
+.project-card-top-information.advisor > * {
   background-color: #0063cb;
 }
 
-.project-card-top-information.observer div {
+.project-card-top-information.observer > * {
   background-color: #27a658;
 }
 
-.project-card-top-information.new div {
+.project-card-top-information.new > * {
   background-color: #fdcd6d;
   color: #222;
 }
 
-.project-card-top-information.inactive div {
+.project-card-top-information.inactive > * {
   background-color: #e5e5e5;
   color: #222;
 }

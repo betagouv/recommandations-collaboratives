@@ -2,21 +2,23 @@
 {% load django_vite %}
 {% block js %}
     {% vite_asset 'js/apps/consent.js' %}
-{% endblock %}
+{% endblock js %}
 {% load sass_tags %}
 {% block css %}
     <link href="{% sass_src 'home/css/dsfr/custom-dsfr.scss' %}"
           rel="stylesheet"
           type="text/css">
-{% endblock %}
+    <link href="{% sass_src 'css/consent/banner.scss' %}"
+          rel="stylesheet"
+          type="text/css">
+{% endblock css %}
 <div x-data="Consent">
     <template x-if="!userHasSelectedCookies">
         <div class="fr-consent-banner" data-test-id="fr-consent-banner">
-            <h5 class="title-info mb-2">À propos des cookies sur {{ request.site.name }}</h5>
+            <h5 class="title-info fr-mb-2v">À propos des cookies sur {{ request.site.name }}</h5>
             <div class="fr-consent-banner__content">
                 <p class="custom-text-info">
-                    Bienvenue ! Nous utilisons des cookies pour améliorer votre expérience et les services disponibles sur ce site. Pour en savoir plus, visitez la page <a class="text-decoration-underline"
-    style="color: #335B7E"
+                    Bienvenue ! Nous utilisons des cookies pour améliorer votre expérience et les services disponibles sur ce site. Pour en savoir plus, visitez la page <a class="text-decoration-underline specific-color-335B7E"
     href="{% url "privacy" %}">Données personnelles et cookies</a>. Vous pouvez, à tout moment, avoir le contrôle sur les cookies que vous souhaitez activer.
                 </p>
             </div>
@@ -27,7 +29,7 @@
                             data-test-id="button-consent-accept-all"
                             title="Autoriser tous les cookies">Tout accepter</button>
                 </li>
-                <li class="mx-2">
+                <li class="fr-mx-2v">
                     <button @click="handleRejectAllCookies('{% url 'cookie_consent_decline_all' %}')"
                             data-test-id="button-consent-decline-all"
                             class="button small"
@@ -35,8 +37,7 @@
                 </li>
                 <li>
                     <a href="/cookies/"
-                       style="color: #335B7E"
-                       class="text-decoration-underline">Personnaliser</a>
+                       class="text-decoration-underline specific-color-335B7E">Personnaliser</a>
                 </li>
             </ul>
         </div>
