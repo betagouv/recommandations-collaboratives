@@ -388,6 +388,54 @@ def test_project_actions_available_for_restricted_switchtender(
     assert response.status_code == 200
 
 
+@pytest.mark.django_db
+def test_project_recommandations_not_available_for_non_switchtender(request, client):
+    project = Recipe(models.Project, sites=[get_current_site(request)]).make()
+    url = reverse("projects-project-detail-recommandations-embed", args=[project.id])
+    with login(client):
+        response = client.get(url)
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_project_recommandations_available_for_owner(request, client, project):
+    with login(client) as user:
+        utils.assign_collaborator(user, project)
+        url = reverse(
+            "projects-project-detail-recommandations-embed", args=[project.id]
+        )
+        response = client.get(url)
+    assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_project_recommandations_available_for_switchtender(request, client, project):
+    site = get_current_site(request)
+    url = reverse("projects-project-detail-recommandations-embed", args=[project.id])
+    with login(client, groups=["example_com_advisor"]) as user:
+        utils.assign_advisor(user, project, site)
+        response = client.get(url)
+    assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_project_recommandations_available_for_restricted_switchtender(
+    request, client, make_project
+):
+    other = Recipe(geomatics.Department, code="02").make()
+    site = get_current_site(request)
+    project = make_project(
+        commune__departments__code="01",
+        site=site,
+    )
+    url = reverse("projects-project-detail-recommandations-embed", args=[project.id])
+    with login(client, groups=["example_com_advisor"]) as user:
+        utils.assign_advisor(user, project, site)
+        user.profile.departments.add(other)
+        response = client.get(url)
+    assert response.status_code == 200
+
+
 # conversations
 @pytest.mark.django_db
 def test_project_conversations_not_available_for_unprivileged_user(request, client):
