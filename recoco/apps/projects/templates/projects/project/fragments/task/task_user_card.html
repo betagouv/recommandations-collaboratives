@@ -13,8 +13,8 @@
      class="user-card position-relative d-flex fr-my-1v flex-column justify-content-between align-items-start">
     <div class="position-relative d-flex align-items-center justify-content-between">
         <div x-ref="user"
-             @click.stop="onUserClick"
-             class="d-flex align-items-center flex-wrap user-info">
+             {% if embed_view is not True %}@click.stop="onUserClick"{% endif %}
+             class="d-flex align-items-center flex-wrap {% if embed_view is not True %}user-info{% endif %}">
             <span class="fr-mr-1v d-flex align-items-center font-very-small">
                 <img class="rounded-circle d-inline-block"
                      width="20px"

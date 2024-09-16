@@ -53,7 +53,9 @@
     </head>
     {% with request.resolver_match.url_name as url_name %}
         <body class="bg-light">
-            {% include "consent/banner.html" %}
+            {% if url_name != "projects-project-detail-recommandations-embed" %}
+                {% include "consent/banner.html" %}
+            {% endif %}
             <h1 class="visually-hidden">{{ request.site.name }}</h1>
             {% if url_name != "projects-project-detail-recommandations-embed" %}
                 {% include "header/menu-top.html" %}
