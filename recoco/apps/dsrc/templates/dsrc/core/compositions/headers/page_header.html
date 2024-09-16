@@ -2,10 +2,14 @@
     <div class="fr-grid-row fr-grid-row--gutters fr-grid-row--center">
         <div class="fr-col-12 fr-col-md-10 fr-col-lg-8">
             <h1 class="fr-h2">
-                {% block page_title %}{{ title }}{% endblock %}
+                {% block page_title %}
+                    {{ title }}
+                {% endblock page_title %}
             </h1>
             <p class="fr-text--lead">
-                {% block lead %}{{ lead }}{% endblock %}
+                {% block lead %}
+                    {{ lead }}
+                {% endblock lead %}
             </p>
         </div>
     </div>

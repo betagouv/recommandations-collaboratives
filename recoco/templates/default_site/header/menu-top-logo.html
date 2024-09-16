@@ -1,54 +1,63 @@
 {% load static %}
+{% load sass_tags %}
+{% block css %}
+    <link href="{% sass_src 'css/header/header.scss' %}"
+          rel="stylesheet"
+          type="text/css">
+{% endblock css %}
 {% if user.is_authenticated and request.site.configuration.logo_small %}
-     <a href="{% url 'home' %}"
-        class="d-flex align-middle align-items-center">
-          <img class="logo-{{ request.site.name|lower }}"
-               src="{{ request.site.configuration.logo_small.url }}"
-               width="auto"
-               height="40px"
-               alt="logo {{ request.site.name }} - lien retour page accueil" />
-     </a>
+    <a href="{% url 'home' %}"
+       class="d-flex align-middle align-items-center">
+        <img class="logo-{{ request.site.name|lower }}"
+             src="{{ request.site.configuration.logo_small.url }}"
+             width="auto"
+             height="40px"
+             alt="logo {{ request.site.name }} - lien retour page accueil" />
+    </a>
 {% elif user.is_authenticated %}
-     <a href="{% url 'home' %}" class="d-flex align-middle align-items-center text-dark">
-          <span class="fw-bold" style="font-size: 30px;">{{ request.site.name }}</span>
-     </a>
+    <a href="{% url 'home' %}"
+       class="d-flex align-middle align-items-center">
+        <span class="fw-bold span-specific-fontsize-30 specific-ml-30">{{ request.site.name }}</span>
+    </a>
 {% elif not user.is_authenticated and request.site.configuration.logo_large %}
-     <div class="navbar-logo">
-          <button class="toggler-secondary"
-                  type="button"
-                  data-bs-toggle="collapse"
-                  data-bs-target="#secondary-navbar"
-                  aria-controls="secondary-navbar"
-                  aria-expanded="false"
-                  aria-label="Ouvrir le Menu"
-                  data-test-id="toggler-secondary-menu">
-               <span class="navbar-toggler-icon"></span>
-          </button>
-          <a href="{% url 'home' %}"
-             class="d-flex align-middle p-3 align-items-center">
-             {% include 'header/menu-top-logo-supp.html' %}
-               <img class="logo-{{ request.site.name|lower }}"
-                    src="{{ request.site.configuration.logo_large.url }}"
-                    width="auto"
-                    height="60px"
-                    alt="logo {{ request.site.name }} - lien retour page accueil" />
-          </a>
-     </div>
+    <div class="navbar-logo">
+        <button class="toggler-secondary"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#secondary-navbar"
+                aria-controls="secondary-navbar"
+                aria-expanded="false"
+                aria-label="Ouvrir le Menu"
+                data-test-id="toggler-secondary-menu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <a href="{% url 'home' %}"
+           class="d-flex align-middle fr-p-2w align-items-center">
+            {% include 'header/menu-top-logo-supp.html' %}
+            <img class="logo-{{ request.site.name|lower }}"
+                 src="{{ request.site.configuration.logo_large.url }}"
+                 width="auto"
+                 height="40px"
+                 alt="logo {{ request.site.name }} - lien retour page accueil" />
+            <span class="fw-bold span-specific-fontsize-30 specific-ml-30">{{ request.site.name }}</span>
+        </a>
+    </div>
 {% else %}
-     <div class="navbar-logo">
-          <button class="toggler-secondary"
-               type="button"
-               data-bs-toggle="collapse"
-               data-bs-target="#secondary-navbar"
-               aria-controls="secondary-navbar"
-               aria-expanded="false"
-               aria-label="Ouvrir le Menu"
-               data-test-id="toggler-secondary-menu">
-               <span class="navbar-toggler-icon"></span>
-          </button>
-          <a href="{% url 'home' %}" class="d-flex align-middle p-3 align-items-center text-dark">
-               {% include 'header/menu-top-logo-supp.html' %}
-               <span class="fw-bold" style="font-size: 30px;">{{ request.site.name }}</span>
-          </a>
-     </div>
+    <div class="navbar-logo">
+        <button class="toggler-secondary"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#secondary-navbar"
+                aria-controls="secondary-navbar"
+                aria-expanded="false"
+                aria-label="Ouvrir le Menu"
+                data-test-id="toggler-secondary-menu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <a href="{% url 'home' %}"
+           class="d-flex align-middle fr-p-2w align-items-center">
+            {% include 'header/menu-top-logo-supp.html' %}
+            <span class="fw-bold span-specific-fontsize-30 specific-ml-30">{{ request.site.name }}</span>
+        </a>
+    </div>
 {% endif %}

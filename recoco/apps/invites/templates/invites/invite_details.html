@@ -2,13 +2,14 @@
 {% load humanize %}
 {% load static %}
 {% load sass_tags %}
-{% block css %}{% endblock %}
-{% block title %}{{ site.name }} | Invitation à rejoindre le projet {{ invite.project.name }}{% endblock %}
+{% block title %}
+    {{ site.name }} | Invitation à rejoindre le projet {{ invite.project.name }}
+{% endblock title %}
 {% block content %}
-    <div class="col-10 py-5 mx-auto">
+    <div class="col-10 fr-py-6w fr-mx-auto">
         <span class="fs-4">Vous êtes invité·e sur le projet</span>
         <h4 class="fw-bolder">{{ invite.project.name }}</h4>
-        <div class="mt-3">
+        <div class="fr-mt-2w">
             <strong>{{ invite.inviter.get_full_name }}</strong> vous invite à contribuer
             sur le projet <strong>{{ invite.project.name }}</strong> en tant
             que <strong>{{ invite.get_role_display }}</strong>.
@@ -16,9 +17,9 @@
         <div class="row">
             <div class="col-7">
                 {% if not existing_account %}<h5>Créez votre compte {{ site.name }}</h5>{% endif %}
-                <form class="form mt-4"
+                <form class="form fr-mt-3w"
                       action="{% url 'invites-invite-accept' invite.pk %}"
-                      method="POST">
+                      method="post">
                     {% csrf_token %}
                     {% if not existing_account %}
                         <label class="form-label" for="email">Adresse courriel</label>
@@ -29,7 +30,7 @@
                                disabled>
                         <div class="row">
                             <div class="col-6">
-                                <div class="my-3">
+                                <div class="fr-my-2w">
                                     <label class="form-label" for="input-first-name">Prénom</label>
                                     <input type="text"
                                            class="form-control {% if form.first_name.errors %}is-invalid{% endif %}"
@@ -42,7 +43,7 @@
                                 </div>
                             </div>
                             <div class="col-6">
-                                <div class="my-3">
+                                <div class="fr-my-2w">
                                     <label class="form-label" for="input-last-name">Nom</label>
                                     <input type="text"
                                            class="form-control {% if form.last_name.errors %}is-invalid{% endif %}"
@@ -57,7 +58,7 @@
                         </div>
                         <div class="row">
                             <div class="col-6">
-                                <div class="my-2">
+                                <div class="fr-my-2v">
                                     <label class="form-label" for="input-organization">Organisation</label>
                                     <input type="text"
                                            class="form-control {% if form.organization.errors %}is-invalid{% endif %}"
@@ -70,7 +71,7 @@
                                 </div>
                             </div>
                             <div class="col-6">
-                                <div class="my-2">
+                                <div class="fr-my-2v">
                                     <label class="form-label" for="input-position">Fonction</label>
                                     <input type="text"
                                            class="form-control {% if form.position.errors %}is-invalid{% endif %}"
@@ -84,18 +85,18 @@
                             </div>
                         </div>
                     {% endif %}
-                    <button class="my-2 btn btn-primary" type="submit">Accepter l'invitation</button>
+                    <button class="fr-my-2v btn btn-primary" type="submit">Accepter l'invitation</button>
                 </form>
             </div>
             <div class="col-4">
                 {% if invite.message %}
-                    <div class="bg-light p-3">
+                    <div class="bg-light fr-p-2w">
                         <h6 class="fw-bolder">Message de l'utilisateur</h6>
                         <p>{{ invite.message }}</p>
                         <p>-- {{ invite.inviter.get_full_name }}</p>
                     </div>
                 {% endif %}
-                <div class="bg-light p-3 my-2">
+                <div class="bg-light fr-p-2w fr-my-2v">
                     <h6 class="fw-bolder">Qu'est ce que {{ request.site.name }} ?</h6>
                     {% include "invites/invite_site_message.html" %}
                     <p>
@@ -105,4 +106,4 @@
             </div>
         </div>
     </div>
-{% endblock %}
+{% endblock content %}

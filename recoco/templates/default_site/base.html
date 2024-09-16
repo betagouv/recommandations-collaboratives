@@ -36,7 +36,7 @@
 
             </script>
         {% endif %}
-        {% include 'seo.html' %}
+        {% include "seo.html" %}
         <link href="{% sass_src 'css/base.scss' %}"
               rel="stylesheet"
               type="text/css">
@@ -47,12 +47,13 @@
               rel="stylesheet"
               type="text/css">
         <!-- Extra CSS -->
-        {% block css %}{% endblock %}
-        {% include 'favicon.html' %}
+        {% block css %}
+        {% endblock css %}
+        {% include "favicon.html" %}
     </head>
     {% with request.resolver_match.url_name as url_name %}
         <body class="bg-light">
-            {% include 'consent/banner.html' %}
+            {% include "consent/banner.html" %}
             <h1 class="visually-hidden">{{ request.site.name }}</h1>
             {% if url_name != "projects-project-detail-recommandations-embed" %}
                 {% include "header/menu-top.html" %}
@@ -67,29 +68,28 @@
                 </div>
                 {% if messages %}
                     <div id="notification-container"
-                         class="position-fixed bottom-0 end-0 p-3"
-                         style="z-index: 11">
+                         class="position-fixed bottom-0 end-0 fr-p-2w z-2">
                         {% for message in messages %}
                             <div class="toast" role="alert" aria-live="assertive" aria-atomic="true">
                                 <div class="toast-header {% if message.level == DEFAULT_MESSAGE_LEVELS.SUCCESS %}bg-success text-white{% endif %} {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}bg-error text-white{% endif %}">
                                     {% if "email" in message.tags %}
-                                        <strong class="me-auto">
-                                            <svg class="bi me-1" width="16" height="16" fill="currentColor">
+                                        <strong class="fr-mr-auto">
+                                            <svg class="bi fr-mr-1v" width="16" height="16" fill="currentColor">
                                                 <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#envelope" />
                                             </svg>
                                             &nbsp;
                                             <span class="align-middle">Courriel envoyé !</span>
                                         </strong>
                                     {% elif "auth" in message.tags %}
-                                        <strong class="me-auto">
-                                            <svg class="bi me-1" width="16" height="16" fill="currentColor">
+                                        <strong class="fr-mr-auto">
+                                            <svg class="bi fr-mr-1v" width="16" height="16" fill="currentColor">
                                                 <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#lock" />
                                             </svg>
                                             &nbsp;
                                             <span class="align-middle">Gestion des droits</span>
                                         </strong>
                                     {% else %}
-                                        <strong class="me-auto">Notification</strong>
+                                        <strong class="fr-mr-auto">Notification</strong>
                                     {% endif %}
                                     <small></small>
                                     <button type="button"
@@ -105,10 +105,11 @@
                 <!--             <div class="b-page-divider"></div> -->
                 <div class="container-fluid bg-white">
                     <div class="row background--grey-light">
-                        {% block content %}{% endblock %}
+                        {% block content %}
+                        {% endblock content %}
                     </div>
                     {% if url_name != "projects-project-detail-recommandations-embed" %}
-                        <div class="row justify-content-center">{% include 'footer.html' %}</div>
+                        <div class="row justify-content-center">{% include "footer.html" %}</div>
                     {% endif %}
                 </div>
             </main>
@@ -133,7 +134,8 @@
              $('.toast').toast('show');
          });
             </script>
-            {% block js %}{% endblock %}
+            {% block js %}
+            {% endblock js %}
         </body>
     {% endwith %}
 </html>

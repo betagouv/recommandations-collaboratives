@@ -3,7 +3,9 @@
 {% load sass_tags %}
 {% load cookie_consent_tags %}
 {% load static %}
-{% block title %}Politique de confidentialité{% endblock %}
+{% block title %}
+    Politique de confidentialité
+{% endblock title %}
 {% block css %}
     <link href="{% sass_src 'home/css/home/home.scss' %}"
           rel="stylesheet"
@@ -11,11 +13,14 @@
     <link href="{% sass_src 'home/css/dsfr/custom-dsfr.scss' %}"
           rel="stylesheet"
           type="text/css">
-{% endblock %}
+    <link href="{% sass_src 'home/css/privacy/privacy.scss' %}"
+          rel="stylesheet"
+          type="text/css">
+{% endblock css %}
 {% block content %}
-    <div class="col-8 mt-4 py-3 g-0 mx-auto font-marianne">
+    <div class="col-8 fr-mt-3w fr-py-2w g-0 fr-mx-auto font-marianne">
         <h2>Politique de confidentialité de {{ request.site.name }}</h2>
-        <p class="mt-4 mb-2">
+        <p class="fr-mt-3w fr-mb-2v">
             <strong>Qui est responsable de {{ request.site.name }} ?</strong>
         </p>
         <p>
@@ -28,7 +33,7 @@
             Le responsable de l’utilisation des données est le CEREMA représenté par Pascal Berteaud,
             directeur général du CEREMA.
         </p>
-        <p class="mt-4 mb-2">
+        <p class="fr-mt-3w fr-mb-2v">
             <strong>Pourquoi manipulons-nous ces données ?</strong>
         </p>
         <p>{{ request.site.name }} manipule des données à caractère personnelles pour les raisons suivantes :</p>
@@ -45,7 +50,7 @@
                 </li>
             </ul>
         </p>
-        <p class="mt-4 mb-2">
+        <p class="fr-mt-3w fr-mb-2v">
             <strong>Quelles sont les données que nous manipulons ?</strong>
         </p>
         <p>{{ request.site.name }} manipule les données personnelles suivantes :</p>
@@ -57,7 +62,7 @@
                 <li>Numéro de téléphone</li>
             </ul>
         </p>
-        <p class="mt-4 mb-2">
+        <p class="fr-mt-3w fr-mb-2v">
             <strong>Qu’est-ce qui nous autorise à manipuler ces données ?</strong>
         </p>
         <p>{{ request.site.name }} manipule des données personnelles en se basant sur :</p>
@@ -75,10 +80,10 @@
                 </li>
             </ul>
         </p>
-        <p class="mt-4 mb-2">
+        <p class="fr-mt-3w fr-mb-2v">
             <strong>Pendant combien de temps conservons-nous ces données ?</strong>
         </p>
-        <div class="d-flex justify-content-between border p-2">
+        <div class="d-flex justify-content-between border fr-p-2v">
             <p class=" w-50">
                 <strong>Données de contact :</strong>
                 <br />
@@ -90,7 +95,7 @@
                 2 ans à compter de la fin du projet de réhabilitation de lafriche.
             </p>
         </div>
-        <p class="mt-4 mb-2">
+        <p class="fr-mt-3w fr-mb-2v">
             <strong>Quels droits avez-vous ?</strong>
         </p>
         <p>
@@ -124,7 +129,7 @@
             Nous nous engageons à vous répondre dans un délai raisonnable qui ne saurait dépasser 1
             mois à compter de la réception de votre demande.
         </p>
-        <p class="mt-4 mb-2">
+        <p class="fr-mt-3w fr-mb-2v">
             <strong>Qui va avoir accès à ces données ?</strong>
         </p>
         <p>
@@ -140,7 +145,7 @@
                 <li>Les conseillers publics (DDT, DREAL, EPF) ?</li>
             </ul>
         </p>
-        <p class="mt-4 mb-2">
+        <p class="fr-mt-3w fr-mb-2v">
             <strong>Quelles mesures de sécurité mettons-nous en place ?</strong>
         </p>
         <p>
@@ -159,7 +164,7 @@
                 <li>Mesures restrictives limitant l’accès physiques aux données à caractère personnel</li>
             </ul>
         </p>
-        <p class="mt-4 mb-2">
+        <p class="fr-mt-3w fr-mb-2v">
             <strong>Qui nous aide à manipuler les données ?</strong>
         </p>
         <p>
@@ -167,33 +172,33 @@
             pour qu’ils nous aident à les manipuler. Nous nous assurons qu’ils respectent strictement le
             RGPD et qu’ils apportent des garanties suffisantes en matière de sécurité.
         </p>
-        <div class="d-flex border mt-4">
-            <div class="d-flex flex-column" style="border-right: 1px solid #dee2e6;">
-                <p class="p-2" style="border-bottom: 1px solid #dee2e6;height: 70px;">Sous-traitant</p>
-                <p class="p-2"style="border-bottom: 1px solid #dee2e6;height: 200px">[Nom]</p>
-                <p class="p-2">AlwaysData</p>
+        <div class="d-flex border fr-mt-3w">
+            <div class="d-flex flex-column privacy-div">
+                <p class="fr-p-2v p-in-dev-1">Sous-traitant</p>
+                <p class="fr-p-2v p-in-dev-2">[Nom]</p>
+                <p class="fr-p-2v ">AlwaysData</p>
             </div>
-            <div class="d-flex flex-column" style="border-right: 1px solid #dee2e6;">
-                <p class="p-2" style="border-bottom: 1px solid #dee2e6;height: 70px;">Pays destinataire</p>
-                <p class="p-2" style="border-bottom: 1px solid #dee2e6;height: 200px">[Lieu de manipulatio n des données]</p>
-                <p class="p-2">France</p>
+            <div class="d-flex flex-column privacy-div">
+                <p class="fr-p-2v p-in-dev-1">Pays destinataire</p>
+                <p class="fr-p-2v p-in-dev-2">[Lieu de manipulatio n des données]</p>
+                <p class="fr-p-2v">France</p>
             </div>
-            <div class="d-flex flex-column" style="border-right: 1px solid #dee2e6;">
-                <p class="p-2"style="border-bottom: 1px solid #dee2e6; height: 70px;">Traitement réalisé</p>
-                <p class="p-2"style="border-bottom: 1px solid #dee2e6;height: 200px">
-                    [Mission du sous-traitant : hébergement , envoi d&#39;emails, création de formulaire, cookies…]
+            <div class="d-flex flex-column privacy-div">
+                <p class="fr-p-2v p-in-dev-1">Traitement réalisé</p>
+                <p class="fr-p-2v p-in-dev-2">
+                    [Mission du sous-traitant : hébergement , envoi d'emails, création de formulaire, cookies…]
                 </p>
-                <p class="p-2">Hébergement des données</p>
+                <p class="fr-p-2v">Hébergement des données</p>
             </div>
-            <div class="d-flex flex-column" style="border-right: 1px solid #dee2e6;">
-                <p class="p-2" style="border-bottom: 1px solid #dee2e6;height: 70px;">Garanties</p>
-                <p class="p-2" style="border-bottom: 1px solid #dee2e6;height: 200px">
+            <div class="d-flex flex-column privacy-div">
+                <p class="fr-p-2v p-in-dev-1">Garanties</p>
+                <p class="fr-p-2v p-in-dev-2">
                     [Lien vers la politique de confidentialité du sous-traitant, vers un contrat, ou vers toute mesure qui prouve sa conformité au RGPD]
                 </p>
-                <p class="p-2">https://www.alwaysdata.com/en/contract/16/</p>
+                <p class="fr-p-2v">https://www.alwaysdata.com/en/contract/16/</p>
             </div>
         </div>
-        <p class="mt-4 mb-2">
+        <p class="fr-mt-3w fr-mb-2v">
             <strong>Cookies</strong>
         </p>
         <p>
@@ -215,9 +220,9 @@
             <br />
             <br />
             Ce consentement de la personne concernée pour une ou plusieurs finalités spécifiques
-            constitue une base légale au sens du RGPD et doit être entendu au sens de l&#39;article 6-a du
+            constitue une base légale au sens du RGPD et doit être entendu au sens de l'article 6-a du
             Règlement (UE) 2016/679 du Parlement européen et du Conseil du 27 avril 2016 relatif à la
-            protection des personnes physiques à l&#39;égard du traitement des données à caractère personnel
+            protection des personnes physiques à l'égard du traitement des données à caractère personnel
             et à la libre circulation de ces données.
             <br />
             <br />
@@ -231,99 +236,35 @@
             <br />
             <br />
         </p>
-        <div class="d-flex border mt-4">
-            <div class="d-flex flex-column w-25"
-                 style="border-right: 1px solid #dee2e6">
-                <p class="p-2 bg-light"
-                   style="border-bottom: 1px solid #dee2e6;
-                          height: 70px;
-                          word-break: break-all">Nom du cookie</p>
-                <p class="p-2"
-                   style="border-bottom: 1px solid #dee2e6;
-                          height: 100px;
-                          word-break: break-all">SessionId</p>
-                <p class="p-2"
-                   style="border-bottom: 1px solid #dee2e6;
-                          height: 100px;
-                          word-break: break-all">Csrftoken</p>
-                <p class="p-2"
-                   style="border-bottom: 1px solid #dee2e6;
-                          height: 100px;
-                          word-break: break-all">Posthog</p>
-                <p class="p-2"
-                   style="border-bottom: 1px solid #dee2e6;
-                          height: 100px;
-                          word-break: break-all">www.youtube.com</p>
+        <div class="d-flex border fr-mt-3w">
+            <div class="d-flex flex-column w-25 privacy-div">
+                <p class="fr-p-2v bg-light text-break p-in-dev-1">Nom du cookie</p>
+                <p class="fr-p-2v text-break p-in-dev-3">SessionId</p>
+                <p class="fr-p-2v text-break p-in-dev-3">Csrftoken</p>
+                <p class="fr-p-2v text-break p-in-dev-3">Posthog</p>
+                <p class="fr-p-2v text-break p-in-dev-3">www.youtube.com</p>
             </div>
-            <div class="d-flex flex-column w-25"
-                 style="border-right: 1px solid #dee2e6">
-                <p class="p-2 bg-light"
-                   style="border-bottom: 1px solid #dee2e6;
-                          height: 70px;
-                          word-break: break-all">Finalités</p>
-                <p class="p-2"
-                   style="border-bottom: 1px solid #dee2e6;
-                          height: 100px;
-                          word-break: break-all">Identifiant de session</p>
-                <p class="p-2"
-                   style="border-bottom: 1px solid #dee2e6;
-                          height: 100px;
-                          word-break: break-all">Cross Site Request Forgery cookie</p>
-                <p class="p-2"
-                   style="border-bottom: 1px solid #dee2e6;
-                          height: 100px;
-                          word-break: break-all">Plateforme moderne de tracking numérique</p>
-                <p class="p-2"
-                   style="border-bottom: 1px solid #dee2e6;
-                          height: 100px;
-                          word-break: break-all">tracking de média</p>
+            <div class="d-flex flex-column w-25 privacy-div">
+                <p class="fr-p-2v bg-light text-break p-in-dev-1">Finalités</p>
+                <p class="fr-p-2v text-break p-in-dev-3">Identifiant de session</p>
+                <p class="fr-p-2v text-break p-in-dev-3">Cross Site Request Forgery cookie</p>
+                <p class="fr-p-2v text-break p-in-dev-3">Plateforme moderne de tracking numérique</p>
+                <p class="fr-p-2v text-break p-in-dev-3">tracking de média</p>
             </div>
-            <div class="d-flex flex-column w-25"
-                 style="border-right: 1px solid #dee2e6">
-                <p class="p-2 bg-light"
-                   style="border-bottom: 1px solid #dee2e6;
-                          height: 70px;
-                          word-break: break-all">Hébergement</p>
-                <p class="p-2"
-                   style="border-bottom: 1px solid #dee2e6;
-                          height: 100px;
-                          word-break: break-all">{{ request.site.name }}</p>
-                <p class="p-2"
-                   style="border-bottom: 1px solid #dee2e6;
-                          height: 100px;
-                          word-break: break-all">{{ request.site.name }}</p>
-                <p class="p-2"
-                   style="border-bottom: 1px solid #dee2e6;
-                          height: 100px;
-                          word-break: break-all">USA</p>
-                <p class="p-2"
-                   style="border-bottom: 1px solid #dee2e6;
-                          height: 100px;
-                          word-break: break-all">USA</p>
+            <div class="d-flex flex-column w-25 privacy-div">
+                <p class="fr-p-2v bg-light text-break p-in-dev-1">Hébergement</p>
+                <p class="fr-p-2v text-break p-in-dev-3">{{ request.site.name }}</p>
+                <p class="fr-p-2v text-break p-in-dev-3">{{ request.site.name }}</p>
+                <p class="fr-p-2v text-break p-in-dev-3">USA</p>
+                <p class="fr-p-2v text-break p-in-dev-3">USA</p>
             </div>
-            <div class="d-flex flex-column w-25"
-                 style="border-right: 1px solid #dee2e6">
-                <p class="p-2 bg-light"
-                   style="border-bottom: 1px solid #dee2e6;
-                          height: 70px;
-                          word-break: break-all">Garanties</p>
-                <p class="p-2"
-                   style="border-bottom: 1px solid #dee2e6;
-                          height: 100px;
-                          word-break: break-all">{{ request.site.name }}</p>
-                <p class="p-2"
-                   style="border-bottom: 1px solid #dee2e6;
-                          height: 100px;
-                          word-break: break-all">{{ request.site.name }}</p>
-                <p class="p-2"
-                   style="border-bottom: 1px solid #dee2e6;
-                          height: 100px;
-                          word-break: break-all">https://app.posthog.com</p>
-                <p class="p-2"
-                   style="border-bottom: 1px solid #dee2e6;
-                          height: 100px;
-                          word-break: break-all">https://policies.google.com/privacy</p>
+            <div class="d-flex flex-column w-25 privacy-div">
+                <p class="fr-p-2v bg-light p-in-dev-1 text-break">Garanties</p>
+                <p class="fr-p-2v p-in-dev-3 text-break">{{ request.site.name }}</p>
+                <p class="fr-p-2v p-in-dev-3 text-break">{{ request.site.name }}</p>
+                <p class="fr-p-2v p-in-dev-3 text-break">https://app.posthog.com</p>
+                <p class="fr-p-2v p-in-dev-3 text-break">https://policies.google.com/privacy</p>
             </div>
         </div>
     </div>
-{% endblock %}
+{% endblock content %}

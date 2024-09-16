@@ -1,37 +1,56 @@
 .link-edit {
-    color: black;
+  color: black;
 }
-
 
 .next-arrow {
-    transition-property: transform;
-    transition-duration: 0.3s;
+  transition-property: transform;
+  transition-duration: 0.3s;
 }
 .answer:hover {
-    .next-arrow {
-        transform: translateX(5px);
-    }
+  .next-arrow {
+    transform: translateX(5px);
+  }
 }
 
-
 .survey-card {
-    .q-progress {
-        height: 5px;
+  .q-progress {
+    height: 5px;
 
-        span:first-of-type {
-            margin-left: 0 !important;
-        }
-
-        .done {
-
-        }
-
-        .todo {
-            background-color: #eee;
-        }
+    span:first-of-type {
+      margin-left: 0 !important;
     }
 
-    h6 {
-        letter-spacing: 0.1em !important;
+    .done {
     }
+
+    .todo {
+      background-color: #eee;
+    }
+  }
+
+  h6 {
+    letter-spacing: 0.1em !important;
+  }
+}
+
+.specific-height-100px {
+  height: 100px;
+}
+
+.specific-background-5DC2B0 {
+  background: #5dc2b0;
+}
+
+.specific-border-solid5pxWhite {
+  border-left: 5px solid white;
+  border-radius: 2px;
+}
+
+.specific-pl-20 {
+  padding-left: 20px;
+}
+
+.specific-h5 {
+  line-height: 120%;
+  letter-spacing: 0.2em;
 }
