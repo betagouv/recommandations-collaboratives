@@ -57,6 +57,7 @@ const config = {
         projectEmailReminder: resolve('./src/js/apps/projectEmailReminder.js'),
         mapEditor: resolve('./src/js/apps/mapEditor.js'),
         menuNotification: resolve('./src/js/apps/menuNotification.js'),
+        actionsEmbed: resolve('./src/js/apps/actionsEmbed.js'),
       },
       output: {
         chunkFileNames: undefined,
