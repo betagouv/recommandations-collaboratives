@@ -11,8 +11,8 @@
 {% get_obj_perms request.user for project as "user_project_perms" %}
 <div x-data="Task(task)"
      :class="`border${getTaskColor(task)}`"
-     class="rounded fr-mb-2w fr-px-2w d-flex fr-pt-2w fr-pb-2w justify-content-between align-items-start task-item cursor-pointer hover-shadow hover-border-blue transition-all"
-     @click="handleOpenPreviewModal()"
+     class="rounded fr-mb-2w fr-px-2w d-flex fr-pt-2w fr-pb-2w justify-content-between align-items-start task-item {% if embed_view is not True %}cursor-pointer{% endif %} hover-shadow hover-border-blue transition-all"
+     {% if embed_view is not True %}@click="handleOpenPreviewModal()"{% endif %}
      :id="task.id">
     <div x-show="task.isLoading"
          class="fr-ml-2v item-loader z-1 specific-size">
@@ -53,8 +53,10 @@
                         x-text="task.intent"></h4>
                 </div>
             </div>
-            {% if "manage_tasks" in user_project_perms and not disable_edit %}
-                {% include "projects/project/fragments/task/task_actions.html" %}
+            {% if embed_view is not True %}
+                {% if "manage_tasks" in user_project_perms and not disable_edit %}
+                    {% include "projects/project/fragments/task/task_actions.html" %}
+                {% endif %}
             {% endif %}
         </div>
         {% if embed_view is not True %}
@@ -109,12 +111,12 @@
                 {% endif %}
                 <div class="text-grey-dark d-flex align-items-center tiny fr-mr-2w responsive-flex-column">
                     <span class="fr-icon-chat-2-line fr-icon--sm fr-mr-1v" aria-hidden="true"></span>
-                    <span class="tiny hover-underline cursor-pointer"
-                          @click="handleOpenPreviewModal()"
+                    <span class="tiny {% if embed_view is not True %}hover-underline cursor-pointer{% endif %}"
+                          {% if embed_view is not True %}@click="handleOpenPreviewModal()"{% endif %}
                           x-text="task.resource_id ? getTaskMessageCountLabel(task.comments_count + 1) : getTaskMessageCountLabel(task.comments_count)"></span>
                     <template x-if="task.notifications.count > 0">
-                        <span class="tiny hover-underline cursor-pointer text-blue fw-medium fr-ml-1v"
-                              @click="handleOpenPreviewModal()"
+                        <span class="tiny {% if embed_view is not True %}hover-underline cursor-pointer{% endif %} text-blue fw-medium fr-ml-1v"
+                              {% if embed_view is not True %}@click="handleOpenPreviewModal()"{% endif %}
                               x-text="task.resource_id ? getTaskNewMessageCountLabel(task.notifications.count) : getTaskNewMessageCountLabel(task.notifications.count)"></span>
                     </template>
                 </div>
