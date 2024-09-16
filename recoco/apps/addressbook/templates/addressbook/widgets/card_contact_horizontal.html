@@ -1,11 +1,15 @@
 {% load static %}
+{% block css %}
+    <link href="{% static 'css/user/card_contact_horizontal.scss' %}"
+          rel="stylesheet"
+          type="text/css">
+{% endblock css %}
 {% load phone_filters %}
 <!-- Horizontal Card -->
-<div class="card-resource card-resource-horizontal card h-100 w-100"
-     style="min-height: 100px">
+<div class="card-resource card-resource-horizontal card h-100 w-100 specific-minheight-100">
     <!-- <hr class="middle-hr" /> -->
     <div class="card-body">
-        <div class="card-title mb-3">
+        <div class="card-title fr-mb-2w">
             <div class="row">
                 <!-- <div class="icon-placeholder  d-inline"> -->
                 <!--</div> -->
@@ -16,7 +20,7 @@
                      </span>
                 -->
                 <div class="title">
-                    <svg class="bi me-2 bg-color-darkgrey resource-icon">
+                    <svg class="bi fr-mr-2v bg-color-darkgrey resource-icon">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#person-badge" />
                     </svg>
                     {{ contact.full_name|title }}
@@ -30,7 +34,7 @@
             </div>
         </div>
         <div class="card-text">
-            {% if contact.division %}<div class="mb-2">{{ contact.division }}</div>{% endif %}
+            {% if contact.division %}<div class="fr-mb-2v">{{ contact.division }}</div>{% endif %}
             <div class="small text-secondary subtitle">{{ contact.organization.name|truncatechars:120 }}</div>
             {% if contact.phone_no %}
                 <div class="small text-secondary">

@@ -6,17 +6,17 @@
     <link href="{% sass_src 'projects/css/project.scss' %}"
           rel="stylesheet"
           type="text/css">
-{% endblock %}
+{% endblock css %}
 {% block content %}
-    <div class="col-12 p-4 mx-auto">
+    <div class="col-12 fr-p-3w fr-mx-auto">
         <section>
-            <h2 class="mb-4 d-flex align-items-center">
-                <span style="font-weight: 300;">
+            <h2 class="fr-mb-3w d-flex align-items-center">
+                <span class="font-weight-light">
                     Projet
-                    <strong style="font-weight: 500;">{{ project.name }}</strong>
+                    <strong class="specific-fontweight-500">{{ project.name }}</strong>
                 </span>
             </h2>
-            <h4 class="d-block mb-2">
+            <h4 class="d-block fr-mb-2v">
                 <svg class="bi " width="32" height="32" fill="currentColor">
                     <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#tags" />
                 </svg>
@@ -24,10 +24,10 @@
                 Édition des étiquettes
             </h4>
             <form action="{% url "projects-project-tags" project.pk %}" method="post">
-                <div class="d-flex flex-column mt-4">
+                <div class="d-flex flex-column fr-mt-3w">
                     <div class="common-input">{{ form.tags }}</div>
-                    <div class="mt-2 flag grey mb-4 d-flex align-items-center justify-content-start">
-                        <p class="text-info-custom font-small text-grey-dark my-0 ">{{ form.tags.help_text }}</p>
+                    <div class="fr-mt-2v flag grey fr-mb-3w d-flex align-items-center justify-content-start">
+                        <p class="text-info-custom font-small text-grey-dark fr-my-0 ">{{ form.tags.help_text }}</p>
                     </div>
                 </div>
                 {% csrf_token %}
@@ -36,4 +36,4 @@
             {{ form.media }}
         </section>
     </div>
-{% endblock %}
+{% endblock content %}

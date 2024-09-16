@@ -2,20 +2,20 @@
 {% load django_vite %}
 {% block js %}
     {% vite_asset 'js/apps/topicSearch.js' %}
-{% endblock %}
+{% endblock js %}
 <!-- Action details -->
 <template x-if="push_type != 'multiple'">
     <div class="message d-flex flex-row justify-content-between">
         <div id="action-details"
-             class="form w-50 pe-4 flex-fill d-flex flex-column">
-            <div class="bg-light p-3 border-form">
+             class="form w-50 fr-pr-3w flex-fill d-flex flex-column">
+            <div class="bg-light fr-p-2w border-form">
                 <h4>
-                    <span class="text-muted me-1"
+                    <span class="text-muted fr-mr-1v"
                           x-text="push_type == 'noresource' ? '2.' : '3.'"></span>Décrivez votre recommandation
                 </h4>
-                <div class="mt-2">
-                    <label class="mb-2 text-info-custom text-grey-dark" for="intent">Titre</label>
-                    <div class="input-group mb-3">
+                <div class="fr-mt-2v">
+                    <label class="fr-mb-2v text-info-custom text-grey-dark" for="intent">Titre</label>
+                    <div class="input-group fr-mb-2w">
                         <input class="form-control"
                                type="text"
                                id="intent"
@@ -27,8 +27,8 @@
                     </div>
                 </div>
                 <div x-data='TopicSearch("{{ form.topic_name.value|default:"" }}", "recommendations")'
-                     class="mt-2 mb-3">
-                    <label class="mb-2 text-info-custom text-grey-dark" for="topic_name">Thématique</label>
+                     class="fr-mt-2v fr-mb-2w">
+                    <label class="fr-mb-2v text-info-custom text-grey-dark" for="topic_name">Thématique</label>
                     <div class="input-group">
                         <input class="form-control"
                                type="text"
@@ -39,10 +39,10 @@
                         {% for error in form.topic.errors %}<div class="text-danger text-end">{{ error }}</div>{% endfor %}
                     </div>
                     <template x-if="results.length > 0">
-                        <div class="d-flex align-items-center flex-wrap mb-2 mt-1">
+                        <div class="d-flex align-items-center flex-wrap fr-mb-2v fr-mt-1v">
                             <span class="d-block text-blue text-info-custom text-grey-dark font-small fw-normal">Suggestions :</span>
                             <template x-for="result in results">
-                                <div class="d-flex align-item-center flex-wrap mx-1 mt-1">
+                                <div class="d-flex align-item-center flex-wrap fr-mx-1v fr-mt-1v">
                                     <button @click.prevent="handleResultClick(result.name)"
                                             class="button secondary blue small"
                                             x-text="result.name"></button>
@@ -52,12 +52,14 @@
                     </template>
                 </div>
                 <div class="d-flex flex-column">
-                    <label class="mb-2 text-info-custom text-grey-dark" for="message">Message</label>
-                    {% include 'tools/editor.html' with input_name="content" input_value="content" errors=form.content.errors is_task=True %}
+                    <label class="fr-mb-2v text-info-custom text-grey-dark" for="message">Message</label>
+                    {% include "tools/editor.html" with input_name="content" input_value="content" errors=form.content.errors is_task=True %}
                 </div>
-                <div class="mb-4">
-                    {% include 'projects/project/fragments/files_links/file_upload_input_standalone.html' %}
-                    {% for error in document_form.the_file.errors %}<div class="text-danger text-start mb-2">{{ error }}</div>{% endfor %}
+                <div class="fr-mb-3w">
+                    {% include "projects/project/fragments/files_links/file_upload_input_standalone.html" %}
+                    {% for error in document_form.the_file.errors %}
+                        <div class="text-danger text-start fr-mb-2v">{{ error }}</div>
+                    {% endfor %}
                 </div>
                 <template x-if="push_type == 'single'">
                     <div class="buttons d-flex flex-row justify-content-between">
@@ -76,8 +78,7 @@
                 <template x-if="push_type == 'noresource'">
                     <div class="buttons d-flex flex-row justify-content-between">
                         {% if not disable_draft %}
-                            <button data-test-id="publish-draft-task-button"
-                                    @click="set_draft(true)"
+                            <button @click="set_draft(true)"
                                     data-test-id="publish-draft-task-button"
                                     class="button small">Enregister comme Brouillon</button>
                         {% endif %}
@@ -89,11 +90,11 @@
                 </template>
             </div>
         </div>
-        <div class="help w-50 p-3 bg-light rounded">
+        <div class="help w-50 fr-p-2w bg-light rounded">
             <h6>Comment écrire une recommandation</h6>
-            <img class="mt-3 img-fluid"
+            <img class="fr-mt-2w fr-responsive-img"
                  src="{% static 'projects/img/push_example.png'  %}" />
-            <ol class="mt-3">
+            <ol class="fr-mt-2w fr-pl-4w">
                 <li>
                     <strong>Donnez un titre actionnable à votre recommandation</strong>
                     <p>
@@ -113,10 +114,10 @@
 <template x-if="push_type == 'multiple'">
     <div>
         <button @click="set_draft(true)"
-        data-test-id="publish-draft-task-button"
+                data-test-id="publish-draft-task-button"
                 class="btn btn-secondary"
                 :disabled="!selected_resources.length">Enregistrer comme Brouillon</button>
-        <span class="ms-2"
+        <span class="fr-ml-2v"
               x-text="`${selected_resources.length} ressource(s) sélectionnée(s)`"></span>
     </div>
 </template>

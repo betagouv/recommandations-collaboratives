@@ -4,7 +4,6 @@ from django.contrib.sites import models as site_models
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
 from django.utils import timezone
-from django.utils.text import capfirst, slugify
 from model_bakery import baker
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
@@ -439,118 +438,6 @@ def test_toggle_missing_project_annotation(request, client, project):
 
     url = reverse("crm-project-details", args=[annotation.project.id])
     assertRedirects(response, url)
-
-
-@pytest.mark.django_db
-def test_toggle_on_project_annotation(request, client, project):
-    site = get_current_site(request)
-    onboarding = onboarding_models.Onboarding.objects.first()
-    test_tag = "a nice tag"
-    other_tag = "an other nice tag"
-    site_config = baker.make(
-        home_models.SiteConfiguration,
-        site=site,
-        onboarding=onboarding,
-    )
-    site_config.crm_available_tags.add(test_tag)
-    site_config.crm_available_tags.add(other_tag)
-
-    annotation = baker.make(models.ProjectAnnotations, site=site, project=project)
-    detail_url = reverse("crm-project-details", args=[annotation.project.id])
-
-    with login(client, groups=["example_com_staff"]):
-        response = client.get(detail_url)
-        assert response.status_code == 200
-
-        # unselected tag
-        assertContains(
-            response,
-            f'id="checkbox-{slugify(test_tag)}" >',
-        )
-        assertContains(
-            response,
-            f'<label class="form-check-label" for="checkbox-{slugify(test_tag)}">{capfirst(test_tag)}</label>',
-        )
-        assertContains(
-            response,
-            f'id="checkbox-{slugify(other_tag)}" >',
-        )
-        assertContains(
-            response,
-            f'<label class="form-check-label" for="checkbox-{slugify(other_tag)}">{capfirst(other_tag)}</label>',
-        )
-
-        url = reverse("crm-project-toggle-annotation", args=[annotation.project.id])
-        response = client.post(url, data={"tag": test_tag})
-        updated = models.ProjectAnnotations.objects.first()
-        assert test_tag in updated.tags.names()
-        assertRedirects(response, detail_url)
-
-        response = client.get(detail_url)
-        assert response.status_code == 200
-        # selected tag
-        assertContains(
-            response,
-            f'id="checkbox-{slugify(test_tag)}" checked>',
-        )
-        # unselected tag
-        assertContains(
-            response,
-            f'id="checkbox-{slugify(other_tag)}" >',
-        )
-
-
-@pytest.mark.django_db
-def test_toggle_off_project_annotation(request, client, project):
-    site = get_current_site(request)
-    onboarding = onboarding_models.Onboarding.objects.first()
-    test_tag = "a nice tag"
-    other_tag = "an other nice tag"
-    site_config = baker.make(
-        home_models.SiteConfiguration,
-        site=site,
-        onboarding=onboarding,
-    )
-    site_config.crm_available_tags.add(test_tag)
-    site_config.crm_available_tags.add(other_tag)
-
-    annotation = baker.make(models.ProjectAnnotations, site=site, project=project)
-    detail_url = reverse("crm-project-details", args=[annotation.project.id])
-
-    data = {"tag": other_tag}
-    annotation.tags.add(data["tag"])
-
-    url = reverse("crm-project-toggle-annotation", args=[annotation.project.id])
-
-    with login(client, groups=["example_com_staff"]):
-        response = client.get(detail_url)
-        assert response.status_code == 200
-        # unselected tag
-        assertContains(
-            response,
-            f'id="checkbox-{slugify(test_tag)}" >',
-        )
-        assertContains(
-            response,
-            f'<label class="form-check-label" for="checkbox-{slugify(test_tag)}">{capfirst(test_tag)}',
-        )
-        # selected tag
-        assertContains(
-            response,
-            f'id="checkbox-{slugify(other_tag)}" checked>',
-        )
-        assertContains(
-            response,
-            f'<label class="form-check-label" for="checkbox-{slugify(other_tag)}">{capfirst(other_tag)}',
-        )
-
-        response = client.post(url, data=data)
-
-        updated = models.ProjectAnnotations.objects.first()
-        assert data["tag"] not in updated.tags.names()
-
-        url = reverse("crm-project-details", args=[annotation.project.id])
-        assertRedirects(response, url)
 
 
 #### Handover

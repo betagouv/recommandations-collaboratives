@@ -4,20 +4,25 @@
             <div class="fr-grid-row fr-grid-row--gutters fr-grid-row--center">
                 <div class="fr-col-12 fr-col-md-10 fr-col-lg-8">
                     <h1 class="fr-h2">
-                        {% block page_title %}{{ request.site }}{% endblock %}
+                        {% block page_title %}
+                            {{ request.site }}
+                        {% endblock page_title %}
                     </h1>
                     <p class="fr-text--lead">
-                        {% block tagline %}Bienvenue !{% endblock %}
+                        {% block tagline %}
+                            Bienvenue !
+                        {% endblock tagline %}
                     </p>
                 </div>
             </div>
         </div>
-    {% endblock %}
+    {% endblock page_header %}
     <main role="main" id="content">
         <div class="fr-container fr-container--fluid fr-mb-md-14v">
             <div class="fr-grid-row fr-grid-row--gutters fr-grid-row--center">
                 <div class="fr-col-12 fr-col-md-10 fr-col-lg-8">
-                    {% block center_content %}{% endblock %}
+                    {% block center_content %}
+                    {% endblock center_content %}
                     {% block center_narrow %}
                         <div class="fr-container fr-background-alt--grey fr-px-md-0 fr-pt-4v fr-pt-md-6v fr-pb-4v fr-pb-md-6v">
                             <div class="fr-grid-row fr-grid-row--gutters fr-grid-row--center">
@@ -32,4 +37,4 @@
             </div>
         </div>
     </main>
-{% endblock %}
+{% endblock main %}

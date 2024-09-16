@@ -1,6 +1,6 @@
 {% with formset.management_form as form %}
-    {% include 'dsrc_crispy_forms_no_js/uni_form.html' %}
+    {% include "dsrc_crispy_forms_no_js/uni_form.html" %}
 {% endwith %}
 {% for form in formset.forms %}
-    <div class="multiple-fields">{% include 'dsrc_crispy_forms_no_js/uni_form.html' %}</div>
+    <div class="multiple-fields">{% include "dsrc_crispy_forms_no_js/uni_form.html" %}</div>
 {% endfor %}

@@ -2,40 +2,37 @@
 {% load sass_tags %}
 {% load static %}
 {% load django_vite %}
-{% block title %}{{ organization.name }} - CRM{% endblock %}
+{% block title %}
+    {{ organization.name }} - CRM
+{% endblock title %}
 {% block js %}
     {% vite_asset 'js/apps/crm.js' %}
-{% endblock %}
+{% endblock js %}
 {% block css %}
     <link href="{% sass_src 'home/css/dsfr/marianne.css' %}"
           rel="stylesheet"
           type="text/css">
-    <style>
-    html, body {
-        scroll-padding-top: 240px;
-    }
-    </style>
-{% endblock %}
+    <link href="{% sass_src 'crm/css/organization.scss' %}"
+          rel="stylesheet"
+          type="text/css">
+{% endblock css %}
 {% block content %}
-    <div x-data="Crm"
-         class="d-flex px-0"
-         style="font-family: 'Marianne', arial, sans-serif">
+    <div x-data="Crm" class="d-flex fr-px-0">
         {% include "crm/fragments/sidebar.html" with search=True back_button=True organization_members=True followed_projects=True unfollowed_projects=True %}
         <div class="w-75 d-flex flex-column justify-content-start">
-            <div class="crm-header px-4 py-3 pt-4 {% if active_project %}mb-3{% else %}no-project{% endif %}">
+            <div class="crm-header fr-px-3w fr-py-2w fr-pt-3w {% if active_project %}mb-3{% endif %}">
                 <div class="d-flex justify-content-between">
                     <div>
                         <h3 class="d-flex align-items-center">
-                            <svg class="bi me-2" width="16" height="16" fill="currentColor">
+                            <svg class="bi fr-mr-2v" width="16" height="16" fill="currentColor">
                                 <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#building" />
                             </svg>
                             <span>{{ organization.name }}</span>
                         </h3>
-                        <ul class="d-flex align-items-center list-unstyled flex-wrap"
-                            style="padding-left: 0">
+                        <ul class="d-flex align-items-center list-unstyled flex-wrap organization-specific-pl-0">
                             {% for department in org_departments %}
-                                <li class="me-2 crm-region-tag">
-                                    <span class="">{{ department.name }}</span>
+                                <li class="fr-mr-2v crm-region-tag">
+                                    <span>{{ department.name }}</span>
                                     <strong>({{ department.code }})</strong>
                                 </li>
                             {% endfor %}
@@ -51,7 +48,7 @@
                 </div>
             </div>
             {% if unread_notifications %}
-                <div class="px-4 py-4 bg-light">
+                <div class="fr-px-3w fr-py-3w bg-light">
                     <h4>
                         <svg class="align-middle bi text-warning"
                              width="20px"
@@ -68,20 +65,20 @@
                     </ul>
                 </div>
             {% endif %}
-            <div class="px-4 pt-4 crm-notes-wrapper relative">
-                <a class="btn btn-primary mb-4"
+            <div class="fr-px-3w fr-pt-3w crm-notes-wrapper relative">
+                <a class="btn btn-primary fr-mb-3w"
                    href="{% url 'crm-organization-note-create' organization.pk %}">créer une note</a>
                 {% for note in sticky_notes.all %}
-                    {% include 'crm/note.html' with pinned=True update_url_name='crm-organization-note-update' get_user_profile=True %}
+                    {% include "crm/note.html" with pinned=True update_url_name="crm-organization-note-update" get_user_profile=True %}
                 {% endfor %}
                 {% for note in notes.all %}
-                    {% include 'crm/note.html' with update_url_name='crm-organization-note-update' get_user_profile=True %}
+                    {% include "crm/note.html" with update_url_name="crm-organization-note-update" get_user_profile=True %}
                 {% endfor %}
             </div>
-            <div class="px-4 pt-4 bg-light crm-timeline-min-height">
+            <div class="fr-px-3w fr-pt-3w bg-light crm-timeline-min-height">
                 <h4>Activité</h4>
-                {% include 'crm/timeline.html' %}
+                {% include "crm/timeline.html" %}
             </div>
         </div>
     </div>
-{% endblock %}
+{% endblock content %}

@@ -3,8 +3,8 @@
     {% if old_project %}
         {% for title, content in onboarding_response.items %}
             {% if content %}
-                {% include 'projects/project/fragments/information_card_description_details.html' %}
-                {% if forloop.counter != onboarding_response.items|length %}<hr class="mt-0" />{% endif %}
+                {% include "projects/project/fragments/information_card_description_details.html" %}
+                {% if forloop.counter != onboarding_response.items|length %}<hr class="fr-mt-0" />{% endif %}
             {% endif %}
         {% endfor %}
     {% else %}
@@ -13,7 +13,7 @@
             {% question_answer session question as answer %}
             {% if answer.comment %}
                 <!--Texte libre-->
-                {% include 'projects/project/fragments/information_card_description_details.html' with title=answer.question.text_short content=answer.comment|safe %}
+                {% include "projects/project/fragments/information_card_description_details.html" with title=answer.question.text_short content=answer.comment|safe %}
             {% else %}
                 <!--Choix multiples-->
                 {% lookup_choices_from_answer answer as choices %}
@@ -26,7 +26,7 @@
                     {% else %}
                         <!--Réponse Unique-->
                         {% for choice in choices %}
-                            {% include 'projects/project/fragments/information_card_description_details.html' with title=answer.question.text_short content=choice.conclusion|default:choice.text|capfirst %}
+                            {% include "projects/project/fragments/information_card_description_details.html" with title=answer.question.text_short content=choice.conclusion|default:choice.text|capfirst %}
                         {% endfor %}
                     {% endif %}
                 {% else %}
@@ -34,15 +34,14 @@
                     {% include 'projects/project/fragments/information_card_description_details.html' with title=answer.question.text_short content='Non renseigné' %}
                 {% endif %}
             {% endif %}
-            {% if not forloop.last %}<hr class="mt-0">{% endif %}
+            {% if not forloop.last %}<hr class="fr-mt-0">{% endif %}
         {% endfor %}
     {% endif %}
     {% if answer.attachment %}
         <div>
             <span class="align-middle">
-                <a style="position: relative;
-                          z-index:2;
-                          color: {{ question_set.color|default:'black' }} !important"
+                <a class="tmp-usevar position-relative z-2"
+                   style="color: {{ question_set.color|default:'black' }} !important"
                    target="_new"
                    href="{{ answer.attachment.url }}">Télécharger le fichier joint</a>
             </span>

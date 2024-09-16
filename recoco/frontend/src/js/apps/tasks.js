@@ -1,5 +1,4 @@
 import '../../css/statusSwitcher.css';
-import '../../css/tasksViewSwitcher.css';
 import '../../css/tasks.css';
 
 //Store

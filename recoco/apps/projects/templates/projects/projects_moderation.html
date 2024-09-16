@@ -22,7 +22,7 @@
           type="text/css">
 {% endblock css %}
 {% block content %}
-    <div class="col-11 pt-3 pb-5 mx-auto">
+    <div class="col-11 fr-pt-2w fr-pb-6w fr-mx-auto">
         <div class="container-fluid">
             <div class="row">
                 <div class="col-12">
@@ -34,9 +34,9 @@
                         <h2>Aucun projet à examiner</h2>
                     {% endif %}
                     {% for project in draft_projects %}
-                        <div class="card mb-3 d-flex flex-row project-card">
+                        <div class="card fr-mb-2w d-flex flex-row project-card">
                             <div class="project-card__col--left project-card__col__padding d-flex flex-column">
-                                <h3 class="project-card__title">
+                                <h3 class="project-card__title fr-mb-0">
                                     <a href="{% url 'projects-project-detail' project.id %}">
                                         {% if project.commune %}
                                             <span class="project-card__city">{{ project.commune.name }}({{ project.commune.postal|slice:2 }})</span>
@@ -44,63 +44,62 @@
                                         <span class="project-card__name">{{ project.name }}</span>
                                     </a>
                                 </h3>
-                                <p class="project-card__keyinfo">
+                                <p class="project-card__keyinfo fr-mb-2v">
                                     {% if project.commune %}
                                         <span class="fr-icon--sm fr-icon-map-pin-2-line">INSEE: {{ project.commune.insee }}</span>
                                     {% endif %}
                                     <span class="fr-icon--sm fr-icon-calendar-event-line">déposé depuis {{ project.created_on|timesince }}</span>
                                 </p>
-                                <h4 class="text-uppercase project-card__address">Localisation</h4>
+                                <h4 class="text-uppercase project-card__address fr-mb-0">Localisation</h4>
                                 {% if project.location and project.commune %}
                                     <p>
                                         <span class="fr-icon--sm fr-icon-map-pin-2-line project-card__location"
                                               id="no-margin">{{ project.location }}</span>
                                     </p>
-                                    <p>
+                                    <p class="fr-mb-2v">
                                         <span class="project-card__communename">{{ project.commune.postal }} {{ project.commune.name }}</span>
                                     </p>
                                 {% elif project.location %}
-                                    <p>
+                                    <p class="fr-mb-2v">
                                         <span class="fr-icon--sm fr-icon-map-pin-2-line project-card__location">{{ project.location }}</span>
                                     </p>
                                 {% elif project.commune %}
-                                    <p>
+                                    <p class="fr-mb-2v">
                                         <span class="fr-icon--sm fr-icon-map-pin-2-line project-card__location">{{ project.commune.postal }} {{ project.commune.name }}</span>
                                     </p>
                                 {% else %}
-                                    <p>
+                                    <p class="fr-mb-2v">
                                         <span class="fr-icon--sm fr-icon-map-pin-2-line project-card__location">Non renseigné</span>
                                     </p>
                                 {% endif %}
-                                <h4 class="text-uppercase project-card__team">Équipe collectivité</h4>
+                                <h4 class="text-uppercase project-card__team fr-mb-0">Équipe collectivité</h4>
                                 <div>
                                     {% include "projects/project/fragments/project_owner.html" with project=project %}
                                     {% include "projects/project/fragments/owner/owner-details.html" with project=project %}
                                 </div>
-                                <div class="d-flex flex-grow-1 align-items-end mt-4">
-                                    <div class="d-flex justify-content-between align-items-stretch w-100"
-                                         style="max-height: 70px">
-                                        <form method="POST"
+                                <div class="d-flex flex-grow-1 align-items-end fr-mt-3w">
+                                    <div class="d-flex justify-content-between align-items-stretch w-100 specific-maxheight-70">
+                                        <form method="post"
                                               action="{% url "projects-moderation-refuse" project.id %}"
                                               class="flex-grow-1">
                                             {% csrf_token %}
-                                            {% include "dsrc/core/blocks/buttons/button.html" with label="Refuser"  role="submit" variant="secondary black" classes="fr-btn--sm me-1 h-100" data_test_id="refuse-project" %}
+                                            {% include "dsrc/core/blocks/buttons/button.html" with label="Refuser"  role="submit" variant="secondary black" classes="fr-btn--sm fr-mr-1v h-100" data_test_id="refuse-project" %}
                                         </form>
-                                        <form method="POST"
+                                        <form method="post"
                                               action="{% url "projects-moderation-accept" project.id %}">
                                             {% csrf_token %}
-                                            {% include "dsrc/core/blocks/buttons/button.html" with label="Accepter"  role="submit" variant="secondary" classes="fr-btn--sm me-1 float-end h-100" data_test_id="accept-project" %}
+                                            {% include "dsrc/core/blocks/buttons/button.html" with label="Accepter"  role="submit" variant="secondary" classes="fr-btn--sm fr-mr-1v float-end h-100" data_test_id="accept-project" %}
                                         </form>
-                                        <form method="POST"
+                                        <form method="post"
                                               action="{% url "projects-moderation-accept" project.id %}">
                                             {% csrf_token %}
                                             <input type="hidden" name="join" value="1">
-                                            {% include "dsrc/core/blocks/buttons/button.html" with label="Accepter et rejoindre"  role="submit" variant="secondary" classes="fr-btn--sm me-1 float-end h-100" %}
+                                            {% include "dsrc/core/blocks/buttons/button.html" with label="Accepter et rejoindre"  role="submit" variant="secondary" classes="fr-btn--sm fr-mr-1v float-end h-100" %}
                                         </form>
                                     </div>
                                 </div>
                             </div>
-                            <div class="project-card__col--right p-0">
+                            <div class="project-card__col--right fr-p-0">
                                 <!-- Contexte -->
                                 {% include "projects/project/fragments/information_card.html" with full_width=True padding_end=False padding_top=False project=project title="Résumé du projet" description=project.description updated_on=project.created_on data_test="context" display_user=False %}
                                 <!-- Complément -->
@@ -113,7 +112,7 @@
                                             <!--Texte libre-->
                                             {% include "projects/project/fragments/information_card.html" with full_width=True padding_end=False padding_top=False project=project title=answer.question.text description=answer.comment updated_on=project.created_on card_user=project.submitted_by org_name=project.submitted_by.profile.organization.name display_user=False %}
                                         {% else %}
-                                            <div class="pt-2">
+                                            <div class="fr-pt-2v">
                                                 {% for choice in choices %}
                                                     {% include "projects/project/fragments/information_card.html" with full_width=True project=project title=answer.question.text_short description=choice.conclusion updated_on=project.created_on card_user=project.submitted_by org_name=project.submitted_by.profile.organization.name display_user=False %}
                                                 {% endfor %}

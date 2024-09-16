@@ -31,9 +31,9 @@
                 <span class="visually-hidden">Loading...</span>
             </div>
         </div>
-        <div class="topbar d-flex justify-content-between p-2">
+        <div class="topbar d-flex justify-content-between fr-p-2v">
             <span class="fs-5">{% include "projects/project/fragments/navigation/display_select.html" %}</span>
-            <div class="ms-4 flex-grow-1">
+            <div class="fr-ml-3w flex-grow-1">
                 {% include "projects/project/fragments/search_bar.html" with action_search="onSearch(event)" x_model="searchText" %}
             </div>
             {% include "projects/project/fragments/region_filter.html" with filter_by_regions=True %}
@@ -41,20 +41,20 @@
         </div>
         <div x-init="getData()" x-cloak class="d-flex">
             <div class="flex-grow-1 kanban-container">
-                <div class="py-4 md-py-8">
-                    <div class="d-flex pb-2">
+                <div class="fr-py-3w md-py-8">
+                    <div class="d-flex fr-pb-2v">
                         <template x-for="(board, index) in boards" :key="board.code">
-                            <div class="px-2 flex-shrink-0 kanban-column-container">
+                            <div class="fr-px-2v flex-shrink-0 kanban-column-container">
                                 <div class="rounded border-4 kanban-column"
                                      :class="board.color_class"
                                      :data-test-id="`board-targetable-${index}`">
-                                    <div class="d-flex justify-content-between justify-items-center px-2 py-2 sticky top-0">
-                                        <h5 x-text="board.title" class="font-medium text-gray-800 mb-0"></h5>
+                                    <div class="d-flex justify-content-between justify-items-center fr-px-2v fr-py-2v sticky top-0">
+                                        <h5 x-text="board.title" class="font-medium text-gray-800 fr-mb-0"></h5>
                                     </div>
                                     <div class="kanban-column--content">
-                                        <div class="px-2 py-1 pb-1 h-100">
+                                        <div class="fr-px-2v fr-py-1v fr-pb-1v h-100">
                                             <template x-if="column(board.code).length === 0">
-                                                <div class="drag-targetable py-2 h-100"
+                                                <div class="drag-targetable fr-py-2v h-100"
                                                      @dragover="onDragOver(event, null)"
                                                      @drop="onDrop(event, board.code, null)"
                                                      @dragenter="onDragEnter(event)"
@@ -78,7 +78,7 @@
                                                      @dragstart="onDragStart(event, t.uuid)"
                                                      @dragend="onDragEnd(event)">
                                                     <a :href="makeProjectURL(t.id)">
-                                                        <div class="kanban-card rounded p-2 w-100 position-relative"
+                                                        <div class="kanban-card rounded fr-p-2v w-100 position-relative"
                                                              :class="{'kanban-card--border__is-switchtender': t.is_switchtender, 'kanban-card--border__is-observer': t.is_observer}"
                                                              draggable="true"
                                                              :data-test-id="`item-draggable-${taskIndex}`">
@@ -99,7 +99,7 @@
                                                                     <span class="kanban-card--commune-postal" x-text="`(${t.commune.postal})`"></span>
                                                                 </div>
                                                             </template>
-                                                            <div class="kanban-card--project-container fw-semibold mb-2">
+                                                            <div class="kanban-card--project-container fw-semibold fr-mb-2v">
                                                                 <span class="kanban-card--project-name project-link"
                                                                       x-text="truncate(t.name)"></span>
                                                             </div>
@@ -126,7 +126,7 @@
                                                                     <span x-text="`Déposé le ${formatDateDisplay(t.created_on)}`"
                                                                           class="kanban-card--project-date fr-icon--sm fr-icon-calendar-event-line align-middle not-a-link"></span>
                                                                 </div>
-                                                                <div class="d-flex justify-content-end me-1">
+                                                                <div class="d-flex justify-content-end fr-mr-1v">
                                                                     <template x-for="switchtender in t.switchtenders">
                                                                         <div class="got-my-style">
                                                                             {% include "projects/project/fragments/advisor_gravatar_list_item.html" with wide_margin=True transparent_background=True %}

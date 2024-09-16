@@ -1,6 +1,12 @@
 {% load static %}
 <a class="fr-btn{% if variant %} fr-btn--{{ variant }}{% endif %}{% if size %} fr-btn--{{ size }}{% endif %}{% if align %} fr-btn--icon-{{ align }}{% endif %}{% if icon %} {{ icon }}{% endif %} {% if classes %}{{ classes }}{% endif %}"
-   {% if href_url %} href="{% url href_url %}" {% elif href %} href="{{ href }}" {% else %} href="#" {% endif %}
+   {% if href_url %} href="{% url href_url %}{% if next_url %}?next={{ next_url }}{% endif %}
+   "
+   {% elif href %}
+   href="{{ href }}"
+   {% else %}
+   href="#"
+   {% endif %}
    {% if disabled %}disabled=""{% endif %}
    {% if type %}type="{{ type }}"{% endif %}
    {% if role %}role="{{ role }}"{% endif %}
