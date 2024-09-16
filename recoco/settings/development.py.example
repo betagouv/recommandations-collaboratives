@@ -106,4 +106,8 @@ SILENCED_SYSTEM_CHECKS += ["captcha.recaptcha_test_key_error"]
 #     }
 # ]
 
+# Démarches simplifiées
+DS_AUTOLOAD_SCHEMA = False
+DS_AUTOCREATE_FOLDER = False
+
 # eof

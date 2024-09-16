@@ -1,29 +1,44 @@
 {% extends "base.html" %}
 {% load static %}
-{% block title %}Configurer le questionnaire d'état des lieux{% endblock %}
+{% load sass_tags %}
+{% block css %}
+    <link href="{% sass_src 'survey/css/editor/survey.scss' %}"
+          rel="stylesheet"
+          type="text/css" />
+{% endblock css %}
+{% block title %}
+    Configurer le questionnaire d'état des lieux
+{% endblock title %}
 {% block content %}
-    <div class="col-12 p-4 mx-auto">
+    <div class="col-12 fr-p-3w fr-mx-auto">
         <!-- Breadcrumb -->
-        <nav aria-label="breadcrumb">
-            <ul class="breadcrumb">
-                <li class="breadcrumb-item">
-                    <svg class="bi align-middle" width="18" height="18" fill="currentColor">
-                        <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#question-square-fill" />
-                    </svg>
-                    &nbsp;
-                    Questionnaire
-                </li>
-                <li class="breadcrumb-item active">
-                    <a href="{% url 'survey-editor-survey-details' survey.id %}">
-                        {{ survey.name|default:"Questionnaire"|title|truncatechars:20 }}
-                    </a>
-                </li>
-            </ul>
+        <nav role="navigation" class="fr-breadcrumb" aria-label="vous êtes ici :">
+            <button class="fr-breadcrumb__button"
+                    aria-expanded="false"
+                    aria-controls="breadcrumb-1">Voir le fil d’Ariane</button>
+            <div class="fr-collapse" id="breadcrumb-1">
+                <ol class="fr-breadcrumb__list">
+                    <li>
+                        <svg class="bi align-top" width="18" height="18" fill="currentColor">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#question-square-fill" />
+                        </svg>
+                        &nbsp;
+                        <a class="fr-breadcrumb__link">Questionnaire</a>
+                    </li>
+                    <li>
+                        <a class="fr-breadcrumb__link"
+                           aria-current="page"
+                           href="{% url 'survey-editor-survey-details' survey.id %}">
+                            {{ survey.name|default:"Questionnaire"|title|truncatechars:20 }}
+                        </a>
+                    </li>
+                </ol>
+            </div>
         </nav>
         <!-- Notes de suivi -->
         <div class="row">
             <div class="col">
-                <h2 class="mt-3 d-inline-block">
+                <h2 class="fr-mt-2w d-inline-block">
                     <svg class="bi" width="28" height="28" fill="currentColor">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#question-square-fill" />
                     </svg>
@@ -34,7 +49,7 @@
             <div class="col">
                 <a class="btn btn-light d-inline-block float-end"
                    href="{% url 'survey-editor-question-set-create' survey.id %}">
-                    <svg class="bi me-1" width="16" height="16" fill="currentColor">
+                    <svg class="bi fr-mr-1v" width="16" height="16" fill="currentColor">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#plus-circle" />
                     </svg>
                     Ajouter un groupe de questions
@@ -44,19 +59,19 @@
         <ul class="list-group list-group-numbered">
             {% for question_set in survey.question_sets.all|dictsortreversed:"priority" %}
                 <li class="list-group-item d-flex justify-content-between align-items-start">
-                    <div class="ms-2 me-auto">
+                    <div class="fr-ml-2v fr-mr-auto">
                         {% if question_set.icon %}
-                            <svg class="bi me-1 d-inline rounded-circle align-middle p-1"
+                            <svg class="bi fr-mr-1v d-inline rounded-circle align-middle fr-p-1v tmp-usevar"
                                  width="24"
                                  height="24"
                                  style="background-color: {{ question_set.color }}">
                                 <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#{{ question_set.icon }}" />
                             </svg>
                         {% endif %}
-                        <div class="d-inline align-middle fw-bold me-2">
+                        <div class="d-inline align-middle fw-bold fr-mr-2v">
                             <a href="{% url 'survey-editor-question-set-details' question_set.pk %}">{{ question_set.heading }}</a>
                             <!-- Priority -->
-                            <span class="text-secondary small" style="font-size: 15px">
+                            <span class="text-secondary small span-specific-fontsize-15">
                                 &nbsp;
                                 <svg class="bi" width="15" height="15" fill="currentColor">
                                     <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#sort-up" />
@@ -73,4 +88,4 @@
             {% endfor %}
         </ul>
     </div>
-{% endblock %}
+{% endblock content %}

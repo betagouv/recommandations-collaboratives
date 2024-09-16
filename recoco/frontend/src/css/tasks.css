@@ -41,6 +41,10 @@ body.modal-open {
   margin-bottom: 5px;
 }
 
+.task-item h4 {
+  font-size: 1rem;
+}
+
 .board-status-filter-button {
   cursor: pointer !important;
 }

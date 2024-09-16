@@ -2,35 +2,35 @@
 {% load django_vite %}
 {% block js %}
     {% vite_asset 'js/apps/contactList.js' %}
-{% endblock %}
+{% endblock js %}
 {% if contacts.count %}
-    <div x-data="ContactList" id="contact-list" class="mt-4">
+    <div x-data="ContactList" id="contact-list" class="fr-mt-3w">
         {% if user.is_anonymous %}
             <div class="flag blue">
-                <span class="title text-blue text-uppercase fw-bold mb-2 d-block">Contacts</span>
+                <span class="title text-blue text-uppercase fw-bold fr-mb-2v d-block">Contacts</span>
                 <p class="content">
                     Nous avons des <strong>contacts associés</strong>
                     à cette ressource. Si vous souhaitez y accéder, veuillez <a href="{% url 'magicauth-login' %}">vous identifier</a>.
                 </p>
             </div>
         {% else %}
-            <div class="bg-grey-light py-4 px-3 font-marianne">
-                <h6 class="fw-bold text-uppercase d-block mb-3">👩‍💼 Contacts</h6>
+            <div class="bg-grey-light fr-py-3w fr-px-2w font-marianne">
+                <h6 class="fw-bold text-uppercase d-block fr-mb-2w">👩‍💼 Contacts</h6>
                 {% for contact in contacts.all %}
                     <div :class="currentHash === '#contact-{{ contact.pk }}' && 'component-focus'"
-                         class="border py-2 px-3 mb-2"
+                         class="border fr-py-2v fr-px-2w fr-mb-2v"
                          id="contact-{{ contact.pk }}">
                         <div>
-                            <span class="text-black fw-medium my-1">{{ contact.full_name }}</span>
+                            <span class="text-black fw-medium fr-my-1v">{{ contact.full_name }}</span>
                             <div class="text-info-custom text-grey-light d-flex flex-column">
-                                {% if contact.division %}<span class="me-1  fw-bolder">{{ contact.division }}</span>{% endif %}
+                                {% if contact.division %}<span class="fr-mr-1v  fw-bolder">{{ contact.division }}</span>{% endif %}
                                 <span class="small">{{ contact.organization.name|truncatechars:120 }}</span>
                             </div>
                         </div>
                         <div class="d-flex flex-column">
                             {% if contact.email %}
-                                <div class="text-blue my-1">
-                                    <svg class="bi me-1" width="12" height="12" fill="#0063CB">
+                                <div class="text-blue fr-my-1v">
+                                    <svg class="bi fr-mr-1v" width="12" height="12" fill="#0063CB">
                                         <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#envelope" />
                                     </svg>
                                     <a class="text-blue text-decoration-none small"
@@ -39,7 +39,7 @@
                             {% endif %}
                             {% if contact.phone_no %}
                                 <div class="text-blue d-flex align-items-center">
-                                    <svg class="bi me-2" width="12" height="12" fill="#0063CB">
+                                    <svg class="bi fr-mr-2v" width="12" height="12" fill="#0063CB">
                                         <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#telephone" />
                                     </svg>
                                     <a class="text-blue text-decoration-none small"
@@ -48,7 +48,7 @@
                             {% endif %}
                             {% if contact.mobile_no %}
                                 <div class="text-blue">
-                                    <svg class="bi me-2" width="12" height="12" fill="#0063CB">
+                                    <svg class="bi fr-mr-2v" width="12" height="12" fill="#0063CB">
                                         <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#phone" />
                                     </svg>
                                     <a class="text-blue text-decoration-none small"

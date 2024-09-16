@@ -7,6 +7,7 @@ recursive-include recoco/apps/projects *.txt
 recursive-include recoco/apps/projects *.md
 recursive-include recoco/apps/projects/static *.*
 recursive-include recoco/apps/resources/static *.*
+recursive-include recoco/apps/crm/static *.*
 recursive-include recoco/apps/survey/static *.*
 recursive-include recoco/apps/resources *.md
 recursive-include recoco/sql/ *.sql

@@ -2,8 +2,8 @@
 {% load activity_tags %}
 {% load humanize %}
 {% load gravatar %}
-<li class="d-flex mx-0 px-0 d-flex align-items-center py-1">
-    <span class="small text-info-custom text-grey-dark me-2 text-nowrap font-small">{{ action.timestamp|naturalday|capfirst }}</span>
+<li class="d-flex fr-mx-0 fr-px-0 d-flex align-items-center fr-py-1v">
+    <span class="small text-info-custom text-grey-dark fr-mr-2v text-nowrap font-small">{{ action.timestamp|naturalday|capfirst }}</span>
     <div class="activity-stream-actions-container d-flex flex-column">
         {% load i18n %}
         {% load static %}
@@ -13,7 +13,7 @@
             <div class="d-flex align-items-start">
                 <div class="font-small">
                     <span class="fw-normal">
-                        <a class="" href="{% url 'crm-user-details' action.actor.pk %}">
+                        <a href="{% url 'crm-user-details' action.actor.pk %}">
                             {{ action.actor.first_name|default:action.actor }}
                             {{ action.actor.last_name|default:"" }}
                         </a>
@@ -76,7 +76,7 @@
                                     {% endif %}
                                     {% if action.target %}
                                         {% if action.verb != verbs.Project.SUBMITTED_BY and action.verb != verbs.Project.VALIDATED_BY and action.verb != verbs.Project.LEFT_ADVISING and action.verb != verbs.Project.JOINED and action.verb != verbs.Project.BECAME_ADVISOR and action.verb != verbs.Project.BECAME_OBSERVER %}
-                                            <div class="d-inline-block ms-1">
+                                            <div class="d-inline-block fr-ml-1v">
                                                 {% if action.verb == verbs.Conversation.PUBLIC_MESSAGE or  action.verb == verbs.Conversation.PRIVATE_MESSAGE %}
                                                     <span>à propos de</span>
                                                 {% else %}

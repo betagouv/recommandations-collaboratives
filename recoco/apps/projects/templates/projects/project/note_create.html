@@ -7,25 +7,30 @@
      $(".markdownx-preview").addClass("collapse show");
  });
     </script>
-{% endblock %}
+{% endblock js %}
 {% block content %}
-    <div class="col-12 p-4 mx-auto">
+    <div class="col-12 fr-p-3w fr-mx-auto">
         <!-- Breadcrumb -->
-        <nav aria-label="breadcrumb">
-            <ul class="breadcrumb">
-                <li class="breadcrumb-item">
-                    <svg class="bi align-middle" width="18" height="18" fill="currentColor">
-                        <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#building" />
-                    </svg>
-                    &nbsp;
-                    <a href="{% url 'projects-project-list' %}">Projets</a>
-                </li>
-                <li class="breadcrumb-item">
-                    <span class="text-secondary">
-                        <a href="{% url 'projects-project-detail' project.pk %}">{{ project.name|capfirst }}</a>
-                    </span>
-                </li>
-            </ul>
+        <nav role="navigation" class="fr-breadcrumb" aria-label="vous êtes ici :">
+            <button class="fr-breadcrumb__button"
+                    aria-expanded="false"
+                    aria-controls="breadcrumb-1">Voir le fil d’Ariane</button>
+            <div class="fr-collapse" id="breadcrumb-1">
+                <ol class="fr-breadcrumb__list">
+                    <li>
+                        <svg class="bi align-top" width="18" height="18" fill="currentColor">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#building" />
+                        </svg>
+                        &nbsp;
+                        <a class="fr-breadcrumb__link" href="{% url 'projects-project-list' %}">Projets</a>
+                    </li>
+                    <li>
+                        <a class="fr-breadcrumb__link"
+                           aria-current="page"
+                           href="{% url 'projects-project-detail' project.pk %}">{{ project.name|capfirst }}</a>
+                    </li>
+                </ol>
+            </div>
         </nav>
         <h2>
             <svg class="bi" width="28" height="28" fill="currentColor">
@@ -36,7 +41,7 @@
         <section>
             <form id="form-projects-add-note" method="post" action="." class="form">
                 {% csrf_token %}
-                <div class="p-1">
+                <div class="fr-p-1v">
                     <button class="btn btn-outline-primary float-end"
                             type="button"
                             data-bs-toggle="collapse"
@@ -49,4 +54,5 @@
             </form>
             {{ form.media }}
         </section>
-    {% endblock %}
+    </div>
+{% endblock content %}

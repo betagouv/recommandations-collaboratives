@@ -1,21 +1,21 @@
 {% extends "base.html" %}
 {% load django_vite %}
 {% load static %}
-{% block title %}Usage des thématiques - CRM{% endblock %}
+{% block title %}
+    Usage des thématiques - CRM
+{% endblock title %}
 {% block js %}
     {% vite_asset 'js/apps/crm.js' %}
     {% vite_asset 'js/apps/tagCloud.js' %}
-{% endblock %}
+{% endblock js %}
 {% block content %}
     {{ topics_wc|json_script:"topicsArray" }}
-    <div x-data="Crm"
-         class="d-flex px-0"
-         style="font-family: 'Marianne', arial, sans-serif">
+    <div x-data="Crm" class="d-flex fr-px-0">
         {% include "crm/fragments/sidebar.html" with back_button=True map=True tools=True search=True %}
         <div class="w-75 d-flex flex-column justify-content-start">
             {% url 'crm-search' as crmSearchUrl %}
-            <div class="d-flex flex-column font-marianne pt-4 px-4 ">
-                <h2 class="">
+            <div class="d-flex flex-column font-marianne fr-pt-3w fr-px-3w ">
+                <h2>
                     <svg class="bi align-middle" width="25" height="25" fill="currentColor">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#tags" />
                     </svg>
@@ -26,12 +26,12 @@
                     <a href="{% url 'crm-list-topics-as-csv' %}">Télécharger en CSV</a>
                 </div>
                 <div id="wordCloud"
-                     class="mb-4 pt-4 mx-auto fw-bold"
+                     class="fr-mb-3w fr-pt-3w fr-mx-auto fw-bold"
                      x-data="WordCloud(topicsArray, '{{ crmSearchUrl }}')"></div>
             </div>
             <section class="w-100 d-flex flex-column justify-content-center font-marianne">
                 <div class="d-flex justify-content-center">
-                    <table class="w-100 my-auto table table-striped table-hover">
+                    <table class="w-100 fr-my-auto table table-striped table-hover">
                         <thead>
                             <tr>
                                 <th scope="col">Nom</th>
@@ -49,13 +49,13 @@
                                     <td>{{ value.0 }}</td>
                                     <td>
                                         {% for project in value.1 %}
-                                            <a href="{% url 'projects-project-detail-overview' project.1 %}">{{ project.0 }}</a>
+                                            <a href="{% url 'projects-project-detail-overview' project.pk %}">{{ project.commune }} - {{ project.name }}</a>
                                             {% if not forloop.last %}<br />{% endif %}
                                         {% endfor %}
                                     </td>
                                     <td>
                                         {% for task in value.2 %}
-                                            <a href="{% url 'projects-project-detail-actions' task.2 %}#action-{{ task.1 }}">{{ task.0 }}</a>
+                                            <a href="{% url 'projects-project-detail-overview' task.project.pk %}#action-{{ task.pk }}">{{ task.project.commune }} - {{ task.project.name }} / {{ task }} </a>
                                             {% if not forloop.last %}<br />{% endif %}
                                         {% endfor %}
                                     </td>
@@ -67,4 +67,4 @@
             </section>
         </div>
     </div>
-{% endblock %}
+{% endblock content %}
