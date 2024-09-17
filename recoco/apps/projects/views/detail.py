@@ -10,6 +10,7 @@ created : 2022-03-07 15:56:20 CEST -- HB David!
 from django.contrib.auth.decorators import login_required
 from django.contrib.contenttypes.models import ContentType
 from django.forms import formset_factory
+from django.http import HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render, reverse
 from django.utils import timezone
 from django.views.decorators.clickjacking import xframe_options_exempt
@@ -207,6 +208,12 @@ def project_actions(request, project_id=None):
 def project_recommendations_embed(request, project_id=None):
     """Embed recommendation page for given project"""
     project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
+
+    key = request.GET.get("key", None)
+    if not key or key != project.ro_key:
+        return HttpResponseForbidden()
+
+    actions = project.tasks.filter(public=True).order_by("-created_on", "-updated_on")
 
     return render(request, "projects/project/actions_embed.html", locals())
 
