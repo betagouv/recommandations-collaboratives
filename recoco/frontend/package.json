@@ -24,7 +24,7 @@
     "ajv-errors": "^3.0.0",
     "ajv-formats": "^3.0.1",
     "alpinejs": "^3.10.2",
-    "axios": "^1.6.0",
+    "axios": "^1.7.4",
     "bootstrap": "^5.3.3",
     "d3": "^7.8.4",
     "d3-cloud": "^1.2.5",
