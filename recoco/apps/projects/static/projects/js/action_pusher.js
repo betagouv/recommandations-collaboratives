@@ -1,140 +1,139 @@
 function action_pusher_app() {
-	return {
-		isBusy: true,
-		search: '',
+  return {
+    isBusy: true,
+    search: '',
 
-		db: new MiniSearch({
-			fields: ['title', 'subtitle', 'tags'], // fields to index for full-text search
-			storeFields: ['title', 'subtitle', 'url', 'url_embeded'] //
-		}),
+    db: new MiniSearch({
+      fields: ['title', 'subtitle', 'tags'], // fields to index for full-text search
+      storeFields: ['title', 'subtitle', 'url', 'url_embeded', 'is_dsresource'], //
+    }),
 
-		push_type: 'single',
+    push_type: 'single',
 
-		intent: '',
-		content: '',
+    intent: '',
+    content: '',
 
-		resources: [],
-		results: [],
-		suggestions: [],
-		selected_resource: null,
-		selected_resources: [],
-		public: true,
-		draft: false,
-		next: null,
+    resources: [],
+    results: [],
+    suggestions: [],
+    selected_resource: null,
+    selected_resources: [],
+    public: true,
+    draft: false,
+    next: null,
 
-		searchResources(text = null) {
-			if (!text) {
-				text = this.search;
-			}
+    searchResources(text = null) {
+      if (!text) {
+        text = this.search;
+      }
 
-			this.results = this.db.search(text, { fuzzy: 0.2 }).slice(0, 8);
-			this.suggestions = this.db.autoSuggest(text, { fuzzy: 0.2 }).slice(0, 2);
+      this.results = this.db.search(text, { fuzzy: 0.2 }).slice(0, 8);
+      this.suggestions = this.db.autoSuggest(text, { fuzzy: 0.2 }).slice(0, 2);
 
-			return true;
-		},
+      return true;
+    },
 
-		resultsAndSelected() {
-			if (this.push_type == 'multiple') {
-				for (var resource of this.selected_resources) {
-					var f = _.find(this.resources, function (r) {
-						return resource == r.id;
-					});
+    resultsAndSelected() {
+      if (this.push_type == 'multiple') {
+        for (var resource of this.selected_resources) {
+          var f = _.find(this.resources, function (r) {
+            return resource == r.id;
+          });
 
-					/* Add it to the list of results */
-					if (
-						!_.find(this.results, function (r) {
-							return resource == r.id;
-						})
-					) {
-						this.results.push(f);
-					}
-				}
-			}
+          /* Add it to the list of results */
+          if (
+            !_.find(this.results, function (r) {
+              return resource == r.id;
+            })
+          ) {
+            this.results.push(f);
+          }
+        }
+      }
+      return this.results;
+    },
 
-			return this.results;
-		},
+    truncate(input, size = 30) {
+      return input.length > size ? `${input.substring(0, size)}...` : input;
+    },
 
-		truncate(input, size = 30) {
-			return input.length > size ? `${input.substring(0, size)}...` : input;
-		},
+    formatDateDisplay(date) {
+      if (this.dateDisplay === 'toDateString')
+        return new Date(date).toDateString();
+      if (this.dateDisplay === 'toLocaleDateString')
+        return new Date(date).toLocaleDateString('fr-FR');
 
-		formatDateDisplay(date) {
-			if (this.dateDisplay === 'toDateString') return new Date(date).toDateString();
-			if (this.dateDisplay === 'toLocaleDateString')
-				return new Date(date).toLocaleDateString('fr-FR');
+      return new Date().toLocaleDateString('fr-FR');
+    },
 
-			return new Date().toLocaleDateString('fr-FR');
-		},
+    setIntent(resource) {
+      this.intent = resource.title;
+    },
 
-		setIntent(resource) {
-			this.intent = resource.title;
-		},
+    async update_recommendation(task_id, intent, content, resource_id) {
+      this.intent = intent;
+      this.content = content;
 
-		async update_recommendation(task_id, intent, content, resource_id) {
-			this.intent = intent;
-			this.content = content;
+      if (resource_id) this.push_type = 'single';
+      else this.push_type = 'noresource';
+      await this.getResources();
 
-			if (resource_id) this.push_type = 'single';
-			else this.push_type = 'noresource';
+      if (resource_id) {
+        this.results = _.where(this.resources, { id: resource_id });
 
-			await this.getResources();
+        if (this.results.length) {
+          this.selected_resource = resource_id;
+          this.selected_resources = [resource_id];
+          this.setIntent(this.results[0]);
+        }
+      }
+    },
 
-			if (resource_id) {
-				this.results = _.where(this.resources, { id: resource_id });
+    async create_recommendation() {
+      await this.getResources();
 
-				if (this.results.length) {
-					this.selected_resource = resource_id;
-					this.selected_resources = [resource_id];
-					this.setIntent(this.results[0]);
-				}
-			}
-		},
+      const params = new URLSearchParams(document.location.search);
 
-		async create_recommendation() {
-			await this.getResources();
+      const selected_resource = parseInt(params.get('resource'));
 
-			const params = new URLSearchParams(document.location.search);
+      if (selected_resource) {
+        this.results = _.where(this.resources, { id: selected_resource });
+        if (this.results.length) {
+          this.selected_resource = selected_resource;
+          this.selected_resources = [selected_resource];
+          this.setIntent(this.results[0]);
+        }
+      }
+    },
 
-			const selected_resource = parseInt(params.get('resource'));
+    async getResources() {
+      this.isBusy = true;
 
-			if (selected_resource) {
-				this.results = _.where(this.resources, { id: selected_resource });
-				if (this.results.length) {
-					this.selected_resource = selected_resource;
-					this.selected_resources = [selected_resource];
-					this.setIntent(this.results[0]);
-				}
-			}
-		},
+      const response = await fetch('/api/resources/');
+      resourcesFromApi = await response.json(); //extract JSON from the http response
 
-		async getResources() {
-			this.isBusy = true;
+      resourcesFromApi.forEach((t) => {
+        let entry = {
+          id: t.id,
+          title: t.title,
+          subtitle: t.subtitle,
+          tags: t.tags,
+          url: t.web_url,
+          url_embeded: t.embeded_url,
+          is_dsresource: t.is_dsresource,
+          category: t.category,
+        };
 
-			const response = await fetch('/api/resources/');
-			resourcesFromApi = await response.json(); //extract JSON from the http response
+        this.resources.push(entry);
+        this.db.add(entry);
+      });
 
-			resourcesFromApi.forEach((t) => {
-				let entry = {
-					id: t.id,
-					title: t.title,
-					subtitle: t.subtitle,
-					tags: t.tags,
-					url: t.web_url,
-					url_embeded: t.embeded_url,
-					is_dsresource: t.is_dsresource,
-					category: t.category,
-				};
+      this.isBusy = false;
+    },
 
-				this.resources.push(entry);
-				this.db.add(entry);
-			});
-
-			this.isBusy = false;
-		},
-
-		set_draft(draft) {
-			this.draft = draft;
-			this.public = !this.draft;
-		}
-	};
+    set_draft(draft) {
+      this.draft = draft;
+      this.public = !this.draft;
+    },
+  };
 }
