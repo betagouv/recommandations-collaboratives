@@ -1,7 +1,7 @@
 from wagtail.admin.panels import FieldPanel
 from wagtail.blocks import RichTextBlock
 from wagtail.contrib.table_block.blocks import TableBlock
-from wagtail.fields import RichTextField, StreamField
+from wagtail.fields import StreamField
 from wagtail.images.blocks import ImageChooserBlock
 from wagtail.models import Page
 
@@ -9,7 +9,13 @@ from .blocks import HeroBlock, MultiColumnsBlock, QuoteBlock
 
 
 class SimplePage(Page):
-    body = RichTextField(blank=True)
+    body = StreamField(
+        [
+            ("richtext", RichTextBlock(label="Texte riche")),
+            ("table", TableBlock()),
+        ],
+        verbose_name="Contenu",
+    )
 
     content_panels = Page.content_panels + [
         FieldPanel("body"),

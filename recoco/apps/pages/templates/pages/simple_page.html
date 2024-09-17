@@ -21,6 +21,18 @@
 {% block content %}
     <div class="col-8 fr-mt-3w fr-py-2w g-0 fr-mx-auto font-marianne"
          id="simple-text">
-        <p>{{ page.body|richtext }}</p>
+        {% for block in page.body %}
+            {% if block.block_type == 'table' %}
+                <div class="fr-table--md fr-table fr-table">
+                    <div class="fr-table__wrapper">
+                        <div class="fr-table__container">
+                            <div class="fr-table__content">{% include_block block %}</div>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <p>{{ block.value|richtext }}</p>
+            {% endif %}
+        {% endfor %}
     </div>
 {% endblock content %}

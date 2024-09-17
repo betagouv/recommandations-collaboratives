@@ -20,7 +20,7 @@
 {% endblock title %}
 {% block content %}
     <div class="g-0 fr-mx-auto font-marianne">
-        <!--------------------- page.heading --------------------->
+        <!--------------------- page.heading ---------------------->
         {% for block in page.heading %}
             {% if block.block_type == 'hero' %}
                 {% image block.value.bg_image fill-1200x800 as bg_image %}
@@ -41,7 +41,7 @@
                 </div>
             {% endif %}
         {% endfor %}
-        <!--------------------- page.gallery --------------------->
+        <!--------------------- page.gallery ---------------------->
         <div class="fr-container">
             <div class="fr-grid-row fr-grid-row--gutters fr-py-3w">
                 {% for block in page.gallery %}
