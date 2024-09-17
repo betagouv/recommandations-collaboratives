@@ -1715,4 +1715,34 @@ def test_last_members_activity_not_updated_by_document_upload_from_advisor(
     assert project.last_members_activity_at < before_update
 
 
+######
+# Embedding
+######
+@pytest.mark.django_db
+def test_recommendation_embed_is_reachable(client, request, project):
+    url = reverse("projects-project-detail-recommandations-embed", args=(project.pk,))
+
+    response = client.get(url, data={"key": project.ro_key})
+
+    assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_recommendation_embed_requires_correct_rokey(client, request, project):
+    url = reverse("projects-project-detail-recommandations-embed", args=(project.pk,))
+
+    response = client.get(url, data={"key": "blahelalaeeane"})
+
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_recommendation_embed_needs_a_rokey(client, request, project):
+    url = reverse("projects-project-detail-recommandations-embed", args=(project.pk,))
+
+    response = client.get(url)
+
+    assert response.status_code == 403
+
+
 # eof
