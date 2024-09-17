@@ -7,9 +7,9 @@
                    value="1"
                    type="radio"
                    :checked="$store.tasksView.currentView === 'inline'"
-                   id="segmented-2215-1"
-                   name="segmented-2215">
-            <label class="fr-label" for="segmented-2215-1">Liste</label>
+                   id="segmented-task-inline"
+                   name="segmented-task-inline-kanban">
+            <label class="fr-label" for="segmented-task-inline">Liste</label>
         </div>
         <div class="fr-segmented__element">
             <input data-test-id="kanban-tasks-switch-button"
@@ -17,9 +17,9 @@
                    :checked="$store.tasksView.currentView === 'kanban'"
                    value="2"
                    type="radio"
-                   id="segmented-2215-2"
-                   name="segmented-2215">
-            <label class="fr-label" for="segmented-2215-2">Tableau</label>
+                   id="segmented-task-kanban"
+                   name="segmented-task-inline-kanban">
+            <label class="fr-label" for="segmented-task-kanban">Tableau</label>
         </div>
     </div>
 </fieldset>
