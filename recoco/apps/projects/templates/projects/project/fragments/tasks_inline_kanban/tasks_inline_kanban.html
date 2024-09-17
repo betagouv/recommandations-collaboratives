@@ -1,7 +1,11 @@
 {% load django_vite %}
-{% block project_js %}
-    {% vite_asset 'js/apps/tasks.js' %}
-{% endblock project_js %}
+{% block js %}
+    {% if embed_view is not True %}
+        {% vite_asset 'js/apps/tasks.js' %}
+    {% else %}
+        {% vite_asset 'js/apps/tasksEmbed.js' %}
+    {% endif %}
+{% endblock js %}
 {{ project.pk|json_script:"djangoProjectId" }}
 {{ can_administrate|json_script:"canAdministrate" }}
 {{ user_project_perms|json_script:"userProjectPerms" }}
@@ -15,7 +19,9 @@
     <template x-if="$store.tasksView.currentView === 'kanban'">
         {% include "projects/project/fragments/tasks_kanban/tasks_kanban.html" %}
     </template>
-    {% include "projects/project/fragments/tasks_modal/task_modal.html" %}
-    {% include "projects/project/fragments/tasks_modal/delete_task_confirmation_modal.html" %}
-    {% include "projects/project/fragments/tasks_modal/feedback_modal.html" %}
+    {% if embed_view is not True %}
+        {% include "projects/project/fragments/tasks_modal/task_modal.html" %}
+        {% include "projects/project/fragments/tasks_modal/delete_task_confirmation_modal.html" %}
+        {% include "projects/project/fragments/tasks_modal/feedback_modal.html" %}
+    {% endif %}
 </div>
