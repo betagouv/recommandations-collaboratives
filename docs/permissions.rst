@@ -12,10 +12,7 @@ There are 3 permission levels::
 
 Utilities and low level functions that matches permission levels:
 
-.. autofunction:: urbanvitaliz.apps.projects.utils.can_administrate_project
-
-
-.. autofunction:: urbanvitaliz.apps.projects.utils.can_manage_project
+.. autofunction:: recoco.apps.projects.utils.can_administrate_project
 
 
 Roles
@@ -25,7 +22,7 @@ Roles
 * Regional Actor: means this user is a localized actor for a given project
 
 
-.. autofunction:: urbanvitaliz.apps.projects.context_processors.is_switchtender_processor
+.. autofunction:: recoco.apps.projects.context_processors.is_switchtender_processor
 
-.. autofunction:: urbanvitaliz.apps.projects.utils.get_regional_actors_for_project
-.. autofunction:: urbanvitaliz.apps.projects.utils.is_regional_actor_for_project
+.. autofunction:: recoco.apps.projects.utils.get_regional_actors_for_project
+.. autofunction:: recoco.apps.projects.utils.is_regional_actor_for_project
