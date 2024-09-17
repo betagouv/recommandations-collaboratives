@@ -59,7 +59,7 @@
                            value="{{ request.GET.email }}"
                            data-test-id="contact-form-email"
                            required>
-                    <label for="{{ form.email.id_for_label }}">Votre addresse courriel</label>
+                    <label for="{{ form.email.id_for_label }}">Votre adresse courriel</label>
                     {% for error in form.email.errors %}<div class="text-danger text-end">{{ error }}</div>{% endfor %}
                 </div>
             {% endif %}
