@@ -3,11 +3,6 @@
 {% load gravatar %}
 {% load django_vite %}
 {% load projects_extra %}
-{% block css %}
-    <link href="{% static 'css/header/header.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-{% endblock css %}
 {% block js %}
     {% vite_asset 'js/apps/menuNotification.js' %}
 {% endblock js %}
@@ -136,21 +131,24 @@
             </a>
         </li>
         {% comment %} surcharge pour ajouter des éléments au menu top à droite de ressources {% endcomment %}
-        {% include 'header/menu-top-secondary-right.html' %}
+        {% include "header/menu-top-secondary-right.html" %}
         <!-- Notifications -->
         {% if user.is_authenticated %}
-            <li class="dropdown"
+            <li class="dropdown navigation__item-notification-menu"
                 x-data="MenuNotifications({{ unread_notifications_count }})">
                 <button class="fr-btn fr-btn--tertiary-no-outline fr-icon-notification-3-line"
+                        id="notification-menu-button"
                         role="button"
                         data-bs-toggle="dropdown"
                         data-bs-auto-close="outside"
                         aria-expanded="false"
-                        data-test-id="notification-menu-open">Notifications</button>
-                <span class="badge text-bg-danger"
-                      x-show="true || notificationNumber > 0"
-                      x-text="notificationNumber"
-                      data-test-id="notification-badge"></span>
+                        data-test-id="notification-menu-open">
+                    Notifications
+                    <span class="badge text-bg-danger"
+                          x-show="true || notificationNumber > 0"
+                          x-text="notificationNumber"
+                          data-test-id="notification-badge"></span>
+                </button>
                 {% include "header/dropdown-menu-notifications.html" %}
             </li>
         {% endif %}
