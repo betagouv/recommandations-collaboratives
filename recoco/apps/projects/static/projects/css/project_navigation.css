@@ -52,6 +52,10 @@
   margin-bottom: 0;
 }
 
+.project-navigation li {
+  padding-bottom: 0;
+}
+
 .project-navigation a.active {
   background-color: white;
   font-weight: bold;
@@ -79,7 +83,7 @@
   display: flex;
   align-items: center;
 
-  bottom: 2px;
+  bottom: -2px;
   left: 5%;
 
   width: 90%;

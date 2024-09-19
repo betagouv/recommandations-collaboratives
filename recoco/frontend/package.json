@@ -6,12 +6,14 @@
   "private": true,
   "scripts": {
     "test": "./node_modules/vitest/vitest.mjs",
-    "dev": "vite",
+    "dev": "vite --force",
+    "test-server": "vite --port 3001",
     "build": "vite build",
     "preview": "vite preview --port 3000"
   },
   "dependencies": {
     "@gouvfr/dsfr": "^1.11.2",
+    "@iframe-resizer/child": "^5.3.1",
     "@popperjs/core": "^2.11.5",
     "@tiptap/core": "^2.0.0-beta.218",
     "@tiptap/extension-hard-break": "^2.1.16",
@@ -22,11 +24,10 @@
     "ajv-errors": "^3.0.0",
     "ajv-formats": "^3.0.1",
     "alpinejs": "^3.10.2",
-    "axios": "^1.6.0",
+    "axios": "^1.7.4",
     "bootstrap": "^5.3.3",
     "d3": "^7.8.4",
     "d3-cloud": "^1.2.5",
-    "dsrc_ui": "file:./modules/dsrc_ui",
     "fuse.js": "^7.0.0",
     "intro.js": "^7.0.1",
     "js-cookie": "^3.0.1",

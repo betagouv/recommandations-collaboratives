@@ -111,11 +111,11 @@ template = Template(
     <style>
         {{csscore}} # necessary in Jupyter Notebooks only
     </style>
-{% endblock %}
+{% endblock css %}
 
 {% block main %}
     {% dsrc_button data_dict %}
-{% endblock %}
+{% endblock main %}
 """
 )
 

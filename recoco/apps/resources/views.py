@@ -6,6 +6,7 @@ Views for resources application
 author  : raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created : 2021-06-16 10:59:08 CEST
 """
+
 import datetime
 
 import reversion
@@ -246,6 +247,18 @@ class EmbededResourceDetailView(BaseResourceDetailView):
     model = models.Resource
     template_name = "resources/resource/details_embeded.html"
     pk_url_kwarg = "resource_id"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        if task_id := self.request.GET.get("task_id"):
+            context["task"] = (
+                self.object.task_set.filter(pk=task_id)
+                .select_related("ds_folder")
+                .first()
+            )
+
+        return context
 
 
 ########################################################################

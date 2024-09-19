@@ -4,7 +4,9 @@
 {% load django_vite %}
 {% load projects_extra %}
 {% load sass_tags %}
-{% block title %}{{ project.name }}{% endblock %}
+{% block title %}
+    {{ project.name }}
+{% endblock title %}
 {% block css %}
     <link href="{% sass_src 'resources/resources.scss' %}"
           rel="stylesheet"
@@ -18,17 +20,23 @@
     <link href="{% sass_src 'home/css/dsfr/marianne.css' %}"
           rel="stylesheet"
           type="text/css">
-{% endblock %}
+{% endblock css %}
 {% block content %}
     {% is_staff_for_current_site request.user as is_staff %}
-    <div class="col-11 pt-3 pb-5 mx-auto">
-        <div class="row" style="font-family: 'Marianne', arial, sans-serif;">
-            {% block banner %}{% endblock %}
-            {% include 'projects/project/header.html' %}
-            {% if project.status == "DRAFT" and request.user in project.members.all %}
-                {% include 'projects/project/fragments/pending_confirmation_banner.html' %}
-            {% endif %}
-            {% block project_detail %}{% endblock %}
+    <div class="col-11 fr-pt-2w fr-pb-6w fr-mx-auto">
+        <div class="row">
+            {% block banner %}
+            {% endblock banner %}
+            {% with request.resolver_match.url_name as url_name %}
+                {% if url_name != "projects-project-detail-recommandations-embed" %}
+                    {% include "projects/project/header.html" %}
+                    {% if project.status == "DRAFT" and request.user in project.members.all %}
+                        {% include "projects/project/fragments/pending_confirmation_banner.html" %}
+                    {% endif %}
+                {% endif %}
+                {% block project_detail %}
+                {% endblock project_detail %}
+            {% endwith %}
         </div>
     </div>
-{% endblock %}
+{% endblock content %}

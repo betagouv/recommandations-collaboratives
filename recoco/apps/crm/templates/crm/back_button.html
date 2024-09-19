@@ -1,11 +1,12 @@
 {% load static %}
-<div class="d-flex ps-4 p-1" style="background-color: #8cb0fa;">
-    <a x-data="Crm"
-       @click="goBack"
-       class="my-2"
-       style="cursor: pointer;
-              color: #222">
-        <svg class="bi me-2" width="16" height="16" fill="currentColor">
+{% block css %}
+    <link href="{% static 'crm/css/button.scss' %}"
+          rel="stylesheet"
+          type="text/css" />
+{% endblock css %}
+<div class="d-flex fr-pl-3w fr-p-1v div-background">
+    <a x-data="Crm" @click="goBack" class="fr-my-2v button-style">
+        <svg class="bi fr-mr-2v" width="16" height="16" fill="currentColor">
             <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#arrow-return-left" />
         </svg>
         <span>revenir en arrière</span>

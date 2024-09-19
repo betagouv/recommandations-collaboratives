@@ -19,7 +19,7 @@
                 </div>
             {% endif %}
             {% if field|is_checkboxselectmultiple %}
-                {% include 'dsrc_crispy_forms_no_js/layout/checkboxselectmultiple.html' %}
+                {% include "dsrc_crispy_forms_no_js/layout/checkboxselectmultiple.html" %}
             {% endif %}
             {% if not field|is_checkbox and not field|is_checkboxselectmultiple %}
                 {% crispy_field field %}

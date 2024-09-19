@@ -1,7 +1,11 @@
 {% extends "base.html" %}
 {% load static %}
-{% block title %}| Solliciter l'équipe UrbanVitaliz{% endblock %}
-{% block og_title %}| Solliciter l'équipe UrbanVitaliz{% endblock %}
+{% block title %}
+    | Solliciter l'équipe UrbanVitaliz
+{% endblock title %}
+{% block og_title %}
+    | Solliciter l'équipe UrbanVitaliz
+{% endblock og_title %}
 {% block css %}
     <style type="text/css">
  .commune-select ul {
@@ -9,20 +13,21 @@
      margin-left: 0;
      }
     </style>
-{% endblock %}
+{% endblock css %}
 {% block content %}
-    <div class="col-11 col-lg-9 py-5 mx-auto">
+    <div class="col-11 col-lg-9 fr-py-6w fr-mx-auto">
         <h2>
-            <svg class="bi me-2" width="32" height="32">
+            <svg class="bi fr-mr-2v" width="32" height="32">
                 <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#megaphone" />
             </svg>
             Solliciter l'équipe UrbanVitaliz
         </h2>
-        <h3 class="py-2">Merci ! Pourriez-vous nous préciser votre commune ?</h3>
-        <form class="form" action="." method="POST">
+        <h3 class="fr-py-2v">Merci ! Pourriez-vous nous préciser votre commune ?</h3>
+        <form class="form" action="." method="post">
             {% csrf_token %}
-            <span class="mt-4">Nous avons trouvé <strong>plusieurs communes</strong> correspondantes à ce code postal, laquelle est la vôtre ?</span>
+            <span class="fr-mt-3w">Nous avons trouvé <strong>plusieurs communes</strong> correspondantes à ce code postal, laquelle est la vôtre ?</span>
             <div class="commune-select">{{ form.as_p }}</div>
             <button class="btn btn-primary" type="submit">Valider</button>
         </form>
-    {% endblock %}
+    </div>
+{% endblock content %}

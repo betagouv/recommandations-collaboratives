@@ -4,28 +4,26 @@
 {% load projects_extra %}
 {% block js %}
     {% vite_asset 'js/apps/projectShare.js' %}
-{% endblock %}
+{% endblock js %}
 {% get_advising_position request.user project request.site as position %}
 {% get_obj_perms request.user for request.site as "user_site_perms" %}
 {% get_obj_perms request.user for project as "user_project_perms" %}
 {% with request.resolver_match.url_name as url_name %}
     {% block banner %}
-        {% include 'projects/project/fragments/project_active_status_banner.html' %}
-    {% endblock %}
+        {% include "projects/project/fragments/project_active_status_banner.html" %}
+    {% endblock banner %}
     <div x-data="ProjectShare"
          class="col-12 d-flex justify-content-between align-items-start">
-        <div class=" d-flex flex-column mb-2">
+        <div class=" d-flex flex-column fr-mb-2v">
             <div class="d-flex align-items-center">
-                <h2 class="project-link d-flex align-items-center">
-                    <span class="fw-bold title-info text-dark me-2 location">{{ project.commune.name }}</span>
+                <h2 class="project-link d-flex align-items-center fr-mb-0">
+                    <span class="fw-bold title-info text-dark fr-mr-2v location">{{ project.commune.name }}</span>
                     <span class="text-info-custom text-grey-dark name">{{ project.name }}</span>
                 </h2>
             </div>
             <div class="d-flex">
-                <p class="tiny text-grey-dark">
-                    <svg class="bi" width="15" height="15" fill="currentColor">
-                        <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#geo-alt-fill" />
-                    </svg>
+                <p class="tiny text-grey-dark fr-mb-0">
+                    <span class="fr-icon-map-pin-2-line fr-icon--sm" aria-hidden="true"></span>
                     {% if project.commune %}
                         {{ project.commune.name }} —   {{ project.commune.postal }}, {{ project.commune.department }} - {{ project.commune.department.region }} - INSEE: {{ project.commune.insee }}
                     </p>
@@ -33,22 +31,18 @@
             </div>
             {% if "use_project_tags" in user_site_perms %}
                 <div class="d-flex justify-content-between">
-                    <ul class="d-flex list-unstyled m-0 p-0 flex-wrap mb-3">
-                        {% for tag in project.tags.all %}<li class="mx-1 my-1 badge rounded-pill bg-dark">{{ tag }}</li>{% endfor %}
-                        <a class="d-flex align-items-center"
-                           href="{% url "projects-project-tags" project.id %}">
-                            <svg class="bi ms-2 " width="15" height="15" fill="currentColor">
-                                <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#pencil-fill" />
-                            </svg>
-                        </a>
+                    <ul class="d-flex list-unstyled fr-m-0 fr-p-0 flex-wrap fr-mb-2w">
+                        {% for tag in project.tags.all %}<li class="fr-mx-1v fr-my-1v badge rounded-pill bg-dark">{{ tag }}</li>{% endfor %}
+                        <a class="fr-btn fr-btn--sm fr-btn--tertiary-no-outline fr-icon-pencil-line"
+                           href="{% url "projects-project-tags" project.id %}">Modifier les etiquettes</a>
                     </ul>
                 </div>
             {% endif %}
         </div>
-        <div class="flex-grow-1 ps-2">
+        <div class="flex-grow-1 fr-pl-2v">
             {% include "projects/project/fragments/email_reminder/project_email_reminder.html" with position=position %}
         </div>
-        <div class="project-header-actions flex-shrink-0 ps-2">
+        <div class="project-header-actions flex-shrink-0 fr-pl-2v">
             {% include "projects/project/fragments/sidebar.html" with disable_can_share=True disable_add_recommendation=True disable_add_recommendation=True disable_administration=True url_name=url_name %}
         </div>
     </div>

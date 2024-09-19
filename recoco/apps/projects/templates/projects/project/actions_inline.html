@@ -5,36 +5,38 @@
 {% load sass_tags %}
 {% load django_vite %}
 {% load guardian_tags %}
-{% block title %}Recommandations - {{ block.super }}{% endblock %}
+{% block title %}
+    Recommandations - {{ block.super }}
+{% endblock title %}
 {% block js %}
     {% vite_asset 'js/apps/project.js' %}
-{% endblock %}
+{% endblock js %}
 {% block css %}
     <link href="{% sass_src 'projects/css/board.scss' %}"
           rel="stylesheet"
           type="text/css" />
-{% endblock %}
+{% endblock css %}
 {% block banner %}
-    {% include 'projects/project/fragments/positioning_banner.html' %}
-{% endblock %}
+    {% include "projects/project/fragments/positioning_banner.html" %}
+{% endblock banner %}
 {% block project_detail %}
     {% get_obj_perms request.user for request.site as "user_site_perms" %}
     {% get_obj_perms request.user for project as "user_project_perms" %}
-    <div class="col-12 mx-auto">
-        {% include 'projects/project/navigation.html' with recommandations=True %}
-        <div class="mb-2 d-flex align-items-center justify-content-between">
+    <div class="col-12 fr-mx-auto">
+        {% include "projects/project/navigation.html" with recommandations=True %}
+        <div class="fr-mb-2v d-flex align-items-center justify-content-between">
             <div>
-                <span class="title-info mb-0">Liste des nouvelles recommandations</span>
-                <p class="text-info-custom text-grey-light font-small mb-0">
+                <span class="title-info fr-mb-0">Liste des nouvelles recommandations</span>
+                <p class="text-info-custom text-grey-light font-small fr-mb-0">
                     Vous pouvez filtrer cette liste en affichant uniquement les recommandations en brouillon
                 </p>
             </div>
             <div class="d-flex align-items-center">
                 {% if not disable_add_recommendation %}
                     {% if "manage_tasks" in user_project_perms %}
-                        <a class="button filled me-2"
+                        <a class="button filled fr-mr-2v"
                            href="{% url 'projects-project-create-task' project.id %}?next={{ request.path }}">
-                            <svg class="bi me-1" width="16" height="16" fill="currentColor">
+                            <svg class="bi fr-mr-1v" width="16" height="16" fill="currentColor">
                                 <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#journal-plus" />
                             </svg>
                             Ajouter une recommandation
@@ -45,6 +47,6 @@
                    href="{% url 'projects-project-detail-actions' project.pk %}">Revenir sur la vue du kanban</a>
             </div>
         </div>
-        {% include 'projects/project/fragments/tasks_inline/tasks_inline.html' %}
+        {% include "projects/project/fragments/tasks_inline/tasks_inline.html" %}
     </div>
-{% endblock %}
+{% endblock project_detail %}

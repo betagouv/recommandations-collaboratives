@@ -1137,8 +1137,8 @@ def crm_list_topics_as_csv(request):
             [
                 name,
                 usage[0],
-                [project[1] for project in usage[1]],
-                [task[1] for task in usage[2]],
+                [project.pk for project in usage[1]],
+                [task.pk for task in usage[2]],
             ]
         )
 

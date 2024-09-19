@@ -1,40 +1,36 @@
 {% load static %}
 <div x-data="TaskComment()">
-    <template x-if="task.content !== '' && !isEditing">
+    <template x-if="currentTask.content !== '' && !isEditing">
         <div data-test-id="task-initial-comment"
-             class="position-relative p-3 bg-grey-light rounded-3 p-3">
-            <div x-html="truncate(renderMarkdown(task.content),100)"
-                 class="text-info-custom font-small text-dark mb-3"></div>
-            {% include 'projects/project/fragments/task/task_user_card.html' %}
-            {% if "manage_tasks" in user_project_perms and not disable_edit %}
-                <button class="position-absolute bottom-0 mb-3 me-3 right-0 end-0 border tiny d-flex align-items-center justify-content-center px-2 py-2 me-1 hover-bg-grey"
-                        @click.stop="isEditing = true;"
-                        data-test-id="edit-comment-button">
-                    <svg class="bi" width="12px" height="12px" fill="#929292">
-                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#pencil-fill" />
-                    </svg>
-                </button>
+             class="position-relative fr-p-2w bg-grey-light rounded-3 fr-p-2w">
+            <div x-html="truncate(renderMarkdown(currentTask.content),100)"
+                 class="text-info-custom font-small text-dark fr-mb-2w"></div>
+            {% include "projects/project/fragments/task/task_user_card.html" %}
+            {% if embed_view is not True %}
+                {% if "manage_tasks" in user_project_perms and not disable_edit %}
+                    <button class="fr-btn fr-btn--sm fr-btn--tertiary fr-icon-pencil-line position-absolute bottom-0 end-0 fr-m-2w"
+                            @click.stop="isEditing = true;"
+                            data-test-id="edit-comment-button">
+                        Modifier le commentaire initial de la recommandation
+                    </button>
+                {% endif %}
             {% endif %}
         </div>
     </template>
-    <template x-if="!isEditing && task.content === ''">
-        <div class="rounded bg-grey-light mb-4 px-3 d-flex flex-column py-3 justify-content-between align-items-start task-item position-relative">
-            <div class="d-flex flex-column align-items-center justify-content-center w-100 py-4">
-                <span class="text-info-custom text-orange name fw-normal mb-2">Pas de commentaire initial</span>
+    <template x-if="!isEditing && currentTask.content === ''">
+        <div class="rounded bg-grey-light fr-mb-3w fr-px-2w d-flex flex-column fr-py-2w justify-content-between align-items-start task-item position-relative">
+            <div class="d-flex flex-column align-items-center justify-content-center w-100 fr-py-3w">
+                <span class="text-info-custom text-orange name fw-normal fr-mb-2v">Pas de commentaire initial</span>
                 <button class="button filled blue small inherit"
                         @click.stop="isEditing = true;">Ajouter un commentaire</button>
             </div>
         </div>
     </template>
     <template x-if="isEditing">
-        <div class="py-3 px-3 mb-2 border-blue task-comment medium-border-radius position-relative">
-            <button class="position-absolute top-0 mt-3 me-3 right-0 end-0 border tiny d-flex align-items-center justify-content-center px-2 py-2 me-1 hover-bg-grey"
-                    @click.stop="isEditing = false">
-                <svg class="bi" width="12px" height="12px" fill="#929292">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#x" />
-                </svg>
-            </button>
-            {% include 'tools/editor.html' with is_task_comment=True %}
+        <div class="fr-py-2w fr-px-2w fr-mb-2v border-blue task-comment medium-border-radius position-relative">
+            <button class="fr-btn fr-btn--sm fr-btn--tertiary fr-icon-close-line position-absolute top-0 end-0 fr-m-2w"
+                    @click.stop="isEditing = false">Annuler la modification</button>
+            {% include "tools/editor.html" with is_task_comment=True %}
         </div>
     </template>
 </div>
