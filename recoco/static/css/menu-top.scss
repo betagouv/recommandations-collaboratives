@@ -6,50 +6,30 @@
     padding: var(--padding-y-navigation);
   }
   &__menu-top-secondary-container {
-    height: 56px;
+    height: 64px;
   }
   &__menu-top-secondary {
     margin-block-start: 0;
     margin-block-end: 0;
     height: 100%;
+    li {
+      margin-right: 1rem;
+    }
+    &:first-child {
+      margin-left: 15px;
+    }
     li.navigation__item-dashboard,
-    li.navigation__item-projects {
+    li.navigation__item-moderation,
+    li.navigation__item-resource {
       padding: var(--padding-y-navigation);
     }
-    li.navigation__item-dashboard {
-    }
-    li.navigation__item-notification-menu {
-      padding: var(--padding-navigation);
-      height: 100%;
-      border-left: solid 1px #ccc;
-      border-right: solid 1px #ccc;
-      button#notification-menu-button {
-        margin-left: var(--padding-y-navigation);
-        margin-right: var(--padding-y-navigation);
-        max-height: 2.25rem;
-        max-width: 2.25rem;
-        &::before {
-          --icon-size: 1.25rem;
-        }
-      }
+
+    li.navigation__item-moderation {
       .badge {
-        position: absolute;
-        bottom: 0;
-        right: 0;
+        margin-left: 0.5rem;
+        line-height: 1rem;
       }
     }
-  }
-}
-
-nav ul:not(.dropdown-menu) > li {
-  margin-right: 15px;
-
-  &:first-child {
-    margin-left: 15px;
-  }
-
-  &.activated {
-    border-bottom: solid 2px #0063cb;
   }
 }
 
@@ -58,17 +38,6 @@ nav ul:not(.dropdown-menu) > li {
     padding-top: 4px !important;
     padding-bottom: 4px !important;
   }
-}
-
-.project-selector-dropdown {
-  width: 28vw;
-  max-height: 90vh;
-}
-
-.project-selector-dropdown li.inactive {
-  background-color: #f6f6f6;
-  color: #222;
-  border: 2px solid #222;
 }
 
 .project-card-top-information.inactive span {
@@ -85,10 +54,6 @@ nav ul:not(.dropdown-menu) > li {
   color: #222;
 }
 
-#user-info .dropdown-menu {
-  transform: translate3d(-60px, 0, 0);
-}
-
 // Collapse secondary navigation
 
 .collapse {
@@ -102,16 +67,6 @@ nav ul:not(.dropdown-menu) > li {
 .logo-rf,
 .logo-cerema {
   display: none;
-}
-
-#user-info .dropdown-menu {
-  transform: translate3d(-60px, 0, 0);
-}
-
-@media (max-width: 1200px) {
-  #user-info .dropdown-menu {
-    transform: translate3d(-130px, 0, 0);
-  }
 }
 
 @media (max-width: 1350px) {

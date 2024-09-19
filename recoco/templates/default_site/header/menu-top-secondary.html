@@ -29,7 +29,7 @@
         {% endif %}
         <!-- Projects -->
         {% if request.session.projects|length > 0 %}
-            <li>
+            <li class="navigation__item-projects">
                 <div class="fr-select-group fr-my-0">
                     <label class="fr-label fr-sr-only" for="project-selector">Label pour liste déroulante</label>
                     {% comment %} TODO
@@ -74,7 +74,8 @@
         {% comment %} surcharge pour ajouter des éléments au menu top à gauche de ressources {% endcomment %}
         {% include 'header/menu-top-secondary-left.html' %}
         <!-- Ressources -->
-        <li style="{% if url_name == 'resources-resource-search' %}activated{% endif %}">
+        <li class="navigation__item-resource"
+            style="{% if url_name == 'resources-resource-search' %}activated{% endif %}">
             <a href="{% url 'resources-resource-search' %}"
                class="fr-link {% if url_name == 'resources-resource-search' %}active{% endif %}"
                data-test-id="link-ressources">
@@ -83,25 +84,5 @@
         </li>
         {% comment %} surcharge pour ajouter des éléments au menu top à droite de ressources {% endcomment %}
         {% include "header/menu-top-secondary-right.html" %}
-        <!-- Notifications -->
-        {% if user.is_authenticated %}
-            <li class="dropdown navigation__item-notification-menu"
-                x-data="MenuNotifications({{ unread_notifications_count }})">
-                <button class="fr-btn fr-btn--tertiary-no-outline fr-icon-notification-3-line"
-                        id="notification-menu-button"
-                        role="button"
-                        data-bs-toggle="dropdown"
-                        data-bs-auto-close="outside"
-                        aria-expanded="false"
-                        data-test-id="notification-menu-open">
-                    Notifications
-                    <span class="badge text-bg-danger"
-                          x-show="true || notificationNumber > 0"
-                          x-text="notificationNumber"
-                          data-test-id="notification-badge"></span>
-                </button>
-                {% include "header/dropdown-menu-notifications.html" %}
-            </li>
-        {% endif %}
     </ul>
 {% endwith %}
