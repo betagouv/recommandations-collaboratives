@@ -6,6 +6,9 @@ import { gravatar_url } from '../utils/gravatar';
 import { isStatusUpdate, statusText } from '../utils/taskStatus';
 import { truncate } from '../utils/taskStatus';
 
+/**
+ * A Preview Modal component
+ */
 export default function PreviewModal() {
   return {
     pendingComment: '',
