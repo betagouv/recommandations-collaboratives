@@ -1,13 +1,15 @@
 {% extends "projects/project/list.html" %}
 {% load static %}
-{% block title %}Carte des projets {{ block.super }}{% endblock %}
+{% block title %}
+    Carte des projets {{ block.super }}
+{% endblock title %}
 {% block project_list_content %}
     <div x-data="Map">
-        <div class="topbar d-flex justify-content-between p-2">
+        <div class="topbar d-flex justify-content-between fr-p-2v">
             <span class="fs-5 flex-grow-1">
                 {% include "projects/project/fragments/navigation/display_select.html" %}
                 {% if project_moderator %}
-                    <svg class="ms-2 align-middle bi"
+                    <svg class="fr-ml-2v align-middle bi"
                          width="24px"
                          height="24px"
                          fill="currentColor">
@@ -32,15 +34,17 @@
                     </div>
                 {% endif %}
             </span>
-            <div x-show="isBusy" x-transition class="mx-5 justify-content-center">
+            <div x-show="isBusy"
+                 x-transition
+                 class="position-absolute w-100 text-center">
                 <div class="spinner-border" role="status">
                     <span class="visually-hidden">Loading...</span>
                 </div>
             </div>
-            {% include 'projects/project/fragments/list-toolbars.html' %}
+            {% include "projects/project/fragments/list-toolbars.html" %}
         </div>
-        <div x-cloak class="p-0 pt-4">
+        <div x-cloak class="fr-p-0 fr-pt-3w">
             <div x-ref="map" id="map"></div>
         </div>
     </div>
-{% endblock %}
+{% endblock project_list_content %}

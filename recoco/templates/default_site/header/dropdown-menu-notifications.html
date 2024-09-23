@@ -9,13 +9,13 @@
                 title="Fermer le menu"
                 @click="closeNotificationsMenu"
                 data-test-id="notification-menu-close">
-            <svg class="bi me-1" width="16" height="16" fill="currentColor">
+            <svg class="bi fr-mr-1v" width="16" height="16" fill="currentColor">
                 <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#x-lg" />
             </svg>
         </button>
     </li>
     <li>
-        <hr class="dropdown-divider">
+        <hr class="dropdown-divider fr-pb-0">
     </li>
     <div class="notifications__container" x-show="notificationNumber > 0">
         {% for date, notifications in grouped_notifications.items %}
@@ -53,7 +53,7 @@
                             title="Supprimer la notification"
                             data-test-id="notification-mark-as-read-one"
                             @click="markNotificationAsRead({{ notification.id }}, $el, `${ {{ forloop.counter }}{{ forloop.parentloop.counter0 }} }`)">
-                        <svg class="bi me-1" width="16" height="16" fill="currentColor">
+                        <svg class="bi fr-mr-1v" width="16" height="16" fill="currentColor">
                             <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#x-lg" />
                         </svg>
                     </button>
@@ -65,7 +65,7 @@
         <span class="dropdown-item-text">Vous n'avez aucune notification ☀️</span>
     </li>
     <li>
-        <hr class="dropdown-divider">
+        <hr class="dropdown-divider fr-pb-0">
     </li>
     <li class="btn-container">
         <button @click="markAllNotificationsAsRead"

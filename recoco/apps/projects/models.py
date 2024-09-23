@@ -391,7 +391,12 @@ class Project(models.Model):
         related_name="advisors_notes",
     )
 
-    location = models.CharField(max_length=256, verbose_name="Localisation")
+    location = models.CharField(
+        max_length=256,
+        verbose_name="Localisation",
+        null=True,
+        blank=True,
+    )
     location_x = models.FloatField(
         null=True, blank=True, verbose_name="Coordonnées géographiques (X)"
     )
@@ -603,6 +608,11 @@ class NoteManager(models.Manager):
         return self.get_queryset().filter(public=False)
 
 
+class AllNotesManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().order_by("-created_on", "-updated_on")
+
+
 class NoteOnSiteManager(CurrentSiteManager, NoteManager):
     pass
 
@@ -612,6 +622,7 @@ class Note(models.Model):
 
     objects = NoteManager()
     on_site = NoteOnSiteManager()
+    all_notes = AllNotesManager()
 
     site = models.ForeignKey(
         Site, on_delete=models.CASCADE, related_name="project_notes"

@@ -65,7 +65,7 @@ template = Template(
     <style>
         {{csscore}}
     </style>
-{% endblock %}
+{% endblock css %}
 
 <table class="fr-table">
     <tr>

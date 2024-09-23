@@ -1,6 +1,6 @@
 {% load static %}
-<div class="crm-search pb-4">
-    <form method="POST" action="{% url 'crm-search' %}" class="crm-form-search">
+<div class="crm-search fr-pb-3w">
+    <form method="post" action="{% url 'crm-search' %}" class="crm-form-search">
         {% csrf_token %}
         {{ search_form.as_p }}
         <button type="submit" class="button">

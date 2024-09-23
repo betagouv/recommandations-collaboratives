@@ -1,27 +1,52 @@
+{% load survey %}
 {% if onboarding_information %}
-    {% for title, content in onboarding_response.items %}
-        {% if content %}
-            {% include 'projects/project/fragments/information_card_description_details.html' %}
-            {% if forloop.counter != onboarding_response.items|length %}<hr />{% endif %}
-        {% endif %}
-    {% endfor %}
-{% elif new_onboarding %}
-    {% if multichoice %}
-        {% for choice in choices %}
-            {{ choice.conclusion|default:choice.text|capfirst }}
+    {% if old_project %}
+        {% for title, content in onboarding_response.items %}
+            {% if content %}
+                {% include "projects/project/fragments/information_card_description_details.html" %}
+                {% if forloop.counter != onboarding_response.items|length %}<hr class="fr-mt-0" />{% endif %}
+            {% endif %}
+        {% endfor %}
+    {% else %}
+        {% for question in site_config.onboarding_questions.all %}
+            {% project_session_for_survey project site_config.project_survey as session %}
+            {% question_answer session question as answer %}
+            {% if answer.comment %}
+                <!--Texte libre-->
+                {% include "projects/project/fragments/information_card_description_details.html" with title=answer.question.text_short content=answer.comment|safe %}
+            {% else %}
+                <!--Choix multiples-->
+                {% lookup_choices_from_answer answer as choices %}
+                {% if choices %}
+                    {% if question.is_multiple %}
+                        <!--Réponse multiples-->
+                        <ul>
+                            {% for choice in choices %}<li>{{ choice.conclusion|default:choice.text|capfirst }}</li>{% endfor %}
+                        </ul>
+                    {% else %}
+                        <!--Réponse Unique-->
+                        {% for choice in choices %}
+                            {% include "projects/project/fragments/information_card_description_details.html" with title=answer.question.text_short content=choice.conclusion|default:choice.text|capfirst %}
+                        {% endfor %}
+                    {% endif %}
+                {% else %}
+                    <!--Réponse vide-->
+                    {% include 'projects/project/fragments/information_card_description_details.html' with title=answer.question.text_short content='Non renseigné' %}
+                {% endif %}
+            {% endif %}
+            {% if not forloop.last %}<hr class="fr-mt-0">{% endif %}
         {% endfor %}
     {% endif %}
+    {% if answer.attachment %}
+        <div>
+            <span class="align-middle">
+                <a class="tmp-usevar position-relative z-2"
+                   style="color: {{ question_set.color|default:'black' }} !important"
+                   target="_new"
+                   href="{{ answer.attachment.url }}">Télécharger le fichier joint</a>
+            </span>
+        </div>
+    {% endif %}
 {% else %}
-    {{ description|safe }}
-{% endif %}
-{% if answer.attachment %}
-    <div>
-        <span class="align-middle">
-            <a style="position: relative;
-                        z-index:2;
-                        color: {{ question_set.color|default:'black' }} !important"
-                target="_new"
-                href="{{ answer.attachment.url }}">Télécharger le fichier joint</a>
-        </span>
-    </div>
+    {{ description }}
 {% endif %}

@@ -5,7 +5,7 @@ indent = 4
 exclude = ".venv,venv,.eggs" # override the default set of excluded paths
 
 [tool.pytest.ini_options]
-DJANGO_SETTINGS_MODULE = "recoco.settings.development"
+DJANGO_SETTINGS_MODULE = "recoco.settings.testing"
 addopts = [
         "-p no:warnings",
         "--reuse-db",

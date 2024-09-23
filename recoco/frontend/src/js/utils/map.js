@@ -1,9 +1,8 @@
+import geolocUtils from './geolocation/';
+import GeocoderBAN from './geocoderBAN';
 import * as L from 'leaflet';
 import 'leaflet-control-geocoder';
 import 'leaflet-providers';
-
-import GeocoderBAN from './geocoderBAN';
-import geolocUtils from './geolocation/';
 
 function mapLayerStyles(className) {
   return {
@@ -17,7 +16,7 @@ function mapLayerStyles(className) {
 }
 
 function ignServiceURL(layer, env = 'decouverte', format = 'image/png') {
-  const url = `https://data.geopf.fr/wmts`;
+  const url = 'https://data.geopf.fr/wmts';
   const query =
     'service=WMTS&request=GetTile&version=1.0.0&tilematrixset=PM&tilematrix={z}&tilecol={x}&tilerow={y}&style=normal';
 
@@ -39,7 +38,17 @@ function getDefaultLatLngForLayers(project, geoData) {
   return [latitude, longitude];
 }
 
-function getDefaultLatLngForMap(project) {
+async function getDefaultLatLngForMap(project) {
+  // TODO Geocoder l'adresse du projet pour obtenir les coordonnées
+  const latLongProject = await addressGeocoder(
+    `${project.location} ${project.commune.name}`
+  );
+  if (latLongProject?.features[0]?.geometry?.coordinates) {
+    const [longitude, latitude] =
+      latLongProject.features[0].geometry.coordinates;
+    return [latitude, longitude];
+  }
+
   const longitude = project.location_x
     ? project.location_x
     : project.commune.longitude
@@ -54,9 +63,30 @@ function getDefaultLatLngForMap(project) {
   return [latitude, longitude];
 }
 
+async function addressGeocoder(address) {
+  const url = new URL('https://api-adresse.data.gouv.fr/search');
+  const params = { q: address, limit: 1 };
+  Object.keys(params).forEach((key) =>
+    url.searchParams.append(key, params[key])
+  );
+  try {
+    const response = await fetch(url);
+
+    if (response.status < 200 || response.status >= 300) {
+      const error = new Error(response.statusText);
+      error.response = response;
+      throw error;
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    return undefined;
+  }
+}
+
 // Map creation shortcuts
-function makeMap(idMap, project, options, zoom) {
-  const [latitude, longitude] = getDefaultLatLngForMap(project);
+async function makeMap(idMap, project, options, zoom) {
+  const [latitude, longitude] = await getDefaultLatLngForMap(project);
 
   var map = new L.map(idMap, { ...options });
 
@@ -264,21 +294,21 @@ function markerPopupTemplate({
   title,
 }) {
   const lat = location_x
-    ? `<p data-test-id="project-coord-x-latitude" class="m-0 fs-7 text-capitalize">Lat: ${Number.parseFloat(location_x).toFixed(2)}</p>`
+    ? `<p data-test-id="project-coord-x-latitude" class="fr-m-0 fs-7 text-capitalize">Lat: ${Number.parseFloat(location_x).toFixed(2)}</p>`
     : '';
   const lng = location_y
-    ? `<p data-test-id="project-coord-y-longitude" class="m-0 fs-7 text-capitalize">Lng: ${Number.parseFloat(location_y).toFixed(2)}</p>`
+    ? `<p data-test-id="project-coord-y-longitude" class="fr-m-0 fs-7 text-capitalize">Lng: ${Number.parseFloat(location_y).toFixed(2)}</p>`
     : '';
 
   let popupAddress = '';
   if (address) {
-    popupAddress = `<p class="m-0 fs-7">${address}</p>`;
+    popupAddress = `<p class="fr-m-0 fs-7">${address}</p>`;
   } else if (location) {
-    popupAddress = `<p class="m-0 fs-7">${location}</p>`;
+    popupAddress = `<p class="fr-m-0 fs-7">${location}</p>`;
   }
 
   if (commune) {
-    popupAddress = `${popupAddress}<p class="m-0 fs-7 text-capitalize">${commune.name} (${commune.postal})</p>`;
+    popupAddress = `${popupAddress}<p class="fr-m-0 fs-7 text-capitalize">${commune.name} (${commune.postal})</p>`;
   }
 
   const popupTitle = title ? title : name;

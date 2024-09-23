@@ -1,15 +1,18 @@
 {% load static %}
 <!-- resources -->
 <div id="resource-list"
-     class="mb-4 grow"
+     class="fr-mb-3w grow"
      x-show="push_type != 'noresource'"
      x-transition:enter-start="grow-enter-start"
      x-transition:leave="grow-leave">
-    <h4 class="mb-3">
-        <span class="text-muted me-1">2.</span>Sélectionnez les ressources à publier
+    <h4 class="fr-mb-2w">
+        <span class="text-muted fr-mr-1v">2.</span>Sélectionnez les ressources à publier
     </h4>
     <div class="search input-group-lg">
-        <svg class="bi me-1 text-muted" width="24" height="24" fill="currentColor">
+        <svg class="bi fr-mr-1v text-muted"
+             width="24"
+             height="24"
+             fill="currentColor">
             <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#search" />
         </svg>
         <input data-test-id="search-resource-input"
@@ -19,20 +22,20 @@
                x-model="search"
                placeholder="Rechercher une ressource...">
     </div>
-    {% for error in form.resource.errors %}<div class="text-danger text-start mb-2">{{ error }}</div>{% endfor %}
+    {% for error in form.resource.errors %}<div class="text-danger text-start fr-mb-2v">{{ error }}</div>{% endfor %}
     <!-- listing -->
-    <p class="search-counter fs-6 mb-0"
+    <p class="search-counter fs-6 fr-mb-0"
        x-show="!search"
        x-text="`${db.documentCount} ressources au total`"></p>
-    <p class="search-counter fs-6 mb-0"
+    <p class="search-counter fs-6 fr-mb-0"
        x-show="search"
        x-text="`${results.length} ressource(s) trouvée(s)`"></p>
     <ul x-show="results.length > 0"
-        class="cards d-flex row row-cols-3 g-4 ps-0 ms-0 mt-1">
+        class="cards d-flex row row-cols-3 g-4 fr-pl-0 fr-ml-0 fr-mt-1v">
         <template x-for="resource in resultsAndSelected()" :key="resource.id">
             <li class="col">
-                <div class="resource-card card p-2 ps-5 rounded">
-                    <div class="card-body position-relative">
+                <div class="resource-card card fr-p-2v fr-pl-6w rounded">
+                    <div class="card-body position-relative fr-pb-1w">
                         <template x-if="push_type == 'single'">
                             <input :id="'resource-' + resource.id"
                                    type="radio"
@@ -48,11 +51,11 @@
                                    :value="resource.id"
                                    x-model="selected_resources">
                         </template>
-                        <label :for="'resource-' + resource.id" x-text="resource.title"></label>
-                        <h5 x-text="resource.title"></h5>
-                        <p x-text="resource.subtitle" class="mb-0"></p>
+                        <label class="fs-6" :for="'resource-' + resource.id" x-text="resource.title"></label>
+                        <h5 class="fs-6" x-text="resource.title"></h5>
+                        <p x-text="resource.subtitle" class="fr-fr-text--sm mb-0"></p>
                     </div>
-                    <div class="card-body">
+                    <div class="card-body fr-pt-1w">
                         <!-- Full screen modal -->
                         <div class="modal fade"
                              :id="`resource-preview-`+resource.id"
@@ -62,8 +65,7 @@
                             <div class="modal-dialog modal-fullscreen">
                                 <div class="modal-content">
                                     <div class="modal-header">
-                                        <h5 class="modal-title"">Prévisualisation de la ressource
-                                        </h5>
+                                        <h5 class="modal-title">Prévisualisation de la ressource</h5>
                                         <button type="button"
                                                 class="btn-close"
                                                 data-bs-dismiss="modal"
@@ -75,17 +77,37 @@
                                 </div>
                             </div>
                         </div>
+                        <div>
+                            <ul class="fr-badge-group fr-p-0">
+                                <li x-show="resource.category.name">
+                                    <span class="fr-badge fr-badge--sm fr-badge--green-menthe"
+                                          x-text="resource.category.name"></span>
+                                </li>
+                                <li x-show="resource.is_dsresource">
+                                    <span class="fr-badge fr-badge--sm text-transform-none">
+                                        <img height="8px"
+                                             width="18px"
+                                             src="{% static 'svg/picto-demarches_simplifiees--no-border.svg' %}"
+                                             alt="Pictogramme Démarches Simpliffiées"
+                                             class="fr-pr-1v">
+                                    Démarches Simplifiées</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <hr>
                         <button @click.prevent
                                 data-bs-toggle="modal"
                                 :data-bs-target="`#resource-preview-`+resource.id"
-                                class="btn btn-sm btn-secondary">Prévisualiser cette ressource</button>
+                                class="fr-btn fr-btn--tertiary-no-outline fr-btn--icon-left fr-icon-eye-line">
+                            Prévisualiser
+                        </button>
                     </div>
                 </div>
             </li>
         </template>
     </ul>
     <div x-show="results.length <= 0 && search != ''"
-         class="p-3 w-100 text-center rounded bg-light">
+         class="fr-p-2w w-100 text-center rounded bg-light">
         <span class="fw-bolder">Aucune ressource correspondante</span>
         <div x-show="suggestions.length">
             Vous cherchez peut être : <template x-for="suggestion in suggestions">

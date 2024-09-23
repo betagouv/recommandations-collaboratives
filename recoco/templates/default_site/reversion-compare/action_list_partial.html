@@ -1,21 +1,21 @@
 {% load i18n l10n %}
-{% if compare_view %}<form method="GET" action="{{ action }}">{% endif %}
+{% if compare_view %}<form method="get" action="{{ action }}">{% endif %}
     <div class="fr-table">
         <p>Merci de sélectionner deux versions à comparer :</p>
         <table id="change-history">
             <thead>
                 <tr>
                     {% if compare_view %}
-                        <th scope="col" colspan="2" class="text-center p-2">
+                        <th scope="col" colspan="2" class="text-center fr-p-2v">
                             {% if comparable %}
                                 <input type="submit" class="fr-btn" value="{% trans 'compare' %}">
                             {% else %}
                             {% endif %}
                         </th>
                     {% endif %}
-                    <th class="p-2"></th>
-                    <th class="p-2"></th>
-                    <th class="p-2"></th>
+                    <th class="fr-p-2v"></th>
+                    <th class="fr-p-2v"></th>
+                    <th class="fr-p-2v"></th>
                 </tr>
                 <tr>
                     <th scope="col">Version 1</th>
@@ -32,6 +32,7 @@
                             <td scope="row" class="text-center">
                                 {% if comparable %}
                                     <input type="radio"
+                                           class="tmp-usevar"
                                            name="version_id1"
                                            value="{{ action.version.pk|unlocalize }}"
                                            {% if action.first %}style="visibility:hidden"{% endif %}

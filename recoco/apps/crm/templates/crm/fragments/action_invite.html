@@ -1,7 +1,7 @@
 {% load gravatar %}
 <li class="d-flex flex-columns list-group-item">
     {% if action.actor %}
-        <div class="align-middle mx-2 flex-shrink">
+        <div class="align-middle fr-mx-2v flex-shrink">
             <img class="rounded-circle"
                  src="{% gravatar_url action.actor.email size=24 %}"
                  alt="{{ action.actor }}">
@@ -35,7 +35,7 @@
                     sur le projet <a href="{{ action.target.get_absolute_url }}">{{ action.target }}</a>
                 </span>
             {% endif %}
-            <span class="ms-1 small text-secondary">il y a {{ action.timestamp|timesince }}</span>
+            <span class="fr-ml-1v small text-secondary">il y a {{ action.timestamp|timesince }}</span>
         </div>
     </div>
 </li>

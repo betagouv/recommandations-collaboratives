@@ -6,6 +6,7 @@ Views for projects application
 author  : raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created : 2022-12-19 11:56:20 CEST
 """
+
 from django.http import Http404
 from django.shortcuts import render
 
@@ -24,7 +25,7 @@ def project_detail_from_sharing_link(request, project_ro_key):
 
     try:
         site_config = utils.get_site_config_or_503(request.site)
-        survey_models.Session.objects.get_or_create(
+        session, created = survey_models.Session.objects.get_or_create(
             project=project, survey=site_config.project_survey
         )
     except Exception:  # nosec

@@ -11,11 +11,14 @@
     <link href="{% sass_src 'home/css/dsfr/custom-dsfr.scss' %}"
           rel="stylesheet"
           type="text/css">
+    <link href="{% sass_src 'home/css/contact/contact.scss' %}"
+          rel="stylesheet"
+          type="text/css">
 {% endblock css %}
 {% block content %}
-    <div class="col-9 py-5 mx-auto">
-        <h2 class="mb-3">
-            <svg class="bi me-2" width="28" height="28">
+    <div class="col-9 fr-py-6w fr-mx-auto">
+        <h2 class="fr-mb-2w">
+            <svg class="bi fr-mr-2v" width="28" height="28">
                 <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#envelope" />
             </svg>
             Contacter l'équipe {{ request.site.name }}
@@ -29,11 +32,11 @@
                 {% endwith %}
             </p>
         {% endif %}
-        <form method="POST" data-test-id="contact-form">
+        <form method="post" data-test-id="contact-form">
             {% csrf_token %}
             <input type="hidden" name="next" value="{{ request.GET.next }}" />
             {% if form.name %}
-                <div class="form-floating mb-3">
+                <div class="form-floating fr-mb-2w">
                     <input type="text"
                            id="{{ form.name.id_for_label }}"
                            class="form-control {% if form.name.errors %}is-invalid{% endif %}"
@@ -47,7 +50,7 @@
                 </div>
             {% endif %}
             {% if form.email %}
-                <div class="form-floating mb-3">
+                <div class="form-floating fr-mb-2w">
                     <input type="text"
                            id="{{ form.email.id_for_label }}"
                            class="form-control {% if form.email.errors %}is-invalid{% endif %}"
@@ -56,11 +59,11 @@
                            value="{{ request.GET.email }}"
                            data-test-id="contact-form-email"
                            required>
-                    <label for="{{ form.email.id_for_label }}">Votre addresse courriel</label>
+                    <label for="{{ form.email.id_for_label }}">Votre adresse courriel</label>
                     {% for error in form.email.errors %}<div class="text-danger text-end">{{ error }}</div>{% endfor %}
                 </div>
             {% endif %}
-            <div class="form-floating mb-3">
+            <div class="form-floating fr-mb-2w">
                 <input type="text"
                        id="{{ form.subject.id_for_label }}"
                        class="form-control {% if form.subject.errors %}is-invalid{% endif %}"
@@ -72,9 +75,8 @@
                 <label for="{{ form.subject.id_for_label }}">Sujet de votre message</label>
                 {% for error in form.subject.errors %}<div class="text-danger text-end">{{ error }}</div>{% endfor %}
             </div>
-            <div class="mb-3">
-                <textarea class="form-control {% if form.content.errors %}is-invalid{% endif %}"
-                          style="height: 100px"
+            <div class="fr-mb-2w">
+                <textarea class="form-control {% if form.content.errors %}is-invalid{% endif %} text-area-size"
                           id="input-project-content"
                           name="{{ form.content.name }}"
                           value="{{ form.content.value|default:'' }}"
@@ -92,9 +94,9 @@
                     data-test-id="contact-form-submit">Envoyer mon message</button>
         </form>
         {% if request.GET.next %}
-            <p class="small mt-3">
+            <p class="small fr-mt-2w">
                 <a href="{{ request.GET.next }}" class="small">Annuler et revenir à la page précédente</a>
             </p>
         {% endif %}
     </div>
-{% endblock %}
+{% endblock content %}
