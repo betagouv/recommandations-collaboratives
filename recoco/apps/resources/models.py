@@ -160,6 +160,13 @@ class Resource(models.Model):
     on_site = ResourceOnSiteManager()
 
     sites = models.ManyToManyField(Site)
+    site_origin = models.ForeignKey(
+        Site,
+        on_delete=models.SET_NULL,
+        related_name="authored_resources",
+        null=True,
+        verbose_name="site d'origine de la ressource",
+    )
 
     status = models.IntegerField(
         choices=STATUS_CHOICES, verbose_name="État", default=DRAFT
