@@ -9,6 +9,7 @@ landingURL: 'https://recommandations-collaboratives.beta.gouv.fr/'
 releaseDate: 'https://github.com/betagouv/recommandations-collaboratives/releases/latest'
 developmentStatus: beta
 softwareType: standalone/backend
+logo: https://raw.githubusercontent.com/bzg/recommandations-collaboratives/develop/logo.png
 categories:
   - digital-citizenship
 platforms:
