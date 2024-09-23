@@ -351,10 +351,11 @@ def test_create_new_resource_and_redirect(request, client):
 
     with login(client, groups=["example_com_staff"]):
         response = client.post(reverse("resources-resource-create"), data=data)
+
+    assert response.status_code == 302
+
     resource = models.Resource.on_site.all()[0]
     assert resource.content == data["content"]
-    assert resource.site_origin == get_current_site(request)
-    assert response.status_code == 302
     assert resource.site_origin == get_current_site(request)
 
 
@@ -526,13 +527,17 @@ def test_update_resource_from_non_origin_site_and_redirect(request, client):
     assert additional_site in original_resource.sites.all()
     assert current_site not in original_resource.sites.all()
     assert original_resource.site_origin == other_site
+    assert original_resource.sites.count() == 2
 
     new_resource = models.Resource.on_site.get()
+    assert new_resource != original_resource
     assert new_resource.content == updated_data["content"]
     assert other_site not in new_resource.sites.all()
     assert additional_site not in new_resource.sites.all()
+    assert new_resource.sites.count() == 1
     assert current_site in new_resource.sites.all()
     assert new_resource.tags.get().name == "tag2"
+    assert new_resource.site_origin == current_site
 
 
 ########################################################################

@@ -310,36 +310,42 @@ def resource_update(request, resource_id=None):
     resource = get_object_or_404(models.Resource, pk=resource_id)
 
     if request.method == "POST":
-        needs_copy = False
-        if resource.site_origin is not None and resource.site_origin != request.site:
-            needs_copy = True
-
         form = EditResourceForm(request.POST, instance=resource)
 
-        if form.is_valid() and needs_copy:
-            original_resource = resource
-            resource = original_resource.make_clone()
-            resource.tags.set(original_resource.tags.all())
-            form = EditResourceForm(request.POST, instance=resource)
-
         if form.is_valid():
-            next_url = reverse("resources-resource-detail", args=[resource.id])
-
-            resource = form.save(commit=False)
-            resource.updated_on = timezone.now()
-
-            with reversion.create_revision():
-                reversion.set_user(request.user)
-                form.save_m2m()
+            needs_copy = (resource.site_origin != request.site) and (
+                resource.site_origin is not None
+            )
 
             if needs_copy:
-                original_resource.sites.remove(request.site)
-                resource.site_origin = request.site
-                resource.sites.clear()
-                resource.sites.add(request.site)
+                with transaction.atomic():
+                    new_resource = resource.make_clone()
+                    form.instance = new_resource
 
-            resource.save()
+                    with reversion.create_revision():
+                        reversion.set_comment(
+                            f"Ressource dupliquée à l'écriture depuis {resource.site_origin.name}"
+                        )
+                        reversion.set_user(request.user)
+                        resource.updated_on = timezone.now()
+                        new_resource.site_origin = request.site
+                        new_resource.sites.clear()
+                        new_resource.sites.add(request.site)
+                        # new_resource.save()
+                        form.save()
 
+                    resource.sites.remove(request.site)
+
+            else:
+                with reversion.create_revision():
+                    resource = form.save(commit=False)
+                    resource.updated_on = timezone.now()
+                    resource.save()
+
+                    reversion.set_user(request.user)
+                    form.save_m2m()
+
+            next_url = reverse("resources-resource-detail", args=[form.instance.id])
             return redirect(next_url)
     else:
         form = EditResourceForm(instance=resource)
