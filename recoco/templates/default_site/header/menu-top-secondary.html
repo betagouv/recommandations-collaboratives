@@ -23,7 +23,7 @@
                 <a href="{% url 'projects-project-list' %}"
                    class="fr-link {% if url_name == 'projects-project-list-advisor' or url_name == 'projects-project-list-staff' or url_name == 'projects-project-list-map' %}active{% endif %}">
                     {% if unread_notifications_count %}<span class="has-notification">&nbsp;</span>{% endif %}
-                    <span class="fr-ml-1v align-middle">Tous les projets</span>
+                    <span class="fr-ml-1v align-middle no-wrap">Tous les projets</span>
                 </a>
             </li>
         {% endif %}
@@ -68,7 +68,7 @@
             <!-- Projects moderation -->
             <li class="navigation__item-moderation d-flex">
                 <a href="{% url "projects-moderation-list" %}"
-                   class="{% if url_name == 'projects-moderation-list' %}active{% endif %}"><span class="fr-link underline">Projets à examiner</span></a><span class="badge text-bg-danger">{{ projects_to_moderate_count }}</span>
+                   class="{% if url_name == 'projects-moderation-list' %}active{% endif %}"><span class="fr-link underline no-wrap">Projets à examiner</span></a><span class="badge text-bg-danger no-underline">{{ projects_to_moderate_count }}</span>
             </li>
         {% endif %}
         {% comment %} surcharge pour ajouter des éléments au menu top à gauche de ressources {% endcomment %}

@@ -14,6 +14,15 @@
     height: 100%;
     li {
       margin-right: 1rem;
+      span {
+        text-decoration: underline;
+      }
+      a.active {
+        span {
+          text-decoration: none;
+          color: #3a3a3a;
+        }
+      }
     }
     &:first-child {
       margin-left: 15px;
