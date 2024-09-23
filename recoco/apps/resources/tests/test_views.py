@@ -15,6 +15,7 @@ from django.contrib.sites.models import Site
 from django.contrib.sites.shortcuts import get_current_site
 from django.db import transaction
 from django.urls import reverse
+from django.utils import timezone
 from model_bakery import baker
 from model_bakery.recipe import Recipe
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
@@ -317,6 +318,7 @@ def test_resource_detail_does_not_contain_update_for_common_user(request, client
 # create
 
 
+@pytest.mark.resource_create
 @pytest.mark.django_db
 def test_create_resource_not_available_for_non_switchtender_users(client):
     url = reverse("resources-resource-create")
@@ -325,6 +327,7 @@ def test_create_resource_not_available_for_non_switchtender_users(client):
     assert response.status_code == 403
 
 
+@pytest.mark.resource_create
 @pytest.mark.django_db
 def test_create_resource_available_for_authorized_users(client):
     url = reverse("resources-resource-create")
@@ -334,6 +337,7 @@ def test_create_resource_available_for_authorized_users(client):
     assertContains(response, 'form id="form-resource-create"')
 
 
+@pytest.mark.resource_create
 @pytest.mark.django_db
 def test_create_new_resource_and_redirect(request, client):
     data = {
@@ -344,46 +348,55 @@ def test_create_new_resource_and_redirect(request, client):
         "tags": "#tag",
         "content": "this is some content",
     }
+
     with login(client, groups=["example_com_staff"]):
         response = client.post(reverse("resources-resource-create"), data=data)
     resource = models.Resource.on_site.all()[0]
     assert resource.content == data["content"]
     assert resource.site_origin == get_current_site(request)
     assert response.status_code == 302
+    assert resource.site_origin == get_current_site(request)
 
 
-#
+########################################################################
 # update
+########################################################################
 
 
+@pytest.mark.resource_update
 @pytest.mark.django_db
-def test_update_resource_not_available_for_common_user(request, client):
+def test_update_resource_not_available_for_non_staff(request, client):
     resource = Recipe(models.Resource, sites=[get_current_site(request)]).make()
+
     url = reverse("resources-resource-update", args=[resource.id])
     with login(client):
         response = client.get(url)
+
     assert response.status_code == 403
 
 
+@pytest.mark.resource_update
 @pytest.mark.django_db
-def test_update_resource_available_for_authorized_user(request, client):
+def test_update_resource_available_for_staff(request, client):
     resource = Recipe(models.Resource, sites=[get_current_site(request)]).make()
+
     url = reverse("resources-resource-update", args=[resource.id])
     with login(client, groups=["example_com_staff"]):
         response = client.get(url)
+
     assert response.status_code == 200
     assertContains(response, 'form id="form-resource-update"')
 
 
+@pytest.mark.resource_update
 @pytest.mark.django_db
-def test_update_resource_and_redirect(request, client):
-    resource = Recipe(
-        models.Resource,
-        category__sites=[get_current_site(request)],
-        sites=[get_current_site(request)],
-    ).make()
+def test_update_resource_from_origin_site_and_redirect(request, client):
+    resource = baker.make(models.Resource)
+    current_site = get_current_site(request)
+    resource.site_origin = current_site
+    resource.save()
 
-    updated_on_before = resource.updated_on
+    previous_update = resource.updated_on
 
     url = reverse("resources-resource-update", args=[resource.id])
 
@@ -393,54 +406,212 @@ def test_update_resource_and_redirect(request, client):
         "status": 0,
         "summary": "a summary",
         "tags": "#tag",
-        "content": "this is some content",
+        "content": "this is some updated content",
     }
 
     with login(client, groups=["example_com_staff"]):
         response = client.post(url, data=data)
 
     assert response.status_code == 302
-    resource = models.Resource.on_site.get(id=resource.id)
+
+    resource.refresh_from_db()
     assert resource.content == data["content"]
-    assert resource.updated_on > updated_on_before
+    assert resource.updated_on > previous_update
 
 
-#
+@pytest.mark.resource_update
+@pytest.mark.django_db
+def test_update_resource_from_non_origin_site_does_not_duplicate_with_get(
+    request, client
+):
+    original_resource = baker.make(models.Resource)
+    current_site = get_current_site(request)
+    other_site = baker.make(Site)
+
+    original_resource.sites.add(current_site, other_site)
+    original_resource.site_origin = other_site
+
+    original_resource.save()
+
+    assert models.Resource.objects.all().count() == 1
+
+    url = reverse("resources-resource-update", args=[original_resource.id])
+
+    with login(client, groups=["example_com_staff"]):
+        response = client.get(url)
+
+    assert response.status_code == 200
+    assert models.Resource.objects.all().count() == 1
+
+
+@pytest.mark.resource_update
+@pytest.mark.django_db
+def test_update_resource_from_non_origin_site_with_invalid_form(request, client):
+    original_resource = baker.make(models.Resource)
+    current_site = get_current_site(request)
+    other_site = baker.make(Site)
+
+    original_resource.sites.add(current_site, other_site)
+    original_resource.site_origin = other_site
+    previous_update = timezone.now()
+    original_resource.updated_on = previous_update
+    original_content = "this is some original content"
+    original_resource.content = original_content
+
+    original_resource.save()
+
+    assert models.Resource.objects.all().count() == 1
+
+    url = reverse("resources-resource-update", args=[original_resource.id])
+
+    bad_data = {
+        "titl": 1,
+        "subtitl": 2,
+        "statu": 0,
+        "summar": "a summary",
+        "tag": "#tag",
+        "conten": "this is some badly formatted content",
+    }
+
+    with login(client, groups=["example_com_staff"]):
+        response = client.post(url, data=bad_data)
+
+    assert response.status_code == 200
+
+    assert original_resource.content == original_content
+    assert models.Resource.objects.all().count() == 1
+
+
+@pytest.mark.resource_update
+@pytest.mark.django_db
+def test_update_resource_from_non_origin_site_and_redirect(request, client):
+    original_resource = baker.make(models.Resource)
+    current_site = get_current_site(request)
+    other_site = baker.make(Site)
+    additional_site = baker.make(Site)
+
+    original_resource.sites.add(current_site, other_site, additional_site)
+    original_resource.site_origin = other_site
+    previous_update = timezone.now()
+    original_resource.updated_on = previous_update
+    original_content = "this is some original content"
+    original_resource.content = original_content
+    original_resource.tags.add("tag1")
+    original_resource.tags.add("tag2")
+
+    original_resource.save()
+
+    assert models.Resource.objects.all().count() == 1
+
+    url = reverse("resources-resource-update", args=[original_resource.id])
+
+    updated_data = {
+        "title": "a title",
+        "subtitle": "a sub title",
+        "status": 0,
+        "summary": "a summary",
+        "content": "this is some updated content",
+        "tags": "tag2",
+    }
+
+    with login(client, groups=["example_com_staff"]):
+        response = client.post(url, data=updated_data)
+
+    assert response.status_code == 302
+
+    original_resource.refresh_from_db()
+    assert original_resource.content == original_content
+    assert original_resource.updated_on == previous_update
+    assert other_site in original_resource.sites.all()
+    assert additional_site in original_resource.sites.all()
+    assert current_site not in original_resource.sites.all()
+    assert original_resource.site_origin == other_site
+
+    new_resource = models.Resource.on_site.get()
+    assert new_resource.content == updated_data["content"]
+    assert other_site not in new_resource.sites.all()
+    assert additional_site not in new_resource.sites.all()
+    assert current_site in new_resource.sites.all()
+    assert new_resource.tags.get().name == "tag2"
+
+
+########################################################################
 # delete
+########################################################################
 
 
+@pytest.mark.resource_delete
 @pytest.mark.django_db
 def test_delete_resource_not_available_for_non_staff_users(client, request):
-    resource = baker.make(models.Resource, sites=[get_current_site(request)])
+    resource = baker.make(models.Resource)
+    current_site = get_current_site(request)
+    resource.sites.add(current_site)
 
     url = reverse("resources-resource-delete", args=[resource.pk])
     with login(client):
         response = client.get(url)
+
     assert response.status_code == 403
 
 
+@pytest.mark.resource_delete
 @pytest.mark.django_db
-def test_delete_resource_available_for_staff(client, request):
-    resource = baker.make(models.Resource, sites=[get_current_site(request)])
+def test_delete_resource_referenced_available_for_staff(client, request):
+    resource = baker.make(models.Resource)
+    current_site = get_current_site(request)
+    resource.sites.add(current_site)
 
     url = reverse("resources-resource-delete", args=(resource.pk,))
     with login(client, groups=["example_com_staff"]):
         response = client.get(url)
+
     assert response.status_code == 200
     assertContains(response, 'form id="form-resource-delete"')
+    assert models.Resource.objects.all().count() == 1
 
 
+@pytest.mark.resource_delete
 @pytest.mark.django_db
-def test_delete_resource_and_redirect(client, request):
-    resource = baker.make(models.Resource, sites=[get_current_site(request)])
+def test_delete_resource_shared_and_redirect(client, request):
+    resource = baker.make(models.Resource)
+    current_site = get_current_site(request)
+    other_site = baker.make(Site)
+    resource.sites.add(current_site)
+    resource.sites.add(other_site)
 
-    assert models.Resource.on_site.count() == 1
+    assert resource.sites.count() == 2
+
+    url = reverse("resources-resource-delete", args=(resource.pk,))
     with login(client, groups=["example_com_staff"]):
-        response = client.post(reverse("resources-resource-delete", args=[resource.pk]))
+        response = client.post(url)
 
     assert response.status_code == 302
 
-    assert models.Resource.on_site.count() == 0
+    resource.refresh_from_db()
+    assert resource.sites.count() == 1
+    assert current_site not in resource.sites.all()
+    assert other_site in resource.sites.all()
+    assert resource.deleted is None
+
+
+@pytest.mark.resource_delete
+@pytest.mark.django_db
+def test_delete_resource_non_shared_and_redirect(client, request):
+    resource = baker.make(models.Resource)
+    current_site = get_current_site(request)
+    resource.sites.add(current_site)
+
+    assert resource.sites.count() == 1
+
+    url = reverse("resources-resource-delete", args=(resource.pk,))
+    with login(client, groups=["example_com_staff"]):
+        response = client.post(url)
+
+    assert response.status_code == 302
+
+    resource.refresh_from_db()
+    assert resource.sites.count() == 0
+    assert resource.deleted is not None
 
 
 #

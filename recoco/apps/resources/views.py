@@ -272,19 +272,29 @@ class ResourceDeleteView(UserPassesTestMixin, DeleteView):
     success_url = reverse_lazy("resources-resource-search")
     pk_url_kwarg = "resource_id"
 
-    def delete(self, request, *args, **kwargs):
+    def form_valid(self, form):
         """
-        Call the delete() method on the fetched object and then redirect to the
-        success URL.
+        Dereference the current site from the resource.
+        When no more sites are referenced on the resource
+        then mark it as deleted.
+        Then redirect to the success URL.
         """
-        self.object = self.get_object()
+        resource = self.object
+
+        resource.sites.remove(self.request.site)
+
+        if resource.sites.count() == 0:
+            resource.deleted = timezone.now()
+            resource.save()
+
         success_url = self.get_success_url()
-        self.object.deleted = timezone.now()
-        self.object.save()
         return HttpResponseRedirect(success_url)
 
     def test_func(self):
-        return has_perm(self.request.user, "sites.manage_resources", self.request.site)
+        user_has_permissions = has_perm(
+            self.request.user, "sites.manage_resources", self.request.site
+        )
+        return user_has_permissions
 
 
 ########################################################################
@@ -298,17 +308,37 @@ def resource_update(request, resource_id=None):
     has_perm_or_403(request.user, "sites.manage_resources", request.site)
 
     resource = get_object_or_404(models.Resource, pk=resource_id)
-    next_url = reverse("resources-resource-detail", args=[resource.id])
+
     if request.method == "POST":
+        needs_copy = False
+        if resource.site_origin is not None and resource.site_origin != request.site:
+            needs_copy = True
+
         form = EditResourceForm(request.POST, instance=resource)
+
+        if form.is_valid() and needs_copy:
+            original_resource = resource
+            resource = original_resource.make_clone()
+            resource.tags.set(original_resource.tags.all())
+            form = EditResourceForm(request.POST, instance=resource)
+
         if form.is_valid():
+            next_url = reverse("resources-resource-detail", args=[resource.id])
+
             resource = form.save(commit=False)
             resource.updated_on = timezone.now()
 
             with reversion.create_revision():
                 reversion.set_user(request.user)
-                resource.save()
                 form.save_m2m()
+
+            if needs_copy:
+                original_resource.sites.remove(request.site)
+                resource.site_origin = request.site
+                resource.sites.clear()
+                resource.sites.add(request.site)
+
+            resource.save()
 
             return redirect(next_url)
     else:
@@ -318,7 +348,9 @@ def resource_update(request, resource_id=None):
 
 @login_required
 def resource_create(request):
-    """Create new resource"""
+    """
+    Create new resource
+    """
     has_perm_or_403(request.user, "sites.manage_resources", request.site)
 
     if request.method == "POST":

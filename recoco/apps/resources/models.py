@@ -21,6 +21,7 @@ from django.dispatch import receiver
 from django.shortcuts import reverse
 from django.utils import timezone
 from markdownx.utils import markdownify
+from model_clone.models import CloneMixin
 from taggit.managers import TaggableManager
 from watson import search as watson
 
@@ -143,7 +144,7 @@ class ResourceOnSiteManager(CurrentSiteManager, ResourceManagerWithQS):
     ),
     follow=("category",),
 )
-class Resource(models.Model):
+class Resource(CloneMixin, models.Model):
     """Représente une fiche ressource pour les utilisateur·ices"""
 
     DRAFT = 0
@@ -237,6 +238,8 @@ class Resource(models.Model):
         return markdownify(self.content)
 
     deleted = models.DateTimeField(null=True, blank=True)
+
+    _clone_linked_m2m_fields = ["sites", "contacts", "departments"]
 
     class Meta:
         verbose_name = "ressource"
