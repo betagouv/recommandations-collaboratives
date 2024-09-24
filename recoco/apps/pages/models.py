@@ -1,3 +1,4 @@
+from django.db import models
 from wagtail.admin.panels import FieldPanel
 from wagtail.blocks import RichTextBlock
 from wagtail.fields import RichTextField, StreamField
@@ -12,6 +13,23 @@ class SimplePage(Page):
 
     content_panels = Page.content_panels + [
         FieldPanel("body"),
+    ]
+
+
+class StatisticsPage(Page):
+    url = models.URLField()
+
+    content = StreamField(
+        [
+            ("multicol", MultiColumnsBlock(label="Multi Colonnes")),
+            ("richtext", RichTextBlock(label="Texte riche")),
+        ],
+        blank=True,
+    )
+
+    content_panels = Page.content_panels + [
+        FieldPanel("url"),
+        FieldPanel("content"),
     ]
 
 

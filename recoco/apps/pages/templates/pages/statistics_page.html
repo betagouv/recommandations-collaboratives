@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% load wagtailcore_tags %}
+{% load sass_tags %}
+{% block css %}
+<link href="{% sass_src 'home/css/home/home.scss' %}"
+      rel="stylesheet"
+      type="text/css">
+<link href="{% sass_src 'home/css/dsfr/dsfr.css' %}"
+      rel="stylesheet"
+      type="text/css">
+<link href="{% sass_src 'home/css/dsfr/custom-dsfr.scss' %}"
+      rel="stylesheet"
+      type="text/css">
+<link href="{% sass_src 'home/css/cms/page-text.css' %}"
+      rel="stylesheet"
+      type="text/css">
+{% endblock css %}
+{% block title %}
+{{ page.title }}
+{% endblock title %}
+{% block content %}
+<div class="col-8 fr-mt-3w fr-py-2w g-0 fr-mx-auto font-marianne"
+     id="simple-text">
+
+    <h3>Statistiques d'impact {{ request.site.name }}</h3>
+
+    <div class="container">
+        <iframe width="1280px" height="1024px" src="{{ page.url }}" allowtransparency frameborder="0"></iframe>
+    </div>
+
+    <div>
+        <p>{{ page.content }}</p>
+    </div>
+</div>
+{% endblock content %}
