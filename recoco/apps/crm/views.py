@@ -114,11 +114,6 @@ def crm_search(request):
     if search_form.is_valid():
         site = request.site
         query = search_form.cleaned_data["query"]
-        project_results = watson.filter(
-            Project.objects.filter(sites=request.site), query, ranking=True
-        )
-
-        search_results = list(project_results)
 
         all_sites_search_results = watson.search(
             query,

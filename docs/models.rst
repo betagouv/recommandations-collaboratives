@@ -5,10 +5,11 @@ Modèles de données
 Les Projets
 ###########
 
-.. autoclass:: recoco.apps.projects.models.Project
+.. autoclass:: recoco.apps.projects.models::Project
 
 
 Les recommandations
 ###################
 
-.. autoclass:: recoco.apps.tasks.models.Task
+.. automodule:: recoco.apps.tasks.models
+   :members: Task

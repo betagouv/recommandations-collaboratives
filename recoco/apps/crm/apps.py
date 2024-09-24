@@ -13,7 +13,7 @@ class CrmConfig(AppConfig):
         watson.register(
             ProjectAnnotations,
             fields=(
-                "tags",
+                "tags__name",
                 "project__name",
             ),
         )

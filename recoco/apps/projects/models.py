@@ -24,6 +24,7 @@ from guardian.shortcuts import get_objects_for_user
 from markdownx.utils import markdownify
 from notifications import models as notifications_models
 from taggit.managers import TaggableManager
+from watson import search as watson
 
 from recoco.apps.geomatics import models as geomatics_models
 from recoco.utils import CastedGenericRelation, check_if_advisor, has_perm
@@ -788,6 +789,21 @@ class Document(models.Model):
 ########################################################################
 # helpers / utils
 ########################################################################
+
+
+class ProjectSearchAdapter(watson.SearchAdapter):
+    """
+    A custom search adapter for Project Models
+    """
+
+    fields = (
+        "name",
+        "tags_as_list",
+        "commune__name",
+    )
+
+    def tags_as_list(self, obj):
+        return list(obj.tags.names())
 
 
 def truncate_string(s, max_length):

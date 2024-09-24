@@ -12,9 +12,11 @@ Documentation de Recommandations Collaboratives
 
    install.rst
    models.rst
+   fts.rst
    permissions.rst
    workflows.rst
    js_components.rst
+   terminology.rst
 
 
 
