@@ -5,6 +5,7 @@
 {% load sass_tags %}
 {% load django_vite %}
 {% load guardian_tags %}
+{% load projects_extra %}
 {% block title %}
     Recommandations - {{ block.super }}
 {% endblock title %}
@@ -23,6 +24,7 @@
 {% block project_detail %}
     {% get_obj_perms request.user for request.site as "user_site_perms" %}
     {% get_obj_perms request.user for project as "user_project_perms" %}
+    {% get_advising_position request.user project request.site as position %}
     <div class="col-12 fr-mx-auto">
         <div class="row">
             <div class="col">
@@ -31,6 +33,8 @@
                 {{ user_project_perms|json_script:"userProjectPerms" }}
                 {{ is_switchtender|json_script:"isSwitchtender" }}
                 {{ user.email|json_script:"userEmail" }}
+                {{ position.is_observer|json_script:"isObserverOnProject" }}
+                {{ position.is_advisor|json_script:"isAdvisorOnProject" }}
                 {% if is_switchtender and project.tasks.all.count == 0 %}
                     <div data-test-id="no-tasks-banner" class="bg-light fr-p-3w rounded-2">
                         <h3 class="fw-light">Pas encore de recommandations à la collectivité ?</h3>
