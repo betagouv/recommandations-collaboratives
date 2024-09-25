@@ -27,17 +27,22 @@
     &:first-child {
       margin-left: 15px;
     }
-    li.navigation__item-dashboard,
-    li.navigation__item-moderation,
-    li.navigation__item-resource {
+    .navigation__item-dashboard,
+    .navigation__item-moderation,
+    .navigation__item-resource {
       padding: var(--padding-y-navigation);
     }
 
-    li.navigation__item-moderation {
+    .navigation__item-dashboard,
+    .navigation__item-moderation {
       .badge {
         margin-left: 0.5rem;
         line-height: 1rem;
       }
+    }
+
+    .navigation__item-projects {
+      max-width: 500px;
     }
   }
 }

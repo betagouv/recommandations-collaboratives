@@ -125,18 +125,15 @@ main {
   transform: rotate(135deg);
 }
 
-
 .arrow-right {
   transform: rotate(225deg);
   transform: rotate(225deg);
 }
 
-
 .arrow-down {
   transform: rotate(-45deg);
   transform: rotate(-45deg);
 }
-
 
 .arrow-left {
   transform: rotate(45deg);
@@ -145,10 +142,6 @@ main {
 
 a {
   color: $blue;
-}
-
-a:not(.fr-btn):not(.btn-outline-primary):not(.btn-primary):not(.btn-outline-secondary):hover {
-  color: $dark-blue !important;
 }
 
 .btn-primary {
@@ -183,7 +176,6 @@ progress {
   background-color: black;
 }
 
-
 progress::-webkit-progress-bar {
   border: 0;
   height: 6px;
@@ -195,7 +187,6 @@ progress::-webkit-progress-bar {
   background-color: black;
 }
 
-
 progress::-webkit-progress-value {
   border: 0;
   height: 6px;
@@ -206,7 +197,6 @@ progress::-webkit-progress-value {
   border-radius: 20px;
   background-color: black;
 }
-
 
 progress::-moz-progress-bar {
   border: 0;
@@ -244,37 +234,36 @@ progress::-moz-progress-bar {
 
 // Main content layout
 
-.project-header-sidebar>.btn {
+.project-header-sidebar > .btn {
   border-radius: 2px;
   padding: 0.29rem 1rem;
 
-  .project-header-sidebar>.btn {
+  .project-header-sidebar > .btn {
     border-radius: 2px;
     padding: 0.29rem 1rem;
   }
 }
 
 .custom-callout-blue {
-  background: rgba(96, 162, 228, 0.10);
-  color: #4285F4;
+  background: rgba(96, 162, 228, 0.1);
+  color: #4285f4;
   padding: 0.5rem;
 }
 
 p {
-
-  &>input,
-  &>select {
+  & > input,
+  & > select {
     border: 1px solid #ccc;
     background-color: white;
     border-radius: 0.2rem;
     width: 100%;
   }
 
-  &>input.fr-input {
-    border: none
+  & > input.fr-input {
+    border: none;
   }
 
-  &>input[type="checkbox"] {
+  & > input[type='checkbox'] {
     width: auto;
   }
 }

@@ -22,9 +22,11 @@
             <li class="navigation__item-dashboard">
                 <a href="{% url 'projects-project-list' %}"
                    class="fr-link {% if url_name == 'projects-project-list-advisor' or url_name == 'projects-project-list-staff' or url_name == 'projects-project-list-map' %}active{% endif %}">
-                    {% if unread_notifications_count %}<span class="has-notification">&nbsp;</span>{% endif %}
                     <span class="fr-ml-1v align-middle no-wrap">Tous les projets</span>
                 </a>
+                {% if unread_notifications_count %}
+                    <span class="badge text-bg-danger no-underline">{{ unread_notifications_count }}</span>
+                {% endif %}
             </li>
         {% endif %}
         <!-- Projects -->
@@ -37,7 +39,7 @@
                     {% endcomment %}
                     <select class="fr-select" id="select" name="project-selector">
                         <option value="" selected>
-                            <a href="{% url 'projects-project-detail' active_project.pk %}"><strong>{{ active_project.commune.name }}</strong> <span class="text-secondary small ms-2 text-break text-truncate">{{ active_project.name }}</span></strong></a>
+                            <a href="{% url 'projects-project-detail' active_project.pk %}"><strong>{{ active_project.commune.name }}</strong> <span class="text-secondary small ms-2 text-break text-truncate">{{ active_project.name }}</span></a>
                         </option>
                         {% for project in request.session.projects %}
                             {% comment %} TODO
@@ -72,7 +74,7 @@
             </li>
         {% endif %}
         {% comment %} surcharge pour ajouter des éléments au menu top à gauche de ressources {% endcomment %}
-        {% include 'header/menu-top-secondary-left.html' %}
+        {% include "header/menu-top-secondary-left.html" %}
         <!-- Ressources -->
         <li class="navigation__item-resource"
             style="{% if url_name == 'resources-resource-search' %}activated{% endif %}">
