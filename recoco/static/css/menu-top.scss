@@ -16,9 +16,10 @@
       margin-right: 1rem;
       white-space: nowrap;
       &:not(:last-child) {
-        --padding-y: 0.5rem;
-        --padding-x: 1rem;
-        padding: var(--padding-y) var(--padding-x) var(--padding-y) 0;
+        --padding-y-item: 0.5rem;
+        --padding-x-item: 1rem;
+        padding: var(--padding-y-item) var(--padding-x-item)
+          var(--padding-y-item) 0;
         border-right: 1px solid #ccc;
       }
       span {
