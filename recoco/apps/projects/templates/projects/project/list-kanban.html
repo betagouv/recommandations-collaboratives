@@ -104,8 +104,8 @@
                                                                       x-text="truncate(t.name)"></span>
                                                             </div>
                                                             <template x-if="t.origin">
-                                                                <div class=" kanban-card--project-push-by-container"
-                                                                     x-show="t.origin && {{ site_config.id }} !== t.origin?.site">
+                                                                <div class=" kanban-card__project-push-by-container"
+                                                                     x-show="t.origin && {{ site_config.site_id }} !== t.origin?.site">
                                                                     <img x-show="t.origin.siteInfo.configuration.logo_small"
                                                                          :src="t.origin.siteInfo.configuration.logo_small"
                                                                          width="16px"
