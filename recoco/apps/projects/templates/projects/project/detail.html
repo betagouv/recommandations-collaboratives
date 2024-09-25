@@ -29,7 +29,6 @@
             {% endblock banner %}
             {% with request.resolver_match.url_name as url_name %}
                 {% if url_name != "projects-project-detail-recommandations-embed" %}
-                    {% include "projects/project/header.html" %}
                     {% if project.status == "DRAFT" and request.user in project.members.all %}
                         {% include "projects/project/fragments/pending_confirmation_banner.html" %}
                     {% endif %}
