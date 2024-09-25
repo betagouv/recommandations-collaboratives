@@ -1,7 +1,18 @@
 .project-navigation {
   width: 100%;
-  height: 69px;
+  height: 64px;
   border-bottom: solid 1px #ccc;
+  background: white;
+  position: sticky;
+  z-index: 1001;
+  top: 65px;
+  &__btn-role-selection {
+    padding: 0 10px;
+    height: 100%;
+    border-left: solid 1px #ccc;
+    display: flex;
+    align-items: center;
+  }
 }
 
 .old-project-navigation {
