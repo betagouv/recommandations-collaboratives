@@ -14,6 +14,13 @@
     height: 100%;
     li {
       margin-right: 1rem;
+      white-space: nowrap;
+      &:not(:last-child) {
+        --padding-y: 0.5rem;
+        --padding-x: 1rem;
+        padding: var(--padding-y) var(--padding-x) var(--padding-y) 0;
+        border-right: 1px solid #ccc;
+      }
       span {
         text-decoration: underline;
       }
@@ -42,8 +49,9 @@
       }
     }
 
-    .navigation__item-projects {
-      max-width: 500px;
+    li.navigation__item-projects {
+      max-width: 414px;
+      --padding-y: 0.3rem;
     }
   }
 }

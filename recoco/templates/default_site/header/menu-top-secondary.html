@@ -19,11 +19,10 @@
                {% endif %}">
         <!-- Dashboard -->
         {% if is_switchtender or is_administrating_project %}
-            <li class="navigation__item-dashboard">
+            <li class="navigation__item-dashboard d-flex">
                 <a href="{% url 'projects-project-list' %}"
                    class="fr-link {% if url_name == 'projects-project-list-advisor' or url_name == 'projects-project-list-staff' or url_name == 'projects-project-list-map' %}active{% endif %}">
-                    <span class="fr-ml-1v align-middle no-wrap">Tous les projets</span>
-                </a>
+                    <span class="fr-ml-1v align-middle no-wrap">Tous les projets</span></a>
                 {% if unread_notifications_count %}
                     <span class="badge text-bg-danger no-underline">{{ unread_notifications_count }}</span>
                 {% endif %}
@@ -37,7 +36,9 @@
                     {% comment %} TODO
                 - consider this rule {% if request.session.projects|length > 0 %}
                     {% endcomment %}
-                    <select class="fr-select" id="select" name="project-selector">
+                    <select class="fr-select fr-mt-0 fr-py-1v"
+                            id="select"
+                            name="project-selector">
                         <option value="" selected>
                             <a href="{% url 'projects-project-detail' active_project.pk %}"><strong>{{ active_project.commune.name }}</strong> <span class="text-secondary small ms-2 text-break text-truncate">{{ active_project.name }}</span></a>
                         </option>
@@ -47,7 +48,7 @@
                             {% endcomment %}
                             <option value="1">
                                 {{ project.commune|capfirst }} {{ project.name|capfirst }}
-                                {% if project.inactive is False and project.actions_open > 0 %}
+                                {% if True or project.inactive is False and project.actions_open > 0 %}
                                     <div>
                                         <span class="align-middle badge bg-primary rounded-pill">{{ project.actions_open }}</span>
                                     </div>
@@ -70,7 +71,10 @@
             <!-- Projects moderation -->
             <li class="navigation__item-moderation d-flex">
                 <a href="{% url "projects-moderation-list" %}"
-                   class="{% if url_name == 'projects-moderation-list' %}active{% endif %}"><span class="fr-link underline no-wrap">Projets à examiner</span></a><span class="badge text-bg-danger no-underline">{{ projects_to_moderate_count }}</span>
+                   class="{% if url_name == 'projects-moderation-list' %}active{% endif %}"><span class="fr-link underline no-wrap">Projets à examiner</span></a>
+                {% if projects_to_moderate_count %}
+                    <span class="badge text-bg-danger no-underline">{{ projects_to_moderate_count }}</span>
+                {% endif %}
             </li>
         {% endif %}
         {% comment %} surcharge pour ajouter des éléments au menu top à gauche de ressources {% endcomment %}
