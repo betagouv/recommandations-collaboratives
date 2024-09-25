@@ -99,12 +99,12 @@
                                                                     <span class="kanban-card--commune-postal" x-text="`(${t.commune.postal})`"></span>
                                                                 </div>
                                                             </template>
-                                                            <div class="kanban-card--project-container fw-semibold fr-mb-2v">
-                                                                <span class="kanban-card--project-name project-link"
+                                                            <div class="kanban-card__project-container fw-semibold fr-mb-2v">
+                                                                <span class="kanban-card__project-name project-link"
                                                                       x-text="truncate(t.name)"></span>
                                                             </div>
                                                             <template x-if="t.origin">
-                                                                <div class=" kanban-card__project-push-by-container"
+                                                                <div class="kanban-card__project-push-by-container"
                                                                      x-show="t.origin && {{ site_config.site_id }} !== t.origin?.site">
                                                                     <img x-show="t.origin.siteInfo.configuration.logo_small"
                                                                          :src="t.origin.siteInfo.configuration.logo_small"
@@ -118,13 +118,29 @@
                                                                     <span x-text="t.origin.siteInfo.name"></span>
                                                                 </div>
                                                             </template>
+                                                            <template x-for="portal in t.publishTo">
+                                                                <template x-if="portal.site !== {{ site_config.site_id }}">
+                                                                    <div class="kanban-card__project-push-by-container">
+                                                                        <img x-show="portal.siteInfo.configuration.logo_small"
+                                                                             :src="portal.siteInfo.configuration.logo_small"
+                                                                             width="16px"
+                                                                             height="auto"
+                                                                             :alt="`Logo ${portal.siteInfo.name}`" />
+                                                                        <span x-show="!portal.siteInfo.configuration.logo_small"
+                                                                              class="fr-icon--sm fr-icon-window-line"
+                                                                              aria-hidden="true"></span>
+                                                                        <span class="not-a-link kanban">projet envoyé sur</span>
+                                                                        <span x-text="portal.siteInfo.name"></span>
+                                                                    </div>
+                                                                </template>
+                                                            </template>
                                                             <div>
-                                                                <span class="kanban-card--project-insee fr-icon--sm fr-icon-map-pin-2-line not-a-link">INSEE: <span x-text="truncate(t.commune.insee)"></span></span>
+                                                                <span class="kanban-card__project-insee fr-icon--sm fr-icon-map-pin-2-line not-a-link">INSEE: <span x-text="truncate(t.commune.insee)"></span></span>
                                                             </div>
                                                             <div class="d-flex justify-content-between">
-                                                                <div class="kanban-card--project-date-container text-secondary">
+                                                                <div class="kanban-card__project-date-container text-secondary">
                                                                     <span x-text="`Déposé le ${formatDateDisplay(t.created_on)}`"
-                                                                          class="kanban-card--project-date fr-icon--sm fr-icon-calendar-event-line align-middle not-a-link"></span>
+                                                                          class="kanban-card__project-date fr-icon--sm fr-icon-calendar-event-line align-middle not-a-link"></span>
                                                                 </div>
                                                                 <div class="d-flex justify-content-end fr-mr-1v">
                                                                     <template x-for="switchtender in t.switchtenders">
