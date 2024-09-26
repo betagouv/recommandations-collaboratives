@@ -43,7 +43,6 @@ Alpine.store('projects', {
           };
         });
     });
-    console.log(projects);
 
     return projects;
   },
