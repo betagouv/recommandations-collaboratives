@@ -45,7 +45,7 @@ export default function PreviewModal() {
     statusText,
     truncate,
     newTasksNavigationText() {
-      return `${this.index + 1} sur ${this.newTasks.length} recommandation${this.newTasks.length > 0 ? 's' : ''}`;
+      return `${this.index + 1} sur ${this.newTasks.length} nouvelle${this.newTasks.length > 0 ? 's' : ''} recommandation${this.newTasks.length > 0 ? 's' : ''}`;
     },
     hasNotification(followupId) {
       return (
@@ -63,11 +63,13 @@ export default function PreviewModal() {
           content
         );
         await this.$store.previewModal.loadFollowups();
+        await this.$store.tasksView.updateView();
       } else {
         const [type, id] = this.currentlyEditing;
         if (type === 'followup') {
           await this.$store.tasksData.editComment(this.task.id, id, content);
           await this.$store.previewModal.loadFollowups();
+          await this.$store.tasksView.updateView();
         } else if (type === 'content') {
           await this.$store.tasksData.patchTask(this.task.id, {
             content: content,
