@@ -51,7 +51,7 @@
                                     <div class="d-flex justify-content-between justify-items-center fr-px-2v fr-py-2v sticky top-0">
                                         <h5 x-text="board.title" class="font-medium text-gray-800 fr-mb-0"></h5>
                                     </div>
-                                    <div class="kanban-column--content">
+                                    <div class="kanban-column__content">
                                         <div class="fr-px-2v fr-py-1v fr-pb-1v h-100">
                                             <template x-if="column(board.code).length === 0">
                                                 <div class="drag-targetable fr-py-2v h-100"
@@ -79,24 +79,24 @@
                                                      @dragend="onDragEnd(event)">
                                                     <a :href="makeProjectURL(t.id)">
                                                         <div class="kanban-card rounded fr-p-2v w-100 position-relative"
-                                                             :class="{'kanban-card--border__is-switchtender': t.is_switchtender, 'kanban-card--border__is-observer': t.is_observer}"
+                                                             :class="{'kanban-card__border--is-switchtender': t.is_switchtender, 'kanban-card__border--is-observer': t.is_observer}"
                                                              draggable="true"
                                                              :data-test-id="`item-draggable-${taskIndex}`">
                                                             <template x-if="t.inactive_since !== null">
-                                                                <div class="kanban-card--state-container">
+                                                                <div class="kanban-card__state-container">
                                                                     <div class="left-0">
-                                                                        <div class="kanban-card--state__pause">En pause</div>
+                                                                        <div class="kanban-card__state--pause">En pause</div>
                                                                     </div>
                                                                 </div>
                                                             </template>
                                                             <template x-if="t.notifications.count > 0">
-                                                                <span class="kanban-card--notification-container position-absolute top-25 start-100 badge bg-info"
+                                                                <span class="kanban-card__notification-container position-absolute top-25 start-100 badge bg-info"
                                                                       :class="{'bg-danger': t.notifications.has_collaborator_activity == true}"><span x-text="t.notifications.count"></span> <span class="visually-hidden">nouvelle activité</span></span>
                                                             </template>
                                                             <template x-if="t.commune">
-                                                                <div class="kanban-card--commune-container fw-bold">
-                                                                    <span class="kanban-card--commune-name" x-text="t.commune.name"></span>
-                                                                    <span class="kanban-card--commune-postal" x-text="`(${t.commune.postal})`"></span>
+                                                                <div class="kanban-card__commune-container fw-bold">
+                                                                    <span class="kanban-card__commune-name" x-text="t.commune.name"></span>
+                                                                    <span class="kanban-card__commune-postal" x-text="`(${t.commune.postal})`"></span>
                                                                 </div>
                                                             </template>
                                                             <div class="kanban-card__project-container fw-semibold fr-mb-2v">

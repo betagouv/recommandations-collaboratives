@@ -14,12 +14,7 @@
     min-height: 100px;
     background-color: #f6f6f6;
 
-    &--title-container {
-      border-top-left-radius: 4px;
-      border-top-right-radius: 4px;
-    }
-
-    &--content {
+    &__content {
       height: 60vh;
       overflow-x: hidden;
       overflow-y: auto;
@@ -39,7 +34,7 @@
     background-color: #fafafa;
     box-shadow: 2px 2px 4px 0px #0000001a;
 
-    &--state {
+    &__state {
       &-container {
         display: flex;
         position: absolute;
@@ -47,7 +42,7 @@
         gap: 0.8rem;
       }
 
-      &__pause {
+      &--pause {
         padding: 0.25rem 0.5rem;
         font-size: 12px;
         text-transform: uppercase;
@@ -58,25 +53,25 @@
       }
     }
 
-    &--border {
-      &__is-switchtender {
+    &__border {
+      &--is-switchtender {
         border: 1px solid #0063cb;
         background-color: white;
       }
 
-      &__is-observer {
+      &--is-observer {
         border: 1px solid #27a658;
         background-color: white;
       }
     }
 
-    &--notification {
+    &__notification {
       &-container {
         transform: translate(-65%, -75%) !important;
       }
     }
 
-    &--commune {
+    &__commune {
       &-container {
         margin-top: 2px;
         color: #3a3a3a;
@@ -94,6 +89,8 @@
     &__project {
       &-container {
         margin-top: -5px;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
 
       &-push-by-container,
@@ -109,6 +106,7 @@
         font-size: 14px;
         font-weight: 400;
         font-family: 'Marianne';
+        white-space: nowrap;
       }
 
       &-date-container {
