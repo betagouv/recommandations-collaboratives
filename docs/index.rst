@@ -3,16 +3,22 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to UrbanVitaliz's documentation!
-========================================
+Documentation de Recommandations Collaboratives
+===============================================
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
-
+   install.rst
+   models.rst
+   fts.rst
    permissions.rst
    workflows.rst
+   js_components.rst
+   terminology.rst
+
+
 
 
 

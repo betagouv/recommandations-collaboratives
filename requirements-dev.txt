@@ -30,3 +30,6 @@ jupytext==1.16.1
 graphviz==0.20.1
 freezegun
 responses==0.25.3
+sphinxcontrib-django
+sphinx-js
+sphinx-autodoc-annotation

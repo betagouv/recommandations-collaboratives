@@ -22,7 +22,8 @@
       "location": "861 chemin rural 53",
       "commune": 42,
       "impediments": "🍟🍟🍟🍟",
-      "deleted": null
+      "deleted": null,
+      "sites": [1]
     }
   },
   {
@@ -49,7 +50,8 @@
       "location": "861 chemin rural 53",
       "commune": 42,
       "impediments": "La toute première friche",
-      "deleted": null
+      "deleted": null,
+      "sites": [1]
     }
   },
   {
@@ -75,7 +77,8 @@
       "location": "861 chemin rural 53",
       "commune": 42,
       "impediments": "La seconde friche",
-      "deleted": null
+      "deleted": null,
+      "sites": [1]
     }
   },
   {
@@ -101,7 +104,8 @@
       "location": "861 chemin rural 53",
       "commune": 42,
       "impediments": "La seconde friche",
-      "deleted": null
+      "deleted": null,
+      "sites": [1]
     }
   },
   {
@@ -127,7 +131,8 @@
       "location": "861 chemin rural 53",
       "commune": 1,
       "impediments": "La seconde friche",
-      "deleted": null
+      "deleted": null,
+      "sites": [1]
     }
   },
   {
@@ -153,7 +158,8 @@
       "location": "861 chemin rural 53",
       "commune": 1,
       "impediments": "La seconde friche",
-      "deleted": null
+      "deleted": null,
+      "sites": [1]
     }
   },
   {
@@ -179,7 +185,8 @@
       "location": "861 chemin rural 53",
       "commune": 1,
       "impediments": "La seconde friche",
-      "deleted": null
+      "deleted": null,
+      "sites": [1]
     }
   },
   {
@@ -205,7 +212,8 @@
       "location": "861 chemin rural 53",
       "commune": 1,
       "impediments": "La seconde friche",
-      "deleted": null
+      "deleted": null,
+      "sites": [1]
     }
   },
   {
@@ -231,7 +239,8 @@
       "location": "861 chemin rural 53",
       "commune": 1,
       "impediments": "La seconde friche",
-      "deleted": null
+      "deleted": null,
+      "sites": [1]
     }
   },
   {
@@ -258,7 +267,8 @@
       "location": "861 chemin rural 53",
       "commune": 1,
       "impediments": "La seconde friche",
-      "deleted": null
+      "deleted": null,
+      "sites": [1]
     }
   },
   {
@@ -285,7 +295,8 @@
       "location": "861 chemin rural 53",
       "commune": 42,
       "impediments": "La 11ème friche",
-      "deleted": null
+      "deleted": null,
+      "sites": [1]
     }
   },
   {
@@ -312,7 +323,8 @@
       "location": "861 chemin rural 53",
       "commune": 3,
       "impediments": "Map Area Commune",
-      "deleted": null
+      "deleted": null,
+      "sites": [1]
     }
   },
   {
@@ -339,7 +351,8 @@
       "location": "",
       "commune": 3,
       "impediments": "Map Area Circle",
-      "deleted": null
+      "deleted": null,
+      "sites": [1]
     }
   },
   {
@@ -366,7 +379,8 @@
       "location": "861 chemin rural 53",
       "commune": 1,
       "impediments": "deleted user - project",
-      "deleted": null
+      "deleted": null,
+      "sites": [1]
     }
   },
   {
@@ -393,7 +407,8 @@
       "location": "21 Rue Elise Gervais",
       "commune": 2,
       "impediments": "Map Marker Project Location",
-      "deleted": null
+      "deleted": null,
+      "sites": [1]
     }
   },
   {
@@ -422,7 +437,8 @@
       "location_y": 45.4387021,
       "commune": 2,
       "impediments": "Map Marker Project Coordinates",
-      "deleted": null
+      "deleted": null,
+      "sites": [1]
     }
   },
   {
@@ -449,7 +465,8 @@
       "location": "",
       "commune": null,
       "impediments": "Map with no location data",
-      "deleted": null
+      "deleted": null,
+      "sites": [1]
     }
   },
   {
@@ -476,7 +493,8 @@
       "location": "861 chemin rural 53",
       "commune": 42,
       "impediments": "",
-      "deleted": null
+      "deleted": null,
+      "sites": [1]
     }
   },
   {
@@ -502,7 +520,8 @@
       "location": "861 chemin rural 53",
       "commune": 42,
       "impediments": "",
-      "deleted": null
+      "deleted": null,
+      "sites": [1]
     }
   },
   {
@@ -529,7 +548,8 @@
       "location": "861 chemin rural 53",
       "commune": 42,
       "impediments": "",
-      "deleted": null
+      "deleted": null,
+      "sites": [1]
     }
   },
   {
@@ -556,7 +576,8 @@
       "location": "861 chemin rural 53",
       "commune": 42,
       "impediments": "",
-      "deleted": null
+      "deleted": null,
+      "sites": [1]
     }
   },
   {
@@ -583,7 +604,8 @@
       "location": "861 chemin rural 53",
       "commune": 42,
       "impediments": "",
-      "deleted": null
+      "deleted": null,
+      "sites": [1]
     }
   }
 ]
