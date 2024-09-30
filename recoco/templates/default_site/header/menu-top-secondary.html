@@ -39,9 +39,6 @@
                     <select class="fr-select fr-mt-0 fr-py-1v"
                             id="select"
                             name="project-selector">
-                        <option value="" selected>
-                            <a href="{% url 'projects-project-detail' active_project.pk %}"><strong>{{ active_project.commune.name }}</strong> <span class="text-secondary small ms-2 text-break text-truncate">{{ active_project.name }}</span></a>
-                        </option>
                         {% for project in request.session.projects %}
                             {% comment %} TODO
                     - consider this style rule <:class ="{'inactive': '{{ project.inactive }}' === 'True'}">

@@ -94,7 +94,7 @@
                         <!-- Push -->
                         {% if "project_id" in request.session %}
                             <a class="text-reset text-decoration-none align-baseline"
-                               href="{% url "projects-create-resource-action" resource.id %}"
+                               href="{% url "projects-project-create-task" resource.id %}"
                                data-bs-toggle="tooltip"
                                data-bs-placement="top"
                                title="Pousser cette ressource">
@@ -107,7 +107,7 @@
                             </a>
                         {% else %}
                             <span class="align-baseline"
-                                  href="{% url "projects-create-resource-action" resource.id %}"
+                                  href="{% url "projects-project-create-task" resource.id %}"
                                   data-bs-toggle="tooltip"
                                   data-bs-placement="top"
                                   title="Sélectionnez d'abord un projet pour pousser cette ressource">

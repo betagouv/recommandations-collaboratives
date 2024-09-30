@@ -9,11 +9,9 @@ created : 2021-05-26 15:56:20 CEST
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.signals import user_logged_in
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import PermissionDenied
-from django.dispatch import receiver
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
@@ -39,12 +37,9 @@ from ..utils import (
     assign_collaborator,
     assign_observer,
     can_administrate_project,
-    get_active_project,
     is_advisor_for_project,
     is_project_moderator_or_403,
     is_regional_actor_for_project_or_403,
-    refresh_user_projects_in_session,
-    set_active_project_id,
     unassign_advisor,
 )
 
@@ -382,26 +377,6 @@ def project_delete(request, project_id=None):
         project.deleted = project.updated_on = timezone.now()
         project.save()
     return redirect(reverse("projects-project-list"))
-
-
-########################################################################
-# Login methods and signals
-########################################################################
-@receiver(user_logged_in)
-def post_login_set_active_project(sender, user, request, **kwargs):
-    # store my projects in the session
-    refresh_user_projects_in_session(request, user)
-
-    # Needed since get_active_project expects a user attribute
-    request.user = user
-
-    active_project = get_active_project(request)
-
-    if not active_project:
-        # Try to fetch a project
-        active_project = models.Project.on_site.filter(members=user).first()
-        if active_project:
-            set_active_project_id(request, active_project.id)
 
 
 # eof

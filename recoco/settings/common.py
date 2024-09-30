@@ -142,7 +142,6 @@ TEMPLATES = [
                 "django.template.context_processors.media",
                 "django.contrib.messages.context_processors.messages",
                 "recoco.apps.projects.context_processors.is_switchtender_processor",
-                "recoco.apps.projects.context_processors.active_project_processor",
                 "recoco.apps.projects.context_processors.unread_notifications_processor",
             ],
             "loaders": [

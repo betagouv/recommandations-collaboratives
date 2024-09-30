@@ -3,6 +3,7 @@ import datetime
 import django.dispatch
 from actstream import action
 from actstream.models import action_object_stream
+from django.contrib.auth.signals import user_logged_in
 from django.contrib.contenttypes.models import ContentType
 from django.db.models.signals import pre_delete, pre_save
 from django.dispatch import receiver
@@ -21,6 +22,7 @@ from .utils import (
     get_notification_recipients_for_project,
     get_project_moderators,
     get_regional_actors_for_project,
+    refresh_user_projects_in_session,
 )
 
 ########################################################################
@@ -399,6 +401,14 @@ def log_survey_session_updated(sender, session, request, **kwargs):
         action_object=session,
         target=project,
     )
+
+
+########################################################################
+# Login methods and signals
+########################################################################
+@receiver(user_logged_in)
+def post_login_set_user_projects_in_session(sender, user, request, **kwargs):
+    refresh_user_projects_in_session(request, user)
 
 
 # eof

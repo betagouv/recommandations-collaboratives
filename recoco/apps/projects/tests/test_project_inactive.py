@@ -342,6 +342,7 @@ def test_notifications_are_not_dispatched_to_collaborators_if_project_is_inactiv
             "url-args": {"project_id": project.pk},
             "user": superuser,
             "post-data": {
+                "project": project.pk,
                 "push_type": "noresource",
                 "intent": "yeah",
                 "content": "this is some content",

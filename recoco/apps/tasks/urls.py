@@ -15,11 +15,6 @@ from .views import (
 )
 
 urlpatterns = [
-    path(
-        r"project/<int:resource_id>/resource/action/",
-        tasks.create_resource_action_for_current_project,
-        name="projects-create-resource-action",
-    ),
     # Recommendations
     path(
         r"projects/task-recommendation",

@@ -16,11 +16,7 @@ from django.utils.text import slugify
 
 from recoco.apps.projects import models as project_models
 from recoco.apps.projects.forms import DocumentUploadForm
-from recoco.apps.projects.utils import (
-    get_active_project_id,
-    get_collaborators_for_project,
-)
-from recoco.apps.resources import models as resources
+from recoco.apps.projects.utils import get_collaborators_for_project
 from recoco.apps.survey import models as survey_models
 from recoco.utils import (
     check_if_advisor,
@@ -545,19 +541,3 @@ def rsvp_followup_task(request, rsvp_id=None, status=None):
     else:
         form = RsvpTaskFollowupForm()
     return render(request, "tasks/task/rsvp_followup_confirm.html", locals())
-
-
-@login_required
-def create_resource_action_for_current_project(request, resource_id=None):
-    """Create action for given resource to project stored in session"""
-    project_id = get_active_project_id(request)
-    resource = get_object_or_404(resources.Resource, sites=request.site, pk=resource_id)
-    project = get_object_or_404(
-        project_models.Project, sites=request.site, pk=project_id
-    )
-
-    has_perm_or_403(request.user, "projects.manage_tasks", project)
-
-    next_url = reverse("projects-project-create-task", args=[project.id])
-    next_url += f"?resource={resource.id}"
-    return redirect(next_url)

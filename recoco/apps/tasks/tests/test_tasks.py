@@ -588,6 +588,7 @@ def test_create_new_task_for_project_notify_collaborators(
         client.post(
             reverse("projects-project-create-task", args=[project_ready.id]),
             data={
+                "project": project_ready.pk,
                 "push_type": "noresource",
                 "intent": "yeah",
                 "content": "this is some content",
@@ -808,6 +809,7 @@ def test_create_new_action_with_invalid_push_type(request, client, project_ready
         client.post(
             reverse("projects-project-create-task", args=[project_ready.id]),
             data={
+                "project": project_ready.pk,
                 "push_type": "blah",
                 "public": True,
             },
@@ -826,6 +828,7 @@ def test_create_new_action_as_draft(request, client, project_ready):
         response = client.post(
             reverse("projects-project-create-task", args=[project_ready.id]),
             data={
+                "project": project_ready.pk,
                 "push_type": "noresource",
                 "intent": intent,
                 "content": content,
@@ -851,6 +854,7 @@ def test_create_new_action_with_new_topic(request, client, project_ready):
         response = client.post(
             reverse("projects-project-create-task", args=[project_ready.id]),
             data={
+                "project": project_ready.pk,
                 "push_type": "noresource",
                 "intent": intent,
                 "content": content,
@@ -879,6 +883,7 @@ def test_create_new_action_with_existing_topic(request, client, project_ready):
         response = client.post(
             reverse("projects-project-create-task", args=[project_ready.id]),
             data={
+                "project": project_ready.pk,
                 "push_type": "noresource",
                 "intent": intent,
                 "content": content,
@@ -904,6 +909,7 @@ def test_create_new_action_without_resource(request, client, project_ready):
         response = client.post(
             reverse("projects-project-create-task", args=[project_ready.id]),
             data={
+                "project": project_ready.pk,
                 "push_type": "noresource",
                 "public": True,
                 "intent": intent,
@@ -931,6 +937,7 @@ def test_create_new_action_with_document(request, client, project_ready):
         response = client.post(
             reverse("projects-project-create-task", args=[project_ready.id]),
             data={
+                "project": project_ready.pk,
                 "push_type": "noresource",
                 "public": True,
                 "intent": intent,
@@ -966,6 +973,7 @@ def test_create_new_action_with_single_resource(request, client, project_ready):
         response = client.post(
             reverse("projects-project-create-task", args=[project_ready.id]),
             data={
+                "project": project_ready.pk,
                 "push_type": "single",
                 "public": True,
                 "resource": resource.pk,
@@ -1002,6 +1010,7 @@ def test_create_new_action_with_multiple_resources(request, client, project_read
         response = client.post(
             reverse("projects-project-create-task", args=[project_ready.id]),
             data={
+                "project": project_ready.pk,
                 "push_type": "multiple",
                 "public": True,
                 "resources": [resource1.pk, resource2.pk],
@@ -1014,6 +1023,31 @@ def test_create_new_action_with_multiple_resources(request, client, project_read
         assert task.public is True
 
     assert response.status_code == 302
+
+
+@pytest.mark.django_db
+def test_create_new_action_on_unauthorized_project(request, client, project_ready):
+    intent = "My Intent"
+    content = "My Content"
+
+    with login(client):
+        response = client.post(
+            reverse("projects-project-create-task", args=[project_ready.id]),
+            data={
+                "project": project_ready.pk,
+                "push_type": "noresource",
+                "public": True,
+                "intent": intent,
+                "content": content,
+            },
+        )
+
+        assert response.status_code == 403
+
+    assert models.Task.on_site.count() == 0
+
+
+# Action sorting
 
 
 @pytest.mark.django_db

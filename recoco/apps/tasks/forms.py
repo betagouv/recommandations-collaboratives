@@ -9,8 +9,10 @@ created : 2021-12-14 10:36:20 CEST
 
 
 from django import forms
+from django.contrib.sites.models import Site
 from markdownx.fields import MarkdownxFormField
 
+from recoco.apps.projects import models as projects_models
 from recoco.apps.resources import models as resources_models
 
 from . import models
@@ -71,19 +73,36 @@ class PushTypeActionForm(forms.Form):
     next = forms.CharField(required=False)
 
 
-class CreateActionWithoutResourceForm(forms.ModelForm):
-    """Create an action for a project, without attached resource"""
+class CreateActionBaseForm(forms.ModelForm):
+    """Base form for action creation"""
+
+    def __init__(self, *args, **kwargs):
+        super(CreateActionBaseForm, self).__init__(*args, **kwargs)
+
+        # Allow only projects on the current site with a usable status
+        current_site = Site.objects.get_current()
+        self.fields["project"].queryset = projects_models.Project.on_site.filter(
+            project_sites__site=current_site
+        ).exclude(project_sites__status__in=["DRAFT", "REJECTED"])
+
+    project = forms.ModelChoiceField(
+        queryset=projects_models.Project.objects.none(),
+        empty_label="(Veuillez sélectionner un projet)",
+        required=True,
+    )
 
     topic_name = forms.CharField(required=False)
+
+
+class CreateActionWithoutResourceForm(CreateActionBaseForm):
+    """Create an action for a project, without attached resource"""
 
     class Meta:
         model = models.Task
         fields = ["intent", "content", "public"]
 
 
-class CreateActionWithResourceForm(CreateActionWithoutResourceForm):
-    topic_name = forms.CharField(required=False)
-
+class CreateActionWithResourceForm(CreateActionBaseForm):
     resource = (
         forms.ModelChoiceField(
             queryset=resources_models.Resource.objects.exclude(
@@ -110,7 +129,7 @@ class CreateActionWithResourceForm(CreateActionWithoutResourceForm):
         fields = ["intent", "content", "public", "resource"]
 
 
-class CreateActionsFromResourcesForm(forms.ModelForm):
+class CreateActionsFromResourcesForm(CreateActionBaseForm):
     resources = forms.ModelMultipleChoiceField(
         queryset=resources_models.Resource.objects.exclude(
             status=resources_models.Resource.DRAFT

@@ -23,13 +23,12 @@ from guardian.shortcuts import get_user_perms
 from model_bakery import baker
 from model_bakery.recipe import Recipe
 from notifications import notify
-from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
+from pytest_django.asserts import assertContains, assertNotContains
 
 from recoco import verbs
 from recoco.apps.geomatics import models as geomatics
 from recoco.apps.home import models as home_models
 from recoco.apps.onboarding import models as onboarding_models
-from recoco.apps.resources import models as resources
 from recoco.apps.tasks import models as task_models
 from recoco.apps.tasks import signals
 from recoco.utils import get_group_for_site, login
@@ -290,6 +289,7 @@ def test_project_knowledge_available_for_owner(request, client, project):
     with login(client, user=owner, is_staff=False):
         url = reverse("projects-project-detail-knowledge", args=[project.id])
         response = client.get(url)
+
     assert response.status_code == 200
 
 
@@ -946,47 +946,6 @@ def test_projects_feed_available_for_all_users(request, client, project):
     response = client.get(url)
     detail_url = reverse("projects-project-detail", args=[project.id])
     assertContains(response, detail_url)
-
-
-########################################################################
-# pushing a resource to a project's owner
-########################################################################
-
-
-@pytest.mark.django_db
-def test_switchtender_push_resource_to_project_fails_if_no_project_in_session(client):
-    resource = Recipe(resources.Resource, status=resources.Resource.PUBLISHED).make()
-
-    url = reverse("projects-create-resource-action", args=[resource.id])
-    with login(client, groups=["example_com_advisor"]):
-        response = client.get(url)
-
-    assert response.status_code == 404
-
-
-@pytest.mark.django_db
-def test_switchtender_create_action_for_resource_push(request, client, project):
-    current_site = get_current_site(request)
-
-    resource = Recipe(
-        resources.Resource, sites=[current_site], status=resources.Resource.PUBLISHED
-    ).make()
-
-    url = reverse("projects-create-resource-action", args=[resource.id])
-    with login(client) as user:
-        utils.assign_advisor(user, project, current_site)
-
-        session = client.session
-        session["active_project"] = project.id
-        session.save()
-
-        response = client.post(url)
-
-    newurl = (
-        reverse("projects-project-create-task", args=[project.id])
-        + f"?resource={resource.id}"
-    )
-    assertRedirects(response, newurl)
 
 
 @pytest.mark.django_db
