@@ -1,0 +1,11 @@
+<span class="fr-tooltip fr-placement"
+      id="{{ id }}"
+      role="tooltip"
+      aria-hidden="true">Pour accéder à cet onglet,
+    <form method="post"
+          action="{% url 'projects-project-switchtender-join' project.id %}"
+          id="positioning-form">
+        {% csrf_token %}
+        <button class="fr-btn fr-btn--sm">devenez conseiller</button>
+    </form>
+ou <a href="">observateur du projet</a></span>

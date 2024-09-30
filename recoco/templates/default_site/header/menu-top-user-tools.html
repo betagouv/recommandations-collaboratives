@@ -7,99 +7,87 @@
     <link href="{% sass_src 'css/header/header.scss' %}"
           rel="stylesheet"
           type="text/css">
+    <link href="{% sass_src 'css/header/user-tools.scss' %}"
+          rel="stylesheet"
+          type="text/css">
 {% endblock css %}
 {% is_staff_for_current_site request.user as is_staff %}
 <!-- User -->
-<div id="user-info" class="fr-px-2v fr-mx-2v">
+<div class="user-tools d-flex">
     {% if user.is_authenticated %}
         {% get_obj_perms request.user for request.site as "user_site_perms" %}
-        <div x-data="{ open: false }"
-             x-on:click.outside="open = false"
-             class="dropdown">
-            <a x-on:click="open = !open"
-               href="#"
-               class="d-flex align-items-center link-dark text-decoration-none"
-               data-test-id="open-dropdown-profil-option-button">
-                <img src="{% gravatar_url user.email 16 %}"
-                     alt="{{ user.get_full_name }}"
-                     class="fr-mr-2v rounded-circle header-img-specific-size" />
-                <span class="d-none d-lg-none d-xl-block specific-color-0063CB">{{ user.get_full_name|default:user.email }}</span>
-                <button id="user-menu-button" type="button" class="border-0 fr-py-0 fr-px-1v">
-                    <svg data-toggle="tooltip"
-                         data-placement="top"
-                         title="Notifications désactivées"
-                         class="align-middle bi fr-p-0-5v"
-                         width="20px"
-                         height="20px"
-                         fill="#0063CB"
-                         stroke="#0063CB">
-                        <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#chevron-down" />
-                    </svg>
-                </button>
-            </a>
-            <ul x-show="open"
-                :class="{'show':open}"
-                class="dropdown-menu text-small shadow fr-mt-2v top-100">
-                {% if is_switchtender or is_administrating_project %}
+        <!-- Notifications -->
+        <div class="dropdown user-tools__notification-menu"
+             x-data="MenuNotifications({{ unread_notifications_count }})">
+            <button class="fr-btn fr-btn--tertiary-no-outline fr-icon-notification-3-line"
+                    id="notification-menu-button"
+                    role="button"
+                    data-bs-toggle="dropdown"
+                    data-bs-auto-close="outside"
+                    aria-expanded="false"
+                    data-test-id="notification-menu-open">
+                Notifications
+                <span class="badge text-bg-danger"
+                      x-show="notificationNumber > 0"
+                      x-text="notificationNumber"
+                      data-test-id="notification-badge"></span>
+            </button>
+            {% include "header/dropdown-menu-notifications.html" %}
+        </div>
+        <div>
+            <button class="fr-nav__btn user-tools__main-menu-button h-100"
+                    aria-expanded="false"
+                    aria-controls="user-tools-main-menu"
+                    data-test-id="open-dropdown-profil-option-button">
+                <span class="fr-icon-account-circle-line fr-mr-1w" aria-hidden="true"></span>
+                <span class="d-none d-lg-none d-xl-block">{{ user.get_full_name|default:user.email }}</span>
+            </button>
+            <div class="fr-collapse fr-menu" id="user-tools-main-menu">
+                <ul class="fr-menu__list user-tools__main-menu">
+                    {% if is_switchtender or is_administrating_project %}
+                        <li>
+                            <a class="fr-nav__link " href="{% url 'projects-project-list' %}">Accueil</a>
+                        </li>
+                    {% endif %}
+                    {% if "use_crm" in user_site_perms %}
+                        <li>
+                            <a class="fr-nav__link " href="{% url 'crm-site-dashboard' %}">CRM</a>
+                        </li>
+                    {% endif %}
+                    {% if user.is_staff %}
+                        <li>
+                            <a class="fr-nav__link" href="{% url 'admin:index' %}">Administration Reco-co</a>
+                        </li>
+                    {% endif %}
+                    <!-- Address Book -->
+                    {% if "use_addressbook" in user_site_perms %}
+                        <li>
+                            <a href="{% url 'addressbook-organization-list' %}"
+                               class="fr-nav__link"
+                               data-test-id="button-adress-book"
+                               {% if 'addressbook' in url_name %}aria-current="page"{% endif %}>Carnet d'adresses</a>
+                        </li>
+                    {% endif %}
+                    {% if is_staff %}
+                        <li>
+                            <a class="fr-nav__link"
+                               href="https://reco-co.gitbook.io/reco-co/pour-les-administrateurs-dun-portail"
+                               data-test-id="documentation-button-staff"
+                               target="_blank">Documentation</a>
+                        </li>
+                    {% elif is_switchtender or is_administrating_project %}
+                        <li>
+                            <a class="fr-nav__link"
+                               href="https://reco-co.gitbook.io/reco-co/pour-les-acteurs-publics-qui-conseillent-les-collectivites"
+                               data-test-id="documentation-button-advisor"
+                               target="_blank">Documentation</a>
+                        </li>
+                    {% endif %}
                     <li>
-                        <a class="dropdown-item small " href="{% url 'projects-project-list' %}">Accueil</a>
+                        <a class="fr-nav__link" href="{% url 'account_logout' %}">Déconnexion</a>
                     </li>
-                    <li>
-                        <hr class="dropdown-divider fr-py-0">
-                    </li>
-                {% endif %}
-                {% if "use_crm" in user_site_perms %}
-                    <li>
-                        <a class="dropdown-item small " href="{% url 'crm-site-dashboard' %}">CRM</a>
-                    </li>
-                    <li>
-                        <hr class="dropdown-divider fr-py-0">
-                    </li>
-                {% endif %}
-                {% if user.is_staff %}
-                    <li>
-                        <a class="small dropdown-item" href="{% url 'admin:index' %}">Administration Reco-co</a>
-                    </li>
-                    <li>
-                        <hr class="dropdown-divider fr-py-0">
-                    </li>
-                {% endif %}
-                <!-- Address Book -->
-                {% if "use_addressbook" in user_site_perms %}
-                    <li class="{% if 'addressbook' in url_name %}activated{% endif %}">
-                        <a href="{% url 'addressbook-organization-list' %}"
-                           class="small dropdown-item"
-                           data-test-id="button-adress-book">Carnet d'adresses</a>
-                    </li>
-                    <li>
-                        <hr class="dropdown-divider fr-py-0">
-                    </li>
-                {% endif %}
-                {% if is_staff %}
-                    <li>
-                        <a class="small dropdown-item"
-                           href="https://reco-co.gitbook.io/reco-co/pour-les-administrateurs-dun-portail"
-                           data-test-id="documentation-button-staff"
-                           target="_blank">Documentation</a>
-                    </li>
-                    <li>
-                        <hr class="dropdown-divider fr-py-0">
-                    </li>
-                {% elif is_switchtender or is_administrating_project %}
-                    <li>
-                        <a class="small dropdown-item"
-                           href="https://reco-co.gitbook.io/reco-co/pour-les-acteurs-publics-qui-conseillent-les-collectivites"
-                           data-test-id="documentation-button-advisor"
-                           target="_blank">Documentation</a>
-                    </li>
-                    <li>
-                        <hr class="dropdown-divider fr-py-0">
-                    </li>
-                {% endif %}
-                <li>
-                    <a class="dropdown-item small " href="{% url 'account_logout' %}">Déconnexion</a>
-                </li>
-            </ul>
+                </ul>
+            </div>
         </div>
     {% else %}
         <a href="{% url 'account_login' %}">
@@ -110,3 +98,4 @@
         </a>
     {% endif %}
 </div>
+{% include "header/menu-burger.html" %}

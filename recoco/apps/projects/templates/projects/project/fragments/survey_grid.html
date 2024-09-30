@@ -1,6 +1,8 @@
+{% load django_vite %}
 {% block js %}
     <script src="https://cdn.jsdelivr.net/npm/masonry-layout@4.2.2/dist/masonry.pkgd.min.js" integrity="sha384-GNFwBvfVxBkLMJpYMOABq3c+d3KnQxudP/mGPkzpZSTYykLBNsZEnG2D9G/X/+7D" crossorigin="anonymous">
     </script>
+    {% vite_asset 'js/apps/projectShare.js' %}
 {% endblock js %}
 {% load survey %}
 {% load static %}
@@ -10,7 +12,19 @@
           rel="stylesheet"
           type="text/css">
 {% endblock css %}
-<span class="d-block text-uppercase fw-bold fr-mb-2v knowledge-title specific-mt-50 span-specific-fontsize-16">Éléments renseignés par la collectivité</span>
+<div x-data="ProjectShare" class="d-flex justify-content-between">
+    <h2 class="text-uppercase fw-bold fr-mt-0 fr-mb-2v knowledge-title specific-mt-50 span-specific-fontsize-16">
+        Éléments renseignés par la collectivité
+    </h2>
+    <button @click="openPublicShareModal"
+            data-toggle="modal"
+            data-target="#publicShareModal"
+            {% if project.status == 'DRAFT' %}disabled{% endif %}
+            class="fr-btn fr-btn--sm fr-btn--secondary text-uppercase h-100 {% if project.status == 'DRAFT' %}fr-btn--icon-left fr-icon-lock-line disabled{% endif %}">
+        Partager l'état des lieux
+    </button>
+    {% include "projects/project/fragments/share/public_share_modal.html" %}
+</div>
 <div class="row g-0 masonry-wrapper"
      data-masonry='{"percentPosition": true, "transitionDuration": 0 }'>
     <div class="col-12 col-xl-4 col-md-6 fr-p-2v masonry-item">

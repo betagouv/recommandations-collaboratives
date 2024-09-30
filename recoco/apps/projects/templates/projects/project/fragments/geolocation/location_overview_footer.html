@@ -15,5 +15,6 @@
             {{ project.commune.name }} {{ project.commune.postal }}
             {% if project.commune.insee %}(INSEE: {{ project.commune.insee }}){% endif %}
         </span>
+        <span>{{ project.commune.department }} - {{ project.commune.department.region }}</span>
     </p>
 </div>

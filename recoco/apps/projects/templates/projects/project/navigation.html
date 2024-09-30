@@ -6,7 +6,7 @@
     <link href="{% sass_src 'home/css/dsfr/marianne.css' %}"
           rel="stylesheet"
           type="text/css">
-    <link href="{% sass_src 'projects/css/project_navigation.css' %}"
+    <link href="{% sass_src 'projects/css/project_navigation.scss' %}"
           rel="stylesheet"
           type="text/css">
 {% endblock css %}
@@ -14,162 +14,163 @@
 {% get_obj_perms request.user for project as "user_project_perms" %}
 {% is_staff_for_current_site request.user as is_staff %}
 {% get_advising_position user project request.site as position %}
-<ul class="project-navigation d-flex align-items-center fr-p-0">
-    <div class="position-relative d-flex align-items-center"
-         id="overview-step-1">
+<div class="project-navigation d-flex justify-content-between">
+    <fieldset x-data="" class="fr-segmented fr-segmented--md fr-px-3w">
+        <legend class="fr-segmented__legend visually-hidden">Onglets du projet</legend>
         {% if overview %}
             {% if position.is_advisor or position.is_observer or is_regional_actor %}
                 {% include "tutorial/tutorial_hint.html" %}
             {% endif %}
         {% endif %}
-        {% if "list_projects" in user_site_perms or "view_project" in user_project_perms %}
-            <li id="overview-hint-1">
-                {% if overview %}<h3>{% endif %}
-                    <a data-test-id="project-navigation-overview"
-                       class="{% if overview %} active{% endif %}"
-                       href="{% url 'projects-project-detail-overview' project.pk %}">Présentation</a>
-                    {% if overview %}</h3>{% endif %}
-            </li>
-        {% endif %}
-        {% if "list_projects" in user_site_perms or "view_surveys" in user_project_perms %}
-            <li class="position-relative survey" id="overview-hint-2">
-                {% if state_of_play %}<h3>{% endif %}
-                    <a data-test-id="project-navigation-knowledge"
-                       class="text-nowrap {% if state_of_play %}active{% endif %}"
-                       href="{% url 'projects-project-detail-knowledge' project.pk %}">
-                        <span>État des lieux</span>
-                        <div class="survey-completion">
-                            <div class="survey-completion-progress-bar-container">
-                                <i class="survey-completion-progress-bar tmp-usevar"
-                                   style="width: {{ active_project_survey_session.completion }}%;
-                                          {% if active_project_survey_session.completion >= 90 %}background-color:#5ec495{% else %}background-color:#f58188{% endif %}"></i>
-                            </div>
-                            <span class="survey-completion-number">{{ active_project_survey_session.completion }}%</span>
-                        </div>
-                    </a>
-                    {% if state_of_play %}</h3>{% endif %}
-            </li>
-        {% endif %}
-        <li id="overview-step-2">
-            {% with "Recommandations" as label %}
-                {% if "list_projects" in user_site_perms or "view_tasks" in user_project_perms %}
-                    {% if recommandations %}<h3>{% endif %}
-                        <a data-test-id="project-navigation-actions"
-                           class="{% if recommandations %} active{% endif %} align-items-center"
-                           href="{% url 'projects-project-detail-actions' project.pk %}">
-                            {% if active_project_action_notifications_count %}
-                                <span data-test-id="badge-tab-new-task" class="has-notification">{{ active_project_action_notifications_count }}</span>
-                            {% endif %}
-                            <span>{{ label }}</span>
-                        </a>
-                        {% if recommandations %}</h3>{% endif %}
-                {% else %}
-                    <a data-test-id="project-navigation-actions"
-                       class="disabled align-items-center"
-                       href="#">
-                        <svg class="bi align-middle" width="18" height="18" fill="currentColor">
-                            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#lock-fill" />
-                        </svg>
-                        &nbsp;
-                        <span>{{ label }}</span>
-                    </a>
-                {% endif %}
-            {% endwith %}
-        </li>
-    </div>
-    <div class="position-relative d-flex align-items-center"
-         id="overview-step-3">
-        <li>
-            {% with "Conversation" as label %}
-                {% if "view_public_notes" in user_project_perms or "use_public_notes" in user_project_perms %}
-                    {% if conversation %}<h3>{% endif %}
-                        <a class="{% if conversation %} active{% endif %} align-items-center"
-                           href="{% url 'projects-project-detail-conversations' project.pk %}">
-                            {% if active_project_conversation_notifications_count %}
-                                <span class="has-notification">{{ active_project_conversation_notifications_count }}</span>
-                            {% endif %}
-                            <span>{{ label }}</span>
-                        </a>
-                        {% if conversation %}</h3>{% endif %}
-                {% else %}
-                    <a class="disabled align-items-center" href="#">
-                        <svg class="bi align-middle" width="18" height="18" fill="currentColor">
-                            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#lock-fill" />
-                        </svg>
-                        &nbsp;
-                        <span>{{ label }}</span>
-                    </a>
-                {% endif %}
-            {% endwith %}
-        </li>
-        <li>
-            {% with "Fichiers et liens" as label %}
-                {% if 'manage_documents' in user_project_perms %}
-                    {% if files_links %}<h3>{% endif %}
-                        <a class="{% if files_links %}active{% endif %} align-items-center"
-                           href="{% url 'projects-project-detail-documents' project.pk %}">
-                            {% if active_project_document_notifications_count %}
-                                <span class="has-notification">{{ active_project_document_notifications_count }}</span>
-                            {% endif %}
-                            <span>{{ label }}</span>
-                        </a>
-                        {% if files_links %}</h3>{% endif %}
-                {% else %}
-                    <a class="disabled align-items-center" href="#">
-                        <svg class="bi align-middle" width="18" height="18" fill="currentColor">
-                            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#lock-fill" />
-                        </svg>
-                        &nbsp;
-                        <span>{{ label }}</span>
-                    </a>
-                {% endif %}
-            {% endwith %}
-        </li>
-        <li id="overview-step-4">
-            {% if "list_projects" in user_site_perms or 'use_private_notes' in user_project_perms %}
-                {% with "Espace conseillers" as label %}
-                    {% if 'use_private_notes' in user_project_perms %}
-                        {% if internal_followup %}<h3>{% endif %}
-                            <a class="{% if internal_followup %}active{% endif %} align-items-center"
-                               href="{% url 'projects-project-detail-internal-followup' project.pk %}">
-                                {% if active_project_private_conversation_notifications_count %}
-                                    <span class="has-notification">{{ active_project_private_conversation_notifications_count }}</span>
-                                {% endif %}
-                                <span>{{ label }}</span>
-                            </a>
-                            {% if internal_followup %}</h3>{% endif %}
-                    {% else %}
-                        <a class="disabled align-items-center" href="#">
-                            <svg class="bi align-middle" width="18" height="18" fill="currentColor">
-                                <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#lock-fill" />
-                            </svg>
-                            &nbsp;
-                            <span>{{ label }}</span>
-                        </a>
-                    {% endif %}
-                {% endwith %}
+        <div class="fr-segmented__elements">
+            {% if "list_projects" in user_site_perms or "view_project" in user_project_perms %}
+                <div class="fr-segmented__element">
+                    <input value="overview"
+                           type="radio"
+                           {% if overview %}checked{% endif %}
+                           aria-checked="{% if overview %}true{% else %}false{% endif %}"
+                           id="segmented-control-overview"
+                           name="segmented-control-project"
+                           @click="window.location='{% url 'projects-project-detail-overview' project.pk %}'">
+                    <label class="fr-label" for="segmented-control-overview">
+                        <a data-test-id="project-navigation-overview"
+                           href="{% url 'projects-project-detail-overview' project.pk %}">Présentation</a>
+                    </label>
+                </div>
             {% endif %}
-        </li>
+            {% if "list_projects" in user_site_perms or "view_surveys" in user_project_perms %}
+                <div class="fr-segmented__element">
+                    <input value="survey"
+                           type="radio"
+                           {% if state_of_play %}checked{% endif %}
+                           aria-checked="{% if state_of_play %}true{% else %}false{% endif %}"
+                           id="segmented-control-survey"
+                           name="segmented-control-project"
+                           @click="window.location='{% url 'projects-project-detail-knowledge' project.pk %}'">
+                    <label class="fr-label" for="segmented-control-survey">
+                        <a data-test-id="project-navigation-knowledge"
+                           href="{% url 'projects-project-detail-knowledge' project.pk %}">État des lieux <span class="fr-text--sm text-ease">({{ active_project_survey_session.completion }}%)</span></a>
+                    </label>
+                </div>
+            {% endif %}
+            <div class="fr-segmented__element" id="overview-step-2">
+                <input value="tasks"
+                       type="radio"
+                       {% if recommandations %}checked{% endif %}
+                       aria-checked="{% if recommandations %}true{% else %}false{% endif %}"
+                       {% if "list_projects" in user_site_perms or "view_tasks" in user_project_perms %} @click="window.location='{% url 'projects-project-detail-actions' project.pk %}'" {% else %} disabled {% endif %}
+                       id="segmented-control-tasks"
+                       name="segmented-control-project">
+                <label class="fr-label" for="segmented-control-tasks">
+                    <a data-test-id="project-navigation-actions"
+                       {% if "list_projects" in user_site_perms or "view_tasks" in user_project_perms %} href="{% url 'projects-project-detail-actions' project.pk %}" {% endif %}>Recommandations
+                        {% if active_project_action_notifications_count %}
+                            <span class="badge text-bg-danger" data-test-id="badge-tab-new-task">{{ active_project_action_notifications_count }}</span>
+                        {% endif %}
+                    </a>
+                </label>
+            </div>
+            <div class="fr-segmented__element"
+                 id="overview-step-3"
+                 {% if "view_public_notes" not in user_project_perms and "use_public_notes" not in user_project_perms %} aria-describedby="tooltip-lock-access-conversations" {% endif %}>
+                {% include "projects/project/fragments/navigation/tooltip_lock_access.html" with id="tooltip-lock-access-conversations" %}
+                <input value="conversations"
+                       type="radio"
+                       {% if conversation %}checked{% endif %}
+                       aria-checked="{% if conversation %}true{% else %}false{% endif %}"
+                       {% if "view_public_notes" in user_project_perms or "use_public_notes" in user_project_perms %} @click="window.location='{% url 'projects-project-detail-conversations' project.pk %}'" {% else %} disabled {% endif %}
+                       id="segmented-control-tasks"
+                       name="segmented-control-project">
+                <label class="fr-label" for="segmented-control-tasks">
+                    <a href="{% if "view_public_notes" in user_project_perms or "use_public_notes" in user_project_perms %} {% url 'projects-project-detail-conversations' project.pk %}{% else %}#{% endif %}">Conversation
+                        {% if "view_public_notes" in user_project_perms or "use_public_notes" in user_project_perms %}
+                            {% if active_project_conversation_notifications_count %}
+                                <span class="badge text-bg-danger">{{ active_project_conversation_notifications_count }}</span>
+                            {% endif %}
+                        {% else %}
+                            <span class="fr-icon--sm fr-icon-lock-line" aria-hidden="true"></span>
+                        {% endif %}
+                    </a>
+                </label>
+            </div>
+            <div class="fr-segmented__element"
+                 {% if 'manage_documents' not in user_project_perms %}aria-describedby="tooltip-lock-access-files-links"{% endif %}>
+                {% include "projects/project/fragments/navigation/tooltip_lock_access.html" with id="tooltip-lock-access-files-links" %}
+                <input value="filesLinks"
+                       type="radio"
+                       {% if files_links %}checked{% endif %}
+                       aria-checked="{% if files_links %}true{% else %}false{% endif %}"
+                       {% if 'manage_documents' in user_project_perms %} @click="window.location='{% url 'projects-project-detail-documents' project.pk %}'" {% else %} disabled {% endif %}
+                       id="segmented-control-tasks"
+                       name="segmented-control-project">
+                <label class="fr-label" for="segmented-control-tasks">
+                    <a href="{% if 'manage_documents' in user_project_perms %} {% url 'projects-project-detail-documents' project.pk %} {% else %}#{% endif %}">Fichiers
+                        {% if 'manage_documents' in user_project_perms %}
+                            {% if active_project_document_notifications_count %}
+                                <span class="badge text-bg-danger">{{ active_project_document_notifications_count }}</span>
+                            {% endif %}
+                        {% else %}
+                            <span class="fr-icon--sm fr-icon-lock-line" aria-hidden="true"></span>
+                        {% endif %}
+                    </a>
+                </label>
+            </div>
+            {% if "list_projects" in user_site_perms or 'use_private_notes' in user_project_perms %}
+                <div class="fr-segmented__element"
+                     id="overview-step-4"
+                     {% if 'use_private_notes' not in user_project_perms %}aria-describedby="tooltip-lock-access-internal-followup"{% endif %}>
+                    {% include "projects/project/fragments/navigation/tooltip_lock_access.html" with id="tooltip-lock-access-internal-followup" %}
+                    <input value="internalFollowup"
+                           type="radio"
+                           {% if internal_followup %}checked{% endif %}
+                           aria-checked="{% if internal_followup %}true{% else %}false{% endif %}"
+                           {% if 'use_private_notes' in user_project_perms %} @click="window.location='{% url 'projects-project-detail-internal-followup' project.pk %}'" {% else %} disabled {% endif %}
+                           id="segmented-control-tasks"
+                           name="segmented-control-project">
+                    <label class="fr-label" for="segmented-control-tasks">
+                        <a href="{% if 'use_private_notes' in user_project_perms %} {% url 'projects-project-detail-internal-followup' project.pk %} {% else %}#{% endif %}">Espace conseillers
+                            {% if 'use_private_notes' in user_project_perms %}
+                                {% if active_project_private_conversation_notifications_count %}
+                                    <span class="badge text-bg-danger">{{ active_project_private_conversation_notifications_count }}</span>
+                                {% endif %}
+                            {% else %}
+                                <span class="fr-icon--sm fr-icon-lock-line" aria-hidden="true"></span>
+                            {% endif %}
+                        </a>
+                    </label>
+                </div>
+            {% endif %}
+            <div class="fr-segmented__element"
+                 {% if "invite_collaborators" not in user_project_perms and "invite_advisors" not in user_project_perms and "manage_advisors" not in user_project_perms and "manage_collaborators" not in user_project_perms and "change_project" not in user_project_perms and not is_staff %} aria-describedby="tooltip-lock-access-settings" {% endif %}>
+                {% include "projects/project/fragments/navigation/tooltip_lock_access.html" with id="tooltip-lock-access-settings" %}
+                <input value="administrationPanel"
+                       type="radio"
+                       {% if administration_panel %}checked{% endif %}
+                       aria-checked="{% if administration_panel %}true{% else %}false{% endif %}"
+                       {% if "invite_collaborators" in user_project_perms or "invite_advisors" in user_project_perms or "manage_advisors" in user_project_perms or "manage_collaborators" in user_project_perms or "change_project" in user_project_perms or is_staff %} @click="window.location='{% url 'projects-project-administration' project.pk %}'" {% else %} disabled {% endif %}
+                       id="segmented-control-tasks"
+                       name="segmented-control-project">
+                <label class="fr-label" for="segmented-control-tasks">
+                    <a data-test-id="navigation-administration-tab"
+                       href="{% if "invite_collaborators" in user_project_perms or "invite_advisors" in user_project_perms or "manage_advisors" in user_project_perms or "manage_collaborators" in user_project_perms or "change_project" in user_project_perms or is_staff %} {% url 'projects-project-administration' project.pk %} {% else %}#{% endif %}">Paramètres
+                        {% if "invite_collaborators" not in user_project_perms and "invite_advisors" not in user_project_perms and "manage_advisors" not in user_project_perms and "manage_collaborators" not in user_project_perms and "change_project" not in user_project_perms and not is_staff %}
+                            <span class="fr-icon--sm fr-icon-lock-line" aria-hidden="true"></span>
+                        {% endif %}
+                    </a>
+                </label>
+            </div>
+        </div>
+    </fieldset>
+    <div class="d-flex">
+        <div class="d-flex fr-px-4w align-items-center">
+            <button class="fr-btn fr-btn--sm fr-btn--tertiary">Inviter</button>
+        </div>
+        <div class="project-navigation__btn-role-selection">
+            <button class="fr-btn fr-btn--tertiary-no-outline fr-icon-team-line"
+                    role="button"
+                    data-bs-toggle="dropdown"
+                    data-bs-auto-close="outside"
+                    aria-expanded="false">Sélectionnez votre rôle sur le projet</button>
+        </div>
     </div>
-    {% if "invite_collaborators" in user_project_perms or "invite_advisors" in user_project_perms or "manage_advisors" in user_project_perms or "manage_collaborators" in user_project_perms or "change_project" in user_project_perms or is_staff %}
-        <li>
-            {% if administration_panel %}<h3>{% endif %}
-                <a class="{% if administration_panel %} active{% endif %} align-items-center"
-                   data-test-id="navigation-administration-tab"
-                   href="{% url 'projects-project-administration' project.pk %}">
-                    <span class="text-nowrap">Paramètres</span>
-                </a>
-                {% if administration_panel %}</h3>{% endif %}
-        </li>
-    {% else %}
-        <li>
-            <a class="disabled align-items-center" href="#">
-                <svg class="bi align-middle" width="18" height="18" fill="currentColor">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#lock-fill" />
-                </svg>
-                &nbsp;
-                <span>Paramètres</span>
-            </a>
-        </li>
-    {% endif %}
-</ul>
+</div>

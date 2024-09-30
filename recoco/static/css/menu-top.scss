@@ -1,28 +1,59 @@
-.navbar-border-top {
-  border-top: solid 1px #e5e5e5;
-}
-
-.navbar-shadow {
-  box-shadow: 0px 16px 16px -16px rgba(0, 0, 0, 0.32),
-    0px 8px 16px rgba(0, 0, 0, 0.1);
-}
-
-.main-menu {
-  .nav-item {
-    font-weight: 500;
+.navigation {
+  --padding-navigation: 6px;
+  --padding-y-navigation: 1rem 0;
+  border-bottom: solid 1px #ccc;
+  &__menu-top-logo {
+    padding: var(--padding-y-navigation);
   }
-}
-
-nav ul:not(.dropdown-menu) > li {
-  margin-right: 15px;
-  border-bottom: solid 2px transparent;
-
-  &:first-child {
-    margin-left: 15px;
+  &__menu-top-secondary-container {
+    height: 64px;
   }
+  &__menu-top-secondary {
+    margin-block-start: 0;
+    margin-block-end: 0;
+    height: 100%;
+    li {
+      margin-right: 1rem;
+      white-space: nowrap;
+      &:not(:last-child) {
+        --padding-y-item: 0.5rem;
+        --padding-x-item: 1rem;
+        padding: var(--padding-y-item) var(--padding-x-item)
+          var(--padding-y-item) 0;
+        border-right: 1px solid #ccc;
+      }
+      span {
+        text-decoration: underline;
+      }
+      a.active {
+        span {
+          text-decoration: none;
+          color: #3a3a3a;
+        }
+      }
+    }
+    &:first-child {
+      margin-left: 15px;
+    }
+    .navigation__item-dashboard,
+    .navigation__item-moderation,
+    .navigation__item-resource,
+    .navigation__item {
+      padding: var(--padding-y-navigation);
+    }
 
-  &.activated {
-    border-bottom: solid 2px #0063cb;
+    .navigation__item-dashboard,
+    .navigation__item-moderation {
+      .badge {
+        margin-left: 0.5rem;
+        line-height: 1rem;
+      }
+    }
+
+    li.navigation__item-projects {
+      max-width: 414px;
+      --padding-y-item: 0.3rem;
+    }
   }
 }
 
@@ -31,17 +62,6 @@ nav ul:not(.dropdown-menu) > li {
     padding-top: 4px !important;
     padding-bottom: 4px !important;
   }
-}
-
-.project-selector-dropdown {
-  width: 28vw;
-  max-height: 90vh;
-}
-
-.project-selector-dropdown li.inactive {
-  background-color: #f6f6f6;
-  color: #222;
-  border: 2px solid #222;
 }
 
 .project-card-top-information.inactive span {
@@ -58,79 +78,7 @@ nav ul:not(.dropdown-menu) > li {
   color: #222;
 }
 
-.navbar-logo {
-  min-width: fit-content;
-  display: flex;
-}
-
-.secondary-navbar {
-  width: 100%;
-  padding-top: 0px;
-}
-
-.secondary-navbar ul {
-  flex-direction: column !important;
-  justify-content: start !important;
-  align-items: flex-start !important;
-}
-
-#user-info .dropdown-menu {
-  transform: translate3d(-60px, 0, 0);
-}
-
-.nav-scroller {
-  position: relative;
-  z-index: 2;
-  height: 2.75rem;
-  overflow-y: hidden;
-}
-
-.nav-scroller .nav {
-  display: flex;
-  flex-wrap: nowrap;
-  padding-bottom: 1rem;
-  margin-top: -1px;
-  overflow-x: auto;
-  color: rgba(255, 255, 255, 0.75);
-  text-align: center;
-  white-space: nowrap;
-  -webkit-overflow-scrolling: touch;
-}
-
-.nav-underline .nav-link {
-  padding-top: 0.75rem;
-  padding-bottom: 0.75rem;
-  font-size: 0.875rem;
-  color: #6c757d;
-}
-
-.nav-underline .nav-link:hover {
-  color: #007bff;
-}
-
-.nav-underline .active {
-  font-weight: 500;
-  color: #343a40;
-}
-
-.project-name-box {
-  min-width: 15vw;
-}
-
 // Collapse secondary navigation
-
-.toggler-secondary {
-  display: inline;
-}
-
-.logo-uv {
-  height: 35px;
-  width: auto;
-}
-
-.navbar-logo {
-  display: flex;
-}
 
 .collapse {
   display: none;
@@ -143,16 +91,6 @@ nav ul:not(.dropdown-menu) > li {
 .logo-rf,
 .logo-cerema {
   display: none;
-}
-
-#user-info .dropdown-menu {
-  transform: translate3d(-60px, 0, 0);
-}
-
-@media (max-width: 1200px) {
-  #user-info .dropdown-menu {
-    transform: translate3d(-130px, 0, 0);
-  }
 }
 
 @media (max-width: 1350px) {
@@ -192,24 +130,8 @@ nav ul:not(.dropdown-menu) > li {
 }
 
 @media (min-width: 690px) {
-  .secondary-navbar ul {
-    flex-direction: row !important;
-  }
-
-  .secondary-navbar li {
-    margin: 5px 0;
-  }
-
-  .toggler-secondary {
-    display: none;
-  }
-
   .collapse:not(.show) {
     display: block;
-  }
-
-  .logo-uv {
-    height: 40px;
   }
 
   .logo-rf,

@@ -31,11 +31,7 @@
 
   // --text-active-blue-france: #0063cb;
   // --text-action-high-blue-france: #0063cb;
-  // --text-active-blue-france: #0063cb;
-  // --text-action-high-blue-france: #0063cb;
 
-  // --border-action-high-blue-france: #0063cb;
-  // --border-active-blue-france: #0063cb;
   // --border-action-high-blue-france: #0063cb;
   // --border-active-blue-france: #0063cb;
 
@@ -545,4 +541,12 @@ form > p {
 
 .height-fit-content {
   height: fit-content;
+}
+
+.no-wrap {
+  white-space: nowrap;
+}
+
+.text-ease {
+  color: var(--grey-625-425);
 }
