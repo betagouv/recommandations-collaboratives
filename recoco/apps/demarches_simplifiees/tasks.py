@@ -1,11 +1,12 @@
 import requests
 from celery import shared_task
 from django.conf import settings
+from django.db import transaction
 
 from recoco.apps.tasks.models import Task
 
 from .exceptions import DSAPIError
-from .models import DSFolder, DSResource
+from .models import DSFolder, DSMappingField, DSResource
 from .services import find_ds_resource_for_project, make_ds_data_from_project
 from .utils import hash_data
 
@@ -22,9 +23,6 @@ def load_ds_resource_schema(ds_resource_id: int):
     except DSResource.DoesNotExist:
         return
 
-    if ds_resource.schema and len(ds_resource.schema) > 0:
-        return
-
     resp = requests.get(
         url=f"{ds_resource.preremplir_url}/schema",
         timeout=30,
@@ -35,8 +33,26 @@ def load_ds_resource_schema(ds_resource_id: int):
             status_code=resp.status_code,
         )
 
-    ds_resource.schema = resp.json()
-    ds_resource.save()
+    with transaction.atomic():
+        ds_resource.schema = resp.json()
+        ds_resource.save()
+
+        # Disable all the mapping fields that are not referenced in the schema anymore
+        DSMappingField.objects.filter(ds_resource=ds_resource).exclude(
+            field_id__in=[field["field_id"] for field in ds_resource.fields]
+        ).update(enabled=False)
+
+        # Update or create the mapping fields based on the current schema
+        for field in ds_resource.fields:
+            DSMappingField.objects.update_or_create(
+                ds_resource=ds_resource,
+                field_id=field["field_id"],
+                defaults={
+                    "field_label": field["field_label"],
+                    "field_options": field["field_options"],
+                    "enabled": True,
+                },
+            )
 
 
 @shared_task(

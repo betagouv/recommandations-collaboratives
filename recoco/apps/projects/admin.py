@@ -8,15 +8,17 @@ created : 2021-05-26 13:55:23 CEST
 """
 
 from csvexport.actions import csvexport
-from django.contrib import admin
-from django.db.models import Count, F, Q
+from django.contrib import admin, messages
+from django.db.models import Count, F, JSONField, Q
 from django.db.models.query import QuerySet
 from django.http import HttpRequest
+from django_json_widget.widgets import JSONEditorWidget
 from ordered_model.admin import OrderedInlineModelAdminMixin, OrderedTabularInline
 
 from recoco.apps.tasks import models as task_models
 
 from . import models
+from .tasks import collect_survey_answers_in_project
 
 
 class RecommendationListFilter(admin.SimpleListFilter):
@@ -109,23 +111,49 @@ class ProjectSiteTabularInline(admin.TabularInline):
 
 @admin.register(models.Project)
 class ProjectAdmin(OrderedInlineModelAdminMixin, admin.ModelAdmin):
-    search_fields = ["name"]
-    list_filter = [
+    search_fields = (
+        "name",
+        "commune__name",
+    )
+    list_filter = (
         "sites",
         "created_on",
         "exclude_stats",
         "publish_to_cartofriches",
         RecommendationListFilter,
         "tags",
-    ]
-    list_display = ["created_on", "name", "location"]
-    actions = [csvexport]
+    )
+    list_display = (
+        "created_on",
+        "name",
+        "location",
+    )
+    actions = (
+        csvexport,
+        "collect_survey_answers",
+    )
     inlines = (
         ProjectSiteTabularInline,
         ProjectMemberTabularInline,
         ProjectSwitchtenderTabularInline,
         ProjectTaskTabularInline,
     )
+
+    formfield_overrides = {
+        JSONField: {"widget": JSONEditorWidget},
+    }
+
+    @admin.action(description="Collecter les réponses aux enquêtes")
+    def collect_survey_answers(
+        self, request: HttpRequest, queryset: QuerySet[models.Project]
+    ):
+        for project in queryset:
+            collect_survey_answers_in_project.delay(project.id)
+            self.message_user(
+                request,
+                f"Collecting survey answers for project '{project.name}' (#{project.pk})",
+                messages.INFO,
+            )
 
 
 @admin.register(models.UserProjectStatus)

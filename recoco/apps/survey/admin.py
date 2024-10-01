@@ -69,4 +69,17 @@ class ChoiceAdmin(admin.ModelAdmin):
 
 @admin.register(models.Answer)
 class AnswerAdmin(admin.ModelAdmin):
-    list_display = ("session", "question", "value")
+    list_display = (
+        "session",
+        "question",
+        "project_name",
+    )
+    list_select_related = (
+        "session__project",
+        "question",
+    )
+    search_fields = ("session__project__name",)
+
+    @admin.display(description="Project name")
+    def project_name(self, obj: models.Answer):
+        return obj.session.project.name
