@@ -2,6 +2,7 @@
 {% load sass_tags %}
 {% load guardian_tags %}
 {% load projects_extra %}
+{% load django_vite %}
 {% block css %}
     <link href="{% sass_src 'home/css/dsfr/marianne.css' %}"
           rel="stylesheet"
@@ -10,12 +11,17 @@
           rel="stylesheet"
           type="text/css">
 {% endblock css %}
+{% block js %}
+    {% vite_asset 'js/store/projectQueue' %}
+{% endblock js %}
 {% get_obj_perms request.user for request.site as "user_site_perms" %}
 {% get_obj_perms request.user for project as "user_project_perms" %}
 {% is_staff_for_current_site request.user as is_staff %}
 {% get_advising_position user project request.site as position %}
 <div class="project-navigation d-flex justify-content-between">
-    <fieldset x-data="" class="fr-segmented fr-segmented--md fr-px-3w">
+    <fieldset x-data=""
+              class="fr-segmented fr-segmented--md fr-px-3w"
+              x-init="$nextTick(() => $store.projectQueue.addCurrentProjectId({{ project.id }}))">
         <legend class="fr-segmented__legend visually-hidden">Onglets du projet</legend>
         {% if overview %}
             {% if position.is_advisor or position.is_observer or is_regional_actor %}
