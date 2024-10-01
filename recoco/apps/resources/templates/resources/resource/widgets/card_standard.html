@@ -122,20 +122,20 @@
                 <!-- Admin Actions -->
                 {% if is_switchtender %}
                     <!-- Push -->
-                        {% if not resource.status == 0 %}
-                    <a class="text-reset text-decoration-none align-baseline"
-                       href="{% url "projects-project-create-task" resource.id %}"
-                       data-bs-toggle="tooltip"
-                       data-bs-placement="top"
-                       title="Pousser cette ressource">
-                                <svg class="bi text-success align-baseline"
-                                     width="14"
-                                     height="14"
-                                     fill="currentColor">
-                                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#layer-forward" />
-                                </svg>
-                            </a>
-                      {% endif %}
+                    {% if not resource.status == 0 %}
+                        <a class="text-reset text-decoration-none align-baseline"
+                           href="{% url "projects-create-task" %}?resource_id={{ resource.id }}"
+                           data-bs-toggle="tooltip"
+                           data-bs-placement="top"
+                           title="Pousser cette ressource">
+                            <svg class="bi text-success align-baseline"
+                                 width="14"
+                                 height="14"
+                                 fill="currentColor">
+                                <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#layer-forward" />
+                            </svg>
+                        </a>
+                    {% endif %}
                 {% endif %}
             </div>
         </div>

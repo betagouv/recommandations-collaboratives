@@ -604,7 +604,7 @@ def test_project_detail_contains_actions_for_assigned_advisor(request, client, p
         response = client.get(url)
     assert response.status_code == 200
 
-    add_task_url = reverse("projects-project-create-task", args=[project.id])
+    add_task_url = reverse("projects-create-task")
     assertContains(response, add_task_url)
 
 

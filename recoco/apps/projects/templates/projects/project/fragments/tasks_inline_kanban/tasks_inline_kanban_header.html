@@ -7,7 +7,7 @@
                     {% if embed_view is not True %}
                         <div>
                             <a data-test-id="create-task-button"
-                               href="{% url 'projects-project-create-task' project.id %}"
+                               href="{% url 'projects-create-task' %}"
                                class="fr-btn fr-btn--sm">Créer une recommandation</a>
                             <a href="{% url 'projects-project-tasks-suggest' project.pk %}"
                                class="fr-btn fr-btn--secondary fr-btn--sm">Voir les recommandations suggérées automatiquement</a>

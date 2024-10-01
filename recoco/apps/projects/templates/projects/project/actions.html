@@ -43,7 +43,7 @@
                         </p>
                         {% if advising %}
                             <a data-test-id="submit-task-button"
-                               href="{% url 'projects-project-create-task' project.id %}"
+                               href="{% url 'projects-create-task' %}"
                                class="fr-btn">Émettre une recommandation</a>
                             <a href="{% url 'projects-project-detail-knowledge' project.id %}"
                                class="fr-btn fr-btn--secondary">Consulter les détails du projet</a>
