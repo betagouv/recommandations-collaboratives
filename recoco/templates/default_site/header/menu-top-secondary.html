@@ -13,7 +13,8 @@
     {% if 'moderate_projects' in user_site_perms %}
         {% get_project_moderation_count as projects_to_moderate_count %}
     {% endif %}
-    <ul class="navigation__menu-top-secondary list-unstyled fr-mb-0 d-flex align-items-center header-specific-pl-15 tmp-usevar"
+    <ul x-data=""
+        class="navigation__menu-top-secondary list-unstyled fr-mb-0 d-flex align-items-center header-specific-pl-15 tmp-usevar"
         data-test-id="secondary-menu"
         style="{% if not user.is_authenticated %}border-left: 0.1rem solid #d5d5d5;
                {% endif %}">
@@ -38,12 +39,13 @@
                     {% endcomment %}
                     <select class="fr-select fr-mt-0 fr-py-1v"
                             id="select"
-                            name="project-selector">
+                            name="project-selector"
+                            @change="window.location=$event.target.value">
                         {% for project in request.session.projects %}
                             {% comment %} TODO
                     - consider this style rule <:class ="{'inactive': '{{ project.inactive }}' === 'True'}">
                             {% endcomment %}
-                            <option value="1">
+                            <option value="{% url 'projects-project-detail' project.id %}">
                                 {{ project.commune|capfirst }} {{ project.name|capfirst }}
                                 {% if True or project.inactive is False and project.actions_open > 0 %}
                                     <div>
@@ -52,13 +54,8 @@
                                 {% endif %}
                             </option>
                         {% endfor %}
-                        {% comment %} TODO
-                        - link to create a project
-                        {% endcomment %}
                         {% if not is_switchtender %}
-                            <option value="4">
-                                <a href="{% url 'onboarding' %}">Créer un projet</a>
-                            </option>
+                            <option value="{% url 'onboarding' %}">Créer un projet</option>
                         {% endif %}
                     </select>
                 </div>
