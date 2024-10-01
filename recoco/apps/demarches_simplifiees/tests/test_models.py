@@ -13,6 +13,18 @@ class TestDSResource(BaseTestMixin):
         ds_resource.schema = ds_schema_sample
         assert ds_resource.number == 80892
 
+    def test_property_fields(self, ds_schema_sample):
+        ds_resource = baker.prepare(DSResource)
+        assert ds_resource.fields == []
+
+        ds_resource.schema = ds_schema_sample
+        assert len(ds_resource.fields) == 100
+        assert ds_resource.fields[0] == {
+            "field_id": "champ_Q2hhbXAtMjk5Njg5OA",
+            "field_label": "Demandes de subventions DETR - DSIL 2024",
+            "field_options": [],
+        }
+
 
 class TestDSFolder(BaseTestMixin):
     @pytest.mark.django_db

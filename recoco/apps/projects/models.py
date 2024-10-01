@@ -7,7 +7,10 @@ author  : raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created : 2021-05-26 13:33:11 CEST
 """
 
+import operator
 import os
+from functools import reduce
+from typing import Any
 
 from django.contrib.auth import models as auth_models
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
@@ -458,8 +461,27 @@ class Project(models.Model):
 
     deleted = models.DateTimeField(null=True, blank=True)
 
+    survey_answers = models.JSONField(default=dict)
+
     def get_absolute_url(self):
         return reverse("projects-project-detail", kwargs={"project_id": self.pk})
+
+    def get_from_lookup_key(self, lookup_key: str) -> Any | None:
+        parts = lookup_key.split(".")
+        if len(parts) == 1:
+            return getattr(self, lookup_key, None)
+
+        project_attr = getattr(self, parts[0], None)
+        if project_attr is None:
+            return None
+
+        if isinstance(project_attr, dict):
+            try:
+                return reduce(operator.getitem, parts[1:], project_attr)
+            except KeyError:
+                return None
+
+        return getattr(project_attr, parts[1], None)
 
     class Meta:
         verbose_name = "project"

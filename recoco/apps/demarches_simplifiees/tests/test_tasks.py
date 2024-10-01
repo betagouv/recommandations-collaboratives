@@ -9,7 +9,7 @@ from recoco.apps.resources.models import Resource
 from recoco.apps.tasks.models import Task
 
 from ..exceptions import DSAPIError
-from ..models import DSFolder, DSResource
+from ..models import DSFolder, DSMappingField, DSResource
 from ..tasks import load_ds_resource_schema, update_or_create_ds_folder
 from .base import BaseTestMixin
 
@@ -25,13 +25,6 @@ class TestLoadDSResourceSchema(BaseTestMixin):
         responses.assert_call_count(self.ds_url, 0)
 
     @responses.activate
-    def test_schema_already_set(self):
-        ds_resource = baker.make(DSResource, name="ds-name", schema={"foo": "bar"})
-        responses.get(url=self.ds_url)
-        load_ds_resource_schema(ds_resource.id)
-        responses.assert_call_count(self.ds_url, 0)
-
-    @responses.activate
     def test_bad_response(self):
         ds_resource = baker.make(DSResource, name="ds-name", schema=None)
         responses.get(url=self.ds_url, status=500)
@@ -41,12 +34,30 @@ class TestLoadDSResourceSchema(BaseTestMixin):
 
     @responses.activate
     def test_schema_loaded(self, ds_schema_sample):
-        ds_resource = baker.make(DSResource, name="ds-name", schema={})
         responses.get(url=self.ds_url, json=ds_schema_sample)
+
+        ds_resource = baker.make(DSResource, name="ds-name", schema={})
+        ds_mapping_field = baker.make(
+            DSMappingField, ds_resource=ds_resource, field_id="champ_obsolete"
+        )
+
         load_ds_resource_schema(ds_resource.id)
         responses.assert_call_count(self.ds_url, 1)
+
         ds_resource.refresh_from_db()
         assert ds_resource.schema == ds_schema_sample
+
+        ds_mapping_field.refresh_from_db()
+        assert (
+            ds_mapping_field.enabled is False
+        ), "Obsolete mapping field should be disabled"
+
+        qs = ds_resource.mapping_fields.filter(enabled=True)
+        assert qs.count() == 100, "Mapping fields should be created"
+        assert (
+            qs.first().field_label
+            == "Adaptation au changement climatique et prévention des risques naturels"
+        ), "Mapping fields should be sorted by label"
 
 
 @pytest.mark.django_db
@@ -102,6 +113,12 @@ class TestUpdateOrCreateDSFolder(BaseTestMixin):
         resource = baker.make(Resource)
         recommendation = baker.make(Task, project__name="my-project", resource=resource)
         ds_resource = baker.make(DSResource, schema=ds_schema_sample)
+        baker.make(
+            DSMappingField,
+            ds_resource=ds_resource,
+            field_id="champ_Q2hhbXAtMjk3MTQ0NA",
+            project_lookup_key="name",
+        )
 
         responses.post(url=self.ds_url, status=400)
 
@@ -124,6 +141,12 @@ class TestUpdateOrCreateDSFolder(BaseTestMixin):
         resource = baker.make(Resource)
         recommendation = baker.make(Task, project__name="my-project", resource=resource)
         ds_resource = baker.make(DSResource, schema=ds_schema_sample)
+        baker.make(
+            DSMappingField,
+            ds_resource=ds_resource,
+            field_id="champ_Q2hhbXAtMjk3MTQ0NA",
+            project_lookup_key="name",
+        )
 
         responses.post(
             url=self.ds_url,
@@ -169,6 +192,12 @@ class TestUpdateOrCreateDSFolder(BaseTestMixin):
     def test_ds_folder_already_exist(self, ds_schema_sample):
         recommendation = baker.make(Task, project__name="my-project")
         ds_resource = baker.make(DSResource, schema=ds_schema_sample)
+        baker.make(
+            DSMappingField,
+            ds_resource=ds_resource,
+            field_id="champ_Q2hhbXAtMjk3MTQ0NA",
+            project_lookup_key="name",
+        )
 
         ds_folder = baker.make(
             DSFolder,
