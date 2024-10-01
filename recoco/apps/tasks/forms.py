@@ -63,6 +63,15 @@ class ResourceTaskForm(forms.ModelForm):
 class PushTypeActionForm(forms.Form):
     """Determine which type of push it is"""
 
+    def __init__(self, *args, **kwargs):
+        super(PushTypeActionForm, self).__init__(*args, **kwargs)
+
+        # Allow only projects on the current site with a usable status
+        current_site = Site.objects.get_current()
+        self.fields["project"].queryset = projects_models.Project.on_site.filter(
+            project_sites__site=current_site
+        ).exclude(project_sites__status__in=["DRAFT", "REJECTED"])
+
     PUSH_TYPES = (
         ("noresource", "noresource"),
         ("single", "single"),
@@ -71,25 +80,15 @@ class PushTypeActionForm(forms.Form):
 
     push_type = forms.ChoiceField(choices=PUSH_TYPES)
     next = forms.CharField(required=False)
-
-
-class CreateActionBaseForm(forms.ModelForm):
-    """Base form for action creation"""
-
-    def __init__(self, *args, **kwargs):
-        super(CreateActionBaseForm, self).__init__(*args, **kwargs)
-
-        # Allow only projects on the current site with a usable status
-        current_site = Site.objects.get_current()
-        self.fields["project"].queryset = projects_models.Project.on_site.filter(
-            project_sites__site=current_site
-        ).exclude(project_sites__status__in=["DRAFT", "REJECTED"])
-
     project = forms.ModelChoiceField(
         queryset=projects_models.Project.objects.none(),
         empty_label="(Veuillez sélectionner un projet)",
         required=True,
     )
+
+
+class CreateActionBaseForm(forms.ModelForm):
+    """Base form for action creation"""
 
     topic_name = forms.CharField(required=False)
 
