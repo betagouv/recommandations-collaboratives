@@ -7,7 +7,6 @@ authors: raphael.marvie@beta.gouv.fr, guillaume.libersat@beta.gouv.fr
 created: 2022-12-26 11:54:56 CEST
 """
 
-
 import pytest
 from actstream.models import Action
 from django.contrib.auth import models as auth_models
@@ -338,8 +337,8 @@ def test_notifications_are_not_dispatched_to_collaborators_if_project_is_inactiv
             "post-data": {"description": "this is some content", "the_file": png},
         },  # document uploaded ✓
         {
-            "url-name": "projects-project-create-task",
-            "url-args": {"project_id": project.pk},
+            "url-name": "projects-create-task",
+            "url-args": {},
             "user": superuser,
             "post-data": {
                 "project": project.pk,
