@@ -16,13 +16,12 @@ from django.utils.text import slugify
 
 from recoco.apps.projects import models as project_models
 from recoco.apps.projects.forms import DocumentUploadForm
-from recoco.apps.projects.utils import get_collaborators_for_project
-from recoco.apps.survey import models as survey_models
-from recoco.utils import (
-    check_if_advisor,
-    has_perm_or_403,
-    is_staff_for_site_or_403,
+from recoco.apps.projects.utils import (
+    can_administrate_project,
+    get_collaborators_for_project,
 )
+from recoco.apps.survey import models as survey_models
+from recoco.utils import check_if_advisor, has_perm_or_403, is_staff_for_site_or_403
 
 from .. import models, signals
 from ..forms import (
@@ -43,13 +42,14 @@ from ..forms import (
 
 
 @login_required
-def create_task(request, project_id=None):
-    """Create task for given project"""
-    project = get_object_or_404(
-        project_models.Project, sites=request.site, pk=project_id
-    )
+def create_task(request):
+    """Create task"""
 
-    has_perm_or_403(request.user, "projects.manage_tasks", project)
+    is_switchtender = check_if_advisor(request.user)
+    if not (
+        is_switchtender or can_administrate_project(project=None, user=request.user)
+    ):
+        return HttpResponseForbidden()
 
     if request.method == "POST":
         # Pick a different form for better data handling based
@@ -71,9 +71,13 @@ def create_task(request, project_id=None):
 
         form = push_form_type(request.POST)
         if form.is_valid():
+            project = type_form.cleaned_data.get("project")
+            has_perm_or_403(request.user, "projects.manage_tasks", project)
+
             if push_type == "multiple":
                 for resource in form.cleaned_data.get("resources", []):
                     public = form.cleaned_data.get("public", False)
+
                     action = models.Task.on_site.create(
                         project=project,
                         site=request.site,

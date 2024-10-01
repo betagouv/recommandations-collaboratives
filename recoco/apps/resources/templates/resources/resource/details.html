@@ -121,7 +121,7 @@
                     <div id="push-resource" class="d-grid gap-2 fr-mt-2w">
                         {% if active_project %}
                             {% if not resource.status == 0 %}
-                                <form action="{% url "projects-project-create-task" resource.id %}"
+                                <form action="{% url "projects-create-task" %}?resource_id={{ resource.id }}"
                                       method="get">
                                     {% include "dsrc/core/blocks/buttons/button.html" with label="Pousser cette ressource" classes="w-100 justify-content-center" %}
                                 </form>
