@@ -42,7 +42,7 @@ def test_additional_survey_session_is_created(request, client, project):
 
     project.sites.add(another_site)
 
-    url = reverse("survey-project-session", args=(project.id, another_survey.id))
+    url = reverse("survey-project-session", args=(project.id, another_site.id))
     with login(client, is_staff=False):
         response = client.get(url)
 

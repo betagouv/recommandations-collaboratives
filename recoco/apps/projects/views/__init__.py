@@ -138,7 +138,7 @@ def project_moderation_accept(request, project_pk):
         if owner:
             # in case that's our primary site, assign and greet the project leader,
             # otherwise, notify her she's invited to fill an additional survey
-            project_site = project.project_sites.filter(site=request.site)
+            project_site = project.project_sites.get(site=request.site)
 
             if project_site.is_origin:
                 # Update owner permissions now the project is no in DRAFT state anymore

@@ -10,8 +10,8 @@ created: 2021-08-03 14:26:39 CEST
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.sites.models import Site
 from django.core.exceptions import BadRequest
-from django.db.models import F
 from django.shortcuts import get_object_or_404, redirect, render, reverse
 from django.utils import timezone
 from django.views.generic import DetailView, RedirectView
@@ -100,7 +100,7 @@ def survey_question_details(request, session_id, question_id):
 
 
 @login_required
-def survey_create_session_for_project(request, project_id, survey_id=None):
+def survey_create_session_for_project(request, project_id, site_id=None):
     """
     Create a session for the given project if necessary. Redirects to session.
     Optional survey_id allows one to ask for another survey in case of multisites
@@ -110,13 +110,13 @@ def survey_create_session_for_project(request, project_id, survey_id=None):
     )
     site_config = get_site_config_or_503(request.site)
 
-    if survey_id:
+    if site_id:
         try:
-            survey = models.Survey.objects.get(
-                pk=survey_id,
-                siteconfiguration__site__in=project.sites.all(),
-                site=F("siteconfiguration__site"),
-            )
+            try:
+                site = project.sites.get(id=site_id)
+            except Site.DoesNotExist as _:
+                raise BadRequest("Project not on site") from None
+            survey = site.configuration.project_survey
         except models.Survey.DoesNotExist as _:
             raise BadRequest("Unknown survey") from None
     else:
