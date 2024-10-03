@@ -137,3 +137,43 @@
   margin: 0;
   transform: translate3d(0, -4px, 0);
 }
+
+.show-me {
+  right: 0%;
+}
+
+.divider-specific {
+  border-top: solid 1px #e5e5e5;
+  padding: 0;
+  opacity: 1;
+}
+
+.test:active > .project-navigation__btn-role-selection {
+  background-color: #1b0093;
+}
+
+.active-effect-div-button {
+  background-color: #000091;
+}
+
+button.active-effect-button {
+  color: white;
+
+  &:hover {
+    background-color: #000091;
+  }
+}
+
+.specific-fontsize-14px {
+  font-size: 14px;
+}
+
+.specific-width-25rem {
+  width: 25rem;
+}
+
+.specific-button-close-from-dsfr {
+  min-height: 1.7rem;
+  padding: 0;
+  padding-right: 10px;
+}
