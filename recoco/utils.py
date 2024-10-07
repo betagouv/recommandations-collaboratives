@@ -111,13 +111,17 @@ def check_if_advisor(user, site=None):
     return auth.User.objects.filter(pk=user.id, groups__name=group_name).exists()
 
 
-def build_absolute_url(path, auto_login_user=None):
+def build_absolute_url(path, auto_login_user=None, site=None):
     """
     Where we can't use request,
     use this to build the absolute url,
     assuming we're always using https
     """
-    current_site = Site.objects.get_current()
+    if site:
+        current_site = site
+    else:
+        current_site = Site.objects.get_current()
+
     base = "https://" + current_site.domain
     url = urljoin(base, path)
 

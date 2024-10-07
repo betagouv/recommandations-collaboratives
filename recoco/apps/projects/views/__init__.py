@@ -163,6 +163,12 @@ def project_moderation_accept(request, project_pk):
                 # Send an email to the project owner
                 params = {
                     "project": digests.make_project_digest(project, owner),
+                    "site": digests.make_site_digest(project.projectsites.origin()),
+                    "survey_site": digests.make_site_digest(request.site),
+                    "survey": digests.make_project_survey_digest_for_site(
+                        project,
+                        request.site,
+                    ),
                 }
                 send_email(
                     template_name=communication_constants.TPL_PROJECT_ADDED_TO_NEW_SITE,

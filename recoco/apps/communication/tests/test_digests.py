@@ -102,6 +102,32 @@ def test_make_site_digest_with_siteconfiguration(client, request):
     assert len(data) > 0
 
 
+@pytest.mark.django_db
+def test_make_project_survey_for_site_digest_without_configuration(
+    project_ready, client, request
+):
+    site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=site)
+    user = Recipe(auth.User).make()
+    data = digests.make_project_survey_digest_for_site(user, project_ready, site)
+
+    assert len(data) > 0
+    assert data["name"] is None
+
+
+@pytest.mark.django_db
+def test_make_project_survey_for_site_digest_with_configuration(
+    project_ready, client, request
+):
+    site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, project_survey__name="Survey", site=site)
+    user = Recipe(auth.User).make()
+    data = digests.make_project_survey_digest_for_site(user, project_ready, site)
+
+    assert len(data) > 0
+    assert data["name"] is not None
+
+
 ########################################################################
 # new sites digests
 ########################################################################
