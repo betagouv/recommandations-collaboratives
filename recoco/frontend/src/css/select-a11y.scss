@@ -1,0 +1,204 @@
+// select-a11y
+// ==========================================================
+/* if you use Scampi (https://gitlab.com/pidila/scampi),
+you don't need this first part */
+$gray-base: #42434e;
+
+$gray-1: darken($gray-base, 5%) !default;
+$gray-2: $gray-base !default;
+$gray-3: lighten($gray-base, 10%) !default;
+$gray-4: lighten($gray-base, 20%) !default;
+$gray-5: lighten($gray-base, 30%) !default;
+$gray-6: lighten($gray-base, 40%) !default;
+$gray-7: lighten($gray-base, 50%) !default;
+$gray-8: lighten($gray-base, 55%) !default;
+$gray-9: lighten($gray-base, 60%) !default;
+$gray-10: lighten($gray-base, 65%) !default;
+
+button,
+input,
+label,
+select {
+  font-size: 1em;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(1px, 1px, 1px, 1px);
+  -webkit-clip-path: inset(50%);
+  clip-path: inset(50%);
+  border: 0;
+  white-space: nowrap;
+}
+
+/* select-a11y
+------------------------------------------------------ */
+$btn-select-a11y-bg: $gray-9 !default;
+$btn-select-a11y-symbol: '\25BC' !default; // ▼
+
+$tag-item-border: $gray-7 !default;
+$tag-item-supp-symbol: '\2715' !default; // X
+$tag-item-supp-symbol-color: red !default;
+$tag-item-supp-border: red !default;
+
+$a11y-suggestions-bg: $gray-10 !default;
+$a11y-suggestion-color: $gray-3 !default;
+$a11y-suggestion-color-hover: $gray-1 !default;
+$a11y-suggestion-bg-hover: var(--hover-tint) !default;
+$a11y-suggestion-bg-selected: $gray-7 !default;
+$a11y-suggestion-border: $gray-3 !default;
+
+.select-a11y {
+  position: relative;
+
+  .btn-select-a11y {
+    position: relative;
+    width: 100%;
+    text-align: left;
+    background-color: $btn-select-a11y-bg;
+
+    .icon-select {
+      position: absolute;
+      background-color: red;
+      top: 50%;
+      right: 0.5em;
+      line-height: 0;
+
+      &::before {
+        content: $btn-select-a11y-symbol;
+      }
+    }
+
+    &[aria-expanded='true'] {
+      border-bottom-right-radius: 0;
+      border-bottom-left-radius: 0;
+
+      .icon-select {
+        transform: rotate(180deg);
+      }
+    }
+  }
+
+  .tag-item {
+    border: 1px solid $tag-item-border;
+    padding: 0.2em 0.1em 0.2em 0.5em;
+  }
+
+  .tag-item-supp {
+    background-color: transparent;
+    border: 1px solid transparent;
+
+    .icon-delete:before {
+      content: $tag-item-supp-symbol;
+      color: $tag-item-supp-symbol-color;
+      line-height: 1;
+    }
+
+    &:focus {
+      outline: 1px solid $tag-item-supp-border;
+      color: $tag-item-supp-border;
+    }
+
+    &:hover {
+      color: $tag-item-supp-border;
+      border-color: $tag-item-supp-border;
+    }
+  }
+
+  .tag-hidden {
+    display: none;
+  }
+
+  &.is-open .a11y-container {
+    display: block;
+  }
+
+  .a11y-container {
+    position: absolute;
+    left: 0;
+    right: 0;
+    padding: 0.5em;
+    background: white;
+    z-index: 10;
+    border: 1px solid $btn-select-a11y-bg;
+  }
+
+  // fix safari pour cacher l'autocompletion native
+  // cf http://stackoverflow.com/questions/38663578/how-to-hide-autofill-safari-icon-in-input-field
+  input::-webkit-contacts-auto-fill-button {
+    visibility: hidden;
+    display: none !important;
+    pointer-events: none;
+    position: absolute;
+    right: 0;
+  }
+
+  .a11y-suggestions {
+    max-height: 10em;
+    overflow-y: auto;
+    border: 1px solid $a11y-suggestion-border;
+    margin-top: 0.5em;
+    background-color: #fff;
+  }
+
+  .a11y-suggestion {
+    padding: 0 calc(8em / 16) 0 calc(26em / 16);
+    color: $a11y-suggestion-color;
+    cursor: pointer;
+    text-align: left;
+    line-height: 2.5rem;
+
+    &:focus,
+    &:hover {
+      color: $a11y-suggestion-color-hover;
+      background-color: #f6f6f6;
+    }
+    &:focus {
+      outline: 1px dotted $a11y-suggestion-color-hover !important;
+      outline-offset: -1px;
+    }
+
+    &[aria-selected='true'] {
+      background-color: $a11y-suggestion-bg-selected;
+      color: var(--text-active-blue-france);
+      position: relative;
+
+      // &:before {
+      //   content: '✓';
+      //   position: absolute;
+      //   top: 50%;
+      //   transform: translateY(-50%);
+      //   left: calc(8em / 16);
+      // }
+    }
+  }
+
+  .a11y-no-suggestion {
+    padding: 0 0.5em;
+    color: $a11y-suggestion-color;
+    text-align: left;
+    margin: 0;
+  }
+
+  .list-selected {
+    padding: 0.5em 0;
+    margin: 0;
+
+    li {
+      margin: 0 0.3em 0.3em 0;
+
+      &:before {
+        content: '';
+      }
+
+      span {
+        display: inline-block;
+      }
+    }
+  }
+}

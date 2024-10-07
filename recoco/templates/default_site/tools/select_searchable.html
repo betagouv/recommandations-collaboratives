@@ -1,0 +1,5 @@
+{% load django_vite %}
+{% block js %}
+    {% vite_asset 'js/apps/selectSearchable.js' %}
+{% endblock js %}
+<div x-data="SelectSearchable" x-ref="selectSearchable">{{ list }}</div>
