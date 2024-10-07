@@ -394,7 +394,7 @@ def user_update(request, user_id=None):
                         # a user with the new mail already exist
                         if request.site in users[0].profile.sites.all():  # on same site
                             user_link = reverse("crm-user-details", args=[users[0].pk])
-                            error_msg = mark_safe(
+                            error_msg = mark_safe(  # noqa: S308
                                 f'L\'utilisateur <a href="{user_link}">'
                                 f"{users[0].first_name} {users[0].last_name}</a>'"
                                 " utilise déjà cette adresse email."
