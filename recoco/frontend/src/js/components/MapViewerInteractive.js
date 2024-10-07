@@ -38,7 +38,7 @@ function MapViewerInteractive(projectOptions) {
         maxZoom: 20,
       });
 
-      var map = mapUtils.makeMap(
+      var map = await mapUtils.makeMap(
         'map-interactive',
         project,
         options,
