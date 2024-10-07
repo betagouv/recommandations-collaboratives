@@ -256,6 +256,30 @@ def make_recommendations_digest(recommendations, user):
     return recommendation_digest
 
 
+def make_site_digest(site):
+    """Return site informations as a dict"""
+
+    data = {
+        "name": site.name,
+    }
+
+    siteconf = utils.get_site_config_or_503(site)
+    data.update(
+        {
+            "description": siteconf.description or "",
+            "sender_name": siteconf.sender_name or "",
+            "sender_email": siteconf.sender_email or "",
+            "legal_address": siteconf.legal_address or "",
+            "legal_owner": siteconf.legal_owner or "",
+        }
+    )
+
+    if siteconf.email_logo:
+        data["site_logo"] = utils.build_absolute_url(siteconf.email_logo.url)
+
+    return data
+
+
 def make_project_digest(project, user=None, url_name="overview"):
     """Return base information digest for project"""
     project_url = utils.build_absolute_url(
