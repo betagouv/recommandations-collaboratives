@@ -54,7 +54,7 @@ def create_task(request):
     if request.method == "POST":
         # Pick a different form for better data handling based
         # on the 'push_type' attribute
-        type_form = PushTypeActionForm(request.POST)
+        type_form = PushTypeActionForm(user=request.user, data=request.POST)
 
         type_form.is_valid()
 
@@ -143,7 +143,7 @@ def create_task(request):
             next_url = reverse("projects-project-detail-actions", args=[project.id])
             return redirect(next_url)
     else:
-        type_form = PushTypeActionForm(request.GET)
+        type_form = PushTypeActionForm(request.user, request.GET)
 
     return render(request, "tasks/tasks/task_create.html", locals())
 
