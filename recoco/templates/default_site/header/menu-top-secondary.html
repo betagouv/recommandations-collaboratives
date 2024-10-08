@@ -63,7 +63,7 @@
                                 </a>
                             </li>
                         {% endfor %}
-                        {% if True or not is_switchtender %}
+                        {% if not is_switchtender %}
                             <a class="fr-btn justify-content-center w-100"
                                href="{% url 'onboarding' %}">Créer un projet</a>
                         {% endif %}

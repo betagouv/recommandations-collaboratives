@@ -49,8 +49,7 @@ migrations:
 migrate:
 	./manage.py migrate
 
-safe:
-	pre-commit run --all-files bandit
+safe: nice
 	semgrep --config=p/ci recoco
 
 runserver:

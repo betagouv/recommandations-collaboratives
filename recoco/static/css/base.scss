@@ -99,6 +99,12 @@ a {
   color: $blue;
 }
 
+a:not(.fr-btn):not(.btn-outline-primary):not(.btn-primary):not(
+    .btn-outline-secondary
+  ):not(.stretched-link):hover {
+  color: $dark-blue !important;
+}
+
 .btn-primary {
   background-color: $blue !important;
   border-color: $dark-blue !important;
@@ -154,6 +160,7 @@ progress::-moz-progress-bar {
 
 // Main content layout
 
+.project-header-sidebar > .btn {
 .project-header-sidebar > .btn {
   border-radius: 2px;
   padding: 0.29rem 1rem;

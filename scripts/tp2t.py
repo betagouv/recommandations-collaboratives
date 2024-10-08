@@ -2,7 +2,6 @@
 Migrate ProjectTopic to Topic into project.topics
 """
 
-
 from django.conf import settings
 from django.contrib.sites.models import Site
 
