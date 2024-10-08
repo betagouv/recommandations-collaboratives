@@ -178,20 +178,19 @@
                  data-test-id="header-banner-advising-position">
                 <button class="fr-btn fr-btn--tertiary-no-outline fr-icon-team-line"
                         role="button"
-                        data-bs-toggle="dropdown"
-                        data-bs-auto-close="outside"
                         aria-expanded="false"
                         aria-controls="select-observer-or-advisor"
                         data-test-id="show-banner">Sélectionnez votre rôle sur le projet</button>
                 <div class="fr-collapse fr-menu show-me" id="select-observer-or-advisor">
-                    <div class="fr-menu__list specific-width-25rem" x-data="{role:'
+                    <div class="fr-menu__list specific-width-25rem" x-data="{role:
                         {% if position.is_advisor %}
-                            {% url 'projects-project-switchtender-join' project.id %}
+                            '{% url 'projects-project-switchtender-join' project.id %}'
                         {% elif position.is_observer %}
-                            {% url 'projects-project-observer-join' project.id %}
+                            '{% url 'projects-project-observer-join' project.id %}'
                         {% else %}
+                            ''
                         {% endif %}
-                        '}">
+                        }">
                         {% if position.is_advisor or position.is_observer %}
                             <div class="d-flex justify-content-between fr-p-3v">
                                 <div>
