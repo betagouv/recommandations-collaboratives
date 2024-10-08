@@ -15,13 +15,14 @@ function SelectSearchable(params) {
   return {
     selectElIsChild: params.selectElIsChild,
     init() {
-      console.log(this.$refs.selectSearchable);
       const select = this.selectElIsChild
         ? this.$refs.selectSearchable.children
         : this.$refs.selectSearchable;
+      const params = new URLSearchParams(document.location.search);
 
+      const selected_project = parseInt(params.get('project_id'));
       Array.prototype.map.call(select, function (select) {
-        return new Select(select);
+        return new Select(select, {}, selected_project || null);
       });
     },
   };

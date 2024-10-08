@@ -29,7 +29,7 @@ if (!closest) {
 }
 
 class Select {
-  constructor(el, options) {
+  constructor(el, options = {}, selectedId) {
     this.el = el;
     this.label = document.querySelector(`label[for=${el.id}]`);
     this.id = el.id;
@@ -38,6 +38,12 @@ class Select {
     this.search = '';
     this.suggestions = [];
     this.focusIndex = null;
+    this.selectedId = selectedId;
+    if (this.selectedId) {
+      this.el.selectedIndex = [...this.el.options].findIndex(
+        (option) => option.value == this.selectedId
+      );
+    }
 
     const passedOptions = Object.assign({}, options);
     const textOptions = Object.assign(text, passedOptions.text);
@@ -95,7 +101,15 @@ class Select {
     if (this.multiple) {
       text.innerText = this.label.innerText;
     } else {
-      const selectedOption = this.el.item(this.el.selectedIndex);
+      let indexOptions;
+      if (this.selectedId) {
+        indexOptions = [...this.el.options]
+          .map((options) => options.value)
+          .indexOf(this.selectedId.toString());
+      } else {
+        indexOptions = this.el.selectedIndex;
+      }
+      const selectedOption = this.el.item(indexOptions);
       text.innerText = selectedOption.label || selectedOption.value;
 
       if (this.label && !this.label.id) {
