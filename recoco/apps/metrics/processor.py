@@ -39,12 +39,14 @@ class MaterializedView:
         name: str,
         indexes: list[str] = None,
         unique_indexes: list[str] = None,
+        db_owner: str = None,
     ):
         self.site = site
         self.name = name
         self.cursor = None
         self.indexes = indexes or []
         self.unique_indexes = unique_indexes or []
+        self.db_owner = db_owner
 
     @classmethod
     def create_for_site(
@@ -68,10 +70,14 @@ class MaterializedView:
     def db_view_name(self) -> str:
         return self.name
 
+    @staticmethod
+    def make_db_schema_name(site) -> str:
+        site_slug = make_site_slug(site=site)
+        return f"metrics_{site_slug}"
+
     @property
     def db_schema_name(self) -> str:
-        site_slug = make_site_slug(site=self.site)
-        return f"metrics_{site_slug}"
+        return self.make_db_schema_name(self.site)
 
     def set_cursor(self, cursor: CursorWrapper | None) -> None:
         self.cursor = cursor
