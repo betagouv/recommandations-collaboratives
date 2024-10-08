@@ -166,13 +166,14 @@
             <button class="fr-btn fr-btn--sm fr-btn--tertiary"><a href="{% url 'projects-project-administration' project.pk %}#bouton-modifier-les-info">Inviter</a></button>
         </div>
         {% if "list_projects" in user_site_perms or 'use_private_notes' in user_project_perms %}
-            <div class="project-navigation__container-btn-role-selection" >
+            <div class="project-navigation__container-btn-role-selection" data-test-id="header-banner-advising-position">
                 <button class="fr-btn fr-btn--tertiary-no-outline fr-icon-team-line"
                         role="button"
                         data-bs-toggle="dropdown"
                         data-bs-auto-close="outside"
                         aria-expanded="false"
-                        aria-controls="select-observer-or-advisor">Sélectionnez votre rôle sur le projet</button>
+                        aria-controls="select-observer-or-advisor"
+                        data-test-id="show-banner">Sélectionnez votre rôle sur le projet</button>
                 <div class="fr-collapse fr-menu show-me" id="select-observer-or-advisor">
                     <div class="fr-menu__list specific-width-25rem" x-data="{role:'{% if position.is_advisor %}{% url 'projects-project-switchtender-join' project.id %}{% elif position.is_observer %}{% url 'projects-project-observer-join' project.id %}{% else %}{% endif %}'}">
                         {% if position.is_advisor or position.is_observer %}
@@ -196,7 +197,7 @@
                                     {% csrf_token %}
                                     <div class="fr-p-3v"  x-on:click="role='{% url 'projects-project-switchtender-join' project.id %}'">
                                         <div class="fr-radio-group">
-                                            <input type="radio" id="role-advisor" name="role" value="{% url 'projects-project-switchtender-join' project.id %}"  x-model="role">
+                                            <input type="radio" id="role-advisor" name="role" value="{% url 'projects-project-switchtender-join' project.id %}"  x-model="role" data-test-id="button-join-as-advisor">
                                             <label for="role-advisor" class="fw-bolder specific-fontsize-14px">Conseiller</label>
                                         </div>
                                         <div>
@@ -206,7 +207,7 @@
                                     <hr class="divider-specific">
                                     <div class="fr-p-3v"  x-on:click="role='{% url 'projects-project-observer-join' project.id %}'">
                                         <div class="fr-radio-group">
-                                            <input type="radio" id="role-observer" name="role" value="{% url 'projects-project-observer-join' project.id %}" x-model="role">
+                                            <input type="radio" id="role-observer" name="role" value="{% url 'projects-project-observer-join' project.id %}" x-model="role" data-test-id="button-join-as-observer">
                                             <label for="role-observer" class="fw-bolder specific-fontsize-14px">Observateur</label>
                                         </div>
                                         <div>
@@ -216,7 +217,7 @@
                                     <hr class="divider-specific">
                                     <div class="d-flex justify-content-between">
                                         <div class="fr-p-3v">
-                                            <button class="fr-btn fr-btn--sm fr-btn--tertiary w-100 justify-content-center">Changer de rôle</button>
+                                            <button class="fr-btn fr-btn--sm fr-btn--tertiary w-100 justify-content-center" data-test-id="button-validate-role">Changer de rôle</button>
                                         </div>
                                 </form>
                                         <div class="fr-p-3v">
@@ -249,7 +250,7 @@
                                     {% csrf_token %}
                                     <div class="fr-p-3v" x-on:click="role='{% url 'projects-project-switchtender-join' project.id %}'">
                                         <div class="fr-radio-group">
-                                            <input type="radio" id="role-advisor" name="role" value="{% url 'projects-project-switchtender-join' project.id %}" x-model="role">
+                                            <input type="radio" id="role-advisor" name="role" value="{% url 'projects-project-switchtender-join' project.id %}" x-model="role" data-test-id="button-join-as-advisor">
                                             <label for="role-advisor" class="fw-bolder specific-fontsize-14px">Conseiller</label>
                                         </div>
                                         <div>
@@ -259,7 +260,7 @@
                                     <hr class="divider-specific">
                                     <div  class="fr-p-3v" x-on:click="role='{% url 'projects-project-observer-join' project.id %}'">
                                         <div class="fr-radio-group">
-                                            <input type="radio" id="role-observer" name="role" value="{% url 'projects-project-observer-join' project.id %}" x-model="role">
+                                            <input type="radio" id="role-observer" name="role" value="{% url 'projects-project-observer-join' project.id %}" x-model="role" data-test-id="button-join-as-observer">
                                             <label for="role-observer" class="fw-bolder specific-fontsize-14px">Observateur</label>
                                         </div>
                                         <div>
@@ -268,7 +269,7 @@
                                     </div>
                                     <hr class="divider-specific">
                                     <div class="fr-p-3v">
-                                        <button class="fr-btn fr-btn--sm fr-btn--tertiary w-100 justify-content-center" type="submit">choisir un rôle</button>
+                                        <button class="fr-btn fr-btn--sm fr-btn--tertiary w-100 justify-content-center" type="submit" data-test-id="button-validate-role">choisir un rôle</button>
                                     </div>
                                 </form>
                             </div>
