@@ -20,6 +20,9 @@
 
 .specific-color-white {
   color: white !important;
+  &:hover {
+    color: white !important;
+  }
 }
 
 .specific-color-inherit {
