@@ -6,12 +6,21 @@
   position: sticky;
   z-index: 1001;
   top: 65px;
-  &__btn-role-selection {
+  &__container-btn-role-selection {
     padding: 0 10px;
     height: 100%;
     border-left: solid 1px #ccc;
     display: flex;
     align-items: center;
+    &:has(> #select-observer-or-advisor.fr-collapse--expanded) {
+      background-color: #1b0093;
+    }
+    button:has(+ #select-observer-or-advisor.fr-collapse--expanded) {
+      color: white;
+    }
+    button:hover {
+      background-color: inherit;
+    }
   }
 }
 
@@ -136,4 +145,28 @@
 .old-project-navigation .survey p {
   margin: 0;
   transform: translate3d(0, -4px, 0);
+}
+
+.show-me {
+  right: 0%;
+}
+
+.divider-specific {
+  border-top: solid 1px #e5e5e5;
+  padding: 0;
+  opacity: 1;
+}
+
+.specific-fontsize-14px {
+  font-size: 14px;
+}
+
+.specific-width-25rem {
+  width: 25rem;
+}
+
+.specific-button-close-from-dsfr {
+  min-height: 1.7rem;
+  padding: 0;
+  padding-right: 10px;
 }

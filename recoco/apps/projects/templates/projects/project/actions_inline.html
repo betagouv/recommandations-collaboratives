@@ -16,9 +16,6 @@
           rel="stylesheet"
           type="text/css" />
 {% endblock css %}
-{% block banner %}
-    {% include "projects/project/fragments/positioning_banner.html" %}
-{% endblock banner %}
 {% block project_detail %}
     {% get_obj_perms request.user for request.site as "user_site_perms" %}
     {% get_obj_perms request.user for project as "user_project_perms" %}

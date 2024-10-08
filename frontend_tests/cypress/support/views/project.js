@@ -52,10 +52,12 @@ const domElements = {
   TASK_CARD: '[data-test-id="task-kanban-topic"]',
 
   // Positioning Banner
+  SHOW_BANNER: '[data-test-id="show-banner"]',
   HEADER_BANNER_ADVISING_POSITION:
     '[data-test-id="header-banner-advising-position"]',
   BUTTON_JOIN_AS_ADVISOR: '[data-test-id="button-join-as-advisor"]',
   BUTTON_JOIN_AS_OBSERVER: '[data-test-id="button-join-as-observer"]',
+  BUTTON_VALIDATE_ROLE: '[data-test-id="button-validate-role"]',
 };
 
 class Project {
@@ -91,7 +93,9 @@ class Project {
   // Actions
 
   joinAsAdvisor() {
-    cy.get(this.dom.BUTTON_JOIN_AS_ADVISOR)
+    cy.get(this.dom.SHOW_BANNER).click({ force: true });
+    cy.get(this.dom.BUTTON_JOIN_AS_ADVISOR).click({ force: true });
+    cy.get(this.dom.BUTTON_VALIDATE_ROLE)
       .click({ force: true })
       .then(() => {
         cy.get(this.dom.HEADER_BANNER_ADVISING_POSITION).should('not.exist');
@@ -99,7 +103,9 @@ class Project {
   }
 
   joinAsObserver() {
-    cy.get(this.dom.BUTTON_JOIN_AS_OBSERVER)
+    cy.get(this.dom.SHOW_BANNER).click({ force: true });
+    cy.get(this.dom.BUTTON_JOIN_AS_OBSERVER).click({ force: true });
+    cy.get(this.dom.BUTTON_VALIDATE_ROLE)
       .click({ force: true })
       .then(() => {
         cy.get(this.dom.HEADER_BANNER_ADVISING_POSITION).should('not.exist');
