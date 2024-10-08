@@ -24,6 +24,8 @@
     {% if project.inactive_since != None %}<div class="specific-border-4pxsolid1e1e1e">
         {% include "projects/project/fragments/project_banner/paused_project_banner.html" %}
         <div class="no-interaction-possible">
+    {% elif project.status == 'DRAFT' %}<div class="specific-border-4pxsolid000091">
+        {% include "projects/project/fragments/project_banner/non_published_project_banner.html" %}
     {% endif %}
             {{ project_form.postcode.value|json_script:"projectPostcode" }}
             {{ project_form.insee.value|json_script:"projectInsee" }}
@@ -363,5 +365,6 @@
             </div>
         {% if project.inactive_since != None %}</div>
     </div>
+    {% elif project.status == 'DRAFT' %}</div>
         {% endif %}
 {% endblock project_detail %}
