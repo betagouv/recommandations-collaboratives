@@ -51,9 +51,17 @@
     }
 
     li.navigation__item-projects {
-      max-width: 414px;
+      width: 337px;
       --padding-y-item: 0.3rem;
       --ul-type: none;
+      .item-projects__button-open {
+        text-align: left;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        height: 2rem;
+        padding: 0.25rem 1.5rem 0.25rem 0.5rem;
+      }
+
       .list-project {
         max-height: 70vh;
         overflow-y: auto;

@@ -32,13 +32,11 @@
         <!-- Projects -->
         {% if request.session.projects|length > 0 %}
             <li class="navigation__item-projects">
-                {% comment %} <input type="search" class="fr-input" aria-expanded="false" aria-controls="project_list" value="{{ request.project|default:"Selectionnez un de vos projets" }}"> {% endcomment %}
-                <button class="fr-input h-100"
+                <button class="fr-select item-projects__button-open"
                         aria-expanded="false"
                         aria-controls="project_list">
-                    {% comment %} <span class="fr-icon-account-circle-line fr-mr-1w" aria-hidden="true"></span> {% endcomment %}
                     {% if project %}
-                        <span class="no-underline">{{ project.commune.name }} - {{ project.name }}</span>
+                        <span class="no-underline">{{ project.commune.name }} <span class="list-project__project-name">{{ project.name }}</span></span>
                     {% else %}
                         <span class="no-underline">Selectionnez l'un de vos projets</span>
                     {% endif %}
