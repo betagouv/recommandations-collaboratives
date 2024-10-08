@@ -24,13 +24,11 @@
 {% block content %}
     {% is_staff_for_current_site request.user as is_staff %}
     <div class="col-12 fr-p-0 fr-pb-6w fr-mx-auto">
-        <div class="row">
-            {% block banner %}
-            {% endblock banner %}
-            {% with request.resolver_match.url_name as url_name %}
-                {% block project_detail %}
-                {% endblock project_detail %}
-            {% endwith %}
-        </div>
+        {% block banner %}
+        {% endblock banner %}
+        {% with request.resolver_match.url_name as url_name %}
+            {% block project_detail %}
+            {% endblock project_detail %}
+        {% endwith %}
     </div>
 {% endblock content %}

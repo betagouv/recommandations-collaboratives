@@ -39,7 +39,8 @@
                            name="segmented-control-project"
                            @click="window.location='{% url 'projects-project-detail-overview' project.pk %}'">
                     <label class="fr-label" for="segmented-control-overview">
-                        <a data-test-id="project-navigation-overview"
+                        <a class="stretched-link"
+                           data-test-id="project-navigation-overview"
                            href="{% url 'projects-project-detail-overview' project.pk %}">Présentation</a>
                     </label>
                 </div>
@@ -54,8 +55,13 @@
                            name="segmented-control-project"
                            @click="window.location='{% url 'projects-project-detail-knowledge' project.pk %}'">
                     <label class="fr-label" for="segmented-control-survey">
-                        <a data-test-id="project-navigation-knowledge"
-                           href="{% url 'projects-project-detail-knowledge' project.pk %}">État des lieux <span class="fr-text--sm text-ease">({{ active_project_survey_session.completion }}%)</span></a>
+                        <a class="stretched-link"
+                           data-test-id="project-navigation-knowledge"
+                           href="{% url 'projects-project-detail-knowledge' project.pk %}">État des lieux
+                            {% comment %} TODO
+                           <span class="fr-text--sm text-ease">({{ project.survey.completion }}%)</span>
+                            {% endcomment %}
+                        </a>
                     </label>
                 </div>
             {% endif %}
@@ -68,7 +74,8 @@
                        id="segmented-control-tasks"
                        name="segmented-control-project">
                 <label class="fr-label" for="segmented-control-tasks">
-                    <a data-test-id="project-navigation-actions"
+                    <a class="stretched-link"
+                       data-test-id="project-navigation-actions"
                        {% if "list_projects" in user_site_perms or "view_tasks" in user_project_perms %} href="{% url 'projects-project-detail-actions' project.pk %}" {% endif %}>Recommandations
                         {% if active_project_action_notifications_count %}
                             <span class="badge text-bg-danger" data-test-id="badge-tab-new-task">{{ active_project_action_notifications_count }}</span>
@@ -88,7 +95,8 @@
                        id="segmented-control-tasks"
                        name="segmented-control-project">
                 <label class="fr-label" for="segmented-control-tasks">
-                    <a href="{% if "view_public_notes" in user_project_perms or "use_public_notes" in user_project_perms %} {% url 'projects-project-detail-conversations' project.pk %}{% else %}#{% endif %}">Conversation
+                    <a class="stretched-link"
+                       href="{% if "view_public_notes" in user_project_perms or "use_public_notes" in user_project_perms %} {% url 'projects-project-detail-conversations' project.pk %}{% else %}#{% endif %}">Conversation
                         {% if "view_public_notes" in user_project_perms or "use_public_notes" in user_project_perms %}
                             {% if active_project_conversation_notifications_count %}
                                 <span class="badge text-bg-danger">{{ active_project_conversation_notifications_count }}</span>
@@ -110,7 +118,8 @@
                        id="segmented-control-tasks"
                        name="segmented-control-project">
                 <label class="fr-label" for="segmented-control-tasks">
-                    <a href="{% if 'manage_documents' in user_project_perms %} {% url 'projects-project-detail-documents' project.pk %} {% else %}#{% endif %}">Fichiers
+                    <a class="stretched-link"
+                       href="{% if 'manage_documents' in user_project_perms %} {% url 'projects-project-detail-documents' project.pk %} {% else %}#{% endif %}">Fichiers
                         {% if 'manage_documents' in user_project_perms %}
                             {% if active_project_document_notifications_count %}
                                 <span class="badge text-bg-danger">{{ active_project_document_notifications_count }}</span>
@@ -134,7 +143,8 @@
                            id="segmented-control-tasks"
                            name="segmented-control-project">
                     <label class="fr-label" for="segmented-control-tasks">
-                        <a href="{% if 'use_private_notes' in user_project_perms %} {% url 'projects-project-detail-internal-followup' project.pk %} {% else %}#{% endif %}">Espace conseillers
+                        <a class="stretched-link"
+                           href="{% if 'use_private_notes' in user_project_perms %} {% url 'projects-project-detail-internal-followup' project.pk %} {% else %}#{% endif %}">Espace conseillers
                             {% if 'use_private_notes' in user_project_perms %}
                                 {% if active_project_private_conversation_notifications_count %}
                                     <span class="badge text-bg-danger">{{ active_project_private_conversation_notifications_count }}</span>
@@ -157,7 +167,8 @@
                        id="segmented-control-tasks"
                        name="segmented-control-project">
                 <label class="fr-label" for="segmented-control-tasks">
-                    <a data-test-id="navigation-administration-tab"
+                    <a class="stretched-link"
+                       data-test-id="navigation-administration-tab"
                        href="{% if "invite_collaborators" in user_project_perms or "invite_advisors" in user_project_perms or "manage_advisors" in user_project_perms or "manage_collaborators" in user_project_perms or "change_project" in user_project_perms or is_staff %} {% url 'projects-project-administration' project.pk %} {% else %}#{% endif %}">Paramètres
                         {% if "invite_collaborators" not in user_project_perms and "invite_advisors" not in user_project_perms and "manage_advisors" not in user_project_perms and "manage_collaborators" not in user_project_perms and "change_project" not in user_project_perms and not is_staff %}
                             <span class="fr-icon--sm fr-icon-lock-line" aria-hidden="true"></span>

@@ -21,17 +21,17 @@
     {% challenge_for request.user "project-conversation-writer" as challenge %}
     {% get_obj_perms request.user for request.site as "user_site_perms" %}
     {% get_obj_perms request.user for project as "user_project_perms" %}
-    <div class="col-12 fr-mx-auto">
-        {% include "projects/project/navigation.html" with conversation=True %}
-        {% if project.inactive_since != None %}
-            <div class="specific-border-4pxsolid1e1e1e">
-                {% include "projects/project/fragments/project_banner/paused_project_banner.html" %}
-                <div class="no-interaction-possible">
-                {% elif project.status == 'DRAFT' %}
-                    <div class="specific-border-4pxsolid000091">
-                        {% include "projects/project/fragments/project_banner/non_published_project_banner.html" %}
-                    {% endif %}
-                    <div class="row">
+    {% include "projects/project/navigation.html" with conversation=True %}
+    {% if project.inactive_since != None %}
+        <div class="specific-border-4pxsolid1e1e1e">
+            {% include "projects/project/fragments/project_banner/paused_project_banner.html" %}
+            <div class="no-interaction-possible">
+            {% elif project.status == 'DRAFT' %}
+                <div class="specific-border-4pxsolid000091">
+                    {% include "projects/project/fragments/project_banner/non_published_project_banner.html" %}
+                {% endif %}
+                <div class="container-fluid">
+                    <div class="row fr-p-2w">
                         <div class="col-12 col-lg-8">
                             {% regroup project.notes.public by created_on.date as notes_by_day %}
                             <div class="message-window flex-grow-1 d-flex flex-column-reverse scroll-gestion">
@@ -52,8 +52,9 @@
                                                             {% include "user/user_card.html" with user=note.created_by %}
                                                             {% if note.created_by == request.user %}
                                                                 <span class="align-middle small text-dark fr-ml-2v">
-                                                                    - <a class="fr-btn fr-btn--sm fr-btn--tertiary-no-outline fr-ml-1v"
-    href="{% url 'projects-update-note' note.pk %}">éditer</a>
+                                                                    -
+                                                                    <a class="fr-btn fr-btn--sm fr-btn--tertiary-no-outline fr-ml-1v"
+                                                                       href="{% url 'projects-update-note' note.pk %}">éditer</a>
                                                                 </span>
                                                             {% endif %}
                                                         </div>
@@ -118,11 +119,11 @@
                             </div>
                         </div>
                     </div>
-                    {% if project.inactive_since != None %}
-                    </div>
                 </div>
-            {% elif project.status == 'DRAFT' %}
+                {% if project.inactive_since != None %}
+                </div>
             </div>
-        {% endif %}
-    </div>
+        {% elif project.status == 'DRAFT' %}
+        </div>
+    {% endif %}
 {% endblock project_detail %}

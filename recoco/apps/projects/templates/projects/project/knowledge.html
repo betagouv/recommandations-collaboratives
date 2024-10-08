@@ -75,31 +75,33 @@
                             {% include "projects/project/fragments/project_banner/join_project_banner.html" %}
                             <div class="specific-opacity-02">
                             {% endif %}
-                            <div class="row">
-                                <!-- TODO PERMISSIONS -->
-                                {% if request.user in project.members.all %}
-                                    {% if "use_surveys" in user_project_perms and session and session.next_question and session.completion < 80 %}
-                                        <div class="bg-light d-flex flex-column justify-content-center align-items-center fr-py-3w rounded">
-                                            <h4 class="fr-pt-2v fr-mb-0">
-                                                {% if session.completion == 0 %}
-                                                    Prochaine étape : Remplissez le parcours d’état des lieux
-                                                {% else %}
-                                                    Continuez le parcours d’état des lieux
-                                                {% endif %}
-                                            </h4>
-                                            <p class="fr-m-0 text-info-custom fw-normal fr-pb-2w">
-                                                Pour faire le point sur votre avancement et recevoir des conseils pertinents.
-                                            </p>
-                                            <a class="fr-btn text-uppercase"
-                                               data-test-id="link-fill-survey"
-                                               href="{% url 'survey-session-start' session.id %}">Compléter l'état des lieux</a>
-                                        </div>
+                            <div class="container-fluid">
+                                <div class="row">
+                                    <!-- TODO PERMISSIONS -->
+                                    {% if request.user in project.members.all %}
+                                        {% if "use_surveys" in user_project_perms and session and session.next_question and session.completion < 80 %}
+                                            <div class="col bg-light d-flex flex-column justify-content-center align-items-center fr-py-3w rounded">
+                                                <h4 class="fr-pt-2v fr-mb-0">
+                                                    {% if session.completion == 0 %}
+                                                        Prochaine étape : Remplissez le parcours d’état des lieux
+                                                    {% else %}
+                                                        Continuez le parcours d’état des lieux
+                                                    {% endif %}
+                                                </h4>
+                                                <p class="fr-m-0 text-info-custom fw-normal fr-pb-2w">
+                                                    Pour faire le point sur votre avancement et recevoir des conseils pertinents.
+                                                </p>
+                                                <a class="fr-btn text-uppercase"
+                                                   data-test-id="link-fill-survey"
+                                                   href="{% url 'survey-session-start' session.id %}">Compléter l'état des lieux</a>
+                                            </div>
+                                        {% else %}
+                                            <div class="col"></div>
+                                        {% endif %}
                                     {% else %}
                                         <div class="col"></div>
                                     {% endif %}
-                                {% else %}
-                                    <div class="col"></div>
-                                {% endif %}
+                                </div>
                             </div>
                             {% include "projects/project/fragments/survey_grid.html" %}
                             {% if project.inactive_since != None %}
