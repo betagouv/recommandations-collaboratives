@@ -3,12 +3,17 @@
 {% load guardian_tags %}
 {% load projects_extra %}
 {% load sass_tags %}
+{% load django_vite %}
 {% block css %}
     <link href="{% sass_src 'css/header/header.scss' %}"
           rel="stylesheet"
           type="text/css">
 {% endblock css %}
+{% block js %}
+    {% vite_asset 'js/components/SentryConfig.js' %}
+{% endblock js %}
 {% is_staff_for_current_site request.user as is_staff %}
+<div x-data="SentryConfig('{{ user.email }}')"class="fr-hidden"></div>
 <!-- User -->
 <div id="user-info" class="fr-px-2v fr-mx-2v">
     {% if user.is_authenticated %}
