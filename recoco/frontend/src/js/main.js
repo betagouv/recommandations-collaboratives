@@ -1,3 +1,4 @@
+import '../js/utils/sentry.config';
 //Bootstrap librairie
 // import 'bootstrap/dist/css/bootstrap.min.css';
 import '../css/main.scss';
