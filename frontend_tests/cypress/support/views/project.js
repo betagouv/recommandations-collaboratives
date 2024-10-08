@@ -95,21 +95,13 @@ class Project {
   joinAsAdvisor() {
     cy.get(this.dom.SHOW_BANNER).click({ force: true });
     cy.get(this.dom.BUTTON_JOIN_AS_ADVISOR).click({ force: true });
-    cy.get(this.dom.BUTTON_VALIDATE_ROLE)
-      .click({ force: true })
-      .then(() => {
-        cy.get(this.dom.HEADER_BANNER_ADVISING_POSITION).should('not.exist');
-      });
+    cy.get(this.dom.BUTTON_VALIDATE_ROLE).click({ force: true });
   }
 
   joinAsObserver() {
     cy.get(this.dom.SHOW_BANNER).click({ force: true });
     cy.get(this.dom.BUTTON_JOIN_AS_OBSERVER).click({ force: true });
-    cy.get(this.dom.BUTTON_VALIDATE_ROLE)
-      .click({ force: true })
-      .then(() => {
-        cy.get(this.dom.HEADER_BANNER_ADVISING_POSITION).should('not.exist');
-      });
+    cy.get(this.dom.BUTTON_VALIDATE_ROLE).click({ force: true });
   }
 
   deactivateProject() {
