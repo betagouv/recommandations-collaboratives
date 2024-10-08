@@ -57,7 +57,7 @@
                                     </span>
                                 </div>
                             </li>
-                            <li class="text-white bg-blue-light-hover list-group-item fr-px-2w fr-py-2v list-group-item-action dropdown-item border-0 d-flex align-items-center specific-background-0063CB">
+                            <li class="text-white position-relative bg-blue-light-hover list-group-item fr-px-2w fr-py-2v list-group-item-action dropdown-item border-0 d-flex align-items-center specific-background-0063CB">
                                 <span class="text-break text-truncate">
                                     <svg data-toggle="tooltip"
                                          data-placement="top"
@@ -119,11 +119,11 @@
                                 class="project-selector-dropdown dropdown-menu fr-py-0 fr-mt-2v top-100 overflow-y-scroll"
                                 data-test-id="project-selector-dropdown">
                                 {% for project in request.session.projects %}
-                                    <li class="list-group-item fr-px-2w fr-py-2v fr-my-0 list-group-item-action dropdown-item border-0 border-bottom"
+                                    <li class="list-group-item position-relative fr-px-2w fr-py-2v fr-my-0 list-group-item-action dropdown-item border-0 border-bottom"
                                         :class="{'inactive': '{{ project.inactive }}' === 'True'}">
                                         <div class="d-flex flex-wrap justify-content-between align-items-center">
                                             <span class="text-break text-truncate">
-                                                <a class="text-reset text-decoration-none"
+                                                <a class="stretched-link text-reset text-decoration-none"
                                                    href="{% url "projects-project-detail" project.id %}">{{ project.commune|capfirst }}</a>
                                             </span>
                                             {% if project.inactive is False and project.actions_open > 0 %}
@@ -141,7 +141,7 @@
                                     </li>
                                 {% endfor %}
                                 {% if not is_switchtender %}
-                                    <li class="text-white bg-blue-light-hover list-group-item fr-px-2w fr-py-2v list-group-item-action dropdown-item border-0 d-flex align-items-center specific-background-0063CB">
+                                    <li class="position-relative text-white p bg-blue-light-hover list-group-item fr-px-2w fr-py-2v list-group-item-action dropdown-item border-0 d-flex align-items-center specific-background-0063CB">
                                         <span class="text-break text-truncate">
                                             <svg data-toggle="tooltip"
                                                  data-placement="top"
