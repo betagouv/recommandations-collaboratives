@@ -6,12 +6,21 @@
   position: sticky;
   z-index: 1001;
   top: 65px;
-  &__btn-role-selection {
+  &__container-btn-role-selection {
     padding: 0 10px;
     height: 100%;
     border-left: solid 1px #ccc;
     display: flex;
     align-items: center;
+    &:has(> #select-observer-or-advisor.fr-collapse--expanded) {
+      background-color: #1b0093;
+    }
+    button:has(+ #select-observer-or-advisor.fr-collapse--expanded) {
+      color: white;
+    }
+    button:hover {
+      background-color: inherit;
+    }
   }
 }
 
@@ -146,22 +155,6 @@
   border-top: solid 1px #e5e5e5;
   padding: 0;
   opacity: 1;
-}
-
-.test:active > .project-navigation__btn-role-selection {
-  background-color: #1b0093;
-}
-
-.active-effect-div-button {
-  background-color: #000091;
-}
-
-button.active-effect-button {
-  color: white;
-
-  &:hover {
-    background-color: #000091;
-  }
 }
 
 .specific-fontsize-14px {
