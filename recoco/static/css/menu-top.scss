@@ -53,6 +53,33 @@
     li.navigation__item-projects {
       max-width: 414px;
       --padding-y-item: 0.3rem;
+      --ul-type: none;
+      .list-project {
+        max-height: 70vh;
+        overflow-y: auto;
+        & > li {
+          border: none;
+          --padding-y-item: none;
+          --padding-x-item: none;
+          padding: 0;
+          margin: 0;
+        }
+        a {
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+        &__item:nth-child(2) > .fr-nav__link {
+          box-shadow: none;
+        }
+
+        &__project-name {
+          color: #666666;
+          text-decoration: none;
+        }
+      }
+      li.list-project__search-container {
+        padding: 0.5rem;
+      }
     }
   }
 }

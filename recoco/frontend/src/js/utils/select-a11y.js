@@ -1,3 +1,6 @@
+/**
+ * https://gitlab.com/pidila/select-a11y
+ */
 const text = {
   help: 'Utilisez la tabulation (ou les touches flèches) pour naviguer dans la liste des suggestions',
   placeholder: 'Rechercher dans la liste',

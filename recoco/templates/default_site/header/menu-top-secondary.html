@@ -13,7 +13,7 @@
     {% if 'moderate_projects' in user_site_perms %}
         {% get_project_moderation_count as projects_to_moderate_count %}
     {% endif %}
-    <ul x-data=""
+    <ul x-data
         class="navigation__menu-top-secondary list-unstyled fr-mb-0 d-flex align-items-center header-specific-pl-15 tmp-usevar"
         data-test-id="secondary-menu"
         style="{% if not user.is_authenticated %}border-left: 0.1rem solid #d5d5d5;
@@ -32,32 +32,42 @@
         <!-- Projects -->
         {% if request.session.projects|length > 0 %}
             <li class="navigation__item-projects">
-                <div class="fr-select-group fr-my-0">
-                    <label class="fr-label fr-sr-only" for="project-selector">Label pour liste déroulante</label>
-                    {% comment %} TODO
-                - consider this rule {% if request.session.projects|length > 0 %}
-                    {% endcomment %}
-                    <select class="fr-select fr-mt-0 fr-py-1v"
-                            id="select"
-                            name="project-selector"
-                            @change="window.location=$event.target.value">
+                {% comment %} <input type="search" class="fr-input" aria-expanded="false" aria-controls="project_list" value="{{ request.project|default:"Selectionnez un de vos projets" }}"> {% endcomment %}
+                <button class="fr-input h-100"
+                        aria-expanded="false"
+                        aria-controls="project_list">
+                    {% comment %} <span class="fr-icon-account-circle-line fr-mr-1w" aria-hidden="true"></span> {% endcomment %}
+                    {% if project %}
+                        <span class="no-underline">{{ project.commune.name }} - {{ project.name }}</span>
+                    {% else %}
+                        <span class="no-underline">Selectionnez l'un de vos projets</span>
+                    {% endif %}
+                </button>
+                <div class="fr-collapse fr-menu" id="project_list">
+                    <ul x-data="{search:''}"class="fr-menu__list list-project">
+                        <li class="list-project__search-container">
+                            <input type="search"
+                                   class="fr-input"
+                                   placeholder="Rechercher votre projet"
+                                   @input.debounce.100ms="search=$event.target.value.toLowerCase()">
+                        </li>
                         {% for project in request.session.projects %}
-                            {% comment %} TODO
-                    - consider this style rule <:class ="{'inactive': '{{ project.inactive }}' === 'True'}">
-                            {% endcomment %}
-                            <option value="{% url 'projects-project-detail' project.id %}">
-                                {{ project.commune|capfirst }} {{ project.name|capfirst }}
-                                {% if True or project.inactive is False and project.actions_open > 0 %}
-                                    <div>
-                                        <span class="align-middle badge bg-primary rounded-pill">{{ project.actions_open }}</span>
-                                    </div>
-                                {% endif %}
-                            </option>
+                            <li class="list-project__item"
+                                x-show="'{{ project.commune }}'.toLowerCase().includes(search) || '{{ project.name }}'.toLowerCase().includes(search)">
+                                <a class="fr-nav__link"
+                                   href="{% url 'projects-project-detail' project.id %}">{{ project.commune|capfirst }}
+                                    <span class="list-project__project-name">{{ project.name|capfirst }}</span>
+                                    {% if project.inactive is False and project.actions_open > 0 %}
+                                        <span class="align-middle badge bg-primary rounded-pill no-underline">{{ project.actions_open }}</span>
+                                    {% endif %}
+                                </a>
+                            </li>
                         {% endfor %}
-                        {% if not is_switchtender %}
-                            <option value="{% url 'onboarding' %}">Créer un projet</option>
+                        {% if True or not is_switchtender %}
+                            <a class="fr-btn justify-content-center w-100"
+                               href="{% url 'onboarding' %}">Créer un projet</a>
                         {% endif %}
-                    </select>
+                    </ul>
                 </div>
             </li>
         {% endif %}
