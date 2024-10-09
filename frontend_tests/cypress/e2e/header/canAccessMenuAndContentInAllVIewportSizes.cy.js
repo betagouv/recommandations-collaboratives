@@ -35,12 +35,14 @@ describe('As a visitor, I can access the menu and content on different devices',
               cy.get('[data-test-id="secondary-menu"]').should(
                 'not.be.visible'
               );
+              // FIXME : this selector is no longer valid
               cy.get('[data-test-id="toggler-secondary-menu"]')
                 .should('be.visible')
                 .click();
               cy.get('[data-test-id="secondary-menu"]')
                 .find('[data-test-id="link-ressources"]')
                 .should('be.visible');
+              // FIXME : this selector is no longer valid
               cy.get('[data-test-id="toggler-secondary-menu"]').click();
             } else {
               cy.get('[data-test-id="secondary-menu"]').should('be.visible');

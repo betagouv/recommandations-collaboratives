@@ -299,11 +299,6 @@ def generate_ro_key():
     return uuid.uuid4().hex
 
 
-def get_active_project_id(request):
-    """Return the active project ID for a given user"""
-    return request.session.get("active_project", None)
-
-
 def get_projects_for_user(user, site):
     memberships = models.ProjectMember.objects.filter(
         Q(project__sites=site),
@@ -314,39 +309,6 @@ def get_projects_for_user(user, site):
     )
 
     return [m.project for m in memberships.all()]
-
-
-def get_active_project(request):
-    """Return the active project for a given user"""
-    if not request.user.is_authenticated:
-        return None
-
-    current_site = get_current_site(request)
-
-    project_id = get_active_project_id(request)
-    project = None
-
-    if project_id:
-        try:
-            project = models.Project.on_site.get(id=project_id)
-        except models.Project.DoesNotExist:
-            pass
-    else:
-        try:
-            projects = get_projects_for_user(request.user, current_site)
-
-            if projects:
-                project = projects[0]
-
-        except models.Project.DoesNotExist:
-            pass
-
-    return project
-
-
-def set_active_project_id(request, project_id: int):
-    """Set the current project in a session cookie"""
-    request.session["active_project"] = project_id
 
 
 def refresh_user_projects_in_session(request, user):

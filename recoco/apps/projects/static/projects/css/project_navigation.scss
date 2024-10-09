@@ -1,10 +1,36 @@
 .project-navigation {
+  width: 100%;
+  height: 64px;
+  border-bottom: solid 1px #ccc;
+  background: white;
+  position: sticky;
+  z-index: 1001;
+  top: 65px;
+  &__container-btn-role-selection {
+    padding: 0 10px;
+    height: 100%;
+    border-left: solid 1px #ccc;
+    display: flex;
+    align-items: center;
+    &:has(> #select-observer-or-advisor.fr-collapse--expanded) {
+      background-color: #1b0093;
+    }
+    button:has(+ #select-observer-or-advisor.fr-collapse--expanded) {
+      color: white;
+    }
+    button:hover {
+      background-color: inherit;
+    }
+  }
+}
+
+.old-project-navigation {
   border-bottom: 1px solid #e5e5e5;
   list-style: none;
   margin-bottom: 30px;
 }
 
-.project-navigation a .has-notification {
+.old-project-navigation a .has-notification {
   position: absolute;
 
   top: -2px;
@@ -25,7 +51,7 @@
   border-bottom-left-radius: 0 !important;
 }
 
-.project-navigation a {
+.old-project-navigation a {
   display: flex;
   padding: 10px 15px;
   margin: 0 5px;
@@ -47,16 +73,16 @@
   font-size: 15px;
 }
 
-.project-navigation h3 {
+.old-project-navigation h3 {
   line-height: 24px;
   margin-bottom: 0;
 }
 
-.project-navigation li {
+.old-project-navigation li {
   padding-bottom: 0;
 }
 
-.project-navigation a.active {
+.old-project-navigation a.active {
   background-color: white;
   font-weight: bold;
   color: #0063cb;
@@ -67,7 +93,7 @@
   border-bottom: solid 1px white;
 }
 
-.project-navigation a.disabled {
+.old-project-navigation a.disabled {
   background-color: #eeeeee;
   cursor: not-allowed;
   user-select: none;
@@ -78,7 +104,7 @@
   border-bottom: solid 1px #eeeeee;
 }
 
-.project-navigation .survey-completion {
+.old-project-navigation .survey-completion {
   position: absolute;
   display: flex;
   align-items: center;
@@ -89,7 +115,7 @@
   width: 90%;
 }
 
-.project-navigation .survey-completion-progress-bar-container {
+.old-project-navigation .survey-completion-progress-bar-container {
   position: relative;
   display: flex;
   flex-grow: 1;
@@ -102,21 +128,41 @@
   border-radius: 6px;
 }
 
-.project-navigation .survey-completion-progress-bar {
+.old-project-navigation .survey-completion-progress-bar {
   position: absolute;
   left: 0;
   top: 0;
   height: 100%;
 }
 
-.project-navigation .survey-completion-number {
+.old-project-navigation .survey-completion-number {
   color: #222;
   font-weight: 400;
   font-size: 11px;
   margin-left: 5px;
 }
 
-.project-navigation .survey p {
+.old-project-navigation .survey p {
   margin: 0;
   transform: translate3d(0, -4px, 0);
+}
+
+.divider-specific {
+  border-top: solid 1px #e5e5e5;
+  padding: 0;
+  opacity: 1;
+}
+
+.specific-fontsize-14px {
+  font-size: 14px;
+}
+
+.specific-width-25rem {
+  width: 25rem;
+}
+
+.specific-button-close-from-dsfr {
+  min-height: 1.7rem;
+  padding: 0;
+  padding-right: 10px;
 }

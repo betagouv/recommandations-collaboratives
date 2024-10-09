@@ -43,7 +43,6 @@ from ..utils import (
     is_advisor_for_project,
     is_member,
     is_regional_actor_for_project,
-    set_active_project_id,
 )
 
 
@@ -73,9 +72,6 @@ def project_overview(request, project_id=None):
         onboarding_response = dict(project.onboarding.response)
     except models.Project.onboarding.RelatedObjectDoesNotExist:
         onboarding_response = None
-
-    # Set this project as active
-    set_active_project_id(request, project.pk)
 
     # Make sure we track record of user's interest for this project
     if not request.user.is_hijacked:
@@ -151,9 +147,6 @@ def project_knowledge(request, project_id=None):
         request.user, "view_surveys", project
     )
 
-    # Set this project as active
-    set_active_project_id(request, project.pk)
-
     site_config = get_site_config_or_503(request.site)
     session, created = survey_models.Session.objects.get_or_create(
         project=project, survey=site_config.project_survey
@@ -186,9 +179,6 @@ def project_actions(request, project_id=None):
     has_perm(request.user, "list_projects", request.site) or has_perm_or_403(
         request.user, "view_tasks", project
     )
-
-    # Set this project as active
-    set_active_project_id(request, project.pk)
 
     # FIXME check this really been deleted from develop
     # Mark this project action notifications as read
@@ -233,9 +223,6 @@ def project_actions_inline(request, project_id=None):
         request.user, "view_tasks", project
     )
 
-    # Set this project as active
-    set_active_project_id(request, project.pk)
-
     return render(request, "projects/project/actions_inline.html", locals())
 
 
@@ -251,9 +238,6 @@ def project_conversations(request, project_id=None):
     advising = get_advisor_for_project(request.user, project)
 
     is_regional_actor or has_perm_or_403(request.user, "view_public_notes", project)
-
-    # Set this project as active
-    set_active_project_id(request, project.pk)
 
     public_note_form = PublicNoteForm()
 
@@ -282,9 +266,6 @@ def project_internal_followup(request, project_id=None):
 
     advising = get_advisor_for_project(request.user, project)
 
-    # Set this project as active
-    set_active_project_id(request, project.pk)
-
     # Mark this project notifications as read
     if not request.user.is_hijacked:
         project_ct = ContentType.objects.get_for_model(project)
@@ -309,9 +290,6 @@ def project_internal_followup_tracking(request, project_id=None):
     has_perm_or_403(request.user, "projects.use_private_notes", project)
 
     advising = get_advisor_for_project(request.user, project)
-
-    # Set this project as active
-    set_active_project_id(request, project.pk)
 
     return render(request, "projects/project/internal_followup_tracking.html", locals())
 

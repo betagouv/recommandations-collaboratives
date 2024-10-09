@@ -30,7 +30,6 @@ import '../css/colors.css';
 import '../css/text-colors.css';
 import '../css/border.css';
 import '../css/role.css';
-import '../css/navbar.css';
 
 //Layouts CSS
 import '../css/layouts/stack.css';

@@ -12,7 +12,7 @@
     <link href="{% sass_src 'home/css/auth/auth.css' %}"
           rel="stylesheet"
           type="text/css">
-    <link href="{% sass_src 'css/account/login.css' %}"
+    <link href="{% sass_src 'css/account/login.scss' %}"
           rel="stylesheet"
           type="text/css">
 {% endblock css %}
@@ -85,11 +85,11 @@
                 </div>
             </fieldset>
         </form>
-        <hr class="specific-height-1px specific-mt-45px specific-backgroundcolor-grey specific-backgroundimage-none" />
+        <hr />
         <div class="fr-form-group fr-mt-14v">
-            <fieldset class="fr-fieldset d-flex flex-column align-items-center justify-content-center">
+            <fieldset class="d-flex flex-column align-items-center justify-content-center">
                 <h4 class="fr-mb-3w d-block ">Vous avez déjà un compte chez nous ?</h4>
-                <div class="fr-fieldset__content">
+                <div class="fr-fieldset__content text-center">
                     <div class="fr-input-group">
                         <a class="fr-btn fr-btn--secondary custom-login-button"
                            href="{% url 'account_login' %}">Se
@@ -99,5 +99,4 @@
             </fieldset>
         </div>
     </div>
-    <hr class=" specific-height-1px specific-mb-20px specific-backgroundcolor-grey specific-backgroundimage-none" />
 {% endblock content %}

@@ -2,11 +2,6 @@
 {% load humanize %}
 {% load guardian_tags %}
 {% load sass_tags %}
-{% block css %}
-    <link href="{% sass_src 'projects/css/fragments/sidebar.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-{% endblock css %}
 {% get_obj_perms request.user for request.site as "user_site_perms" %}
 {% get_obj_perms request.user for project as "user_project_perms" %}
 <div class="project-header-sidebar d-grid gap-2">
@@ -18,7 +13,7 @@
         {% if not disable_add_recommendation %}
             {% if "manage_tasks" in user_project_perms %}
                 <a class="fr-btn fr-btn--sm fr-btn--secondary fr-btn--icon-left fr-icon-health-book-line justify-content-center w-100"
-                   href="{% url 'projects-project-create-task' project.id %}">Ajouter une recommandation</a>
+                   href="{% url 'projects-create-task' %}">Ajouter une recommandation</a>
             {% endif %}
         {% endif %}
     {% endif %}

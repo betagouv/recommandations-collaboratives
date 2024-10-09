@@ -42,7 +42,7 @@
                     {% if "use_tasks" in user_project_perms and not disable_edit %}
                         <div>
                             <template x-if="i > 0">
-                                <a class="d-block fr-p-1v specific-cursor-pointer"
+                                <a class="d-block fr-p-1v cursor-pointer"
                                    @click="$store.tasksData.moveAbove(t, column(board.status)[i - 1])">
                                     <svg class="aling-middle bi fr-ml-1v"
                                          width="12px"
@@ -53,7 +53,7 @@
                                 </a>
                             </template>
                             <template x-if="i < (column(board.status).length - 1)">
-                                <a class="d-block fr-p-1v specific-cursor-pointer"
+                                <a class="d-block fr-p-1v cursor-pointer"
                                    @click="$store.tasksData.moveBelow(t, column(board.status)[i + 1])">
                                     <svg class="aling-middle bi fr-ml-1v"
                                          width="12px"
@@ -66,7 +66,7 @@
                         </div>
                         {% if is_switchtender %}
                             <template x-if="t.status < 3 && t.public">
-                                <div class="fr-mr-2v text-danger d-flex d-flex flex-column justify-content-center align-items-center archive-cta specific-cursor-pointer div-style"
+                                <div class="fr-mr-2v text-danger d-flex d-flex flex-column justify-content-center align-items-center archive-cta cursor-pointer div-style"
                                      data-bs-toggle="tooltip"
                                      data-bs-placement="bottom"
                                      :title="toArchiveTooltip()"
@@ -85,7 +85,7 @@
                         {% endif %}
                     {% endif %}
                 </div>
-                <div class="flex-fill fr-mt-1v fr-ml-2v specific-cursor-pointer specific-fontsize-09"
+                <div class="flex-fill fr-mt-1v fr-ml-2v cursor-pointer specific-fontsize-09"
                      @click="onPreviewClick(t.id)">
                     <h6 class="fr-mb-0 fw-bold" x-text="t.intent"></h6>
                     <div class="rounded bg-light fr-p-2v fr-my-2v"
@@ -123,7 +123,7 @@
         </div>
         <div class="border-top fr-p-2v d-flex justify-content-between specific-fontsize-08">
             <div class="d-flex align-items-center">
-                <div class="text-primary position-relative specific-cursor-pointer"
+                <div class="text-primary position-relative cursor-pointer"
                      @click="onPreviewClick(t.id)">
                     <svg class="bi fr-ml-1v" width="16px" height="16px" fill="currentColor">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#chat" />
@@ -133,7 +133,7 @@
             </div>
             <div class="d-flex align-items-center"
                  x-data="{ hasReminders: t.reminders.length > 0, reminder: t.reminders[0] }">
-                <div class="fr-mr-2v tmp-usevar specific-cursor-pointer"
+                <div class="fr-mr-2v tmp-usevar cursor-pointer"
                      :class="hasReminders ? 'text-primary' : 'text-muted'"
                      :style="isOldReminder(t.reminders[0]) ? 'color:#6c757d !important;' : ''"
                      data-bs-toggle="tooltip"
@@ -162,13 +162,13 @@
                             </li>
                             <template x-if="t.content !== '' && !t.public">
                                 <li>
-                                    <a class="dropdown-item specific-cursor-pointer"
+                                    <a class="dropdown-item cursor-pointer"
                                        @click="onSetTaskPublic(t.id, true)">Publier</a>
                                 </li>
                             </template>
                             <template x-if="t.public">
                                 <li>
-                                    <a class="dropdown-item specific-cursor-pointer"
+                                    <a class="dropdown-item cursor-pointer"
                                        @click="onSetTaskPublic(t.id, false)">Passer en
                                     brouillon</a>
                                 </li>
@@ -184,7 +184,7 @@
                                    task-
                                    t.id
                                    -delete-button
-                                   class="dropdown-item text-danger specific-cursor-pointer"
+                                   class="dropdown-item text-danger cursor-pointer"
                                    @click="openDeleteTaskConfirmationModal(t)">Supprimer</a>
                             </li>
                         </ul>
