@@ -109,6 +109,9 @@ class Select {
       } else {
         indexOptions = this.el.selectedIndex;
       }
+      if (indexOptions === -1) {
+        indexOptions = 0;
+      }
       const selectedOption = this.el.item(indexOptions);
       text.innerText = selectedOption.label || selectedOption.value;
 
