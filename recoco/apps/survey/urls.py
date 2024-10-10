@@ -46,7 +46,12 @@ urlpatterns = [
         name="survey-session-start",
     ),
     path(
-        "project/<int:project_id>/survey/",
+        "project/<int:project_id>/survey",
+        fill.survey_create_session_for_project,
+        name="survey-project-session",
+    ),
+    path(
+        "project/<int:project_id>/survey/<int:site_id>",
         fill.survey_create_session_for_project,
         name="survey-project-session",
     ),

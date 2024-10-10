@@ -32,3 +32,5 @@ responses==0.25.3
 sphinxcontrib-django
 sphinx-js
 sphinx-autodoc-annotation
+sphinxcontrib-django-urls
+sphinx-toolbox

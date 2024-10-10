@@ -36,7 +36,9 @@ extensions = [
     "sphinx.ext.graphviz",
     "sphinx.ext.autodoc",
     "sphinxcontrib_django",
+    "sphinxcontrib_django_urls",
     "celery.contrib.sphinx",
+    "sphinx_toolbox.more_autodoc.no_docstring",
     "sphinx_js",
 ]
 

@@ -20,6 +20,7 @@ class SiteConfigurationForm(forms.ModelForm):
             "legal_address",
             "legal_owner",
             "description",
+            "main_topic",
             "logo_large",
             "logo_small",
             "email_logo",

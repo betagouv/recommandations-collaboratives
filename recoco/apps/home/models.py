@@ -177,6 +177,13 @@ class SiteConfiguration(models.Model):
         blank=True,
     )
 
+    main_topic = models.CharField(
+        verbose_name="Thématique principale",
+        help_text="Décrivez le plus brièvement possible la thématique de ce portail",
+        null=True,
+        blank=True,
+    )
+
     def logo_email_upload_path(self, filename):
         return self._logo_upload_path(filename, prefix="email")
 
