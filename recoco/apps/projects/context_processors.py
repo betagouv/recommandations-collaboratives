@@ -7,6 +7,7 @@ from django.db.models import Q
 from django.utils.timezone import localtime
 from notifications import models as notifications_models
 
+from recoco import verbs
 from recoco.apps.projects import models as projects_models
 from recoco.apps.survey import models as survey_models
 from recoco.apps.tasks import models as tasks_models
@@ -39,6 +40,19 @@ def unread_notifications_processor(request):
 
     grouped_notifications = defaultdict(list)
 
+    is_show_project_verb_list = [
+        verbs.Document.ADDED,
+        verbs.Document.ADDED_FILE,
+        verbs.Document.ADDED_LINK,
+        verbs.Recommendation.COMMENTED,
+        verbs.Recommendation.CREATED,
+        verbs.Conversation.PUBLIC_MESSAGE,
+        verbs.Conversation.PRIVATE_MESSAGE,
+        verbs.Conversation.POST_MESSAGE,
+        verbs.Survey.STARTED,
+        verbs.Survey.UPDATED,
+    ]
+
     for notification in unread_notifications:
         date = localtime(notification.timestamp).date()
         grouped_notifications[date].append(notification)
@@ -47,6 +61,7 @@ def unread_notifications_processor(request):
         "unread_notifications": serialize("json", unread_notifications.all()),
         "unread_notifications_count": unread_notifications.count(),
         "grouped_notifications": dict(grouped_notifications),
+        "is_show_project_verb_list": is_show_project_verb_list,
     }
 
 
