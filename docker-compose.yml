@@ -1,0 +1,52 @@
+services:
+  server:
+    image: recocos-server
+    build: .
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_DB: postgres
+      POSTGRES_PASSWORD: postgres
+      SECRET_KEY: SECRET_KEY
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+      - broker
+    volumes:
+      - "./:/workspace"
+      - "/workspace/node_modules"
+  worker:
+    image: recocos-server
+    command: ["celery", "-A", "recoco", "worker", "-l", "info", "--concurrency=1"]
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_DB: postgres
+      POSTGRES_PASSWORD: postgres
+      SECRET_KEY: SECRET_KEY
+      CELERY_BROKER_URL: redis://broker:6379/0
+    depends_on:
+      - db
+      - broker
+  frontend:
+    image: recoco-frontend
+    build:
+      context: recoco/frontend
+    ports:
+      - "3000:3000"
+  db:
+    image: postgres:13
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_DB: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - 5432:5432
+  broker:
+    image: redis:7-alpine
+    ports:
+      - 6379:6379
+
+volumes:
+  postgres-data:
