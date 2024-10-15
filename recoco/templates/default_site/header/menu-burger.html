@@ -1,0 +1,27 @@
+{% load sass_tags %}
+{% block css %}
+    <link href="{% sass_src "css/header/menu-burger.scss" %}" rel="stylesheet" type="text/css">
+{% endblock css %}
+<button class="fr-btn fr-btn--tertiary fr-icon-menu-fill fr-mr-2w menu-burger__btn"
+        data-fr-opened="false"
+        aria-controls="fr-modal-menu">Menu</button>
+<dialog aria-labelledby="fr-modal-title-menu-burger"
+        role="dialog"
+        id="fr-modal-menu"
+        class="fr-modal">
+    <div class="fr-grid-row fr-grid-row--center">
+        <div class="fr-modal__body">
+            <div class="fr-modal__header">
+                <button class="fr-btn--close fr-btn"
+                        title="Fermer la fenêtre modale"
+                        aria-controls="fr-modal-menu">Fermer</button>
+            </div>
+            <div class="fr-modal__content">
+                <h1 id="fr-modal-title-menu-burger" class="fr-modal__title">
+                    <span class="fr-icon-arrow-right-line fr-icon--lg"></span>Menu
+                </h1>
+                <p>Menu en construction</p>
+            </div>
+        </div>
+    </div>
+</dialog>

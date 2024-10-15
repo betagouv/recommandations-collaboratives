@@ -1,8 +1,20 @@
 <div class="fr-mb-3w">
     <h4 class="fr-mb-2w">
-        <span class="text-muted fr-mr-1v">1.</span>Sélectionnez le type de recommandation
+        <span class="text-muted fr-mr-1v">2.</span>Sélectionnez le type de recommandation
     </h4>
     <div id="push-type-selector" class="d-flex flex-row">
+        <div class="card fr-p-2v fr-pl-6w rounded fr-mx-2v">
+            <div class="card-body">
+                <label for="push-single">Attacher une ressource existante</label>
+                <input type="radio"
+                       id="push-single"
+                       name="push_type"
+                       value="single"
+                       x-model="push_type">
+                <h5>Attacher une ressource existante</h5>
+                <p class="fr-mb-0">Vous pourrez sélectionner la ressource que vous souhaitez attacher</p>
+            </div>
+        </div>
         <div class="card fr-p-2v fr-pl-6w rounded fr-mr-2v">
             <div class="card-body">
                 <label for="push-noresource">No Ressource</label>
@@ -14,18 +26,6 @@
                        @click="intent = ''">
                 <h5>Proposer une recommandation sans ressource</h5>
                 <p class="fr-mb-0">Vous devrez spécifier les détails de votre recommandation</p>
-            </div>
-        </div>
-        <div class="card fr-p-2v fr-pl-6w rounded fr-mx-2v">
-            <div class="card-body">
-                <label for="push-single">Attacher une ressource existante</label>
-                <input type="radio"
-                       id="push-single"
-                       name="push_type"
-                       value="single"
-                       x-model="push_type">
-                <h5>Attacher une ressource existante</h5>
-                <p class="fr-mb-0">Vous pourrez sélectionner la ressource que vous souhaitez attacher</p>
             </div>
         </div>
         {% if not disable_multi %}

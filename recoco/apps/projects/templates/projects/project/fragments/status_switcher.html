@@ -13,11 +13,11 @@
         <div class="d-flex flex-column">
             <h2 class="text-secondary text-uppercase fw-bolder fr-m-2w h2-specific-fontsize-12">État d'avancement actuel</h2>
             {% if "use_tasks" in user_project_perms %}
-                <span class="status-switcher-item fr-mx-2w text-white specific-bgcolor specific-cursor-pointer"
+                <span class="status-switcher-item fr-mx-2w text-white specific-bgcolor cursor-pointer"
                       @click="handleStatusWrapper"
                       x-text="statusText($store.taskModal.currentTask.status)"></span>
                 <div class="d-flex align-items-center justify-content-center">
-                    <span class="fr-py-2v fr-m-2w tiny fw-bold text-center text-decoration-underline specific-cursor-pointer specific-color-335B7E"
+                    <span class="fr-py-2v fr-m-2w tiny fw-bold text-center text-decoration-underline cursor-pointer specific-color-335B7E"
                           @click="handleStatusWrapper"
                           x-text="openStatusWrapper ? 'Fermer' : 'Modifier le statut'"></span>
                 </div>

@@ -94,7 +94,7 @@ function action_pusher_app() {
 
       const params = new URLSearchParams(document.location.search);
 
-      const selected_resource = parseInt(params.get('resource'));
+      const selected_resource = parseInt(params.get('resource_id'));
 
       if (selected_resource) {
         this.results = _.where(this.resources, { id: selected_resource });

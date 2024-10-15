@@ -96,7 +96,7 @@
                                                               x-text="`le ${formatDate($store.taskModal.currentTask.created_on)}`"></span>
                                                     </div>
                                                     <template x-if="canAdministrate">
-                                                        <a class="text-muted specific-cursor-pointer" @click="onEditContent()">Editer</a>
+                                                        <a class="text-muted cursor-pointer" @click="onEditContent()">Editer</a>
                                                     </template>
                                                 </div>
                                             </div>
@@ -177,7 +177,7 @@
                                                                                   x-text="`le ${formatDate(f.timestamp)}`"></span>
                                                                         </div>
                                                                         <template x-if="$store.tasksData.canUseTasks && f.who.email === userEmail">
-                                                                            <a class="text-muted specific-cursor-pointer" @click="onEditComment(f)">Editer</a>
+                                                                            <a class="text-muted cursor-pointer" @click="onEditComment(f)">Editer</a>
                                                                         </template>
                                                                     </div>
                                                                 </div>

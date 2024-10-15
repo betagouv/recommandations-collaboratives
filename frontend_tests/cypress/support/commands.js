@@ -93,7 +93,9 @@ Cypress.Commands.add('loginWithUi', (role) => {
 });
 
 Cypress.Commands.add('logout', () => {
-  cy.get('#user-menu-button').click({ force: true });
+  cy.get('[data-test-id="open-dropdown-profil-option-button"]').click({
+    force: true,
+  });
   cy.contains('Déconnexion').click({ force: true });
 });
 

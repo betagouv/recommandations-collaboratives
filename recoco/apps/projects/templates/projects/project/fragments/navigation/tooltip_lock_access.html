@@ -1,0 +1,18 @@
+{% load sass_tags %}
+{% block css %}
+    <link href="{% sass_src 'projects/css/fragments/navigation/tooltip_lock_access.scss' %}"
+          rel="stylesheet"
+          type="text/css">
+{% endblock css %}
+<span class="fr-tooltip fr-placement"
+      id="{{ id }}"
+      role="tooltip"
+      aria-hidden="true">Pour accéder à cet onglet,
+      <span class="specific-span"
+            data-bs-toggle="dropdown"
+            data-bs-auto-close="outside"
+            aria-expanded="false"
+            aria-controls="select-observer-or-advisor">
+        devenez conseiller ou observateur du projet
+      </span>
+</span>

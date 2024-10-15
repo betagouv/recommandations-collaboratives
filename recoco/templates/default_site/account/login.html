@@ -52,29 +52,28 @@
                     <h4 class="fr-mb-3w d-block">Se connecter avec son mot de passe</h4>
                     <div class="fr-fieldset__content">
                         {{ form.as_p }}
-                        <div class="d-flex justify-content-between align-items-start fr-mt-10v">
-                            <div class="d-flex flex-column align-items-start">
+                        <div class="d-flex flex-column justify-content-between align-items-start fr-mt-2w">
+                            <div class="d-flex w-100 justify-content-between">
                                 <a id="forgot-password"
-                                   class="button secondary Action  d-block fr-link text-decoration-underline"
+                                   class="fr-btn fr-btn--secondary"
                                    href="{% url 'account_reset_password' %}">{% trans "Forgot Password?" %}</a>
-                                <div class="fr-input-group fr-mt-4v">
+                                <div class="fr-input-group">
                                     <button class="fr-btn custom-login-button" type="submit">Se connecter</button>
                                 </div>
                             </div>
-                            <div class="fr-input-group d-flex justify-content-end flex-column align-items-end">
-                                <p>Se connecter avec un simple email ?</p>
-                                <div class="fr-mt-4v">
-                                    <a class="fr-btn fr-btn--secondary" href="/login/">Connexion avec email</a>
-                                </div>
+                            <div class="fr-input-group d-flex justify-content-end flex-column align-items-end fr-mt-7w">
+                                <p>
+                                    Se connecter avec un simple email ? <a class="fr-btn fr-btn--sm fr-btn--secondary fr-ml-2w" href="/login/">Connexion avec email</a>
+                                </p>
                             </div>
                         </div>
                     </div>
                 </fieldset>
             </form>
-            <hr class="specific-height-1px specific-mt-45px specific-backgroundcolor-grey specific-backgroundimage-none" />
+            <hr />
             <div class="d-flex justify-content-center align-items-center fr-mt-14v">
                 <div class="fr-form-group text-center">
-                    <fieldset class="fr-fieldset">
+                    <fieldset>
                         <h4 class="fr-mb-3w d-block ">Vous n'avez pas de compte ?</h4>
                         <div class="fr-fieldset__content">
                             <div class="fr-input-group">
@@ -87,5 +86,4 @@
             </div>
         </div>
     </div>
-    <hr class=" specific-height-1px specific-mb-20px specific-backgroundcolor-grey specific-backgroundimage-none" />
 {% endblock content %}
