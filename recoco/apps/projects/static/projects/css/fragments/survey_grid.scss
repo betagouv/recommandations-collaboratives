@@ -5,3 +5,43 @@
 .span-specific-fontsize-16 {
   font-size: 16px;
 }
+
+.knowledge {
+  &__info {
+    background-color: white;
+    .info {
+      &__survey-navbar {
+      }
+      &__title {
+        text-transform: uppercase;
+      }
+    }
+  }
+  &__surveys {
+    background-color: #fafafa;
+  }
+}
+
+// TODO Extract this to a separate file
+.survey-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem;
+  border-radius: 2px;
+  border: 1px solid var(--light-border-default-grey, #e5e5e5);
+  background: var(--light-background-default-grey, #fff);
+  box-shadow: 2px 2px 4px 0px rgba(0, 0, 0, 0.1);
+  margin-bottom: 0.75rem;
+  &__title {
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 24px;
+    .badge {
+      font-size: 12px;
+      margin-right: 0.375rem;
+    }
+  }
+}

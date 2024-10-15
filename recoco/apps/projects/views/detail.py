@@ -159,6 +159,8 @@ def project_knowledge(request, project_id=None):
         project=project, survey=site_config.project_survey
     )
 
+    sessions = survey_models.Session.objects.filter(project=project)
+
     # Mark this project survey notifications as read
     if not request.user.is_hijacked:
         project_ct = ContentType.objects.get_for_model(project)
