@@ -40,7 +40,7 @@ def unread_notifications_processor(request):
 
     grouped_notifications = defaultdict(list)
 
-    is_show_project_verb_list = [
+    show_project_verb_list = [
         verbs.Document.ADDED,
         verbs.Document.ADDED_FILE,
         verbs.Document.ADDED_LINK,
@@ -61,7 +61,7 @@ def unread_notifications_processor(request):
         "unread_notifications": serialize("json", unread_notifications.all()),
         "unread_notifications_count": unread_notifications.count(),
         "grouped_notifications": dict(grouped_notifications),
-        "is_show_project_verb_list": is_show_project_verb_list,
+        "show_project_verb_list": show_project_verb_list,
     }
 
 
