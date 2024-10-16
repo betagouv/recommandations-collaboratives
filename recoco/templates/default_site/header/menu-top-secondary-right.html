@@ -1,5 +1,5 @@
 {% comment %} {% if nb_usecase_page > 0 && user.is_authenticated%} {% endcomment %}
 <li>
-    <a class="link-secondary" href="{% url 'usage-case-example' %}">Cas d'usage</a>
+    <a class="nav-link link-dark {% if user.is_authenticated == False %}fr-ml-2v{% endif %}" href="{% url 'usage-case-example' %}">Cas d'usage</a>
 </li>
 {% comment %} {% endif %} {% endcomment %}
