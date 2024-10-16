@@ -95,15 +95,7 @@
                                 {% endif %}
                             </div>
                             {% if "view_surveys" in user_project_perms %}
-                                <div class="flex-shrink-1 next-arrow">
-                                    {% if can_view_updated_answers and answer.updated_recently %}
-                                        <svg class="text-danger align-middle bi"
-                                             width="14px"
-                                             height="14px"
-                                             fill="currentColor">
-                                            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#asterisk" />
-                                        </svg>
-                                    {% endif %}
+                                <div class="flex-shrink-1 edit-answer">
                                     <span class="fr-icon-pencil-line fr-icon--sm" aria-hidden="true"></span>
                                 </div>
                             {% endif %}
@@ -116,6 +108,7 @@
                                 </div>
                             </li>
                         {% endif %}
+                        <hr class="fr-mt-1v fr-pb-1v">
                     {% endfor %}
                 </ul>
             </p>

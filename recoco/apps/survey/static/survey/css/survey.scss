@@ -2,12 +2,13 @@
   color: black;
 }
 
-.next-arrow {
+.edit-answer {
+  color: var(--background-action-high-blue-france, #000091);
   transition-property: transform;
   transition-duration: 0.3s;
 }
 .answer:hover {
-  .next-arrow {
+  .edit-answer {
     transform: translateX(5px);
   }
 }
