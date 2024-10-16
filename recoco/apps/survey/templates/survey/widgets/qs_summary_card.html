@@ -75,13 +75,7 @@
                                 {% endif %}
                                 {% if show_comment and answer.comment or not choices %}
                                     <div>
-                                        <svg class="bi fr-mr-1v align-middle"
-                                             width="16"
-                                             height="16"
-                                             fill="currentColor"
-                                             cou>
-                                            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#chat-right-quote" />
-                                        </svg>
+                                        <span class="fr-icon-quote-line fr-icon--sm" aria-hidden="true"></span>
                                         <span class="align-middle">{{ answer.comment|capfirst }}</span>
                                     </div>
                                 {% endif %}
@@ -128,10 +122,10 @@
                             {% endif %}
                         </li>
                         {% if can_view_updated_answers and answer.updated_recently %}
-                            <li class="small bg-light-yellow fr-p-1v">
-                                <div display="">
-                                    Mis à jour {{ answer.updated_on|naturalday }}
-                                    {% if answer.updated_by %}par {{ answer.updated_by }}{% endif %}
+                            <li class="small bg-primary-subtle fr-p-1v">
+                                <div class="updated-by">
+                                    Cette réponse à été mise à jour {{ answer.updated_on|naturalday }}
+                                    {% if answer.updated_by %}par <strong>{{ answer.updated_by }}</strong>{% endif %}
                                 </div>
                             </li>
                         {% endif %}
