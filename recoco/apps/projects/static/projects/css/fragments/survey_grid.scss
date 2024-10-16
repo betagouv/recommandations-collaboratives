@@ -13,12 +13,49 @@
       &__survey-navbar {
       }
       &__title {
+        color: var(--light-text-mention-grey, #666);
+        font-size: 12px;
+        font-style: normal;
+        font-weight: 700;
         text-transform: uppercase;
+      }
+      &__survey-title {
+        color: var(--light-text-default-grey, #3a3a3a);
+        font-family: Marianne;
+        font-size: 16px;
+        font-weight: 700;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        .badge {
+          height: fit-content;
+        }
+      }
+      &__survey-questions {
+        list-style: none;
+        li {
+          line-height: 1.125rem;
+          padding: 0;
+        }
+        .fr-link {
+          color: var(
+            --light-text-active-blue-france,
+            var(--colors-brand-blue-france-strong, #000091)
+          );
+          font-family: Marianne;
+          font-size: 12px;
+          font-style: normal;
+          font-weight: 400;
+          text-decoration-line: underline !important;
+        }
       }
     }
   }
   &__surveys {
     background-color: #fafafa;
+    &-header {
+      margin-bottom: 1.125rem;
+    }
   }
 }
 

@@ -14,25 +14,35 @@
 {% endblock js %}
 <div class="container-fluid knowledge">
     <div class="row">
-        <div class="col-4 knowledge__info">
+        <div class="col-3 knowledge__info">
             <!-- Barre de navigation de l'edl -->
             <div class="info__survey-navbar">
                 <div class="info__title">États des lieux</div>
                 <nav>
-                    <ul>
-                        État des lieux de la friche
-                        <li>Contexte</li>
-                        <li>Pollution</li>
-                        <li>Nature</li>
-                        <li>Besoins</li>
-                    </ul>
-                    <ul>
-                        Questionnaire collectivité
-                        <li>Contexte</li>
-                        <li>Pollution</li>
-                        <li>Nature</li>
-                        <li>Besoins</li>
-                    </ul>
+                    {% for session in sessions.all %}
+                        <div class="info__survey-title">
+                            <span>{{ session.survey.name }}</span>
+                            <span class="badge {% if session.completion < 100 %}text-bg-danger {% else %}text-bg-light{% endif %} text-bg-danger">{{ session.completion }}%</span>
+                        </div>
+                        <ul class="info__survey-questions">
+                            {% regroup session.the_answers.all by question.question_set as answer_list %}
+                            {% for question_set, answers in answer_list %}
+                                <li>
+                                    <a class="fr-link"
+                                       href="#{{ session.survey.site.id }}_{{ question_set.id }}">{{ question_set.heading }}</a>
+                                </li>
+                            {% endfor %}
+                            {% for question_set in session.survey.question_sets.all %}
+                                {% question_set_completion session question_set as qs_completion %}
+                                {% if qs_completion == 0 %}
+                                    <li>
+                                        <a class="fr-link"
+                                           href="#{{ session.survey.site.id }}_{{ question_set.id }}">{{ question_set.heading }}</a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                        </ul>
+                    {% endfor %}
                 </nav>
             </div>
             <hr>
@@ -41,12 +51,22 @@
             {% include "projects/project/fragments/geolocation/location_knowledge.html" with project=project %}
             <div class="info__title">Informations projet</div>
             {% comment %} TODO
-            - projet envoyé par
             - projet déposé depuis ...
             {% endcomment %}
+            <div>
+                {% if origin_site.site.configuration.logo_small %}
+                    <img src="{{ origin_site.site.configuration.logo_small.url }}"
+                         width="16px"
+                         height="auto"
+                         alt="Logo {{ origin_site.site.name }}" />
+                {% else %}
+                    <span class="fr-icon--sm fr-icon-window-line" aria-hidden="true"></span>
+                {% endif %}
+                projet envoyé par {{ origin_site.site.name }}
+            </div>
         </div>
-        <div class="col-8 knowledge__surveys">
-            <div class="d-flex justify-content-between">
+        <div class="col-9 knowledge__surveys">
+            <div class="d-flex justify-content-between knowledge__surveys-header">
                 <h3 class="fr-m-0">État des lieux</h3>
                 {% comment %} TODO
                 - refonte modal share EDL
@@ -79,16 +99,24 @@
                     <!-- Show QS with progress -->
                     {% regroup session.the_answers.all by question.question_set as answer_list %}
                     {% for question_set, answers in answer_list %}
-                        <div class="col-12 col-xl-4 col-md-6 fr-p-2v masonry-item">
-                            {% include "survey/widgets/qs_summary_card.html" with question_set=question_set can_manage=can_manage_draft answers=answers show_conclusion=1 show_comment=1 %}
+                        <div class="col-12 col-xl-6 col-md-6 fr-p-2v masonry-item">
+                            <div class="position-relative">
+                                <div class="invisible-anchor-high"
+                                     id="{{ session.survey.site.id }}_{{ question_set.id }}"></div>
+                                {% include "survey/widgets/qs_summary_card.html" with question_set=question_set can_manage=can_manage_draft answers=answers show_conclusion=1 show_comment=1 %}
+                            </div>
                         </div>
                     {% endfor %}
                     <!-- Show other QS not yet started -->
                     {% for question_set in session.survey.question_sets.all %}
                         {% question_set_completion session question_set as qs_completion %}
                         {% if qs_completion == 0 %}
-                            <div class="col-12 col-xl-4 col-md-6 fr-p-2v masonry-item">
-                                {% include "survey/widgets/qs_summary_card.html" with question_set=question_set can_manage=can_manage_draft %}
+                            <div class="col-12 col-xl-6 col-md-6 fr-p-2v masonry-item">
+                                <div class="position-relative">
+                                    <div class="invisible-anchor-high"
+                                         id="{{ session.survey.site.id }}_{{ question_set.id }}"></div>
+                                    {% include "survey/widgets/qs_summary_card.html" with question_set=question_set can_manage=can_manage_draft %}
+                                </div>
                             </div>
                         {% endif %}
                     {% endfor %}
