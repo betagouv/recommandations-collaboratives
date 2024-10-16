@@ -45,7 +45,7 @@
                     {% endfor %}
                 </nav>
             </div>
-            <hr>
+            <hr class="info__separator">
             <!-- Informations du projet -->
             <div class="info__title">Localisation</div>
             {% include "projects/project/fragments/geolocation/location_knowledge.html" with project=project %}
@@ -53,7 +53,7 @@
             {% comment %} TODO
             - projet déposé depuis ...
             {% endcomment %}
-            <div>
+            <div class="info__project-origin">
                 {% if origin_site.site.configuration.logo_small %}
                     <img src="{{ origin_site.site.configuration.logo_small.url }}"
                          width="16px"
@@ -83,8 +83,8 @@
                 </div>
             </div>
             {% for session in sessions.all %}
-                <div class="survey-card">
-                    <div class="survey-card__title">
+                <div class="survey-card-cta">
+                    <div class="survey-card-cta__title">
                         <span class="badge {% if session.completion < 100 %}text-bg-danger {% else %}text-bg-light{% endif %} text-bg-danger">{{ session.completion }}%</span>
                         {{ session.survey.name }}
                     </div>

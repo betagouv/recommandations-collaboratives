@@ -9,6 +9,7 @@
 .knowledge {
   &__info {
     background-color: white;
+    border-right: 1px solid var(--light-border-default-grey, #e5e5e5);
     .info {
       &__survey-navbar {
       }
@@ -27,6 +28,7 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
+        margin-top: 20px;
         .badge {
           height: fit-content;
         }
@@ -49,6 +51,18 @@
           text-decoration-line: underline !important;
         }
       }
+      &__project-origin {
+        color: var(--light-text-mention-grey, #666);
+        font-size: 12px;
+        font-weight: 400;
+        line-height: 24px;
+      }
+      &__separator {
+        opacity: 1;
+        margin-right: -12px;
+        margin-top: 20px;
+        padding-bottom: 20px;
+      }
     }
   }
   &__surveys {
@@ -60,7 +74,7 @@
 }
 
 // TODO Extract this to a separate file
-.survey-card {
+.survey-card-cta {
   display: flex;
   justify-content: space-between;
   align-items: center;

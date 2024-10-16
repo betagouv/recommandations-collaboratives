@@ -13,6 +13,20 @@
 }
 
 .survey-card {
+  color: var(--light-text-default-grey, #3a3a3a);
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 18px;
+  margin-bottom: 0.75rem;
+  border-radius: 2px;
+  border: 1px solid var(--light-border-default-grey, #e5e5e5);
+  background: #fff;
+  box-shadow: 2px 2px 4px 0px rgba(0, 0, 0, 0.1);
+  .card-title {
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 24px;
+  }
   .q-progress {
     height: 5px;
 
@@ -30,6 +44,17 @@
 
   h6 {
     letter-spacing: 0.1em !important;
+    color: var(--light-text-default-grey, #3a3a3a);
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 24px;
+  }
+
+  .updated-by {
+    color: var(--light-text-default-info, #0063cb);
+    font-size: 10px;
+    font-weight: 400;
+    line-height: 15px;
   }
 }
 

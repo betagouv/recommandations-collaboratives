@@ -7,14 +7,11 @@
     <link href="{% sass_src 'survey/css/survey.scss' %}"
           rel="stylesheet"
           type="text/css">
-    <link href="{% sass_src 'survey/css/widgets/summary_card.scss' %}"
-          rel="stylesheet"
-          type="text/css">
 {% endblock css %}
 {% get_obj_perms request.user for request.site as "user_site_perms" %}
 {% get_obj_perms request.user for project as "user_project_perms" %}
 {% question_set_completion session.pk question_set as completion %}
-<div class="survey-card text-black rounded-3">
+<div class="survey-card">
     <div class="card-body fr-m-1v">
         <div>
             <div class="fr-mb-0 fr-mb-2v d-flex justify-content-between align-items-start tmp-usevar"
@@ -43,25 +40,21 @@
             <p class="card-text">
                 <ul class="list-unstyled">
                     {% for answer in answers %}
-                        <li class="answer fr-mb-2v fr-mt-3w d-flex justify-content-between position-relative">
+                        <li class="answer fr-my-2v d-flex justify-content-between position-relative">
                             <div class="flex-grow-1 specific-width">
                                 {% lookup_choices_from_answer answer as choices %}
                                 {% if show_question or not choices %}
-                                    <div>
-                                        <!-- TODO PERMISSIONS : edit_survey -->
+                                    <h6 class="fr-m-0 d-inline align-middle text-uppercase">
                                         {% if "use_surveys" in user_project_perms %}
                                             <a class="text-decoration-none stretched-link link-edit"
                                                href="{% url 'survey-question-details' session.id answer.question.id %}">
-                                            {% endif %}
-                                            <h6 class="fr-m-0 d-inline align-middle text-uppercase">
-                                                {{ answer.question.text_short|default:answer.question.text }}
-                                            </h6>
-                                            {% if "use_surveys" in user_project_perms %}</a>{% endif %}
-                                        <!-- ENDIF -->
-                                    </div>
+                                            </a>
+                                        {% endif %}
+                                        {{ answer.question.text_short|default:answer.question.text }}
+                                    </h6>
                                 {% endif %}
                                 {% if show_answers or show_conclusion %}
-                                    <ul class="list-unstyled">
+                                    <ul class="list-unstyled fr-mt-0">
                                         {% if "use_surveys" in user_project_perms and not show_question %}
                                             <a class="link-edit stretched-link text-decoration-none"
                                                href="{% url 'survey-question-details' session.id answer.question.id %}">
@@ -111,13 +104,7 @@
                                             <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#asterisk" />
                                         </svg>
                                     {% endif %}
-                                    <svg class="align-middle bi tmp-usevar"
-                                         width="26px"
-                                         height="26px"
-                                         fill="currentColor"
-                                         style="color: {{ question_set.color|default:'black' }} !important">
-                                        <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#arrow-right-short" />
-                                    </svg>
+                                    <span class="fr-icon-pencil-line fr-icon--sm" aria-hidden="true"></span>
                                 </div>
                             {% endif %}
                         </li>
