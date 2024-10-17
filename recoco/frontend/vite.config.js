@@ -59,6 +59,7 @@ const config = {
         menuNotification: resolve('./src/js/apps/menuNotification.js'),
         actionsEmbed: resolve('./src/js/apps/actionsEmbed.js'),
         tasksEmbed: resolve('./src/js/apps/tasksEmbed.js'),
+        projectKnowledge: resolve('./src/js/apps/projectKnowledge.js'),
       },
       output: {
         chunkFileNames: undefined,
