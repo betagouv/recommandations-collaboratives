@@ -64,12 +64,12 @@
                              aria-hidden="true">
                             <div class="modal-dialog modal-fullscreen">
                                 <div class="modal-content">
-                                    <div class="modal-header">
+                                    <div class="modal-header justify-content-between">
                                         <h5 class="modal-title">Prévisualisation de la ressource</h5>
                                         <button type="button"
-                                                class="btn-close"
+                                                class="fr-btn fr-btn-close"
                                                 data-bs-dismiss="modal"
-                                                aria-label="Close"></button>
+                                                aria-label="Close">Fermer</button>
                                     </div>
                                     <div class="modal-body">
                                         <iframe class="w-100 h-100" :src="resource.url_embeded"></iframe>
@@ -79,10 +79,12 @@
                         </div>
                         <div>
                             <ul class="fr-badge-group fr-p-0">
-                                <li x-show="resource.category.name">
-                                    <span class="fr-badge fr-badge--sm fr-badge--green-menthe"
-                                          x-text="resource.category.name"></span>
-                                </li>
+                                <template x-if="resource.category && resource.category.name">
+                                    <li>
+                                        <span class="fr-badge fr-badge--sm fr-badge--green-menthe"
+                                              x-text="resource.category.name"></span>
+                                    </li>
+                                </template>
                                 <li x-show="resource.is_dsresource">
                                     <span class="fr-badge fr-badge--sm text-transform-none">
                                         <img height="8px"
