@@ -19,7 +19,7 @@
             <div class="info__survey-navbar fr-mt-5v">
                 <div class="info__title">États des lieux</div>
                 <nav>
-                    {% for session in sessions.all %}
+                    {% for session in project.survey_session.all %}
                         <div class="info__survey-title">
                             <span>{{ session.survey.name }}</span>
                             <span class="badge {% if session.completion < 100 %}text-bg-danger {% else %}text-bg-light{% endif %} text-bg-danger">{{ session.completion }}%</span>
@@ -54,15 +54,15 @@
             - projet déposé depuis ...
             {% endcomment %}
             <div class="info__project-origin">
-                {% if origin_site.site.configuration.logo_small %}
-                    <img src="{{ origin_site.site.configuration.logo_small.url }}"
+                {% if project.project_sites.origin.site.configuration.logo_small %}
+                    <img src="{{ project.project_sites.origin.site.configuration.logo_small.url }}"
                          width="16px"
                          height="auto"
-                         alt="Logo {{ origin_site.site.name }}" />
+                         alt="Logo {{ project.project_sites.origin.site.name }}" />
                 {% else %}
                     <span class="fr-icon--sm fr-icon-window-line" aria-hidden="true"></span>
                 {% endif %}
-                projet envoyé par {{ origin_site.site.name }}
+                projet envoyé par {{ project.project_sites.origin.site.name }}
             </div>
         </div>
         <div class="col-9 knowledge__surveys">
@@ -82,7 +82,7 @@
                     {% include "projects/project/fragments/share/public_share_modal.html" %}
                 </div>
             </div>
-            {% for session in sessions.all %}
+            {% for session in project.survey_session.all %}
                 <div class="survey-card-cta">
                     <div class="survey-card-cta__title">
                         <span class="badge {% if session.completion < 100 %}text-bg-danger {% else %}text-bg-light{% endif %} text-bg-danger">{{ session.completion }}%</span>
@@ -93,7 +93,7 @@
                 </div>
             {% endfor %}
             <div class="fr-mt-3w">
-                {% for session in sessions.all %}
+                {% for session in project.survey_session.all %}
                     <h4>{{ session.survey.name }}</h4>
                     <div class="masonry-wrapper row"
                          data-masonry='{"percentPosition": true, "transitionDuration": 0 }'>

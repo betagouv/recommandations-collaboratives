@@ -135,10 +135,6 @@ def project_knowledge(request, project_id=None):
     """Return the survey results for a given project"""
     project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
 
-    origin_site = models.ProjectSite.objects.filter(
-        project=project, is_origin=True
-    ).first()
-
     is_regional_actor = is_regional_actor_for_project(
         request.site, project, request.user, allow_national=True
     )
@@ -162,8 +158,6 @@ def project_knowledge(request, project_id=None):
     session, created = survey_models.Session.objects.get_or_create(
         project=project, survey=site_config.project_survey
     )
-
-    sessions = survey_models.Session.objects.filter(project=project)
 
     # Mark this project survey notifications as read
     if not request.user.is_hijacked:
