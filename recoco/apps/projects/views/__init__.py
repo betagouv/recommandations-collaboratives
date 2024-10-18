@@ -161,11 +161,15 @@ def project_moderation_accept(request, project_pk):
             else:
                 # Invite her to fill in a new form
                 # Send an email to the project owner
+
                 params = {
                     "project": digests.make_project_digest(project, owner),
-                    "site": digests.make_site_digest(project.projectsites.origin()),
+                    "site": digests.make_site_digest(
+                        project.project_sites.origin().site
+                    ),
                     "survey_site": digests.make_site_digest(request.site),
                     "survey": digests.make_project_survey_digest_for_site(
+                        request.user,
                         project,
                         request.site,
                     ),
