@@ -4,7 +4,7 @@ from model_bakery import baker
 from recoco.apps.projects.models import Project
 from recoco.apps.resources.models import Resource
 
-from ..models import DSResource
+from ..models import DSMappingField, DSResource
 from ..services import (
     find_ds_resource_for_project,
     make_ds_data_from_project,
@@ -13,22 +13,33 @@ from .base import BaseTestMixin
 
 
 class TestMakeDSDataFromProject(BaseTestMixin):
-    def test_no_adapter_module(self):
+    @pytest.mark.django_db
+    def test_no_mapping_fields(self):
+        project = baker.make(Project, name="my project")
+        ds_resource = baker.make(DSResource)
         assert (
             make_ds_data_from_project(
-                project=baker.prepare(Project),
-                ds_resource=baker.prepare(DSResource, schema={"number": 123}),
+                project=project,
+                ds_resource=ds_resource,
             )
             == {}
         )
 
-    def test_adapter_module(self, ds_schema_sample):
+    @pytest.mark.django_db
+    def test_mapping_done(self):
+        project = baker.make(Project, name="my project")
+        ds_resource = baker.make(DSResource)
+        baker.make(
+            DSMappingField,
+            ds_resource=ds_resource,
+            field_id="123",
+            project_lookup_key="name",
+        )
+
         assert make_ds_data_from_project(
-            project=baker.prepare(Project, name="Mon projet"),
-            ds_resource=baker.prepare(DSResource, schema=ds_schema_sample),
-        ) == {
-            "champ_Q2hhbXAtMjk3MTQ0NA": "Mon projet",
-        }
+            project=project,
+            ds_resource=ds_resource,
+        ) == {"123": "my project"}
 
 
 class TestfindDSResourceForProject(BaseTestMixin):
