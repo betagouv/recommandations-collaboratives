@@ -38,6 +38,18 @@
   }
 }
 
+#display-corrected {
+  transform: none;
+  right: 0;
+  left: auto;
+  text-wrap: wrap;
+}
+
+#display-corrected span {
+  text-wrap: wrap;
+  display: inline-block;
+}
+
 @media (max-width: 1200px) {
   .user-info .dropdown-menu {
     transform: translate3d(-130px, 0, 0);
