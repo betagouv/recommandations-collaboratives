@@ -372,7 +372,6 @@
                         <section id="project-status-settings" class="col">
                             <hr class="fr-my-3w" />
                             {% include "projects/project/fragments/administration/quit_project.html" %}
-                            {% include "projects/project/fragments/administration/activate_project.html" with position=position %}
                             {% include "projects/project/fragments/administration/stand_by_project.html" with position=position %}
                         </section>
                     </div>
@@ -383,4 +382,7 @@
         {% elif project.status == 'DRAFT' %}
         </div>
     {% endif %}
+    <div class="fr-mt-2w fr-px-2w">
+        {% include "projects/project/fragments/administration/activate_project.html" with position=position %}
+    </div>
 {% endblock project_detail %}
