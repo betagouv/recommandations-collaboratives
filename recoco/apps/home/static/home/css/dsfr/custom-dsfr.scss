@@ -589,3 +589,9 @@ form > p {
   position: absolute;
   top: -120px;
 }
+
+.specific-position-absolute-centered {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
