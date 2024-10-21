@@ -2,15 +2,15 @@
 {% load wagtailcore_tags wagtailimages_tags %}
 {% load sass_tags %}
 {% block css %}
-    <link href="{% sass_src 'home/css/usage_case_example/usage_case_example.scss' %}"
+    <link href="{% sass_src 'pages/css/pages/showcase_list.scss' %}"
           rel="stylesheet"
           type="text/css">
 {% endblock css %}
 
 {% block content %}
-    <h1 class="fr-mt-2w fr-ml-2v">Exemples de cas d'usage</h1>
+    <h1 class="fr-mt-2w fr-ml-2v">{{ page.title }}</h1>
     <div class="showcase-gallery">
-        {% for showcase_page in showcase_pages %}
+        {% for showcase_page in page.get_children.live.specific %}
             <div class="fr-card fr-enlarge-link fr-card--horizontal fr-m-2v">
                 <div class="fr-card__body">
                     <div class="fr-card__content">

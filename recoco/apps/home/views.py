@@ -18,10 +18,8 @@ from django.shortcuts import redirect, render
 from django.utils.decorators import method_decorator
 from django.views.generic import View
 from django.views.generic.base import TemplateView
-from wagtail.models import Page
 
 from recoco.apps.onboarding.forms import OnboardingEmailForm
-from recoco.apps.pages.models import ShowcasePage
 from recoco.apps.projects import models as projects
 from recoco.apps.projects.utils import (
     can_administrate_project,
@@ -99,16 +97,6 @@ class PrivacyPageView(TemplateView):
 
 class FollowUsPageView(TemplateView):
     template_name = "home/followus.html"
-
-
-class UsageCaseExampleView(TemplateView, Page):
-    template_name = "home/usage_case_example.html"
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        showcase_pages = ShowcasePage.objects.live().all()
-        context["showcase_pages"] = showcase_pages
-        return context
 
 
 class StatisticsView(TemplateView):

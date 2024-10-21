@@ -36,11 +36,6 @@ urlpatterns = [
         name="multi-annual-schema",
     ),
     path(r"nous-suivre", views.FollowUsPageView.as_view(), name="followus"),
-    path(
-        r"example-cas-usage",
-        views.UsageCaseExampleView.as_view(),
-        name="usage-case-example",
-    ),
     path(r"contact/", views.contact, name="home-contact"),
     path(r"setup-password/", views.setup_password, name="home-user-setup-password"),
 ]

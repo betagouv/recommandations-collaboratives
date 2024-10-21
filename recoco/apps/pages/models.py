@@ -15,6 +15,12 @@ class SimplePage(Page):
     ]
 
 
+class ShowcaseListPage(Page):
+    """List all show cases in a fancy manner"""
+
+    subpage_types = ["ShowcasePage"]
+
+
 class ShowcasePage(Page):
     heading = StreamField(
         [("hero", HeroBlock(label="Hero"))],
