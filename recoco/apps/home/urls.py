@@ -7,7 +7,6 @@ authors: raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created: 2021-05-26 15:54:25 CEST
 """
 
-
 from django.urls import path
 
 from . import views
@@ -37,6 +36,11 @@ urlpatterns = [
         name="multi-annual-schema",
     ),
     path(r"nous-suivre", views.FollowUsPageView.as_view(), name="followus"),
+    path(
+        r"example-cas-usage",
+        views.UsageCaseExampleView.as_view(),
+        name="usage-case-example",
+    ),
     path(r"contact/", views.contact, name="home-contact"),
     path(r"setup-password/", views.setup_password, name="home-user-setup-password"),
 ]
