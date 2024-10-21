@@ -3,6 +3,7 @@
 {% load guardian_tags %}
 {% load projects_extra %}
 {% load sass_tags %}
+{% load django_vite %}
 {% block css %}
     <link href="{% sass_src 'css/header/header.scss' %}"
           rel="stylesheet"
@@ -11,6 +12,9 @@
           rel="stylesheet"
           type="text/css">
 {% endblock css %}
+{% block js %}
+    {% vite_asset 'js/components/ExpandableMenuHandler.js' %}
+{% endblock js %}
 {% is_staff_for_current_site request.user as is_staff %}
 <!-- User -->
 <div class="user-tools d-flex">
@@ -34,15 +38,17 @@
             </button>
             {% include "header/dropdown-menu-notifications.html" %}
         </div>
-        <div>
+        <div x-data="ExpandableMenuHandler" @click.outside="toggle">
             <button class="fr-nav__btn user-tools__main-menu-button h-100"
+                    x-ref="expandMenuButton"
                     aria-expanded="false"
                     aria-controls="user-tools-main-menu"
                     data-test-id="open-dropdown-profil-option-button">
                 <span class="fr-icon-account-circle-line fr-mr-1w" aria-hidden="true"></span>
                 <span class="d-none d-lg-none d-xl-block">{{ user.get_full_name|default:user.email }}</span>
             </button>
-            <div class="fr-collapse fr-menu menu-modal-correct-fr-menu" id="user-tools-main-menu">
+            <div class="fr-collapse fr-menu menu-modal-correct-fr-menu"
+                 id="user-tools-main-menu">
                 <ul class="fr-menu__list user-tools__main-menu">
                     {% if is_switchtender or is_administrating_project %}
                         <li>
