@@ -1,8 +1,12 @@
 {% extends "base.html" %}
 {% load sass_tags %}
 {% load static %}
-{% block title %}Methodologie{% endblock %}
-{% block og_title %}Methodologie{% endblock %}
+{% block title %}
+    Methodologie
+{% endblock title %}
+{% block og_title %}
+    Methodologie
+{% endblock og_title %}
 {% block css %}
     <link href="{% sass_src 'home/css/home/home.scss' %}"
           rel="stylesheet"

@@ -3,8 +3,12 @@
 {% load humanize %}
 {% load sass_tags %}
 {% load django_vite %}
-{% block title %}Thématiques du projet {{ project.name }}{% endblock %}
-{% block og_title %}Thématiques du projet {{ project.name }}{% endblock %}
+{% block title %}
+    Thématiques du projet {{ project.name }}
+{% endblock title %}
+{% block og_title %}
+    Thématiques du projet {{ project.name }}
+{% endblock og_title %}
 {% block js %}
     {% vite_asset 'js/apps/topicSearch.js' %}
 {% endblock js %}

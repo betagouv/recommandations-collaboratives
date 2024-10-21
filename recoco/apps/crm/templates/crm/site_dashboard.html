@@ -15,9 +15,13 @@
 {% endblock css %}
 {% block js %}
     {% vite_asset 'js/apps/crm.js' %}
-{% endblock %}
-{% block title %}CRM{% endblock %}
-{% block og_title %}CRM{% endblock %}
+{% endblock js %}
+{% block title %}
+    CRM
+{% endblock title %}
+{% block og_title %}
+    CRM
+{% endblock og_title %}
 {% block content %}
     {% get_obj_perms request.user for request.site as "user_site_perms" %}
     {% is_staff_for_current_site request.user as is_staff %}

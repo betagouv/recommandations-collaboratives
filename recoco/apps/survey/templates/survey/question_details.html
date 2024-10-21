@@ -8,8 +8,12 @@
 {% endblock css %}
 {% load humanize %}
 {% load django_vite %}
-{% block title %}{{ question.text }} - {{ request.site.name }}{% endblock %}
-{% block og_title %}{{ question.text }} - {{ request.site.name }}{% endblock %}
+{% block title %}
+    {{ question.text }} - {{ request.site.name }}
+{% endblock title %}
+{% block og_title %}
+    {{ question.text }} - {{ request.site.name }}
+{% endblock og_title %}
 {% block js %}
     {% vite_asset 'js/apps/tutorial.js' %}
 {% endblock js %}

@@ -2,8 +2,12 @@
 {% load sass_tags %}
 {% load static %}
 {% load django_vite %}
-{% block title %}Emails de notification à {{ crm_user.get_full_name }}{% endblock %}
-{% block og_title %}Emails de notification à {{ crm_user.get_full_name }}{% endblock %}
+{% block title %}
+    Emails de notification à {{ crm_user.get_full_name }}
+{% endblock title %}
+{% block og_title %}
+    Emails de notification à {{ crm_user.get_full_name }}
+{% endblock og_title %}
 {% block js %}
     {% vite_asset 'js/apps/crm.js' %}
 {% endblock js %}

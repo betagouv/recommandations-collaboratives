@@ -4,8 +4,12 @@
 {% load django_vite %}
 {% load projects_extra %}
 {% load sass_tags %}
-{% block title %}{{ project.name }}{% endblock %}
-{% block og_title %}{{ project.name }}{% endblock %}
+{% block title %}
+    {{ project.name }}
+{% endblock title %}
+{% block og_title %}
+    {{ project.name }}
+{% endblock og_title %}
 {% block css %}
     <link href="{% sass_src 'resources/resources.scss' %}"
           rel="stylesheet"

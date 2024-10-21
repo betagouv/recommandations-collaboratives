@@ -6,8 +6,12 @@
 {% load training %}
 {% load hijack %}
 {% load phone_filters %}
-{% block title %}{{ crm_user.get_full_name }} - CRM{% endblock %}
-{% block og_title %}{{ crm_user.get_full_name }} - CRM{% endblock %}
+{% block title %}
+    {{ crm_user.get_full_name }} - CRM
+{% endblock title %}
+{% block og_title %}
+    {{ crm_user.get_full_name }} - CRM
+{% endblock og_title %}
 {% block js %}
     {% vite_asset 'js/apps/crm.js' %}
 {% endblock js %}

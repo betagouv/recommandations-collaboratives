@@ -3,8 +3,12 @@
 {% load static %}
 {% load humanize %}
 {% load crm_tags %}
-{% block title %}Recommandations sans ressource - CRM{% endblock %}
-{% block og_title %}Recommandations sans ressource - CRM{% endblock %}
+{% block title %}
+    Recommandations sans ressource - CRM
+{% endblock title %}
+{% block og_title %}
+    Recommandations sans ressource - CRM
+{% endblock og_title %}
 {% block js %}
     {% vite_asset 'js/apps/crm.js' %}
 {% endblock js %}

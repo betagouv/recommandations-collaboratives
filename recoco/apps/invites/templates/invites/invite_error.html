@@ -2,8 +2,12 @@
 {% load humanize %}
 {% load static %}
 {% load sass_tags %}
-{% block title %}{{ site.name }} | Invitation à rejoindre le projet {{ invite.project.name }}{% endblock %}
-{% block og_title %}{{ site.name }} | Invitation à rejoindre le projet {{ invite.project.name }}{% endblock %}
+{% block title %}
+    {{ site.name }} | Invitation à rejoindre le projet {{ invite.project.name }}
+{% endblock title %}
+{% block og_title %}
+    {{ site.name }} | Invitation à rejoindre le projet {{ invite.project.name }}
+{% endblock og_title %}
 {% block content %}
     <div class="col-10 fr-py-6w fr-mx-auto">
         <h4 class="fw-bolder">Invitation à rejoindre {{ site.name }}</h4>

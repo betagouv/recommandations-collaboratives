@@ -5,8 +5,12 @@
 {% load humanize %}
 {% load training %}
 {% load hijack %}
-{% block title %}Utilisateurs - CRM{% endblock %}
-{% block og_title %}Utilisateurs - CRM{% endblock %}
+{% block title %}
+    Utilisateurs - CRM
+{% endblock title %}
+{% block og_title %}
+    Utilisateurs - CRM
+{% endblock og_title %}
 {% block js %}
     {% vite_asset 'js/apps/crm.js' %}
 {% endblock js %}

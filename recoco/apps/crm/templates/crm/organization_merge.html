@@ -4,8 +4,12 @@
 {% load django_vite %}
 {% load humanize %}
 {% load training %}
-{% block title %}Fusionner des organisations - CRM{% endblock %}
-{% block og_title %}Fusionner des organisations - CRM{% endblock %}
+{% block title %}
+    Fusionner des organisations - CRM
+{% endblock title %}
+{% block og_title %}
+    Fusionner des organisations - CRM
+{% endblock og_title %}
 {% block js %}
     {% vite_asset 'js/apps/crm.js' %}
 {% endblock js %}

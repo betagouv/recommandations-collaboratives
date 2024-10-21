@@ -2,8 +2,12 @@
 {% load gravatar %}
 {% load sass_tags %}
 {% load static %}
-{% block title %}Conditions générales d'utilisation{% endblock %}
-{% block og_title %}Conditions générales d'utilisation{% endblock %}
+{% block title %}
+    Conditions générales d'utilisation
+{% endblock title %}
+{% block og_title %}
+    Conditions générales d'utilisation
+{% endblock og_title %}
 {% block css %}
     <link href="{% sass_src 'home/css/home/home.scss' %}"
           rel="stylesheet"

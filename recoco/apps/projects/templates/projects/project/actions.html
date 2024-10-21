@@ -5,8 +5,12 @@
 {% load sass_tags %}
 {% load django_vite %}
 {% load guardian_tags %}
-{% block title %}Recommandations - {{ block.super }}{% endblock %}
-{% block og_title %}Recommandations - {{ block.super }}{% endblock %}
+{% block title %}
+    Recommandations - {{ block.super }}
+{% endblock title %}
+{% block og_title %}
+    Recommandations - {{ block.super }}
+{% endblock og_title %}
 {% block js %}
     <script src="https://cdn.jsdelivr.net/npm/js-md5@0.7.3/src/md5.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>

@@ -9,7 +9,7 @@
         {{ the_object.get_full_name }}
     {% endif %}
     - CRM
-{% endblock %}
+{% endblock title %}
 {% block og_title %}
     Écrire une note sur
     {% if the_object.name %}
@@ -18,7 +18,7 @@
         {{ the_object.get_full_name }}
     {% endif %}
     - CRM
-{% endblock %}
+{% endblock og_title %}
 {% block content %}
     <div class="col-12 fr-p-3w fr-mx-auto">
         <section>
