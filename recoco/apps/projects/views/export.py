@@ -82,6 +82,7 @@ def project_list_export_csv(request):
         "tags",
         "lien_projet",
         "exclude_stats",
+        "origin_site",
     ]
     site_config = get_site_config_or_503(request.site)
     tags_for_site = site_config.crm_available_tags.values_list("name", flat=True)
@@ -168,6 +169,7 @@ def project_list_export_csv(request):
             [tag for tag in project.tags.names()],
             build_absolute_url(reverse("projects-project-detail", args=[project.id])),
             project.exclude_stats,
+            project.project_sites.origin().site.domain,
         ]
 
         try:
