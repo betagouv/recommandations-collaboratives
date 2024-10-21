@@ -31,7 +31,9 @@ if (!closest) {
 class Select {
   constructor(el, options = {}, selectedId) {
     this.el = el;
-    this.label = document.querySelector(`label[for=${el.id}]`);
+    if (this.el.id) {
+      this.label = document.querySelector(`label[for=${el.id}]`);
+    }
     this.id = el.id;
     this.open = false;
     this.multiple = this.el.multiple;
@@ -39,7 +41,7 @@ class Select {
     this.suggestions = [];
     this.focusIndex = null;
     this.selectedId = selectedId;
-    if (this.selectedId) {
+    if (this.selectedId && this.el.options) {
       this.el.selectedIndex = [...this.el.options].findIndex(
         (option) => option.value == this.selectedId
       );
@@ -87,7 +89,9 @@ class Select {
     this.wrap.addEventListener('keydown', this._handleKeyboard);
     document.addEventListener('blur', this._handleFocus, true);
 
-    this.el.form.addEventListener('reset', this._handleReset);
+    if (Object.prototype.hasOwnProperty.call(this.el, 'form')) {
+      this.el.form.addEventListener('reset', this._handleReset);
+    }
   }
 
   _createButton() {
@@ -102,7 +106,7 @@ class Select {
       text.innerText = this.label.innerText;
     } else {
       let indexOptions;
-      if (this.selectedId) {
+      if (this.selectedId && this.el.options) {
         indexOptions = [...this.el.options]
           .map((options) => options.value)
           .indexOf(this.selectedId.toString());
@@ -112,6 +116,7 @@ class Select {
       if (indexOptions === -1) {
         indexOptions = 0;
       }
+
       const selectedOption = this.el.item(indexOptions);
       text.innerText = selectedOption.label || selectedOption.value;
 
