@@ -131,11 +131,9 @@
                             </div>
                         {% endif %}
                         <hr class="fr-mt-3w" />
-                        <div x-data="ProjectShare" class="row fr-mt-2v">
-                            <h6 id="user-management"
-                                class="text-uppercase fw-bold d-block fr-mb-2w font-small">
-                                Gestion des utilisateurs
-                            </h6>
+                        <div x-data="ProjectShare" class="row fr-mt-2v position-relative">
+                            <div id="user-management" class="invisible-anchor-high"></div>
+                            <h6 class="text-uppercase fw-bold d-block fr-mb-2w font-small">Gestion des utilisateurs</h6>
                             <div class="col">
                                 <p class="text-info-custom fr-mb-2v">Équipe de suivi</p>
                                 {% if "invite_advisors" in user_project_perms %}

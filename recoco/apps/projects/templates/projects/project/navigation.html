@@ -182,7 +182,7 @@
     <div class="d-flex">
         <div class="d-flex fr-px-4w align-items-center">
             <button class="fr-btn fr-btn--sm fr-btn--tertiary">
-                <a href="{% url 'projects-project-administration' project.pk %}#bouton-modifier-les-info">Inviter</a>
+                <a href="{% url 'projects-project-administration' project.pk %}#user-management">Inviter</a>
             </button>
         </div>
         {% if "list_projects" in user_site_perms or 'use_private_notes' in user_project_perms %}
