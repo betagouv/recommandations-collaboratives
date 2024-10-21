@@ -181,6 +181,10 @@
     </fieldset>
     <div class="d-flex">
         <div class="d-flex fr-px-4w align-items-center">
+            {% if "use_crm" in user_site_perms and not disable_crm %}
+                <a class="fr-btn fr-btn--tertiary fr-btn--sm fr-btn--icon-left fr-icon-pulse-line justify-content-center fr-mr-2v"
+                   href="{% url 'crm-project-details' project.pk %}">CRM</a>
+            {% endif %}
             <button class="fr-btn fr-btn--sm fr-btn--tertiary">
                 <a href="{% url 'projects-project-administration' project.pk %}#user-management">Inviter</a>
             </button>
