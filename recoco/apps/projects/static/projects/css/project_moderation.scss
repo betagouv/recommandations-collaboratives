@@ -15,20 +15,16 @@
   &__title {
     font-size: 16px;
     text-align: left;
+    line-height: 1rem;
+    margin-bottom: 0.75rem;
   }
   &__city {
     font-weight: 700;
-    line-height: 24px;
     color: #3a3a3a;
-    text-decoration: underline;
-    text-decoration-color: #3a3a3a;
   }
   &__name {
     font-weight: 400;
-    line-height: 22px;
     color: #666666;
-    text-decoration: underline;
-    text-decoration-color: #666666;
   }
   &__keyinfo,
   &__address,
@@ -42,6 +38,11 @@
     flex-direction: column;
     font-weight: 400;
     line-height: 24px;
+  }
+  &__location {
+    p {
+      line-height: 18px;
+    }
   }
   &__address,
   &__team {
