@@ -13,6 +13,7 @@ describe('I can go tasks tab', () => {
     cy.visit(`/project/${currentProject.pk}`);
     cy.contains('Recommandations').click({ force: true });
     cy.url().should('include', '/actions');
+    cy.createTask('test');
 
     cy.get('[data-test-id="list-tasks-switch-button"]').should(
       'have.class',

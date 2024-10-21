@@ -12,6 +12,7 @@ import test  # noqa
 import pytest
 from django.contrib.auth import models as auth
 from django.contrib.sites.shortcuts import get_current_site
+from django.core.exceptions import ImproperlyConfigured
 from model_bakery import baker
 from model_bakery.recipe import Recipe
 from notifications import models as notifications_models
@@ -35,7 +36,7 @@ from .. import digests
 
 
 @pytest.mark.django_db
-def test_send_digests_for_new_reco(client, request):
+def test_send_digests_for_new_reco(client, request, make_project):
     current_site = get_current_site(request)
     baker.make(home_models.SiteConfiguration, site=current_site)
     membership = baker.make(projects_models.ProjectMember)
@@ -44,9 +45,8 @@ def test_send_digests_for_new_reco(client, request):
         auth.User, username="advisor", email="advisor@example.com"
     ).make()
 
-    project = baker.make(
-        projects_models.Project,
-        sites=[current_site],
+    project = make_project(
+        site=current_site,
         status="DONE",
         projectmember_set=[membership],
     )
@@ -69,10 +69,11 @@ def test_send_digests_for_new_reco(client, request):
 
 
 @pytest.mark.django_db
-def test_send_digests_for_new_reco_empty(client):
+def test_send_digests_for_new_reco_empty(client, request, make_project):
+    site = get_current_site(request)
     membership = baker.make(projects_models.ProjectMember)
 
-    baker.make(projects_models.Project, status="DONE", projectmember_set=[membership])
+    make_project(site=site, status="DONE", projectmember_set=[membership])
 
     digests.send_digests_for_new_recommendations_by_user(
         membership.member, dry_run=False
@@ -81,13 +82,59 @@ def test_send_digests_for_new_reco_empty(client):
     assert membership.member.notifications.unsent().count() == 0
 
 
+@pytest.mark.django_db
+def test_make_site_digest_without_siteconfiguration(client, request):
+    site = get_current_site(request)
+
+    with pytest.raises(ImproperlyConfigured):
+        digests.make_site_digest(site)
+
+
+@pytest.mark.django_db
+def test_make_site_digest_with_siteconfiguration(client, request):
+    site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=site)
+
+    data = digests.make_site_digest(site)
+
+    assert "legal_owner" in data
+
+    assert len(data) > 0
+
+
+@pytest.mark.django_db
+def test_make_project_survey_for_site_digest_without_configuration(
+    project_ready, client, request
+):
+    site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=site)
+    user = Recipe(auth.User).make()
+    data = digests.make_project_survey_digest_for_site(user, project_ready, site)
+
+    assert len(data) > 0
+    assert data["name"] is None
+
+
+@pytest.mark.django_db
+def test_make_project_survey_for_site_digest_with_configuration(
+    project_ready, client, request
+):
+    site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, project_survey__name="Survey", site=site)
+    user = Recipe(auth.User).make()
+    data = digests.make_project_survey_digest_for_site(user, project_ready, site)
+
+    assert len(data) > 0
+    assert data["name"] is not None
+
+
 ########################################################################
 # new sites digests
 ########################################################################
 
 
 @pytest.mark.django_db
-def test_send_digests_for_new_sites_by_user(request):
+def test_send_digests_for_new_sites_by_user(request, make_project):
     current_site = get_current_site(request)
     baker.make(home_models.SiteConfiguration, site=current_site)
 
@@ -117,12 +164,11 @@ def test_send_digests_for_new_sites_by_user(request):
     moderator = Recipe(auth.User).make()
 
     membership = baker.make(projects_models.ProjectMember, is_owner=True)
-    project = baker.make(
-        projects_models.Project,
+    project = make_project(
         projectmember_set=[membership],
         commune=commune,
         status="READY",
-        sites=[current_site],
+        site=current_site,
     )
 
     # Generate a notification
@@ -144,7 +190,7 @@ def test_send_digests_for_new_sites_by_user(request):
 
 
 @pytest.mark.django_db
-def test_send_digests_for_switchtender_by_user(request, client):
+def test_send_digests_for_switchtender_by_user(request, client, make_project):
     current_site = get_current_site(request)
     baker.make(home_models.SiteConfiguration, site=current_site)
 
@@ -180,10 +226,10 @@ def test_send_digests_for_switchtender_by_user(request, client):
     non_regional_actor.profile.sites.add(current_site)
 
     membership = baker.make(projects_models.ProjectMember, is_owner=True)
-    project = baker.make(
-        projects_models.Project,
+    project = make_project(
         projectmember_set=[membership],
         commune=commune,
+        site=current_site,
         status="READY",
     )
 
@@ -209,7 +255,7 @@ def test_send_digests_for_switchtender_by_user(request, client):
 
 
 @pytest.mark.django_db
-def test_notification_formatter():
+def test_notification_formatter(request, make_project):
     formatter = digests.NotificationFormatter()
 
     user = Recipe(auth.User, username="Bob", first_name="Bobi", last_name="Joe").make()
@@ -218,9 +264,11 @@ def test_notification_formatter():
     user.profile.save()
     recipient = Recipe(auth.User).make()
     resource = Recipe(resources_models.Resource, title="Belle Ressource").make()
+    project = make_project(site=get_current_site(request), name="Nice Project")
     task = Recipe(
         tasks_models.Task,
         intent="my intent",
+        project=project,
         content="A very nice content",
         resource=resource,
     ).make()
@@ -230,12 +278,6 @@ def test_notification_formatter():
     ).make()
 
     followup = Recipe(tasks_models.TaskFollowup, task=task, comment="Hello!").make()
-    project = Recipe(
-        projects_models.Project,
-        name="Nice Project",
-        description="Super description",
-        location="SomeWhere",
-    ).make()
 
     tests = [
         (

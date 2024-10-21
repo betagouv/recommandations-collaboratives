@@ -5,6 +5,12 @@
 {% load crm_tags %}
 {% block title %}Utilisation des tags sur les projets - CRM{% endblock %}
 {% block og_title %}Utilisation des tags sur les projets - CRM{% endblock %}
+{% load sass_tags %}
+{% block css %}
+    <link href="{% sass_src 'crm/css/tags.scss' %}"
+          rel="stylesheet"
+          type="text/css">
+{% endblock css %}
 {% block js %}
     {% vite_asset 'js/apps/crm.js' %}
     <script src="{% static "/js/d3.min.js" %}"></script>
@@ -54,20 +60,18 @@
 
  }
     </script>
-{% endblock %}
+{% endblock js %}
 {% block content %}
-    <div x-data="Crm"
-         class="d-flex px-0"
-         style="font-family: 'Marianne', arial, sans-serif">
+    <div x-data="Crm" class="d-flex fr-px-0">
         {% include "crm/fragments/sidebar.html" with back_button=True map=True tools=True search=True %}
         <div class="w-75 d-flex flex-column justify-content-start">
-            <div class="d-flex justify-content-between align-items-center px-4 pt-4">
+            <div class="d-flex justify-content-between align-items-center fr-px-3w fr-pt-3w">
                 <h2>Relation Projets-Tags</h2>
                 <a href="{% url 'crm-project-list-by-tags-csv' %}"
                    class="btn btn-primary">Export CSV</a>
             </div>
             <div id="chart-new">
-                <svg class="w-100" style=" min-height: 300px">
+                <svg class="w-100 specific-minheight-300">
                 </svg>
             </div>
             <table class="table table-striped">
@@ -95,4 +99,4 @@
             </table>
         </div>
     </div>
-{% endblock %}
+{% endblock content %}

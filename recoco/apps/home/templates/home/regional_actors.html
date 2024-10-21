@@ -10,10 +10,9 @@
     <link href="{% sass_src 'home/css/actors/actors.scss' %}"
           rel="stylesheet"
           type="text/css">
-{% endblock %}
+{% endblock css %}
 {% block content %}
-    <div class="fr-container"
-         style="font-family: 'Marianne', arial, sans-serif">
+    <div class="fr-container">
         <div class="fr-mb-0w custom-background-actors-image">
             <div class="fr-grid-row">
                 <div class="fr-col-offset-md-2"></div>
@@ -33,7 +32,7 @@
                         </li>
                     </ul>
                     <div>
-                        <p class="fr-text--lg fr-text--bold fr-mb-2w">Pour qui ?</p>
+                        <p class="fr-text--lg fr-text--bold fr-mb-3w">Pour qui ?</p>
                         <p class="fr-text--lg">
                             Le service est ouvert aux acteurs publics qui conseillent les collectivités sur les friches, de
                             manière régulière ou ponctuelle. Selon les territoires et les projets : DDT(M), EPF, DREAL,
@@ -44,79 +43,77 @@
             </div>
         </div>
     </div>
-    <div class="fr-py-6w"
-         style="background-color:#1B1B35;
-                font-family: 'Marianne', arial, sans-serif">
-        <div class="fr-container fr-pt-2w fr-pb-6w">
+    <div class="fr-py-6w actors-bg-color">
+        <div class="fr-container fr-pt-3w fr-pb-6w">
             <div class="fr-m-auto">
                 <h3 class="fr-text-inverted--grey text-center fr-pb-6w">Comment fonctionne UrbanVitaliz pour un conseiller ?</h3>
             </div>
             <div class="fr-grid-row justify-content-center">
                 <div class="fr-col-12 fr-col-md fr-m-2v">
-                    <div class="fr-p-2w fr-background-default--grey" style="height:100%">
-                        <div class="w-100 fr-p-2w fr-m-auto" style="max-width: 160px;">
+                    <div class="fr-p-3w fr-background-default--grey h-100">
+                        <div class="w-100 fr-p-3w fr-m-auto max-width">
                             <img src="{% static 'home/img/actors/search.png' %}"
                                  width="100%"
                                  height="100%"
                                  alt="Icon de recherche">
                         </div>
-                        <span class="fr-display--xl fr-text-label--blue-cumulus fr-mb-2w d-block">1</span>
+                        <span class="fr-display--xl fr-text-label--blue-cumulus fr-mb-3w d-block">1</span>
                         <h6>Une collectivité dépose sa demande d’aide concernant une friche.</h6>
                     </div>
                 </div>
                 <div class="fr-col-12 fr-col-md fr-m-2v">
-                    <div class="fr-p-2w fr-background-default--grey" style="height:100%">
-                        <div class="w-100 fr-p-2w fr-m-auto" style="max-width: 160px;">
+                    <div class="fr-p-3w fr-background-default--grey h-100">
+                        <div class="w-100 fr-p-3w fr-m-auto max-width">
                             <img src="{% static 'home/img/actors/form.png' %}"
                                  width="100%"
                                  height="100%"
                                  alt="Icone d'un fichier">
                         </div>
-                        <span class="fr-display--xl fr-text-label--blue-cumulus fr-mb-2w d-block">2</span>
+                        <span class="fr-display--xl fr-text-label--blue-cumulus fr-mb-3w d-block">2</span>
                         <h6>Les conseillers du territoire sont notifiés et consultent le projet.</h6>
                     </div>
                 </div>
                 <div class="fr-col-12 fr-col-md fr-m-2v">
-                    <div class="fr-p-2w fr-background-default--grey" style="height:100%">
-                        <div class="w-100 fr-p-2w fr-m-auto" style="max-width: 160px;">
+                    <div class="fr-p-3w fr-background-default--grey h-100">
+                        <div class="w-100 fr-p-3w fr-m-auto max-width">
                             <img src="{% static 'home/img/actors/community.png' %}"
                                  width="100%"
                                  height="100%"
                                  alt="Icone de communauté">
                         </div>
-                        <span class="fr-display--xl fr-text-label--blue-cumulus fr-mb-2w d-block">3</span>
+                        <span class="fr-display--xl fr-text-label--blue-cumulus fr-mb-3w d-block">3</span>
                         <h6>Ils proposent des recommandations via la plateforme.</h6>
                     </div>
                 </div>
                 <div class="fr-col-12 fr-col-md fr-m-2v">
-                    <div class="fr-p-2w fr-background-default--grey" style="height:100%">
-                        <div class="w-100 fr-p-2w fr-m-auto" style="max-width: 160px;">
+                    <div class="fr-p-3w fr-background-default--grey h-100">
+                        <div class="w-100 fr-p-3w fr-m-auto max-width">
                             <img src="{% static 'home/img/actors/progress.png' %}"
                                  width="100%"
                                  height="100%"
                                  alt="Icone de progrès">
                         </div>
-                        <span class="fr-display--xl fr-text-label--blue-cumulus fr-mb-2w d-block">4</span>
+                        <span class="fr-display--xl fr-text-label--blue-cumulus fr-mb-3w d-block">4</span>
                         <h6>La collectivité réagit sur les recommandations reçues.</h6>
                     </div>
                 </div>
                 <div class="fr-col-12 fr-col-md fr-m-2v">
-                    <div class="fr-p-2w fr-background-default--grey" style="height:100%">
-                        <div class="w-100 fr-p-2w fr-m-auto" style="max-width: 160px;">
+                    <div class="fr-p-3w fr-background-default--grey h-100">
+                        <div class="w-100 fr-p-3w fr-m-auto max-width">
                             <img src="{% static 'home/img/actors/form.png' %}"
                                  width="100%"
                                  height="100%"
                                  alt="Icone d'un fichier">
                         </div>
-                        <span class="fr-display--xl fr-text-label--blue-cumulus fr-mb-2w d-block">5</span>
+                        <span class="fr-display--xl fr-text-label--blue-cumulus fr-mb-3w d-block">5</span>
                         <h6>Le projet est mis à jour par tous les intervenants au fil de l’eau.</h6>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <div class="fr-py-6w" style="font-family: 'Marianne', arial, sans-serif;">
-        <div class="fr-container fr-pt-2w fr-pb-6w">
+    <div class="fr-py-6w">
+        <div class="fr-container fr-pt-3w fr-pb-6w">
             <div class="fr-m-auto">
                 <h3 class="text-center fr-pb-6w">A quoi les conseillers ont-ils accès ?</h3>
             </div>
@@ -151,14 +148,13 @@
                          alt="Image Liste des ressources déjà créées sur UrbanVitaliz"
                          aria-labelledby="custom-carousel-item-7">
                 </div>
-                <div class="fr-col-12 fr-col-md-5 fr-pl-0v fr-pl-md-4v">
+                <div class="fr-col-12 fr-col-md-5 fr-pl-0 fr-pl-md-4v">
                     <ul class="list-group list-group-flush custom-carousel-tabs "
                         id="list-tab"
                         role="tablist">
                         <li role="button"
-                            class="list-group-item list-group-item-action active d-flex justify-content-between align-items-center"
-                            id="custom-carousel-item-1"
-                            style="border-top: solid 1px #e3e3e3">
+                            class="list-group-item list-group-item-action active d-flex justify-content-between align-items-center border-style"
+                            id="custom-carousel-item-1">
                             <p class="fr-text--md">Descriptif détaillé de la friche et du projet</p>
                             <svg xmlns="http://www.w3.org/2000/svg"
                                  height="12"
@@ -241,8 +237,7 @@
                             </svg>
                         </li>
                         <li role="button"
-                            class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
-                            style="border-bottom: solid 1px #e3e3e3"
+                            class="list-group-item list-group-item-action d-flex justify-content-between align-items-center border-style"
                             id="custom-carousel-item-7">
                             <p class="fr-text--md">Liste des ressources déjà créées sur UrbanVitaliz</p>
                             <svg xmlns="http://www.w3.org/2000/svg"
@@ -260,19 +255,17 @@
             </div>
         </div>
     </div>
-    <div class="fr-background-alt--grey fr-py-4w"
-         style="font-family: 'Marianne', arial, sans-serif">
-        <div class="fr-container fr-pt-2w">
+    <div class="fr-background-alt--grey fr-py-4w">
+        <div class="fr-container fr-pt-3w">
             <div class="fr-grid-row fr-grid-row--gutters">
-                <div class="fr-col-12 fr-col-sm-3 text-center">
+                <div class="fr-col-12 fr-col-sm-3 text-center max-width">
                     <img src="{% static 'home/img/actors/human_cooperation.png' %}"
                          width="100%"
-                         style="max-width: 160px"
                          alt="Image coopération humaine">
                 </div>
                 <div class="fr-col-12 fr-col-sm-9 fr-text--lg">
                     <h3>Faire connaître UrbanVitaliz sur votre territoire</h3>
-                    <p class="fr-my-2w">
+                    <p class="fr-my-3w">
                         Pour avancer, un projet friche doit rassembler toutes les parties prenantes. Faites
                         connaître UrbanVitaliz à votre écosystème, lors de webinaires ou de rencontres locales !
                     </p>
@@ -290,10 +283,7 @@
             </div>
         </div>
     </div>
-    <div class="fr-py-8w border-bottom"
-         style="border-color:#E5E5E5 !important;
-                border-width: 1px !important;
-                font-family: 'Marianne', arial, sans-serif">
+    <div class="fr-py-8w border-bottom border-important">
         <div class="fr-container">
             <h3 class="fr-pb-4v">Portage politique, financement et contexte</h3>
             <div class="fr-mr-0v fr-mr-md-15w">
@@ -316,8 +306,7 @@
     </div>
     <div class="fr-container fr-mt-8v">
         <p class="fr-text--sm fr-mb-1v">Nos partenaires :</p>
-        <div class="fr-mt-2v fr-mb-4w fr-grid-row fr-grid-row--middle"
-             style="justify-content: center">
+        <div class="fr-mt-2v fr-mb-4w fr-grid-row fr-grid-row--middle justify-content-center">
             <div class="fr-col-6 fr-col-sm-3 fr-col-md-2 fr-pr-2v fr-pr-md-4v">
                 <img src="{% static 'img/partners/logo_cerema.png' %}"
                      width="100%"
@@ -374,4 +363,4 @@
         })
     })
     </script>
-{% endblock %}
+{% endblock content %}

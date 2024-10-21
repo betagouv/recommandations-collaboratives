@@ -1,5 +1,5 @@
 import Alpine from 'alpinejs';
-import mapUtils from '../utils/map/';
+import mapUtils from '../utils/map';
 
 function MapViewerStatic(projectOptions) {
   return {
@@ -31,7 +31,12 @@ function MapViewerStatic(projectOptions) {
     async initMap(project, geoData) {
       const options = mapUtils.mapOptions({ interactive: false });
 
-      var map = mapUtils.makeMap('map-static', project, options, this.zoom);
+      var map = await mapUtils.makeMap(
+        'map-static',
+        project,
+        options,
+        this.zoom
+      );
 
       let markers = mapUtils.initMarkerLayer(map, project, geoData);
       if (!markers || markers.length === 0) {

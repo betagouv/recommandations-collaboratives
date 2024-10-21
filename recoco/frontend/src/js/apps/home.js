@@ -1,4 +1,4 @@
 import '../components/ModalVideo';
 
-import '../components/DsrcFormValidatorActivate';
+import '../components/DsrcFormValidator';
 import '../components/AjvValidationSchema';

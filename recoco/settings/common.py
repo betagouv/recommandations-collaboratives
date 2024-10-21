@@ -11,11 +11,10 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
 import os
+from datetime import timedelta
 from pathlib import Path
 
 from multisite import SiteID
-from datetime import timedelta
-
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -41,6 +40,7 @@ INSTALLED_APPS = [
     "django.contrib.sites",
     "multisite",
     "reversion",
+    "reversion_compare",
     "django.contrib.admin",
     "hijack",
     "hijack.contrib.admin",
@@ -87,6 +87,7 @@ INSTALLED_APPS = [
     "recoco.apps.training",
     "recoco.apps.pages",
     "recoco.apps.metrics",
+    "recoco.apps.demarches_simplifiees",
     "crispy_forms",
     "wagtail.contrib.forms",
     "wagtail.contrib.redirects",
@@ -99,6 +100,8 @@ INSTALLED_APPS = [
     "wagtail.search",
     "wagtail.admin",
     "wagtail",
+    "django_celery_results",
+    "django_json_widget",
 ]
 
 SITE_ID = SiteID(default=1)
@@ -140,6 +143,7 @@ TEMPLATES = [
                 "django.contrib.messages.context_processors.messages",
                 "recoco.apps.projects.context_processors.is_switchtender_processor",
                 "recoco.apps.projects.context_processors.active_project_processor",
+                "recoco.apps.projects.context_processors.unread_notifications_processor",
             ],
             "loaders": [
                 "dbtemplates.loader.Loader",
@@ -148,7 +152,6 @@ TEMPLATES = [
             ],
             "libraries": {
                 "common_tags": "recoco.templatetags.common_extra",
-                "dsrc_tags": "recoco.apps.dsrc.templatetags.dsrc_tags",
             },
         },
     },
@@ -160,7 +163,7 @@ DBTEMPLATES_USE_CODEMIRROR = True
 # MULTISITE
 MULTISITE_DEFAULT_TEMPLATE_DIR = "default_site/"
 
-CRISPY_ALLOWED_TEMPLATE_PACKS = "dsrc_crispy_forms"
+CRISPY_ALLOWED_TEMPLATE_PACKS = ["dsrc_crispy_forms", "dsrc_crispy_forms_no_js"]
 CRISPY_TEMPLATE_PACK = "dsrc_crispy_forms"
 
 WSGI_APPLICATION = "recoco.wsgi.application"
@@ -348,6 +351,11 @@ REST_FRAMEWORK = {
         "rest_framework_xml.renderers.XMLRenderer",
     ],
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    "DEFAULT_FILTER_BACKENDS": [
+        "django_filters.rest_framework.DjangoFilterBackend",
+    ],
+    # "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
+    "PAGE_SIZE": 50,
 }
 
 # https://django-rest-framework-simplejwt.readthedocs.io/en/latest/settings.html
@@ -386,9 +394,50 @@ MATERIALIZED_VIEWS_SPEC = [
         "unique_indexes": ["hash"],
         "indexes": ["last_login", "is_advisor"],
     },
+    {
+        "name": "user_activity",
+        "indexes": ["user_hash"],
+    },
 ]
 
 MATERIALIZED_VIEWS_SQL_DIR = BASE_DIR / "apps/metrics/sql_queries"
-MATERIALIZED_VIEWS_PREFIX = "mv"
+
+# Baker
+# https://model-bakery.readthedocs.io/en/latest/how_bakery_behaves.html#customizing-baker
+BAKER_CUSTOM_CLASS = "recoco.tests.CustomBaker"
+
+# CELERY
+CELERY_TIMEZONE = "Europe/Paris"
+CELERY_TASK_TRACK_STARTED = True
+CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL", default="redis://localhost:6379/0")
+CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
+CELERY_RESULT_BACKEND = "django-db"
+
+
+# Metabase
+METABASE_HOST = os.environ.get("METABASE_HOST")
+METABASE_API_KEY = os.environ.get("METABASE_API_KEY")
+
+# Webhook
+INSTALLED_APPS += [
+    "django_webhook",
+    "recoco.apps.webhook",
+]
+DJANGO_WEBHOOK = {
+    "MODELS": [
+        "projects.Project",
+        "survey.Answer",
+        "taggit.TaggedItem",
+    ],
+    "SIGNAL_LISTENER": "recoco.apps.webhook.signals.WebhookSignalListener",
+    "USE_CACHE": False,
+}
+
+# Démarches simplifiées
+DS_BASE_URL = "https://www.demarches-simplifiees.fr"
+DS_API_BASE_URL = f"{DS_BASE_URL}/api/public/v1"
+DS_AUTOLOAD_SCHEMA = True
+DS_AUTOCREATE_FOLDER = True
+DS_ADAPTERS_DIR = BASE_DIR / "apps/demarches_simplifiees/adapters"
 
 # eof

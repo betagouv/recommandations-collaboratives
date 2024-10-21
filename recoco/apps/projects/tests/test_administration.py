@@ -28,7 +28,6 @@ from recoco.apps.projects import models as projects_models
 from recoco.apps.projects.utils import assign_advisor, assign_collaborator
 from recoco.utils import login
 
-
 from .. import models
 
 ########################################################################
@@ -37,8 +36,7 @@ from .. import models
 
 
 @pytest.mark.django_db
-def test_project_admin_not_available_for_unprivileged_users(request, client):
-    project = Recipe(models.Project, sites=[get_current_site(request)]).make()
+def test_project_admin_not_available_for_unprivileged_users(request, client, project):
     url = reverse("projects-project-administration", args=[project.id])
     with login(client):
         response = client.get(url)
@@ -148,29 +146,29 @@ def test_project_update_accessible_for_advisor(request, client):
 
 
 @pytest.mark.django_db
-def test_draft_project_update_not_accessible_for_collaborator(request, client):
+def test_draft_project_update_not_accessible_for_collaborator(
+    request, client, project_draft
+):
     commune = Recipe(geomatics.Commune, postal="12345").make()
-    project = Recipe(
-        models.Project, sites=[get_current_site(request)], commune=commune
-    ).make()
-    url = reverse("projects-project-administration", args=[project.id])
+
+    project_draft.commune = commune
+    project_draft.save()
+
+    url = reverse("projects-project-administration", args=[project_draft.id])
 
     with login(client) as user:
-        assign_collaborator(user, project)
+        assign_collaborator(user, project_draft)
         response = client.get(url)
 
     assert response.status_code == 403
 
 
 @pytest.mark.django_db
-def test_accepted_project_update_accessible_for_collaborator(request, client):
+def test_accepted_project_update_accessible_for_collaborator(request, client, project):
     commune = Recipe(geomatics.Commune, postal="12345").make()
-    project = Recipe(
-        models.Project,
-        sites=[get_current_site(request)],
-        commune=commune,
-        status="TO_PROCESS",
-    ).make()
+    project.commune = commune
+    project.save()
+
     url = reverse("projects-project-administration", args=[project.id])
 
     with login(client) as user:
@@ -197,12 +195,11 @@ def test_promote_referent_not_available_is_post_only(request, client):
 
 
 @pytest.mark.django_db
-def test_promote_referent_not_available_for_unprivileged_users(request, client):
-    site = get_current_site(request)
-    project = Recipe(models.Project, sites=[site]).make()
-
+def test_promote_referent_not_available_for_unprivileged_users(
+    request, client, project
+):
     crm_user = baker.make(auth_models.User)
-    crm_user.profile.sites.add(site)
+    crm_user.profile.sites.add(project.sites.first())
 
     baker.make(
         projects_models.ProjectMember, project=project, member=crm_user, is_owner=False
@@ -273,7 +270,7 @@ def test_promote_referent_available_for_advisor(request, client):
 
 
 @pytest.mark.django_db
-def test_owner_cannot_be_removed_from_project_acl(request, client):
+def test_owner_cannot_be_removed_from_project_acl(request, client, project):
     site = get_current_site(request)
 
     membership = baker.make(
@@ -284,12 +281,7 @@ def test_owner_cannot_be_removed_from_project_acl(request, client):
         member__email="coll@ab.fr",
     )
 
-    project = baker.make(
-        models.Project,
-        sites=[site],
-        projectmember_set=[membership],
-        status="READY",
-    )
+    project.projectmember_set.add(membership)
 
     url = reverse(
         "projects-project-access-collectivity-delete",
@@ -308,18 +300,15 @@ def test_owner_cannot_be_removed_from_project_acl(request, client):
 
 
 @pytest.mark.django_db
-def test_collaborator_can_remove_other_collaborator_from_project(request, client):
-    site = get_current_site(request)
+def test_collaborator_can_remove_other_collaborator_from_project(
+    request, client, project
+):
+
     collaborator = baker.make(
         auth_models.User,
         email="owner@ab.fr",
         username="owner@ab.fr",
     )
-    project = Recipe(
-        models.Project,
-        sites=[site],
-        status="READY",
-    ).make()
     assign_collaborator(collaborator, project)
 
     url = reverse(
@@ -339,13 +328,7 @@ def test_collaborator_can_remove_other_collaborator_from_project(request, client
 
 
 @pytest.mark.django_db
-def test_collaborator_can_remove_herself_project(request, client):
-    site = get_current_site(request)
-    project = Recipe(
-        models.Project,
-        sites=[site],
-        status="READY",
-    ).make()
+def test_collaborator_can_remove_herself_project(request, client, project):
 
     with login(client) as user:
         assign_collaborator(user, project, is_owner=False)
@@ -364,18 +347,14 @@ def test_collaborator_can_remove_herself_project(request, client):
 
 
 @pytest.mark.django_db
-def test_advisor_can_remove_collaborator_from_project(request, client):
+def test_advisor_can_remove_collaborator_from_project(request, client, project):
     site = get_current_site(request)
     collaborator = baker.make(
         auth_models.User,
         email="owner@ab.fr",
         username="owner@ab.fr",
     )
-    project = Recipe(
-        models.Project,
-        sites=[site],
-        status="READY",
-    ).make()
+
     assign_collaborator(collaborator, project)
 
     url = reverse(
@@ -394,18 +373,14 @@ def test_advisor_can_remove_collaborator_from_project(request, client):
 
 
 @pytest.mark.django_db
-def test_unassigning_a_collaborator_cleans_notifications(request, client):
+def test_unassigning_a_collaborator_cleans_notifications(request, client, project):
     site = get_current_site(request)
     collaborator = baker.make(
         auth_models.User,
         email="owner@ab.fr",
         username="owner@ab.fr",
     )
-    project = Recipe(
-        models.Project,
-        sites=[site],
-        status="READY",
-    ).make()
+
     assign_collaborator(collaborator, project)
 
     notify.send(
@@ -433,18 +408,14 @@ def test_unassigning_a_collaborator_cleans_notifications(request, client):
 
 
 @pytest.mark.django_db
-def test_staff_can_remove_collaborator_from_project(request, client):
-    site = get_current_site(request)
+def test_staff_can_remove_collaborator_from_project(request, client, project):
+
     collaborator = baker.make(
         auth_models.User,
         email="owner@ab.fr",
         username="owner@ab.fr",
     )
-    project = Recipe(
-        models.Project,
-        sites=[site],
-        status="READY",
-    ).make()
+
     assign_collaborator(collaborator, project)
 
     url = reverse(
@@ -462,17 +433,15 @@ def test_staff_can_remove_collaborator_from_project(request, client):
 
 
 @pytest.mark.django_db
-def test_unprivileged_user_cannot_remove_collaborator_from_project(request, client):
+def test_unprivileged_user_cannot_remove_collaborator_from_project(
+    request, client, project
+):
     collaborator = baker.make(
         auth_models.User,
         email="owner@ab.fr",
         username="owner@ab.fr",
     )
-    project = Recipe(
-        models.Project,
-        sites=[get_current_site(request)],
-        status="READY",
-    ).make()
+
     assign_collaborator(collaborator, project)
 
     url = reverse(
@@ -495,18 +464,14 @@ def test_unprivileged_user_cannot_remove_collaborator_from_project(request, clie
 
 
 @pytest.mark.django_db
-def test_collaborator_cannot_remove_advisor_from_project(request, client):
+def test_collaborator_cannot_remove_advisor_from_project(request, client, project):
     site = get_current_site(request)
     advisor = baker.make(
         auth_models.User,
         email="advisor@ab.fr",
         username="advisor@ab.fr",
     )
-    project = Recipe(
-        models.Project,
-        sites=[site],
-        status="READY",
-    ).make()
+
     assign_advisor(advisor, project, site)
 
     url = reverse(
@@ -525,18 +490,14 @@ def test_collaborator_cannot_remove_advisor_from_project(request, client):
 
 
 @pytest.mark.django_db
-def test_advisor_cannot_remove_advisor_from_project(request, client):
+def test_advisor_cannot_remove_advisor_from_project(request, client, project):
     site = get_current_site(request)
     advisor = baker.make(
         auth_models.User,
         email="advisor@ab.fr",
         username="advisor@ab.fr",
     )
-    project = Recipe(
-        models.Project,
-        sites=[site],
-        status="READY",
-    ).make()
+
     assign_advisor(advisor, project, site)
 
     url = reverse(
@@ -555,13 +516,8 @@ def test_advisor_cannot_remove_advisor_from_project(request, client):
 
 
 @pytest.mark.django_db
-def test_advisor_can_remove_herself_from_project(request, client):
+def test_advisor_can_remove_herself_from_project(request, client, project):
     site = get_current_site(request)
-    project = Recipe(
-        models.Project,
-        sites=[site],
-        status="READY",
-    ).make()
 
     with login(client) as user:
         assign_advisor(user, project, site)
@@ -579,13 +535,8 @@ def test_advisor_can_remove_herself_from_project(request, client):
 
 
 @pytest.mark.django_db
-def test_removing_advisor_cleans_notifications(request, client):
+def test_removing_advisor_cleans_notifications(request, client, project):
     site = get_current_site(request)
-    project = Recipe(
-        models.Project,
-        sites=[site],
-        status="READY",
-    ).make()
 
     with login(client) as user:
         assign_advisor(user, project, site)
@@ -612,13 +563,8 @@ def test_removing_advisor_cleans_notifications(request, client):
 
 
 @pytest.mark.django_db
-def test_removing_advisor_cleans_dashboard_entries(request, client):
+def test_removing_advisor_cleans_dashboard_entries(request, client, project):
     site = get_current_site(request)
-    project = Recipe(
-        models.Project,
-        sites=[site],
-        status="READY",
-    ).make()
 
     with login(client) as user:
         assign_advisor(user, project, site)
@@ -642,18 +588,14 @@ def test_removing_advisor_cleans_dashboard_entries(request, client):
 
 
 @pytest.mark.django_db
-def test_staff_can_remove_advisor_from_project_on_site(request, client):
+def test_staff_can_remove_advisor_from_project_on_site(request, client, project):
     site = get_current_site(request)
     advisor = baker.make(
         auth_models.User,
         email="advisor@ab.fr",
         username="advisor@ab.fr",
     )
-    project = Recipe(
-        models.Project,
-        sites=[site],
-        status="READY",
-    ).make()
+
     assign_advisor(advisor, project, site)
 
     url = reverse(
@@ -680,7 +622,7 @@ def test_staff_can_remove_advisor_from_project_on_site(request, client):
 
 
 @pytest.mark.django_db
-def test_staff_can_resend_advisor_invitation(request, client, mocker):
+def test_staff_can_resend_advisor_invitation(request, client, project, mocker):
     site = get_current_site(request)
     invited = baker.make(
         auth_models.User,
@@ -691,11 +633,6 @@ def test_staff_can_resend_advisor_invitation(request, client, mocker):
         auth_models.User,
         username="inviter@example.com",
         email="inviter@example.com",
-    )
-    project = baker.make(
-        models.Project,
-        sites=[site],
-        status="READY",
     )
 
     invite = baker.make(
@@ -722,7 +659,7 @@ def test_staff_can_resend_advisor_invitation(request, client, mocker):
 
 
 @pytest.mark.django_db
-def test_staff_can_resend_collaborator_invitation(request, client, mocker):
+def test_staff_can_resend_collaborator_invitation(request, client, mocker, project):
     site = get_current_site(request)
     invited = baker.make(
         auth_models.User,
@@ -733,11 +670,6 @@ def test_staff_can_resend_collaborator_invitation(request, client, mocker):
         auth_models.User,
         username="inviter@example.com",
         email="inviter@example.com",
-    )
-    project = baker.make(
-        models.Project,
-        sites=[site],
-        status="READY",
     )
 
     invite = baker.make(

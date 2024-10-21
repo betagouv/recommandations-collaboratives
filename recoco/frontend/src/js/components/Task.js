@@ -7,6 +7,11 @@ import { renderMarkdown } from '../utils/markdown';
 import { gravatar_url } from '../utils/gravatar';
 import { truncate } from '../utils/taskStatus';
 
+/**
+ * Represents a Task component.
+ * @param {Object} currentTask - The current task object.
+ * @returns {Object} - The Task component object.
+ */
 export default function Task(currentTask) {
   return {
     currentTask: null,
@@ -27,7 +32,7 @@ export default function Task(currentTask) {
       this.$dispatch('open-delete-modal', this.currentTask);
     },
     handleOpenPreviewModal() {
-      this.$store.previewModal.open(this.currentTask.id);
+      this.$store.previewModal.open(this.currentTask);
     },
     async onSetTaskPublic(task, value) {
       task.isLoading = true;

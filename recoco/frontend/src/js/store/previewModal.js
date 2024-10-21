@@ -1,10 +1,15 @@
 import Alpine from 'alpinejs';
-import api, { followupsUrl, taskNotificationsUrl } from '../utils/api';
+import api, {
+  followupsUrl,
+  markTaskNotificationAsVisited,
+  taskNotificationsUrl,
+} from '../utils/api';
 import { Modal } from 'bootstrap';
 
 document.addEventListener('alpine:init', () => {
   Alpine.store('previewModal', {
     taskId: null,
+    currentTask: null,
     handle: null,
     followups: null,
 
@@ -20,15 +25,14 @@ document.addEventListener('alpine:init', () => {
       return Alpine.store('tasksData').newTasks;
     },
 
-    async init() {
+    init() {
       const element = document.getElementById('task-modal');
       const body = document.querySelector('body');
       this.handle = new Modal(element);
 
-      const cleanup = async () => {
+      const cleanup = () => {
         location.hash = '';
-        await this.setTaskIsVisited();
-
+        Alpine.store('tasksView').updateView();
         // Restore scroll position
         window.scrollTo(0, this.scrollY);
       };
@@ -60,9 +64,10 @@ document.addEventListener('alpine:init', () => {
         this.open(parseInt(urlFromHash[1], 10));
       }
     },
-    open(taskId) {
+    open(task) {
       this.isPaginated = false;
-      this.setLocation(taskId);
+      this.setLocation(task.id);
+      this.visitTask(task);
       this.handle.show();
     },
 
@@ -70,6 +75,7 @@ document.addEventListener('alpine:init', () => {
       this.isPaginated = true;
       this.index = 0;
       this.setLocation(this.newTasks[this.index].id);
+      this.visitTask(this.newTasks[this.index]);
       this.handle.show();
     },
 
@@ -77,6 +83,7 @@ document.addEventListener('alpine:init', () => {
       if (this.index + 1 < this.newTasks.length) {
         this.index++;
         this.setLocation(this.newTasks[this.index].id);
+        this.visitTask(this.newTasks[this.index]);
       }
     },
 
@@ -84,6 +91,15 @@ document.addEventListener('alpine:init', () => {
       if (this.index > 0) {
         this.index--;
         this.setLocation(this.newTasks[this.index].id);
+        this.visitTask(this.newTasks[this.index]);
+      }
+    },
+    visitTask(task) {
+      this.currentTask = task;
+      this.taskId = task.id;
+
+      if (!this.currentTask.visited) {
+        this.setTaskIsVisited();
       }
     },
 
@@ -92,8 +108,8 @@ document.addEventListener('alpine:init', () => {
     },
     async loadFollowups() {
       const { data } = await api.get(followupsUrl(this.projectId, this.taskId));
+
       Alpine.store('tasksData').markAllAsRead(this.taskId);
-      await Alpine.store('tasksView').updateView();
       this.followups = data;
     },
     async loadNotifications() {
@@ -104,10 +120,9 @@ document.addEventListener('alpine:init', () => {
     },
     async setTaskIsVisited() {
       if (!Alpine.store('djangoData').isAdvisor) {
-        await Alpine.store('tasksData').patchTask(this.taskId, {
-          visited: true,
-        });
-        await Alpine.store('tasksView').updateView();
+        await api.post(
+          markTaskNotificationAsVisited(this.projectId, this.taskId)
+        );
       }
     },
   });

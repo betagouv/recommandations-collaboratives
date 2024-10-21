@@ -1,16 +1,16 @@
 from django.contrib.auth import models as auth_models
-from django.utils import timezone
 from django.contrib.contenttypes.models import ContentType
+from django.utils import timezone
 from generic_relations.relations import GenericRelatedField
 from notifications import models as notifications_models
 from ordered_model.serializers import OrderedModelSerializer
 from rest_framework import serializers
 
-from recoco.apps.projects.serializers import TopicSerializer
+from recoco.apps.demarches_simplifiees.serializers import DSFolderSerializer
 from recoco.apps.home.serializers import UserSerializer
-from recoco.apps.projects.serializers import DocumentSerializer
-from recoco.apps.resources.serializers import ResourceSerializer
+from recoco.apps.projects.serializers import DocumentSerializer, TopicSerializer
 from recoco.apps.projects.utils import get_collaborators_for_project
+from recoco.apps.resources.serializers import ResourceSerializer
 
 from .models import Task, TaskFollowup
 
@@ -86,6 +86,8 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer, OrderedModelSeriali
             "followups_count",
             "comments_count",
             "topic",
+            "site",
+            "ds_folder",
         ]
         read_only_fields = ["created_on", "updated_on", "created_by"]
 
@@ -99,6 +101,12 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer, OrderedModelSeriali
     followups_count = serializers.SerializerMethodField()
     comments_count = serializers.SerializerMethodField()
     topic = TopicSerializer(read_only=True)
+    ds_folder = DSFolderSerializer(read_only=True)
+
+    site = serializers.SerializerMethodField()
+
+    def get_site(self, obj):
+        return {"name": obj.site.name, "id": obj.site.id}
 
     def get_notifications(self, obj):
         request = self.context.get("request")

@@ -1,7 +1,7 @@
-from django import forms
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Fieldset
-
+from crispy_forms.layout import Fieldset, Layout
+from django import forms
+from taggit.forms import TagField, TagWidget
 
 """
 Base DSRC form:
@@ -19,7 +19,9 @@ class DsrcBaseForm(forms.Form):
         # If the widget is already set for a Field: merge the default `dsrc` attrs with the ones provided by the widget
         for field_name, field in self.fields.items():
             if isinstance(field, forms.CharField):
-                if isinstance(
+                if isinstance(field, TagField):
+                    field.widget = TagWidget()
+                elif isinstance(
                     field.widget,
                     (forms.Textarea, forms.PasswordInput, forms.EmailInput),
                 ):

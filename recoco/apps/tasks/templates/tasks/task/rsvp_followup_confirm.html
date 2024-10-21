@@ -12,15 +12,18 @@
     <link href="{% sass_src 'projects/css/project.scss' %}"
           rel="stylesheet"
           type="text/css">
-{% endblock %}
+    <link href="{% sass_src 'tasks/css/task/rsvp_followup.scss' %}"
+          rel="stylesheet"
+          type="text/css">
+{% endblock css %}
 {% block content %}
-    <div class="col-11 py-5 mx-auto">
-        <h2 class="mb-4">
+    <div class="col-12 fr-p-3w fr-mx-auto">
+        <h2 class="fr-mb-3w">
             <span class="align-middle">Mise à jour de votre avancement sur le projet {{ task.project.name }}</span>
         </h2>
-        <form id="form-rsvp-followup-confirm" class="form" method="POST" action=".">
+        <form id="form-rsvp-followup-confirm" class="form" method="post" action=".">
             {% csrf_token %}
-            <div class="d-flex flex-column p-4 bg-light rounded rounded-4 mb-4">
+            <div class="d-flex flex-column fr-p-3w bg-light rounded rounded-4 fr-mb-3w">
                 <div class="d-flex justify-content-between">
                     <span class="fs-3 flex-grow-1">
                         <svg class="align-middle bi"
@@ -43,16 +46,14 @@
                         </span>.
                     </span>
                 </span>
-                <button type="submit" class="ms-2 btn btn-primary btn-lg">Confirmer</button>
+                <button type="submit" class="fr-ml-2v btn btn-primary btn-lg">Confirmer</button>
             </div>
             <span class="text-secondary">Souhaitez-vous laisser un commentaire de suivi ?</span>
             <textarea name="comment"
-                      style="min-height: 100px;
-                             border-color: #ccc"
-                      class="w-100 p-2 rounded rounded-4 my-1 border"
+                      class="w-100 fr-p-2v rounded rounded-4 fr-my-1v border specific-bordercolor-ccc specific-minheight-100"
                       placeholder="Cette note est privée et ne sera consultée que par votre équipe et UrbanVitaliz"></textarea>
         </div>
     </form>
-    {% include 'projects/project/fragments/action_list_item.html' with task=task show_comments=True %}
+    {% include "projects/project/fragments/action_list_item.html" with task=task show_comments=True %}
 </div>
-{% endblock %}
+{% endblock content %}

@@ -35,6 +35,9 @@ Cypress.Commands.add('login', (role) => {
     case 'nonactive':
       username = users[8].fields.username;
       break;
+    case 'national':
+      username = users[7].fields.username;
+      break;
     default:
       break;
   }
@@ -114,7 +117,7 @@ Cypress.Commands.add('declineCookies', () => {
   cy.visit('/');
 });
 
-Cypress.Commands.add('createProject', (label) => {
+Cypress.Commands.add('createProject', (label, objProject = null) => {
   cy.visit('/');
 
   cy.get('[data-test-id="button-need-help"]')
@@ -125,14 +128,14 @@ Cypress.Commands.add('createProject', (label) => {
 
   cy.get('#id_name')
     .should('not.have.class', 'fr-input--error')
-    .type(label || project.name)
-    .should('have.value', label || project.name)
+    .type(label || objProject.name || project.name)
+    .should('have.value', label || objProject.name || project.name)
     .should('have.class', 'fr-input--valid');
 
   cy.get('#id_location')
     .should('not.have.class', 'fr-input--error')
-    .type(project.location)
-    .should('have.value', project.location)
+    .type(objProject.location || project.location)
+    .should('have.value', objProject.location || project.location)
     .should('have.class', 'fr-input--valid');
 
   cy.get('[data-test-id="input-postcode"]')
@@ -140,8 +143,8 @@ Cypress.Commands.add('createProject', (label) => {
     .should('not.have.class', 'fr-input-group--error');
 
   cy.get('[data-test-id="input-postcode"]')
-    .type(project.postcode)
-    .should('have.value', project.postcode)
+    .type(objProject.postcode || project.postcode)
+    .should('have.value', objProject.postcode || project.postcode)
     .parent()
     .should('have.class', 'fr-input-group--valid');
 
@@ -157,8 +160,8 @@ Cypress.Commands.add('createProject', (label) => {
 
   cy.get('#id_description')
     .should('not.have.class', 'fr-input--error')
-    .type(project.description)
-    .should('have.value', project.description)
+    .type(objProject.description || project.description)
+    .should('have.value', objProject.description || project.description)
     .should('have.class', 'fr-input--valid');
 
   cy.get('button[type="submit"]').click();
@@ -180,7 +183,7 @@ Cypress.Commands.add('becomeAdvisor', () => {
 
 Cypress.Commands.add(
   'createTask',
-  (label, topic = '', withResource = false) => {
+  (label, topic = '', withResource = false, draft = false) => {
     cy.get('body').then((body) => {
       if (body.find('[data-test-id="submit-task-button"]').length > 0) {
         cy.contains('Émettre une recommandation').click({
@@ -214,7 +217,13 @@ Cypress.Commands.add(
             .should('have.value', `${topic}`);
         }
 
-        cy.get('[type=submit]').click({ force: true });
+        if (draft) {
+          cy.get('[data-test-id="publish-draft-task-button"]')
+            .trigger('click')
+            .click();
+        } else {
+          cy.get('[type=submit]').click({ force: true });
+        }
 
         cy.url().should('include', '/actions');
 
@@ -232,7 +241,13 @@ Cypress.Commands.add(
           .type(`reco test from action description`, { force: true })
           .should('have.value', `reco test from action description`);
 
-        cy.get('[type=submit]').click({ force: true });
+        if (draft) {
+          cy.get('[data-test-id="publish-draft-task-button"]')
+            .trigger('click')
+            .click();
+        } else {
+          cy.get('[type=submit]').click({ force: true });
+        }
 
         cy.url().should('include', '/actions');
 

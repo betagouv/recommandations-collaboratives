@@ -1,6 +1,7 @@
 from django.contrib.contenttypes.models import ContentType
 from notifications import models as notifications_models
 from rest_framework import serializers
+from taggit.serializers import TagListSerializerField, TaggitSerializer
 
 from recoco import verbs
 from recoco.apps.geomatics.serializers import CommuneSerializer
@@ -8,7 +9,7 @@ from recoco.apps.home.serializers import UserSerializer
 from recoco.apps.tasks import models as task_models
 from recoco.utils import get_group_for_site
 
-from .models import Document, Note, Project, Topic, UserProjectStatus
+from .models import Document, Note, Project, ProjectSite, Topic, UserProjectStatus
 
 
 class DocumentSerializer(serializers.HyperlinkedModelSerializer):
@@ -28,44 +29,47 @@ class DocumentSerializer(serializers.HyperlinkedModelSerializer):
     uploaded_by = UserSerializer(read_only=True, many=False)
 
 
-class ProjectSerializer(serializers.HyperlinkedModelSerializer):
+class InlineProjectSiteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProjectSite
+        fields = ["id", "site", "is_origin", "status"]
+        read_only_fields = ["id", "site", "is_origin"]
+
+
+class ProjectSiteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProjectSite
+        fields = ["id", "project", "site", "is_origin", "status"]
+        read_only_fields = ["id", "project", "site", "is_origin"]
+
+
+class ProjectSerializer(TaggitSerializer, serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Project
         fields = [
             "id",
             "name",
-            "status",
+            "description",
             "inactive_since",
             "created_on",
             "updated_on",
             "org_name",
             "switchtenders",
-            "is_switchtender",
-            "is_observer",
             "commune",
-            "notifications",
+            "location",
             "recommendation_count",
             "public_message_count",
             "private_message_count",
+            "project_sites",
+            "tags",
         ]
 
     switchtenders = UserSerializer(read_only=True, many=True)
-    is_switchtender = serializers.SerializerMethodField()
-
-    def get_is_switchtender(self, obj):
-        # FIXME check that we should reduce switchteders to current site
-        request = self.context.get("request")
-        return request.user in obj.switchtenders.all()
-
-    is_observer = serializers.SerializerMethodField()
-
-    def get_is_observer(self, obj):
-        request = self.context.get("request")
-        return request.user.pk in obj.switchtenders_on_site.filter(
-            is_observer=True
-        ).values_list("switchtender__id", flat=True)
+    tags = TagListSerializerField()
 
     recommendation_count = serializers.SerializerMethodField()
+
+    project_sites = InlineProjectSiteSerializer(read_only=True, many=True)
 
     def get_recommendation_count(self, obj):
         return task_models.Task.on_site.published().filter(project=obj).count()
@@ -81,6 +85,30 @@ class ProjectSerializer(serializers.HyperlinkedModelSerializer):
         return Note.on_site.private().filter(project=obj).count()
 
     commune = CommuneSerializer(read_only=True)
+
+
+class UserProjectSerializer(ProjectSerializer):
+    class Meta(ProjectSerializer.Meta):
+        fields = ProjectSerializer.Meta.fields + [
+            "is_switchtender",
+            "is_observer",
+            "notifications",
+        ]
+
+    is_switchtender = serializers.SerializerMethodField()
+
+    def get_is_switchtender(self, obj):
+        # FIXME check that we should reduce switchteders to current site
+        request = self.context.get("request")
+        return request.user in obj.switchtenders.all()
+
+    is_observer = serializers.SerializerMethodField()
+
+    def get_is_observer(self, obj):
+        request = self.context.get("request")
+        return request.user.pk in obj.switchtender_sites.on_site().filter(
+            is_observer=True
+        ).values_list("switchtender__id", flat=True)
 
     notifications = serializers.SerializerMethodField()
 
@@ -137,8 +165,9 @@ class ProjectForListSerializer(serializers.BaseSerializer):
         return {
             "id": data.id,
             "name": data.name,
+            "description": data.description,
             "org_name": data.org_name,
-            "status": data.status,
+            "status": data.project_sites.current().status,
             "inactive_since": data.inactive_since,
             "created_on": data.created_on,
             "updated_on": data.updated_on,
@@ -146,7 +175,10 @@ class ProjectForListSerializer(serializers.BaseSerializer):
             "is_switchtender": data.is_switchtender,
             "is_observer": data.is_observer,
             "commune": commune_data,
+            "location": data.location,
             "notifications": data.notifications,
+            "project_sites": format_sites(data),
+            "tags": data.tags.names(),
         }
 
 
@@ -155,7 +187,7 @@ class UserProjectStatusSerializer(serializers.HyperlinkedModelSerializer):
         model = UserProjectStatus
         fields = ["id", "project", "status"]
 
-    project = ProjectSerializer(read_only=True)
+    project = UserProjectSerializer(read_only=True)
 
 
 class UserProjectStatusForListSerializer(serializers.BaseSerializer):
@@ -175,7 +207,7 @@ class UserProjectStatusForListSerializer(serializers.BaseSerializer):
                 "id": data.project.id,
                 "name": data.project.name,
                 "org_name": data.project.org_name,
-                "status": data.project.status,
+                "status": data.project.project_sites.current().status,
                 "created_on": data.project.created_on,
                 "updated_on": data.project.updated_on,
                 "switchtenders": format_switchtenders(data.project),
@@ -216,13 +248,25 @@ def format_switchtenders(project):
             "email": s.email,
             "profile": {
                 "organization": {
-                    "name": s.profile.organization.name
-                    if s.profile.organization
-                    else "",
+                    "name": (
+                        s.profile.organization.name if s.profile.organization else ""
+                    ),
                 }
             },
         }
         for s in project.switchtenders.all()
+    ]
+
+
+def format_sites(project):
+    return [
+        {
+            "id": ps.id,
+            "site": ps.site_id,
+            "is_origin": ps.is_origin,
+            "status": ps.status,
+        }
+        for ps in project.project_sites.all()
     ]
 
 

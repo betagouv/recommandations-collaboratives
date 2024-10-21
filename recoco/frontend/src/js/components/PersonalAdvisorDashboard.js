@@ -9,10 +9,12 @@ import 'leaflet-control-geocoder';
 import 'leaflet-providers';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-control-geocoder/dist/Control.Geocoder.css';
+import Fuse from 'fuse.js';
 
 function PersonalAdvisorDashboard() {
   return {
     data: [],
+    rawData: [],
     displayedData: [],
     nbNewProjects: 0,
     errors: null,
@@ -23,6 +25,7 @@ function PersonalAdvisorDashboard() {
     currentSort: this.sortProjectDate,
     search: '',
     select: '',
+    fuse: null,
     //departments
     departments: [],
     territorySelectAll: true,
@@ -37,13 +40,17 @@ function PersonalAdvisorDashboard() {
       this.handleBodyTopPaddingScroll(this.bodyScrollTopPadding);
     },
     async getData(currentUser) {
-      const projects = await this.$store.projects.getProjects();
+      const projects = await this.$store.projects.getUserProjetsStatus();
 
       this.nbNewProjects = projects.filter((p) => p.status === 'NEW').length;
 
       this.extractAndCreateAdvisorDepartments(projects);
       this.data = projects.map((project) => ({ ...project, isLoading: false }));
       this.data = this.createProjectListWithNewActivities(projects);
+      this.rawData = [...this.data];
+      this.fuse = new Fuse(this.rawData, {
+        keys: ['project.name', 'project.commune.name', 'project.commune.insee'],
+      });
 
       this.displayedData = this.data.sort(this.sortProjectDate);
       const { map, markersLayer } = initMap(projects);
@@ -200,6 +207,7 @@ function PersonalAdvisorDashboard() {
 
       return (this.departments = departments.sort(this.sortDepartments));
     },
+
     handleTerritorySelectAll() {
       this.territorySelectAll = !this.territorySelectAll;
 
@@ -237,7 +245,7 @@ function PersonalAdvisorDashboard() {
         (item) =>
           this.departments.find(
             (department) =>
-              department.code === item.project.commune.department.code
+              department.code === item.project.commune?.department?.code
           )?.active
       );
     },
@@ -427,7 +435,8 @@ function PersonalAdvisorDashboard() {
         projectUpdated.isLoading = true;
 
         await api.post(url.replace('0', id));
-        const updatedProjects = await this.$store.projects.getProjects();
+        const updatedProjects =
+          await this.$store.projects.getUserProjetsStatus();
 
         const updatedProject = updatedProjects.find(
           ({ project }) => project.id === id
@@ -533,10 +542,10 @@ function markerPopupTemplate(item) {
   }
 
   return `
-        <div class="dashboard-marker-popup ${item.status === 'NEW' && 'new-project'}" style="${item.status === 'NEW' ? 'border:solid 1px #FDCD6D' : 'border:solid 1px #222'}">
+        <div class="dashboard-marker-popup ${item.status === 'NEW' && 'new-project'} tmp-usevar" style="${item.status === 'NEW' ? 'border:solid 1px #FDCD6D' : 'border:solid 1px #222'}">
             ${roleTemplate != null ? roleTemplate : ''}
             <a class="text-nowrap project-link d-flex align-items-center" href="/project/${item.project.id}/presentation">
-                <span class="text-nowrap fw-bold title-info text-dark me-2 location">${item.project.commune.name}</span>
+                <span class="text-nowrap fw-bold title-info text-dark fr-mr-2v location">${item.project.commune.name}</span>
                 <span class="text-nowrap text-info-custom text-grey-dark name">${item.project.name}</span>
             </a>
         </div>

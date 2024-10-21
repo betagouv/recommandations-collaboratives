@@ -17,6 +17,7 @@ from django.core.management import call_command
 from django.test import override_settings
 from django.utils import timezone
 from model_bakery import baker
+
 from recoco.apps.home import models as home_models
 from recoco.apps.projects import models as projects_models
 from recoco.apps.projects.utils import assign_advisor, assign_collaborator
@@ -29,7 +30,7 @@ from .. import digests
 
 @pytest.mark.django_db
 @override_settings(BREVO_FORCE_DEBUG=True)
-def test_command_send_digest_executes_all_tasks(request, mocker, caplog):
+def test_command_send_digest_executes_all_tasks(request, mocker, caplog, make_project):
     caplog.set_level(logging.DEBUG)
 
     site = get_current_site(request)
@@ -42,9 +43,7 @@ def test_command_send_digest_executes_all_tasks(request, mocker, caplog):
     user = baker.make(auth_models.User, username="jdoe", email="jdoe@example.org")
     user.profile.sites.add(site)
 
-    project = baker.make(
-        projects_models.Project, name="A project", sites=[site], members=[user]
-    )
+    project = make_project(name="A project", site=site, members=[user])
     # FIXME(raph) pourquoi ne met pas aussi dans advisor group for site ?
     # 23/11/03: (glibersat) pas compris @raph
     assign_advisor(advisor, project, site)
@@ -143,12 +142,11 @@ def test_command_do_not_send_digest_to_deactivated_users(request, mocker, caplog
 #################################################################
 @pytest.mark.django_db
 @override_settings(BREVO_FORCE_DEBUG=True)
-def test_command_reminder_are_treated(request, mocker):
+def test_command_reminder_are_treated(request, mocker, project):
     current_site = get_current_site(request)
     baker.make(home_models.SiteConfiguration, site=current_site)
     user = baker.make(auth_models.User)
 
-    project = baker.make(projects_models.Project, sites=[current_site])
     assign_collaborator(user, project, is_owner=True)
 
     mocker.patch("recoco.apps.communication.digests.send_reminder_digests_by_project")
@@ -160,12 +158,11 @@ def test_command_reminder_are_treated(request, mocker):
 
 @pytest.mark.django_db
 @override_settings(BREVO_FORCE_DEBUG=True)
-def test_command_pending_recommendation_reminder_sent(request, mocker):
+def test_command_pending_recommendation_reminder_sent(request, mocker, project):
     current_site = get_current_site(request)
     baker.make(home_models.SiteConfiguration, site=current_site)
     user = baker.make(auth_models.User)
 
-    project = baker.make(projects_models.Project, sites=[current_site])
     assign_collaborator(user, project, is_owner=True)
 
     mocker.patch(
@@ -184,14 +181,13 @@ def test_command_pending_recommendation_reminder_sent(request, mocker):
 
 @pytest.mark.django_db
 @override_settings(BREVO_FORCE_DEBUG=True)
-def test_command_pending_reminder_sent_and_rescheduled(request, mocker):
+def test_command_pending_reminder_sent_and_rescheduled(request, mocker, make_project):
     current_site = get_current_site(request)
     baker.make(home_models.SiteConfiguration, site=current_site)
     user = baker.make(auth_models.User)
 
-    project = baker.make(
-        projects_models.Project,
-        sites=[current_site],
+    project = make_project(
+        site=current_site,
         last_members_activity_at=timezone.now() - datetime.timedelta(days=6 * 7),
     )
 
@@ -214,11 +210,11 @@ def test_command_pending_reminder_sent_and_rescheduled(request, mocker):
 
 @pytest.mark.django_db
 @override_settings(BREVO_FORCE_DEBUG=True)
-def test_command_pending_recommendation_reminder_not_send_if_no_owner(request, mocker):
+def test_command_pending_recommendation_reminder_not_send_if_no_owner(
+    request, mocker, project
+):
     current_site = get_current_site(request)
     baker.make(home_models.SiteConfiguration, site=current_site)
-
-    baker.make(projects_models.Project, sites=[current_site])
 
     mocker.patch(
         "recoco.apps.communication.digests.send_new_recommendations_reminders_digest_by_project"
@@ -235,14 +231,14 @@ def test_command_pending_recommendation_reminder_not_send_if_no_owner(request, m
 
 @pytest.mark.django_db
 @override_settings(BREVO_FORCE_DEBUG=True)
-def test_command_pending_reminders_not_sent_if_project_inactive(request, mocker):
+def test_command_pending_reminders_not_sent_if_project_inactive(
+    request, mocker, make_project
+):
     current_site = get_current_site(request)
     baker.make(home_models.SiteConfiguration, site=current_site)
     user = baker.make(auth_models.User)
 
-    project = baker.make(
-        projects_models.Project, sites=[current_site], inactive_since=timezone.now()
-    )
+    project = make_project(site=current_site, inactive_since=timezone.now())
     assign_collaborator(user, project, is_owner=True)
 
     mocker.patch(
@@ -260,12 +256,14 @@ def test_command_pending_reminders_not_sent_if_project_inactive(request, mocker)
 
 @pytest.mark.django_db
 @override_settings(BREVO_FORCE_DEBUG=True)
-def test_command_pending_reminders_not_sent_if_project_muted(request, mocker):
+def test_command_pending_reminders_not_sent_if_project_muted(
+    request, mocker, make_project
+):
     current_site = get_current_site(request)
     baker.make(home_models.SiteConfiguration, site=current_site)
     user = baker.make(auth_models.User)
 
-    project = baker.make(projects_models.Project, sites=[current_site], muted=True)
+    project = make_project(site=current_site, muted=True)
     assign_collaborator(user, project, is_owner=True)
 
     mocker.patch(

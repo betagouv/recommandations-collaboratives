@@ -12,6 +12,7 @@ import pytest
 from django.contrib.auth import models as auth
 from django.contrib.sites.shortcuts import get_current_site
 from model_bakery import baker
+
 from recoco import utils
 
 from .. import models
@@ -55,7 +56,7 @@ def test_advising_position_for_user_when_nothing(request):
     project = baker.make(models.Project, sites=[site])
     user = baker.make(auth.User)
     expected = {"is_observer": False, "is_advisor": False}
-    assert projects_extra.get_advising_position(user, project) == expected
+    assert projects_extra.get_advising_position(user, project, site) == expected
 
 
 @pytest.mark.django_db
@@ -71,7 +72,7 @@ def test_advising_position_for_user_when_advisor(request):
         is_observer=False,
     )
     expected = {"is_observer": False, "is_advisor": True}
-    assert projects_extra.get_advising_position(user, project) == expected
+    assert projects_extra.get_advising_position(user, project, site) == expected
 
 
 @pytest.mark.django_db
@@ -87,7 +88,7 @@ def test_advising_position_for_user_when_observer(request):
         is_observer=True,
     )
     expected = {"is_observer": True, "is_advisor": False}
-    assert projects_extra.get_advising_position(user, project) == expected
+    assert projects_extra.get_advising_position(user, project, site) == expected
 
 
 # eof

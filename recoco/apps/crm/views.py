@@ -6,16 +6,16 @@ created : 2022-07-20 12:27:25 CEST
 """
 
 import csv
-import datetime
 from collections import Counter, OrderedDict, defaultdict
+from datetime import datetime, timedelta
 
 from actstream import action
 from actstream.models import Action, actor_stream, target_stream
 from allauth.account.models import EmailAddress
 from allauth.account.utils import (
     filter_users_by_email,
-    setup_user_email,
     send_email_confirmation,
+    setup_user_email,
 )
 from django import forms as django_forms
 from django.contrib import messages
@@ -26,22 +26,28 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 from django.contrib.syndication.views import Feed
 from django.db import transaction
-from django.db.models import Count, Q
+from django.db.models import Count, ExpressionWrapper, F, FloatField, Max, Q, Value
+from django.db.models.functions import Cast
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render, reverse
+from django.urls import reverse_lazy
 from django.utils import timezone
 from django.utils.safestring import mark_safe
 from django.views.decorators.http import require_http_methods
 from django.views.generic.base import TemplateView
+from django.views.generic.edit import UpdateView
 from guardian.shortcuts import get_users_with_perms
 from notifications import models as notifications_models
 from notifications import notify
+from watson import search as watson
+
 from recoco import verbs
 from recoco.apps.addressbook import models as addressbook_models
 from recoco.apps.addressbook.models import Organization
 from recoco.apps.communication import api
 from recoco.apps.geomatics import models as geomatics
 from recoco.apps.home import models as home_models
+from recoco.apps.onboarding import utils as onboarding_utils
 from recoco.apps.projects.models import Project, Topic
 from recoco.apps.reminders import models as reminders_models
 from recoco.apps.tasks.models import Task
@@ -52,9 +58,9 @@ from recoco.utils import (
     has_perm_or_403,
     make_group_name_for_site,
 )
-from watson import search as watson
 
 from . import filters, forms, models
+from .forms import SiteConfigurationForm
 
 
 class CRMSiteDashboardView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
@@ -66,7 +72,9 @@ class CRMSiteDashboardView(LoginRequiredMixin, UserPassesTestMixin, TemplateView
     def get_context_data(self, *orgs, **kwargs):
         context = super().get_context_data(*orgs, **kwargs)
         context["search_form"] = forms.CRMSearchForm()
-        context["projects_waiting"] = Project.on_site.filter(status="DRAFT").count()
+        context["projects_waiting"] = Project.on_site.filter(
+            project_sites__status="DRAFT", project_sites__site=self.request.site
+        ).count()
         context["project_model"] = Project
         context["user_model"] = User
 
@@ -106,11 +114,6 @@ def crm_search(request):
     if search_form.is_valid():
         site = request.site
         query = search_form.cleaned_data["query"]
-        project_results = watson.filter(
-            Project.objects.filter(sites=request.site), query, ranking=True
-        )
-
-        search_results = list(project_results)
 
         all_sites_search_results = watson.search(
             query,
@@ -145,6 +148,25 @@ def crm_search(request):
         search_results = list(filter(filter_current_site, all_sites_search_results))
 
     return render(request, "crm/search_results.html", locals())
+
+
+########################################################################
+# tenancy
+########################################################################
+
+
+class SiteConfigurationUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    form_class = SiteConfigurationForm
+    template_name = "crm/siteconfiguration_update.html"
+    success_url = reverse_lazy("crm-site-dashboard")
+
+    def test_func(self):
+        return has_perm(
+            self.request.user, "sites.manage_configuration", self.request.site
+        )
+
+    def get_object(self, queryset=None):
+        return self.request.site.configuration
 
 
 ########################################################################
@@ -372,11 +394,11 @@ def user_update(request, user_id=None):
                         # a user with the new mail already exist
                         if request.site in users[0].profile.sites.all():  # on same site
                             user_link = reverse("crm-user-details", args=[users[0].pk])
-                            error_msg = mark_safe(
+                            error_msg = mark_safe(  # noqa: S308
                                 f'L\'utilisateur <a href="{user_link}">'
                                 f"{users[0].first_name} {users[0].last_name}</a>'"
                                 " utilise déjà cette adresse email."
-                            )
+                            )  # nosec
                             form.add_error(
                                 "username", django_forms.ValidationError(error_msg)
                             )
@@ -641,6 +663,8 @@ def project_details(request, project_id):
     project = get_object_or_404(Project.all_on_site, pk=project_id)
 
     site_config = get_site_config_or_503(request.site)
+
+    site_origin = project.project_sites.get(is_origin=True)
 
     actions = target_stream(project)
 
@@ -932,6 +956,63 @@ def crm_list_recommendation_without_resources(request):
 
 
 @login_required
+def crm_list_projects_with_low_reach(request):
+    """List projects that don't get a good impact"""
+    has_perm_or_403(request.user, "use_crm", request.site)
+
+    site_config = get_site_config_or_503(request.site)
+
+    search_form = forms.CRMSearchForm()
+
+    projects = (
+        Project.on_site.filter(
+            project_sites__status__in=("READY", "IN_PROGRESS", "DONE"),
+            project_sites__site=request.site,
+        )
+        .exclude(exclude_stats=True)
+        .prefetch_related("tasks", "notes")
+        .annotate(
+            reco_total=Count(
+                "tasks",
+                filter=Q(tasks__public=True, tasks__deleted=None),
+                distinct=True,
+            ),
+            reco_read=Count(
+                "tasks",
+                filter=Q(tasks__public=True, tasks__visited=True, tasks__deleted=None),
+                distinct=True,
+            ),
+        )
+        .exclude(reco_total=0)
+        .annotate(
+            reco_read_ratio=ExpressionWrapper(
+                Cast(F("reco_read"), FloatField()) / F("reco_total") * Value(100.0),
+                output_field=FloatField(),
+            ),  # Pc of unread reco
+            last_reco_at=Max("tasks__created_on", filter=Q(tasks__public=True)),
+            last_public_msg_at=Max(
+                "notes__created_on",
+                filter=Q(notes__public=True, notes__created_by__in=F("members__id")),
+            ),
+        )
+        .exclude(reco_read_ratio__gte=99.9)  # Not interested if everything was read
+        .exclude(
+            last_reco_at__lte=datetime.now()
+            - timedelta(days=site_config.reminder_interval)
+        )
+        .order_by(
+            "reco_read_ratio",
+            "last_members_activity_at",
+            "last_reco_at",
+            "last_public_msg_at",
+        )
+        .distinct()
+    )
+
+    return render(request, "crm/projects_low_reach.html", locals())
+
+
+@login_required
 def crm_list_tags(request):
     """Return a page containing all tags with their count"""
     has_perm_or_403(request.user, "use_crm", request.site)
@@ -971,7 +1052,7 @@ def compute_topics_occurences(site):
     project_topics = defaultdict(
         list,
         (
-            (topic.name, list(topic.projects.values_list("name", "id")))
+            (topic.name, list(topic.projects.all()))
             for topic in (
                 Topic.objects.filter(projects__sites=site, projects__deleted=None)
                 .prefetch_related("projects")
@@ -983,10 +1064,11 @@ def compute_topics_occurences(site):
     task_topics = defaultdict(
         list,
         (
-            (topic.name, list(topic.tasks.values_list("intent", "id", "project__id")))
+            (topic.name, list(topic.tasks.all()))
             for topic in (
                 Topic.objects.filter(tasks__site=site, tasks__deleted=None)
                 .prefetch_related("tasks")
+                .prefetch_related("tasks__project")
                 .distinct()
             )
         ),
@@ -1023,7 +1105,7 @@ def crm_list_topics_as_csv(request):
 
     topics = compute_topics_occurences(request.site)
 
-    today = datetime.datetime.today().date()
+    today = datetime.today().date()
 
     content_disposition = (
         f'attachment; filename="topics-for-projects-and-recos-{today}.csv"'
@@ -1050,8 +1132,8 @@ def crm_list_topics_as_csv(request):
             [
                 name,
                 usage[0],
-                [project[1] for project in usage[1]],
-                [task[1] for task in usage[2]],
+                [project.pk for project in usage[1]],
+                [task.pk for task in usage[2]],
             ]
         )
 
@@ -1088,7 +1170,7 @@ def project_list_by_tags_as_csv(request):
         .distinct()
     )
 
-    today = datetime.datetime.today().date()
+    today = datetime.today().date()
 
     content_disposition = f'attachment; filename="tags-for-projects-{today}.csv"'
     response = HttpResponse(
@@ -1142,6 +1224,48 @@ def projects_activity_feed(request):
     search_form = forms.CRMSearchForm()
 
     return render(request, "crm/projects_activity_feed.html", locals())
+
+
+################
+# Project Handover to another Site
+################
+
+
+@login_required
+def project_site_handover(request, project_id):
+    has_perm_or_403(request.user, "use_crm", request.site)
+
+    project = get_object_or_404(
+        Project,
+        Q(project_sites__site=request.site) & ~Q(project_sites__status="DRAFT"),
+        pk=project_id,
+    )
+
+    available_sites = (
+        (Site.objects.filter(configuration__accept_handover=True) | project.sites.all())
+        .distinct()
+        .order_by("name")
+    )
+
+    if request.method == "POST":
+        form = forms.ProjectHandover(request.POST)
+        if form.is_valid():
+            site = form.cleaned_data["site"]
+
+            project.project_sites.create(site=site, is_origin=False, status="DRAFT")
+            onboarding_utils.notify_new_project(
+                site=site, project=project, owner=project.owner
+            )
+
+            messages.add_message(
+                request,
+                messages.SUCCESS,
+                f"Le projet {project.name} a bien été proposé au portail '{site.name}'",
+            )
+
+            return redirect(reverse("crm-project-handover", args=(project.pk,)))
+
+    return render(request, "crm/project_site_handover.html", locals())
 
 
 ########################################################################

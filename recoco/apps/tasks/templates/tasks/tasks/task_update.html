@@ -8,14 +8,14 @@
     <link href="{% sass_src 'projects/css/push.scss' %}"
           rel="stylesheet"
           type="text/css">
-{% endblock %}
+{% endblock css %}
 {% block js %}
     <script src="https://cdn.jsdelivr.net/npm/minisearch@4.0.3/dist/umd/index.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/underscore@1.13.2/underscore-umd-min.js"></script>
     <script src="{% static 'projects/js/action_pusher.js' %}"></script>
-{% endblock %}
+{% endblock js %}
 {% block content %}
-    <div class="col-11 py-5 mx-auto">
+    <div class="col-12 fr-p-3w fr-mx-auto">
         <h1 class=" align-items-center">
             <svg class="bi" width="40" height="40" fill="currentColor">
                 <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#card-checklist" />
@@ -32,9 +32,9 @@
                       action="."
                       class="form">
                     {% csrf_token %}
-                    {% include 'projects/project/fragments/action_pusher/type.html' with disable_multi=True %}
-                    {% include 'projects/project/fragments/action_pusher/resource_search.html' %}
-                    {% include 'projects/project/fragments/action_pusher/details_form.html' with disable_draft=task.public %}
+                    {% include "projects/project/fragments/action_pusher/type.html" with disable_multi=True %}
+                    {% include "projects/project/fragments/action_pusher/resource_search.html" %}
+                    {% include "projects/project/fragments/action_pusher/details_form.html" with disable_draft=task.public %}
                     <input type="hidden" name="next" value="{{ form.next.value }}">
                     <input type="hidden" name="public" x-model="public">
                     {{ form.media }}
@@ -43,7 +43,7 @@
             <hr />
             <div class="d-flex justify-content-end">
                 <form id="form-project-delete-task"
-                      method="POST"
+                      method="post"
                       action="{% url 'projects-delete-task' task.id %}">
                     {% csrf_token %}
                     <button type="submit" class="btn btn-danger">
@@ -56,4 +56,4 @@
             </div>
         </section>
     </div>
-{% endblock %}
+{% endblock content %}

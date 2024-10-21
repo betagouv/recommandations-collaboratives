@@ -1,14 +1,18 @@
 {% extends "base.html" %}
 {% load static %}
-{% block title %}Examiner les recommandations suggérées automatiquement{% endblock %}
-{% block og_title %}Examiner les recommandations suggérées automatiquement{% endblock %}
+{% block title %}
+    Examiner les recommandations suggérées automatiquement
+{% endblock title %}
+{% block og_title %}
+    Examiner les recommandations suggérées automatiquement
+{% endblock og_title %}
 {% block content %}
-    <div class="col-11 py-5 mx-auto">
+    <div class="col-12 fr-p-3w fr-mx-auto">
         <h2>Recommandations suggérées</h2>
-        <p class="text-secondary mb-4">Nb de recos : {{ tasks|length }}</p>
+        <p class="text-secondary fr-mb-3w">Nb de recos : {{ tasks|length }} -- basé sur les signaux: {{ signals }}</p>
         {% for task in tasks %}
-            <p class="mb-4">{{ task.intent }}</p>
-            {% include 'projects/project/fragments/action_list_item.html' with hide_comments=True %}
+            <p class="fr-mb-3w">{{ task.intent }}</p>
+            {% include "projects/project/fragments/action_list_item.html" with hide_comments=True %}
         {% endfor %}
     </div>
-{% endblock %}
+{% endblock content %}

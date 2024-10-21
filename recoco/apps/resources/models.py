@@ -21,10 +21,12 @@ from django.dispatch import receiver
 from django.shortcuts import reverse
 from django.utils import timezone
 from markdownx.utils import markdownify
-from recoco.apps.addressbook import models as addressbook_models
-from recoco.apps.geomatics import models as geomatics_models
+from model_clone.models import CloneMixin
 from taggit.managers import TaggableManager
 from watson import search as watson
+
+from recoco.apps.addressbook import models as addressbook_models
+from recoco.apps.geomatics import models as geomatics_models
 
 from . import apps
 
@@ -142,7 +144,7 @@ class ResourceOnSiteManager(CurrentSiteManager, ResourceManagerWithQS):
     ),
     follow=("category",),
 )
-class Resource(models.Model):
+class Resource(CloneMixin, models.Model):
     """Représente une fiche ressource pour les utilisateur·ices"""
 
     DRAFT = 0
@@ -159,6 +161,13 @@ class Resource(models.Model):
     on_site = ResourceOnSiteManager()
 
     sites = models.ManyToManyField(Site)
+    site_origin = models.ForeignKey(
+        Site,
+        on_delete=models.SET_NULL,
+        related_name="authored_resources",
+        null=True,
+        verbose_name="site d'origine de la ressource",
+    )
 
     status = models.IntegerField(
         choices=STATUS_CHOICES, verbose_name="État", default=DRAFT
@@ -167,6 +176,10 @@ class Resource(models.Model):
     @property
     def public(self):
         return self.status >= self.TO_REVIEW
+
+    @property
+    def is_dsresource(self):
+        return self.dsresource_set.exists()
 
     created_on = models.DateTimeField(
         default=timezone.now, verbose_name="date de création"
@@ -225,6 +238,8 @@ class Resource(models.Model):
         return markdownify(self.content)
 
     deleted = models.DateTimeField(null=True, blank=True)
+
+    _clone_linked_m2m_fields = ["sites", "contacts", "departments"]
 
     class Meta:
         verbose_name = "ressource"

@@ -7,7 +7,6 @@ author  : raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created : 2021-05-26 15:54:25 CEST
 """
 
-
 from django.urls import path
 
 from . import views
@@ -23,6 +22,21 @@ from .views import (
 
 urlpatterns = [
     path(r"projects/", views.project_list, name="projects-project-list"),
+    path(
+        r"projects/moderation/",
+        views.project_moderation_list,
+        name="projects-moderation-list",
+    ),
+    path(
+        r"projects/moderation/<int:project_pk>/refuse",
+        views.project_moderation_refuse,
+        name="projects-moderation-refuse",
+    ),
+    path(
+        r"projects/moderation/<int:project_pk>/accept",
+        views.project_moderation_accept,
+        name="projects-moderation-accept",
+    ),
     # projects for switchtenders
     path(
         r"projects/advisor/",
@@ -92,6 +106,11 @@ urlpatterns = [
         name="projects-project-detail-actions",
     ),
     path(
+        r"project/<int:project_id>/recommandations/embed",
+        detail.project_recommendations_embed,
+        name="projects-project-detail-recommandations-embed",
+    ),
+    path(
         r"project/<int:project_id>/actions/inline",
         detail.project_actions_inline,
         name="projects-project-detail-actions-inline",
@@ -120,11 +139,6 @@ urlpatterns = [
         r"project/partage/<str:project_ro_key>/",
         sharing.project_detail_from_sharing_link,
         name="projects-project-sharing-link",
-    ),
-    path(
-        r"project/<int:project_id>/accept/",
-        views.project_accept,
-        name="projects-project-accept",
     ),
     path(
         r"project/<int:project_id>/delete/",

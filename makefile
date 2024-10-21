@@ -22,7 +22,7 @@ tags:
 	@find ./recoco -name \*.py | etags --language=python -
 
 nice:
-	pre-commit run --all-files ruff
+	pre-commit run --all-files
 
 lint:
 	pylint --django-settings-module=$(SETTINGS) $(which)
@@ -49,8 +49,13 @@ migrations:
 migrate:
 	./manage.py migrate
 
-safe:
-	pre-commit run --all-files bandit
+safe: nice
 	semgrep --config=p/ci recoco
+
+runserver:
+	@python manage.py runserver 0.0.0.0:8000
+
+runworker:
+	@celery -A recoco worker -l info --concurrency=1
 
 # eof

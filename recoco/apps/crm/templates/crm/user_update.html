@@ -8,25 +8,18 @@
 {% block og_title %}Modifier {{ crm_user.get_full_name }}{% endblock %}
 {% block js %}
     {% vite_asset 'js/apps/crm.js' %}
-{% endblock %}
+{% endblock js %}
 {% block css %}
     <link href="{% sass_src 'home/css/dsfr/marianne.css' %}"
           rel="stylesheet"
           type="text/css">
-    <style>
- html, body {
-     scroll-padding-top: 240px;
- }
-    </style>
-{% endblock %}
+{% endblock css %}
 {% block content %}
-    <div x-data="Crm"
-         class="d-flex px-0"
-         style="font-family: 'Marianne', arial, sans-serif">
+    <div x-data="Crm" class="d-flex fr-px-0">
         {% include "crm/fragments/sidebar.html" with search=True back_button=True user_advised_projects=False user_projects=False %}
         <div class="w-75 d-flex flex-column justify-content-start">
-            <div class="crm-header px-4 py-4 mb-3">
-                <div class="d-flex justify-content-between align-items-center mb-2">
+            <div class="crm-header fr-px-3w fr-py-3w fr-mb-2w">
+                <div class="d-flex justify-content-between align-items-center fr-mb-2v">
                     <h3>Gérer le compte « {{ crm_user.username }} »</h3>
                 </div>
                 {% if crm_user.is_active %}
@@ -38,18 +31,17 @@
                     <div class="alert alert-danger" role="alert">
                         Ce compte a été suspendu. Ceci signifie que la personne ne peut plus se connecter à {{ request.site.name }}.
                         Vous pouvez néanmoins le réactiver si vous le souhaitez.
-                        <div class="d-flex justify-content-end mt-2">
-                            <form method="POST" action="{% url 'crm-user-reactivate' crm_user.pk %}">
+                        <div class="d-flex justify-content-end fr-mt-2v">
+                            <form method="post" action="{% url 'crm-user-reactivate' crm_user.pk %}">
                                 {% csrf_token %}
-                                <button type="submit" class="btn btn-danger">
-                                Réactiver ce compte</a>
+                                <button type="submit" class="btn btn-danger">Réactiver ce compte</button>
                             </form>
                         </div>
                     </div>
                 {% endif %}
             </div>
-            <div class="px-4 pt-4 mb-3">
-                <span class="me-2">Type de compte</span>
+            <div class="fr-px-3w fr-pt-3w fr-mb-2w">
+                <span class="fr-mr-2v">Type de compte</span>
                 <div class="btn-group btn-group-sm">
                     {% if crm_user_is_advisor %}
                         <div class="dropdown">
@@ -88,7 +80,7 @@
                     {% endif %}
                 </div>
                 {% if crm_user_is_advisor %}
-                    <div class="mt-2">
+                    <div class="fr-mt-2v">
                         <i>Départements de conseil :</i>
                         {% for dpt in crm_user.profile.departments.all %}
                             {{ dpt }} ({{ dpt.code }})
@@ -100,11 +92,11 @@
                 {% endif %}
             </div>
             <hr />
-            <div class="px-4 pt-4 mb-3">
-                <form method="POST" action="{% url 'crm-user-update' crm_user.pk %}">
+            <div class="fr-px-3w fr-pt-3w fr-mb-2w">
+                <form method="post" action="{% url 'crm-user-update' crm_user.pk %}">
                     {% csrf_token %}
                     {{ form.non_field_errors }}
-                    <div class="input-group mb-3">
+                    <div class="input-group fr-mb-2w">
                         <label for="{{ form.username.name }}" class="col-sm-2 col-form-label">
                             Identifiant de connexion
                             <br />
@@ -121,7 +113,7 @@
                             {% endfor %}
                         </div>
                     </div>
-                    <div class="input-group mb-3">
+                    <div class="input-group fr-mb-2w">
                         <label for="{{ form.first_name.name }}" class="col-sm-2 col-form-label">Prénom</label>
                         <div class="col-sm-5">
                             <input type="text"
@@ -134,7 +126,7 @@
                             {% endfor %}
                         </div>
                     </div>
-                    <div class="input-group mb-3">
+                    <div class="input-group fr-mb-2w">
                         <label for="{{ form.last_name.name }}" class="col-sm-2 col-form-label">Nom</label>
                         <div class="col-sm-5">
                             <input type="text"
@@ -147,7 +139,7 @@
                             {% endfor %}
                         </div>
                     </div>
-                    <div class="input-group mb-3">
+                    <div class="input-group fr-mb-2w">
                         <label for="{{ form.phone_no.name }}" class="col-sm-2 col-form-label">Numéro de téléphone</label>
                         <div class="col-sm-5">
                             <input type="text"
@@ -161,7 +153,7 @@
                         </div>
                     </div>
                     <hr />
-                    <div class="input-group mb-3">
+                    <div class="input-group fr-mb-2w">
                         <label for="{{ form.organization.name }}" class="col-sm-2 col-form-label">Structure de rattachement</label>
                         <div class=" col-sm-5">
                             <select class="form-control{% if form.organization.errors %} is-invalid{% endif %}"
@@ -179,7 +171,7 @@
                             {% endfor %}
                         </div>
                     </div>
-                    <div class="input-group mb-3">
+                    <div class="input-group fr-mb-2w">
                         <label for="{{ form.organization_position.name }}"
                                class="col-sm-2 col-form-label">Rôle dans la structure</label>
                         <div class="col-sm-5">
@@ -199,4 +191,4 @@
             </div>
         </div>
     </div>
-{% endblock %}
+{% endblock content %}

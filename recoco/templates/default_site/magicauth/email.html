@@ -1,10 +1,10 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
-  <head>
-    <meta name="viewport" content="width=device-width" />
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <title>Connectez-vous à UrbanVitaliz ici</title>
-    <style>
+    <head>
+        <meta name="viewport" content="width=device-width" />
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>Connectez-vous à {{ request.site.name }} ici</title>
+        <style>
       /* -------------------------------------
           GLOBAL RESETS
       ------------------------------------- */
@@ -282,67 +282,63 @@
           background-color: #34495e !important;
           border-color: #34495e !important; } }
 
-    </style>
-  </head>
-  <body class="">
-    <table border="0" cellpadding="0" cellspacing="0" class="body">
-      <tr>
-        <td>&nbsp;</td>
-        <td class="container">
-          <div class="content">
-
-            <!-- START CENTERED WHITE CONTAINER -->
-            <table class="main">
-
-              <!-- START MAIN CONTENT AREA -->
-              <tr>
-                <td class="wrapper">
-                  <table border="0" cellpadding="6" cellspacing="0">
-                    <tr>
-                      <td>
-                        <p>Bonjour,</p>
-                        <p>Pour accéder à UrbanVitaliz, vous avez juste à cliquer sur ce bouton :</p>
-                        <table border="0" cellpadding="0" cellspacing="0" class="btn btn-primary">
-                          <tbody>
+        </style>
+    </head>
+    <body>
+        <table border="0" cellpadding="0" cellspacing="0" class="body">
+            <tr>
+                <td>&nbsp;</td>
+                <td class="container">
+                    <div class="content">
+                        <!-- START CENTERED WHITE CONTAINER -->
+                        <table class="main">
+                            <!-- START MAIN CONTENT AREA -->
                             <tr>
-                              <td align="center">
-                                <table border="0" cellpadding="0" cellspacing="0">
-                                  <tbody>
-                                    <tr>
-                                      <td align="center"> <a href="https://{{ site.domain }}{% url 'magicauth-wait' token.key %}?next={{ next_url|urlencode }}">Connexion</a> </td>
-                                    </tr>
-                                  </tbody>
-                                </table>
-                              </td>
+                                <td class="wrapper">
+                                    <table border="0" cellpadding="6" cellspacing="0">
+                                        <tr>
+                                            <td>
+                                                <p>Bonjour,</p>
+                                                <p>Pour accéder à {{ request.site.name }}, vous avez juste à cliquer sur ce bouton :</p>
+                                                <table border="0" cellpadding="0" cellspacing="0" class="btn btn-primary">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td align="center">
+                                                                <table border="0" cellpadding="0" cellspacing="0">
+                                                                    <tbody>
+                                                                        <tr>
+                                                                            <td align="center">
+                                                                                <a href="https://{{ site.domain }}{% url 'magicauth-wait' token.key %}?next={{ next_url|urlencode }}">Connexion</a>
+                                                                            </td>
+                                                                        </tr>
+                                                                    </tbody>
+                                                                </table>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                                <p>Ce lien n'est valable que 3 jours. Il est à usage unique.</p>
+                                                <hr>
+                                                <div>
+                                                    <p>Des difficultés pour vous connecter ?</p>
+                                                    <p>Nous vous recommandons de copier-coller ce lien dans un navigateur :</p>
+                                                    <p class= align-center">
+                                                        <strong>https://{{ site.domain }}{% url 'magicauth-wait' token.key %}?next={{ next_url|urlencode }}</strong>
+                                                    </p>
+                                                    <p>Bonne journée,</p>
+                                                    <p>L'équipe {{ request.site.name }}</p>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
                             </tr>
-                          </tbody>
+                            <!-- END MAIN CONTENT AREA -->
                         </table>
-                        <p>Ce lien n'est valable que 3 jours. Il est à usage unique.</p>
-                        <hr>
-                        <div>
-                          <p>Des difficultés pour vous connecter ?</p>
-                          <p>
-                            Nous vous recommandons de copier-coller ce lien dans un navigateur :
-                          </p>
-                          <p class="mb-6 align-center">
-                            <strong>
-                              https://{{ site.domain }}{% url 'magicauth-wait' token.key %}?next={{ next_url|urlencode }}
-                            </strong>
-                          </p>
-                          <p>Bonne journée,</p>
-                          <p>L'équipe UrbanVitaliz</p>
-                        </div>
-                      </td>
-                    </tr>
-                  </table>
+                        <!-- END CENTERED WHITE CONTAINER -->
+                    </div>
                 </td>
-              </tr>
-            <!-- END MAIN CONTENT AREA -->
-            </table>
-          <!-- END CENTERED WHITE CONTAINER -->
-          </div>
-        </td>
-      </tr>
-    </table>
-  </body>
+            </tr>
+        </table>
+    </body>
 </html>

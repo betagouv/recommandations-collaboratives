@@ -6,15 +6,21 @@ Views for resources application
 author  : raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created : 2021-06-16 10:59:08 CEST
 """
+
 import datetime
 
 import reversion
 from django import forms
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.contrib.auth.mixins import (
+    LoginRequiredMixin,
+    PermissionRequiredMixin,
+    UserPassesTestMixin,
+)
 from django.contrib.sites.shortcuts import get_current_site
 from django.contrib.syndication.views import Feed
+from django.db import transaction
 from django.db.models import Q
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
@@ -22,17 +28,18 @@ from django.template import TemplateDoesNotExist
 from django.template.loader import get_template
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
-from django.views.generic.detail import DetailView
+from django.views.generic.detail import DetailView, View
 from django.views.generic.edit import DeleteView
 from markdownx.fields import MarkdownxFormField
+from reversion.models import Version
+from reversion_compare.views import HistoryCompareDetailView
+
 from recoco.apps.addressbook import models as addressbook_models
 from recoco.apps.geomatics import models as geomatics_models
 from recoco.apps.projects import models as projects
 from recoco.utils import check_if_advisor, has_perm, has_perm_or_403, is_staff_for_site
-from reversion_compare.views import HistoryCompareDetailView
 
 from . import models
-
 
 ########################################################################
 # Searching resources
@@ -241,6 +248,18 @@ class EmbededResourceDetailView(BaseResourceDetailView):
     template_name = "resources/resource/details_embeded.html"
     pk_url_kwarg = "resource_id"
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        if task_id := self.request.GET.get("task_id"):
+            context["task"] = (
+                self.object.task_set.filter(pk=task_id)
+                .select_related("ds_folder")
+                .first()
+            )
+
+        return context
+
 
 ########################################################################
 # Deleting resources
@@ -253,19 +272,29 @@ class ResourceDeleteView(UserPassesTestMixin, DeleteView):
     success_url = reverse_lazy("resources-resource-search")
     pk_url_kwarg = "resource_id"
 
-    def delete(self, request, *args, **kwargs):
+    def form_valid(self, form):
         """
-        Call the delete() method on the fetched object and then redirect to the
-        success URL.
+        Dereference the current site from the resource.
+        When no more sites are referenced on the resource
+        then mark it as deleted.
+        Then redirect to the success URL.
         """
-        self.object = self.get_object()
+        resource = self.object
+
+        resource.sites.remove(self.request.site)
+
+        if resource.sites.count() == 0:
+            resource.deleted = timezone.now()
+            resource.save()
+
         success_url = self.get_success_url()
-        self.object.deleted = timezone.now()
-        self.object.save()
         return HttpResponseRedirect(success_url)
 
     def test_func(self):
-        return has_perm(self.request.user, "sites.manage_resources", self.request.site)
+        user_has_permissions = has_perm(
+            self.request.user, "sites.manage_resources", self.request.site
+        )
+        return user_has_permissions
 
 
 ########################################################################
@@ -279,18 +308,44 @@ def resource_update(request, resource_id=None):
     has_perm_or_403(request.user, "sites.manage_resources", request.site)
 
     resource = get_object_or_404(models.Resource, pk=resource_id)
-    next_url = reverse("resources-resource-detail", args=[resource.id])
+
     if request.method == "POST":
         form = EditResourceForm(request.POST, instance=resource)
+
         if form.is_valid():
-            resource = form.save(commit=False)
-            resource.updated_on = timezone.now()
+            needs_copy = (resource.site_origin != request.site) and (
+                resource.site_origin is not None
+            )
 
-            with reversion.create_revision():
-                reversion.set_user(request.user)
-                resource.save()
-                form.save_m2m()
+            if needs_copy:
+                with transaction.atomic():
+                    new_resource = resource.make_clone()
+                    form.instance = new_resource
 
+                    with reversion.create_revision():
+                        reversion.set_comment(
+                            f"Ressource dupliquée à l'écriture depuis {resource.site_origin.name}"
+                        )
+                        reversion.set_user(request.user)
+                        resource.updated_on = timezone.now()
+                        new_resource.site_origin = request.site
+                        new_resource.sites.clear()
+                        new_resource.sites.add(request.site)
+                        # new_resource.save()
+                        form.save()
+
+                    resource.sites.remove(request.site)
+
+            else:
+                with reversion.create_revision():
+                    resource = form.save(commit=False)
+                    resource.updated_on = timezone.now()
+                    resource.save()
+
+                    reversion.set_user(request.user)
+                    form.save_m2m()
+
+            next_url = reverse("resources-resource-detail", args=[form.instance.id])
             return redirect(next_url)
     else:
         form = EditResourceForm(instance=resource)
@@ -299,7 +354,9 @@ def resource_update(request, resource_id=None):
 
 @login_required
 def resource_create(request):
-    """Create new resource"""
+    """
+    Create new resource
+    """
     has_perm_or_403(request.user, "sites.manage_resources", request.site)
 
     if request.method == "POST":
@@ -307,6 +364,7 @@ def resource_create(request):
         if form.is_valid():
             resource = form.save(commit=False)
             resource.created_by = request.user
+            resource.site_origin = request.site
             with reversion.create_revision():
                 reversion.set_user(request.user)
                 resource.save()
@@ -382,6 +440,35 @@ class EditResourceForm(forms.ModelForm):
 
 
 # History/Reversion
+class ResourceHistoryRestoreView(LoginRequiredMixin, PermissionRequiredMixin, View):
+    permission_required = "sites.manage_resources"
+    http_method_names = ["post"]
+
+    def has_permission(self):
+        site = get_current_site(self.request)
+        return self.request.user.has_perm(self.permission_required, site)
+
+    def post(self, request, *args, **kwargs):
+        resource_id = self.kwargs.get("pk")
+
+        resource = get_object_or_404(models.Resource, pk=resource_id)
+
+        rev_id = self.kwargs.get("rev_pk")
+
+        version = get_object_or_404(Version.objects.get_for_object(resource), pk=rev_id)
+        with transaction.atomic(), reversion.create_revision():
+            version.revert()
+            reversion.set_user(request.user)
+            reversion.set_comment("Restauration de version")
+
+        messages.add_message(
+            request,
+            messages.SUCCESS,
+            f"La version du {version.revision.date_created} a bien été restaurée.",
+        )
+        return redirect(reverse("resources-resource-detail", args=(resource.pk,)))
+
+
 class ResourceHistoryCompareView(
     LoginRequiredMixin, PermissionRequiredMixin, HistoryCompareDetailView
 ):

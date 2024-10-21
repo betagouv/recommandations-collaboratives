@@ -13,10 +13,9 @@ init_django("recoco")
 # %%
 
 
-from recoco.apps.projects.models import Project
-
-
 from IPython.display import Image
+
+from recoco.apps.projects.models import Project
 
 # # Les composants
 
@@ -46,9 +45,8 @@ Image("models.png")
 # %%
 
 
-from django.template import Context, Template
 from IPython.display import HTML
-
+from django.template import Context, Template
 
 # %%
 

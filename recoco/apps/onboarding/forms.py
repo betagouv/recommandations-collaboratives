@@ -11,10 +11,11 @@ import os
 
 from captcha.fields import ReCaptchaField
 from captcha.widgets import ReCaptchaV2Checkbox
+from crispy_forms.layout import Fieldset, Layout
 from django import forms
-from crispy_forms.layout import Layout, Fieldset
-from recoco.apps.dsrc.forms import DsrcBaseForm
 from django.shortcuts import reverse
+
+from recoco.apps.dsrc.forms import DsrcBaseForm
 
 from . import models
 
@@ -169,7 +170,8 @@ class OnboardingSignupForm(DsrcBaseForm):
     first_name = forms.CharField(label="Prénom *", initial="", required=True)
     last_name = forms.CharField(label="Nom *", initial="", required=True)
     org_name = forms.CharField(
-        label="Nom de votre administration ou de votre entreprise  *",
+        label="Nom de votre organisation *",
+        help_text="Si vous êtes un particulier, indiquez votre nom. Votre administration, entreprise, association. Si vous êtes un particulier, écrivez 'Particulier'.",
         initial="",
     )
     role = forms.CharField(label="Fonction *", initial="", required=True)
@@ -226,11 +228,16 @@ class OnboardingProject(DsrcBaseForm):
             )
         )
 
-    name = forms.CharField(label="Nom du projet *", initial="", required=True)
-    location = forms.CharField(
-        label="Adresse *",
+    name = forms.CharField(
+        label="Nom du projet *",
+        initial="",
         required=True,
-        help_text="Si le projet n'a pas d'adresse exacte, donnez-nous une indication proche.",
+        help_text="Indiquez un nom court qui décrit le projet. Inutile d'ajouter le nom de la commune, l'adresse ou le programme.",
+    )
+    location = forms.CharField(
+        label="Adresse",
+        required=False,
+        help_text="Indiquez une adresse ou une indication pour localiser le lieu, ou laissez vide si ça n'est pas applicable.",
         initial="",
     )
     postcode = forms.CharField(label="Code postal *", initial="", required=True)
@@ -242,9 +249,10 @@ class OnboardingProject(DsrcBaseForm):
     )
 
     description = forms.CharField(
-        label="Description *",
+        label="Résumé du projet *",
         initial="",
         required=True,
+        help_text="Décrivez votre projet et son contexte en quelques mots.",
         widget=forms.Textarea(attrs={"rows": 3}),
     )
 
@@ -278,7 +286,8 @@ class PrefillSetuserForm(DsrcBaseForm):
     first_name = forms.CharField(label="Prénom *", initial="", required=True)
     last_name = forms.CharField(label="Nom *", initial="", required=True)
     org_name = forms.CharField(
-        label="Nom de votre administration ou de votre entreprise *",
+        label="Nom de votre organisation *",
+        help_text="Si vous êtes un particulier, indiquez votre nom. Votre administration, entreprise, association. Si vous êtes un particulier, écrivez 'Particulier'.",
         initial="",
     )
     role = forms.CharField(label="Fonction *", initial="", required=True)
@@ -336,10 +345,10 @@ class PrefillProjectForm(DsrcBaseForm):
         help_text="Indiquez un nom court qui décrit le projet. Inutile d'ajouter le nom de la commune, l'adresse ou le programme.",
     )
     location = forms.CharField(
-        label="Adresse *",
+        label="Adresse",
         initial="",
-        required=True,
-        help_text="Si le projet n'a pas d'adresse exacte, donnez-nous une indication proche.",
+        required=False,
+        help_text="Indiquez une adresse ou une indication pour localiser le lieu, ou laissez vide si ça n'est pas applicable.",
     )
     postcode = forms.CharField(label="Code postal", initial="", required=True)
 

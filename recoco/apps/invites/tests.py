@@ -15,11 +15,12 @@ from django.urls import reverse
 from django.utils import timezone
 from model_bakery import baker
 from model_bakery.recipe import Recipe
-from pytest_django.asserts import assertRedirects, assertNotContains, assertContains
+from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
+
 from recoco.apps.addressbook import models as addressbook_models
 from recoco.apps.home import models as home_models
 from recoco.apps.projects import models as projects_models
-from recoco.apps.projects.utils import assign_collaborator, assign_advisor
+from recoco.apps.projects.utils import assign_advisor, assign_collaborator
 from recoco.utils import has_perm, login
 
 from . import api, models
@@ -42,17 +43,11 @@ def test_email_is_always_lowercased_on_invite():
 # Invite API
 ################################################################
 @pytest.mark.django_db
-def test_invite_collaborator_api(request, client):
+def test_invite_collaborator_api(request, client, project):
     current_site = get_current_site(request)
     baker.make(home_models.SiteConfiguration, site=current_site)
 
     invited_email = "new@invited.org"
-
-    project = baker.make(
-        projects_models.Project,
-        sites=[current_site],
-        status="READY",
-    )
 
     with login(client) as user:
         invite = api.invite_collaborator_on_project(
@@ -67,17 +62,11 @@ def test_invite_collaborator_api(request, client):
 
 
 @pytest.mark.django_db
-def test_invite_collaborator_twice_api(request, client, mailoutbox):
+def test_invite_collaborator_twice_api(request, client, mailoutbox, project):
     current_site = get_current_site(request)
     baker.make(home_models.SiteConfiguration, site=current_site)
 
     invited_email = "new@invited.org"
-
-    project = baker.make(
-        projects_models.Project,
-        sites=[current_site],
-        status="READY",
-    )
 
     with login(client) as user:
         invite1 = api.invite_collaborator_on_project(
@@ -94,17 +83,11 @@ def test_invite_collaborator_twice_api(request, client, mailoutbox):
 
 
 @pytest.mark.django_db
-def test_invite_collaborator_but_already_member(request, client):
+def test_invite_collaborator_but_already_member(request, client, project):
     current_site = get_current_site(request)
     baker.make(home_models.SiteConfiguration, site=current_site)
 
     email = "invited@people.org"
-
-    project = baker.make(
-        projects_models.Project,
-        sites=[current_site],
-        status="READY",
-    )
 
     membership = baker.make(
         projects_models.ProjectMember,
@@ -127,17 +110,11 @@ def test_invite_collaborator_but_already_member(request, client):
 
 
 @pytest.mark.django_db
-def test_invite_collaborator_after_leaved_api(request, client):
+def test_invite_collaborator_after_leaved_api(request, client, project):
     current_site = get_current_site(request)
     baker.make(home_models.SiteConfiguration, site=current_site)
 
     invited_email = "new@invited.org"
-
-    project = baker.make(
-        projects_models.Project,
-        sites=[current_site],
-        status="READY",
-    )
 
     Recipe(
         models.Invite,
@@ -260,11 +237,13 @@ def test_accept_invite_returns_to_details_if_get(request, client):
 
 
 @pytest.mark.django_db
-def test_accept_invite_matches_existing_account(request, client):
+def test_accept_invite_matches_existing_account(request, client, project):
     current_site = get_current_site(request)
     baker.make(home_models.SiteConfiguration, site=current_site)
     with login(client) as user:
-        invite = Recipe(models.Invite, site=current_site, email=user.email).make()
+        invite = Recipe(
+            models.Invite, project=project, site=current_site, email=user.email
+        ).make()
         url = reverse("invites-invite-accept", args=[invite.pk])
         response = client.post(url)
 
@@ -274,19 +253,14 @@ def test_accept_invite_matches_existing_account(request, client):
 
 
 @pytest.mark.django_db
-def test_accept_invite_as_switchtender_triggers_notification(request, client):
+def test_accept_invite_as_switchtender_triggers_notification(request, client, project):
     current_site = get_current_site(request)
     baker.make(home_models.SiteConfiguration, site=current_site)
 
     membership = baker.make(
         projects_models.ProjectMember, member__is_staff=False, is_owner=True
     )
-    project = baker.make(
-        projects_models.Project,
-        sites=[current_site],
-        projectmember_set=[membership],
-        status="READY",
-    )
+    project.projectmember_set.add(membership)
 
     with login(client) as user:
         user.profile.sites.add(current_site)
@@ -305,19 +279,15 @@ def test_accept_invite_as_switchtender_triggers_notification(request, client):
 
 
 @pytest.mark.django_db
-def test_accept_invite_as_team_member_triggers_notification(request, client):
+def test_accept_invite_as_team_member_triggers_notification(request, client, project):
     current_site = get_current_site(request)
     baker.make(home_models.SiteConfiguration, site=current_site)
 
     membership = baker.make(
         projects_models.ProjectMember, member__is_staff=False, is_owner=True
     )
-    project = baker.make(
-        projects_models.Project,
-        sites=[current_site],
-        projectmember_set=[membership],
-        status="READY",
-    )
+
+    project.projectmember_set.add(membership)
 
     with login(client) as user:
         invite = Recipe(
@@ -362,8 +332,7 @@ def test_user_cannot_access_member_invitation_for_someone_else(
 
 @pytest.mark.django_db
 def test_logged_in_user_accepts_invite_advisor_with_matching_existing_account(
-    request,
-    client,
+    request, client, project
 ):
     current_site = get_current_site(request)
     baker.make(home_models.SiteConfiguration, site=current_site)
@@ -374,8 +343,7 @@ def test_logged_in_user_accepts_invite_advisor_with_matching_existing_account(
             site=current_site,
             role="SWITCHTENDER",
             email=user.email,
-            project__name="project",
-            project__location="here",
+            project=project,
         ).make()
         url = reverse("invites-invite-accept", args=[invite.pk])
         response = client.post(url)
@@ -385,7 +353,7 @@ def test_logged_in_user_accepts_invite_advisor_with_matching_existing_account(
     assert invite.accepted_on is not None
     assert current_site in user.profile.sites.all()
     assert user not in invite.project.members.all()
-    switchtending = invite.project.switchtenders_on_site.first()
+    switchtending = invite.project.switchtender_sites.first()
     assert user == switchtending.switchtender
     assert switchtending.is_observer is False
     assert has_perm(user, "view_project", invite.project)
@@ -393,8 +361,7 @@ def test_logged_in_user_accepts_invite_advisor_with_matching_existing_account(
 
 @pytest.mark.django_db
 def test_logged_in_user_accepts_invite_observer_with_matching_existing_account(
-    request,
-    client,
+    request, client, project
 ):
     current_site = get_current_site(request)
     baker.make(home_models.SiteConfiguration, site=current_site)
@@ -405,8 +372,7 @@ def test_logged_in_user_accepts_invite_observer_with_matching_existing_account(
             site=current_site,
             role="OBSERVER",
             email=user.email,
-            project__name="project",
-            project__location="here",
+            project=project,
         ).make()
         url = reverse("invites-invite-accept", args=[invite.pk])
         response = client.post(url)
@@ -416,7 +382,7 @@ def test_logged_in_user_accepts_invite_observer_with_matching_existing_account(
     assert invite.accepted_on is not None
     assert current_site in user.profile.sites.all()
     assert user not in invite.project.members.all()
-    switchtending = invite.project.switchtenders_on_site.first()
+    switchtending = invite.project.switchtender_sites.first()
     assert user == switchtending.switchtender
     assert switchtending.is_observer is True
     assert has_perm(user, "view_project", invite.project)
@@ -455,8 +421,7 @@ def test_user_cannot_access_switchtender_invitation_for_someone_else(
 
 @pytest.mark.django_db
 def test_logged_in_user_accepts_invite_collaborator_with_matching_existing_account(
-    request,
-    client,
+    request, client, project
 ):
     current_site = get_current_site(request)
     baker.make(home_models.SiteConfiguration, site=current_site)
@@ -466,8 +431,7 @@ def test_logged_in_user_accepts_invite_collaborator_with_matching_existing_accou
             role="COLLABORATOR",
             site=current_site,
             email=user.email,
-            project__name="project",
-            project__location="here",
+            project=project,
         ).make()
         url = reverse("invites-invite-accept", args=[invite.pk])
         response = client.post(url)
@@ -541,16 +505,14 @@ def test_anonymous_accepts_invite_with_existing_account_fails(
 
 
 @pytest.mark.django_db
-def test_anonymous_accepts_invite_as_switchtender(
-    request,
-    client,
-):
+def test_anonymous_accepts_invite_as_switchtender(request, client, project):
     current_site = get_current_site(request)
     baker.make(home_models.SiteConfiguration, site=current_site)
     invite = Recipe(
         models.Invite,
         role="SWITCHTENDER",
         site=current_site,
+        project=project,
         email="a@new.one",
     ).make()
 
@@ -568,7 +530,7 @@ def test_anonymous_accepts_invite_as_switchtender(
     invite = models.Invite.on_site.get(pk=invite.pk)
     assert invite.accepted_on is not None
     assert invite.project.members.count() == 0
-    assert invite.project.switchtenders_on_site.count() == 1
+    assert invite.project.switchtender_sites.count() == 1
 
     user = auth_models.User.objects.get(email=invite.email)
     assert user.username == invite.email
@@ -581,16 +543,14 @@ def test_anonymous_accepts_invite_as_switchtender(
 
 
 @pytest.mark.django_db
-def test_anonymous_accepts_invite_as_collaborator(
-    request,
-    client,
-):
+def test_anonymous_accepts_invite_as_collaborator(request, client, project):
     current_site = get_current_site(request)
     baker.make(home_models.SiteConfiguration, site=current_site)
     invite = Recipe(
         models.Invite,
         role="COLLABORATOR",
         site=current_site,
+        project=project,
         email="a@new.one",
     ).make()
 
@@ -608,7 +568,7 @@ def test_anonymous_accepts_invite_as_collaborator(
     invite = models.Invite.on_site.get(pk=invite.pk)
     assert invite.accepted_on is not None
     assert invite.project.members.count() == 1
-    assert invite.project.switchtenders_on_site.count() == 0
+    assert invite.project.switchtender_sites.count() == 0
 
     user = auth_models.User.objects.get(email=invite.email)
     assert user.username == invite.email
@@ -621,12 +581,15 @@ def test_anonymous_accepts_invite_as_collaborator(
 
 
 @pytest.mark.django_db
-def test_accepting_invitation_assigns_organization_to_current_site(request, client):
+def test_accepting_invitation_assigns_organization_to_current_site(
+    request, client, project
+):
     current_site = get_current_site(request)
     baker.make(home_models.SiteConfiguration, site=current_site)
     invite = Recipe(
         models.Invite,
         role="COLLABORATOR",
+        project=project,
         site=current_site,
         email="a@new.one",
     ).make()
@@ -648,13 +611,16 @@ def test_accepting_invitation_assigns_organization_to_current_site(request, clie
 
 
 @pytest.mark.django_db
-def test_accepting_invitation_updates_organization_with_current_site(request, client):
+def test_accepting_invitation_updates_organization_with_current_site(
+    request, client, project
+):
     current_site = get_current_site(request)
     baker.make(home_models.SiteConfiguration, site=current_site)
     invite = Recipe(
         models.Invite,
         role="COLLABORATOR",
         site=current_site,
+        project=project,
         email="a@new.one",
     ).make()
 
@@ -674,10 +640,7 @@ def test_accepting_invitation_updates_organization_with_current_site(request, cl
 
 
 @pytest.mark.django_db
-def test_logged_in_user_accepts_invite_but_is_already_member(
-    request,
-    client,
-):
+def test_logged_in_user_accepts_invite_but_is_already_member(request, client, project):
     current_site = get_current_site(request)
     baker.make(home_models.SiteConfiguration, site=current_site)
     with login(client, email="invited@here.tld") as user:
@@ -686,8 +649,7 @@ def test_logged_in_user_accepts_invite_but_is_already_member(
             role="COLLABORATOR",
             site=current_site,
             email=user.email,
-            project__name="project",
-            project__location="here",
+            project=project,
         ).make()
         assign_collaborator(user, invite.project, is_owner=False)
 

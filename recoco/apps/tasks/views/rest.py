@@ -16,6 +16,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from recoco.apps.projects import models as projects_models
+from recoco.apps.projects.utils import is_member
 from recoco.utils import has_perm, has_perm_or_403
 
 from .. import models, signals
@@ -52,7 +53,7 @@ class TaskViewSet(viewsets.ModelViewSet):
     API endpoint for project tasks
     """
 
-    queryset = models.Task.on_site
+    queryset = models.Task.objects
     serializer_class = TaskSerializer
     permission_classes = [permissions.IsAuthenticated, IsTaskViewerOrManagerToWrite]
 
@@ -117,6 +118,29 @@ class TaskViewSet(viewsets.ModelViewSet):
             return Response({"status": "insert below done"})
 
         return Response(status=status.HTTP_400_BAD_REQUEST)
+
+    @action(
+        methods=["post"],
+        detail=True,
+    )
+    def mark_visited(self, request, project_id, pk):
+        task = self.get_object()
+
+        has_perm_or_403(self.request.user, "projects.use_tasks", task.project)
+
+        if not task.public:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+
+        is_hijacked = getattr(request.user, "is_hijacked", False)
+
+        if (not is_hijacked) and is_member(
+            request.user, task.project, allow_draft=False
+        ):
+            task.visited = True
+            task.save()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+
+        return Response(status=status.HTTP_304_NOT_MODIFIED)
 
 
 ########################################################################
@@ -215,7 +239,7 @@ class TaskFollowupViewSet(viewsets.ModelViewSet):
 
         # also filter with project_id to ensure the given task and project are consistent
         return models.TaskFollowup.objects.filter(
-            task_id=task_id, task__site=self.request.site, task__project_id=project_id
+            task_id=task_id, task__project_id=project_id
         )
 
     def create(self, request, project_id, task_id):

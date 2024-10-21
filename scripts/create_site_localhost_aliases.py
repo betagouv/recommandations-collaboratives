@@ -6,8 +6,14 @@
 
 
 from django.contrib.sites.models import Site
+from django.core.exceptions import ValidationError
 
 for site in Site.objects.all():
     hostname = site.domain.split(".")[0]
     staging_fqdn = f"{hostname}.localhost"
-    site.aliases.create(domain=staging_fqdn, redirect_to_canonical=False)
+    print(f"Creating local alias '{staging_fqdn}' for site '{site.name}'")
+    try:
+        site.aliases.create(domain=staging_fqdn, redirect_to_canonical=False)
+        print("OK")
+    except ValidationError as _:
+        print("FAILED")

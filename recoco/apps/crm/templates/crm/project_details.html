@@ -4,27 +4,42 @@
 {% load django_vite %}
 {% block title %}
     {{ project.name }} - CRM
+    {{ project.name }} - CRM
 {% endblock title %}
 {% block og_title %}
     {{ project.name }} - CRM
 {% endblock og_title %}
 {% block js %}
     {% vite_asset 'js/apps/crm.js' %}
+    {% vite_asset 'js/apps/crm.js' %}
 {% endblock js %}
 {% block css %}
     <link href="{% sass_src 'home/css/dsfr/marianne.css' %}"
           rel="stylesheet"
           type="text/css" />
+    <link href="{% sass_src 'home/css/dsfr/marianne.css' %}"
+          rel="stylesheet"
+          type="text/css" />
 {% endblock css %}
 {% block content %}
-    <div x-data="Crm" class="d-flex px-0 crm-font">
+    <div x-data="Crm" class="d-flex fr-px-0 crm-font">
         {% include "crm/fragments/sidebar.html" with search=True back_button=True project_advisors=True project_members=True %}
         <div class="w-75 d-flex flex-column justify-content-start">
+            {% if request.site != site_origin.site %}
+                <div class="fr-notice fr-notice--info">
+                    <div class="fr-container">
+                        <div class="fr-notice__body">
+                            <span class="fr-notice__title">Il s'agit d'un projet provenant d'un autre portail ({{ site_origin.site.name }}).</span>
+                            <span class="fr-notice__description">Les notes de CRM ne sont pas partagées, vous ne verrez donc pas celles rédigées par les autres portails. Vous pouvez néanmoins en ajouter pour vous.</span>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
             {% if project.deleted %}
-                <div class="d-block mx-4">
-                    <div class="alert alert-danger mt-4" role="alert">
+                <div class="d-block fr-mx-3w">
+                    <div class="alert alert-danger fr-mt-3w" role="alert">
                         <span>Ce projet a été supprimé. Ceci signifie qu'il n'est plus visible sur {{ request.site.name }}. Vous pouvez néanmoins le réactiver si vous le souhaitez.</span>
-                        <div class="d-flex justify-content-end mt-2">
+                        <div class="d-flex justify-content-end fr-mt-2v">
                             <form method="post" action="{% url 'crm-project-undelete' project.pk %}">
                                 {% csrf_token %}
                                 <button type="submit" class="btn btn-danger">Réactiver ce projet</button>
@@ -33,82 +48,77 @@
                     </div>
                 </div>
             {% endif %}
-            {% if active_project %}
-                <div class="crm-header px-4 py-4 mb-3 d-flex justify-content-between align-items-center">
-                {% else %}
-                    <div class="crm-header no-project px-4 py-4 d-flex justify-content-between align-items-center">
-                    {% endif %}
-                    <div>
-                        <h3 class="d-flex mb-0 align-items-center">
-                            <svg class="bi me-2" width="16" height="16" fill="currentColor">
-                                <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#folder-fill" />
-                            </svg>
-                            <span>{{ project.name }}</span>
-                        </h3>
-                        <div class="mt-1 d-flex small">
-                            {% for tag in project.tags.all %}<span class="crm-project-tag mx-1">#{{ tag }}</span>{% endfor %}
-                        </div>
-                        <hr />
-                        <div class="d-flex align-items-center small">
-                            <fieldset class="fr-fieldset"
-                                      id="checkboxes-inline"
-                                      aria-labelledby="checkboxes-inline-legend">
-                                <legend class="crm-fieldset__legend--regular fr-fieldset__legend--regular fr-fieldset__legend"
-                                        id="checkboxes-inline-legend">Suivi de l'impact</legend>
-                                <div class="crm-group-checkbox">
-                                    {% with project.crm_annotations.tags.names as active_tags %}
-                                        {% for crm_tag in site_config.crm_available_tags.all %}
-                                            <form class="me-2"
-                                                  action="{% url 'crm-project-toggle-annotation' project.pk %}"
-                                                  method="post">
-                                                {% csrf_token %}
-                                                <input class="button"
-                                                       hidden
-                                                       name="tag"
-                                                       value="{{ crm_tag.name }}"
-                                                       id="id_tag" />
-                                                <div class="crm-form-check form-check form-check-inline">
-                                                    <input class="form-check-input"
-                                                           type="checkbox"
-                                                           name="checkbox-{{ crm_tag.name|slugify }}"
-                                                           onchange="document.getElementById('checkbox-{{ crm_tag.name|slugify }}').closest('form').submit()"
-                                                           id="checkbox-{{ crm_tag.name|slugify }}"
-                                                           {% if crm_tag.name in active_tags %}checked{% endif %}>
-                                                    <label class="form-check-label" for="checkbox-{{ crm_tag.name|slugify }}">{{ crm_tag.name| capfirst }}</label>
-                                                </div>
-                                            </form>
-                                        {% endfor %}
-                                    {% endwith %}
-                                </div>
-                            </fieldset>
-                        </div>
+            <div class="crm-header fr-px-3w fr-py-3w d-flex justify-content-between align-items-center{% if active_project %}fr-mb-2w {% endif %}">
+                <div>
+                    <h3 class="d-flex fr-mb-0 align-items-center">
+                        <svg class="bi fr-mr-2v" width="16" height="16" fill="currentColor">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#folder-fill" />
+                        </svg>
+                        <span>{{ project.name }}</span>
+                    </h3>
+                    <div class="fr-mt-1v d-flex flex-wrap small">
+                        {% for tag in project.tags.all %}<span class="crm-project-tag fr-mx-1v">#{{ tag }}</span>{% endfor %}
                     </div>
-                    <div>
-                        <a class="btn btn-primary" href="{{ project.get_absolute_url }}">
-                            <span>Voir le projet</span>
-                        </a>
-                        <a href="{% url 'crm-project-update' project.pk %}"
-                           class="btn btn-outline-secondary"
-                           aria-current="page">Gérer le projet</a>
+                    <hr />
+                    <div class="d-flex align-items-center small">
+                        <fieldset class="fr-fieldset"
+                                  id="checkboxes-inline"
+                                  aria-labelledby="checkboxes-inline-legend">
+                            <legend class="crm-fieldset__legend--regular fr-fieldset__legend--regular fr-fieldset__legend"
+                                    id="checkboxes-inline-legend">Suivi de l'impact</legend>
+                            <div class="crm-group-checkbox">
+                                {% with project.crm_annotations.tags.names as active_tags %}
+                                    {% for crm_tag in site_config.crm_available_tags.all %}
+                                        <form class="fr-mr-2v"
+                                              action="{% url 'crm-project-toggle-annotation' project.pk %}"
+                                              method="post">
+                                            {% csrf_token %}
+                                            <input class="button"
+                                                   hidden
+                                                   name="tag"
+                                                   value="{{ crm_tag.name }}"
+                                                   id="id_tag_{{ crm_tag.name|slugify }}" />
+                                            <div class="crm-form-check form-check form-check-inline">
+                                                <input class="form-check-input"
+                                                       type="checkbox"
+                                                       name="checkbox-{{ crm_tag.name|slugify }}"
+                                                       onchange="document.getElementById('checkbox-{{ crm_tag.name|slugify }}').closest('form').submit()"
+                                                       id="checkbox-{{ crm_tag.name|slugify }}"
+                                                       {% if crm_tag.name in active_tags %}checked{% endif %}>
+                                                <label class="form-check-label" for="checkbox-{{ crm_tag.name|slugify }}">{{ crm_tag.name| capfirst }}</label>
+                                            </div>
+                                        </form>
+                                    {% endfor %}
+                                {% endwith %}
+                            </div>
+                        </fieldset>
                     </div>
                 </div>
-                <div class="px-4 pt-4 crm-notes-wrapper">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <a class="btn btn-primary mb-4"
-                           href="{% url 'crm-project-note-create' project.pk %}">créer une note</a>
-                    </div>
-                    {% for note in sticky_notes.all %}
-                        {% include "crm/note.html" with pinned=True update_url_name="crm-project-note-update" get_user_profile=True %}
-                    {% endfor %}
-                    {% for note in notes.all %}
-                        {% include "crm/note.html" with update_url_name="crm-project-note-update" get_user_profile=True %}
-                    {% endfor %}
-                </div>
-                <div class="px-4 pt-4 bg-light crm-timeline-min-height">
-                    <h4>Activité</h4>
-                    {% include "crm/timeline.html" %}
+                <div>
+                    <a class="btn btn-primary" href="{{ project.get_absolute_url }}">
+                        <span>Voir le projet</span>
+                    </a>
+                    <a href="{% url 'crm-project-update' project.pk %}"
+                       class="btn btn-outline-secondary"
+                       aria-current="page">Gérer le projet</a>
                 </div>
             </div>
-        {% endblock content %}
+            <div class="fr-px-3w fr-pt-3w crm-notes-wrapper">
+                <div class="d-flex justify-content-between align-items-start">
+                    <a class="btn btn-primary fr-mb-3w"
+                       href="{% url 'crm-project-note-create' project.pk %}">créer une note</a>
+                </div>
+                {% for note in sticky_notes.all %}
+                    {% include "crm/note.html" with pinned=True update_url_name="crm-project-note-update" get_user_profile=True %}
+                {% endfor %}
+                {% for note in notes.all %}
+                    {% include "crm/note.html" with update_url_name="crm-project-note-update" get_user_profile=True %}
+                {% endfor %}
+            </div>
+            <div class="fr-px-3w fr-pt-3w bg-light crm-timeline-min-height">
+                <h4>Activité</h4>
+                {% include "crm/timeline.html" %}
+            </div>
+        </div>
     </div>
-</div>
+{% endblock content %}

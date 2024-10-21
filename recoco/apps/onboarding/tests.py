@@ -1,16 +1,17 @@
 import pytest
 from django.contrib.auth import models as auth
-from django.contrib.sites.shortcuts import get_current_site
 from django.contrib.sites.models import Site
+from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
 from model_bakery import baker
 from model_bakery.recipe import Recipe
+
 from recoco.apps.geomatics import models as geomatics
 from recoco.apps.home import models as home_models
-from recoco.apps.onboarding import models as onboarding_models
-from recoco.apps.survey import models as survey_models
-from recoco.apps.projects import models as projects_models
 from recoco.apps.invites import models as invites_models
+from recoco.apps.onboarding import models as onboarding_models
+from recoco.apps.projects import models as projects_models
+from recoco.apps.survey import models as survey_models
 from recoco.utils import login
 
 
@@ -242,7 +243,8 @@ def test_performing_onboarding_creates_a_new_project(request, client):
     project = projects_models.Project.on_site.first()
     assert project
     assert project.name == data["name"]
-    assert project.status == "DRAFT"
+    assert project.project_sites.current().status == "DRAFT"
+    assert project.project_sites.current().is_origin is True
     assert len(project.ro_key) == 32
 
 
@@ -535,7 +537,9 @@ def test_create_prefilled_project_creates_a_new_project(request, client):
     assert project.commune is not None
     assert project.description == project_data["description"]
 
-    assert project.status == "TO_PROCESS"
+    assert project.project_sites.current().status == "TO_PROCESS"
+    assert project.project_sites.current().is_origin is True
+
     assert len(project.ro_key) == 32
 
     # User
@@ -618,18 +622,19 @@ def test_prefill_project_with_survey_fills_it(request, client):
 
 
 @pytest.mark.django_db
-def test_selecting_proper_commune_completes_project_creation(request, client):
+def test_selecting_proper_commune_completes_project_creation(
+    request, client, make_project
+):
     commune = Recipe(geomatics.Commune, postal="12345").make()
     selected = Recipe(geomatics.Commune, postal="12345").make()
     membership = baker.make(
         projects_models.ProjectMember, member__is_staff=False, is_owner=True
     )
-    project = Recipe(
-        projects_models.Project,
-        sites=[get_current_site(request)],
+    project = make_project(
+        site=get_current_site(request),
         projectmember_set=[membership],
         commune=commune,
-    ).make()
+    )
 
     with login(client, user=membership.member):
         response = client.post(

@@ -1,10 +1,10 @@
+from django.contrib.auth.models import User
+from django.contrib.postgres.aggregates import ArrayAgg
+from django.contrib.sites.models import Site
 from django.db.models import BooleanField, Case, QuerySet, TextField, Value, When
 
-
-from django.contrib.auth.models import User
-from django.contrib.sites.models import Site
-
 from recoco.utils import make_group_name_for_site
+
 from ..utils import hash_field
 
 
@@ -23,7 +23,8 @@ def get_queryset(site_id: int) -> QuerySet:
                 When(groups__name=advisor_group_name, then=True),
                 default=False,
                 output_field=BooleanField(),
-            )
+            ),
+            advising_departments=ArrayAgg("profile__departments__code", distinct=True),
         )
         .annotate(
             is_site_staff=Case(
@@ -52,10 +53,11 @@ def get_queryset(site_id: int) -> QuerySet:
             "hash",
             "date_joined",
             "is_advisor",
+            "advising_departments",
             "advisor_scope",
             "is_site_staff",
             "last_login",
         )
         .order_by("hash")
-        .distinct("hash")
+        .distinct()
     )

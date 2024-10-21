@@ -7,6 +7,7 @@ authors: raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created: 2021-08-16 15:40:08 CEST
 """
 
+
 import django.core.mail
 from django.contrib import messages
 from django.contrib.auth import login as log_user
@@ -18,20 +19,20 @@ from django.shortcuts import redirect, render
 from django.utils.decorators import method_decorator
 from django.views.generic import View
 from django.views.generic.base import TemplateView
+
+from recoco.apps.onboarding.forms import OnboardingEmailForm
 from recoco.apps.projects import models as projects
 from recoco.apps.projects.utils import (
     can_administrate_project,
     get_active_project,
 )
-from recoco.apps.tasks import models as tasks
 from recoco.apps.resources import models as resources_models
+from recoco.apps.tasks import models as tasks
 from recoco.utils import check_if_advisor
 
 from . import models
 from .forms import ContactForm, UserPasswordFirstTimeSetupForm
 from .utils import get_current_site_sender_email
-
-from recoco.apps.onboarding.forms import OnboardingEmailForm
 
 
 class HomePageView(TemplateView):
@@ -106,11 +107,13 @@ class StatisticsView(TemplateView):
         staff_users = auth.User.objects.filter(is_staff=True)
         the_projects = projects.Project.on_site.exclude(
             Q(members__in=staff_users)
-            | Q(status="DRAFT")
-            | Q(status="STUCK")
             # FIXME ^ replace w/: | Q(status="STANDBY") -> OK
             | Q(exclude_stats=True)
+        ).exclude(
+            project_sites__site=self.request.site,
+            project_sites__status__in=["DRAFT", "STUCK"],
         )
+
         context = super().get_context_data(**kwargs)
         context["reco_following_pc"] = 78
         context["collectivity_supported"] = the_projects.count()
@@ -120,10 +123,12 @@ class StatisticsView(TemplateView):
             )
             .exclude(
                 Q(project__members__in=staff_users)
-                | Q(project__status="DRAFT")
-                | Q(project__status="STUCK")
                 # FIXME ^ replace w/: | Q(project__status="STANDBY")
                 | Q(project__exclude_stats=True)
+            )
+            .exclude(
+                project__project_sites__status__in=["DRAFT", "STUCK"],
+                project__project_sites__site=self.request.site,
             )
             .order_by("project_id")
             .values("project_id")
@@ -184,14 +189,14 @@ def send_message_to_team(request, data):
         name = data.get("name")
         email = data.get("email")
         content += f"\n\nfrom: {name} {email}"
-    content += "\nsource: " + request.META.get("HTTP_REFERER", "")
+    content += "\nsource: " + request.headers.get("referer", "")
 
     try:
         site_config = request.site.configuration
-    except models.SiteConfiguration.DoesNotExist:
+    except models.SiteConfiguration.DoesNotExist as exc:
         raise ImproperlyConfigured(
             f"Please create the SiteConfiguration for this site '{request.site}'"
-        )
+        ) from exc
 
     recipient = site_config.contact_form_recipient
 

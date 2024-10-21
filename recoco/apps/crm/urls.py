@@ -43,6 +43,17 @@ urlpatterns = [
         views.crm_list_recommendation_without_resources,
         name="crm-reco-without-resources",
     ),
+    path(
+        r"crm/low-reach-projects",
+        views.crm_list_projects_with_low_reach,
+        name="crm-list-projects-low-reach",
+    ),
+    # tenancy
+    path(
+        "crm/site_config",
+        views.SiteConfigurationUpdateView.as_view(),
+        name="crm-site-configuration",
+    ),
     #
     # users
     path(
@@ -183,6 +194,11 @@ urlpatterns = [
         r"crm/project/<int:project_id>/note/<int:note_id>",
         views.update_note_for_project,
         name="crm-project-note-update",
+    ),
+    path(
+        r"crm/project/<int:project_id>/handover",
+        views.project_site_handover,
+        name="crm-project-handover",
     ),
     path(
         r"crm/projects/by_tags",

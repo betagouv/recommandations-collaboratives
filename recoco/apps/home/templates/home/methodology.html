@@ -7,24 +7,20 @@
     <link href="{% sass_src 'home/css/home/home.scss' %}"
           rel="stylesheet"
           type="text/css">
-{% endblock %}
+    <link href="{% sass_src 'home/css/methodology/methodology.scss' %}"
+          rel="stylesheet"
+          type="text/css">
+{% endblock css %}
 {% block content %}
-    <div class="col-8 py-3 g-0 mx-auto" style="margin-top: 40px;">
+    <div class="col-8 fr-py-2w g-0 fr-mx-auto fr-mt-6w">
         <h2>Quelle étape vous intéresse ?</h2>
         <p>Pour mener votre projet de revitalisation de friche, nous vous proposons d'explorer cette approche en 4 étapes</p>
-        <div style="width: 100%;">
-            <div style="position: relative;
-                        padding-bottom: 56.25%;
-                        padding-top: 0;
-                        height: 0">
+        <div class="w-100">
+            <div class="position-relative fr-pt-0 methodo-div-position">
                 <iframe frameborder="0"
                         width="1200"
                         height="675"
-                        style="position: absolute;
-                               top: 0;
-                               left: 0;
-                               width: 100%;
-                               height: 100%"
+                        class="position-absolute top-0 start-0 w-100 h-100"
                         src="https://view.genial.ly/60e8451c062c5d0dc40864c0"
                         type="text/html"
                         allowscriptaccess="always"
@@ -48,4 +44,4 @@
             </ul>
         </p>
     </div>
-{% endblock %}
+{% endblock content %}

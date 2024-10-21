@@ -27,7 +27,7 @@
     {% vite_asset 'js/apps/map.js' %}
     {% vite_asset 'js/apps/boardProjects.js' %}
     {% leaflet_js %}
-{% endblock %}
+{% endblock js %}
 {% block css %}
     <link href="{% sass_src 'projects/css/board.scss' %}"
           rel="stylesheet"
@@ -48,134 +48,15 @@
           crossorigin="" />
     <link rel="stylesheet"
           href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
-{% endblock %}
+{% endblock css %}
 {% block content %}
     {% get_obj_perms request.user for request.site as "user_site_perms" %}
-    <div class="col-11 py-5 mx-auto">
-        <div class="row">
-            <div class="d-flex flex-column border p-0 m-0">
-                {% block project_list_content %}{% endblock %}
+    <div class="col-12 fr-p-3w fr-mx-auto">
+        <div class="row fr-mx-0">
+            <div class="d-flex flex-column fr-p-0 fr-m-0">
+                {% block project_list_content %}
+                {% endblock project_list_content %}
             </div>
         </div>
-        {% if unread_notifications.count %}
-            <div class="col-12 bg-light p-2 border-top">
-                <h4>
-                    <svg class="align-middle bi"
-                         width="20px"
-                         height="20px"
-                         fill="currentColor">
-                        <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#bell" />
-                    </svg>
-                    <span class="align-middle">Notifications</span>
-                </h4>
-                <ul class="w-100 list-unstyled">
-                    {% for notification in unread_notifications.all %}
-                        <li class="d-flex flex-columns my-3">
-                            {% if notification.actor %}
-                                <div class="align-middle mx-2 flex-shrink">
-                                    <img class="rounded-circle"
-                                         src="{% gravatar_url notification.actor.email size=24 %}"
-                                         alt="{{ notification.actor }}">
-                                </div>
-                            {% endif %}
-                            <div class=" flex-row flex-grow-1">
-                                <div class="flex-grow w-100 flex-grow-1">
-                                    {% if notification.actor %}
-                                        <span class="actor">
-                                            {{ notification.actor.first_name|default:notification.actor.email }}
-                                            {{ notification.actor.last_name|default:"" }}
-                                        </span>
-                                    {% else %}
-                                        <span class="actor">(compte supprimé)</span>
-                                    {% endif %}
-                                    <span class="verb">
-                                        <strong>{{ notification.verb }}</strong> sur
-                                    </span>
-                                    <span class="target">
-                                        <a href="{{ notification.target.get_absolute_url }}">{{ notification.target }}</a>
-                                    </span>
-                                    <span class="ms-1 small text-secondary">il y a {{ notification.timestamp|timesince }}</span>
-                                </div>
-                                {% if notification.action_object.resource %}
-                                    <div class="border p-2 rounded bg-white w-100">{{ notification.action_object.resource.title }}</div>
-                                {% endif %}
-                                {% if notification.action_object.comment %}
-                                    <div class="border p-2 rounded bg-white w-100">
-                                        "{{ notification.action_object.comment }}" à propos de <a href=" {{ notification.action_object.task.get_absolute_url }}">{{ notification.action_object.task }}</a>
-                                    </div>
-                                {% endif %}
-                            </div>
-                        </li>
-                    {% endfor %}
-                </ul>
-            </div>
-        {% endif %}
-        {% if project_moderator %}
-            <div class="row mx-auto mt-4">
-                <div class="col-12 mx-auto">
-                    <h3 id="draft-projects">Projets en attente d'acceptation</h3>
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>Date de création</th>
-                                <th>Nom</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for project in draft_projects %}
-                                <tr>
-                                    <td>
-                                        {{ project.created_on }}
-                                        <br />
-                                        <span class="text-secondary small">({{ project.created_on|naturaltime }})</span>
-                                    </td>
-                                    <td>
-                                        <a href="{% url 'projects-project-detail' project.id %}">{{ project.name|capfirst }}</a>
-                                        <br />
-                                        <span class="text-secondary">{{ project.location }}</span>
-                                        {% if project.commune %}
-                                            <br />
-                                            <span class="text-secondary small">{{ project.commune.postal }}, {{ project.commune.name }}</span>
-                                            <br />
-                                            <span class="text-secondary small">INSEE: {{ project.commune.insee }}</span>
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        {% if "moderate_projects" in user_site_perms %}
-                                            <div class="btn-group" role="group" aria-label="actions">
-                                                <form method="POST" action="{% url "projects-project-accept" project.id %}">
-                                                    {% csrf_token %}
-                                                    <button class="btn btn-primary btn-sm">
-                                                        <svg class="bi" width="16" height="16" fill="currentColor">
-                                                            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#check2-circle" />
-                                                        </svg>
-                                                        Accepter
-                                                    </button>
-                                                </form>
-                                                &nbsp;
-                                                <form method="POST" action="{% url "projects-project-delete" project.id %}">
-                                                    {% csrf_token %}
-                                                    <button class="btn btn-secondary btn-sm">
-                                                        <svg class="bi" width="16" height="16" fill="currentColor">
-                                                            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#x-circle" />
-                                                        </svg>
-                                                        Supprimer
-                                                    </button>
-                                                </form>
-                                            </div>
-                                        {% endif %}
-                                    </td>
-                                </tr>
-                            {% empty %}
-                                <tr>
-                                    <td colspan="5">Rien à faire ici.</td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        {% endif %}
     </div>
-{% endblock %}
+{% endblock content %}

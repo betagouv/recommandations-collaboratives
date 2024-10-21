@@ -8,17 +8,18 @@ created : 2022-11-28 14:14:20 CEST
 """
 
 from django.contrib import messages
-from django.db.utils import IntegrityError
 from django.contrib.auth.decorators import login_required
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import PermissionDenied
+from django.db.utils import IntegrityError
 from django.shortcuts import get_object_or_404, redirect, render, reverse
 from django.utils import timezone
+
 from recoco.utils import has_perm_or_403
 
 from .. import models, signals
 from ..forms import DocumentUploadForm
-from ..utils import set_active_project_id, get_collaborators_for_project
+from ..utils import get_collaborators_for_project, set_active_project_id
 
 
 @login_required
@@ -31,11 +32,11 @@ def document_list(request, project_id=None):
     # Set this project as active
     set_active_project_id(request, project.pk)
 
-    all_files = models.Document.on_site.filter(project_id=project.pk).exclude(
+    all_files = models.Document.objects.filter(project_id=project.pk).exclude(
         the_file__in=["", None]
     )
     pinned_files = all_files.filter(pinned=True)
-    links = models.Document.on_site.filter(project_id=project.pk).exclude(the_link=None)
+    links = models.Document.objects.filter(project_id=project.pk).exclude(the_link=None)
 
     # Mark this project document notifications as read
     if not request.user.is_hijacked:
@@ -96,8 +97,8 @@ def document_upload(request, project_id):
 @login_required
 def document_delete(request, project_id, document_id):
     """Delete a document for a project"""
-    project = get_object_or_404(models.Project, pk=project_id, sites=request.site)
-    document = get_object_or_404(models.Document, pk=document_id, site=request.site)
+    project = get_object_or_404(models.Project, pk=project_id)
+    document = get_object_or_404(models.Document, pk=document_id)
 
     has_perm_or_403(request.user, "manage_documents", project)
 
@@ -118,8 +119,8 @@ def document_delete(request, project_id, document_id):
 @login_required
 def document_pin_unpin(request, project_id, document_id):
     """Delete a document for a project"""
-    project = get_object_or_404(models.Project, pk=project_id, sites=request.site)
-    document = get_object_or_404(models.Document, pk=document_id, site=request.site)
+    project = get_object_or_404(models.Project, pk=project_id)
+    document = get_object_or_404(models.Document, pk=document_id)
 
     has_perm_or_403(request.user, "manage_documents", project)
 

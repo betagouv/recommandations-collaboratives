@@ -7,43 +7,34 @@ authors: guillaume.libersat@beta.gouv.fr, raphael.marvie@beta.gouv.fr
 created: 2023-07-17 20:39:35 CEST
 """
 
-from django.contrib import messages
+from allauth.account.views import LoginView
 from django.contrib.auth import login as log_user
 from django.contrib.auth import models as auth
 from django.contrib.auth.decorators import login_required
 from django.contrib.sites import models as sites
+from django.db import transaction
 from django.shortcuts import get_object_or_404, redirect, render, reverse
 from django.template.loader import render_to_string
 from django.utils.http import urlencode
 from django.views.generic import FormView
-from allauth.account.views import LoginView
-
 
 from recoco.apps.addressbook import models as addressbook
-from recoco.apps.communication import constants as communication_constants
-from recoco.apps.communication import digests
-from recoco.apps.communication.api import send_email
-from recoco.apps.communication.digests import normalize_user_name
 from recoco.apps.geomatics import models as geomatics
-from recoco.apps.invites import models as invites
 from recoco.apps.projects import models as projects
-from recoco.apps.projects import signals as projects_signals
 from recoco.apps.projects.utils import (
     assign_advisor,
     assign_collaborator,
     generate_ro_key,
     refresh_user_projects_in_session,
 )
-from recoco.apps.survey.forms import AnswerForm
 from recoco.apps.survey import models as survey_models
-
+from recoco.apps.survey.forms import AnswerForm
 from recoco.utils import (
-    build_absolute_url,
     get_site_config_or_503,
     is_switchtender_or_403,
 )
 
-from . import forms, models
+from . import forms, models, utils
 
 
 class OnboardingLogin(LoginView):
@@ -185,10 +176,11 @@ def onboarding_project(request):
 
         if all_forms_valid:
             project = create_project_for_user(
-                user=request.user, data=form.cleaned_data, status="DRAFT"
+                site=request.site,
+                user=request.user,
+                data=form.cleaned_data,
+                status="DRAFT",
             )
-
-            project.sites.add(request.site)
 
             # Save survey questions
             if site_config.project_survey:
@@ -201,8 +193,8 @@ def onboarding_project(request):
 
             assign_collaborator(request.user, project, is_owner=True)
 
-            notify_new_project(request.site, project, request.user)
-            email_owner_of_project(request.site, project, request.user)
+            utils.notify_new_project(request.site, project, request.user)
+            utils.email_owner_of_project(request.site, project, request.user)
 
             refresh_user_projects_in_session(request, request.user)
 
@@ -227,16 +219,22 @@ def onboarding_summary(request, project_id=None):
 
     project = get_object_or_404(projects.Project, sites=request.site, pk=project_id)
 
-    if site_config.project_survey:
-        next_args_for_project_location = urlencode(
-            {"next": reverse("survey-project-session", args=(project.pk,))}
-        )
+    if not project.location:
+        next_url = f"{reverse('survey-project-session' if site_config.project_survey else 'projects-project-detail', args=(project.pk,))}"
     else:
         next_args_for_project_location = urlencode(
-            {"next": reverse("projects-project-detail", args=(project.pk,))}
+            {
+                "next": reverse(
+                    (
+                        "survey-project-session"
+                        if site_config.project_survey
+                        else "projects-project-detail"
+                    ),
+                    args=(project.pk,),
+                )
+            }
         )
-
-    next_url = f"{reverse('projects-project-location', args=(project.pk,))}?{next_args_for_project_location}"
+        next_url = f"{reverse('projects-project-location', args=(project.pk,))}?{next_args_for_project_location}"
 
     context = {"project": project, "next_url": next_url, "site_config": site_config}
 
@@ -318,6 +316,7 @@ def prefill_project_submit(request):
 
             # Project creation
             project = create_project_for_user(
+                site=request.site,
                 user=user,
                 submitted_by=request.user,
                 data=form.cleaned_data,
@@ -338,8 +337,8 @@ def prefill_project_submit(request):
             assign_collaborator(user, project, is_owner=True)
             assign_advisor(request.user, project, request.site)
 
-            invite_user_to_project(request, user, project, is_new_user)
-            notify_new_project(request.site, project, user)
+            utils.invite_user_to_project(request, user, project, is_new_user)
+            utils.notify_new_project(request.site, project, user)
 
             # cleanup now useless prefill existing data if present
             if "prefill_set_user" in request.session:
@@ -372,8 +371,9 @@ def select_commune(request, project_id=None):
     return render(request, "onboarding/select-commune.html", locals())
 
 
+@transaction.atomic
 def create_project_for_user(
-    user: auth.User, data: dict, status: str, submitted_by: auth.User = None
+    site, user: auth.User, data: dict, status: str, submitted_by: auth.User = None
 ) -> projects.Project:
     """Use data from form to create and return a new project for user"""
 
@@ -392,9 +392,10 @@ def create_project_for_user(
         description=data.get("description"),
         location=data.get("location"),
         commune=commune,
-        status=status,
         ro_key=generate_ro_key(),
     )
+
+    project.project_sites.create(site=site, status=status, is_origin=True)
 
     return project
 
@@ -462,88 +463,6 @@ def create_initial_note(
         ),
         public=True,
         site=site,
-    )
-
-
-def notify_new_project(
-    site: sites.Site, project: projects.Project, owner: auth.User
-) -> None:
-    """Create notification of new project"""
-
-    # notify project submission
-    projects_signals.project_submitted.send(
-        sender=projects.Project,
-        site=site,
-        submitter=owner,
-        project=project,
-    )
-
-
-def email_owner_of_project(
-    site: sites.Site, project: projects.Project, user: auth.User
-) -> None:
-    """Send email to new project owner"""
-
-    # Send an email to the project owner
-    params = {
-        "project": digests.make_project_digest(
-            project, project.owner, url_name="knowledge"
-        ),
-    }
-    send_email(
-        template_name=communication_constants.TPL_PROJECT_RECEIVED,
-        recipients=[
-            {
-                "name": normalize_user_name(project.owner),
-                "email": project.owner.email,
-            }
-        ],
-        params=params,
-    )
-    # FIXME return send_mail status ?
-
-
-def invite_user_to_project(
-    request, user: auth.User, project: projects.Project, is_new_user: bool
-):
-    invite, _ = invites.Invite.objects.get_or_create(
-        project=project,
-        inviter=request.user,
-        site=request.site,
-        email=user.email,
-        defaults={
-            "message": (
-                "Je viens de déposer votre projet sur la"
-                "plateforme de manière à faciliter nos échanges."
-            )
-        },
-    )
-
-    send_email(
-        template_name=communication_constants.TPL_SHARING_INVITATION,
-        recipients=[{"email": user.email}],
-        params={
-            "sender": {
-                "first_name": request.user.first_name,
-                "last_name": request.user.last_name,
-                "email": request.user.email,
-            },
-            "message": invite.message,
-            "invite_url": build_absolute_url(
-                invite.get_absolute_url(),
-                auto_login_user=user if not is_new_user else None,
-            ),
-            "project": digests.make_project_digest(project),
-        },
-    )
-
-    messages.success(
-        request,
-        (
-            "Un courriel d'invitation à rejoindre"
-            f" le projet a été envoyé à {user.email}."
-        ),
-        extra_tags=["email"],
     )
 
 

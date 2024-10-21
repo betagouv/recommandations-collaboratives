@@ -1,14 +1,16 @@
 from django.urls import path
-
+from notifications import views as notifications_views
 from rest_framework import routers
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 from recoco.apps.addressbook import rest as addressbook_rest
 from recoco.apps.geomatics import rest as geomatics_rest
+from recoco.apps.home import rest as home_rest
 from recoco.apps.projects.views import rest as projects_rest
+from recoco.apps.resources import rest as resources_rest
+from recoco.apps.survey.views import rest as survey_rest
 from recoco.apps.tasks.views import rest as tasks_rest
 from recoco.apps.training import rest as training_rest
-from recoco.apps.resources import rest as resources_rest
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 router = routers.DefaultRouter()
 
@@ -62,6 +64,17 @@ router.register(
     training_rest.ChallengeDefinitionViewSet,
     basename="challenge-definitions",
 )
+router.register(
+    r"projects/projectsites",
+    projects_rest.ProjectSiteViewSet,
+    basename="projects-projectsites",
+)
+router.register(
+    r"sites",
+    home_rest.SiteViewSet,
+    basename="sites",
+)
+
 
 api_urls = [
     path(
@@ -89,6 +102,21 @@ api_urls = [
         training_rest.ChallengeView.as_view(),
         name="challenges-challenge",
     ),
+    path(
+        "notifications/mark-one-as-read/<int:pk>/",
+        home_rest.UserNotificationsMarkOneAsRead.as_view(),
+        name="notifications-mark-one-as-read",
+    ),
+    path(
+        "notifications/mark-all-as-read",
+        home_rest.UserNotificationsMarkAllAsRead.as_view(),
+        name="notifications-mark-all-as-read",
+    ),
+    path(
+        "notifications/unread_list",
+        notifications_views.live_unread_notification_list,
+        name="notifications-unread-list",
+    ),
 ]
 
 auth_urls = [
@@ -104,4 +132,17 @@ auth_urls = [
     ),
 ]
 
-urlpatterns = router.urls + api_urls + auth_urls
+survey_urls = [
+    path(
+        "survey/sessions/",
+        survey_rest.SessionView.as_view(),
+        name="api-survey-sessions",
+    ),
+    path(
+        "survey/sessions/<int:session_id>/answers/",
+        survey_rest.SessionAnswersView.as_view(),
+        name="api-survey-session-answers",
+    ),
+]
+
+urlpatterns = router.urls + api_urls + auth_urls + survey_urls

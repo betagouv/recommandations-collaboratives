@@ -12,8 +12,14 @@ from django.http import Http404, HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
-from recoco.apps.projects.utils import get_active_project_id
+from django.utils.text import slugify
+
 from recoco.apps.projects import models as project_models
+from recoco.apps.projects.forms import DocumentUploadForm
+from recoco.apps.projects.utils import (
+    get_active_project_id,
+    get_collaborators_for_project,
+)
 from recoco.apps.resources import models as resources
 from recoco.apps.survey import models as survey_models
 from recoco.utils import (
@@ -23,14 +29,10 @@ from recoco.utils import (
 )
 
 from .. import models, signals
-
-from recoco.apps.projects.forms import DocumentUploadForm
-from recoco.apps.projects.utils import get_collaborators_for_project
-
 from ..forms import (
-    CreateActionsFromResourcesForm,
-    CreateActionWithoutResourceForm,
     CreateActionWithResourceForm,
+    CreateActionWithoutResourceForm,
+    CreateActionsFromResourcesForm,
     PushTypeActionForm,
     RsvpTaskFollowupForm,
     TaskFollowupForm,
@@ -385,42 +387,55 @@ def presuggest_task(request, project_id):
 
     has_perm_or_403(request.user, "projects.manage_tasks", project)
 
-    try:
-        survey = survey_models.Survey.on_site.get(pk=1)  # XXX Hardcoded survey ID
-        session, created = survey_models.Session.objects.get_or_create(
-            project=project, survey=survey
-        )
-    except survey_models.Survey.DoesNotExist:
-        session = None
+    signals = set()
+
+    # Get signals from survey session
+    if request.site.configuration.project_survey:
+        try:
+            survey = survey_models.Survey.on_site.get(
+                pk=request.site.configuration.project_survey.pk
+            )
+        except survey_models.Survey.DoesNotExist:
+            survey = None
+
+        if survey:
+            session, _ = survey_models.Session.objects.get_or_create(
+                project=project, survey=survey
+            )
+
+            signals = signals.union(session.signals)
 
     tasks = []
 
-    if session:
-        session_signals = session.signals
+    # Make signals from project topics
+    project_signals = set()
+    for topic in project.topics.all():
+        project_signals.add(f"project_topic:{slugify(topic.name)}")
 
-        for recommandation in models.TaskRecommendation.on_site.all():
-            if not project.commune:
+    signals = signals.union(project_signals)
+
+    # Now, find matching TaskRecommendation
+    for recommandation in models.TaskRecommendation.on_site.all():
+        if not project.commune:
+            continue
+
+        if recommandation.departments.all().count() > 0:
+            if (
+                project.commune.department.code
+                not in recommandation.departments.values_list("code", flat=True)
+            ):
                 continue
 
-            if recommandation.departments.all().count() > 0:
-                if (
-                    project.commune.department.code
-                    not in recommandation.departments.values_list("code", flat=True)
-                ):
-                    continue
-
-            reco_tags = set(
-                recommandation.condition_tags.values_list("name", flat=True)
-            )
-            if reco_tags.issubset(session_signals):
-                tasks.append(
-                    models.Task(
-                        id=0,
-                        project=project,
-                        resource=recommandation.resource,
-                        intent=recommandation.text,
-                    )
+        reco_tags = set(recommandation.condition_tags.values_list("name", flat=True))
+        if reco_tags.issubset(signals):
+            tasks.append(
+                models.Task(
+                    id=0,
+                    project=project,
+                    resource=recommandation.resource,
+                    intent=recommandation.text,
                 )
+            )
 
     return render(request, "tasks/tasks/task_suggest.html", locals())
 

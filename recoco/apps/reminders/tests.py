@@ -10,15 +10,16 @@ created: 2021-09-28 13:17:53 CEST
 import datetime
 
 import pytest
-from django.contrib.sites.shortcuts import get_current_site
+from django.contrib.auth import models as auth_models
 from django.contrib.sites import models as sites_models
+from django.contrib.sites.shortcuts import get_current_site
 from django.utils import timezone
 from model_bakery import baker
-from django.contrib.auth import models as auth_models
+
+from recoco.apps.home import models as home_models
 from recoco.apps.projects import models as projects_models
 from recoco.apps.projects.utils import assign_collaborator
 from recoco.apps.tasks import models as tasks_models
-from recoco.apps.home import models as home_models
 
 from . import api, models
 
@@ -387,12 +388,13 @@ def test_make_or_update_new_reco_reminder_with_task_off_site(request):
 
 
 @pytest.mark.django_db
-def test_make_or_update_new_reco_reminder_postpones_reminder_if_new_task(request):
+def test_make_or_update_new_reco_reminder_postpones_reminder_if_new_task(
+    request, project
+):
     current_site = get_current_site(request)
     yesterday = timezone.localdate() - datetime.timedelta(days=1)
     user = baker.make(auth_models.User)
 
-    project = baker.make(projects_models.Project, sites=[current_site])
     assign_collaborator(user, project, is_owner=True)
 
     task = baker.make(
@@ -742,14 +744,15 @@ def test_make_whatsup_reminder_with_task_off_site(request):
 
 
 @pytest.mark.django_db
-def test_make_or_update_whatsup_reminder_postpones_reminder_if_new_activity(request):
+def test_make_or_update_whatsup_reminder_postpones_reminder_if_new_activity(
+    request, make_project
+):
     current_site = get_current_site(request)
     yesterday = timezone.localdate() - datetime.timedelta(days=1)
     user = baker.make(auth_models.User)
 
-    project = baker.make(
-        projects_models.Project,
-        sites=[current_site],
+    project = make_project(
+        site=current_site,
         last_members_activity_at=timezone.now(),
     )
     assign_collaborator(user, project, is_owner=True)
@@ -848,11 +851,10 @@ def test_make_or_update_whatsup_reminder_with_sent_reminder_honors_interval(
 # Getting reminders
 ########################################################################
 @pytest.mark.django_db
-def test_reminder_is_due(request):
+def test_reminder_is_due(request, project):
     current_site = get_current_site(request)
     today = timezone.localdate()
     user = baker.make(auth_models.User)
-    project = baker.make(projects_models.Project, sites=[current_site])
     assign_collaborator(user, project, is_owner=True)
 
     kind = models.Reminder.NEW_RECO

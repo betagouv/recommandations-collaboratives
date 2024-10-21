@@ -17,6 +17,7 @@ from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.db.models import Q
 from guardian.shortcuts import assign_perm, get_users_with_perms, remove_perm
+
 from recoco import utils as uv_utils
 
 from . import models
@@ -27,7 +28,7 @@ def assign_collaborator(user, project, is_owner=False):
     """Make someone becomes a project collaborator and assign permissions"""
 
     permissions = models.COLLABORATOR_DRAFT_PERMISSIONS
-    if project.status != "DRAFT":
+    if project.project_sites.origin().status != "DRAFT":
         permissions += models.COLLABORATOR_PERMISSIONS
 
     for perm in permissions:
@@ -169,7 +170,7 @@ def can_administrate_project(project, user):
 
     # FIXME replace by checking permissions
     if project:
-        return project.switchtenders_on_site.filter(switchtender=user).exists()
+        return project.switchtender_sites.on_site().filter(switchtender=user).exists()
     else:
         return models.Project.on_site.filter(switchtenders=user).exists()
 
@@ -177,7 +178,7 @@ def can_administrate_project(project, user):
 def is_member(user, project, allow_draft):
     """return true if user is member of the project"""
     return (user in project.members.all()) and (
-        (project.status != "DRAFT") or allow_draft
+        (project.project_sites.current().status != "DRAFT") or allow_draft
     )  # noqa: F841
 
 
@@ -262,8 +263,8 @@ def get_switchtenders_for_project(project):
 def get_advisors_for_project(project):
     """Return all the switchtenders for a given project"""
     return auth_models.User.objects.filter(
-        projects_switchtended_on_site__project=project,
-        projects_switchtended_on_site__site=get_current_site(request=None),
+        projects_switchtended_per_site__project=project,
+        projects_switchtended_per_site__site=get_current_site(request=None),
     ).distinct()
 
 
@@ -303,10 +304,24 @@ def get_active_project_id(request):
     return request.session.get("active_project", None)
 
 
+def get_projects_for_user(user, site):
+    memberships = models.ProjectMember.objects.filter(
+        Q(project__sites=site),
+        Q(project__deleted=None),
+        Q(member=user),
+        Q(is_owner=True)
+        | Q(~Q(project__project_sites__status="DRAFT"), is_owner=False),
+    )
+
+    return [m.project for m in memberships.all()]
+
+
 def get_active_project(request):
     """Return the active project for a given user"""
     if not request.user.is_authenticated:
         return None
+
+    current_site = get_current_site(request)
 
     project_id = get_active_project_id(request)
     project = None
@@ -318,15 +333,10 @@ def get_active_project(request):
             pass
     else:
         try:
-            memberships = models.ProjectMember.objects.filter(
-                Q(project__sites=get_current_site(request)),
-                Q(project__deleted=None),
-                Q(member=request.user),
-                Q(is_owner=True) | Q(~Q(project__status="DRAFT"), is_owner=False),
-            )
+            projects = get_projects_for_user(request.user, current_site)
 
-            if memberships.first():
-                project = memberships.first().project
+            if projects:
+                project = projects[0]
 
         except models.Project.DoesNotExist:
             pass
@@ -342,18 +352,9 @@ def set_active_project_id(request, project_id: int):
 def refresh_user_projects_in_session(request, user):
     """store the user projects in the session"""
 
-    memberships = models.ProjectMember.objects.filter(
-        Q(project__sites=get_current_site(request)),
-        Q(project__deleted=None),
-        Q(member=user),
-        Q(is_owner=True) | Q(~Q(project__status="DRAFT"), is_owner=False),
-    )
+    site = get_current_site(request)
 
-    projects = [m.project for m in memberships.all()]
-
-    # projects = models.Project.objects.filter(deleted=None).filter(
-    #    Q(members=user) | Q(~Q(status="DRAFT"), members=user)
-    # )
+    projects = get_projects_for_user(user, site)
 
     request.session["projects"] = list(
         {

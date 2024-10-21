@@ -7,6 +7,7 @@ authors: guillaume.libersat@beta.gouv.fr, raphael.marvie@beta.gouv.fr
 updated: 2022-02-03 16:16:37 CET
 """
 
+import logging
 from dataclasses import asdict, dataclass
 from itertools import groupby
 
@@ -15,20 +16,18 @@ from django.contrib.sites.models import Site
 from django.urls import reverse
 
 from recoco import utils, verbs
-from recoco.apps.tasks import models as tasks_models
 from recoco.apps.projects import models as projects_models
 from recoco.apps.projects import utils as projects_utils
 from recoco.apps.reminders.api import (
-    make_or_update_new_recommendations_reminder,
-    make_or_update_whatsup_reminder,
     get_due_new_recommendations_reminder_for_project,
     get_due_whatsup_reminder_for_project,
+    make_or_update_new_recommendations_reminder,
+    make_or_update_whatsup_reminder,
 )
+from recoco.apps.tasks import models as tasks_models
 
-from .api import send_email
 from . import constants as communication_constants
-
-import logging
+from .api import send_email
 
 logger = logging.getLogger("main")
 
@@ -257,6 +256,50 @@ def make_recommendations_digest(recommendations, user):
     return recommendation_digest
 
 
+def make_site_digest(site):
+    """Return site informations as a dict"""
+
+    data = {
+        "name": site.name,
+    }
+
+    siteconf = utils.get_site_config_or_503(site)
+    data.update(
+        {
+            "description": siteconf.description or "",
+            "sender_name": siteconf.sender_name or "",
+            "sender_email": siteconf.sender_email or "",
+            "legal_address": siteconf.legal_address or "",
+            "main_topic": siteconf.main_topic or "",
+            "legal_owner": siteconf.legal_owner or "",
+        }
+    )
+
+    if siteconf.email_logo:
+        data["site_logo"] = utils.build_absolute_url(siteconf.email_logo.url)
+
+    return data
+
+
+def make_project_survey_digest_for_site(user, project, site):
+    """Return survey information as a dict for a given project on a given site"""
+
+    siteconf = utils.get_site_config_or_503(site)
+
+    if not siteconf.project_survey:
+        return {"name": None, "url": None}
+
+    project_survey_url = utils.build_absolute_url(
+        reverse("survey-project-session", args=[project.id, site.id]),
+        auto_login_user=user,
+        site=site,
+    )
+
+    data = {"name": siteconf.project_survey.name, "url": project_survey_url}
+
+    return data
+
+
 def make_project_digest(project, user=None, url_name="overview"):
     """Return base information digest for project"""
     project_url = utils.build_absolute_url(
@@ -385,7 +428,11 @@ def make_digest_for_new_site(notification, user):
         ),
         "project": {
             "name": project.name,
-            "org_name": project.org_name,
+            "org_name": (
+                project.owner.profile.organization.name
+                if project.owner.profile.organization
+                else ""
+            ),
             "url": project_link,
             "commune": {
                 "postal": project.commune.postal,

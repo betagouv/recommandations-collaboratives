@@ -1,42 +1,16 @@
 {% load static %}
-<header class="d-flex mb-2 w-100 px-3 pt-4 mt-3">
-    <div class="d-flex justify-content-between align-items-start w-100">
-        <div class="d-flex flex-column">
-            <div class="d-flex align-items-center">
-                <h2 class="mb-1 d-flex align-items-center">Accueil</h2>
-                <div x-show="isBusy" class="ms-2" style="width: 24px; height: 24px">
-                    <div class="spinner-border spinner-border spinner-border-sm text-primary"
-                         role="status"></div>
-                </div>
-            </div>
-            <div class="d-flex align-items-center mb-4 text-muted text-small">
-                <div class="d-flex align-items-center me-1">
-                    <svg class="align-middle bi me-2"
-                         width="18px"
-                         height="18px"
-                         fill="currentColor">
-                        <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#folder" />
-                    </svg>
-                    <span x-text="`${data.length} projets`"></span>
-                </div>
-                <template x-if="nbNewProjects > 0">
-                    <div class="d-flex align-items-center me-1 text-blue">
-                        <span class="fw-medium"
-                              x-text="nbNewProjects > 1 ? `(${nbNewProjects} nouveaux)` : `(${nbNewProjects} nouveau)`"></span>
-                    </div>
-                </template>
-                <template x-if="errors">
-                    <div class="d-flex align-items-center me-2">
-                        <span class="text-danger" x-text="errors"></span>>
-                    </div>
-                </template>
-            </div>
-        </div>
-        <div class="d-flex align-items-center">
-            <a class="button filled blue small inherit"
-               href="{% url 'onboarding-prefill-set-user' %}">Créer un projet</a>
-            <a class="button filled blue small inherit ms-2"
-               href="{% url 'projects-project-list-export-csv' %}">Exporter en CSV</a>
-        </div>
+<div x-show="isBusy"
+     x-transition
+     class="position-absolute text-center w-100">
+    <div class="spinner-border" role="status">
+        <span class="visually-hidden">Loading...</span>
     </div>
+</div>
+<header class="d-flex justify-content-between fr-p-2v ">
+    <span class="fs-5">{% include "projects/project/fragments/navigation/display_select.html" %}</span>
+    <div class="fr-ml-3w flex-grow-1">
+        {% include "projects/project/fragments/search_bar.html" with action_search="handleProjectsSearch" x_model="search" %}
+    </div>
+    {% include "projects/project/fragments/region_filter.html"  with filter_by_regions=False %}
+    {% include "projects/project/fragments/list-toolbars.html" %}
 </header>

@@ -18,6 +18,8 @@ document.addEventListener('alpine:init', () => {
     },
 
     tasks: [],
+    draftTasks: [],
+    validatedTasks: [],
     topics: [],
     async init() {
       await this.loadTasks();
@@ -54,6 +56,8 @@ document.addEventListener('alpine:init', () => {
       );
 
       this.tasks = data.map((task) => ({ ...task, isLoading: false }));
+      this.draftTasks = this.tasks.filter((task) => task.public === false);
+      this.validatedTasks = this.tasks.filter((task) => task.public === true);
 
       return this.tasks;
     },

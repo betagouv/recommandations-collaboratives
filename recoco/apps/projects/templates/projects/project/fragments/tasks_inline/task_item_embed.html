@@ -1,0 +1,73 @@
+{% load static %}
+{% load gravatar %}
+{% load guardian_tags %}
+{% load sass_tags %}
+{% block css %}
+    <link href="{% sass_src 'projects/css/fragments/task_inline/task.scss' %}"
+          rel="stylesheet"
+          type="text/css" />
+{% endblock css %}
+{% get_obj_perms request.user for request.site as "user_site_perms" %}
+{% get_obj_perms request.user for project as "user_project_perms" %}
+<div x-data="Task({id:{{ task.id }}, public:Boolean(`{{ task.public }}`), topic:{name :`{{ task.topic }}` == `None` ? null : `{{ task.topic }}`}, intent:`{{ task.intent }}`, resource:`{{ task.resource }}`, ds_folder:`{{ task.ds_folder }}`, comments_count:Number(`{{ task.comments_count }}`), content:`{{ task.content }}`, created_by:{ email : `{{ task.created_by.email }}`, first_name: `{{ task.created_by.first_name }}`, last_name: `{{ task.created_by.last_name }}`, is_active: Boolean(`{{ task.created_by.is_active }}`), profile : {organization: { name: `{{ task.created_by.profile.organization.name }}` }}}  })"
+     :class="`border${getTaskColor(currentTask)}`"
+     class="rounded fr-mb-2w fr-px-2w d-flex fr-pt-2w fr-pb-2w justify-content-between align-items-start task-item hover-shadow hover-border-blue transition-all"
+     :id="currentTask.id">
+    <div class="d-flex flex-column flex-grow-1 ease-transition tmp-usevar">
+        <div data-test-id="badge-new-task"
+             class="card-top-information d-flex align-items-center">
+            <template x-if="!currentTask.public">
+                <div class="left-0">
+                    <span data-test-id="task-draft-status"
+                          :class="`bg${getTaskColor(currentTask)}`"
+                          class="text-dark">Brouillon</span>
+                </div>
+            </template>
+            <template x-if="currentTask.topic && currentTask.topic.name ">
+                <div class="left-0 fr-ml-2v">
+                    <span data-test-id="task-inline-topic"
+                          class="bg-purple text-white"
+                          x-text="currentTask.topic.name"></span>
+                </div>
+            </template>
+        </div>
+        <div class="d-flex align-items-center justify-content-between">
+            <div class="d-flex w-100 justify-content-between align-items-center">
+                <div class="d-flex w-100 align-items-center">
+                    <h4 class="fr-mt-0 fr-pt-0 fr-mb-0 fw-bold fr-mb-3v"
+                        x-text="currentTask.intent"></h4>
+                </div>
+            </div>
+        </div>
+        <template x-if="currentTask.resource">
+            <article>{% include "projects/project/fragments/task/task_comment.html" %}</article>
+        </template>
+        <template x-if="currentTask.ds_folder">
+            <hr class="fr-mt-3w">
+            <div>
+                <h4 class="fw-bolder">
+                    <img height="31px"
+                         width="32px"
+                         src="{% static 'svg/picto-demarches_simplifiees.svg' %}"
+                         alt="Pictogramme Démarches Simplifiées">
+                    Dossier Démarches Simplifiées
+                </h4>
+                <p class="fr-text-mention--grey fr-text--sm fr-my-3v">
+                    Complétez l’état des lieux pour pré-remplir automatiquement le dossier de candidature.
+                </p>
+                <a class="fr-btn fr-btn--secondary fr-btn--sm"
+                   @click.stop=""
+                   x-bind:href="currentTask.ds_folder.dossier_url">Voir mon dossier</a>
+                <span class="fr-ml-2w fr-text-label--blue-france fr-text--xs">
+                    {% if task.ds_folder.prefilled_count > 1 %}
+                        {{ task.ds_folder.prefilled_count }} données pré-remplies
+                    {% elif task.ds_folder.prefilled_count > 0 %}
+                        1 donnée pré-remplie
+                    {% else %}
+                        aucune donnée pré-remplie
+                    {% endif %}
+                </span>
+            </div>
+        </template>
+    </div>
+</div>

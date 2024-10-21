@@ -47,7 +47,7 @@ function AdvisorDashboard() {
       },
     ],
     async getData() {
-      const projects = await this.$store.projects.getProjects();
+      const projects = await this.$store.projects.getUserProjetsStatus();
 
       this.totalNotifications = 0;
       this.nbNewProjects = 0;

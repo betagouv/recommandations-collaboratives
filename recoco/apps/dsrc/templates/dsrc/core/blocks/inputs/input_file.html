@@ -1,0 +1,11 @@
+<input {% if js_validation %} x-model="form['{{ field.html_name }}'].value" x-ref="{{ field.html_name }}" @input="changeInput" @focus="touchInput" @blur="validateInput" :class="`fr-input--${form['{{ field.html_name }}'].valid_class}`" :aria-describedby="`{{ field.id_for_label }}-desc-${form['{{ field.html_name }}'].valid_class}`" {% endif %}
+       value="{{ field.value|default:'' }}"
+       id="{{ field.id_for_label }}"
+       name="{{ field.html_name }}"
+       type="{{ field.field.widget.input_type }}"
+       data-test="{{ field.field.widget.attrs.input_test_id }}"
+       class="fr-input{% if field.field.errors %} fr-input--error{% endif %}{% if field.field.is_valid %} fr-input--valid{% endif %}{% if field.field.widget.attrs.size %} fr-input-group--{{ field.field.widget.attrs.size }}{% endif %} {{ field.field.widget.attrs.classes }}"
+       aria-describedby="{% if field.field.errors %}{{ field.id_for_label }}-desc-error{% elif field.messages %}{{ field.id_for_label }}-input-messages{% elif field.valid_text %}{{ field.id_for_label }}-desc-valid{% endif %}"
+       {% if field.field.placeholder %}placeholder="{{ field.field.placeholder }}"{% endif %}
+       {% if field.field.required %}required{% endif %}
+       {% if field.field.disabled %}disabled{% endif %} />

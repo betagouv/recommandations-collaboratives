@@ -8,13 +8,12 @@ created : 2021-05-26 15:56:20 CEST
 """
 
 
+from django.http import Http404
 from django.utils import timezone
 from rest_framework import generics, permissions, status, viewsets
 from rest_framework.response import Response
-from django.http import Http404
 
 from . import models, serializers, utils
-
 
 ########################################################################
 # REST API

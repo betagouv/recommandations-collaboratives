@@ -21,6 +21,7 @@ from guardian.shortcuts import assign_perm, remove_perm
 from magicauth import models as magicauth_models
 from model_bakery import baker
 from pytest_django.asserts import assertRedirects
+
 from recoco.apps.home import models as home_models
 from recoco.apps.onboarding import models as onboarding_models
 from recoco.apps.projects import models as projects_models
@@ -243,12 +244,8 @@ def test_logged_user_can_send_message_to_team(mocker, client, request):
 # Login routing based on user profile
 ########################################################################
 @pytest.mark.django_db
-def test_project_owner_is_sent_to_action_page_on_login(request, client):
+def test_project_owner_is_sent_to_action_page_on_login(request, client, project):
     url = reverse("login-redirect")
-    project = baker.make(
-        projects_models.Project,
-        sites=[get_current_site(request)],
-    )
 
     with login(client) as user:
         assign_collaborator(user, project, is_owner=True)
@@ -322,10 +319,11 @@ def test_user_can_access_followus(client):
 
 
 @pytest.mark.django_db
-def test_guardian_supports_assign_for_user_with_site_framework(client, request):
+def test_guardian_supports_assign_for_user_with_site_framework(
+    client, request, project
+):
     """Test usage of assign_perm for User"""
     user = baker.make(auth_models.User)
-    project = baker.make(projects_models.Project)
 
     site1 = baker.make(Site, pk=1)
     site2 = baker.make(Site, pk=2)
@@ -343,11 +341,12 @@ def test_guardian_supports_assign_for_user_with_site_framework(client, request):
 
 
 @pytest.mark.django_db
-def test_guardian_supports_assign_for_group_with_site_framework(client, request):
+def test_guardian_supports_assign_for_group_with_site_framework(
+    client, request, project
+):
     """Test usage of assign_perm for Group"""
     group = baker.make(auth_models.Group)
     user = baker.make(auth_models.User, groups=[group])
-    project = baker.make(projects_models.Project)
 
     site1 = baker.make(Site, pk=1)
     site2 = baker.make(Site, pk=2)
@@ -365,10 +364,11 @@ def test_guardian_supports_assign_for_group_with_site_framework(client, request)
 
 
 @pytest.mark.django_db
-def test_guardian_supports_bulk_assign_users_with_site_framework(client, request):
+def test_guardian_supports_bulk_assign_users_with_site_framework(
+    client, request, project
+):
     baker.make(auth_models.User)
     baker.make(auth_models.User)
-    project = baker.make(projects_models.Project)
 
     users = auth_models.User.objects.all()
     site1 = baker.make(Site, pk=1)
@@ -388,11 +388,11 @@ def test_guardian_supports_bulk_assign_users_with_site_framework(client, request
 
 
 @pytest.mark.django_db
-def test_guardian_supports_bulk_assign_groups_with_site_framework(client, request):
+def test_guardian_supports_bulk_assign_groups_with_site_framework(
+    client, request, project
+):
     baker.make(auth_models.Group)
     baker.make(auth_models.Group)
-
-    project = baker.make(projects_models.Project)
 
     groups = auth_models.Group.objects.all()
 
@@ -405,9 +405,10 @@ def test_guardian_supports_bulk_assign_groups_with_site_framework(client, reques
 
 
 @pytest.mark.django_db
-def test_guardian_supports_assigning_perms_to_two_different_sites(client, request):
+def test_guardian_supports_assigning_perms_to_two_different_sites(
+    client, request, project
+):
     user = baker.make(auth_models.User)
-    project = baker.make(projects_models.Project)
 
     site1 = baker.make(Site, pk=1)
     site2 = baker.make(Site, pk=2)
@@ -420,9 +421,8 @@ def test_guardian_supports_assigning_perms_to_two_different_sites(client, reques
 
 
 @pytest.mark.django_db
-def test_guardian_supports_remove_perm_with_site_framework(client, request):
+def test_guardian_supports_remove_perm_with_site_framework(client, request, project):
     user = baker.make(auth_models.User)
-    project = baker.make(projects_models.Project)
 
     site1 = baker.make(Site, pk=1)
     site2 = baker.make(Site, pk=2)
@@ -443,14 +443,16 @@ def test_guardian_supports_remove_perm_with_site_framework(client, request):
 
 @pytest.mark.django_db
 def test_guardian_supports_remove_bulk_perm_for_user_with_site_framework(
-    client, request
+    client, request, make_project
 ):
+    current_site = get_current_site(request)
     user = baker.make(auth_models.User)
-    baker.make(projects_models.Project)
-    baker.make(projects_models.Project)
 
     site1 = baker.make(Site, pk=1)
     site2 = baker.make(Site, pk=2)
+
+    _ = make_project(site=current_site)
+    _ = make_project(site=current_site)
 
     projects = projects_models.Project.objects.all()
 
@@ -472,12 +474,14 @@ def test_guardian_supports_remove_bulk_perm_for_user_with_site_framework(
 
 @pytest.mark.django_db
 def test_guardian_supports_remove_bulk_perm_for_group_with_site_framework(
-    client, request
+    client, request, make_project
 ):
+    site = get_current_site(request)
+
     group = baker.make(auth_models.Group)
     user = baker.make(auth_models.User, groups=[group])
-    baker.make(projects_models.Project)
-    baker.make(projects_models.Project)
+    _ = make_project(site=site)
+    _ = make_project(site=site)
 
     site1 = baker.make(Site, pk=1)
     site2 = baker.make(Site, pk=2)
@@ -504,16 +508,29 @@ def test_guardian_supports_remove_bulk_perm_for_group_with_site_framework(
 def test_make_new_site_fails_for_existing_domain(client):
     before = models.SiteConfiguration.objects.count()
 
-    site = utils.make_new_site("Example", "example.com", "sender@example.com", "Sender")
+    with pytest.raises(Exception) as excinfo:
+        utils.make_new_site(
+            "Example",
+            "example.com",
+            "sender@example.com",
+            "Sender",
+            "contact@example.com",
+            "36 green street 75000 Paris",
+        )
 
-    assert site is None
+    assert str(excinfo.value) == "The domain example.com already used"
     assert models.SiteConfiguration.objects.count() == before
 
 
 @pytest.mark.django_db
 def test_make_new_site(client):
     site = utils.make_new_site(
-        "New example", "new-example.com", "sender@example.com", "Sender"
+        "New example",
+        "new-example.com",
+        "sender@example.com",
+        "Sender",
+        "contact@example.com",
+        "36 green street 75000 Paris",
     )
 
     assert site

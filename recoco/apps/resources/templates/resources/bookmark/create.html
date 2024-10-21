@@ -6,27 +6,36 @@
     <link href="{% sass_src 'resources/resources.scss' %}"
           rel="stylesheet"
           type="text/css">
-{% endblock %}
+{% endblock css %}
 {% block content %}
-    <div class="col-11 py-5 mx-auto">
+    <div class="col-12 fr-p-3w fr-mx-auto">
         <!-- Breadcrumb -->
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item">
-                    <svg class="bi align-middle" width="18" height="18" fill="currentColor">
-                        <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#book" />
-                    </svg>
-                    &nbsp;
-                    <a href="{% url 'resources-resource-search' %}">Ressources</a>
-                </li>
-                <li class="breadcrumb-item">
-                    <a href="{% url 'resources-resource-detail' resource.id %}">{{ resource.title|title|truncatechars:20 }}</a>
-                </li>
-                <li class="breadcrumb-item active">Mettre en favori</li>
-            </ol>
+        <nav role="navigation" class="fr-breadcrumb" aria-label="vous êtes ici :">
+            <button class="fr-breadcrumb__button"
+                    aria-expanded="false"
+                    aria-controls="breadcrumb-1">Voir le fil d’Ariane</button>
+            <div class="fr-collapse" id="breadcrumb-1">
+                <ol class="fr-breadcrumb__list">
+                    <li>
+                        <svg class="bi align-top" width="18" height="18" fill="currentColor">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#book" />
+                        </svg>
+                        &nbsp;
+                        <a class="fr-breadcrumb__link"
+                           href="{% url 'resources-resource-search' %}">Ressources</a>
+                    </li>
+                    <li>
+                        <a class="fr-breadcrumb__link"
+                           href="{% url 'resources-resource-detail' resource.id %}">{{ resource.title|title|truncatechars:20 }}</a>
+                    </li>
+                    <li>
+                        <a class="fr-breadcrumb__link" aria-current="page">Mettre en favori</a>
+                    </li>
+                </ol>
+            </div>
         </nav>
         <h2>
-            <svg class="bi me-1 " width="32" height="32" fill="currentColor">
+            <svg class="bi fr-mr-1v " width="32" height="32" fill="currentColor">
                 <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#star" />
             </svg>
             Ajouter une ressource en favori
@@ -34,12 +43,11 @@
         <form class="form"
               id="form-create-bookmark"
               action="{% url "resources-bookmark-create" resource.id %}"
-              method="POST">
+              method="post">
             {% csrf_token %}
-            <div class="mb-3">
-                <label class="mb-2" for="input-project-comments">Vous pouvez ajouter une note privée si vous le souhaitez :</label>
-                <textarea class="form-control {% if form.comments.errors %}is-invalid{% endif %}"
-                          style="height: 100px"
+            <div class="fr-mb-2w">
+                <label class="fr-mb-2v" for="input-project-comments">Vous pouvez ajouter une note privée si vous le souhaitez :</label>
+                <textarea class="form-control {% if form.comments.errors %}is-invalid{% endif %} specific-height-100px"
                           id="input-bookmark-comments"
                           name="{{ form.comments.name }}"
                           placeholder="Vous pouvez par exemple donner du contexte, ajouter un mémo, ...">{{ form.comments.value|default:'' }}</textarea>
@@ -48,4 +56,4 @@
             <button class="btn btn-primary" type="submit">Ajouter aux favoris</button>
         </form>
     </div>
-{% endblock %}
+{% endblock content %}

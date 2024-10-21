@@ -103,6 +103,12 @@ class ProjectTopicsForm(forms.ModelForm):
         fields = ["advisors_note"]
 
 
+class ProjectModerationForm(forms.Form):
+    """Form to add options to moderation"""
+
+    join = forms.BooleanField(initial=False)
+
+
 class ProjectActiveForm(forms.ModelForm):
     """Form to set/unset a project inactive"""
 

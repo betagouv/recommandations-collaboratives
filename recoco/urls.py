@@ -7,7 +7,6 @@ author  : raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created : 2021-05-26 11:29:25 CEST
 """
 
-import notifications.urls
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
@@ -17,7 +16,6 @@ from magicauth.urls import urlpatterns as magicauth_urls
 from wagtail import urls as wagtail_urls
 from wagtail.admin import urls as wagtailadmin_urls
 from wagtail.documents import urls as wagtaildocs_urls
-from recoco.rest_api.urls import urlpatterns as rest_api_urls
 
 from recoco.apps.addressbook.urls import urlpatterns as addressbook_urls
 from recoco.apps.crm.urls import urlpatterns as crm_urls
@@ -25,17 +23,16 @@ from recoco.apps.home.urls import urlpatterns as home_urls
 from recoco.apps.invites.urls import urlpatterns as invites_urls
 from recoco.apps.onboarding.urls import urlpatterns as onboarding_urls
 from recoco.apps.projects.urls import urlpatterns as projects_urls
-from recoco.apps.tasks.urls import urlpatterns as tasks_urls
 from recoco.apps.resources.urls import urlpatterns as resources_urls
 from recoco.apps.survey.urls import urlpatterns as survey_urls
-
+from recoco.apps.tasks.urls import urlpatterns as tasks_urls
+from recoco.rest_api.urls import urlpatterns as rest_api_urls
 
 urlpatterns = [
     path("api/", include(rest_api_urls)),
     path("accounts/", include("allauth.urls")),
     path("logout/", auth_views.LogoutView.as_view(), name="logout"),
     path("markdownx/", include("markdownx.urls")),
-    path("notifications/", include(notifications.urls, namespace="notifications")),
     path("hijack/", include("hijack.urls")),
     path("nimda/", admin.site.urls),
     path("cookies/", include("cookie_consent.urls")),

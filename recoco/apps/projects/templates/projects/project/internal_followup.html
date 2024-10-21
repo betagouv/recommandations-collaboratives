@@ -11,19 +11,19 @@
 {% block project_detail %}
     {% get_obj_perms request.user for request.site as "user_site_perms" %}
     {% get_obj_perms request.user for project as "user_project_perms" %}
-    <div class="col-12 mx-auto">
-        {% include 'projects/project/navigation.html' with internal_followup=True full_page=True %}
+    <div class="col-12 fr-mx-auto">
+        {% include "projects/project/navigation.html" with internal_followup=True full_page=True %}
         <div class="row">
             <div class="col-8">
-                <div class="flag orange mb-4 d-flex align-items-center justify-content-start">
-                    <svg class="bi align-middle me-4 ms-2"
+                <div class="flag orange fr-mb-3w d-flex align-items-center justify-content-start">
+                    <svg class="bi align-middle fr-mr-3w fr-ml-2v"
                          width="25"
                          height="25"
                          fill="currentColor">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#eye-fill" />
                     </svg>
-                    <p class="text-info-custom my-0">
-                        Seuls les acteurs positionnés sur ce projet et l’équipe {{ request.site.name }} ont accès à cet espace, pas la collectivité.
+                    <p class="text-info-custom fr-my-0">
+                        Seuls les acteurs positionnés sur ce projet et les équipes de conseil (ex: {{ request.site.name }}) ont accès à cet espace, pas la collectivité.
                     </p>
                 </div>
                 {% activity_stream "target" project %}
@@ -31,16 +31,16 @@
                 {% if "use_private_notes" in user_project_perms %}
                     <hr />
                     <form class="form d-flex align-items-end flex-column"
-                          method="POST"
+                          method="post"
                           action="{% url 'projects-create-note' project.pk %}">
                         {% csrf_token %}
-                        {% include 'tools/editor.html' with input_name=private_note_form.content.name input_value=private_note_form.content.value|default:'' input_required=True %}
+                        {% include "tools/editor.html" with input_name=private_note_form.content.name input_value=private_note_form.content.value|default:'' input_required=True %}
                         <label class="visually-hidden" for="input-project-content">{{ private_note_form.content.label }}</label>
                         {% for error in private_note_form.content.errors %}<div class="text-danger text-end">{{ error }}</div>{% endfor %}
-                        <div class="d-flex justify-content-end mt-2">
+                        <div class="d-flex justify-content-end fr-mt-2v">
                             <button x-data
                                     :disabled="$store.editor.currentMessage === ''"
-                                    class="button filled"
+                                    class="fr-btn"
                                     type="submit">Envoyer</button>
                         </div>
                     </form>
@@ -49,14 +49,14 @@
             </div>
             <div class="col-4">
                 <h5>Équipe de suivi</h5>
-                <ul class="d-flex flex-column list-unstyled mb-0">
-                    {% for advisor in project.switchtenders_on_site.all %}
+                <ul class="d-flex flex-column list-unstyled fr-mb-0">
+                    {% for advisor in project.switchtender_sites.all %}
                         {% if advisor.switchtender.is_active %}
-                            <li>{% include 'user/user_card.html' with user=advisor.switchtender user_activity=True %}</li>
+                            <li>{% include "user/user_card.html" with user=advisor.switchtender user_activity=True %}</li>
                         {% endif %}
                     {% endfor %}
                 </ul>
             </div>
         </div>
     </div>
-{% endblock %}
+{% endblock project_detail %}

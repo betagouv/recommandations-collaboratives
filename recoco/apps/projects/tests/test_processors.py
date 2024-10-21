@@ -10,13 +10,13 @@ created: 2023-01-31 14:24:56 CEST
 
 import pytest
 from django.contrib.sites.shortcuts import get_current_site
-from model_bakery import baker
 from django.shortcuts import reverse
-from recoco.utils import login
+from model_bakery import baker
 from notifications.signals import notify
 
-from recoco.apps.tasks import models as task_models
 from recoco.apps.home import models as home_models
+from recoco.apps.tasks import models as task_models
+from recoco.utils import login
 
 from .. import models, utils
 
@@ -27,7 +27,8 @@ def test_active_project_processor(request, client):
 
     baker.make(home_models.SiteConfiguration, site=current_site)
 
-    project = baker.make(models.Project, sites=[current_site], status="READY")
+    project = baker.make(models.Project)
+    project.project_sites.create(site=current_site, status="READY", is_origin=True)
 
     objects = (
         baker.make(models.Document, project=project, the_link="http://nowhe.re"),

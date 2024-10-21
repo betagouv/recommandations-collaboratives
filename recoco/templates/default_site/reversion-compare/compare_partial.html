@@ -1,25 +1,41 @@
 {% load i18n %}
-{% for field_diff in compare_data %}
-<h3>{% firstof field_diff.field.verbose_name field_diff.field.related_name %}{% if field_diff.is_related and not field_diff.follow %}<sup class="follow">*</sup>{% endif %}</h3>
-{% if field_diff.field.help_text %}<p class="help">{{ field_diff.field.help_text }}</p>{% endif %}
-<div class="module">
-    {{ field_diff.diff }}
-</div>
-{% empty %}
-<div class="module">
-    <p><strong>{% trans "Aucune différence." %}</strong></p>
-</div>
-{% endfor %}
-
-<h4>{% trans "Commentaire d'édition :" %}</h4>
-<blockquote>{{ version2.revision.comment|default:_("(pas de commentaire)") }}</blockquote>
-
-{% if has_unfollowed_fields %}
-<h4 class="follow">{% trans "Note:" %}</h4>
-<p class="follow">
-    {% blocktrans %}
+<form method="post"
+      action="{% url 'resources-resource-history-restore' resource.pk version1.pk %}">
+    {% csrf_token %}
+    <button class="btn btn-secondary">
+        Restaurer la version du {{ version1.revision.date_created }} par {{ version1.revision.user }}
+    </button>
+    <form method="post"
+          action="{% url 'resources-resource-history-restore' resource.pk version2.pk %}">
+        {% csrf_token %}
+        <button class="btn btn-secondary">
+            Restaurer la version du {{ version2.revision.date_created }} par {{ version2.revision.user }}
+        </button>
+    </form>
+    {% for field_diff in compare_data %}
+        <h3>
+            {% firstof field_diff.field.verbose_name field_diff.field.related_name %}
+            {% if field_diff.is_related and not field_diff.follow %}<sup class="follow">*</sup>{% endif %}
+        </h3>
+        {% if field_diff.field.help_text %}<p class="help">{{ field_diff.field.help_text }}</p>{% endif %}
+        <div class="module">{{ field_diff.diff }}</div>
+    {% empty %}
+        <div class="module">
+            <p>
+                <strong>{% trans "Aucune différence." %}</strong>
+            </p>
+        </div>
+    {% endfor %}
+    <h4>{% trans "Commentaire d'édition :" %}</h4>
+    <blockquote>
+        {{ version2.revision.comment|default:_("(pas de commentaire)") }}
+    </blockquote>
+    {% if has_unfollowed_fields %}
+        <h4 class="follow">{% trans "Note:" %}</h4>
+        <p class="follow">
+            {% blocktrans %}
     Les champs marqués avec <sup class="follow">*</sup> ne sont pas historisés.
     Il est possible que les informations ne soient pas pertinentes.
     {% endblocktrans %}
-</p>
-{% endif %}
+        </p>
+    {% endif %}

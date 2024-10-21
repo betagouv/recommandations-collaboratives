@@ -39,11 +39,20 @@ export default instance;
 
 // Projects :
 export function projectsUrl() {
-  return `/api/projects/`;
+  return '/api/projects/';
+}
+
+export function projectsProjectSitesUrl() {
+  return '/api/projects/projectsites/';
 }
 
 export function userProjectStatusUrl() {
-  return `/api/userprojectstatus/`;
+  return '/api/userprojectstatus/';
+}
+
+// Sites :
+export function sitesConfigUrl() {
+  return '/api/sites/';
 }
 
 // Organization
@@ -77,6 +86,18 @@ export function markTaskNotificationsAsReadUrl(projectId, taskId) {
   return `/api/projects/${projectId}/tasks/${taskId}/notifications/mark_all_as_read/`;
 }
 
+export function markTaskNotificationAsVisited(projectId, taskId) {
+  return `/api/projects/${projectId}/tasks/${taskId}/mark_visited/`;
+}
+
+export function notificationsMarkAsReadByIdUrl(notificationId) {
+  return `/api/notifications/mark-one-as-read/${notificationId}/`;
+}
+
+export function markAllNotificationsAsReadUrl() {
+  return '/api/notifications/mark-all-as-read';
+}
+
 export function followupsUrl(projectId, taskId) {
   return `/api/projects/${projectId}/tasks/${taskId}/followups/`;
 }
@@ -85,8 +106,11 @@ export function followupUrl(projectId, taskId, followupId) {
   return `/api/projects/${projectId}/tasks/${taskId}/followups/${followupId}/`;
 }
 
-export function resourcePreviewUrl(resourceId) {
-  return `/ressource/${resourceId}/embed`;
+export function resourcePreviewUrl(resourceId, taskId) {
+  if (taskId) {
+    return `/ressource/${resourceId}/embed?task_id=${taskId}`;
+  }
+  return `/ressource/${resourceId}/embed/`;
 }
 
 // Regions :

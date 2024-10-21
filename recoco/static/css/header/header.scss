@@ -1,0 +1,39 @@
+.span-specific-fontsize-30 {
+  font-size: 30px;
+}
+
+.specific-ml-30 {
+  margin-left: 30px;
+}
+
+.header-specific-pl-15 {
+  padding-left: 15px;
+}
+
+.specific-padding-3px {
+  padding: 3px;
+}
+
+.specific-background-0063CB {
+  background: #0063cb;
+}
+
+.specific-color-white {
+  color: white !important;
+  &:hover {
+    color: white !important;
+  }
+}
+
+.specific-color-inherit {
+  color: inherit;
+}
+
+.specific-color-0063CB {
+  color: #0063cb;
+}
+
+.header-img-specific-size {
+  width: 16px;
+  height: 16px;
+}

@@ -17,9 +17,9 @@ os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"  # Pas besoin en dehors de Jupy
 
 # coding: utf-8
 from django.contrib.auth.models import User
-from recoco.apps.projects.models import Project
 from django.contrib.sites.models import Site
 
+from recoco.apps.projects.models import Project
 
 user = User.objects.first()
 print(user)
@@ -35,8 +35,8 @@ print(site)
 
 
 from recoco.apps.projects.utils import (
-    assign_collaborator,
     assign_advisor,
+    assign_collaborator,
     assign_observer,
 )
 

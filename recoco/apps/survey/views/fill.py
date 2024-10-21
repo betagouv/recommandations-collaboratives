@@ -10,9 +10,12 @@ created: 2021-08-03 14:26:39 CEST
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.sites.models import Site
+from django.core.exceptions import BadRequest
 from django.shortcuts import get_object_or_404, redirect, render, reverse
 from django.utils import timezone
 from django.views.generic import DetailView, RedirectView
+
 from recoco.apps.projects import models as projects_models
 from recoco.apps.projects.utils import get_collaborators_for_project
 from recoco.utils import get_site_config_or_503, has_perm_or_403
@@ -58,7 +61,8 @@ class SessionDoneView(LoginRequiredMixin, RedirectView):
 def survey_question_details(request, session_id, question_id):
     """Display a single question and go to next"""
     session = get_object_or_404(
-        models.Session, pk=session_id, survey__site=request.site
+        models.Session,
+        pk=session_id,
     )
     question = get_object_or_404(models.Question, pk=question_id)
     try:
@@ -96,18 +100,31 @@ def survey_question_details(request, session_id, question_id):
 
 
 @login_required
-def survey_create_session_for_project(request, project_id):
-    """Create a session for the given project if necessary. Redirects to session."""
+def survey_create_session_for_project(request, project_id, site_id=None):
+    """
+    Create a session for the given project if necessary. Redirects to session.
+    Optional survey_id allows one to ask for another survey in case of multisites
+    """
     project = get_object_or_404(
         projects_models.Project, sites=request.site, pk=project_id
     )
     site_config = get_site_config_or_503(request.site)
 
-    session, _ = models.Session.objects.get_or_create(
-        project=project, survey=site_config.project_survey
-    )
+    if site_id:
+        try:
+            try:
+                site = project.sites.get(id=site_id)
+            except Site.DoesNotExist as _:
+                raise BadRequest("Project not on site") from None
+            survey = site.configuration.project_survey
+        except models.Survey.DoesNotExist as _:
+            raise BadRequest("Unknown survey") from None
+    else:
+        survey = site_config.project_survey
+
+    session, _ = models.Session.objects.get_or_create(project=project, survey=survey)
     signals.survey_session_started.send(
-        sender=None, survey=site_config.project_survey, project=project, request=request
+        sender=None, survey=survey, project=project, request=request
     )
 
     url = reverse("survey-session-start", args=(session.id,))
@@ -120,9 +137,7 @@ def survey_create_session_for_project(request, project_id):
 @login_required
 def survey_next_question(request, session_id, question_id=None):
     """Redirect to next unanswered/answerable question from survey"""
-    session = get_object_or_404(
-        models.Session, survey__site=request.site, pk=session_id
-    )
+    session = get_object_or_404(models.Session, pk=session_id)
 
     if question_id is not None:
         question = get_object_or_404(models.Question, pk=question_id)
@@ -145,9 +160,7 @@ def survey_next_question(request, session_id, question_id=None):
 @login_required
 def survey_previous_question(request, session_id, question_id):
     """Redirect to previous unanswered/answerable question from survey"""
-    session = get_object_or_404(
-        models.Session, survey__site=request.site, pk=session_id
-    )
+    session = get_object_or_404(models.Session, pk=session_id)
     question = get_object_or_404(models.Question, pk=question_id)
 
     previous_question = session.previous_question(question)

@@ -23,7 +23,7 @@ django.setup()
 # -- Project information -----------------------------------------------------
 
 project = "Recoco"
-copyright = "2022, Guillaume Libersat, Raphael Marvie"
+copyright = "2022-2024, Guillaume Libersat, Raphael Marvie"
 author = "Guillaume Libersat, Raphael Marvie"
 
 
@@ -32,7 +32,15 @@ author = "Guillaume Libersat, Raphael Marvie"
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = ["sphinx.ext.graphviz", "sphinx.ext.autodoc"]
+extensions = [
+    "sphinx.ext.graphviz",
+    "sphinx.ext.autodoc",
+    "sphinxcontrib_django",
+    "sphinxcontrib_django_urls",
+    "celery.contrib.sphinx",
+    "sphinx_toolbox.more_autodoc.no_docstring",
+    "sphinx_js",
+]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
@@ -61,3 +69,11 @@ html_theme = "alabaster"
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ["_static"]
+
+# -- Django config
+django_settings = "recoco.settings.common"
+django_show_db_tables = True
+
+
+js_source_path = "../recoco/frontend/src/js/"
+jsdoc_config_path = "conf.json"

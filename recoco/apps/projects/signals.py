@@ -2,25 +2,25 @@ import datetime
 
 import django.dispatch
 from actstream import action
-from django.db.models.signals import pre_delete, pre_save
 from actstream.models import action_object_stream
 from django.contrib.contenttypes.models import ContentType
+from django.db.models.signals import pre_delete, pre_save
 from django.dispatch import receiver
 from django.utils import timezone
 from notifications import models as notifications_models
 from notifications.signals import notify
+
 from recoco import verbs
 from recoco.apps.survey import signals as survey_signals
 from recoco.apps.training import utils as training_utils
 from recoco.utils import is_staff_for_site
 
 from . import models
-
 from .utils import (
+    get_advisors_for_project,
     get_notification_recipients_for_project,
     get_project_moderators,
     get_regional_actors_for_project,
-    get_advisors_for_project,
 )
 
 ########################################################################
@@ -76,7 +76,7 @@ def log_project_validated(sender, site, moderator, project, **kwargs):
         target=project,
     )
 
-    if project.status == "DRAFT" or project.muted:
+    if project.project_sites.current().status == "DRAFT" or project.muted:
         return
 
     # prevent crashing on misconfigured object
@@ -117,7 +117,7 @@ def log_project_switchtender_joined(sender, project, **kwargs):
 
 @receiver(project_switchtender_joined)
 def notify_project_switchtender_joined(sender, project, **kwargs):
-    if project.status == "DRAFT" or project.muted:
+    if project.project_sites.current().status == "DRAFT" or project.muted:
         return
 
     if project.inactive_since:
@@ -148,7 +148,7 @@ def log_project_observer_joined(sender, project, **kwargs):
 
 @receiver(project_observer_joined)
 def notify_project_observer_joined(sender, project, **kwargs):
-    if project.status == "DRAFT" or project.muted:
+    if project.project_sites.current().status == "DRAFT" or project.muted:
         return
 
     if project.inactive_since:
@@ -205,7 +205,7 @@ def log_project_member_joined(sender, project, **kwargs):
 
 @receiver(project_member_joined)
 def notify_project_member_joined(sender, project, **kwargs):
-    if project.status == "DRAFT" or project.muted:
+    if project.project_sites.current().status == "DRAFT" or project.muted:
         return
 
     if project.inactive_since:
@@ -291,7 +291,7 @@ def notify_note_created(sender, note, project, user, **kwargs):
             target=project,
         )
 
-    if project.status == "DRAFT" or project.muted:
+    if project.project_sites.current().status == "DRAFT" or project.muted:
         return
 
     notify.send(
@@ -336,7 +336,7 @@ def project_userproject_trace_status_changes(sender, old_one, new_one, **kwargs)
 @receiver(document_uploaded)
 def project_document_uploaded(sender, instance, **kwargs):
     project = instance.project
-    if project.status == "DRAFT" or project.muted:
+    if project.project_sites.current().status == "DRAFT" or project.muted:
         return
 
     # Add a trace

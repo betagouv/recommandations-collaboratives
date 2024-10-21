@@ -1,11 +1,12 @@
-from pathlib import Path
-from django.db.backends.utils import CursorWrapper
-from django.contrib.sites.models import Site
 import importlib
-from django.db.models import QuerySet
-from typing import Any
-from django.conf import settings
 from dataclasses import dataclass
+from pathlib import Path
+from typing import Any
+
+from django.conf import settings
+from django.contrib.sites.models import Site
+from django.db.backends.utils import CursorWrapper
+from django.db.models import QuerySet
 
 from recoco.utils import make_site_slug
 
@@ -38,12 +39,14 @@ class MaterializedView:
         name: str,
         indexes: list[str] = None,
         unique_indexes: list[str] = None,
+        db_owner: str = None,
     ):
         self.site = site
         self.name = name
         self.cursor = None
         self.indexes = indexes or []
         self.unique_indexes = unique_indexes or []
+        self.db_owner = db_owner
 
     @classmethod
     def create_for_site(
@@ -51,10 +54,10 @@ class MaterializedView:
     ) -> "MaterializedView":
         try:
             materialized_view = MaterializedView(site, **spec)
-        except TypeError:
+        except TypeError as exc:
             raise MaterializedViewSpecError(
                 f"Invalid materialized view specification '{spec}'"
-            )
+            ) from exc
 
         if check_sql_query and materialized_view.get_sql_query() is None:
             raise MaterializedViewSpecError(
@@ -65,12 +68,16 @@ class MaterializedView:
 
     @property
     def db_view_name(self) -> str:
-        return f"{settings.MATERIALIZED_VIEWS_PREFIX}_{self.name}"
+        return self.name
+
+    @staticmethod
+    def make_db_schema_name(site) -> str:
+        site_slug = make_site_slug(site=site)
+        return f"metrics_{site_slug}"
 
     @property
     def db_schema_name(self) -> str:
-        site_slug = make_site_slug(site=self.site)
-        return f"metrics_{site_slug}"
+        return self.make_db_schema_name(self.site)
 
     def set_cursor(self, cursor: CursorWrapper | None) -> None:
         self.cursor = cursor
@@ -116,26 +123,21 @@ class MaterializedView:
 
         # Create the materialized view
         self.cursor.execute(
-            sql=f"CREATE MATERIALIZED VIEW {self.db_schema_name}.{self.db_view_name} AS ( {sql_query.sql} ) WITH NO DATA;",
+            sql=f"CREATE MATERIALIZED VIEW IF NOT EXISTS {self.db_schema_name}.{self.db_view_name} AS ( {sql_query.sql} ) WITH NO DATA;",
             params=sql_query.params,
         )
 
         # Create indexes if any
         for index in self.indexes:
             self.cursor.execute(
-                sql=f"CREATE INDEX ON {self.db_schema_name}.{self.db_view_name} ({index});"
+                sql=f"CREATE INDEX IF NOT EXISTS {index} ON {self.db_schema_name}.{self.db_view_name} ({index});"
             )
 
         # Create unique indexes if any
         for index in self.unique_indexes:
             self.cursor.execute(
-                sql=f"CREATE UNIQUE INDEX ON {self.db_schema_name}.{self.db_view_name} ({index});"
+                sql=f"CREATE UNIQUE INDEX IF NOT EXISTS {index} ON {self.db_schema_name}.{self.db_view_name} ({index});"
             )
-
-    def drop(self) -> None:
-        self.cursor.execute(
-            sql=f"DROP MATERIALIZED VIEW IF EXISTS {self.db_schema_name}.{self.db_view_name};"
-        )
 
     def refresh(self) -> None:
         self.cursor.execute(

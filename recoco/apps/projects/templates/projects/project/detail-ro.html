@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% load humanize %}
 {% load static %}
+{% load django_vite %}
 {% load sass_tags %}
 {% block css %}
     <link href="{% sass_src 'resources/resources.scss' %}"
@@ -12,7 +13,8 @@
     <link href="{% sass_src 'projects/css/project.scss' %}"
           rel="stylesheet"
           type="text/css">
-{% endblock %}
+    {% vite_asset 'css/projectDetails.css' %}
+{% endblock css %}
 {% block js %}
     <script type="text/javascript">
 $(document).ready(function(){
@@ -39,9 +41,9 @@ function activateTab(){
 };
 
     </script>
-{% endblock %}
+{% endblock js %}
 {% block content %}
-    <div class="col-11 py-5 mx-auto">
+    <div class="col-12 fr-p-3w fr-mx-auto">
         <h1 class=" align-items-center">
             <svg class="bi" width="40" height="40" fill="currentColor">
                 <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#building" />
@@ -60,6 +62,4 @@ function activateTab(){
         {% endif %}
         <div class="row">{% include "projects/project/fragments/survey_grid.html" %}</div>
     </div>
-    <section>
-    </section>
-{% endblock %}
+{% endblock content %}

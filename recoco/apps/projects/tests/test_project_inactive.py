@@ -16,6 +16,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 from django.utils import timezone
 from model_bakery import baker
+
 from recoco import verbs
 from recoco.apps.home import models as home_models
 from recoco.apps.invites.api import invite_collaborator_on_project
@@ -33,15 +34,7 @@ from .. import models
 
 
 @pytest.mark.django_db
-def test_owner_can_set_project_inactive_without_reason(request, client):
-    site = get_current_site(request)
-
-    project = baker.make(
-        models.Project,
-        sites=[site],
-        status="READY",
-    )
-
+def test_owner_can_set_project_inactive_without_reason(request, client, project):
     url = reverse(
         "projects-project-set-inactive",
         args=[project.id],
@@ -60,15 +53,7 @@ def test_owner_can_set_project_inactive_without_reason(request, client):
 
 
 @pytest.mark.django_db
-def test_notify_and_trace_when_project_is_set_inactive(request, client):
-    site = get_current_site(request)
-
-    project = baker.make(
-        models.Project,
-        sites=[site],
-        status="READY",
-    )
-
+def test_notify_and_trace_when_project_is_set_inactive(request, client, project):
     collab = baker.make(auth_models.User, username="collab@project.info")
     advisor = baker.make(auth_models.User, username="advisor@project.info")
 
@@ -106,15 +91,7 @@ def test_notify_and_trace_when_project_is_set_inactive(request, client):
 
 
 @pytest.mark.django_db
-def test_owner_can_set_project_inactive_with_reason(request, client):
-    site = get_current_site(request)
-
-    project = baker.make(
-        models.Project,
-        sites=[site],
-        status="READY",
-    )
-
+def test_owner_can_set_project_inactive_with_reason(request, client, project):
     url = reverse(
         "projects-project-set-inactive",
         args=[project.id],
@@ -133,22 +110,14 @@ def test_owner_can_set_project_inactive_with_reason(request, client):
 
 
 @pytest.mark.django_db
-def test_site_staff_can_set_project_inactive(request, client):
-    site = get_current_site(request)
-
-    project = baker.make(
-        models.Project,
-        sites=[site],
-        status="READY",
-    )
-
+def test_site_staff_can_set_project_inactive(request, client, project):
     url = reverse(
         "projects-project-set-inactive",
         args=[project.id],
     )
 
     with login(client) as user:
-        assign_site_staff(site, user)
+        assign_site_staff(project.project_sites.current().site, user)
         response = client.post(url)
 
     assert response.status_code == 302
@@ -160,15 +129,7 @@ def test_site_staff_can_set_project_inactive(request, client):
 
 
 @pytest.mark.django_db
-def test_regular_collaborator_cannot_set_project_inactive(request, client):
-    site = get_current_site(request)
-
-    project = baker.make(
-        models.Project,
-        sites=[site],
-        status="READY",
-    )
-
+def test_regular_collaborator_cannot_set_project_inactive(request, client, project):
     url = reverse(
         "projects-project-set-inactive",
         args=[project.id],
@@ -189,12 +150,11 @@ def test_regular_collaborator_cannot_set_project_inactive(request, client):
 
 
 @pytest.mark.django_db
-def test_owner_can_set_project_active(request, client):
+def test_owner_can_set_project_active(request, client, make_project):
     site = get_current_site(request)
 
-    project = baker.make(
-        models.Project,
-        sites=[site],
+    project = make_project(
+        site=site,
         status="READY",
         inactive_since=timezone.now(),
     )
@@ -216,11 +176,13 @@ def test_owner_can_set_project_active(request, client):
 
 
 @pytest.mark.django_db
-def test_trace_when_project_is_set_active(request, client):
+def test_trace_when_project_is_set_active(request, client, make_project):
     site = get_current_site(request)
 
-    project = baker.make(
-        models.Project, sites=[site], status="READY", inactive_since=timezone.now()
+    project = make_project(
+        site=site,
+        status="READY",
+        inactive_since=timezone.now(),
     )
 
     collab = baker.make(auth_models.User, username="collab@project.info")
@@ -253,15 +215,10 @@ def test_trace_when_project_is_set_active(request, client):
 
 
 @pytest.mark.django_db
-def test_site_staff_can_set_project_active(request, client):
+def test_site_staff_can_set_project_active(request, client, make_project):
     site = get_current_site(request)
 
-    project = baker.make(
-        models.Project,
-        sites=[site],
-        status="READY",
-        inactive_since=timezone.now(),
-    )
+    project = make_project(site=site, status="READY", inactive_since=timezone.now())
 
     url = reverse(
         "projects-project-set-active",
@@ -280,12 +237,11 @@ def test_site_staff_can_set_project_active(request, client):
 
 
 @pytest.mark.django_db
-def test_regular_collaborator_cannot_set_project_active(request, client):
+def test_regular_collaborator_cannot_set_project_active(request, client, make_project):
     site = get_current_site(request)
 
-    project = baker.make(
-        models.Project,
-        sites=[site],
+    project = make_project(
+        site=site,
         status="READY",
         inactive_since=timezone.now(),
     )
@@ -311,17 +267,17 @@ def test_regular_collaborator_cannot_set_project_active(request, client):
 
 @pytest.mark.django_db
 def test_notifications_are_not_dispatched_to_collaborators_if_project_is_inactive(
-    request, client, subtests
+    request, client, subtests, make_project
 ):
     site = get_current_site(request)
     baker.make(home_models.SiteConfiguration, site=site)
 
-    project = baker.make(
-        models.Project,
-        sites=[site],
+    project = make_project(
+        site=site,
         status="READY",
         inactive_since=timezone.now(),
     )
+
     task = baker.make(
         tasks_models.Task, project=project, site=get_current_site(request)
     )
@@ -413,12 +369,11 @@ def test_notifications_are_not_dispatched_to_collaborators_if_project_is_inactiv
 
 # -- Implicit reactivation
 @pytest.mark.django_db
-def test_project_is_reactivated_on_conversation_message(request, client):
+def test_project_is_reactivated_on_conversation_message(request, client, make_project):
     site = get_current_site(request)
 
-    project = baker.make(
-        models.Project,
-        sites=[site],
+    project = make_project(
+        site=site,
         status="READY",
         inactive_since=timezone.now(),
     )
@@ -439,12 +394,11 @@ def test_project_is_reactivated_on_conversation_message(request, client):
 
 
 @pytest.mark.django_db
-def test_project_is_reactivated_on_document_upload(request, client):
+def test_project_is_reactivated_on_document_upload(request, client, make_project):
     site = get_current_site(request)
 
-    project = baker.make(
-        models.Project,
-        sites=[site],
+    project = make_project(
+        site=site,
         status="READY",
         inactive_since=timezone.now(),
     )
@@ -469,12 +423,13 @@ def test_project_is_reactivated_on_document_upload(request, client):
 
 
 @pytest.mark.django_db
-def test_project_is_reactivated_on_recommendation_comment(request, client):
+def test_project_is_reactivated_on_recommendation_comment(
+    request, client, make_project
+):
     site = get_current_site(request)
 
-    project = baker.make(
-        models.Project,
-        sites=[site],
+    project = make_project(
+        site=site,
         status="READY",
         inactive_since=timezone.now(),
     )

@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% load django_vite %}
+{% load static %}
+{% load humanize %}
+{% load crm_tags %}
+{% block title %}
+    Projets à faible répondant - CRM
+{% endblock title %}
+{% block content %}
+    <div x-data="Crm" class="d-flex fr-px-0">
+        {% include "crm/fragments/sidebar.html" with back_button=True map=True tools=True search=True %}
+        <div class="w-75 d-flex flex-column justify-content-start">
+            <div class="d-flex justify-content-between align-items-center fr-px-3w fr-pt-3w">
+                <h2>Projets à faible répondant</h2>
+                <!-- <a href="{% url 'crm-project-list-by-tags-csv' %}" class="btn btn-primary">Export CSV</a>  -->
+            </div>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Nom</th>
+                        <th>% d'accès aux recos</th>
+                        <th>Dernière activité collectivité</th>
+                        <th>Dernière reco publiée</th>
+                        <th>Dernier msg conversation</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for project in projects %}
+                        <tr>
+                            <td>
+                                {% if project.inactive_since %}<s>{% endif %}
+                                    <a href="{% url 'crm-project-details' project.pk %}">{{ project.name }}</a>
+                                    <a href="{% url 'projects-project-detail' project.pk %}"
+                                       target="_blank"
+                                       title="Ouvrir dans un nouvel onglet">
+                                        <svg class="align-middle bi"
+                                             width="12px"
+                                             height="12px"
+                                             fill="currentColor">
+                                            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#box-arrow-up-right" />
+                                        </svg>
+                                    </a>
+                                    {% if project.inactive_since %}</s>{% endif %}
+                                {% with project.crm_annotations.tags.names as active_tags %}
+                                    {% for crm_tag in site_config.crm_available_tags.all %}
+                                        {% if crm_tag.name in active_tags %}
+                                            &nbsp;<span class="fr-badge--info fr-badge--sm">{{ crm_tag.name }}</span>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endwith %}
+                                {% if project.inactive_since %}
+                                    <br>
+                                    <span class="small">(Project désactivé: {{ project.inactive_reason|default:"Intervention humaine" }})</span>
+                                {% endif %}
+                                <br>
+                                <span class="secondary small">{{ project.commune }} ({{ project.commune.postal }})</span>
+                            </td>
+                            <td>{{ project.reco_read_ratio|floatformat:0 }}% ({{ project.reco_read }}/{{ project.reco_total }})</td>
+                            <td>{{ project.last_members_activity_at|timesince }}</td>
+                            <td>{{ project.last_reco_at|timesince|default:"-" }}</td>
+                            <td>{{ project.last_public_msg_at|timesince|default:"-" }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock content %}

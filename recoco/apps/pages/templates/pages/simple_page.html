@@ -14,11 +14,16 @@
     <link href="{% sass_src 'home/css/cms/page-text.css' %}"
           rel="stylesheet"
           type="text/css">
-{% endblock %}
-{% block title %}{{ page.title }}{% endblock %}
-{% block og_title %}{{ page.title }}{% endblock %}
+{% endblock css %}
+{% block title %}
+    {{ page.title }}
+{% endblock title %}
+{% block og_title %}
+    {{ page.title }}
+{% endblock og_title %}
 {% block content %}
-    <div class="col-8 mt-4 py-3 g-0 mx-auto font-marianne" id="simple-text">
+    <div class="col-8 fr-mt-3w fr-py-2w g-0 fr-mx-auto font-marianne"
+         id="simple-text">
         <p>{{ page.body|richtext }}</p>
     </div>
-{% endblock %}
+{% endblock content %}
