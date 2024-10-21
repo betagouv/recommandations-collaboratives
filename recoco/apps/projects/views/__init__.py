@@ -131,23 +131,54 @@ def project_moderation_accept(request, project_pk):
 
         owner = project.owner
         if owner:
-            # Update owner permissions now the project is no in DRAFT state anymore
-            assign_collaborator(owner, project, is_owner=True)
+            # in case that's our primary site, assign and greet the project leader,
+            # otherwise, notify her she's invited to fill an additional survey
+            project_site = project.project_sites.get(site=request.site)
 
-            # Send an email to the project owner
-            params = {
-                "project": digests.make_project_digest(project, owner),
-            }
-            send_email(
-                template_name=communication_constants.TPL_PROJECT_ACCEPTED,
-                recipients=[
-                    {
-                        "name": normalize_user_name(owner),
-                        "email": project.owner.email,
-                    }
-                ],
-                params=params,
-            )
+            if project_site.is_origin:
+                # Update owner permissions now the project is no in DRAFT state anymore
+                assign_collaborator(owner, project, is_owner=True)
+
+                # Send an email to the project owner
+                params = {
+                    "project": digests.make_project_digest(project, owner),
+                }
+                send_email(
+                    template_name=communication_constants.TPL_PROJECT_ACCEPTED,
+                    recipients=[
+                        {
+                            "name": normalize_user_name(owner),
+                            "email": project.owner.email,
+                        }
+                    ],
+                    params=params,
+                )
+            else:
+                # Invite her to fill in a new form
+                # Send an email to the project owner
+
+                params = {
+                    "project": digests.make_project_digest(project, owner),
+                    "site": digests.make_site_digest(
+                        project.project_sites.origin().site
+                    ),
+                    "survey_site": digests.make_site_digest(request.site),
+                    "survey": digests.make_project_survey_digest_for_site(
+                        request.user,
+                        project,
+                        request.site,
+                    ),
+                }
+                send_email(
+                    template_name=communication_constants.TPL_PROJECT_ADDED_TO_NEW_SITE,
+                    recipients=[
+                        {
+                            "name": normalize_user_name(owner),
+                            "email": project.owner.email,
+                        }
+                    ],
+                    params=params,
+                )
 
         form = forms.ProjectModerationForm(request.POST)
         if form.is_valid():

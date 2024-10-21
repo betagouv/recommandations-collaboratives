@@ -5,7 +5,7 @@
 <div class="card-text map">
     <div class="d-flex gap-1 text-muted">
         <span class="fr-icon-map-pin-2-line fr-icon--sm" aria-hidden="true"></span>
-        <p class="d-flex flex-column fr-mb-1v">
+        <p class="fr-ml-1v fr-text--xs fr-mb-0 d-flex flex-column fr-mb-1v">
             <span>{{ project.location }}</span>
             <span>
                 {{ project.commune.name }} {{ project.commune.postal }}
@@ -17,25 +17,16 @@
         <div class="d-flex gap-1 text-muted justify-flex-end flex-grow-1">
             <span class="fr-icon-road-map-line fr-icon--sm" aria-hidden="true"></span>
             <div class="d-flex flex-column">
-                {% if project.location_x and project.location_y %}
-                    <p class="fr-mb-0">lat: {{ project.location_y|floatformat:2 }} ; lng: {{ project.location_x|floatformat:2 }}</p>
-                    <a href="https://www.google.com/maps/search/?api=1&query={{ project.location_y|unlocalize }}%2C{{ project.location_x|unlocalize }}"
-                       target="_blank"
-                       rel="noopener noreferrer">Voir sur Google Maps</a>
-                {% else %}
-                    <p class="fr-mb-0">
-                        lat: {{ project.commune.latitude|floatformat:2 }} ; lng: {{ project.commune.longitude|floatformat:2 }}
-                    </p>
-                    <a href="https://www.google.com/maps/search/?api=1&query={{ project.commune.latitude|unlocalize }}%2C{{ project.commune.longitude|unlocalize }}"
-                       target="_blank"
-                       rel="noopener noreferrer">Voir sur Google Maps</a>
-                {% endif %}
+                <a class="fr-ml-1v fr-text--xs fr-mb-0"
+                   href="https://www.google.com/maps/search/?api=1&query={{ project.location_y|unlocalize }}%2C{{ project.location_x|unlocalize }}"
+                   target="_blank"
+                   rel="noopener noreferrer">Voir sur Google Maps</a>
             </div>
         </div>
         {% if request.user in project.members.all or 'change_location' in user_project_perms %}
             <div class="answer">
                 <a href="{% url 'projects-project-location' project.pk %}"
-                   class="link-project-location-edit link-edit stretched-link text-decoration-none"
+                   class="fr-text--xs fr-mb-0 link-project-location-edit link-edit stretched-link text-decoration-none"
                    data-test-id="link-project-location-edit-knowledge">Préciser la localisation du projet</a>
                 <div class="flex-shrink-1 next-arrow">
                     <span class="fr-icon-arrow-right-line fr-icon--sm" aria-hidden="true"></span>

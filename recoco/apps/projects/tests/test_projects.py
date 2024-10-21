@@ -772,6 +772,32 @@ def test_project_moderation_refuse_and_redirect(request, client):
     assert response.status_code == 302
 
 
+@pytest.mark.multisite
+@pytest.mark.django_db
+def test_project_moderation_accept_on_secondary_site(request, client, project_draft):
+    current_site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=current_site)
+    owner = Recipe(auth.User, username="owner@owner.co").make()
+
+    baker.make(models.ProjectMember, project=project_draft, member=owner, is_owner=True)
+
+    updated_on_before = project_draft.updated_on
+    url = reverse("projects-moderation-accept", args=[project_draft.id])
+
+    with login(client, groups=["example_com_staff"]) as moderator:
+        moderator.profile.sites.add(current_site)
+        response = client.post(url)
+
+    project = models.Project.on_site.get(id=project_draft.id)
+    assert project.project_sites.current().status == "TO_PROCESS"
+    assert project.updated_on > updated_on_before
+
+    # check updated permissions
+    assert "invite_collaborators" in get_user_perms(owner, project)
+
+    assert response.status_code == 302
+
+
 ########################################################################
 # delete project
 ########################################################################

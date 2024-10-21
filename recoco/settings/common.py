@@ -393,6 +393,10 @@ MATERIALIZED_VIEWS_SPEC = [
         "unique_indexes": ["hash"],
         "indexes": ["last_login", "is_advisor"],
     },
+    {
+        "name": "user_activity",
+        "indexes": ["user_hash"],
+    },
 ]
 
 MATERIALIZED_VIEWS_SQL_DIR = BASE_DIR / "apps/metrics/sql_queries"

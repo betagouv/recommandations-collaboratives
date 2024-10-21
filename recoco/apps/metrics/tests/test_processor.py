@@ -24,6 +24,12 @@ class TestMaterializedView:
         ]
 
     @pytest.fixture(autouse=True)
+    def _disable_owner_settings(self, settings):
+        """We disable that feature to prevent the test from required another role in
+        the database"""
+        settings.MATERIALIZED_VIEWS_OWNER_TPL = None
+
+    @pytest.fixture(autouse=True)
     def stub_site(self):
         return Site(id=9, domain="example.com", name="site_name")
 
@@ -106,6 +112,27 @@ class TestMaterializedView:
         assert calls[3] == call(
             sql="CREATE UNIQUE INDEX IF NOT EXISTS unique_idx ON metrics_example_com.view_test_simple (unique_idx);"
         )
+
+    @pytest.mark.django_db(transaction=True)
+    def test_create_with_specified_owner(self, mocker, settings):
+        settings.MATERIALIZED_VIEWS_OWNER_TPL = "bal"
+        mock = mocker.patch(
+            "recoco.apps.metrics.management.commands.update_materialized_views.Command._assign_permissions_to_owner"
+        )
+
+        call_command("update_materialized_views")
+
+        mock.assert_called_once()
+
+    @pytest.mark.django_db(transaction=True)
+    def test_create_without_specified_owner(self, mocker, settings):
+        mock = mocker.patch(
+            "recoco.apps.metrics.management.commands.update_materialized_views.Command._assign_permissions_to_owner"
+        )
+
+        call_command("update_materialized_views")
+
+        mock.assert_not_called()
 
     @pytest.mark.django_db(transaction=True)
     def test_command(self):
