@@ -20,9 +20,9 @@
 {% is_staff_for_current_site request.user as is_staff %}
 {% get_advising_position user project request.site as position %}
 <div class="project-navigation d-flex justify-content-between">
-    <fieldset x-data=""
+    <fieldset x-data
               class="fr-segmented fr-segmented--md fr-px-3w"
-              x-init="$nextTick(() => $store.projectQueue.addCurrentProjectId({{ project.id }}))">
+              x-init="$nextTick(() => $store.projectQueue.addCurrentProjectId({{ project.id }}, `{{ project.name }}`, `{{ project.commune.name }}`,`{{ project.commune.insee }}`))">
         <legend class="fr-segmented__legend visually-hidden">Onglets du projet</legend>
         {% if overview %}
             {% if position.is_advisor or position.is_observer or is_regional_actor %}

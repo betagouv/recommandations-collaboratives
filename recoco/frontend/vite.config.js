@@ -56,7 +56,7 @@ const config = {
         mapViewerInteractive: resolve('./src/js/apps/mapViewerInteractive.js'),
         projectEmailReminder: resolve('./src/js/apps/projectEmailReminder.js'),
         mapEditor: resolve('./src/js/apps/mapEditor.js'),
-        menuNotification: resolve('./src/js/apps/menuNotification.js'),
+        menuTop: resolve('./src/js/apps/menuTop.js'),
         actionsEmbed: resolve('./src/js/apps/actionsEmbed.js'),
         tasksEmbed: resolve('./src/js/apps/tasksEmbed.js'),
         selectSearchable: resolve('./src/js/apps/selectSearchable.js'),
