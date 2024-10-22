@@ -73,4 +73,5 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         for site in Site.objects.order_by("id"):
-            self._create_views_for_site(site, **options)
+            with settings.SITE_ID.override(site.pk):
+                self._create_views_for_site(site, **options)
