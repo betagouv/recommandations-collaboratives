@@ -3,6 +3,6 @@
 
 {% if not user.is_authenticated %}
     {% for menuitem in current_site.root_page.get_children.live.in_menu %}
-        <a href="{% pageurl menuitem %}">{{ menuitem.title }}</a>
+        <a href="{% pageurl menuitem %}"><span class="fr-mx-1v align-middle">{{ menuitem.title }}</span></a>
     {% endfor %}
 {% endif %}

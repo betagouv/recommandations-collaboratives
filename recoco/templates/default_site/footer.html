@@ -7,6 +7,11 @@
         <div class="col-6 col-md">
             <h5>{{ request.site.name }}</h5>
             <ul class="list-unstyled text-small">
+                {% if not user.is_authenticated %}
+                    {% for menuitem in current_site.root_page.get_children.live.in_menu %}
+                        <a href="{% pageurl menuitem %}">{{ menuitem.title }}</a>
+                    {% endfor %}
+                {% endif %}
                 {% comment %} <li>
                     <a class="link-secondary" href="{% url 'whoweare' %}">Qui sommes-nous ?</a>
                 </li> {% endcomment %}
