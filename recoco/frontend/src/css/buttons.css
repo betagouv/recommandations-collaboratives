@@ -163,8 +163,7 @@
 
 .hint-button {
   position: absolute;
-  top: 50px;
-  left: -5px;
+  top: 60px;
   border-radius: 2px;
   cursor: pointer;
   transition: all 0.25s ease;
@@ -182,7 +181,7 @@
   content: '';
 
   position: absolute;
-  bottom: 83.5px;
+  bottom: 89.5px;
   left: 10px;
 
   width: 15px;

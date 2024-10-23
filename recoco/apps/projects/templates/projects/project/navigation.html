@@ -25,7 +25,7 @@
               x-init="$nextTick(() => $store.projectQueue.addCurrentProjectId({{ project.id }}, `{{ project.name }}`, `{{ project.commune.name }}`,`{{ project.commune.insee }}`))">
         <legend class="fr-segmented__legend visually-hidden">Onglets du projet</legend>
         {% if overview %}
-            {% if position.is_advisor or position.is_observer or is_regional_actor %}
+            {% if position.is_advisor or position.is_observer %}
                 {% include "tutorial/tutorial_hint.html" %}
             {% endif %}
         {% endif %}
