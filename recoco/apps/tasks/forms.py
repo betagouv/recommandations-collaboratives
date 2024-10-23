@@ -72,9 +72,9 @@ class PushTypeActionForm(forms.Form):
         self.fields["project"].queryset = projects_models.Project.objects.filter(
             switchtenders=user,
             sites=current_site,
-        ).filter(
-            ~Q(project_sites__status__in=["DRAFT", "REJECTED"]),
-            project_sites__site=current_site,
+        ).exclude(
+            Q(project_sites__status__in=["DRAFT", "REJECTED"]),
+            ~Q(project_sites__site=current_site),
         )
 
     PUSH_TYPES = (
