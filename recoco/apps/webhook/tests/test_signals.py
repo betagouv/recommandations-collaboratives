@@ -1,8 +1,10 @@
 import pytest
+from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 from django_webhook.models import WebhookTopic
 from freezegun import freeze_time
 from model_bakery import baker
+from taggit.models import TaggedItem
 
 from recoco.apps.geomatics.models import Commune
 from recoco.apps.projects.models import Project
@@ -45,8 +47,8 @@ def project(commune, make_project):
             commune=commune,
             location="rue des basques",
             description="My description",
-            tags=["my_tag"],
         )
+        project.tags.add("my_tag")  # taggit doesn't support initialization
         yield project
 
 
@@ -132,7 +134,10 @@ def test_model_dict_project(project, serialized_project):
 
 @pytest.mark.django_db
 def test_model_dict_taggeditem(project, serialized_project):
-    tagged_item = baker.make("taggit.TaggedItem", content_object=project)
+    project_ct = ContentType.objects.get_for_model(project)
+    tagged_item = TaggedItem.objects.get(
+        content_type=project_ct, object_id=project.pk, tag__name="my_tag"
+    )
     assert build_listener().model_dict(tagged_item) == serialized_project
 
 

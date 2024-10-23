@@ -25,7 +25,7 @@ django-tagging@git+https://github.com/nextories/django-tagging.git@bug/usage_for
 django-ordered-model==3.7.4
 django_otp==1.3.0
 
-django-taggit==4.0.0 # move to 5.0
+django-taggit==5.0.1
 django-gravatar2
 psycopg[binary]>3
 django-leaflet
@@ -58,7 +58,7 @@ django-clone==5.3.3
 django-reversion==5.0.2
 django-reversion-compare==0.17.0
 
-wagtail==6.1.3
+wagtail==6.2.2
 
 celery==5.4.0
 django-celery-results==2.5.1
@@ -69,3 +69,5 @@ metabase-api==3.4
 
 # Django webhook fork
 django-webhook @ git+https://github.com/etchegom/django-webhook.git@recoco
+
+django-json-widget==2.0.1

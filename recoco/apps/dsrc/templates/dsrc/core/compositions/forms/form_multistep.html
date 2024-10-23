@@ -2,7 +2,8 @@
 {% dsrc_stepper %}
 <form class="fr-mb-0" id="{{ form.id }}">
     {% csrf_token %}
-    {% block form_content %}{% endblock %}
+    {% block form_content %}
+    {% endblock form_content %}
     {% for field in form.visible_fields %}
         {% if field.use_fieldset %}
             {% dsrc_fieldset field %}

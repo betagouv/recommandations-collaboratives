@@ -4,30 +4,27 @@
 {% load django_vite %}
 {% load humanize %}
 {% load training %}
-{% block title %}Fusionner des organisations - CRM{% endblock %}
+{% block title %}
+    Fusionner des organisations - CRM
+{% endblock title %}
 {% block js %}
     {% vite_asset 'js/apps/crm.js' %}
-{% endblock %}
+{% endblock js %}
 {% block css %}
     <link href="{% sass_src 'home/css/dsfr/marianne.css' %}"
           rel="stylesheet"
           type="text/css">
-    <style>
- html, body {
-     scroll-padding-top: 240px;
- }
-    </style>
-{% endblock %}
+{% endblock css %}
 {% block content %}
-    <div x-data="Crm" class="d-flex px-0" style="">
+    <div x-data="Crm" class="d-flex fr-px-0">
         {% include "crm/fragments/sidebar.html" with search=True back_button=True user_advised_projects=False user_projects=False %}
         <div class="w-75 d-flex flex-column justify-content-start">
-            <div class="crm-header px-4 py-4 mb-3">
-                <div class="d-flex justify-content-between align-items-center mb-2">
+            <div class="crm-header fr-px-3w fr-py-3w fr-mb-2w">
+                <div class="d-flex justify-content-between align-items-center fr-mb-2v">
                     <h3>Fusionner des organisations</h3>
                 </div>
             </div>
-            <div class="m-4">
+            <div class="fr-m-3w">
                 <p class="fw-bolder">Vous êtes sur le point de fusionner les organisations suivantes :</p>
                 <p>
                     <ul>
@@ -45,9 +42,9 @@
                         </li>
                     </ul>
                 </p>
-                <div class="m-4 card py-4">
-                    <ul class="mb-4">
-                        <div class="mb-2">
+                <div class="fr-m-3w card fr-py-3w">
+                    <ul class="fr-mb-3w">
+                        <div class="fr-mb-2v">
                             <svg class="align-middle bi"
                                  width="18px"
                                  height="18px"
@@ -57,13 +54,13 @@
                             <span class="align-middle">Contacts</span>
                         </div>
                         {% for contact in contacts.all %}
-                            <li class="ms-4">{{ contact }} ({{ contact.email }})</li>
+                            <li class="fr-ml-3w">{{ contact }} ({{ contact.email }})</li>
                         {% empty %}
-                            <li class="ms-4">-- Aucun --</li>
+                            <li class="fr-ml-3w">-- Aucun --</li>
                         {% endfor %}
                     </ul>
                     <ul>
-                        <div class="mb-2">
+                        <div class="fr-mb-2v">
                             <svg class="align-middle bi"
                                  width="18px"
                                  height="18px"
@@ -73,13 +70,13 @@
                             <span class="align-middle">Utilisateur·trice·s</span>
                         </div>
                         {% for profile in profiles.all %}
-                            <li class="ms-4">{{ profile.user.get_full_name|default:profile.user.email }}</li>
+                            <li class="fr-ml-3w">{{ profile.user.get_full_name|default:profile.user.email }}</li>
                         {% empty %}
-                            <li class="ms-4">-- Aucun --</li>
+                            <li class="fr-ml-3w">-- Aucun --</li>
                         {% endfor %}
                     </ul>
                     <ul>
-                        <div class="mb-2">
+                        <div class="fr-mb-2v">
                             <svg class="align-middle bi"
                                  width="18px"
                                  height="18px"
@@ -89,18 +86,18 @@
                             <span class="align-middle">Départements</span>
                         </div>
                         {% for dpt in departments.all %}
-                            <li class="ms-4">{{ dpt }} ({{ dpt.code }})</li>
+                            <li class="fr-ml-3w">{{ dpt }} ({{ dpt.code }})</li>
                         {% empty %}
-                            <li class="ms-4">-- Aucun --</li>
+                            <li class="fr-ml-3w">-- Aucun --</li>
                         {% endfor %}
                     </ul>
                 </div>
-                <div class="mt-4">
+                <div class="fr-mt-3w">
                     <form x-data="{name: '{{ organizations.0.name }}'}"
-                          method="POST"
+                          method="post"
                           action="{% url 'crm-organization-merge' %}">
                         {% csrf_token %}
-                        <div class="mb-4">
+                        <div class="fr-mb-3w">
                             <div class="input-group">
                                 <label for="{{ merge_form.name.name }}" class="col-sm-2 col-form-label">Nouveau nom</label>
                                 <div class="col-sm-5">
@@ -112,7 +109,7 @@
                                            value="{{ merge_form.name.value|default:organizations.0.name }}">
                                 </div>
                             </div>
-                            <div class="small text-secondary mt-1">
+                            <div class="small text-secondary fr-mt-1v">
                                 Suggestions :
                                 {% for organization in organizations %}
                                     <button @click="name = '{{ organization.name }}'"
@@ -134,4 +131,4 @@
             </div>
         </div>
     </div>
-{% endblock %}
+{% endblock content %}

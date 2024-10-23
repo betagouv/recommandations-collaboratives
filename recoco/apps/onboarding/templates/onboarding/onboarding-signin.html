@@ -13,6 +13,9 @@
     <link href="{% sass_src 'home/css/dsfr/custom-dsfr.scss' %}"
           rel="stylesheet"
           type="text/css">
+    <link href="{% sass_src 'onboarding/css/signin.scss' %}"
+          rel="stylesheet"
+          type="text/css">
 {% endblock css %}
 {% block title %}
     Connexion | Solliciter l'équipe {{ request.site.name }}
@@ -28,7 +31,7 @@
 {% endblock tagline %}
 {% block content %}
     <div x-data="Auth" x-init="initLogin" class="container">
-        <div class="banner mt-6 mb-6 text-center">
+        <div class="banner  text-center">
             {% if site_config.email_logo %}
                 <img src="{{ site_config.email_logo.url }}"
                      width="10%"
@@ -39,7 +42,7 @@
                 <strong>Déposer votre projet</strong> {{ request.site.name }}
             </h1>
         </div>
-        <div class="fr-stepper mb-3">
+        <div class="fr-stepper fr-mb-2w">
             <h2 class="fr-stepper__title">
                 Identifiez-vous
                 <span class="fr-stepper__state">Étape 1 sur 2</span>
@@ -55,7 +58,7 @@
                  x-data="DsrcFormValidator('onboarding-login-form', schemaValidator, '{{ request.method }}')"
                  x-init="init">
                 <div class="container-fluid">
-                    <div class="fr-container fr-py-6w max-width-800" style="">
+                    <div class="fr-container fr-py-6w max-width-800">
                         <form class="login fr-form-group"
                               id="onboarding-login-form"
                               method="post"
@@ -71,9 +74,9 @@
                                    id="onboarding-login-form_js_enabled"
                                    value="false">
                             <fieldset class="fr-fieldset">
-                                <legend class="fr-fieldset__legend" style="font-size:1.5rem">Vous avez dejà un compte ? Identifiez-vous !</legend>
+                                <legend class="fr-fieldset__legend legend-specific-fontsize-1--5">Vous avez dejà un compte ? Identifiez-vous !</legend>
                                 {% if user_other_sites %}
-                                    <div class="mx-2 mb-4 custom-callout-blue">
+                                    <div class="fr-mx-2v fr-mb-3w custom-callout-blue">
                                         Pour vous connecter à {{ request.site.name }}, utilisez le même compte que sur
                                         {% for site in user_other_sites %}
                                             {% if not forloop.first and not forloop.last %},{% endif %}
@@ -164,7 +167,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="px-2 w-100 d-flex justify-content-between align-items-start fr-mt-10v">
+                                <div class="fr-px-2v w-100 d-flex justify-content-between align-items-start fr-mt-10v">
                                     <div class="d-flex flex-column align-items-start">
                                         {% comment %} TODO Add next {% endcomment %}
                                         <a class="link-underline-primary" href="/login/">Recevoir un lien de connexion par email</a>

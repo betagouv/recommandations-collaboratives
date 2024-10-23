@@ -1,3 +1,4 @@
+from string import Template
 from typing import Any
 
 from django.conf import settings
@@ -9,10 +10,21 @@ from recoco.apps.metrics.processor import (
     MaterializedView,
     MaterializedViewSpecError,
 )
+from recoco.utils import make_site_slug
 
 
 class Command(BaseCommand):
     help = "Update materialized view used for metrics"
+
+    def _assign_permissions_to_owner(self, cursor, schema_name: str, schema_owner: str):
+        cursor.execute(
+            sql=f"GRANT CONNECT ON DATABASE {connection.settings_dict['NAME']} TO {schema_owner};"
+        )
+        cursor.execute(sql=f"GRANT USAGE ON SCHEMA {schema_name} TO {schema_owner};")
+
+        cursor.execute(
+            sql=f"GRANT SELECT ON ALL TABLES IN SCHEMA {schema_name} TO {schema_owner};"
+        )
 
     def _create_views_for_site(self, site: Site, **options: Any):
         self.stdout.write(
@@ -38,6 +50,28 @@ class Command(BaseCommand):
                     materialized_view.create()
                     materialized_view.refresh()
 
+                # if an owner is specified, assign rights
+                if settings.MATERIALIZED_VIEWS_OWNER_TPL:
+                    db_schema_name = MaterializedView.make_db_schema_name(site)
+
+                    schema_owner = Template(
+                        settings.MATERIALIZED_VIEWS_OWNER_TPL
+                    ).substitute(
+                        site_name=site.name,
+                        site_slug=make_site_slug(site=site),
+                    )
+
+                    self.stdout.write(
+                        f"  ++ Assigning permissions to '{schema_owner}' on schema '{db_schema_name}'"
+                    )
+
+                    self._assign_permissions_to_owner(
+                        cursor,
+                        db_schema_name,
+                        schema_owner,
+                    )
+
     def handle(self, *args, **options):
         for site in Site.objects.order_by("id"):
-            self._create_views_for_site(site, **options)
+            with settings.SITE_ID.override(site.pk):
+                self._create_views_for_site(site, **options)

@@ -9,13 +9,13 @@
                 title="Fermer le menu"
                 @click="closeNotificationsMenu"
                 data-test-id="notification-menu-close">
-            <svg class="bi me-1" width="16" height="16" fill="currentColor">
+            <svg class="bi fr-mr-1v" width="16" height="16" fill="currentColor">
                 <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#x-lg" />
             </svg>
         </button>
     </li>
     <li>
-        <hr class="dropdown-divider">
+        <hr class="dropdown-divider fr-pb-0">
     </li>
     <div class="notifications__container" x-show="notificationNumber > 0">
         {% for date, notifications in grouped_notifications.items %}
@@ -26,7 +26,7 @@
                     x-show="isNotificationShown[`${ {{ forloop.counter }}{{ forloop.parentloop.counter0 }} }`]"
                     x-transition.duration.400ms>
                     <a href="javascript:void(0);"
-                       @click="clickConsummeNotificationAndRedirect({{ notification.pk }}, '{% if notification.verb == verbs.Recommendation.COMMENTED %}{{ notification.action_object.task.get_absolute_url }} {% else %}{{ notification.action_object.get_absolute_url }} {% endif %}')">
+                       @click="clickConsummeNotificationAndRedirect({{ notification.pk }}, {% if notification.verb == verbs.Recommendation.COMMENTED %}'{{ notification.action_object.task.get_absolute_url }}' {% elif notification.verb == verbs.Survey.STARTED or notification.verb == verbs.Survey.UPDATED %} `{{ notification.target.get_absolute_url }}connaissance` {% else %}'{{ notification.action_object.get_absolute_url }}' {% endif %})">
                         {% include "user/user_card.html" with user=notification.actor project=notification.target user_popup_deactivate=True user_activity=False disable_links=True %}
                         {% if notification.verb == verbs.Project.VALIDATED %}
                             <div class="notification__project">{{ notification.target }}</div>
@@ -43,7 +43,7 @@
                         {% elif notification.action_object.content and "message" in notification.verb %}
                             <div class="notification__message">"{{ notification.action_object.content|truncatewords:100 }}"</div>
                         {% endif %}
-                        {% if notification.verb == verbs.Recommendation.COMMENTED or notification.verb == verbs.Recommendation.CREATED or notification.verb == verbs.Conversation.POST_MESSAGE or notification.verb == verbs.Document.ADDED_FILE %}
+                        {% if notification.verb in show_project_verb_list %}
                             <div class="notification__project">
                                 <span class="notification__verb--no-margin">sur le projet</span> {{ notification.target }}
                             </div>
@@ -53,7 +53,7 @@
                             title="Supprimer la notification"
                             data-test-id="notification-mark-as-read-one"
                             @click="markNotificationAsRead({{ notification.id }}, $el, `${ {{ forloop.counter }}{{ forloop.parentloop.counter0 }} }`)">
-                        <svg class="bi me-1" width="16" height="16" fill="currentColor">
+                        <svg class="bi fr-mr-1v" width="16" height="16" fill="currentColor">
                             <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#x-lg" />
                         </svg>
                     </button>
@@ -65,7 +65,7 @@
         <span class="dropdown-item-text">Vous n'avez aucune notification ☀️</span>
     </li>
     <li>
-        <hr class="dropdown-divider">
+        <hr class="dropdown-divider fr-pb-0">
     </li>
     <li class="btn-container">
         <button @click="markAllNotificationsAsRead"

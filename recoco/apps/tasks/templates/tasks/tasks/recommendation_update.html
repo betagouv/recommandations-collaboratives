@@ -1,16 +1,18 @@
 {% extends "base.html" %}
 {% load static %}
-{% block title %}Modifier une suggestion automatique{% endblock %}
+{% block title %}
+    Modifier une suggestion automatique
+{% endblock title %}
 {% block content %}
-    <div class="col-12 p-4 mx-auto">
+    <div class="col-12 fr-p-3w fr-mx-auto">
         <h2>Mise à jour d'un pré-fléchage</h2>
         <p>{{ recommendation.ressource.title }} / {{ recommendation.text }}</p>
         <form class="form"
-              method="POST"
+              method="post"
               action="{% url 'projects-task-recommendation-update' recommendation.pk %}">
             {% csrf_token %}
             {{ form.as_p }}
             <button class="btn btn-primary" type="submit">Mettre à jour</button>
         </form>
     </div>
-{% endblock %}
+{% endblock content %}

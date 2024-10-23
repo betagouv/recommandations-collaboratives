@@ -1,29 +1,36 @@
 {% load static %}
 {% load gravatar %}
 {% load guardian_tags %}
+{% load sass_tags %}
+{% block css %}
+    <link href="{% sass_src 'projects/css/fragments/task_inline/task.scss' %}"
+          rel="stylesheet"
+          type="text/css" />
+{% endblock css %}
 {% get_obj_perms request.user for request.site as "user_site_perms" %}
 {% get_obj_perms request.user for project as "user_project_perms" %}
 <div x-data="Task(task)"
      :class="`border${getTaskColor(task)}`"
-     class="rounded mb-3 px-3 d-flex pt-3 pb-3 justify-content-between align-items-start task-item cursor-pointer hover-shadow hover-border-blue transition-all"
-     @click="handleOpenPreviewModal()"
+     class="rounded fr-mb-2w fr-px-2w d-flex fr-pt-2w fr-pb-2w justify-content-between align-items-start task-item {% if embed_view is not True %}cursor-pointer{% endif %} hover-shadow hover-border-blue transition-all"
+     {% if embed_view is not True %}@click="handleOpenPreviewModal()"{% endif %}
      :id="task.id">
     <div x-show="task.isLoading"
-         class="ms-2 item-loader z-index-1"
-         style="width: 24px;
-                height: 24px">
+         class="fr-ml-2v item-loader z-1 specific-size">
         <div class="spinner-border spinner-border spinner-border-sm text-primary"
              role="status"></div>
     </div>
-    <div class="d-flex flex-column flex-grow-1 ease-transition"
+    <div class="d-flex flex-column flex-grow-1 ease-transition tmp-usevar"
          :style="task.isLoading && 'opacity:0.3';">
-        <div class="card-top-information d-flex align-items-center">
-            <template x-if="!task.visited && task.public">
-                <div class="left-0">
-                    <span class="bg-blue text-white"
-                          x-text="!$store.djangoData.isAdvisor ? 'Nouveau' : 'Non lu par la collectivité' "></span>
-                </div>
-            </template>
+        <div data-test-id="badge-new-task"
+             class="card-top-information d-flex align-items-center">
+            {% if embed_view is not True %}
+                <template x-if="!task.visited && task.public">
+                    <div class="left-0">
+                        <span class="bg-blue text-white"
+                              x-text="!$store.djangoData.isAdvisor ? 'Nouveau' : 'Non lu par la collectivité' "></span>
+                    </div>
+                </template>
+            {% endif %}
             <template x-if="!task.public">
                 <div class="left-0">
                     <span data-test-id="task-draft-status"
@@ -32,7 +39,7 @@
                 </div>
             </template>
             <template x-if="task.topic && task.topic.name">
-                <div class="left-0 ms-2">
+                <div class="left-0 fr-ml-2v">
                     <span data-test-id="task-inline-topic"
                           class="bg-purple text-white"
                           x-text="task.topic.name"></span>
@@ -42,56 +49,85 @@
         <div class="d-flex align-items-center justify-content-between">
             <div class="d-flex w-100 justify-content-between align-items-center">
                 <div class="d-flex w-100 align-items-center">
-                    <span class="mt-0 pt-0 mb-0 fw-bold title-info text-transform-none text-blue text-decoration-underline"
-                          x-text="task.intent"></span>
+                    <h4 class="fr-mt-0 fr-pt-0 fr-mb-0 fw-bold {% if embed_view %}fr-mb-3v{% endif %}"
+                        x-text="task.intent"></h4>
                 </div>
             </div>
-            {% if "manage_tasks" in user_project_perms and not disable_edit %}
-                {% include 'projects/project/fragments/task/task_actions.html' %}
+            {% if embed_view is not True %}
+                {% if "manage_tasks" in user_project_perms and not disable_edit %}
+                    {% include "projects/project/fragments/task/task_actions.html" %}
+                {% endif %}
             {% endif %}
         </div>
-        <article class="mt-1 mb-2">
-            <template x-if="task.resource_id && task.resource && task.resource.subtitle">
-                <div x-html="truncate(renderMarkdown(task.resource.subtitle),100)"
-                     class="text-info-custom fw-light font-small text-dark m-0 p-0">
-                </div>
-            </template>
-            <template x-if="!task.resource_id && task.content">
-                <div x-html="truncate(renderMarkdown(task.content),100)"
-                     class="text-info-custom fw-light font-small text-dark mb-2 p-0"></div>
-            </template>
-        </article>
+        {% if embed_view is not True %}
+            <article class="fr-mt-1v fr-mb-2v">
+                <template x-if="task.resource_id && task.resource && task.resource.subtitle">
+                    <div x-html="truncate(renderMarkdown(task.resource.subtitle),100)"
+                         class="text-info-custom fw-light font-small text-dark fr-m-0 fr-p-0"></div>
+                </template>
+                <template x-if="!task.resource_id && task.content">
+                    <div x-html="truncate(renderMarkdown(task.content),100)"
+                         class="text-info-custom fw-light font-small text-dark fr-mb-2v fr-p-0"></div>
+                </template>
+            </article>
+        {% endif %}
         <template x-if="task.resource">
-            <article class="mb-3">{% include 'projects/project/fragments/task/task_comment.html' %}</article>
+            <article>{% include 'projects/project/fragments/task/task_comment.html' %}</article>
+        </template>
+        <hr class="fr-mt-3w">
+        <template x-if="task.ds_folder">
+            <div>
+                <h4 class="fw-bolder">
+                    <img height="31px"
+                         width="32px"
+                         src="{% static 'svg/picto-demarches_simplifiees.svg' %}"
+                         alt="Pictogramme Démarches Simplifiées">
+                    Dossier Démarches Simplifiées
+                </h4>
+                <p class="fr-text-mention--grey fr-text--sm fr-my-3v">
+                    Complétez l’état des lieux pour pré-remplir automatiquement le dossier de candidature.
+                </p>
+                <a class="fr-btn fr-btn--secondary fr-btn--sm"
+                   @click.stop=""
+                   x-bind:href="task.ds_folder.dossier_url">Voir mon dossier</a>
+                <span class="fr-ml-2w fr-text-label--blue-france fr-text--xs">
+                    {% if task.ds_folder.prefilled_count > 1 %}
+                        {{ task.ds_folder.prefilled_count }} données pré-remplies
+                    {% elif task.ds_folder.prefilled_count > 0 %}
+                        1 donnée pré-remplie
+                    {% else %}
+                        aucune donnée pré-remplie
+                    {% endif %}
+                </span>
+                <hr class="fr-mt-3w">
+            </div>
         </template>
         <footer class="d-flex justify-content-between align-items-center">
             <div class="d-flex align-items-center">
-                <template x-if="task.public">
-                    {% include 'projects/project/fragments/tasks_inline_kanban/tasks_status_buttons.html' %}
-                </template>
-                <div class="text-grey-dark d-flex align-items-center tiny me-3 responsive-flex-column">
-                    <svg class="align-middle bi me-1"
-                         width="18px"
-                         height="15px"
-                         fill="currentColor">
-                        <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#chat-square" />
-                    </svg>
-                    <span class="tiny hover-underline cursor-pointer"
-                          @click="handleOpenPreviewModal()"
+                {% if embed_view is not True %}
+                    <template x-if="task.public">
+                        {% include "projects/project/fragments/tasks_inline_kanban/tasks_status_buttons.html" %}
+                    </template>
+                {% endif %}
+                <div class="text-grey-dark d-flex align-items-center tiny fr-mr-2w responsive-flex-column">
+                    <span class="fr-icon-chat-2-line fr-icon--sm fr-mr-1v" aria-hidden="true"></span>
+                    <span class="tiny {% if embed_view is not True %}hover-underline cursor-pointer{% endif %}"
+                          {% if embed_view is not True %}@click="handleOpenPreviewModal()"{% endif %}
                           x-text="task.resource_id ? getTaskMessageCountLabel(task.comments_count + 1) : getTaskMessageCountLabel(task.comments_count)"></span>
                     <template x-if="task.notifications.count > 0">
-                        <span class="tiny hover-underline cursor-pointer text-blue fw-medium ms-1"
-                              @click="handleOpenPreviewModal()"
+                        <span class="tiny {% if embed_view is not True %}hover-underline cursor-pointer{% endif %} text-blue fw-medium fr-ml-1v"
+                              {% if embed_view is not True %}@click="handleOpenPreviewModal()"{% endif %}
                               x-text="task.resource_id ? getTaskNewMessageCountLabel(task.notifications.count) : getTaskNewMessageCountLabel(task.notifications.count)"></span>
                     </template>
                 </div>
             </div>
-            <div class="tiny d-flex align-items-center">
-                <span class="text-muted me-1"
-                      x-text="`Émis le ${formatDate(task.created_on)}`"
-                      style="line-height: 20px"></span>
-                {% include 'projects/project/fragments/task/task_user_card.html' %}
-            </div>
+            {% if embed_view is not True %}
+                <div class="tiny d-flex align-items-center">
+                    <span class="text-muted fr-mr-1v specific-lineheight-20"
+                          x-text="`Émis le ${formatDate(task.created_on)}`"></span>
+                    {% include "projects/project/fragments/task/task_user_card.html" %}
+                </div>
+            {% endif %}
         </footer>
     </div>
 </div>

@@ -87,6 +87,7 @@ INSTALLED_APPS = [
     "recoco.apps.training",
     "recoco.apps.pages",
     "recoco.apps.metrics",
+    "recoco.apps.demarches_simplifiees",
     "crispy_forms",
     "wagtail.contrib.forms",
     "wagtail.contrib.redirects",
@@ -100,6 +101,7 @@ INSTALLED_APPS = [
     "wagtail.admin",
     "wagtail",
     "django_celery_results",
+    "django_json_widget",
 ]
 
 SITE_ID = SiteID(default=1)
@@ -392,6 +394,10 @@ MATERIALIZED_VIEWS_SPEC = [
         "unique_indexes": ["hash"],
         "indexes": ["last_login", "is_advisor"],
     },
+    {
+        "name": "user_activity",
+        "indexes": ["user_hash"],
+    },
 ]
 
 MATERIALIZED_VIEWS_SQL_DIR = BASE_DIR / "apps/metrics/sql_queries"
@@ -406,6 +412,7 @@ CELERY_TASK_TRACK_STARTED = True
 CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL", default="redis://localhost:6379/0")
 CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
 CELERY_RESULT_BACKEND = "django-db"
+
 
 # Metabase
 METABASE_HOST = os.environ.get("METABASE_HOST")
@@ -425,5 +432,12 @@ DJANGO_WEBHOOK = {
     "SIGNAL_LISTENER": "recoco.apps.webhook.signals.WebhookSignalListener",
     "USE_CACHE": False,
 }
+
+# Démarches simplifiées
+DS_BASE_URL = "https://www.demarches-simplifiees.fr"
+DS_API_BASE_URL = f"{DS_BASE_URL}/api/public/v1"
+DS_AUTOLOAD_SCHEMA = True
+DS_AUTOCREATE_FOLDER = True
+DS_ADAPTERS_DIR = BASE_DIR / "apps/demarches_simplifiees/adapters"
 
 # eof

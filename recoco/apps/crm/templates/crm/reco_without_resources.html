@@ -3,15 +3,17 @@
 {% load static %}
 {% load humanize %}
 {% load crm_tags %}
-{% block title %}Recommandations sans ressource - CRM{% endblock %}
+{% block title %}
+    Recommandations sans ressource - CRM
+{% endblock title %}
 {% block js %}
     {% vite_asset 'js/apps/crm.js' %}
-{% endblock %}
+{% endblock js %}
 {% block content %}
-    <div x-data="Crm" class="d-flex px-0" style="">
+    <div x-data="Crm" class="d-flex fr-px-0">
         {% include "crm/fragments/sidebar.html" with back_button=True map=True tools=True search=True %}
         <div class="w-75 d-flex flex-column justify-content-start">
-            <div class="d-flex justify-content-between align-items-center px-4 pt-4">
+            <div class="d-flex justify-content-between align-items-center fr-px-3w fr-pt-3w">
                 <h2>Recommandations sans ressource ({{ recommendations.count }})</h2>
             </div>
             <table class="table table-striped">
@@ -27,7 +29,7 @@
                     {% for reco in recommendations %}
                         <tr>
                             <td>
-                                {{ reco.project }}<a href="{% url 'projects-project-detail'  reco.project.pk %}"
+                                {{ reco.project }}<a href="{% url 'projects-project-detail' reco.project.pk %}"
    target="_new">[&nearr;]</a>
                             </td>
                             <td>{{ reco.created_on }}</td>
@@ -45,4 +47,4 @@
             </table>
         </div>
     </div>
-{% endblock %}
+{% endblock content %}

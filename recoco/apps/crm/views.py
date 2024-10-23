@@ -114,11 +114,6 @@ def crm_search(request):
     if search_form.is_valid():
         site = request.site
         query = search_form.cleaned_data["query"]
-        project_results = watson.filter(
-            Project.objects.filter(sites=request.site), query, ranking=True
-        )
-
-        search_results = list(project_results)
 
         all_sites_search_results = watson.search(
             query,
@@ -399,7 +394,7 @@ def user_update(request, user_id=None):
                         # a user with the new mail already exist
                         if request.site in users[0].profile.sites.all():  # on same site
                             user_link = reverse("crm-user-details", args=[users[0].pk])
-                            error_msg = mark_safe(
+                            error_msg = mark_safe(  # noqa: S308
                                 f'L\'utilisateur <a href="{user_link}">'
                                 f"{users[0].first_name} {users[0].last_name}</a>'"
                                 " utilise déjà cette adresse email."
@@ -1057,7 +1052,7 @@ def compute_topics_occurences(site):
     project_topics = defaultdict(
         list,
         (
-            (topic.name, list(topic.projects.values_list("name", "id")))
+            (topic.name, list(topic.projects.all()))
             for topic in (
                 Topic.objects.filter(projects__sites=site, projects__deleted=None)
                 .prefetch_related("projects")
@@ -1069,10 +1064,11 @@ def compute_topics_occurences(site):
     task_topics = defaultdict(
         list,
         (
-            (topic.name, list(topic.tasks.values_list("intent", "id", "project__id")))
+            (topic.name, list(topic.tasks.all()))
             for topic in (
                 Topic.objects.filter(tasks__site=site, tasks__deleted=None)
                 .prefetch_related("tasks")
+                .prefetch_related("tasks__project")
                 .distinct()
             )
         ),
@@ -1136,8 +1132,8 @@ def crm_list_topics_as_csv(request):
             [
                 name,
                 usage[0],
-                [project[1] for project in usage[1]],
-                [task[1] for task in usage[2]],
+                [project.pk for project in usage[1]],
+                [task.pk for task in usage[2]],
             ]
         )
 

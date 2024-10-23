@@ -31,3 +31,19 @@
 [data-popper-placement^='right'] > .popover-arrow {
   left: -4px;
 }
+
+.h6-specific-fontsize-1 {
+  font-size: 1em;
+}
+
+.file-upload-btn,
+.link-upload-btn {
+  &__modal {
+    z-index: 500;
+    width: 420px;
+  }
+}
+
+.project-file-search {
+  width: max-content;
+}

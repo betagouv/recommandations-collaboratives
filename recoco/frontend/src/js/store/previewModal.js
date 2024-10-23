@@ -32,10 +32,7 @@ document.addEventListener('alpine:init', () => {
 
       const cleanup = () => {
         location.hash = '';
-        if (!this.currentTask.visited) {
-          this.setTaskIsVisited();
-        }
-
+        Alpine.store('tasksView').updateView();
         // Restore scroll position
         window.scrollTo(0, this.scrollY);
       };
@@ -70,7 +67,7 @@ document.addEventListener('alpine:init', () => {
     open(task) {
       this.isPaginated = false;
       this.setLocation(task.id);
-      this.currentTask = task;
+      this.visitTask(task);
       this.handle.show();
     },
 
@@ -78,6 +75,7 @@ document.addEventListener('alpine:init', () => {
       this.isPaginated = true;
       this.index = 0;
       this.setLocation(this.newTasks[this.index].id);
+      this.visitTask(this.newTasks[this.index]);
       this.handle.show();
     },
 
@@ -85,6 +83,7 @@ document.addEventListener('alpine:init', () => {
       if (this.index + 1 < this.newTasks.length) {
         this.index++;
         this.setLocation(this.newTasks[this.index].id);
+        this.visitTask(this.newTasks[this.index]);
       }
     },
 
@@ -92,6 +91,15 @@ document.addEventListener('alpine:init', () => {
       if (this.index > 0) {
         this.index--;
         this.setLocation(this.newTasks[this.index].id);
+        this.visitTask(this.newTasks[this.index]);
+      }
+    },
+    visitTask(task) {
+      this.currentTask = task;
+      this.taskId = task.id;
+
+      if (!this.currentTask.visited) {
+        this.setTaskIsVisited();
       }
     },
 
@@ -100,8 +108,8 @@ document.addEventListener('alpine:init', () => {
     },
     async loadFollowups() {
       const { data } = await api.get(followupsUrl(this.projectId, this.taskId));
+
       Alpine.store('tasksData').markAllAsRead(this.taskId);
-      await Alpine.store('tasksView').updateView();
       this.followups = data;
     },
     async loadNotifications() {
@@ -115,7 +123,6 @@ document.addEventListener('alpine:init', () => {
         await api.post(
           markTaskNotificationAsVisited(this.projectId, this.taskId)
         );
-        await Alpine.store('tasksView').updateView();
       }
     },
   });

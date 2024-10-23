@@ -1,14 +1,16 @@
 {% extends "base.html" %}
 {% load static %}
 {% load humanize %}
-{% block title %}Modifier la note - CRM{% endblock %}
+{% block title %}
+    Modifier la note - CRM
+{% endblock title %}
 {% block content %}
-    <div class="col-12 p-4 mx-auto">
+    <div class="col-12 fr-p-3w fr-mx-auto">
         <section>
             <form method="post">
                 {% csrf_token %}
-                <h2 class="mb-4 d-flex align-items-center">
-                    <svg class="bi me-2" width="20" height="20" fill="currentColor">
+                <h2 class="fr-mb-3w d-flex align-items-center">
+                    <svg class="bi fr-mr-2v" width="20" height="20" fill="currentColor">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#activity" />
                     </svg>
                     <span>CRM</span>
@@ -38,7 +40,7 @@
                     {{ form.title }}
                 </p>
                 <div class="d-flex">
-                    {% include 'tools/editor.html' with input_name=form.content.name input_value=form.content.value|default:'' input_required=True escapejs=True %}
+                    {% include "tools/editor.html" with input_name=form.content.name input_value=form.content.value|default:'' input_required=True escapejs=True %}
                 </div>
                 <p>
                     {{ form.tags.label }}
@@ -55,4 +57,4 @@
             {{ form.media }}
         </section>
     </div>
-{% endblock %}
+{% endblock content %}

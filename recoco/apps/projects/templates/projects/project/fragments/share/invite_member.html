@@ -1,4 +1,10 @@
 {% load static %}
+{% load sass_tags %}
+{% block css %}
+    <link href="{% sass_src 'projects/css/fragments/share/invite.scss' %}"
+          rel="stylesheet"
+          type="text/css" />
+{% endblock css %}
 <div class="modal fade"
      id="invite-member-modal"
      tabindex="-1"
@@ -8,17 +14,15 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h6 style="font-size: 22px;" class="fw-bold d-block mb-0">Inviter un membre de la collectivité</h6>
+                <h6 class="fw-bold d-block fr-mb-0 h6-specific-fontsize-22">Inviter un membre de la collectivité</h6>
             </div>
             <div class="modal-body">
                 <form class="form"
                       id="form-projects-access-add-user"
                       action="{% url 'projects-project-access-collectivity-invite' project.pk %}"
                       method="post">
-                    <div class="mb-3">
-                        <label class="form-label"
-                               style="font-size: 16px;
-                                      color: #666666"
+                    <div class="fr-mb-2w">
+                        <label class="form-label specific-fontsize-16 specific-color-666"
                                for="invite-email">Saisissez l'adresse email de la personne à inviter</label>
                         <input id="invite-email"
                                type="email"
@@ -32,10 +36,8 @@
                            id="role-collaborator"
                            value="COLLABORATOR">
                     {% if source %}<input type="hidden" name="source" id="source" value="{{ source }}">{% endif %}
-                    <div class="mb-3">
-                        <label style="font-size: 16px;
-                                      color: #666666"
-                               class="form-label"
+                    <div class="fr-mb-2w">
+                        <label class="form-label specific-fontsize-16 specific-color-666"
                                for="invite-message">Message d'invitation (optionnel)</label>
                         <textarea id="invite-message"
                                   rows="8"

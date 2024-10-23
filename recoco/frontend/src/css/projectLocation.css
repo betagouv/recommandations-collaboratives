@@ -100,15 +100,6 @@
   position: absolute;
   right: 0;
   bottom: 10px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  background-color: white;
-  padding: 10px;
-  border: 1px solid #e5e5e5;
-
-  cursor: pointer;
 }
 
 .map.card-text {

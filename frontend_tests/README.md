@@ -16,15 +16,50 @@ DATABASES = {
         'HOST': 'localhost',
         'PORT': 5432,
         'TEST': {
-            'NAME':'test_recoco'
+            'NAME':'test_recoco' # <-- ici
         }
     }
 }
 ```
 
+- Dupliquer le fichier `development.py` en `frontend_tests.py` et modifier les paramètres de la base de données pour qu'ils correspondent à la base de données de test.
+
+```python
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': test_recoco, # <-- ici
+        'USER': os.environ.get('POSTGRES_USER'),
+        'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
+        'HOST': 'localhost',
+        'PORT': 5432,
+    }
+}
+```
+
+Ces paramètres sont seulement utilisés pour lancer la mise à jour des permissions à l'aide du script `update_permissions.py`
+
+- Dans le fichier `frontend_tests.py`, modifier le port d'accès du front end, cela permettra de lancer le serveur front end sur un port différent du serveur de développement Django et de pouvoir lancer les tests en parallèle.:
+
+```python
+DJANGO_VITE = {"default": {"dev_mode": DEBUG, "dev_server_port": 3001}}
+```
+
 ## Lancer les tests
 
 ### Lancement de la serie de tests Cypress
+
+Installer les dépendances :
+
+```bash
+$ yarn install
+```
+
+> ⚠️ Attention
+>
+> S'assurer d'être dans son environnement virtuel Django.
+
+Lancer les tests :
 
 ```bash
 $ yarn test

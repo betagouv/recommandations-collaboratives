@@ -2,28 +2,28 @@
 -- create a database for a django project
 
 -- Create the dedicated database
-CREATE DATABASE urbanvitaliz;
+CREATE DATABASE recoco;
 
 -- Create the dedicated user
-CREATE USER urbanvitaliz WITH PASSWORD 'urbanvitaliz';
+CREATE USER recoco WITH PASSWORD 'recoco';
 
 -- grant privileges to dedicated user for creating things
-ALTER USER "urbanvitaliz" CREATEDB ;
-GRANT ALL PRIVILEGES ON DATABASE "urbanvitaliz" to "urbanvitaliz";
+ALTER USER "recoco" CREATEDB ;
+GRANT ALL PRIVILEGES ON DATABASE "recoco" to "recoco";
 
 -- Connect to the database
-\connect urbanvitaliz;
+\connect recoco;
 
 -- even on pg 15 stay on unsafe usage of public schema
-GRANT ALL PRIVILEGES ON SCHEMA public TO urbanvitaliz;
-ALTER SCHEMA public OWNER TO urbanvitaliz;
+GRANT ALL PRIVILEGES ON SCHEMA public TO recoco;
+ALTER SCHEMA public OWNER TO recoco;
 
 -- Create a new schema with dedicated user as owner for safe usage
-CREATE SCHEMA urbanvitaliz AUTHORIZATION urbanvitaliz;
+CREATE SCHEMA recoco AUTHORIZATION recoco;
 
 -- Set some settings as recommended by the Django documentation
-ALTER ROLE urbanvitaliz SET client_encoding TO 'utf8';
-ALTER ROLE urbanvitaliz SET default_transaction_isolation TO 'read committed';
-ALTER ROLE urbanvitaliz SET timezone TO 'UTC';
+ALTER ROLE recoco SET client_encoding TO 'utf8';
+ALTER ROLE recoco SET default_transaction_isolation TO 'read committed';
+ALTER ROLE recoco SET timezone TO 'UTC';
 
 -- eof

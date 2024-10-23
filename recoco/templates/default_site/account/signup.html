@@ -4,7 +4,7 @@
 {% load i18n %}
 {% block head_title %}
     {% trans "Signup" %}
-{% endblock %}
+{% endblock head_title %}
 {% block css %}
     <link href="{% sass_src 'home/css/dsfr/custom-dsfr.scss' %}"
           rel="stylesheet"
@@ -12,11 +12,14 @@
     <link href="{% sass_src 'home/css/auth/auth.css' %}"
           rel="stylesheet"
           type="text/css">
-{% endblock %}
+    <link href="{% sass_src 'css/account/login.css' %}"
+          rel="stylesheet"
+          type="text/css">
+{% endblock css %}
 {% block content %}
-    <div class="fr-container fr-py-6w max-width-800" style="">
+    <div class="fr-container fr-py-6w max-width-800">
         <h1 class="fr-mb-6w">
-            <svg class="bi me-2" width="28" height="28">
+            <svg class="bi fr-mr-2v" width="28" height="28">
                 <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#person-circle" />
             </svg>
             Création d'un compte {{ site.name }}
@@ -32,7 +35,7 @@
                        value="{{ redirect_field_value }}" />
             {% endif %}
             <fieldset class="fr-fieldset">
-                <h4 class="fr-mb-2w d-block">S'inscrire en remplissant les champs suivants</h4>
+                <h4 class="fr-mb-3w d-block">S'inscrire en remplissant les champs suivants</h4>
                 <div class="fr-fieldset__content">
                     <p>
                         {{ form.first_name.label }}
@@ -44,7 +47,7 @@
                         {{ form.last_name.errors }}
                         {{ form.last_name }}
                     </p>
-                    <p class="">
+                    <p>
                         {% include "tools/organization_search.html" with name=form.organization.name label=form.organization.label value=form.organization.value id_for_label=form.organization.id_for_label placeholder="" errors=form.organization.errors dsfr=True %}
                     </p>
                     <p>
@@ -74,7 +77,7 @@
                     </p>
                     <p>
                         {{ form.captcha }}
-                        {% for error in form.captcha.errors %}<div class="text-danger text-start mb-2">{{ error }}</div>{% endfor %}
+                        {% for error in form.captcha.errors %}<div class="text-danger text-start fr-mb-2v">{{ error }}</div>{% endfor %}
                     </p>
                     <div class="fr-input-group fr-mt-4v">
                         <button class="fr-btn custom-login-button" type="submit">S'inscrire</button>
@@ -82,13 +85,10 @@
                 </div>
             </fieldset>
         </form>
-        <hr style="height: 1px;
-                   margin-top: 45px;
-                   background-color: grey!important;
-                   background-image: none" />
+        <hr class="specific-height-1px specific-mt-45px specific-backgroundcolor-grey specific-backgroundimage-none" />
         <div class="fr-form-group fr-mt-14v">
             <fieldset class="fr-fieldset d-flex flex-column align-items-center justify-content-center">
-                <h4 class="fr-mb-2w d-block ">Vous avez déjà un compte chez nous ?</h4>
+                <h4 class="fr-mb-3w d-block ">Vous avez déjà un compte chez nous ?</h4>
                 <div class="fr-fieldset__content">
                     <div class="fr-input-group">
                         <a class="fr-btn fr-btn--secondary custom-login-button"
@@ -99,8 +99,5 @@
             </fieldset>
         </div>
     </div>
-    <hr style="height: 1px;
-               margin-bottom: 20px;
-               background-color: grey!important;
-               background-image: none" />
-{% endblock %}
+    <hr class=" specific-height-1px specific-mb-20px specific-backgroundcolor-grey specific-backgroundimage-none" />
+{% endblock content %}

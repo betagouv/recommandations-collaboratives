@@ -50,6 +50,10 @@ function Tutorial(challengeCode, autoStart = false) {
         this.acquireChallenge(this.challengeCode);
       });
 
+      this.tour.onexit(async () => {
+        this.snoozeChallenge(this.challengeCode);
+      });
+
       if (autoStart) {
         this.tour.start();
         await this.startChallenge(this.challengeCode);

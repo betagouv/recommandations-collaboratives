@@ -6,41 +6,42 @@
     <link href="{% sass_src 'projects/css/file_upload.scss' %}"
           rel="stylesheet"
           type="text/css" />
-{% endblock %}
-<div x-data="FileUpload('{{ type }}')">
-    <button x-ref="button" class="button small" @click="onButtonClick">Épingler un lien</button>
+{% endblock css %}
+<div class="link-upload-btn" x-data="FileUpload('{{ type }}')">
+    <button x-ref="button"
+            class="fr-btn fr-btn--sm fr-btn--secondary"
+            @click="onButtonClick">Épingler un lien</button>
     <div x-cloak
          x-ref="popover"
          id="link-popover"
          @click.outside="onOutsideClick"
-         class="rounded bg-white shadow"
-         style="width: 420px">
+         class="link-upload-btn__modal rounded bg-white shadow">
         <form method="post" action="{{ action }}" enctype="multipart/form-data">
             {% csrf_token %}
-            <div class="p-3">
-                <h6 class="text-uppercase" style="font-size: 1em;">Épingler un lien</h6>
-                <div class="mb-2 pt-3">
+            <div class="fr-p-2w">
+                <h6 class="text-uppercase h6-specific-fontsize-1">Épingler un lien</h6>
+                <div class="fr-mb-2v fr-pt-2w">
                     <label class="d-block">
-                        <span class="mb-1 d-block text-info-custom text-grey-dark">Titre du lien</span>
+                        <span class="fr-mb-1v d-block text-info-custom text-grey-dark">Titre du lien</span>
                         <input id="link-description"
                                placeholder="Dossier dropbox"
                                required
                                name="description"
-                               class="form-control form-control-sm py-2"
+                               class="fr-input fr-py-2v"
                                type="text" />
                     </label>
                 </div>
-                <label class="d-block mt-3">
-                    <span class="mb-1 d-block text-info-custom text-grey-dark">Url du lien</span>
+                <label class="d-block fr-mt-2w">
+                    <span class="fr-mb-1v d-block text-info-custom text-grey-dark">Url du lien</span>
                     <input placeholder="https://www.dropbox.com/.."
                            required
                            name="the_link"
-                           class="form-control form-control-sm py-2"
+                           class="fr-input fr-py-2v"
                            type="text" />
                 </label>
             </div>
-            <div class="p-3 pt-0 d-flex justify-content-end">
-                <button id="link-submit-button" class="button filled small" type="submit">Épingler</button>
+            <div class="fr-p-2w fr-pt-0 d-flex justify-content-end">
+                <button id="link-submit-button" class="fr-btn" type="submit">Épingler</button>
             </div>
         </form>
         <div x-ref="arrow" class="popover-arrow"></div>

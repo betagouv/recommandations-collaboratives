@@ -1,25 +1,20 @@
 {% load static %}
-<footer class="col-11 py-5">
-    <div class="row py-5">
+{% load wagtailcore_tags %}
+{% wagtail_site as current_site %}
+
+<footer class="col-11 fr-py-6w">
+    <div class="row fr-py-6w">
         <div class="col-6">
             <img src="{% static 'home/img/home/logo_rf.png' %}" width="150px" alt="Logo république française" />
         </div>
         <div class="col-6 col-md">
             <h5>{{ request.site.name }}</h5>
             <ul class="list-unstyled text-small">
-                <!-- <li>
-                    <a class="link-secondary" href="{% url 'whoweare' %}">Qui sommes-nous ?</a>
-                </li>
-                <li>
-                    <a class="link-secondary" href="{% url 'followus' %}">Suivre le projet</a>
-                </li>
-                <li>
-                    <a class="link-secondary" href="https://betagouv.github.io/urbanvitaliz/recrutement/">Recrutement</a>
-                </li>
-
-                <li>
-                    <a class="link-secondary" href="https://drive.google.com/file/d/1Zd5sJZ_y1Hjj9H1H0JLuBymApgb2hjRn/view" target="_new">Plaquette de présentation</a>
-                </li> -->
+                {% for menuitem in current_site.root_page.get_children.live.in_menu %}
+                    <li>
+                        <a class="link-secondary" href="{% pageurl menuitem %}">{{ menuitem.title }}</a>
+                    </li>
+                {% endfor %}
                 <li>
                     <a class="link-secondary" href="{% url 'home-contact' %}">Nous contacter</a>
                 </li>

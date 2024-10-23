@@ -38,7 +38,7 @@ function MapViewerInteractive(projectOptions) {
         maxZoom: 20,
       });
 
-      var map = mapUtils.makeMap(
+      var map = await mapUtils.makeMap(
         'map-interactive',
         project,
         options,
@@ -61,7 +61,7 @@ function MapViewerInteractive(projectOptions) {
         })
         .addTo(map);
 
-      const [latitude, longitude] = mapUtils.getDefaultLatLngForMap(
+      const [latitude, longitude] = await mapUtils.getDefaultLatLngForMap(
         project,
         geoData
       );

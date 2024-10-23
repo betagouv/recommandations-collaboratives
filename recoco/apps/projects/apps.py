@@ -1,6 +1,8 @@
 from django.apps import AppConfig
 from watson import search as watson
 
+# from .search import ProjectSearchAdapter
+
 
 class ProjectConfig(AppConfig):
     default_auto_field = "django.db.models.BigAutoField"
@@ -9,15 +11,12 @@ class ProjectConfig(AppConfig):
     def ready(self):
         import recoco.apps.projects.signals  # noqa
         from actstream import registry  # noqa
+        from .models import ProjectSearchAdapter
 
         Project = self.get_model("Project")
         watson.register(
             Project,
-            fields=(
-                "name",
-                "tags",
-                "commune__name",
-            ),
+            ProjectSearchAdapter,
         )
 
         Topic = self.get_model("Topic")

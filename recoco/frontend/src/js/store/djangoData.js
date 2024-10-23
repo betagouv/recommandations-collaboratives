@@ -3,7 +3,10 @@ import Alpine from '../utils/globals';
 document.addEventListener('alpine:init', () => {
   Alpine.store('djangoData', {
     projectId: getDjangoData('djangoProjectId'),
-    isAdvisor: getDjangoData('isSwitchtender'),
+    isAdvisor:
+      getDjangoData('isSwitchtender') ||
+      getDjangoData('isObserverOnProject') ||
+      getDjangoData('isAdvisorOnProject'),
     userEmail: getDjangoData('userEmail'),
     canAdministrate: getDjangoData('canAdministrate'),
     canUseTasks: getDjangoPermsData('userProjectPerms', 'use_tasks'),

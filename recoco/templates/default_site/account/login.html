@@ -22,23 +22,25 @@
     <link href="{% sass_src 'home/css/auth/auth.css' %}"
           rel="stylesheet"
           type="text/css">
-{% endblock %}
+    <link href="{% static 'css/account/login.css' %}"
+          rel="stylesheet"
+          type="text/css">
+{% endblock css %}
 {% block content %}
     <div class="container-fluid">
         <div x-data="Auth"
              x-init="initLogin"
-             class="fr-container fr-py-6w max-width-800"
-             style="">
+             class="fr-container fr-py-6w max-width-800">
             <div class="d-flex justify-content-between align-items-start">
                 <h1 class="fr-mb-6w d-flex align-items-center">
-                    <svg class="bi me-2" width="28" height="28">
+                    <svg class="bi fr-mr-2v" width="28" height="28">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#person-circle" />
                     </svg>
                     Connexion à {{ site.name }}
                 </h1>
             </div>
             <form class="login fr-form-group"
-                  method="POST"
+                  method="post"
                   action="{% url 'account_login' %}">
                 {% csrf_token %}
                 {% if redirect_field_value %}
@@ -47,14 +49,13 @@
                            value="{{ redirect_field_value }}" />
                 {% endif %}
                 <fieldset class="fr-fieldset">
-                    <h4 class="fr-mb-2w d-block">Se connecter avec son mot de passe</h4>
+                    <h4 class="fr-mb-3w d-block">Se connecter avec son mot de passe</h4>
                     <div class="fr-fieldset__content">
                         {{ form.as_p }}
                         <div class="d-flex justify-content-between align-items-start fr-mt-10v">
                             <div class="d-flex flex-column align-items-start">
                                 <a id="forgot-password"
-                                   class="button secondary Action  d-block fr-link"
-                                   style="text-decoration: underline"
+                                   class="button secondary Action  d-block fr-link text-decoration-underline"
                                    href="{% url 'account_reset_password' %}">{% trans "Forgot Password?" %}</a>
                                 <div class="fr-input-group fr-mt-4v">
                                     <button class="fr-btn custom-login-button" type="submit">Se connecter</button>
@@ -70,14 +71,11 @@
                     </div>
                 </fieldset>
             </form>
-            <hr style="height: 1px;
-                       margin-top: 45px;
-                       background-color: grey!important;
-                       background-image: none" />
+            <hr class="specific-height-1px specific-mt-45px specific-backgroundcolor-grey specific-backgroundimage-none" />
             <div class="d-flex justify-content-center align-items-center fr-mt-14v">
                 <div class="fr-form-group text-center">
                     <fieldset class="fr-fieldset">
-                        <h4 class="fr-mb-2w d-block ">Vous n'avez pas de compte ?</h4>
+                        <h4 class="fr-mb-3w d-block ">Vous n'avez pas de compte ?</h4>
                         <div class="fr-fieldset__content">
                             <div class="fr-input-group">
                                 <a class="fr-btn fr-btn--secondary custom-login-button"
@@ -89,8 +87,5 @@
             </div>
         </div>
     </div>
-    <hr style="height: 1px;
-               margin-bottom: 20px;
-               background-color: grey!important;
-               background-image: none" />
-{% endblock %}
+    <hr class=" specific-height-1px specific-mb-20px specific-backgroundcolor-grey specific-backgroundimage-none" />
+{% endblock content %}

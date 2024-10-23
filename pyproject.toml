@@ -5,16 +5,16 @@ indent = 4
 exclude = ".venv,venv,.eggs" # override the default set of excluded paths
 
 [tool.pytest.ini_options]
-DJANGO_SETTINGS_MODULE = "recoco.settings.development"
+DJANGO_SETTINGS_MODULE = "recoco.settings.testing"
 addopts = [
-        "-p no:warnings",
-        "--reuse-db",
-        "--tb=short",
-        "--numprocesses=auto",
-        "--maxprocesses=4",
-        "--cov=recoco",
-        "--cov-report=xml"
-        ]
+    "-p no:warnings",
+    "--reuse-db",
+    "--tb=short",
+    "--numprocesses=auto",
+    "--maxprocesses=4",
+    "--cov=recoco",
+    "--cov-report=xml",
+]
 testpaths = ["recoco"]
 python_files = "tests.py test_*.py *_test.py *_tests.py"
 
@@ -38,12 +38,6 @@ disable = [
 [tool.pylint.design]
 min-public-methods = 1
 
-[tool.bandit]
-exclude_dirs = ['node_modules']
-
-[tool.bandit.assert_used]
-skips = ['*_test.py', '**/test_*.py', '**/tests.py']
-
 [tool.ruff.lint]
 select = [
     "E4",
@@ -52,9 +46,18 @@ select = [
     "B",  # flake8-bugbear
     "F",  # Pyflakes
     "I",  # isort
+    "S",  # flake8-bandit
 ]
 unfixable = ["ALL"]
 fixable = ["I"]
+exclude = [
+    "docs/*",
+    "frontend_tests/*",
+    "node_modules/*",
+    "notebooks/*",
+    "sql/*",
+]
+ignore = ["S101", "S110", "S112"]
 
 [tool.ruff.lint.isort]
 case-sensitive = true
@@ -81,5 +84,8 @@ section-order = [
 ]
 
 [tool.ruff.lint.extend-per-file-ignores]
-"notebooks/*.py" = ["E402", "F821"]
 "**/migrations/*.py" = ["I"]
+"**/test_*.py" = ["S105"]
+
+[tool.ruff.lint.flake8-bandit]
+check-typed-exception = true

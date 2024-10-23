@@ -5,7 +5,7 @@
      x-init="getPostcode(projectPostcode,projectInsee)"
      x-effect='validateData(submittedForm)'>
     <div class="row">
-        <div class="col-6 fr-input-group {% if form.postcode.errors %}fr-input-group--error{% endif %} mb-0"
+        <div class="col-6 fr-input-group {% if form.postcode.errors %}fr-input-group--error{% endif %} fr-mb-0"
              x-ref="formGroupPostcode"
              data-test-id="input-group-postcode">
             <label class="fr-label" for="input-project-address">

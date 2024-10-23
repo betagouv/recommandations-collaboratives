@@ -2,9 +2,15 @@
 {% load static %}
 {% load guardian_tags %}
 {% load projects_extra %}
+{% load sass_tags %}
+{% block css %}
+    <link href="{% sass_src 'css/header/header.scss' %}"
+          rel="stylesheet"
+          type="text/css">
+{% endblock css %}
 {% is_staff_for_current_site request.user as is_staff %}
 <!-- User -->
-<div id="user-info" class="pe-2 ps-2 ms-2 me-2">
+<div id="user-info" class="fr-px-2v fr-mx-2v">
     {% if user.is_authenticated %}
         {% get_obj_perms request.user for request.site as "user_site_perms" %}
         <div x-data="{ open: false }"
@@ -16,33 +22,30 @@
                data-test-id="open-dropdown-profil-option-button">
                 <img src="{% gravatar_url user.email 16 %}"
                      alt="{{ user.get_full_name }}"
-                     class="me-2 rounded-circle"
-                     style="width: 16px;
-                            height: 16px" />
-                <span style="color: #0063CB;" class="d-none d-lg-none d-xl-block">{{ user.get_full_name|default:user.email }}</span>
-                <button id="user-menu-button" type="button" class="border-0 py-0 px-1">
+                     class="fr-mr-2v rounded-circle header-img-specific-size" />
+                <span class="d-none d-lg-none d-xl-block specific-color-0063CB">{{ user.get_full_name|default:user.email }}</span>
+                <button id="user-menu-button" type="button" class="border-0 fr-py-0 fr-px-1v">
                     <svg data-toggle="tooltip"
                          data-placement="top"
                          title="Notifications désactivées"
-                         class="align-middle bi"
+                         class="align-middle bi fr-p-0-5v"
                          width="20px"
                          height="20px"
                          fill="#0063CB"
-                         stroke="#0063CB"
-                         style="padding: 3px">
+                         stroke="#0063CB">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#chevron-down" />
                     </svg>
                 </button>
             </a>
             <ul x-show="open"
                 :class="{'show':open}"
-                class="dropdown-menu text-small shadow mt-2 top-100">
+                class="dropdown-menu text-small shadow fr-mt-2v top-100">
                 {% if is_switchtender or is_administrating_project %}
                     <li>
                         <a class="dropdown-item small " href="{% url 'projects-project-list' %}">Accueil</a>
                     </li>
                     <li>
-                        <hr class="dropdown-divider">
+                        <hr class="dropdown-divider fr-py-0">
                     </li>
                 {% endif %}
                 {% if "use_crm" in user_site_perms %}
@@ -50,7 +53,7 @@
                         <a class="dropdown-item small " href="{% url 'crm-site-dashboard' %}">CRM</a>
                     </li>
                     <li>
-                        <hr class="dropdown-divider">
+                        <hr class="dropdown-divider fr-py-0">
                     </li>
                 {% endif %}
                 {% if user.is_staff %}
@@ -58,7 +61,7 @@
                         <a class="small dropdown-item" href="{% url 'admin:index' %}">Administration Reco-co</a>
                     </li>
                     <li>
-                        <hr class="dropdown-divider">
+                        <hr class="dropdown-divider fr-py-0">
                     </li>
                 {% endif %}
                 <!-- Address Book -->
@@ -69,7 +72,7 @@
                            data-test-id="button-adress-book">Carnet d'adresses</a>
                     </li>
                     <li>
-                        <hr class="dropdown-divider">
+                        <hr class="dropdown-divider fr-py-0">
                     </li>
                 {% endif %}
                 {% if is_staff %}
@@ -80,7 +83,7 @@
                            target="_blank">Documentation</a>
                     </li>
                     <li>
-                        <hr class="dropdown-divider">
+                        <hr class="dropdown-divider fr-py-0">
                     </li>
                 {% elif is_switchtender or is_administrating_project %}
                     <li>
@@ -90,7 +93,7 @@
                            target="_blank">Documentation</a>
                     </li>
                     <li>
-                        <hr class="dropdown-divider">
+                        <hr class="dropdown-divider fr-py-0">
                     </li>
                 {% endif %}
                 <li>
@@ -99,8 +102,8 @@
             </ul>
         </div>
     {% else %}
-        <a href="{% url 'account_login' %}" class="btn">
-            <svg class="bi me-2 align-middle" width="16" height="16">
+        <a href="{% url 'account_login' %}">
+            <svg class="bi fr-mr-2v align-middle" width="16" height="16">
                 <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#person-circle" />
             </svg>
             <span class="align-middle">Se connecter</span>

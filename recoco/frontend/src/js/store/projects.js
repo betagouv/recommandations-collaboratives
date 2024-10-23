@@ -32,6 +32,16 @@ Alpine.store('projects', {
       project.currentSite = project.project_sites.find(
         (projectSite) => projectSite.site === currentSiteId
       );
+      project.publishTo = project.project_sites
+        .filter((projectSite) => !projectSite.is_origin)
+        .map((projectSite) => {
+          return {
+            ...projectSite,
+            siteInfo: this.sitesConfig.find(
+              (site) => site.id === projectSite.site
+            ),
+          };
+        });
     });
 
     return projects;

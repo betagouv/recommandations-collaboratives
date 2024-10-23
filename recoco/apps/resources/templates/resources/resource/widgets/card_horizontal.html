@@ -1,17 +1,20 @@
 {% load static %}
+{% load sass_tags %}
+{% block css %}
+    <link href="{% sass_src 'resources/widget/card.scss' %}"
+          rel="stylesheet"
+          type="text/css" />
+{% endblock css %}
 <!-- Horizontal Card -->
-<div class="card-resource card-resource-horizontal card h-100 w-100"
-     style="min-height: 100px">
+<div class="card-resource card-resource-horizontal card h-100 w-100 specific-minheight-100">
     <div class="card-body">
-        <div class="card-title mb-2">
+        <div class="card-title fr-mb-2v">
             {% if resource.category and with_category %}
-                <div class="text-uppercase fw-bold small text-muted mb-3">{{ resource.category.name }}</div>
+                <div class="text-uppercase fw-bold small text-muted fr-mb-2w">{{ resource.category.name }}</div>
             {% endif %}
             <div class="d-flex">
                 <!-- Icon -->
-                <svg class="bi me-2 rounded-circle resource-icon bg-color-{{ resource.category.color|default:"darkgrey" }}"
-                     style="width:30px;
-                            height: 30px">
+                <svg class="bi fr-mr-2v rounded-circle resource-icon bg-color-{{ resource.category.color|default:"darkgrey" }} svg-specific-size">
                     <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#{{ resource.category.icon|default:"key" }}" />
                 </svg>
                 <!-- title -->
@@ -28,7 +31,7 @@
         </div>
     </div>
     {% if with_footer %}
-        <div class="card-footer" style="z-index: 10;">
+        <div class="card-footer z-2">
             <div class="btn-toolbar justify-content-between"
                  role="toolbar"
                  aria-label="Toolbar with button groups">
@@ -59,11 +62,11 @@
                 <div class="btn-group" role="group" aria-label="Actions">
                     <!-- Bookmark -->
                     {% if resource.id in user.bookmarks.as_list %}
-                        <form method="POST"
+                        <form method="post"
                               action="{% url "resources-bookmark-delete" resource.id %}">
                             {% csrf_token %}
                             <button type="submit"
-                                    class="btn btn-text p-0 m-0 me-2 text-reset text-decoration-none align-baseline"
+                                    class="btn btn-text fr-p-0 fr-m-0 fr-mr-2v text-reset text-decoration-none align-baseline"
                                     data-bs-toggle="tooltip"
                                     data-bs-placement="top"
                                     title="Retirer de vos favoris">
@@ -76,7 +79,7 @@
                             </button>
                         </form>
                     {% else %}
-                        <a class="me-2 align-baseline text-secondary"
+                        <a class="fr-mr-2v align-baseline text-secondary"
                            href="{% url "resources-bookmark-create" resource.id %}"
                            data-bs-toggle="tooltip"
                            data-bs-placement="top"

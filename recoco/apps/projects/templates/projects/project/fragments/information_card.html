@@ -1,13 +1,19 @@
 {% load static %}
 {% load gravatar %}
 {% load guardian_tags %}
+{% load sass_tags %}
+{% block css %}
+    <link href="{% sass_src 'projects/css/card_info.scss' %}"
+          rel="stylesheet"
+          type="text/css">
+{% endblock css %}
 {% get_obj_perms request.user for request.site as "user_site_perms" %}
 {% get_obj_perms request.user for project as "user_project_perms" %}
 <div class="{% if padding_end is True %}pe-4{% endif %} {% if padding_top is True %}pt-4{% endif %}  {% if full_width %}w-100{% else %}w-50{% endif %} {% if full_height %}h-100{% endif %}"
      data-test-id="project-information-card-{{ data_test }}">
-    <div class="d-flex align-items-center justify-content-between"
-         style="margin-bottom: 6px">
-        <h6 class="text-uppercase fw-bold m-0 p-0 project-card--subtitle">
+    <div class="d-flex align-items-center justify-content-between fr-mb-1v">
+        {% comment %} TODO check this line {% endcomment %}
+        <h6 class="text-uppercase fr-text--sm project-card__subtitle fr-mb-0">
             {% if onboarding_information %}
                 Compléments
             {% else %}
@@ -15,36 +21,26 @@
             {% endif %}
         </h6>
         {% if is_advisor_note %}
-            <span class="ms-2 me-4 text-danger tiny d-flex align-items-center"
+            <span class="fr-ml-2v fr-mr-3w text-danger tiny d-flex align-items-center"
                   href="{% url "projects-project-topics" project.id %}#advisor-note">
-                <svg class="bi ms-2 " width="10" height="10" fill="currentColor">
+                <svg class="bi fr-ml-2v " width="10" height="10" fill="currentColor">
                     <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#lock" />
                 </svg>
                 <span>Non visible par la collectivité</span>
             </span>
         {% endif %}
         {% if "use_advisor_note" in user_project_perms and is_editable %}
-            <a class="ms-2 tiny d-flex align-items-center"
-               href="{% url "projects-project-topics" project.id %}#advisor-note">
-                <span>Éditer</span>
-                <svg class="bi ms-2 " width="10" height="10" fill="currentColor">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#pencil-fill" />
-                </svg>
-            </a>
+            <a class="fr-btn fr-btn--sm fr-btn--tertiary-no-outline fr-btn--icon-right fr-icon-pencil-line fr-text--xs"
+               href="{% url "projects-project-topics" project.id %}#advisor-note">Éditer</a>
         {% endif %}
     </div>
-    <div class="project-card-details h-100 p-4 d-flex flex-column justify-content-between project-card--description">
-        <article class="overflow-hidden">{% include 'projects/project/fragments/information_card_description.html' %}</article>
+    <div class="project-card-details h-100 fr-p-3w d-flex flex-column justify-content-between project-card__description">
+        <article class="overflow-hidden">{% include "projects/project/fragments/information_card_description.html" %}</article>
         {% if display_user is not False %}
-            <footer class="d-flex mt-4 justify-content-between {% if full_width %}align-items-center{% else %}flex-column{% endif %}">
-                {% include 'user/user_card.html' with user=card_user %}
+            <footer class="d-flex fr-mt-3w justify-content-between {% if full_width %}align-items-center{% else %}flex-column{% endif %}">
+                {% include "user/user_card.html" with user=card_user %}
                 <div class=" {% if is_editable %}mt-0{% else %}mt-2{% endif %}">
-                    <span style="color:#929292;
-                                 text-align: right;
-                                 font-weight: 300;
-                                 font-size: 14px;
-                                 text-align: right"
-                          class="font-italic d-flex">{{ updated_on }}</span>
+                    <span class="font-italic d-flex fw-light text-end span-style">{{ updated_on }}</span>
                 </div>
             </footer>
         {% endif %}

@@ -1,8 +1,11 @@
 {% extends "base.html" %}
 {% load leaflet_tags %}
+{% load sass_tags %}
 {% load l10n %}
 {% load static %}
-{% block title %}Statistiques d'impact{% endblock %}
+{% block title %}
+    Statistiques d'impact
+{% endblock title %}
 {% block js %}
     {% leaflet_js %}
     <script src="{% static "/js/d3.min.js" %}"></script>
@@ -65,31 +68,33 @@
 
     }
     </script>
-{% endblock %}
+{% endblock js %}
 {% block css %}
     {% leaflet_css %}
     <link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/leaflet.fullscreen.css'
           rel='stylesheet' />
-{% endblock %}
+    <link href="{% sass_src 'home/css/statistics/statistics.scss' %}"
+          rel="stylesheet"
+          type="text/css">
+{% endblock css %}
 {% block content %}
-    <div class="col-9 py-5 mx-auto">
+    <div class="col-9 fr-py-6w fr-mx-auto">
         <h2>Quel est l'impact d'UrbanVitaliz ?</h2>
         <p>Mis à jour en continu</p>
-        <div class="border border-1 p-4 rounded-4 text-center text-white mb-4"
-             style="background-color: #04466c">
-            <h2 class="text-white mb-2">
+        <div class="border border-1 fr-p-3w rounded-4 text-center text-white fr-mb-3w bg-color">
+            <h2 class="text-white fr-mb-2v">
                 <strong>{{ reco_following_pc }}%</strong>
                 <br />
                 des collectivités utilisatrices du service agissent sur la base des recommandations qu'elles ont reçu sur UrbanVitaliz
             </h2>
             <p>
-                Notre impact est atteint lorsqu'une collectivité entreprend une recommandations. Les collectivités actionnent ces recommandations sous quelques semaines à quelques mois, selon leur disponibilité et leur agenda politique.
+                Notre impact est atteint lorsqu'une collectivité entreprend une recommandation. Les collectivités actionnent ces recommandations sous quelques semaines à quelques mois, selon leur disponibilité et leur agenda politique.
             </p>
         </div>
         <div class="row row-cols-xl-2 row-cols-1">
             <div class="col align-content-stretch d-flex">
-                <div class="rounded-4 border border-1 p-4 mb-4 text-center w-100">
-                    <h4 class="fw-bold mb-2">Sites accompagnés et recommandations</h4>
+                <div class="rounded-4 border border-1 fr-p-3w fr-mb-3w text-center w-100 height-fit-content">
+                    <h4 class="fw-bold fr-mb-2v">Sites accompagnés et recommandations</h4>
                     <p class="text-start">
                         <ul class="text-start">
                             <li>Nombre de sites accompagnés : {{ collectivity_supported }}</li>
@@ -102,18 +107,17 @@
                 </div>
             </div>
             <div class="col align-content-stretch d-flex">
-                <div class="rounded-4 border border-1 p-4 mb-4 text-center w-100">
-                    <h4 class="fw-bold mb-2">Sollicitations de nouvelles friches</h4>
-                    <div id="chart-new">
-                        <svg class="w-100"  style="min-height: 300px;">
-                            >
+                <div class="rounded-4 border border-1 fr-p-3w fr-mb-3w text-center w-100">
+                    <h4 class="fw-bold fr-mb-2v">Sollicitations de nouvelles friches</h4>
+                    <div id="chart-new" class="d-flex align-items-center h-100 ">
+                        <svg class="w-100 min-height">
                         </svg>
                     </div>
                 </div>
             </div>
             <div class="col align-content-stretch d-flex">
-                <div class="rounded-4 border border-1 p-4 mb-4 text-center w-100">
-                    <h4 class="fw-bold mb-2">Exemples de blocages levés</h4>
+                <div class="rounded-4 border border-1 fr-p-3w fr-mb-3w text-center w-100">
+                    <h4 class="fw-bold fr-mb-2v">Exemples de blocages levés</h4>
                     <div class="row">
                         <div class="col-6">
                             <img src="{% static "/img/statistics/handshake.jpg" %}" alt="handshake" />
@@ -135,8 +139,8 @@
                 </div>
             </div>
             <div class="col align-content-stretch d-flex">
-                <div class="rounded-4 border border-1 p-4 mb-4 text-center w-100">
-                    <h4 class="fw-bold mb-2">Quel impact potentiel ?</h4>
+                <div class="rounded-4 border border-1 fr-p-3w fr-mb-3w text-center w-100">
+                    <h4 class="fw-bold fr-mb-2v">Quel impact potentiel ?</h4>
                     <p class="text-start">
                         <h5 class="fw-bolder text-start">Combien de friches en France ?</h5>
                         <p class="text-start">
@@ -157,4 +161,4 @@
             </div>
         </div>
     </div>
-{% endblock %}
+{% endblock content %}

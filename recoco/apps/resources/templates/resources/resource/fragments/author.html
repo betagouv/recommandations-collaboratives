@@ -2,7 +2,7 @@
 {% load guardian_tags %}
 {% get_obj_perms request.user for request.site as "user_site_perms" %}
 <div class="d-flex align-items-center">
-    <span class="align-middle mb-0">
+    <span class="align-middle fr-mb-0">
         par
         <strong>{{ resource.created_by.get_full_name|default:request.site.name }}</strong>
         {% if "manage_resources" in user_site_perms %}
