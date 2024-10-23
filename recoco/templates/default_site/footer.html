@@ -10,13 +10,11 @@
         <div class="col-6 col-md">
             <h5>{{ request.site.name }}</h5>
             <ul class="list-unstyled text-small">
-                {% if not user.is_authenticated %}
-                    {% for menuitem in current_site.root_page.get_children.live.in_menu %}
+                {% for menuitem in current_site.root_page.get_children.live.in_menu %}
                     <li>
                         <a class="link-secondary" href="{% pageurl menuitem %}">{{ menuitem.title }}</a>
                     </li>
-                    {% endfor %}
-                {% endif %}
+                {% endfor %}
                 <li>
                     <a class="link-secondary" href="{% url 'home-contact' %}">Nous contacter</a>
                 </li>
