@@ -59,6 +59,7 @@ const config = {
         menuTop: resolve('./src/js/apps/menuTop.js'),
         actionsEmbed: resolve('./src/js/apps/actionsEmbed.js'),
         tasksEmbed: resolve('./src/js/apps/tasksEmbed.js'),
+        projectKnowledge: resolve('./src/js/apps/projectKnowledge.js'),
         selectSearchable: resolve('./src/js/apps/selectSearchable.js'),
       },
       output: {

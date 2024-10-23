@@ -37,7 +37,8 @@
             <button class="fr-select item-projects__button-open"
                     x-ref="expandMenuButton"
                     aria-expanded="false"
-                    aria-controls="project_list">
+                    aria-controls="project_list"
+                    :disabled="displayedProjectList.length == 0">
                 {% if project %}
                     <span class="no-underline">{{ project.commune.name }} <span class="list-project__project-name">{{ project.name }}</span></span>
                 {% else %}
@@ -48,7 +49,14 @@
                         </div>
                     </template>
                     <template x-if="!currentProject">
-                        <span class="no-underline list-project__project-name">Projets récents</span>
+                        <div>
+                            <template x-if="displayedProjectList.length == 0">
+                                <span class="no-underline list-project__project-name">Pas de projet récent</span>
+                            </template>
+                            <template x-if="displayedProjectList.length > 0">
+                                <span class="no-underline list-project__project-name">Projets récents</span>
+                            </template>
+                        </div>
                     </template>
                 {% endif %}
             </button>
@@ -101,7 +109,7 @@
         <a href="{% url 'resources-resource-search' %}"
            class="fr-link {% if url_name == 'resources-resource-search' %}active{% endif %}"
            data-test-id="link-ressources">
-            <span class="ms-1 align-middle">Ressources</span>
+            <span class="fr-mx-1v align-middle">Ressources</span>
         </a>
     </li>
     {% comment %} surcharge pour ajouter des éléments au menu top à droite de ressources {% endcomment %}
