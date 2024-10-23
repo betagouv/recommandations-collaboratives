@@ -70,7 +70,7 @@
                 {% elif project.status == 'DRAFT' %}
                     <div class="specific-border-4pxsolid000091">
                         {% include "projects/project/fragments/project_banner/non_published_project_banner.html" %}
-                    {% elif not advising and is_regional_actor %}
+                    {% elif not advising and is_regional_actor and not is_staff %}
                         <div class="specific-border-4pxsolid000091">
                             {% include "projects/project/fragments/project_banner/join_project_banner.html" %}
                             <div class="specific-opacity-02">
@@ -81,7 +81,7 @@
                         </div>
                     {% elif project.status == 'DRAFT' %}
                     </div>
-                {% elif not advising and is_regional_actor %}
+                {% elif not advising and is_regional_actor and not is_staff %}
                 </div>
             </div>
         {% endif %}
