@@ -12,7 +12,7 @@
           type="text/css">
 {% endblock css %}
 {% block js %}
-    {% vite_asset 'js/store/projectQueue' %}
+    {% vite_asset 'js/store/projectQueue.js' %}
     {% vite_asset 'js/components/ExpandableMenuHandler.js' %}
 {% endblock js %}
 {% get_obj_perms request.user for request.site as "user_site_perms" %}
