@@ -61,6 +61,7 @@ const config = {
         tasksEmbed: resolve('./src/js/apps/tasksEmbed.js'),
         projectKnowledge: resolve('./src/js/apps/projectKnowledge.js'),
         selectSearchable: resolve('./src/js/apps/selectSearchable.js'),
+	ExpandableMenuHandler: resolve("./src/js/components/ExpandableMenuHandler.js"),
       },
       output: {
         chunkFileNames: undefined,
