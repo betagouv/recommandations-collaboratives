@@ -4,19 +4,14 @@
 {% load django_vite %}
 {% block title %}
     {{ project.name }} - CRM
-    {{ project.name }} - CRM
 {% endblock title %}
 {% block og_title %}
     {{ project.name }} - CRM
 {% endblock og_title %}
 {% block js %}
     {% vite_asset 'js/apps/crm.js' %}
-    {% vite_asset 'js/apps/crm.js' %}
 {% endblock js %}
 {% block css %}
-    <link href="{% sass_src 'home/css/dsfr/marianne.css' %}"
-          rel="stylesheet"
-          type="text/css" />
     <link href="{% sass_src 'home/css/dsfr/marianne.css' %}"
           rel="stylesheet"
           type="text/css" />
