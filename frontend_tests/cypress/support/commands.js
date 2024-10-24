@@ -63,10 +63,14 @@ Cypress.Commands.add('login', (role) => {
     });
   });
 });
+// TODO Add a test to logout via ui
+// Cypress.Commands.add('logout', () => {
+//   cy.get('#user-menu-button').click({ force: true });
+//   cy.contains('Déconnexion').click({ force: true });
+// });
 
 Cypress.Commands.add('logout', () => {
-  cy.get('#user-menu-button').click({ force: true });
-  cy.contains('Déconnexion').click({ force: true });
+  cy.visit('/accounts/logout/');
 });
 
 /**
@@ -139,6 +143,10 @@ Cypress.Commands.add('createProject', (label, objProject = null) => {
   cy.get('button[type="submit"]').click();
 
   cy.url().should('include', '/onboarding/summary');
+});
+
+Cypress.Commands.add('becomeAdvisorOnProject', (projectId) => {
+  cy.visit(`/project/${projectId}/switchtender/join`);
 });
 
 Cypress.Commands.add('becomeAdvisor', () => {
