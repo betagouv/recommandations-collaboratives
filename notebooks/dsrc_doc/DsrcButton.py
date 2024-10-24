@@ -39,7 +39,6 @@ out = widgets.Output(layout={"border": "1px solid black"})
 
 def on_button_clicked(b):
     my_js = """
-    console.log('Hello world2!');
     alert("hi");
     """
     with out:
