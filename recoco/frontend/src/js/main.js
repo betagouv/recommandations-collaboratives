@@ -40,5 +40,3 @@ import '../css/user.css';
 import '../css/callout.css';
 import '../css/markdown.css';
 import '../css/miscellaneous.css';
-
-console.log('js main added');
