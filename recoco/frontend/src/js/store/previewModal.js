@@ -25,7 +25,7 @@ document.addEventListener('alpine:init', () => {
       return Alpine.store('tasksData').newTasks;
     },
 
-    init() {
+    async init() {
       const element = document.getElementById('task-modal');
       const body = document.querySelector('body');
       this.handle = new Modal(element);
@@ -57,11 +57,13 @@ document.addEventListener('alpine:init', () => {
           }
         }
       });
-
       const urlFromHash = location.hash.match(/^#action-(\d+)/);
       if (urlFromHash) {
         this.taskId = parseInt(urlFromHash[1], 10);
-        this.open(parseInt(urlFromHash[1], 10));
+        if (this.newTasks.length === 0) {
+          await Alpine.store('tasksData').loadTasks();
+        }
+        this.open(this.newTasks.find((task) => task.id === this.taskId));
       }
     },
     open(task) {
