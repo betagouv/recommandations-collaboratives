@@ -31,65 +31,67 @@
             </li>
         {% endif %}
         <!-- Projects -->
-        <li class="navigation__item-projects"
-            x-data="ExpandableMenuHandler"
-            @click.outside="toggle">
-            <button class="fr-select item-projects__button-open"
-                    x-ref="expandMenuButton"
-                    aria-expanded="false"
-                    aria-controls="project_list"
-                    :disabled="displayedProjectList.length == 0">
-                {% if project %}
-                    <span class="no-underline">{{ project.commune.name }} <span class="list-project__project-name">{{ project.name }}</span></span>
-                {% else %}
-                    <template x-if="currentProject">
-                        <div>
-                            <span class="no-underline" x-text="currentProject.commune.name"></span>
-                            <span class="list-project__project-name" x-text='currentProject.name'></span>
-                        </div>
-                    </template>
-                    <template x-if="!currentProject">
-                        <div>
-                            <template x-if="displayedProjectList.length == 0">
-                                <span class="no-underline list-project__project-name">Pas de projet récent</span>
-                            </template>
-                            <template x-if="displayedProjectList.length > 0">
-                                <span class="no-underline list-project__project-name">Projets récents</span>
-                            </template>
-                        </div>
-                    </template>
-                {% endif %}
-            </button>
-            <div class="fr-collapse fr-menu" id="project_list">
-                <ul x-data="{search:''}"class="fr-menu__list list-project">
-                    {% comment %} <li class="list-project__search-container">
-                            <input type="search" class="fr-input" placeholder="Rechercher votre projet" @input.debounce.400ms="onSearch()" x-model="search">
-                    </li> {% endcomment %}
+         {% if user.is_authenticated %}
+            <li class="navigation__item-projects"
+                x-data="ExpandableMenuHandler"
+                @click.outside="toggle">
+                <button class="fr-select item-projects__button-open"
+                        x-ref="expandMenuButton"
+                        aria-expanded="false"
+                        aria-controls="project_list"
+                        :disabled="displayedProjectList.length == 0">
                     {% if project %}
-                        <li class="list-project__header">
-                            <template x-if="displayedProjectList.length > 0">
-                                <div class="list-project__header-text">Projets récents</div>
-                            </template>
-                            <template x-if="displayedProjectList.length == 0">
-                                <div class="list-project__header-text">Pas de projets récents</div>
-                            </template>
-                        </li>
+                        <span class="no-underline">{{ project.commune.name }} <span class="list-project__project-name">{{ project.name }}</span></span>
+                    {% else %}
+                        <template x-if="currentProject">
+                            <div>
+                                <span class="no-underline" x-text="currentProject.commune.name"></span>
+                                <span class="list-project__project-name" x-text='currentProject.name'></span>
+                            </div>
+                        </template>
+                        <template x-if="!currentProject">
+                            <div>
+                                <template x-if="displayedProjectList.length == 0">
+                                    <span class="no-underline list-project__project-name">Pas de projet récent</span>
+                                </template>
+                                <template x-if="displayedProjectList.length > 0">
+                                    <span class="no-underline list-project__project-name">Projets récents</span>
+                                </template>
+                            </div>
+                        </template>
                     {% endif %}
-                    <template x-for="project in displayedProjectList">
-                        <li class="list-project__item">
-                            <a class="fr-nav__link" :href="`/project/${project.id}`">
-                                <span class="no-underline strong" x-text="project.commune.name"></span>
-                                <span class="list-project__project-name" x-text="project.name"></span>
-                            </a>
-                        </li>
-                    </template>
-                    {% if not is_switchtender %}
-                        <a class="fr-btn justify-content-center w-100"
-                           href="{% url 'onboarding' %}">Créer un projet</a>
-                    {% endif %}
-                </ul>
-            </div>
-        </li>
+                </button>
+                <div class="fr-collapse fr-menu" id="project_list">
+                    <ul x-data="{search:''}"class="fr-menu__list list-project">
+                        {% comment %} <li class="list-project__search-container">
+                                <input type="search" class="fr-input" placeholder="Rechercher votre projet" @input.debounce.400ms="onSearch()" x-model="search">
+                        </li> {% endcomment %}
+                        {% if project %}
+                            <li class="list-project__header">
+                                <template x-if="displayedProjectList.length > 0">
+                                    <div class="list-project__header-text">Projets récents</div>
+                                </template>
+                                <template x-if="displayedProjectList.length == 0">
+                                    <div class="list-project__header-text">Pas de projets récents</div>
+                                </template>
+                            </li>
+                        {% endif %}
+                        <template x-for="project in displayedProjectList">
+                            <li class="list-project__item">
+                                <a class="fr-nav__link" :href="`/project/${project.id}`">
+                                    <span class="no-underline strong" x-text="project.commune.name"></span>
+                                    <span class="list-project__project-name" x-text="project.name"></span>
+                                </a>
+                            </li>
+                        </template>
+                        {% if not is_switchtender %}
+                            <a class="fr-btn justify-content-center w-100"
+                            href="{% url 'onboarding' %}">Créer un projet</a>
+                        {% endif %}
+                    </ul>
+                </div>
+            </li>
+        {% endif %}
     </template>
     {% if projects_to_moderate_count > 0 %}
         <!-- Projects moderation -->

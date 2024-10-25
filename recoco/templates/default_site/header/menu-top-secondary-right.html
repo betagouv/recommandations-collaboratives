@@ -1,10 +1,11 @@
 {% load wagtailcore_tags %}
 {% wagtail_site as current_site %}
+{% url 'home' as home_url %}
 
 {% if not user.is_authenticated %}
     {% for menuitem in current_site.root_page.get_children.live.in_menu %}
-    <li>
-        <a href="{% pageurl menuitem %}"><span class="fr-mx-1v align-middle">{{ menuitem.title }}</span></a>
+    <li class="navigation__item-resource">
+        <a href="{% pageurl menuitem %}" class="fr-link {% if request.path in menuitem.url and not request.path == home_url %}active{% endif %}"><span class="fr-mx-1v align-middle">{{ menuitem.title }}</span></a>
     </li>
     {% endfor %}
 {% endif %}
