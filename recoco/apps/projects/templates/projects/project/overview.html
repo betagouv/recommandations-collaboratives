@@ -21,9 +21,6 @@
           rel="stylesheet"
           type="text/css">
 {% endblock css %}
-{% block banner %}
-    {% include "projects/project/fragments/positioning_banner.html" %}
-{% endblock banner %}
 {% block project_detail %}
     {% get_obj_perms request.user for request.site as "user_site_perms" %}
     {% get_obj_perms request.user for project as "user_project_perms" %}
@@ -68,108 +65,126 @@
                 {% endif %}
             </div>
             {% include "projects/project/navigation.html" with overview=True %}
-            <div class="row">
-                <div class="col-8">
-                    <div class="d-flex">
-                        {% if "use_advisor_note" in user_project_perms %}
-                            <div class="row w-100">
-                                <div class="col-12 col-lg-6 h-100 responsive-wrapper">
-                                    <div class="h-100">{% include "projects/project/fragments/topics/topic_list.html" %}</div>
+            {% if project.inactive_since != None %}
+                <div class="specific-border-4pxsolid1e1e1e">
+                    {% include "projects/project/fragments/project_banner/paused_project_banner.html" %}
+                {% elif project.status == 'DRAFT' %}
+                    <div class="specific-border-4pxsolid000091">
+                        {% include "projects/project/fragments/project_banner/non_published_project_banner.html" %}
+                    {% elif not advising and is_regional_actor and not is_staff %}
+                        <div class="specific-border-4pxsolid000091">
+                            {% include "projects/project/fragments/project_banner/join_project_banner.html" %}
+                        {% endif %}
+                        <div class="container-fluid">
+                            <div class="row fr-p-1w {% if project.inactive_since != None %}no-interaction-possible {% elif not advising and is_regional_actor and not is_staff %}specific-opacity-02{% endif %}">
+                                <div class="col-8">
+                                    <div class="d-flex">
+                                        {% if "use_advisor_note" in user_project_perms %}
+                                            <div class="row w-100">
+                                                <div class="col-12 col-lg-6 h-100 responsive-wrapper">
+                                                    <div class="h-100">{% include "projects/project/fragments/topics/topic_list.html" %}</div>
+                                                </div>
+                                                <div class="col-12 col-lg-6 h-100 responsive-wrapper">
+                                                    {% include "projects/project/fragments/advisor_note.html" %}
+                                                </div>
+                                            </div>
+                                        {% else %}
+                                            <div class="fr-pr-3w w-100">{% include "projects/project/fragments/topics/topic_list.html" %}</div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="fr-mt-3w">
+                                        <div class="d-flex w-full flex-wrap">
+                                            <!-- Contexte -->
+                                            {% include "projects/project/fragments/information_card.html" with full_width=True padding_end=True padding_top=True full_height=True project=project title="Résumé du projet" description=project.description updated_on=project.created_on card_user=project.submitted_by org_name=project.submitted_by.profile.organization.name data_test="context" %}
+                                            <!-- Onboarding -->
+                                            {% if not onboarding_response %}
+                                                {% include "projects/project/fragments/information_card.html" with full_width=True padding_end=True padding_top=True full_height=True project=project onboarding_information=True updated_on=project.created_on card_user=project.submitted_by org_name=project.submitted_by.profile.organization.name %}
+                                            {% endif %}
+                                            <!-- Old onboarding project  -->
+                                            {% if onboarding_response %}
+                                                {% include "projects/project/fragments/information_card.html" with full_width=True padding_end=True padding_top=True full_height=True project=project onboarding_information=True updated_on=project.created_on card_user=project.submitted_by org_name=project.submitted_by.profile.organization.name old_project=True %}
+                                            {% elif project.impediments %}
+                                                {% include "projects/project/fragments/information_card.html" with full_width=True padding_end=True padding_top=True full_height=True project=project title="Difficultés rencontrées" description=project.impediments updated_on=project.created_on card_user=project.submitted_by org_name=project.submitted_by.profile.organization.name old_project=True %}
+                                            {% endif %}
+                                        </div>
+                                        {% if 'use_private_notes' in user_project_perms %}
+                                            <div>{% include "projects/project/fragments/timeline/project_timeline.html" %}</div>
+                                        {% endif %}
+                                    </div>
                                 </div>
-                                <div class="col-12 col-lg-6 h-100 responsive-wrapper">
-                                    {% include "projects/project/fragments/advisor_note.html" %}
+                                <div class="col-4">
+                                    <div class="fr-mb-2w">
+                                        <div class="d-flex flex-column">
+                                            <h6 class="text-uppercase fw-bold d-block fr-mb-1v lh-base h6-specific-fontsize-14">Localisation</h6>
+                                            {% include "projects/project/fragments/geolocation/location_overview.html" %}
+                                        </div>
+                                    </div>
+                                    <div class="fr-mb-3w">
+                                        <div class="d-flex flex-column">
+                                            <h6 class="text-uppercase fw-bold d-block fr-mb-2w h6-specific-fontsize-14">Référent collectivité</h6>
+                                            {% include "projects/project/fragments/project_owner.html" with project=project %}
+                                            {% include "projects/project/fragments/owner/owner-details.html" with project=project %}
+                                        </div>
+                                    </div>
+                                    <!-- User lists -->
+                                    <div class="d-flex flex-column fr-my-3w">
+                                        <!-- Collectivity -->
+                                        <div>
+                                            <h6 class="text-uppercase fw-bold d-block fr-mb-2w h6-specific-fontsize-14">Membres de la collectivité</h6>
+                                            <ul class="flex-column list-unstyled fr-mb-0">
+                                                {% for projectmember in project.projectmember_set.all %}
+                                                    {% if projectmember.is_owner and projectmember.member.is_active %}
+                                                        <li>{% include "user/user_card.html" with user=project.owner project_owner=True user_activity=True %}</li>
+                                                    {% elif projectmember.member.is_active %}
+                                                        <li>{% include "user/user_card.html" with user=projectmember.member user_activity=True %}</li>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </ul>
+                                            <div class="d-block fr-mb-2v fr-mt-2w"
+                                                 {% if not "invite_collaborators" in user_project_perms %} data-bs-toggle="tooltip" data-bs-title="Vous devez être Conseiller ou Observateur pour cela" {% endif %}>
+                                                <button @click="openInviteMemberModal"
+                                                        data-toggle="modal"
+                                                        data-target="#InviteMemberModal"
+                                                        data-cy="invite-advisor-button"
+                                                        class="{% if project.status == 'DRAFT' or not "invite_collaborators" in user_project_perms %} disabled fr-btn--icon-left fr-icon-lock-line{% endif %} fr-btn fr-btn--secondary justify-content-center w-100 fr-text--sm text-uppercase"
+                                                        {% if project.status == 'DRAFT' or not "invite_collaborators" in user_project_perms %}disabled{% endif %}>
+                                                    Inviter un membre de la collectivité
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <!-- Advisors -->
+                                        <div class="fr-mt-3w">
+                                            <h6 class="text-uppercase fw-bold d-block h6-specific-fontsize-14">Équipe de suivi</h6>
+                                            <ul class="d-flex flex-column list-unstyled fr-mb-0">
+                                                {% for advisor in project.switchtender_sites.all %}
+                                                    {% if advisor.switchtender.is_active %}
+                                                        <li>{% include "user/user_card.html" with user=advisor.switchtender user_activity=True %}</li>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </ul>
+                                            {% if "invite_advisors" in user_project_perms or is_regional_actor %}
+                                                <div class="d-block fr-mb-2v fr-mt-2w">
+                                                    <button @click="openInviteSwitchtenderModal"
+                                                            data-toggle="modal"
+                                                            data-target="#InviteSwitchtenderModal"
+                                                            class="{% if project.status == 'DRAFT' %} disabled fr-btn--icon-left fr-icon-lock-line{% endif %} fr-btn fr-btn--secondary justify-content-center w-100 fr-text--sm text-uppercase"
+                                                            {% if project.status == 'DRAFT' %}disabled{% endif %}>
+                                                        <span>Inviter un conseiller</span>
+                                                    </button>
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        {% else %}
-                            <div class="fr-pr-3w w-100">{% include "projects/project/fragments/topics/topic_list.html" %}</div>
-                        {% endif %}
-                    </div>
-                    <div class="fr-mt-3w">
-                        <div class="d-flex w-full flex-wrap">
-                            <!-- Contexte -->
-                            {% include "projects/project/fragments/information_card.html" with full_width=True padding_end=True padding_top=True full_height=True project=project title="Résumé du projet" description=project.description updated_on=project.created_on card_user=project.submitted_by org_name=project.submitted_by.profile.organization.name data_test="context" %}
-                            <!-- Onboarding -->
-                            {% if not onboarding_response %}
-                                {% include "projects/project/fragments/information_card.html" with full_width=True padding_end=True padding_top=True full_height=True project=project onboarding_information=True updated_on=project.created_on card_user=project.submitted_by org_name=project.submitted_by.profile.organization.name %}
-                            {% endif %}
-                            <!-- Old onboarding project  -->
-                            {% if onboarding_response %}
-                                {% include "projects/project/fragments/information_card.html" with full_width=True padding_end=True padding_top=True full_height=True project=project onboarding_information=True updated_on=project.created_on card_user=project.submitted_by org_name=project.submitted_by.profile.organization.name old_project=True %}
-                            {% elif project.impediments %}
-                                {% include "projects/project/fragments/information_card.html" with full_width=True padding_end=True padding_top=True full_height=True project=project title="Difficultés rencontrées" description=project.impediments updated_on=project.created_on card_user=project.submitted_by org_name=project.submitted_by.profile.organization.name old_project=True %}
-                            {% endif %}
                         </div>
-                        {% if 'use_private_notes' in user_project_perms %}
-                            <div>{% include "projects/project/fragments/timeline/project_timeline.html" %}</div>
-                        {% endif %}
+                        {% if project.inactive_since != None %}
+                        </div>
+                    {% elif project.status == 'DRAFT' %}
                     </div>
+                {% elif not advising and is_regional_actor and not is_staff %}
                 </div>
-                <div class="col-4">
-                    <div class="fr-mb-2w">
-                        <div class="d-flex flex-column">
-                            <h6 class="text-uppercase fw-bold d-block fr-mb-1v lh-base h6-specific-fontsize-14">Localisation</h6>
-                            {% include "projects/project/fragments/geolocation/location_overview.html" %}
-                        </div>
-                    </div>
-                    <div class="fr-mb-3w">
-                        <div class="d-flex flex-column">
-                            <h6 class="text-uppercase fw-bold d-block fr-mb-2w h6-specific-fontsize-14">Référent collectivité</h6>
-                            {% include "projects/project/fragments/project_owner.html" with project=project %}
-                            {% include "projects/project/fragments/owner/owner-details.html" with project=project %}
-                        </div>
-                        {% include "projects/project/fragments/positioning.html" %}
-                    </div>
-                    <!-- User lists -->
-                    <div class="d-flex flex-column fr-my-3w">
-                        <!-- Collectivity -->
-                        <div>
-                            <h6 class="text-uppercase fw-bold d-block fr-mb-2w h6-specific-fontsize-14">Membres de la collectivité</h6>
-                            <ul class="flex-column list-unstyled fr-mb-0">
-                                {% for projectmember in project.projectmember_set.all %}
-                                    {% if projectmember.is_owner and projectmember.member.is_active %}
-                                        <li>{% include "user/user_card.html" with user=project.owner project_owner=True user_activity=True %}</li>
-                                    {% elif projectmember.member.is_active %}
-                                        <li>{% include "user/user_card.html" with user=projectmember.member user_activity=True %}</li>
-                                    {% endif %}
-                                {% endfor %}
-                            </ul>
-                            <div class="d-block fr-mb-2v fr-mt-2w"
-                                 {% if not "invite_collaborators" in user_project_perms %} data-bs-toggle="tooltip" data-bs-title="Vous devez être Conseiller ou Observateur pour cela" {% endif %}>
-                                <button @click="openInviteMemberModal"
-                                        data-toggle="modal"
-                                        data-target="#InviteMemberModal"
-                                        data-cy="invite-advisor-button"
-                                        class="{% if project.status == 'DRAFT' or not "invite_collaborators" in user_project_perms %} disabled fr-btn--icon-left fr-icon-lock-line{% endif %} fr-btn fr-btn--secondary justify-content-center w-100 fr-text--sm text-uppercase"
-                                        {% if project.status == 'DRAFT' or not "invite_collaborators" in user_project_perms %}disabled{% endif %}>
-                                    Inviter un membre de la collectivité
-                                </button>
-                            </div>
-                        </div>
-                        <!-- Advisors -->
-                        <div class="fr-mt-3w">
-                            <h6 class="text-uppercase fw-bold d-block h6-specific-fontsize-14">Équipe de suivi</h6>
-                            <ul class="d-flex flex-column list-unstyled fr-mb-0">
-                                {% for advisor in project.switchtender_sites.all %}
-                                    {% if advisor.switchtender.is_active %}
-                                        <li>{% include "user/user_card.html" with user=advisor.switchtender user_activity=True %}</li>
-                                    {% endif %}
-                                {% endfor %}
-                            </ul>
-                            {% if "invite_advisors" in user_project_perms or is_regional_actor %}
-                                <div class="d-block fr-mb-2v fr-mt-2w">
-                                    <button @click="openInviteSwitchtenderModal"
-                                            data-toggle="modal"
-                                            data-target="#InviteSwitchtenderModal"
-                                            class="{% if project.status == 'DRAFT' %} disabled fr-btn--icon-left fr-icon-lock-line{% endif %} fr-btn fr-btn--secondary justify-content-center w-100 fr-text--sm text-uppercase"
-                                            {% if project.status == 'DRAFT' %}disabled{% endif %}>
-                                        <span>Inviter un conseiller</span>
-                                    </button>
-                                </div>
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
-            </div>
+            {% endif %}
             {% include "projects/project/fragments/share/invite_member.html" %}
             {% include "projects/project/fragments/share/invite_switchtender.html" %}
         </div>

@@ -19,7 +19,7 @@ from recoco.utils import has_perm_or_403
 
 from .. import models, signals
 from ..forms import DocumentUploadForm
-from ..utils import get_collaborators_for_project, set_active_project_id
+from ..utils import get_collaborators_for_project
 
 
 @login_required
@@ -28,9 +28,6 @@ def document_list(request, project_id=None):
     project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
 
     has_perm_or_403(request.user, "manage_documents", project)
-
-    # Set this project as active
-    set_active_project_id(request, project.pk)
 
     all_files = models.Document.objects.filter(project_id=project.pk).exclude(
         the_file__in=["", None]

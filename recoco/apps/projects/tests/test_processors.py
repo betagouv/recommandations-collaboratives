@@ -53,17 +53,7 @@ def test_active_project_processor(request, client):
             reverse("projects-project-detail-overview", args=[project.pk])
         )
 
-    assert response.context["active_project"] == project
-
-    notifs = (
-        "active_project_action_notifications_count",
-        "active_project_conversation_notifications_count",
-        "active_project_document_notifications_count",
-        "active_project_private_conversation_notifications_count",
-    )
-
-    for notif in notifs:
-        assert response.context[notif] == 1, f"{notif} expected 1"
+        assert "unread_notifications_count" in response.context
 
 
 # eof

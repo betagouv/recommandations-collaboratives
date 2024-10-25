@@ -119,20 +119,9 @@
                     <!-- Switchtender actions -->
                     <!-- Push Resource -->
                     <div id="push-resource" class="d-grid gap-2 fr-mt-2w">
-                        {% if active_project %}
-                            {% if not resource.status == 0 %}
-                                <form action="{% url "projects-create-resource-action" resource.id %}"
-                                      method="get">
-                                    {% include "dsrc/core/blocks/buttons/button.html" with label="Pousser cette ressource" classes="w-100 justify-content-center" %}
-                                </form>
-                            {% endif %}
-                        {% else %}
-                            <span class="d-inline-block"
-                                  data-bs-toggle="tooltip"
-                                  data-bs-placement="left"
-                                  title="Sélectionner d'abord un projet pour pousser une ressource">
-                                {% include "dsrc/core/blocks/buttons/button.html" with label="Pousser cette ressource" classes="w-100 justify-content-center" disable=True %}
-                            </span>
+                        {% if not resource.status == 0 %}
+                            <a href="{% url "projects-create-task" %}?resource_id={{ resource.id }}"
+                               class="fr-btn w-100 justify-content-center">Pousser cette ressource</a>
                         {% endif %}
                     </div>
                 {% endif %}
