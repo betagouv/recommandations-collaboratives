@@ -1,7 +1,6 @@
 describe('As a switchtender I can manage notifications in header', () => {
   before(() => {
     cy.login('bob');
-    // cy.hideCookieBannerAndDjango();
     cy.visit('/project/2/conversations');
 
     for (let i = 0; i < 4; i++) {
@@ -56,7 +55,6 @@ describe('As a switchtender I can manage notifications in header', () => {
   it('displays a button to mark all notifications as read', () => {
     cy.login('jean');
     cy.visit('/');
-    cy.hideCookieBannerAndDjango();
     cy.get('[data-test-id="notification-badge"]').then((span) => {
       const notificationNumber = +span.text();
       expect(notificationNumber).be.greaterThan(0);

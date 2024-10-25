@@ -1,7 +1,6 @@
 describe('I can go to tasks tab', () => {
   beforeEach(() => {
     cy.login('jean');
-    cy.hideCookieBannerAndDjango();
     cy.createProject('Count Published Project');
   });
 

@@ -10,7 +10,6 @@ describe('I can go to overview tab and check invitation advisor button', () => {
     cy.get('[data-cy="btn-accept-project"]').first().click();
     cy.logout();
     cy.login('national');
-    cy.hideCookieBannerAndDjango();
   });
 
   it('shows disabled button to invite new advisor', () => {

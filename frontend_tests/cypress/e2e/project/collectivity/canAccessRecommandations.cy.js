@@ -13,7 +13,6 @@ describe('I can access the recommandations', () => {
 
   beforeEach(() => {
     cy.login('bob');
-    cy.hideCookieBannerAndDjango();
   });
 
   it('goes to recommandations tab and see new recommandations', () => {

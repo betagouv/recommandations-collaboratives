@@ -1,7 +1,6 @@
 describe('I can access documentation', () => {
   it('displays as staff member', () => {
     cy.login('staff');
-    cy.hideCookieBannerAndDjango();
     cy.visit(`/`);
     cy.get("[data-test-id='open-dropdown-profil-option-button']").click({
       force: true,
@@ -16,7 +15,6 @@ describe('I can access documentation', () => {
 
   it('displays as advisor', () => {
     cy.login('jean');
-    cy.hideCookieBannerAndDjango();
     cy.visit(`/`);
     cy.get("[data-test-id='open-dropdown-profil-option-button']").click({
       force: true,
@@ -34,7 +32,6 @@ describe('I can access documentation', () => {
 
   it('cannnot displays it', () => {
     cy.login('bob');
-    cy.hideCookieBannerAndDjango();
     cy.visit(`/`);
     cy.get('[data-test-id="open-dropdown-profil-option-button"]').click({
       force: true,
