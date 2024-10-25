@@ -17,28 +17,28 @@
 {% endblock css %}
 {% block js %}
     <script type="text/javascript">
-$(document).ready(function(){
-    activateTab();
+        document.addEventListener('DOMContentLoaded', function() {
+            activateTab();
 
-    window.addEventListener('hashchange', function() {
-        activateTab()
-    });
-});
+            window.addEventListener('hashchange', function() {
+                activateTab()
+            });
+        })
+        // TODO dead code ?
+        // Change hash for page-reload
+        document.querySelector('.nav-tabs button').addEventListener('shown.bs.tab', function(e) {
+            window.location.hash = $(e.target).data("bs-target");
+            window.scrollBy(0, 0);
+        });
 
-// Change hash for page-reload
-$('.nav-tabs button').on('shown.bs.tab', function (e) {
 
-    window.location.hash = $(e.target).data("bs-target");
-    window.scrollBy(0, 0);
-})
-
-function activateTab(){
-    var url = document.location.toString();
-    if (url.match('#')) {
-        let hash = url.split('#')[1]
-        $('#' + hash + "-tab").get(0).click();
-    }
-};
+        function activateTab(){
+            var url = document.location.toString();
+            if (url.match('#')) {
+                let hash = url.split('#')[1]
+                $('#' + hash + "-tab").get(0).click();
+            }
+        };
 
     </script>
 {% endblock js %}
