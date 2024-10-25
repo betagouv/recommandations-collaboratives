@@ -2,7 +2,7 @@ import projects from '../../../fixtures/projects/projects.json';
 
 const currentProject = projects[3];
 
-describe('I can fill a project survey', () => {
+describe('I can fill a project survey @critical', () => {
   beforeEach(() => {
     cy.login('bob');
     cy.visit(`/project/${currentProject.pk}`);
