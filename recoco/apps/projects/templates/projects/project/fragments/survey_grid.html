@@ -71,27 +71,31 @@
                 {% comment %} TODO
                 - refonte modal share EDL
                 {% endcomment %}
-                <div x-data="ProjectShare" class="d-flex align-items-center">
-                    <button @click="openPublicShareModal"
-                            data-toggle="modal"
-                            data-target="#publicShareModal"
-                            {% if project.status == 'DRAFT' %}disabled{% endif %}
-                            class="fr-btn fr-btn--sm fr-btn--secondary {% if project.status == 'DRAFT' %}fr-btn--icon-left fr-icon-lock-line disabled{% endif %}">
-                        Partager l'état des lieux
-                    </button>
-                    {% include "projects/project/fragments/share/public_share_modal.html" %}
-                </div>
-            </div>
-            {% for session in project.survey_session.all %}
-                <div class="survey-card-cta">
-                    <div class="survey-card-cta__title">
-                        <span class="badge {% if session.completion < 100 %}text-bg-danger {% else %}text-bg-light{% endif %} text-bg-danger">{{ session.completion }}%</span>
-                        {{ session.survey.name }}
+                {% if "use_surveys" in user_project_perms %}
+                    <div x-data="ProjectShare" class="d-flex align-items-center">
+                        <button @click="openPublicShareModal"
+                                data-toggle="modal"
+                                data-target="#publicShareModal"
+                                {% if project.status == 'DRAFT' %}disabled{% endif %}
+                                class="fr-btn fr-btn--sm fr-btn--secondary {% if project.status == 'DRAFT' %}fr-btn--icon-left fr-icon-lock-line disabled{% endif %}">
+                            Partager l'état des lieux
+                        </button>
+                        {% include "projects/project/fragments/share/public_share_modal.html" %}
                     </div>
-                    <a class="fr-btn fr-btn--sm"
-                       href="{% url 'survey-project-session' project_id=project.pk site_id=session.survey.site.id %}">Compléter le questionnaire</a>
-                </div>
-            {% endfor %}
+                {% endif %}
+            </div>
+            {% if "use_surveys" in user_project_perms %}
+                {% for session in project.survey_session.all %}
+                    <div class="survey-card-cta">
+                        <div class="survey-card-cta__title">
+                            <span class="badge {% if session.completion < 100 %}text-bg-danger {% else %}text-bg-light{% endif %} text-bg-danger">{{ session.completion }}%</span>
+                            {{ session.survey.name }}
+                        </div>
+                        <a class="fr-btn fr-btn--sm"
+                           href="{% url 'survey-project-session' project_id=project.pk site_id=session.survey.site.id %}">Compléter le questionnaire</a>
+                    </div>
+                {% endfor %}
+            {% endif %}
             <div class="fr-mt-3w">
                 {% for session in project.survey_session.all %}
                     <h4>{{ session.survey.name }}</h4>
