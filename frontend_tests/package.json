@@ -18,12 +18,13 @@
   "author": "",
   "license": " GPL-3.0-or-later",
   "devDependencies": {
+    "concurrently": "^8.2.2",
     "cross-env": "^7.0.3",
     "cypress": "^13.6.0",
     "cypress-mochawesome-reporter": "^3.8.1",
     "eslint": "^8.56.0",
     "prettier": "^3.2.2",
-    "concurrently": "^8.2.2",
-    "start-server-and-test": "^2.0.2"
+    "start-server-and-test": "^2.0.2",
+    "@cypress/grep": "^4.1.0"
   }
 }

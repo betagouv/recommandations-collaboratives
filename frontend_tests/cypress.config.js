@@ -9,6 +9,7 @@ module.exports = defineConfig({
     inlineAssets: true,
     saveAllAttempts: false,
     videoOnFailOnly: true,
+    screenshotOnRunFailure: false,
   },
   chromeWebSecurity: false,
   e2e: {
@@ -17,6 +18,8 @@ module.exports = defineConfig({
     setupNodeEvents(on, config) {
       require('cypress-mochawesome-reporter/plugin')(on);
       require('./cypress/plugins/index.js')(on, config);
+      require('@cypress/grep/src/plugin')(config);
+      return config;
     },
     chromeWebSecurity: false,
     // baseUrl: 'http://example.localhost:8000/',
