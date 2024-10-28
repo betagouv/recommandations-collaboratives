@@ -79,34 +79,19 @@ Vous pouvez aussi renseigner les valeurs dans le fichier si vous préférez ne p
 
 ### Docker
 
-Les fichiers docker se trouvent à la racine dans le dossier `docker`.
-
-#### Configuration de l'applicatif
-
-Référez vous à la section de Virtualenv, mais limitez vous aux variables d'environnement.
-
-#### Création des conteneurs
-
-En ligne de commandes, aller dans ce dossier `Docker` et taper :
+Un environnement Docker et fourni et orchestré avec le fichier
+[`docker-compose.yml](./docker-compose.yml). Pour le lancer :
 
 ```sh
-docker-compose up -d
+docker compose up
 ```
 
-Après quelques minutes d'installation, vous devriez avoir un environnement prêt.
-
-#### Création de la base de donnnées
-
-Entrez dans le container `app` en tapant :
+Une fois votre environnement installé, initialisez ou synchroniser la
+base de données depuis le conteneur du serveur :
 
 ```sh
-docker-compose exec app /bin/bash
-```
-
-Initialisez ou synchronisez la base de données en tapant :
-
-```sh
-./manage.py migrate
+docker compose run --rm server bash
+python manage.py migrate
 ```
 
 ## Lancement de l'applicatif
