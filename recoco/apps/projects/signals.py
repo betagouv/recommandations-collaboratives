@@ -3,7 +3,6 @@ import datetime
 import django.dispatch
 from actstream import action
 from actstream.models import action_object_stream
-from django.contrib.auth.signals import user_logged_in
 from django.contrib.contenttypes.models import ContentType
 from django.db.models.signals import pre_delete, pre_save
 from django.dispatch import receiver
@@ -22,7 +21,8 @@ from .utils import (
     get_notification_recipients_for_project,
     get_project_moderators,
     get_regional_actors_for_project,
-    refresh_user_projects_in_session,
+    notify_advisors_of_project,
+    notify_members_of_project,
 )
 
 ########################################################################
@@ -102,7 +102,7 @@ def log_project_validated(sender, site, moderator, project, **kwargs):
 )
 def delete_notifications_on_project_delete(sender, instance, **kwargs):
     project_ct = ContentType.objects.get_for_model(instance)
-    notifications_models.Notification.on_site.filter(
+    notifications_models.Notification.objects.filter(
         target_content_type=project_ct.pk, target_object_id=instance.pk
     ).delete()
 
@@ -122,20 +122,16 @@ def notify_project_switchtender_joined(sender, project, **kwargs):
     if project.project_sites.current().status == "DRAFT" or project.muted:
         return
 
-    if project.inactive_since:
-        recipients = get_advisors_for_project(project)
-    else:
-        recipients = get_notification_recipients_for_project(project)
+    notification = {
+        "sender": sender,
+        "verb": verbs.Project.BECAME_ADVISOR,
+        "action_object": project,
+        "target": project,
+    }
 
-    recipients = recipients.exclude(id=sender.id)
-
-    notify.send(
-        sender=sender,
-        recipient=recipients,
-        verb=verbs.Project.BECAME_ADVISOR,
-        action_object=project,
-        target=project,
-    )
+    notify_advisors_of_project(project, notification, exclude=sender)
+    if not project.inactive_since:
+        notify_members_of_project(project, notification)
 
 
 @receiver(project_observer_joined)
@@ -153,20 +149,16 @@ def notify_project_observer_joined(sender, project, **kwargs):
     if project.project_sites.current().status == "DRAFT" or project.muted:
         return
 
-    if project.inactive_since:
-        recipients = get_advisors_for_project(project)
-    else:
-        recipients = get_notification_recipients_for_project(project)
+    notification = {
+        "sender": sender,
+        "verb": verbs.Project.BECAME_OBSERVER,
+        "action_object": project,
+        "target": project,
+    }
 
-    recipients = recipients.exclude(id=sender.id)
-
-    notify.send(
-        sender=sender,
-        recipient=recipients,
-        verb=verbs.Project.BECAME_OBSERVER,
-        action_object=project,
-        target=project,
-    )
+    notify_advisors_of_project(project, notification, exclude=sender)
+    if not project.inactive_since:
+        notify_members_of_project(project, notification)
 
 
 @receiver(project_switchtender_leaved)
@@ -182,7 +174,7 @@ def log_project_switchtender_leaved(sender, project, **kwargs):
 @receiver(project_switchtender_leaved)
 def delete_joined_on_switchtender_leaved_if_same_day(sender, project, **kwargs):
     project_ct = ContentType.objects.get_for_model(project)
-    notifications_models.Notification.on_site.filter(
+    notifications_models.Notification.objects.filter(
         target_content_type=project_ct.pk,
         target_object_id=project.pk,
         verb=verbs.Project.BECAME_ADVISOR,
@@ -210,20 +202,16 @@ def notify_project_member_joined(sender, project, **kwargs):
     if project.project_sites.current().status == "DRAFT" or project.muted:
         return
 
-    if project.inactive_since:
-        recipients = get_advisors_for_project(project)
-    else:
-        recipients = get_notification_recipients_for_project(project)
+    notification = {
+        "sender": sender,
+        "verb": verbs.Project.JOINED,
+        "action_object": project,
+        "target": project,
+    }
 
-    recipients = recipients.exclude(id=sender.id)
-
-    notify.send(
-        sender=sender,
-        recipient=recipients,
-        verb=verbs.Project.JOINED,
-        action_object=project,
-        target=project,
-    )
+    notify_advisors_of_project(project, notification)
+    if not project.inactive_since:
+        notify_members_of_project(project, notification, exclude=sender)
 
 
 ########################################################################
@@ -401,14 +389,6 @@ def log_survey_session_updated(sender, session, request, **kwargs):
         action_object=session,
         target=project,
     )
-
-
-########################################################################
-# Login methods and signals
-########################################################################
-@receiver(user_logged_in)
-def post_login_set_user_projects_in_session(sender, user, request, **kwargs):
-    refresh_user_projects_in_session(request, user)
 
 
 # eof

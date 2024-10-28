@@ -7,11 +7,13 @@ authors: raphael.marvie@beta.gouv.fr, guillaume.libersat@beta.gouv.fr
 created: 2022-01-18 10:11:56 CEST
 """
 import pytest
+from django.conf import settings
 from django.contrib.auth import models as auth
 from django.contrib.sites import models as sites_models
 from django.contrib.sites.shortcuts import get_current_site
 from model_bakery import baker
 
+from recoco import verbs
 from recoco.apps.geomatics import models as geomatics
 from recoco.apps.projects.utils import assign_advisor, assign_collaborator
 
@@ -154,6 +156,71 @@ testdata = (
 @pytest.mark.parametrize("string,length,expected", testdata)
 def test_truncate_string(string, length, expected):
     assert models.truncate_string(string, length) == expected
+
+
+# ----------------------------------------------
+# Notification helpers
+# ----------------------------------------------
+@pytest.mark.django_db
+def test_notify_advisors_of_project(project_ready, request):
+    sender = baker.make(auth.User)
+    notification = {
+        "sender": sender,
+        "verb": verbs.Project.BECAME_ADVISOR,
+        "action_object": project_ready,
+        "target": project_ready,
+    }
+
+    # create a few advisors on 3 different sites
+    current_site = get_current_site(request)
+    second_site = baker.make(sites_models.Site, name="second")
+
+    userA = baker.make(auth.User)
+    userB = baker.make(auth.User)
+
+    assign_advisor(userA, project_ready, current_site)
+    assign_advisor(userB, project_ready, second_site)
+
+    utils.notify_advisors_of_project(project_ready, notification)
+
+    with settings.SITE_ID.override(current_site):
+        assert userA.notifications(manager="on_site").count() == 1
+        assert userB.notifications(manager="on_site").count() == 0
+
+    with settings.SITE_ID.override(second_site):
+        assert userA.notifications(manager="on_site").count() == 0
+        assert userB.notifications(manager="on_site").count() == 1
+
+
+@pytest.mark.django_db
+def test_notify_members_of_project(project_ready, request):
+    sender = baker.make(auth.User)
+    notification = {
+        "sender": sender,
+        "verb": verbs.Project.BECAME_ADVISOR,
+        "action_object": project_ready,
+        "target": project_ready,
+    }
+
+    # create a few advisors on 3 different sites
+    current_site = get_current_site(request)
+    second_site = baker.make(sites_models.Site, name="second")
+
+    userA = baker.make(auth.User)
+    userB = baker.make(auth.User)
+
+    assign_collaborator(userA, project_ready)
+    assign_collaborator(userB, project_ready)
+
+    with settings.SITE_ID.override(second_site):
+        utils.notify_members_of_project(project_ready, notification)
+
+        assert userA.notifications(manager="on_site").count() == 0
+        assert userB.notifications(manager="on_site").count() == 0
+
+    with settings.SITE_ID.override(current_site):
+        assert userA.notifications(manager="on_site").count() == 1
+        assert userB.notifications(manager="on_site").count() == 1
 
 
 # eof
