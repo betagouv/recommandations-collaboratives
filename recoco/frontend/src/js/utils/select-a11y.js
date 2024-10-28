@@ -69,7 +69,6 @@ class Select {
     this._removeOption = this._removeOption.bind(this);
 
     this._disable();
-
     this.button = this._createButton();
     this.liveZone = this._createLiveZone();
     this.overlay = this._createOverlay();
@@ -178,7 +177,7 @@ class Select {
   _fillSuggestions() {
     const search = this.search.toLowerCase();
 
-    // loop over the
+    // loop over the options to create the suggestions
     this.suggestions = Array.prototype.map
       .call(
         this.el.options,
@@ -196,6 +195,12 @@ class Select {
           suggestion.setAttribute('role', 'option');
           suggestion.setAttribute('tabindex', 0);
           suggestion.setAttribute('data-index', index);
+          if (option.getAttribute('data-select')) {
+            suggestion.setAttribute(
+              'data-select',
+              option.getAttribute('data-select')
+            );
+          }
           suggestion.classList.add('a11y-suggestion');
 
           // check if the option is selected
@@ -209,6 +214,18 @@ class Select {
         }.bind(this)
       )
       .filter(Boolean);
+
+    if (this.suggestions[1].getAttribute('data-select') === 'recent_project') {
+      const recentProjectSeparator = document.createElement('div');
+      recentProjectSeparator.classList.add('a11y-suggestion-separator');
+      recentProjectSeparator.innerText = 'Projet(s) récent(s)';
+      this.suggestions.splice(1, 0, recentProjectSeparator);
+      const separatorIndex = this.suggestions.findLastIndex(
+        (x) => x.getAttribute('data-select') === 'recent_project'
+      );
+      const separator = document.createElement('hr');
+      this.suggestions.splice(separatorIndex, 0, separator);
+    }
 
     if (!this.suggestions.length) {
       this.list.innerHTML = `<p class="a11y-no-suggestion">${this._options.text.noResult}</p>`;
@@ -233,7 +250,7 @@ class Select {
     this._setLiveZone();
   }
 
-  _handleOpener(event) {
+  _handleOpener() {
     this._toggleOverlay();
   }
 

@@ -3,5 +3,4 @@
     {% vite_asset 'js/apps/selectSearchable.js' %}
 {% endblock js %}
 <div x-data="SelectSearchable({selectElIsChild: true})"
-     x-init="init"
      x-ref="selectSearchable">{{ list }}</div>
