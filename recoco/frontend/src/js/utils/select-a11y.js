@@ -215,7 +215,10 @@ class Select {
       )
       .filter(Boolean);
 
-    if (this.suggestions[1].getAttribute('data-select') === 'recent_project') {
+    if (
+      this.suggestions.length > 1 &&
+      this.suggestions[1].getAttribute('data-select') === 'recent_project'
+    ) {
       const recentProjectSeparator = document.createElement('div');
       recentProjectSeparator.classList.add('a11y-suggestion-separator');
       recentProjectSeparator.innerText = 'Projet(s) récent(s)';
@@ -224,7 +227,7 @@ class Select {
         (x) => x.getAttribute('data-select') === 'recent_project'
       );
       const separator = document.createElement('hr');
-      this.suggestions.splice(separatorIndex, 0, separator);
+      this.suggestions.splice(separatorIndex + 1, 0, separator);
     }
 
     if (!this.suggestions.length) {
