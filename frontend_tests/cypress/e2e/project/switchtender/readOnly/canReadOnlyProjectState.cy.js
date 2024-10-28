@@ -3,7 +3,7 @@ const currentProject = projects[1];
 
 describe('I can read only project state', () => {
   beforeEach(() => {
-    cy.login('jeannot');
+    cy.login('conseiller3');
   });
 
   it('goes to project state and read only content', () => {

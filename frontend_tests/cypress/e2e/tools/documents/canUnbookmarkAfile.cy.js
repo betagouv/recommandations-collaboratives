@@ -2,7 +2,7 @@ import documents from '../../../fixtures/documents/documents.json';
 
 describe('I can unbookmark a file already pinned', () => {
   beforeEach(() => {
-    cy.login('bob');
+    cy.login('collectivité1');
   });
 
   it('shows the pinned file', () => {

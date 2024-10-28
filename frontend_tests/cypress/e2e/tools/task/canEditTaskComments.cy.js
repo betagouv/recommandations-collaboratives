@@ -8,7 +8,7 @@ const taskName = 'task intent';
 
 describe('As advisor, I can make a comment on a task', () => {
   beforeEach(() => {
-    cy.login('jean');
+    cy.login('conseiller1');
   });
 
   it('adds a new comment, and stops from submitting the comment more than once', () => {

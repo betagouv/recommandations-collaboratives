@@ -14,7 +14,7 @@ describe('I can access documentation', () => {
   });
 
   it('displays as advisor', () => {
-    cy.login('jean');
+    cy.login('conseiller1');
     cy.visit(`/`);
     cy.get("[data-test-id='open-dropdown-profil-option-button']").click({
       force: true,
@@ -31,7 +31,7 @@ describe('I can access documentation', () => {
   });
 
   it('cannnot displays it', () => {
-    cy.login('bob');
+    cy.login('collectivité1');
     cy.visit(`/`);
     cy.get('[data-test-id="open-dropdown-profil-option-button"]').click({
       force: true,

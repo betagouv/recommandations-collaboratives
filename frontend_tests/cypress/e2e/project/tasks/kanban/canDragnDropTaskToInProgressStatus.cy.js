@@ -6,7 +6,7 @@ describe('I can go to tasks tab', () => {
   beforeEach(() => {
     cy.visit('/');
 
-    cy.login('jean');
+    cy.login('conseiller1');
     cy.createProject('dragndroptest');
   });
 

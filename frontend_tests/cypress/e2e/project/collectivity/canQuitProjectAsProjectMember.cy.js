@@ -5,7 +5,7 @@ const currentProject = projects[17];
 
 describe('As collectivity project member, I can quit a project if I am not the owner', () => {
   beforeEach(() => {
-    cy.login('boba');
+    cy.login('collectivité2');
     cy.visit(`/project/${currentProject.pk}`);
   });
 

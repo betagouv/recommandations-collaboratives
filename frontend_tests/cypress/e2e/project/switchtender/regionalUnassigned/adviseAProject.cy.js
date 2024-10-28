@@ -3,7 +3,7 @@ const currentProject = projects[1];
 
 describe('I can advice a project', () => {
   beforeEach(() => {
-    cy.login('jeanne');
+    cy.login('conseiller2');
   });
 
   it('goes to overview page and advise the project', () => {

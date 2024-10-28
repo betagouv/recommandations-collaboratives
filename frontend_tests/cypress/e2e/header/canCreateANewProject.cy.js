@@ -1,6 +1,6 @@
 describe('I can create a new project from the main header project list dropdown as a collectivity', () => {
   beforeEach(() => {
-    cy.login('bob');
+    cy.login('collectivité1');
   });
 
   it('', () => {
@@ -13,7 +13,7 @@ describe('I can create a new project from the main header project list dropdown 
 
 describe("I can't see create a new project from the main header project list dropdown as an advisor", () => {
   beforeEach(() => {
-    cy.login('jean');
+    cy.login('conseiller1');
   });
 
   it('', () => {

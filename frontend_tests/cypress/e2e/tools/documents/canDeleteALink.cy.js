@@ -2,7 +2,7 @@ import documents from '../../../fixtures/documents/documents.json';
 
 describe('I can delete a link on the document tab', () => {
   beforeEach(() => {
-    cy.login('bob');
+    cy.login('collectivité1');
   });
 
   it('deletes a link', () => {

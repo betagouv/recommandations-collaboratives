@@ -14,7 +14,7 @@
         {% get_project_moderation_count as projects_to_moderate_count %}
     {% endif %}
     <ul x-data="MenuProjects({% if is_switchtender or is_administrating_project %}false{% else %}true{% endif %})"
-        x-init="getProjetctsData"
+        {% if user.is_authenticated %}x-init="getProjetctsData"{% endif %}
         class="navigation__menu-top-secondary list-unstyled fr-mb-0 d-flex align-items-center header-specific-pl-15 tmp-usevar"
         data-test-id="secondary-menu"
         style="{% if not user.is_authenticated %}border-left: 0.1rem solid #d5d5d5;
@@ -31,7 +31,7 @@
             </li>
         {% endif %}
         <!-- Projects -->
-         {% if user.is_authenticated %}
+        {% if user.is_authenticated %}
             <li class="navigation__item-projects"
                 x-data="ExpandableMenuHandler"
                 @click.outside="toggle">
@@ -86,7 +86,7 @@
                         </template>
                         {% if not is_switchtender %}
                             <a class="fr-btn justify-content-center w-100"
-                            href="{% url 'onboarding' %}">Créer un projet</a>
+                               href="{% url 'onboarding' %}">Créer un projet</a>
                         {% endif %}
                     </ul>
                 </div>

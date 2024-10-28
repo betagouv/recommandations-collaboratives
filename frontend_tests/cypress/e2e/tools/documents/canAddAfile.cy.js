@@ -2,7 +2,7 @@ import file from '../../../fixtures/documents/file.json';
 
 describe('I can add a file on the document tab', () => {
   beforeEach(() => {
-    cy.login('bob');
+    cy.login('collectivité1');
   });
 
   it('upload a file', () => {

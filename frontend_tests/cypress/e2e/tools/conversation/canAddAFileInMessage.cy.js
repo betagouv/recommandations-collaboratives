@@ -6,7 +6,7 @@ const currentProject = projects[1];
 
 describe('I can add a file with my message in public notes', () => {
   beforeEach(() => {
-    cy.login('jean');
+    cy.login('conseiller1');
   });
 
   it('writes a message with a file', () => {

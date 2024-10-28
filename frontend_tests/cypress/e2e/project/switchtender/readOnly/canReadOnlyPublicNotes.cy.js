@@ -3,7 +3,7 @@ const currentProject = projects[1];
 
 describe('I can read only public notes', () => {
   beforeEach(() => {
-    cy.login('jeannot');
+    cy.login('conseiller3');
   });
 
   it('goes to public notes and read only content', () => {

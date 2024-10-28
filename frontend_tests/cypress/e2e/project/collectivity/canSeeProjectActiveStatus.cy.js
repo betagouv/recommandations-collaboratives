@@ -6,7 +6,7 @@ const currentProject = projects[21];
 describe(`As non referent project member, I can see a project's active status`, () => {
   before(() => {
     // First: login as owner and deactivate project
-    cy.login('bob');
+    cy.login('collectivité1');
     cy.visit(`/project/${currentProject.pk}`);
 
     projectView.navigateToPreferencesTab();
@@ -16,7 +16,7 @@ describe(`As non referent project member, I can see a project's active status`, 
 
   it('Displays a header banner when a project is paused', () => {
     // Then: login as non referent project member and check banner
-    cy.login('boba');
+    cy.login('collectivité2');
     cy.visit(`/project/${currentProject.pk}`);
     projectView.navigateToPreferencesTab();
     projectView.checkProjectStatusBanner();

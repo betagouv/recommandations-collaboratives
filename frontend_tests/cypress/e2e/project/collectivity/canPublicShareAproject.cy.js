@@ -4,7 +4,7 @@ const currentProject = projects[2];
 
 describe('I can have a public url to share', () => {
   beforeEach(() => {
-    cy.login('boba');
+    cy.login('collectivité2');
   });
 
   it('goes to share a project page', () => {

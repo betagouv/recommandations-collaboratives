@@ -3,7 +3,7 @@ const currentTask = tasks[6];
 
 describe('I can go to tasks tab', () => {
   beforeEach(() => {
-    cy.login('jean');
+    cy.login('conseiller1');
     cy.createProject('status not');
   });
 

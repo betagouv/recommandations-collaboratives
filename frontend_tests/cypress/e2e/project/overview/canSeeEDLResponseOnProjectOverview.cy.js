@@ -4,7 +4,7 @@ const projectName = 'New project onboarding answer';
 
 describe('I can see onboarding answer on the overview tab', () => {
   before(() => {
-    cy.login('bob');
+    cy.login('collectivité1');
     cy.createProject(projectName);
     cy.logout();
   });
@@ -24,7 +24,7 @@ describe('I can see onboarding answer on the overview tab', () => {
   });
 
   it('should see the project description on overview tab as collectivity', () => {
-    cy.login('bob');
+    cy.login('collectivité1');
     cy.visit('/');
     cy.contains(projectName).parent().find('a').click({ force: true });
     cy.get('[data-test-id="project-information-card-context"]').should(

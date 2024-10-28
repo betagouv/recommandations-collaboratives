@@ -3,7 +3,7 @@ const currentProject = projects[1];
 
 describe('I can invite a switchtender as a regional actor', () => {
   beforeEach(() => {
-    cy.login('jeannot');
+    cy.login('conseiller3');
   });
 
   it('goes to the overview page and invite a switchtender', () => {

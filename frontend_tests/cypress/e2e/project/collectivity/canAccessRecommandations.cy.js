@@ -4,7 +4,7 @@ const currentProject = projects[1];
 
 describe('I can access the recommandations', () => {
   before(() => {
-    cy.login('jean');
+    cy.login('conseiller1');
     cy.visit(`/project/${currentProject.pk}`);
     cy.contains('Recommandations').click({ force: true });
     cy.createTask('Notif test');
@@ -12,7 +12,7 @@ describe('I can access the recommandations', () => {
   });
 
   beforeEach(() => {
-    cy.login('bob');
+    cy.login('collectivité1');
   });
 
   it('goes to recommandations tab and see new recommandations', () => {

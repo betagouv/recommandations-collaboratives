@@ -3,7 +3,7 @@ const currentProject = projects[1];
 
 describe('I can invite people', () => {
   beforeEach(() => {
-    cy.login('jean');
+    cy.login('conseiller1');
   });
 
   it('goes to share a project page', () => {

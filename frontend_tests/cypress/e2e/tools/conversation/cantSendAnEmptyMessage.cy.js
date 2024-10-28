@@ -5,7 +5,7 @@ const currentProject = projects[1];
 
 describe("I can't send an empty message", () => {
   beforeEach(() => {
-    cy.login('jean');
+    cy.login('conseiller1');
   });
 
   it('shows a disabled send message button', () => {

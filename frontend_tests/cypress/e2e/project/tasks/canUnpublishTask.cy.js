@@ -1,6 +1,6 @@
 describe('I can go tasks tab', () => {
   beforeEach(() => {
-    cy.login('jean');
+    cy.login('conseiller1');
     cy.createProject('unpublish task');
   });
 

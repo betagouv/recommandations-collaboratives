@@ -1,32 +1,53 @@
+/**
+ * Custom Cypress commands for various actions such as login, logout,
+ * accepting/declining cookies, creating projects and tasks, and more.
+ *
+ * @module CypressCommands
+ */
+
 import users from '../fixtures/users/users.json';
 import project from '../fixtures/projects/project.json';
 import resources from '../fixtures/resources/resources.json';
 import communes from '../fixtures/geomatics/commune.json';
+
 const currentResource = resources[4];
 const projectCommune = communes.find(
   (c) => c.fields.postal == project.postcode
 );
 
+/**
+ * Logs in a user based on their role.
+ *
+ * @function login
+ * @memberof Cypress.Commands
+ * @param {string} role - The role of the user to log in as.
+ */
 Cypress.Commands.add('login', (role) => {
   let username = '';
 
   switch (role) {
     case 'jean': //conseiller
+    case 'conseiller1': //conseiller
       username = users[1].fields.username;
       break;
     case 'jeanne': //conseiller
+    case 'conseiller2': //conseiller
       username = users[2].fields.username;
       break;
     case 'jeannot': //conseiller
+    case 'conseiller3': //conseiller
       username = users[3].fields.username;
       break;
     case 'bob': //collectivité
+    case 'collectivité1': //collectivité
       username = users[4].fields.username;
       break;
     case 'boba': //collectivité
+    case 'collectivité2': //collectivité
       username = users[5].fields.username;
       break;
     case 'bobette': //collectivité
+    case 'collectivité3': //collectivité
       username = users[6].fields.username;
       break;
     case 'staff': //staff
@@ -69,12 +90,21 @@ Cypress.Commands.add('login', (role) => {
 //   cy.contains('Déconnexion').click({ force: true });
 // });
 
+/**
+ * Logs out the current user.
+ *
+ * @function logout
+ * @memberof Cypress.Commands
+ */
 Cypress.Commands.add('logout', () => {
   cy.visit('/accounts/logout/');
 });
 
 /**
- * Consent to cookies banner
+ * Accepts the cookies consent banner.
+ *
+ * @function acceptCookies
+ * @memberof Cypress.Commands
  */
 Cypress.Commands.add('acceptCookies', () => {
   cy.get('[data-test-id="fr-consent-banner"]')
@@ -84,7 +114,10 @@ Cypress.Commands.add('acceptCookies', () => {
 });
 
 /**
- * Decline cookies banner
+ * Declines the cookies consent banner.
+ *
+ * @function declineCookies
+ * @memberof Cypress.Commands
  */
 Cypress.Commands.add('declineCookies', () => {
   cy.get('[data-test-id="fr-consent-banner"]')
@@ -93,6 +126,14 @@ Cypress.Commands.add('declineCookies', () => {
   cy.visit('/');
 });
 
+/**
+ * Creates a new project with the given label and optional project object.
+ *
+ * @function createProject
+ * @memberof Cypress.Commands
+ * @param {string} label - The label for the new project.
+ * @param {Object} [objProject=null] - Optional project object with additional details.
+ */
 Cypress.Commands.add('createProject', (label, objProject = null) => {
   cy.visit('/');
 
@@ -145,10 +186,23 @@ Cypress.Commands.add('createProject', (label, objProject = null) => {
   cy.url().should('include', '/onboarding/summary');
 });
 
+/**
+ * Joins a project as an advisor.
+ *
+ * @function becomeAdvisorOnProject
+ * @memberof Cypress.Commands
+ * @param {number} projectId - The ID of the project to join as an advisor.
+ */
 Cypress.Commands.add('becomeAdvisorOnProject', (projectId) => {
   cy.visit(`/project/${projectId}/switchtender/join`);
 });
 
+/**
+ * Joins as an advisor if not already an advisor.
+ *
+ * @function becomeAdvisor
+ * @memberof Cypress.Commands
+ */
 Cypress.Commands.add('becomeAdvisor', () => {
   cy.get('body').then((body) => {
     if (body.find('#positioning-form').length > 0) {
@@ -161,6 +215,16 @@ Cypress.Commands.add('becomeAdvisor', () => {
   });
 });
 
+/**
+ * Creates a new task with the given label, topic, and options.
+ *
+ * @function createTask
+ * @memberof Cypress.Commands
+ * @param {string} label - The label for the new task.
+ * @param {string} [topic=''] - The topic for the new task.
+ * @param {boolean} [withResource=false] - Whether to associate a resource with the task.
+ * @param {boolean} [draft=false] - Whether to save the task as a draft.
+ */
 Cypress.Commands.add(
   'createTask',
   (label, topic = '', withResource = false, draft = false) => {
@@ -239,6 +303,13 @@ Cypress.Commands.add(
   }
 );
 
+/**
+ * Approves a project with the given index.
+ *
+ * @function approveProject
+ * @memberof Cypress.Commands
+ * @param {number} index - The index of the project to approve.
+ */
 Cypress.Commands.add('approveProject', (index) => {
   cy.login('staff');
   cy.visit('nimda/projects/project/');
@@ -258,12 +329,25 @@ Cypress.Commands.add('approveProject', (index) => {
   cy.visit('/');
 });
 
+/**
+ * Navigates to a project with the given index.
+ *
+ * @function navigateToProject
+ * @memberof Cypress.Commands
+ * @param {number} index - The index of the project to navigate to.
+ */
 Cypress.Commands.add('navigateToProject', (index) => {
   cy.visit(`/`);
   cy.get('#projects-list-button').click({ force: true });
   cy.contains(`${project.name} ${index}`).click({ force: true });
 });
 
+/**
+ * Hides the cookie banner and Django debug toolbar.
+ *
+ * @function hideCookieBannerAndDjango
+ * @memberof Cypress.Commands
+ */
 Cypress.Commands.add('hideCookieBannerAndDjango', () => {
   cy.get('[data-test-id="fr-consent-banner"]')
     .find('[data-test-id="button-consent-accept-all"]')
@@ -272,11 +356,12 @@ Cypress.Commands.add('hideCookieBannerAndDjango', () => {
 });
 
 /**
- * Verify that image loads and that alt attribute corresponds to ARIA role.
- * Possible role values are:
- * - img-informative
- * - img-presentation
- * - img-functional
+ * Verifies that an image loads and that its alt attribute corresponds to its ARIA role.
+ *
+ * @function testImage
+ * @memberof Cypress.Commands
+ * @param {string} role - The ARIA role of the image. img-informative, img-presentation, or img-functional.
+ * @param {string} type - The type of the image (e.g., 'svg', 'png', 'jpg', 'jpeg').
  */
 Cypress.Commands.add(
   'testImage',

@@ -8,7 +8,7 @@ const currentUser = users[1];
 
 describe('I can go tasks tab', () => {
   beforeEach(() => {
-    cy.login('jean');
+    cy.login('conseiller1');
   });
 
   it('posts a followup', () => {

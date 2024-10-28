@@ -6,7 +6,7 @@ const task1 = tasks[0];
 
 describe('I can go tasks tab', () => {
   beforeEach(() => {
-    cy.login('jean');
+    cy.login('conseiller1');
   });
 
   it('see creation date of a followup', () => {

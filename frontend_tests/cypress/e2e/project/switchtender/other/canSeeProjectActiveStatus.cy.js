@@ -16,7 +16,7 @@ describe(`As project advisor, I can see a project's active status`, () => {
 
   it('Displays a header banner when a project is paused', () => {
     // Then: login as non referent project member and check banner
-    cy.login('jean');
+    cy.login('conseiller1');
     cy.visit(`/project/${currentProject.pk}`);
     projectView.checkProjectStatusBanner();
   });

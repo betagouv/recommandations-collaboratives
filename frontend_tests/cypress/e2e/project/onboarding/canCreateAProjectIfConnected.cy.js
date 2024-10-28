@@ -1,6 +1,6 @@
 describe("I can create a project if i'm connected", () => {
   beforeEach(() => {
-    cy.login('bob');
+    cy.login('collectivité1');
     cy.acceptCookies();
   });
 

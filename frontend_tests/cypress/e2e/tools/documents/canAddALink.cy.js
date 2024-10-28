@@ -2,7 +2,7 @@ import link from '../../../fixtures/documents/link.json';
 
 describe('I can add a link on the document tab', () => {
   beforeEach(() => {
-    cy.login('bob');
+    cy.login('collectivité1');
   });
 
   it('add a link', () => {
