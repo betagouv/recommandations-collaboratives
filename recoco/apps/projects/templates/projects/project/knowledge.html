@@ -14,7 +14,7 @@
     État des lieux - {{ block.super }}
 {% endblock og_title %}
 {% block banner %}
-    {% include "projects/project/fragments/positioning_banner.html" %}
+    {% include "projects/project/fragments/project_banner/positioning_banner.html" %}
 {% endblock banner %}
 {% block project_detail %}
     {% challenge_for request.user "project-knowledge-reader" as challenge %}
