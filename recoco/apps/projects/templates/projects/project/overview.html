@@ -129,14 +129,18 @@
                                                     déposé il y a {{ project.created_on|timesince }}
                                                 </span>
                                             </div>
-                                            <div class="d-flex">
-                                                <div class="project-info__container-tags">
-                                                    <span class="fr-icon-pantone-line fr-icon--sm" aria-hidden="true"></span>
-                                                    {% for tag in project.tags.all %}<span class="project-info__tag fr-mr-1v">#{{ tag }}</span>{% endfor %}
+                                            {% if project.tags.count > 0 %}
+                                                <div class="d-flex">
+                                                    <div class="project-info__container-tags">
+                                                        <span class="fr-icon-pantone-line fr-icon--sm" aria-hidden="true"></span>
+                                                        {% for tag in project.tags.all %}<span class="project-info__tag fr-mr-1v">#{{ tag }}</span>{% endfor %}
+                                                    </div>
+                                                    {% if "use_project_tags" in user_site_perms %}
+                                                        <a class="fr-btn fr-btn--sm fr-btn--tertiary-no-outline fr-icon-pencil-line"
+                                                           href="{% url "projects-project-tags" project.id %}">Modifier les etiquettes</a>
+                                                    {% endif %}
                                                 </div>
-                                                <a class="fr-btn fr-btn--sm fr-btn--tertiary-no-outline fr-icon-pencil-line"
-                                                   href="{% url "projects-project-tags" project.id %}">Modifier les etiquettes</a>
-                                            </div>
+                                            {% endif %}
                                         </div>
                                     </div>
                                     <div class="fr-mb-2w">
