@@ -1,0 +1,19 @@
+.banner-container {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 401;
+}
+
+.banner {
+  border-radius: 0px 0px 4px 4px;
+  box-shadow: 0 4px 2px 0 rgba(0, 0, 0, 0.25);
+  color: white;
+  &--paused {
+    background: #1e1e1e;
+  }
+  &--join,
+  &--non-publish {
+    background: #000091;
+  }
+}

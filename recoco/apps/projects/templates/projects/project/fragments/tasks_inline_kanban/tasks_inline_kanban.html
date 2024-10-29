@@ -11,7 +11,7 @@
 {{ user_project_perms|json_script:"userProjectPerms" }}
 {{ is_switchtender|json_script:"isSwitchtender" }}
 {{ user.email|json_script:"userEmail" }}
-<div x-data>
+<div class="fr-p-3w" x-data>
     {% include "projects/project/fragments/tasks_inline_kanban/tasks_inline_kanban_header.html" %}
     <template x-if="$store.tasksView.currentView === 'inline'">
         <div>{% include "projects/project/fragments/tasks_inline/tasks_inline.html" %}</div>

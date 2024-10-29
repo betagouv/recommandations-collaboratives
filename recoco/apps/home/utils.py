@@ -71,10 +71,11 @@ def make_new_site(
         if created:
             # if we just created the survey, create initial sample questions
             question_set = survey_models.QuestionSet.objects.create(
-                survey=survey, heading="Thématique d'exemple"
+                survey=survey, heading=f"Thématique d'exemple de '{name}'"
             )
             survey_models.Question.objects.create(
-                question_set=question_set, text="Ceci est une question exemple"
+                question_set=question_set,
+                text=f"Ceci est une question exemple de '{name}'",
             )
 
         site_config = models.SiteConfiguration.objects.create(

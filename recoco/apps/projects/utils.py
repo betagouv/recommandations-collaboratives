@@ -17,6 +17,7 @@ from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.db.models import Q
 from guardian.shortcuts import assign_perm, get_users_with_perms, remove_perm
+from notifications.signals import notify
 
 from recoco import utils as uv_utils
 
@@ -294,14 +295,34 @@ def get_notification_recipients_for_project(project):
     ).distinct()
 
 
+# ----------------------------------------------
+# Notification helpers
+# ----------------------------------------------
+
+
+def notify_advisors_of_project(project, notification, exclude=None):
+    """Dispatch notification to every advisor, on their reference Site"""
+    for advisor in project.switchtender_sites.exclude(switchtender=exclude):
+        notify.send(recipient=advisor.switchtender, site=advisor.site, **notification)
+
+
+def notify_members_of_project(project, notification, exclude=None):
+    """Dispatch notification to members, always on the project original Site"""
+    original_site = project.project_sites.origin()
+    recipients = project.members.all()
+    if exclude:
+        recipients = recipients.exclude(pk=exclude.pk)
+
+    notify.send(
+        recipient=recipients,
+        site=original_site.site,
+        **notification,
+    )
+
+
 def generate_ro_key():
     """Generate the ReadOnly key for sharing"""
     return uuid.uuid4().hex
-
-
-def get_active_project_id(request):
-    """Return the active project ID for a given user"""
-    return request.session.get("active_project", None)
 
 
 def get_projects_for_user(user, site):
@@ -314,39 +335,6 @@ def get_projects_for_user(user, site):
     )
 
     return [m.project for m in memberships.all()]
-
-
-def get_active_project(request):
-    """Return the active project for a given user"""
-    if not request.user.is_authenticated:
-        return None
-
-    current_site = get_current_site(request)
-
-    project_id = get_active_project_id(request)
-    project = None
-
-    if project_id:
-        try:
-            project = models.Project.on_site.get(id=project_id)
-        except models.Project.DoesNotExist:
-            pass
-    else:
-        try:
-            projects = get_projects_for_user(request.user, current_site)
-
-            if projects:
-                project = projects[0]
-
-        except models.Project.DoesNotExist:
-            pass
-
-    return project
-
-
-def set_active_project_id(request, project_id: int):
-    """Set the current project in a session cookie"""
-    request.session["active_project"] = project_id
 
 
 def refresh_user_projects_in_session(request, user):

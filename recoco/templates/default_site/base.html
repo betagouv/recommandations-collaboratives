@@ -40,9 +40,6 @@
         <link href="{% sass_src 'css/base.scss' %}"
               rel="stylesheet"
               type="text/css">
-        <link href="{% sass_src 'css/menu-top.scss' %}"
-              rel="stylesheet"
-              type="text/css">
         <link href="{% sass_src 'css/markdownx.scss' %}"
               rel="stylesheet"
               type="text/css">
@@ -57,6 +54,7 @@
                 {% include "consent/banner.html" %}
             {% endif %}
             <h1 class="visually-hidden">{{ request.site.name }}</h1>
+            {% include "header/skip-links.html" %}
             {% if url_name != "projects-project-detail-recommandations-embed" %}
                 {% include "header/menu-top.html" %}
             {% endif %}
@@ -104,13 +102,13 @@
                     </div>
                 {% endif %}
                 <!--             <div class="b-page-divider"></div> -->
-                <div class="container-fluid bg-white">
+                <div class="container-fluid bg-white" id="content">
                     <div class="row background--grey-light">
                         {% block content %}
                         {% endblock content %}
                     </div>
                     {% if url_name != "projects-project-detail-recommandations-embed" %}
-                        <div class="row justify-content-center">{% include "footer.html" %}</div>
+                        <div class="row justify-content-center" id="footer">{% include "footer.html" %}</div>
                     {% endif %}
                 </div>
             </main>

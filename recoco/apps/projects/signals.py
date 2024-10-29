@@ -17,10 +17,10 @@ from recoco.utils import is_staff_for_site
 
 from . import models
 from .utils import (
-    get_advisors_for_project,
-    get_notification_recipients_for_project,
     get_project_moderators,
     get_regional_actors_for_project,
+    notify_advisors_of_project,
+    notify_members_of_project,
 )
 
 ########################################################################
@@ -100,7 +100,7 @@ def log_project_validated(sender, site, moderator, project, **kwargs):
 )
 def delete_notifications_on_project_delete(sender, instance, **kwargs):
     project_ct = ContentType.objects.get_for_model(instance)
-    notifications_models.Notification.on_site.filter(
+    notifications_models.Notification.objects.filter(
         target_content_type=project_ct.pk, target_object_id=instance.pk
     ).delete()
 
@@ -120,20 +120,16 @@ def notify_project_switchtender_joined(sender, project, **kwargs):
     if project.project_sites.current().status == "DRAFT" or project.muted:
         return
 
-    if project.inactive_since:
-        recipients = get_advisors_for_project(project)
-    else:
-        recipients = get_notification_recipients_for_project(project)
+    notification = {
+        "sender": sender,
+        "verb": verbs.Project.BECAME_ADVISOR,
+        "action_object": project,
+        "target": project,
+    }
 
-    recipients = recipients.exclude(id=sender.id)
-
-    notify.send(
-        sender=sender,
-        recipient=recipients,
-        verb=verbs.Project.BECAME_ADVISOR,
-        action_object=project,
-        target=project,
-    )
+    notify_advisors_of_project(project, notification, exclude=sender)
+    if not project.inactive_since:
+        notify_members_of_project(project, notification)
 
 
 @receiver(project_observer_joined)
@@ -151,20 +147,16 @@ def notify_project_observer_joined(sender, project, **kwargs):
     if project.project_sites.current().status == "DRAFT" or project.muted:
         return
 
-    if project.inactive_since:
-        recipients = get_advisors_for_project(project)
-    else:
-        recipients = get_notification_recipients_for_project(project)
+    notification = {
+        "sender": sender,
+        "verb": verbs.Project.BECAME_OBSERVER,
+        "action_object": project,
+        "target": project,
+    }
 
-    recipients = recipients.exclude(id=sender.id)
-
-    notify.send(
-        sender=sender,
-        recipient=recipients,
-        verb=verbs.Project.BECAME_OBSERVER,
-        action_object=project,
-        target=project,
-    )
+    notify_advisors_of_project(project, notification, exclude=sender)
+    if not project.inactive_since:
+        notify_members_of_project(project, notification)
 
 
 @receiver(project_switchtender_leaved)
@@ -180,7 +172,7 @@ def log_project_switchtender_leaved(sender, project, **kwargs):
 @receiver(project_switchtender_leaved)
 def delete_joined_on_switchtender_leaved_if_same_day(sender, project, **kwargs):
     project_ct = ContentType.objects.get_for_model(project)
-    notifications_models.Notification.on_site.filter(
+    notifications_models.Notification.objects.filter(
         target_content_type=project_ct.pk,
         target_object_id=project.pk,
         verb=verbs.Project.BECAME_ADVISOR,
@@ -208,20 +200,16 @@ def notify_project_member_joined(sender, project, **kwargs):
     if project.project_sites.current().status == "DRAFT" or project.muted:
         return
 
-    if project.inactive_since:
-        recipients = get_advisors_for_project(project)
-    else:
-        recipients = get_notification_recipients_for_project(project)
+    notification = {
+        "sender": sender,
+        "verb": verbs.Project.JOINED,
+        "action_object": project,
+        "target": project,
+    }
 
-    recipients = recipients.exclude(id=sender.id)
-
-    notify.send(
-        sender=sender,
-        recipient=recipients,
-        verb=verbs.Project.JOINED,
-        action_object=project,
-        target=project,
-    )
+    notify_advisors_of_project(project, notification)
+    if not project.inactive_since:
+        notify_members_of_project(project, notification, exclude=sender)
 
 
 ########################################################################
@@ -256,7 +244,7 @@ def delete_activity_on_note_delete(sender, instance, **kwargs):
         return
 
     project_ct = ContentType.objects.get_for_model(instance)
-    notifications_models.Notification.on_site.filter(
+    notifications_models.Notification.objects.filter(
         target_content_type=project_ct.pk, target_object_id=instance.pk
     ).delete()
 
@@ -265,42 +253,43 @@ def delete_activity_on_note_delete(sender, instance, **kwargs):
 
 @receiver(note_created)
 def notify_note_created(sender, note, project, user, **kwargs):
-    if note.public is False:
-        recipients = get_advisors_for_project(project).exclude(id=user.id)
-
-        verb = verbs.Conversation.PRIVATE_MESSAGE
-        action.send(
-            user,
-            verb=verb,
-            action_object=note,
-            target=project,
-        )
-    else:
-        if project.inactive_since:
-            recipients = get_advisors_for_project(project)
-        else:
-            recipients = get_notification_recipients_for_project(project)
-
-        recipients = recipients.exclude(id=user.id)
-
-        verb = verbs.Conversation.PUBLIC_MESSAGE
-        action.send(
-            user,
-            verb=verb,
-            action_object=note,
-            target=project,
-        )
-
     if project.project_sites.current().status == "DRAFT" or project.muted:
         return
 
-    notify.send(
-        sender=user,
-        recipient=recipients,
-        verb=verb,
-        action_object=note,
-        target=project,
-    )
+    if note.public is False:
+        action.send(
+            user,
+            verb=verbs.Conversation.PRIVATE_MESSAGE,
+            action_object=note,
+            target=project,
+        )
+
+        notification = {
+            "sender": user,
+            "verb": verbs.Conversation.PRIVATE_MESSAGE,
+            "action_object": note,
+            "target": project,
+        }
+
+        notify_advisors_of_project(project, notification, exclude=user)
+    else:
+        action.send(
+            user,
+            verb=verbs.Conversation.PUBLIC_MESSAGE,
+            action_object=note,
+            target=project,
+        )
+
+        notification = {
+            "sender": user,
+            "verb": verbs.Conversation.PUBLIC_MESSAGE,
+            "action_object": note,
+            "target": project,
+        }
+
+        notify_advisors_of_project(project, notification, exclude=user)
+        if not project.inactive_since:
+            notify_members_of_project(project, notification, exclude=user)
 
 
 @receiver(note_created)
@@ -347,21 +336,17 @@ def project_document_uploaded(sender, instance, **kwargs):
         target=project,
     )
 
+    notification = {
+        "sender": instance.uploaded_by,
+        "verb": verbs.Document.ADDED,
+        "action_object": instance,
+        "target": project,
+    }
+
     # Notify other project's people and advisors
-    if project.inactive_since:
-        recipients = get_advisors_for_project(project)
-    else:
-        recipients = get_notification_recipients_for_project(project)
-
-    recipients = recipients.exclude(id=instance.uploaded_by.id)
-
-    notify.send(
-        sender=instance.uploaded_by,
-        recipient=recipients,
-        verb=verbs.Document.ADDED,
-        action_object=instance,
-        target=instance.project,
-    )
+    notify_advisors_of_project(project, notification, exclude=instance.uploaded_by)
+    if not project.inactive_since:
+        notify_members_of_project(project, notification, exclude=instance.uploaded_by)
 
 
 ################################################################
@@ -391,14 +376,14 @@ def log_survey_session_updated(sender, session, request, **kwargs):
         target=session.project,
     )
 
-    recipients = get_advisors_for_project(project).exclude(id=user.id)
-    notify.send(
-        sender=user,
-        recipient=recipients,
-        verb=verbs.Survey.UPDATED,
-        action_object=session,
-        target=project,
-    )
+    notification = {
+        "sender": user,
+        "verb": verbs.Survey.UPDATED,
+        "action_object": session,
+        "target": project,
+    }
+
+    notify_advisors_of_project(project, notification, exclude=user)
 
 
 # eof

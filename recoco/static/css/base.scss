@@ -7,27 +7,18 @@ $turquoise: #5dc2b0;
 body {
   min-height: 100vh;
   min-height: -webkit-fill-available;
-  min-height: 100vh;
-  min-height: -webkit-fill-available;
 }
 
 html {
-  height: -webkit-fill-available;
   height: -webkit-fill-available;
 }
 
 main {
   display: flex;
   flex-wrap: nowrap;
-  display: flex;
-  flex-wrap: nowrap;
 
   min-height: 100vh;
   height: -webkit-fill-available;
-  overflow-x: auto;
-  min-height: 100vh;
-  height: -webkit-fill-available;
-  overflow-x: auto;
 }
 
 /* Info boxes */
@@ -38,30 +29,17 @@ main {
   border: 1px solid #e9ecef;
   border-left-width: 0.25rem;
   border-radius: 0.25rem;
-  padding: 1.25rem;
-  margin-top: 1.25rem;
-  margin-bottom: 1.25rem;
-  border: 1px solid #e9ecef;
-  border-left-width: 0.25rem;
-  border-radius: 0.25rem;
 }
 
 .bd-callout-info {
-  border-left-color: #5bc0de;
   border-left-color: #5bc0de;
 }
 
 .bd-callout-warning {
   border-left-color: orange;
-  border-left-color: orange;
 }
 
 .bd-placeholder-img {
-  font-size: 1.125rem;
-  text-anchor: middle;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  user-select: none;
   font-size: 1.125rem;
   text-anchor: middle;
   -webkit-user-select: none;
@@ -73,19 +51,10 @@ main {
   .bd-placeholder-img-lg {
     font-size: 3.5rem;
   }
-
-  .bd-placeholder-img-lg {
-    font-size: 3.5rem;
-  }
 }
 
 /* Heading Infobox */
 .box-heading {
-  background-color: #fafafa;
-  border-radius: 10px;
-  padding: 20px;
-  padding-top: 30px;
-  padding-bottom: 30px;
   background-color: #fafafa;
   border-radius: 10px;
   padding: 20px;
@@ -103,40 +72,26 @@ main {
   border: solid transparent;
   border-width: 0 0 2rem 2rem;
   transition: 0.2s;
-  position: absolute;
-  padding: 0.4em;
-  /* Arrow size */
-  box-shadow: 1px -1px 0 1px white inset;
-  -webkit-box-shadow: 2px -2px white inset;
-  border: solid transparent;
-  border-width: 0 0 2rem 2rem;
-  transition: 0.2s;
 }
 
 .arrow:hover {
-  box-shadow: 2px -2px 0 2px #ddd inset;
-  -webkit-box-shadow: 4px -4px #ddd inset;
   box-shadow: 2px -2px 0 2px #ddd inset;
   -webkit-box-shadow: 4px -4px #ddd inset;
 }
 
 .arrow-up {
   transform: rotate(135deg);
-  transform: rotate(135deg);
 }
 
 .arrow-right {
-  transform: rotate(225deg);
   transform: rotate(225deg);
 }
 
 .arrow-down {
   transform: rotate(-45deg);
-  transform: rotate(-45deg);
 }
 
 .arrow-left {
-  transform: rotate(45deg);
   transform: rotate(45deg);
 }
 
@@ -154,15 +109,6 @@ a:not(.fr-btn):not(.btn-outline-primary):not(.btn-primary):not(
   background-color: $blue !important;
   border-color: $dark-blue !important;
   color: white !important;
-  background-color: $blue !important;
-  border-color: $dark-blue !important;
-  color: white !important;
-
-  &:hover,
-  &:focus {
-    background-color: $dark-blue !important;
-    color: white !important;
-  }
 
   &:hover,
   &:focus {
@@ -176,17 +122,9 @@ progress {
   height: 6px;
   border-radius: 20px;
   background-color: black;
-  border: 0;
-  height: 6px;
-  border-radius: 20px;
-  background-color: black;
 }
 
 progress::-webkit-progress-bar {
-  border: 0;
-  height: 6px;
-  border-radius: 20px;
-  background-color: black;
   border: 0;
   height: 6px;
   border-radius: 20px;
@@ -198,10 +136,6 @@ progress::-webkit-progress-value {
   height: 6px;
   border-radius: 20px;
   background-color: black;
-  border: 0;
-  height: 6px;
-  border-radius: 20px;
-  background-color: black;
 }
 
 progress::-moz-progress-bar {
@@ -209,32 +143,18 @@ progress::-moz-progress-bar {
   height: 6px;
   border-radius: 20px;
   background-color: black;
-  border: 0;
-  height: 6px;
-  border-radius: 20px;
-  background-color: black;
-}
-
-.active {
-  color: black;
-  font-weight: 700 !important;
-  color: black;
-  font-weight: 700 !important;
 }
 
 .bg-light-yellow {
-  background-color: #fffbc4;
   background-color: #fffbc4;
 }
 
 // Alpine Cloaking
 [x-cloak] {
   display: none !important;
-  display: none !important;
 }
 
 .modal {
-  z-index: 9889089;
   z-index: 9889089;
 }
 
@@ -243,11 +163,6 @@ progress::-moz-progress-bar {
 .project-header-sidebar > .btn {
   border-radius: 2px;
   padding: 0.29rem 1rem;
-
-  .project-header-sidebar > .btn {
-    border-radius: 2px;
-    padding: 0.29rem 1rem;
-  }
 }
 
 .custom-callout-blue {

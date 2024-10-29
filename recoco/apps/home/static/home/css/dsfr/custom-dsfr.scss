@@ -31,11 +31,7 @@
 
   // --text-active-blue-france: #0063cb;
   // --text-action-high-blue-france: #0063cb;
-  // --text-active-blue-france: #0063cb;
-  // --text-action-high-blue-france: #0063cb;
 
-  // --border-action-high-blue-france: #0063cb;
-  // --border-active-blue-france: #0063cb;
   // --border-action-high-blue-france: #0063cb;
   // --border-active-blue-france: #0063cb;
 
@@ -535,6 +531,10 @@ form > p {
   text-decoration: none !important;
 }
 
+.text-underline {
+  text-decoration: underline !important;
+}
+
 .bg-white {
   background-color: white;
 }
@@ -547,7 +547,51 @@ form > p {
   height: fit-content;
 }
 
+.height-fit-content {
+  height: fit-content;
+}
+
+.no-wrap {
+  white-space: nowrap;
+}
+
+.text-ease {
+  color: var(--grey-625-425);
+}
+
+.specific-border-4pxsolid000091 {
+  border: 4px solid #000091;
+}
+
+.specific-border-4pxsolid1e1e1e {
+  border: 4px solid #1e1e1e;
+}
+
+.specific-opacity-02 {
+  opacity: 0.2;
+}
+
+.no-interaction-possible {
+  pointer-events: none;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.menu-modal-correct-fr-menu {
+  right: 0px;
+  margin: 0;
+  padding: 0;
+}
+
 .invisible-anchor-high {
   position: absolute;
-  top: -120px;
+  top: -130px;
+}
+
+.specific-position-absolute-centered {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
 }

@@ -116,21 +116,19 @@ def test_create_private_note_not_available_for_project_collaborator(
 
 @pytest.mark.django_db
 def test_switchtender_creates_new_private_note_for_project_and_redirect(
-    request, client
+    request, client, project_ready
 ):
-    project = Recipe(models.Project, sites=[get_current_site(request)]).make()
-
     with login(client) as user:
-        assign_advisor(user, project)
+        assign_advisor(user, project_ready)
 
         response = client.post(
-            reverse("projects-create-note", args=[project.id]),
+            reverse("projects-create-note", args=[project_ready.id]),
             data={"content": "this is some content"},
         )
     assert response.status_code == 302
 
     note = models.Note.on_site.all()[0]
-    assert note.project == project
+    assert note.project == project_ready
     assert note.public is False
 
     # stream and notifications

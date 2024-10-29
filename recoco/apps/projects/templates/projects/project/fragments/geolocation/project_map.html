@@ -1,10 +1,5 @@
 {% load static %}
 {% load sass_tags %}
-{% block css %}
-    <link href="{% sass_src 'projects/css/fragments/geolocation/project_map.scss' %}"
-          rel="stylesheet"
-          type="text/css" />
-{% endblock css %}
 {% load django_vite %}
 {{ project.name|json_script:"nameProject" }}
 {{ project.status|json_script:"status" }}

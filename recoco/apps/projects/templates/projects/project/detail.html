@@ -26,20 +26,12 @@
 {% endblock css %}
 {% block content %}
     {% is_staff_for_current_site request.user as is_staff %}
-    <div class="col-11 fr-pt-2w fr-pb-6w fr-mx-auto">
-        <div class="row">
-            {% block banner %}
-            {% endblock banner %}
-            {% with request.resolver_match.url_name as url_name %}
-                {% if url_name != "projects-project-detail-recommandations-embed" %}
-                    {% include "projects/project/header.html" %}
-                    {% if project.status == "DRAFT" and request.user in project.members.all %}
-                        {% include "projects/project/fragments/pending_confirmation_banner.html" %}
-                    {% endif %}
-                {% endif %}
-                {% block project_detail %}
-                {% endblock project_detail %}
-            {% endwith %}
-        </div>
+    <div class="col-12 fr-p-0 fr-pb-6w fr-mx-auto">
+        {% block banner %}
+        {% endblock banner %}
+        {% with request.resolver_match.url_name as url_name %}
+            {% block project_detail %}
+            {% endblock project_detail %}
+        {% endwith %}
     </div>
 {% endblock content %}

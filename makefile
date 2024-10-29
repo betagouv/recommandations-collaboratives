@@ -10,6 +10,9 @@ which=recoco  # default package for linting
 
 SETTINGS=recoco.settings.development
 
+# docker things
+DOCKER-RUN = docker compose run -e TERM --rm --entrypoint=""
+
 all:
 	echo "what do you want?"
 
@@ -57,5 +60,14 @@ runserver:
 
 runworker:
 	@celery -A recoco worker -l info --concurrency=1
+
+build:
+	docker compose build
+
+up:
+	docker compose up
+
+sh:
+	$(DOCKER-RUN) server bash
 
 # eof

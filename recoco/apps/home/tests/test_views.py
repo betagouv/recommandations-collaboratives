@@ -247,8 +247,10 @@ def test_logged_user_can_send_message_to_team(mocker, client, request):
 def test_project_owner_is_sent_to_action_page_on_login(request, client, project):
     url = reverse("login-redirect")
 
-    with login(client) as user:
-        assign_collaborator(user, project, is_owner=True)
+    user = baker.make(auth_models.User)
+    assign_collaborator(user, project, is_owner=True)
+
+    with login(client, user=user):
         response = client.get(url)
 
     assert response.status_code == 302

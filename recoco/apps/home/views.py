@@ -7,7 +7,6 @@ authors: raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created: 2021-08-16 15:40:08 CEST
 """
 
-
 import django.core.mail
 from django.contrib import messages
 from django.contrib.auth import login as log_user
@@ -22,10 +21,7 @@ from django.views.generic.base import TemplateView
 
 from recoco.apps.onboarding.forms import OnboardingEmailForm
 from recoco.apps.projects import models as projects
-from recoco.apps.projects.utils import (
-    can_administrate_project,
-    get_active_project,
-)
+from recoco.apps.projects.utils import can_administrate_project
 from recoco.apps.resources import models as resources_models
 from recoco.apps.tasks import models as tasks
 from recoco.utils import check_if_advisor
@@ -52,9 +48,10 @@ class LoginRedirectView(View):
         ):
             return redirect("projects-project-list")
 
-        project = get_active_project(request)
-        if project:
-            return redirect("projects-project-detail-actions", project.pk)
+        projects = request.session.get("projects", None)
+
+        if projects:
+            return redirect("projects-project-detail-actions", projects[0]["id"])
 
         return redirect("home")
 

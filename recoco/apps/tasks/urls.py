@@ -15,12 +15,7 @@ from .views import (
 )
 
 urlpatterns = [
-    path(
-        r"project/<int:resource_id>/resource/action/",
-        tasks.create_resource_action_for_current_project,
-        name="projects-create-resource-action",
-    ),
-    # Recommendations
+    # Recommendations suggestion
     path(
         r"projects/task-recommendation",
         tasks.task_recommendation_list,
@@ -37,9 +32,9 @@ urlpatterns = [
         name="projects-task-recommendation-update",
     ),
     path(
-        r"project/<int:project_id>/action/",
+        r"projects/action/",
         tasks.create_task,
-        name="projects-project-create-task",
+        name="projects-create-task",
     ),
     path(
         r"task/<int:task_id>/update/",
