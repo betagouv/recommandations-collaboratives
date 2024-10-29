@@ -7,7 +7,6 @@ author  : raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created : 2021-12-14 10:36:20 CEST
 """
 
-
 from django import forms
 from django.contrib.sites.models import Site
 from django.db.models import Q
@@ -69,12 +68,16 @@ class PushTypeActionForm(forms.Form):
 
         # Allow only projects on the current site with a usable status
         current_site = Site.objects.get_current()
-        self.fields["project"].queryset = projects_models.Project.objects.filter(
-            switchtenders=user,
-            sites=current_site,
-        ).exclude(
-            Q(project_sites__status__in=["DRAFT", "REJECTED"]),
-            ~Q(project_sites__site=current_site),
+        self.fields["project"].queryset = (
+            projects_models.Project.objects.filter(
+                switchtenders=user,
+                sites=current_site,
+            )
+            .exclude(
+                Q(project_sites__status__in=["DRAFT", "REJECTED"]),
+                ~Q(project_sites__site=current_site),
+            )
+            .distinct()
         )
 
     PUSH_TYPES = (
