@@ -17,6 +17,7 @@ from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.db.models import Q
 from guardian.shortcuts import assign_perm, get_users_with_perms, remove_perm
+from notifications.signals import notify
 
 from recoco import utils as uv_utils
 
@@ -292,6 +293,31 @@ def get_notification_recipients_for_project(project):
     return (
         get_switchtenders_for_project(project) | get_collaborators_for_project(project)
     ).distinct()
+
+
+# ----------------------------------------------
+# Notification helpers
+# ----------------------------------------------
+
+
+def notify_advisors_of_project(project, notification, exclude=None):
+    """Dispatch notification to every advisor, on their reference Site"""
+    for advisor in project.switchtender_sites.exclude(switchtender=exclude):
+        notify.send(recipient=advisor.switchtender, site=advisor.site, **notification)
+
+
+def notify_members_of_project(project, notification, exclude=None):
+    """Dispatch notification to members, always on the project original Site"""
+    original_site = project.project_sites.origin()
+    recipients = project.members.all()
+    if exclude:
+        recipients = recipients.exclude(pk=exclude.pk)
+
+    notify.send(
+        recipient=recipients,
+        site=original_site.site,
+        **notification,
+    )
 
 
 def generate_ro_key():
