@@ -13,9 +13,6 @@
 {% block og_title %}
     État des lieux - {{ block.super }}
 {% endblock og_title %}
-{% block banner %}
-    {% include "projects/project/fragments/project_banner/positioning_banner.html" %}
-{% endblock banner %}
 {% block project_detail %}
     {% challenge_for request.user "project-knowledge-reader" as challenge %}
     {% if challenge and not challenge.acquired_on %}
