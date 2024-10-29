@@ -114,6 +114,32 @@
                                 </div>
                                 <div class="col-4">
                                     <div class="fr-mb-2w">
+                                        <div class="d-flex flex-column project-info">
+                                            <div class="project-info__commune">{{ project.commune.name }}</div>
+                                            <div class="project-info__name">{{ project.name }}</div>
+                                            <div class="project-info__secondary">
+                                                <span class="fr-mr-1w">
+                                                    <span class="fr-icon-map-pin-2-line fr-icon--sm fr-mr-1v"
+                                                          aria-hidden="true"></span>
+                                                    INSEE: {{ project.commune.insee }}
+                                                </span>
+                                                <span>
+                                                    <span class="fr-icon-calendar-event-line fr-icon--sm fr-mr-1v"
+                                                          aria-hidden="true"></span>
+                                                    déposé il y a {{ project.created_on|timesince }}
+                                                </span>
+                                            </div>
+                                            <div class="d-flex">
+                                                <div class="project-info__container-tags">
+                                                    <span class="fr-icon-pantone-line fr-icon--sm" aria-hidden="true"></span>
+                                                    {% for tag in project.tags.all %}<span class="project-info__tag fr-mr-1v">#{{ tag }}</span>{% endfor %}
+                                                </div>
+                                                <a class="fr-btn fr-btn--sm fr-btn--tertiary-no-outline fr-icon-pencil-line"
+                                                   href="{% url "projects-project-tags" project.id %}">Modifier les etiquettes</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="fr-mb-2w">
                                         <div class="d-flex flex-column">
                                             <h6 class="text-uppercase fw-bold d-block fr-mb-1v lh-base h6-specific-fontsize-14">Localisation</h6>
                                             {% include "projects/project/fragments/geolocation/location_overview.html" %}
