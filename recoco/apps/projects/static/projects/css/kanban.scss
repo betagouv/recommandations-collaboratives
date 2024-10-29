@@ -2,7 +2,7 @@
   &-container {
     overflow-x: auto;
     overflow-y: hidden;
-    height: 70vh;
+    // height: 85vh;
   }
 
   &-column-container {
@@ -15,7 +15,7 @@
     background-color: #f6f6f6;
 
     &__content {
-      height: 60vh;
+      height: 75vh;
       overflow-x: hidden;
       overflow-y: auto;
       border-bottom-right-radius: 4px;
