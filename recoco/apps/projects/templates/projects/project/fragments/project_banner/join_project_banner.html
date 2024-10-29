@@ -5,11 +5,16 @@
           type="text/css">
 {% endblock css %}
 <div class="d-flex justify-content-center banner-container">
-    <span class="fr-pb-2v fr-px-3v fr-pt-1v banner banner--join">
+    <span class="fr-pb-2v fr-px-3v fr-pt-1v banner banner--join d-flex">
         Certains espaces sont réservés aux membres du projet. Pour y accéder,
-        <span class="text-underline cursor-pointer"
-              data-bs-toggle="dropdown"
-              data-bs-auto-close="outside"
-              aria-expanded="false"
-              aria-controls="select-observer-or-advisor">rejoignez le</span>.</span>
-    </div>
+        <form method="post" action="{% url 'projects-project-switchtender-join' project.id %}">
+            {% csrf_token %}
+            <button class="text-underline specific-hover-blue" x-on:click="$store.showRole.setShowToTrue">devenez conseiller</button>
+        </form>
+            ou
+        <form method="post" action="{% url 'projects-project-observer-join' project.id %}">
+            {% csrf_token %}
+            <button class="text-underline specific-hover-blue" x-on:click="$store.showRole.setShowToTrue">devenez observateur</button>
+        </form>
+    </span>
+</div>
