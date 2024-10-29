@@ -19,7 +19,6 @@ from django.utils import timezone
 from django.views.decorators.http import require_http_methods
 from guardian.shortcuts import get_perms
 from notifications import models as notifications_models
-from notifications.signals import notify
 
 from recoco import verbs
 from recoco.apps.geomatics import models as geomatics_models
@@ -40,8 +39,8 @@ from recoco.utils import (
 
 from .. import forms, models
 from ..utils import (
-    get_advisors_for_project,
     is_regional_actor_for_project,
+    notify_advisors_of_project,
     refresh_user_projects_in_session,
     unassign_advisor,
     unassign_collaborator,
@@ -495,17 +494,15 @@ def set_project_inactive(request, project_id: int):
         project.save()
 
         # Notifications
-        recipients = get_advisors_for_project(project)
-        recipients = recipients.exclude(id=request.user.id)
+        notification = {
+            "sender": request.user,
+            "actor": request.user,
+            "verb": verbs.Project.SET_INACTIVE,
+            "action_object": project,
+            "target": project,
+        }
 
-        notify.send(
-            sender=request.user,
-            actor=request.user,
-            recipient=recipients,
-            verb=verbs.Project.SET_INACTIVE,
-            action_object=project,
-            target=project,
-        )
+        notify_advisors_of_project(project, notification, exclude=request.user)
 
         # Action trace
         action.send(
