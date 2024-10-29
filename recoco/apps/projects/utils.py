@@ -309,8 +309,12 @@ def notify_advisors_of_project(project, notification, exclude=None):
 def notify_members_of_project(project, notification, exclude=None):
     """Dispatch notification to members, always on the project original Site"""
     original_site = project.project_sites.origin()
+    recipients = project.members.all()
+    if exclude:
+        recipients = recipients.exclude(pk=exclude.pk)
+
     notify.send(
-        recipient=project.members.exclude(projectmember=exclude),
+        recipient=recipients,
         site=original_site.site,
         **notification,
     )

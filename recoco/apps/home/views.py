@@ -49,7 +49,7 @@ class LoginRedirectView(View):
             return redirect("projects-project-list")
 
         projects = request.session.get("projects", None)
-        print(projects)
+
         if projects:
             return redirect("projects-project-detail-actions", projects[0]["id"])
 
