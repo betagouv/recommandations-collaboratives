@@ -14,13 +14,17 @@ Alpine.store('showRole', {
   init() {
     const showRole = localStorage.getItem('showRole');
     if (showRole) {
+      //   alert("on devrait voir la modal s'ouvir");
       document.getElementById('select-observer-or-advisor-button').click();
       localStorage.removeItem('showRole');
+    } else {
+      //   alert("on devrait pas voir la modal s'ouvrir");
     }
   },
 
   setShowToTrue() {
     localStorage.setItem('showRole', true);
+    alert('coucou');
   },
 });
 

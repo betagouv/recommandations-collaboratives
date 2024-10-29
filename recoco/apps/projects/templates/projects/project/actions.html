@@ -12,6 +12,7 @@
 {% block js %}
     <script src="https://cdn.jsdelivr.net/npm/js-md5@0.7.3/src/md5.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    {% vite_asset 'js/store/showRole.js' %}
 {% endblock js %}
 {% block css %}
     <link href="{% sass_src 'projects/css/board.scss' %}"
@@ -31,7 +32,7 @@
                 <div class="specific-border-4pxsolid000091">
                     {% include "projects/project/fragments/project_banner/non_published_project_banner.html" %}
                 {% elif not advising and is_regional_actor and not is_staff %}
-                    <div class="specific-border-4pxsolid000091">
+                    <div x-data x-init="$nextTick(() => $store.showRole.init())" class="specific-border-4pxsolid000091">
                         {% include "projects/project/fragments/project_banner/join_project_banner.html" %}
                         <div>
                         {% endif %}
