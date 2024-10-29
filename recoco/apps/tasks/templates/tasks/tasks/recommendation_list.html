@@ -3,9 +3,6 @@
 {% block title %}
     Configuration des suggestions automatiques
 {% endblock title %}
-{% block og_title %}
-    Configuration des suggestions automatiques
-{% endblock og_title %}
 {% block content %}
     <div class="col-12 fr-p-3w fr-mx-auto">
         <div class="row recommendation-list fr-mb-2w">
@@ -56,88 +53,12 @@
                                             Toute la France
                                         {% endif %}
                                     </span>
-                                    <div class="ms-4 text-secondary align-middle d-inline-block">
-                                        <svg class="bi me-1 align-middle"
+                                    <div class="fr-ml-3w text-secondary align-middle d-inline-block">
+                                        <svg class="bi fr-mr-1v align-middle"
                                              width="16"
                                              height="16"
                                              fill="currentColor">
                                             <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#alt" />
-                                        </svg>
-                                        <span class="align-middle">
-                                            Condition :
-                                            {% for tag in recommendation.condition_tags %}
-                                                <span class="badge bg-dark rounded-pill">{{ tag }}</span>
-                                                {% if not forloop.last %}+{% endif %}
-                                            {% endfor %}
-                                        </span>
-                                    </div>
-                                </div>
-                                <div class="btn-group ms-5 align-middle" role="group" aria-label="actions">
-                                    <a class="btn btn-light mb-1 d-inline-block btn-outline-primary btn-sm"
-                                       href="{% url 'projects-task-recommendation-update' recommendation.pk %}">
-                                        <svg class="bi me-1" width="16" height="16" fill="currentColor">
-                                            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#pen" />
-                                        </svg>
-                                        Éditer
-                                    </a>
-                                </div>
-                            </div>
-                            <div class="d-block w-100 pe-4">
-                                <div class="text-secondary my-2">Message aiguilleuse : "{{ recommendation.text }}"</div>
-                                {% include 'projects/project/fragments/action_list_item.html' with task=recommendation hide_comments=True disable_tracking=True disable_edit=True %}
-                            </div>
-                        </div>
-                        <div class="col-4 border-start ps-4 pt-3">
-                            <div class="small">
-                                <svg class="bi me-1 align-middle"
-                                     width="16"
-                                     height="16"
-                                     fill="currentColor">
-                                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#info-circle" />
-                                </svg>
-                                <span class="align-middle">Déclencheurs</span>
-                                <ul>
-                                    {% for trigger, choices in recommendation.trigged_by.items %}
-                                        <li>
-                                            {{ trigger }}
-                                            <ul>
-                                                {% for choice in choices %}
-                                                    <li>
-                                                        <a href="{% url 'survey-editor-question-set-details' choice.question.question_set.pk %}#q-{{ choice.question.pk }}">
-                                                            {{ choice.conclusion|default:choice.text }}
-                                                        </a>
-                                                    </li>
-                                                {% empty %}
-                                                    <li class="text-danger">---Non déclenchable--</li>
-                                                                                                    {% endfor %}
-                                                                                            </ul>
-                                                                                    </li>
-                                                                                {% endfor %}
-                                                                        </ul>
-                                                                </div>
-                                                        </div>
-                                                </div>
-                                            {% empty %}
-                                                <div class="bd-callout bd-callout-info">
-                                                    Il n'y a pas de pré-fléchage pour l'instant.
-                                                    <a href="{% url 'projects-task-recommendation-create' %}">Créez-en un</a>.
-                                            </div>
-                                        {% endfor %}
-                                </div>
-                        </div>
-                </div>
-        {% endblock %}
-                                                    {% endfor %}
-                                                {% else %}
-                                                    Toute la France
-                                                {% endif %}
-                                        </span>
-                                        <div class="fr-ml-3w text-secondary align-middle d-inline-block">
-                                            <svg class="bi fr-mr-1v align-middle"
-                                                 width="16"
-                                                 height="16"
-                                                 fill="currentColor">
-                                                <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#alt" />
                                         </svg>
                                         <span class="align-middle">
                                             Condition :
@@ -187,21 +108,21 @@
                                                     </li>
                                                 {% empty %}
                                                     <li class="text-danger">---Non déclenchable--</li>
-{% endfor %}
-</ul>
-</li>
-{% endfor %}
-</ul>
-</div>
-</div>
-</div>
-{% empty %}
-<div class="bd-callout bd-callout-info">
-    Il n'y a pas de pré-fléchage pour l'instant.
-    <a href="{% url 'projects-task-recommendation-create' %}">Créez-en un</a>.
-</div>
-{% endfor %}
-</div>
-</div>
-</div>
+                                                {% endfor %}
+                                            </ul>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                {% empty %}
+                    <div class="bd-callout bd-callout-info">
+                        Il n'y a pas de pré-fléchage pour l'instant.
+                        <a href="{% url 'projects-task-recommendation-create' %}">Créez-en un</a>.
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
 {% endblock content %}
