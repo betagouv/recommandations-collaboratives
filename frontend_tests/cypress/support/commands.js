@@ -132,9 +132,9 @@ Cypress.Commands.add('declineCookies', () => {
  * @function createProject
  * @memberof Cypress.Commands
  * @param {string} label - The label for the new project.
- * @param {Object} [objProject=null] - Optional project object with additional details.
+ * @param {Object} [objProject=project] - Optional project object with additional details.
  */
-Cypress.Commands.add('createProject', (label, objProject = null) => {
+Cypress.Commands.add('createProject', (label, objProject = project) => {
   cy.visit('/');
 
   cy.get('[data-test-id="button-need-help"]')
@@ -145,13 +145,13 @@ Cypress.Commands.add('createProject', (label, objProject = null) => {
 
   cy.get('#id_name')
     .should('not.have.class', 'fr-input--error')
-    .type(label || objProject.name || project.name)
+    .type(label || objProject.name || project.name, { delay: 0 })
     .should('have.value', label || objProject.name || project.name)
     .should('have.class', 'fr-input--valid');
 
   cy.get('#id_location')
     .should('not.have.class', 'fr-input--error')
-    .type(objProject.location || project.location)
+    .type(objProject.location || project.location, { delay: 0 })
     .should('have.value', objProject.location || project.location)
     .should('have.class', 'fr-input--valid');
 
@@ -160,7 +160,7 @@ Cypress.Commands.add('createProject', (label, objProject = null) => {
     .should('not.have.class', 'fr-input-group--error');
 
   cy.get('[data-test-id="input-postcode"]')
-    .type(objProject.postcode || project.postcode)
+    .type(objProject.postcode || project.postcode, { delay: 0 })
     .should('have.value', objProject.postcode || project.postcode)
     .parent()
     .should('have.class', 'fr-input-group--valid');
@@ -177,7 +177,7 @@ Cypress.Commands.add('createProject', (label, objProject = null) => {
 
   cy.get('#id_description')
     .should('not.have.class', 'fr-input--error')
-    .type(objProject.description || project.description)
+    .type(objProject.description || project.description, { delay: 0 })
     .should('have.value', objProject.description || project.description)
     .should('have.class', 'fr-input--valid');
 
