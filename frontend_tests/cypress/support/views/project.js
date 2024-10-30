@@ -14,8 +14,7 @@ const domElements = {
     '[data-test-id="admin-banner-deactivate-project"]',
   ADMIN_BANNER_ACTIVATE_PROJECT:
     '[data-test-id="admin-banner-activate-project"]',
-  HEADER_BANNER_PROJECT_INACTIVE:
-    '[data-test-id="header-banner-project-inactive"]',
+  BANNER_PROJECT_INACTIVE: '[data-test-id="banner-project-inactive"]',
   BUTTON_MODAL_DEACTIVATE_PROJECT:
     '[data-test-id="button-open-modal-deactivate-project"]',
   FORM_PAUSE_PROJECT: '[data-test-id="form-pause-project"]',
@@ -172,9 +171,7 @@ class Project {
    * @param {*} condition 'exist' if user has rights to pause a Project, 'not.exists' if not
    */
   checkProjectStatusBanner(condition = 'not.exist') {
-    cy.get(this.dom.HEADER_BANNER_PROJECT_INACTIVE).then(() => {
-      cy.get(this.dom.BUTTON_ACTIVATE_PROJECT).should(condition);
-    });
+    cy.get(this.dom.BANNER_PROJECT_INACTIVE).should(condition);
   }
 
   /**
