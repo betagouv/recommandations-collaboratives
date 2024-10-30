@@ -26,7 +26,8 @@
         })
         // TODO dead code ?
         // Change hash for page-reload
-        document.querySelector('.nav-tabs button').addEventListener('shown.bs.tab', function(e) {
+        const navTab = document.querySelector('.nav-tabs button')
+        navTab?.addEventListener('shown.bs.tab', function(e) {
             window.location.hash = $(e.target).data("bs-target");
             window.scrollBy(0, 0);
         });
