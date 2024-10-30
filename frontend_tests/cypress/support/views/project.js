@@ -141,7 +141,7 @@ class Project {
         cy.get(this.dom.ADMIN_BANNER_QUIT_PROJECT)
           .get(this.dom.BUTTON_QUIT_PROJECT)
           .click({ force: true });
-        cy.url().should('equal', 'http://example.localhost:8000/');
+        cy.url().should('match', /^http:\/\/example\.localhost:\d+\/$/);
         break;
       default:
         cy.get(this.dom.ADMIN_BANNER_QUIT_PROJECT).should('not.exist');
