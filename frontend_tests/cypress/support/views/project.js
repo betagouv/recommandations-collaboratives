@@ -124,15 +124,6 @@ class Project {
       });
   }
 
-  activateProjectFromHeaderBanner() {
-    cy.get(this.dom.HEADER_BANNER_PROJECT_INACTIVE)
-      .find(this.dom.BUTTON_ACTIVATE_PROJECT)
-      .click({ force: true })
-      .then(() => {
-        cy.get(this.dom.HEADER_BANNER_PROJECT_INACTIVE).should('not.exist');
-      });
-  }
-
   quitProject(role) {
     switch (role) {
       case 'advisor':
