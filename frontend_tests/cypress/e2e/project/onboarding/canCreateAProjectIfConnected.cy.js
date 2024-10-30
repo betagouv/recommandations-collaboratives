@@ -1,7 +1,6 @@
 describe("I can create a project if i'm connected", () => {
   beforeEach(() => {
     cy.login('collectivité1');
-    cy.acceptCookies();
   });
 
   it('goes to the onboarding process step by step and create a project ', () => {
