@@ -1,23 +1,16 @@
-describe('I can create a new project from the main header project list dropdown as a collectivity', () => {
-  beforeEach(() => {
+describe('I can create a new project from the main header project list dropdown', () => {
+  it('display button as a collectivity', () => {
     cy.login('collectivité1');
-  });
-
-  it('', () => {
     cy.visit(`/`);
-    cy.contains('Mes projets').siblings('button').click();
-    cy.contains('Créer un nouveau projet').click({ force: true });
+    cy.get('[data-test-id="create-project"]')
+      .should('exist')
+      .click({ force: true });
     cy.url().should('include', '/onboarding');
   });
-});
 
-describe("I can't see create a new project from the main header project list dropdown as an advisor", () => {
-  beforeEach(() => {
+  it("don't display button as an advisor", () => {
     cy.login('conseiller1');
-  });
-
-  it('', () => {
     cy.visit(`/`);
-    cy.contains('Mes projets').should('not.exist');
+    cy.get('[data-test-id="create-project"]').should('not.exist');
   });
 });
