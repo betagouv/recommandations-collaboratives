@@ -1,4 +1,4 @@
-describe("I can create a project if i'm connected", () => {
+describe("I can create a project if i'm connected @critical", () => {
   beforeEach(() => {
     cy.login('collectivité1');
   });
