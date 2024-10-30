@@ -8,12 +8,11 @@ from django.db.models.signals import post_save, pre_delete, pre_save
 from django.dispatch import receiver
 from django.utils import timezone
 from notifications import models as notifications_models
-from notifications.signals import notify
 
 from recoco import verbs
 from recoco.apps.projects.utils import (
-    get_advisors_for_project,
-    get_notification_recipients_for_project,
+    notify_advisors_of_project,
+    notify_members_of_project,
 )
 from recoco.utils import is_staff_for_site
 
@@ -59,23 +58,19 @@ def notify_action_created(sender, task, project, user, **kwargs):
     if project.project_sites.current().status == "DRAFT" or project.muted:
         return
 
-    if project.inactive_since:
-        recipients = get_advisors_for_project(project)
-    else:
-        recipients = get_notification_recipients_for_project(project)
-
-    recipients = recipients.exclude(id=user.id)
+    notification = {
+        "sender": user,
+        "verb": verbs.Recommendation.CREATED,
+        "action_object": task,
+        "target": project,
+    }
 
     task.created_on = timezone.now()
     task.save()
 
-    notify.send(
-        sender=user,
-        recipient=recipients,
-        verb=verbs.Recommendation.CREATED,
-        action_object=task,
-        target=project,
-    )
+    notify_advisors_of_project(project, notification, exclude=user)
+    if not project.inactive_since:
+        notify_members_of_project(project, notification)
 
 
 @receiver(action_visited)
@@ -172,20 +167,16 @@ def notify_action_commented(sender, task, project, user, **kwargs):
     if project.project_sites.current().status == "DRAFT" or project.muted:
         return
 
-    if project.inactive_since:
-        recipients = get_advisors_for_project(project)
-    else:
-        recipients = get_notification_recipients_for_project(project)
+    notification = {
+        "sender": user,
+        "verb": verbs.Recommendation.COMMENTED,
+        "action_object": sender,
+        "target": project,
+    }
 
-    recipients = recipients.exclude(id=user.id)
-
-    notify.send(
-        sender=user,
-        recipient=recipients,
-        verb=verbs.Recommendation.COMMENTED,
-        action_object=sender,
-        target=project,
-    )
+    notify_advisors_of_project(project, notification, exclude=user)
+    if not project.inactive_since:
+        notify_members_of_project(project, notification, exclude=user)
 
 
 def delete_task_history(
@@ -196,7 +187,7 @@ def delete_task_history(
 ):
     """Remove all logging history and notification if a task is deleted"""
     task_ct = ContentType.objects.get_for_model(task)
-    notifications = notifications_models.Notification.on_site.filter(
+    notifications = notifications_models.Notification.objects.filter(
         action_object_content_type_id=task_ct.pk, action_object_object_id=task.pk
     )
     actions = action_object_stream(task)

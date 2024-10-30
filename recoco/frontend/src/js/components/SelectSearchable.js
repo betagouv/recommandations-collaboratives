@@ -15,15 +15,55 @@ function SelectSearchable(params) {
   return {
     selectElIsChild: params.selectElIsChild,
     init() {
+      const _selectList = document.getElementById('id_project');
+      const recentProjectList = this.$store.projectQueue.get();
+      const recentProjectListId = recentProjectList.map((x) => x.id);
+      const _selectListOptions = Array.from(_selectList.children);
+      const _selectListOptionsId = _selectListOptions.map((x) => +x.value);
+      _selectList.innerHTML = '';
+      _selectList.appendChild(_selectListOptions.shift());
+      recentProjectList.forEach((project) => {
+        if (!_selectListOptionsId.includes(project.id)) {
+          return;
+        }
+        _selectList.appendChild(
+          this.createOption(
+            project.id,
+            `${project.commune.name} - ${project.name}`,
+            false
+          )
+        );
+      });
+      _selectListOptions.forEach((option) => {
+        if (recentProjectListId.includes(+option.value)) {
+          return;
+        }
+        _selectList.appendChild(option);
+      });
+
+      this.generatea11ySelect();
+    },
+    generatea11ySelect() {
       const select = this.selectElIsChild
         ? this.$refs.selectSearchable.children
         : this.$refs.selectSearchable;
-      const params = new URLSearchParams(document.location.search);
 
+      const params = new URLSearchParams(document.location.search);
       const selected_project = parseInt(params.get('project_id'));
+
       Array.prototype.map.call(select, function (select) {
         return new Select(select, {}, selected_project || null);
       });
+    },
+    createOption(value, text, selected) {
+      const option = document.createElement('option');
+      option.setAttribute('data-select', 'recent_project');
+      option.value = value;
+      option.text = text;
+      if (selected) {
+        option.selected = true;
+      }
+      return option;
     },
   };
 }

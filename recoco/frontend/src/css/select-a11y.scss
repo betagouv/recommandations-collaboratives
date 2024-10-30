@@ -144,6 +144,10 @@ $a11y-suggestion-border: $gray-3 !default;
     border: 1px solid $a11y-suggestion-border;
     margin-top: 0.5em;
     background-color: #fff;
+    hr {
+      padding-bottom: 1px;
+      background-image: linear-gradient(0deg, #e5e5e5, black);
+    }
   }
 
   .a11y-suggestion {
@@ -175,6 +179,16 @@ $a11y-suggestion-border: $gray-3 !default;
       //   transform: translateY(-50%);
       //   left: calc(8em / 16);
       // }
+    }
+
+    &-separator {
+      color: var(--light-text-mention-grey, #666);
+      font-style: italic;
+      font-size: 16px;
+      font-weight: 400;
+      line-height: 13px;
+      padding: 0.5em 0.5em 0.5em 1.625em;
+      border-bottom: 1px solid var(--light-border-default-grey, #e5e5e5);
     }
   }
 
