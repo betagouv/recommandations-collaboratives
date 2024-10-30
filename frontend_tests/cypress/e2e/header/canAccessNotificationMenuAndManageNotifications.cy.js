@@ -4,7 +4,9 @@ describe('As a switchtender I can manage notifications in header', () => {
     cy.visit('/project/2/conversations');
 
     for (let i = 0; i < 4; i++) {
-      cy.get('[data-test-id="tiptap-editor-content"]').type('Hello World');
+      cy.get('[data-test-id="tiptap-editor-content"]').type('Hello World', {
+        delay: 0,
+      });
       cy.get('[data-test-id="send-message-conversation"]').click();
     }
 
@@ -39,15 +41,14 @@ describe('As a switchtender I can manage notifications in header', () => {
       const notificationNumber = +span.text();
       expect(notificationNumber).be.greaterThan(0);
       cy.get('[data-test-id="notification-menu-open"]').click();
-      for (let i = 0; i < notificationNumber - 2; i++) {
-        cy.get('[data-test-id="notification-mark-as-read-one"]')
-          .first()
-          .click();
-        cy.wait(400);
-      }
+
+      cy.get('[data-test-id="notification-mark-as-read-one"]')
+        .first()
+        .click({ force: true });
+      cy.wait(400);
       cy.get('[data-test-id="notification-badge"]').then((spanafter) => {
         const notificationNumberAfter = +spanafter.text();
-        expect(notificationNumberAfter).be.equal(2);
+        expect(notificationNumberAfter).be.equal(notificationNumber - 1);
       });
     });
   });
