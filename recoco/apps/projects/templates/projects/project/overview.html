@@ -76,7 +76,7 @@
                             {% include "projects/project/fragments/project_banner/join_project_banner.html" %}
                         {% endif %}
                         <div class="container-fluid">
-                            <div class="row fr-p-1w {% if project.inactive_since != None %}no-interaction-possible{% endif %}">
+                            <div class="row fr-p-1w">
                                 <div class="col-8">
                                     <div class="d-flex">
                                         {% if "use_advisor_note" in user_project_perms %}
