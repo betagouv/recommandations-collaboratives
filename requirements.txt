@@ -41,7 +41,7 @@ django-crispy-forms==2.0
 django-hijack==3.4.5
 django-sesame[ua]==3.2.2
 django-recaptcha==3.0.0
-django-allauth[socialaccount,openid]==0.51.0
+django-allauth[socialaccount,openid]==0.63.6
 sentry-sdk
 sib-api-v3-sdk
 # STATIC FILES
