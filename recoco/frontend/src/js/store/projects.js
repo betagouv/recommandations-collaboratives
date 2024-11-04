@@ -5,6 +5,39 @@ Alpine.store('projects', {
   projects: [],
   userProjetsStatus: [],
   sitesConfig: [],
+  setProjectsToLocalStorage(projects, siteLabel = 'default') {
+    Date.prototype.addHours = function (h) {
+      this.setTime(this.getTime() + h * 60 * 60 * 1000);
+      return this;
+    };
+
+    const saveObjects = {
+      projects,
+      expireAt: new Date().addHours(1),
+    };
+
+    localStorage.setItem(
+      `projects-data-${siteLabel}`,
+      JSON.stringify(saveObjects)
+    );
+  },
+  getProjectsFromLocalStorage(siteLabel = 'default') {
+    const localStorageProjects = localStorage.getItem(
+      `projects-data-${siteLabel}`
+    );
+    if (!localStorageProjects) {
+      return null;
+    }
+    const savedProjects = JSON.parse(localStorageProjects);
+    const expireAt = new Date(savedProjects?.expireAt).valueOf();
+    const now = new Date().valueOf();
+    if (expireAt > now) {
+      return savedProjects.projects;
+    }
+  },
+  resetProjectsLocalStorage(siteLabel = 'default') {
+    localStorage.removeItem(`projects-data-${siteLabel}`);
+  },
   async getUserProjetsStatus() {
     const json = await api.get(userProjectStatusUrl());
 
