@@ -13,6 +13,9 @@
 {% block title %}
     État des lieux - {{ block.super }}
 {% endblock title %}
+{% block og_title %}
+    État des lieux - {{ block.super }}
+{% endblock og_title %}
 {% block project_detail %}
     {% challenge_for request.user "project-knowledge-reader" as challenge %}
     {% if challenge and not challenge.acquired_on %}

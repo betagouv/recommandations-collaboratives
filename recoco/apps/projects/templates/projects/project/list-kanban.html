@@ -21,6 +21,9 @@
 {% block title %}
     Tableau de bord administrateur {{ block.super }}
 {% endblock title %}
+{% block og_title %}
+    Tableau de bord administrateur {{ block.super }}
+{% endblock og_title %}
 {% block project_list_content %}
     <div x-data="KanbanProjects({{ request.site.id }})">
         <div x-show="isBusy"
