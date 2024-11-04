@@ -1,26 +1,27 @@
+let currentProjectId;
 describe('I can go to tasks tab', () => {
   beforeEach(() => {
     cy.login('conseiller1');
-    cy.createProject('draft project');
+    cy.createProject('draft project').then((projectId) => {
+      currentProjectId = projectId;
+      cy.logout();
+    });
   });
 
   it('publishes a task', () => {
-    cy.visit(`/projects`);
-    cy.contains('draft project').first().click({ force: true });
-    cy.becomeAdvisor();
+    cy.login('conseiller2');
+    cy.visit(`/project/${currentProjectId}/actions`).then(() => {
+      cy.becomeAdvisor(currentProjectId);
+      cy.visit(`/project/${currentProjectId}/actions`);
 
-    cy.contains('Recommandations').click({ force: true });
-    cy.url().should('include', '/actions');
+      cy.createTask('draft project');
 
-    cy.createTask('draft project');
+      cy.get('[data-test-id="list-tasks-switch-button"]').should('be.checked');
 
-    cy.get('[data-test-id="list-tasks-switch-button"]').should(
-      'have.class',
-      'active'
-    );
-    cy.get('#unpublish-task-button').click({ force: true });
-    cy.get('[data-test-id="task-draft-status"]').should('be.visible');
-    cy.get('#publish-task-button').click({ force: true });
-    cy.get('[data-test-id="task-draft-status"]').should('not.exist');
+      cy.get('#unpublish-task-button').click({ force: true });
+      cy.get('[data-test-id="task-draft-status"]').should('be.visible');
+      cy.get('#publish-task-button').click({ force: true });
+      cy.get('[data-test-id="task-draft-status"]').should('not.exist');
+    });
   });
 });

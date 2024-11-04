@@ -8,10 +8,8 @@ describe('I can go to tasks tab', () => {
   });
 
   it('deletes a task', () => {
-    cy.becomeAdvisor();
-    cy.visit(`/project/${currentProject.pk}`);
-    cy.contains('Recommandations').click({ force: true });
-    cy.url().should('include', '/actions');
+    cy.becomeAdvisor(currentProject.pk);
+    cy.visit(`/project/${currentProject.pk}/actions`);
 
     cy.createTask('test');
 

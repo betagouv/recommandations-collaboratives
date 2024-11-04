@@ -199,31 +199,20 @@ Cypress.Commands.add('createProject', (label, objProject = project) => {
 });
 
 /**
- * Joins a project as an advisor.
- *
- * @function becomeAdvisorOnProject
- * @memberof Cypress.Commands
- * @param {number} projectId - The ID of the project to join as an advisor.
- */
-Cypress.Commands.add('becomeAdvisorOnProject', (projectId) => {
-  cy.visit(`/project/${projectId}/switchtender/join`);
-});
-
-/**
  * Joins as an advisor if not already an advisor.
  *
  * @function becomeAdvisor
  * @memberof Cypress.Commands
  */
-Cypress.Commands.add('becomeAdvisor', () => {
-  cy.get('body').then((body) => {
-    if (body.find('#positioning-form').length > 0) {
-      cy.get('[data-test-id="button-join-as-advisor"]').click({
-        force: true,
-      });
-    } else {
-      assert.isOk('advisor', 'already advisor');
-    }
+Cypress.Commands.add('becomeAdvisor', (projectId) => {
+  cy.getCookie('csrftoken').then((csrfToken) => {
+    cy.request({
+      method: 'POST',
+      url: `/project/${projectId}/switchtender/join`,
+      headers: {
+        'X-CSRFToken': csrfToken.value,
+      },
+    });
   });
 });
 
