@@ -15,10 +15,7 @@ describe('I can go to tasks tab', () => {
 
     cy.createTask('test');
 
-    cy.get('[data-test-id="list-tasks-switch-button"]').should(
-      'have.class',
-      'active'
-    );
+    cy.get('[data-test-id="list-tasks-switch-button"]').should('be.checked');
 
     cy.get('[data-test-id="open-task-actions-button"]').then((el) => {
       const count3 = el.length;
