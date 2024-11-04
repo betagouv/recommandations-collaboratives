@@ -1,42 +1,32 @@
 import Alpine from 'alpinejs';
 import api, { sitesConfigUrl, userProjectStatusUrl } from '../utils/api';
+import { LocalStorageMgmt } from '../utils/localStorageMgmt';
 
 Alpine.store('projects', {
   projects: [],
   userProjetsStatus: [],
   sitesConfig: [],
-  setProjectsToLocalStorage(projects, siteLabel = 'default') {
-    Date.prototype.addHours = function (h) {
-      this.setTime(this.getTime() + h * 60 * 60 * 1000);
-      return this;
-    };
-
-    const saveObjects = {
-      projects,
-      expireAt: new Date().addHours(1),
-    };
-
-    localStorage.setItem(
-      `projects-data-${siteLabel}`,
-      JSON.stringify(saveObjects)
-    );
+  projectsLocalStorage: null,
+  initLocalStorage(currentSiteName = 'default') {
+    this.projectsLocalStorage = new LocalStorageMgmt({
+      dataLabel: 'projects-data',
+      tag: currentSiteName,
+      expiringData: true,
+      expiringTime: 1,
+    });
   },
-  getProjectsFromLocalStorage(siteLabel = 'default') {
-    const localStorageProjects = localStorage.getItem(
-      `projects-data-${siteLabel}`
-    );
-    if (!localStorageProjects) {
+  setProjectsToLocalStorage(projects) {
+    this.projectsLocalStorage.set(projects);
+  },
+  getProjectsFromLocalStorage() {
+    const projects = this.projectsLocalStorage.get();
+    if (!projects) {
       return null;
     }
-    const savedProjects = JSON.parse(localStorageProjects);
-    const expireAt = new Date(savedProjects?.expireAt).valueOf();
-    const now = new Date().valueOf();
-    if (expireAt > now) {
-      return savedProjects.projects;
-    }
+    return projects;
   },
-  resetProjectsLocalStorage(siteLabel = 'default') {
-    localStorage.removeItem(`projects-data-${siteLabel}`);
+  resetProjectsLocalStorage() {
+    this.projectsLocalStorage.reset();
   },
   async getUserProjetsStatus() {
     const json = await api.get(userProjectStatusUrl());

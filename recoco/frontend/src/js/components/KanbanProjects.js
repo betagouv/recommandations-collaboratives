@@ -41,9 +41,8 @@ function boardProjectsApp(currentSiteId, currentSiteName) {
     fuse: null,
     searchText: '',
     async getData(postProcess = true) {
-      let projectList = this.$store.projects.getProjectsFromLocalStorage(
-        this.currentSiteName
-      );
+      this.$store.projects.initLocalStorage(this.currentSiteName);
+      let projectList = this.$store.projects.getProjectsFromLocalStorage();
       if (!projectList) {
         const projects = await api.get(projectsUrl());
         await this.$store.projects.mapperProjetsProjectSites(
@@ -56,10 +55,7 @@ function boardProjectsApp(currentSiteId, currentSiteName) {
             uuid: generateUUID(),
           })
         );
-        this.$store.projects.setProjectsToLocalStorage(
-          projectList,
-          this.currentSiteName
-        );
+        this.$store.projects.setProjectsToLocalStorage(projectList);
       }
       if (postProcess) {
         await this.postProcessData(projectList);
