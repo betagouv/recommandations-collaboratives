@@ -6,6 +6,9 @@
 {% block title %}
     Modifier la localisation du projet - {{ request.site.name }}
 {% endblock title %}
+{% block og_title %}
+    Modifier la localisation du projet - {{ request.site.name }}
+{% endblock og_title %}
 {% current_project request.session as project %}
 {% get_obj_perms request.user for project as "user_project_perms" %}
 {% if 'change_location' in user_project_perms %}

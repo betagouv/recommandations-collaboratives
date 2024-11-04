@@ -4,6 +4,9 @@
 {% block title %}
     Tableau de bord conseillers {{ block.super }}
 {% endblock title %}
+{% block og_title %}
+    Tableau de bord conseillers {{ block.super }}
+{% endblock og_title %}
 {% block js %}
     {% vite_asset 'js/apps/advisorDashboard.js' %}
 {% endblock js %}

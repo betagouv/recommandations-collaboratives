@@ -7,9 +7,15 @@
 {% block css %}
     {% vite_asset 'css/projectDetails.css' %}
 {% endblock css %}
+{% block js %}
+    {% vite_asset 'js/store/showRole.js' %}
+{% endblock js %}
 {% block title %}
     État des lieux - {{ block.super }}
 {% endblock title %}
+{% block og_title %}
+    État des lieux - {{ block.super }}
+{% endblock og_title %}
 {% block project_detail %}
     {% challenge_for request.user "project-knowledge-reader" as challenge %}
     {% if challenge and not challenge.acquired_on %}
@@ -61,7 +67,7 @@
         }
 	}
     </style>
-    <div class="col-12">
+    <div x-data x-init="$nextTick(() => $store.showRole.init())" class="col-12">
         {% include "projects/project/navigation.html" with state_of_play=True %}
         {% if project.inactive_since != None %}
             <div class="specific-border-4pxsolid1e1e1e">
@@ -73,7 +79,7 @@
                     {% elif not advising and is_regional_actor and not is_staff %}
                         <div class="specific-border-4pxsolid000091">
                             {% include "projects/project/fragments/project_banner/join_project_banner.html" %}
-                            <div class="specific-opacity-02">
+                            <div>
                             {% endif %}
                             {% include "projects/project/fragments/survey_grid.html" %}
                             {% if project.inactive_since != None %}

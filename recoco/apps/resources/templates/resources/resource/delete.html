@@ -4,6 +4,9 @@
 {% block title %}
     Supprimer {{ resource.title }}
 {% endblock title %}
+{% block og_title %}
+    Supprimer {{ resource.title }}
+{% endblock og_title %}
 {% load sass_tags %}
 {% block css %}
     <link href="{% sass_src 'resources/resources.scss' %}"
