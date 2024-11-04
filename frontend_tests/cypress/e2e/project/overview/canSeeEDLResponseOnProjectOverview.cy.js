@@ -1,12 +1,14 @@
 import project from '../../../fixtures/projects/project.json';
 
 const projectName = 'New project onboarding answer';
-
+let projetId;
 describe('I can see onboarding answer on the overview tab', () => {
   before(() => {
     cy.login('collectivité1');
-    cy.createProject(projectName);
-    cy.logout();
+    cy.createProject(projectName).then((projectId) => {
+      projetId = projectId;
+      cy.logout();
+    });
   });
 
   afterEach(() => {
@@ -15,8 +17,7 @@ describe('I can see onboarding answer on the overview tab', () => {
 
   it('should see the project description on overview tab as staff', () => {
     cy.login('staff');
-    cy.visit('/projects');
-    cy.contains(projectName).first().click({ force: true });
+    cy.visit(`/project/${projetId}`);
     cy.get('[data-test-id="project-information-card-context"]').should(
       'contain.text',
       project.description
@@ -25,8 +26,7 @@ describe('I can see onboarding answer on the overview tab', () => {
 
   it('should see the project description on overview tab as collectivity', () => {
     cy.login('collectivité1');
-    cy.visit('/');
-    cy.contains(projectName).parent().find('a').click({ force: true });
+    cy.visit(`/project/${projetId}`);
     cy.get('[data-test-id="project-information-card-context"]').should(
       'contain.text',
       project.description

@@ -184,6 +184,18 @@ Cypress.Commands.add('createProject', (label, objProject = project) => {
   cy.get('button[type="submit"]').click();
 
   cy.url().should('include', '/onboarding/summary');
+
+  cy.url().then((url) => {
+    const idMatch = url.match(/\/onboarding\/summary\/(\d+)$/);
+
+    if (idMatch) {
+      const id = idMatch[1];
+      cy.log(`L'ID récupéré est : ${id}`);
+      cy.wrap(id).as('projectId');
+    } else {
+      throw new Error("ID non trouvé dans l'URL");
+    }
+  });
 });
 
 /**
