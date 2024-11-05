@@ -90,5 +90,6 @@ export class LocalStorageMgmt {
    */
   reset() {
     localStorage.removeItem(this.fullDataLabel);
+    this.data = null;
   }
 }

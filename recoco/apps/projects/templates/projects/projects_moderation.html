@@ -11,7 +11,7 @@
     Projets à examiner
 {% endblock og_title %}
 {% block js %}
-    {% comment %} {% vite_asset 'js/apps/.js' %} {% endcomment %}
+    {% vite_asset 'js/store/projects.js' %}
 {% endblock js %}
 {% block css %}
     <link href="{% sass_src 'home/css/dsfr/marianne.css' %}"
@@ -22,7 +22,9 @@
           type="text/css">
 {% endblock css %}
 {% block content %}
-    <div class="col-11 fr-pt-2w fr-pb-6w fr-mx-auto">
+    <div x-data
+         x-init="$nextTick(() => $store.projects.init('{{ request.site.name }}'))"
+         class="col-11 fr-pt-2w fr-pb-6w fr-mx-auto">
         <div class="container-fluid">
             <div class="row">
                 <div class="col-12">
@@ -98,18 +100,29 @@
                                               action="{% url "projects-moderation-refuse" project.id %}"
                                               class="flex-grow-1">
                                             {% csrf_token %}
-                                            {% include "dsrc/core/blocks/buttons/button.html" with label="Refuser"  role="submit" variant="secondary black" classes="fr-btn--sm fr-mr-1v h-100" data_test_id="refuse-project" %}
+                                            <button class="fr-btn fr-btn--secondary black fr-btn--sm fr-mr-1v h-100"
+                                                    type="submit"
+                                                    role="submit"
+                                                    data-test-id="refuse-project">Refuser</button>
                                         </form>
                                         <form method="post"
                                               action="{% url "projects-moderation-accept" project.id %}">
                                             {% csrf_token %}
-                                            {% include "dsrc/core/blocks/buttons/button.html" with label="Accepter"  role="submit" variant="secondary" classes="fr-btn--sm fr-mr-1v float-end h-100" data_test_id="accept-project" %}
+                                            <button class="fr-btn fr-btn--secondary fr-btn--sm fr-mr-1v float-end h-100"
+                                                    type="submit"
+                                                    role="submit"
+                                                    @click="$store.projects.resetProjectsLocalStorage()"
+                                                    data-test-id="accept-project">Accepter</button>
                                         </form>
                                         <form method="post"
                                               action="{% url "projects-moderation-accept" project.id %}">
                                             {% csrf_token %}
                                             <input type="hidden" name="join" value="1">
-                                            {% include "dsrc/core/blocks/buttons/button.html" with label="Accepter et rejoindre"  role="submit" variant="secondary" classes="fr-btn--sm fr-mr-1v float-end h-100" %}
+                                            <button class="fr-btn fr-btn--secondary fr-btn--sm fr-mr-1v float-end h-100"
+                                                    type="submit"
+                                                    role="submit"
+                                                    @click="$store.projects.resetProjectsLocalStorage()"
+                                                    data-test-id="accept-project">Accepter et rejoindre</button>
                                         </form>
                                     </div>
                                 </div>

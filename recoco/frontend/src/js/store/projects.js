@@ -7,7 +7,7 @@ Alpine.store('projects', {
   userProjetsStatus: [],
   sitesConfig: [],
   projectsLocalStorage: null,
-  initLocalStorage(currentSiteName = 'default') {
+  init(currentSiteName) {
     this.projectsLocalStorage = new LocalStorageMgmt({
       dataLabel: 'projects-data',
       tag: currentSiteName,

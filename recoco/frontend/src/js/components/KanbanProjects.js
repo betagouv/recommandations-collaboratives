@@ -41,7 +41,7 @@ function boardProjectsApp(currentSiteId, currentSiteName) {
     fuse: null,
     searchText: '',
     async getData(postProcess = true) {
-      this.$store.projects.initLocalStorage(this.currentSiteName);
+      this.$store.projects.init(this.currentSiteName);
       let projectList = this.$store.projects.getProjectsFromLocalStorage();
       if (!projectList) {
         const projects = await api.get(projectsUrl());
