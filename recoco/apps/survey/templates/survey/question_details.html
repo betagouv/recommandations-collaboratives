@@ -18,7 +18,7 @@
     {% vite_asset 'js/apps/tutorial.js' %}
 {% endblock js %}
 {% block content %}
-    <div x-data="Tutorial('survey', {{ session.completion }} === 0)"
+    <div x-data="Tutorial('survey', true)"
          class="col-11 fr-py-6w fr-mx-auto">
         <!-- Breadcrumb -->
         <nav role="navigation" class="fr-breadcrumb" aria-label="vous êtes ici :">

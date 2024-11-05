@@ -19,7 +19,6 @@ function Tutorial(challengeCode, autoStart = false) {
     showTuto: false,
     async init() {
       this.challengeCode = challengeCode;
-
       const challengeDefinition =
         await this.getChallengeDefinition(challengeCode);
 
