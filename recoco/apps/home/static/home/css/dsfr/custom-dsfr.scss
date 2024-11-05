@@ -596,3 +596,17 @@ form > p {
   left: 50%;
   transform: translateX(-50%);
 }
+
+.text-align-center {
+  text-align: center;
+}
+
+.justify-content-center {
+  justify-content: center;
+}
+
+.blue-text-block {
+  color: #4285f4;
+  background-color: rgba(96, 162, 228, 0.1);
+  border-radius: 4px;
+}
