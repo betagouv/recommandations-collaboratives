@@ -16,14 +16,14 @@
 }
 
 .introjs-button {
-  border: 1px solid #0063cb;
+  border: 1px solid var(--background-action-high-blue-france);
   padding: 5px 10px !important;
   border-radius: 2px;
   font-size: 12px !important;
 
   text-transform: uppercase;
   font-size: 0.85rem;
-  color: #0063cb;
+  color: var(--background-action-high-blue-france);
   text-decoration: none;
 
   transition: all 0.25s ease;
@@ -35,15 +35,15 @@
 
 .introjs-button:hover {
   background-color: #e2effc;
-  border: 1px solid #0063cb;
+  border: 1px solid var(--background-action-high-blue-france);
 }
 
 .introjs-button:focus {
-  border: 1px solid #0063cb;
+  border: 1px solid var(--background-action-high-blue-france);
   background-color: #e2effc;
   box-shadow: none;
   /* box-shadow: 0 0 1px 4px #e0ecf9; */
-  background-color: #0063cb;
+  background-color: var(--background-action-high-blue-france);
   color: white;
 }
 
@@ -59,7 +59,7 @@
 }
 
 .introjs-bullets ul li a.active {
-  background: #0063cb;
+  background: var(--background-action-high-blue-france);
 }
 
 .introjs-tooltip-header {
@@ -68,7 +68,7 @@
 }
 
 .intro-tutorial .introjs-tooltip-header {
-  border-bottom: #0063cb solid 1px;
+  border-bottom: var(--background-action-high-blue-france) solid 1px;
   padding-bottom: 8px;
 }
 

@@ -3,7 +3,7 @@
   flex-direction: column;
   align-items: flex-start;
   padding: 10px 20px 20px 30px;
-  border-left: solid 4px #0063cb;
+  border-left: solid 4px var(--background-action-high-blue-france);
 }
 
 .callout .callout-title {

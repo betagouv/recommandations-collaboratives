@@ -15,5 +15,5 @@
   height: 100%;
   width: 3px;
 
-  background-color: #0063cb;
+  background-color: var(--background-action-high-blue-france);
 }

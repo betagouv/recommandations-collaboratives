@@ -196,7 +196,7 @@ body {
 
 .crm-results .crm-sticky {
   background-color: white;
-  border-bottom: solid 2px #0063cb;
+  border-bottom: solid 2px var(--background-action-high-blue-france);
   padding: 15px 0;
   top: 150px;
 }
@@ -232,7 +232,7 @@ body {
 
 .crm-project-tag {
   text-decoration: underline;
-  color: #0063cb;
+  color: var(--background-action-high-blue-france);
 }
 
 .crm-group-checkbox {
