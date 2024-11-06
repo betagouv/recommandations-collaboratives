@@ -33,7 +33,7 @@ body {
   right: 15px;
   text-decoration: underline;
   cursor: pointer;
-  color: #335b7e;
+  color: var(--background-action-high-blue-france);
 }
 
 .crm-note-toggle-button.hidden {
