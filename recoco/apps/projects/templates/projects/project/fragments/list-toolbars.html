@@ -1,5 +1,9 @@
 {% load static %}
 <div class="btn-group fr-ml-3w" role="group" aria-label="Admin actions">
-    {% include "dsrc/core/blocks/buttons/button_link.html" with label="Déposer un projet" href_url="onboarding-prefill-set-user" role="button" classes="fr-mr-1v" %}
-    {% include "dsrc/core/blocks/buttons/button_link.html" with label="Exporter en CSV" href_url="projects-project-list-export-csv" role="button" variant="secondary" classes="fr-mr-1v" %}
+    <a class="fr-btn fr-btn--sm fr-mr-1v"
+       href="{% url 'onboarding-prefill-set-user' %}"
+       role="button">Déposer un projet</a>
+    <a class="fr-btn fr-btn--sm fr-btn--secondary fr-mr-1v"
+       href="{% url 'projects-project-list-export-csv' %}"
+       role="button">Exporter en CSV</a>
 </div>
