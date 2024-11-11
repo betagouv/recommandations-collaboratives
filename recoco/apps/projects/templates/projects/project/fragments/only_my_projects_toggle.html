@@ -1,0 +1,15 @@
+<div class="fr-toggle fr-toggle--label-left">
+    <input type="checkbox"
+           class="fr-toggle__input"
+           aria-describedby="my-projects-toggle-messages"
+           x-ref="myProjectsToggle"
+           @change="toggleMyProjectsFilter"
+           :checked="isDisplayingOnlyUserProjects"
+           id="my-projects-toggle"
+           data-test-id="my-projects-toggle">
+    <label class="fr-toggle__label specific-toggle__label "
+           for="my-projects-toggle">Uniquement mes projets</label>
+    <div class="fr-messages-group"
+         id="my-projects-toggle-messages"
+         aria-live="polite"></div>
+</div>

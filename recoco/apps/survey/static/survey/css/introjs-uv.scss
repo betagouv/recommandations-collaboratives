@@ -1,38 +1,36 @@
-$green: #5DC2B0;
-$blue: #335B7E;
-$dark-blue: #224A6D;
-
+$green: #5dc2b0;
+$blue: var(--background-action-high-blue-france);
+$dark-blue: #224a6d;
 
 .introjs-tooltip {
-    background-color: $green;
-    color: white;
-    font-size: 1.3em;
+  background-color: $green;
+  color: white;
+  font-size: 1.3em;
 
-    border: 1px solid white;
+  border: 1px solid white;
 
-    min-width: 50vw; // change to desired
-
+  min-width: 50vw; // change to desired
 }
 
 .introjs-skipbutton {
-    color: white;
+  color: white;
 }
 
 .introjs-button {
+  background-color: $blue;
+  border: 1px solid $dark-blue;
+  color: white;
+
+  text-shadow: none;
+
+  &:hover,
+  &:focus {
     background-color: $blue;
-    border: 1px solid $dark-blue;
-    color: white;
-
-    text-shadow: none;
-
-    &:hover, &:focus {
-        background-color: $blue;
-        color: white !important;
-    }
-
+    color: white !important;
+  }
 }
 
 .introjs-prevbutton {
-    background-color: white;
-    color: black;
+  background-color: white;
+  color: black;
 }

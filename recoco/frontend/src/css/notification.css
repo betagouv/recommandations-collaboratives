@@ -19,7 +19,7 @@
   left: -2px;
   z-index: -1;
 
-  background-color: #0063cb;
+  background-color: var(--background-action-high-blue-france);
   color: white;
 
   display: flex;

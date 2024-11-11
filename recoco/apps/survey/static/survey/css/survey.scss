@@ -52,7 +52,10 @@
   }
 
   .updated-by {
-    color: var(--light-text-default-info, #0063cb);
+    color: var(
+      --light-text-default-info,
+      var(--background-action-high-blue-france)
+    );
     font-size: 10px;
     font-weight: 400;
     line-height: 15px;
