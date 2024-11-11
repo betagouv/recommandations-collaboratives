@@ -68,7 +68,7 @@
          id="user-tooltip"
          @click.outside="onOutsideUserClick"
          data-test-id="tooltip-user-card"
-         class="user-card-popup flex-column {% if not user.is_active %}coucou{% elif position.is_advisor %}advisor-border{% elif position.is_observer %}observer-border{% else %}neutral-role-border{% endif %}">
+         class="user-card-popup flex-column {% if not user.is_active %}...{% elif position.is_advisor %}advisor-border{% elif position.is_observer %}observer-border{% else %}neutral-role-border{% endif %}">
         {% if user.is_active and position.is_advisor %}
             <div class="user-role position-absolute">
                 <span class="fr-py-1v fr-px-2v fw-bold text-uppercase tiny advisor-background text-white specific-borderradius-2px">Conseiller</span>

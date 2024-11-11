@@ -281,10 +281,7 @@
                                         <form method="post"
                                               action="{% url 'projects-project-access-advisor-delete' project.pk request.user.username %}">
                                             {% csrf_token %}
-                                            <button class="fr-btn fr-btn--sm fr-btn--tertiary w-100 justify-content-center"
-                                                    {% comment %}
-                                                    x-on:click="role={% url 'projects-project-access-advisor-delete' project.pk request.user.username %}"
-                                                    {% endcomment %}>Quitter le projet</button>
+                                            <button class="fr-btn fr-btn--sm fr-btn--tertiary w-100 justify-content-center">Quitter le projet</button>
                                         </form>
                                     </div>
                                 </div>

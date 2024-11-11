@@ -27,13 +27,13 @@
   // --display-spacing: 0 0 2rem;
   --display-spacing: ;
   // --display-spacing: 0 0 2rem;
-  // --background-action-high-blue-france: #0063cb;
+  // --background-action-high-blue-france: var(--background-action-high-blue-france);
 
-  // --text-active-blue-france: #0063cb;
-  // --text-action-high-blue-france: #0063cb;
+  // --text-active-blue-france: var(--background-action-high-blue-france);
+  // --text-action-high-blue-france: var(--background-action-high-blue-france);
 
-  // --border-action-high-blue-france: #0063cb;
-  // --border-active-blue-france: #0063cb;
+  // --border-action-high-blue-france: var(--background-action-high-blue-france);
+  // --border-active-blue-france: var(--background-action-high-blue-france);
 
   --bs-link-color-rgb: 51, 91, 126;
 
@@ -459,6 +459,16 @@ form > p {
   box-shadow: inset 0 0 0 1px var(--border-default-grey);
 }
 
+/* ----------- *\
+  TOGGLE SWITCH
+\* ----------- */
+.fr-toggle {
+  padding: 0;
+  .fr-toggle__label:after {
+    top: 0;
+  }
+}
+
 /* -------------------- *\
   Add from 1.5.2 of DSFR
 \* -------------------- */
@@ -506,7 +516,7 @@ form > p {
 
 .modal-description {
   margin: 1rem 0;
-  border-left: 4px solid #0063cb;
+  border-left: 4px solid var(--background-action-high-blue-france);
   padding-left: 1rem;
 }
 
@@ -572,10 +582,6 @@ form > p {
   opacity: 0.2;
 }
 
-.no-interaction-possible {
-  pointer-events: none;
-}
-
 .cursor-pointer {
   cursor: pointer;
 }
@@ -595,4 +601,12 @@ form > p {
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
+}
+
+.specific-color-high-blue-france {
+  color: var(--background-action-high-blue-france);
+}
+
+.specific-background-high-blue-france {
+  background: var(--background-action-high-blue-france);
 }

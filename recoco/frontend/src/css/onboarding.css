@@ -48,13 +48,13 @@ body {
 }
 
 .onboarding__summary ol > li::marker {
-  color: #0063cb;
+  color: var(--background-action-high-blue-france);
 }
 
 .project-card {
   /* padding: 1rem;
   border-radius: 4px;
-  border: 1px solid #0063cb;
+  border: 1px solid var(--background-action-high-blue-france);
   box-shadow: 2px 2px 4px 0px rgba(0, 0, 0, 0.1);
   position: relative; */
   margin: 0 0 2rem;
@@ -65,7 +65,7 @@ body {
   top: 50%;
   transform: translateY(-50%);
   right: 1rem;
-  color: #0063cb;
+  color: var(--background-action-high-blue-france);
 }
 
 .project__title > p {
