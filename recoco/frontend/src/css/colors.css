@@ -1,5 +1,5 @@
 :root {
-  --color-topic-default: #0063cb;
+  --color-topic-default: var(--background-action-high-blue-france);
   --color-topic-1: #fbaff5;
   --color-topic-2: #79e7d5;
   --color-topic-3: #fcb0a2;
@@ -56,7 +56,7 @@
 }
 
 .bg-blue {
-  background: #0063cb;
+  background: var(--background-action-high-blue-france);
 }
 
 .bg-purple {
@@ -64,7 +64,7 @@
 }
 
 .fill-blue {
-  fill: #0063cb;
+  fill: var(--background-action-high-blue-france);
 }
 
 .fill-grey {
