@@ -55,7 +55,7 @@
 
     &__border {
       &--is-switchtender {
-        border: 1px solid #0063cb;
+        border: 1px solid var(--background-action-high-blue-france);
         background-color: white;
       }
 
@@ -114,6 +114,13 @@
       }
     }
   }
+}
+
+.fr-toggle label.specific-toggle__label {
+  color: var(--light-text-mention-grey, #666);
+  font-size: 0.9rem;
+  font-weight: 400;
+  line-height: 24px;
 }
 
 h5 {

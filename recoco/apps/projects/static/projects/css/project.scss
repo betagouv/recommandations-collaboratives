@@ -17,7 +17,10 @@
     line-height: 22px;
   }
   &__tag {
-    color: var(--light-background-flat-info, #0063cb);
+    color: var(
+      --light-background-flat-info,
+      var(--background-action-high-blue-france)
+    );
     font-size: 12px;
     font-weight: 400;
     line-height: 22px;

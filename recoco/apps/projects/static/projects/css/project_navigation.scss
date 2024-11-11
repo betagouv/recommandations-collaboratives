@@ -40,7 +40,7 @@
   font-size: 9px !important;
 
   border-bottom-right-radius: 5px;
-  background-color: #0063cb;
+  background-color: var(--background-action-high-blue-france);
   padding: 0 5px !important;
 
   width: auto !important;
@@ -85,9 +85,9 @@
 .old-project-navigation a.active {
   background-color: white;
   font-weight: bold;
-  color: #0063cb;
+  color: var(--background-action-high-blue-france);
 
-  border-top: solid 2px #0063cb;
+  border-top: solid 2px var(--background-action-high-blue-france);
   border-left: solid 1px #e5e5e5;
   border-right: solid 1px #e5e5e5;
   border-bottom: solid 1px white;

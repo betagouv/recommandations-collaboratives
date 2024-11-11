@@ -25,7 +25,7 @@ function AdvisorDashboard() {
         code: ['TODO', 'NEW'],
         title: 'À traiter',
         color_class: 'border-secondary',
-        color: '#0063CB',
+        color: 'var(--background-action-high-blue-france)',
       },
       {
         code: 'WIP',

@@ -7,7 +7,7 @@
 {% endblock css %}
 {% load phone_filters %}
 {% if project.owner %}
-    <a class="d-flex align-items-center fr-mb-1v text-decoration-none a-specific-fontsize-14 specific-color-335B7E"
+    <a class="d-flex align-items-center fr-mb-1v text-decoration-none a-specific-fontsize-14 specific-color-high-blue-france"
        href="mailto:{{ project.owner.email }}">
         <svg class="bi align-middle" width="18" height="18" fill="currentColor">
             <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#link-45deg" />
@@ -17,14 +17,14 @@
     </a>
 {% endif %}
 {% if project.owner.profile.phone_no or project.phone %}
-    <span class="d-flex align-items-center a-specific-fontsize-14 specific-color-335B7E">
+    <span class="d-flex align-items-center a-specific-fontsize-14 specific-color-high-blue-france">
         <svg class="bi align-middle fr-mr-2v"
              width="15"
              height="15"
              fill="currentColor">
             <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#telephone" />
         </svg>
-        <a class="text-decoration-none a-specific-fontsize-14 specific-color-335B7E"
+        <a class="text-decoration-none a-specific-fontsize-14 specific-color-high-blue-france"
            href="tel:{{ project.owner.profile.phone_no }}">
             {% if project.owner.profile.phone_no %}
                 {{ project.owner.profile.phone_no|format_phone }}

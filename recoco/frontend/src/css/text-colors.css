@@ -21,7 +21,7 @@
 }
 
 .text-blue {
-  color: #0063cb !important;
+  color: var(--background-action-high-blue-france) !important;
 }
 
 .text-black {

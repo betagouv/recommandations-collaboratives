@@ -24,7 +24,6 @@ Alpine.store('showRole', {
 
   setShowToTrue() {
     localStorage.setItem('showRole', true);
-    alert('coucou');
   },
 });
 
