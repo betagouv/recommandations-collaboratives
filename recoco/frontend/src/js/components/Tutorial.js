@@ -7,7 +7,7 @@ import api, { challengeUrl, challengeDefinitionUrl } from '../utils/api';
 //Custom introjs CSS
 import '../../css/introJs.css';
 
-function Tutorial(challengeCode, autoStart = false) {
+function Tutorial(challengeCode) {
   return {
     steps: [],
     hints: [],
@@ -52,11 +52,6 @@ function Tutorial(challengeCode, autoStart = false) {
       this.tour.onexit(async () => {
         this.snoozeChallenge(this.challengeCode);
       });
-
-      if (autoStart) {
-        this.tour.start();
-        await this.startChallenge(this.challengeCode);
-      }
     },
     async getChallengeDefinition(code) {
       try {
