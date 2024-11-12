@@ -89,7 +89,7 @@ INSTALLED_APPS = [
     "recoco.apps.pages",
     "recoco.apps.metrics",
     "recoco.apps.demarches_simplifiees",
-    "recoco.apps.proconnect",
+    "recoco.apps.social_account",
     "crispy_forms",
     "wagtail.contrib.forms",
     "wagtail.contrib.redirects",
@@ -331,13 +331,14 @@ ACCOUNT_FORMS = {
     "disconnect": "allauth.socialaccount.forms.DisconnectForm",
 }
 
-SOCIALACCOUNT_ADAPTER = "recoco.apps.proconnect.adapters.SocialAccountAdapter"
+SOCIALACCOUNT_ADAPTER = "recoco.apps.social_account.adapters.SocialAccountAdapter"
 
 SOCIALACCOUNT_OPENID_CONNECT_URL_PREFIX = "oidc"
+SOCIALACCOUNT_LOGIN_ON_GET = True
 
 SOCIALACCOUNT_PROVIDERS = {
     # https://docs.allauth.org/en/latest/socialaccount/providers/openid_connect.html
-    "agentconnect": {
+    "openid_connect": {
         "APPS": [
             {
                 "provider_id": "agentconnect",
