@@ -1,4 +1,6 @@
 import file from '../../../fixtures/documents/file.json';
+import projects from '../../../fixtures/projects/projects.json';
+const currentProject = projects[1];
 
 describe('I can add a file on the document tab', () => {
   beforeEach(() => {
@@ -6,13 +8,7 @@ describe('I can add a file on the document tab', () => {
   });
 
   it('upload a file', () => {
-    cy.visit('/');
-
-    cy.contains('Friche numéro 1').click({ force: true });
-
-    cy.contains('Fichiers et liens').click({ force: true });
-
-    cy.url().should('include', '/documents');
+    cy.visit(`/project/${currentProject.pk}/documents`);
 
     cy.document().then((doc) => {
       var popover = doc.getElementById('popover');
@@ -20,7 +16,7 @@ describe('I can add a file on the document tab', () => {
 
       cy.get('[name="the_file"]').selectFile(file.path, { force: true });
       cy.get('#document-description')
-        .type(file.description, { force: true })
+        .type(file.description, { force: true, delay: 0 })
         .should('have.value', file.description);
       cy.get('#document-submit-button').click({ force: true });
     });
@@ -29,13 +25,7 @@ describe('I can add a file on the document tab', () => {
   });
 
   it('show the file in the file list', () => {
-    cy.visit('/');
-
-    cy.contains('Friche numéro 1').click({ force: true });
-
-    cy.contains('Fichiers et liens').click({ force: true });
-
-    cy.url().should('include', '/documents');
+    cy.visit(`/project/${currentProject.pk}/documents`);
 
     cy.contains(file.description);
   });
