@@ -1,4 +1,5 @@
 const taskName = 'to inprogress';
+let currentProjectId;
 
 describe('I can go to tasks tab', () => {
   const TASK_STATUSES = [0, 1, 2, 3];
@@ -7,27 +8,23 @@ describe('I can go to tasks tab', () => {
     cy.visit('/');
 
     cy.login('conseiller1');
-    cy.createProject('dragndroptest');
+    cy.createProject('dragndroptest').then((projectId) => {
+      currentProjectId = projectId;
+    });
   });
 
   it('drags n drops no status task to in progress status', () => {
-    cy.visit(`/projects`);
-    cy.contains('dragndroptest').first().click({ force: true });
+    cy.visit(`/project/${currentProjectId}`);
 
-    cy.becomeAdvisor();
-
-    cy.contains('Recommandations').click({ force: true });
-    cy.url().should('include', '/actions');
+    cy.becomeAdvisor(currentProjectId);
+    cy.visit(`/project/${currentProjectId}/actions`);
 
     cy.createTask(taskName);
 
     cy.get('[data-test-id="kanban-tasks-switch-button"]').click({
       force: true,
     });
-    cy.get('[data-test-id="kanban-tasks-switch-button"]').should(
-      'have.class',
-      'active'
-    );
+    cy.get('[data-test-id="kanban-tasks-switch-button"]').should('be.checked');
 
     // let droppableCoords = {}
 
