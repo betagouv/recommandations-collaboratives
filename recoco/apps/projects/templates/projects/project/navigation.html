@@ -14,13 +14,18 @@
 {% block js %}
     {% vite_asset 'js/store/projectQueue.js' %}
     {% vite_asset 'js/components/ExpandableMenuHandler.js' %}
+    {% vite_asset 'js/store/showRole.js' %}
 {% endblock js %}
 {% get_obj_perms request.user for request.site as "user_site_perms" %}
 {% get_obj_perms request.user for project as "user_project_perms" %}
 {% is_staff_for_current_site request.user as is_staff %}
 {% get_advising_position user project request.site as position %}
-<div class="project-navigation d-flex justify-content-between">
-    <fieldset x-data
+<div x-data
+     class="project-navigation d-flex justify-content-between"
+     x-init="$nextTick(() => $store.showRole.init())"
+     >
+    <fieldset
+
               class="fr-segmented fr-segmented--md fr-px-3w"
               x-init="$nextTick(() => $store.projectQueue.addCurrentProjectId({{ project.id }}, `{{ project.name }}`, `{{ project.commune.name }}`,`{{ project.commune.insee }}`))">
         <legend class="fr-segmented__legend visually-hidden">Onglets du projet</legend>
@@ -31,7 +36,7 @@
         {% endif %}
         <div class="fr-segmented__elements">
             {% if "list_projects" in user_site_perms or "view_project" in user_project_perms %}
-                <div class="fr-segmented__element">
+                <div class="fr-segmented__element" id="overview-step-1">
                     <input value="overview"
                            type="radio"
                            {% if overview %}checked{% endif %}
@@ -194,10 +199,12 @@
             <div x-data="ExpandableMenuHandler"
                  @click.outside="toggle"
                  class="project-navigation__container-btn-role-selection"
-                 data-test-id="header-banner-advising-position">
+                 data-test-id="header-banner-advising-position"
+                 id="overview-step-5">
                 <button class="fr-btn fr-btn--tertiary-no-outline fr-icon-team-line"
                         role="button"
                         x-ref="expandMenuButton"
+                        id="select-observer-or-advisor-button"
                         aria-expanded="false"
                         aria-controls="select-observer-or-advisor"
                         data-test-id="show-banner">Sélectionnez votre rôle sur le projet</button>
@@ -276,10 +283,7 @@
                                         <form method="post"
                                               action="{% url 'projects-project-access-advisor-delete' project.pk request.user.username %}">
                                             {% csrf_token %}
-                                            <button class="fr-btn fr-btn--sm fr-btn--tertiary w-100 justify-content-center"
-                                                    {% comment %}
-                                                    x-on:click="role={% url 'projects-project-access-advisor-delete' project.pk request.user.username %}"
-                                                    {% endcomment %}>Quitter le projet</button>
+                                            <button class="fr-btn fr-btn--sm fr-btn--tertiary w-100 justify-content-center">Quitter le projet</button>
                                         </form>
                                     </div>
                                 </div>

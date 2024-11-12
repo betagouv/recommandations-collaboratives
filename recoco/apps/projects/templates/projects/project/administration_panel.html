@@ -7,6 +7,9 @@
 {% block title %}
     Paramètres - {{ block.super }}
 {% endblock title %}
+{% block og_title %}
+    Paramètres - {{ block.super }}
+{% endblock og_title %}
 {% block js %}
     {% vite_asset 'js/apps/projectAdministration.js' %}
 {% endblock js %}
@@ -24,7 +27,7 @@
     {% if project.inactive_since != None %}
         <div class="specific-border-4pxsolid1e1e1e">
             {% include "projects/project/fragments/project_banner/paused_project_banner.html" %}
-            <div class="no-interaction-possible">
+            <div>
             {% elif project.status == 'DRAFT' %}
                 <div class="specific-border-4pxsolid000091">
                     {% include "projects/project/fragments/project_banner/non_published_project_banner.html" %}
@@ -196,7 +199,7 @@
                                 {% endif %}
                             </div>
                             <div class="col">
-                                <p class="text-info-custom fr-mb-2v">Membres de la collectivité</p>
+                                <p class="text-info-custom fr-mb-2v">Equipe du porteur de projet et partenaires</p>
                                 {% if "invite_collaborators" in user_project_perms %}
                                     <button @click="openInviteMemberModal"
                                             data-toggle="modal"
@@ -207,7 +210,7 @@
                                                 <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#lock-fill" />
                                             </svg>
                                         {% endif %}
-                                        <span>Inviter un membre de la collectivité</span>
+                                        <span>Inviter un membre porteur de projet ou un partenaire</span>
                                     </button>
                                 {% endif %}
                                 <ul class="flex-column list-unstyled fr-mb-0">
@@ -328,7 +331,7 @@
                                 {% else %}
                                     <p data-test-id="administration-member-invitation-list"
                                        class="text-info-custom fr-mb-3w fr-mt-1v">
-                                        Invitations en attente de membres collectivité
+                                        Invitations en attente porteur de projet et partenaires
                                     </p>
                                     <ul class="list-group">
                                         {% for invite in pending_invites %}

@@ -8,6 +8,9 @@
 {% block title %}
     Conversation - {{ block.super }}
 {% endblock title %}
+{% block og_title %}
+    Conversation - {{ block.super }}
+{% endblock og_title %}
 {% block css %}
     <link href="{% sass_src 'projects/css/conversations.scss' %}"
           rel="stylesheet"
@@ -25,7 +28,7 @@
     {% if project.inactive_since != None %}
         <div class="specific-border-4pxsolid1e1e1e">
             {% include "projects/project/fragments/project_banner/paused_project_banner.html" %}
-            <div class="no-interaction-possible">
+            <div>
             {% elif project.status == 'DRAFT' %}
                 <div class="specific-border-4pxsolid000091">
                     {% include "projects/project/fragments/project_banner/non_published_project_banner.html" %}
@@ -94,7 +97,7 @@
                         <div class="col fr-mx-auto col-lg-4 col-md-12">
                             <h6 class="text-uppercase fw-bold d-block fr-mb-2w h6-specific-fontsize-14">Participants</h6>
                             <div>
-                                <p class="text-info-custom">Membres de la collectivité</p>
+                                <p class="text-info-custom">Porteur de projet et partenaires</p>
                                 <ul class="flex-column list-unstyled fr-mb-0">
                                     {% for pm in project.projectmember_set.all %}
                                         {% if pm.member.is_active %}

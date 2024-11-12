@@ -32,7 +32,7 @@ function FieldValidator(
     },
     validateData(submittedForm = false) {
       if (this.isRequired && (this.requestMethod === 'POST' || submittedForm)) {
-        if (this.value) {
+        if (this.$el.value) {
           addClassIfNotExists(
             this.$el.parentElement,
             `fr-${fieldType}-group--valid`

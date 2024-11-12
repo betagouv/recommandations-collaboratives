@@ -68,7 +68,7 @@
                             {% endif %}
                             *
                         </label>
-                        <textarea x-data="FieldValidator(true,'{{ form.comment.value }}', 'input', ['focusout', 'input'], submittedForm)"
+                        <textarea x-data="FieldValidator(true,'{{ form.comment.value|default:'' }}', 'input', ['focusout', 'input'], submittedForm)"
                                   x-effect="validateData(submittedForm)"
                                   class="fr-input"
                                   rows="3"

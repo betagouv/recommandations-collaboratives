@@ -76,7 +76,7 @@
                             {% include "projects/project/fragments/project_banner/join_project_banner.html" %}
                         {% endif %}
                         <div class="container-fluid">
-                            <div class="row fr-p-1w {% if project.inactive_since != None %}no-interaction-possible {% elif not advising and is_regional_actor and not is_staff %}specific-opacity-02{% endif %}">
+                            <div class="row fr-p-1w">
                                 <div class="col-8">
                                     <div class="d-flex">
                                         {% if "use_advisor_note" in user_project_perms %}
@@ -151,7 +151,7 @@
                                     </div>
                                     <div class="fr-mb-3w">
                                         <div class="d-flex flex-column">
-                                            <h6 class="text-uppercase fw-bold d-block fr-mb-2w h6-specific-fontsize-14">Référent collectivité</h6>
+                                            <h6 class="text-uppercase fw-bold d-block fr-mb-2w h6-specific-fontsize-14">Référent porteur de projet</h6>
                                             {% include "projects/project/fragments/project_owner.html" with project=project %}
                                             {% include "projects/project/fragments/owner/owner-details.html" with project=project %}
                                         </div>
@@ -160,7 +160,7 @@
                                     <div class="d-flex flex-column fr-my-3w">
                                         <!-- Collectivity -->
                                         <div>
-                                            <h6 class="text-uppercase fw-bold d-block fr-mb-2w h6-specific-fontsize-14">Membres de la collectivité</h6>
+                                            <h6 class="text-uppercase fw-bold d-block fr-mb-2w h6-specific-fontsize-14">Porteur de projet et partenaires</h6>
                                             <ul class="flex-column list-unstyled fr-mb-0">
                                                 {% for projectmember in project.projectmember_set.all %}
                                                     {% if projectmember.is_owner and projectmember.member.is_active %}

@@ -9,6 +9,9 @@
 {% block title %}
     Espace conseillers - {{ block.super }}
 {% endblock title %}
+{% block og_title %}
+    Espace conseillers - {{ block.super }}
+{% endblock og_title %}
 {% block project_detail %}
     {% get_obj_perms request.user for request.site as "user_site_perms" %}
     {% get_obj_perms request.user for project as "user_project_perms" %}
@@ -17,7 +20,7 @@
         {% if project.inactive_since != None %}
             <div class="specific-border-4pxsolid1e1e1e">
                 {% include "projects/project/fragments/project_banner/paused_project_banner.html" %}
-                <div class="no-interaction-possible">
+                <div>
                 {% elif project.status == 'DRAFT' %}
                     <div class="specific-border-4pxsolid000091">
                         {% include "projects/project/fragments/project_banner/non_published_project_banner.html" %}
@@ -33,7 +36,7 @@
                                         <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#eye-fill" />
                                     </svg>
                                     <p class="text-info-custom fr-my-0">
-                                        Seuls les acteurs positionnés sur ce projet et les équipes de conseil (ex: {{ request.site.name }}) ont accès à cet espace, pas la collectivité.
+                                        Seuls les acteurs positionnés sur ce projet et les équipes de conseil (ex: {{ request.site.name }}) ont accès à cet espace, pas le porteur de projet.
                                     </p>
                                 </div>
                                 {% activity_stream "target" project %}

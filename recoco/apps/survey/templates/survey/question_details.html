@@ -11,12 +11,15 @@
 {% block title %}
     {{ question.text }} - {{ request.site.name }}
 {% endblock title %}
+{% block og_title %}
+    {{ question.text }} - {{ request.site.name }}
+{% endblock og_title %}
 {% block js %}
     {% vite_asset 'js/apps/tutorial.js' %}
 {% endblock js %}
 {% block content %}
-    <div x-data="Tutorial('survey', {{ session.completion }} === 0)"
-          class="col-11 fr-py-6w fr-mx-auto">
+    <div x-data="Tutorial('survey')"
+         class="col-11 fr-py-6w fr-mx-auto">
         <!-- Breadcrumb -->
         <nav role="navigation" class="fr-breadcrumb" aria-label="vous êtes ici :">
             <button class="fr-breadcrumb__button"

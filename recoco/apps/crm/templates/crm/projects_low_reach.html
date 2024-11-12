@@ -6,6 +6,9 @@
 {% block title %}
     Projets à faible répondant - CRM
 {% endblock title %}
+{% block og_title %}
+    Projets à faible répondant - CRM
+{% endblock og_title %}
 {% block content %}
     <div x-data="Crm" class="d-flex fr-px-0">
         {% include "crm/fragments/sidebar.html" with back_button=True map=True tools=True search=True %}
@@ -19,7 +22,7 @@
                     <tr>
                         <th>Nom</th>
                         <th>% d'accès aux recos</th>
-                        <th>Dernière activité collectivité</th>
+                        <th>Dernière activité porteur de projet</th>
                         <th>Dernière reco publiée</th>
                         <th>Dernier msg conversation</th>
                     </tr>
