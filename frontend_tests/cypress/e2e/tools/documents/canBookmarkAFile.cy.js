@@ -1,4 +1,6 @@
 import documents from '../../../fixtures/documents/documents.json';
+import projects from '../../../fixtures/projects/projects.json';
+const currentProject = projects[1];
 
 describe('I can unbookmark a file already pinned', () => {
   beforeEach(() => {
@@ -6,45 +8,29 @@ describe('I can unbookmark a file already pinned', () => {
   });
 
   it('shows the unpinned file', () => {
-    cy.visit('/');
-
-    cy.contains('Friche numéro 1').click({ force: true });
-
-    cy.contains('Fichiers et liens').click({ force: true });
-
-    cy.url().should('include', '/documents');
+    cy.visit(`/project/${currentProject.pk}/documents`);
 
     //Unbookmark a file
     cy.contains(documents[2].fields.description)
       .parent()
-      .siblings()
-      .children()
+      .parent()
+      .parent()
       .find('#file-is-not-bookmarked');
     cy.contains(documents[2].fields.description)
       .parent()
-      .siblings()
-      .children()
+      .parent()
+      .parent()
       .find('#file-is-not-bookmarked')
-      .parent()
-      .parent()
       .click({ force: true });
-
-    cy.wait(500);
   });
 
   it('checks if the file is now correctly bookmarked', () => {
-    cy.visit('/');
-
-    cy.contains('Friche numéro 1').click({ force: true });
-
-    cy.contains('Fichiers et liens').click({ force: true });
-
-    cy.url().should('include', '/documents');
+    cy.visit(`/project/${currentProject.pk}/documents`);
 
     cy.contains(documents[2].fields.description)
       .parent()
-      .siblings()
-      .children()
+      .parent()
+      .parent()
       .find('#file-is-bookmarked');
   });
 });
