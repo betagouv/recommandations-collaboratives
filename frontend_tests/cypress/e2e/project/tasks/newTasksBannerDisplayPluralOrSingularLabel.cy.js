@@ -3,10 +3,14 @@ import projects from '../../../fixtures/projects/projects.json';
 const currentProject = projects[10];
 
 describe('I can go to tasks tab', () => {
+  before(() => {
+    cy.login('conseiller1');
+    cy.becomeAdvisor(currentProject.pk);
+  });
+
   it('creates a single task and display a singular label for new tasks banner', () => {
     cy.login('conseiller1');
     cy.visit(`/project/${currentProject.pk}/actions`);
-    cy.becomeAdvisorOnProject(currentProject.pk);
     cy.createTask(1);
     cy.logout();
 
