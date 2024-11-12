@@ -10,12 +10,11 @@ import api, {
 
 Alpine.data('KanbanProjects', boardProjectsApp);
 
-function boardProjectsApp(currentSiteId, currentSiteName) {
+function boardProjectsApp(currentSiteId) {
   return {
     projectList: [],
     rawProjectList: [],
     currentSiteId: currentSiteId,
-    currentSiteName: currentSiteName.replaceAll(' ', '_'),
     get isBusy() {
       return this.$store.app.isLoading;
     },
@@ -41,22 +40,14 @@ function boardProjectsApp(currentSiteId, currentSiteName) {
     fuse: null,
     searchText: '',
     async getData(postProcess = true) {
-      this.$store.projects.init(this.currentSiteName);
-      let projectList = this.$store.projects.getProjectsFromLocalStorage();
-      if (!projectList) {
-        const projects = await api.get(projectsUrl());
-        await this.$store.projects.mapperProjetsProjectSites(
-          projects.data,
-          this.currentSiteId
-        );
+      const projects = await api.get(projectsUrl());
 
-        projectList = projects.data.map((d) =>
-          Object.assign(d, {
-            uuid: generateUUID(),
-          })
-        );
-        this.$store.projects.setProjectsToLocalStorage(projectList);
-      }
+      const projectList = projects.data.map((d) =>
+        Object.assign(d, {
+          uuid: generateUUID(),
+        })
+      );
+
       if (postProcess) {
         await this.postProcessData(projectList);
       }
