@@ -44,11 +44,18 @@ class Command(BaseCommand):
 
                     materialized_view.set_cursor(cursor)
 
-                    self.stdout.write(
-                        f"  >> Refreshing materialized view '{materialized_view.db_schema_name}.{materialized_view.db_view_name}'"
-                    )
-                    materialized_view.create()
-                    materialized_view.refresh()
+                    if not options["refresh_only"]:
+                        self.stdout.write(
+                            f"  >> Dropping materialized view '{materialized_view.db_schema_name}.{materialized_view.db_view_name}'"
+                        )
+                        materialized_view.drop()
+
+                    if not options["drop_only"]:
+                        self.stdout.write(
+                            f"  >> Refreshing materialized view '{materialized_view.db_schema_name}.{materialized_view.db_view_name}'"
+                        )
+                        materialized_view.create()
+                        materialized_view.refresh()
 
                 # if an owner is specified, assign rights
                 if settings.MATERIALIZED_VIEWS_OWNER_TPL:
@@ -71,7 +78,27 @@ class Command(BaseCommand):
                         schema_owner,
                     )
 
+    def add_arguments(self, parser):
+        parser.add_argument(
+            "--drop-only",
+            action="store_true",
+            help="Drop the materialized views only, do not recreate them.",
+        )
+        parser.add_argument(
+            "--refresh-only",
+            action="store_true",
+            help="Refresh the materialized views only, do not drop them.",
+        )
+
     def handle(self, *args, **options):
+        if options["drop_only"] and options["refresh_only"]:
+            self.stdout.write(
+                self.style.ERROR(
+                    "Cannot use both --drop-only and --refresh-only at the same time"
+                )
+            )
+            return
+
         for site in Site.objects.order_by("id"):
             with settings.SITE_ID.override(site.pk):
                 self._create_views_for_site(site, **options)

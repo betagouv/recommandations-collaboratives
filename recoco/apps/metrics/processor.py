@@ -139,6 +139,11 @@ class MaterializedView:
                 sql=f"CREATE UNIQUE INDEX IF NOT EXISTS {index} ON {self.db_schema_name}.{self.db_view_name} ({index});"
             )
 
+    def drop(self) -> None:
+        self.cursor.execute(
+            sql=f"DROP MATERIALIZED VIEW IF EXISTS {self.db_schema_name}.{self.db_view_name};"
+        )
+
     def refresh(self) -> None:
         self.cursor.execute(
             sql=f"REFRESH MATERIALIZED VIEW {self.db_schema_name}.{self.db_view_name};"
