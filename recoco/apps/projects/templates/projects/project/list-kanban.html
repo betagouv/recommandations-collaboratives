@@ -34,14 +34,23 @@
                 <span class="visually-hidden">Loading...</span>
             </div>
         </div>
-        <div class="topbar d-flex justify-content-between align-items-center fr-p-2v ">
-            <span class="fs-5">{% include "projects/project/fragments/navigation/display_select.html" %}</span>
-            <div class="fr-mx-3w flex-grow-1">
-                {% include "projects/project/fragments/search_bar.html" with action_search="onSearch(event)" x_model="searchText" %}
+        <div class="kanban-header topbar d-flex justify-content-between align-items-center fr-p-2v">
+            <div class="kanban-header__view-selector fs-5 fr-mr-6v">
+                {% include "projects/project/fragments/navigation/display_select.html" %}
             </div>
-            {% include "projects/project/fragments/only_my_projects_toggle.html" %}
-            {% include "projects/project/fragments/region_filter.html" with filter_by_regions=True %}
-            {% include "projects/project/fragments/list-toolbars.html" %}
+            <div class="kanban-header__middle-part">
+                {% comment %} <div class="kanban-header__searchbar fr-mx-3w flex-grow-1"> {% endcomment %}
+                <div class="kanban-header__searchbar">
+                    {% include "projects/project/fragments/search_bar.html" with action_search="onSearch(event)" x_model="searchText" %}
+                </div>
+                <div class="kanban-header__my-projects-toggle">
+                    {% include "projects/project/fragments/only_my_projects_toggle.html" %}
+                </div>
+                <div class="kanban-header__region-filter">
+                    {% include "projects/project/fragments/region_filter.html" with filter_by_regions=True %}
+                </div>
+            </div>
+            <div class="kanban-header__toolbar">{% include "projects/project/fragments/list-toolbars.html" %}</div>
         </div>
         <div x-init="getData()" x-cloak class="d-flex">
             <div class="flex-grow-1 kanban-container">
