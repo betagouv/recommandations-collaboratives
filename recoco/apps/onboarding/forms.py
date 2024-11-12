@@ -105,7 +105,7 @@ class OnboardingEmailForm(DsrcBaseForm):
         self.helper.form_method = "post"
         self.helper.action_button = {
             "submit": {
-                "label": "Déposer votre projet",
+                "label": "Déposer votre dossier",
             }
         }
         self.helper.layout = Layout(
@@ -229,10 +229,10 @@ class OnboardingProject(DsrcBaseForm):
         )
 
     name = forms.CharField(
-        label="Nom du projet *",
+        label="Nom du dossier *",
         initial="",
         required=True,
-        help_text="Indiquez un nom court qui décrit le projet. Inutile d'ajouter le nom de la commune, l'adresse ou le programme.",
+        help_text="Indiquez un nom court qui décrit le dossier. Inutile d'ajouter le nom de la commune, l'adresse ou le programme.",
     )
     location = forms.CharField(
         label="Adresse",
@@ -249,10 +249,10 @@ class OnboardingProject(DsrcBaseForm):
     )
 
     description = forms.CharField(
-        label="Résumé du projet *",
+        label="Résumé du dossier *",
         initial="",
         required=True,
-        help_text="Décrivez votre projet et son contexte en quelques mots.",
+        help_text="Décrivez votre dossier et son contexte en quelques mots.",
         widget=forms.Textarea(attrs={"rows": 3}),
     )
 
