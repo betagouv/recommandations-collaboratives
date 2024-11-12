@@ -1,6 +1,3 @@
-// import resources from '../../../../fixtures/resources/resources.json'
-
-// const currentResource = resources[4]
 const taskName = 'task intent';
 let currentProjectId;
 
@@ -22,5 +19,7 @@ describe('I can go to tasks tab', () => {
     cy.get('[data-test-id="list-tasks-switch-button"]').should('be.checked');
 
     cy.get('[data-test-id="task-initial-comment"]').should('exist');
+    cy.contains(currentResource.fields.subtitle);
+    cy.contains(currentResource.fields.title);
   });
 });
