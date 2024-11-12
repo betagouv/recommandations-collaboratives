@@ -69,7 +69,7 @@ def invite_user_to_project(
         email=user.email,
         defaults={
             "message": (
-                "Je viens de déposer votre dossier sur la"
+                "Je viens de déposer votre projet sur la"
                 "plateforme de manière à faciliter nos échanges."
             )
         },
