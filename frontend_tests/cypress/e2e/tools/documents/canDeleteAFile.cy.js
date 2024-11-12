@@ -1,4 +1,6 @@
 import documents from '../../../fixtures/documents/documents.json';
+import projects from '../../../fixtures/projects/projects.json';
+const currentProject = projects[1];
 
 describe('I can delete a file on the document tab', () => {
   beforeEach(() => {
@@ -6,18 +8,12 @@ describe('I can delete a file on the document tab', () => {
   });
 
   it('deletes a file', () => {
-    cy.visit('/');
-
-    cy.contains('Friche numéro 1').click({ force: true });
-
-    cy.contains('Fichiers et liens').click({ force: true });
-
-    cy.url().should('include', '/documents');
+    cy.visit(`/project/${currentProject.pk}/documents`);
 
     cy.contains(documents[3].fields.description)
       .parent()
-      .siblings()
-      .children()
+      .parent()
+      .parent()
       .find('#file-delete-button')
       .click({ force: true });
 
@@ -25,13 +21,7 @@ describe('I can delete a file on the document tab', () => {
   });
 
   it('must not show the deleted link', () => {
-    cy.visit('/');
-
-    cy.contains('Friche numéro 1').click({ force: true });
-
-    cy.contains('Fichiers et liens').click({ force: true });
-
-    cy.url().should('include', '/documents');
+    cy.visit(`/project/${currentProject.pk}/documents`);
 
     cy.contains(documents[3].fields.description).should('not.exist');
   });
