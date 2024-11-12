@@ -12,8 +12,7 @@ describe('I can go tasks tab', () => {
     cy.contains('unpublish task').first().click({ force: true });
     cy.becomeAdvisor(currentProjectId);
 
-    cy.contains('Recommandations').click({ force: true });
-    cy.url().should('include', '/actions');
+    cy.visit(`/project/${currentProjectId}/actions`);
 
     cy.createTask('unpublish task');
 
