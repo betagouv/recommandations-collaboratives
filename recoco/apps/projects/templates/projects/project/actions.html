@@ -36,7 +36,9 @@
                 <div class="specific-border-4pxsolid000091">
                     {% include "projects/project/fragments/project_banner/non_published_project_banner.html" %}
                 {% elif not advising and is_regional_actor and not is_staff %}
-                    <div x-data x-init="$nextTick(() => $store.showRole.init())" class="specific-border-4pxsolid000091">
+                    <div x-data
+                         x-init="$nextTick(() => $store.showRole.init())"
+                         class="specific-border-4pxsolid000091">
                         {% include "projects/project/fragments/project_banner/join_project_banner.html" %}
                         <div>
                         {% endif %}
@@ -48,9 +50,9 @@
                         {{ position.is_advisor|json_script:"isAdvisorOnProject" }}
                         {% if is_switchtender and project.tasks.all.count == 0 %}
                             <div data-test-id="no-tasks-banner" class="bg-light fr-p-3w rounded-2">
-                                <h3 class="fw-light">Pas encore de recommandations à la collectivité ?</h3>
+                                <h3 class="fw-light">Pas encore de recommandations au porteur de projet ?</h3>
                                 <p class="fst-italic fw-light fr-mb-2w">
-                                    Soyez la première personne à proposer des recommandations ou des ressources à la collectivité !
+                                    Soyez la première personne à proposer des recommandations ou des ressources au porteur de projet !
                                 </p>
                                 {% if advising or is_staff %}
                                     <a data-test-id="submit-task-button"
