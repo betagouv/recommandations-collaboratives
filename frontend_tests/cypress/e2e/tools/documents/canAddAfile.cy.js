@@ -3,7 +3,7 @@ import projects from '../../../fixtures/projects/projects.json';
 const currentProject = projects[1];
 
 describe('I can add a file on the document tab', () => {
-  before(() => {
+  beforeEach(() => {
     cy.login('collectivité1');
   });
 
