@@ -7,25 +7,20 @@ describe('I can not comment a draft task', () => {
   });
 
   it('should create task and opens a modal with the task', () => {
-    cy.visit(`/project/${currentProject.pk}`);
-    cy.contains('Recommandations').click({ force: true });
-    cy.url().should('include', '/actions');
+    cy.visit(`/project/${currentProject.pk}/actions`);
 
-    cy.get('[data-test-id="list-tasks-switch-button"]').should(
-      'have.class',
-      'active'
-    );
+    cy.get('[data-test-id="list-tasks-switch-button"]').should('be.checked');
 
     cy.get('[data-test-id="create-task-button"]').click({ force: true });
 
     cy.get('#push-noresource').click({ force: true });
 
     cy.get('#intent')
-      .type(`Draft reco`, { force: true })
+      .type(`Draft reco`, { force: true, delay: 0 })
       .should('have.value', `Draft reco`);
 
     cy.get('textarea')
-      .type(`reco test from action description`, { force: true })
+      .type(`reco test from action description`, { force: true, delay: 0 })
       .should('have.value', `reco test from action description`);
 
     cy.get('[data-test-id="publish-draft-task-button"]')
