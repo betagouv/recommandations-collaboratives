@@ -61,7 +61,7 @@ class Command(BaseCommand):
                         materialized_view.refresh()
 
                 # if an owner is specified, assign rights
-                if settings.MATERIALIZED_VIEWS_OWNER_TPL:
+                if settings.MATERIALIZED_VIEWS_OWNER_TPL and not options["drop_only"]:
                     db_schema_name = MaterializedView.make_db_schema_name(site)
 
                     schema_owner = Template(
