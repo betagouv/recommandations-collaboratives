@@ -115,7 +115,7 @@
 }
 
 .map.card-text a {
-  color: #0063cb;
+  color: var(--background-action-high-blue-france);
   text-decoration: none;
 }
 

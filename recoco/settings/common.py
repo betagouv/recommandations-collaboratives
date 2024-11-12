@@ -102,6 +102,7 @@ INSTALLED_APPS = [
     "wagtail",
     "django_celery_results",
     "django_json_widget",
+    "waffle",
 ]
 
 SITE_ID = SiteID(default=1)
@@ -125,6 +126,7 @@ MIDDLEWARE = [
     "watson.middleware.SearchContextMiddleware",
     "hijack.middleware.HijackUserMiddleware",
     "wagtail.contrib.redirects.middleware.RedirectMiddleware",
+    "waffle.middleware.WaffleMiddleware",
 ]
 
 ROOT_URLCONF = "recoco.urls"

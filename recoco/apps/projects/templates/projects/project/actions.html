@@ -31,7 +31,7 @@
     {% if project.inactive_since != None %}
         <div class="specific-border-4pxsolid1e1e1e">
             {% include "projects/project/fragments/project_banner/paused_project_banner.html" %}
-            <div class="no-interaction-possible">
+            <div>
             {% elif project.status == 'DRAFT' %}
                 <div class="specific-border-4pxsolid000091">
                     {% include "projects/project/fragments/project_banner/non_published_project_banner.html" %}
@@ -52,7 +52,7 @@
                                 <p class="fst-italic fw-light fr-mb-2w">
                                     Soyez la première personne à proposer des recommandations ou des ressources à la collectivité !
                                 </p>
-                                {% if advising %}
+                                {% if advising or is_staff %}
                                     <a data-test-id="submit-task-button"
                                        href="{% url 'projects-create-task' %}?project_id={{ project.id }}"
                                        class="fr-btn">Émettre une recommandation</a>
@@ -62,8 +62,13 @@
                                         <span class="badge bg-warning">Beta feature</span> <a href="{% url 'projects-project-tasks-suggest' project.pk %}">Examiner les recommandation suggérées automatiquement pour ce projet</a>
                                     </p>
                                 {% else %}
-                                    <a href="{% url 'projects-project-switchtender-join' project.id %}"
-                                       class="fr-btn">Rejoindre ce projet pour l'aiguiller</a>
+                                    <button class="fr-btn"
+                                            data-bs-toggle="dropdown"
+                                            data-bs-auto-close="outside"
+                                            aria-expanded="false"
+                                            aria-controls="select-observer-or-advisor">
+                                        Rejoindre ce projet pour l'aiguiller
+                                    </button>
                                 {% endif %}
                             </div>
                         {% elif not is_switchtender and project.tasks.public.count == 0 %}

@@ -1,6 +1,6 @@
 export const roles = {
   switchtender: {
-    color: '#0063CB',
+    color: 'var(--background-action-high-blue-france)',
   },
   observer: {
     color: '#27A658',
