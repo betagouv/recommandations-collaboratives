@@ -1,23 +1,22 @@
 import tasks from '../../../../fixtures/projects/tasks.json';
 const currentTask = tasks[4];
+let currentProjectId;
 
 describe('I can go to tasks tab', () => {
   beforeEach(() => {
     cy.login('conseiller1');
-    cy.createProject('status inprogress');
+    cy.createProject('status inprogress').then((projectId) => {
+      currentProjectId = projectId;
+    });
   });
 
   it('changes the status to in progress', () => {
-    cy.visit(`/projects`);
-    cy.contains('status inprogress').first().click({ force: true });
-    cy.becomeAdvisor();
-    cy.contains('Recommandations').click({ force: true });
-    cy.url().should('include', '/actions');
+    cy.visit(`/project/${currentProjectId}`);
+    cy.becomeAdvisor(currentProjectId);
+    cy.visit(`/project/${currentProjectId}/actions`);
+
     cy.createTask(currentTask.fields.intent);
-    cy.get('[data-test-id="list-tasks-switch-button"]').should(
-      'have.class',
-      'active'
-    );
+    cy.get('[data-test-id="list-tasks-switch-button"]').should('be.checked');
     cy.contains(currentTask.fields.intent);
 
     cy.get('[data-test-id="in-progress-status-task-button"]').click({
