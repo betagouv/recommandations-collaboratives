@@ -87,9 +87,9 @@ class Command(BaseCommand):
                     )
 
                     self._assign_permissions_to_owner(
-                        cursor,
-                        db_schema_name,
-                        schema_owner,
+                        cursor=cursor,
+                        schema_name=db_schema_name,
+                        schema_owner=schema_owner,
                     )
 
     def add_arguments(self, parser):
