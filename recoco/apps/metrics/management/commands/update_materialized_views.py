@@ -5,6 +5,7 @@ from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.management.base import BaseCommand
 from django.db import connection, transaction
+from django.db.backends.utils import CursorWrapper
 
 from recoco.apps.metrics.processor import (
     MaterializedView,
@@ -16,7 +17,9 @@ from recoco.utils import make_site_slug
 class Command(BaseCommand):
     help = "Update materialized view used for metrics"
 
-    def _assign_permissions_to_owner(self, cursor, schema_name: str, schema_owner: str):
+    def _assign_permissions_to_owner(
+        self, cursor: CursorWrapper, schema_name: str, schema_owner: str
+    ):
         cursor.execute(
             sql=f"GRANT CONNECT ON DATABASE {connection.settings_dict['NAME']} TO {schema_owner};"
         )
@@ -67,6 +70,17 @@ class Command(BaseCommand):
                         site_name=site.name,
                         site_slug=make_site_slug(site=site),
                     )
+
+                    cursor.execute(
+                        sql=f"SELECT 1 FROM pg_roles WHERE rolname='{schema_owner}';"  # noqa: S608
+                    )
+                    if cursor.fetchone() is None:
+                        self.stdout.write(
+                            self.style.ERROR(
+                                f"  -- Owner '{schema_owner}' does not exist in the database"
+                            )
+                        )
+                        return
 
                     self.stdout.write(
                         f"  ++ Assigning permissions to '{schema_owner}' on schema '{db_schema_name}'"
