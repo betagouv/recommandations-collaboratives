@@ -12,15 +12,11 @@ describe('I can go tasks tab', () => {
   });
 
   it('posts a followup', () => {
-    cy.visit(`/project/${currentProject.pk}`);
-    cy.contains('Recommandations').click({ force: true });
-    cy.url().should('include', '/actions');
+    cy.visit(`/project/${currentProject.pk}/actions`);
+
     cy.createTask(task3.fields.intent);
 
-    cy.get('[data-test-id="list-tasks-switch-button"]').should(
-      'have.class',
-      'active'
-    );
+    cy.get('[data-test-id="list-tasks-switch-button"]').should('be.checked');
 
     cy.contains(task3.fields.intent).click({ force: true });
 
