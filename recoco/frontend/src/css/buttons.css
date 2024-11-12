@@ -165,7 +165,6 @@
   position: absolute;
   top: 60px;
   border-radius: 2px;
-  cursor: pointer;
   transition: all 0.25s ease;
   font-size: 14px;
   font-weight: 500;
@@ -181,7 +180,7 @@
   content: '';
 
   position: absolute;
-  bottom: 89.5px;
+  bottom: 99.5px;
   left: 10px;
 
   width: 15px;
