@@ -59,7 +59,7 @@
                                 <br>
                                 <span class="secondary small">{{ project.commune }} ({{ project.commune.postal }})</span>
                             </td>
-                            <td>{{ project.switchtenders }}</td>
+                            <td>{{ project.switchtenders_txt }}</td>
                             <td>{{ project.reco_read_ratio|floatformat:0 }}% ({{ project.reco_read }}/{{ project.reco_total }})</td>
                             <td>{{ project.last_members_activity_at|timesince }}</td>
                             <td>{{ project.last_reco_at|timesince|default:"-" }}</td>
