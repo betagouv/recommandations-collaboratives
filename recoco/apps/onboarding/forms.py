@@ -105,7 +105,7 @@ class OnboardingEmailForm(DsrcBaseForm):
         self.helper.form_method = "post"
         self.helper.action_button = {
             "submit": {
-                "label": "Déposer votre demande",
+                "label": "Déposez votre demande",
             }
         }
         self.helper.layout = Layout(
