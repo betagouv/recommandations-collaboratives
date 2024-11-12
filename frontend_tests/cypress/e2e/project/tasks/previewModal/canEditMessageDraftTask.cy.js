@@ -52,7 +52,5 @@ describe('I can not comment a draft task', () => {
 
     cy.contains('Draft reco edited').click({ force: true });
     cy.contains('reco test from action description new value');
-
-    // cy.get('[data-test-id="button-submit-new"]').should('not.exist');
   });
 });
