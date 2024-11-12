@@ -11,7 +11,7 @@ describe('I can go tasks tab', () => {
     cy.login('conseiller1');
   });
 
-  it('posts a followup', () => {
+  it('posts a followup and see creation date', () => {
     cy.visit(`/project/${currentProject.pk}/actions`);
 
     cy.createTask(task3.fields.intent);
@@ -30,6 +30,7 @@ describe('I can go tasks tab', () => {
     cy.contains('Envoyer').click({ force: true });
     cy.contains(`${currentUser.fields.first_name}`);
     cy.contains(`${currentUser.fields.last_name}`);
+    cy.contains(now.toLocaleDateString());
 
     cy.contains(`test ${now}`);
   });
