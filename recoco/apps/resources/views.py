@@ -22,6 +22,7 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.contrib.syndication.views import Feed
 from django.db import transaction
 from django.db.models import Q
+from django.db.models.query import QuerySet
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.template import TemplateDoesNotExist
@@ -241,6 +242,9 @@ class ResourceDetailView(UserPassesTestMixin, BaseResourceDetailView):
             )
 
         return context
+
+    def get_queryset(self) -> QuerySet[models.Resource]:
+        return super().get_queryset().with_ds_annotations()
 
 
 class EmbededResourceDetailView(BaseResourceDetailView):
