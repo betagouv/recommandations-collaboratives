@@ -5,3 +5,25 @@
 .specific-height-0 {
   height: 0;
 }
+
+// Override tiptap styles
+.tiptap.ProseMirror {
+  --idle: transparent;
+  --hover: var(--background-contrast-grey-hover);
+  --active: var(--background-contrast-grey-active);
+  background-color: var(--background-contrast-grey);
+  border-radius: 0.25rem 0.25rem 0 0;
+  box-shadow: inset 0 -2px 0 0 var(--border-plain-grey);
+  color: var(--text-default-grey);
+  display: block;
+  font-size: 1rem;
+  line-height: 1.5rem;
+  padding: 0.5rem 1rem;
+  width: 100%;
+}
+
+.tiptap-menu {
+  position: absolute;
+  z-index: 1;
+  top
+}

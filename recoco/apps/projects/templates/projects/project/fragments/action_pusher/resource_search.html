@@ -1,26 +1,21 @@
 {% load static %}
 <!-- resources -->
 <div id="resource-list"
-     class="fr-mb-3w grow"
+     class="push-reco__ressources fr-mb-3w grow container-fluid"
      x-show="push_type != 'noresource'"
      x-transition:enter-start="grow-enter-start"
      x-transition:leave="grow-leave">
-    <h4 class="fr-mb-2w">
-        <span class="text-muted fr-mr-1v">3.</span>Sélectionnez les ressources à publier
-    </h4>
-    <div class="search input-group-lg">
-        <svg class="bi fr-mr-1v text-muted"
-             width="24"
-             height="24"
-             fill="currentColor">
-            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#search" />
-        </svg>
-        <input data-test-id="search-resource-input"
-               class="w-100 fs-5 form-control"
-               type="text"
-               x-on:input.debounce="searchResources()"
-               x-model="search"
-               placeholder="Rechercher une ressource...">
+    <h3 class="push-reco__title-section">Recherche d'une ressource existante sur {{ request.site.name }}</h3>
+    <div class="row g-0">
+        <div class="ressources__search-bar col-12">
+            <span class="fr-icon-search-line fr-icon--sm" aria-hidden="true"></span>
+            <input data-test-id="search-resource-input"
+                   class="fr-input w-100"
+                   type="search"
+                   x-on:input.debounce="searchResources()"
+                   x-model="search"
+                   placeholder="Rechercher une ressource...">
+        </div>
     </div>
     {% for error in form.resource.errors %}<div class="text-danger text-start fr-mb-2v">{{ error }}</div>{% endfor %}
     <!-- listing -->
@@ -32,51 +27,19 @@
        x-text="`${results.length} ressource(s) trouvée(s)`"></p>
     <ul x-show="results.length > 0"
         class="cards d-flex row row-cols-3 g-4 fr-pl-0 fr-ml-0 fr-mt-1v">
-        <template x-for="resource in resultsAndSelected()" :key="resource.id">
-            <li class="col">
-                <div class="resource-card card fr-p-2v fr-pl-6w rounded">
-                    <div class="card-body position-relative fr-pb-1w">
-                        <template x-if="push_type == 'single'">
-                            <input :id="'resource-' + resource.id"
-                                   type="radio"
-                                   name="resource"
-                                   :value="resource.id"
-                                   x-model="selected_resource"
-                                   @click="setIntent(resource)">
-                        </template>
-                        <template x-if="push_type == 'multiple'">
-                            <input :id="'resource-' + resource.id"
-                                   type="checkbox"
-                                   name="resources"
-                                   :value="resource.id"
-                                   x-model="selected_resources">
-                        </template>
-                        <label class="fs-6" :for="'resource-' + resource.id" x-text="resource.title"></label>
-                        <h5 class="fs-6" x-text="resource.title"></h5>
-                        <p x-text="resource.subtitle" class="fr-fr-text--sm mb-0"></p>
-                    </div>
-                    <div class="card-body fr-pt-1w">
-                        <!-- Full screen modal -->
-                        <div class="modal fade"
-                             :id="`resource-preview-`+resource.id"
-                             tabindex="-1"
-                             :aria-labelledby="`resource-preview-`+resource.id"
-                             aria-hidden="true">
-                            <div class="modal-dialog modal-fullscreen">
-                                <div class="modal-content">
-                                    <div class="modal-header justify-content-between">
-                                        <h5 class="modal-title">Prévisualisation de la ressource</h5>
-                                        <button type="button"
-                                                class="fr-btn fr-btn-close"
-                                                data-bs-dismiss="modal"
-                                                aria-label="Close">Fermer</button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <iframe class="w-100 h-100" :src="resource.url_embeded"></iframe>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+        <template x-for="resource in results" :key="resource.id">
+            <li class="col-4">
+                <div class="ressources__result-item fr-radio-group fr-radio-rich">
+                    <input type="radio"
+                           :value="resource.id"
+                           :id="'resource-' + resource.id"
+                           name="resource"
+                           x-model="selected_resource"
+                           @click="setIntent(resource)">
+                    <label class="fr-label" :for="'resource-' + resource.id">
+                        <span class="ressources__result-item-title" x-text="resource.title"></span>
+                        <span class="ressources__result-item-subtitle fr-hint-text"
+                              x-text="resource.subtitle"></span>
                         <div>
                             <ul class="fr-badge-group fr-p-0">
                                 <template x-if="resource.category && resource.category.name">
@@ -96,13 +59,33 @@
                                 </li>
                             </ul>
                         </div>
-                        <hr>
                         <button @click.prevent
                                 data-bs-toggle="modal"
                                 :data-bs-target="`#resource-preview-`+resource.id"
                                 class="fr-btn fr-btn--tertiary-no-outline fr-btn--icon-left fr-icon-eye-line">
                             Prévisualiser
                         </button>
+                    </label>
+                    <!-- Full screen modal -->
+                    <div class="modal fade"
+                         :id="`resource-preview-`+resource.id"
+                         tabindex="-1"
+                         :aria-labelledby="`resource-preview-`+resource.id"
+                         aria-hidden="true">
+                        <div class="modal-dialog modal-fullscreen">
+                            <div class="modal-content">
+                                <div class="modal-header justify-content-between">
+                                    <h5 class="modal-title">Prévisualisation de la ressource</h5>
+                                    <button type="button"
+                                            class="fr-btn fr-btn-close"
+                                            data-bs-dismiss="modal"
+                                            aria-label="Close">Fermer</button>
+                                </div>
+                                <div class="modal-body">
+                                    <iframe class="w-100 h-100" :src="resource.url_embeded"></iframe>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </li>

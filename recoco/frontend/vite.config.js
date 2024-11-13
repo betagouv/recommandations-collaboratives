@@ -66,6 +66,7 @@ const config = {
         ),
         projectQueue: resolve('./src/js/store/projectQueue.js'),
         showRole: resolve('./src/js/store/showRole.js'),
+        ActionPusher: resolve('./src/js/components/ActionPusher.js'),
       },
       output: {
         chunkFileNames: undefined,
