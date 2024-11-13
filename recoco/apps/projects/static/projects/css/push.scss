@@ -6,12 +6,25 @@
     line-height: 2.25rem;
   }
   &__title-section {
-    color: var(--light-neutral-grey-50, #161616);
-    font-size: 0.875rem;
-    font-weight: 700;
+    color: #242424;
+    font-size: 16px;
+    font-weight: 500;
     line-height: 1.5rem;
-    text-transform: uppercase;
-    margin-bottom: 0.75rem;
+  }
+
+  .resource-selector {
+    &__label {
+      color: #3a3a3a;
+      font-size: 16px;
+      font-weight: 700;
+      line-height: 1.5rem;
+    }
+    &__subtitle {
+      color: var(--light-text-mention-grey, #666);
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 1.3125rem;
+    }
   }
 
   .ressources__search-bar,
@@ -42,6 +55,12 @@
       line-height: 1.3125rem;
       max-height: 4.5rem;
     }
+  }
+
+  .file-upload-wrapper {
+    position: absolute;
+    bottom: 0.5rem;
+    left: 0.5rem;
   }
 }
 

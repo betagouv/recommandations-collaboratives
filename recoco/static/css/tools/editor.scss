@@ -18,12 +18,20 @@
   display: block;
   font-size: 1rem;
   line-height: 1.5rem;
-  padding: 0.5rem 1rem;
+  padding: 3rem 0.5rem 0.5rem;
   width: 100%;
+  margin-top: 0;
 }
 
-.tiptap-menu {
+.tiptap-menu-custom {
   position: absolute;
   z-index: 1;
-  top
+  top: 3rem;
+  left: 0.5rem;
+  button {
+    color: #3a3a3a;
+    &.text-white:disabled {
+      color: #3a3a3a !important;
+    }
+  }
 }

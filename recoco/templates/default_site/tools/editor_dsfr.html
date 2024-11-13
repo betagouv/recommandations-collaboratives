@@ -1,0 +1,88 @@
+{% load static %}
+{% load sass_tags %}
+{% block css %}
+    <link href="{% sass_src 'css/tools/editor.scss' %}"
+          rel="stylesheet"
+          type="text/css">
+{% endblock css %}
+<div class="w-100"
+     {% if escapejs %} x-data='editor("{{ input_value|escapejs }}")' {% elif is_task_comment %}x-data='editor(task.content)' {% else %} x-data='editor({{ input_value }})'{% endif %}
+     @set-comment.window="setMarkdownContentFromTaskModal($event)"
+     data-test-id="tiptap-editor">
+    <template x-if="isLoaded()">
+        <div class="tiptap-menu-custom">
+            <button @click.stop.prevent="toggleHeading({ level: 3 })"
+                    title="Titre"
+                    class="fr-btn fr-btn--sm fr-icon-h-1"
+                    :class="{ 'fr-btn--secondary': isActive('heading', { level: 3 }, updatedAt), 'fr-btn--tertiary': !isActive('heading', { level: 3 }, updatedAt), }">
+                Titre
+            </button>
+            <button @click.stop.prevent="toggleBold()"
+                    title="Gras"
+                    class="fr-btn fr-btn--sm fr-icon-bold"
+                    :class="{ 'fr-btn--secondary': isActive('bold', updatedAt), 'fr-btn--tertiary': !isActive('bold', updatedAt), }">
+                Gras
+            </button>
+            <button @click.stop.prevent="toggleItalic()"
+                    title="Italique"
+                    class="fr-btn fr-btn--sm fr-icon-italic"
+                    :class="{ 'fr-btn--secondary': isActive('italic', updatedAt), 'fr-btn--tertiary': !isActive('italic', updatedAt), }">
+                Italique
+            </button>
+            <button @click.stop.prevent="toggleBulletList()"
+                    title="Liste"
+                    class="fr-btn fr-btn--sm fr-icon-list-unordered"
+                    :class="{ 'fr-btn--secondary': isActive('bulletList', updatedAt), 'fr-btn--tertiary': !isActive('bulletList', updatedAt), }">
+                Liste
+            </button>
+            <button @click.stop.prevent="setLink()"
+                    title="Attacher un lien"
+                    class="fr-btn fr-btn--sm fr-icon-link"
+                    :class="{ 'fr-btn--secondary': isActive('link', updatedAt), 'fr-btn--tertiary': !isActive('link', updatedAt), }">
+                Attacher un lien
+            </button>
+            <button @click.stop.prevent="unsetLink()"
+                    title="Attacher un lien"
+                    class="fr-btn fr-btn--sm fr-icon-link text-white"
+                    x-bind:disabled="!isActive('link', updatedAt)">Déttacher un lien</button>
+        </div>
+    </template>
+    <div class="position-relative">
+        <div class="tiptap-editor {% if wide %}is-wide{% endif %}"
+             x-ref="element"
+             data-test-id="tiptap-editor-content"
+             @click.stop
+             id="comment-text-ref"></div>
+        {% if is_task_comment %}
+            <div class="d-flex justify-content-end">
+                <button class="fr-btn fr-btn--sm"
+                        :disabled="$store.editor.isSubmitted === true"
+                        @click.stop="handleEditComment(markdownContent,task)"
+                        data-test-id="button-submit-edit">Enregistrer</button>
+            </div>
+        {% endif %}
+        {% if is_task_modal_comment %}
+            <div class="d-flex justify-content-end">
+                <button class="fr-btn fr-btn--sm"
+                        :disabled="$store.editor.isSubmitted === true"
+                        @click.stop="onSubmitComment(markdownContent)"
+                        data-test-id="button-submit-new">Envoyer</button>
+            </div>
+        {% endif %}
+        {% if errors %}
+            {% for error in errors %}<div class="text-danger text-start fr-mb-2v">{{ error }}</div>{% endfor %}
+        {% endif %}
+        {% if not is_task_comment and not is_task_modal_comment and is_task %}
+            <textarea class="position-absolute top-0 opacity-0 specific-height-0"
+                      x-model="markdownContent"
+                      name="{{input_name}}"
+                      :required="push_type == 'noresource' || (push_type == 'single' && public)"
+                      {% if input_required %} required {% endif %}></textarea>
+        {% else %}
+            <textarea class="position-absolute top-0 opacity-0 specific-height-0"
+                      x-model="markdownContent"
+                      name="{{input_name}}"
+                      {% if input_required %} required {% endif %}></textarea>
+        {% endif %}
+    </div>
+</div>

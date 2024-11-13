@@ -1,8 +1,4 @@
-<div class="container-fluid">
-    <h3 class="push-reco__title-section">Sélectionnez le projet</h3>
-    <div class="row g-0 fr-mb-3w">
-        <div class="col-12">
-            {% include "tools/select_searchable.html" with list=type_form.project label="Sélectionnez le projet" search_list_id=type_form.project.id_for_label search_options="['name']" item_label="projet" %}
-        </div>
-    </div>
+<h3 class="push-reco__title-section fr-mb-3v">Sélection du projet</h3>
+<div class="fr-mb-4w">
+    {% include "tools/select_searchable.html" with list=type_form.project label="Sélectionnez le projet" search_list_id=type_form.project.id_for_label search_options="['name']" item_label="projet" %}
 </div>

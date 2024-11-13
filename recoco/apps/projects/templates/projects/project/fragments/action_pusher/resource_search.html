@@ -1,21 +1,19 @@
 {% load static %}
 <!-- resources -->
 <div id="resource-list"
-     class="push-reco__ressources fr-mb-3w grow container-fluid"
+     class="push-reco__ressources fr-mb-3w grow"
      x-show="push_type != 'noresource'"
      x-transition:enter-start="grow-enter-start"
      x-transition:leave="grow-leave">
-    <h3 class="push-reco__title-section">Recherche d'une ressource existante sur {{ request.site.name }}</h3>
-    <div class="row g-0">
-        <div class="ressources__search-bar col-12">
-            <span class="fr-icon-search-line fr-icon--sm" aria-hidden="true"></span>
-            <input data-test-id="search-resource-input"
-                   class="fr-input w-100"
-                   type="search"
-                   x-on:input.debounce="searchResources()"
-                   x-model="search"
-                   placeholder="Rechercher une ressource...">
-        </div>
+    <h3 class="push-reco__title-section fr-mb-3v">Recherche d'une ressource existante sur {{ request.site.name }}</h3>
+    <div class="ressources__search-bar">
+        <span class="fr-icon-search-line fr-icon--sm" aria-hidden="true"></span>
+        <input data-test-id="search-resource-input"
+               class="fr-input w-100"
+               type="search"
+               x-on:input.debounce="searchResources()"
+               x-model="search"
+               placeholder="Rechercher une ressource...">
     </div>
     {% for error in form.resource.errors %}<div class="text-danger text-start fr-mb-2v">{{ error }}</div>{% endfor %}
     <!-- listing -->
@@ -37,7 +35,8 @@
                            x-model="selected_resource"
                            @click="setIntent(resource)">
                     <label class="fr-label" :for="'resource-' + resource.id">
-                        <span class="ressources__result-item-title" x-text="resource.title"></span>
+                        <span class="ressources__result-item-title"
+                              x-text="truncate(resource.title, 100)"></span>
                         <span class="ressources__result-item-subtitle fr-hint-text"
                               x-text="resource.subtitle"></span>
                         <div>
