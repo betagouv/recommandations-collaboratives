@@ -7,9 +7,7 @@ describe('I can see and update an advisor note', () => {
   });
 
   it('goes to project overview and update advisor note', () => {
-    cy.visit('/projects');
-
-    cy.contains(currentProject.fields.name).click({ force: true });
+    cy.visit(`/project/${currentProject.pk}`);
 
     cy.contains('Note interne');
 

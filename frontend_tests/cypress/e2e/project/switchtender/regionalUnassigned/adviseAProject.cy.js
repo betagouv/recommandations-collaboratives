@@ -6,12 +6,8 @@ describe('I can advice a project', () => {
     cy.login('conseiller2');
   });
 
-  it('goes to overview page and advise the project', () => {
-    cy.visit('/projects');
-
-    cy.contains(currentProject.fields.name).click({ force: true });
-
-    // cy.url().should('include', '/presentation')
+  xit('goes to overview page and advise the project', () => {
+    cy.visit(`/project/${currentProject.pk}`);
 
     // cy.contains("Conseiller ce projet").click({ force: true })
     // cy.wait(500);

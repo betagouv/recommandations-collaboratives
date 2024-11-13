@@ -7,9 +7,7 @@ describe('I can invite people', () => {
   });
 
   it('goes to share a project page', () => {
-    cy.visit('/projects');
-
-    cy.contains(currentProject.fields.name).click({ force: true });
+    cy.visit(`/project/${currentProject.pk}`);
 
     cy.contains('Inviter un membre de la collectivité').click({ force: true });
 

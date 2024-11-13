@@ -9,13 +9,7 @@ describe("I can't send an empty message", () => {
   });
 
   it('shows a disabled send message button', () => {
-    cy.visit('/projects');
-
-    cy.contains(currentProject.fields.name).click({ force: true });
-
-    cy.contains('Conversation').click({ force: true });
-
-    cy.url().should('include', '/conversations');
+    cy.visit(`/project/${currentProject.pk}/conversations`);
 
     cy.get('[data-test-id="send-message-conversation"]').should(
       'have.attr',
@@ -24,13 +18,7 @@ describe("I can't send an empty message", () => {
   });
 
   it('enables the send message if I type a message', () => {
-    cy.visit('/projects');
-
-    cy.contains(currentProject.fields.name).click({ force: true });
-
-    cy.contains('Conversation').click({ force: true });
-
-    cy.url().should('include', '/conversations');
+    cy.visit(`/project/${currentProject.pk}/conversations`);
 
     editor.writeMessage(`new message`);
 
@@ -41,13 +29,7 @@ describe("I can't send an empty message", () => {
   });
 
   it('disables the send message if I erase my message (empty message)', () => {
-    cy.visit('/projects');
-
-    cy.contains(currentProject.fields.name).click({ force: true });
-
-    cy.contains('Conversation').click({ force: true });
-
-    cy.url().should('include', '/conversations');
+    cy.visit(`/project/${currentProject.pk}/conversations`);
 
     editor.writeMessage(`new message`);
 

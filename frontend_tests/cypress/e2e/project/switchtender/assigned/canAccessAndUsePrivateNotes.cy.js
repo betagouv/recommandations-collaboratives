@@ -9,13 +9,7 @@ describe('I can access and use private notes', () => {
   });
 
   it('goes to private notes', () => {
-    cy.visit('/projects');
-
-    cy.contains(currentProject.fields.name).click({ force: true });
-
-    cy.contains('Espace conseiller').click({ force: true });
-
-    cy.url().should('include', '/suivi');
+    cy.visit(`/project/${currentProject.pk}/suivi`);
 
     const now = new Date();
 

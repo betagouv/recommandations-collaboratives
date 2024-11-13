@@ -7,13 +7,7 @@ describe('I can read only recommandations', () => {
   });
 
   it('goes to recommandations and read only content', () => {
-    cy.visit('/projects');
-
-    cy.contains(currentProject.fields.name).click({ force: true });
-
-    cy.contains('Recommandations').click({ force: true });
-
-    cy.url().should('include', '/actions');
+    cy.visit(`/project/${currentProject.pk}/actions`);
 
     cy.contains('Ajouter une recommandation').should('not.exist');
   });

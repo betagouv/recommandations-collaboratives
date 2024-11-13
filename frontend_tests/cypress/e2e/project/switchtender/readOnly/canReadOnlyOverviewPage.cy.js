@@ -7,9 +7,7 @@ describe('I can read only overview page', () => {
   });
 
   it('goes to overview and read only content', () => {
-    cy.visit('/projects');
-
-    cy.contains(currentProject.fields.name).click({ force: true });
+    cy.visit(`/project/${currentProject.pk}`);
 
     cy.url().should('include', '/presentation');
 

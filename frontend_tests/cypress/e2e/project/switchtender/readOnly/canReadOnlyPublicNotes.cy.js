@@ -7,14 +7,8 @@ describe('I can read only public notes', () => {
   });
 
   it('goes to public notes and read only content', () => {
-    cy.visit('/projects');
+    cy.visit(`/project/${currentProject.pk}/conversations`);
 
-    cy.contains(currentProject.fields.name).click({ force: true });
-
-    // cy.contains("Conversation").click({ force: true })
-
-    // cy.url().should('include', '/conversations')
-
-    // cy.get('textarea').should('not.exist')
+    cy.get('textarea').should('not.exist');
   });
 });
