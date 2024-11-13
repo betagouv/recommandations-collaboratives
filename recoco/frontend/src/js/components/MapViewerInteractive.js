@@ -57,7 +57,7 @@ function MapViewerInteractive(projectOptions) {
       L.control
         .zoom({
           position: 'topright',
-          color: '#335B7E',
+          color: 'var(--background-action-high-blue-france)',
         })
         .addTo(map);
 

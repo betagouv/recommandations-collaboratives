@@ -7,7 +7,7 @@
 }
 
 .flag.dark-blue {
-  background: #0063cb;
+  background: var(--background-action-high-blue-france);
 }
 
 .flag.grey {

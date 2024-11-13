@@ -44,7 +44,7 @@
 
 .project-location-marker.map-marker:after,
 .project-coordinates-marker.map-marker:after {
-  background-color: #0063cb;
+  background-color: var(--background-action-high-blue-france);
   border: solid 2px white;
   transform: scale(1.6);
   font-size: 0.5em;
