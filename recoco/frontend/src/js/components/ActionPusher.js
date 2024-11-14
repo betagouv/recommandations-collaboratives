@@ -1,4 +1,8 @@
-function action_pusher_app() {
+import Alpine from 'alpinejs';
+import { Editor } from '@tiptap/core';
+import MiniSearch from 'minisearch';
+
+Alpine.data('ActionPusher', () => {
   return {
     isBusy: true,
     search: '',
@@ -12,6 +16,9 @@ function action_pusher_app() {
 
     intent: '',
     content: '',
+    currentFile: '',
+    isUploadedFile: false,
+    fileName: '',
 
     resources: [],
     results: [],
@@ -21,7 +28,6 @@ function action_pusher_app() {
     public: true,
     draft: false,
     next: null,
-
     searchResources(text = null) {
       if (!text) {
         text = this.search;
@@ -33,28 +39,13 @@ function action_pusher_app() {
       return true;
     },
 
-    resultsAndSelected() {
-      if (this.push_type == 'multiple') {
-        for (var resource of this.selected_resources) {
-          var f = _.find(this.resources, function (r) {
-            return resource == r.id;
-          });
-
-          /* Add it to the list of results */
-          if (
-            !_.find(this.results, function (r) {
-              return resource == r.id;
-            })
-          ) {
-            this.results.push(f);
-          }
-        }
-      }
-      return this.results;
-    },
-
     truncate(input, size = 30) {
       return input.length > size ? `${input.substring(0, size)}...` : input;
+    },
+    handleFileUpload() {
+      if (this.$refs.fileUploadInput.files.length > 0) {
+        this.fileName = this.$refs.fileUploadInput.files[0].name;
+      }
     },
 
     formatDateDisplay(date) {
@@ -79,7 +70,10 @@ function action_pusher_app() {
       await this.getResources();
 
       if (resource_id) {
-        this.results = _.where(this.resources, { id: resource_id });
+        // this.results = _.where(this.resources, { id: resource_id });
+        this.results = this.resources.filter(
+          (resource) => resource.id === resource_id
+        );
 
         if (this.results.length) {
           this.selected_resource = resource_id;
@@ -97,7 +91,10 @@ function action_pusher_app() {
       const selected_resource = parseInt(params.get('resource_id'));
 
       if (selected_resource) {
-        this.results = _.where(this.resources, { id: selected_resource });
+        // this.results = _.where(this.resources, { id: selected_resource });
+        this.results = this.resources.filter(
+          (resource) => resource.id === selected_resource
+        );
         if (this.results.length) {
           this.selected_resource = selected_resource;
           this.selected_resources = [selected_resource];
@@ -110,7 +107,7 @@ function action_pusher_app() {
       this.isBusy = true;
 
       const response = await fetch('/api/resources/');
-      resourcesFromApi = await response.json(); //extract JSON from the http response
+      const resourcesFromApi = await response.json(); //extract JSON from the http response
 
       resourcesFromApi.forEach((t) => {
         let entry = {
@@ -136,4 +133,4 @@ function action_pusher_app() {
       this.public = !this.draft;
     },
   };
-}
+});
