@@ -1,7 +1,7 @@
 <div class="tmp-usevar"
      style="{% if wide_margin %} margin-right:-10px;
             {% else %} margin-right:-5px {% endif %}">
-    <img x-data="GravatarCache('{{ request.site.name }}')"
+    <img x-data="GravatarCache()"
          class="align-middle rounded-circle d-inline-block fr-p-1v {% if not transparent_background %}bg-white{% endif %} z-3"
          width="35px"
          :src="gravatarUrl(switchtender.email, 25, switchtender.first_name + ' ' + switchtender.last_name)"

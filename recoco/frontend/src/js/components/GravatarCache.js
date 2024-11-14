@@ -5,17 +5,14 @@ import { LocalStorageMgmt } from '../utils/localStorageMgmt';
 /**
  * Alpine.js component for caching Gravatar URLs in local storage.
  *
- * @param {string} currentSiteName - The name of the current site, used as a tag for local storage.
  * @returns {object} - The Alpine.js component object.
  *
  * @property {object|null} cache - The cache object for storing Gravatar URLs.
- * @property {string} currentSiteName - The sanitized name of the current site.
  * @property {object|null} gravatarLocalStorage - The local storage management object.
  *
  */
-Alpine.data('GravatarCache', (currentSiteName) => ({
+Alpine.data('GravatarCache', () => ({
   cache: null,
-  currentSiteName: currentSiteName.replaceAll(' ', '_'),
   gravatarLocalStorage: null,
   init() {
     this.initLocalStorage();
@@ -25,7 +22,6 @@ Alpine.data('GravatarCache', (currentSiteName) => ({
   initLocalStorage() {
     this.gravatarLocalStorage = new LocalStorageMgmt({
       dataLabel: 'gravatar-map',
-      tag: this.currentSiteName,
       expiringData: false,
     });
   },
