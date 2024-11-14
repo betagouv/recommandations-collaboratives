@@ -234,6 +234,21 @@ class ProjectSite(models.Model):
 
     is_origin = models.BooleanField(default=False)
 
+    sent_from = models.ForeignKey(
+        Site,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="projects_sent_from",
+    )
+    sent_by = models.ForeignKey(
+        auth_models.User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="projects_sent_by",
+    )
+
 
 class Project(models.Model):
     """Représente un project de suivi d'une collectivité"""
@@ -247,7 +262,10 @@ class Project(models.Model):
     all_on_site = ProjectOnSiteManager()
 
     sites = models.ManyToManyField(
-        Site, through=ProjectSite, related_name="project_sites"
+        Site,
+        through=ProjectSite,
+        through_fields=("project", "site"),
+        related_name="project_sites",
     )
 
     topics = models.ManyToManyField("Topic", related_name="projects", blank=True)
