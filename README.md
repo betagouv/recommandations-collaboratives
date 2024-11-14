@@ -153,6 +153,17 @@ site.aliases.create(domain="localhost", redirect_to_canonical=False)
 
 ### Tests Front End
 
+#### Unitaires
+
+Pour lancer les tests unitaires front end, vous pouvez utiliser la commande suivante :
+
+```sh
+cd recoco/frontend
+yarn test
+```
+
+#### Bout en bout
+
 Merci de trouver la documentation de tests front end [ici](./frontend_tests/README.md).
 
 ### Tests Back End
