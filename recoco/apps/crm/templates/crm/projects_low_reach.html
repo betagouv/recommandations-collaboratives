@@ -29,7 +29,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for project in projects %}
+                    {% for project in low_reach_projects %}
                         <tr>
                             <td>
                                 {% if project.inactive_since %}<s>{% endif %}
@@ -59,7 +59,12 @@
                                 <br>
                                 <span class="secondary small">{{ project.commune }} ({{ project.commune.postal }})</span>
                             </td>
-                            <td>{{ project.switchtenders_txt }}</td>
+                            <td>
+                                {% for advisor in project.switchtenders.all %}
+                                <span><a href="{% url 'crm-user-details' advisor.pk %}">{{ advisor.get_full_name }} ({{ advisor.profile.organization }})</a></span>
+                                {% if not forloop.last %} - {% endif %}
+                                {% endfor %}
+                            </td>
                             <td>{{ project.reco_read_ratio|floatformat:0 }}% ({{ project.reco_read }}/{{ project.reco_total }})</td>
                             <td>{{ project.last_members_activity_at|timesince }}</td>
                             <td>{{ project.last_reco_at|timesince|default:"-" }}</td>

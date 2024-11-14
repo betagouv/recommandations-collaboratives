@@ -49,10 +49,6 @@ from recoco.apps.geomatics import models as geomatics
 from recoco.apps.home import models as home_models
 from recoco.apps.onboarding import utils as onboarding_utils
 from recoco.apps.projects.models import Project, Topic
-from recoco.apps.projects.utils import (
-    format_switchtender_identity,
-    get_switchtenders_for_project,
-)
 from recoco.apps.reminders import models as reminders_models
 from recoco.apps.tasks.models import Task
 from recoco.utils import (
@@ -974,7 +970,7 @@ def crm_list_projects_with_low_reach(request):
             project_sites__site=request.site,
         )
         .exclude(exclude_stats=True)
-        .prefetch_related("tasks", "notes")
+        .prefetch_related("tasks", "notes", "switchtenders")
         .annotate(
             reco_total=Count(
                 "tasks",
@@ -1012,18 +1008,6 @@ def crm_list_projects_with_low_reach(request):
         )
         .distinct()
     )
-
-    projects = []
-
-    for project in low_reach_projects:
-        switchtenders = get_switchtenders_for_project(project)
-        switchtenders_txt = ", ".join(
-            [format_switchtender_identity(u) for u in switchtenders]
-        )
-
-        project.switchtenders_txt = switchtenders_txt
-
-        projects.append(project)
 
     return render(request, "crm/projects_low_reach.html", locals())
 
