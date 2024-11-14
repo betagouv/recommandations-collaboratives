@@ -37,13 +37,6 @@
 <div class="row">
     <div class="col-11 fr-px-2v fr-mx-auto" x-data="PrintTaskResource">
         <div class="d-flex justify-content-end fr-pb-2v fr-mb-2v task-preview-cta fr-mt-2v">
-            {% if ressource.categories > 0 %}
-                <div class="fr-mr-1w">
-                    {% for category in resource.categories.all %}
-                        <span class="fr-tag fr-tag--secondary fr-mr-1w">{{ category.name }}</span>
-                    {% endfor %}
-                </div>
-            {% endif %}
             {% if task and task.ds_folder %}
                 <a class="fr-btn fr-btn--secondary fr-btn--sm fr-mr-1w"
                    href="{{ task.ds_folder.dossier_url }}"
