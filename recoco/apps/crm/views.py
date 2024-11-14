@@ -1252,7 +1252,13 @@ def project_site_handover(request, project_id):
         if form.is_valid():
             site = form.cleaned_data["site"]
 
-            project.project_sites.create(site=site, is_origin=False, status="DRAFT")
+            project.project_sites.create(
+                site=site,
+                sent_by=request.user,
+                sent_from=request.site,
+                is_origin=False,
+                status="DRAFT",
+            )
             onboarding_utils.notify_new_project(
                 site=site, project=project, owner=project.owner
             )

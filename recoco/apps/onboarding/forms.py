@@ -283,18 +283,20 @@ class PrefillSetuserForm(DsrcBaseForm):
         email = self.cleaned_data["email"]
         return email.lower()
 
-    first_name = forms.CharField(label="Prénom *", initial="", required=True)
-    last_name = forms.CharField(label="Nom *", initial="", required=True)
+    first_name = forms.CharField(
+        label="Prénom du référent *", initial="", required=True
+    )
+    last_name = forms.CharField(label="Nom du référent *", initial="", required=True)
     org_name = forms.CharField(
-        label="Nom de votre organisation *",
-        help_text="Si vous êtes un particulier, indiquez votre nom. Votre administration, entreprise, association. Si vous êtes un particulier, écrivez 'Particulier'.",
+        label="Organisation du référent *",
+        help_text="Collectivité, administration, entreprise, association...",
         initial="",
     )
-    role = forms.CharField(label="Fonction *", initial="", required=True)
+    role = forms.CharField(label="Fonction du référent *", initial="", required=True)
 
     # TODO: add an email validation, pattern / mask
     email = forms.EmailField(
-        label="Adresse email *",
+        label="Adresse email du référent *",
         help_text="Format attendu : prenom.nom@domaine.fr",
         required=True,
         initial="",
@@ -303,7 +305,7 @@ class PrefillSetuserForm(DsrcBaseForm):
     # TODO: add a phone number validation, pattern / mask
     phone = forms.CharField(
         max_length=16,
-        label="Téléphone *",
+        label="Téléphone du référent *",
         initial="",
         help_text="Format attendu: 0102030405",
         required=True,

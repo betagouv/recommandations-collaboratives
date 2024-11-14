@@ -36,7 +36,7 @@
         {% endif %}
         <div class="fr-segmented__elements">
             {% if "list_projects" in user_site_perms or "view_project" in user_project_perms %}
-                <div class="fr-segmented__element">
+                <div class="fr-segmented__element" id="overview-step-1">
                     <input value="overview"
                            type="radio"
                            {% if overview %}checked{% endif %}
@@ -198,7 +198,8 @@
             <div x-data="ExpandableMenuHandler"
                  @click.outside="toggle"
                  class="project-navigation__container-btn-role-selection"
-                 data-test-id="header-banner-advising-position">
+                 data-test-id="header-banner-advising-position"
+                 id="overview-step-5">
                 <button class="fr-btn fr-btn--tertiary-no-outline fr-icon-team-line"
                         role="button"
                         x-ref="expandMenuButton"
