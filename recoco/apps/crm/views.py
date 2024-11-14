@@ -964,13 +964,13 @@ def crm_list_projects_with_low_reach(request):
 
     search_form = forms.CRMSearchForm()
 
-    projects = (
+    low_reach_projects = (
         Project.on_site.filter(
             project_sites__status__in=("READY", "IN_PROGRESS", "DONE"),
             project_sites__site=request.site,
         )
         .exclude(exclude_stats=True)
-        .prefetch_related("tasks", "notes")
+        .prefetch_related("tasks", "notes", "switchtenders")
         .annotate(
             reco_total=Count(
                 "tasks",
