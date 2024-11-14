@@ -105,7 +105,7 @@ class OnboardingEmailForm(DsrcBaseForm):
         self.helper.form_method = "post"
         self.helper.action_button = {
             "submit": {
-                "label": "Déposer votre projet",
+                "label": "Décrivez votre demande",
             }
         }
         self.helper.layout = Layout(
@@ -229,10 +229,10 @@ class OnboardingProject(DsrcBaseForm):
         )
 
     name = forms.CharField(
-        label="Nom du projet *",
+        label="Titre de la demande *",
         initial="",
         required=True,
-        help_text="Indiquez un nom court qui décrit le projet. Inutile d'ajouter le nom de la commune, l'adresse ou le programme.",
+        help_text="Indiquez un nom court qui décrit la demande ou le projet. Inutile d'ajouter le nom de la commune, l'adresse ou le programme.",
     )
     location = forms.CharField(
         label="Adresse",
@@ -249,10 +249,10 @@ class OnboardingProject(DsrcBaseForm):
     )
 
     description = forms.CharField(
-        label="Résumé du projet *",
+        label="Résumé de la demande *",
         initial="",
         required=True,
-        help_text="Décrivez votre projet et son contexte en quelques mots.",
+        help_text="Décrivez votre demande ou projet et son contexte en quelques mots.",
         widget=forms.Textarea(attrs={"rows": 3}),
     )
 
@@ -283,18 +283,20 @@ class PrefillSetuserForm(DsrcBaseForm):
         email = self.cleaned_data["email"]
         return email.lower()
 
-    first_name = forms.CharField(label="Prénom *", initial="", required=True)
-    last_name = forms.CharField(label="Nom *", initial="", required=True)
+    first_name = forms.CharField(
+        label="Prénom du référent *", initial="", required=True
+    )
+    last_name = forms.CharField(label="Nom du référent *", initial="", required=True)
     org_name = forms.CharField(
-        label="Nom de votre organisation *",
-        help_text="Si vous êtes un particulier, indiquez votre nom. Votre administration, entreprise, association. Si vous êtes un particulier, écrivez 'Particulier'.",
+        label="Organisation du référent *",
+        help_text="Collectivité, administration, entreprise, association...",
         initial="",
     )
-    role = forms.CharField(label="Fonction *", initial="", required=True)
+    role = forms.CharField(label="Fonction du référent *", initial="", required=True)
 
     # TODO: add an email validation, pattern / mask
     email = forms.EmailField(
-        label="Adresse email *",
+        label="Adresse email du référent *",
         help_text="Format attendu : prenom.nom@domaine.fr",
         required=True,
         initial="",
@@ -303,7 +305,7 @@ class PrefillSetuserForm(DsrcBaseForm):
     # TODO: add a phone number validation, pattern / mask
     phone = forms.CharField(
         max_length=16,
-        label="Téléphone *",
+        label="Téléphone du référent *",
         initial="",
         help_text="Format attendu: 0102030405",
         required=True,

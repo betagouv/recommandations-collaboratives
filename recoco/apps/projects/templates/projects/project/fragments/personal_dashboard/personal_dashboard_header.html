@@ -8,9 +8,9 @@
 </div>
 <header class="d-flex justify-content-between fr-p-2v ">
     <span class="fs-5">{% include "projects/project/fragments/navigation/display_select.html" %}</span>
-    <div class="fr-ml-3w flex-grow-1">
+    <div class="fr-ml-3w flex-grow-1 fr-mr-6v">
         {% include "projects/project/fragments/search_bar.html" with action_search="handleProjectsSearch" x_model="search" %}
     </div>
-    {% include "projects/project/fragments/region_filter.html"  with filter_by_regions=False %}
+    {% include "projects/project/fragments/region_filter.html" with filter_by_regions=False %}
     {% include "projects/project/fragments/list-toolbars.html" %}
 </header>
