@@ -312,7 +312,9 @@ ACCOUNT_PRESERVE_USERNAME_CASING = False
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_CONFIRM_EMAIL_ON_GET = True
 ACCOUNT_EMAIL_VERIFICATION = "optional"
-ACCOUNT_LOGIN_ATTEMPTS_LIMIT = 20
+ACCOUNT_RATE_LIMITS = {
+    "login_failed": "20/m/ip",
+}
 ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
 ACCOUNT_LOGOUT_ON_GET = True
 ACCOUNT_UNIQUE_EMAIL = True
@@ -341,10 +343,10 @@ SOCIALACCOUNT_PROVIDERS = {
     "openid_connect": {
         "APPS": [
             {
-                "provider_id": "agentconnect",
-                "name": "AgentConnect",
-                "client_id": os.getenv("AGENTCONNECT_CLIENT_ID", ""),
-                "secret": os.getenv("AGENTCONNECT_SECRET", ""),
+                "provider_id": "proconnect",
+                "name": "ProConnect",
+                "client_id": os.getenv("PROCONNECT_CLIENT_ID", ""),
+                "secret": os.getenv("PROCONNECT_SECRET", ""),
                 "settings": {
                     "server_url": "https://fca.integ01.dev-agentconnect.fr/api/v2/.well-known/openid-configuration",
                     "token_auth_method": "client_secret_post",

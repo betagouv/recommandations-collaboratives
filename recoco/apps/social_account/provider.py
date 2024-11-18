@@ -4,9 +4,9 @@ from allauth.socialaccount.providers.openid_connect.provider import (
 from django.utils.crypto import get_random_string
 
 
-class AgentConnectProvider(OpenIDConnectProvider):
-    id = "agentconnect"
-    name = "AgentConnect"
+class ProConnectProvider(OpenIDConnectProvider):
+    id = "proconnect"
+    name = "ProConnect"
 
     def get_auth_params(self):
         return super().get_auth_params() | {
@@ -15,4 +15,4 @@ class AgentConnectProvider(OpenIDConnectProvider):
         }
 
 
-provider_classes = [AgentConnectProvider]
+provider_classes = [ProConnectProvider]

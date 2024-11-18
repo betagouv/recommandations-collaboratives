@@ -44,21 +44,21 @@
 
 
             <!-- Proconnect -->
-            {% flag "flag_agentconnect" %}
+            {% flag "proconnect_login" %}
 
-            <h4 class="fr-mb-2w d-block">Se connecter via AgentConnect</h4>
+            <h4 class="fr-mb-2w d-block">Se connecter via ProConnect</h4>
             <div class="fr-connect-group">
-              <form action="{% provider_login_url 'agentconnect' process='process' %}">
+              <form action="{% provider_login_url 'proconnect' process='process' %}">
                   <button class="fr-connect">
                     <span class="fr-connect__login">S’identifier avec</span>
-                    <span class="fr-connect__brand">AgentConnect</span>
+                    <span class="fr-connect__brand">ProConnect</span>
                 </button>
               </form>
               <p>
-                  <a href="https://agentconnect.gouv.fr/"
+                  <a href="https://proconnect.gouv.fr/"
                     target="_blank"
                     rel="noopener"
-                    title="Qu’est-ce que AgentConnect ? - nouvelle fenêtre">Qu’est-ce que AgentConnect ?</a>
+                    title="Qu’est-ce que ProConnect ? - nouvelle fenêtre">Qu’est-ce que ProConnect ?</a>
               </p>
             </div>
 
