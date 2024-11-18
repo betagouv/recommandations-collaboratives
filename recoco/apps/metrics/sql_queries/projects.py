@@ -7,18 +7,35 @@ from recoco.apps.tasks.models import Task
 from ..utils import hash_field
 
 
-def get_queryset(site_id: int) -> QuerySet:
+def get_queryset(site_id: int | None) -> QuerySet:
+    # site filters and subquery site filters
+    if site_id:
+        site_filter = {"sites__pk": site_id}
+        task_site_filter = {"site_id": site_id}
+        switchtender_site_filter = {"site_id": site_id}
+        note_site_filter = {"notes__site_id": site_id}
+    else:
+        site_filter = {}
+        task_site_filter = {}
+        switchtender_site_filter = {}
+        note_site_filter = {}
+
+    # exclusion filters
+    exclude_filter = {"project_sites__status": "DRAFT"}
+    if site_id:
+        exclude_filter.update({"project_sites__site__pk": site_id})
+
     return (
         Project.objects.exclude(exclude_stats=True)
         .prefetch_related("tasks", "switchtenders")
-        .exclude(project_sites__status="DRAFT", project_sites__site__pk=site_id)
+        .exclude(**exclude_filter)
         .order_by("-created_on")
-        .filter(sites__pk=site_id)
-        .annotate(hash=hash_field("id", salt="project"))
+        .filter(**site_filter)
         .annotate(
+            hash=hash_field("id", salt="project"),
             recommandation_count=Subquery(
                 Task.objects.filter(
-                    project_id=OuterRef("pk"), site_id=site_id, public=True
+                    project_id=OuterRef("pk"), public=True, **task_site_filter
                 )
                 .order_by()
                 .annotate(count=Func(F("id"), function="Count"))
@@ -26,26 +43,27 @@ def get_queryset(site_id: int) -> QuerySet:
             ),
             advisor_count=Subquery(
                 ProjectSwitchtender.objects.filter(
-                    project_id=OuterRef("pk"), site_id=site_id
+                    project_id=OuterRef("pk"), **switchtender_site_filter
                 )
                 .order_by()
                 .annotate(count=Func(F("id"), function="Count"))
                 .values("count")
             ),
             member_count=Count("members", distinct=True),
-        )
-        .annotate(
             public_message_count=Count(
                 "notes",
-                filter=Q(notes__public=True, notes__site_id=site_id),
+                filter=Q(
+                    notes__public=True,
+                    **note_site_filter,
+                ),
                 distinct=True,
             ),
             public_message_from_members_count=Count(
                 "notes",
                 filter=Q(
                     notes__public=True,
-                    notes__site_id=site_id,
                     notes__created_by__in=F("members"),
+                    **note_site_filter,
                 ),
                 distinct=True,
             ),
@@ -53,20 +71,19 @@ def get_queryset(site_id: int) -> QuerySet:
                 "notes",
                 filter=Q(
                     notes__public=True,
-                    notes__site_id=site_id,
                     notes__created_by__in=F("switchtender_sites__switchtender"),
+                    **note_site_filter,
                 ),
                 distinct=True,
             ),
-        )
-        .annotate(
             private_message_count=Count(
                 "notes",
-                filter=Q(notes__public=False, notes__site_id=site_id),
+                filter=Q(
+                    notes__public=False,
+                    **note_site_filter,
+                ),
                 distinct=True,
-            )
-        )
-        .annotate(
+            ),
             project_topics=ArrayAgg(
                 "topics__name",
                 distinct=True,

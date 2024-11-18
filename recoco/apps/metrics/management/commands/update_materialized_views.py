@@ -11,48 +11,29 @@ from recoco.apps.metrics.processor import (
     MaterializedView,
     MaterializedViewSpecError,
 )
+from recoco.apps.metrics.utils import metrics_db_schema_name
 from recoco.utils import make_site_slug
 
 
 class Command(BaseCommand):
     help = "Update materialized view used for metrics"
 
-    def _check_user_exists_in_db(self, cursor: CursorWrapper, schema_owner: str):
-        cursor.execute(
-            sql=f"SELECT 1 FROM pg_roles WHERE rolname='{schema_owner}';"  # noqa: S608
-        )
-        return cursor.fetchone() is not None
+    def _create_views(self, site: Site | None = None, **options: Any):
+        for spec in settings.METRICS_MATERIALIZED_VIEWS_SPEC:
+            try:
+                materialized_view = MaterializedView.from_spec(
+                    spec=spec, site=site, check_sql_query=True
+                )
+            except MaterializedViewSpecError as err:
+                self.stdout.write(self.style.ERROR(str(err)))
+                continue
 
-    def _assign_permissions_to_owner(
-        self, cursor: CursorWrapper, schema_name: str, schema_owner: str
-    ):
-        cursor.execute(
-            sql=f"GRANT CONNECT ON DATABASE {connection.settings_dict['NAME']} TO {schema_owner};"
-        )
-        cursor.execute(sql=f"GRANT USAGE ON SCHEMA {schema_name} TO {schema_owner};")
+            self.stdout.write(f"Updating materialized views {materialized_view}")
 
-        cursor.execute(
-            sql=f"GRANT SELECT ON ALL TABLES IN SCHEMA {schema_name} TO {schema_owner};"
-        )
+            with connection.cursor() as cursor:
+                materialized_view.set_cursor(cursor)
 
-    def _create_views_for_site(self, site: Site, **options: Any):
-        self.stdout.write(
-            f"Updating materialized views for site {site.name} (#{site.id})"
-        )
-
-        with connection.cursor() as cursor:
-            with transaction.atomic():
-                for spec in settings.METRICS_MATERIALIZED_VIEWS_SPEC:
-                    try:
-                        materialized_view = MaterializedView.create_for_site(
-                            site=site, spec=spec
-                        )
-                    except MaterializedViewSpecError as err:
-                        self.stdout.write(self.style.ERROR(str(err)))
-                        continue
-
-                    materialized_view.set_cursor(cursor)
-
+                with transaction.atomic():
                     if not options["refresh_only"]:
                         self.stdout.write(
                             f"  >> Dropping materialized view '{materialized_view.db_schema_name}.{materialized_view.db_view_name}'"
@@ -66,46 +47,55 @@ class Command(BaseCommand):
                         materialized_view.create()
                         materialized_view.refresh()
 
-                # if an owner is specified, assign rights
-                if (
-                    settings.METRICS_MATERIALIZED_VIEWS_OWNER_TPL
-                    and not options["drop_only"]
-                ):
-                    db_schema_name = MaterializedView.make_db_schema_name(site)
+    def _assign_permissions(self, site: Site | None = None, **options: Any):
+        if not settings.METRICS_MATERIALIZED_VIEWS_OWNER_TPL or options["drop_only"]:
+            return
 
-                    # Check first if we have an owner override
-                    schema_owner = (
-                        settings.METRICS_MATERIALIZED_VIEWS_OWNER_OVERRIDES.get(
-                            make_site_slug(site), None
-                        )
+        schema_owner_slug = make_site_slug(site=site) if site else "recoconseil"
+
+        # Check first if we have an owner override
+        schema_owner = settings.METRICS_MATERIALIZED_VIEWS_OWNER_OVERRIDES.get(
+            schema_owner_slug, None
+        )
+
+        # Compute default one in case we didn't find an override
+        if not schema_owner:
+            schema_owner = Template(
+                settings.METRICS_MATERIALIZED_VIEWS_OWNER_TPL
+            ).substitute(slug=schema_owner_slug)
+
+        with connection.cursor() as cursor:
+            if not self._check_user_exists_in_db(cursor, schema_owner):
+                self.stdout.write(
+                    self.style.ERROR(
+                        f"  -- Owner '{schema_owner}' does not exist in the database"
                     )
+                )
+                return
 
-                    # Compute default one in case we didn't find an override
-                    if not schema_owner:
-                        schema_owner = Template(
-                            settings.METRICS_MATERIALIZED_VIEWS_OWNER_TPL
-                        ).substitute(
-                            site_name=site.name,
-                            site_slug=make_site_slug(site=site),
-                        )
+            db_schema_name = metrics_db_schema_name(site=site)
 
-                    if not self._check_user_exists_in_db(cursor, schema_owner):
-                        self.stdout.write(
-                            self.style.ERROR(
-                                f"  -- Owner '{schema_owner}' does not exist in the database"
-                            )
-                        )
-                        return
+            self.stdout.write(
+                f"  ++ Assigning permissions to '{schema_owner}' on schema '{db_schema_name}'"
+            )
 
-                    self.stdout.write(
-                        f"  ++ Assigning permissions to '{schema_owner}' on schema '{db_schema_name}'"
-                    )
+            with transaction.atomic():
+                cursor.execute(
+                    sql=f"GRANT CONNECT ON DATABASE {connection.settings_dict['NAME']} TO {schema_owner};"
+                )
+                cursor.execute(
+                    sql=f"GRANT USAGE ON SCHEMA {db_schema_name} TO {schema_owner};"
+                )
 
-                    self._assign_permissions_to_owner(
-                        cursor=cursor,
-                        schema_name=db_schema_name,
-                        schema_owner=schema_owner,
-                    )
+                cursor.execute(
+                    sql=f"GRANT SELECT ON ALL TABLES IN SCHEMA {db_schema_name} TO {schema_owner};"
+                )
+
+    def _check_user_exists_in_db(self, cursor: CursorWrapper, schema_owner: str):
+        cursor.execute(
+            sql=f"SELECT 1 FROM pg_roles WHERE rolname='{schema_owner}';"  # noqa: S608
+        )
+        return cursor.fetchone() is not None
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -130,4 +120,8 @@ class Command(BaseCommand):
 
         for site in Site.objects.order_by("id"):
             with settings.SITE_ID.override(site.pk):
-                self._create_views_for_site(site, **options)
+                self._create_views(site=site, **options)
+                self._assign_permissions(site=site, **options)
+
+        self._create_views(site=None, **options)
+        self._assign_permissions(site=None, **options)

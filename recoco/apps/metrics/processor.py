@@ -8,7 +8,7 @@ from django.contrib.sites.models import Site
 from django.db.backends.utils import CursorWrapper
 from django.db.models import QuerySet
 
-from recoco.utils import make_site_slug
+from .utils import metrics_db_schema_name
 
 
 class MaterializedViewSpecError(Exception):
@@ -27,7 +27,7 @@ class MaterializedViewSqlQuery:
 
 
 class MaterializedView:
-    site: Site
+    site: Site | None
     name: str
     cursor: CursorWrapper
     indexes: list[str]
@@ -35,7 +35,7 @@ class MaterializedView:
 
     def __init__(
         self,
-        site: Site,
+        site: Site | None,
         name: str,
         indexes: list[str] = None,
         unique_indexes: list[str] = None,
@@ -49,8 +49,11 @@ class MaterializedView:
         self.db_owner = db_owner
 
     @classmethod
-    def create_for_site(
-        cls, site: Site, spec: dict[str, Any], check_sql_query: bool = True
+    def from_spec(
+        cls,
+        spec: dict[str, Any],
+        site: Site | None = None,
+        check_sql_query: bool = True,
     ) -> "MaterializedView":
         try:
             materialized_view = MaterializedView(site, **spec)
@@ -66,18 +69,23 @@ class MaterializedView:
 
         return materialized_view
 
+    def __str__(self) -> str:
+        name = self.name
+        if self.site:
+            name = f"{name} ({self.site.domain})"
+        return name
+
     @property
     def db_view_name(self) -> str:
         return self.name
 
-    @staticmethod
-    def make_db_schema_name(site) -> str:
-        site_slug = make_site_slug(site=site)
-        return f"metrics_{site_slug}"
-
     @property
     def db_schema_name(self) -> str:
-        return self.make_db_schema_name(self.site)
+        return metrics_db_schema_name(site=self.site)
+
+    @property
+    def site_id(self) -> int | None:
+        return self.site.id if self.site else None
 
     def set_cursor(self, cursor: CursorWrapper | None) -> None:
         self.cursor = cursor
@@ -96,7 +104,7 @@ class MaterializedView:
         except ModuleNotFoundError:
             return None
 
-        queryset = module.get_queryset(site_id=self.site.id)
+        queryset = module.get_queryset(site_id=self.site_id)
 
         if isinstance(queryset, QuerySet):
             sql, params = queryset.query.sql_with_params()
@@ -108,7 +116,7 @@ class MaterializedView:
             return None
 
         with open(sql_file, "r") as f:
-            return MaterializedViewSqlQuery(sql=f.read(), params=(self.site.id,))
+            return MaterializedViewSqlQuery(sql=f.read(), params=(self.site_id,))
 
     def get_sql_query(self) -> MaterializedViewSqlQuery | None:
         return self.get_django_sql_query() or self.get_raw_sql_query()

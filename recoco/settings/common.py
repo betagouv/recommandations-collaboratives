@@ -412,7 +412,8 @@ WAGTAIL_EMAIL_MANAGEMENT_ENABLED = False
 METRICS_MATERIALIZED_VIEWS_SPEC = [
     {
         "name": "projects",
-        "unique_indexes": ["hash"],
+        # FIXME: unique index is failing on projects
+        # "unique_indexes": ["hash"],
         "indexes": ["created_on"],
     },
     {
@@ -427,7 +428,8 @@ METRICS_MATERIALIZED_VIEWS_SPEC = [
     {
         "name": "users",
         "unique_indexes": ["hash"],
-        "indexes": ["last_login", "is_advisor"],
+        # FIXME: can not create index with is_advisor
+        # "indexes": ["last_login", "is_advisor"],
     },
     {
         "name": "user_activity",
@@ -437,12 +439,11 @@ METRICS_MATERIALIZED_VIEWS_SPEC = [
 
 METRICS_MATERIALIZED_VIEWS_SQL_DIR = BASE_DIR / "apps/metrics/sql_queries"
 METRICS_MATERIALIZED_VIEWS_OWNER_TPL = (
-    "metrics_owner_$site_slug"  # template string to apply persmissions on db schemes
+    "metrics_owner_$slug"  # template string to apply persmissions on db schemes
 )
 METRICS_MATERIALIZED_VIEWS_OWNER_OVERRIDES = (
     {}
 )  # specific rules for the OWNER_TPL per site
-
 
 # Baker
 # https://model-bakery.readthedocs.io/en/latest/how_bakery_behaves.html#customizing-baker

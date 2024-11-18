@@ -100,7 +100,7 @@ DJANGO_VITE = {"default": {"dev_mode": DEBUG, "dev_server_port": 3000}}
 SILENCED_SYSTEM_CHECKS += ["captcha.recaptcha_test_key_error"]
 
 # Materialized views
-# MATERIALIZED_VIEWS_SPEC = [
+# METRICS_MATERIALIZED_VIEWS_SPEC = [
 #     {
 #         "name": "your_view_name",
 #         "indexes": ["field 1"],

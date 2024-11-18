@@ -5,25 +5,27 @@ from recoco.apps.tasks.models import Task
 from ..utils import display_value, hash_field
 
 
-def get_queryset(site_id: int) -> QuerySet:
+def get_queryset(site_id: int | None) -> QuerySet:
+    site_filter = {"site__pk": site_id} if site_id else {}
+
     return (
         Task.objects.exclude(project__exclude_stats=True)
-        .filter(site__pk=site_id)
+        .filter(**site_filter)
         .order_by("created_on")
-        .annotate(hash=hash_field("id", salt="task"))
-        .annotate(project_hash=hash_field("project__id", salt="project"))
-        .annotate(status_name=display_value(Task.STATUS_CHOICES, "status"))
-        .annotate(created_by_hash=hash_field("created_by", salt="user"))
         .annotate(
+            hash=hash_field("id", salt="task"),
+            project_hash=hash_field("project__id", salt="project"),
+            status_name=display_value(Task.STATUS_CHOICES, "status"),
+            created_by_hash=hash_field("created_by", salt="user"),
             has_resource=Case(
                 When(resource__isnull=True, then=False),
                 default=True,
                 output_field=BooleanField(),
             ),
-        )
-        .annotate(
             comment_count=Count(
-                "followups", filter=~Q(followups__comment=""), distinct=True
+                "followups",
+                filter=~Q(followups__comment=""),
+                distinct=True,
             ),
             member_comment_count=Count(
                 "followups",
@@ -37,9 +39,8 @@ def get_queryset(site_id: int) -> QuerySet:
                 & ~Q(followups__comment=""),
                 distinct=True,
             ),
-        )
-        .annotate(
             topic_name=F("topic__name"),
+            site_domain=F("site__domain"),
         )
         .values(
             "hash",
@@ -54,5 +55,6 @@ def get_queryset(site_id: int) -> QuerySet:
             "visited",
             "has_resource",
             "topic_name",
+            "site_domain",
         )
     )

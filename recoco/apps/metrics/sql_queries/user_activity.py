@@ -11,10 +11,13 @@ from recoco.apps.tasks.models import TaskFollowup
 from ..utils import hash_field
 
 
-def get_queryset(site_id: int) -> QuerySet:
+def _get_actions(site_id: int | None) -> QuerySet:
+    site_filter = {"site__pk": site_id} if site_id else {}
+
     UserCT = ContentType.objects.get_for_model(User)
-    activity = (
-        Action.objects.filter(site__pk=site_id)
+
+    return (
+        Action.objects.filter(**site_filter)
         .filter(public=True, actor_content_type=UserCT)
         .filter(
             verb__in=[
@@ -42,8 +45,12 @@ def get_queryset(site_id: int) -> QuerySet:
         )
     )
 
-    reco_status_updated = (
-        TaskFollowup.objects.filter(task__site__pk=site_id)
+
+def _get_task_followup(site_id: int | None) -> QuerySet:
+    task_site_filter = {"task__site__pk": site_id} if site_id else {}
+
+    return (
+        TaskFollowup.objects.filter(**task_site_filter)
         .exclude(status=None)
         .annotate(
             user_hash=hash_field("who", salt="user"),
@@ -53,7 +60,15 @@ def get_queryset(site_id: int) -> QuerySet:
             ),
             when=Cast("timestamp", output_field=models.DateField()),
         )
-        .values("user_hash", "event_name", "when")
+        .values(
+            "user_hash",
+            "event_name",
+            "when",
+        )
     )
 
+
+def get_queryset(site_id: int | None) -> QuerySet:
+    activity = _get_actions(site_id)
+    reco_status_updated = _get_task_followup(site_id)
     return activity.union(reco_status_updated)
