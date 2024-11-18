@@ -99,9 +99,12 @@ function Tutorial(challengeCode) {
         console.warn(err);
       }
     },
-    async handleStartTour() {
+    async hideStartModal() {
       this.startButton = this.$refs.startTourButton;
       this.startButton.style.display = 'none';
+      this.handleStartTour();
+    },
+    async handleStartTour() {
       this.tour.start();
       await this.startChallenge(this.challengeCode);
     },
