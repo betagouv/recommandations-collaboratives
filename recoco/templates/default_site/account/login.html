@@ -2,6 +2,8 @@
 {% load sass_tags %}
 {% load static %}
 {% load i18n %}
+{% load socialaccount %}
+{% load waffle_tags %}
 {% block head_title %}
     {% trans "Sign In" %}
 {% endblock head_title %}
@@ -39,6 +41,31 @@
                     Connexion à {{ site.name }}
                 </h1>
             </div>
+
+
+            <!-- Proconnect -->
+            {% flag "flag_agentconnect" %}
+
+            <h4 class="fr-mb-2w d-block">Se connecter via AgentConnect</h4>
+            <div class="fr-connect-group">
+              <form action="{% provider_login_url 'agentconnect' process='process' %}">
+                  <button class="fr-connect">
+                    <span class="fr-connect__login">S’identifier avec</span>
+                    <span class="fr-connect__brand">AgentConnect</span>
+                </button>
+              </form>
+              <p>
+                  <a href="https://agentconnect.gouv.fr/"
+                    target="_blank"
+                    rel="noopener"
+                    title="Qu’est-ce que AgentConnect ? - nouvelle fenêtre">Qu’est-ce que AgentConnect ?</a>
+              </p>
+            </div>
+
+            {% else %}
+            {% endflag %}
+
+
             <form class="login fr-form-group"
                   method="post"
                   action="{% url 'account_login' %}">
