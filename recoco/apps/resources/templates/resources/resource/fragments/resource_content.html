@@ -2,7 +2,11 @@
 <div class="text-justified font-marianne">
     {% include "resources/resource/fragments/title.html" %}
     {% include "resources/resource/fragments/summary.html" %}
+
     {% comment %} {% if resource.content_rendered %} {% endcomment %}
+
+    {% comment %} -------------- code "variabilisé" mis en commentaire ------------------ {% endcomment %}
+
         {% comment %} {% if not resource.interne %}
             <div class="fr-p-3w d-flex" style="background-color:{% resource.site.color %}">
                 <img src="{{ resource.site.image.url }}" alt="" class="fr-mr-2v">
@@ -17,19 +21,28 @@
                 </div>
             </div>
         {% endif %} {% endcomment %}
+
+
+
+        {% comment %} Changer la couleur dans l'attribut style par une variable de la couleur du site externe {% endcomment %}
             <div class="fr-p-3w d-flex fr-mb-3w" style="background-color:cyan">
+                {% comment %} Changer limage par une variable de l'image du site externe {% endcomment %}
                 <img src="{% static 'home/img/actors/progress.png' %}">
                 <div>
+                    {% comment %} Changer monSuperSite par le nom du site externe {% endcomment %}
                     <span><b> Cette ressource provient du site monSuperSite </b></span>
+                    {% comment %} Changer le paragraphe par un résumé du site externe {% endcomment %}
                         <p> AideTerritoires offre aux collectivité une expertise
                             sur l’ensemble des aides disponibles en ingéniérie et en financement,
                             découvrez l’accompagnement proposé par AidesTerritoires. </p>
+                    {% comment %} Changer l'url par celle du site externe ET monSuperSite par le nom du site externe {% endcomment %}
                     <a href="www.google.com" target="_blank" class="fr-btn fr-btn--primary fr-btn--sm">
                         Voir la ressource sur le site de monSuperSite
                     </a>
                 </div>
             </div>
         {% comment %} {{ resource.content_rendered|safe }} {% endcomment %}
+
     {% comment %} {% elif not resource.interne %}
         <img>
         <p> Malheuresement nous n’avons pas pu récupérer le contenu de la page.
