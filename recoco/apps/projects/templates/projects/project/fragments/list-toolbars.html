@@ -1,8 +1,10 @@
 {% load static %}
 <div class="btn-group" role="group" aria-label="Admin actions">
+   {% if is_switchtender %}
     <a class="fr-btn fr-btn--sm fr-mr-1v text-nowrap"
        href="{% url 'onboarding-prefill-set-user' %}"
        role="button">Déposer un projet</a>
+   {% endif %}
     <a class="fr-btn fr-btn--sm fr-btn--secondary fr-mr-1v text-nowrap"
        href="{% url 'projects-project-list-export-csv' %}"
        role="button">Exporter en CSV</a>

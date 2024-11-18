@@ -93,7 +93,7 @@
                 <h3>{{ question.text }}</h3>
                 <form method="post" enctype="multipart/form-data">
                     {% csrf_token %}
-                    <ul class="list-group fr-mt-2w fr-mb-2w">
+                    <ul class="list-group list-unstyled fr-mt-2w fr-mb-2w">
                         {% for choice in form.fields.answer.choices %}
                             <li class="list-group-item fr-py-2w">
                                 {% if question.is_multiple %}

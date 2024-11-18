@@ -22,11 +22,8 @@
 {% get_advising_position user project request.site as position %}
 <div x-data
      class="project-navigation d-flex justify-content-between"
-     x-init="$nextTick(() => $store.showRole.init())"
-     >
-    <fieldset
-
-              class="fr-segmented fr-segmented--md fr-px-3w"
+     x-init="$nextTick(() => $store.showRole.init())">
+    <fieldset class="fr-segmented fr-segmented--md fr-px-3w"
               x-init="$nextTick(() => $store.projectQueue.addCurrentProjectId({{ project.id }}, `{{ project.name }}`, `{{ project.commune.name }}`,`{{ project.commune.insee }}`))">
         <legend class="fr-segmented__legend visually-hidden">Onglets du projet</legend>
         {% if overview %}
@@ -218,66 +215,79 @@
                             ''
                         {% endif %}
                         }">
-                        {% if position.is_advisor or position.is_observer %}
-                            <div class="d-flex justify-content-between fr-p-3v">
-                                <div>
-                                    <span class="fw-bolder specific-fontsize-14px">Changer de rôle</span>
-                                </div>
-                                <div>
-                                    <button class="fr-btn--close fr-btn specific-button-close-from-dsfr"
-                                            title="Fermer le menu déroulant"
-                                            data-bs-toggle="dropdown"
-                                            data-bs-auto-close="outside"
-                                            aria-expanded="false"
-                                            aria-controls="select-observer-or-advisor">Fermer</button>
-                                </div>
+                        <div class="d-flex justify-content-between fr-p-3v">
+                            <div>
+                                <span class="fw-bolder specific-fontsize-14px">Changer de rôle</span>
                             </div>
-                            <hr class="divider-specific">
-                            <div class="d-flex flex-column">
-                                <form method="post" :action="role">
-                                    {% csrf_token %}
-                                    <div class="fr-p-3v"
-                                         x-on:click="role='{% url 'projects-project-observer-join' project.id %}'">
-                                        <div class="fr-radio-group">
-                                            <input type="radio"
-                                                   id="role-observer"
-                                                   name="role"
-                                                   value="{% url 'projects-project-observer-join' project.id %}"
-                                                   x-model="role"
-                                                   data-test-id="button-join-as-observer">
-                                            <label for="role-observer" class="fw-bolder specific-fontsize-14px">Observateur</label>
-                                        </div>
-                                        <div>
-                                            <p class="fr-pl-8v fr-mb-0 specific-fontsize-14px">
-                                                Vous pouvez voir les éléments du projet, mais n’avez pas accès aux fonctionnalités de communication avec la collectivité.
-                                            </p>
-                                        </div>
+                            <div>
+                                <button class="fr-btn--close fr-btn specific-button-close-from-dsfr"
+                                        title="Fermer le menu déroulant"
+                                        data-bs-toggle="dropdown"
+                                        data-bs-auto-close="outside"
+                                        aria-expanded="false"
+                                        aria-controls="select-observer-or-advisor">Fermer</button>
+                            </div>
+                        </div>
+                        <hr class="divider-specific">
+                        <div class="d-flex flex-column">
+                            <form method="post" :action="role">
+                                {% csrf_token %}
+                                <div class="fr-p-3v"
+                                     x-on:click="role='{% url 'projects-project-observer-join' project.id %}'">
+                                    <div class="fr-radio-group">
+                                        <input type="radio"
+                                               id="role-observer"
+                                               name="role"
+                                               value="{% url 'projects-project-observer-join' project.id %}"
+                                               x-model="role"
+                                               data-test-id="button-join-as-observer">
+                                        <label for="role-observer" class="fw-bolder specific-fontsize-14px">Observateur</label>
                                     </div>
-                                    <hr class="divider-specific">
-                                    <div class="fr-p-3v"
-                                         x-on:click="role='{% url 'projects-project-switchtender-join' project.id %}'">
-                                         <div class="fr-radio-group">
-                                            <input type="radio"
-                                                   id="role-advisor"
-                                                   name="role"
-                                                   value="{% url 'projects-project-switchtender-join' project.id %}"
-                                                   x-model="role"
-                                                   data-test-id="button-join-as-advisor">
-                                            <label for="role-advisor" class="fw-bolder specific-fontsize-14px">Conseiller</label>
-                                        </div>
-                                        <div>
-                                            <p class="fr-pl-8v fr-mb-0 specific-fontsize-14px">
-                                                Vous pouvez envoyer des messsages et recommandation à la collectivité ainsi qu’intéragir avec l’équipe conseil.
-                                            </p>
-                                        </div>
+                                    <div>
+                                        <p class="fr-pl-8v fr-mb-0 specific-fontsize-14px">
+                                            {% if position.is_advisor or position.is_observer %}
+                                                Vous pouvez voir les éléments du projet, mais n’avez pas accès aux fonctionnalités de communication avec le porteur de projet.
+                                            {% else %}
+                                                Vous avez accès à l'intégralité du projet et recevez les notifications de mises à jour, mais vous ne pouvez pas communiquer avec le porteur de projet.
+                                            {% endif %}
+                                        </p>
                                     </div>
-                                    <hr class="divider-specific">
-                                    <div class="d-flex justify-content-between">
-                                        <div class="fr-p-3v">
+                                </div>
+                                <hr class="divider-specific">
+                                <div class="fr-p-3v"
+                                     x-on:click="role='{% url 'projects-project-switchtender-join' project.id %}'">
+                                    <div class="fr-radio-group">
+                                        <input type="radio"
+                                               id="role-advisor"
+                                               name="role"
+                                               value="{% url 'projects-project-switchtender-join' project.id %}"
+                                               x-model="role"
+                                               data-test-id="button-join-as-advisor">
+                                        <label for="role-advisor" class="fw-bolder specific-fontsize-14px">Conseiller</label>
+                                    </div>
+                                    <div>
+                                        <p class="fr-pl-8v fr-mb-0 specific-fontsize-14px">
+                                            {% if position.is_advisor or position.is_observer %}
+                                                Vous pouvez envoyer des messsages et recommandation au porteur de projet ainsi qu’intéragir avec l’équipe conseil.
+                                            {% else %}
+                                                Vous pouvez en plus communiquer avec le porteur de projet, lui envoyer des recommandations et interagir avec les autres conseillers.
+                                            {% endif %}
+                                        </p>
+                                    </div>
+                                </div>
+                                <hr class="divider-specific">
+                                <div class="d-flex justify-content-between">
+                                    <div class="fr-p-3v {% if not position.is_advisor and not position.is_observer %}w-100{% endif %}">
+                                        {% if position.is_advisor or position.is_observer %}
                                             <button class="fr-btn fr-btn--sm fr-btn--tertiary w-100 justify-content-center"
                                                     data-test-id="button-validate-role">Changer de rôle</button>
-                                        </div>
-                                    </form>
+                                        {% else %}
+                                            <button class="fr-btn fr-btn--sm fr-btn--tertiary w-100 justify-content-center"
+                                                    data-test-id="button-validate-role">Choisir un rôle</button>
+                                        {% endif %}
+                                    </div>
+                                </form>
+                                {% if position.is_advisor or position.is_observer %}
                                     <div class="fr-p-3v">
                                         <form method="post"
                                               action="{% url 'projects-project-access-advisor-delete' project.pk request.user.username %}">
@@ -285,70 +295,9 @@
                                             <button class="fr-btn fr-btn--sm fr-btn--tertiary w-100 justify-content-center">Quitter le projet</button>
                                         </form>
                                     </div>
-                                </div>
+                                {% endif %}
                             </div>
-                        {% else %}
-                            <div class="d-flex justify-content-between fr-p-3v">
-                                <div>
-                                    <span class="fw-bolder specific-fontsize-14px">Sélectionnez votre rôle sur le projet :</span>
-                                </div>
-                                <div>
-                                    <button class="fr-btn--close fr-btn specific-button-close-from-dsfr"
-                                            title="Fermer le menu déroulant"
-                                            data-bs-toggle="dropdown"
-                                            data-bs-auto-close="outside"
-                                            aria-expanded="false"
-                                            aria-controls="select-observer-or-advisor">Fermer</button>
-                                </div>
-                            </div>
-                            <hr class="divider-specific">
-                            <div class="d-flex flex-column">
-                                <form method="post" :action="role">
-                                    {% csrf_token %}
-                                    <div class="fr-p-3v"
-                                         x-on:click="role='{% url 'projects-project-observer-join' project.id %}'">
-                                        <div class="fr-radio-group">
-                                            <input type="radio"
-                                                   id="role-observer"
-                                                   name="role"
-                                                   value="{% url 'projects-project-observer-join' project.id %}"
-                                                   x-model="role"
-                                                   data-test-id="button-join-as-observer">
-                                            <label for="role-observer" class="fw-bolder specific-fontsize-14px">Observateur</label>
-                                        </div>
-                                        <div>
-                                            <p class="fr-pl-8v fr-mb-0 specific-fontsize-14px">
-                                                Vous avez accès à l'intégralité du projet et recevez les notifications de mises à jour, mais vous ne pouvez pas communiquer avec la collectivité.
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <hr class="divider-specific">
-                                    <div class="fr-p-3v"
-                                         x-on:click="role='{% url 'projects-project-switchtender-join' project.id %}'">
-                                        <div class="fr-radio-group">
-                                            <input type="radio"
-                                                   id="role-advisor"
-                                                   name="role"
-                                                   value="{% url 'projects-project-switchtender-join' project.id %}"
-                                                   x-model="role"
-                                                   data-test-id="button-join-as-advisor">
-                                            <label for="role-advisor" class="fw-bolder specific-fontsize-14px">Conseiller</label>
-                                        </div>
-                                        <div>
-                                            <p class="fr-pl-8v fr-mb-0 specific-fontsize-14px">
-                                                Vous pouvez en plus communiquer avec la collectivité, lui envoyer des recommandations et interagir avec les autres conseillers.
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <hr class="divider-specific">
-                                    <div class="fr-p-3v">
-                                        <button class="fr-btn fr-btn--sm fr-btn--tertiary w-100 justify-content-center"
-                                                type="submit"
-                                                data-test-id="button-validate-role">choisir un rôle</button>
-                                    </div>
-                                </form>
-                            </div>
-                        {% endif %}
+                        </div>
                     </div>
                 </div>
             </div>
