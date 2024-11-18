@@ -22,11 +22,8 @@
 {% get_advising_position user project request.site as position %}
 <div x-data
      class="project-navigation d-flex justify-content-between"
-     x-init="$nextTick(() => $store.showRole.init())"
-     >
-    <fieldset
-
-              class="fr-segmented fr-segmented--md fr-px-3w"
+     x-init="$nextTick(() => $store.showRole.init())">
+    <fieldset class="fr-segmented fr-segmented--md fr-px-3w"
               x-init="$nextTick(() => $store.projectQueue.addCurrentProjectId({{ project.id }}, `{{ project.name }}`, `{{ project.commune.name }}`,`{{ project.commune.insee }}`))">
         <legend class="fr-segmented__legend visually-hidden">Onglets du projet</legend>
         {% if overview %}
@@ -250,7 +247,7 @@
                                         </div>
                                         <div>
                                             <p class="fr-pl-8v fr-mb-0 specific-fontsize-14px">
-                                                Vous pouvez voir les éléments du projet, mais n’avez pas accès aux fonctionnalités de communication avec la collectivité.
+                                                Vous pouvez voir les éléments du projet, mais n’avez pas accès aux fonctionnalités de communication avec le porteur de projet.
                                             </p>
                                         </div>
                                     </div>
@@ -268,7 +265,7 @@
                                         </div>
                                         <div>
                                             <p class="fr-pl-8v fr-mb-0 specific-fontsize-14px">
-                                                Vous pouvez envoyer des messsages et recommandation à la collectivité ainsi qu’intéragir avec l’équipe conseil.
+                                                Vous pouvez envoyer des messsages et recommandation au porteur de projet ainsi qu’intéragir avec l’équipe conseil.
                                             </p>
                                         </div>
                                     </div>
@@ -319,7 +316,7 @@
                                         </div>
                                         <div>
                                             <p for="role-advisor" class="fr-pl-8v fr-mb-0 specific-fontsize-14px">
-                                                Vous avez accès à l'intégralité du projet et recevez les notifications de mises à jour, mais vous ne pouvez pas communiquer avec la collectivité.
+                                                Vous avez accès à l'intégralité du projet et recevez les notifications de mises à jour, mais vous ne pouvez pas communiquer avec le porteur de projet.
                                             </p>
                                         </div>
                                     </div>
@@ -337,7 +334,7 @@
                                         </div>
                                         <div>
                                             <p class="fr-pl-8v fr-mb-0 specific-fontsize-14px">
-                                                Vous pouvez en plus communiquer avec la collectivité, lui envoyer des recommandations et interagir avec les autres conseillers.
+                                                Vous pouvez en plus communiquer avec le porteur de projet, lui envoyer des recommandations et interagir avec les autres conseillers.
                                             </p>
                                         </div>
                                     </div>

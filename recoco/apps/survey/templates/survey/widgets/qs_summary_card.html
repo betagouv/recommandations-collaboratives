@@ -10,7 +10,7 @@
 {% endblock css %}
 {% get_obj_perms request.user for request.site as "user_site_perms" %}
 {% get_obj_perms request.user for project as "user_project_perms" %}
-{% question_set_completion session.pk question_set as completion %}
+{% question_set_completion session question_set as completion %}
 <div class="survey-card">
     <div class="card-body fr-m-1v">
         <div>

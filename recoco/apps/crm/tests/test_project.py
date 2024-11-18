@@ -493,6 +493,26 @@ def test_crm_project_handover_on_existing_site(request, client, project):
 
 
 @pytest.mark.django_db
+def test_crm_project_handover_fills_sent_by_from_info(request, client, project):
+    current_site = get_current_site(request)
+    url = reverse("crm-project-handover", args=[project.id])
+    other_site = baker.make(
+        site_models.Site, name="other site", configuration__accept_handover=True
+    )
+    john = baker.make(auth_models.User, first_name="John", last_name="DOE")
+    projects_utils.assign_collaborator(john, project, is_owner=True)
+
+    with login(client, groups=["example_com_staff"]) as user:
+        response = client.post(url, data={"site": other_site.pk})
+        assert response.status_code == 302
+
+        project.refresh_from_db()
+        ps = project.project_sites.get(site=other_site)
+        assert ps.sent_from == current_site
+        assert ps.sent_by == user
+
+
+@pytest.mark.django_db
 def test_crm_project_handover_is_refused_if_not_authorized(request, client, project):
     url = reverse("crm-project-handover", args=[project.id])
     other_site = baker.make(
