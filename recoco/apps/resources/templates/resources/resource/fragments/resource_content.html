@@ -1,58 +1,43 @@
 {% load static %}
 <div class="text-justified font-marianne">
+
+{% comment %} On garde le titre, sous titre (s'il existe), et résumé d'une ressource pour les ressources externes {% endcomment %}
+
     {% include "resources/resource/fragments/title.html" %}
     {% include "resources/resource/fragments/summary.html" %}
 
-    {% comment %} {% if resource.content_rendered %} {% endcomment %}
+    {% comment %} -------- code d'une ressource externe en dur -------------- {% endcomment %}
 
-    {% comment %} -------------- code "variabilisé" mis en commentaire ------------------ {% endcomment %}
+    {% comment %} Changer la couleur dans l'attribut style par une variable de la couleur du site externe {% endcomment %}
+    <div class="fr-p-3w d-flex fr-mb-3w" style="background-color:cyan">
+        {% comment %} Changer l'image par une variable de l'image du site externe {% endcomment %}
+        <img src="{% static 'home/img/actors/progress.png' %}">
+        <div>
+            {% comment %} Changer monSuperSite par le nom du site externe {% endcomment %}
+            <span><b> Cette ressource provient du site monSuperSite </b></span>
+            {% comment %} Changer le paragraphe par un résumé du site externe {% endcomment %}
+            <p> AideTerritoires offre aux collectivité une expertise
+                sur l’ensemble des aides disponibles en ingéniérie et en financement,
+                découvrez l’accompagnement proposé par AidesTerritoires. </p>
+            {% comment %} Changer l'url par celle du site externe ET monSuperSite par le nom du site externe {% endcomment %}
+            <a href="www.google.com" target="_blank" class="fr-btn fr-btn--primary fr-btn--sm">
+                Voir la ressource sur le site de monSuperSite
+            </a>
+        </div>
+    </div>
 
-        {% comment %} {% if not resource.interne %}
-            <div class="fr-p-3w d-flex" style="background-color:{% resource.site.color %}">
-                <img src="{{ resource.site.image.url }}" alt="" class="fr-mr-2v">
-                <div>
-                    <span> Cette ressource provient du site {{ resource.site.name }} </span>
-                    {% if resource.site.description %}
-                        <p> {% resource.site.description %} </p>
-                    {% endif %}
-                    <a href="{{ resource.site.url }}" target="_blank" class="fr-btn fr-btn--secondary fr-btn--sm">
-                        Voir la ressource sur le site de {{ resource.site.name }}
-                    </a>
-                </div>
-            </div>
-        {% endif %} {% endcomment %}
+    {% comment %} -------- si la ressource n'a pas de contenu ---------- {% endcomment %}
 
-
-
-        {% comment %} Changer la couleur dans l'attribut style par une variable de la couleur du site externe {% endcomment %}
-            <div class="fr-p-3w d-flex fr-mb-3w" style="background-color:cyan">
-                {% comment %} Changer limage par une variable de l'image du site externe {% endcomment %}
-                <img src="{% static 'home/img/actors/progress.png' %}">
-                <div>
-                    {% comment %} Changer monSuperSite par le nom du site externe {% endcomment %}
-                    <span><b> Cette ressource provient du site monSuperSite </b></span>
-                    {% comment %} Changer le paragraphe par un résumé du site externe {% endcomment %}
-                        <p> AideTerritoires offre aux collectivité une expertise
-                            sur l’ensemble des aides disponibles en ingéniérie et en financement,
-                            découvrez l’accompagnement proposé par AidesTerritoires. </p>
-                    {% comment %} Changer l'url par celle du site externe ET monSuperSite par le nom du site externe {% endcomment %}
-                    <a href="www.google.com" target="_blank" class="fr-btn fr-btn--primary fr-btn--sm">
-                        Voir la ressource sur le site de monSuperSite
-                    </a>
-                </div>
-            </div>
-        {% comment %} {{ resource.content_rendered|safe }} {% endcomment %}
-
-    {% comment %} {% elif not resource.interne %}
-        <img>
-        <p> Malheuresement nous n’avons pas pu récupérer le contenu de la page.
-            Vous pouvez cependant la consulter directement <a href="{% resource.url %}">sur le site de {% resource.site.name %}.</a>
-        </p>
-    {% endif %} {% endcomment %}
     <div class="fr-px-8w fr-py-2w" style="background-color:#fafafa;">
         <img style="margin: auto;display: block;" src="{% static 'home/img/actors/progress.png' %}">
         <p> Malheuresement nous n’avons pas pu récupérer le contenu de la page.
-            Vous pouvez cependant la consulter directement <a href="www.google.com">sur le site de monSuperSite.</a>
+            Vous pouvez cependant la consulter directement
+            {% comment %} Changer l'url par celle du site externe ET monSuperSite par le nom du site externe {% endcomment %}
+            <a href="www.google.com">sur le site de monSuperSite.</a>
         </p>
     </div>
+
+    {% comment %} -------- si la ressource a du contenu ----------  {% endcomment %}
+
+    {{ resource.content_rendered|safe }}
 </div>
