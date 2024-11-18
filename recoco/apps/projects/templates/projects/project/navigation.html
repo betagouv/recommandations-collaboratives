@@ -237,24 +237,6 @@
                                 <form method="post" :action="role">
                                     {% csrf_token %}
                                     <div class="fr-p-3v"
-                                         x-on:click="role='{% url 'projects-project-switchtender-join' project.id %}'">
-                                        <div class="fr-radio-group">
-                                            <input type="radio"
-                                                   id="role-advisor"
-                                                   name="role"
-                                                   value="{% url 'projects-project-switchtender-join' project.id %}"
-                                                   x-model="role"
-                                                   data-test-id="button-join-as-advisor">
-                                            <label for="role-advisor" class="fw-bolder specific-fontsize-14px">Conseiller</label>
-                                        </div>
-                                        <div>
-                                            <p class="fr-pl-8v fr-mb-0 specific-fontsize-14px">
-                                                Vous pouvez voir les éléments du projet, mais n’avez pas accès aux fonctionnalités de communication avec la collectivité.
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <hr class="divider-specific">
-                                    <div class="fr-p-3v"
                                          x-on:click="role='{% url 'projects-project-observer-join' project.id %}'">
                                         <div class="fr-radio-group">
                                             <input type="radio"
@@ -264,6 +246,24 @@
                                                    x-model="role"
                                                    data-test-id="button-join-as-observer">
                                             <label for="role-observer" class="fw-bolder specific-fontsize-14px">Observateur</label>
+                                        </div>
+                                        <div>
+                                            <p class="fr-pl-8v fr-mb-0 specific-fontsize-14px">
+                                                Vous pouvez voir les éléments du projet, mais n’avez pas accès aux fonctionnalités de communication avec la collectivité.
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <hr class="divider-specific">
+                                    <div class="fr-p-3v"
+                                         x-on:click="role='{% url 'projects-project-switchtender-join' project.id %}'">
+                                         <div class="fr-radio-group">
+                                            <input type="radio"
+                                                   id="role-advisor"
+                                                   name="role"
+                                                   value="{% url 'projects-project-switchtender-join' project.id %}"
+                                                   x-model="role"
+                                                   data-test-id="button-join-as-advisor">
+                                            <label for="role-advisor" class="fw-bolder specific-fontsize-14px">Conseiller</label>
                                         </div>
                                         <div>
                                             <p class="fr-pl-8v fr-mb-0 specific-fontsize-14px">
@@ -306,24 +306,6 @@
                                 <form method="post" :action="role">
                                     {% csrf_token %}
                                     <div class="fr-p-3v"
-                                         x-on:click="role='{% url 'projects-project-switchtender-join' project.id %}'">
-                                        <div class="fr-radio-group">
-                                            <input type="radio"
-                                                   id="role-advisor"
-                                                   name="role"
-                                                   value="{% url 'projects-project-switchtender-join' project.id %}"
-                                                   x-model="role"
-                                                   data-test-id="button-join-as-advisor">
-                                            <label for="role-advisor" class="fw-bolder specific-fontsize-14px">Conseiller</label>
-                                        </div>
-                                        <div>
-                                            <p for="role-advisor" class="fr-pl-8v fr-mb-0 specific-fontsize-14px">
-                                                Vous avez accès à l'intégralité du projet et recevez les notifications de mises à jour, mais vous ne pouvez pas communiquer avec la collectivité.
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <hr class="divider-specific">
-                                    <div class="fr-p-3v"
                                          x-on:click="role='{% url 'projects-project-observer-join' project.id %}'">
                                         <div class="fr-radio-group">
                                             <input type="radio"
@@ -333,6 +315,24 @@
                                                    x-model="role"
                                                    data-test-id="button-join-as-observer">
                                             <label for="role-observer" class="fw-bolder specific-fontsize-14px">Observateur</label>
+                                        </div>
+                                        <div>
+                                            <p class="fr-pl-8v fr-mb-0 specific-fontsize-14px">
+                                                Vous avez accès à l'intégralité du projet et recevez les notifications de mises à jour, mais vous ne pouvez pas communiquer avec la collectivité.
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <hr class="divider-specific">
+                                    <div class="fr-p-3v"
+                                         x-on:click="role='{% url 'projects-project-switchtender-join' project.id %}'">
+                                        <div class="fr-radio-group">
+                                            <input type="radio"
+                                                   id="role-advisor"
+                                                   name="role"
+                                                   value="{% url 'projects-project-switchtender-join' project.id %}"
+                                                   x-model="role"
+                                                   data-test-id="button-join-as-advisor">
+                                            <label for="role-advisor" class="fw-bolder specific-fontsize-14px">Conseiller</label>
                                         </div>
                                         <div>
                                             <p class="fr-pl-8v fr-mb-0 specific-fontsize-14px">
