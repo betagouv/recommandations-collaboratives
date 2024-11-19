@@ -17,6 +17,12 @@ from recoco.utils import make_site_slug
 class Command(BaseCommand):
     help = "Update materialized view used for metrics"
 
+    def _check_user_exists_in_db(self, cursor: CursorWrapper, schema_owner: str):
+        cursor.execute(
+            sql=f"SELECT 1 FROM pg_roles WHERE rolname='{schema_owner}';"  # noqa: S608
+        )
+        return cursor.fetchone() is not None
+
     def _assign_permissions_to_owner(
         self, cursor: CursorWrapper, schema_name: str, schema_owner: str
     ):
@@ -36,7 +42,7 @@ class Command(BaseCommand):
 
         with connection.cursor() as cursor:
             with transaction.atomic():
-                for spec in settings.MATERIALIZED_VIEWS_SPEC:
+                for spec in settings.METRICS_MATERIALIZED_VIEWS_SPEC:
                     try:
                         materialized_view = MaterializedView.create_for_site(
                             site=site, spec=spec
@@ -61,20 +67,29 @@ class Command(BaseCommand):
                         materialized_view.refresh()
 
                 # if an owner is specified, assign rights
-                if settings.MATERIALIZED_VIEWS_OWNER_TPL and not options["drop_only"]:
+                if (
+                    settings.METRICS_MATERIALIZED_VIEWS_OWNER_TPL
+                    and not options["drop_only"]
+                ):
                     db_schema_name = MaterializedView.make_db_schema_name(site)
 
-                    schema_owner = Template(
-                        settings.MATERIALIZED_VIEWS_OWNER_TPL
-                    ).substitute(
-                        site_name=site.name,
-                        site_slug=make_site_slug(site=site),
+                    # Check first if we have an owner override
+                    schema_owner = (
+                        settings.METRICS_MATERIALIZED_VIEWS_OWNER_OVERRIDES.get(
+                            make_site_slug(site), None
+                        )
                     )
 
-                    cursor.execute(
-                        sql=f"SELECT 1 FROM pg_roles WHERE rolname='{schema_owner}';"  # noqa: S608
-                    )
-                    if cursor.fetchone() is None:
+                    # Compute default one in case we didn't find an override
+                    if not schema_owner:
+                        schema_owner = Template(
+                            settings.METRICS_MATERIALIZED_VIEWS_OWNER_TPL
+                        ).substitute(
+                            site_name=site.name,
+                            site_slug=make_site_slug(site=site),
+                        )
+
+                    if not self._check_user_exists_in_db(cursor, schema_owner):
                         self.stdout.write(
                             self.style.ERROR(
                                 f"  -- Owner '{schema_owner}' does not exist in the database"
