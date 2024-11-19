@@ -5,7 +5,7 @@ const currentProject = projects[17];
 
 describe('As an advisor, I can quit a project', () => {
   beforeEach(() => {
-    cy.login('jean');
+    cy.login('conseiller1');
     cy.visit(`/project/${currentProject.pk}`);
   });
 

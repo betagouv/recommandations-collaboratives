@@ -7,7 +7,7 @@ const projectCommune = communes.find(
 
 describe('I cant create a projetc if the postal cities are empty', () => {
   beforeEach(() => {
-    cy.login('bob');
+    cy.login('collectivité1');
   });
 
   it('goes to the onboarding page and trigger an error if the postal is set but returns 0 cities', () => {

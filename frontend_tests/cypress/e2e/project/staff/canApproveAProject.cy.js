@@ -5,15 +5,19 @@ describe('I can go to the dashboard and see the pending projects, and approve on
 
   it('approves a project', () => {
     cy.visit('/projects/moderation');
-    cy.contains('projet entrant à examiner');
-    cy.contains('Friche numéro 4');
-    cy.get('[data_test_id="accept-project"]')
+    cy.contains('Friche numéro 4')
+      .closest("[data-test-id='project-card']")
+      .find('[data-test-id="accept-project"]')
       .contains('Accepter')
-      .click({ force: true });
+      .click();
+
     cy.url().should('include', '/project/');
     cy.contains('Friche numéro 4');
 
     cy.visit('/projects/moderation');
-    cy.contains('Friche numéro 4').should('not.exist');
+    cy.get('[data-test-id="moderation-page"]').should(
+      'not.include.text',
+      'Friche numéro 4'
+    );
   });
 });

@@ -122,6 +122,7 @@
                        name="segmented-control-project">
                 <label class="fr-label" for="segmented-control-tasks">
                     <a class="stretched-link"
+                       data-test-id="project-navigation-documents"
                        href="{% if 'manage_documents' in user_project_perms %} {% url 'projects-project-detail-documents' project.pk %} {% else %}#{% endif %}">Fichiers
                         {% if 'manage_documents' in user_project_perms %}
                             {% if active_project_document_notifications_count %}

@@ -4,7 +4,7 @@ const currentProject = projects[1];
 
 describe("I can't change topics of a project", () => {
   beforeEach(() => {
-    cy.login('bob');
+    cy.login('collectivité1');
   });
 
   it('goes to overview page and should not see edit topic button', () => {
