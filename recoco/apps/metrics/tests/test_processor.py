@@ -45,8 +45,8 @@ class TestMaterializedView:
             == "metrics_example_com"
         )
 
-    def test_create_for_site(self, stub_site):
-        view = MaterializedView.create(
+    def test_from_spec(self, stub_site):
+        view = MaterializedView.from_spec(
             site=stub_site,
             spec={
                 "name": "view_test",
@@ -59,17 +59,17 @@ class TestMaterializedView:
         assert view.indexes == ["index1", "index2"]
         assert view.unique_indexes == ["unique_index1", "unique_index2"]
 
-    def test_create_for_site_sql_query_error(self, stub_site):
+    def test_from_spec_sql_query_error(self, stub_site):
         with pytest.raises(MaterializedViewSpecError):
-            MaterializedView.create(
+            MaterializedView.from_spec(
                 site=stub_site,
                 spec={"name": "dummy_view_name"},
             )
-        assert MaterializedView.create(
+        assert MaterializedView.from_spec(
             site=stub_site,
             spec={"name": "view_test_django_qs"},
         )
-        assert MaterializedView.create(
+        assert MaterializedView.from_spec(
             site=stub_site,
             spec={"name": "view_test_raw_sql"},
         )
@@ -85,7 +85,7 @@ class TestMaterializedView:
 
     def test_create_with_indexes(self, stub_site):
         mock_cursor = Mock(spec=CursorWrapper)
-        view = MaterializedView.create(
+        view = MaterializedView.from_spec(
             site=stub_site,
             spec={
                 "name": "view_test_simple",
