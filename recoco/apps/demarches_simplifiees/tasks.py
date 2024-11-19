@@ -53,6 +53,9 @@ def update_or_create_ds_folder(recommendation_id: int):
     except Task.DoesNotExist:
         return
 
+    if recommendation.resource is None:
+        return
+
     ds_resource: DSResource = find_ds_resource_for_project(
         project=recommendation.project,
         resource=recommendation.resource,

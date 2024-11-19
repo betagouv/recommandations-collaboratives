@@ -1,7 +1,6 @@
-describe("I can create a project if i'm connected", () => {
+describe("I can create a project if i'm connected @critical", () => {
   beforeEach(() => {
-    cy.login('bob');
-    cy.acceptCookies();
+    cy.login('collectivité1');
   });
 
   it('goes to the onboarding process step by step and create a project ', () => {

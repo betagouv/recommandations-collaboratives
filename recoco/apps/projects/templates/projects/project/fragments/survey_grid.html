@@ -76,6 +76,7 @@
                         <button @click="openPublicShareModal"
                                 data-toggle="modal"
                                 data-target="#publicShareModal"
+                                data-test-id="public-share-button"
                                 {% if project.status == 'DRAFT' %}disabled{% endif %}
                                 class="fr-btn fr-btn--sm fr-btn--secondary {% if project.status == 'DRAFT' %}fr-btn--icon-left fr-icon-lock-line disabled{% endif %}">
                             Partager l'état des lieux

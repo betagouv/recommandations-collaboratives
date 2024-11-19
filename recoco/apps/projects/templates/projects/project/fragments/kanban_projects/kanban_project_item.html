@@ -19,7 +19,7 @@
          @dragend="onDragEnd(event)">
         <div class="d-flex align-items-center">
             <template x-if="p.status === 'NEW' ">
-                <i class="status-color-indicator fr-mr-2v specific-background-0063CB"></i>
+                <i class="status-color-indicator fr-mr-2v specific-background-high-blue-france"></i>
             </template>
             <a :href="makeProjectURL('{% url 'projects-project-detail' 0 %}', p.project.id)"
                class="fw-bold fr-mt-0 fr-pt-0 font-normal fr-mb-0 text-decoration-none fr-pr-3w text-dark cursor-pointer specific-fontsize-18"

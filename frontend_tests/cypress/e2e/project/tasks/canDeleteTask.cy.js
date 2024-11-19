@@ -3,22 +3,17 @@ const currentProject = projects[1];
 
 describe('I can go to tasks tab', () => {
   beforeEach(() => {
-    cy.login('jean');
+    cy.login('conseiller1');
     // cy.createProject('delete task');
   });
 
   it('deletes a task', () => {
-    cy.becomeAdvisor();
-    cy.visit(`/project/${currentProject.pk}`);
-    cy.contains('Recommandations').click({ force: true });
-    cy.url().should('include', '/actions');
+    cy.becomeAdvisor(currentProject.pk);
+    cy.visit(`/project/${currentProject.pk}/actions`);
 
     cy.createTask('test');
 
-    cy.get('[data-test-id="list-tasks-switch-button"]').should(
-      'have.class',
-      'active'
-    );
+    cy.get('[data-test-id="list-tasks-switch-button"]').should('be.checked');
 
     cy.get('[data-test-id="open-task-actions-button"]').then((el) => {
       const count3 = el.length;

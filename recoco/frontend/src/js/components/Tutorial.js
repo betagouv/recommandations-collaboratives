@@ -7,7 +7,7 @@ import api, { challengeUrl, challengeDefinitionUrl } from '../utils/api';
 //Custom introjs CSS
 import '../../css/introJs.css';
 
-function Tutorial(challengeCode, autoStart = false) {
+function Tutorial(challengeCode) {
   return {
     steps: [],
     hints: [],
@@ -19,13 +19,13 @@ function Tutorial(challengeCode, autoStart = false) {
     showTuto: false,
     async init() {
       this.challengeCode = challengeCode;
-
       const challengeDefinition =
         await this.getChallengeDefinition(challengeCode);
 
       //Get current challenge for current user
       //Can be empty object
       const challenge = await this.getChallenge(this.challengeCode);
+      if (!challenge) return;
       const userHasActiveChallenge = !(Object.keys(challenge).length === 0);
 
       if (challengeDefinition && userHasActiveChallenge) {
@@ -53,11 +53,6 @@ function Tutorial(challengeCode, autoStart = false) {
       this.tour.onexit(async () => {
         this.snoozeChallenge(this.challengeCode);
       });
-
-      if (autoStart) {
-        this.tour.start();
-        await this.startChallenge(this.challengeCode);
-      }
     },
     async getChallengeDefinition(code) {
       try {
@@ -105,9 +100,12 @@ function Tutorial(challengeCode, autoStart = false) {
         console.warn(err);
       }
     },
-    async handleStartTour() {
+    async hideStartModal() {
       this.startButton = this.$refs.startTourButton;
       this.startButton.style.display = 'none';
+      this.handleStartTour();
+    },
+    async handleStartTour() {
       this.tour.start();
       await this.startChallenge(this.challengeCode);
     },

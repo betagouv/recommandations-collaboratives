@@ -3,14 +3,11 @@ import projects from '../../../fixtures/projects/projects.json';
 const currentProject = projects[2];
 
 describe('I can have a public url to share', () => {
-  beforeEach(() => {
-    cy.login('boba');
-  });
-
   it('goes to share a project page', () => {
-    cy.visit(`/project/${currentProject.pk}`);
+    cy.login('collectivité2');
+    cy.visit(`/project/${currentProject.pk}/connaissance`);
 
-    cy.contains("Partager l'état des lieux").click({ force: true });
+    cy.get('[data-test-id="public-share-button"]').click({ force: true });
 
     // cy.url().should('include', '/access/')
 

@@ -15,20 +15,21 @@
         <div class="w-75 d-flex flex-column justify-content-start">
             <div class="d-flex justify-content-between align-items-center fr-px-3w fr-pt-3w">
                 <h2>Projets à faible répondant</h2>
-                <!-- <a href="{% url 'crm-project-list-by-tags-csv' %}" class="btn btn-primary">Export CSV</a>  -->
+                <a href="{% url 'crm-projects-low-reach-csv' %}" class="btn btn-primary">Export CSV</a>
             </div>
             <table class="table table-striped">
                 <thead>
                     <tr>
                         <th>Nom</th>
+                        <th>Conseillers</th>
                         <th>% d'accès aux recos</th>
-                        <th>Dernière activité collectivité</th>
+                        <th>Dernière activité porteur de projet</th>
                         <th>Dernière reco publiée</th>
                         <th>Dernier msg conversation</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for project in projects %}
+                    {% for project in low_reach_projects %}
                         <tr>
                             <td>
                                 {% if project.inactive_since %}<s>{% endif %}
@@ -40,7 +41,6 @@
                                              width="12px"
                                              height="12px"
                                              fill="currentColor">
-                                            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#box-arrow-up-right" />
                                         </svg>
                                     </a>
                                     {% if project.inactive_since %}</s>{% endif %}
@@ -57,6 +57,12 @@
                                 {% endif %}
                                 <br>
                                 <span class="secondary small">{{ project.commune }} ({{ project.commune.postal }})</span>
+                            </td>
+                            <td>
+                                {% for advisor in project.switchtenders.all %}
+                                <span><a href="{% url 'crm-user-details' advisor.pk %}">{{ advisor.get_full_name }} ({{ advisor.profile.organization }})</a></span>
+                                {% if not forloop.last %} - {% endif %}
+                                {% endfor %}
                             </td>
                             <td>{{ project.reco_read_ratio|floatformat:0 }}% ({{ project.reco_read }}/{{ project.reco_total }})</td>
                             <td>{{ project.last_members_activity_at|timesince }}</td>

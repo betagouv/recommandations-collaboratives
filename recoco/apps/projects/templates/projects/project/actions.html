@@ -31,12 +31,14 @@
     {% if project.inactive_since != None %}
         <div class="specific-border-4pxsolid1e1e1e">
             {% include "projects/project/fragments/project_banner/paused_project_banner.html" %}
-            <div class="no-interaction-possible">
+            <div>
             {% elif project.status == 'DRAFT' %}
                 <div class="specific-border-4pxsolid000091">
                     {% include "projects/project/fragments/project_banner/non_published_project_banner.html" %}
                 {% elif not advising and is_regional_actor and not is_staff %}
-                    <div x-data x-init="$nextTick(() => $store.showRole.init())" class="specific-border-4pxsolid000091">
+                    <div x-data
+                         x-init="$nextTick(() => $store.showRole.init())"
+                         class="specific-border-4pxsolid000091">
                         {% include "projects/project/fragments/project_banner/join_project_banner.html" %}
                         <div>
                         {% endif %}
@@ -48,11 +50,11 @@
                         {{ position.is_advisor|json_script:"isAdvisorOnProject" }}
                         {% if is_switchtender and project.tasks.all.count == 0 %}
                             <div data-test-id="no-tasks-banner" class="bg-light fr-p-3w rounded-2">
-                                <h3 class="fw-light">Pas encore de recommandations à la collectivité ?</h3>
+                                <h3 class="fw-light">Pas encore de recommandations au porteur de projet ?</h3>
                                 <p class="fst-italic fw-light fr-mb-2w">
-                                    Soyez la première personne à proposer des recommandations ou des ressources à la collectivité !
+                                    Soyez la première personne à proposer des recommandations ou des ressources au porteur de projet !
                                 </p>
-                                {% if advising %}
+                                {% if advising or is_staff %}
                                     <a data-test-id="submit-task-button"
                                        href="{% url 'projects-create-task' %}?project_id={{ project.id }}"
                                        class="fr-btn">Émettre une recommandation</a>
@@ -62,8 +64,13 @@
                                         <span class="badge bg-warning">Beta feature</span> <a href="{% url 'projects-project-tasks-suggest' project.pk %}">Examiner les recommandation suggérées automatiquement pour ce projet</a>
                                     </p>
                                 {% else %}
-                                    <a href="{% url 'projects-project-switchtender-join' project.id %}"
-                                       class="fr-btn">Rejoindre ce projet pour l'aiguiller</a>
+                                    <button class="fr-btn"
+                                            data-bs-toggle="dropdown"
+                                            data-bs-auto-close="outside"
+                                            aria-expanded="false"
+                                            aria-controls="select-observer-or-advisor">
+                                        Rejoindre ce projet pour l'aiguiller
+                                    </button>
                                 {% endif %}
                             </div>
                         {% elif not is_switchtender and project.tasks.public.count == 0 %}

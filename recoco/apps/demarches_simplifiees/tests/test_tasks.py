@@ -190,3 +190,8 @@ class TestUpdateOrCreateDSFolder(BaseTestMixin):
             update_or_create_ds_folder(recommendation.id)
 
         responses.assert_call_count(self.ds_url, 0)
+
+    def test_no_recommendation_resource(self):
+        recommendation = baker.make(Task, resource=None)
+        update_or_create_ds_folder(recommendation.id)
+        assert DSFolder.objects.count() == 0

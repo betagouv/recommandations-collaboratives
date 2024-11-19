@@ -1,5 +1,5 @@
 /* variables */
-$blue: #335b7e;
+$blue: var(--background-action-high-blue-france);
 $dark-blue: #224a6d;
 $turquoise: #5dc2b0;
 
@@ -93,10 +93,6 @@ main {
 
 .arrow-left {
   transform: rotate(45deg);
-}
-
-a {
-  color: $blue;
 }
 
 a:not(.fr-btn):not(.btn-outline-primary):not(.btn-primary):not(

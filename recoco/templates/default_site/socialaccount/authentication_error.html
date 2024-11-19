@@ -1,0 +1,28 @@
+
+{% load i18n %}
+{% load allauth %}
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>
+            {% trans "Third-Party Login Failure" %}
+        </title>
+    </head>
+    <body>
+        {% element h1 %}
+            {% trans "Third-Party Login Failure" %}
+        {% endelement %}
+
+        {% element p %}
+            {% trans "An error occurred while attempting to login via your third-party account." %}
+        {% endelement %}
+
+        {% url 'account_login' as login_url %}
+        {% if login_url %}
+        <a href="{{ login_url }}">{% trans "Sign In" %}</a>
+        {% endif %}
+    </body>
+</html>

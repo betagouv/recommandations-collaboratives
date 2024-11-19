@@ -138,6 +138,7 @@
                 {% if "manage_resources" in user_site_perms %}
                     <div id="edit-resource" class="fr-mt-2w">
                         <a class="fr-btn fr-btn--secondary w-100 justify-content-center fr-btn--icon-left fr-icon-edit-line"
+                           data-test-id="edit-resource"
                            href="{% url "resources-resource-update" resource.id %}">Editer</a>
                     </div>
                 {% endif %}
