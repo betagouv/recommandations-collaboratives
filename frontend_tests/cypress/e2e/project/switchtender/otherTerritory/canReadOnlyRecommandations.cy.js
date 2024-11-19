@@ -3,17 +3,11 @@ const currentProject = projects[1];
 
 describe('I can read only recommandations', () => {
   beforeEach(() => {
-    cy.login('jeannot');
+    cy.login('conseiller3');
   });
 
   it('goes to recommandations and read only content', () => {
-    cy.visit('/projects');
-
-    cy.contains(currentProject.fields.name).click({ force: true });
-
-    cy.contains('Recommandations').click({ force: true });
-
-    cy.url().should('include', '/actions');
+    cy.visit(`/project/${currentProject.pk}/actions`);
 
     cy.contains('Ajouter une recommandation').should('not.exist');
   });

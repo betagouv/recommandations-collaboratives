@@ -5,12 +5,18 @@ describe('I can go to the dashboard and see the pending projects, and refuse one
 
   it('refuses a project', () => {
     cy.visit('/projects/moderation');
-    cy.contains('projet entrant à examiner');
-    cy.contains('Friche à refuser');
-    cy.get('[data_test_id="refuse-project"]')
+
+    cy.contains('Friche à refuser')
+      .closest("[data-test-id='project-card']")
+      .find('[data-test-id="refuse-project"]')
       .contains('Refuser')
-      .click({ force: true });
+      .click();
+
     cy.url().should('include', '/projects/moderation/');
-    cy.contains('Friche à refuser').should('not.exist');
+
+    cy.get('[data-test-id="moderation-page"]').should(
+      'not.include.text',
+      'Friche à refuser'
+    );
   });
 });

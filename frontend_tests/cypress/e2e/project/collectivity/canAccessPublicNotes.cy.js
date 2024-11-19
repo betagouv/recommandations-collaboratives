@@ -4,7 +4,7 @@ const currentProject = projects[1];
 
 describe('I can access and use public notes', () => {
   beforeEach(() => {
-    cy.login('bob');
+    cy.login('collectivité1');
   });
 
   it('clicks on the "public note" button', () => {

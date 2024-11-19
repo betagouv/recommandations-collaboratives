@@ -19,6 +19,7 @@ import './store/app';
 import './components/Notification';
 import './components/Editor';
 import './components/FieldValidator';
+import './components/Toast';
 
 //Global CSS
 import '../css/dsfr-custom.css';

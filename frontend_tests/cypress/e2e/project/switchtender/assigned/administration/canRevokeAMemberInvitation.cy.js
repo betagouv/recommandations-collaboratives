@@ -4,7 +4,7 @@ const currentProject = projects[1];
 
 describe('I can go to administration area of a project and revoke an invite for a member', () => {
   beforeEach(() => {
-    cy.login('jean');
+    cy.login('conseiller1');
   });
 
   it('goes to the administration tab of a project and revoke the member invitation', () => {

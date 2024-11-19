@@ -10,7 +10,7 @@ describe('I can invite a member', () => {
   const project = 'Friche numéro 2';
 
   it('goes to the overview page and invite a member', () => {
-    cy.login('boba');
+    cy.login('collectivité2');
     const message = `Bonjour ${invitedFullName}, je t'invite à conseiller mon projet ${project} ${invitedEmail}`;
     const sentNotification = `Un courriel d'invitation à rejoindre le projet a été envoyé à ${invitedEmail}`;
 
