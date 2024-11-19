@@ -36,7 +36,7 @@ class Command(BaseCommand):
 
         with connection.cursor() as cursor:
             with transaction.atomic():
-                for spec in settings.MATERIALIZED_VIEWS_SPEC:
+                for spec in settings.METRICS_MATERIALIZED_VIEWS_SPEC:
                     try:
                         materialized_view = MaterializedView.create_for_site(
                             site=site, spec=spec
@@ -61,11 +61,14 @@ class Command(BaseCommand):
                         materialized_view.refresh()
 
                 # if an owner is specified, assign rights
-                if settings.MATERIALIZED_VIEWS_OWNER_TPL and not options["drop_only"]:
+                if (
+                    settings.METRICS_MATERIALIZED_VIEWS_OWNER_TPL
+                    and not options["drop_only"]
+                ):
                     db_schema_name = MaterializedView.make_db_schema_name(site)
 
                     schema_owner = Template(
-                        settings.MATERIALIZED_VIEWS_OWNER_TPL
+                        settings.METRICS_MATERIALIZED_VIEWS_OWNER_TPL
                     ).substitute(
                         site_name=site.name,
                         site_slug=make_site_slug(site=site),

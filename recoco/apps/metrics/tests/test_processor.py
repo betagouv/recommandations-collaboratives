@@ -15,10 +15,10 @@ from recoco.apps.metrics.processor import (
 class TestMaterializedView:
     @pytest.fixture(autouse=True)
     def _change_sql_dir(self, settings):
-        settings.MATERIALIZED_VIEWS_SQL_DIR = (
+        settings.METRICS_MATERIALIZED_VIEWS_SQL_DIR = (
             settings.BASE_DIR / "apps/metrics/tests/sql_queries"
         )
-        settings.MATERIALIZED_VIEWS_SPEC = [
+        settings.METRICS_MATERIALIZED_VIEWS_SPEC = [
             {"name": "view_test_django_qs"},
             {"name": "view_test_raw_sql"},
         ]
@@ -27,7 +27,7 @@ class TestMaterializedView:
     def _disable_owner_settings(self, settings):
         """We disable that feature to prevent the test from required another role in
         the database"""
-        settings.MATERIALIZED_VIEWS_OWNER_TPL = None
+        settings.METRICS_MATERIALIZED_VIEWS_OWNER_TPL = None
 
     @pytest.fixture(autouse=True)
     def stub_site(self):
@@ -115,7 +115,7 @@ class TestMaterializedView:
 
     @pytest.mark.django_db(transaction=True)
     def test_assign_permissions_to_owner(self, mocker, settings):
-        settings.MATERIALIZED_VIEWS_OWNER_TPL = "metrics_owner_example_com"
+        settings.METRICS_MATERIALIZED_VIEWS_OWNER_TPL = "metrics_owner_example_com"
 
         with connection.cursor() as cursor:
             cursor.execute("DROP ROLE IF EXISTS metrics_owner_example_com;")
