@@ -65,9 +65,12 @@ if SENTRY_URL := os.environ.get("SENTRY_URL"):
             DjangoIntegration(),
             CeleryIntegration(),
         ],
-        environment="production",
-        traces_sample_rate=0.05,
+        environment="production" if not DEBUG else "dev",
+        # Set traces_sample_rate to 1.0 to capture 100%
+        # of transactions for performance monitoring.
+        traces_sample_rate=1.0,
         send_default_pii=True,
+        release=f"recoco@{VERSION}",
     )
 
 # eof
