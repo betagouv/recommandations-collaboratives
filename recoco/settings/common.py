@@ -430,36 +430,43 @@ WAGTAIL_EMAIL_MANAGEMENT_ENABLED = False
 METRICS_MATERIALIZED_VIEWS_SPEC = [
     {
         "name": "projects",
-        "unique_indexes": ["hash"],
+        "unique_indexes": [
+            # ("hash", "site_domain"),
+        ],
         "indexes": ["created_on"],
     },
     {
         "name": "recommendations",
-        "unique_indexes": ["hash"],
+        "unique_indexes": [
+            # ("hash", "site_domain"),
+        ],
         "indexes": ["created_on"],
     },
     {
         "name": "resources",
-        "unique_indexes": ["hash"],
+        "unique_indexes": [
+            # ("hash", "site_domain"),
+        ],
     },
     {
         "name": "users",
-        "unique_indexes": ["hash"],
-        "indexes": ["last_login", "is_advisor"],
+        "unique_indexes": [
+            # ("hash", "site_domain"),
+        ],
+        # "indexes": ["last_login", "is_advisor"],
     },
     {
         "name": "user_activity",
-        "indexes": ["user_hash"],
+        "unique_indexes": [
+            # ("hash", "site_domain"),
+        ],
     },
 ]
 
 METRICS_MATERIALIZED_VIEWS_SQL_DIR = BASE_DIR / "apps/metrics/sql_queries"
-METRICS_MATERIALIZED_VIEWS_OWNER_TPL = (
-    "metrics_owner_$site_slug"  # template string to apply persmissions on db schemes
-)
 METRICS_MATERIALIZED_VIEWS_OWNER_OVERRIDES = (
     {}
-)  # specific rules for the OWNER_TPL per site
+)  # specific rules for the schema owner per site
 
 
 # Baker

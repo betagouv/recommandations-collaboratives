@@ -11,11 +11,10 @@ from recoco.apps.tasks.models import TaskFollowup
 from ..utils import hash_field
 
 
-def get_queryset(site_id: int) -> QuerySet:
+def get_queryset() -> QuerySet:
     UserCT = ContentType.objects.get_for_model(User)
     activity = (
-        Action.objects.filter(site__pk=site_id)
-        .filter(public=True, actor_content_type=UserCT)
+        Action.objects.filter(public=True, actor_content_type=UserCT)
         .filter(
             verb__in=[
                 verbs.Project.INVITATION,
@@ -31,29 +30,36 @@ def get_queryset(site_id: int) -> QuerySet:
             ]
         )
         .annotate(
-            user_hash=hash_field("actor_object_id", salt="user"),
+            hash=hash_field("actor_object_id", salt="user"),
             event_name=F("verb"),
             when=Cast("timestamp", output_field=models.DateField()),
+            site_domain=F("site__domain"),
         )
         .values(
-            "user_hash",
+            "hash",
+            "site_domain",
             "event_name",
             "when",
         )
     )
 
     reco_status_updated = (
-        TaskFollowup.objects.filter(task__site__pk=site_id)
-        .exclude(status=None)
+        TaskFollowup.objects.exclude(status=None)
         .annotate(
-            user_hash=hash_field("who", salt="user"),
+            hash=hash_field("who", salt="user"),
             event_name=Value(
                 "a mis à jour l'état de la recommandation",
                 output_field=models.TextField(),
             ),
             when=Cast("timestamp", output_field=models.DateField()),
+            site_domain=F("task__site__domain"),
         )
-        .values("user_hash", "event_name", "when")
+        .values(
+            "hash",
+            "site_domain",
+            "event_name",
+            "when",
+        )
     )
 
     return activity.union(reco_status_updated)

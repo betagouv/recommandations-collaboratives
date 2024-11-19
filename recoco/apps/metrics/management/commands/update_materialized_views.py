@@ -1,17 +1,15 @@
-from string import Template
 from typing import Any
 
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.management.base import BaseCommand
-from django.db import connection, transaction
+from django.db import connection
 from django.db.backends.utils import CursorWrapper
 
 from recoco.apps.metrics.processor import (
     MaterializedView,
     MaterializedViewSpecError,
 )
-from recoco.utils import make_site_slug
 
 
 class Command(BaseCommand):
@@ -23,89 +21,64 @@ class Command(BaseCommand):
         )
         return cursor.fetchone() is not None
 
-    def _assign_permissions_to_owner(
-        self, cursor: CursorWrapper, schema_name: str, schema_owner: str
-    ):
-        cursor.execute(
-            sql=f"GRANT CONNECT ON DATABASE {connection.settings_dict['NAME']} TO {schema_owner};"
-        )
-        cursor.execute(sql=f"GRANT USAGE ON SCHEMA {schema_name} TO {schema_owner};")
+    def create_views(self, **options: Any):
+        for spec in settings.METRICS_MATERIALIZED_VIEWS_SPEC:
+            try:
+                materialized_view = MaterializedView.from_spec(spec=spec)
+            except MaterializedViewSpecError as err:
+                self.stdout.write(self.style.ERROR(str(err)))
+                continue
 
-        cursor.execute(
-            sql=f"GRANT SELECT ON ALL TABLES IN SCHEMA {schema_name} TO {schema_owner};"
-        )
+            with connection.cursor() as cursor:
+                materialized_view.set_cursor(cursor)
 
-    def _create_views_for_site(self, site: Site, **options: Any):
-        self.stdout.write(
-            f"Updating materialized views for site {site.name} (#{site.id})"
-        )
-
-        with connection.cursor() as cursor:
-            with transaction.atomic():
-                for spec in settings.METRICS_MATERIALIZED_VIEWS_SPEC:
-                    try:
-                        materialized_view = MaterializedView.create_for_site(
-                            site=site, spec=spec
-                        )
-                    except MaterializedViewSpecError as err:
-                        self.stdout.write(self.style.ERROR(str(err)))
-                        continue
-
-                    materialized_view.set_cursor(cursor)
-
-                    if not options["refresh_only"]:
+                if not options["refresh_only"]:
+                    for site in Site.objects.order_by("id"):
                         self.stdout.write(
-                            f"  >> Dropping materialized view '{materialized_view.db_schema_name}.{materialized_view.db_view_name}'"
+                            f"  >> Dropping materialized view '{materialized_view.site_db_schema_name(site)}.{materialized_view.db_view_name}'"
                         )
-                        materialized_view.drop()
-
-                    if not options["drop_only"]:
-                        self.stdout.write(
-                            f"  >> Refreshing materialized view '{materialized_view.db_schema_name}.{materialized_view.db_view_name}'"
-                        )
-                        materialized_view.create()
-                        materialized_view.refresh()
-
-                # if an owner is specified, assign rights
-                if (
-                    settings.METRICS_MATERIALIZED_VIEWS_OWNER_TPL
-                    and not options["drop_only"]
-                ):
-                    db_schema_name = MaterializedView.make_db_schema_name(site)
-
-                    # Check first if we have an owner override
-                    schema_owner = (
-                        settings.METRICS_MATERIALIZED_VIEWS_OWNER_OVERRIDES.get(
-                            make_site_slug(site), None
-                        )
-                    )
-
-                    # Compute default one in case we didn't find an override
-                    if not schema_owner:
-                        schema_owner = Template(
-                            settings.METRICS_MATERIALIZED_VIEWS_OWNER_TPL
-                        ).substitute(
-                            site_name=site.name,
-                            site_slug=make_site_slug(site=site),
-                        )
-
-                    if not self._check_user_exists_in_db(cursor, schema_owner):
-                        self.stdout.write(
-                            self.style.ERROR(
-                                f"  -- Owner '{schema_owner}' does not exist in the database"
-                            )
-                        )
-                        return
+                        materialized_view.drop_for_site(site=site)
 
                     self.stdout.write(
-                        f"  ++ Assigning permissions to '{schema_owner}' on schema '{db_schema_name}'"
+                        f"  >> Dropping materialized view '{materialized_view.db_schema_name}.{materialized_view.db_view_name}'"
                     )
+                    materialized_view.drop()
 
-                    self._assign_permissions_to_owner(
-                        cursor=cursor,
-                        schema_name=db_schema_name,
-                        schema_owner=schema_owner,
+                if not options["drop_only"]:
+                    self.stdout.write(
+                        f"  >> Refreshing materialized view '{materialized_view.db_schema_name}.{materialized_view.db_view_name}'"
                     )
+                    materialized_view.create()
+                    materialized_view.refresh()
+
+                    for site in Site.objects.order_by("id"):
+                        self.stdout.write(
+                            f"  >> Refreshing materialized view '{materialized_view.site_db_schema_name(site)}.{materialized_view.db_view_name}'"
+                        )
+                        materialized_view.create_for_site(site=site)
+                        materialized_view.refresh_for_site(site=site)
+
+                if not options["drop_only"] and not options["refresh_only"]:
+                    if not self._check_user_exists_in_db(
+                        cursor, materialized_view.db_schema_owner
+                    ):
+                        self.stdout.write(
+                            self.style.ERROR(
+                                f"  -- Owner '{materialized_view.db_schema_owner}' does not exist in the database"
+                            )
+                        )
+                        continue
+
+                    self.stdout.write(
+                        f"  ++ Assigning permissions to '{materialized_view.db_schema_owner}' on schema '{materialized_view.db_schema_name}'"
+                    )
+                    materialized_view.assign_permissions()
+
+                    for site in Site.objects.order_by("id"):
+                        self.stdout.write(
+                            f"  ++ Assigning permissions to '{materialized_view.site_db_schema_owner(site)}' on schema '{materialized_view.site_db_schema_name(site)}'"
+                        )
+                        materialized_view.assign_permissions_for_site(site=site)
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -128,6 +101,4 @@ class Command(BaseCommand):
             )
             return
 
-        for site in Site.objects.order_by("id"):
-            with settings.SITE_ID.override(site.pk):
-                self._create_views_for_site(site, **options)
+        self.create_views(**options)
