@@ -15,8 +15,8 @@ DJANGO_DB_HOST=localhost
 DJANGO_DB_PORT=5432
 DJANGO_VITE_TEST_SERVER_PORT=3001
 DJANGO_VITE_DEV_SERVER_PORT=3000
-DJANGO_GDAL_LIBRARY_PATH=
-DJANGO_GEOS_LIBRARY_PATH=
+GDAL_LIBRARY_PATH=
+GEOS_LIBRARY_PATH=
 ```
 
 - S'assurer que dans le fichier `development.py` dans les settings de `Django`, la base de données de test est bien configurée. Par exemple :
