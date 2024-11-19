@@ -54,25 +54,31 @@ uv pip install -r requirements-dev.txt
 
 #### Configuration de l'applicatif
 
+Copiez le fichier de variables d'environnement d'exemple :
+
+```sh
+cp .env.example .env
+```
+
+Puis compléter le fichier `.env` avec les informations de votre base de données.
+
+```bash
+DJANGO_DB_NAME=recoco
+DJANGO_DB_TEST_NAME=test_recoco
+DJANGO_DB_USER=recoco
+DJANGO_DB_PASSWORD=
+DJANGO_DB_HOST=localhost
+DJANGO_DB_PORT=5432
+DJANGO_VITE_TEST_SERVER_PORT=3001
+DJANGO_VITE_DEV_SERVER_PORT=3000
+DJANGO_GDAL_LIBRARY_PATH=
+DJANGO_GEOS_LIBRARY_PATH=
+```
+
 Copiez le fichier de configuration d'exemple :
 
 ```sh
 cp recoco/settings/development.py.example recoco/settings/development.py
-```
-
-Puis modifiez la configuration de la base de données :
-
-```python
-DATABASES = {
-     'default': {
-         'ENGINE': 'django.db.backends.postgresql',
-         'NAME': os.environ.get('POSTGRES_NAME'),
-         'USER': os.environ.get('POSTGRES_USER'),
-         'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
-         'HOST': 'db',
-         'PORT': 5432,
-     }
-}
 ```
 
 Vous pouvez aussi renseigner les valeurs dans le fichier si vous préférez ne pas utiliser des variables d'environnement.
