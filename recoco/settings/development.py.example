@@ -35,14 +35,16 @@ DEBUG_TOOLBAR_CONFIG = {
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
+
 DATABASES = {
     "default": {
-        "ENGINE": os.environ.get("DB_ENGINE", "django.db.backends.sqlite3"),
-        "NAME": os.environ.get("DB_NAME", BASE_DIR / "db.sqlite3"),
-        "USER": os.environ.get("DB_USER", None),
-        "PASSWORD": os.environ.get("DB_PASSWORD", None),
-        "HOST": os.environ.get("DB_HOST", None),
-        "PORT": os.environ.get("DB_PORT", None),
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": os.getenv("DJANGO_DB_NAME", "recoco"),
+        "USER": os.getenv("DJANGO_DB_USER", "recoco"),
+        "PASSWORD": os.getenv("DJANGO_DB_PASSWORD"),
+        "HOST": os.getenv("DJANGO_DB_HOST", "localhost"),
+        "PORT": os.getenv("DJANGO_DB_PORT", 5432),
+        "TEST": {"NAME": os.getenv("DJANGO_DB_TEST_NAME", "test_recoco")},
     }
 }
 

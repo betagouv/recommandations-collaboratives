@@ -95,10 +95,6 @@ main {
   transform: rotate(45deg);
 }
 
-a {
-  color: $blue;
-}
-
 a:not(.fr-btn):not(.btn-outline-primary):not(.btn-primary):not(
     .btn-outline-secondary
   ):not(.stretched-link):hover {

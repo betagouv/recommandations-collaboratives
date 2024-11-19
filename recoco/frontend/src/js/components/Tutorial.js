@@ -25,6 +25,7 @@ function Tutorial(challengeCode) {
       //Get current challenge for current user
       //Can be empty object
       const challenge = await this.getChallenge(this.challengeCode);
+      if (!challenge) return;
       const userHasActiveChallenge = !(Object.keys(challenge).length === 0);
 
       if (challengeDefinition && userHasActiveChallenge) {

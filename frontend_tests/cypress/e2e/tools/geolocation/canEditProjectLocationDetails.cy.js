@@ -12,7 +12,6 @@ const address = '12 Rue Edouard Vaillant';
 describe('I can edit the location details of a project on the project knowledge tab', () => {
   beforeEach(() => {
     cy.visit('/');
-    cy.hideCookieBannerAndDjango();
   });
 
   it('can access a page to set the project coordinates by entering an address', () => {

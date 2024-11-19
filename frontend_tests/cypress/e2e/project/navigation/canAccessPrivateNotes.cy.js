@@ -3,7 +3,7 @@ const currentProject = projects[1];
 
 describe('I can access private notes tab in a project as a switchtender', () => {
   beforeEach(() => {
-    cy.login('jean');
+    cy.login('conseiller1');
   });
 
   it('goes to the private notes page of my project', () => {

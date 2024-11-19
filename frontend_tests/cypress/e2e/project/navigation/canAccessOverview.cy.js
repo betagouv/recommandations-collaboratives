@@ -3,7 +3,7 @@ const currentProject = projects[1];
 
 describe('I can access overview tab in a project as a member', () => {
   beforeEach(() => {
-    cy.login('bob');
+    cy.login('collectivité1');
   });
 
   it('goes to knowledge page and then overview page of my project', () => {
@@ -19,7 +19,7 @@ describe('I can access overview tab in a project as a member', () => {
 
 describe('I can access overview tab in a project as an advisor', () => {
   beforeEach(() => {
-    cy.login('jean');
+    cy.login('conseiller1');
   });
 
   it('goes to knowledge page and then overview page of my project', () => {

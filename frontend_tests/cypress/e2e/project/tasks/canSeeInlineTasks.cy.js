@@ -1,55 +1,24 @@
+let currentProjectId;
 describe('I can go to tasks tab', () => {
-  beforeEach(() => {
-    cy.login('jean');
-    cy.hideCookieBannerAndDjango();
-    cy.createProject('Count Published Project');
-  });
-
-  it('list all inline tasks', () => {
-    cy.visit('/projects/advisor').then(() => {
+  before(() => {
+    cy.login('conseiller1');
+    cy.createProject('Count Published Project').then((projectId) => {
+      currentProjectId = projectId;
+      cy.visit('/projects/advisor');
       cy.get('[data-test-id="project-link"]').first().click();
-      cy.becomeAdvisor();
-      cy.contains('Recommandations').click({ force: true });
-      cy.url().should('include', '/actions');
+      cy.becomeAdvisor(currentProjectId);
+      cy.visit(`/project/${currentProjectId}/actions`);
       cy.createTask('published task');
-      cy.get('[data-test-id="list-tasks-switch-button"]').should(
-        'have.class',
-        'active'
-      );
+      cy.createTask('drafted task', 'drafted label', false, true);
     });
   });
 
-  it('count the number of published inline tasks', () => {
-    cy.visit(`/projects`);
-    cy.get('[data-test-id="project-link"]').first().click();
-    cy.becomeAdvisor();
-    cy.contains('Recommandations').click({ force: true });
-    cy.url().should('include', '/actions');
-    cy.createTask('published task');
-    cy.get('[data-test-id="list-tasks-switch-button"]').should(
-      'have.class',
-      'active'
-    );
+  it('list all inline tasks, count task and ignore drafted one', () => {
+    cy.visit(`/project/${currentProjectId}/actions`);
+    cy.get('[data-test-id="list-tasks-switch-button"]').should('be.checked');
     cy.get('[data-test-id="tasks-count"]').should(
       'have.text',
       '1 recommandation'
-    );
-  });
-
-  it('count the number of drafted inline tasks', () => {
-    cy.visit(`/projects`);
-    cy.get('[data-test-id="project-link"]').first().click();
-    cy.becomeAdvisor();
-    cy.contains('Recommandations').click({ force: true });
-    cy.url().should('include', '/actions');
-    cy.createTask('drafted task', 'drafted label', false, true);
-    cy.get('[data-test-id="list-tasks-switch-button"]').should(
-      'have.class',
-      'active'
-    );
-    cy.get('[data-test-id="tasks-count"]').should(
-      'have.text',
-      '0 recommandation'
     );
   });
 });

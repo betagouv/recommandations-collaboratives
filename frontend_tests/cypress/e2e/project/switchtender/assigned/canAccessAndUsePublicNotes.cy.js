@@ -5,17 +5,11 @@ const currentProject = projects[1];
 
 describe('I can access and use public notes', () => {
   beforeEach(() => {
-    cy.login('jean');
+    cy.login('conseiller1');
   });
 
   it('goes to public notes', () => {
-    cy.visit('/projects');
-
-    cy.contains(currentProject.fields.name).click({ force: true });
-
-    cy.contains('Conversation').click({ force: true });
-
-    cy.url().should('include', '/conversations');
+    cy.visit(`/project/${currentProject.pk}/conversations`);
 
     const now = new Date();
 

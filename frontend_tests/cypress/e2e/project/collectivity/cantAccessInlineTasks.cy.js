@@ -4,7 +4,7 @@ const currentProject = projects[1];
 
 describe("I can go to action page but can't see the loop to access the inline tasks", () => {
   beforeEach(() => {
-    cy.login('bob');
+    cy.login('collectivité1');
   });
 
   it("goes to action page and can't see inline tasks loop button", () => {
