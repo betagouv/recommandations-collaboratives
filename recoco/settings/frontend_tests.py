@@ -11,7 +11,7 @@ import os
 
 from dotenv import load_dotenv
 
-from .common import *  # noqa: F403
+from .common import *
 
 load_dotenv()
 
@@ -21,7 +21,7 @@ DJANGO_DEBUG = True
 
 ALLOWED_HOSTS = ["localhost", "example.localhost"]
 
-INSTALLED_APPS += (  # noqa: F405
+INSTALLED_APPS += (
     "drf_spectacular",
     "drf_spectacular_sidecar",
     "django_extensions",
@@ -68,7 +68,7 @@ BREVO_FORCE_DEBUG = True
 RECAPTCHA_REQUIRED_SCORE = 0
 
 # Vite
-DJANGO_VITE_ASSETS_PATH = BASE_DIR / "frontend" / "dist"  # noqa: F405
+DJANGO_VITE_ASSETS_PATH = BASE_DIR / "frontend" / "dist"
 DJANGO_VITE = {
     "default": {
         "dev_mode": False,
@@ -77,10 +77,10 @@ DJANGO_VITE = {
     }
 }
 
-MULTISITE_REPO_DIR = BASE_DIR / ".." / "multisites"  # noqa: F405
-TEMPLATES[0]["DIRS"] += [MULTISITE_REPO_DIR / "templates"]  # noqa: F405
-STATICFILES_DIRS += [MULTISITE_REPO_DIR / "static"]  # noqa: F405
-STATICFILES_DIRS += [BASE_DIR / "static"]  # noqa: F405
+MULTISITE_REPO_DIR = BASE_DIR / ".." / "multisites"
+TEMPLATES[0]["DIRS"] += [MULTISITE_REPO_DIR / "templates"]
+STATICFILES_DIRS += [MULTISITE_REPO_DIR / "static"]
+STATICFILES_DIRS += [BASE_DIR / "static"]
 STATICFILES_DIRS += [DJANGO_VITE_ASSETS_PATH]
 
 
@@ -88,7 +88,7 @@ STATICFILES_DIRS += [DJANGO_VITE_ASSETS_PATH]
 GDAL_LIBRARY_PATH = os.getenv("DJANGO_GDAL_LIBRARY_PATH")
 GEOS_LIBRARY_PATH = os.getenv("DJANGO_GEOS_LIBRARY_PATH")
 
-SILENCED_SYSTEM_CHECKS += ["captcha.recaptcha_test_key_error"]  # noqa: F405
+SILENCED_SYSTEM_CHECKS += ["captcha.recaptcha_test_key_error"]
 
 # Celery
 CELERY_TASK_ALWAYS_EAGER = True

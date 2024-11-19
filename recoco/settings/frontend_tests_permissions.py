@@ -9,10 +9,8 @@ created : 2024-11-18 11:54:53 CEST
 
 import os
 
-from .frontend_tests import *  # noqa: F403
+from .frontend_tests import *
 
-DATABASES["default"]["NAME"] = os.getenv(  # noqa: F405
-    "DJANGO_DB_TEST_NAME", "test_recoco"
-)
+DATABASES["default"]["NAME"] = os.getenv("DJANGO_DB_TEST_NAME", "test_recoco")
 
 # eof
