@@ -1,4 +1,4 @@
-from unittest.mock import Mock, call
+from unittest.mock import ANY, Mock, call
 
 import pytest
 from django.contrib.sites.models import Site
@@ -114,18 +114,12 @@ class TestMaterializedView:
         )
 
     @pytest.mark.django_db(transaction=True)
-    def test_create_with_specified_owner(self, mocker, settings):
-        settings.MATERIALIZED_VIEWS_OWNER_TPL = "bal"
-        mock = mocker.patch(
-            "recoco.apps.metrics.management.commands.update_materialized_views.Command._assign_permissions_to_owner"
-        )
+    def test_assign_permissions_to_owner(self, mocker, settings):
+        settings.MATERIALIZED_VIEWS_OWNER_TPL = "metrics_owner_example_com"
 
-        call_command("update_materialized_views")
+        with connection.cursor() as cursor:
+            cursor.execute("DROP ROLE IF EXISTS metrics_owner_example_com;")
 
-        mock.assert_called_once()
-
-    @pytest.mark.django_db(transaction=True)
-    def test_create_without_specified_owner(self, mocker, settings):
         mock = mocker.patch(
             "recoco.apps.metrics.management.commands.update_materialized_views.Command._assign_permissions_to_owner"
         )
@@ -133,6 +127,20 @@ class TestMaterializedView:
         call_command("update_materialized_views")
 
         mock.assert_not_called()
+        mock.reset_mock()
+
+        with connection.cursor() as cursor:
+            cursor.execute(
+                "CREATE ROLE metrics_owner_example_com WITH LOGIN PASSWORD 'test_password';"
+            )
+
+        call_command("update_materialized_views")
+
+        mock.assert_called_once_with(
+            cursor=ANY,
+            schema_name="metrics_example_com",
+            schema_owner="metrics_owner_example_com",
+        )
 
     @pytest.mark.django_db(transaction=True)
     def test_command(self):
