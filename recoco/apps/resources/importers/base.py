@@ -1,6 +1,8 @@
 from abc import ABC, abstractmethod
 from urllib.parse import urlparse
 
+import requests
+
 
 class BaseRIAdapter(ABC):
     """Interface for external Resource adapters such as MediaWiki"""
@@ -12,7 +14,7 @@ class BaseRIAdapter(ABC):
 
     @staticmethod
     @abstractmethod
-    def can_handle(generator):
+    def can_handle(response: requests.Response):
         return NotImplemented
 
     @abstractmethod

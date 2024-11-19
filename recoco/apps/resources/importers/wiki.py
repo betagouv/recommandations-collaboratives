@@ -2,13 +2,17 @@ from urllib.parse import unquote
 
 import mwclient
 import pandoc
+import requests
 
 from .base import BaseRIAdapter
 
 
 class MediaWikiRIAdapter(BaseRIAdapter):
     @staticmethod
-    def can_handle(generator: str):
+    def can_handle(response: requests.Response):
+        generator = response.html.find("head > meta[name='generator']", first=True)
+        generator = generator.attrs["content"].lower()
+
         return "mediawiki" in generator
 
     def load_data(self):

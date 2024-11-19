@@ -14,11 +14,8 @@ class ResourceImporter:
 
         response = session.get(uri)
 
-        generator = response.html.find("head > meta[name='generator']", first=True)
-        generator = generator.attrs["content"].lower()
-
-        for adapter_class in self.ADAPTERS:
-            if adapter_class.can_handle(generator):
+        for adapter_class in self.ADAPTERS.values():
+            if adapter_class.can_handle(response):
                 adapter = adapter_class(uri)
                 adapter.load_data()
                 markdown = adapter.extract_markdown()
