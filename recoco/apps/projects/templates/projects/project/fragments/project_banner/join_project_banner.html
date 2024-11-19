@@ -10,7 +10,7 @@
     </span>
     <form method="post" action="{% url 'projects-project-switchtender-join' project.id %}">
         {% csrf_token %}
-        <button class="text-underline specific-hover-blue" x-on:click="$store.showRole.setShowToTrue">devenez conseiller</button>
+        <button class="text-underline specific-hover-blue" x-on:click="$store.showRole.setShowToTrue" data-test-id="become-advisor">devenez conseiller</button>
     </form>
     <span>
         ou
