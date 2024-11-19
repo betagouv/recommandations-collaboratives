@@ -442,9 +442,6 @@ METRICS_MATERIALIZED_VIEWS_OWNER_TPL = (
 METRICS_MATERIALIZED_VIEWS_OWNER_OVERRIDES = (
     {}
 )  # specific rules for the OWNER_TPL per site
-METRICS_MATERIALIZED_VIEWS_FAIL_ON_MISSING_OWNER = (
-    True  # if we stop processing the views in case of missing database user
-)
 
 
 # Baker

@@ -117,8 +117,10 @@ class TestMaterializedView:
     def test_assign_permissions_to_owner(self, mocker, settings):
         settings.METRICS_MATERIALIZED_VIEWS_OWNER_TPL = "metrics_owner_example_com"
 
-        with connection.cursor() as cursor:
-            cursor.execute("DROP ROLE IF EXISTS metrics_owner_example_com;")
+        mocker.patch(
+            "recoco.apps.metrics.management.commands.update_materialized_views.Command._check_user_exists_in_db",
+            return_value=True,
+        )
 
         mock = mocker.patch(
             "recoco.apps.metrics.management.commands.update_materialized_views.Command._assign_permissions_to_owner"
@@ -126,20 +128,34 @@ class TestMaterializedView:
 
         call_command("update_materialized_views")
 
-        mock.assert_not_called()
-        mock.reset_mock()
+        mock.assert_called_once_with(
+            cursor=ANY,
+            schema_name="metrics_example_com",
+            schema_owner="metrics_owner_example_com",
+        )
 
-        with connection.cursor() as cursor:
-            cursor.execute(
-                "CREATE ROLE metrics_owner_example_com WITH LOGIN PASSWORD 'test_password';"
-            )
+    @pytest.mark.django_db(transaction=True)
+    def test_assign_permissions_to_owner_with_override(self, mocker, settings):
+        owner_name = "my_overridden_user"
+        settings.METRICS_MATERIALIZED_VIEWS_OWNER_TPL = "metrics_owner_example_com"
+        settings.METRICS_MATERIALIZED_VIEWS_OWNER_OVERRIDES = {
+            "example_com": owner_name
+        }
+
+        mocker.patch(
+            "recoco.apps.metrics.management.commands.update_materialized_views.Command._check_user_exists_in_db",
+            return_value=True,
+        )
+        mock = mocker.patch(
+            "recoco.apps.metrics.management.commands.update_materialized_views.Command._assign_permissions_to_owner"
+        )
 
         call_command("update_materialized_views")
 
         mock.assert_called_once_with(
             cursor=ANY,
             schema_name="metrics_example_com",
-            schema_owner="metrics_owner_example_com",
+            schema_owner=owner_name,
         )
 
     @pytest.mark.django_db(transaction=True)
