@@ -24,7 +24,8 @@
 {% block content %}
     <div x-data
          x-init="$nextTick(() => $store.projects.init('{{ request.site.name }}'))"
-         class="col-11 fr-pt-2w fr-pb-6w fr-mx-auto">
+         class="col-11 fr-pt-2w fr-pb-6w fr-mx-auto"
+         data-test-id="moderation-page">
         <div class="container-fluid">
             <div class="row">
                 <div class="col-12">
@@ -36,7 +37,8 @@
                         <h2>Aucun projet à examiner</h2>
                     {% endif %}
                     {% for project in draft_projects %}
-                        <div class="card fr-mb-2w d-flex flex-row project-card">
+                        <div class="card fr-mb-2w d-flex flex-row project-card"
+                             data-test-id="project-card">
                             <div class="project-card__col--left project-card__col__padding d-flex flex-column">
                                 <h3 class="project-card__title">
                                     <a href="{% url 'projects-project-detail' project.id %}">

@@ -9,17 +9,13 @@ describe('I can go to tasks tab', () => {
 
   it('list all kanban tasks', () => {
     cy.visit(`/project/${currentProject.pk}`);
-    cy.becomeAdvisor();
-    cy.contains('Recommandations').click({ force: true });
-    cy.url().should('include', '/actions');
+    cy.becomeAdvisor(currentProject.pk);
+    cy.visit(`/project/${currentProject.pk}/actions`);
     cy.createTask('test');
 
     cy.get('[data-test-id="kanban-tasks-switch-button"]').click({
       force: true,
     });
-    cy.get('[data-test-id="kanban-tasks-switch-button"]').should(
-      'have.class',
-      'active'
-    );
+    cy.get('[data-test-id="kanban-tasks-switch-button"]').should('be.checked');
   });
 });

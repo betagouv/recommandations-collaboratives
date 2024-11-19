@@ -11,7 +11,7 @@ from pytest_django.asserts import assertContains, assertNotContains
 
 from recoco import verbs
 from recoco.apps.home import models as home_models
-from recoco.apps.projects import models as project_models
+from recoco.apps.projects import models as projects_models
 from recoco.utils import login
 
 
@@ -24,8 +24,37 @@ def test_low_reach_not_available_for_non_staff_users(client):
 
 
 @pytest.mark.django_db
-def test_low_reach_available_for_staff_users(request, client):
+def test_low_reach_available_for_staff_users(request, client, make_project):
     url = reverse("crm-list-projects-low-reach")
+
+    current_site = get_current_site(request)
+
+    baker.make(home_models.SiteConfiguration, site=get_current_site(request))
+
+    make_project(current_site)
+    make_project(current_site)
+
+    with login(client, groups=["example_com_staff"]):
+        response = client.get(url)
+    assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_low_reach_as_csv_not_available_for_non_staff_users(client):
+    url = reverse("crm-projects-low-reach-csv")
+    with login(client):
+        response = client.get(url)
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_low_reach_as_csv_available_for_staff_users(request, client, make_project):
+    url = reverse("crm-projects-low-reach-csv")
+
+    current_site = get_current_site(request)
+
+    make_project(current_site)
+    make_project(current_site)
 
     baker.make(home_models.SiteConfiguration, site=get_current_site(request))
 
@@ -37,12 +66,12 @@ def test_low_reach_available_for_staff_users(request, client):
 @pytest.mark.django_db
 def test_site_dashboard__shows_project_actions_to_staff(request, client):
     site = get_current_site(request)
-    project = baker.make(project_models.Project, sites=[site])
+    project = baker.make(projects_models.Project, sites=[site])
     action.send(project, verb="Was here", target=project)
 
     other_site = baker.make(site_models.Site)
     with settings.SITE_ID.override(other_site.pk):
-        other = baker.make(project_models.Project, sites=[other_site])
+        other = baker.make(projects_models.Project, sites=[other_site])
         action.send(other, verb="Was not here", target=other)
 
     url = reverse("crm-site-dashboard")
@@ -61,7 +90,7 @@ def test_site_dashboard_hides_other_site_project_notifications(request, client):
 
     other_site = baker.make(site_models.Site)
     with settings.SITE_ID.override(other_site.pk):
-        other_project = baker.make(project_models.Project, sites=[other_site])
+        other_project = baker.make(projects_models.Project, sites=[other_site])
         # a notification for this project
         verb = verbs.CRM.NOTE_CREATED
         notify.send(

@@ -48,6 +48,11 @@ urlpatterns = [
         views.crm_list_projects_with_low_reach,
         name="crm-list-projects-low-reach",
     ),
+    path(
+        r"crm/low-reach-projects-csv",
+        views.crm_projects_with_low_reach_as_csv,
+        name="crm-projects-low-reach-csv",
+    ),
     # tenancy
     path(
         "crm/site_config",

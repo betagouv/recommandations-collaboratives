@@ -67,10 +67,16 @@
                     <span x-text="message"></span>
                 </div>
                 {% if messages %}
-                    <div id="notification-container"
+                    <div x-data="Toast"
+                         x-init="init()"
+                         id="notification-container"
                          class="position-fixed bottom-0 end-0 fr-p-2w z-2">
                         {% for message in messages %}
-                            <div class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+                            <div class="toast"
+                                 role="alert"
+                                 aria-live="assertive"
+                                 aria-atomic="true"
+                                 x-ref="toastContainer">
                                 <div class="toast-header {% if message.level == DEFAULT_MESSAGE_LEVELS.SUCCESS %}bg-success text-white{% endif %} {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}bg-error text-white{% endif %}">
                                     {% if "email" in message.tags %}
                                         <strong class="fr-mr-auto">
@@ -116,23 +122,6 @@
                 <script src="https://sentry.incubateur.net/js-sdk-loader/5b872cee93efddce4396cc52605838c1.min.js"
                         crossorigin="anonymous"></script>
             {% endif %}
-            {% if debug %}
-                <script src="{% static 'js/jquery-3.6.0.slim.min.js' %}"></script>
-                <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.1/dist/js.cookie.js"
-                        crossorigin="anonymous"></script>
-            {% else %}
-                <script src="{% static 'js/jquery-3.6.0.slim.min.js' %}"></script>
-                <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.1/dist/js.cookie.min.js"
-                        integrity="sha256-0H3Nuz3aug3afVbUlsu12Puxva3CP4EhJtPExqs54Vg="
-                        crossorigin="anonymous"></script>
-            {% endif %}
-            <script src="{% static 'js/text.js' %}"></script>
-            <!-- bs5 notifications  -->
-            <script type="text/javascript">
-         $('document').ready(function() {
-             $('.toast').toast('show');
-         });
-            </script>
             {% block js %}
             {% endblock js %}
         </body>

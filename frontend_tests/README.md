@@ -47,7 +47,7 @@ DJANGO_VITE = {"default": {"dev_mode": DEBUG, "dev_server_port": 3001}}
 
 ## Lancer les tests
 
-### Lancement de la serie de tests Cypress
+### Lancement de la serie de tests Cypress (mode non interactif)
 
 Installer les dépendances :
 
@@ -74,12 +74,31 @@ Cela permettra de :
 
 ### Lancement de l'interface graphique de Cypress
 
-Pour lancer les tests, il faut lancer plusieurs processus dans des consoles distinctes:
+Installer les dépendances :
 
-- Console 1: Initialiser un server django en mode test avec la base de test et les différentes fixtures avec la commande : `yarn django:start-server`
-- Console 2:
-  - Lancer la commande de mise à jour des permissions: `yarn django:update-permissions`
-  - Lancer la commande de dev front qui met les static et composants JS à disposition de Django: `yarn frontend:start-server`
-- Console 3: Vous pouvez maintenant exécuter les différents tests avec les commandes suivantes au choix :
-  - `yarn test_ui` -> pour lancer cypress avec une interface graphique
-  - `yarn cy:run` -> pour lancer cypress en ligne de commande
+```bash
+$ yarn install
+```
+
+> ⚠️ Attention
+>
+> S'assurer d'être dans son environnement virtuel Django.
+
+Lancer les tests :
+
+```bash
+$ yarn test_ui
+```
+
+Cela permettra de :
+
+- Démarrer un serveur Vite (front end)
+- Démarrer un serveur Django en mode test (back end)
+- Lancer les tests Cypress
+- Générer un rapport d'éxecution des tests dans le dossier `frontend_tests/cypress/reports`
+
+## Autres commandes
+
+- `yarn django:start-server` : Initialiser un serveur de test Django et une base données de test et les différentes fixtures.
+- `yarn django:update-permissions` : Mise à jour des permissions des utilisateurs
+- `yarn frontend:start-server` : Mise à disposition des statics et composants JS

@@ -1,18 +1,20 @@
 import file from '../../../fixtures/documents/file.json';
 
+let currentProjectId;
+
 describe('I can add a file in a task', () => {
   beforeEach(() => {
-    cy.login('jean');
-    cy.createProject('file in task');
+    cy.login('conseiller1');
+    cy.createProject('file in task').then((projectId) => {
+      currentProjectId = projectId;
+    });
   });
 
   it('writes a message with a file', () => {
-    cy.visit(`/projects`);
-    cy.contains('file in task').first().click({ force: true });
+    cy.visit(`/project/${currentProjectId}`);
 
-    cy.becomeAdvisor();
-    cy.contains('Recommandations').click({ force: true });
-    cy.url().should('include', '/actions');
+    cy.becomeAdvisor(currentProjectId);
+    cy.visit(`/project/${currentProjectId}/actions`);
 
     cy.get("[data-test-id='submit-task-button']").click({ force: true });
 
@@ -27,6 +29,7 @@ describe('I can add a file in a task', () => {
     cy.get('textarea')
       .type(`fake recommandation content with no resource : ${now}`, {
         force: true,
+        delay: 0,
       })
       .should(
         'have.value',

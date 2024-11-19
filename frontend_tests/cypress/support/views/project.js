@@ -14,8 +14,7 @@ const domElements = {
     '[data-test-id="admin-banner-deactivate-project"]',
   ADMIN_BANNER_ACTIVATE_PROJECT:
     '[data-test-id="admin-banner-activate-project"]',
-  HEADER_BANNER_PROJECT_INACTIVE:
-    '[data-test-id="header-banner-project-inactive"]',
+  BANNER_PROJECT_INACTIVE: '[data-test-id="banner-project-inactive"]',
   BUTTON_MODAL_DEACTIVATE_PROJECT:
     '[data-test-id="button-open-modal-deactivate-project"]',
   FORM_PAUSE_PROJECT: '[data-test-id="form-pause-project"]',
@@ -124,15 +123,6 @@ class Project {
       });
   }
 
-  activateProjectFromHeaderBanner() {
-    cy.get(this.dom.HEADER_BANNER_PROJECT_INACTIVE)
-      .find(this.dom.BUTTON_ACTIVATE_PROJECT)
-      .click({ force: true })
-      .then(() => {
-        cy.get(this.dom.HEADER_BANNER_PROJECT_INACTIVE).should('not.exist');
-      });
-  }
-
   quitProject(role) {
     switch (role) {
       case 'advisor':
@@ -150,7 +140,7 @@ class Project {
         cy.get(this.dom.ADMIN_BANNER_QUIT_PROJECT)
           .get(this.dom.BUTTON_QUIT_PROJECT)
           .click({ force: true });
-        cy.url().should('equal', 'http://example.localhost:8000/');
+        cy.url().should('match', /^http:\/\/example\.localhost:\d+\/$/);
         break;
       default:
         cy.get(this.dom.ADMIN_BANNER_QUIT_PROJECT).should('not.exist');
@@ -181,9 +171,7 @@ class Project {
    * @param {*} condition 'exist' if user has rights to pause a Project, 'not.exists' if not
    */
   checkProjectStatusBanner(condition = 'not.exist') {
-    cy.get(this.dom.HEADER_BANNER_PROJECT_INACTIVE).then(() => {
-      cy.get(this.dom.BUTTON_ACTIVATE_PROJECT).should(condition);
-    });
+    cy.get(this.dom.BANNER_PROJECT_INACTIVE).should(condition);
   }
 
   /**

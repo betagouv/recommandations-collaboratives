@@ -85,7 +85,7 @@ class MaterializedView:
     def get_django_sql_query(self) -> MaterializedViewSqlQuery | None:
         module_name = "{}.{}".format(
             str(
-                Path(settings.MATERIALIZED_VIEWS_SQL_DIR).relative_to(
+                Path(settings.METRICS_MATERIALIZED_VIEWS_SQL_DIR).relative_to(
                     settings.BASE_DIR.parent
                 )
             ).replace("/", "."),
@@ -103,7 +103,7 @@ class MaterializedView:
             return MaterializedViewSqlQuery(sql=sql, params=params)
 
     def get_raw_sql_query(self) -> MaterializedViewSqlQuery | None:
-        sql_file = settings.MATERIALIZED_VIEWS_SQL_DIR / f"{self.name}.sql"
+        sql_file = settings.METRICS_MATERIALIZED_VIEWS_SQL_DIR / f"{self.name}.sql"
         if not sql_file.exists():
             return None
 
@@ -138,6 +138,11 @@ class MaterializedView:
             self.cursor.execute(
                 sql=f"CREATE UNIQUE INDEX IF NOT EXISTS {index} ON {self.db_schema_name}.{self.db_view_name} ({index});"
             )
+
+    def drop(self) -> None:
+        self.cursor.execute(
+            sql=f"DROP MATERIALIZED VIEW IF EXISTS {self.db_schema_name}.{self.db_view_name};"
+        )
 
     def refresh(self) -> None:
         self.cursor.execute(

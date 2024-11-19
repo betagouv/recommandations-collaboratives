@@ -7,7 +7,7 @@ describe('I can assign new contacts when I edit a resource', () => {
 
   it('goes to edit a resource and assign 3 new contacts', () => {
     cy.visit('/ressource/1/');
-    cy.contains('Éditer').click({ force: true });
+    cy.get('[data-test-id="edit-resource"]').click();
 
     cy.get('#id_contacts-selected-list')
       .children()

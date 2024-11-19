@@ -3,32 +3,27 @@ const currentProject = projects[1];
 
 describe('I can not comment a draft task', () => {
   beforeEach(() => {
-    cy.login('jean');
-    cy.declineCookies();
+    cy.login('conseiller1');
   });
 
   it('opens a modal with the task', () => {
     cy.visit(`/project/${currentProject.pk}`);
-    cy.becomeAdvisor();
-    cy.contains('Recommandations').click({ force: true });
-    cy.url().should('include', '/actions');
+    cy.becomeAdvisor(currentProject.pk);
+    cy.visit(`/project/${currentProject.pk}/actions`);
     cy.createTask('test');
 
-    cy.get('[data-test-id="list-tasks-switch-button"]').should(
-      'have.class',
-      'active'
-    );
+    cy.get('[data-test-id="list-tasks-switch-button"]').should('be.checked');
 
     cy.get('[data-test-id="create-task-button"]').click({ force: true });
 
     cy.get('#push-noresource').click({ force: true });
 
     cy.get('#intent')
-      .type(`Draft reco`, { force: true })
+      .type(`Draft reco`, { force: true, delay: 0 })
       .should('have.value', `Draft reco`);
 
     cy.get('textarea')
-      .type(`reco test from action description`, { force: true })
+      .type(`reco test from action description`, { force: true, delay: 0 })
       .should('have.value', `reco test from action description`);
 
     cy.get('[data-test-id="publish-draft-task-button"]')
@@ -43,11 +38,11 @@ describe('I can not comment a draft task', () => {
     cy.contains('Modifier').click({ force: true });
 
     cy.get('#intent')
-      .type(` edited`, { force: true })
+      .type(` edited`, { force: true, delay: 0 })
       .should('have.value', `Draft reco edited`);
 
     cy.get('textarea')
-      .type(` new value`, { force: true })
+      .type(` new value`, { force: true, delay: 0 })
       .should('have.value', `reco test from action description new value`);
 
     cy.get('[data-test-id="publish-draft-task-button"]')
@@ -57,7 +52,5 @@ describe('I can not comment a draft task', () => {
 
     cy.contains('Draft reco edited').click({ force: true });
     cy.contains('reco test from action description new value');
-
-    // cy.get('[data-test-id="button-submit-new"]').should('not.exist');
   });
 });
