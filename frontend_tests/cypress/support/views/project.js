@@ -54,9 +54,12 @@ const domElements = {
   SHOW_BANNER: '[data-test-id="show-banner"]',
   HEADER_BANNER_ADVISING_POSITION:
     '[data-test-id="header-banner-advising-position"]',
+  SELECTOR_JOIN_AS_ADVISOR: '[data-test-id="selector-join-as-advisor"]',
   BUTTON_JOIN_AS_ADVISOR: '[data-test-id="button-join-as-advisor"]',
+  SELECTOR_JOIN_AS_OBSERVER: '[data-test-id="selector-join-as-observer"]',
   BUTTON_JOIN_AS_OBSERVER: '[data-test-id="button-join-as-observer"]',
   BUTTON_VALIDATE_ROLE: '[data-test-id="button-validate-role"]',
+  BUTTON_QUIT_ROLE: '[data-test-id="button-quit-role"]',
 };
 
 class Project {
@@ -91,16 +94,28 @@ class Project {
 
   // Actions
 
-  joinAsAdvisor() {
+  joinAsAdvisorWithSelector() {
     cy.get(this.dom.SHOW_BANNER).click({ force: true });
-    cy.get(this.dom.BUTTON_JOIN_AS_ADVISOR).click({ force: true });
+    cy.get(this.dom.SELECTOR_JOIN_AS_ADVISOR).click({ force: true });
     cy.get(this.dom.BUTTON_VALIDATE_ROLE).click({ force: true });
   }
 
-  joinAsObserver() {
+  joinAsAdvisorWithBanner() {
+    cy.get(this.dom.BUTTON_JOIN_AS_ADVISOR).click({ force: true });
+  }
+
+  joinAsObserverWithSelector() {
     cy.get(this.dom.SHOW_BANNER).click({ force: true });
-    cy.get(this.dom.BUTTON_JOIN_AS_OBSERVER).click({ force: true });
+    cy.get(this.dom.SELECTOR_JOIN_AS_OBSERVER).click({ force: true });
     cy.get(this.dom.BUTTON_VALIDATE_ROLE).click({ force: true });
+  }
+
+  joinAsObserverWithBanner() {
+    cy.get(this.dom.BUTTON_JOIN_AS_OBSERVER).click({ force: true });
+  }
+
+  quitProjectRole() {
+    cy.get(this.dom.BUTTON_QUIT_ROLE).click({ force: true });
   }
 
   deactivateProject() {
@@ -129,7 +144,7 @@ class Project {
         cy.get(this.dom.ADMIN_BANNER_QUIT_PROJECT)
           .get(this.dom.BUTTON_QUIT_PROJECT)
           .click({ force: true });
-        cy.get(this.dom.BUTTON_JOIN_AS_OBSERVER).should('exist');
+        cy.get(this.dom.SELECTOR_JOIN_AS_OBSERVER).should('exist');
         break;
       case 'staff':
         cy.get(this.dom.ADMIN_BANNER_QUIT_PROJECT)
