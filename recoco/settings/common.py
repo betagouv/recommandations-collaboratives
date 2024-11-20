@@ -430,35 +430,73 @@ WAGTAIL_EMAIL_MANAGEMENT_ENABLED = False
 METRICS_MATERIALIZED_VIEWS_SPEC = [
     {
         "name": "projects",
-        "unique_indexes": [
-            # ("hash", "site_domain"),
+        "indexes": [
+            {
+                "name": "hash_idx",
+                "columns": "hash,site_domain",
+                "unique": True,
+                "for_site": False,
+            },
+            {
+                "name": "created_on_idx",
+                "columns": "created_on",
+            },
         ],
-        "indexes": ["created_on"],
     },
     {
         "name": "recommendations",
-        "unique_indexes": [
-            # ("hash", "site_domain"),
+        "indexes": [
+            {
+                "name": "hash_idx",
+                "columns": "hash,site_domain",
+                "unique": True,
+                "for_site": False,
+            },
+            {
+                "name": "created_on_idx",
+                "columns": "created_on",
+            },
         ],
-        "indexes": ["created_on"],
     },
     {
         "name": "resources",
-        "unique_indexes": [
-            # ("hash", "site_domain"),
+        "indexes": [
+            {
+                "name": "hash_idx",
+                "columns": "hash,site_domain",
+                "unique": True,
+                "for_site": False,
+            },
         ],
     },
     {
         "name": "users",
-        "unique_indexes": [
-            # ("hash", "site_domain"),
+        "indexes": [
+            {
+                "name": "hash_idx",
+                "columns": "hash,site_domain",
+                "unique": True,
+                "for_site": False,
+            },
+            {
+                "name": "last_login_idx",
+                "columns": "last_login",
+            },
+            # {
+            #     "name": "is_advisor_idx",
+            #     "columns": "is_advisor",
+            # },
         ],
-        # "indexes": ["last_login", "is_advisor"],
     },
     {
         "name": "user_activity",
-        "unique_indexes": [
-            # ("hash", "site_domain"),
+        "indexes": [
+            {
+                "name": "hash_idx",
+                "columns": "hash,site_domain",
+                "unique": True,
+                "for_site": False,
+            },
         ],
     },
 ]

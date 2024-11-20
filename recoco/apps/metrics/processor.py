@@ -27,30 +27,35 @@ class MaterializedViewSqlQuery:
             self.sql = self.sql[:-1]
 
 
+@dataclass
+class MaterializedViewIndex:
+    name: str
+    columns: str
+    unique: bool = False
+    for_site: bool = True
+
+
 class MaterializedView:
     name: str
     cursor: CursorWrapper
-    indexes: list[str]
-    unique_indexes: list[str]
+    indexes: list[MaterializedViewIndex]
     db_schema_name: str
     db_schema_owner: str
 
     def __init__(
         self,
         name: str,
-        indexes: list[str] = None,
-        unique_indexes: list[str] = None,
+        indexes: list[dict[str, Any]] = None,
         db_owner: str = None,
         db_schema_name: str = "metrics",
         db_schema_owner: str = "metrics_owner",
     ):
         self.name = name
         self.cursor = None
-        self.indexes = indexes or []
-        self.unique_indexes = unique_indexes or []
         self.db_owner = db_owner
         self.db_schema_name = db_schema_name
         self.db_schema_owner = db_schema_owner
+        self.indexes = [MaterializedViewIndex(**index) for index in indexes or []]
 
     @classmethod
     def from_spec(
@@ -137,14 +142,11 @@ class MaterializedView:
             params=sql_query.params,
         )
 
-        # Create indexes / unique indexes if any
+        # Create indexes if any
         for index in self.indexes:
+            is_unique = "UNIQUE " if index.unique else ""
             self.cursor.execute(
-                sql=f"CREATE INDEX IF NOT EXISTS {index} ON {self.db_schema_name}.{self.db_view_name} ({index});"
-            )
-        for index in self.unique_indexes:
-            self.cursor.execute(
-                sql=f"CREATE UNIQUE INDEX IF NOT EXISTS {index} ON {self.db_schema_name}.{self.db_view_name} ({index});"
+                sql=f"CREATE {is_unique}INDEX IF NOT EXISTS {index.name} ON {self.db_schema_name}.{self.db_view_name} ({index.columns});"
             )
 
     def create_for_site(self, site: Site) -> None:
@@ -159,7 +161,14 @@ class MaterializedView:
             sql=f"CREATE MATERIALIZED VIEW IF NOT EXISTS {site_db_schema_name}.{self.db_view_name} AS ( {site_sql_query} ) WITH NO DATA;"
         )
 
-        # TODO: Create indexes
+        # Create indexes if any
+        for index in self.indexes:
+            if not index.for_site:
+                continue
+            is_unique = "UNIQUE " if index.unique else ""
+            self.cursor.execute(
+                sql=f"CREATE {is_unique}INDEX IF NOT EXISTS {index.name} ON {site_db_schema_name}.{self.db_view_name} ({index.columns});"
+            )
 
     def drop(self) -> None:
         self.cursor.execute(
