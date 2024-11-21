@@ -15,6 +15,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.managers import CurrentSiteManager
 from django.contrib.sites.models import Site
 from django.db import models
+from django.db.models import BooleanField, Case, Count, When
 from django.db.models.functions import Lower
 from django.db.models.signals import post_migrate
 from django.dispatch import receiver
@@ -117,6 +118,15 @@ class ResourceQuerySet(models.QuerySet):
             models.Q(departments__in=departments) | models.Q(departments=None)
         ).distinct()
 
+    def with_ds_annotations(self):
+        return self.annotate(count_dsresource=Count("dsresource")).annotate(
+            has_dsresource=Case(
+                When(count_dsresource__gt=0, then=True),
+                default=False,
+                output_field=BooleanField(),
+            )
+        )
+
 
 class ResourceManager(models.Manager):
     def get_queryset(self):
@@ -176,10 +186,6 @@ class Resource(CloneMixin, models.Model):
     @property
     def public(self):
         return self.status >= self.TO_REVIEW
-
-    @property
-    def is_dsresource(self):
-        return self.dsresource_set.exists()
 
     created_on = models.DateTimeField(
         default=timezone.now, verbose_name="date de création"
