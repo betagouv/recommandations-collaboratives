@@ -93,6 +93,7 @@
                             {{ session.survey.name }}
                         </div>
                         <a class="fr-btn fr-btn--sm"
+                           data-test-id="link-fill-survey"
                            href="{% url 'survey-project-session' project_id=project.pk site_id=session.survey.site.id %}">Compléter le questionnaire</a>
                     </div>
                 {% endfor %}
