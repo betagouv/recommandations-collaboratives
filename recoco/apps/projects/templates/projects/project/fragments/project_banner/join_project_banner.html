@@ -10,13 +10,13 @@
     </span>
     <form method="post" action="{% url 'projects-project-switchtender-join' project.id %}">
         {% csrf_token %}
-        <button class="text-underline specific-hover-blue" x-on:click="$store.showRole.setShowToTrue" data-test-id="become-advisor">devenez conseiller</button>
+        <button class="text-underline specific-hover-blue" x-on:click="$store.showRole.setShowToTrue" data-test-id="button-join-as-advisor">devenez conseiller</button>
     </form>
     <span>
         ou
     </span>
     <form method="post" action="{% url 'projects-project-observer-join' project.id %}">
         {% csrf_token %}
-        <button class="text-underline specific-hover-blue" x-on:click="$store.showRole.setShowToTrue">devenez observateur</button>
+        <button class="text-underline specific-hover-blue" x-on:click="$store.showRole.setShowToTrue" data-test-id="button-join-as-observer">devenez observateur</button>
     </form>
 </div>
