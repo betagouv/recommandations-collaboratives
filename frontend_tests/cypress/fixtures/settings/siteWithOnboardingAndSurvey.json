@@ -178,5 +178,194 @@
       "sender_name": "Recoconseil",
       "contact_form_recipient": "noreply@nodomain.nowhere"
     }
+  },
+  {
+    "model": "sites.site",
+    "pk": 2,
+    "fields": {
+      "domain": "example2.com",
+      "name": "example2"
+    }
+  },
+  {
+    "model": "multisite.alias",
+    "pk": 2,
+    "fields": {
+      "domain": "example2.localhost",
+      "site": 2,
+      "is_canonical": true,
+      "redirect_to_canonical": false
+    }
+  },
+  {
+    "model": "onboarding.onboarding",
+    "pk": 2,
+    "fields": {
+      "form": [
+        {
+          "type": "header",
+          "subtype": "h3",
+          "label": "Pourquoi nous sollicitez-vous ?"
+        },
+        {
+          "type": "textarea",
+          "required": "True",
+          "label": "Demande initiale",
+          "placeholder": "N'hésitez pas à préciser votre demande en quelques mots",
+          "className": "form-control",
+          "name": "textarea-1663073840671-0",
+          "subtype": "textarea"
+        },
+        {
+          "type": "checkbox-group",
+          "required": "False",
+          "label": "Cartofriche",
+          "toggle": "True",
+          "className": "list-unstyled form-input",
+          "name": "checkbox-group-1663073888038-0",
+          "values": [
+            {
+              "label": "Je souhaite ajouter cette friche à la cartographie publique des friches - ce qui me permet de faire connaître ce site à des porteurs de projet potentiels !",
+              "value": "cartofriches",
+              "selected": "True"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "model": "survey.survey",
+    "pk": 2,
+    "fields": {
+      "name": "Exploration",
+      "site": 2
+    }
+  },
+  {
+    "model": "survey.questionset",
+    "pk": 3,
+    "fields": {
+      "survey": 2,
+      "heading": "Propriété du site",
+      "icon": "key",
+      "color": "#895cf2",
+      "subheading": "",
+      "priority": 1000,
+      "deleted": null
+    }
+  },
+  {
+    "model": "survey.questionset",
+    "pk": 4,
+    "fields": {
+      "survey": 2,
+      "heading": "Connaissance du terrain et du bâti",
+      "icon": "building",
+      "color": "#f58188",
+      "subheading": "",
+      "priority": 900,
+      "deleted": null
+    }
+  },
+  {
+    "model": "home.siteconfiguration",
+    "pk": 2,
+    "fields": {
+      "site": 2,
+      "project_survey": 2,
+      "onboarding": 2,
+      "sender_email": "noreply2@recoconseil.fr",
+      "sender_name": "Recoconseil2",
+      "contact_form_recipient": "noreply2@nodomain.nowhere"
+    }
+  },
+  {
+    "model": "sites.site",
+    "pk": 3,
+    "fields": {
+      "domain": "example3.com",
+      "name": "example3"
+    }
+  },
+  {
+    "model": "multisite.alias",
+    "pk": 3,
+    "fields": {
+      "domain": "example3.localhost",
+      "site": 3,
+      "is_canonical": true,
+      "redirect_to_canonical": false
+    }
+  },
+  {
+    "model": "onboarding.onboarding",
+    "pk": 3,
+    "fields": {
+      "form": [
+        {
+          "type": "header",
+          "subtype": "h3",
+          "label": "Pourquoi nous sollicitez-vous ?"
+        },
+        {
+          "type": "textarea",
+          "required": "True",
+          "label": "Demande initiale",
+          "placeholder": "N'hésitez pas à préciser votre demande en quelques mots",
+          "className": "form-control",
+          "name": "textarea-1663073840671-0",
+          "subtype": "textarea"
+        },
+        {
+          "type": "checkbox-group",
+          "required": "False",
+          "label": "Cartofriche",
+          "toggle": "True",
+          "className": "list-unstyled form-input",
+          "name": "checkbox-group-1663073888038-0",
+          "values": [
+            {
+              "label": "Je souhaite ajouter cette friche à la cartographie publique des friches - ce qui me permet de faire connaître ce site à des porteurs de projet potentiels !",
+              "value": "cartofriches",
+              "selected": "True"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "model": "survey.survey",
+    "pk": 3,
+    "fields": {
+      "name": "Exploration",
+      "site": 3
+    }
+  },
+  {
+    "model": "survey.questionset",
+    "pk": 3,
+    "fields": {
+      "survey": 3,
+      "heading": "Propriété du site",
+      "icon": "key",
+      "color": "#895cf2",
+      "subheading": "",
+      "priority": 1000,
+      "deleted": null
+    }
+  },
+  {
+    "model": "home.siteconfiguration",
+    "pk": 3,
+    "fields": {
+      "site": 3,
+      "project_survey": 3,
+      "onboarding": 3,
+      "sender_email": "noreply3@recoconseil.fr",
+      "sender_name": "Recoconseil3",
+      "contact_form_recipient": "noreply3@nodomain.nowhere"
+    }
   }
 ]

@@ -50,7 +50,7 @@
                                 </h3>
                                 <p class="project-card__keyinfo fr-mb-2v">
                                     {% if project.project_sites.origin.site != request.site %}
-                                        <span>
+                                        <span data-cy="moderation-projet-shared-by">
                                             {% if project.project_sites.origin.site.configuration.logo_small %}
                                                 <img src="{{ project.project_sites.origin.site.configuration.logo_small.url }}"
                                                      width="16px"
