@@ -96,7 +96,7 @@ class Command(BaseCommand):
         if options["drop_only"] and options["refresh_only"]:
             self.stdout.write(
                 self.style.ERROR(
-                    "Cannot use both --drop-only and --refresh-only at the same time"
+                    "You can't use both --drop-only and --refresh-only at the same time"
                 )
             )
             return

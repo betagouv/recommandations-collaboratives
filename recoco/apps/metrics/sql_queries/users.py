@@ -1,10 +1,10 @@
 from django.contrib.auth.models import User
-from django.contrib.postgres.aggregates import ArrayAgg
-from django.contrib.sites.models import Site
-from django.db.models import BooleanField, Case, F, QuerySet, TextField, Value, When
+from django.db.models import F, QuerySet
 
-from recoco.utils import make_group_name_for_site
-
+# from django.contrib.postgres.aggregates import ArrayAgg
+# from django.contrib.sites.models import Site
+# from django.db.models import TextField, Value, When, BooleanField, Case,
+# from recoco.utils import make_group_name_for_site
 from ..utils import hash_field
 
 
