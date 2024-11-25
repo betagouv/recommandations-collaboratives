@@ -1,10 +1,13 @@
 from django.contrib.sites.shortcuts import get_current_site
-from rest_framework import permissions, viewsets
+from rest_framework import permissions, status, viewsets
+from rest_framework.decorators import action
+from rest_framework.response import Response
 
 from recoco.utils import has_perm
 
 from . import models
-from .serializers import ResourceSerializer
+from .importers import ResourceImporter
+from .serializers import ResourceSerializer, ResourceURIImportSerializer
 
 ########################################################################
 # REST API
@@ -43,6 +46,19 @@ class ResourceViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer: ResourceSerializer):
         site = get_current_site(self.request)
         serializer.save(created_by=self.request.user, sites=[site])
+
+    @action(detail=False, methods=["post"])
+    def import_from_uri(self, request):
+        serializer = ResourceURIImportSerializer(data=request.data)
+        if serializer.is_valid():
+            ri = ResourceImporter()
+            resource = ri.from_uri(serializer.validated_data["uri"])
+            resource.save()
+            return Response(
+                ResourceSerializer(resource).data, status=status.HTTP_201_CREATED
+            )
+
+        return Response(status=status.HTTP_501_NOT_IMPLEMENTED)
 
 
 # eof

@@ -34,3 +34,4 @@ sphinx-js
 sphinx-autodoc-annotation
 sphinxcontrib-django-urls
 sphinx-toolbox
+requests-mock==1.12.1

@@ -159,32 +159,45 @@
                                     <!-- User lists -->
                                     <div class="d-flex flex-column fr-my-3w">
                                         <!-- Collectivity -->
-                                        <div>
-                                            <h6 class="text-uppercase fw-bold d-block fr-mb-2w h6-specific-fontsize-14">Porteur de projet et partenaires</h6>
-                                            <ul class="flex-column list-unstyled fr-mb-0">
-                                                {% for projectmember in project.projectmember_set.all %}
-                                                    {% if projectmember.is_owner and projectmember.member.is_active %}
-                                                        <li>{% include "user/user_card.html" with user=project.owner project_owner=True user_activity=True %}</li>
-                                                    {% elif projectmember.member.is_active %}
-                                                        <li>{% include "user/user_card.html" with user=projectmember.member user_activity=True %}</li>
-                                                    {% endif %}
-                                                {% endfor %}
-                                            </ul>
-                                            <div class="d-block fr-mb-2v fr-mt-2w"
+                                        <div class="d-flex justify-content-between fr-mb-2w">
+                                            <h6 class="text-uppercase fw-bold fr-m-0 d-block h6-specific-fontsize-14">Porteur de projet et partenaires</h6>
+                                            <div class="d-block"
                                                  {% if not "invite_collaborators" in user_project_perms %} data-bs-toggle="tooltip" data-bs-title="Vous devez être Conseiller ou Observateur pour cela" {% endif %}>
                                                 <button @click="openInviteMemberModal"
                                                         data-toggle="modal"
                                                         data-target="#InviteMemberModal"
                                                         data-cy="invite-advisor-button"
-                                                        class="{% if project.status == 'DRAFT' or not "invite_collaborators" in user_project_perms %} disabled fr-btn--icon-left fr-icon-lock-line{% endif %} fr-btn fr-btn--secondary justify-content-center w-100 fr-text--sm text-uppercase"
+                                                        class="{% if project.status == 'DRAFT' or not "invite_collaborators" in user_project_perms %} disabled fr-btn--icon-left fr-icon-lock-line{% endif %} fr-btn fr-btn--tertiary fr-btn--sm justify-content-center fr-text--sm"
                                                         {% if project.status == 'DRAFT' or not "invite_collaborators" in user_project_perms %}disabled{% endif %}>
-                                                    Inviter un membre de la collectivité
+                                                    Inviter
                                                 </button>
                                             </div>
                                         </div>
+                                        <ul class="flex-column list-unstyled fr-mb-0">
+                                            {% for projectmember in project.projectmember_set.all %}
+                                                {% if projectmember.is_owner and projectmember.member.is_active %}
+                                                    <li>{% include "user/user_card.html" with user=project.owner project_owner=True user_activity=True %}</li>
+                                                {% elif projectmember.member.is_active %}
+                                                    <li>{% include "user/user_card.html" with user=projectmember.member user_activity=True %}</li>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </ul>
                                         <!-- Advisors -->
                                         <div class="fr-mt-3w">
-                                            <h6 class="text-uppercase fw-bold d-block h6-specific-fontsize-14">Équipe de suivi</h6>
+                                            <div class="d-flex justify-content-between">
+                                                <h6 class="text-uppercase fw-bold d-block h6-specific-fontsize-14">Équipe de suivi</h6>
+                                                {% if "invite_advisors" in user_project_perms or is_regional_actor %}
+                                                    <div class="d-block">
+                                                        <button @click="openInviteSwitchtenderModal"
+                                                                data-toggle="modal"
+                                                                data-target="#InviteSwitchtenderModal"
+                                                                class="{% if project.status == 'DRAFT' %} disabled fr-btn--icon-left fr-icon-lock-line{% endif %} fr-btn fr-btn--tertiary fr-btn--sm justify-content-center"
+                                                                {% if project.status == 'DRAFT' %}disabled{% endif %}>
+                                                            Inviter
+                                                        </button>
+                                                    </div>
+                                                {% endif %}
+                                            </div>
                                             <ul class="d-flex flex-column list-unstyled fr-mb-0">
                                                 {% for advisor in project.switchtender_sites.all %}
                                                     {% if advisor.switchtender.is_active %}
@@ -192,17 +205,6 @@
                                                     {% endif %}
                                                 {% endfor %}
                                             </ul>
-                                            {% if "invite_advisors" in user_project_perms or is_regional_actor %}
-                                                <div class="d-block fr-mb-2v fr-mt-2w">
-                                                    <button @click="openInviteSwitchtenderModal"
-                                                            data-toggle="modal"
-                                                            data-target="#InviteSwitchtenderModal"
-                                                            class="{% if project.status == 'DRAFT' %} disabled fr-btn--icon-left fr-icon-lock-line{% endif %} fr-btn fr-btn--secondary justify-content-center w-100 fr-text--sm text-uppercase"
-                                                            {% if project.status == 'DRAFT' %}disabled{% endif %}>
-                                                        <span>Inviter un conseiller</span>
-                                                    </button>
-                                                </div>
-                                            {% endif %}
                                         </div>
                                     </div>
                                 </div>

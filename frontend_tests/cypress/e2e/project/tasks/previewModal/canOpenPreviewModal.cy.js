@@ -7,18 +7,11 @@ const task2 = tasks[1];
 describe('I can go tasks tab', () => {
   beforeEach(() => {
     cy.login('staff');
+    cy.becomeAdvisor(currentProject.pk);
   });
 
   it('opens a modal with the task', () => {
-    cy.visit(`/project/${currentProject.pk}`);
-    cy.contains('Recommandations').click({ force: true });
-    cy.url().should('include', '/actions');
-    cy.createTask('test');
-
-    cy.get('[data-test-id="list-tasks-switch-button"]').should(
-      'have.class',
-      'active'
-    );
+    cy.visit(`/project/${currentProject.pk}/actions`);
 
     cy.createTask(task2.fields.intent);
     cy.contains(task2.fields.intent).click({ force: true });

@@ -60,7 +60,7 @@ jobs:
       - name: Install packages
         run: |
           sudo apt-get update
-          sudo apt-get install python3-gdal
+          sudo apt-get install python3-gdal pandoc
 
       - name: Compile JS
         working-directory: ./recoco/frontend
@@ -83,11 +83,11 @@ jobs:
         env:
           SECRET_KEY: 'this-is-not-a-secret-key'
           SENDINBLUE_API_KEY: 'this-is-a-fake-api-key'
-          DB_HOST: localhost
-          DB_USER: postgres
-          DB_PASSWORD: postgres
-          DB_NAME: uv_ci
-          DB_PORT: 5432
-          DB_ENGINE: django.db.backends.postgresql
+          DJANGO_DB_HOST: localhost
+          DJANGO_DB_USER: postgres
+          DJANGO_DB_PASSWORD: postgres
+          DJANGO_DB_NAME: uv_ci
+          DJANGO_DB_PORT: 5432
+          DJANGO_DB_ENGINE: django.db.backends.postgresql
         run: |
           pytest --create-db

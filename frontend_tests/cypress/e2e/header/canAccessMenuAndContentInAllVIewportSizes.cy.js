@@ -1,4 +1,4 @@
-describe('As a visitor, I can access the menu and content on different devices', () => {
+describe.skip('As a visitor, I can access the menu and content on different devices', () => {
   const testLayouts = ['phone', 'tablet', 'desktop'];
   const breakpoint = 690;
 

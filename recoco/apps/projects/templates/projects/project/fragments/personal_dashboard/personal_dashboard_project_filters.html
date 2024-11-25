@@ -47,10 +47,10 @@
     </div> {% endcomment %}
     <div class="d-flex align-items-center projects-filters-select">
         <span class="text-custom-info text-grey-dark fw-light fr-mr-2v">Trier :</span>
-        <div class="input-item bg-white">
+        <div class="input-item bg-white position-relative">
             <select x-model="select"
                     x-on:input.change="handleProjectsSelect"
-                    class="input-field fr-px-2w fw-normal text-dark appearance-none z-2 specific-background-transparent specific-pr-40"
+                    class="input-field fr-px-2w fw-normal text-dark appearance-none z-2 bg-white specific-pr-40"
                     name="projects-select"
                     id="projects-select">
                 <option value="date">Date de dépôt</option>
@@ -59,12 +59,8 @@
                 <option value="recent-activities">Activité récente</option>
                 <option value="role">Rôle</option>
             </select>
-            <svg class="input-icon right black bi align-baseline fr-mr-2v z-1"
-                 width="15"
-                 height="15"
-                 fill="#000000">
-                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#chevron-down" />
-            </svg>
+            <span class="fr-icon--sm fr-icon-arrow-down-s-line select-input-icon fr-pr-4v"
+                  aria-hidden="true"></span>
         </div>
     </div>
 </div>

@@ -12,14 +12,11 @@ const resource = {
   expires_on: '20/12/2022',
 };
 
-describe('I can edit a resource as a switchtender', () => {
-  beforeEach(() => {
-    cy.login('staff');
-  });
-
+describe('I can edit a resource as a staff', () => {
   it('edits a resource', () => {
+    cy.login('staff');
     cy.visit('/ressource/1/');
-    cy.contains('Éditer').click({ force: true });
+    cy.get('[data-test-id="edit-resource"]').click();
     cy.url().should('include', '/ressource/1/update/');
 
     cy.get('#id_title')

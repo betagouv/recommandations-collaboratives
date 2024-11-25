@@ -1,25 +1,22 @@
 import tasks from '../../../../fixtures/projects/tasks.json';
 const currentTask = tasks[6];
+let currentProjectId;
 
 describe('I can go to tasks tab', () => {
   beforeEach(() => {
-    cy.login('jean');
-    cy.createProject('status not');
+    cy.login('conseiller1');
+    cy.createProject('status not').then((projectId) => {
+      currentProjectId = projectId;
+    });
   });
 
   it('changes the status to non applicable', () => {
-    cy.visit('/projects');
-    cy.contains('status not').click({ force: true });
+    cy.visit(`/project/${currentProjectId}`);
+    cy.becomeAdvisor(currentProjectId);
+    cy.visit(`/project/${currentProjectId}/actions`);
 
-    cy.becomeAdvisor();
-
-    cy.contains('Recommandations').click({ force: true });
-    cy.url().should('include', '/actions');
     cy.createTask(currentTask.fields.intent);
-    cy.get('[data-test-id="list-tasks-switch-button"]').should(
-      'have.class',
-      'active'
-    );
+    cy.get('[data-test-id="list-tasks-switch-button"]').should('be.checked');
     cy.contains(currentTask.fields.intent);
 
     cy.get('[data-test-id="not-interested-status-task-button"]').click({

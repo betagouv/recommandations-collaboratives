@@ -4,10 +4,10 @@
 {% load sass_tags %}
 {% load crispy_forms_tags %}
 {% block title %}
-    Déposer un projet pour le compte de la collectivité {{ block.super }}
+    Déposer un projet pour le compte du porteur de projet {{ block.super }}
 {% endblock title %}
 {% block og_title %}
-    Déposer un projet pour le compte de la collectivité {{ block.super }}
+    Déposer un projet pour le compte du porteur de projet {{ block.super }}
 {% endblock og_title %}
 {% block js %}
     {% vite_asset 'js/apps/advisorCreateProject.js' %}
@@ -30,17 +30,17 @@
                      alt="Logo {{ request.site.name }}" />
             {% endif %}
             <h1>
-                <strong>Déposer votre projet</strong> {{ request.site.name }}
+                <strong>Décrivez votre demande sur</strong> {{ request.site.name }}
             </h1>
         </div>
         <div class="fr-stepper fr-mb-2w">
             <h2 class="fr-stepper__title">
-                Décrivez votre projet
+                Décrivez votre demande
                 <span class="fr-stepper__state">Étape 2 sur 2</span>
             </h2>
             <div class="fr-stepper__steps" data-fr-current-step="2" data-fr-steps="2"></div>
             <p class="fr-stepper__details">
-                <span class="fr-text--bold">Étape suivante :</span> Localisez votre projet
+                <span class="fr-text--bold">Étape suivante :</span> Décrivez votre demande
             </p>
         </div>
         <div class="container__form d-flex justify-content-center"

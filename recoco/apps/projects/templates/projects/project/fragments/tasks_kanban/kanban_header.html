@@ -12,7 +12,7 @@
 <div class="d-flex fr-mt-1v fr-mb-3w fr-mx-2v align-items-center justify-content-between">
     {% if advising %}
         <h2 class="text-secondary text-uppercase fw-bolder fr-mb-0 h2-specific-fontsize-12">
-            Recommandations proposées à la collectivité
+            Recommandations proposées au porteur du projet
         </h2>
     {% endif %}
     <div class="d-flex align-items-center">
@@ -52,6 +52,6 @@
         <a href="{% url 'projects-project-tasks-suggest' project.pk %}">
             Examiner les recommandations suggérées automatiquement pour ce projet
         </a>
-        <span class="fr-mb-3w ml-4 pl-4 text-muted">Pour éventuellement les proposer à la collectivité</span>
+        <span class="fr-mb-3w ml-4 pl-4 text-muted">Pour éventuellement les proposer au porteur du projet</span>
     </div>
 {% endif %}

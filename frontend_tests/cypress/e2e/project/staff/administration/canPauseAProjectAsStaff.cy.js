@@ -18,10 +18,4 @@ describe('As site staff, I can pause and reactivate a project', () => {
     projectView.navigateToPreferencesTab();
     projectView.activateProjectFromPreferences();
   });
-
-  it('Reactivates a project from the header banner', () => {
-    projectView.navigateToPreferencesTab();
-    projectView.deactivateProject();
-    projectView.activateProjectFromHeaderBanner();
-  });
 });

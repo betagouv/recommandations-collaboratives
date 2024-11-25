@@ -197,6 +197,13 @@ class Resource(CloneMixin, models.Model):
         null=True,
     )
 
+    imported_from = models.URLField(
+        null=True,
+        blank=True,
+        verbose_name="Importé depuis",
+        help_text="l'URL depuis laquelle cette ressource a été importée",
+    )
+
     def get_absolute_url(self):
         return reverse("resources-resource-detail", kwargs={"resource_id": self.pk})
 
