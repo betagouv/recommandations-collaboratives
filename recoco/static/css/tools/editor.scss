@@ -21,12 +21,13 @@
   padding: 3rem 0.5rem 0.5rem;
   width: 100%;
   margin-top: 0;
+  min-height: 10rem;
 }
 
 .tiptap-menu-custom {
   position: absolute;
   z-index: 1;
-  top: 3rem;
+  top: 2rem;
   left: 0.5rem;
   button {
     color: #3a3a3a;

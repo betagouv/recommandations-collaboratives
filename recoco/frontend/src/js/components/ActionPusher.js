@@ -1,6 +1,7 @@
 import Alpine from 'alpinejs';
 import { Editor } from '@tiptap/core';
 import MiniSearch from 'minisearch';
+import api, { postExternalRessourceUrl } from '../utils/api';
 
 Alpine.data('ActionPusher', () => {
   return {
@@ -9,7 +10,7 @@ Alpine.data('ActionPusher', () => {
 
     db: new MiniSearch({
       fields: ['title', 'subtitle', 'tags'], // fields to index for full-text search
-      storeFields: ['title', 'subtitle', 'url', 'url_embeded', 'is_dsresource'], //
+      storeFields: ['title', 'subtitle', 'url', 'embeded_url', 'is_dsresource'], //
     }),
 
     push_type: 'single',
@@ -21,6 +22,7 @@ Alpine.data('ActionPusher', () => {
     fileName: '',
 
     resources: [],
+    externalResource: [],
     results: [],
     suggestions: [],
     selected_resource: null,
@@ -116,7 +118,7 @@ Alpine.data('ActionPusher', () => {
           subtitle: t.subtitle,
           tags: t.tags,
           url: t.web_url,
-          url_embeded: t.embeded_url,
+          embeded_url: t.embeded_url,
           is_dsresource: t.is_dsresource,
           category: t.category,
         };
@@ -126,6 +128,20 @@ Alpine.data('ActionPusher', () => {
       });
 
       this.isBusy = false;
+    },
+
+    async postExternalResource(externalRessourceUrl) {
+      this.isBusy = true;
+      try {
+        const response = await api.post(postExternalRessourceUrl(), {
+          uri: externalRessourceUrl,
+        });
+        this.externalResource = [response.data];
+        this.isBusy = false;
+      } catch (error) {
+        debugger;
+        console.error(error);
+      }
     },
 
     set_draft(draft) {
