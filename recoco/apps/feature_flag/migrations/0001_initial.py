@@ -13,6 +13,7 @@ class Migration(migrations.Migration):
         ("sites", "0002_alter_domain_unique"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ("auth", "0012_alter_user_first_name_max_length"),
+        ("waffle", "__latest__"),
     ]
 
     operations = [
