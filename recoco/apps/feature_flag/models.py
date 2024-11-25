@@ -20,9 +20,9 @@ class SitesMixin(models.Model):
     )
 
     def is_active_for_current_site(self, request: HttpRequest | None = None) -> bool:
-        if not self.sites.exists():
-            return True
-        return Site.objects.get_current(request) in self.sites.all()
+        if self.pk and self.sites.exists():
+            return Site.objects.get_current(request) in self.sites.all()
+        return True
 
     def get_queryset(self):
         return super().get_queryset().prefetch_related("sites")

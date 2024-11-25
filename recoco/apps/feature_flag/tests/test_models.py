@@ -15,6 +15,11 @@ class TestCustomModels:
         current_site = Site.objects.get_current()
         assert current_site == self.site_one
 
+    def test_does_not_exist(self):
+        assert switch_is_active("dummy_switch") is False
+        assert flag_is_active(RequestFactory(), "dummy_flag") is False
+        assert sample_is_active("dummy_sample") is False
+
     def test_switch(self):
         switch = Switch.objects.create(name="test_switch", active=True)
         assert switch_is_active("test_switch") is True
