@@ -143,20 +143,7 @@
                                             {% endif %}
                                         </div>
                                     </div>
-                                    {% if project.origin %}
-                                        <div>
-                                            {% comment %} <img x-show="t.origin.siteInfo.configuration.logo_small"
-                                                 :src="t.origin.siteInfo.configuration.logo_small"
-                                                 width="16px"
-                                                 height="auto"
-                                                 :alt="`Logo ${t.origin.siteInfo.name}`" />
-                                            <span x-show="!t.origin.siteInfo.configuration.logo_small"
-                                                  class="fr-icon--sm fr-icon-window-line"
-                                                  aria-hidden="true"></span> {% endcomment %}
-                                            <span class="not-a-link kanban">projet envoyé par</span>
-                                            <span x-text="projet.origin.siteInfo.name"></span>
-                                        </div>
-                                    {% endif %}
+                                    {% include "projects/project/fragments/site_origin/show_file_origin.html" %}
                                     <div class="fr-mb-2w">
                                         <div class="d-flex flex-column">
                                             <h6 class="text-uppercase fw-bold d-block fr-mb-1v lh-base h6-specific-fontsize-14">Localisation</h6>
