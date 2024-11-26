@@ -1,8 +1,13 @@
+import logging
 import re
 
 import requests
+import requests_jwt
+from django.conf import settings
 
 from .base import BaseRIAdapter
+
+LOGGER = logging.getLogger("recoco.apps.resources")
 
 
 class AidesTerritoiresRIAdapter(BaseRIAdapter):
@@ -11,16 +16,34 @@ class AidesTerritoiresRIAdapter(BaseRIAdapter):
     @staticmethod
     def can_handle(response: requests.Response):
         # example : https://aides-territoires.beta.gouv.fr/aides/32cf-sadapter-au-recul-du-trait-de-cote/
-        url_pattern = "^https?:\\/\\/(?:www\\.)aides-territoires\\.fr\\/aides\\/*)$"
+        url_pattern = "^https?:\\/\\/(www\\.)?aides-territoires\\.beta\\.gouv\\.fr\\/aides\\/(.*)$"
 
-        m = re.match(url_pattern, response.url)
-        if m:
-            return True
-
-        return False
+        return re.match(url_pattern, response.url) is not None
 
     def load_data(self):
-        pass
+        if not settings.AIDES_TERRITOIRES_TOKEN:
+            LOGGER.warning(
+                "No AIDES_TERRITOIRES_TOKEN defined, no request will succeed!"
+            )
 
-    def extract_markdown(self):
+        cnx_response = requests.post(
+            "https://aides-territoires.beta.gouv.fr/api/connexion/",
+            headers={"X-Auth-Token": settings.AIDES_TERRITOIRES_TOKEN},
+            timeout=5,
+        )  # FIXME
+
+        if not cnx_response.ok:
+            return False
+
+        token = cnx_response.json()["token"]
+        auth = requests_jwt.JWTAuth(token)
+        response = requests.get(
+            "https://aides-territoires.beta.gouv.fr/api/aids/", auth=auth, timeout=5
+        )
+
+        self.raw_data = response.json
+
+        return True
+
+    def extract_data(self):
         pass
