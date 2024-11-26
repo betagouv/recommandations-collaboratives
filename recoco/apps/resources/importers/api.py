@@ -5,7 +5,7 @@ import requests
 from .base import BaseRIAdapter
 
 
-class AidesTerritoireRIAdapter(BaseRIAdapter):
+class AidesTerritoiresRIAdapter(BaseRIAdapter):
     """Adapter for website Aides Territoires"""
 
     @staticmethod

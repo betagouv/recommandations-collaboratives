@@ -18,8 +18,10 @@ class ResourceImporter:
             if adapter_class.can_handle(response):
                 adapter = adapter_class(uri)
                 adapter.load_data()
-                markdown = adapter.extract_markdown()
+                adapter.extract_data()
 
-                return Resource(content=markdown)
+                return Resource(
+                    title=adapter.title, content=adapter.content, imported_from=uri
+                )
 
         return None

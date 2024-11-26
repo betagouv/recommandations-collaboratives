@@ -21,13 +21,17 @@ class MediaWikiRIAdapter(BaseRIAdapter):
             path="/",
             clients_useragent="Recoco MediaWiki Ressource Importer",
         )
-        page_name = unquote(self.parsed_uri.path.rsplit("/", 1)[-1])
+        self.page_name = unquote(self.parsed_uri.path.rsplit("/", 1)[-1])
 
-        page = site.pages[page_name]
-        self.raw_data = page.text(expandtemplates=True)
+        page = site.pages[self.page_name]
+        if page.exists:
+            help(page)
+            self.raw_data = page.text(expandtemplates=True)
 
         return True
 
-    def extract_markdown(self):
+    def extract_data(self):
         doc = pandoc.read(self.raw_data, format="mediawiki")
-        return pandoc.write(doc, format="markdown_strict")
+
+        self.title = unquote(self.parsed_uri.path.rsplit("/", 1)[-1])
+        self.content = pandoc.write(doc, format="markdown_strict")
