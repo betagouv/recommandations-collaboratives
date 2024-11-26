@@ -29,13 +29,14 @@
     {% comment %} -------- si la ressource n'a pas de contenu ---------- {% endcomment %}
     {% if resource.imported_from %}
         <div class="fr-px-8w fr-py-2w" style="background-color:#fafafa;">
-            <img style="margin: auto;display: block;" src="{% static '/static/home/img/home/progress.png' %}">
-            <p> Malheuresement nous n’avons pas pu récupérer le contenu de la page.
+            <img style="margin: auto;display: block;" src="{% static '/home/img/home/progress.png' %}">
+            <p> Malheureusement nous n’avons pas pu récupérer le contenu de la page.
                 Vous pouvez cependant la consulter directement ici :
                 <a href="resource.imported_from">{{ resource.imported_from }}</a>
             </p>
         </div>
     {% endif %}
-
-    {{ resource.content_rendered|safe }}
+    {% if not resource.imported_from %}
+        {{ resource.content_rendered|safe }}
+    {% endif %}
 </div>
