@@ -482,10 +482,10 @@ METRICS_MATERIALIZED_VIEWS_SPEC = [
                 "name": "last_login_idx",
                 "columns": "last_login",
             },
-            # {
-            #     "name": "is_advisor_idx",
-            #     "columns": "is_advisor",
-            # },
+            {
+                "name": "is_advisor_idx",
+                "columns": "is_advisor",
+            },
         ],
     },
     {
