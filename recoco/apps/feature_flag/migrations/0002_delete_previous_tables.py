@@ -8,10 +8,11 @@ class Migration(migrations.Migration):
         ("feature_flag", "0001_initial"),
         (
             "home",
-            "0016_remove_unused_groups",
+            "0016_remove_unused_groups",  # must be run after removing the groups to avoid exceptions raised
         ),
     ]
 
+    # https://github.com/jazzband/django-waffle/issues/317
     operations = [
         migrations.RunSQL("DROP TABLE IF EXISTS waffle_flag CASCADE"),
         migrations.RunSQL("DROP TABLE IF EXISTS waffle_sample"),
