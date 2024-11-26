@@ -26,8 +26,6 @@ class SocialAccountAdapter(DefaultSocialAccountAdapter):
 
         if "phone_number" in data:
             user.phone_no = data.get("phone_number")
-        if "organizational_unit" in data:
-            user.organization_position = data.get("organizational_unit")
 
         return user
 
