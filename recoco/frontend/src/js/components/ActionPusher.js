@@ -138,11 +138,10 @@ Alpine.data('ActionPusher', () => {
           uri: externalRessourceUrl,
         });
         this.externalResource = [response.data];
-        this.isBusyExternalResource = false;
       } catch (error) {
-        debugger;
         console.error(error);
       }
+      this.isBusyExternalResource = false;
     },
 
     set_draft(draft) {
