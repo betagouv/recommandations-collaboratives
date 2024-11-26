@@ -11,6 +11,46 @@ class SocialAccountAdapter(DefaultSocialAccountAdapter):
     def generate_state_param(self, state: dict) -> str:
         return get_random_string(32)
 
+    def populate_user(self, request, sociallogin, data):
+        """
+        Hook that can be used to further populate the user instance.
+        """
+        user = super().populate_user(request, sociallogin, data)
+
+        # TODO: compléter les informations de l'utilisateur si possible
+        # https://github.com/numerique-gouv/proconnect-documentation/blob/main/doc_fs/donnees_fournies.md
+        # user.organization = ...
+        # user.organization_position = ...
+        # user.phone_no = ...
+        # user.siret = ...
+
+        if "phone_number" in data:
+            user.phone_no = data.get("phone_number")
+        if "organizational_unit" in data:
+            user.organization_position = data.get("organizational_unit")
+
+        return user
+
+    def pre_social_login(self, request, sociallogin) -> None:
+        """
+        Invoked just after a user successfully authenticates via a
+        social provider, but before the login is actually processed
+        (and before the pre_social_login signal is emitted).
+
+        You can use this hook to intervene, e.g. abort the login by
+        raising an ImmediateHttpResponse
+        """
+        return super().pre_social_login(request, sociallogin)
+
+    def is_open_for_signup(self, request, sociallogin) -> bool:
+        """
+        Checks whether or not the site is open for signups.
+
+        Next to simply returning True/False you can also intervene the
+        regular flow by raising an ImmediateHttpResponse
+        """
+        return super().is_open_for_signup(request, sociallogin)
+
 
 class CustomOpenIDConnectOAuth2Adapter(OpenIDConnectOAuth2Adapter):
     @property
