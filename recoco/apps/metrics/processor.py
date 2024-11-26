@@ -37,8 +37,8 @@ class MaterializedViewIndex:
 
 class MaterializedView:
     name: str
-    cursor: CursorWrapper
     indexes: list[MaterializedViewIndex]
+    cursor: CursorWrapper
     db_schema_name: str
     db_schema_owner: str
 
@@ -46,16 +46,12 @@ class MaterializedView:
         self,
         name: str,
         indexes: list[dict[str, Any]] = None,
-        db_owner: str = None,
-        db_schema_name: str = "metrics",
-        db_schema_owner: str = "metrics_owner",
     ):
         self.name = name
-        self.cursor = None
-        self.db_owner = db_owner
-        self.db_schema_name = db_schema_name
-        self.db_schema_owner = db_schema_owner
         self.indexes = [MaterializedViewIndex(**index) for index in indexes or []]
+        self.cursor = None
+        self.db_schema_name = settings.METRICS_PREFIX
+        self.db_schema_owner = f"{settings.METRICS_PREFIX}_owner"
 
     @classmethod
     def from_spec(

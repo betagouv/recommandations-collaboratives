@@ -426,7 +426,9 @@ WAGTAIL_EMAIL_MANAGEMENT_ENABLED = False
 
 # WAGTAILADMIN_BASE_URL = define that
 
-# Materialized views for Metrics
+# Metrics
+METRICS_PREFIX = os.getenv("METRICS_PREFIX", default="metrics")
+
 METRICS_MATERIALIZED_VIEWS_SPEC = [
     {
         "name": "projects",
