@@ -21,14 +21,15 @@ class AidesTerritoiresRIAdapter(BaseRIAdapter):
         return re.match(url_pattern, response.url) is not None
 
     def load_data(self):
-        if not settings.AIDES_TERRITOIRES_TOKEN:
+        at_token = getattr(settings, "AIDES_TERRITOIRES_TOKEN", None)
+        if not at_token:
             LOGGER.warning(
                 "No AIDES_TERRITOIRES_TOKEN defined, no request will succeed!"
             )
 
         cnx_response = requests.post(
             "https://aides-territoires.beta.gouv.fr/api/connexion/",
-            headers={"X-Auth-Token": settings.AIDES_TERRITOIRES_TOKEN},
+            headers={"X-Auth-Token": at_token},
             timeout=5,
         )  # FIXME
 
