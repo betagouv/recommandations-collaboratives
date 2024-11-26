@@ -39,7 +39,7 @@
                             {% regroup project.notes.public by created_on.date as notes_by_day %}
                             <div class="message-window flex-grow-1 d-flex flex-column-reverse scroll-gestion">
                                 <ul class="list-unstyled list-group">
-                                    {% for date, notes in notes_by_day|slice:":20" reversed %}
+                                    {% for date, notes in notes_by_day|slice:":100" reversed %}
                                         <li class="list-group-item border-0 fr-m-0 fr-p-0">
                                             <div class="small fr-my-2v text-center w-100">{{ date|naturalday|capfirst }}</div>
                                             {% for note in notes reversed %}
