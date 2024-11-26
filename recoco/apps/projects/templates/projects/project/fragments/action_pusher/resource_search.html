@@ -1,7 +1,8 @@
 <!-- Resources externes -->
 <div x-show="push_type == 'external_resource'"
      x-transition:enter-start="grow-enter-start"
-     x-transition:leave="grow-leave">
+     x-transition:leave="grow-leave"
+     class="position-relative">
     <div class="fr-search-bar fr-search-bar--lg" id="search-2" role="search">
         <label class="fr-label" for="external-resource-url-input">
             Url du site :
@@ -16,9 +17,9 @@
         <button class="fr-btn"
                 @click.prevent="postExternalResource($refs.external_resource_url.value)">Charger la ressource</button>
     </div>
-    <div x-show="isBusy"
+    <div x-show="isBusyExternalResource"
          x-transition
-         class="position-absolute text-center w-100">
+         class="position-absolute top-0 text-center w-100">
         <div class="spinner-border" role="status">
             <span class="visually-hidden">Loading...</span>
         </div>

@@ -6,6 +6,7 @@ import api, { postExternalRessourceUrl } from '../utils/api';
 Alpine.data('ActionPusher', () => {
   return {
     isBusy: true,
+    isBusyExternalResource: false,
     search: '',
 
     db: new MiniSearch({
@@ -131,13 +132,13 @@ Alpine.data('ActionPusher', () => {
     },
 
     async postExternalResource(externalRessourceUrl) {
-      this.isBusy = true;
+      this.isBusyExternalResource = true;
       try {
         const response = await api.post(postExternalRessourceUrl(), {
           uri: externalRessourceUrl,
         });
         this.externalResource = [response.data];
-        this.isBusy = false;
+        this.isBusyExternalResource = false;
       } catch (error) {
         debugger;
         console.error(error);
