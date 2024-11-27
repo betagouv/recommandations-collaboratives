@@ -1,5 +1,4 @@
 import { resolve } from 'path';
-import { optimizeDeps } from 'vite';
 
 const config = {
   plugins: [],
@@ -17,9 +16,6 @@ const config = {
   },
   resolve: {
     extensions: ['.js', '.json'],
-  },
-  optimizeDeps: {
-    exclude: ['masonry-layout'],
   },
   build: {
     outDir: resolve('./dist'),
