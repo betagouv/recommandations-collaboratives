@@ -80,11 +80,15 @@
                     <a class="stretched-link"
                        data-test-id="project-navigation-actions"
                        {% if "list_projects" in user_site_perms or "view_tasks" in user_project_perms %} href="{% url 'projects-project-detail-actions' project.pk %}" {% endif %}>Recommandations
-                        {% if active_project_action_notifications_count %}
-                            <span class="badge text-bg-danger" data-test-id="badge-tab-new-task">{{ active_project_action_notifications_count }}</span>
-                        {% endif %}
                     </a>
                 </label>
+                {% if active_project_action_notifications_count %}
+                    {% comment %} <span class="badge text-bg-danger">{{ active_project_action_notifications_count }}</span> {% endcomment %}
+                    <span class="position-absolute top-0 start-96 translate-middle p-2 bg-danger border border-light rounded-circle"
+                          data-test-id="badge-tab-new-task">
+                        <span class="visually-hidden">Nouvelle notification</span>
+                    </span>
+                {% endif %}
             </div>
             <div class="fr-segmented__element"
                  id="overview-step-3"
@@ -109,6 +113,12 @@
                         {% endif %}
                     </a>
                 </label>
+                {% if active_project_conversation_notifications_count %}
+                    <span class="has-notification">{{ active_project_conversation_notifications_count }}</span>
+                    <span class="position-absolute top-0 start-96 translate-middle p-2 bg-danger border border-light rounded-circle">
+                        <span class="visually-hidden">Nouvelle notification</span>
+                    </span>
+                {% endif %}
             </div>
             <div class="fr-segmented__element"
                  {% if 'manage_documents' not in user_project_perms %}aria-describedby="tooltip-lock-access-files-links"{% endif %}>
@@ -133,6 +143,12 @@
                         {% endif %}
                     </a>
                 </label>
+                {% if active_project_document_notifications_count %}
+                    {% comment %} <span class="has-notification">{{ active_project_document_notifications_count }}</span> {% endcomment %}
+                    <span class="position-absolute top-0 start-96 translate-middle p-2 bg-danger border border-light rounded-circle">
+                        <span class="visually-hidden">Nouvelle notification</span>
+                    </span>
+                {% endif %}
             </div>
             {% if "list_projects" in user_site_perms or 'use_private_notes' in user_project_perms %}
                 <div class="fr-segmented__element"
@@ -158,6 +174,12 @@
                             {% endif %}
                         </a>
                     </label>
+                    {% if active_project_private_conversation_notifications_count %}
+                        {% comment %} <span class="has-notification">{{ active_project_private_conversation_notifications_count }}</span> {% endcomment %}
+                        <span class="position-absolute top-0 start-96 translate-middle p-2 bg-danger border border-light rounded-circle">
+                            <span class="visually-hidden">Nouvelle notification</span>
+                        </span>
+                    {% endif %}
                 </div>
             {% endif %}
             <div class="fr-segmented__element"
