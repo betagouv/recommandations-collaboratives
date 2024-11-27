@@ -5,6 +5,9 @@ import '@gouvfr/dsfr/dist/dsfr.min.css';
 import '@gouvfr/dsfr/dist/utility/utility.min.css';
 import '@gouvfr/dsfr/dist/dsfr.module.min';
 
+//External librairies
+import 'masonry-layout/dist/masonry.pkgd.min';
+
 import 'vite/modulepreload-polyfill';
 import './utils/globals';
 import './utils/tooltipInitialization.js';
