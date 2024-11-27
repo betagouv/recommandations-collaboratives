@@ -15,14 +15,18 @@
   &--join,
   &--non-publish {
     // background: #000091;
-    background: var(--error-425-625);
+    background: var(--warning-425-625-hover);
   }
 }
 
 .specific-hover-blue:hover {
-  color: var(--background-action-high-blue-france);
+  color: black;
   background-color: transparent !important;
   cursor: pointer;
+}
+
+.specficic-paddingtop-1px {
+  padding-top: 1px;
 }
 
 @media (max-width: 1850px) {
