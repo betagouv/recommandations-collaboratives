@@ -9,13 +9,18 @@ created : 2021-05-31 11:54:53 CEST
 
 import os
 
+from dotenv import load_dotenv
+
+from .common import *
+
+load_dotenv()
+
 for k, v in {
     "PROCONNECT_SERVER_URL": "https://fca.integ01.dev-agentconnect.fr/api/v2/.well-known/openid-configuration"
 }.items():
     os.environ.setdefault(k, v)
 
 
-from .common import *
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -37,11 +42,15 @@ INSTALLED_APPS += [
     "debug_toolbar",
     "drf_spectacular",
     "drf_spectacular_sidecar",
+    "django_extensions",
 ]
 
 MIDDLEWARE += ("debug_toolbar.middleware.DebugToolbarMiddleware",)
 
-INTERNAL_IPS = []
+# Necessary for debug_toolbar to work
+INTERNAL_IPS = [
+  "127.0.0.1",
+]
 
 DEBUG_TOOLBAR_CONFIG = {
     "SHOW_TOOLBAR_CALLBACK": lambda r: r.environ.get("SERVER_NAME", None)
