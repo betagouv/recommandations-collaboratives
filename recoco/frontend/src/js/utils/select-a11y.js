@@ -98,6 +98,7 @@ class Select {
     button.setAttribute('type', 'button');
     button.setAttribute('aria-expanded', this.open);
     button.className = 'fr-select text-start';
+    button.setAttribute('data-cy', 'reco-pusher-selected-project');
 
     const text = document.createElement('span');
 
