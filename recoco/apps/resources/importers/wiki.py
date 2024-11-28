@@ -25,7 +25,6 @@ class MediaWikiRIAdapter(BaseRIAdapter):
 
         page = site.pages[self.page_name]
         if page.exists:
-            help(page)
             self.raw_data = page.text(expandtemplates=True)
 
         return True
