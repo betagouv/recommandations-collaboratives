@@ -7,6 +7,14 @@ author  : raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created : 2021-05-31 11:54:53 CEST
 """
 
+import os
+
+for k, v in {
+    "PROCONNECT_SERVER_URL": "https://fca.integ01.dev-agentconnect.fr/api/v2/.well-known/openid-configuration"
+}.items():
+    os.environ.setdefault(k, v)
+
+
 from .common import *
 
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -14,6 +22,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = [
     "localhost",
+    "bacasable.localhost",
 ]
 
 INSTALLED_APPS += [
