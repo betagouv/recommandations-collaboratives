@@ -14,5 +14,11 @@ class ProConnectProvider(OpenIDConnectProvider):
             "acr_values": "eidas1",
         }
 
+    def extract_common_fields(self, data):
+        """
+        Override this method to extract common fields from the data
+        """
+        return super().extract_common_fields(data)
+
 
 provider_classes = [ProConnectProvider]
