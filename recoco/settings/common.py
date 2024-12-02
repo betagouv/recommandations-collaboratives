@@ -19,6 +19,9 @@ from multisite import SiteID
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# import sys
+# sys.path.append(str(BASE_DIR / "recoco"))
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
@@ -323,6 +326,9 @@ ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_LOGIN_ON_PASSWORD_RESET = True
 ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = "/login-redirect"
 
+# Common signup form shared by account and socialaccount
+ACCOUNT_SIGNUP_FORM_CLASS = "recoco.forms.BaseSignupForm"
+
 ACCOUNT_FORMS = {
     "login": "recoco.apps.home.forms.UVLoginForm",
     "signup": "recoco.apps.home.forms.UVSignupForm",
@@ -338,8 +344,14 @@ ACCOUNT_FORMS = {
 SOCIALACCOUNT_ADAPTER = "recoco.apps.social_account.adapters.SocialAccountAdapter"
 SOCIALACCOUNT_OPENID_CONNECT_URL_PREFIX = "oidc"
 SOCIALACCOUNT_LOGIN_ON_GET = True
-SOCIALACCOUNT_IS_OPEN_FOR_SIGNUP = False
-# SOCIALACCOUNT_AUTO_SIGNUP = False # TODO: make user fill the missing data at signup
+SOCIALACCOUNT_AUTO_SIGNUP = False
+SOCIALACCOUNT_EMAIL_REQUIRED = True
+SOCIALACCOUNT_EMAIL_AUTHENTICATION = True
+SOCIALACCOUNT_EMAIL_AUTHENTICATION_AUTO_CONNECT = True
+
+SOCIALACCOUNT_FORMS = {
+    "signup": "recoco.apps.social_account.forms.SignupForm",
+}
 
 SOCIALACCOUNT_PROVIDERS = {
     # https://docs.allauth.org/en/latest/socialaccount/providers/openid_connect.html
