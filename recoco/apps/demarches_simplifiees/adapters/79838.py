@@ -18,21 +18,14 @@ def make(project: Project) -> dict[str, Any]:
             }
         )
 
-    if advisor := project.advisors_note_by:
+    if referrer := project.owner:
         d.update(
             {
-                "champ_Q2hhbXAtMzUyMTg0OA": advisor.email,
-                "champ_Q2hhbXAtMzUyMTg0Nw": advisor.organization_position,
-                "champ_Q2hhbXAtMzUyMTg0OQ": advisor.phone_no,
+                "champ_Q2hhbXAtMzUyMTg0OA": referrer.email,
+                "champ_Q2hhbXAtMzUyMTg0Nw": referrer.organization_position,
+                "champ_Q2hhbXAtMzUyMTg0OQ": referrer.phone_no,
             }
         )
-
-    # if len(project.phone):
-    #     d.update(
-    #         {
-    #             "champ_Q2hhbXAtMzUyMTg0OQ": project.phone,
-    #         }
-    #     )
 
     if commune := project.commune:
         d.update(
