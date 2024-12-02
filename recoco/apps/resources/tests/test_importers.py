@@ -39,7 +39,8 @@ def test_mediawiki_adapter(mocker):
 def test_aides_territoires_adapter(mocker):
     mwi_class = importers.api.AidesTerritoiresRIAdapter
 
-    uri = "https://aides-territoires.beta.gouv.fr/aides/passeurs-dimages-en-bourgogne-franche-comte/"
+    uri = "https://aides-territoires.beta.gouv.fr/aides/aide-imaginaire/"
+    api_uri = "https://aides-territoires.beta.gouv.fr/api/aids/aide-imaginaire/"
 
     adapter = requests_mock.Adapter()
     session = HTMLSession()
@@ -51,17 +52,40 @@ def test_aides_territoires_adapter(mocker):
         text="<!DOCTYPE html><html><head></head></html>",
     )
 
+    adapter.register_uri(
+        "GET",
+        api_uri,
+        text="fake-data",
+    )
+
     response = session.get(uri)
 
     assert mwi_class.can_handle(response) is True
-    # assert mwi_class.can_handle("my dokuwiki v7") is False
-
-    mocker.patch("mwclient.Site")
-    mocker.patch("mwclient.Site.pages", return_value="Hello", create=True)
 
     mwi = mwi_class(uri)
     assert mwi.load_data() is True
-    assert mwi.extract_data()
 
     # Add fake data
-    mwi.raw_data = "'''hello'''"
+    mwi.raw_data = SAMPLE_AT_AID
+
+    mwi.extract_data()
+
+    assert mwi.content is not None
+
+
+SAMPLE_AT_AID = """{
+    "@context": "string",
+    "@id": "string",
+    "@type": "string",
+    "name": "string",
+    "description": "string",
+    "status": "string",
+    "origin_url": "https://appelsaprojets.ademe.fr/aap/AURASTC2019-54",
+    "aid_audiences": "commune",
+    "aid_types": "grant",
+    "aid_destinations": "supply",
+    "date_start": "2024-12-02T13:30:57.225Z",
+    "date_predeposit": "2024-12-02T13:30:57.225Z",
+    "date_submission_deadline": "2023-05-30",
+    "time_create": "2024-12-02T13:30:57.225Z"
+}"""

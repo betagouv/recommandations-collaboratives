@@ -1,3 +1,4 @@
+import json
 import logging
 import re
 
@@ -13,12 +14,19 @@ LOGGER = logging.getLogger("recoco.apps.resources")
 class AidesTerritoiresRIAdapter(BaseRIAdapter):
     """Adapter for website Aides Territoires"""
 
+    URL_PATTERN = (
+        # example : https://aides-territoires.beta.gouv.fr/aides/32cf-sadapter-au-recul-du-trait-de-cote/
+        "^https?:\\/\\/(www\\.)?aides-territoires\\.beta\\.gouv\\.fr\\/aides\\/(?P<slug>.*)$"
+    )
+
     @staticmethod
     def can_handle(response: requests.Response):
-        # example : https://aides-territoires.beta.gouv.fr/aides/32cf-sadapter-au-recul-du-trait-de-cote/
-        url_pattern = "^https?:\\/\\/(www\\.)?aides-territoires\\.beta\\.gouv\\.fr\\/aides\\/(.*)$"
+        return re.match(AidesTerritoiresRIAdapter.URL_PATTERN, response.url) is not None
 
-        return re.match(url_pattern, response.url) is not None
+    def _extract_pageslug_from_url(self, url):
+        groups = re.match(self.URL_PATTERN, url)
+
+        return groups["slug"]
 
     def load_data(self):
         at_token = getattr(settings, "AIDES_TERRITOIRES_TOKEN", None)
@@ -36,10 +44,15 @@ class AidesTerritoiresRIAdapter(BaseRIAdapter):
         if not cnx_response.ok:
             return False
 
+        pageslug = self._extract_pageslug_from_url(self.uri)
+
         token = cnx_response.json()["token"]
         auth = requests_jwt.JWTAuth(token)
+        uri = f"https://aides-territoires.beta.gouv.fr/api/aids/{pageslug}"
         response = requests.get(
-            "https://aides-territoires.beta.gouv.fr/api/aids/", auth=auth, timeout=5
+            uri,
+            auth=auth,
+            timeout=5,
         )
 
         self.raw_data = response.json
@@ -47,4 +60,7 @@ class AidesTerritoiresRIAdapter(BaseRIAdapter):
         return True
 
     def extract_data(self):
-        pass
+        data = json.loads(self.raw_data)
+
+        self.title = data["name"]
+        self.content = data["description"]
