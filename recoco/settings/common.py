@@ -72,6 +72,7 @@ INSTALLED_APPS = [
     "watson",
     "phonenumber_field",
     "cookie_consent",
+    "recoco.apps.feature_flag",
     "recoco.apps.dsrc",
     "recoco.apps.onboarding",
     "recoco.apps.home",
@@ -496,5 +497,10 @@ DS_API_BASE_URL = f"{DS_BASE_URL}/api/public/v1"
 DS_AUTOLOAD_SCHEMA = True
 DS_AUTOCREATE_FOLDER = True
 DS_ADAPTERS_DIR = BASE_DIR / "apps/demarches_simplifiees/adapters"
+
+# Waffle (feature flags)
+WAFFLE_FLAG_MODEL = "feature_flag.Flag"
+WAFFLE_SWITCH_MODEL = "feature_flag.Switch"
+WAFFLE_SAMPLE_MODEL = "feature_flag.Sample"
 
 # eof
