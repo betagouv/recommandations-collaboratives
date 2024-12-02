@@ -11,7 +11,13 @@ Alpine.data('ActionPusher', () => {
 
     db: new MiniSearch({
       fields: ['title', 'subtitle', 'tags'], // fields to index for full-text search
-      storeFields: ['title', 'subtitle', 'url', 'embeded_url', 'is_dsresource'], //
+      storeFields: [
+        'title',
+        'subtitle',
+        'url',
+        'embeded_url',
+        'has_dsresource',
+      ], //
     }),
 
     push_type: 'single',
@@ -120,7 +126,7 @@ Alpine.data('ActionPusher', () => {
           tags: t.tags,
           url: t.web_url,
           embeded_url: t.embeded_url,
-          is_dsresource: t.is_dsresource,
+          has_dsresource: t.has_dsresource,
           category: t.category,
         };
 

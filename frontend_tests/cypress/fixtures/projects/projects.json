@@ -585,7 +585,7 @@
     "pk": 22,
     "fields": {
       "submitted_by": 5,
-      "ro_key": "af408518b67048a9bef11802765d0ky5",
+      "ro_key": "89d56952af6d457ebc7d8daa19319aab",
       "last_name": "John",
       "first_name": "Doe",
       "publish_to_cartofriches": false,
@@ -606,6 +606,60 @@
       "impediments": "",
       "deleted": null,
       "sites": [1]
+    }
+  },
+  {
+    "model": "projects.project",
+    "pk": 23,
+    "fields": {
+      "submitted_by": 5,
+      "ro_key": "af408518b67048a9bef11802765d0ky5",
+      "last_name": "Jean-Pierre",
+      "first_name": "Lepécheur",
+      "publish_to_cartofriches": false,
+      "exclude_stats": true,
+      "muted": false,
+      "org_name": "Frichti",
+      "created_on": "2024-11-19T14:31:39Z",
+      "updated_on": "2024-11-19T13:08:07.795Z",
+      "tags": "",
+      "name": "Projet multipublié",
+      "phone": "01 01 01 01 01",
+      "description": "Projet multipublié",
+      "advisors_note": "Quels financements existent pour ouvrir une friterie traditionnelle mais dans un food truck, le tout sur une ancienne usine de draperie ?\r\nedit de PR@beta",
+      "advisors_note_on": "2024-11-19T14:51:12Z",
+      "advisors_note_by": 1,
+      "location": "861 chemin rural 53",
+      "commune": 42,
+      "impediments": "",
+      "deleted": null
+    }
+  },
+  {
+    "model": "projects.project",
+    "pk": 24,
+    "fields": {
+      "submitted_by": 5,
+      "ro_key": "f36583acf05043e193e4026df3531fb0",
+      "last_name": "Jean-Pierre",
+      "first_name": "Lepécheur",
+      "publish_to_cartofriches": false,
+      "exclude_stats": true,
+      "muted": false,
+      "org_name": "Frichti",
+      "created_on": "2024-11-19T14:31:39Z",
+      "updated_on": "2024-11-19T13:08:07.795Z",
+      "tags": "",
+      "name": "Projet multipublié non accepté",
+      "phone": "01 01 01 01 01",
+      "description": "Projet multipublié non accepté",
+      "advisors_note": "Quels financements existent pour ouvrir une friterie traditionnelle mais dans un food truck, le tout sur une ancienne usine de draperie ?\r\nedit de PR@beta",
+      "advisors_note_on": "2024-11-19T14:51:12Z",
+      "advisors_note_by": 1,
+      "location": "861 chemin rural 53",
+      "commune": 42,
+      "impediments": "",
+      "deleted": null
     }
   }
 ]

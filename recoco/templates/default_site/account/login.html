@@ -4,9 +4,6 @@
 {% load i18n %}
 {% load socialaccount %}
 {% load waffle_tags %}
-{% block head_title %}
-    {% trans "Sign In" %}
-{% endblock head_title %}
 {% block title %}
     Connexion
 {% endblock title %}
@@ -34,83 +31,77 @@
              x-init="initLogin"
              class="fr-container fr-py-6w max-width-800">
             <div class="d-flex justify-content-between align-items-start">
-                <h1 class="fr-mb-6w d-flex align-items-center">
+                <h2 class="fr-mb-6w d-flex align-items-center">
                     <svg class="bi fr-mr-2v" width="28" height="28">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#person-circle" />
                     </svg>
                     Connexion à {{ site.name }}
-                </h1>
+                </h2>
             </div>
-
-
             <!-- Proconnect -->
             {% flag "proconnect_login" %}
-
-            <h4 class="fr-mb-2w d-block">Se connecter via ProConnect</h4>
-            <div class="fr-connect-group">
-              <form action="{% provider_login_url 'proconnect' process='process' %}">
-                  <button class="fr-connect">
-                    <span class="fr-connect__login">S’identifier avec</span>
-                    <span class="fr-connect__brand">ProConnect</span>
-                </button>
-              </form>
-              <p>
-                  <a href="https://proconnect.gouv.fr/"
-                    target="_blank"
-                    rel="noopener"
-                    title="Qu’est-ce que ProConnect ? - nouvelle fenêtre">Qu’est-ce que ProConnect ?</a>
-              </p>
+            <h3 class="fr-mb-2w d-block">Se connecter via ProConnect</h3>
+            <div class="fr-connect-group text-align-center">
+                <form action="{% provider_login_url 'proconnect' process='process' %}">
+                    <button class="fr-connect">
+                        <span class="fr-connect__login">S’identifier avec</span>
+                        <span class="fr-connect__brand">ProConnect</span>
+                    </button>
+                </form>
+                <p>
+                    <a href="https://proconnect.gouv.fr/"
+                       target="_blank"
+                       rel="noopener"
+                       title="Qu’est-ce que ProConnect ? - nouvelle fenêtre">Qu’est-ce que ProConnect ?</a>
+                </p>
             </div>
-
-            {% else %}
-            {% endflag %}
-
-
-            <form class="login fr-form-group"
-                  method="post"
-                  action="{% url 'account_login' %}">
-                {% csrf_token %}
-                {% if redirect_field_value %}
-                    <input type="hidden"
-                           name="{{ redirect_field_name }}"
-                           value="{{ redirect_field_value }}" />
-                {% endif %}
-                <fieldset class="fr-fieldset">
-                    <h4 class="fr-mb-3w d-block">Se connecter avec son mot de passe</h4>
+            <hr />
+        {% endflag %}
+        <form class="login fr-form-group"
+              method="post"
+              action="{% url 'account_login' %}">
+            {% csrf_token %}
+            {% if redirect_field_value %}
+                <input type="hidden"
+                       name="{{ redirect_field_name }}"
+                       value="{{ redirect_field_value }}" />
+            {% endif %}
+            <fieldset class="fr-fieldset">
+                <h3 class="fr-mb-3w d-block">Se connecter avec son mot de passe</h3>
+                <div class="fr-fieldset__content">
+                    {{ form.as_p }}
+                    <div class="d-flex flex-column justify-content-between align-items-start fr-mt-2w">
+                        <div class="d-flex w-100 justify-content-between">
+                            <a id="forgot-password"
+                               class="fr-btn fr-btn--secondary"
+                               href="{% url 'account_reset_password' %}">{% trans "Forgot Password?" %}</a>
+                            <div class="fr-input-group">
+                                <button class="fr-btn custom-login-button" type="submit">Se connecter</button>
+                            </div>
+                        </div>
+                        <div class="fr-input-group d-flex justify-content-end flex-column align-items-end fr-mt-7w">
+                            <p>
+                                Se connecter avec un simple email ? <a class="fr-btn fr-btn--sm fr-btn--secondary fr-ml-2w" href="/login/">Connexion avec email</a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+        </form>
+        <hr />
+        <div class="d-flex justify-content-center align-items-center fr-mt-14v">
+            <div class="fr-form-group text-center">
+                <fieldset>
+                    <h3 class="fr-mb-3w d-block ">Vous n'avez pas de compte ?</h3>
                     <div class="fr-fieldset__content">
-                        {{ form.as_p }}
-                        <div class="d-flex flex-column justify-content-between align-items-start fr-mt-2w">
-                            <div class="d-flex w-100 justify-content-between">
-                                <a id="forgot-password"
-                                   class="fr-btn fr-btn--secondary"
-                                   href="{% url 'account_reset_password' %}">{% trans "Forgot Password?" %}</a>
-                                <div class="fr-input-group">
-                                    <button class="fr-btn custom-login-button" type="submit">Se connecter</button>
-                                </div>
-                            </div>
-                            <div class="fr-input-group d-flex justify-content-end flex-column align-items-end fr-mt-7w">
-                                <p>
-                                    Se connecter avec un simple email ? <a class="fr-btn fr-btn--sm fr-btn--secondary fr-ml-2w" href="/login/">Connexion avec email</a>
-                                </p>
-                            </div>
+                        <div class="fr-input-group">
+                            <a class="fr-btn fr-btn--secondary custom-login-button"
+                               href="{{ signup_url }}">S'inscrire</a>
                         </div>
                     </div>
                 </fieldset>
-            </form>
-            <hr />
-            <div class="d-flex justify-content-center align-items-center fr-mt-14v">
-                <div class="fr-form-group text-center">
-                    <fieldset>
-                        <h4 class="fr-mb-3w d-block ">Vous n'avez pas de compte ?</h4>
-                        <div class="fr-fieldset__content">
-                            <div class="fr-input-group">
-                                <a class="fr-btn fr-btn--secondary custom-login-button"
-                                   href="{{ signup_url }}">S'inscrire</a>
-                            </div>
-                        </div>
-                    </fieldset>
-                </div>
             </div>
         </div>
     </div>
+</div>
 {% endblock content %}
