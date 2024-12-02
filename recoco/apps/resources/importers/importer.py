@@ -1,13 +1,16 @@
 from requests_html import HTMLSession
 
 from ..models import Resource
-from . import wiki
+from . import api, wiki
 
 
 class ResourceImporter:
     """Import external resources as native `Resource` using API or web scraping"""
 
-    ADAPTERS = {"mediawiki": wiki.MediaWikiRIAdapter}
+    ADAPTERS = {
+        "mediawiki": wiki.MediaWikiRIAdapter,
+        "aides_territoires": api.AidesTerritoiresRIAdapter,
+    }
 
     def from_uri(self, uri):
         session = HTMLSession()
@@ -21,7 +24,10 @@ class ResourceImporter:
                 adapter.extract_data()
 
                 return Resource(
-                    title=adapter.title, content=adapter.content, imported_from=uri
+                    status=Resource.TO_REVIEW,
+                    title=adapter.title,
+                    content=adapter.content,
+                    imported_from=uri,
                 )
 
         return None
