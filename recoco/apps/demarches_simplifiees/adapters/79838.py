@@ -10,13 +10,13 @@ def make(project: Project) -> dict[str, Any]:
         "champ_Q2hhbXAtMzUyMTg1Mg": project.name,
     }
 
-    if referrer := project.owner:
+    if owner := project.owner:
         d.update(
             {
-                "champ_Q2hhbXAtMzUyMTg0Ng": f"{referrer.last_name} {referrer.first_name}",
-                "champ_Q2hhbXAtMzUyMTg0OA": referrer.email,
-                "champ_Q2hhbXAtMzUyMTg0Nw": referrer.organization_position,
-                "champ_Q2hhbXAtMzUyMTg0OQ": referrer.phone_no,
+                "champ_Q2hhbXAtMzUyMTg0Ng": f"{owner.last_name} {owner.first_name}",
+                "champ_Q2hhbXAtMzUyMTg0OA": owner.email,
+                "champ_Q2hhbXAtMzUyMTg0Nw": owner.profile.organization_position,
+                "champ_Q2hhbXAtMzUyMTg0OQ": owner.profile.phone_no.as_international,
             }
         )
 
