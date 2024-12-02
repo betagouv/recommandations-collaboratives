@@ -1,7 +1,7 @@
 # encoding: utf-8
 
 """
-Settings for frontend tests permissions
+Settings for frontend tests
 
 author  : raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created : 2024-11-18 11:54:53 CEST
@@ -19,7 +19,7 @@ load_dotenv()
 DEBUG = True
 DJANGO_DEBUG = True
 
-ALLOWED_HOSTS = ["example.localhost"]
+ALLOWED_HOSTS = ["localhost", "example.localhost"]
 
 INSTALLED_APPS += (
     "drf_spectacular",
@@ -30,15 +30,30 @@ INSTALLED_APPS += (
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
+# LOCAL DOCKER DATABASE
+# DATABASES = {
+#      'default': {
+#          'ENGINE': 'django.db.backends.postgresql',
+#          'NAME': os.environ.get('POSTGRES_NAME'),
+#          'USER': os.environ.get('POSTGRES_USER'),
+#          'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
+#          'HOST': 'db',
+#          'PORT': 5432,
+#      }
+# }
+
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.getenv("DJANGO_DB_TEST_NAME", "test_recoco"),
-        "USER": os.getenv("DJANGO_DB_USER", "recoco"),
-        "PASSWORD": os.getenv("DJANGO_DB_PASSWORD", ""),
-        "HOST": os.getenv("DJANGO_DB_HOST", "localhost"),
+        "NAME": os.getenv("DJANGO_DB_NAME"),
+        "USER": os.getenv("DJANGO_DB_USER"),
+        "PASSWORD": os.getenv("DJANGO_DB_PASSWORD"),
+        "HOST": os.getenv("DJANGO_DB_HOST"),
+        "PORT": os.getenv("DJANGO_DB_PORT"),
+        "TEST": {"NAME": os.getenv("DJANGO_DB_TEST_NAME")},
     }
 }
+
 
 # EMAIL
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
@@ -56,12 +71,11 @@ RECAPTCHA_REQUIRED_SCORE = 0
 DJANGO_VITE_ASSETS_PATH = BASE_DIR / "frontend" / "dist"
 DJANGO_VITE = {
     "default": {
-        "dev_mode": DEBUG,
-        "dev_server_port": os.getenv("DJANGO_VITE_TEST_SERVER_PORT"),
+        "dev_mode": False,
+        "dev_server_port": 3001,
+        "manifest_path": DJANGO_VITE_ASSETS_PATH / "manifest.json",
     }
 }
-DJANGO_VITE_DEV_MODE = DEBUG
-
 
 MULTISITE_REPO_DIR = BASE_DIR / ".." / "multisites"
 TEMPLATES[0]["DIRS"] += [MULTISITE_REPO_DIR / "templates"]
@@ -71,8 +85,8 @@ STATICFILES_DIRS += [DJANGO_VITE_ASSETS_PATH]
 
 
 # Uncomment Gdal and Geos libraries paths on MacOS
-# GDAL_LIBRARY_PATH = "/opt//homebrew/lib/libgdal.dylib"
-# GEOS_LIBRARY_PATH = "/opt//homebrew/lib/libgeos_c.dylib"
+GDAL_LIBRARY_PATH = os.getenv("GDAL_LIBRARY_PATH")
+GEOS_LIBRARY_PATH = os.getenv("GEOS_LIBRARY_PATH")
 
 SILENCED_SYSTEM_CHECKS += ["captcha.recaptcha_test_key_error"]
 

@@ -30,7 +30,7 @@
   "project-advisor-overview": {
     "steps": [
       {
-        "intro": "Ici, familiarisez-vous avec le projet",
+        "intro": "<div data-test-id='project-overview-tutorial'>Ici, familiarisez-vous avec le projet</div>",
         "element": "#overview-step-1"
       },
       {
