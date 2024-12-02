@@ -8,7 +8,7 @@
     {% comment %} -------- code d'une ressource externe en dur -------------- {% endcomment %}
 
     {% comment %} Changer la couleur dans l'attribut style par une variable de la couleur du site externe {% endcomment %}
-    {% if resource.imported_from and resource.content_rendered %}
+    {% if resource.imported_from and resource.content %}
         <div class="fr-p-3w d-flex fr-mb-3w" style="background-color:#DFFDF7">
             <img src="{% static 'home/img/actors/progress.png' %}">
             <div class="d-flex flex-column">
@@ -21,7 +21,7 @@
     {% endif %}
 
     {% comment %} -------- si la ressource n'a pas de contenu ---------- {% endcomment %}
-    {% if not resource.content_rendered and resource.imported_from %}
+    {% if not resource.content and resource.imported_from %}
         <div class="fr-px-8w fr-py-2w" style="background-color:#fafafa;">
             <img style="margin: auto;display: block;" src="{% static '/home/img/home/progress.png' %}">
             <p> Malheureusement nous n’avons pas pu récupérer le contenu de la page.
@@ -30,8 +30,7 @@
             </p>
         </div>
     {% endif %}
-    {% if resource.content_rendered %}
+    {% if resource.content %}
         {{ resource.content_rendered|safe }}
-
     {% endif %}
 </div>

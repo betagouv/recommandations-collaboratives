@@ -6,6 +6,7 @@
   "scripts": {
     "cy:test_ui": "cypress open",
     "cy:run": "cypress run",
+    "cy:parallel": "cypress-parallel -s cy:run -t 2 -d ./cypress/e2e/** ",
     "test": "concurrently \"yarn frontend:start-server\" \"yarn start-server-and-test\"",
     "start-server-and-test": "start-server-and-test 'yarn django:start-server --verbosity 0' http://localhost:8001  'yarn update-and-test'",
     "update-and-test": "yarn django:update-permissions && yarn cy:run",
@@ -20,13 +21,14 @@
   "author": "",
   "license": " GPL-3.0-or-later",
   "devDependencies": {
+    "@cypress/grep": "^4.1.0",
     "concurrently": "^8.2.2",
     "cross-env": "^7.0.3",
     "cypress": "^13.6.0",
     "cypress-mochawesome-reporter": "^3.8.1",
+    "cypress-parallel": "^0.14.0",
     "eslint": "^8.56.0",
     "prettier": "^3.2.2",
-    "start-server-and-test": "^2.0.2",
-    "@cypress/grep": "^4.1.0"
+    "start-server-and-test": "^2.0.2"
   }
 }

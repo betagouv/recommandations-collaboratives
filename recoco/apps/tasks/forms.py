@@ -111,22 +111,20 @@ class CreateActionWithoutResourceForm(CreateActionBaseForm):
 
 class CreateActionWithResourceForm(CreateActionBaseForm):
     resource = (
-        # forms.ModelChoiceField(
-        #     queryset=resources_models.Resource.objects.exclude(
-        #         status=resources_models.Resource.DRAFT
-        #     )
-        # ),
-        forms.ModelChoiceField(queryset=resources_models.Resource.objects.all()),
+        forms.ModelChoiceField(
+            queryset=resources_models.Resource.objects.exclude(
+                status=resources_models.Resource.DRAFT
+            ).with_ds_annotations()
+        ),
     )
 
     def clean_resource(self):
         resource = self.cleaned_data["resource"]
 
         try:
-            # resource = resources_models.Resource.on_site.exclude(
-            #     status=resources_models.Resource.DRAFT
-            # ).get(pk=resource.pk)
-            resource = resources_models.Resource.objects.all().get(pk=resource.pk)
+            resource = resources_models.Resource.on_site.exclude(
+                status=resources_models.Resource.DRAFT
+            ).get(pk=resource.pk)
         except resources_models.Resource.DoesNotExist:
             self.add_error("resource_unknown", "Cette ressource n'existe pas")
             raise
@@ -142,16 +140,20 @@ class CreateActionsFromResourcesForm(CreateActionBaseForm):
     resources = forms.ModelMultipleChoiceField(
         queryset=resources_models.Resource.objects.exclude(
             status=resources_models.Resource.DRAFT
-        ),
+        ).with_ds_annotations(),
         required=True,
     )
 
     def clean_resources(self):
         resources = self.cleaned_data["resources"]
 
-        resources = resources_models.Resource.on_site.exclude(
-            status=resources_models.Resource.DRAFT
-        ).filter(pk__in=[resource.pk for resource in resources.all()])
+        resources = (
+            resources_models.Resource.on_site.exclude(
+                status=resources_models.Resource.DRAFT
+            )
+            .with_ds_annotations()
+            .filter(pk__in=[resource.pk for resource in resources.all()])
+        )
 
         if resources.count() == 0:
             self.add_error("no_valid_resource", "Aucune ressource")

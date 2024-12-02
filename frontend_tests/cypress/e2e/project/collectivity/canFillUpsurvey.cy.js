@@ -1,19 +1,11 @@
 import projects from '../../../fixtures/projects/projects.json';
 
-const currentProject = projects[3];
+const currentProject = projects[1];
 
 describe('I can fill a project survey @critical', () => {
   beforeEach(() => {
     cy.login('collectivité1');
     cy.visit(`/project/${currentProject.pk}`);
-
-    const challengeCode = 'survey';
-    cy.intercept(`/api/challenges/definitions/${challengeCode}`, {
-      fixture: 'settings/challengeDefinition',
-    });
-    cy.intercept(`/api/challenges/${challengeCode}`, {
-      fixture: 'settings/challenge',
-    });
   });
 
   it('displays the tutorial on a pristine survey', () => {
@@ -24,7 +16,7 @@ describe('I can fill a project survey @critical', () => {
     });
     cy.get('[data-test-id="link-fill-survey"]').first().click({ force: true });
 
-    cy.get('[data-test-id="survey-tutorial"]').should.exist;
+    cy.get("[data-test-id='survey-tutorial']").should.exist;
   });
 
   it('does not display the tutorial on a survey that already has answers', () => {
@@ -62,6 +54,16 @@ describe('I can fill a project survey @critical', () => {
     cy.get('[data-test-id="link-fill-survey"]').first().click({ force: true });
 
     // cy.url().should('include', '/projects/survey/')
+
+    cy.get('#form_answer-1').check({ force: true });
+
+    cy.get('#input-project-comment')
+      .type('Fake comment on first survey question', { force: true })
+      .should('have.value', 'Fake comment on first survey question');
+
+    cy.get('[data-test-id="button-submit-survey-questionset"]').click({
+      force: true,
+    });
 
     cy.get('#form_answer-1').check({ force: true });
 

@@ -4,46 +4,44 @@ Dossier de tests : `frontend_tests/`
 
 ## Démarrer
 
-- S'assurer que dans le fichier `development.py` dans les settings de `django`, la base de données de test est bien configurée. Par exemple :
+- S'assurer que les variables d'environnement sont bien configurées dans le fichier `.env` à la racine du projet. Par exemple :
+
+```bash
+DJANGO_DB_NAME=recoco
+DJANGO_DB_TEST_NAME=test_recoco
+DJANGO_DB_USER=recoco
+DJANGO_DB_PASSWORD=
+DJANGO_DB_HOST=localhost
+DJANGO_DB_PORT=5432
+DJANGO_VITE_TEST_SERVER_PORT=3001
+DJANGO_VITE_DEV_SERVER_PORT=3000
+GDAL_LIBRARY_PATH=
+GEOS_LIBRARY_PATH=
+```
+
+- S'assurer que dans le fichier `development.py` dans les settings de `Django`, la base de données de test est bien configurée. Par exemple :
 
 ```python
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('POSTGRES_NAME'), # ex 'recoco'
-        'USER': os.environ.get('POSTGRES_USER'),
-        'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
-        'HOST': 'localhost',
-        'PORT': 5432,
-        'TEST': {
-            'NAME':'test_recoco' # <-- ici
-        }
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": os.getenv("DJANGO_DB_NAME"),
+        "USER": os.getenv("DJANGO_DB_USER"),
+        "PASSWORD": os.getenv("DJANGO_DB_PASSWORD"),
+        "HOST": os.getenv("DJANGO_DB_HOST"),
+        "PORT": os.getenv("DJANGO_DB_PORT"),
+        "TEST": {"NAME": os.getenv("DJANGO_DB_TEST_NAME")}, # <-- ici
     }
 }
 ```
 
-- Dupliquer le fichier `development.py` en `frontend_tests.py` et modifier les paramètres de la base de données pour qu'ils correspondent à la base de données de test.
+Ce fichier est utilisé pour copier la structure de la base de données de développement dans la base de données de test.
+`DATABASES["default"]["NAME"]` : Nom de la base de données de développement
+`DATABASES["default"]["TEST"]["NAME"]` : Nom de la base de données de test
 
-```python
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': test_recoco, # <-- ici
-        'USER': os.environ.get('POSTGRES_USER'),
-        'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
-        'HOST': 'localhost',
-        'PORT': 5432,
-    }
-}
-```
+- Le fichier `frontend_tests.py` contient les paramètres de configuration pour les tests front end. Notamment les paramètres de connexion à la base de données de développement et de test.
 
-Ces paramètres sont seulement utilisés pour lancer la mise à jour des permissions à l'aide du script `update_permissions.py`
-
-- Dans le fichier `frontend_tests.py`, modifier le port d'accès du front end, cela permettra de lancer le serveur front end sur un port différent du serveur de développement Django et de pouvoir lancer les tests en parallèle.:
-
-```python
-DJANGO_VITE = {"default": {"dev_mode": DEBUG, "dev_server_port": 3001}}
-```
+- Le fichier `frontend_tests_permissions.py` contient les paramètres de connexion à la base de données pour lancer la mise à jour des permissions à l'aide du script `update_permissions.py`
 
 ## Lancer les tests
 

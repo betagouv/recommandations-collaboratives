@@ -43,6 +43,10 @@ function boardProjectsApp(currentSiteId) {
     searchText: '',
     async getData(postProcess = true) {
       const projects = await api.get(projectsUrl());
+      await this.$store.projects.mapperProjetsProjectSites(
+        projects.data,
+        this.currentSiteId
+      );
 
       const projectList = projects.data.map((d) =>
         Object.assign(d, {

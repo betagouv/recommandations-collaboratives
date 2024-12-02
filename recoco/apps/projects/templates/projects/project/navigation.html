@@ -241,7 +241,7 @@
                                                name="role"
                                                value="{% url 'projects-project-observer-join' project.id %}"
                                                x-model="role"
-                                               data-test-id="button-join-as-observer">
+                                               data-test-id="selector-join-as-observer">
                                         <label for="role-observer" class="fw-bolder specific-fontsize-14px">Observateur</label>
                                     </div>
                                     <div>
@@ -263,7 +263,7 @@
                                                name="role"
                                                value="{% url 'projects-project-switchtender-join' project.id %}"
                                                x-model="role"
-                                               data-test-id="button-join-as-advisor">
+                                               data-test-id="selector-join-as-advisor">
                                         <label for="role-advisor" class="fw-bolder specific-fontsize-14px">Conseiller</label>
                                     </div>
                                     <div>
@@ -293,7 +293,8 @@
                                         <form method="post"
                                               action="{% url 'projects-project-access-advisor-delete' project.pk request.user.username %}">
                                             {% csrf_token %}
-                                            <button class="fr-btn fr-btn--sm fr-btn--tertiary w-100 justify-content-center">Quitter le projet</button>
+                                            <button class="fr-btn fr-btn--sm fr-btn--tertiary w-100 justify-content-center"
+                                                    data-test-id="button-quit-role">Quitter le projet</button>
                                         </form>
                                     </div>
                                 {% endif %}

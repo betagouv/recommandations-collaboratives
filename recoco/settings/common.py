@@ -340,6 +340,7 @@ SOCIALACCOUNT_LOGIN_ON_GET = True
 
 SOCIALACCOUNT_PROVIDERS = {
     # https://docs.allauth.org/en/latest/socialaccount/providers/openid_connect.html
+    # https://github.com/numerique-gouv/proconnect-documentation/tree/main/doc_fs
     "openid_connect": {
         "APPS": [
             {
@@ -348,13 +349,27 @@ SOCIALACCOUNT_PROVIDERS = {
                 "client_id": os.getenv("PROCONNECT_CLIENT_ID", ""),
                 "secret": os.getenv("PROCONNECT_SECRET", ""),
                 "settings": {
-                    "server_url": "https://fca.integ01.dev-agentconnect.fr/api/v2/.well-known/openid-configuration",
+                    "server_url": os.getenv(
+                        "PROCONNECT_SERVER_URL",
+                        "https://auth.agentconnect.gouv.fr/api/v2/.well-known/openid-configuration",
+                    ),
                     "token_auth_method": "client_secret_post",
                 },
             },
         ],
+        # https://github.com/numerique-gouv/proconnect-documentation/blob/main/doc_fs/scope-claims.md
+        # https://github.com/numerique-gouv/proconnect-documentation/blob/main/doc_fs/connaitre-le-fi-utilise.md
         "SCOPE": [
             "openid",
+            "email",
+            "uid",
+            "given_name",
+            "usual_name",
+            "siren",
+            "siret",
+            "organizational_unit",
+            "phone_number",
+            "idp_id",
         ],
         "AUTH_PARAMS": {
             "acr_values": "eidas1",

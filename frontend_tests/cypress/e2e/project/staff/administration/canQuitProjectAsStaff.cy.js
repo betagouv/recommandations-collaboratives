@@ -7,7 +7,7 @@ describe('As site staff, I can quit a project', () => {
   beforeEach(() => {
     cy.login('staff');
     cy.visit(`/project/${currentProject.pk}`);
-    projectView.joinAsAdvisor();
+    projectView.joinAsAdvisorWithSelector();
   });
 
   it('I can quit a project from the project preferences', () => {
