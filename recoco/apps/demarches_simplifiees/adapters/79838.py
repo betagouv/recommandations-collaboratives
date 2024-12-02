@@ -22,15 +22,17 @@ def make(project: Project) -> dict[str, Any]:
         d.update(
             {
                 "champ_Q2hhbXAtMzUyMTg0OA": advisor.email,
+                "champ_Q2hhbXAtMzUyMTg0Nw": advisor.organization_position,
+                "champ_Q2hhbXAtMzUyMTg0OQ": advisor.phone_no,
             }
         )
 
-    if len(project.phone):
-        d.update(
-            {
-                "champ_Q2hhbXAtMzUyMTg0OQ": project.phone,
-            }
-        )
+    # if len(project.phone):
+    #     d.update(
+    #         {
+    #             "champ_Q2hhbXAtMzUyMTg0OQ": project.phone,
+    #         }
+    #     )
 
     if commune := project.commune:
         d.update(
