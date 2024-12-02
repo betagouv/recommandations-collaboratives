@@ -334,10 +334,12 @@ ACCOUNT_FORMS = {
     "disconnect": "allauth.socialaccount.forms.DisconnectForm",
 }
 
+# https://docs.allauth.org/en/dev/socialaccount/configuration.html
 SOCIALACCOUNT_ADAPTER = "recoco.apps.social_account.adapters.SocialAccountAdapter"
-
 SOCIALACCOUNT_OPENID_CONNECT_URL_PREFIX = "oidc"
 SOCIALACCOUNT_LOGIN_ON_GET = True
+SOCIALACCOUNT_IS_OPEN_FOR_SIGNUP = False
+# SOCIALACCOUNT_AUTO_SIGNUP = False # TODO: make user fill the missing data at signup
 
 SOCIALACCOUNT_PROVIDERS = {
     # https://docs.allauth.org/en/latest/socialaccount/providers/openid_connect.html
@@ -347,8 +349,8 @@ SOCIALACCOUNT_PROVIDERS = {
             {
                 "provider_id": "proconnect",
                 "name": "ProConnect",
-                "client_id": os.getenv("PROCONNECT_CLIENT_ID", ""),
-                "secret": os.getenv("PROCONNECT_SECRET", ""),
+                "client_id": os.getenv("PROCONNECT_CLIENT_ID"),
+                "secret": os.getenv("PROCONNECT_SECRET"),
                 "settings": {
                     "server_url": os.getenv(
                         "PROCONNECT_SERVER_URL",
