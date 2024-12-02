@@ -72,6 +72,7 @@ INSTALLED_APPS = [
     "watson",
     "phonenumber_field",
     "cookie_consent",
+    "recoco.apps.feature_flag",
     "recoco.apps.dsrc",
     "recoco.apps.onboarding",
     "recoco.apps.home",
@@ -333,10 +334,12 @@ ACCOUNT_FORMS = {
     "disconnect": "allauth.socialaccount.forms.DisconnectForm",
 }
 
+# https://docs.allauth.org/en/dev/socialaccount/configuration.html
 SOCIALACCOUNT_ADAPTER = "recoco.apps.social_account.adapters.SocialAccountAdapter"
-
 SOCIALACCOUNT_OPENID_CONNECT_URL_PREFIX = "oidc"
 SOCIALACCOUNT_LOGIN_ON_GET = True
+SOCIALACCOUNT_IS_OPEN_FOR_SIGNUP = False
+# SOCIALACCOUNT_AUTO_SIGNUP = False # TODO: make user fill the missing data at signup
 
 SOCIALACCOUNT_PROVIDERS = {
     # https://docs.allauth.org/en/latest/socialaccount/providers/openid_connect.html
@@ -346,8 +349,8 @@ SOCIALACCOUNT_PROVIDERS = {
             {
                 "provider_id": "proconnect",
                 "name": "ProConnect",
-                "client_id": os.getenv("PROCONNECT_CLIENT_ID", ""),
-                "secret": os.getenv("PROCONNECT_SECRET", ""),
+                "client_id": os.getenv("PROCONNECT_CLIENT_ID"),
+                "secret": os.getenv("PROCONNECT_SECRET"),
                 "settings": {
                     "server_url": os.getenv(
                         "PROCONNECT_SERVER_URL",
@@ -496,5 +499,10 @@ DS_API_BASE_URL = f"{DS_BASE_URL}/api/public/v1"
 DS_AUTOLOAD_SCHEMA = True
 DS_AUTOCREATE_FOLDER = True
 DS_ADAPTERS_DIR = BASE_DIR / "apps/demarches_simplifiees/adapters"
+
+# Waffle (feature flags)
+WAFFLE_FLAG_MODEL = "feature_flag.Flag"
+WAFFLE_SWITCH_MODEL = "feature_flag.Switch"
+WAFFLE_SAMPLE_MODEL = "feature_flag.Sample"
 
 # eof
