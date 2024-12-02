@@ -7,18 +7,19 @@
 {% load guardian_tags %}
 {% get_obj_perms request.user for project as "user_project_perms" %}
 {% get_advising_position user project request.site as position %}
+{% is_staff_for_current_site request.user as is_staff %}
 {% if project.inactive_since == None %}
     <div x-data="ProjectEmailReminder()"
          class="highlighted highlighted--blue d-flex justify-content-between align-items-center fr-mt-5v fr-mb-3w fr-mr-3w">
-        {% if project.next_reminder %}
-            {% with project.next_reminder as reminder %}
+        {% with project.next_reminder as reminder %}
+            {% if reminder %}
                 <p class="fr-mb-0">
                     <span class="fr-icon-notification-3-line fr-icon--sm fr-mr-1w"
                           aria-hidden="true"></span>Prochain rappel au porteur de projet prévu le <span data-test-id="email-date">{{ reminder.deadline|default:"Aucun" }}</span>
                 </p>
-            {% endwith %}
-        {% endif %}
-        {% if request.user.is_staff and "change_project" in user_project_perms %}
+            {% endif %}
+        {% endwith %}
+        {% if is_staff and "change_project" in user_project_perms %}
             <span data-test-id="no-reminders" class="tiny fw-medium text-blue">Aucun email de rappel programmé actuellement</span>
         {% endif %}
         {% if request.user in project.members.all or position.is_advisor or position.is_observer %}
