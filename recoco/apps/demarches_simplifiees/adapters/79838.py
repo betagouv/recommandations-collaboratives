@@ -5,14 +5,14 @@ from recoco.apps.projects.models import Project
 
 def make(project: Project) -> dict[str, Any]:
     d = {
-        # "identite_prenom": project.first_name,
-        # "identite_nom": project.last_name,
         "champ_Q2hhbXAtMzUyMTg1Mg": project.name,
     }
 
     if owner := project.owner:
         d.update(
             {
+                "identite_prenom": owner.first_name,
+                "identite_nom": owner.last_name,
                 "champ_Q2hhbXAtMzUyMTg0Ng": f"{owner.last_name} {owner.first_name}",
                 "champ_Q2hhbXAtMzUyMTg0OA": owner.email,
                 "champ_Q2hhbXAtMzUyMTg0Nw": owner.profile.organization_position,
