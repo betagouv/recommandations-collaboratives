@@ -1,4 +1,3 @@
-import json
 import logging
 import re
 
@@ -64,7 +63,5 @@ class AidesTerritoiresRIAdapter(BaseRIAdapter):
         return True
 
     def extract_data(self):
-        data = json.loads(self.raw_data)
-
-        self.title = data["name"]
-        self.content = data["description"]
+        self.title = self.raw_data["name"]
+        self.content = self.raw_data["description"]
