@@ -1,5 +1,4 @@
 import Alpine from 'alpinejs';
-import { Editor } from '@tiptap/core';
 import MiniSearch from 'minisearch';
 import api, { postExternalRessourceUrl } from '../utils/api';
 
@@ -7,6 +6,7 @@ Alpine.data('ActionPusher', () => {
   return {
     isBusy: true,
     isBusyExternalResource: false,
+    canLoadNewExternalResource: true,
     search: '',
 
     db: new MiniSearch({
@@ -140,12 +140,17 @@ Alpine.data('ActionPusher', () => {
 
     async postExternalResource(externalRessourceUrl) {
       this.isBusyExternalResource = true;
+      this.externalResourceError = null;
+      this.canLoadNewExternalResource = false;
       try {
         const response = await api.post(postExternalRessourceUrl(), {
           uri: externalRessourceUrl,
         });
         this.externalResource = [response.data];
+        this.selected_resource = response.data.id;
+        this.setIntent(response.data);
       } catch (error) {
+        this.canLoadNewExternalResource = true;
         const errors = {
           500: "Erreur lors de la récupération de la ressource externe, merci d'essayez à nouveau plus tard",
           501: "Il n'est pas encore possible de récupérer des ressources externes sur ce site",
