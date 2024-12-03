@@ -28,7 +28,8 @@ def test_mediawiki_adapter(mocker):
     assert mwi.load_data(response) is True
 
     mwclient_Site.assert_called_once_with(
-        "mock://mymediawiki.com",
+        scheme="mock://",
+        host="mymediawiki.com",
         path="/w/",
         clients_useragent="Recoco MediaWiki Ressource Importer",
     )
@@ -49,7 +50,9 @@ MEDIAWIKI_SAMPLE_PAGE = """
 </html>"""
 
 
-def test_aides_territoires_adapter(mocker):
+def test_aides_territoires_adapter(mocker, settings):
+    settings.AIDES_TERRITOIRES_TOKEN = "a-fake-token"
+
     mwi_class = importers.api.AidesTerritoiresRIAdapter
 
     uri = "https://aides-territoires.beta.gouv.fr/aides/32cf-sadapter-au-recul-du-trait-de-cote/"
