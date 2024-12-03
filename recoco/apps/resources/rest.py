@@ -54,6 +54,8 @@ class ResourceViewSet(viewsets.ModelViewSet):
         if serializer.is_valid():
             ri = ResourceImporter()
             resource = ri.from_uri(serializer.validated_data["uri"])
+            resource.sites.add(request.site)
+            resource.site_origin = request.site
             resource.save()
             return Response(
                 ResourceSerializer(resource).data, status=status.HTTP_201_CREATED
