@@ -3,7 +3,6 @@ import logging
 import re
 
 import requests
-import requests_jwt
 from django.conf import settings
 
 from .base import BaseRIAdapter
@@ -47,21 +46,20 @@ class AidesTerritoiresRIAdapter(BaseRIAdapter):
         pageslug = self._extract_pageslug_from_url(self.uri)
 
         token = cnx_response.json()["token"]
-        auth = requests_jwt.JWTAuth(token)
         uri = f"https://aides-territoires.beta.gouv.fr/api/aids/{pageslug}"
         response = requests.get(
             uri,
-            auth=auth,
+            headers={
+                "Authorization": f"Bearer {token}",
+                "Content-Type": "application/json",
+            },
             timeout=5,
         )
 
-        response = response.json()
-
-        if response["code"] == 200:
-            self.raw_data = response["message"]
-        else:
-            print(response)
+        if not response.ok:
             return False
+
+        self.raw_data = response.json()
 
         return True
 
