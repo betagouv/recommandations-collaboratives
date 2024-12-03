@@ -10,9 +10,6 @@
 {% block og_title %}
     Projets à examiner
 {% endblock og_title %}
-{% block js %}
-    {% vite_asset 'js/store/projects.js' %}
-{% endblock js %}
 {% block css %}
     <link href="{% sass_src 'home/css/dsfr/marianne.css' %}"
           rel="stylesheet"
@@ -22,9 +19,7 @@
           type="text/css">
 {% endblock css %}
 {% block content %}
-    <div x-data
-         x-init="$nextTick(() => $store.projects.init('{{ request.site.name }}'))"
-         class="col-11 fr-pt-2w fr-pb-6w fr-mx-auto"
+    <div class="col-11 fr-pt-2w fr-pb-6w fr-mx-auto"
          data-test-id="moderation-page">
         <div class="container-fluid">
             <div class="row">
