@@ -494,10 +494,14 @@ METRICS_MATERIALIZED_VIEWS_SPEC = [
         "name": "user_activity",
         "indexes": [
             {
-                "name": "hash_idx",
-                "columns": "hash,site_domain",
-                "unique": True,
+                "name": "user_hash_idx",
+                "columns": "user_hash,site_domain",
+                "unique": False,
                 "for_site": False,
+            },
+            {
+                "name": "user_hash_idx",
+                "columns": "user_hash",
             },
         ],
     },

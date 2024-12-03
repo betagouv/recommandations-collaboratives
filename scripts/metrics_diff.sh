@@ -43,16 +43,18 @@ $PSQL_COMMAND "COPY (SELECT date_joined,last_login,hash,is_advisor,advising_depa
 
 echo " >> Exporting metrics_urbanvitaliz_fr.user_activity"
 
-$PSQL_COMMAND "COPY (SELECT user_hash AS hash,event_name FROM metrics_urbanvitaliz_fr.user_activity ORDER BY hash ASC) TO STDOUT WITH CSV HEADER" > metrics_export/metrics_urbanvitaliz_fr_user_activity.csv
+$PSQL_COMMAND "COPY (SELECT user_hash,event_name FROM metrics_urbanvitaliz_fr.user_activity ORDER BY user_hash ASC) TO STDOUT WITH CSV HEADER" > metrics_export/metrics_urbanvitaliz_fr_user_activity.csv
 
-$PSQL_COMMAND "COPY (SELECT hash,event_name FROM metrics_bis_urbanvitaliz_fr.user_activity ORDER BY hash ASC) TO STDOUT WITH CSV HEADER" > metrics_export/metrics_bis_urbanvitaliz_fr_user_activity.csv
+$PSQL_COMMAND "COPY (SELECT user_hash,event_name FROM metrics_bis_urbanvitaliz_fr.user_activity ORDER BY user_hash ASC) TO STDOUT WITH CSV HEADER" > metrics_export/metrics_bis_urbanvitaliz_fr_user_activity.csv
 
 
 # Not ok, some diff
 meld metrics_export/metrics_urbanvitaliz_fr_projects.csv metrics_export/metrics_bis_urbanvitaliz_fr_projects.csv
 
+# Some diff but ok
+# meld metrics_export/metrics_urbanvitaliz_fr_user_activity.csv metrics_export/metrics_bis_urbanvitaliz_fr_user_activity.csv
+
 # Ok, no diff
 # meld metrics_export/metrics_urbanvitaliz_fr_resources.csv metrics_export/metrics_bis_urbanvitaliz_fr_resources.csv
 # meld metrics_export/metrics_urbanvitaliz_fr_recommendations.csv metrics_export/metrics_bis_urbanvitaliz_fr_recommendations.csv
-# meld metrics_export/metrics_urbanvitaliz_fr_user_activity.csv metrics_export/metrics_bis_urbanvitaliz_fr_user_activity.csv
 # meld metrics_export/metrics_urbanvitaliz_fr_users.csv metrics_export/metrics_bis_urbanvitaliz_fr_users.csv

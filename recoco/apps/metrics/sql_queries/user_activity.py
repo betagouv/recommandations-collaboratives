@@ -30,13 +30,13 @@ def get_queryset() -> QuerySet:
             ]
         )
         .annotate(
-            hash=hash_field("actor_object_id", salt="user"),
+            user_hash=hash_field("actor_object_id", salt="user"),
             event_name=F("verb"),
             when=Cast("timestamp", output_field=models.DateField()),
             site_domain=F("site__domain"),
         )
         .values(
-            "hash",
+            "user_hash",
             "site_domain",
             "event_name",
             "when",
@@ -46,7 +46,7 @@ def get_queryset() -> QuerySet:
     reco_status_updated = (
         TaskFollowup.objects.exclude(status=None)
         .annotate(
-            hash=hash_field("who", salt="user"),
+            user_hash=hash_field("who", salt="user"),
             event_name=Value(
                 "a mis à jour l'état de la recommandation",
                 output_field=models.TextField(),
@@ -55,11 +55,11 @@ def get_queryset() -> QuerySet:
             site_domain=F("task__site__domain"),
         )
         .values(
-            "hash",
+            "user_hash",
             "site_domain",
             "event_name",
             "when",
         )
     )
 
-    return activity.union(reco_status_updated, all=False)
+    return activity.union(reco_status_updated)
