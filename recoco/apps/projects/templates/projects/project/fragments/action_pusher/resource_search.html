@@ -15,7 +15,8 @@
                x-ref="external_resource_url"
                name="external-resource-url-input">
         <button class="fr-btn"
-                @click.prevent="postExternalResource($refs.external_resource_url.value)">Charger la ressource</button>
+                type="button"
+                @click="postExternalResource($refs.external_resource_url.value)">Charger la ressource</button>
     </div>
     <div x-show="isBusyExternalResource"
          x-transition
@@ -23,6 +24,10 @@
         <div class="spinner-border" role="status">
             <span class="visually-hidden">Loading...</span>
         </div>
+    </div>
+    <div x-show="!isBusyExternalResource && externalResourceError"
+         class="fr-alert fr-alert--error fr-alert--sm fr-mt-1v">
+        <p x-text="externalResourceError"></p>
     </div>
     <ul x-show="externalResource.length > 0"
         class="cards d-flex row row-cols-3 g-4 fr-pl-0 fr-ml-0 fr-mt-1v">

@@ -30,6 +30,7 @@ Alpine.data('ActionPusher', () => {
 
     resources: [],
     externalResource: [],
+    externalResourceError: null,
     results: [],
     suggestions: [],
     selected_resource: null,
@@ -145,6 +146,12 @@ Alpine.data('ActionPusher', () => {
         });
         this.externalResource = [response.data];
       } catch (error) {
+        const errors = {
+          500: "Erreur lors de la récupération de la ressource externe, merci d'essayez à nouveau plus tard",
+          501: "Il n'est pas encore possible de récupérer des ressources externes sur ce site",
+        };
+        this.externalResourceError = errors[error.response.status];
+
         console.error(error);
       }
       this.isBusyExternalResource = false;
