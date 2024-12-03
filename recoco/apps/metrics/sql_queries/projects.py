@@ -12,13 +12,13 @@ def get_queryset() -> QuerySet:
         Project.objects.exclude(exclude_stats=True)
         .prefetch_related("tasks", "switchtenders")
         .exclude(project_sites__status="DRAFT")
-        # .exclude(project_sites__status="DRAFT", project_sites__site__pk=site_id)
         .order_by("-created_on")
         .annotate(
             hash=hash_field("id", salt="project"),
             site_domain=F("sites__domain"),
             site_id=F("sites__id"),
         )
+        # .exclude(project_sites__site__pk=F("site_id"))
         .annotate(
             recommandation_count=Subquery(
                 Task.objects.filter(
