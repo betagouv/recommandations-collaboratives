@@ -55,7 +55,7 @@ def test_aides_territoires_adapter(mocker):
     adapter.register_uri(
         "GET",
         api_uri,
-        text="fake-data",
+        text=SAMPLE_AT_AID,
     )
 
     response = session.get(uri)
@@ -64,9 +64,6 @@ def test_aides_territoires_adapter(mocker):
 
     mwi = mwi_class(uri)
     assert mwi.load_data() is True
-
-    # Add fake data
-    mwi.raw_data = SAMPLE_AT_AID
 
     mwi.extract_data()
 

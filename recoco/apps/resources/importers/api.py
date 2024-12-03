@@ -55,7 +55,13 @@ class AidesTerritoiresRIAdapter(BaseRIAdapter):
             timeout=5,
         )
 
-        self.raw_data = response.json
+        response = response.json()
+
+        if response["code"] == 200:
+            self.raw_data = response["message"]
+        else:
+            print(response)
+            return False
 
         return True
 
