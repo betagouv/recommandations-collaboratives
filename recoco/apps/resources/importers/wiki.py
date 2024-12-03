@@ -3,6 +3,7 @@ from urllib.parse import unquote
 import mwclient
 import pandoc
 import requests
+from bs4 import BeautifulSoup
 
 from .base import BaseRIAdapter
 
@@ -36,4 +37,7 @@ class MediaWikiRIAdapter(BaseRIAdapter):
         doc = pandoc.read(self.raw_data, format="mediawiki")
 
         self.title = unquote(self.parsed_uri.path.rsplit("/", 1)[-1])
-        self.content = pandoc.write(doc, format="markdown_strict")
+        content = pandoc.write(doc, format="markdown_strict")
+
+        # clean up useless tags (div, span, img)
+        self.content = BeautifulSoup(content).get_text()
