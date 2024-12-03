@@ -1,8 +1,4 @@
-import importlib
-from pathlib import Path
 from typing import Any
-
-from django.conf import settings
 
 from recoco.apps.projects.models import Project
 from recoco.apps.resources.models import Resource
@@ -23,16 +19,14 @@ def make_ds_data_from_project(
     project: Project, ds_resource: DSResource
 ) -> dict[str, Any]:
 
-    module_name = "{}.{}".format(
-        str(
-            Path(settings.DS_ADAPTERS_DIR).relative_to(settings.BASE_DIR.parent)
-        ).replace("/", "."),
-        ds_resource.number,
-    )
+    ds_data: dict[str, Any] = {}
 
-    try:
-        module = importlib.import_module(module_name)
-    except ModuleNotFoundError:
-        return {}
+    for mapping_field in ds_resource.mapping_fields.exclude(
+        project_lookup_key__isnull=True
+    ):
+        if value := project.get_from_lookup_key(
+            lookup_key=mapping_field.project_lookup_key
+        ):
+            ds_data[mapping_field.field_id] = value
 
-    return module.make(project=project)
+    return ds_data

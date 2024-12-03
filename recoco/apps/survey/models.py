@@ -447,5 +447,21 @@ class Answer(models.Model):
         blank=True, null=True, upload_to=survey_private_file_path
     )
 
+    @property
+    def as_dict(self) -> dict[str, str]:
+        answers: list[str]
+
+        if self.choices.exists():
+            answers = [choice.text for choice in self.choices.all()]
+        elif len(self.value):
+            answers = [self.value]
+        else:
+            answers = self.values
+
+        return {
+            "answer": ",".join([a for a in answers if len(a)]),
+            "comment": self.comment,
+        }
+
 
 tagging_register(Answer, tag_descriptor_attr="tags")

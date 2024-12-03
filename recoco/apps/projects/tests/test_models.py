@@ -111,4 +111,37 @@ def test_projectsite_queryset():
         assert project.project_sites.current().site == site
 
 
+@pytest.mark.parametrize(
+    "lookup_key, expected_value",
+    [
+        ("name", "my project"),
+        ("dummy", None),
+        ("dummy.dummy", None),
+        ("survey_answers.thematiques.comment", "Friche"),
+        ("survey_answers.thematiques.dummy_value", None),
+        (
+            "survey_answers.thematiques.answers",
+            "Patrimoine, Transition énergétique, Autre",
+        ),
+        ("survey_answers.dummy_value", None),
+        ("commune.name", "Bayonne"),
+        ("commune.dummy", None),
+    ],
+)
+def test_project_get_from_lookup_key(lookup_key, expected_value):
+    project = baker.prepare(
+        models.Project,
+        name="my project",
+        commune__name="Bayonne",
+        survey_answers={
+            "calendrier": {"answers": [], "comment": "A définir"},
+            "thematiques": {
+                "answers": "Patrimoine, Transition énergétique, Autre",
+                "comment": "Friche",
+            },
+        },
+    )
+    assert project.get_from_lookup_key(lookup_key) == expected_value
+
+
 # eof
