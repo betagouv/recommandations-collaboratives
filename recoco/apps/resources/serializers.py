@@ -53,4 +53,3 @@ class ResourceSerializer(TaggitSerializer, serializers.HyperlinkedModelSerialize
     tags = TagListSerializerField()
     created_by = ResourceCreatorSerializer(read_only=True, many=False)
     category = CategorySerializer(read_only=True)
-    has_dsresource = serializers.BooleanField(read_only=True, default=False)
