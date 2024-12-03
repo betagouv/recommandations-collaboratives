@@ -11,6 +11,9 @@ class MediaWikiRIAdapter(BaseRIAdapter):
     @staticmethod
     def can_handle(response: requests.Response):
         generator = response.html.find("head > meta[name='generator']", first=True)
+        if not generator:
+            return False
+
         generator = generator.attrs["content"].lower()
 
         return "mediawiki" in generator
