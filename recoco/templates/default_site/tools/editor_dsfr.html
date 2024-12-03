@@ -42,9 +42,9 @@
                 Attacher un lien
             </button>
             <button @click.stop.prevent="unsetLink()"
-                    title="Attacher un lien"
-                    class="fr-btn fr-btn--sm fr-icon-link text-white"
-                    x-bind:disabled="!isActive('link', updatedAt)">Déttacher un lien</button>
+                    title="Détacher un lien"
+                    class="fr-btn fr-btn--sm fr-icon-link-unlink text-white"
+                    x-bind:disabled="!isActive('link', updatedAt)">Détacher un lien</button>
         </div>
     </template>
     <div class="position-relative">
