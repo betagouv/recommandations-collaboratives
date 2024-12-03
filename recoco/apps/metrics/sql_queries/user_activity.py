@@ -62,4 +62,4 @@ def get_queryset() -> QuerySet:
         )
     )
 
-    return activity.union(reco_status_updated)
+    return activity.union(reco_status_updated, all=False)
