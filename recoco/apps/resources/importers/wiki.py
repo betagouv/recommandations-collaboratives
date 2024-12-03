@@ -31,7 +31,8 @@ class MediaWikiRIAdapter(BaseRIAdapter):
         api_url = parsed_edit_uri
 
         site = mwclient.Site(
-            f"{api_url.scheme}://{api_url.netloc}",
+            scheme=api_url.scheme,
+            host=api_url.netloc,
             path=api_url.path.removesuffix("api.php"),
             clients_useragent="Recoco MediaWiki Ressource Importer",
         )
