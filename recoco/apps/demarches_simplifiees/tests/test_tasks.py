@@ -11,11 +11,10 @@ from recoco.apps.tasks.models import Task
 from ..exceptions import DSAPIError
 from ..models import DSFolder, DSResource
 from ..tasks import load_ds_resource_schema, update_or_create_ds_folder
-from .base import BaseTestMixin
 
 
 @pytest.mark.django_db
-class TestLoadDSResourceSchema(BaseTestMixin):
+class TestLoadDSResourceSchema:
     ds_url = f"{settings.DS_BASE_URL}/preremplir/ds-name/schema"
 
     @responses.activate
@@ -50,13 +49,25 @@ class TestLoadDSResourceSchema(BaseTestMixin):
 
 
 @pytest.mark.django_db
-class TestUpdateOrCreateDSFolder(BaseTestMixin):
+class TestUpdateOrCreateDSFolder:
     ds_url = f"{settings.DS_API_BASE_URL}/demarches/80892/dossiers"
 
     @responses.activate
-    def test_no_ds_resource(self):
+    def test_no_recommendation(self):
         responses.post(url=self.ds_url)
         update_or_create_ds_folder(9999)
+
+        responses.assert_call_count(self.ds_url, 0)
+        assert DSFolder.objects.count() == 0
+
+    @responses.activate
+    def test_no_resource_on_recommendation(self):
+        recommendation = baker.make(Task)
+        assert recommendation.resource is None
+
+        responses.post(url=self.ds_url)
+        update_or_create_ds_folder(recommendation.id)
+
         responses.assert_call_count(self.ds_url, 0)
         assert DSFolder.objects.count() == 0
 
@@ -65,7 +76,6 @@ class TestUpdateOrCreateDSFolder(BaseTestMixin):
         recommendation = baker.make(Task)
 
         responses.post(url=self.ds_url)
-
         with patch(
             "recoco.apps.demarches_simplifiees.tasks.find_ds_resource_for_project",
             return_value=None,
@@ -76,23 +86,31 @@ class TestUpdateOrCreateDSFolder(BaseTestMixin):
         assert DSFolder.objects.count() == 0
 
     @responses.activate
-    def test_no_ds_resource_number(self):
+    def test_no_ds_data_returned(self, ds_schema_sample):
         resource = baker.make(Resource)
         recommendation = baker.make(Task, resource=resource)
-        ds_resource = baker.make(DSResource, schema={"foo": "bar"})
-        assert ds_resource.number is None
+        ds_resource = baker.make(DSResource, schema=ds_schema_sample)
 
-        responses.post(url=self.ds_url)
-
-        with patch(
-            "recoco.apps.demarches_simplifiees.tasks.find_ds_resource_for_project",
-            return_value=ds_resource,
-        ) as mock_find_ds_resource_for_project:
+        with (
+            patch(
+                "recoco.apps.demarches_simplifiees.tasks.find_ds_resource_for_project",
+                return_value=ds_resource,
+            ) as mock_find_ds_resource_for_project,
+            patch(
+                "recoco.apps.demarches_simplifiees.tasks.make_ds_data_from_project",
+                return_value={},
+            ) as mock_make_ds_data_from_project,
+        ):
             update_or_create_ds_folder(recommendation.id)
 
         mock_find_ds_resource_for_project.assert_called_once_with(
             project=recommendation.project,
             resource=resource,
+        )
+        mock_make_ds_data_from_project.assert_called_once_with(
+            site=recommendation.site,
+            project=recommendation.project,
+            ds_resource=ds_resource,
         )
         responses.assert_call_count(self.ds_url, 0)
         assert DSFolder.objects.count() == 0
@@ -105,16 +123,29 @@ class TestUpdateOrCreateDSFolder(BaseTestMixin):
 
         responses.post(url=self.ds_url, status=400)
 
-        with patch(
-            "recoco.apps.demarches_simplifiees.tasks.find_ds_resource_for_project",
-            return_value=ds_resource,
-        ) as mock_find_ds_resource_for_project:
+        with (
+            patch(
+                "recoco.apps.demarches_simplifiees.tasks.find_ds_resource_for_project",
+                return_value=ds_resource,
+            ) as mock_find_ds_resource_for_project,
+            patch(
+                "recoco.apps.demarches_simplifiees.tasks.make_ds_data_from_project",
+                return_value={
+                    "champ_Q2hhbXAtMjk3MTQ0NA": "my-project",
+                },
+            ) as mock_make_ds_data_from_project,
+        ):
             with pytest.raises(DSAPIError):
                 update_or_create_ds_folder(recommendation.id)
 
         mock_find_ds_resource_for_project.assert_called_once_with(
             project=recommendation.project,
             resource=resource,
+        )
+        mock_make_ds_data_from_project.assert_called_once_with(
+            site=recommendation.site,
+            project=recommendation.project,
+            ds_resource=ds_resource,
         )
         responses.assert_call_count(self.ds_url, 1)
         assert DSFolder.objects.count() == 0
@@ -137,18 +168,22 @@ class TestUpdateOrCreateDSFolder(BaseTestMixin):
             },
         )
 
-        with patch(
-            "recoco.apps.demarches_simplifiees.tasks.find_ds_resource_for_project",
-            return_value=ds_resource,
-        ) as mock_find_ds_resource_for_project:
+        with (
+            patch(
+                "recoco.apps.demarches_simplifiees.tasks.find_ds_resource_for_project",
+                return_value=ds_resource,
+            ),
+            patch(
+                "recoco.apps.demarches_simplifiees.tasks.make_ds_data_from_project",
+                return_value={
+                    "champ_Q2hhbXAtMjk3MTQ0NA": "my-project",
+                },
+            ),
+        ):
+            update_or_create_ds_folder(recommendation.id)
             update_or_create_ds_folder(recommendation.id)
 
-        mock_find_ds_resource_for_project.assert_called_once_with(
-            project=recommendation.project,
-            resource=resource,
-        )
-        responses.assert_call_count(self.ds_url, 1)
-
+        assert DSFolder.objects.count() == 1
         ds_folder = DSFolder.objects.first()
         assert ds_folder is not None
         assert ds_folder.project == recommendation.project
@@ -164,34 +199,3 @@ class TestUpdateOrCreateDSFolder(BaseTestMixin):
             == "9cd55d887a3e036cd6107553d52f804415b6b3d74ecb65b268188c1596eab748"
         )
         assert ds_folder.recommendation == recommendation
-
-    @responses.activate
-    def test_ds_folder_already_exist(self, ds_schema_sample):
-        recommendation = baker.make(Task, project__name="my-project")
-        ds_resource = baker.make(DSResource, schema=ds_schema_sample)
-
-        ds_folder = baker.make(
-            DSFolder,
-            project=recommendation.project,
-            ds_resource=ds_resource,
-            content={"champ_Q2hhbXAtMjk3MTQ0NA": "my-project"},
-        )
-        assert (
-            ds_folder.content_hash
-            == "9cd55d887a3e036cd6107553d52f804415b6b3d74ecb65b268188c1596eab748"
-        )
-
-        responses.post(url=self.ds_url, status=201)
-
-        with patch(
-            "recoco.apps.demarches_simplifiees.tasks.find_ds_resource_for_project",
-            return_value=ds_resource,
-        ):
-            update_or_create_ds_folder(recommendation.id)
-
-        responses.assert_call_count(self.ds_url, 0)
-
-    def test_no_recommendation_resource(self):
-        recommendation = baker.make(Task, resource=None)
-        update_or_create_ds_folder(recommendation.id)
-        assert DSFolder.objects.count() == 0
