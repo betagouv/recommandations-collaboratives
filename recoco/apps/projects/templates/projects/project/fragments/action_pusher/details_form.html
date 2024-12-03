@@ -47,10 +47,11 @@
     <label class="push-reco__title-section" for="content">Rédaction d’un message personnalisé</label>
     {% include "tools/editor_dsfr.html" with input_name="content" input_value="content" errors=form.content.errors is_task=True %}
     <!-- Action file -->
-    <div class="file-upload-wrapper" @click="$refs.fileUploadInput.click()">
-        <span class="fr-icon-file-add-line fr-icon--sm" aria-hidden="true"></span>
+    <button class="fr-btn fr-btn--sm fr-btn--tertiary fr-icon-file-add-line fr-btn--icon-left file-upload-wrapper"
+            type="button"
+            @click="$refs.fileUploadInput.click()">
         <span class="file-upload-text">Ajouter un fichier</span>
-        <span x-text="fileName"></span>
+        <span class="fr-ml-1w" x-text="fileName"></span>
         <input x-ref="fileUploadInput"
                x-model="currentFile"
                type="file"
@@ -58,7 +59,7 @@
                name="the_file"
                @change='handleFileUpload'
                class="d-none file-upload-input">
-    </div>
+    </button>
 </div>
 <div class="fr-mb-3w">
     {% comment %} {% include "projects/project/fragments/files_links/file_upload_input_standalone.html" %} {% endcomment %}
@@ -71,11 +72,13 @@
     {% if not disable_draft %}
         <button @click="set_draft(true)"
                 class="fr-btn fr-btn--secondary fr-btn--lg fr-mr-3w"
-                :disabled="push_type == 'single' && !selected_resource"
+                :disabled="(push_type == 'single' && !selected_resource) || !$store.actionPusher.isSelectedProject"
                 data-test-id="publish-draft-task-button">Enregistrer en brouillon</button>
     {% endif %}
     <button @click="set_draft(false)"
             type="submit"
             class="fr-btn fr-btn--lg"
-            :disabled="push_type == 'single' && !selected_resource">Publier la recommandation</button>
+            :disabled="(push_type == 'single' && !selected_resource) || !$store.actionPusher.isSelectedProject">
+        Publier la recommandation
+    </button>
 </div>

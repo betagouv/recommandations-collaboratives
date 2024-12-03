@@ -25,7 +25,7 @@ Alpine.data('ActionPusher', () => {
     externalResource: [],
     results: [],
     suggestions: [],
-    selected_resource: null,
+    selected_resource: false,
     selected_resources: [],
     public: true,
     draft: false,
@@ -139,7 +139,6 @@ Alpine.data('ActionPusher', () => {
         this.externalResource = [response.data];
         this.isBusy = false;
       } catch (error) {
-        debugger;
         console.error(error);
       }
     },

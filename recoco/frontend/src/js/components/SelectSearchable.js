@@ -50,6 +50,9 @@ function SelectSearchable(params) {
 
       const params = new URLSearchParams(document.location.search);
       const selected_project = parseInt(params.get('project_id'));
+      if (selected_project) {
+        this.setSelectedProject();
+      }
 
       Array.prototype.map.call(select, function (select) {
         return new Select(select, {}, selected_project || null);
@@ -58,12 +61,21 @@ function SelectSearchable(params) {
     createOption(value, text, selected) {
       const option = document.createElement('option');
       option.setAttribute('data-select', 'recent_project');
+      option.addEventListener('click', this.setSelectedProject);
       option.value = value;
       option.text = text;
       if (selected) {
         option.selected = true;
       }
       return option;
+    },
+    setSelectedProject() {
+      this.$store.actionPusher.isSelectedProject = true;
+      console.log(this.$store.actionPusher.isSelectedProject);
+    },
+    resetSelectedProject() {
+      this.$store.actionPusher.isSelectedProject = false;
+      console.log(this.$store.actionPusher.isSelectedProject);
     },
   };
 }
