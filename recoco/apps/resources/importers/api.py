@@ -26,7 +26,7 @@ class AidesTerritoiresRIAdapter(BaseRIAdapter):
 
         return groups["slug"]
 
-    def load_data(self):
+    def load_data(self, response: requests.Response):
         at_token = getattr(settings, "AIDES_TERRITOIRES_TOKEN", None)
         if not at_token:
             LOGGER.warning(

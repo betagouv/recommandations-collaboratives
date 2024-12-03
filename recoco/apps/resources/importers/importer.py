@@ -20,7 +20,7 @@ class ResourceImporter:
         for adapter_class in self.ADAPTERS.values():
             if adapter_class.can_handle(response):
                 adapter = adapter_class(uri)
-                adapter.load_data()
+                adapter.load_data(response)
                 adapter.extract_data()
 
                 return Resource(

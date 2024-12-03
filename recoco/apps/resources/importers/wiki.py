@@ -1,4 +1,4 @@
-from urllib.parse import unquote
+from urllib.parse import unquote, urlparse
 
 import mwclient
 import pandoc
@@ -19,10 +19,20 @@ class MediaWikiRIAdapter(BaseRIAdapter):
 
         return "mediawiki" in generator
 
-    def load_data(self):
+    def load_data(self, response):
+        edit_uri = response.html.find('head > link[rel="EditURI"]', first=True).attrs[
+            "href"
+        ]
+        parsed_edit_uri = urlparse(edit_uri)
+        parsed_edit_uri = parsed_edit_uri._replace(
+            scheme=self.parsed_uri.scheme, query=""
+        )
+
+        api_url = parsed_edit_uri
+
         site = mwclient.Site(
-            f"{self.parsed_uri.netloc}",
-            path="/",
+            f"{api_url.scheme}://{api_url.netloc}",
+            path=api_url.path,
             clients_useragent="Recoco MediaWiki Ressource Importer",
         )
         self.page_name = unquote(self.parsed_uri.path.rsplit("/", 1)[-1])

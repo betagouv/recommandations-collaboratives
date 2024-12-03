@@ -22,7 +22,7 @@ class BaseRIAdapter(ABC):
         return NotImplemented
 
     @abstractmethod
-    def load_data(self):
+    def load_data(self, response: requests.Response):
         return NotImplemented
 
     @abstractmethod

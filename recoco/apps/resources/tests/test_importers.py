@@ -12,9 +12,7 @@ def test_mediawiki_adapter(mocker):
     session.mount("mock://", adapter)
 
     adapter.register_uri(
-        "GET",
-        "mock://mymediawiki.com/apage",
-        text="<!DOCTYPE html><html><head><meta name='generator' content='mediawiki'></head></html>",
+        "GET", "mock://mymediawiki.com/apage", text=MEDIAWIKI_SAMPLE_PAGE
     )
 
     response = session.get("mock://mymediawiki.com/apage")
@@ -27,13 +25,22 @@ def test_mediawiki_adapter(mocker):
     mocker.patch("mwclient.Site.pages", return_value="Hello", create=True)
 
     mwi = mwi_class("mock://mymediawiki.com/apage")
-    assert mwi.load_data() is True
+    assert mwi.load_data(response) is True
 
     # Add fake data
     mwi.raw_data = "'''hello'''"
     mwi.extract_data()
 
     assert mwi.content == "**hello**\n"
+
+
+MEDIAWIKI_SAMPLE_PAGE = """
+<!DOCTYPE html>
+<html>
+<head><meta name='generator' content='mediawiki'>
+<link rel="EditURI" type="application/rsd+xml" href="//mymediawiki.com/w/api.php?action=rsd">
+</head>
+</html>"""
 
 
 def test_aides_territoires_adapter(mocker):
@@ -63,7 +70,7 @@ def test_aides_territoires_adapter(mocker):
     assert mwi_class.can_handle(response) is True
 
     mwi = mwi_class(uri)
-    assert mwi.load_data() is True
+    assert mwi.load_data(response) is True
 
     mwi.extract_data()
 
