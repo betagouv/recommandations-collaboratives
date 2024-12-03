@@ -1,26 +1,34 @@
 from django.contrib.auth.models import User
 from django.contrib.postgres.aggregates import ArrayAgg
-from django.contrib.sites.models import Site
-from django.db.models import BooleanField, Case, QuerySet, TextField, Value, When
-
-from recoco.utils import make_group_name_for_site
+from django.db.models import BooleanField, Case, F, QuerySet, TextField, Value, When
+from django.db.models.functions import Concat, Lower, Replace
 
 from ..utils import hash_field
 
 
-def get_queryset(site_id: int) -> QuerySet:
-    site = Site.objects.get(pk=site_id)
-
-    advisor_group_name = make_group_name_for_site("advisor", site)
-    staff_group_name = make_group_name_for_site("staff", site)
-
+def get_queryset() -> QuerySet:
     return (
-        User.objects.filter(profile__sites__pk=site_id)
-        .order_by("date_joined")
-        .annotate(hash=hash_field("id", salt="user"))
+        User.objects.order_by("date_joined")
+        .annotate(
+            hash=hash_field("id", salt="user"),
+            site_domain=F("profile__sites__domain"),
+            site_slug=Lower(
+                Replace(
+                    Replace(
+                        "site_domain",
+                        Value("-"),
+                        Value("_"),
+                    ),
+                    Value("."),
+                    Value("_"),
+                )
+            ),
+            advisor_group_name=Concat("site_slug", Value("_advisor")),
+            staff_group_name=Concat("site_slug", Value("_staff")),
+        )
         .annotate(
             is_advisor=Case(
-                When(groups__name=advisor_group_name, then=True),
+                When(groups__name=F("advisor_group_name"), then=True),
                 default=False,
                 output_field=BooleanField(),
             ),
@@ -28,7 +36,7 @@ def get_queryset(site_id: int) -> QuerySet:
         )
         .annotate(
             is_site_staff=Case(
-                When(groups__name=staff_group_name, then=True),
+                When(groups__name=F("staff_group_name"), then=True),
                 default=False,
                 output_field=BooleanField(),
             )
@@ -51,12 +59,13 @@ def get_queryset(site_id: int) -> QuerySet:
         )
         .values(
             "hash",
+            "site_domain",
             "date_joined",
+            "last_login",
             "is_advisor",
             "advising_departments",
             "advisor_scope",
             "is_site_staff",
-            "last_login",
         )
         .order_by("hash")
         .distinct()

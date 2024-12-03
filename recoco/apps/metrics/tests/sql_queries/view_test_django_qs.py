@@ -1,11 +1,14 @@
-from django.db.models import Count, QuerySet
+from django.db.models import Count, F, QuerySet
 
 from recoco.apps.projects.models import Project
 
 
-def get_queryset(site_id: int) -> QuerySet:
-    return (
-        Project.objects.filter(sites__id=site_id)
-        .values("id")
-        .annotate(task_count=Count("tasks"))
+def get_queryset() -> QuerySet:
+    return Project.objects.annotate(
+        site_domain=F("sites__domain"),
+        task_count=Count("tasks"),
+    ).values(
+        "id",
+        "site_domain",
+        "task_count",
     )

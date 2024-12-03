@@ -5,12 +5,14 @@ from recoco.apps.tasks.models import Task
 from ..utils import display_value, hash_field
 
 
-def get_queryset(site_id: int) -> QuerySet:
+def get_queryset() -> QuerySet:
     return (
         Task.objects.exclude(project__exclude_stats=True)
-        .filter(site__pk=site_id)
         .order_by("created_on")
-        .annotate(hash=hash_field("id", salt="task"))
+        .annotate(
+            hash=hash_field("id", salt="task"),
+            site_domain=F("site__domain"),
+        )
         .annotate(project_hash=hash_field("project__id", salt="project"))
         .annotate(status_name=display_value(Task.STATUS_CHOICES, "status"))
         .annotate(created_by_hash=hash_field("created_by", salt="user"))
@@ -43,6 +45,7 @@ def get_queryset(site_id: int) -> QuerySet:
         )
         .values(
             "hash",
+            "site_domain",
             "public",
             "project_hash",
             "created_by_hash",
