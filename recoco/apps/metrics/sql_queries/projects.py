@@ -23,7 +23,7 @@ def get_queryset() -> QuerySet:
             recommandation_count=Subquery(
                 Task.objects.filter(
                     project_id=OuterRef("pk"),
-                    site_id=F("site_id"),
+                    site_id=OuterRef("site_id"),
                     public=True,
                 )
                 .order_by()
@@ -33,7 +33,7 @@ def get_queryset() -> QuerySet:
             advisor_count=Subquery(
                 ProjectSwitchtender.objects.filter(
                     project_id=OuterRef("pk"),
-                    site_id=F("site_id"),
+                    site_id=OuterRef("site_id"),
                 )
                 .order_by()
                 .annotate(count=Func(F("id"), function="Count"))
