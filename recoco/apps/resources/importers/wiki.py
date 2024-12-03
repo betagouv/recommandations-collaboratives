@@ -32,7 +32,7 @@ class MediaWikiRIAdapter(BaseRIAdapter):
 
         site = mwclient.Site(
             f"{api_url.scheme}://{api_url.netloc}",
-            path=api_url.path,
+            path=api_url.path.removesuffix("api.php"),
             clients_useragent="Recoco MediaWiki Ressource Importer",
         )
         self.page_name = unquote(self.parsed_uri.path.rsplit("/", 1)[-1])
@@ -46,7 +46,7 @@ class MediaWikiRIAdapter(BaseRIAdapter):
     def extract_data(self):
         doc = pandoc.read(self.raw_data, format="mediawiki")
 
-        self.title = unquote(self.parsed_uri.path.rsplit("/", 1)[-1])
+        self.title = self.page_name.replace("_", " ").capitalize()
         content = pandoc.write(doc, format="markdown_strict")
 
         # clean up useless tags (div, span, img)

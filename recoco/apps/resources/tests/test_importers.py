@@ -21,11 +21,17 @@ def test_mediawiki_adapter(mocker):
 
     # assert mwi_class.can_handle(response) is False
 
-    mocker.patch("mwclient.Site")
+    mwclient_Site = mocker.patch("mwclient.Site")
     mocker.patch("mwclient.Site.pages", return_value="Hello", create=True)
 
     mwi = mwi_class("mock://mymediawiki.com/apage")
     assert mwi.load_data(response) is True
+
+    mwclient_Site.assert_called_once_with(
+        "mock://mymediawiki.com",
+        path="/w/",
+        clients_useragent="Recoco MediaWiki Ressource Importer",
+    )
 
     # Add fake data
     mwi.raw_data = "'''hello'''"
