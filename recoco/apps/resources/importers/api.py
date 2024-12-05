@@ -29,23 +29,23 @@ class AidesTerritoiresRIAdapter(BaseRIAdapter):
     def load_data(self, response: requests.Response):
         at_token = getattr(settings, "AIDES_TERRITOIRES_TOKEN", None)
         if not at_token:
-            LOGGER.warning(
-                "No AIDES_TERRITOIRES_TOKEN defined, no request will succeed!"
-            )
+            LOGGER.error("No AIDES_TERRITOIRES_TOKEN defined, no request will succeed!")
+            return False
 
         cnx_response = requests.post(
             "https://aides-territoires.beta.gouv.fr/api/connexion/",
             headers={"X-Auth-Token": at_token},
             timeout=5,
-        )  # FIXME
+        )
 
         if not cnx_response.ok:
             return False
 
-        pageslug = self._extract_pageslug_from_url(self.uri)
-
         token = cnx_response.json()["token"]
+
+        pageslug = self._extract_pageslug_from_url(self.uri)
         uri = f"https://aides-territoires.beta.gouv.fr/api/aids/{pageslug}"
+
         response = requests.get(
             uri,
             headers={
@@ -56,6 +56,7 @@ class AidesTerritoiresRIAdapter(BaseRIAdapter):
         )
 
         if not response.ok:
+            print("nope")
             return False
 
         self.raw_data = response.json()
