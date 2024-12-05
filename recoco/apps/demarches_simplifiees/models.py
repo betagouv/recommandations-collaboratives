@@ -1,3 +1,5 @@
+from dataclasses import dataclass
+
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.db import models
@@ -9,6 +11,13 @@ from recoco.apps.resources.models import Resource
 from recoco.apps.tasks.models import Task
 
 from .utils import hash_data
+
+
+@dataclass
+class Field:
+    id: str
+    label: str
+    options: list[str] | None = None
 
 
 class DSResource(TimeStampedModel):
@@ -41,14 +50,14 @@ class DSResource(TimeStampedModel):
         return f"{settings.DS_BASE_URL}/preremplir/{self.name}"
 
     @property
-    def fields(self) -> list[dict[str, str]]:
+    def fields(self) -> list[Field]:
         try:
             return [
-                {
-                    "field_id": f"champ_{field.get('id')}",
-                    "field_label": field.get("label"),
-                    "field_options": field.get("options", []),
-                }
+                Field(
+                    id="champ_" + field.get("id").replace("==", ""),
+                    label=field.get("label"),
+                    options=field.get("options"),
+                )
                 for field in self.schema["revision"]["champDescriptors"]
             ]
         except KeyError:
@@ -132,3 +141,28 @@ class DSMapping(TimeStampedModel):
 
     def __str__(self) -> str:
         return f"{self.ds_resource} - {self.site}"
+
+    @property
+    def ds_fields(self) -> list[Field]:
+        return self.ds_resource.fields
+
+    @property
+    def lookup_fields(self) -> list[Field]:
+        lookup_fields = []
+
+        for project_field in Project._meta.get_fields(include_parents=False):
+            if project_field.name in (
+                "description",
+                "first_name",
+                "last_name",
+                "name",
+                "phone",
+            ):
+                lookup_fields.append(
+                    Field(
+                        id="project." + project_field.name,
+                        label=project_field.verbose_name,
+                    )
+                )
+
+        return lookup_fields
