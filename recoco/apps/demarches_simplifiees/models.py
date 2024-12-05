@@ -102,25 +102,25 @@ class DSFolder(TimeStampedModel):
 
 class DSMappingManager(models.Manager):
     def get_queryset(self) -> models.QuerySet:
-        return (
-            super()
-            .get_queryset()
-            .select_related("ds_resource")
-            .prefetch_related("sites")
-        )
+        return super().get_queryset().select_related("ds_resource", "site")
 
 
 class DSMapping(TimeStampedModel):
     ds_resource = models.ForeignKey(
         DSResource,
         on_delete=models.CASCADE,
+        related_name="ds_mappings",
     )
 
-    sites = models.ManyToManyField(Site, blank=True)
+    site = models.ForeignKey(
+        Site,
+        on_delete=models.CASCADE,
+        related_name="ds_mappings",
+    )
 
     enabled = models.BooleanField(default=True)
 
-    fields_mapping = models.JSONField(default=dict, blank=True)
+    mapping = models.JSONField(default=dict, blank=True)
 
     objects = DSMappingManager()
 
@@ -128,3 +128,7 @@ class DSMapping(TimeStampedModel):
         verbose_name = "Mapping"
         verbose_name_plural = "Mappings"
         ordering = ["-created"]
+        unique_together = ["ds_resource", "site"]
+
+    def __str__(self) -> str:
+        return f"{self.ds_resource} - {self.site}"

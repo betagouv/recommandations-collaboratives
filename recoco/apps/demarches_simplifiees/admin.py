@@ -90,13 +90,13 @@ class DSMappingAdminSiteFilter(admin.SimpleListFilter):
 
     def queryset(self, request, queryset):
         if self.value():
-            return queryset.filter(sites=self.value())
+            return queryset.filter(site=self.value())
         return queryset
 
 
 @admin.register(DSMapping)
 class DSMappingAdmin(admin.ModelAdmin):
-    list_display = ("id", "ds_resource", "enabled")
+    list_display = ("id", "ds_resource", "site", "enabled")
     list_filter = ("enabled", DSMappingAdminSiteFilter)
 
     formfield_overrides = {
