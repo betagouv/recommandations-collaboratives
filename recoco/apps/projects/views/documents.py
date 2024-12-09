@@ -25,7 +25,13 @@ from ..utils import get_collaborators_for_project
 @login_required
 def document_list(request, project_id=None):
     """Manage files and links for project"""
-    project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
+
+    project = get_object_or_404(
+        models.Project.objects.filter(sites=request.site).with_unread_notifications(
+            user_id=request.user.id
+        ),
+        pk=project_id,
+    )
 
     has_perm_or_403(request.user, "manage_documents", project)
 

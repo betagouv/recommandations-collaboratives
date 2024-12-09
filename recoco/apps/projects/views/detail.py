@@ -169,10 +169,12 @@ def project_knowledge(request, project_id=None):
 def project_actions(request, project_id=None):
     """Action page for given project"""
 
-    queryset = models.Project.objects.filter(
-        sites=request.site
-    ).with_unread_notifications(user_id=request.user.id)
-    project = get_object_or_404(queryset, pk=project_id)
+    project = get_object_or_404(
+        models.Project.objects.filter(sites=request.site).with_unread_notifications(
+            user_id=request.user.id
+        ),
+        pk=project_id,
+    )
 
     is_regional_actor = is_regional_actor_for_project(
         request.site, project, request.user, allow_national=True
@@ -233,7 +235,13 @@ def project_actions_inline(request, project_id=None):
 @login_required
 def project_conversations(request, project_id=None):
     """Conversation page for project"""
-    project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
+
+    project = get_object_or_404(
+        models.Project.objects.filter(sites=request.site).with_unread_notifications(
+            user_id=request.user.id
+        ),
+        pk=project_id,
+    )
 
     is_regional_actor = is_regional_actor_for_project(
         request.site, project, request.user, allow_national=True

@@ -343,9 +343,7 @@ class ProjectSite(models.Model):
 class Project(models.Model):
     """Représente un project de suivi d'une collectivité"""
 
-    # objects = ActiveProjectManager.from_queryset(ProjectQuerySet)
     objects = ActiveProjectManagerWithQS()
-    # objects = ActiveProjectManager()
     objects_deleted = DeletedProjectManager()
 
     on_site = ActiveProjectOnSiteManager()
