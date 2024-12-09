@@ -272,7 +272,13 @@ def project_conversations(request, project_id=None):
 @login_required
 def project_internal_followup(request, project_id=None):
     """Advisors chat for given project"""
-    project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
+
+    project = get_object_or_404(
+        models.Project.objects.filter(sites=request.site).with_unread_notifications(
+            user_id=request.user.id
+        ),
+        pk=project_id,
+    )
 
     has_perm_or_403(request.user, "projects.use_private_notes", project)
 
