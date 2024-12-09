@@ -103,7 +103,7 @@
                     <template x-if="item.project.origin">
                         <div class="kanban-card__project-push-by-container"
                              data-cy="kanban-project-shared-by-origin"
-                             x-show="item.project.origin && {{ site_config.site_id }} !== item.project.origin?.site">
+                             x-show="item.project.origin && {{ request.site.id }} !== item.project.origin?.site">
                             <img x-show="item.project.origin.siteInfo.configuration.logo_small"
                                  :src="item.project.origin.siteInfo.configuration.logo_small"
                                  width="16px"
@@ -112,8 +112,9 @@
                             <span x-show="!item.project.origin.siteInfo.configuration.logo_small"
                                   class="fr-icon--sm fr-icon-window-line"
                                   aria-hidden="true"></span>
-                            <span class="not-a-link kanban">projet envoyé par</span>
-                            <span x-text="item.project.origin.siteInfo.name"></span>
+                            <span class="align-middle text-grey-dark tiny">projet envoyé par</span>
+                            <span x-text="item.project.origin.siteInfo.name"
+                                  class="align-middle text-grey-dark tiny"></span>
                         </div>
                     </template>
                     <footer class="d-flex align-items-center justify-content-between w-100">
