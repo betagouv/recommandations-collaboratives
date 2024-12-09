@@ -9,13 +9,14 @@ created : 2021-05-26 13:33:11 CEST
 
 import os
 
+from django.apps import apps as django_apps
 from django.contrib.auth import models as auth_models
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.managers import CurrentSiteManager
 from django.contrib.sites.models import Site
 from django.db import models
-from django.db.models import Count, OuterRef, Q, Subquery
+from django.db.models import Count, OuterRef, Q
 from django.db.models.functions import Cast
 from django.db.models.signals import post_migrate
 from django.dispatch import receiver
@@ -153,85 +154,56 @@ class ProjectManager(models.Manager):
 
 class ProjectQuerySet(models.QuerySet):
     def with_unread_notifications(self, user_id: int):
+
+        notification_query = Notification.objects.filter(
+            recipient_id=user_id,
+            target_object_id=Cast(OuterRef("pk"), output_field=models.CharField()),
+            target_content_type=ContentType.objects.get_for_model(Project),
+        )
+
         return self.annotate(
-            project_ct_id=Subquery(
-                ContentType.objects.filter(
-                    app_label="projects", model="project"
-                ).values("id")
-            ),
-            task_ct_id=Subquery(
-                ContentType.objects.filter(
-                    app_label="tasks",
-                    model="task",
-                ).values("id")
-            ),
-            task_followup_ct_id=Subquery(
-                ContentType.objects.filter(
-                    app_label="tasks",
-                    model="taskfollowup",
-                ).values("id")
-            ),
-            note_ct_id=Subquery(
-                ContentType.objects.filter(
-                    app_label="projects",
-                    model="note",
-                ).values("id")
-            ),
-            document_ct_id=Subquery(
-                ContentType.objects.filter(
-                    app_label="projects",
-                    model="document",
-                ).values("id")
-            ),
-        ).annotate(
             action_notifications_count=Count(
-                Notification.objects.filter(
-                    recipient_id=user_id,
-                    target_object_id=Cast(
-                        OuterRef("pk"), output_field=models.CharField()
-                    ),
-                    target_content_type_id=OuterRef("project_ct_id"),
-                )
-                .filter(
-                    Q(action_object_content_type_id=OuterRef("task_ct_id"))
-                    | Q(action_object_content_type_id=OuterRef("task_followup_ct_id")),
+                notification_query.filter(
+                    Q(
+                        action_object_content_type=ContentType.objects.get_for_model(
+                            django_apps.get_model(app_label="tasks", model_name="task")
+                        )
+                    )
+                    | Q(
+                        action_object_content_type=ContentType.objects.get_for_model(
+                            django_apps.get_model(
+                                app_label="tasks", model_name="taskfollowup"
+                            )
+                        )
+                    )
                 )
                 .unread()
+                .values("pk")
             ),
             conversation_notifications_count=Count(
-                Notification.objects.filter(
-                    recipient_id=user_id,
-                    target_object_id=OuterRef("pk"),
-                    target_content_type_id=OuterRef("project_ct_id"),
-                )
-                .filter(
-                    action_object_content_type_id=OuterRef("note_ct_id"),
+                notification_query.filter(
+                    action_object_content_type=ContentType.objects.get_for_model(Note),
                     action_notes__public=True,
                 )
                 .unread()
+                .values("pk")
             ),
             private_conversation_notifications_count=Count(
-                Notification.objects.filter(
-                    recipient_id=user_id,
-                    target_object_id=OuterRef("pk"),
-                    target_content_type_id=OuterRef("project_ct_id"),
-                )
-                .filter(
-                    action_object_content_type_id=OuterRef("note_ct_id"),
+                notification_query.filter(
+                    action_object_content_type=ContentType.objects.get_for_model(Note),
                     action_notes__public=False,
                 )
                 .unread()
+                .values("pk")
             ),
             document_notifications_count=Count(
-                Notification.objects.filter(
-                    recipient_id=user_id,
-                    target_object_id=OuterRef("pk"),
-                    target_content_type_id=OuterRef("project_ct_id"),
-                )
-                .filter(
-                    action_object_content_type_id=OuterRef("document_ct_id"),
+                notification_query.filter(
+                    action_object_content_type=ContentType.objects.get_for_model(
+                        Document
+                    ),
                 )
                 .unread()
+                .values("pk")
             ),
         )
 
@@ -240,18 +212,23 @@ class ProjectOnSiteManager(CurrentSiteManager, ProjectManager):
     pass
 
 
-class ActiveProjectManager(ProjectManager):
+class ActiveProjectManagerBase(ProjectManager):
     """Manager for active projects"""
 
     def get_queryset(self):
         return super().get_queryset().filter(deleted=None)
 
 
-ActiveProjectManagerWithQS = ActiveProjectManager.from_queryset(ProjectQuerySet)
+ActiveProjectManager = ActiveProjectManagerBase.from_queryset(ProjectQuerySet)
 
 
-class ActiveProjectOnSiteManager(CurrentSiteManager, ActiveProjectManager):
+class ActiveProjectOnSiteManagerBase(CurrentSiteManager, ActiveProjectManager):
     pass
+
+
+ActiveProjectOnSiteManager = ActiveProjectOnSiteManagerBase.from_queryset(
+    ProjectQuerySet
+)
 
 
 class DeletedProjectManager(ProjectManager):
@@ -343,7 +320,7 @@ class ProjectSite(models.Model):
 class Project(models.Model):
     """Représente un project de suivi d'une collectivité"""
 
-    objects = ActiveProjectManagerWithQS()
+    objects = ActiveProjectManager()
     objects_deleted = DeletedProjectManager()
 
     on_site = ActiveProjectOnSiteManager()
