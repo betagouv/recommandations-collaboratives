@@ -33,3 +33,6 @@ describe('I can go to tasks tab', () => {
     cy.contains('Vous avez 2 recommandations non lues');
   });
 });
+
+
+// page recommandations

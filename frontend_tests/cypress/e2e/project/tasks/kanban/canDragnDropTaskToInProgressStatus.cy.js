@@ -40,3 +40,5 @@ describe('I can go to tasks tab', () => {
     // TODO : finish this test to trigger api calls
   });
 });
+
+// page recommandation

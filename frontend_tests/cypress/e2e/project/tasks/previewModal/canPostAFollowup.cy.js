@@ -35,3 +35,5 @@ describe('I can go tasks tab', () => {
     cy.contains(`test ${now}`);
   });
 });
+
+// page recommandation

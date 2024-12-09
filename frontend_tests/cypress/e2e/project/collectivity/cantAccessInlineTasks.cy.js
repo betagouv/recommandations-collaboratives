@@ -16,3 +16,5 @@ describe("I can go to action page but can't see the loop to access the inline ta
     cy.get('#tasks-inline-button').should('not.exist');
   });
 });
+
+// page recommandations

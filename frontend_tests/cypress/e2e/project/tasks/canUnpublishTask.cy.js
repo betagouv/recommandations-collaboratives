@@ -23,3 +23,5 @@ describe('I can go tasks tab', () => {
     cy.contains('brouillon');
   });
 });
+
+// page recommandations

@@ -24,3 +24,6 @@ describe('I can go to tasks tab', () => {
     cy.get('[data-test-id="task-inline-topic"]').should('exist');
   });
 });
+
+
+// page recommandation

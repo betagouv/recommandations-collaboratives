@@ -18,3 +18,6 @@ describe('I can go tasks tab', () => {
     cy.contains(task2.fields.intent);
   });
 });
+
+
+// page recommandation

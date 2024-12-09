@@ -26,3 +26,5 @@ describe('I can go to tasks tab', () => {
     cy.get('#task-move-below').click();
   });
 });
+
+// page recommandation
