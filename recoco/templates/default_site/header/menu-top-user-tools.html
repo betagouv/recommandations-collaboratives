@@ -17,7 +17,7 @@
     {% vite_asset 'js/components/SentryConfig.js' %}
 {% endblock js %}
 {% is_staff_for_current_site request.user as is_staff %}
-<div x-data="SentryConfig('{{ user.email }}')"class="fr-hidden"></div>
+<div x-data="SentryConfig('{{ request.user.email }}')" class="fr-hidden"></div>
 <!-- User -->
 <div class="user-tools d-flex">
     {% if user.is_authenticated %}
