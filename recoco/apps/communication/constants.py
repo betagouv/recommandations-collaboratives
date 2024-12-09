@@ -7,6 +7,7 @@ TPL_NEW_SITE_FOR_SWITCHTENDER = "new_site_for_switchtender"
 TPL_SHARING_INVITATION = "sharing_invitation"
 TPL_PROJECT_REMINDERS_NEW_RECO_DIGEST = "project_reminders_new_reco_digest"
 TPL_PROJECT_REMINDERS_WHATS_UP_DIGEST = "project_reminders_whats_up_digest"
+TPL_PROJECT_ADDED_TO_NEW_SITE = "project_added_to_new_site"
 
 TPL_CHOICES = (
     (TPL_PROJECT_RECEIVED, "Projet bien reçu"),
@@ -24,4 +25,5 @@ TPL_CHOICES = (
         "Rappel des nouvelles recommandations (mail projet B)",
     ),
     (TPL_PROJECT_REMINDERS_WHATS_UP_DIGEST, "Où en êtes-vous ? (mail projet C)"),
+    (TPL_PROJECT_ADDED_TO_NEW_SITE, "Le Projet a été validé sur un nouveau portail"),
 )

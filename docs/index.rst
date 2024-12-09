@@ -8,16 +8,24 @@ Documentation de Recommandations Collaboratives
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
+   :caption: Contenu:
 
    install.rst
-   models.rst
+
    fts.rst
    permissions.rst
    workflows.rst
    js_components.rst
-   terminology.rst
 
+
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Annexes:
+
+   models.rst
+   urls.rst
+   terminology.rst
 
 
 

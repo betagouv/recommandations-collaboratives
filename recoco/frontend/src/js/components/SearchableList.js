@@ -15,11 +15,10 @@ function SearchableList(listId, listCount, searchParams) {
       };
 
       new List(listId, options);
-
       //Get already selected items
       Array.from(this.$refs.defaultField.children[listId].options).forEach(
         (option) => {
-          if (option.selected) {
+          if (option.selected && option.value != '') {
             const selectedItem = {
               name: option.innerHTML,
               value: option.value,
@@ -41,12 +40,15 @@ function SearchableList(listId, listCount, searchParams) {
     handleFocusList() {
       return (this.onFocus = true);
     },
-    handleBlurList(event) {
+    handleBlurList() {
       setTimeout(() => {
         return (this.onFocus = false);
       }, 100);
     },
     handleAddItem(event, value, name) {
+      if (value == '' || this.selectedList.find((item) => item.value == value))
+        return;
+
       event.target.classList.add('item-selected');
 
       const selectedItem = {

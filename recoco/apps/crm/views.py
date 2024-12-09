@@ -955,22 +955,16 @@ def crm_list_recommendation_without_resources(request):
     return render(request, "crm/reco_without_resources.html", locals())
 
 
-@login_required
-def crm_list_projects_with_low_reach(request):
-    """List projects that don't get a good impact"""
-    has_perm_or_403(request.user, "use_crm", request.site)
-
+def make_low_reach_project_query(request):
     site_config = get_site_config_or_503(request.site)
 
-    search_form = forms.CRMSearchForm()
-
-    projects = (
+    return (
         Project.on_site.filter(
             project_sites__status__in=("READY", "IN_PROGRESS", "DONE"),
             project_sites__site=request.site,
         )
         .exclude(exclude_stats=True)
-        .prefetch_related("tasks", "notes")
+        .prefetch_related("tasks", "notes", "switchtenders")
         .annotate(
             reco_total=Count(
                 "tasks",
@@ -1009,7 +1003,75 @@ def crm_list_projects_with_low_reach(request):
         .distinct()
     )
 
+
+@login_required
+def crm_list_projects_with_low_reach(request):
+    """List projects that don't get a good impact"""
+    has_perm_or_403(request.user, "use_crm", request.site)
+
+    search_form = forms.CRMSearchForm()
+
+    low_reach_projects = make_low_reach_project_query(request)
+
     return render(request, "crm/projects_low_reach.html", locals())
+
+
+@login_required
+def crm_projects_with_low_reach_as_csv(request):
+    """Export projects that don't get a good impact in CSV"""
+    has_perm_or_403(request.user, "use_crm", request.site)
+
+    low_reach_projects = make_low_reach_project_query(request)
+
+    today = datetime.today().date()
+
+    content_disposition = (
+        f'attachment; filename="projets-a-faible-repondant-{today}.csv"'
+    )
+    response = HttpResponse(
+        content_type="text/csv",
+        headers={
+            "Content-Disposition": content_disposition,
+        },
+    )
+
+    writer = csv.writer(response, quoting=csv.QUOTE_ALL)
+    writer.writerow(
+        [
+            "name",
+            "location",
+            "insee",
+            "inactive_since",
+            "advisors",
+            "reco_access_pc",
+            "reco_read",
+            "reco_total",
+            "last_member_activity",
+            "last_reco_at",
+            "last_public_msg_at",
+        ]
+    )
+
+    for project in low_reach_projects:
+        writer.writerow(
+            [
+                project.name,
+                project.commune.name,
+                project.commune.insee,
+                project.inactive_since,
+                ",".join(
+                    [advisor.get_full_name() for advisor in project.switchtenders.all()]
+                ),
+                project.reco_read_ratio,
+                project.reco_read,
+                project.reco_total,
+                project.last_members_activity_at,
+                project.last_reco_at,
+                project.last_public_msg_at,
+            ]
+        )
+
+    return response
 
 
 @login_required
@@ -1252,7 +1314,13 @@ def project_site_handover(request, project_id):
         if form.is_valid():
             site = form.cleaned_data["site"]
 
-            project.project_sites.create(site=site, is_origin=False, status="DRAFT")
+            project.project_sites.create(
+                site=site,
+                sent_by=request.user,
+                sent_from=request.site,
+                is_origin=False,
+                status="DRAFT",
+            )
             onboarding_utils.notify_new_project(
                 site=site, project=project, owner=project.owner
             )

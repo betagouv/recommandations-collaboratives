@@ -4,50 +4,48 @@ Dossier de tests : `frontend_tests/`
 
 ## Démarrer
 
-- S'assurer que dans le fichier `development.py` dans les settings de `django`, la base de données de test est bien configurée. Par exemple :
+- S'assurer que les variables d'environnement sont bien configurées dans le fichier `.env` à la racine du projet. Par exemple :
+
+```bash
+DJANGO_DB_NAME=recoco
+DJANGO_DB_TEST_NAME=test_recoco
+DJANGO_DB_USER=recoco
+DJANGO_DB_PASSWORD=
+DJANGO_DB_HOST=localhost
+DJANGO_DB_PORT=5432
+DJANGO_VITE_TEST_SERVER_PORT=3001
+DJANGO_VITE_DEV_SERVER_PORT=3000
+GDAL_LIBRARY_PATH=
+GEOS_LIBRARY_PATH=
+```
+
+- S'assurer que dans le fichier `development.py` dans les settings de `Django`, la base de données de test est bien configurée. Par exemple :
 
 ```python
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('POSTGRES_NAME'), # ex 'recoco'
-        'USER': os.environ.get('POSTGRES_USER'),
-        'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
-        'HOST': 'localhost',
-        'PORT': 5432,
-        'TEST': {
-            'NAME':'test_recoco' # <-- ici
-        }
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": os.getenv("DJANGO_DB_NAME"),
+        "USER": os.getenv("DJANGO_DB_USER"),
+        "PASSWORD": os.getenv("DJANGO_DB_PASSWORD"),
+        "HOST": os.getenv("DJANGO_DB_HOST"),
+        "PORT": os.getenv("DJANGO_DB_PORT"),
+        "TEST": {"NAME": os.getenv("DJANGO_DB_TEST_NAME")}, # <-- ici
     }
 }
 ```
 
-- Dupliquer le fichier `development.py` en `frontend_tests.py` et modifier les paramètres de la base de données pour qu'ils correspondent à la base de données de test.
+Ce fichier est utilisé pour copier la structure de la base de données de développement dans la base de données de test.
+`DATABASES["default"]["NAME"]` : Nom de la base de données de développement
+`DATABASES["default"]["TEST"]["NAME"]` : Nom de la base de données de test
 
-```python
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': test_recoco, # <-- ici
-        'USER': os.environ.get('POSTGRES_USER'),
-        'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
-        'HOST': 'localhost',
-        'PORT': 5432,
-    }
-}
-```
+- Le fichier `frontend_tests.py` contient les paramètres de configuration pour les tests front end. Notamment les paramètres de connexion à la base de données de développement et de test.
 
-Ces paramètres sont seulement utilisés pour lancer la mise à jour des permissions à l'aide du script `update_permissions.py`
-
-- Dans le fichier `frontend_tests.py`, modifier le port d'accès du front end, cela permettra de lancer le serveur front end sur un port différent du serveur de développement Django et de pouvoir lancer les tests en parallèle.:
-
-```python
-DJANGO_VITE = {"default": {"dev_mode": DEBUG, "dev_server_port": 3001}}
-```
+- Le fichier `frontend_tests_permissions.py` contient les paramètres de connexion à la base de données pour lancer la mise à jour des permissions à l'aide du script `update_permissions.py`
 
 ## Lancer les tests
 
-### Lancement de la serie de tests Cypress
+### Lancement de la serie de tests Cypress (mode non interactif)
 
 Installer les dépendances :
 
@@ -74,12 +72,31 @@ Cela permettra de :
 
 ### Lancement de l'interface graphique de Cypress
 
-Pour lancer les tests, il faut lancer plusieurs processus dans des consoles distinctes:
+Installer les dépendances :
 
-- Console 1: Initialiser un server django en mode test avec la base de test et les différentes fixtures avec la commande : `yarn django:start-server`
-- Console 2:
-  - Lancer la commande de mise à jour des permissions: `yarn django:update-permissions`
-  - Lancer la commande de dev front qui met les static et composants JS à disposition de Django: `yarn frontend:start-server`
-- Console 3: Vous pouvez maintenant exécuter les différents tests avec les commandes suivantes au choix :
-  - `yarn test_ui` -> pour lancer cypress avec une interface graphique
-  - `yarn cy:run` -> pour lancer cypress en ligne de commande
+```bash
+$ yarn install
+```
+
+> ⚠️ Attention
+>
+> S'assurer d'être dans son environnement virtuel Django.
+
+Lancer les tests :
+
+```bash
+$ yarn test_ui
+```
+
+Cela permettra de :
+
+- Démarrer un serveur Vite (front end)
+- Démarrer un serveur Django en mode test (back end)
+- Lancer les tests Cypress
+- Générer un rapport d'éxecution des tests dans le dossier `frontend_tests/cypress/reports`
+
+## Autres commandes
+
+- `yarn django:start-server` : Initialiser un serveur de test Django et une base données de test et les différentes fixtures.
+- `yarn django:update-permissions` : Mise à jour des permissions des utilisateurs
+- `yarn frontend:start-server` : Mise à disposition des statics et composants JS

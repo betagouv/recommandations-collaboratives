@@ -1,16 +1,17 @@
 {% load static %}
 <template x-cloak x-if="showTuto">
     <div x-ref="startTourButton"
-         class="hint-button align-items-center position-absolute t-0 l-0 fr-p-2w appear-in-with-delay">
+         class="hint-button align-items-center position-absolute t-0 l-0 fr-p-2w appear-in-with-delay"
+         data-test-id="tutorial-project-launcher">
         <span x-text="startButtonDescription"></span>
         <div class="d-flex align-items-center fr-mb-1v fr-mt-2v">
-            <div @click="handleStartTour()" class="fr-mr-2v">
-                <button class="button filled white small tiny">
+            <div @click="hideStartModal()" class="fr-mr-2v">
+                <button class="fr-btn fr-btn--secondary bg-white" data-test-id="launch-tutorial">
                     <span>Découvrir le tutoriel</span>
                 </button>
             </div>
             <div @click="handleSnoozeChallenge()" class="d-flex">
-                <button class="button white small tiny">
+                <button class="fr-btn fr-btn--secondary bg-white" data-test-id="snooze-tutorial">
                     <span>non merci</span>
                 </button>
             </div>

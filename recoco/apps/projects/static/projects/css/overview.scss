@@ -2,6 +2,24 @@
   font-size: 14px;
 }
 
-.specific-cursor-pointer {
-  cursor: pointer;
+.highlighted {
+  padding: 4px 8px;
+  p,
+  a {
+    font-size: 12px;
+    line-height: 24px;
+    font-weight: 700;
+  }
+
+  a {
+    font-weight: 400;
+    text-decoration: underline;
+  }
+  &--blue {
+    background: var(--light-background-contrast-info, #e8edff);
+    color: var(--light-background-action-high-blue-france, #000091);
+  }
+  &__tooltip {
+    color: var(--text-default-grey);
+  }
 }

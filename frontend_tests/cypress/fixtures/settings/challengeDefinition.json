@@ -1,7 +1,28 @@
-{
-  "code": "survey",
-  "name": "survey",
-  "description": "survey",
-  "icon_name": null,
-  "next_challenge": null
-}
+[
+  {
+    "model": "training.challengedefinition",
+    "pk": 1,
+    "fields": {
+      "name": "survey",
+      "description": "survey",
+      "next_challenge": null,
+      "code": "survey",
+      "icon_name": null,
+      "site_id": 1,
+      "week_inactivity_repeat": 0
+    }
+  },
+  {
+    "model": "training.challengedefinition",
+    "pk": 2,
+    "fields": {
+      "name": "project-advisor-overview",
+      "description": "project-advisor-overview",
+      "next_challenge": null,
+      "code": "project-advisor-overview",
+      "icon_name": null,
+      "site_id": 1,
+      "week_inactivity_repeat": 0
+    }
+  }
+]

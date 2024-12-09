@@ -6,6 +6,11 @@ Production settings for recoco-django
 
 from .common import *  # noqa
 
+import os
+import sentry_sdk
+from sentry_sdk.integrations.celery import CeleryIntegration
+from sentry_sdk.integrations.django import DjangoIntegration
+
 DEBUG = False
 
 # logging: send email and log to file 500 internal server errors
@@ -51,5 +56,21 @@ SESSION_COOKIE_SAMESITE = "None"
 X_FRAME_OPTIONS = "DENY"
 
 WAGTAILADMIN_BASE_URL = "recoconseil.fr"
+
+# Sentry
+if SENTRY_URL := os.environ.get("SENTRY_URL"):
+    sentry_sdk.init(
+        dsn=SENTRY_URL,
+        integrations=[
+            DjangoIntegration(),
+            CeleryIntegration(),
+        ],
+        environment="production" if not DEBUG else "dev",
+        # Set traces_sample_rate to 1.0 to capture 100%
+        # of transactions for performance monitoring.
+        traces_sample_rate=1.0,
+        send_default_pii=True,
+        release=f"recoco@{VERSION}",
+    )
 
 # eof

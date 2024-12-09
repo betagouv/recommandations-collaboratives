@@ -1,4 +1,4 @@
-from unittest.mock import Mock, call
+from unittest.mock import ANY, Mock, call
 
 import pytest
 from django.contrib.sites.models import Site
@@ -15,13 +15,19 @@ from recoco.apps.metrics.processor import (
 class TestMaterializedView:
     @pytest.fixture(autouse=True)
     def _change_sql_dir(self, settings):
-        settings.MATERIALIZED_VIEWS_SQL_DIR = (
+        settings.METRICS_MATERIALIZED_VIEWS_SQL_DIR = (
             settings.BASE_DIR / "apps/metrics/tests/sql_queries"
         )
-        settings.MATERIALIZED_VIEWS_SPEC = [
+        settings.METRICS_MATERIALIZED_VIEWS_SPEC = [
             {"name": "view_test_django_qs"},
             {"name": "view_test_raw_sql"},
         ]
+
+    @pytest.fixture(autouse=True)
+    def _disable_owner_settings(self, settings):
+        """We disable that feature to prevent the test from required another role in
+        the database"""
+        settings.METRICS_MATERIALIZED_VIEWS_OWNER_TPL = None
 
     @pytest.fixture(autouse=True)
     def stub_site(self):
@@ -105,6 +111,51 @@ class TestMaterializedView:
         )
         assert calls[3] == call(
             sql="CREATE UNIQUE INDEX IF NOT EXISTS unique_idx ON metrics_example_com.view_test_simple (unique_idx);"
+        )
+
+    @pytest.mark.django_db(transaction=True)
+    def test_assign_permissions_to_owner(self, mocker, settings):
+        settings.METRICS_MATERIALIZED_VIEWS_OWNER_TPL = "metrics_owner_example_com"
+
+        mocker.patch(
+            "recoco.apps.metrics.management.commands.update_materialized_views.Command._check_user_exists_in_db",
+            return_value=True,
+        )
+
+        mock = mocker.patch(
+            "recoco.apps.metrics.management.commands.update_materialized_views.Command._assign_permissions_to_owner"
+        )
+
+        call_command("update_materialized_views")
+
+        mock.assert_called_once_with(
+            cursor=ANY,
+            schema_name="metrics_example_com",
+            schema_owner="metrics_owner_example_com",
+        )
+
+    @pytest.mark.django_db(transaction=True)
+    def test_assign_permissions_to_owner_with_override(self, mocker, settings):
+        owner_name = "my_overridden_user"
+        settings.METRICS_MATERIALIZED_VIEWS_OWNER_TPL = "metrics_owner_example_com"
+        settings.METRICS_MATERIALIZED_VIEWS_OWNER_OVERRIDES = {
+            "example_com": owner_name
+        }
+
+        mocker.patch(
+            "recoco.apps.metrics.management.commands.update_materialized_views.Command._check_user_exists_in_db",
+            return_value=True,
+        )
+        mock = mocker.patch(
+            "recoco.apps.metrics.management.commands.update_materialized_views.Command._assign_permissions_to_owner"
+        )
+
+        call_command("update_materialized_views")
+
+        mock.assert_called_once_with(
+            cursor=ANY,
+            schema_name="metrics_example_com",
+            schema_owner=owner_name,
         )
 
     @pytest.mark.django_db(transaction=True)

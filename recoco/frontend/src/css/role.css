@@ -1,9 +1,9 @@
 .advisor-border {
-  border: solid 1px #0063cb;
+  border: solid 1px var(--background-action-high-blue-france);
 }
 
 .advisor-background {
-  background-color: #0063cb;
+  background-color: var(--background-action-high-blue-france);
 }
 
 .observer-border {

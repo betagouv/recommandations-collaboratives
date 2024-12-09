@@ -218,5 +218,55 @@
       "project_id": 22,
       "site_id": 1
     }
+  },
+  {
+    "pk": 23,
+    "model": "projects.projectsite",
+    "fields": {
+      "status": "TO_PROCESS",
+      "is_origin": false,
+      "project_id": 23,
+      "site_id": 1
+    }
+  },
+  {
+    "pk": 24,
+    "model": "projects.projectsite",
+    "fields": {
+      "status": "TO_PROCESS",
+      "is_origin": true,
+      "project_id": 23,
+      "site_id": 2
+    }
+  },
+  {
+    "pk": 25,
+    "model": "projects.projectsite",
+    "fields": {
+      "status": "TO_PROCESS",
+      "is_origin": false,
+      "project_id": 23,
+      "site_id": 3
+    }
+  },
+  {
+    "pk": 26,
+    "model": "projects.projectsite",
+    "fields": {
+      "status": "DRAFT",
+      "is_origin": false,
+      "project_id": 24,
+      "site_id": 1
+    }
+  },
+  {
+    "pk": 27,
+    "model": "projects.projectsite",
+    "fields": {
+      "status": "TO_PROCESS",
+      "is_origin": true,
+      "project_id": 24,
+      "site_id": 2
+    }
   }
 ]

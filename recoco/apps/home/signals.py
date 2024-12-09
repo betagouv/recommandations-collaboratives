@@ -13,6 +13,7 @@ from django.dispatch import receiver
 from magicauth.signals import user_logged_in as magicauth_user_logged_in
 
 from recoco import verbs
+from recoco.apps.projects.utils import refresh_user_projects_in_session
 
 
 def log_connection_on_user_login(sender, user, request, **kwargs):
@@ -24,6 +25,8 @@ def update_login_fields(sender, user, request, **kwargs):
     profile = user.profile
     profile.previous_login_at = user.last_login
     profile.save(update_fields=["previous_login_at"])
+
+    refresh_user_projects_in_session(request, user)
 
     # Call the original django handler
     update_last_login(sender, user, **kwargs)

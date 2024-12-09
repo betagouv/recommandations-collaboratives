@@ -7,10 +7,12 @@ author  : raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created : 2021-12-14 10:36:20 CEST
 """
 
-
 from django import forms
+from django.contrib.sites.models import Site
+from django.db.models import Q
 from markdownx.fields import MarkdownxFormField
 
+from recoco.apps.projects import models as projects_models
 from recoco.apps.resources import models as resources_models
 
 from . import models
@@ -61,6 +63,23 @@ class ResourceTaskForm(forms.ModelForm):
 class PushTypeActionForm(forms.Form):
     """Determine which type of push it is"""
 
+    def __init__(self, user, *args, **kwargs):
+        super(PushTypeActionForm, self).__init__(*args, **kwargs)
+
+        # Allow only projects on the current site with a usable status
+        current_site = Site.objects.get_current()
+        self.fields["project"].queryset = (
+            projects_models.Project.objects.filter(
+                switchtenders=user,
+                sites=current_site,
+            )
+            .exclude(
+                Q(project_sites__status__in=["DRAFT", "REJECTED"]),
+                ~Q(project_sites__site=current_site),
+            )
+            .distinct()
+        )
+
     PUSH_TYPES = (
         ("noresource", "noresource"),
         ("single", "single"),
@@ -69,26 +88,33 @@ class PushTypeActionForm(forms.Form):
 
     push_type = forms.ChoiceField(choices=PUSH_TYPES)
     next = forms.CharField(required=False)
+    project = forms.ModelChoiceField(
+        queryset=projects_models.Project.objects.none(),
+        empty_label="(Veuillez sélectionner un projet)",
+        required=True,
+    )
 
 
-class CreateActionWithoutResourceForm(forms.ModelForm):
-    """Create an action for a project, without attached resource"""
+class CreateActionBaseForm(forms.ModelForm):
+    """Base form for action creation"""
 
     topic_name = forms.CharField(required=False)
+
+
+class CreateActionWithoutResourceForm(CreateActionBaseForm):
+    """Create an action for a project, without attached resource"""
 
     class Meta:
         model = models.Task
         fields = ["intent", "content", "public"]
 
 
-class CreateActionWithResourceForm(CreateActionWithoutResourceForm):
-    topic_name = forms.CharField(required=False)
-
+class CreateActionWithResourceForm(CreateActionBaseForm):
     resource = (
         forms.ModelChoiceField(
             queryset=resources_models.Resource.objects.exclude(
                 status=resources_models.Resource.DRAFT
-            )
+            ).with_ds_annotations()
         ),
     )
 
@@ -96,9 +122,13 @@ class CreateActionWithResourceForm(CreateActionWithoutResourceForm):
         resource = self.cleaned_data["resource"]
 
         try:
-            resource = resources_models.Resource.on_site.exclude(
-                status=resources_models.Resource.DRAFT
-            ).get(pk=resource.pk)
+            resource = (
+                resources_models.Resource.on_site.exclude(
+                    status=resources_models.Resource.DRAFT
+                )
+                .with_ds_annotations()
+                .get(pk=resource.pk)
+            )
         except resources_models.Resource.DoesNotExist:
             self.add_error("resource_unknown", "Cette ressource n'existe pas")
             raise
@@ -110,20 +140,24 @@ class CreateActionWithResourceForm(CreateActionWithoutResourceForm):
         fields = ["intent", "content", "public", "resource"]
 
 
-class CreateActionsFromResourcesForm(forms.ModelForm):
+class CreateActionsFromResourcesForm(CreateActionBaseForm):
     resources = forms.ModelMultipleChoiceField(
         queryset=resources_models.Resource.objects.exclude(
             status=resources_models.Resource.DRAFT
-        ),
+        ).with_ds_annotations(),
         required=True,
     )
 
     def clean_resources(self):
         resources = self.cleaned_data["resources"]
 
-        resources = resources_models.Resource.on_site.exclude(
-            status=resources_models.Resource.DRAFT
-        ).filter(pk__in=[resource.pk for resource in resources.all()])
+        resources = (
+            resources_models.Resource.on_site.exclude(
+                status=resources_models.Resource.DRAFT
+            )
+            .with_ds_annotations()
+            .filter(pk__in=[resource.pk for resource in resources.all()])
+        )
 
         if resources.count() == 0:
             self.add_error("no_valid_resource", "Aucune ressource")

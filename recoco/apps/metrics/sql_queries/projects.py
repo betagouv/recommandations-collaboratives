@@ -1,4 +1,4 @@
-from django.contrib.postgres.aggregates import StringAgg
+from django.contrib.postgres.aggregates import ArrayAgg
 from django.db.models import Count, F, Func, OuterRef, Q, QuerySet, Subquery
 
 from recoco.apps.projects.models import Project, ProjectSwitchtender
@@ -67,15 +67,30 @@ def get_queryset(site_id: int) -> QuerySet:
             )
         )
         .annotate(
-            crm_annotations_tags=StringAgg(
+            project_topics=ArrayAgg(
+                "topics__name",
+                distinct=True,
+            ),
+            crm_annotations_tags=ArrayAgg(
                 "crm_annotations__tags__name",
-                delimiter=",",
+                distinct=True,
+            ),
+            advised_by=ArrayAgg(
+                hash_field("switchtenders__id", salt="user"),
                 distinct=True,
             ),
             commune_insee=F("commune__insee"),
         )
         .annotate(
             status=F("project_sites__status"), filter=Q(project_sites__site__pk=site_id)
+        )
+        .annotate(
+            site_origin=F("project_sites__site__domain"),
+            filter=Q(project_sites__is_origin=True),
+        )
+        .annotate(
+            all_sites=F("project_sites__site__domain"),
+            filter=~Q(project_sites__status=["DRAFT", "REJECTED"]),
         )
         .values(
             "hash",
@@ -85,11 +100,15 @@ def get_queryset(site_id: int) -> QuerySet:
             "commune_insee",
             "recommandation_count",
             "advisor_count",
+            "advised_by",
             "member_count",
             "public_message_count",
             "public_message_from_members_count",  # FIXME: wrong
             "public_message_from_advisors_count",  # FIXME: wrong
             "private_message_count",
+            "project_topics",
             "crm_annotations_tags",
+            "site_origin",
+            "all_sites",
         )
     )

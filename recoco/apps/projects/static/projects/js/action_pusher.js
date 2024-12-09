@@ -5,7 +5,7 @@ function action_pusher_app() {
 
     db: new MiniSearch({
       fields: ['title', 'subtitle', 'tags'], // fields to index for full-text search
-      storeFields: ['title', 'subtitle', 'url', 'url_embeded', 'is_dsresource'], //
+      storeFields: ['title', 'subtitle', 'url', 'url_embeded', 'has_dsresource'], //
     }),
 
     push_type: 'single',
@@ -94,7 +94,7 @@ function action_pusher_app() {
 
       const params = new URLSearchParams(document.location.search);
 
-      const selected_resource = parseInt(params.get('resource'));
+      const selected_resource = parseInt(params.get('resource_id'));
 
       if (selected_resource) {
         this.results = _.where(this.resources, { id: selected_resource });
@@ -120,7 +120,7 @@ function action_pusher_app() {
           tags: t.tags,
           url: t.web_url,
           url_embeded: t.embeded_url,
-          is_dsresource: t.is_dsresource,
+          has_dsresource: t.has_dsresource,
           category: t.category,
         };
 

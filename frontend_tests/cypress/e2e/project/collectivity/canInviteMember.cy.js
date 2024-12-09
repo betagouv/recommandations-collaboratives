@@ -10,7 +10,7 @@ describe('I can invite a member', () => {
   const project = 'Friche numéro 2';
 
   it('goes to the overview page and invite a member', () => {
-    cy.login('boba');
+    cy.login('collectivité2');
     const message = `Bonjour ${invitedFullName}, je t'invite à conseiller mon projet ${project} ${invitedEmail}`;
     const sentNotification = `Un courriel d'invitation à rejoindre le projet a été envoyé à ${invitedEmail}`;
 
@@ -36,7 +36,7 @@ describe('I can invite a member', () => {
   });
 
   it('can see a notification of the invitation on the project activity feed', () => {
-    const activityNotification = `${inviterFullName} a invité ${invitedEmail} en tant que collectivité`;
+    const activityNotification = `${inviterFullName} a invité ${invitedEmail} en tant que porteur de projet`;
     cy.login('staff');
     cy.visit(`/project/${currentProject.pk}`);
     cy.get('[data-test-id="fr-consent-banner"]')
@@ -50,7 +50,7 @@ describe('I can invite a member', () => {
         cy.contains(inviterFullName);
         cy.contains(' a invité ');
         cy.contains(invitedEmail);
-        cy.contains(' en tant que collectivité');
+        cy.contains(' en tant que porteur de projet');
       });
   });
 });

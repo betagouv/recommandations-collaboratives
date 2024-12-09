@@ -14,20 +14,19 @@
   padding: 3px;
 }
 
-.specific-background-0063CB {
-  background: #0063cb;
-}
-
 .specific-color-white {
   color: white !important;
+  &:hover {
+    color: white !important;
+  }
 }
 
 .specific-color-inherit {
   color: inherit;
 }
 
-.specific-color-0063CB {
-  color: #0063cb;
+.specific-color-high-blue-france {
+  color: var(--background-action-high-blue-france);
 }
 
 .header-img-specific-size {

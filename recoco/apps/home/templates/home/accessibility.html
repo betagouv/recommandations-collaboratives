@@ -4,20 +4,22 @@
 {% block title %}
     Déclaration d'accessibilité
 {% endblock title %}
+{% block og_title %}
+    Déclaration d'accessibilité
+{% endblock og_title %}
 {% block css %}
     <link href="{% sass_src 'home/css/home/home.scss' %}"
           rel="stylesheet"
           type="text/css" />
 {% endblock css %}
 {% block content %}
-    <script>console.log("{{ request.sender_email }}");</script>
     <div class="col-8 fr-py-2w g-0 fr-mx-auto">
         <h1>Déclaration d’accessibilité</h1>
         <p>
             <i>Établie le 2 février 2024.</i>
         </p>
         <p>
-            Le Cerema porte le service Recommandations-Collaboratives, qui permet de créer des plateformes thématiques de conseil aux collectivités, sur un même modèle d’application web. {{ request.site.name }} est l’une de ces plateformes. D’un point de vue technique, l’application {{ request.site.name }} est gérée par l’équipe de Recommandations-Collaboratives, notamment en ce qui concerne l’accessibilité.
+            Le Cerema porte le service Recommandations-Collaboratives, qui permet de créer des plateformes thématiques de conseil aux porteurs de projet, sur un même modèle d’application web. {{ request.site.name }} est l’une de ces plateformes. D’un point de vue technique, l’application {{ request.site.name }} est gérée par l’équipe de Recommandations-Collaboratives, notamment en ce qui concerne l’accessibilité.
             <br />
             Le Cerema s’engage à rendre son service accessible, conformément à l’article 47 de la loi n° 2005-102 du 11 février 2005.
             <br />

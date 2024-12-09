@@ -109,13 +109,13 @@ class QuestionSet(CloneMixin, models.Model):
         return self._following(order_by=["priority", "-id"])
 
     def first_question(self):
-        for question in self.questions.all().order_by("id"):
+        for question in self.questions.all().order_by("-priority", "id"):
             return question
 
         return None
 
     def last_question(self):
-        for question in self.questions.all().order_by("-id"):
+        for question in self.questions.all().order_by("priority", "-id"):
             return question
 
         return None

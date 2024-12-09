@@ -15,7 +15,7 @@ describe('I can access to my adress book', () => {
 
 describe("I can't see adress book because I don't have one", () => {
   beforeEach(() => {
-    cy.login('jean');
+    cy.login('conseiller1');
   });
 
   it('', () => {

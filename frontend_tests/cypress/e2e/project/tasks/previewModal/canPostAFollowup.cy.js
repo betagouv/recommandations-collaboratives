@@ -8,19 +8,15 @@ const currentUser = users[1];
 
 describe('I can go tasks tab', () => {
   beforeEach(() => {
-    cy.login('jean');
+    cy.login('conseiller1');
   });
 
-  it('posts a followup', () => {
-    cy.visit(`/project/${currentProject.pk}`);
-    cy.contains('Recommandations').click({ force: true });
-    cy.url().should('include', '/actions');
+  it('posts a followup and see creation date', () => {
+    cy.visit(`/project/${currentProject.pk}/actions`);
+
     cy.createTask(task3.fields.intent);
 
-    cy.get('[data-test-id="list-tasks-switch-button"]').should(
-      'have.class',
-      'active'
-    );
+    cy.get('[data-test-id="list-tasks-switch-button"]').should('be.checked');
 
     cy.contains(task3.fields.intent).click({ force: true });
 
@@ -34,6 +30,7 @@ describe('I can go tasks tab', () => {
     cy.contains('Envoyer').click({ force: true });
     cy.contains(`${currentUser.fields.first_name}`);
     cy.contains(`${currentUser.fields.last_name}`);
+    cy.contains(now.toLocaleDateString());
 
     cy.contains(`test ${now}`);
   });

@@ -5,6 +5,9 @@
 {% block title %}
     Créer une recommandation
 {% endblock title %}
+{% block og_title %}
+    Créer une recommandation
+{% endblock og_title %}
 {% block css %}
     <link href="{% sass_src 'resources/resources.scss' %}"
           rel="stylesheet"
@@ -36,6 +39,7 @@
         <div x-data="action_pusher_app()" x-init="create_recommendation()" x-cloak>
             <form class="form" method="post" action="." enctype="multipart/form-data">
                 {% csrf_token %}
+                {% include "projects/project/fragments/action_pusher/project_selector.html" %}
                 {% include "projects/project/fragments/action_pusher/type.html" %}
                 {% include "projects/project/fragments/action_pusher/resource_search.html" %}
                 {% include "projects/project/fragments/action_pusher/details_form.html" %}

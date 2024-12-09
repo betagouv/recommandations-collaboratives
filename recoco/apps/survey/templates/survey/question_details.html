@@ -11,11 +11,15 @@
 {% block title %}
     {{ question.text }} - {{ request.site.name }}
 {% endblock title %}
+{% block og_title %}
+    {{ question.text }} - {{ request.site.name }}
+{% endblock og_title %}
 {% block js %}
     {% vite_asset 'js/apps/tutorial.js' %}
 {% endblock js %}
 {% block content %}
-    <div x-data="Tutorial('survey', {{ active_project_survey_session.completion }} === 0)"
+    <div x-data="Tutorial('survey')"
+         x-init="await init(); await handleStartTour()"
          class="col-11 fr-py-6w fr-mx-auto">
         <!-- Breadcrumb -->
         <nav role="navigation" class="fr-breadcrumb" aria-label="vous êtes ici :">
@@ -90,7 +94,7 @@
                 <h3>{{ question.text }}</h3>
                 <form method="post" enctype="multipart/form-data">
                     {% csrf_token %}
-                    <ul class="list-group fr-mt-2w fr-mb-2w">
+                    <ul class="list-group list-unstyled fr-mt-2w fr-mb-2w">
                         {% for choice in form.fields.answer.choices %}
                             <li class="list-group-item fr-py-2w">
                                 {% if question.is_multiple %}

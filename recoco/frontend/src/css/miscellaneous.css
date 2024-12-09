@@ -66,7 +66,7 @@
 }
 
 .hover-border-blue:hover {
-  border-color: #0063cb !important;
+  border-color: var(--background-action-high-blue-france) !important;
 }
 
 .hover-bg-grey-light:hover {
@@ -178,8 +178,8 @@
 }
 
 .border-blue {
-  border: solid 1px #0063cb;
-  border-color: #0063cb !important;
+  border: solid 1px var(--background-action-high-blue-france);
+  border-color: var(--background-action-high-blue-france) !important;
 }
 
 .border-green-dark {

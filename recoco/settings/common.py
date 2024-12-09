@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
+    "allauth.socialaccount.providers.openid_connect",
     "guardian",
     "magicauth",
     "sass_processor",
@@ -71,6 +72,7 @@ INSTALLED_APPS = [
     "watson",
     "phonenumber_field",
     "cookie_consent",
+    "recoco.apps.feature_flag",
     "recoco.apps.dsrc",
     "recoco.apps.onboarding",
     "recoco.apps.home",
@@ -88,6 +90,7 @@ INSTALLED_APPS = [
     "recoco.apps.pages",
     "recoco.apps.metrics",
     "recoco.apps.demarches_simplifiees",
+    "recoco.apps.social_account",
     "crispy_forms",
     "wagtail.contrib.forms",
     "wagtail.contrib.redirects",
@@ -102,6 +105,7 @@ INSTALLED_APPS = [
     "wagtail",
     "django_celery_results",
     "django_json_widget",
+    "waffle",
 ]
 
 SITE_ID = SiteID(default=1)
@@ -120,11 +124,13 @@ MIDDLEWARE = [
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "sesame.middleware.AuthenticationMiddleware",
+    "allauth.account.middleware.AccountMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "watson.middleware.SearchContextMiddleware",
     "hijack.middleware.HijackUserMiddleware",
     "wagtail.contrib.redirects.middleware.RedirectMiddleware",
+    "waffle.middleware.WaffleMiddleware",
 ]
 
 ROOT_URLCONF = "recoco.urls"
@@ -142,7 +148,6 @@ TEMPLATES = [
                 "django.template.context_processors.media",
                 "django.contrib.messages.context_processors.messages",
                 "recoco.apps.projects.context_processors.is_switchtender_processor",
-                "recoco.apps.projects.context_processors.active_project_processor",
                 "recoco.apps.projects.context_processors.unread_notifications_processor",
             ],
             "loaders": [
@@ -308,7 +313,9 @@ ACCOUNT_PRESERVE_USERNAME_CASING = False
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_CONFIRM_EMAIL_ON_GET = True
 ACCOUNT_EMAIL_VERIFICATION = "optional"
-ACCOUNT_LOGIN_ATTEMPTS_LIMIT = 20
+ACCOUNT_RATE_LIMITS = {
+    "login_failed": "20/m/ip",
+}
 ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
 ACCOUNT_LOGOUT_ON_GET = True
 ACCOUNT_UNIQUE_EMAIL = True
@@ -325,6 +332,52 @@ ACCOUNT_FORMS = {
     "reset_password": "recoco.apps.home.forms.UVResetPasswordForm",
     "reset_password_from_key": "recoco.apps.home.forms.UVResetPasswordKeyForm",
     "disconnect": "allauth.socialaccount.forms.DisconnectForm",
+}
+
+# https://docs.allauth.org/en/dev/socialaccount/configuration.html
+SOCIALACCOUNT_ADAPTER = "recoco.apps.social_account.adapters.SocialAccountAdapter"
+SOCIALACCOUNT_OPENID_CONNECT_URL_PREFIX = "oidc"
+SOCIALACCOUNT_LOGIN_ON_GET = True
+SOCIALACCOUNT_IS_OPEN_FOR_SIGNUP = False
+# SOCIALACCOUNT_AUTO_SIGNUP = False # TODO: make user fill the missing data at signup
+
+SOCIALACCOUNT_PROVIDERS = {
+    # https://docs.allauth.org/en/latest/socialaccount/providers/openid_connect.html
+    # https://github.com/numerique-gouv/proconnect-documentation/tree/main/doc_fs
+    "openid_connect": {
+        "APPS": [
+            {
+                "provider_id": "proconnect",
+                "name": "ProConnect",
+                "client_id": os.getenv("PROCONNECT_CLIENT_ID"),
+                "secret": os.getenv("PROCONNECT_SECRET"),
+                "settings": {
+                    "server_url": os.getenv(
+                        "PROCONNECT_SERVER_URL",
+                        "https://auth.agentconnect.gouv.fr/api/v2/.well-known/openid-configuration",
+                    ),
+                    "token_auth_method": "client_secret_post",
+                },
+            },
+        ],
+        # https://github.com/numerique-gouv/proconnect-documentation/blob/main/doc_fs/scope-claims.md
+        # https://github.com/numerique-gouv/proconnect-documentation/blob/main/doc_fs/connaitre-le-fi-utilise.md
+        "SCOPE": [
+            "openid",
+            "email",
+            "uid",
+            "given_name",
+            "usual_name",
+            "siren",
+            "siret",
+            "organizational_unit",
+            "phone_number",
+            "idp_id",
+        ],
+        "AUTH_PARAMS": {
+            "acr_values": "eidas1",
+        },
+    },
 }
 
 # Django vite
@@ -373,8 +426,8 @@ WAGTAIL_EMAIL_MANAGEMENT_ENABLED = False
 
 # WAGTAILADMIN_BASE_URL = define that
 
-# Materialized views
-MATERIALIZED_VIEWS_SPEC = [
+# Materialized views for Metrics
+METRICS_MATERIALIZED_VIEWS_SPEC = [
     {
         "name": "projects",
         "unique_indexes": ["hash"],
@@ -394,9 +447,20 @@ MATERIALIZED_VIEWS_SPEC = [
         "unique_indexes": ["hash"],
         "indexes": ["last_login", "is_advisor"],
     },
+    {
+        "name": "user_activity",
+        "indexes": ["user_hash"],
+    },
 ]
 
-MATERIALIZED_VIEWS_SQL_DIR = BASE_DIR / "apps/metrics/sql_queries"
+METRICS_MATERIALIZED_VIEWS_SQL_DIR = BASE_DIR / "apps/metrics/sql_queries"
+METRICS_MATERIALIZED_VIEWS_OWNER_TPL = (
+    "metrics_owner_$site_slug"  # template string to apply persmissions on db schemes
+)
+METRICS_MATERIALIZED_VIEWS_OWNER_OVERRIDES = (
+    {}
+)  # specific rules for the OWNER_TPL per site
+
 
 # Baker
 # https://model-bakery.readthedocs.io/en/latest/how_bakery_behaves.html#customizing-baker
@@ -435,5 +499,10 @@ DS_API_BASE_URL = f"{DS_BASE_URL}/api/public/v1"
 DS_AUTOLOAD_SCHEMA = True
 DS_AUTOCREATE_FOLDER = True
 DS_ADAPTERS_DIR = BASE_DIR / "apps/demarches_simplifiees/adapters"
+
+# Waffle (feature flags)
+WAFFLE_FLAG_MODEL = "feature_flag.Flag"
+WAFFLE_SWITCH_MODEL = "feature_flag.Switch"
+WAFFLE_SAMPLE_MODEL = "feature_flag.Sample"
 
 # eof

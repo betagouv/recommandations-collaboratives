@@ -1,11 +1,11 @@
 .button {
-  border: 1px solid #0063cb;
+  border: 1px solid var(--background-action-high-blue-france);
   padding: 10px 45px;
   border-radius: 2px;
 
   text-transform: uppercase;
   font-size: 0.85rem;
-  color: #0063cb;
+  color: var(--background-action-high-blue-france);
   text-decoration: none;
 
   transition: all 0.25s ease;
@@ -55,12 +55,12 @@
 }
 
 .button.filled {
-  background-color: #0063cb;
+  background-color: var(--background-action-high-blue-france);
   color: white;
 }
 
 .button.filled:hover {
-  color: #0063cb !important;
+  color: var(--background-action-high-blue-france) !important;
 }
 
 .button.red.filled {
@@ -163,15 +163,13 @@
 
 .hint-button {
   position: absolute;
-  top: 50px;
-  left: -5px;
+  top: 60px;
   border-radius: 2px;
-  cursor: pointer;
   transition: all 0.25s ease;
   font-size: 14px;
   font-weight: 500;
   color: white;
-  background-color: #0063cb;
+  background-color: var(--background-action-high-blue-france);
   z-index: 100;
   box-shadow:
     0px 3px 8px -16px rgba(0, 0, 0, 0.32),
@@ -182,14 +180,14 @@
   content: '';
 
   position: absolute;
-  bottom: 83.5px;
+  bottom: 99.5px;
   left: 10px;
 
   width: 15px;
   height: 15px;
 
   transform: rotate(45deg);
-  background-color: #0063cb;
+  background-color: var(--background-action-high-blue-france);
 }
 
 /* .hint-button:hover {

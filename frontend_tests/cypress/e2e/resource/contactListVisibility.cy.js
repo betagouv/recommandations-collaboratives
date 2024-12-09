@@ -5,7 +5,7 @@ const currentResource = resources[1];
 
 describe('I can see the resource contact list if im logged', () => {
   beforeEach(() => {
-    cy.login('bob');
+    cy.login('collectivité1');
   });
 
   it('see the contact list', () => {

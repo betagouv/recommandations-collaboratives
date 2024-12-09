@@ -18,10 +18,6 @@
   line-height: 20px;
 }
 
-.specific-cursor-pointer {
-  cursor: pointer;
-}
-
 .specific-minheight-100 {
   min-height: 100px;
 }
@@ -54,4 +50,8 @@
 .specific-size {
   width: 24px;
   height: 24px;
+}
+
+.close-btn-modal {
+  z-index: 101;
 }

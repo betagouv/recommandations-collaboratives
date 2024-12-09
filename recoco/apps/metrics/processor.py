@@ -39,12 +39,14 @@ class MaterializedView:
         name: str,
         indexes: list[str] = None,
         unique_indexes: list[str] = None,
+        db_owner: str = None,
     ):
         self.site = site
         self.name = name
         self.cursor = None
         self.indexes = indexes or []
         self.unique_indexes = unique_indexes or []
+        self.db_owner = db_owner
 
     @classmethod
     def create_for_site(
@@ -68,10 +70,14 @@ class MaterializedView:
     def db_view_name(self) -> str:
         return self.name
 
+    @staticmethod
+    def make_db_schema_name(site) -> str:
+        site_slug = make_site_slug(site=site)
+        return f"metrics_{site_slug}"
+
     @property
     def db_schema_name(self) -> str:
-        site_slug = make_site_slug(site=self.site)
-        return f"metrics_{site_slug}"
+        return self.make_db_schema_name(self.site)
 
     def set_cursor(self, cursor: CursorWrapper | None) -> None:
         self.cursor = cursor
@@ -79,7 +85,7 @@ class MaterializedView:
     def get_django_sql_query(self) -> MaterializedViewSqlQuery | None:
         module_name = "{}.{}".format(
             str(
-                Path(settings.MATERIALIZED_VIEWS_SQL_DIR).relative_to(
+                Path(settings.METRICS_MATERIALIZED_VIEWS_SQL_DIR).relative_to(
                     settings.BASE_DIR.parent
                 )
             ).replace("/", "."),
@@ -97,7 +103,7 @@ class MaterializedView:
             return MaterializedViewSqlQuery(sql=sql, params=params)
 
     def get_raw_sql_query(self) -> MaterializedViewSqlQuery | None:
-        sql_file = settings.MATERIALIZED_VIEWS_SQL_DIR / f"{self.name}.sql"
+        sql_file = settings.METRICS_MATERIALIZED_VIEWS_SQL_DIR / f"{self.name}.sql"
         if not sql_file.exists():
             return None
 
@@ -132,6 +138,11 @@ class MaterializedView:
             self.cursor.execute(
                 sql=f"CREATE UNIQUE INDEX IF NOT EXISTS {index} ON {self.db_schema_name}.{self.db_view_name} ({index});"
             )
+
+    def drop(self) -> None:
+        self.cursor.execute(
+            sql=f"DROP MATERIALIZED VIEW IF EXISTS {self.db_schema_name}.{self.db_view_name};"
+        )
 
     def refresh(self) -> None:
         self.cursor.execute(

@@ -25,11 +25,10 @@
                                         <span>a invité
                                             <strong class="d-inline-block fw-bold text-dark">{{ action.action_object.email }}</strong> en tant que
                                             {% if action.action_object.role == "SWITCHTENDER" or action.action_object.role == "OBSERVER" or action.action_object.role == "ADVISOR" %}
-                                                <strong class="text-dark">conseiller·e</strong>
+                                                <strong class="text-dark">conseiller·e</strong> sur le project
                                             {% else %}
-                                                <strong class="text-dark">collectivité</strong>
+                                                <strong class="text-dark">porteur de projet</strong>
                                             {% endif %}
-                                            sur le project
                                             {% if action.target.commune %}
                                                 {% if action.target.get_absolute_url %}
                                                     <a class="hover-underline" href="{{ action.target.get_absolute_url }}">{{ action.target }}</a>

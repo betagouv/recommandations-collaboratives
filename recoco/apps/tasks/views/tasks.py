@@ -17,16 +17,11 @@ from django.utils.text import slugify
 from recoco.apps.projects import models as project_models
 from recoco.apps.projects.forms import DocumentUploadForm
 from recoco.apps.projects.utils import (
-    get_active_project_id,
+    can_administrate_project,
     get_collaborators_for_project,
 )
-from recoco.apps.resources import models as resources
 from recoco.apps.survey import models as survey_models
-from recoco.utils import (
-    check_if_advisor,
-    has_perm_or_403,
-    is_staff_for_site_or_403,
-)
+from recoco.utils import check_if_advisor, has_perm_or_403, is_staff_for_site_or_403
 
 from .. import models, signals
 from ..forms import (
@@ -47,18 +42,19 @@ from ..forms import (
 
 
 @login_required
-def create_task(request, project_id=None):
-    """Create task for given project"""
-    project = get_object_or_404(
-        project_models.Project, sites=request.site, pk=project_id
-    )
+def create_task(request):
+    """Create task"""
 
-    has_perm_or_403(request.user, "projects.manage_tasks", project)
+    is_switchtender = check_if_advisor(request.user)
+    if not (
+        is_switchtender or can_administrate_project(project=None, user=request.user)
+    ):
+        return HttpResponseForbidden()
 
     if request.method == "POST":
         # Pick a different form for better data handling based
         # on the 'push_type' attribute
-        type_form = PushTypeActionForm(request.POST)
+        type_form = PushTypeActionForm(user=request.user, data=request.POST)
 
         type_form.is_valid()
 
@@ -75,9 +71,13 @@ def create_task(request, project_id=None):
 
         form = push_form_type(request.POST)
         if form.is_valid():
+            project = type_form.cleaned_data.get("project")
+            has_perm_or_403(request.user, "projects.manage_tasks", project)
+
             if push_type == "multiple":
                 for resource in form.cleaned_data.get("resources", []):
                     public = form.cleaned_data.get("public", False)
+
                     action = models.Task.on_site.create(
                         project=project,
                         site=request.site,
@@ -143,7 +143,7 @@ def create_task(request, project_id=None):
             next_url = reverse("projects-project-detail-actions", args=[project.id])
             return redirect(next_url)
     else:
-        type_form = PushTypeActionForm(request.GET)
+        type_form = PushTypeActionForm(request.user, request.GET)
 
     return render(request, "tasks/tasks/task_create.html", locals())
 
@@ -545,19 +545,3 @@ def rsvp_followup_task(request, rsvp_id=None, status=None):
     else:
         form = RsvpTaskFollowupForm()
     return render(request, "tasks/task/rsvp_followup_confirm.html", locals())
-
-
-@login_required
-def create_resource_action_for_current_project(request, resource_id=None):
-    """Create action for given resource to project stored in session"""
-    project_id = get_active_project_id(request)
-    resource = get_object_or_404(resources.Resource, sites=request.site, pk=resource_id)
-    project = get_object_or_404(
-        project_models.Project, sites=request.site, pk=project_id
-    )
-
-    has_perm_or_403(request.user, "projects.manage_tasks", project)
-
-    next_url = reverse("projects-project-create-task", args=[project.id])
-    next_url += f"?resource={resource.id}"
-    return redirect(next_url)

@@ -54,59 +54,50 @@ uv pip install -r requirements-dev.txt
 
 #### Configuration de l'applicatif
 
+Copiez le fichier de variables d'environnement d'exemple :
+
+```sh
+cp .env.example .env
+```
+
+Puis compléter le fichier `.env` avec les informations de votre base de données.
+
+```bash
+DJANGO_DB_NAME=recoco
+DJANGO_DB_TEST_NAME=test_recoco
+DJANGO_DB_USER=recoco
+DJANGO_DB_PASSWORD=
+DJANGO_DB_HOST=localhost
+DJANGO_DB_PORT=5432
+DJANGO_VITE_TEST_SERVER_PORT=3001
+DJANGO_VITE_DEV_SERVER_PORT=3000
+GDAL_LIBRARY_PATH=
+GEOS_LIBRARY_PATH=
+```
+
 Copiez le fichier de configuration d'exemple :
 
 ```sh
 cp recoco/settings/development.py.example recoco/settings/development.py
 ```
 
-Puis modifiez la configuration de la base de données :
-
-```python
-DATABASES = {
-     'default': {
-         'ENGINE': 'django.db.backends.postgresql',
-         'NAME': os.environ.get('POSTGRES_NAME'),
-         'USER': os.environ.get('POSTGRES_USER'),
-         'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
-         'HOST': 'db',
-         'PORT': 5432,
-     }
-}
-```
-
 Vous pouvez aussi renseigner les valeurs dans le fichier si vous préférez ne pas utiliser des variables d'environnement.
 
 ### Docker
 
-Les fichiers docker se trouvent à la racine dans le dossier `docker`.
-
-#### Configuration de l'applicatif
-
-Référez vous à la section de Virtualenv, mais limitez vous aux variables d'environnement.
-
-#### Création des conteneurs
-
-En ligne de commandes, aller dans ce dossier `Docker` et taper :
+Un environnement Docker et fourni et orchestré avec le fichier
+[`docker-compose.yml](./docker-compose.yml). Pour le lancer :
 
 ```sh
-docker-compose up -d
+docker compose up
 ```
 
-Après quelques minutes d'installation, vous devriez avoir un environnement prêt.
-
-#### Création de la base de donnnées
-
-Entrez dans le container `app` en tapant :
+Une fois votre environnement installé, initialisez ou synchroniser la
+base de données depuis le conteneur du serveur :
 
 ```sh
-docker-compose exec app /bin/bash
-```
-
-Initialisez ou synchronisez la base de données en tapant :
-
-```sh
-./manage.py migrate
+docker compose run --rm server bash
+python manage.py migrate
 ```
 
 ## Lancement de l'applicatif
@@ -167,6 +158,17 @@ site.aliases.create(domain="localhost", redirect_to_canonical=False)
 ## Tests
 
 ### Tests Front End
+
+#### Unitaires
+
+Pour lancer les tests unitaires front end, vous pouvez utiliser la commande suivante :
+
+```sh
+cd recoco/frontend
+yarn test
+```
+
+#### Bout en bout
 
 Merci de trouver la documentation de tests front end [ici](./frontend_tests/README.md).
 

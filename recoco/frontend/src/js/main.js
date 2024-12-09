@@ -20,6 +20,7 @@ import './store/app';
 import './components/Notification';
 import './components/Editor';
 import './components/FieldValidator';
+import './components/Toast';
 
 //Global CSS
 import '../css/dsfr-custom.css';
@@ -31,7 +32,6 @@ import '../css/colors.css';
 import '../css/text-colors.css';
 import '../css/border.css';
 import '../css/role.css';
-import '../css/navbar.css';
 
 //Layouts CSS
 import '../css/layouts/stack.css';
@@ -42,5 +42,3 @@ import '../css/user.css';
 import '../css/callout.css';
 import '../css/markdown.css';
 import '../css/miscellaneous.css';
-
-console.log('js main added');

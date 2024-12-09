@@ -15,6 +15,8 @@ function boardProjectsApp(currentSiteId) {
     projectList: [],
     rawProjectList: [],
     currentSiteId: currentSiteId,
+    isDisplayingOnlyUserProjects:
+      JSON.parse(localStorage.getItem('isDisplayingOnlyUserProjects')) ?? false,
     get isBusy() {
       return this.$store.app.isLoading;
     },
@@ -51,6 +53,7 @@ function boardProjectsApp(currentSiteId) {
           uuid: generateUUID(),
         })
       );
+
       if (postProcess) {
         await this.postProcessData(projectList);
       }
@@ -168,6 +171,13 @@ function boardProjectsApp(currentSiteId) {
       const departments = this.extractAndCreateAdvisorDepartments(projectList);
       const regionsData = await api.get(regionsUrl());
       this.constructRegionsFilter(departments, regionsData.data);
+    },
+    toggleMyProjectsFilter() {
+      this.isDisplayingOnlyUserProjects = !this.isDisplayingOnlyUserProjects;
+      localStorage.setItem(
+        'isDisplayingOnlyUserProjects',
+        this.isDisplayingOnlyUserProjects
+      );
     },
     extractAndCreateAdvisorDepartments(projects) {
       const departments = [];

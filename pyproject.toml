@@ -86,6 +86,7 @@ section-order = [
 [tool.ruff.lint.extend-per-file-ignores]
 "**/migrations/*.py" = ["I"]
 "**/test_*.py" = ["S105"]
+"recoco/settings/*.py" = ["F403", "F405", "E402"]
 
 [tool.ruff.lint.flake8-bandit]
 check-typed-exception = true
