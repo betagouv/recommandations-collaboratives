@@ -1,13 +1,12 @@
-import importlib
-from pathlib import Path
 from typing import Any
 
-from django.conf import settings
+from django.contrib.sites.models import Site
 
 from recoco.apps.projects.models import Project
 from recoco.apps.resources.models import Resource
+from recoco.apps.survey.models import Answer
 
-from .models import DSResource
+from .models import DSMapping, DSResource
 
 
 def find_ds_resource_for_project(
@@ -20,19 +19,36 @@ def find_ds_resource_for_project(
 
 
 def make_ds_data_from_project(
-    project: Project, ds_resource: DSResource
+    site: Site, project: Project, ds_resource: DSResource
 ) -> dict[str, Any]:
+    data = {}
 
-    module_name = "{}.{}".format(
-        str(
-            Path(settings.DS_ADAPTERS_DIR).relative_to(settings.BASE_DIR.parent)
-        ).replace("/", "."),
-        ds_resource.number,
-    )
+    ds_mapping = DSMapping.objects.filter(
+        ds_resource_id=ds_resource.id, site_id=site.id
+    ).first()
+    if ds_mapping is None:
+        return data
 
-    try:
-        module = importlib.import_module(module_name)
-    except ModuleNotFoundError:
-        return {}
+    last_session = project.survey_session.last()
 
-    return module.make(project=project)
+    for ds_field, lookup_key in ds_mapping.mapping.items():
+        if lookup_key.startswith("project."):
+            data[ds_field] = getattr(project, lookup_key.replace("project.", ""))
+            continue
+
+        if lookup_key.startswith("edl."):
+            parts = lookup_key.split(".")
+            if len(parts) > 2:
+                question_slug = parts[1]
+                question_attr = parts[2]
+            else:
+                question_slug = parts[1]
+                question_attr = "formatted_value"
+
+            answer: Answer = Answer.objects.filter(
+                session_id=last_session.id, question__slug=question_slug
+            ).first()
+            if answer:
+                data[ds_field] = getattr(answer, question_attr)
+
+    return data
