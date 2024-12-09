@@ -222,13 +222,8 @@ class ActiveProjectManagerBase(ProjectManager):
 ActiveProjectManager = ActiveProjectManagerBase.from_queryset(ProjectQuerySet)
 
 
-class ActiveProjectOnSiteManagerBase(CurrentSiteManager, ActiveProjectManagerBase):
+class ActiveProjectOnSiteManager(CurrentSiteManager, ActiveProjectManager):
     pass
-
-
-ActiveProjectOnSiteManager = ActiveProjectOnSiteManagerBase.from_queryset(
-    ProjectQuerySet
-)
 
 
 class DeletedProjectManager(ProjectManager):
