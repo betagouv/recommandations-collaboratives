@@ -9,13 +9,15 @@ created : 2021-05-26 13:33:11 CEST
 
 import os
 
+from django.apps import apps as django_apps
 from django.contrib.auth import models as auth_models
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.managers import CurrentSiteManager
 from django.contrib.sites.models import Site
 from django.db import models
-from django.db.models import Q
+from django.db.models import Count, OuterRef, Q
+from django.db.models.functions import Cast
 from django.db.models.signals import post_migrate
 from django.dispatch import receiver
 from django.urls import reverse
@@ -23,6 +25,7 @@ from django.utils import timezone
 from guardian.shortcuts import get_objects_for_user
 from markdownx.utils import markdownify
 from notifications import models as notifications_models
+from notifications.models import Notification
 from taggit.managers import TaggableManager
 from watson import search as watson
 
@@ -149,15 +152,74 @@ class ProjectManager(models.Manager):
         return (projects | my_projects).distinct()
 
 
+class ProjectQuerySet(models.QuerySet):
+    def with_unread_notifications(self, user_id: int):
+
+        notification_query = Notification.objects.filter(
+            recipient_id=user_id,
+            target_object_id=Cast(OuterRef("pk"), output_field=models.CharField()),
+            target_content_type=ContentType.objects.get_for_model(Project),
+        )
+
+        return self.annotate(
+            action_notifications_count=Count(
+                notification_query.filter(
+                    Q(
+                        action_object_content_type=ContentType.objects.get_for_model(
+                            django_apps.get_model(app_label="tasks", model_name="task")
+                        )
+                    )
+                    | Q(
+                        action_object_content_type=ContentType.objects.get_for_model(
+                            django_apps.get_model(
+                                app_label="tasks", model_name="taskfollowup"
+                            )
+                        )
+                    )
+                )
+                .unread()
+                .values("pk")
+            ),
+            conversation_notifications_count=Count(
+                notification_query.filter(
+                    action_object_content_type=ContentType.objects.get_for_model(Note),
+                    action_notes__public=True,
+                )
+                .unread()
+                .values("pk")
+            ),
+            private_conversation_notifications_count=Count(
+                notification_query.filter(
+                    action_object_content_type=ContentType.objects.get_for_model(Note),
+                    action_notes__public=False,
+                )
+                .unread()
+                .values("pk")
+            ),
+            document_notifications_count=Count(
+                notification_query.filter(
+                    action_object_content_type=ContentType.objects.get_for_model(
+                        Document
+                    ),
+                )
+                .unread()
+                .values("pk")
+            ),
+        )
+
+
 class ProjectOnSiteManager(CurrentSiteManager, ProjectManager):
     pass
 
 
-class ActiveProjectManager(ProjectManager):
+class ActiveProjectManagerBase(ProjectManager):
     """Manager for active projects"""
 
     def get_queryset(self):
         return super().get_queryset().filter(deleted=None)
+
+
+ActiveProjectManager = ActiveProjectManagerBase.from_queryset(ProjectQuerySet)
 
 
 class ActiveProjectOnSiteManager(CurrentSiteManager, ActiveProjectManager):
