@@ -171,11 +171,12 @@ class DSMapping(TimeStampedModel):
             "id"
         )
         for question in Question.objects.filter(question_set__in=question_set_ids):
-            lookup_fields.append(
+            lookup_fields += [
+                Field(id=f"edl.{question.slug}", label=question.text_short),
                 Field(
-                    id=f"edl.{question.slug}",
-                    label=question.text,
-                )
-            )
+                    id=f"edl.{question.slug}.comment",
+                    label=f"{question.text_short} (COMMENTAIRE)",
+                ),
+            ]
 
         return lookup_fields
