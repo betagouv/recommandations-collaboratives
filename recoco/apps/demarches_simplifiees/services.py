@@ -1,13 +1,12 @@
-import importlib
-from pathlib import Path
 from typing import Any
 
-from django.conf import settings
+from django.contrib.sites.models import Site
 
 from recoco.apps.projects.models import Project
 from recoco.apps.resources.models import Resource
+from recoco.apps.survey.models import Answer, Session
 
-from .models import DSResource
+from .models import DSMapping, DSResource
 
 
 def find_ds_resource_for_project(
@@ -20,19 +19,36 @@ def find_ds_resource_for_project(
 
 
 def make_ds_data_from_project(
-    project: Project, ds_resource: DSResource
+    site: Site, project: Project, ds_resource: DSResource
 ) -> dict[str, Any]:
+    data = {}
 
-    module_name = "{}.{}".format(
-        str(
-            Path(settings.DS_ADAPTERS_DIR).relative_to(settings.BASE_DIR.parent)
-        ).replace("/", "."),
-        ds_resource.number,
-    )
+    ds_mapping = DSMapping.objects.filter(
+        ds_resource_id=ds_resource.id, site_id=site.id
+    ).first()
+    if ds_mapping is None:
+        return data
 
-    try:
-        module = importlib.import_module(module_name)
-    except ModuleNotFoundError:
-        return {}
+    if survey := site.configuration.project_survey:
+        session = Session.objects.filter(
+            project_id=project.id, survey_id=survey.id
+        ).first()
+    else:
+        session = None
 
-    return module.make(project=project)
+    for ds_field_id, recoco_field_id in ds_mapping.mapping.items():
+        if recoco_field_id.startswith("project."):
+            data[ds_field_id] = getattr(
+                project, recoco_field_id.replace("project.", "")
+            )
+            continue
+
+        if recoco_field_id.startswith("edl.") and session:
+            answer: Answer = Answer.objects.filter(
+                session_id=session.id,
+                question__slug=recoco_field_id.replace("edl.", ""),
+            ).first()
+            if answer:
+                data[ds_field_id] = answer.formatted_value
+
+    return data

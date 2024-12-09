@@ -64,6 +64,7 @@ def update_or_create_ds_folder(recommendation_id: int):
         return
 
     content = make_ds_data_from_project(
+        site=recommendation.site,
         project=recommendation.project,
         ds_resource=ds_resource,
     )
