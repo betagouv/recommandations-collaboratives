@@ -4,7 +4,7 @@ from django.contrib.sites.models import Site
 
 from recoco.apps.projects.models import Project
 from recoco.apps.resources.models import Resource
-from recoco.apps.survey.models import Answer
+from recoco.apps.survey.models import Answer, Session
 
 from .models import DSMapping, DSResource
 
@@ -29,26 +29,23 @@ def make_ds_data_from_project(
     if ds_mapping is None:
         return data
 
-    last_session = project.survey_session.last()
+    if survey := site.configuration.project_survey:
+        session = Session.objects.filter(
+            project_id=project.id, survey_id=survey.id
+        ).first()
 
-    for ds_field, lookup_key in ds_mapping.mapping.items():
-        if lookup_key.startswith("project."):
-            data[ds_field] = getattr(project, lookup_key.replace("project.", ""))
-            continue
+        for ds_field, lookup_key in ds_mapping.mapping.items():
+            if lookup_key.startswith("project."):
+                data[ds_field] = getattr(project, lookup_key.replace("project.", ""))
+                continue
 
-        if lookup_key.startswith("edl."):
-            parts = lookup_key.split(".")
-            if len(parts) > 2:
-                question_slug = parts[1]
-                question_attr = parts[2]
-            else:
-                question_slug = parts[1]
-                question_attr = "formatted_value"
+            if lookup_key.startswith("edl."):
+                question_slug = lookup_key.replace("edl.", "")
 
-            answer: Answer = Answer.objects.filter(
-                session_id=last_session.id, question__slug=question_slug
-            ).first()
-            if answer:
-                data[ds_field] = getattr(answer, question_attr)
+                answer: Answer = Answer.objects.filter(
+                    session_id=session.id, question__slug=question_slug
+                ).first()
+                if answer:
+                    data[ds_field] = answer.formatted_value
 
     return data

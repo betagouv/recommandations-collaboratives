@@ -8,7 +8,7 @@ from model_utils.models import TimeStampedModel
 from recoco.apps.geomatics.models import Department
 from recoco.apps.projects.models import Project
 from recoco.apps.resources.models import Resource
-from recoco.apps.survey.models import Question, QuestionSet, Survey
+from recoco.apps.survey.models import Question, QuestionSet
 from recoco.apps.tasks.models import Task
 
 from .utils import hash_data
@@ -166,17 +166,18 @@ class DSMapping(TimeStampedModel):
                     )
                 )
 
-        survey_ids = Survey.objects.filter(site_id=self.site_id).values("id")
-        question_set_ids = QuestionSet.objects.filter(survey__in=survey_ids).values(
-            "id"
-        )
-        for question in Question.objects.filter(question_set__in=question_set_ids):
-            lookup_fields += [
-                Field(id=f"edl.{question.slug}", label=question.text_short),
-                Field(
-                    id=f"edl.{question.slug}.comment",
-                    label=f"{question.text_short} (COMMENTAIRE)",
-                ),
-            ]
+        if survey := self.site.configuration.project_survey:
+            for question in Question.objects.filter(
+                question_set__in=QuestionSet.objects.filter(survey_id=survey.id).values(
+                    "id"
+                )
+            ):
+                lookup_fields += [
+                    Field(id=f"edl.{question.slug}", label=question.text_short),
+                    Field(
+                        id=f"edl.{question.slug}.comment",
+                        label=f"{question.text_short} (COMMENTAIRE)",
+                    ),
+                ]
 
         return lookup_fields

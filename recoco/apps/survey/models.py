@@ -448,17 +448,12 @@ class Answer(models.Model):
     )
 
     @property
-    def formatted_value(self):
-        answers: list[str]
-
-        if self.choices.exists():
-            answers = [choice.text for choice in self.choices.all()]
-        elif len(self.value):
-            answers = [self.value]
-        else:
-            answers = self.values
-
-        return ",".join([a for a in answers if len(a)])
+    def formatted_value(self) -> str:
+        if not self.choices.exists():
+            return self.comment
+        return ",".join(
+            [choice.text for choice in self.choices.all() if len(choice.text)]
+        )
 
 
 tagging_register(Answer, tag_descriptor_attr="tags")
