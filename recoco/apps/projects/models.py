@@ -222,7 +222,7 @@ class ActiveProjectManagerBase(ProjectManager):
 ActiveProjectManager = ActiveProjectManagerBase.from_queryset(ProjectQuerySet)
 
 
-class ActiveProjectOnSiteManagerBase(CurrentSiteManager, ActiveProjectManager):
+class ActiveProjectOnSiteManagerBase(CurrentSiteManager, ActiveProjectManagerBase):
     pass
 
 
