@@ -22,3 +22,5 @@ describe('I can go tasks tab', () => {
     cy.get('[data-test-id="list-tasks-switch-button"]').should('be.checked');
   });
 });
+
+// page recommandations

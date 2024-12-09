@@ -22,3 +22,5 @@ describe('I can go to tasks tab', () => {
     );
   });
 });
+
+// page recommandations

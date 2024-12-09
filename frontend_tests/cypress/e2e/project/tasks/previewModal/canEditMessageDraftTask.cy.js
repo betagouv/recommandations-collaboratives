@@ -54,3 +54,6 @@ describe('I can not comment a draft task', () => {
     cy.contains('reco test from action description new value');
   });
 });
+
+
+// page recommandation

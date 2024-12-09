@@ -23,3 +23,5 @@ describe('I can go to tasks tab', () => {
     cy.contains(currentResource.fields.title);
   });
 });
+
+// page recommandation

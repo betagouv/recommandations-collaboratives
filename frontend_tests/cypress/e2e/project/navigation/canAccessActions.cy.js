@@ -24,3 +24,5 @@ describe('I can access actions tab in a project as an advisor', () => {
     cy.url().should('include', '/actions');
   });
 });
+
+// page recommandations

@@ -19,3 +19,5 @@ describe('I can go to tasks tab', () => {
     cy.get('[data-test-id="kanban-tasks-switch-button"]').should('be.checked');
   });
 });
+
+// page recommandations
