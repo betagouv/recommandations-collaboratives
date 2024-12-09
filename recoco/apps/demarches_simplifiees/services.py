@@ -33,19 +33,22 @@ def make_ds_data_from_project(
         session = Session.objects.filter(
             project_id=project.id, survey_id=survey.id
         ).first()
+    else:
+        session = None
 
-        for ds_field, lookup_key in ds_mapping.mapping.items():
-            if lookup_key.startswith("project."):
-                data[ds_field] = getattr(project, lookup_key.replace("project.", ""))
-                continue
+    for ds_field_id, recoco_field_id in ds_mapping.mapping.items():
+        if recoco_field_id.startswith("project."):
+            data[ds_field_id] = getattr(
+                project, recoco_field_id.replace("project.", "")
+            )
+            continue
 
-            if lookup_key.startswith("edl."):
-                question_slug = lookup_key.replace("edl.", "")
-
-                answer: Answer = Answer.objects.filter(
-                    session_id=session.id, question__slug=question_slug
-                ).first()
-                if answer:
-                    data[ds_field] = answer.formatted_value
+        if recoco_field_id.startswith("edl.") and session:
+            answer: Answer = Answer.objects.filter(
+                session_id=session.id,
+                question__slug=recoco_field_id.replace("edl.", ""),
+            ).first()
+            if answer:
+                data[ds_field_id] = answer.formatted_value
 
     return data
