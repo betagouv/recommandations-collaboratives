@@ -58,11 +58,8 @@
                                     <a data-test-id="submit-task-button"
                                        href="{% url 'projects-create-task' %}?project_id={{ project.id }}"
                                        class="fr-btn">Émettre une recommandation</a>
-                                    <a href="{% url 'projects-project-detail-knowledge' project.id %}"
-                                       class="fr-btn fr-btn--secondary">Consulter les détails du projet</a>
-                                    <p class="fr-mt-2w">
-                                        <span class="badge bg-warning">Beta feature</span> <a href="{% url 'projects-project-tasks-suggest' project.pk %}">Examiner les recommandation suggérées automatiquement pour ce projet</a>
-                                    </p>
+                                    <a href="{% url 'projects-project-tasks-suggest' project.pk %}"
+                                       class="fr-btn fr-btn--secondary">Examiner les resssources suggérées</a>
                                 {% else %}
                                     <button class="fr-btn"
                                             data-bs-toggle="dropdown"
