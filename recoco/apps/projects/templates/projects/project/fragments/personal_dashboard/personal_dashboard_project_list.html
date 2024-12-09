@@ -102,7 +102,7 @@
                     </div>
                     <template x-if="item.project.origin">
                         <div class="kanban-card__project-push-by-container"
-                             data-cy="kanban-project-shared-by-origin"
+                             data-cy="list-project-shared-by-origin"
                              x-show="item.project.origin && {{ request.site.id }} !== item.project.origin?.site">
                             <img x-show="item.project.origin.siteInfo.configuration.logo_small"
                                  :src="item.project.origin.siteInfo.configuration.logo_small"
