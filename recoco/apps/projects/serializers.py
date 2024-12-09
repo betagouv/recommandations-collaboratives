@@ -219,6 +219,7 @@ class UserProjectStatusForListSerializer(serializers.BaseSerializer):
                 "recommendation_count": data.project.recommendation_count,
                 "public_message_count": data.project.public_message_count,
                 "private_message_count": data.project.private_message_count,
+                "project_sites": format_sites(data.project),
             },
         }
 

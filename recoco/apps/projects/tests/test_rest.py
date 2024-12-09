@@ -595,6 +595,7 @@ def test_user_project_status_contains_only_my_projects(request, make_project):
         "status",
         "switchtenders",
         "updated_on",
+        "project_sites",
     ]
     assert set(first["project"].keys()) == set(expected)
     assert first["project"]["is_switchtender"] is True

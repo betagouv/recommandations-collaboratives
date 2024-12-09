@@ -1,0 +1,10 @@
+{% if project.project_sites.all|length > 1 %}
+    {% for site in project.project_sites.all %}
+        {% if site.is_origin and not site.site == request.site %}
+            <div class="fr-mb-2w">
+                 <span class="not-a-link kanban">projet envoyé par</span>
+                <span>{{site.site.name}}</span>
+            </div>
+        {% endif %}
+    {% endfor %}
+{% endif %}
