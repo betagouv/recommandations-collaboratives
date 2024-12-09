@@ -53,18 +53,19 @@
 \* ˍˍˍˍ */
 
 a {
-  text-decoration: none !important;
+  text-decoration: none;
 
   &.btn,
   &.button,
   &.nav-link,
   &.link-secondary {
-    text-decoration: none !important;
+    text-decoration: none;
   }
 }
 
 p a {
   text-decoration: underline;
+  color: #0000EE;
 }
 
 p {
