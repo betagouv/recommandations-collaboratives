@@ -53,18 +53,17 @@
 \* ˍˍˍˍ */
 
 a {
-  text-decoration: none !important;
-
-  &.btn,
-  &.button,
-  &.nav-link,
-  &.link-secondary {
-    text-decoration: none !important;
-  }
-}
-
-p a {
   text-decoration: underline;
+  color: initial;
+    &.btn,
+    &.fr-btn,
+    &.fr-link,
+    &.button,
+    &.nav-link,
+    &.stretched-link,
+    &.link-secondary {
+      text-decoration: none ;
+    }
 }
 
 p {
