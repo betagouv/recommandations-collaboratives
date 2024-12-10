@@ -235,6 +235,10 @@ Cypress.Commands.add(
           force: true,
         });
 
+        cy.get('.ProseMirror p')
+          .invoke('text', 'reco test from action description')
+          .should('have.text', 'reco test from action description');
+
         if (!withResource) {
           cy.get('#push-noresource').click({ force: true });
 
@@ -252,10 +256,6 @@ Cypress.Commands.add(
           });
         }
 
-        cy.get('textarea')
-          .type(`reco test from action description`, { force: true })
-          .should('have.value', `reco test from action description`);
-
         if (topic !== '') {
           cy.get('#topic_name')
             .type(`${topic}`, { force: true })
@@ -267,7 +267,7 @@ Cypress.Commands.add(
             .trigger('click')
             .click();
         } else {
-          cy.get('[type=submit]').click({ force: true });
+          cy.get('[type=submit]').should('be.enabled').click({ force: true });
         }
 
         cy.url().should('include', '/actions');
@@ -276,22 +276,22 @@ Cypress.Commands.add(
       } else if (body.find('[data-test-id="create-task-button"]').length > 0) {
         cy.contains('Créer une recommandation').click({ force: true });
 
+        cy.get('.ProseMirror p')
+          .invoke('text', 'reco test from action description')
+          .should('have.text', 'reco test from action description');
+
         cy.get('#push-noresource').click({ force: true });
 
         cy.get('#intent')
           .type(`${label}`, { force: true })
           .should('have.value', `${label}`);
 
-        cy.get('textarea')
-          .type(`reco test from action description`, { force: true })
-          .should('have.value', `reco test from action description`);
-
         if (draft) {
           cy.get('[data-test-id="publish-draft-task-button"]')
             .trigger('click')
             .click();
         } else {
-          cy.get('[type=submit]').click({ force: true });
+          cy.get('[type=submit]').should('be.enabled').click({ force: true });
         }
 
         cy.url().should('include', '/actions');

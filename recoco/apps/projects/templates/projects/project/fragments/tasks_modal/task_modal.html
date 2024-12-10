@@ -15,21 +15,27 @@
      aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered">
         <div class="modal-content font-marianne">
-            <template x-if="task">
+            <template x-if="currentTask">
                 <div class="d-flex flex-column">
                     <!-- Pagination -->
                     <template x-if="$store.previewModal.isPaginated">
                         <div class="bg-blue d-flex align-items-center justify-content-between fr-p-2v rounded specific-border-radiusy-0">
                             <button class="fr-p-1v button filled white small"
                                     @click="$store.previewModal.previous()">
-                                <svg class="bi align-middle" width="25" height="25" fill="var(--background-action-high-blue-france)">
+                                <svg class="bi align-middle"
+                                     width="25"
+                                     height="25"
+                                     fill="var(--background-action-high-blue-france)">
                                     <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#arrow-left-short" />
                                 </svg>
                             </button>
                             <span class="text-white fw-normal" x-text="newTasksNavigationText()"></span>
                             <button class="fr-p-1v button filled white small"
                                     @click="$store.previewModal.next()">
-                                <svg class="bi align-middle" width="25" height="25" fill="var(--background-action-high-blue-france)">
+                                <svg class="bi align-middle"
+                                     width="25"
+                                     height="25"
+                                     fill="var(--background-action-high-blue-france)">
                                     <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#arrow-right-short" />
                                 </svg>
                             </button>
@@ -49,33 +55,34 @@
                         <div class="d-flex flex-grow-1 align-items-stretch w-65 task-modal-content"
                              :class="!contentIsLoading && 'visible'"
                              x-effect="taskId && loadContent()">
-                            <template x-if="task && taskId && task?.resource_id">
+                            <template x-if="currentTask && taskId && currentTask?.resource_id">
                                 <iframe class="w-100 d-flex flex-column rounded"
-                                        :src="resourcePreviewUrl(task?.resource_id, taskId)"></iframe>
+                                        :src="resourcePreviewUrl(currentTask?.resource_id, taskId)"></iframe>
                             </template>
-                            <template x-if="task && taskId && !task?.resource_id">
+                            <template x-if="currentTask && taskId && !currentTask?.resource_id">
                                 <div class="w-100 text-break fr-p-2w specific-maxheight-90vh scroll-gestion">
                                     <div class="resource-details">
-                                        <h1 x-text="task?.intent" class="fr-mb-2w"></h1>
+                                        <h1 x-text="currentTask?.intent" class="fr-mb-2w"></h1>
                                     </div>
                                     <p class="text-justified overflow-hidden text-break"
-                                       x-html="renderMarkdown(task?.content || '' )"></p>
+                                       x-html="renderMarkdown(currentTask?.content || '' )"></p>
                                 </div>
                             </template>
                         </div>
                         <!-- Modal followups -->
-                        <div class="position-relative flex-column justify-content-between w-35 specific-border-left-solid1pxEEE">
+                        <div class="position-relative flex-column justify-content-between w-35 specific-border-left-solid1pxEEE"
+                             data-cy="column-list-comment">
                             <div class="w-100">
                                 <div class="border-bottom-grey"
-                                     x-show="task?.document && task?.document.length > 0">
+                                     x-show="currentTask?.document && currentTask?.document.length > 0">
                                     <span class="fr-py-2v d-block fr-px-2w fw-medium title-info text-dark">Fichier(s) partagé(s)</span>
-                                    <template x-for="document in task?.document" x-key="document.id">
+                                    <template x-for="document in currentTask?.document" x-key="document.id">
                                         <div class="fr-px-2w">{% include "projects/project/fragments/files_links/file_list_item_api.html" %}</div>
                                     </template>
                                 </div>
                             </div>
                             <div class="task-modal-followups position-relative"
-                                 :class="getTypeOfModalClass(task?.document && task?.document.length > 0)"
+                                 :class="getTypeOfModalClass(currentTask?.document && currentTask?.document.length > 0)"
                                  id="followups-scroll-container">
                                 <div class="fr-py-2v fr-px-2w position-sticky top-0 d-flex justify-content-between bg-white z-index-100 border-bottom-grey">
                                     <span class="fw-medium title-info text-dark">Échanges & notes</span>
@@ -87,21 +94,21 @@
                                     </div>
                                 </div>
                                 <div :class="!followupsIsLoading && 'visible'" class="followups-wrapper">
-                                    <template x-if="task?.resource_id">
+                                    <template x-if="currentTask?.resource_id">
                                         <div class="rounded bg-light fr-p-2v fr-m-2w message"
-                                             :class="$store.djangoData.canManageTasks && task?.content === '' && 'border border-warning'">
-                                            <template x-if="task && taskId && task?.content !== ''">
-                                                <p x-html="task && renderMarkdown(task?.content)"
+                                             :class="$store.djangoData.canManageTasks && currentTask?.content === '' && 'border border-warning'">
+                                            <template x-if="currentTask && taskId && currentTask?.content !== ''">
+                                                <p x-html="currentTask && renderMarkdown(currentTask?.content)"
                                                    class="fr-mb-2v overflow-hidden text-break"></p>
                                             </template>
-                                            <template x-if="task?.content === ''">
+                                            <template x-if="currentTask?.content === ''">
                                                 <p class="fst-italic">Aucun commentaire initial n'a été ajouté</p>
                                             </template>
                                             <div class="d-flex justify-content-between align-items-center specific-fontsize-09">
                                                 <div class="d-flex flex-column">
                                                     {% include "projects/project/fragments/task/task_user_card.html" %}
                                                     <span class="text-muted tiny specific-lineheight-20"
-                                                          x-text="`le ${formatDate(task?.created_on)}`"></span>
+                                                          x-text="`le ${formatDate(currentTask?.created_on)}`"></span>
                                                 </div>
                                                 <template x-if="$store.djangoData.canManageTasks">
                                                     <a class="text-muted cursor-pointer tiny" @click="onEditContent()">Editer</a>
@@ -109,13 +116,13 @@
                                             </div>
                                         </div>
                                     </template>
-                                    <template x-if="!task?.resource_id">
+                                    <template x-if="!currentTask?.resource_id">
                                         <div class="fr-my-2w">
                                             <div class="fr-mx-2w fr-mb-1v text-center specific-fontsize-08">
                                                 <span class="fr-ml-1v fst-italic specific-lineheight-20"
-                                                      x-text="`${task?.created_by.first_name} ${task?.created_by.last_name}`"></span> a créé cette recommandation sans ressource
+                                                      x-text="`${currentTask?.created_by.first_name} ${currentTask?.created_by.last_name}`"></span> a créé cette recommandation sans ressource
                                                 <span class="text-muted specific-lineheight-20"
-                                                      x-text="`le ${formatDate(task?.created_on)}`"></span>
+                                                      x-text="`le ${formatDate(currentTask?.created_on)}`"></span>
                                             </div>
                                         </div>
                                     </template>
@@ -175,12 +182,12 @@
                                     </template>
                                 </div>
                             </div>
-                            <template x-if="task.public || showEdition">
+                            <template x-if="currentTask.public || showEdition">
                                 <div class="w-100 fr-p-2w specific-border-top-solid1pxEEE">
                                     {% include "tools/editor.html" with is_task_modal_comment=True %}
                                 </div>
                             </template>
-                            <template x-if="!task.public">
+                            <template x-if="!currentTask.public">
                                 <div class="w-100 fr-p-2w specific-border-top-solid1pxEEE">
                                     <div class="text-center">
                                         <span class="text-muted">Vous devez publier votre recommandation pour ajouter un commentaire</span>
