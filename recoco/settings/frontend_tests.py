@@ -56,7 +56,7 @@ DATABASES = {
 
 
 # EMAIL
-EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+EMAIL_BACKEND = "django.core.mail.backends.dummy.EmailBackend"
 # EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
 SECRET_KEY = os.getenv("SECRET_KEY", "secret")

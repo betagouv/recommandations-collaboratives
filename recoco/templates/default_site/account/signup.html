@@ -24,6 +24,9 @@
             </svg>
             Création d'un compte {{ site.name }}
         </h1>
+
+        {% block signup_form %}
+
         <form class="signup fr-form-group"
               id="signup_form"
               method="post"
@@ -85,6 +88,9 @@
                 </div>
             </fieldset>
         </form>
+
+        {% endblock signup_form %}
+
         <hr />
         <div class="fr-form-group fr-mt-14v">
             <fieldset class="d-flex flex-column align-items-center justify-content-center">

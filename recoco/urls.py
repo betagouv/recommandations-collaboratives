@@ -31,7 +31,6 @@ from recoco.rest_api.urls import urlpatterns as rest_api_urls
 urlpatterns = [
     path("api/", include(rest_api_urls)),
     path("accounts/", include("allauth.urls")),
-    path("accounts/", include("allauth.socialaccount.urls")),
     path("logout/", auth_views.LogoutView.as_view(), name="logout"),
     path("markdownx/", include("markdownx.urls")),
     path("hijack/", include("hijack.urls")),
