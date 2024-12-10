@@ -104,7 +104,7 @@
                            href="{% if "view_public_notes" in user_project_perms or "use_public_notes" in user_project_perms %} {% url 'projects-project-detail-conversations' project.pk %}{% else %}#{% endif %}">Conversation
                             {% if "view_public_notes" in user_project_perms or "use_public_notes" in user_project_perms %}
                                 {% if active_project_conversation_notifications_count %}
-                                    <span class="badge text-bg-danger">{{ active_project_conversation_notifications_count }}</span>
+                                    <span class="badge text-bg-danger" data-test-id="badge-tab-new-message">{{ active_project_conversation_notifications_count }}</span>
                                 {% endif %}
                             {% else %}
                                 <span class="fr-icon--sm fr-icon-lock-line" aria-hidden="true"></span>
@@ -128,7 +128,7 @@
                            href="{% if 'manage_documents' in user_project_perms %} {% url 'projects-project-detail-documents' project.pk %} {% else %}#{% endif %}">Fichiers
                             {% if 'manage_documents' in user_project_perms %}
                                 {% if active_project_document_notifications_count %}
-                                    <span class="badge text-bg-danger">{{ active_project_document_notifications_count }}</span>
+                                    <span class="badge text-bg-danger" data-test-id="badge-tab-new-file">{{ active_project_document_notifications_count }}</span>
                                 {% endif %}
                             {% else %}
                                 <span class="fr-icon--sm fr-icon-lock-line" aria-hidden="true"></span>
