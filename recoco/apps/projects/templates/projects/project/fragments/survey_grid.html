@@ -88,7 +88,7 @@
             {% if "use_surveys" in user_project_perms %}
                 {% for session in sorted_sessions %}
                     <div class="survey-card-cta">
-                        <div class="survey-card-cta__title">{{ session.survey.name }}</div>
+                        <div class="survey-card-cta__title" data-cy="survey-name">{{ session.survey.name }}</div>
                         <a class="fr-btn fr-btn--sm"
                            data-test-id="link-fill-survey"
                            href="{% url 'survey-project-session' project_id=project.pk site_id=session.survey.site.id %}">Compléter le questionnaire</a>
