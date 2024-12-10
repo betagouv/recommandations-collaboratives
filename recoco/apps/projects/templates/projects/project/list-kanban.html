@@ -5,9 +5,6 @@
 {% load gravatar %}
 {% load sass_tags %}
 {% block css %}
-    <link href="{% sass_src 'home/css/dsfr/dsfr.css' %}"
-          rel="stylesheet"
-          type="text/css">
     <link href="{% sass_src 'home/css/dsfr/custom-dsfr.scss' %}"
           rel="stylesheet"
           type="text/css">
@@ -25,7 +22,7 @@
     Tableau de bord administrateur {{ block.super }}
 {% endblock og_title %}
 {% block project_list_content %}
-    <div x-data="KanbanProjects({{ request.site.id }}, '{{ request.site.name }}')">
+    <div x-data="KanbanProjects({{ request.site.id }})">
         <div x-show="isBusy"
              x-transition
              class="position-absolute text-center w-100"

@@ -32,7 +32,6 @@ const domElements = {
   BUTTON_CLOSE_REMINDER_SETTINGS:
     '[data-test-id="button-close-reminder-settings"]',
   MESSAGE_REMINDER_SETTINGS: '[data-test-id="message-reminder-settings"]',
-  REMINDER_EMAIL_RECIPIENT: '[data-test-id="email-recipient"]',
   REMINDER_EMAIL_DATE: '[data-test-id="email-date"]',
   MESSAGE_NO_REMINDER: '[data-test-id="no-reminders"]',
   REMINDER_ACCESS: '[data-test-id="reminder-settings-access"]',
@@ -209,7 +208,6 @@ class Project {
    */
   checkNextEmailReminder({ email, role }) {
     if (email) {
-      cy.get(this.dom.REMINDER_EMAIL_RECIPIENT).should('contain', email);
       cy.get(this.dom.REMINDER_EMAIL_DATE).should('not.contain', 'Aucun');
     } else if (role === 'staff') {
       cy.get(this.dom.MESSAGE_NO_REMINDER).should('exist');

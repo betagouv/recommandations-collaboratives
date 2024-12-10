@@ -55,12 +55,22 @@
              @click.stop
              id="comment-text-ref"></div>
         {% if is_task_comment %}
-            <div class="d-flex justify-content-end">
-                <button class="fr-btn fr-btn--sm"
-                        :disabled="$store.editor.isSubmitted === true"
-                        @click.stop="handleEditComment(markdownContent,task)"
-                        data-test-id="button-submit-edit">Enregistrer</button>
-            </div>
+            <template x-if="task.public == false">
+                <div class="d-flex justify-content-end">
+                    <button class="fr-btn fr-btn--sm"
+                            :disabled="$store.editor.isSubmitted === true"
+                            @click.stop="handleEditComment(markdownContent,task)"
+                            data-test-id="button-submit-edit">Enregistrer en brouillon</button>
+                </div>
+            </template>
+            <template x-if="task.public == true">
+                <div class="d-flex justify-content-end">
+                    <button class="fr-btn fr-btn--sm"
+                            :disabled="$store.editor.isSubmitted === true"
+                            @click.stop="handleEditComment(markdownContent,task)"
+                            data-test-id="button-submit-edit">Enregistrer</button>
+                </div>
+            </template>
         {% endif %}
         {% if is_task_modal_comment %}
             <div class="d-flex justify-content-end">
