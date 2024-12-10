@@ -12,15 +12,19 @@ class BaseRIAdapter(ABC):
         self.parsed_uri = urlparse(uri)
         self.raw_data = None
 
+        # Mirror fields of `Resource`
+        self.title = None
+        self.content = None
+
     @staticmethod
     @abstractmethod
     def can_handle(response: requests.Response):
         return NotImplemented
 
     @abstractmethod
-    def load_data(self):
+    def load_data(self, response: requests.Response):
         return NotImplemented
 
     @abstractmethod
-    def extract_markdown(self):
+    def extract_data(self):
         return NotImplemented
