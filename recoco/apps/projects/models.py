@@ -154,7 +154,6 @@ class ProjectManager(models.Manager):
 
 class ProjectQuerySet(models.QuerySet):
     def with_unread_notifications(self, user_id: int):
-
         notification_query = Notification.objects.filter(
             recipient_id=user_id,
             target_object_id=Cast(OuterRef("pk"), output_field=models.CharField()),
@@ -185,7 +184,7 @@ class ProjectQuerySet(models.QuerySet):
             conversation_notifications_count=Subquery(
                 notification_query.filter(
                     action_object_content_type=ContentType.objects.get_for_model(Note),
-                    # action_object__public=True,
+                    action_notes__public=True,
                 )
                 .unread()
                 .order_by()
@@ -195,7 +194,7 @@ class ProjectQuerySet(models.QuerySet):
             private_conversation_notifications_count=Subquery(
                 notification_query.filter(
                     action_object_content_type=ContentType.objects.get_for_model(Note),
-                    # action_object__public=False,
+                    action_notes__public=False,
                 )
                 .unread()
                 .order_by()
