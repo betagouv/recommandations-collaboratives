@@ -60,10 +60,11 @@ def update_or_create_ds_folder(recommendation_id: int):
         project=recommendation.project,
         resource=recommendation.resource,
     )
-    if ds_resource is None or ds_resource.number is None:
+    if ds_resource is None:
         return
 
     content = make_ds_data_from_project(
+        site=recommendation.site,
         project=recommendation.project,
         ds_resource=ds_resource,
     )
