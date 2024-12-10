@@ -16,7 +16,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.managers import CurrentSiteManager
 from django.contrib.sites.models import Site
 from django.db import models
-from django.db.models import Count, OuterRef, Q
+from django.db.models import F, Func, OuterRef, Q, Subquery
 from django.db.models.functions import Cast
 from django.db.models.signals import post_migrate
 from django.dispatch import receiver
@@ -162,7 +162,7 @@ class ProjectQuerySet(models.QuerySet):
         )
 
         return self.annotate(
-            action_notifications_count=Count(
+            action_notifications_count=Subquery(
                 notification_query.filter(
                     Q(
                         action_object_content_type=ContentType.objects.get_for_model(
@@ -178,32 +178,40 @@ class ProjectQuerySet(models.QuerySet):
                     )
                 )
                 .unread()
-                .values("pk")
+                .order_by()
+                .annotate(count=Func(F("id"), function="Count"))
+                .values("count")
             ),
-            conversation_notifications_count=Count(
+            conversation_notifications_count=Subquery(
                 notification_query.filter(
                     action_object_content_type=ContentType.objects.get_for_model(Note),
                     action_notes__public=True,
                 )
                 .unread()
-                .values("pk")
+                .order_by()
+                .annotate(count=Func(F("id"), function="Count"))
+                .values("count")
             ),
-            private_conversation_notifications_count=Count(
+            private_conversation_notifications_count=Subquery(
                 notification_query.filter(
                     action_object_content_type=ContentType.objects.get_for_model(Note),
                     action_notes__public=False,
                 )
                 .unread()
-                .values("pk")
+                .order_by()
+                .annotate(count=Func(F("id"), function="Count"))
+                .values("count")
             ),
-            document_notifications_count=Count(
+            document_notifications_count=Subquery(
                 notification_query.filter(
                     action_object_content_type=ContentType.objects.get_for_model(
                         Document
                     ),
                 )
                 .unread()
-                .values("pk")
+                .order_by()
+                .annotate(count=Func(F("id"), function="Count"))
+                .values("count")
             ),
         )
 
