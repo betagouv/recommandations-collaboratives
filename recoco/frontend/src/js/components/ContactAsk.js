@@ -4,7 +4,7 @@ function ContactAsk () {
   return {
     contacts:[], //tableau des contacts
     init() {
-     this.contacts = JSON.parse(sessionStorage.getItem('contacts')) || [];
+     this.contacts = JSON.parse(localStorage.getItem('contacts')) || [];
     },
     isLoaded(user) {
         for (let i = 0; i < this.contacts.length; i++) {
@@ -16,7 +16,7 @@ function ContactAsk () {
     },
     togglecliqueUser(user) {
         this.contacts=[...this.contacts,user];
-        sessionStorage.setItem('contacts', JSON.stringify(this.contacts));
+        localStorage.setItem('contacts', JSON.stringify(this.contacts));
     },
   };
 }
