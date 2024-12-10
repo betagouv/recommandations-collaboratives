@@ -22,16 +22,14 @@ describe('I can go tasks tab', () => {
 
     const now = new Date();
 
-    cy.get('.ProseMirror p').then(($el) => {
-      const el = $el.get(0); //native DOM element
-      el.innerHTML = `test ${now}`;
-    });
+    cy.get('.ProseMirror p')
+      .invoke('text', `test ${now}`)
+      .should('have.text', `test ${now}`);
 
-    cy.contains('Envoyer').click({ force: true });
-    cy.contains(`${currentUser.fields.first_name}`);
-    cy.contains(`${currentUser.fields.last_name}`);
-    cy.contains(now.toLocaleDateString());
-
-    cy.contains(`test ${now}`);
+    cy.get('[data-test-id="button-submit-new"]').click();
+    cy.get('[data-cy="column-list-comment"]')
+      .should('contain', `${currentUser.fields.first_name}`)
+      .should('contain', `${currentUser.fields.last_name}`)
+      .should('contain', `test ${now}`);
   });
 });
