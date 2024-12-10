@@ -1,8 +1,10 @@
 {% extends "projects/project/detail.html" %}
 {% load humanize %}
 {% load static %}
+{% load survey %}
 {% load gravatar %}
 {% load guardian_tags %}
+{% load projects_extra %}
 {% block title %}
     Fichiers et liens - {{ block.super }}
 {% endblock title %}
@@ -39,6 +41,52 @@
                                 {% endif %}
                             </div>
                             {% include "projects/project/fragments/files_links/file_list.html" with files=all_files %}
+                            {% for session in project.survey_session.all %}
+                                {% regroup session.the_answers.all by question.question_set as answer_list %}
+                                {% for question_set, answers in answer_list %}
+                                    {% for answer in answers %}
+                                        {% lookup_choices_from_answer answer as choices %}
+                                        {% if answer.attachment %}
+                                            <div class="fr-mb-2w">
+                                                <div class="rounded border fr-py-2v fr-px-2w fr-mb-2v d-flex align-items-center justify-content-between">
+                                                    <div class="d-flex align-items-center">
+                                                        <a class="d-flex align-items-center text-decoration-none"
+                                                           href="{{ answer.attachment.url }}"
+                                                           target="_new"
+                                                           download>
+                                                            <span class="fr-icon-file-line fr-icon--sm fr-mr-2v" aria-hidden="true"></span>
+                                                            {% for choice in choices %}
+                                                                <span class="text-info-custom text-black fw-medium description">{{ choice.conclusion|default:choice.text|capfirst }}</span>
+                                                            {% endfor %}
+                                                            <span class="text-info-custom text-black fr-ml-2v name">{{ answer.attachment.url|split_last|truncatechars:15 }}</span>
+                                                            {% if answer.attachment.size %}
+                                                                <span class="text-info-custom text-black fr-ml-2v">({{ answer.attachment.size|filesizeformat }})</span>
+                                                            {% endif %}
+                                                        </a>
+                                                    </div>
+                                                    <div class="d-flex align-items-center">
+                                                        {% if "use_surveys" in user_project_perms %}
+                                                            <a class="fr-btn fr-btn--tertiary-no-outline fr-icon-download-line"
+                                                               href="{{ answer.attachment.url }}"
+                                                               target="_new"
+                                                               download></a>
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+                                                <div class="fr-pl-3w fr-ml-3w d-flex align-items-center">
+                                                    {% include "user/user_card.html" with user=answer.updated_by %}
+                                                    <span class="fr-ml-3w tiny d-flex align-items-center">
+                                                        <span class="fr-icon--sm fr-icon-calendar-event-line fr-mr-1v"
+                                                              aria-hidden="true"></span>
+                                                    {{ answer.created_on|naturalday }}</span>
+                                                    {% comment %} <span>{{ path(answer.attachment.url).rsplit('/', 1)[-1] }}</span> {% endcomment %}
+                                                    <span class="fr-ml-3w tiny d-flex align-items-center">Fichier récupéré de l'edl</span>
+                                                </div>
+                                            </div>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endfor %}
+                            {% endfor %}
                         </div>
                         <div class="col-4">
                             <div class="d-flex align-items-center justify-content-between fr-mb-3w">
