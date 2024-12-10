@@ -58,10 +58,9 @@ function CitySearch(required = false, requestMethod = 'GET', dsfr = false) {
           this.$refs.postcode.parentElement,
           `fr-input-group--${this.$refs.postcode.value ? 'valid' : 'error'}`
         );
-
         addClassIfNotExists(
           this.$refs.insee.parentElement,
-          `fr-select-group--${this.$refs.insee.value ? 'valid' : 'error'}`
+          `fr-select-group--${this.$refs.insee.value || this.requestMethod === 'POST' || submittedForm ? 'valid' : 'error'}`
         );
       }
     },
@@ -91,10 +90,12 @@ function CitySearch(required = false, requestMethod = 'GET', dsfr = false) {
               'fr-select-group--valid'
             );
           } else {
-            removeClassIfExists(
-              this.$refs.insee.parentElement,
-              'fr-select-group--valid'
-            );
+            if (this.requestMethod !== 'POST') {
+              removeClassIfExists(
+                this.$refs.insee.parentElement,
+                'fr-select-group--valid'
+              );
+            }
           }
         })
         .finally(() => {

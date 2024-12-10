@@ -39,14 +39,13 @@ class ResourceSerializer(TaggitSerializer, serializers.HyperlinkedModelSerialize
             "updated_on",
             "web_url",
             "embeded_url",
-            "is_dsresource",
+            "has_dsresource",
             "category",
         ]
         read_only_fields = [
             "created_on",
             "updated_on",
             "created_by",
-            "is_dsresource",
         ]
 
     web_url = serializers.URLField(source="get_absolute_url", read_only=True)
@@ -54,6 +53,7 @@ class ResourceSerializer(TaggitSerializer, serializers.HyperlinkedModelSerialize
     tags = TagListSerializerField()
     created_by = ResourceCreatorSerializer(read_only=True, many=False)
     category = CategorySerializer(read_only=True)
+    has_dsresource = serializers.BooleanField(read_only=True, default=False)
 
 
 class ResourceURIImportSerializer(serializers.Serializer):

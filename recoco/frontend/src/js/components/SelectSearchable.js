@@ -22,7 +22,9 @@ function SelectSearchable(params) {
       const _selectListOptionsId = _selectListOptions.map((x) => +x.value);
       _selectList.innerHTML = '';
       _selectList.appendChild(_selectListOptions.shift());
-      recentProjectList.forEach((project) => {
+
+      // Add recent projects to the select list
+      recentProjectList.forEach((project, index) => {
         if (!_selectListOptionsId.includes(project.id)) {
           return;
         }
@@ -30,10 +32,12 @@ function SelectSearchable(params) {
           this.createOption(
             project.id,
             `${project.commune.name} - ${project.name}`,
-            false
+            index === 0
           )
         );
       });
+
+      // Add other projects to the select list
       _selectListOptions.forEach((option) => {
         if (recentProjectListId.includes(+option.value)) {
           return;

@@ -2,12 +2,12 @@ import projects from '../../../../fixtures/projects/projects.json';
 import projectView from '../../../../support/views/project';
 
 const ownerEmail = 'bob@test.fr';
-describe.skip('As project advisor, I can see project email reminders', () => {
+describe('As project advisor, I can see project email reminders', () => {
   it('Displays no reminder message on projects with no scheduled emails', () => {
     const currentProject = projects[19];
     cy.login('conseiller1');
     cy.visit(`/project/${currentProject.pk}`);
-    projectView.joinAsAdvisor();
+    projectView.joinAsAdvisorWithSelector();
     projectView.checkNextEmailReminder({ role: 'advisor' });
   });
 
@@ -15,7 +15,7 @@ describe.skip('As project advisor, I can see project email reminders', () => {
     const currentProject = projects[20];
     cy.login('conseiller1');
     cy.visit(`/project/${currentProject.pk}`);
-    projectView.joinAsAdvisor();
+    projectView.joinAsAdvisorWithSelector();
     projectView.checkNextEmailReminder({ email: ownerEmail });
   });
 

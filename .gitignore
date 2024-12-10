@@ -18,8 +18,6 @@ __pycache__
 *~
 .*~
 development.py
-frontend_tests.py
-frontend_tests_permissions.py
 htmlcov
 media
 node_modules/
