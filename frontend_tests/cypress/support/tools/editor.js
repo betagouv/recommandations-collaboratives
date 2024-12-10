@@ -24,7 +24,7 @@ class Editor {
   // Actions
 
   writeMessage(message) {
-    cy.get(this.dom.EDITOR_CONTENT).type(message, { force: true });
+    cy.get(this.dom.EDITOR_CONTENT).type(message, { force: true, delay: 0 });
   }
 
   submitMessage() {
