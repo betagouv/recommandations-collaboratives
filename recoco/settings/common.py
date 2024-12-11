@@ -507,4 +507,13 @@ WAFFLE_FLAG_MODEL = "feature_flag.Flag"
 WAFFLE_SWITCH_MODEL = "feature_flag.Switch"
 WAFFLE_SAMPLE_MODEL = "feature_flag.Sample"
 
+# Hitcount
+INSTALLED_APPS += ["hitcount"]
+
+# FIXME: override the Hitcount model
+# INSTALLED_APPS += [
+#     "recoco.apps.hitcount",
+# ]
+# MODEL_HITCOUNT = "recoco.apps.hitcount.models.HitCount"
+
 # eof

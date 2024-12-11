@@ -6,7 +6,6 @@ Views for resources application
 author  : raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created : 2021-06-16 10:59:08 CEST
 """
-
 import datetime
 
 import reversion
@@ -18,6 +17,7 @@ from django.contrib.auth.mixins import (
     PermissionRequiredMixin,
     UserPassesTestMixin,
 )
+from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.shortcuts import get_current_site
 from django.contrib.syndication.views import Feed
 from django.db import transaction
@@ -31,6 +31,7 @@ from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.views.generic.detail import DetailView, View
 from django.views.generic.edit import DeleteView
+from hitcount.models import HitCount
 from markdownx.fields import MarkdownxFormField
 from reversion.models import Version
 from reversion_compare.views import HistoryCompareDetailView
@@ -184,7 +185,7 @@ class BaseResourceDetailView(DetailView):
     template_name = "resources/resource/details.html"
     pk_url_kwarg = "resource_id"
 
-    def get_contacts(self) -> QuerySet[addressbook_models.Contact]:
+    def contacts(self) -> QuerySet[addressbook_models.Contact]:
         # If our user is responsible for a local authority, only show the
         # relevant contacts (=localized)
         if (
@@ -206,7 +207,16 @@ class BaseResourceDetailView(DetailView):
 
         return self.object.contacts
 
-    def get_bookmark(self) -> models.Bookmark:
+    def contacts_loaded(self) -> bool:
+        # TODO: use a custom HitCount model so that we can add a tag and a site filter
+        return HitCount.objects.filter(
+            content_type=ContentType.objects.get_for_model(self.object),
+            object_pk=self.object.pk,
+            # site=self.request.site,
+            # tag="contacts",
+        ).exists()
+
+    def bookmark(self) -> models.Bookmark:
         if self.request.user.is_authenticated:
             return models.Bookmark.on_site.filter(
                 resource=self.object, created_by=self.request.user
@@ -224,8 +234,8 @@ class ResourceDetailView(UserPassesTestMixin, BaseResourceDetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs) | {
-            "contacts": self.get_contacts(),
-            "bookmark": self.get_bookmark(),
+            "contacts": self.contacts(),
+            "bookmark": self.bookmark(),
         }
 
         if check_if_advisor(self.request.user):
@@ -252,8 +262,8 @@ class EmbededResourceDetailView(BaseResourceDetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs) | {
-            "contacts": self.get_contacts(),
-            "contacts_loaded": False,
+            "contacts": self.contacts(),
+            "contacts_loaded": self.contacts_loaded(),
         }
 
         if task_id := self.request.GET.get("task_id"):
@@ -274,13 +284,21 @@ class ResourceContactListView(BaseResourceDetailView):
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
+
+        HitCount.objects.create(
+            content_type=ContentType.objects.get_for_model(self.object),
+            object_pk=self.object.pk,
+            # site=self.request.site,
+            # tag="contacts"
+        )
+
         context = self.get_context_data(object=self.object)
         return self.render_to_response(context)
 
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {
-            "contacts": self.get_contacts(),
-            "contacts_loaded": True,
+            "contacts": self.contacts(),
+            "contacts_loaded": self.contacts_loaded(),
         }
 
 

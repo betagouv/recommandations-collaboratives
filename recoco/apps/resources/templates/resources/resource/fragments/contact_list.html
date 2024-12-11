@@ -2,7 +2,6 @@
 {% load django_vite %}
 {% block js %}
     {% vite_asset 'js/apps/contactList.js' %}
-    {% vite_asset 'js/apps/contactAsk.js' %}
 {% endblock js %}
 
 {% if contacts.count %}
@@ -17,7 +16,7 @@
             </div>
         {% else %}
             <h6 class="fw-bold text-uppercase d-block fr-mb-2w">👩‍💼 Contacts</h6>
-            <div class="d-flex flex-wrap flex-row" x-data="ContactAsk" x-init="init">
+            <div class="d-flex flex-wrap flex-row">
                 {% for contact in contacts.all %}
                     <div :class="currentHash === '#contact-{{ contact.pk }}' && 'component-focus'"
                          class="border fr-mx-1v fr-py-2v fr-px-2w fr-mb-2v"
