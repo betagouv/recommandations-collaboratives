@@ -86,6 +86,13 @@
                                                     <div class="h-100">{% include "projects/project/fragments/topics/topic_list.html" %}</div>
                                                 </div>
                                                 <div class="col-12 col-lg-6 h-100 responsive-wrapper">
+                                                    {% if is_staff %}
+                                                        <header>
+                                                            <h6 class="font-small text-uppercase fr-mb-1v">DIAGNOSTIC</h6>
+                                                        </header>
+                                                        <a class="fr-btn fr-btn--sm fr-btn--secondary fr-mt-2w fr-py-2w fr-mb-2w text-uppercase w-100 justify-content-center"
+                                                           href="#"><span class="fr-icon-check-line" aria-hidden="true"></span> Marquer l’appel de “diagnostic” comme fait</a>
+                                                    {% endif %}
                                                     {% include "projects/project/fragments/advisor_note.html" %}
                                                 </div>
                                             </div>
