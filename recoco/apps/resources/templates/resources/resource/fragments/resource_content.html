@@ -2,6 +2,8 @@
 <div class="text-justified font-marianne">
     {% include "resources/resource/fragments/title.html" %}
     {% include "resources/resource/fragments/summary.html" %}
-    <div id="task-contacts">{% include "resources/resource/fragments/contact_list.html" %}</div>
+    <div id="task-contacts">
+        {% include "resources/resource/fragments/contact_list.html" %}
+    </div>
     {{ resource.content_rendered|safe }}
 </div>

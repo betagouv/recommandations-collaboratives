@@ -36,6 +36,11 @@ urlpatterns = [
         name="resources-resource-detail-embeded",
     ),
     path(
+        r"ressource/<int:resource_id>/contacts",
+        views.ResourceContactListView.as_view(),
+        name="resources-resource-detail-contacts",
+    ),
+    path(
         r"ressource/<int:resource_id>/update/",
         views.resource_update,
         name="resources-resource-update",

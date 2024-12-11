@@ -184,19 +184,9 @@ class BaseResourceDetailView(DetailView):
     template_name = "resources/resource/details.html"
     pk_url_kwarg = "resource_id"
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-
-        resource = self.object
-
-        if self.request.user.is_authenticated:
-            context["bookmark"] = models.Bookmark.on_site.filter(
-                resource=resource, created_by=self.request.user
-            ).first()
-
+    def get_contacts(self) -> QuerySet[addressbook_models.Contact]:
         # If our user is responsible for a local authority, only show the
         # relevant contacts (=localized)
-        context["contacts"] = resource.contacts
         if (
             not check_if_advisor(self.request.user)
             and not self.request.user.is_anonymous
@@ -209,12 +199,18 @@ class BaseResourceDetailView(DetailView):
                     .values_list("commune__department__code", flat=True)
                     .distinct()
                 )
-                context["contacts"] = resource.contacts.filter(
+                return self.object.contacts.filter(
                     Q(organization__departments__in=user_depts)
                     | Q(organization__departments=None)
                 )
 
-        return context
+        return self.object.contacts
+
+    def get_bookmark(self) -> models.Bookmark:
+        if self.request.user.is_authenticated:
+            return models.Bookmark.on_site.filter(
+                resource=self.object, created_by=self.request.user
+            ).first()
 
 
 class ResourceDetailView(UserPassesTestMixin, BaseResourceDetailView):
@@ -227,13 +223,15 @@ class ResourceDetailView(UserPassesTestMixin, BaseResourceDetailView):
         return resource.public or is_staff_for_site(self.request.user)
 
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        resource = self.get_object()
+        context = super().get_context_data(**kwargs) | {
+            "contacts": self.get_contacts(),
+            "bookmark": self.get_bookmark(),
+        }
 
         if check_if_advisor(self.request.user):
             context["projects_used_by"] = (
                 projects.Project.on_site.filter(
-                    Q(tasks__resource_id=resource.pk)
+                    Q(tasks__resource_id=self.object.pk)
                     & Q(tasks__public=True)
                     & Q(tasks__deleted=None)
                 )
@@ -253,7 +251,10 @@ class EmbededResourceDetailView(BaseResourceDetailView):
     pk_url_kwarg = "resource_id"
 
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs) | {
+            "contacts": self.get_contacts(),
+            "contacts_loaded": False,
+        }
 
         if task_id := self.request.GET.get("task_id"):
             context["task"] = (
@@ -263,6 +264,24 @@ class EmbededResourceDetailView(BaseResourceDetailView):
             )
 
         return context
+
+
+class ResourceContactListView(BaseResourceDetailView):
+    model = models.Resource
+    template_name = "resources/resource/fragments/contact_list.html"
+    pk_url_kwarg = "resource_id"
+    http_method_names = ["post"]
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        context = self.get_context_data(object=self.object)
+        return self.render_to_response(context)
+
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(**kwargs) | {
+            "contacts": self.get_contacts(),
+            "contacts_loaded": True,
+        }
 
 
 ########################################################################

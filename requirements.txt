@@ -72,3 +72,5 @@ django-webhook @ git+https://github.com/etchegom/django-webhook.git@recoco
 
 django-json-widget==2.0.1
 django-waffle==4.1.0
+
+django-htmx==1.21.0

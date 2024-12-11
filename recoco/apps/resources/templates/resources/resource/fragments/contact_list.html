@@ -4,6 +4,7 @@
     {% vite_asset 'js/apps/contactList.js' %}
     {% vite_asset 'js/apps/contactAsk.js' %}
 {% endblock js %}
+
 {% if contacts.count %}
     <div x-data="ContactList" id="contact-list" class="fr-mt-3w">
         {% if user.is_anonymous %}
@@ -30,50 +31,60 @@
                                 {{ contact.organization.name|truncatechars:120 }}</span>
                             </div>
                         </div>
-                        <template x-if="isLoaded('{{ contact }}')">
-                            <div class="d-flex flex-column">
-                                {% if contact.email %}
-                                    <div class="text-blue fr-my-1v">
-                                        <svg class="bi fr-mr-1v"
-                                             width="12"
-                                             height="12"
-                                             fill="var(--background-action-high-blue-france)">
-                                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#envelope" />
-                                        </svg>
-                                        <a class="text-blue text-decoration-none small"
-                                           href="mailto:{{ contact.email }}">{{ contact.email }}</a>
-                                    </div>
-                                {% endif %}
-                                {% if contact.phone_no %}
-                                    <div class="text-blue d-flex align-items-center">
-                                        <svg class="bi fr-mr-2v"
-                                             width="12"
-                                             height="12"
-                                             fill="var(--background-action-high-blue-france)">
-                                            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#telephone" />
-                                        </svg>
-                                        <a class="text-blue text-decoration-none small"
-                                           href="tel:{{ contact.phone_no }}">{{ contact.phone_no }}</a>
-                                    </div>
-                                {% endif %}
-                                {% if contact.mobile_no %}
-                                    <div class="text-blue">
-                                        <svg class="bi fr-mr-2v"
-                                             width="12"
-                                             height="12"
-                                             fill="var(--background-action-high-blue-france)">
-                                            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#phone" />
-                                        </svg>
-                                        <a class="text-blue text-decoration-none small"
-                                           href="tel:{{ contact.mobile_no }}">{{ contact.mobile_no }}</a>
-                                    </div>
-                                {% endif %}
-                            </div>
-                        </template>
-                        <div x-show="!isLoaded('{{ contact }}')" class="fr-p-2v">
-                            <button class="fr-btn w-100 justify-content-center"
-                                    @click="togglecliqueUser('{{ contact }}')">Voir les coordonnées</button>
+
+                        {% if contacts_loaded %}
+
+                        <div class="d-flex flex-column">
+                            {% if contact.email %}
+                                <div class="text-blue fr-my-1v">
+                                    <svg class="bi fr-mr-1v"
+                                            width="12"
+                                            height="12"
+                                            fill="var(--background-action-high-blue-france)">
+                                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#envelope" />
+                                    </svg>
+                                    <a class="text-blue text-decoration-none small"
+                                        href="mailto:{{ contact.email }}">{{ contact.email }}</a>
+                                </div>
+                            {% endif %}
+                            {% if contact.phone_no %}
+                                <div class="text-blue d-flex align-items-center">
+                                    <svg class="bi fr-mr-2v"
+                                            width="12"
+                                            height="12"
+                                            fill="var(--background-action-high-blue-france)">
+                                        <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#telephone" />
+                                    </svg>
+                                    <a class="text-blue text-decoration-none small"
+                                        href="tel:{{ contact.phone_no }}">{{ contact.phone_no }}</a>
+                                </div>
+                            {% endif %}
+                            {% if contact.mobile_no %}
+                                <div class="text-blue">
+                                    <svg class="bi fr-mr-2v"
+                                            width="12"
+                                            height="12"
+                                            fill="var(--background-action-high-blue-france)">
+                                        <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#phone" />
+                                    </svg>
+                                    <a class="text-blue text-decoration-none small"
+                                        href="tel:{{ contact.mobile_no }}">{{ contact.mobile_no }}</a>
+                                </div>
+                            {% endif %}
                         </div>
+
+                        {% else %}
+
+                        <button class="fr-btn w-100 justify-content-center" type="submit"
+                            hx-post="{% url 'resources-resource-detail-contacts' resource.id %}"
+                            hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+                            hx-target="#task-contacts"
+                            hx-swap="outerHTML">
+                            Voir les coordonnées
+                        </button>
+
+                        {% endif %}
+
                     </div>
                 {% endfor %}
             </div>
