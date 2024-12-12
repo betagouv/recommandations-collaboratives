@@ -22,8 +22,6 @@ describe('The Signup Page', () => {
       }
     }
 
-    cy.clickRecaptcha();
-
     cy.get('[type=submit]').click();
 
     cy.location().should((loc) => {

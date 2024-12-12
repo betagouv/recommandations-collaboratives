@@ -24,73 +24,69 @@
             </svg>
             Création d'un compte {{ site.name }}
         </h1>
-
         {% block signup_form %}
-
-        <form class="signup fr-form-group"
-              id="signup_form"
-              method="post"
-              action="{% url 'account_signup' %}">
-            {% csrf_token %}
-            {% if redirect_field_value %}
-                <input type="hidden"
-                       name="{{ redirect_field_name }}"
-                       value="{{ redirect_field_value }}" />
-            {% endif %}
-            <fieldset class="fr-fieldset">
-                <h4 class="fr-mb-3w d-block">S'inscrire en remplissant les champs suivants</h4>
-                <div class="fr-fieldset__content">
-                    <p>
-                        {{ form.first_name.label }}
-                        {{ form.first_name.errors }}
-                        {{ form.first_name }}
-                    </p>
-                    <p>
-                        {{ form.last_name.label }}
-                        {{ form.last_name.errors }}
-                        {{ form.last_name }}
-                    </p>
-                    <p>
-                        {% include "tools/organization_search.html" with name=form.organization.name label=form.organization.label value=form.organization.value id_for_label=form.organization.id_for_label placeholder="" errors=form.organization.errors dsfr=True %}
-                    </p>
-                    <p>
-                        {{ form.organization_position.label }}
-                        {{ form.organization_position.errors }}
-                        {{ form.organization_position }}
-                    </p>
-                    <p>
-                        {{ form.email.label }}
-                        {{ form.email.errors }}
-                        {{ form.email }}
-                    </p>
-                    <p>
-                        {{ form.phone_no.label }}
-                        {{ form.phone_no.errors }}
-                        {{ form.phone_no }}
-                    </p>
-                    <p>
-                        {{ form.password1.label }}
-                        {{ form.password1.errors }}
-                        {{ form.password1 }}
-                    </p>
-                    <p>
-                        {{ form.password2.label }}
-                        {{ form.password2.errors }}
-                        {{ form.password2 }}
-                    </p>
-                    <p>
-                        {{ form.captcha }}
-                        {% for error in form.captcha.errors %}<div class="text-danger text-start fr-mb-2v">{{ error }}</div>{% endfor %}
-                    </p>
-                    <div class="fr-input-group fr-mt-4v">
-                        <button class="fr-btn custom-login-button" type="submit">S'inscrire</button>
+            <form class="signup fr-form-group"
+                  id="signup_form"
+                  method="post"
+                  action="{% url 'account_signup' %}">
+                {% csrf_token %}
+                {% if redirect_field_value %}
+                    <input type="hidden"
+                           name="{{ redirect_field_name }}"
+                           value="{{ redirect_field_value }}" />
+                {% endif %}
+                <fieldset class="fr-fieldset">
+                    <h4 class="fr-mb-3w d-block">S'inscrire en remplissant les champs suivants</h4>
+                    <div class="fr-fieldset__content">
+                        <p>
+                            {{ form.first_name.label }}
+                            {{ form.first_name.errors }}
+                            {{ form.first_name }}
+                        </p>
+                        <p>
+                            {{ form.last_name.label }}
+                            {{ form.last_name.errors }}
+                            {{ form.last_name }}
+                        </p>
+                        <p>
+                            {% include "tools/organization_search.html" with name=form.organization.name label=form.organization.label value=form.organization.value id_for_label=form.organization.id_for_label placeholder="" errors=form.organization.errors dsfr=True %}
+                        </p>
+                        <p>
+                            {{ form.organization_position.label }}
+                            {{ form.organization_position.errors }}
+                            {{ form.organization_position }}
+                        </p>
+                        <p>
+                            {{ form.email.label }}
+                            {{ form.email.errors }}
+                            {{ form.email }}
+                        </p>
+                        <p>
+                            {{ form.phone_no.label }}
+                            {{ form.phone_no.errors }}
+                            {{ form.phone_no }}
+                        </p>
+                        <p>
+                            {{ form.password1.label }}
+                            {{ form.password1.errors }}
+                            {{ form.password1 }}
+                        </p>
+                        <p>
+                            {{ form.password2.label }}
+                            {{ form.password2.errors }}
+                            {{ form.password2 }}
+                        </p>
+                        <p>
+                            {{ form.captcha }}
+                            {% for error in form.captcha.errors %}<div class="text-danger text-start fr-mb-2v">{{ error }}</div>{% endfor %}
+                        </p>
+                        <div class="fr-input-group fr-mt-4v">
+                            <button class="fr-btn custom-login-button" type="submit">S'inscrire</button>
+                        </div>
                     </div>
-                </div>
-            </fieldset>
-        </form>
-
+                </fieldset>
+            </form>
         {% endblock signup_form %}
-
         <hr />
         <div class="fr-form-group fr-mt-14v">
             <fieldset class="d-flex flex-column align-items-center justify-content-center">
