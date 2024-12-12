@@ -51,11 +51,11 @@ class DSResource(TimeStampedModel):
         fields = [
             MappingField(
                 id="identite_prenom",
-                label="identite_prenom",
+                label="Prénom",
             ),
             MappingField(
                 id="identite_nom",
-                label="identite_nom",
+                label="Nom",
             ),
         ]
         try:
