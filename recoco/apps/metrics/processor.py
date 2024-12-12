@@ -52,7 +52,7 @@ class MaterializedView:
         self.indexes = [MaterializedViewIndex(**index) for index in indexes or []]
         self.cursor = None
         self.db_schema_name = settings.METRICS_PREFIX
-        self.db_schema_owner = f"{settings.METRICS_OWNER_PREFIX}_owner"
+        self.db_schema_owner = f"{settings.METRICS_PREFIX}_owner"
 
     @classmethod
     def from_spec(

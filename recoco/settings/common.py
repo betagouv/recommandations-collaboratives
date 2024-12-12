@@ -428,7 +428,6 @@ WAGTAIL_EMAIL_MANAGEMENT_ENABLED = False
 
 # Metrics
 METRICS_PREFIX = os.getenv("METRICS_PREFIX", default="metrics")
-METRICS_OWNER_PREFIX = os.getenv("METRICS_OWNER_PREFIX", default="metrics")
 
 METRICS_MATERIALIZED_VIEWS_SPEC = [
     {
