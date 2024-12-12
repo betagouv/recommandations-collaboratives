@@ -106,6 +106,7 @@ INSTALLED_APPS = [
     "django_celery_results",
     "django_json_widget",
     "waffle",
+    "django_htmx",
 ]
 
 SITE_ID = SiteID(default=1)
@@ -131,6 +132,7 @@ MIDDLEWARE = [
     "hijack.middleware.HijackUserMiddleware",
     "wagtail.contrib.redirects.middleware.RedirectMiddleware",
     "waffle.middleware.WaffleMiddleware",
+    "django_htmx.middleware.HtmxMiddleware",
 ]
 
 ROOT_URLCONF = "recoco.urls"
@@ -504,5 +506,14 @@ DS_ADAPTERS_DIR = BASE_DIR / "apps/demarches_simplifiees/adapters"
 WAFFLE_FLAG_MODEL = "feature_flag.Flag"
 WAFFLE_SWITCH_MODEL = "feature_flag.Switch"
 WAFFLE_SAMPLE_MODEL = "feature_flag.Sample"
+
+# Hitcount
+INSTALLED_APPS += ["hitcount"]
+
+# FIXME: override the Hitcount model
+# INSTALLED_APPS += [
+#     "recoco.apps.hitcount",
+# ]
+# MODEL_HITCOUNT = "recoco.apps.hitcount.models.HitCount"
 
 # eof
