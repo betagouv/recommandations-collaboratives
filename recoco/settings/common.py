@@ -511,7 +511,9 @@ METRICS_MATERIALIZED_VIEWS_SQL_DIR = BASE_DIR / "apps/metrics/sql_queries"
 METRICS_MATERIALIZED_VIEWS_OWNER_OVERRIDES = (
     {}
 )  # specific rules for the schema owner per site
-
+METRICS_MATERIALIZED_VIEWS_OWNER_TPL = os.getenv(
+    "METRICS_MATERIALIZED_VIEWS_OWNER_TPL", default=None
+)
 
 # Baker
 # https://model-bakery.readthedocs.io/en/latest/how_bakery_behaves.html#customizing-baker
