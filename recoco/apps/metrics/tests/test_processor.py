@@ -64,6 +64,15 @@ class TestMaterializedView(BaseClassTestMixin):
             == "metrics_owner_example_com"
         )
 
+    def test_site_db_schema_owner_template(self, stub_site, settings):
+        settings.METRICS_MATERIALIZED_VIEWS_OWNER_TPL = (
+            "${site_name}_metrics_${site_slug}"
+        )
+        assert (
+            MaterializedView(name="view_test").site_db_schema_owner(site=stub_site)
+            == "site_name_metrics_example_com"
+        )
+
     def test_from_spec_error(self, stub_site):
         with pytest.raises(MaterializedViewSpecError):
             MaterializedView.from_spec(
