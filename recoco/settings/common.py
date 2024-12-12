@@ -426,40 +426,91 @@ WAGTAIL_EMAIL_MANAGEMENT_ENABLED = False
 
 # WAGTAILADMIN_BASE_URL = define that
 
-# Materialized views for Metrics
+# Metrics
+METRICS_PREFIX = os.getenv("METRICS_PREFIX", default="metrics")
+
 METRICS_MATERIALIZED_VIEWS_SPEC = [
     {
         "name": "projects",
-        "unique_indexes": ["hash"],
-        "indexes": ["created_on"],
+        "indexes": [
+            {
+                "name": "hash_idx",
+                "columns": "hash,site_domain",
+                "unique": True,
+                "for_site": False,
+            },
+            {
+                "name": "created_on_idx",
+                "columns": "created_on",
+            },
+        ],
     },
     {
         "name": "recommendations",
-        "unique_indexes": ["hash"],
-        "indexes": ["created_on"],
+        "indexes": [
+            {
+                "name": "hash_idx",
+                "columns": "hash,site_domain",
+                "unique": True,
+                "for_site": False,
+            },
+            {
+                "name": "created_on_idx",
+                "columns": "created_on",
+            },
+        ],
     },
     {
         "name": "resources",
-        "unique_indexes": ["hash"],
+        "indexes": [
+            {
+                "name": "hash_idx",
+                "columns": "hash,site_domain",
+                "unique": True,
+                "for_site": False,
+            },
+        ],
     },
     {
         "name": "users",
-        "unique_indexes": ["hash"],
-        "indexes": ["last_login", "is_advisor"],
+        "indexes": [
+            {
+                "name": "hash_idx",
+                "columns": "hash,site_domain",
+                "unique": True,
+                "for_site": False,
+            },
+            {
+                "name": "last_login_idx",
+                "columns": "last_login",
+            },
+            {
+                "name": "is_advisor_idx",
+                "columns": "is_advisor",
+            },
+        ],
     },
     {
         "name": "user_activity",
-        "indexes": ["user_hash"],
+        "indexes": [
+            {
+                "name": "user_hash_idx",
+                "columns": "user_hash,site_domain",
+                "unique": False,
+                "for_site": False,
+            },
+            {
+                "name": "user_hash_idx",
+                "columns": "user_hash",
+            },
+        ],
     },
 ]
 
 METRICS_MATERIALIZED_VIEWS_SQL_DIR = BASE_DIR / "apps/metrics/sql_queries"
-METRICS_MATERIALIZED_VIEWS_OWNER_TPL = (
-    "metrics_owner_$site_slug"  # template string to apply persmissions on db schemes
-)
 METRICS_MATERIALIZED_VIEWS_OWNER_OVERRIDES = (
     {}
-)  # specific rules for the OWNER_TPL per site
+)  # specific rules for the schema owner per site
 
 
 # Baker
