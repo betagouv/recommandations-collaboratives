@@ -88,10 +88,7 @@ class MaterializedView:
         site_slug = make_site_slug(site=site)
 
         if template := settings.METRICS_MATERIALIZED_VIEWS_OWNER_TPL:
-            schema_owner = Template(template).substitute(
-                site_slug=site_slug,
-                site_name=site.name.lower().replace(" ", "_"),
-            )
+            schema_owner = Template(template).substitute(site_slug=site_slug)
         else:
             schema_owner = f"{self.db_schema_owner}_{site_slug}"
 
