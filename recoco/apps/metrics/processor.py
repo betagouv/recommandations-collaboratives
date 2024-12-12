@@ -1,6 +1,7 @@
 import importlib
 from dataclasses import dataclass
 from pathlib import Path
+from string import Template
 from typing import Any
 
 from django.conf import settings
@@ -85,9 +86,18 @@ class MaterializedView:
 
     def site_db_schema_owner(self, site: Site) -> str:
         site_slug = make_site_slug(site=site)
+
+        if template := settings.METRICS_MATERIALIZED_VIEWS_OWNER_TPL:
+            schema_owner = Template(template).substitute(
+                site_slug=site_slug,
+                site_name=site.name.lower(),
+            )
+        else:
+            schema_owner = f"{self.db_schema_owner}_{site_slug}"
+
         return (
-            settings.METRICS_MATERIALIZED_VIEWS_OWNER_OVERRIDES.get(site_slug, None)
-            or f"{self.db_schema_owner}_{site_slug}"
+            settings.METRICS_MATERIALIZED_VIEWS_OWNER_OVERRIDES.get(schema_owner, None)
+            or schema_owner
         )
 
     def set_cursor(self, cursor: CursorWrapper | None) -> None:

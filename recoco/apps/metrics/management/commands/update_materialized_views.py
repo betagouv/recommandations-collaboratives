@@ -64,21 +64,29 @@ class Command(BaseCommand):
                     ):
                         self.stdout.write(
                             self.style.ERROR(
-                                f"  -- Owner '{materialized_view.db_schema_owner}' does not exist in the database"
+                                f"  -- User '{materialized_view.db_schema_owner}' does not exist in the database"
                             )
                         )
-                        continue
-
-                    self.stdout.write(
-                        f"  ++ Assigning permissions to '{materialized_view.db_schema_owner}' on schema '{materialized_view.db_schema_name}'"
-                    )
-                    materialized_view.assign_permissions()
+                    else:
+                        self.stdout.write(
+                            f"  ++ Assigning permissions to '{materialized_view.db_schema_owner}' on schema '{materialized_view.db_schema_name}'"
+                        )
+                        materialized_view.assign_permissions()
 
                     for site in Site.objects.order_by("id"):
-                        self.stdout.write(
-                            f"  ++ Assigning permissions to '{materialized_view.site_db_schema_owner(site)}' on schema '{materialized_view.site_db_schema_name(site)}'"
-                        )
-                        materialized_view.assign_permissions_for_site(site=site)
+                        site_schema_owner = materialized_view.site_db_schema_owner(site)
+
+                        if not self._check_user_exists_in_db(cursor, site_schema_owner):
+                            self.stdout.write(
+                                self.style.ERROR(
+                                    f"  -- User '{site_schema_owner}' does not exist in the database"
+                                )
+                            )
+                        else:
+                            self.stdout.write(
+                                f"  ++ Assigning permissions to '{site_schema_owner}' on schema '{materialized_view.site_db_schema_name(site)}'"
+                            )
+                            materialized_view.assign_permissions_for_site(site=site)
 
     def add_arguments(self, parser):
         parser.add_argument(
