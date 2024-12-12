@@ -9,11 +9,15 @@ created: 2023-08-29 13:59:10 CEST
 
 import pytest
 from django.conf import settings
+from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites import models as sites
 from django.utils import timezone
 from model_bakery import baker
+from notifications.models import Notification
 
+from recoco.apps.projects.models import Document, Note
 from recoco.apps.tasks import models as task_models
+from recoco.apps.tasks.models import Task, TaskFollowup
 
 from .. import models
 
@@ -109,6 +113,72 @@ def test_projectsite_queryset():
 
     with settings.SITE_ID.override(site.id):
         assert project.project_sites.current().site == site
+
+
+@pytest.mark.django_db
+def test_project_queryset_unread_notifications():
+    project = baker.make(models.Project)
+    user = baker.make(settings.AUTH_USER_MODEL)
+    public_note = baker.make(Note, project=project, public=True)
+    private_note = baker.make(Note, project=project, public=False)
+
+    project_ct = ContentType.objects.get_for_model(models.Project)
+    task_ct = ContentType.objects.get_for_model(Task)
+    task_followup_ct = ContentType.objects.get_for_model(TaskFollowup)
+    note_ct = ContentType.objects.get_for_model(Note)
+    document_ct = ContentType.objects.get_for_model(Document)
+
+    baker.make(
+        Notification,
+        recipient=user,
+        target_object_id=project.id,
+        target_content_type=project_ct,
+        unread=True,
+        action_object_content_type=task_ct,
+    )
+    baker.make(
+        Notification,
+        recipient=user,
+        target_object_id=project.id,
+        target_content_type=project_ct,
+        unread=True,
+        action_object_content_type=task_followup_ct,
+    )
+    baker.make(
+        Notification,
+        recipient=user,
+        target_object_id=project.id,
+        target_content_type=project_ct,
+        unread=True,
+        action_object_content_type=note_ct,
+        action_object_object_id=public_note.id,
+    )
+    baker.make(
+        Notification,
+        recipient=user,
+        target_object_id=project.id,
+        target_content_type=project_ct,
+        unread=True,
+        action_object_content_type=note_ct,
+        action_object_object_id=private_note.id,
+    )
+    baker.make(
+        Notification,
+        recipient=user,
+        target_object_id=project.id,
+        target_content_type=project_ct,
+        unread=True,
+        action_object_content_type=document_ct,
+        _quantity=2,
+    )
+
+    annotated_project = models.Project.objects.with_unread_notifications(
+        user.id
+    ).first()
+    assert annotated_project.action_notifications_count == 2
+    assert annotated_project.conversation_notifications_count == 1
+    assert annotated_project.private_conversation_notifications_count == 1
+    assert annotated_project.document_notifications_count == 2
 
 
 # eof
