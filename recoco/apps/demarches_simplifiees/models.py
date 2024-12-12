@@ -48,7 +48,16 @@ class DSResource(TimeStampedModel):
     @property
     def fields(self) -> list[MappingField]:
         # FIXME: trouver la liste des champs communs DS, hors schema
-        fields = ["identite_prenom", "identite_nom"]
+        fields = [
+            MappingField(
+                id="identite_prenom",
+                label="identite_prenom",
+            ),
+            MappingField(
+                id="identite_nom",
+                label="identite_nom",
+            ),
+        ]
         try:
             fields += [
                 MappingField(
