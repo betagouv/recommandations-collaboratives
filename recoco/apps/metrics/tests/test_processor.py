@@ -58,7 +58,9 @@ class TestMaterializedView(BaseClassTestMixin):
             == "metrics_example_com"
         )
 
-    def test_site_db_schema_owner(self, stub_site):
+    def test_site_db_schema_owner(self, stub_site, settings):
+        settings.METRICS_MATERIALIZED_VIEWS_OWNER_TPL = None
+
         assert (
             MaterializedView(name="view_test").site_db_schema_owner(site=stub_site)
             == "metrics_owner_example_com"
@@ -195,6 +197,8 @@ class TestMaterializedView(BaseClassTestMixin):
         ]
 
     def test_assign_permissions_for_site(self, settings, stub_site):
+        settings.METRICS_MATERIALIZED_VIEWS_OWNER_TPL = None
+
         view = MaterializedView.from_spec(
             spec=settings.METRICS_MATERIALIZED_VIEWS_SPEC[0],
             check_sql_query=False,
