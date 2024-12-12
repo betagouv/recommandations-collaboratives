@@ -87,8 +87,8 @@ class TestMakeDSDataFromProject:
             enabled=True,
             mapping={
                 "champ_Q2hhbXAtMjk3MTQ0NA": "project.name",
-                "champ_Q2hhbXAtMzYwNjk5NQ": "project.email",
-                "champ_Q2hhbXAtODgwNDAy": "project.organization_position",
+                "champ_Q2hhbXAtMzYwNjk5NQ": "project.owner_email",
+                "champ_Q2hhbXAtODgwNDAy": "project.owner_organization_position",
                 "champ_Q2hhbXAtMjk0NTM2Mg": "project.owner.dummy",
                 "champ_Q2hhbXAtMzI5MzU1Mw": "edl.avez-vous-deja-identifie-des-subventions",
                 "Q2hhbXAtMzI5MzU1NA": "edl.dummy-question-slug",
