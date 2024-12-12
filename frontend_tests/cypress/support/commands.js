@@ -38,6 +38,10 @@ Cypress.Commands.add('login', (role) => {
     case 'conseiller3': //conseiller
       username = users[3].fields.username;
       break;
+    case 'regional': //conseiller
+    case 'conseiller4': //conseiller
+      username = users[11].fields.username;
+      break;
     case 'bob': //collectivité
     case 'collectivité1': //collectivité
       username = users[4].fields.username;
@@ -209,6 +213,24 @@ Cypress.Commands.add('becomeAdvisor', (projectId) => {
     cy.request({
       method: 'POST',
       url: `/project/${projectId}/switchtender/join`,
+      headers: {
+        'X-CSRFToken': csrfToken.value,
+      },
+    });
+  });
+});
+
+/**
+ * Joins as an observer if not already an observer.
+ *
+ * @function becomeObserver
+ * @memberof Cypress.Commands
+ */
+Cypress.Commands.add('becomeObserver', (projectId) => {
+  cy.getCookie('csrftoken').then((csrfToken) => {
+    cy.request({
+      method: 'POST',
+      url: `/project/${projectId}/observer/join`,
       headers: {
         'X-CSRFToken': csrfToken.value,
       },
