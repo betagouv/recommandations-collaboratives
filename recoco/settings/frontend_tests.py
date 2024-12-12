@@ -85,10 +85,8 @@ STATICFILES_DIRS += [DJANGO_VITE_ASSETS_PATH]
 
 
 # Uncomment Gdal and Geos libraries paths on MacOS
-# GDAL_LIBRARY_PATH="/opt//homebrew/lib/libgdal.dylib"
-GDAL_LIBRARY_PATH = "C:\\OSGeo4W\\bin\\gdal309.dll"
-# GEOS_LIBRARY_PATH="/opt//homebrew/lib/libgeos_c.dylib"
-GEOS_LIBRARY_PATH = "C:\\OSGeo4W\\bin\\geos_c.dll"
+GDAL_LIBRARY_PATH = "/opt//homebrew/lib/libgdal.dylib"
+GEOS_LIBRARY_PATH = "/opt//homebrew/lib/libgeos_c.dylib"
 
 SILENCED_SYSTEM_CHECKS += ["captcha.recaptcha_test_key_error"]
 
