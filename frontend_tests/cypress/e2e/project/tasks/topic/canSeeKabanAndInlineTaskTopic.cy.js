@@ -10,7 +10,7 @@ describe('I can go to tasks tab', () => {
 
   it('sees a task kanban topic', () => {
     cy.visit(`/project/${currentProjectId}`);
-    cy.becomeAdvisor(currentProjectId);
+    cy.becomeAdvisor(currentProjectId); // A remplacer par une fixture avec un user déjà advisor du projet
     cy.visit(`/project/${currentProjectId}/actions`);
 
     cy.createTask('inline task', 'kanban topic');
@@ -24,6 +24,5 @@ describe('I can go to tasks tab', () => {
     cy.get('[data-test-id="task-inline-topic"]').should('exist');
   });
 });
-
 
 // page recommandation

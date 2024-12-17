@@ -11,7 +11,7 @@ describe('I can go to tasks tab', () => {
 
   it('creates a task with a resource and see the initial comment', () => {
     cy.visit(`/project/${currentProjectId}`);
-    cy.becomeAdvisor(currentProjectId);
+    cy.becomeAdvisor(currentProjectId); // A remplacer par une fixture avec un user déjà advisor du projet
 
     cy.visit(`/project/${currentProjectId}/actions`);
 

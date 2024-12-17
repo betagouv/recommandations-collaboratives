@@ -10,7 +10,7 @@ describe('I can go tasks tab', () => {
   it('unpublishes a task', () => {
     cy.visit(`/projects`);
     cy.contains('unpublish task').first().click({ force: true });
-    cy.becomeAdvisor(currentProjectId);
+    cy.becomeAdvisor(currentProjectId); // A remplacer par une fixture avec un user déjà advisor du projet
 
     cy.visit(`/project/${currentProjectId}/actions`);
 
