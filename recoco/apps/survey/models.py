@@ -447,5 +447,13 @@ class Answer(models.Model):
         blank=True, null=True, upload_to=survey_private_file_path
     )
 
+    @property
+    def formatted_value(self) -> str:
+        if not self.choices.exists():
+            return self.comment
+        return ",".join(
+            [choice.text for choice in self.choices.all() if len(choice.text)]
+        )
+
 
 tagging_register(Answer, tag_descriptor_attr="tags")
