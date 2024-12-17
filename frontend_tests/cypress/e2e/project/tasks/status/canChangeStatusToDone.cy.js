@@ -12,7 +12,7 @@ describe('I can go to tasks tab', () => {
 
   it('changes the status to done', () => {
     cy.visit(`/project/${currentProjectId}`);
-    cy.becomeAdvisor(currentProjectId);
+    cy.becomeAdvisor(currentProjectId); // A remplacer par une fixture avec un user déjà advisor du projet
     cy.visit(`/project/${currentProjectId}/actions`);
 
     cy.createTask(currentTask.fields.intent);
@@ -38,3 +38,5 @@ describe('I can go to tasks tab', () => {
     );
   });
 });
+
+// page recommandation

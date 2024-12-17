@@ -10,7 +10,8 @@
                                href="{% url 'projects-create-task' %}?project_id={{ project.pk }}"
                                class="fr-btn fr-btn--sm">Créer une recommandation</a>
                             <a href="{% url 'projects-project-tasks-suggest' project.pk %}"
-                               class="fr-btn fr-btn--secondary fr-btn--sm">Voir les recommandations suggérées automatiquement</a>
+                               class="fr-btn fr-btn--secondary fr-btn--sm"
+                               data-test-id="see-suggest-task-button">Examiner les ressources suggérées</a>
                         </div>
                     {% endif %}
                 </div>

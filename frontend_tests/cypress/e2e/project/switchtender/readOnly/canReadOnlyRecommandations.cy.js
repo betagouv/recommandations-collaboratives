@@ -12,3 +12,5 @@ describe('I can read only recommandations', () => {
     cy.contains('Ajouter une recommandation').should('not.exist');
   });
 });
+
+// page recommandations

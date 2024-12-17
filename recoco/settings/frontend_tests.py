@@ -84,7 +84,6 @@ STATICFILES_DIRS += [BASE_DIR / "static"]
 STATICFILES_DIRS += [DJANGO_VITE_ASSETS_PATH]
 
 
-# Uncomment Gdal and Geos libraries paths on MacOS
 GDAL_LIBRARY_PATH = os.getenv("GDAL_LIBRARY_PATH")
 GEOS_LIBRARY_PATH = os.getenv("GEOS_LIBRARY_PATH")
 
