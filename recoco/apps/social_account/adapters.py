@@ -4,6 +4,7 @@ from allauth.socialaccount.models import SocialToken
 from allauth.socialaccount.providers.openid_connect.views import (
     OpenIDConnectOAuth2Adapter,
 )
+from django.conf import settings
 from django.utils.crypto import get_random_string
 
 
@@ -21,7 +22,6 @@ class SocialAccountAdapter(DefaultSocialAccountAdapter):
         # https://github.com/numerique-gouv/proconnect-documentation/blob/main/doc_fs/donnees_fournies.md
         # user.organization = ...
         # user.organization_position = ...
-        # user.phone_no = ...
         # user.siret = ...
 
         if "phone_number" in data:
@@ -47,7 +47,9 @@ class SocialAccountAdapter(DefaultSocialAccountAdapter):
         Next to simply returning True/False you can also intervene the
         regular flow by raising an ImmediateHttpResponse
         """
-        return super().is_open_for_signup(request, sociallogin)
+        return settings.SOCIALACCOUNT_IS_OPEN_FOR_SIGNUP & super().is_open_for_signup(
+            request, sociallogin
+        )
 
 
 class CustomOpenIDConnectOAuth2Adapter(OpenIDConnectOAuth2Adapter):

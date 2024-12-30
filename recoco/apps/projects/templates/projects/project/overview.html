@@ -78,6 +78,7 @@
                         <div class="container-fluid">
                             <div class="row fr-p-1w">
                                 <div class="col-8">
+                                    {% include "projects/project/fragments/email_reminder/project_email_reminder.html" %}
                                     <div class="d-flex">
                                         {% if "use_advisor_note" in user_project_perms %}
                                             <div class="row w-100">
@@ -112,7 +113,7 @@
                                         {% endif %}
                                     </div>
                                 </div>
-                                <div class="col-4">
+                                <div class="col-4 fr-mt-5v">
                                     <div class="fr-mb-2w">
                                         <div class="d-flex flex-column project-info">
                                             <div class="project-info__commune">{{ project.commune.name }}</div>
@@ -143,6 +144,7 @@
                                             {% endif %}
                                         </div>
                                     </div>
+                                    {% include "projects/project/fragments/site_origin/show_file_origin.html" %}
                                     <div class="fr-mb-2w">
                                         <div class="d-flex flex-column">
                                             <h6 class="text-uppercase fw-bold d-block fr-mb-1v lh-base h6-specific-fontsize-14">Localisation</h6>

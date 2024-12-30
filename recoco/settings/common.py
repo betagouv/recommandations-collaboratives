@@ -334,10 +334,12 @@ ACCOUNT_FORMS = {
     "disconnect": "allauth.socialaccount.forms.DisconnectForm",
 }
 
+# https://docs.allauth.org/en/dev/socialaccount/configuration.html
 SOCIALACCOUNT_ADAPTER = "recoco.apps.social_account.adapters.SocialAccountAdapter"
-
 SOCIALACCOUNT_OPENID_CONNECT_URL_PREFIX = "oidc"
 SOCIALACCOUNT_LOGIN_ON_GET = True
+SOCIALACCOUNT_IS_OPEN_FOR_SIGNUP = False
+# SOCIALACCOUNT_AUTO_SIGNUP = False # TODO: make user fill the missing data at signup
 
 SOCIALACCOUNT_PROVIDERS = {
     # https://docs.allauth.org/en/latest/socialaccount/providers/openid_connect.html
@@ -347,8 +349,8 @@ SOCIALACCOUNT_PROVIDERS = {
             {
                 "provider_id": "proconnect",
                 "name": "ProConnect",
-                "client_id": os.getenv("PROCONNECT_CLIENT_ID", ""),
-                "secret": os.getenv("PROCONNECT_SECRET", ""),
+                "client_id": os.getenv("PROCONNECT_CLIENT_ID"),
+                "secret": os.getenv("PROCONNECT_SECRET"),
                 "settings": {
                     "server_url": os.getenv(
                         "PROCONNECT_SERVER_URL",
@@ -424,41 +426,94 @@ WAGTAIL_EMAIL_MANAGEMENT_ENABLED = False
 
 # WAGTAILADMIN_BASE_URL = define that
 
-# Materialized views for Metrics
+# Metrics
+METRICS_PREFIX = os.getenv("METRICS_PREFIX", default="metrics")
+
 METRICS_MATERIALIZED_VIEWS_SPEC = [
     {
         "name": "projects",
-        "unique_indexes": ["hash"],
-        "indexes": ["created_on"],
+        "indexes": [
+            {
+                "name": "hash_idx",
+                "columns": "hash,site_domain",
+                "unique": True,
+                "for_site": False,
+            },
+            {
+                "name": "created_on_idx",
+                "columns": "created_on",
+            },
+        ],
     },
     {
         "name": "recommendations",
-        "unique_indexes": ["hash"],
-        "indexes": ["created_on"],
+        "indexes": [
+            {
+                "name": "hash_idx",
+                "columns": "hash,site_domain",
+                "unique": True,
+                "for_site": False,
+            },
+            {
+                "name": "created_on_idx",
+                "columns": "created_on",
+            },
+        ],
     },
     {
         "name": "resources",
-        "unique_indexes": ["hash"],
+        "indexes": [
+            {
+                "name": "hash_idx",
+                "columns": "hash,site_domain",
+                "unique": True,
+                "for_site": False,
+            },
+        ],
     },
     {
         "name": "users",
-        "unique_indexes": ["hash"],
-        "indexes": ["last_login", "is_advisor"],
+        "indexes": [
+            {
+                "name": "hash_idx",
+                "columns": "hash,site_domain",
+                "unique": True,
+                "for_site": False,
+            },
+            {
+                "name": "last_login_idx",
+                "columns": "last_login",
+            },
+            {
+                "name": "is_advisor_idx",
+                "columns": "is_advisor",
+            },
+        ],
     },
     {
         "name": "user_activity",
-        "indexes": ["user_hash"],
+        "indexes": [
+            {
+                "name": "user_hash_idx",
+                "columns": "user_hash,site_domain",
+                "unique": False,
+                "for_site": False,
+            },
+            {
+                "name": "user_hash_idx",
+                "columns": "user_hash",
+            },
+        ],
     },
 ]
 
 METRICS_MATERIALIZED_VIEWS_SQL_DIR = BASE_DIR / "apps/metrics/sql_queries"
-METRICS_MATERIALIZED_VIEWS_OWNER_TPL = (
-    "metrics_owner_$site_slug"  # template string to apply persmissions on db schemes
-)
 METRICS_MATERIALIZED_VIEWS_OWNER_OVERRIDES = (
     {}
-)  # specific rules for the OWNER_TPL per site
-
+)  # specific rules for the schema owner per site
+METRICS_MATERIALIZED_VIEWS_OWNER_TPL = os.getenv(
+    "METRICS_MATERIALIZED_VIEWS_OWNER_TPL", default=None
+)
 
 # Baker
 # https://model-bakery.readthedocs.io/en/latest/how_bakery_behaves.html#customizing-baker

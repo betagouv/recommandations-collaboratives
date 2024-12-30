@@ -4,7 +4,7 @@ from django.http import HttpRequest
 from django_json_widget.widgets import JSONEditorWidget
 
 from .models import DSFolder, DSResource
-from .tasks import load_ds_resource_schema
+from .tasks import load_ds_resource_schema, update_or_create_ds_folder
 
 
 @admin.register(DSResource)
@@ -58,3 +58,23 @@ class DSFolderAdmin(admin.ModelAdmin):
     formfield_overrides = {
         JSONField: {"widget": JSONEditorWidget},
     }
+
+    actions = ("update_matching",)
+
+    @admin.action(description="Mettre à jour le matching projet / démarche simplifiée")
+    def update_matching(self, request: HttpRequest, queryset: QuerySet[DSResource]):
+        for ds_folder in queryset:
+            if not ds_folder.recommendation_id:
+                self.message_user(
+                    request,
+                    f"Le dossier '{ds_folder.dossier_id}' n'a pas de recommandation liée.",
+                    messages.ERROR,
+                )
+                continue
+
+            update_or_create_ds_folder.delay(ds_folder.recommendation_id)
+            self.message_user(
+                request,
+                f"Tâche déclenchée pour le dossier '{ds_folder.dossier_id}'.",
+                messages.SUCCESS,
+            )
