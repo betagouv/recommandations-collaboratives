@@ -12,7 +12,7 @@
     "update-and-test": "yarn django:update-permissions && yarn cy:run",
     "django:start-server": "cross-env DJANGO_SETTINGS_MODULE=recoco.settings.frontend_tests ../manage.py testserver --addrport 8001 ./cypress/fixtures/settings/tag.json ./cypress/fixtures/settings/siteWithOnboardingAndSurvey.json ./cypress/fixtures/users/users.json ./cypress/fixtures/geomatics/region.json ./cypress/fixtures/geomatics/department.json ./cypress/fixtures/geomatics/commune.json ./cypress/fixtures/projects/projects.json ./cypress/fixtures/projects/projectsSites.json ./cypress/fixtures/projects/projectsMembers.json ./cypress/fixtures/projects/reminders.json ./cypress/fixtures/addressbook/organizations.json ./cypress/fixtures/profiles/profiles.json ./cypress/fixtures/resources/resources.json ./cypress/fixtures/addressbook/contacts.json ./cypress/fixtures/documents/documents.json ./cypress/fixtures/settings/challengeDefinition.json --noinput",
     "test_ui": "concurrently \"yarn frontend:start-server\" \"yarn start-server-and-test-ui\"",
-    "start-server-and-test-ui": "start-server-and-test 'yarn django:start-server --verbosity 0' http://localhost:8001  'yarn update-and-test_ui'",
+    "start-server-and-test-ui": "PYTEST_CURRENT_TEST=True start-server-and-test 'yarn django:start-server --verbosity 0' http://localhost:8001  'yarn update-and-test_ui'",
     "django:start-server-test_ui": "cross-env DJANGO_SETTINGS_MODULE=recoco.settings.frontend_tests ../manage.py runserver 8001",
     "django:update-permissions": "cross-env ../manage.py update_permissions --settings recoco.settings.frontend_tests_permissions",
     "update-and-test_ui": "yarn django:update-permissions && yarn cy:test_ui",
