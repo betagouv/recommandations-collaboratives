@@ -27,7 +27,6 @@ from .. import models, signals
 from ..forms import (
     CreateActionWithResourceForm,
     CreateActionWithoutResourceForm,
-    CreateActionsFromResourcesForm,
     PushTypeActionForm,
     RsvpTaskFollowupForm,
     TaskFollowupForm,
@@ -62,9 +61,9 @@ def create_task(request):
 
         try:
             push_form_type = {
-                "noresource": CreateActionWithoutResourceForm,
                 "single": CreateActionWithResourceForm,
-                "multiple": CreateActionsFromResourcesForm,
+                "external_resource": CreateActionWithResourceForm,
+                "noresource": CreateActionWithoutResourceForm,
             }[push_type]
         except KeyError:
             return render(request, "tasks/tasks/task_create.html", locals())
