@@ -10,6 +10,7 @@ import os
 import sentry_sdk
 from sentry_sdk.integrations.celery import CeleryIntegration
 from sentry_sdk.integrations.django import DjangoIntegration
+from recoco import VERSION
 
 DEBUG = False
 
@@ -65,7 +66,7 @@ if SENTRY_URL := os.environ.get("SENTRY_URL"):
             DjangoIntegration(),
             CeleryIntegration(),
         ],
-        environment="production" if not DEBUG else "dev",
+        environment="production",
         # Set traces_sample_rate to 1.0 to capture 100%
         # of transactions for performance monitoring.
         traces_sample_rate=1.0,
