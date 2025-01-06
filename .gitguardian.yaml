@@ -1,0 +1,15 @@
+# https://docs.gitguardian.com/ggshield-docs/configuration
+
+version: 2
+
+secret:
+  # Exclude files and paths by globbing
+  ignored_paths:
+    - '**/README.md'
+    - 'docs/*'
+    - frontend_tests/cypress/e2e/auth/signupWithUi.cy.js
+
+  # Ignore security incidents with the SHA256 of the occurrence obtained at output or the secret itself
+  # ignored_matches:
+  #   - name:
+  #     match: 530e5a4a7ea00814db8845dd0cae5efaa4b974a3ce1c76d0384ba715248a5dc1
