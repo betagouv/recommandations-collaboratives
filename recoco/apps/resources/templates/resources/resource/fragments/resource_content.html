@@ -1,36 +1,33 @@
 {% load static %}
 {% comment %} {% load dmd_extrase %} {% endcomment %}
 <div class="text-justified font-marianne">
-
     {% include "resources/resource/fragments/title.html" %}
     {% include "resources/resource/fragments/summary.html" %}
-
     {% comment %} -------- code d'une ressource externe en dur -------------- {% endcomment %}
-
     {% comment %} Changer la couleur dans l'attribut style par une variable de la couleur du site externe {% endcomment %}
     {% if resource.imported_from and resource.content %}
         <div class="fr-p-3w d-flex fr-mb-3w" style="background-color:#DFFDF7">
             <img src="{% static 'home/img/actors/progress.png' %}">
             <div class="d-flex flex-column">
                 <span class="fr-m-auto"><b> Cette ressource provient d'un site externe </b></span>
-                <a href="www.google.com" target="_blank" class="fr-btn fr-btn--primary fr-btn--sm fr-m-auto">
-                    Voir la ressource sur le site externe
-                </a>
+                <a href="{{ resource.imported_from }}"
+                   target="_blank"
+                   class="fr-btn fr-btn--primary fr-btn--sm fr-m-auto">Voir la ressource sur le site externe</a>
             </div>
         </div>
     {% endif %}
-
     {% comment %} -------- si la ressource n'a pas de contenu ---------- {% endcomment %}
     {% if not resource.content and resource.imported_from %}
         <div class="fr-px-8w fr-py-2w" style="background-color:#fafafa;">
-            <img style="margin: auto;display: block;" src="{% static '/home/img/home/progress.png' %}">
-            <p> Malheureusement nous n’avons pas pu récupérer le contenu de la page.
+            <img style="margin: auto;
+                        display: block"
+                 src="{% static '/home/img/home/progress.png' %}">
+            <p>
+                Malheureusement nous n’avons pas pu récupérer le contenu de la page.
                 Vous pouvez cependant la consulter directement ici :
-                <a href="resource.imported_from" target="_blank" >{{ resource.imported_from }}</a>
+                <a href="{{ resource.imported_from }}" target="_blank">{{ resource.imported_from }}</a>
             </p>
         </div>
     {% endif %}
-    {% if resource.content %}
-        {{ resource.content_rendered|safe }}
-    {% endif %}
+    {% if resource.content %}{{ resource.content_rendered|safe }}{% endif %}
 </div>
