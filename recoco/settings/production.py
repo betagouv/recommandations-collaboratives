@@ -58,9 +58,9 @@ X_FRAME_OPTIONS = "DENY"
 WAGTAILADMIN_BASE_URL = "recoconseil.fr"
 
 # Sentry
-if SENTRY_URL := os.environ.get("SENTRY_URL"):
+if SENTRY_DSN := os.environ.get("SENTRY_DSN"):
     sentry_sdk.init(
-        dsn=SENTRY_URL,
+        dsn=SENTRY_DSN,
         integrations=[
             DjangoIntegration(),
             CeleryIntegration(),
