@@ -145,6 +145,9 @@ class DSMapping(TimeStampedModel):
         verbose_name_plural = "Mapping configurations"
         ordering = ["-created"]
         unique_together = ["ds_resource", "site"]
+        indexes = [
+            models.Index(fields=["enabled"]),
+        ]
 
     def __str__(self) -> str:
         return f"{self.ds_resource} - {self.site}"

@@ -33,7 +33,7 @@ def make_ds_data_from_project(
     data = {}
 
     ds_mapping = DSMapping.objects.filter(
-        ds_resource_id=ds_resource.id, site_id=site.id
+        ds_resource_id=ds_resource.id, site_id=site.id, enabled=True
     ).first()
     if ds_mapping is None:
         return data
