@@ -1,7 +1,8 @@
 <!-- Resources externes -->
 <div x-show="push_type == 'external_resource'"
      x-transition:enter-start="grow-enter-start"
-     x-transition:leave="grow-leave">
+     x-transition:leave="grow-leave"
+     class="position-relative">
     <div class="fr-search-bar fr-search-bar--lg" id="search-2" role="search">
         <label class="fr-label" for="external-resource-url-input">
             Url du site :
@@ -12,21 +13,34 @@
                placeholder="https://"
                id="external-resource-url-input"
                x-ref="external_resource_url"
+               @input="canLoadNewExternalResource = true"
                name="external-resource-url-input">
         <button class="fr-btn"
-                @click.prevent="postExternalResource($refs.external_resource_url.value)">Charger la ressource</button>
+                type="button"
+                :disabled="!canLoadNewExternalResource"
+                @click="postExternalResource($refs.external_resource_url.value)">Charger la ressource</button>
     </div>
-    <div x-show="isBusy"
+    <div x-show="isBusyExternalResource"
          x-transition
-         class="position-absolute text-center w-100">
+         class="position-absolute top-0 text-center w-100">
         <div class="spinner-border" role="status">
             <span class="visually-hidden">Loading...</span>
         </div>
     </div>
+    <div x-show="!isBusyExternalResource && externalResourceError"
+         class="fr-alert fr-alert--error fr-alert--sm fr-mt-1v">
+        <p x-text="externalResourceError"></p>
+    </div>
+    <div x-show="externalResource.length > 0 && !externalResourceError"
+         class="fr-alert fr-alert--success fr-alert--sm fr-mt-1v">
+        <p>Ressource importée avec succès, pensez à la relire et si besoin, modifiez la dans la bibliothèque de ressources</p>
+    </div>
     <ul x-show="externalResource.length > 0"
         class="cards d-flex row row-cols-3 g-4 fr-pl-0 fr-ml-0 fr-mt-1v">
         <template x-for="resource in externalResource" :key="resource.id">
-            <li class="col-4">{% include "projects/project/fragments/action_pusher/resource_short_element.html" %}</li>
+            <li class="col-4">
+                {% include "projects/project/fragments/action_pusher/resource_short_element.html" with pre_selected="True" %}
+            </li>
         </template>
     </ul>
 </div>
