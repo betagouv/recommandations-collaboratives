@@ -53,18 +53,18 @@
                     Dossier Démarches Simplifiées
                 </h4>
                 <p class="fr-text-mention--grey fr-text--sm fr-my-3v">
-                    Complétez l’état des lieux pour pré-remplir automatiquement le dossier de candidature.
+                    Un dossier a été pré-rempli sur Démarches simplifiées avec les éléments que vous avez renseignés ici.
                 </p>
                 <a class="fr-btn fr-btn--secondary fr-btn--sm"
                    @click.stop=""
                    x-bind:href="currentTask.ds_folder.dossier_url">Voir mon dossier</a>
                 <span class="fr-ml-2w fr-text-label--blue-france fr-text--xs">
                     {% if task.ds_folder.prefilled_count > 1 %}
-                        {{ task.ds_folder.prefilled_count }} données pré-remplies
+                        {{ task.ds_folder.prefilled_count }} champs pré-remplis
                     {% elif task.ds_folder.prefilled_count > 0 %}
-                        1 donnée pré-remplie
+                        1 champ pré-rempli
                     {% else %}
-                        aucune donnée pré-remplie
+                        Aucun champ n'a pu être pré-rempli
                     {% endif %}
                 </span>
             </div>
