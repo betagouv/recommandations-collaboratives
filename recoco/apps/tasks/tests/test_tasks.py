@@ -130,6 +130,39 @@ def test_task_recommendation_is_updated(request, client):
 
 
 @pytest.mark.django_db
+def test_task_recommendation_delete_not_available_for_non_staff(request, client):
+    recommendation = Recipe(
+        models.TaskRecommendation, site=get_current_site(request)
+    ).make()
+    url = reverse("projects-task-recommendation-delete", args=(recommendation.pk,))
+    with login(client):
+        response = client.get(url)
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_task_recommendation_is_deleted(request, client):
+    recommendation = Recipe(
+        models.TaskRecommendation, site=get_current_site(request)
+    ).make()
+
+    recommendation_id = recommendation.pk
+
+    with login(client, groups=["example_com_staff"]):
+        response = client.post(
+            reverse("projects-task-recommendation-delete", args=(recommendation_id,)),
+            data={"resource": recommendation.resource.pk},
+        )
+
+    assert response.status_code == 302
+    assertRedirects(response, reverse("projects-task-recommendation-list"))
+
+    assert (
+        models.TaskRecommendation.on_site.filter(pk=recommendation_id).exists() is False
+    )
+
+
+@pytest.mark.django_db
 def test_task_suggestion_not_available_for_non_switchtender(
     request, client, project_ready
 ):

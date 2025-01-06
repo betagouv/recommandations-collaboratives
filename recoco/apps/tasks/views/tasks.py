@@ -360,6 +360,7 @@ def task_recommendation_create(request):
 @login_required
 def task_recommendation_update(request, recommendation_id):
     """Update a task recommendation"""
+
     is_staff_for_site_or_403(request.user)
 
     recommendation = get_object_or_404(
@@ -375,6 +376,20 @@ def task_recommendation_update(request, recommendation_id):
         form = TaskRecommendationForm(instance=recommendation)
 
     return render(request, "tasks/tasks/recommendation_update.html", locals())
+
+
+@login_required
+def task_recommendation_delete(request, recommendation_id):
+    """Delete a task recommendation"""
+
+    is_staff_for_site_or_403(request.user)
+
+    task_recommendation = get_object_or_404(
+        models.TaskRecommendation, site=request.site, pk=recommendation_id
+    )
+    task_recommendation.delete()
+
+    return redirect(reverse("projects-task-recommendation-list"))
 
 
 # retourne pour le projet les suggestions du système

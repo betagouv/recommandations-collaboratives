@@ -69,16 +69,23 @@
                                         </span>
                                     </div>
                                 </div>
-                                <div class="btn-group fr-ml-6w align-middle"
-                                     role="group"
-                                     aria-label="actions">
+                                <div class="btn-group fr-ml-6w align-middle" role="group" aria-label="actions">
                                     <a class="btn btn-light fr-mb-1v d-inline-block btn-outline-primary btn-sm"
-                                       href="{% url 'projects-task-recommendation-update' recommendation.pk %}">
+                                        href="{% url 'projects-task-recommendation-update' recommendation.pk %}">
                                         <svg class="bi fr-mr-1v" width="16" height="16" fill="currentColor">
                                             <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#pen" />
                                         </svg>
                                         Éditer
                                     </a>
+                                    <form method="post" action="{% url 'projects-task-recommendation-delete' recommendation.pk %}">
+                                        {% csrf_token %}
+                                        <button class="btn btn-light fr-mb-1v d-inline-block btn-outline-primary btn-sm" type="submit">
+                                            <svg class="bi fr-mr-1v" width="16" height="16" fill="currentColor">
+                                                <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#trash" />
+                                            </svg>
+                                            Supprimer
+                                        </button>
+                                    </form>
                                 </div>
                             </div>
                             <div class="d-block w-100 fr-pr-3w">
