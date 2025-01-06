@@ -79,7 +79,11 @@
                                                         <span class="fr-icon--sm fr-icon-calendar-event-line fr-mr-1v"
                                                               aria-hidden="true"></span>
                                                     {{ answer.updated_on|naturalday }}</span>
-                                                    <span class="fr-ml-3w tiny d-flex align-items-center">Fichier récupéré de l'edl</span>
+                                                    {% comment %} <span class="fr-ml-3w tiny d-flex align-items-center">- {{ answer.attachment.name }}</span>
+                                                    <span class="fr-ml-3w tiny d-flex align-items-center">- {{ answer.attachment.url }}</span>
+                                                    <span class="fr-ml-3w tiny d-flex align-items-center">- {{ answer.attachment.filename }} -</span> {% endcomment %}
+                                                    {% comment %} <span class="fr-ml-3w tiny d-flex align-items-center">{{ answer.attachment.filename[0] }}</span> {% endcomment %}
+                                                    <span class="fr-ml-3w tiny d-flex align-items-center">Fichier récupéré de l'état des lieux</span>
                                                 </div>
                                             </div>
                                         {% endif %}
