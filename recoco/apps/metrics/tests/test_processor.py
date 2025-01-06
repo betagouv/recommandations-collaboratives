@@ -58,7 +58,7 @@ class TestMaterializedView(BaseClassTestMixin):
             == "metrics_example_com"
         )
 
-    def test_site_db_schema_owner(self, stub_site, settings):
+    def test_site_db_schema_owner(self, settings, stub_site):
         settings.METRICS_MATERIALIZED_VIEWS_OWNER_TPL = None
 
         assert (
