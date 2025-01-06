@@ -55,7 +55,14 @@ def project_detail(request, project_id=None):
 @login_required
 def project_overview(request, project_id=None):
     """Return the details of given project for switchtender"""
-    project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
+
+    project = get_object_or_404(
+        models.Project.objects.filter(sites=request.site).with_unread_notifications(
+            user_id=request.user.id
+        ),
+        pk=project_id,
+    )
+
     site_config = get_site_config_or_503(request.site)
 
     is_regional_actor = is_regional_actor_for_project(
@@ -173,7 +180,13 @@ def project_knowledge(request, project_id=None):
 @login_required
 def project_actions(request, project_id=None):
     """Action page for given project"""
-    project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
+
+    project = get_object_or_404(
+        models.Project.objects.filter(sites=request.site).with_unread_notifications(
+            user_id=request.user.id
+        ),
+        pk=project_id,
+    )
 
     is_regional_actor = is_regional_actor_for_project(
         request.site, project, request.user, allow_national=True
@@ -234,7 +247,13 @@ def project_actions_inline(request, project_id=None):
 @login_required
 def project_conversations(request, project_id=None):
     """Conversation page for project"""
-    project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
+
+    project = get_object_or_404(
+        models.Project.objects.filter(sites=request.site).with_unread_notifications(
+            user_id=request.user.id
+        ),
+        pk=project_id,
+    )
 
     is_regional_actor = is_regional_actor_for_project(
         request.site, project, request.user, allow_national=True
@@ -265,7 +284,13 @@ def project_conversations(request, project_id=None):
 @login_required
 def project_internal_followup(request, project_id=None):
     """Advisors chat for given project"""
-    project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
+
+    project = get_object_or_404(
+        models.Project.objects.filter(sites=request.site).with_unread_notifications(
+            user_id=request.user.id
+        ),
+        pk=project_id,
+    )
 
     has_perm_or_403(request.user, "projects.use_private_notes", project)
 
