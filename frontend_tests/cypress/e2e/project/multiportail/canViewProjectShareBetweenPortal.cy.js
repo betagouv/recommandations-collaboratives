@@ -27,4 +27,14 @@ describe('Project share between portal', () => {
       .should('include.text', 'example2');
   });
 
+
+  it('display current portal EDL first', () => {
+    cy.visit('/project/23/connaissance');
+
+    cy.get('[data-cy="survey-name"]').each(($el, index) => {
+      if (index === 0) {
+        cy.wrap($el).should('contain.text', 'Questionnaire example1');
+      }
+    });
+  });
 });

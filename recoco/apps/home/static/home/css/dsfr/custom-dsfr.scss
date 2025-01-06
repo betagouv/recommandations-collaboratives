@@ -53,18 +53,19 @@
 \* ˍˍˍˍ */
 
 a {
-  text-decoration: none !important;
+  text-decoration: none;
 
   &.btn,
   &.button,
   &.nav-link,
   &.link-secondary {
-    text-decoration: none !important;
+    text-decoration: none;
   }
 }
 
 p a {
   text-decoration: underline;
+  color: #0000EE;
 }
 
 p {
@@ -623,4 +624,22 @@ form > p {
   color: #4285f4;
   background-color: rgba(96, 162, 228, 0.1);
   border-radius: 4px;
+}
+
+/* ¯¯¯¯ *\
+  COLORS
+\* ˍˍˍˍ */
+.fr-color {
+  color: white;
+  &--success {
+    background-color: var(--success-425-625-hover, #27a959);
+  }
+  &--warning {
+    color: black;
+    background-color: #ffa500;
+  }
+
+  &--error {
+    background-color: #dc3444;
+  }
 }

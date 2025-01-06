@@ -1,4 +1,5 @@
-from unittest.mock import ANY, Mock, call
+from io import StringIO
+from unittest.mock import Mock, call
 
 import pytest
 from django.contrib.sites.models import Site
@@ -12,164 +13,238 @@ from recoco.apps.metrics.processor import (
 )
 
 
-class TestMaterializedView:
+class BaseClassTestMixin:
     @pytest.fixture(autouse=True)
     def _change_sql_dir(self, settings):
         settings.METRICS_MATERIALIZED_VIEWS_SQL_DIR = (
             settings.BASE_DIR / "apps/metrics/tests/sql_queries"
         )
         settings.METRICS_MATERIALIZED_VIEWS_SPEC = [
-            {"name": "view_test_django_qs"},
+            {
+                "name": "view_test_django_qs",
+                "indexes": [
+                    {
+                        "name": "test_idx",
+                        "columns": "id,site_domain",
+                        "unique": True,
+                        "for_site": False,
+                    },
+                    {
+                        "name": "task_count_idx",
+                        "columns": "task_count",
+                        "unique": False,
+                        "for_site": True,
+                    },
+                ],
+            },
             {"name": "view_test_raw_sql"},
         ]
 
-    @pytest.fixture(autouse=True)
-    def _disable_owner_settings(self, settings):
-        """We disable that feature to prevent the test from required another role in
-        the database"""
-        settings.METRICS_MATERIALIZED_VIEWS_OWNER_TPL = None
 
+class TestMaterializedView(BaseClassTestMixin):
     @pytest.fixture(autouse=True)
     def stub_site(self):
         return Site(id=9, domain="example.com", name="site_name")
 
-    def test_db_view_name(self, settings, stub_site):
-        assert (
-            MaterializedView(site=stub_site, name="view_test").db_view_name
-            == "view_test"
-        )
+    def test_db_view_name(self):
+        assert MaterializedView(name="view_test").db_view_name == "view_test"
 
-    def test_db_schema_name(self, stub_site):
+    def test_db_schema_name(self):
+        assert MaterializedView(name="view_test").db_schema_name == "metrics"
+
+    def test_site_db_schema_name(self, stub_site):
         assert (
-            MaterializedView(site=stub_site, name="view_test").db_schema_name
+            MaterializedView(name="view_test").site_db_schema_name(site=stub_site)
             == "metrics_example_com"
         )
 
-    def test_create_for_site(self, stub_site):
-        view = MaterializedView.create_for_site(
-            site=stub_site,
-            spec={
-                "name": "view_test",
-                "indexes": ["index1", "index2"],
-                "unique_indexes": ["unique_index1", "unique_index2"],
-            },
-            check_sql_query=False,
-        )
-        assert view.name == "view_test"
-        assert view.indexes == ["index1", "index2"]
-        assert view.unique_indexes == ["unique_index1", "unique_index2"]
+    def test_site_db_schema_owner(self, settings, stub_site):
+        settings.METRICS_MATERIALIZED_VIEWS_OWNER_TPL = None
 
-    def test_create_for_site_sql_query_error(self, stub_site):
+        assert (
+            MaterializedView(name="view_test").site_db_schema_owner(site=stub_site)
+            == "metrics_owner_example_com"
+        )
+
+    def test_site_db_schema_owner_template(self, stub_site, settings):
+        settings.METRICS_MATERIALIZED_VIEWS_OWNER_TPL = (
+            "urbanvitaliz_metrics_${site_slug}"
+        )
+        assert (
+            MaterializedView(name="view_test").site_db_schema_owner(site=stub_site)
+            == "urbanvitaliz_metrics_example_com"
+        )
+
+    def test_from_spec_error(self, stub_site):
         with pytest.raises(MaterializedViewSpecError):
-            MaterializedView.create_for_site(
-                site=stub_site,
+            MaterializedView.from_spec(
                 spec={"name": "dummy_view_name"},
             )
-        assert MaterializedView.create_for_site(
-            site=stub_site,
-            spec={"name": "view_test_django_qs"},
-        )
-        assert MaterializedView.create_for_site(
-            site=stub_site,
-            spec={"name": "view_test_raw_sql"},
-        )
 
-    def test_refresh(self, stub_site):
-        mock_cursor = Mock(spec=CursorWrapper)
-        view = MaterializedView(site=stub_site, name="view_test")
-        view.set_cursor(mock_cursor)
-        view.refresh()
-        mock_cursor.execute.assert_called_once_with(
-            sql="REFRESH MATERIALIZED VIEW metrics_example_com.view_test;"
-        )
-
-    def test_create_with_indexes(self, stub_site):
-        mock_cursor = Mock(spec=CursorWrapper)
-        view = MaterializedView.create_for_site(
-            site=stub_site,
-            spec={
-                "name": "view_test_simple",
-                "indexes": ["idx"],
-                "unique_indexes": ["unique_idx"],
-            },
+    def test_create(self, settings):
+        view = MaterializedView.from_spec(
+            spec=settings.METRICS_MATERIALIZED_VIEWS_SPEC[0],
             check_sql_query=False,
         )
+        mock_cursor = Mock(spec=CursorWrapper)
         view.set_cursor(mock_cursor)
         view.create()
 
-        calls = mock_cursor.execute.call_args_list
-        assert len(calls) == 4
-        assert calls[0] == call(
-            sql="CREATE SCHEMA IF NOT EXISTS metrics_example_com;",
+        assert mock_cursor.execute.call_args_list == [
+            call(sql="CREATE SCHEMA IF NOT EXISTS metrics;"),
+            call(
+                sql="CREATE MATERIALIZED VIEW IF NOT EXISTS metrics.view_test_django_qs AS"
+                + ' ( SELECT "projects_project"."id", "django_site"."domain" AS "site_domain", COUNT("tasks_task"."id") AS "task_count" FROM "projects_project"'
+                + ' LEFT OUTER JOIN "projects_projectsite" ON ("projects_project"."id" = "projects_projectsite"."project_id")'
+                + ' LEFT OUTER JOIN "django_site" ON ("projects_projectsite"."site_id" = "django_site"."id")'
+                + ' LEFT OUTER JOIN "tasks_task" ON ("projects_project"."id" = "tasks_task"."project_id")'
+                + ' WHERE "projects_project"."deleted" IS NULL GROUP BY "projects_project"."id", 2 ) WITH NO DATA;',
+                params=(),
+            ),
+            call(
+                sql="CREATE UNIQUE INDEX IF NOT EXISTS test_idx ON metrics.view_test_django_qs (id,site_domain);"
+            ),
+            call(
+                sql="CREATE INDEX IF NOT EXISTS task_count_idx ON metrics.view_test_django_qs (task_count);"
+            ),
+        ]
+
+    def test_create_for_site(self, settings, stub_site):
+        view = MaterializedView.from_spec(
+            spec=settings.METRICS_MATERIALIZED_VIEWS_SPEC[0],
+            check_sql_query=False,
         )
-        assert calls[1] == call(
-            sql='CREATE MATERIALIZED VIEW IF NOT EXISTS metrics_example_com.view_test_simple AS ( select Count(*) from FROM "projects_project" ) WITH NO DATA;',
-            params=(9,),
+        mock_cursor = Mock(spec=CursorWrapper)
+        view.set_cursor(mock_cursor)
+        view.create_for_site(site=stub_site)
+
+        assert mock_cursor.execute.call_args_list == [
+            call(sql="CREATE SCHEMA IF NOT EXISTS metrics_example_com;"),
+            call(
+                sql="CREATE MATERIALIZED VIEW IF NOT EXISTS metrics_example_com.view_test_django_qs"
+                + " AS ( SELECT * FROM metrics.view_test_django_qs WHERE site_domain = 'example.com' ) WITH NO DATA;"
+            ),
+            call(
+                sql="CREATE INDEX IF NOT EXISTS task_count_idx ON metrics_example_com.view_test_django_qs (task_count);"
+            ),
+        ]
+
+    def test_refresh(self, settings):
+        view = MaterializedView.from_spec(
+            spec=settings.METRICS_MATERIALIZED_VIEWS_SPEC[0],
+            check_sql_query=False,
         )
-        assert calls[2] == call(
-            sql="CREATE INDEX IF NOT EXISTS idx ON metrics_example_com.view_test_simple (idx);"
+        mock_cursor = Mock(spec=CursorWrapper)
+        view.set_cursor(mock_cursor)
+        view.refresh()
+
+        mock_cursor.execute.assert_called_once_with(
+            sql="REFRESH MATERIALIZED VIEW metrics.view_test_django_qs;"
         )
-        assert calls[3] == call(
-            sql="CREATE UNIQUE INDEX IF NOT EXISTS unique_idx ON metrics_example_com.view_test_simple (unique_idx);"
+
+    def test_refresh_for_site(self, settings, stub_site):
+        view = MaterializedView.from_spec(
+            spec=settings.METRICS_MATERIALIZED_VIEWS_SPEC[0],
+            check_sql_query=False,
         )
+        mock_cursor = Mock(spec=CursorWrapper)
+        view.set_cursor(mock_cursor)
+        view.refresh_for_site(site=stub_site)
+
+        mock_cursor.execute.assert_called_once_with(
+            sql="REFRESH MATERIALIZED VIEW metrics_example_com.view_test_django_qs;"
+        )
+
+    def test_drop(self, settings):
+        view = MaterializedView.from_spec(
+            spec=settings.METRICS_MATERIALIZED_VIEWS_SPEC[0],
+            check_sql_query=False,
+        )
+        mock_cursor = Mock(spec=CursorWrapper)
+        view.set_cursor(mock_cursor)
+        view.drop()
+
+        mock_cursor.execute.assert_called_once_with(
+            sql="DROP MATERIALIZED VIEW IF EXISTS metrics.view_test_django_qs;"
+        )
+
+    def test_drop_for_site(self, settings, stub_site):
+        view = MaterializedView.from_spec(
+            spec=settings.METRICS_MATERIALIZED_VIEWS_SPEC[0],
+            check_sql_query=False,
+        )
+        mock_cursor = Mock(spec=CursorWrapper)
+        view.set_cursor(mock_cursor)
+        view.drop_for_site(site=stub_site)
+
+        mock_cursor.execute.assert_called_once_with(
+            sql="DROP MATERIALIZED VIEW IF EXISTS metrics_example_com.view_test_django_qs;"
+        )
+
+    def test_assign_permissions(self, settings):
+        view = MaterializedView.from_spec(
+            spec=settings.METRICS_MATERIALIZED_VIEWS_SPEC[0],
+            check_sql_query=False,
+        )
+        mock_cursor = Mock(spec=CursorWrapper)
+        view.set_cursor(mock_cursor)
+        view.assign_permissions()
+
+        assert mock_cursor.execute.call_args_list == [
+            call(sql=f"GRANT CONNECT ON DATABASE {view.db_name} TO metrics_owner;"),
+            call(sql="GRANT USAGE ON SCHEMA metrics TO metrics_owner;"),
+            call(sql="GRANT SELECT ON ALL TABLES IN SCHEMA metrics TO metrics_owner;"),
+        ]
+
+    def test_assign_permissions_for_site(self, settings, stub_site):
+        settings.METRICS_MATERIALIZED_VIEWS_OWNER_TPL = None
+
+        view = MaterializedView.from_spec(
+            spec=settings.METRICS_MATERIALIZED_VIEWS_SPEC[0],
+            check_sql_query=False,
+        )
+        mock_cursor = Mock(spec=CursorWrapper)
+        view.set_cursor(mock_cursor)
+        view.assign_permissions_for_site(site=stub_site)
+
+        assert mock_cursor.execute.call_args_list == [
+            call(
+                sql=f"GRANT CONNECT ON DATABASE {view.db_name} TO metrics_owner_example_com;"
+            ),
+            call(
+                sql="GRANT USAGE ON SCHEMA metrics_example_com TO metrics_owner_example_com;"
+            ),
+            call(
+                sql="GRANT SELECT ON ALL TABLES IN SCHEMA metrics_example_com TO metrics_owner_example_com;"
+            ),
+        ]
+
+
+class TestCommand(BaseClassTestMixin):
+    @pytest.mark.django_db(transaction=True)
+    def test_options_error(self):
+        output = StringIO()
+        call_command(
+            "update_materialized_views",
+            stdout=output,
+            drop_only=True,
+            refresh_only=True,
+        )
+        assert "You can't use both" in output.getvalue()
 
     @pytest.mark.django_db(transaction=True)
-    def test_assign_permissions_to_owner(self, mocker, settings):
-        settings.METRICS_MATERIALIZED_VIEWS_OWNER_TPL = "metrics_owner_example_com"
-
-        mocker.patch(
-            "recoco.apps.metrics.management.commands.update_materialized_views.Command._check_user_exists_in_db",
-            return_value=True,
-        )
-
-        mock = mocker.patch(
-            "recoco.apps.metrics.management.commands.update_materialized_views.Command._assign_permissions_to_owner"
-        )
-
-        call_command("update_materialized_views")
-
-        mock.assert_called_once_with(
-            cursor=ANY,
-            schema_name="metrics_example_com",
-            schema_owner="metrics_owner_example_com",
-        )
-
-    @pytest.mark.django_db(transaction=True)
-    def test_assign_permissions_to_owner_with_override(self, mocker, settings):
-        owner_name = "my_overridden_user"
-        settings.METRICS_MATERIALIZED_VIEWS_OWNER_TPL = "metrics_owner_example_com"
-        settings.METRICS_MATERIALIZED_VIEWS_OWNER_OVERRIDES = {
-            "example_com": owner_name
-        }
-
-        mocker.patch(
-            "recoco.apps.metrics.management.commands.update_materialized_views.Command._check_user_exists_in_db",
-            return_value=True,
-        )
-        mock = mocker.patch(
-            "recoco.apps.metrics.management.commands.update_materialized_views.Command._assign_permissions_to_owner"
-        )
-
-        call_command("update_materialized_views")
-
-        mock.assert_called_once_with(
-            cursor=ANY,
-            schema_name="metrics_example_com",
-            schema_owner=owner_name,
-        )
-
-    @pytest.mark.django_db(transaction=True)
-    def test_command(self):
+    def test_full_command(self):
         assert Site.objects.count() == 1
 
         call_command("update_materialized_views")
 
         with connection.cursor() as cursor:
-            cursor.execute(
-                "SELECT COUNT(*) FROM pg_matviews WHERE matviewname = 'view_test_django_qs' AND schemaname = 'metrics_example_com';"
-            )
-            assert cursor.fetchone()[0] == 1
-            cursor.execute(
-                "SELECT COUNT(*) FROM pg_matviews WHERE matviewname = 'view_test_raw_sql' AND schemaname = 'metrics_example_com';"
-            )
-            assert cursor.fetchone()[0] == 1
+            for schema_name in ("metrics", "metrics_example_com"):
+                cursor.execute(
+                    f"SELECT COUNT(*) FROM pg_matviews WHERE matviewname = 'view_test_django_qs' AND schemaname = '{schema_name}';"
+                )
+                assert cursor.fetchone()[0] == 1
+                cursor.execute(
+                    f"SELECT COUNT(*) FROM pg_matviews WHERE matviewname = 'view_test_raw_sql' AND schemaname = '{schema_name}';"
+                )
+                assert cursor.fetchone()[0] == 1
