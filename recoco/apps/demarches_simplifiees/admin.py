@@ -39,6 +39,8 @@ class DSFolderAdmin(admin.ModelAdmin):
         "recommendation",
     )
 
+    list_filter = ("created",)
+
     search_fields = (
         "project",
         "ds_resource",
@@ -61,6 +63,13 @@ class DSFolderAdmin(admin.ModelAdmin):
     }
 
     actions = ("update_matching",)
+
+    ordering = ("-created",)
+    list_select_related = (
+        "project",
+        "ds_resource",
+        "recommendation",
+    )
 
     @admin.action(description="Mettre à jour le matching projet / démarche simplifiée")
     def update_matching(self, request: HttpRequest, queryset: QuerySet[DSResource]):
