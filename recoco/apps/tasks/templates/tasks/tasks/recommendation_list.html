@@ -6,6 +6,7 @@
 {% block content %}
     <div class="col-12 fr-p-3w fr-mx-auto">
         <div class="row recommendation-list fr-mb-2w">
+
             <div class="col-sm-12 col-lg-8 col-xl-9 fr-mb-6w">
                 <h2>
                     <svg class="bi rounded-circle fr-p-2v" width="40" height="40">
@@ -16,6 +17,7 @@
                 </h2>
                 <span class="text-secondary">Vous pouvez configurer ici les ressources qui seront pré-fléchées à partir des signaux collectés par les réponses aux questions de l'exploration.</span>
             </div>
+            
             <!-- Sidebar -->
             <div class="col-sm-12 col-lg-4 col-xl-3 border-start">
                 <!-- Ajouter -->
@@ -31,11 +33,12 @@
                     </a>
                 </div>
             </div>
+
             <!-- main content -->
             <div>
                 {% for recommendation in recommendations %}
                     <div class="d-flex fr-mb-3w">
-                        <div class="col-8" id="q-{{ recommendation.id }}">
+                        <div class="col-sm-12 col-lg-8 col-xl-9" id="q-{{ recommendation.id }}">
                             <div class="fr-mt-2w d-flex justify-content-between fr-pr-3w">
                                 <div>
                                     <svg class="bi align-middle" width="20" height="20" fill="currentColor">
@@ -69,7 +72,7 @@
                                         </span>
                                     </div>
                                 </div>
-                                <div class="btn-group fr-ml-6w align-middle" role="group" aria-label="actions">
+                                <div class="fr-btns-group fr-ml-6w align-middle" role="group" aria-label="actions">
                                     <a class="btn btn-light fr-mb-1v d-inline-block btn-outline-primary btn-sm"
                                         href="{% url 'projects-task-recommendation-update' recommendation.pk %}">
                                         <svg class="bi fr-mr-1v" width="16" height="16" fill="currentColor">
@@ -79,7 +82,7 @@
                                     </a>
                                     <form method="post" action="{% url 'projects-task-recommendation-delete' recommendation.pk %}">
                                         {% csrf_token %}
-                                        <button class="btn btn-light fr-mb-1v d-inline-block btn-outline-primary btn-sm" type="submit">
+                                        <button class="btn btn-light fr-mb-1v fr-ml-1w d-inline-block btn-outline-primary btn-sm" type="submit">
                                             <svg class="bi fr-mr-1v" width="16" height="16" fill="currentColor">
                                                 <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#trash" />
                                             </svg>
@@ -93,7 +96,8 @@
                                 {% include "projects/project/fragments/action_list_item.html" with task=recommendation hide_comments=True disable_tracking=True disable_edit=True %}
                             </div>
                         </div>
-                        <div class="col-4 border-start fr-pl-3w fr-pt-2w">
+                        
+                        <div class="col-sm-12 col-lg-4 col-xl-3 border-start fr-pl-3w fr-pt-2w">
                             <div class="small">
                                 <svg class="bi fr-mr-1v align-middle"
                                      width="16"
