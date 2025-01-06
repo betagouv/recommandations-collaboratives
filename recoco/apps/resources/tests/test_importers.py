@@ -28,7 +28,7 @@ def test_mediawiki_adapter(mocker):
     assert mwi.load_data(response) is True
 
     mwclient_Site.assert_called_once_with(
-        scheme="mock://",
+        scheme="mock",
         host="mymediawiki.com",
         path="/w/",
         clients_useragent="Recoco MediaWiki Ressource Importer",
@@ -39,6 +39,22 @@ def test_mediawiki_adapter(mocker):
     mwi.extract_data()
 
     assert mwi.content == "**hello**\n"
+
+
+def test_mediawiki_adapter_with_no_content_header(mocker):
+    mwi_class = importers.wiki.MediaWikiRIAdapter
+
+    adapter = requests_mock.Adapter()
+    session = HTMLSession()
+    session.mount("mock://", adapter)
+
+    adapter.register_uri(
+        "GET", "mock://mymediawiki.com/apage", text="<html><head></head></html>"
+    )
+
+    response = session.get("mock://mymediawiki.com/apage")
+
+    assert mwi_class.can_handle(response) is False
 
 
 MEDIAWIKI_SAMPLE_PAGE = """

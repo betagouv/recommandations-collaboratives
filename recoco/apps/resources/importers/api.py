@@ -56,7 +56,6 @@ class AidesTerritoiresRIAdapter(BaseRIAdapter):
         )
 
         if not response.ok:
-            print("nope")
             return False
 
         self.raw_data = response.json()
