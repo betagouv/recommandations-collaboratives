@@ -58,7 +58,7 @@
     "model": "survey.survey",
     "pk": 1,
     "fields": {
-      "name": "Exploration",
+      "name": "Questionnaire example",
       "site": 1
     }
   },
@@ -238,7 +238,7 @@
     "model": "survey.survey",
     "pk": 2,
     "fields": {
-      "name": "Exploration",
+      "name": "Questionnaire example2",
       "site": 2
     }
   },
@@ -339,7 +339,7 @@
     "model": "survey.survey",
     "pk": 3,
     "fields": {
-      "name": "Exploration",
+      "name": "Questionnaire example3",
       "site": 3
     }
   },

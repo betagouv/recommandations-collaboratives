@@ -34,3 +34,5 @@ describe('I can not comment a draft task', () => {
     cy.get('[data-test-id="button-submit-new"]').should('not.exist');
   });
 });
+
+// page recommandation

@@ -42,3 +42,5 @@ describe('I can go to tasks tab', () => {
     // cy.get('[data-test-id="no-tasks-banner"]').should('exist');
   });
 });
+
+// page recommandations

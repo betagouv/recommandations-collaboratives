@@ -15,7 +15,7 @@ from django.utils import timezone
 from model_bakery import baker
 from notifications.models import Notification
 
-from recoco.apps.projects.models import Note
+from recoco.apps.projects.models import Document, Note
 from recoco.apps.tasks import models as task_models
 from recoco.apps.tasks.models import Task, TaskFollowup
 
@@ -126,6 +126,7 @@ def test_project_queryset_unread_notifications():
     task_ct = ContentType.objects.get_for_model(Task)
     task_followup_ct = ContentType.objects.get_for_model(TaskFollowup)
     note_ct = ContentType.objects.get_for_model(Note)
+    document_ct = ContentType.objects.get_for_model(Document)
 
     baker.make(
         Notification,
@@ -161,6 +162,15 @@ def test_project_queryset_unread_notifications():
         action_object_content_type=note_ct,
         action_object_object_id=private_note.id,
     )
+    baker.make(
+        Notification,
+        recipient=user,
+        target_object_id=project.id,
+        target_content_type=project_ct,
+        unread=True,
+        action_object_content_type=document_ct,
+        _quantity=2,
+    )
 
     annotated_project = models.Project.objects.with_unread_notifications(
         user.id
@@ -168,7 +178,7 @@ def test_project_queryset_unread_notifications():
     assert annotated_project.action_notifications_count == 2
     assert annotated_project.conversation_notifications_count == 1
     assert annotated_project.private_conversation_notifications_count == 1
-    assert annotated_project.document_notifications_count == 0
+    assert annotated_project.document_notifications_count == 2
 
 
 # eof
