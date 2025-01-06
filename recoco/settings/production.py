@@ -11,6 +11,8 @@ import sentry_sdk
 from sentry_sdk.integrations.celery import CeleryIntegration
 from sentry_sdk.integrations.django import DjangoIntegration
 
+from recoco import VERSION
+
 DEBUG = False
 
 # logging: send email and log to file 500 internal server errors
