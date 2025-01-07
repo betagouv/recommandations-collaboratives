@@ -9,7 +9,7 @@ describe('I can go tasks tab', () => {
 
   it('switch between inline & kanban view', () => {
     cy.visit(`/project/${currentProject.pk}`);
-    cy.becomeAdvisor(currentProject.pk);
+    cy.becomeAdvisor(currentProject.pk); // A remplacer par une fixture avec un user déjà advisor du projet
     cy.visit(`/project/${currentProject.pk}/actions`);
     cy.createTask('test');
 
@@ -22,3 +22,5 @@ describe('I can go tasks tab', () => {
     cy.get('[data-test-id="list-tasks-switch-button"]').should('be.checked');
   });
 });
+
+// page recommandations

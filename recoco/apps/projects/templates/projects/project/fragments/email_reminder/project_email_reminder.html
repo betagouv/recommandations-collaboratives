@@ -15,13 +15,14 @@
             {% if reminder %}
                 <p class="fr-mb-0">
                     <span class="fr-icon-notification-3-line fr-icon--sm fr-mr-1w"
-                          aria-hidden="true"></span>Prochain rappel au porteur de projet prévu le <span data-test-id="email-date">{{ reminder.deadline|default:"Aucun" }}</span>
+                          aria-hidden="true"></span>Prochain rappel au porteur de projet prévu le <span data-test-id="email-date">{{ reminder.deadline }}</span>
                 </p>
+            {% else %}
+                {% if is_staff and "change_project" in user_project_perms %}
+                    <span data-test-id="no-reminders" class="tiny fw-medium text-blue">Aucun email de rappel programmé actuellement</span>
+                {% endif %}
             {% endif %}
         {% endwith %}
-        {% if is_staff and "change_project" in user_project_perms %}
-            <span data-test-id="no-reminders" class="tiny fw-medium text-blue">Aucun email de rappel programmé actuellement</span>
-        {% endif %}
         {% if request.user in project.members.all or position.is_advisor or position.is_observer %}
             <button x-ref="emailReminderButton"
                     @click="onEmailReminderButtonClick"

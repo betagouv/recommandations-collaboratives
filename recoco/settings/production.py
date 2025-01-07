@@ -11,6 +11,8 @@ import sentry_sdk
 from sentry_sdk.integrations.celery import CeleryIntegration
 from sentry_sdk.integrations.django import DjangoIntegration
 
+from recoco import VERSION
+
 DEBUG = False
 
 # logging: send email and log to file 500 internal server errors
@@ -58,9 +60,9 @@ X_FRAME_OPTIONS = "DENY"
 WAGTAILADMIN_BASE_URL = "recoconseil.fr"
 
 # Sentry
-if SENTRY_URL := os.environ.get("SENTRY_URL"):
+if SENTRY_DSN := os.environ.get("SENTRY_DSN"):
     sentry_sdk.init(
-        dsn=SENTRY_URL,
+        dsn=SENTRY_DSN,
         integrations=[
             DjangoIntegration(),
             CeleryIntegration(),
