@@ -23,135 +23,88 @@
 <div x-data
      class="project-navigation d-flex justify-content-between"
      x-init="$nextTick(() => $store.showRole.init())">
-    <fieldset class="fr-segmented fr-segmented--md fr-px-3w"
-              x-init="$nextTick(() => $store.projectQueue.addCurrentProjectId({{ project.id }}, `{{ project.name }}`, `{{ project.commune.name }}`,`{{ project.commune.insee }}`))">
-        <legend class="fr-segmented__legend visually-hidden">Onglets du projet</legend>
-        {% if overview %}
-            {% if position.is_advisor or position.is_observer or is_regional_actor %}
-                {% include "tutorial/tutorial_hint.html" %}
+    {% with active_project_action_notifications_count=project.action_notifications_count active_project_conversation_notifications_count=project.conversation_notifications_count active_project_document_notifications_count=project.document_notifications_count active_project_private_conversation_notifications_count=project.private_conversation_notifications_count %}
+        <fieldset class="fr-segmented fr-segmented--md fr-px-3w"
+                  x-init="$nextTick(() => $store.projectQueue.addCurrentProjectId({{ project.id }}, `{{ project.name }}`, `{{ project.commune.name }}`,`{{ project.commune.insee }}`))">
+            <legend class="fr-segmented__legend visually-hidden">Onglets du projet</legend>
+            {% if overview %}
+                {% if position.is_advisor or position.is_observer or is_regional_actor %}
+                    {% include "tutorial/tutorial_hint.html" %}
+                {% endif %}
             {% endif %}
-        {% endif %}
-        <div class="fr-segmented__elements">
-            {% if "list_projects" in user_site_perms or "view_project" in user_project_perms %}
-                <div class="fr-segmented__element" id="overview-step-1">
-                    <input value="overview"
-                           type="radio"
-                           {% if overview %}checked{% endif %}
-                           aria-checked="{% if overview %}true{% else %}false{% endif %}"
-                           id="segmented-control-overview"
-                           name="segmented-control-project"
-                           @click="window.location='{% url 'projects-project-detail-overview' project.pk %}'">
-                    <label class="fr-label" for="segmented-control-overview">
-                        <a class="stretched-link"
-                           data-test-id="project-navigation-overview"
-                           href="{% url 'projects-project-detail-overview' project.pk %}">Présentation</a>
-                    </label>
-                </div>
-            {% endif %}
-            {% if "list_projects" in user_site_perms or "view_surveys" in user_project_perms %}
-                <div class="fr-segmented__element">
-                    <input value="survey"
-                           type="radio"
-                           {% if state_of_play %}checked{% endif %}
-                           aria-checked="{% if state_of_play %}true{% else %}false{% endif %}"
-                           id="segmented-control-survey"
-                           name="segmented-control-project"
-                           @click="window.location='{% url 'projects-project-detail-knowledge' project.pk %}'">
-                    <label class="fr-label" for="segmented-control-survey">
-                        <a class="stretched-link"
-                           data-test-id="project-navigation-knowledge"
-                           href="{% url 'projects-project-detail-knowledge' project.pk %}">État des lieux
-                            {% comment %} TODO
+            <div class="fr-segmented__elements">
+                {% if "list_projects" in user_site_perms or "view_project" in user_project_perms %}
+                    <div class="fr-segmented__element" id="overview-step-1">
+                        <input value="overview"
+                               type="radio"
+                               {% if overview %}checked{% endif %}
+                               aria-checked="{% if overview %}true{% else %}false{% endif %}"
+                               id="segmented-control-overview"
+                               name="segmented-control-project"
+                               @click="window.location='{% url 'projects-project-detail-overview' project.pk %}'">
+                        <label class="fr-label" for="segmented-control-overview">
+                            <a class="stretched-link"
+                               data-test-id="project-navigation-overview"
+                               href="{% url 'projects-project-detail-overview' project.pk %}">Présentation</a>
+                        </label>
+                    </div>
+                {% endif %}
+                {% if "list_projects" in user_site_perms or "view_surveys" in user_project_perms %}
+                    <div class="fr-segmented__element">
+                        <input value="survey"
+                               type="radio"
+                               {% if state_of_play %}checked{% endif %}
+                               aria-checked="{% if state_of_play %}true{% else %}false{% endif %}"
+                               id="segmented-control-survey"
+                               name="segmented-control-project"
+                               @click="window.location='{% url 'projects-project-detail-knowledge' project.pk %}'">
+                        <label class="fr-label" for="segmented-control-survey">
+                            <a class="stretched-link"
+                               data-test-id="project-navigation-knowledge"
+                               href="{% url 'projects-project-detail-knowledge' project.pk %}">État des lieux
+                                {% comment %} TODO
                            <span class="fr-text--sm text-ease">({{ project.survey.completion }}%)</span>
-                            {% endcomment %}
-                        </a>
-                    </label>
-                </div>
-            {% endif %}
-            <div class="fr-segmented__element" id="overview-step-2">
-                <input value="tasks"
-                       type="radio"
-                       {% if recommandations %}checked{% endif %}
-                       aria-checked="{% if recommandations %}true{% else %}false{% endif %}"
-                       {% if "list_projects" in user_site_perms or "view_tasks" in user_project_perms %} @click="window.location='{% url 'projects-project-detail-actions' project.pk %}'" {% else %} disabled {% endif %}
-                       id="segmented-control-tasks"
-                       name="segmented-control-project">
-                <label class="fr-label" for="segmented-control-tasks">
-                    <a class="stretched-link"
-                       data-test-id="project-navigation-actions"
-                       {% if "list_projects" in user_site_perms or "view_tasks" in user_project_perms %} href="{% url 'projects-project-detail-actions' project.pk %}" {% endif %}>Recommandations
-                        {% if active_project_action_notifications_count %}
-                            <span class="badge text-bg-danger" data-test-id="badge-tab-new-task">{{ active_project_action_notifications_count }}</span>
-                        {% endif %}
-                    </a>
-                </label>
-            </div>
-            <div class="fr-segmented__element"
-                 id="overview-step-3"
-                 {% if "view_public_notes" not in user_project_perms and "use_public_notes" not in user_project_perms %} aria-describedby="tooltip-lock-access-conversations" {% endif %}>
-                {% include "projects/project/fragments/navigation/tooltip_lock_access.html" with id="tooltip-lock-access-conversations" %}
-                <input value="conversations"
-                       type="radio"
-                       {% if conversation %}checked{% endif %}
-                       aria-checked="{% if conversation %}true{% else %}false{% endif %}"
-                       {% if "view_public_notes" in user_project_perms or "use_public_notes" in user_project_perms %} @click="window.location='{% url 'projects-project-detail-conversations' project.pk %}'" {% else %} disabled {% endif %}
-                       id="segmented-control-tasks"
-                       name="segmented-control-project">
-                <label class="fr-label" for="segmented-control-tasks">
-                    <a class="stretched-link"
-                       href="{% if "view_public_notes" in user_project_perms or "use_public_notes" in user_project_perms %} {% url 'projects-project-detail-conversations' project.pk %}{% else %}#{% endif %}">Conversation
-                        {% if "view_public_notes" in user_project_perms or "use_public_notes" in user_project_perms %}
-                            {% if active_project_conversation_notifications_count %}
-                                <span class="badge text-bg-danger">{{ active_project_conversation_notifications_count }}</span>
-                            {% endif %}
-                        {% else %}
-                            <span class="fr-icon--sm fr-icon-lock-line" aria-hidden="true"></span>
-                        {% endif %}
-                    </a>
-                </label>
-            </div>
-            <div class="fr-segmented__element"
-                 {% if 'manage_documents' not in user_project_perms %}aria-describedby="tooltip-lock-access-files-links"{% endif %}>
-                {% include "projects/project/fragments/navigation/tooltip_lock_access.html" with id="tooltip-lock-access-files-links" %}
-                <input value="filesLinks"
-                       type="radio"
-                       {% if files_links %}checked{% endif %}
-                       aria-checked="{% if files_links %}true{% else %}false{% endif %}"
-                       {% if 'manage_documents' in user_project_perms %} @click="window.location='{% url 'projects-project-detail-documents' project.pk %}'" {% else %} disabled {% endif %}
-                       id="segmented-control-tasks"
-                       name="segmented-control-project">
-                <label class="fr-label" for="segmented-control-tasks">
-                    <a class="stretched-link"
-                       data-test-id="project-navigation-documents"
-                       href="{% if 'manage_documents' in user_project_perms %} {% url 'projects-project-detail-documents' project.pk %} {% else %}#{% endif %}">Fichiers
-                        {% if 'manage_documents' in user_project_perms %}
-                            {% if active_project_document_notifications_count %}
-                                <span class="badge text-bg-danger">{{ active_project_document_notifications_count }}</span>
-                            {% endif %}
-                        {% else %}
-                            <span class="fr-icon--sm fr-icon-lock-line" aria-hidden="true"></span>
-                        {% endif %}
-                    </a>
-                </label>
-            </div>
-            {% if "list_projects" in user_site_perms or 'use_private_notes' in user_project_perms %}
-                <div class="fr-segmented__element"
-                     id="overview-step-4"
-                     {% if 'use_private_notes' not in user_project_perms %}aria-describedby="tooltip-lock-access-internal-followup"{% endif %}>
-                    {% include "projects/project/fragments/navigation/tooltip_lock_access.html" with id="tooltip-lock-access-internal-followup" %}
-                    <input value="internalFollowup"
+                                {% endcomment %}
+                            </a>
+                        </label>
+                    </div>
+                {% endif %}
+                <div class="fr-segmented__element" id="overview-step-2">
+                    <input value="tasks"
                            type="radio"
-                           {% if internal_followup %}checked{% endif %}
-                           aria-checked="{% if internal_followup %}true{% else %}false{% endif %}"
-                           {% if 'use_private_notes' in user_project_perms %} @click="window.location='{% url 'projects-project-detail-internal-followup' project.pk %}'" {% else %} disabled {% endif %}
+                           {% if recommandations %}checked{% endif %}
+                           aria-checked="{% if recommandations %}true{% else %}false{% endif %}"
+                           {% if "list_projects" in user_site_perms or "view_tasks" in user_project_perms %} @click="window.location='{% url 'projects-project-detail-actions' project.pk %}'" {% else %} disabled {% endif %}
                            id="segmented-control-tasks"
                            name="segmented-control-project">
                     <label class="fr-label" for="segmented-control-tasks">
                         <a class="stretched-link"
-                           href="{% if 'use_private_notes' in user_project_perms %} {% url 'projects-project-detail-internal-followup' project.pk %} {% else %}#{% endif %}">Espace conseillers
-                            {% if 'use_private_notes' in user_project_perms %}
-                                {% if active_project_private_conversation_notifications_count %}
-                                    <span class="badge text-bg-danger">{{ active_project_private_conversation_notifications_count }}</span>
+                           data-test-id="project-navigation-actions"
+                           {% if "list_projects" in user_site_perms or "view_tasks" in user_project_perms %} href="{% url 'projects-project-detail-actions' project.pk %}" {% endif %}>
+                            Recommandations
+                            {% if active_project_action_notifications_count %}
+                                <span class="badge text-bg-danger" data-test-id="badge-tab-new-task">{{ active_project_action_notifications_count }}</span>
+                            {% endif %}
+                        </a>
+                    </label>
+                </div>
+                <div class="fr-segmented__element"
+                     id="overview-step-3"
+                     {% if "view_public_notes" not in user_project_perms and "use_public_notes" not in user_project_perms %} aria-describedby="tooltip-lock-access-conversations" {% endif %}>
+                    {% include "projects/project/fragments/navigation/tooltip_lock_access.html" with id="tooltip-lock-access-conversations" %}
+                    <input value="conversations"
+                           type="radio"
+                           {% if conversation %}checked{% endif %}
+                           aria-checked="{% if conversation %}true{% else %}false{% endif %}"
+                           {% if "view_public_notes" in user_project_perms or "use_public_notes" in user_project_perms %} @click="window.location='{% url 'projects-project-detail-conversations' project.pk %}'" {% else %} disabled {% endif %}
+                           id="segmented-control-tasks"
+                           name="segmented-control-project">
+                    <label class="fr-label" for="segmented-control-tasks">
+                        <a class="stretched-link"
+                           href="{% if "view_public_notes" in user_project_perms or "use_public_notes" in user_project_perms %} {% url 'projects-project-detail-conversations' project.pk %}{% else %}#{% endif %}">Conversation
+                            {% if "view_public_notes" in user_project_perms or "use_public_notes" in user_project_perms %}
+                                {% if active_project_conversation_notifications_count %}
+                                    <span class="badge text-bg-danger" data-test-id="badge-tab-new-message">{{ active_project_conversation_notifications_count }}</span>
                                 {% endif %}
                             {% else %}
                                 <span class="fr-icon--sm fr-icon-lock-line" aria-hidden="true"></span>
@@ -159,29 +112,79 @@
                         </a>
                     </label>
                 </div>
-            {% endif %}
-            <div class="fr-segmented__element"
-                 {% if "invite_collaborators" not in user_project_perms and "invite_advisors" not in user_project_perms and "manage_advisors" not in user_project_perms and "manage_collaborators" not in user_project_perms and "change_project" not in user_project_perms and not is_staff %} aria-describedby="tooltip-lock-access-settings" {% endif %}>
-                {% include "projects/project/fragments/navigation/tooltip_lock_access.html" with id="tooltip-lock-access-settings" %}
-                <input value="administrationPanel"
-                       type="radio"
-                       {% if administration_panel %}checked{% endif %}
-                       aria-checked="{% if administration_panel %}true{% else %}false{% endif %}"
-                       {% if "invite_collaborators" in user_project_perms or "invite_advisors" in user_project_perms or "manage_advisors" in user_project_perms or "manage_collaborators" in user_project_perms or "change_project" in user_project_perms or is_staff %} @click="window.location='{% url 'projects-project-administration' project.pk %}'" {% else %} disabled {% endif %}
-                       id="segmented-control-tasks"
-                       name="segmented-control-project">
-                <label class="fr-label" for="segmented-control-tasks">
-                    <a class="stretched-link"
-                       data-test-id="navigation-administration-tab"
-                       href="{% if "invite_collaborators" in user_project_perms or "invite_advisors" in user_project_perms or "manage_advisors" in user_project_perms or "manage_collaborators" in user_project_perms or "change_project" in user_project_perms or is_staff %} {% url 'projects-project-administration' project.pk %} {% else %}#{% endif %}">Paramètres
-                        {% if "invite_collaborators" not in user_project_perms and "invite_advisors" not in user_project_perms and "manage_advisors" not in user_project_perms and "manage_collaborators" not in user_project_perms and "change_project" not in user_project_perms and not is_staff %}
-                            <span class="fr-icon--sm fr-icon-lock-line" aria-hidden="true"></span>
-                        {% endif %}
-                    </a>
-                </label>
+                <div class="fr-segmented__element"
+                     {% if 'manage_documents' not in user_project_perms %}aria-describedby="tooltip-lock-access-files-links"{% endif %}>
+                    {% include "projects/project/fragments/navigation/tooltip_lock_access.html" with id="tooltip-lock-access-files-links" %}
+                    <input value="filesLinks"
+                           type="radio"
+                           {% if files_links %}checked{% endif %}
+                           aria-checked="{% if files_links %}true{% else %}false{% endif %}"
+                           {% if 'manage_documents' in user_project_perms %} @click="window.location='{% url 'projects-project-detail-documents' project.pk %}'" {% else %} disabled {% endif %}
+                           id="segmented-control-tasks"
+                           name="segmented-control-project">
+                    <label class="fr-label" for="segmented-control-tasks">
+                        <a class="stretched-link"
+                           data-test-id="project-navigation-documents"
+                           href="{% if 'manage_documents' in user_project_perms %} {% url 'projects-project-detail-documents' project.pk %} {% else %}#{% endif %}">Fichiers
+                            {% if 'manage_documents' in user_project_perms %}
+                                {% if active_project_document_notifications_count %}
+                                    <span class="badge text-bg-danger" data-test-id="badge-tab-new-file">{{ active_project_document_notifications_count }}</span>
+                                {% endif %}
+                            {% else %}
+                                <span class="fr-icon--sm fr-icon-lock-line" aria-hidden="true"></span>
+                            {% endif %}
+                        </a>
+                    </label>
+                </div>
+                {% if "list_projects" in user_site_perms or 'use_private_notes' in user_project_perms %}
+                    <div class="fr-segmented__element"
+                         id="overview-step-4"
+                         {% if 'use_private_notes' not in user_project_perms %}aria-describedby="tooltip-lock-access-internal-followup"{% endif %}>
+                        {% include "projects/project/fragments/navigation/tooltip_lock_access.html" with id="tooltip-lock-access-internal-followup" %}
+                        <input value="internalFollowup"
+                               type="radio"
+                               {% if internal_followup %}checked{% endif %}
+                               aria-checked="{% if internal_followup %}true{% else %}false{% endif %}"
+                               {% if 'use_private_notes' in user_project_perms %} @click="window.location='{% url 'projects-project-detail-internal-followup' project.pk %}'" {% else %} disabled {% endif %}
+                               id="segmented-control-tasks"
+                               name="segmented-control-project">
+                        <label class="fr-label" for="segmented-control-tasks">
+                            <a class="stretched-link"
+                               href="{% if 'use_private_notes' in user_project_perms %} {% url 'projects-project-detail-internal-followup' project.pk %} {% else %}#{% endif %}">Espace conseillers
+                                {% if 'use_private_notes' in user_project_perms %}
+                                    {% if active_project_private_conversation_notifications_count %}
+                                        <span class="badge text-bg-danger">{{ active_project_private_conversation_notifications_count }}</span>
+                                    {% endif %}
+                                {% else %}
+                                    <span class="fr-icon--sm fr-icon-lock-line" aria-hidden="true"></span>
+                                {% endif %}
+                            </a>
+                        </label>
+                    </div>
+                {% endif %}
+                <div class="fr-segmented__element"
+                     {% if "invite_collaborators" not in user_project_perms and "invite_advisors" not in user_project_perms and "manage_advisors" not in user_project_perms and "manage_collaborators" not in user_project_perms and "change_project" not in user_project_perms and not is_staff %} aria-describedby="tooltip-lock-access-settings" {% endif %}>
+                    {% include "projects/project/fragments/navigation/tooltip_lock_access.html" with id="tooltip-lock-access-settings" %}
+                    <input value="administrationPanel"
+                           type="radio"
+                           {% if administration_panel %}checked{% endif %}
+                           aria-checked="{% if administration_panel %}true{% else %}false{% endif %}"
+                           {% if "invite_collaborators" in user_project_perms or "invite_advisors" in user_project_perms or "manage_advisors" in user_project_perms or "manage_collaborators" in user_project_perms or "change_project" in user_project_perms or is_staff %} @click="window.location='{% url 'projects-project-administration' project.pk %}'" {% else %} disabled {% endif %}
+                           id="segmented-control-tasks"
+                           name="segmented-control-project">
+                    <label class="fr-label" for="segmented-control-tasks">
+                        <a class="stretched-link"
+                           data-test-id="navigation-administration-tab"
+                           href="{% if "invite_collaborators" in user_project_perms or "invite_advisors" in user_project_perms or "manage_advisors" in user_project_perms or "manage_collaborators" in user_project_perms or "change_project" in user_project_perms or is_staff %} {% url 'projects-project-administration' project.pk %} {% else %}#{% endif %}">Paramètres
+                            {% if "invite_collaborators" not in user_project_perms and "invite_advisors" not in user_project_perms and "manage_advisors" not in user_project_perms and "manage_collaborators" not in user_project_perms and "change_project" not in user_project_perms and not is_staff %}
+                                <span class="fr-icon--sm fr-icon-lock-line" aria-hidden="true"></span>
+                            {% endif %}
+                        </a>
+                    </label>
+                </div>
             </div>
-        </div>
-    </fieldset>
+        </fieldset>
+    {% endwith %}
     <div class="d-flex">
         <div class="d-flex fr-px-4w align-items-center">
             {% if "use_crm" in user_site_perms and not disable_crm %}
@@ -246,11 +249,8 @@
                                     </div>
                                     <div>
                                         <p class="fr-pl-8v fr-mb-0 specific-fontsize-14px">
-                                            {% if position.is_advisor or position.is_observer %}
-                                                Vous pouvez voir les éléments du projet, mais n’avez pas accès aux fonctionnalités de communication avec le porteur de projet.
-                                            {% else %}
-                                                Vous avez accès à l'intégralité du projet et recevez les notifications de mises à jour, mais vous ne pouvez pas communiquer avec le porteur de projet.
-                                            {% endif %}
+                                            Vous avez accès à l'intégralité du projet et recevez les notifications de mises à jour,
+                                            mais vous n'êtes pas identifié comme un interlocuteur actif.
                                         </p>
                                     </div>
                                 </div>
@@ -268,11 +268,8 @@
                                     </div>
                                     <div>
                                         <p class="fr-pl-8v fr-mb-0 specific-fontsize-14px">
-                                            {% if position.is_advisor or position.is_observer %}
-                                                Vous pouvez envoyer des messsages et recommandation au porteur de projet ainsi qu’intéragir avec l’équipe conseil.
-                                            {% else %}
-                                                Vous pouvez en plus communiquer avec le porteur de projet, lui envoyer des recommandations et interagir avec les autres conseillers.
-                                            {% endif %}
+                                            Vous avez accès à l'intégralité du projet et à ses notifications par email,
+                                            et êtes identifié comme un interlocuteur disponible sur ce projet.
                                         </p>
                                     </div>
                                 </div>
