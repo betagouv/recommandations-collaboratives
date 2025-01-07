@@ -106,6 +106,7 @@ function Tutorial(challengeCode) {
       this.handleStartTour();
     },
     async handleStartTour() {
+      if (!this.tour) return;
       this.tour.start();
       await this.startChallenge(this.challengeCode);
     },
