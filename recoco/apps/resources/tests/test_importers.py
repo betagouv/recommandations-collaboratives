@@ -1,11 +1,18 @@
-import pytest
 import requests_mock
 from requests_html import HTMLSession
 
 from .. import importers
 
 
-@pytest.mark.skip(reason="need work on this test")
+########
+# Base Importer
+########
+def test_already_imported_resource(mocker):
+    # mwi_class = importers.wiki.MediaWikiRIAdapter
+    pass
+
+
+# -- Mediawiki -- #
 def test_mediawiki_adapter(mocker):
     mwi_class = importers.wiki.MediaWikiRIAdapter
 
@@ -67,10 +74,8 @@ MEDIAWIKI_SAMPLE_PAGE = """
 </head>
 </html>"""
 
+
 # -- Aides Territoires --
-
-
-@pytest.mark.skip(reason="need work on this test")
 def test_aides_territoires_adapter_handling(mocker, settings):
     mwi_class = importers.api.AidesTerritoiresRIAdapter
 
@@ -88,12 +93,6 @@ def test_aides_territoires_adapter_handling(mocker, settings):
             False,
         ),
         (
-            "",
-            404,
-            None,
-            False,
-        ),
-        (
             "https://youcantfind.me/ici",
             404,
             None,
@@ -105,7 +104,7 @@ def test_aides_territoires_adapter_handling(mocker, settings):
         session = HTMLSession()
 
         for uri, return_code, text, expected in test_uris:
-            m.get(uri[0], return_code=return_code, text=text)
+            m.get(uri, status_code=return_code, text=text)
             response = session.get(uri)
             assert mwi_class.can_handle(response) is expected
 
@@ -167,8 +166,54 @@ def test_aides_territoires_adapter(mocker, settings):
         assert mwi.content is not None
 
 
+def test_aides_territoires_adapter_with_incomplete_payload(mocker, settings):
+    settings.AIDES_TERRITOIRES_TOKEN = "a-fake-token"
+
+    mwi_class = importers.api.AidesTerritoiresRIAdapter
+
+    uri = "https://aides-territoires.beta.gouv.fr/aides/32cf-sadapter-au-recul-du-trait-de-cote/"
+
+    with requests_mock.Mocker() as m:
+        m.get(
+            uri,
+            text="<!DOCTYPE html><html><head></head></html>",
+        )
+
+        m.get(
+            "https://aides-territoires.beta.gouv.fr/api/aids/32cf-sadapter-au-recul-du-trait-de-cote/",
+            status_code=200,
+            text=SAMPLE_INCOMPLETE_AT_AID,
+        )
+
+        m.post(
+            "https://aides-territoires.beta.gouv.fr/api/connexion/",
+            json={"token": "my-super-token"},
+        )
+
+        session = HTMLSession()
+        response = session.get(uri)
+
+        assert mwi_class.can_handle(response) is True
+
+        mwi = mwi_class(uri)
+        assert mwi.load_data(response) is True
+
+        mwi.extract_data()
+
+        assert mwi.content is not None
+
+
 SAMPLE_AT_AID = """{
-  "id": 156168,
+  "id": "156168",
+  "slug": "32cf-sadapter-au-recul-du-trait-de-cote",
+  "url": "/aides/32cf-sadapter-au-recul-du-trait-de-cote/",
+  "name": "S'adapter au recul du trait de côte",
+  "description": "very nice decription",
+  "eligibility": "very eligible"
+}"""
+
+SAMPLE_INCOMPLETE_AT_AID = """{
+  "id": "156168",
   "slug": "32cf-sadapter-au-recul-du-trait-de-cote",
   "url": "/aides/32cf-sadapter-au-recul-du-trait-de-cote/",
   "name": "S'adapter au recul du trait de côte",

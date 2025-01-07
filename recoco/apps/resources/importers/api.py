@@ -65,21 +65,25 @@ class AidesTerritoiresRIAdapter(BaseRIAdapter):
 
     def _clean_at_section(self, html: str):
         """Remove styles, ids, and external item from html tags"""
+        if not html:
+            return None
+
         doc = pandoc.read(html, format="html")
 
         return pandoc.write(doc, format="markdown_strict")
 
     def extract_data(self):
         self.title = self.raw_data["name"]
-        description = self._clean_at_section(self.raw_data["description"])
-        eligibility = self._clean_at_section(self.raw_data["eligibility"])
 
-        self.content = (
-            """## Description"""
-            """\n"""
-            f"""{description}"""
-            """\n"""
-            """## Critères d'éligibilité"""
-            """\n"""
-            f"""{eligibility}"""
+        sections = (
+            ("description", "Description"),
+            ("eligibility", "Critères d'éligibilité"),
         )
+
+        self.content = ""
+        for section_key, section_title in sections:
+            section_content = self._clean_at_section(
+                self.raw_data.get(section_key, None)
+            )
+            if section_content:
+                self.content += f"""## {section_title}\n\n{section_content}\n\n"""
