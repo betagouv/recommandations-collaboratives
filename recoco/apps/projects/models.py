@@ -398,7 +398,11 @@ class Project(models.Model):
 
     @property
     def full_name(self):
-        return " ".join([self.first_name, self.last_name])
+        return f"{self.first_name} {self.last_name}"
+
+    @property
+    def full_name_reversed(self):
+        return f"{self.last_name} {self.first_name}"
 
     @property
     def has_blocked_action(self):
