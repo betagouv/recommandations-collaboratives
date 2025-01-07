@@ -132,19 +132,21 @@
                                             </div>
                                             {% if project.tags.count > 0 %}
                                                 <div class="d-flex">
-                                                    <div class="project-info__container-tags">
+                                                    <div class="project-info__container-tags" data-cy="container-tags">
                                                         <span class="fr-icon-pantone-line fr-icon--sm" aria-hidden="true"></span>
                                                         {% for tag in project.tags.all %}<span class="project-info__tag fr-mr-1v">#{{ tag }}</span>{% endfor %}
                                                     </div>
                                                     {% if "use_project_tags" in user_site_perms %}
                                                         <a class="fr-btn fr-btn--sm fr-btn--tertiary-no-outline fr-icon-pencil-line btn-tag-specific-size"
-                                                           href="{% url "projects-project-tags" project.id %}">Modifier les étiquettes</a>
+                                                           href="{% url "projects-project-tags" project.id %}"
+                                                           data-cy="overview-edit-project-tag">Modifier les étiquettes</a>
                                                     {% endif %}
                                                 </div>
                                             {% else %}
                                                 {% if "use_project_tags" in user_site_perms %}
                                                     <a class="fr-btn fr-btn--sm fr-btn--tertiary fr-btn--icon-left fr-icon-pencil-line"
-                                                       href="{% url "projects-project-tags" project.id %}">Ajouter des tags au projet</a>
+                                                       href="{% url "projects-project-tags" project.id %}"
+                                                       data-cy="overview-add-project-tag">Ajouter des tags au projet</a>
                                                 {% endif %}
                                             {% endif %}
                                         </div>
