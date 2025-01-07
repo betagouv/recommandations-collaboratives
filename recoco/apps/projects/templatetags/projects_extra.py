@@ -74,9 +74,4 @@ def get_project_moderation_count():
     ).count()
 
 
-@register.filter
-def split_last(value, arg="/"):
-    return value.rsplit(arg, 1)[-1] if value else ""
-
-
 # eof

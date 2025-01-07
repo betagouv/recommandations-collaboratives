@@ -1,6 +1,7 @@
 {% extends "projects/project/detail.html" %}
 {% load humanize %}
 {% load static %}
+{% load common_tags %}
 {% load survey %}
 {% load gravatar %}
 {% load guardian_tags %}
@@ -58,7 +59,7 @@
                                                             {% for choice in choices %}
                                                                 <span class="text-info-custom text-black fw-medium description">{{ choice.conclusion|default:choice.text|capfirst }}</span>
                                                             {% endfor %}
-                                                            <span class="text-info-custom text-black fr-ml-2v name">{{ answer.attachment.file.name }}</span>
+                                                            <span class="text-info-custom text-black fr-ml-2v name">{{ answer.attachment|filename|truncatechars:30 }}</span>
                                                             {% if answer.attachment.size %}
                                                                 <span class="text-info-custom text-black fr-ml-2v">({{ answer.attachment.size|filesizeformat }})</span>
                                                             {% endif %}
