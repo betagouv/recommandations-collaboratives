@@ -130,13 +130,21 @@ def test_task_recommendation_is_updated(request, client):
 
 
 @pytest.mark.django_db
+def test_task_recommendation_delete_not_available_on_get(request, client):
+    url = reverse("projects-task-recommendation-delete", args=(999,))
+    with login(client):
+        response = client.get(url)
+    assert response.status_code == 405
+
+
+@pytest.mark.django_db
 def test_task_recommendation_delete_not_available_for_non_staff(request, client):
     recommendation = Recipe(
         models.TaskRecommendation, site=get_current_site(request)
     ).make()
     url = reverse("projects-task-recommendation-delete", args=(recommendation.pk,))
     with login(client):
-        response = client.get(url)
+        response = client.post(url)
     assert response.status_code == 403
 
 
