@@ -13,6 +13,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.text import slugify
+from django.views.decorators.http import require_http_methods
 
 from recoco.apps.projects import models as project_models
 from recoco.apps.projects.forms import DocumentUploadForm
@@ -379,6 +380,7 @@ def task_recommendation_update(request, recommendation_id):
 
 
 @login_required
+@require_http_methods(["POST"])
 def task_recommendation_delete(request, recommendation_id):
     """Delete a task recommendation"""
 
