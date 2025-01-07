@@ -42,6 +42,10 @@ Cypress.Commands.add('login', (role) => {
     case 'conseiller4': //conseiller
       username = users[11].fields.username;
       break;
+    case 'regional2': //conseiller
+    case 'conseiller5': //conseiller
+      username = users[12].fields.username;
+      break;
     case 'bob': //collectivité
     case 'collectivité1': //collectivité
       username = users[4].fields.username;

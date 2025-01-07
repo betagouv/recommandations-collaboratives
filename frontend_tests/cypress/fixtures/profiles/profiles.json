@@ -88,5 +88,20 @@
             ],
             "sites" : [1]
         }
+    },
+    {
+        "model": "home.userprofile",
+        "pk": 13,
+        "fields": {
+            "user": 13,
+            "organization": 2,
+            "phone_no": "",
+            "organization_position": null,
+            "deleted": null,
+            "departments": [
+                42
+            ],
+            "sites" : [1]
+        }
     }
 ]

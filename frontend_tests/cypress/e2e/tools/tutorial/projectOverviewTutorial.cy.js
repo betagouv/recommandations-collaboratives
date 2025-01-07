@@ -1,16 +1,16 @@
 import projects from '../../../fixtures/projects/projects.json';
 
 const currentProject = projects[1];
-const currentProject2 = projects[24];
+const currentProject2 = projects[25];
 
 describe('I can follow the project tutorial', () => {
-  xit('displays the launcher tutorial on the overview window as regional advisor', () => {
+  it('displays the launcher tutorial on the overview window as regional advisor', () => {
     cy.login('conseiller1');
     cy.visit(`/project/${currentProject.pk}`);
     cy.get('[data-test-id="tutorial-project-launcher"]').should.exist;
   });
 
-  xit('snooze the tutorial and tutorial disappear', () => {
+  it('snooze the tutorial and tutorial disappear', () => {
     cy.login('conseiller1');
     cy.visit(`/project/${currentProject.pk}`);
 
@@ -19,7 +19,7 @@ describe('I can follow the project tutorial', () => {
     cy.get('[data-test-id="tutorial-project-launcher"]').should('not.exist');
   });
 
-  xit('fills up the tutorial and tutorial disappear', () => {
+  it('fills up the tutorial and tutorial disappear', () => {
     cy.login('conseiller2');
     cy.visit(`/project/2`);
 
@@ -34,7 +34,7 @@ describe('I can follow the project tutorial', () => {
   });
 
 
-  xit('displays the launcher tutorial on the overview window as advisor', () => {
+  it('displays the launcher tutorial on the overview window as advisor', () => {
     cy.login('conseiller3');
     cy.visit(`/project/${currentProject.pk}`);
     cy.becomeAdvisor(currentProject.pk);
@@ -51,12 +51,12 @@ describe('I can follow the project tutorial', () => {
   it('displays the launcher tutorial on the overview window as regional advisor not on the right region ', () => {
     cy.login('conseiller4');
     cy.visit(`/project/${currentProject2.pk}`);
-    cy.get('[data-test-id="tutorial-project-launcher"]').should.exist;
+    cy.get('[data-test-id="tutorial-project-launcher"]').should('not.exist');
   });
 
-  xit('displays the launcher tutorial on the overview window as regional advisor not on the right region', () => {
-    cy.login('conseiller4');
-    cy.visit(`/project/25`);
+  it('displays the launcher tutorial on the overview window as regional advisor not on the right region but with an invite accepted', () => {
+    cy.login('conseiller5');
+    cy.visit(`/project/${currentProject2.pk}`);
     cy.get('[data-test-id="tutorial-project-launcher"]').should.exist;
   });
 });
