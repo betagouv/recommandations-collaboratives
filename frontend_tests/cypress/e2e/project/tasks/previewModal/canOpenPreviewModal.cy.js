@@ -7,7 +7,7 @@ const task2 = tasks[1];
 describe('I can go tasks tab', () => {
   beforeEach(() => {
     cy.login('staff');
-    cy.becomeAdvisor(currentProject.pk);
+    cy.becomeAdvisor(currentProject.pk); // A remplacer par une fixture avec un user déjà advisor du projet
   });
 
   it('opens a modal with the task', () => {
@@ -18,3 +18,5 @@ describe('I can go tasks tab', () => {
     cy.contains(task2.fields.intent);
   });
 });
+
+// page recommandation

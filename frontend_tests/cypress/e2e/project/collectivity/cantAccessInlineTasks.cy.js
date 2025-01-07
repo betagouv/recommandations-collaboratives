@@ -8,11 +8,10 @@ describe("I can go to action page but can't see the loop to access the inline ta
   });
 
   it("goes to action page and can't see inline tasks loop button", () => {
-    cy.visit(`/project/${currentProject.pk}`);
+    cy.visit(`/project/${currentProject.pk}/actions`);
 
-    cy.contains('Recommandations').click({ force: true });
-
-    cy.url().should('include', '/actions');
     cy.get('#tasks-inline-button').should('not.exist');
   });
 });
+
+// page recommandations
