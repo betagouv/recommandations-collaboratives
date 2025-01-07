@@ -1,13 +1,19 @@
+from copy import deepcopy as copy
+
 from django.conf import settings
+from django.contrib.sites.models import Site
 from django.db import models
+from django.utils.functional import cached_property
 from model_utils.models import TimeStampedModel
 
 from recoco.apps.geomatics.models import Department
+from recoco.apps.home.models import SiteConfiguration
 from recoco.apps.projects.models import Project
 from recoco.apps.resources.models import Resource
+from recoco.apps.survey.models import Question, QuestionSet
 from recoco.apps.tasks.models import Task
 
-from .utils import hash_data
+from .utils import MappingField, hash_data, project_mapping_fields
 
 
 class DSResource(TimeStampedModel):
@@ -38,6 +44,31 @@ class DSResource(TimeStampedModel):
     @property
     def preremplir_url(self) -> str:
         return f"{settings.DS_BASE_URL}/preremplir/{self.name}"
+
+    @property
+    def fields(self) -> list[MappingField]:
+        # FIXME: trouver la liste des champs communs DS, hors schema
+        fields = [
+            MappingField(
+                id="identite_prenom",
+                label="Prénom",
+            ),
+            MappingField(
+                id="identite_nom",
+                label="Nom",
+            ),
+        ]
+        try:
+            fields += [
+                MappingField(
+                    id="champ_" + field.get("id").replace("==", ""),
+                    label=field.get("label"),
+                )
+                for field in self.schema["revision"]["champDescriptors"]
+            ]
+        except KeyError:
+            pass
+        return fields
 
 
 class DSFolder(TimeStampedModel):
@@ -83,3 +114,71 @@ class DSFolder(TimeStampedModel):
     @property
     def prefilled_count(self) -> int:
         return len(self.content)
+
+
+class DSMappingManager(models.Manager):
+    def get_queryset(self) -> models.QuerySet:
+        return super().get_queryset().select_related("ds_resource", "site")
+
+
+class DSMapping(TimeStampedModel):
+    ds_resource = models.ForeignKey(
+        DSResource,
+        on_delete=models.CASCADE,
+        related_name="ds_mappings",
+    )
+
+    site = models.ForeignKey(
+        Site,
+        on_delete=models.CASCADE,
+        related_name="ds_mappings",
+    )
+
+    enabled = models.BooleanField(default=True)
+
+    mapping = models.JSONField(default=dict, blank=True)
+
+    objects = DSMappingManager()
+
+    class Meta:
+        verbose_name = "Mapping configuration"
+        verbose_name_plural = "Mapping configurations"
+        ordering = ["-created"]
+        unique_together = ["ds_resource", "site"]
+        indexes = [
+            models.Index(fields=["enabled"]),
+        ]
+
+    def __str__(self) -> str:
+        return f"{self.ds_resource} - {self.site}"
+
+    @property
+    def ds_fields(self) -> list[MappingField]:
+        return self.ds_resource.fields
+
+    @cached_property
+    def recoco_fields(self) -> list[MappingField]:
+        fields = copy(project_mapping_fields)
+
+        if site_configuration := SiteConfiguration.objects.filter(
+            site=self.site
+        ).first():
+            if survey := site_configuration.project_survey:
+                for question in Question.objects.filter(
+                    question_set__in=QuestionSet.objects.filter(
+                        survey_id=survey.id
+                    ).values("id")
+                ):
+                    fields.append(
+                        MappingField(
+                            id=f"edl.{question.slug}",
+                            label=question.text_short,
+                            lookup=question.slug,
+                        ),
+                    )
+
+        return fields
+
+    @cached_property
+    def indexed_recoco_fields(self) -> dict[str, MappingField]:
+        return {field.id: field for field in self.recoco_fields}

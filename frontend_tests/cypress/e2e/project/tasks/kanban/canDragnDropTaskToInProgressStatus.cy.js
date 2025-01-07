@@ -16,7 +16,7 @@ describe('I can go to tasks tab', () => {
   it('drags n drops no status task to in progress status', () => {
     cy.visit(`/project/${currentProjectId}`);
 
-    cy.becomeAdvisor(currentProjectId);
+    cy.becomeAdvisor(currentProjectId); // A remplacer par une fixture avec un user déjà advisor du projet
     cy.visit(`/project/${currentProjectId}/actions`);
 
     cy.createTask(taskName);
@@ -40,3 +40,5 @@ describe('I can go to tasks tab', () => {
     // TODO : finish this test to trigger api calls
   });
 });
+
+// page recommandation

@@ -22,7 +22,7 @@ export default function PreviewModal() {
     get taskId() {
       return this.$store.previewModal.taskId;
     },
-    get task() {
+    get currentTask() {
       return this.$store.tasksData.getTaskById(this.taskId);
     },
     get followups() {
@@ -58,7 +58,7 @@ export default function PreviewModal() {
       this.$store.editor.setIsSubmitted(true);
       if (!this.currentlyEditing) {
         await this.$store.tasksData.issueFollowup(
-          this.task,
+          this.currentTask,
           undefined,
           content
         );
@@ -67,14 +67,18 @@ export default function PreviewModal() {
       } else {
         const [type, id] = this.currentlyEditing;
         if (type === 'followup') {
-          await this.$store.tasksData.editComment(this.task.id, id, content);
+          await this.$store.tasksData.editComment(
+            this.currentTask.id,
+            id,
+            content
+          );
           await this.$store.previewModal.loadFollowups();
           await this.$store.tasksView.updateView();
         } else if (type === 'content') {
-          await this.$store.tasksData.patchTask(this.task.id, {
+          await this.$store.tasksData.patchTask(this.currentTask.id, {
             content: content,
           });
-          await this.$store.tasksView.updateViewWithTask(this.task.id);
+          await this.$store.tasksView.updateViewWithTask(this.currentTask.id);
         }
       }
 
@@ -82,7 +86,7 @@ export default function PreviewModal() {
       this.currentlyEditing = null;
       this.$dispatch('set-comment', this.pendingComment);
       this.followupScrollToLastMessage();
-      if (!this.task.public) {
+      if (!this.currentTask.public) {
         this.showEdition = false;
       }
     },
@@ -95,10 +99,10 @@ export default function PreviewModal() {
     },
     onEditContent() {
       this.showEdition = true;
-      this.pendingComment = this.task.content;
-      this.currentlyEditing = ['content', this.task.id];
+      this.pendingComment = this.currentTask.content;
+      this.currentlyEditing = ['content', this.currentTask.id];
       document.querySelector('#comment-text-ref .ProseMirror').focus();
-      this.$dispatch('set-comment', this.task.content);
+      this.$dispatch('set-comment', this.currentTask.content);
     },
     loadContent() {
       this.contentIsLoading = true;

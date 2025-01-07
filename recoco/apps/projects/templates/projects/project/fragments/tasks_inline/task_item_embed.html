@@ -42,7 +42,9 @@
         <template x-if="currentTask.resource">
             <article>{% include "projects/project/fragments/task/task_comment.html" %}</article>
         </template>
-        <template x-if="currentTask.ds_folder">
+
+        <!-- DS integration -->
+        <template x-if="currentTask.ds_folder && currentTask.ds_folder.prefilled_count > 0">
             <hr class="fr-mt-3w">
             <div>
                 <h4 class="fw-bolder">
@@ -53,19 +55,16 @@
                     Dossier Démarches Simplifiées
                 </h4>
                 <p class="fr-text-mention--grey fr-text--sm fr-my-3v">
-                    Complétez l’état des lieux pour pré-remplir automatiquement le dossier de candidature.
+                    Un dossier a été pré-rempli sur Démarches simplifiées avec les éléments que vous avez renseignés ici.
                 </p>
                 <a class="fr-btn fr-btn--secondary fr-btn--sm"
                    @click.stop=""
-                   x-bind:href="currentTask.ds_folder.dossier_url">Voir mon dossier</a>
-                <span class="fr-ml-2w fr-text-label--blue-france fr-text--xs">
-                    {% if task.ds_folder.prefilled_count > 1 %}
-                        {{ task.ds_folder.prefilled_count }} données pré-remplies
-                    {% elif task.ds_folder.prefilled_count > 0 %}
-                        1 donnée pré-remplie
-                    {% else %}
-                        aucune donnée pré-remplie
-                    {% endif %}
+                   x-bind:href="currentTask.ds_folder.dossier_url"
+                   target="_blank">
+                   Voir mon dossier
+                </a>
+                <span class="fr-ml-2w fr-text-label--blue-france fr-text--xs"
+                    x-text="currentTask.ds_folder.prefilled_count > 1 ? `${currentTask.ds_folder.prefilled_count} champs pré-remplis` : '1 champ pré-rempli'">
                 </span>
             </div>
         </template>
