@@ -15,6 +15,7 @@ from django.db.utils import IntegrityError
 from django.shortcuts import get_object_or_404, redirect, render, reverse
 from django.utils import timezone
 
+from recoco.apps.survey.models import Answer
 from recoco.utils import has_perm_or_403
 
 from .. import models, signals
@@ -40,6 +41,11 @@ def document_list(request, project_id=None):
     )
     pinned_files = all_files.filter(pinned=True)
     links = models.Document.objects.filter(project_id=project.pk).exclude(the_link=None)
+
+    # Fetch Answers from Surveys if they have attachments
+    answers_with_files = Answer.objects.filter(session__project_id=project_id).exclude(
+        attachment=""
+    )
 
     # Mark this project document notifications as read
     if not request.user.is_hijacked:

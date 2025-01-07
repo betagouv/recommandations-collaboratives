@@ -42,6 +42,13 @@
                                 {% endif %}
                             </div>
                             {% include "projects/project/fragments/files_links/file_list.html" with files=all_files %}
+
+                            <ul>
+                            {% for answer in answers_with_files.all %}
+                                <li>{{ answer.question }} - {{ answer.attachment }}</li>
+                            {% endfor %}
+                            </ul>
+
                             {% for session in project.survey_session.all %}
                                 {% regroup session.the_answers.all by question.question_set as answer_list %}
                                 {% for question_set, answers in answer_list %}
