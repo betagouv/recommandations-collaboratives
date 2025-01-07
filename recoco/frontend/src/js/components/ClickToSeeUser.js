@@ -7,14 +7,14 @@ Alpine.data('ClickToSeeUser', (userId) => {
     displayUser: false,
     init() {
       this.usersIdAlreadyDiscovered =
-        JSON.parse(localStorage.getItem('users')) || [];
+        JSON.parse(localStorage.getItem('displayUsersContact')) || [];
       this.displayUser = this.usersIdAlreadyDiscovered.includes(this.userId);
     },
     handleClickToSeeInfo() {
       if (!this.usersIdAlreadyDiscovered.includes(this.userId)) {
         this.usersIdAlreadyDiscovered.push(this.userId);
         localStorage.setItem(
-          'users',
+          'displayUsersContact',
           JSON.stringify(this.usersIdAlreadyDiscovered)
         );
       }
