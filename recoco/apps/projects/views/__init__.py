@@ -164,7 +164,7 @@ def project_moderation_accept(request, project_pk):
                     ),
                     "survey_site": digests.make_site_digest(request.site),
                     "survey": digests.make_project_survey_digest_for_site(
-                        request.user,
+                        owner,
                         project,
                         request.site,
                     ),

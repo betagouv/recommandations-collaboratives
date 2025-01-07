@@ -5,7 +5,7 @@ describe('I can go to tasks tab', () => {
     cy.createProject('task above').then((projectId) => {
       currentProjectId = projectId;
       cy.visit(`/project/${currentProjectId}`);
-      cy.becomeAdvisor(currentProjectId);
+      cy.becomeAdvisor(currentProjectId); // A remplacer par une fixture avec un user déjà advisor du projet
       cy.visit(`/project/${currentProjectId}/actions`);
 
       cy.createTask(1);
@@ -26,3 +26,5 @@ describe('I can go to tasks tab', () => {
     cy.get('#task-move-below').click();
   });
 });
+
+// page recommandation

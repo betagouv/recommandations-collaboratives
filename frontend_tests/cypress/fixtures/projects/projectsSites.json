@@ -273,7 +273,7 @@
     "pk": 28,
     "model": "projects.projectsite",
     "fields": {
-      "status": "",
+      "status": "TO_PROCESS",
       "is_origin": true,
       "project_id": 25,
       "site_id": 1
