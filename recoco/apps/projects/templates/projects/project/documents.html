@@ -58,7 +58,7 @@
                                                             {% for choice in choices %}
                                                                 <span class="text-info-custom text-black fw-medium description">{{ choice.conclusion|default:choice.text|capfirst }}</span>
                                                             {% endfor %}
-                                                            <span class="text-info-custom text-black fr-ml-2v name">{{ answer.attachment.url|split_last|truncatechars:15 }}</span>
+                                                            <span class="text-info-custom text-black fr-ml-2v name">{{ answer.attachment.file.name }}</span>
                                                             {% if answer.attachment.size %}
                                                                 <span class="text-info-custom text-black fr-ml-2v">({{ answer.attachment.size|filesizeformat }})</span>
                                                             {% endif %}
@@ -68,6 +68,7 @@
                                                         {% if "use_surveys" in user_project_perms %}
                                                             <a class="fr-btn fr-btn--tertiary-no-outline fr-icon-download-line"
                                                                href="{{ answer.attachment.url }}"
+                                                               data-test-id="download-attachment"
                                                                target="_new"
                                                                download></a>
                                                         {% endif %}
@@ -79,10 +80,6 @@
                                                         <span class="fr-icon--sm fr-icon-calendar-event-line fr-mr-1v"
                                                               aria-hidden="true"></span>
                                                     {{ answer.updated_on|naturalday }}</span>
-                                                    {% comment %} <span class="fr-ml-3w tiny d-flex align-items-center">- {{ answer.attachment.name }}</span>
-                                                    <span class="fr-ml-3w tiny d-flex align-items-center">- {{ answer.attachment.url }}</span>
-                                                    <span class="fr-ml-3w tiny d-flex align-items-center">- {{ answer.attachment.filename }} -</span> {% endcomment %}
-                                                    {% comment %} <span class="fr-ml-3w tiny d-flex align-items-center">{{ answer.attachment.filename[0] }}</span> {% endcomment %}
                                                     <span class="fr-ml-3w tiny d-flex align-items-center">Fichier récupéré de l'état des lieux</span>
                                                 </div>
                                             </div>
