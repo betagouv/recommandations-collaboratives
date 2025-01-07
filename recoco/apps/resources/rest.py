@@ -48,12 +48,35 @@ class ResourceViewSet(viewsets.ModelViewSet):
         site = get_current_site(self.request)
         serializer.save(created_by=self.request.user, sites=[site])
 
-    @action(detail=False, methods=["post"])
+    @action(
+        detail=False,
+        methods=["post"],
+        permission_classes=[permissions.IsAuthenticatedOrReadOnly],
+    )
     def import_from_uri(self, request):
+        """Import (create) a resource from an external known site, miroring it.
+
+        FIXME The current permissions do not allow a fine grained access, thus it is
+        left open to authenticated users. It should be restricted to only advisors or
+        invited advisors.
+
+        """
         serializer = ResourceURIImportSerializer(data=request.data)
         if serializer.is_valid():
+            resource_uri = serializer.validated_data["uri"]
+
+            # Check if we already have this resource
+            resource = models.Resource.on_site.filter(
+                imported_from=resource_uri
+            ).first()
+            if resource:
+                return Response(
+                    ResourceSerializer(resource).data, status=status.HTTP_200_OK
+                )
+
+            # Try to fetch it since we don't have it
             ri = ResourceImporter()
-            resource = ri.from_uri(serializer.validated_data["uri"])
+            resource = ri.from_uri(resource_uri)
             resource.save()
             resource.sites.add(request.site)
             resource.site_origin = request.site

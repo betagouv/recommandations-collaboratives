@@ -63,9 +63,12 @@ def resource_search(request):
 
     resources = models.Resource.search(query, categories)
 
-    # If we are not allowed to manage resources, filter out DRAFT/TO_REVIEW items
+    # If we are not allowed to manage resources, filter out DRAFT/TO_REVIEW items and
+    # imported resources
     if not has_perm(request.user, "manage_resources", request.site):
-        resources = resources.filter(status__gt=models.Resource.DRAFT)
+        resources = resources.filter(status__gt=models.Resource.DRAFT).filter(
+            imported_from=None
+        )
 
     # If we are a advisor, allow any departement to be filtered
     # Otherwise, show only departments related to my projects

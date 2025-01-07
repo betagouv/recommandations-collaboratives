@@ -1,6 +1,7 @@
 import logging
 import re
 
+import pandoc
 import requests
 from django.conf import settings
 
@@ -62,6 +63,23 @@ class AidesTerritoiresRIAdapter(BaseRIAdapter):
 
         return True
 
+    def _clean_at_section(self, html: str):
+        """Remove styles, ids, and external item from html tags"""
+        doc = pandoc.read(html, format="html")
+
+        return pandoc.write(doc, format="markdown_strict")
+
     def extract_data(self):
         self.title = self.raw_data["name"]
-        self.content = self.raw_data["description"]
+        description = self._clean_at_section(self.raw_data["description"])
+        eligibility = self._clean_at_section(self.raw_data["eligibility"])
+
+        self.content = (
+            """## Description"""
+            """\n"""
+            f"""{description}"""
+            """\n"""
+            """## Critères d'éligibilité"""
+            """\n"""
+            f"""{eligibility}"""
+        )
