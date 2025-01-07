@@ -12,7 +12,8 @@
            name="intent"
            x-model="intent"
            required
-           :readonly="push_type != 'noresource'">
+           :readonly="push_type != 'noresource'"
+           data-cy="input-title-task">
     {% for error in form.intent.errors %}<div class="text-danger text-end">{{ error }}</div>{% endfor %}
 </div>
 <!-- Action theme -->
@@ -78,6 +79,7 @@
     <button @click="set_draft(false)"
             type="submit"
             class="fr-btn fr-btn--lg"
+            data-cy="button-submit-task"
             :disabled="(push_type == 'single' && !selected_resource) || !$store.actionPusher.isSelectedProject">
         Publier la recommandation
     </button>

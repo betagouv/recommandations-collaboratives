@@ -14,11 +14,13 @@
                id="external-resource-url-input"
                x-ref="external_resource_url"
                @input="canLoadNewExternalResource = true"
-               name="external-resource-url-input">
+               name="external-resource-url-input"
+               data-cy="input-external-resource-url">
         <button class="fr-btn"
                 type="button"
                 :disabled="!canLoadNewExternalResource"
-                @click="postExternalResource($refs.external_resource_url.value)">Charger la ressource</button>
+                @click="postExternalResource($refs.external_resource_url.value)"
+                data-cy="button-external-resource-load">Charger la ressource</button>
     </div>
     <div x-show="isBusyExternalResource"
          x-transition

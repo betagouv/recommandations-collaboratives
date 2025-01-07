@@ -152,9 +152,14 @@ Alpine.data('ActionPusher', () => {
       } catch (error) {
         this.canLoadNewExternalResource = true;
         const errors = {
+          403: "Vous n'avez pas les droits pour récupérer cette ressource externe, contactez un administrateur",
           500: "Erreur lors de la récupération de la ressource externe, merci d'essayez à nouveau plus tard",
           501: "Il n'est pas encore possible de récupérer des ressources externes sur ce site",
         };
+        if (!errors[error.response.status]) {
+          this.externalResourceError =
+            'Erreur lors de la récupération de la ressource externe, merci de nous contacter si le problème persiste';
+        }
         this.externalResourceError = errors[error.response.status];
 
         console.error(error);

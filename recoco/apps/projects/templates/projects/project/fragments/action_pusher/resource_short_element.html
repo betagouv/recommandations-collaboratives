@@ -5,6 +5,7 @@
            :id="'resource-' + resource.id"
            name="resource"
            x-model="selected_resource"
+           data-cy="radio-resource-list-task"
            @click="setIntent(resource)">
     <label class="fr-label" :for="'resource-' + resource.id">
         <span class="ressources__result-item-title"
