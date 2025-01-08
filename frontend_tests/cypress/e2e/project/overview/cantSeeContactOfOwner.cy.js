@@ -26,5 +26,10 @@ describe('I can not see owner contact', () => {
       'contains.text',
       'bob@test.fr'
     );
+    cy.reload();
+    cy.get('[data-cy="container-revealed-contact"]').should(
+      'contains.text',
+      'bob@test.fr'
+    );
   });
 });
