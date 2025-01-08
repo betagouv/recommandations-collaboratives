@@ -25,9 +25,9 @@ def test_hit_view():
     headers = {"user-agent": "Mozilla/5.0"}
     payload = json.dumps(
         {
-            "content_ct": ct_label(contact),
+            "content_object_ct": ct_label(contact),
             "content_object_id": contact.id,
-            "context_ct": ct_label(recommendation),
+            "context_object_ct": ct_label(recommendation),
             "context_object_id": recommendation.id,
         }
     )
