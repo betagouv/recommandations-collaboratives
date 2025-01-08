@@ -50,6 +50,7 @@ const config = {
         topicSearch: resolve('./src/js/apps/topicSearch.js'),
         user: resolve('./src/js/apps/user.js'),
         tutorial: resolve('./src/js/apps/tutorial.js'),
+        contactAsk: resolve('./src/js/apps/contactAsk.js'),
         contactList: resolve('./src/js/apps/contactList.js'),
         projectDetailsCss: resolve('./src/css/projectDetails.css'),
         mapViewerStatic: resolve('./src/js/apps/mapViewerStatic.js'),
