@@ -19,6 +19,7 @@ from wagtail.documents import urls as wagtaildocs_urls
 
 from recoco.apps.addressbook.urls import urlpatterns as addressbook_urls
 from recoco.apps.crm.urls import urlpatterns as crm_urls
+from recoco.apps.hitcount.urls import urlpatterns as hitcount_urls
 from recoco.apps.home.urls import urlpatterns as home_urls
 from recoco.apps.invites.urls import urlpatterns as invites_urls
 from recoco.apps.onboarding.urls import urlpatterns as onboarding_urls
@@ -51,6 +52,7 @@ urlpatterns.extend(addressbook_urls)
 urlpatterns.extend(survey_urls)
 urlpatterns.extend(invites_urls)
 urlpatterns.extend(crm_urls)
+urlpatterns.extend(hitcount_urls)
 
 if settings.DEBUG:
     import debug_toolbar

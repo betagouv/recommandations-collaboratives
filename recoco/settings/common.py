@@ -72,6 +72,7 @@ INSTALLED_APPS = [
     "phonenumber_field",
     "cookie_consent",
     "recoco.apps.feature_flag",
+    "recoco.apps.hitcount",
     "recoco.apps.dsrc",
     "recoco.apps.onboarding",
     "recoco.apps.home",
