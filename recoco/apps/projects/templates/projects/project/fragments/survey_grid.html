@@ -93,7 +93,7 @@
                         <div class="survey-card-cta">
                             <div class="survey-card-cta__title" data-cy="survey-name">{{ session.survey.name }}</div>
                             <a class="fr-btn fr-btn--sm"
-                               data-test-id="link-fill-survey"
+                               data-test-id="link-fill-survey-cta"
                                href="{% url 'survey-project-session' project_id=project.pk site_id=session.survey.site.id %}">Compléter le questionnaire</a>
                         </div>
                     {% endfor %}
