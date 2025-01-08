@@ -1,5 +1,23 @@
 describe('I can not see owner contact', () => {
-  it('display owner contact (as advisor)', () => {
+  it('display owner contact (as staff)', () => {
+    cy.login('staff');
+    cy.visit(`/project/2/presentation`);
+    cy.get('[data-cy="container-revealed-contact"]').should(
+      'contains.text',
+      'bob@test.fr'
+    );
+  });
+
+  it('display owner contact (as owner)', () => {
+    cy.login('bob');
+    cy.visit(`/project/2/presentation`);
+    cy.get('[data-cy="container-revealed-contact"]').should(
+      'contains.text',
+      'bob@test.fr'
+    );
+  });
+
+  it('display hiden owner contact (as advisor)', () => {
     cy.login('conseiller1');
     cy.visit(`/project/2/presentation`);
     cy.get('[data-cy="container-revealed-contact"]').should('not.be.visible');
