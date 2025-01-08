@@ -1,7 +1,44 @@
 from django.contrib import admin
+from django.contrib.contenttypes.models import ContentType
 from django.db.models import Count
 
 from .models import Hit, HitCount
+
+
+class ContentObjectCTFilter(admin.SimpleListFilter):
+    title = "Content object CT"
+    parameter_name = "content_object_ct"
+
+    def lookups(self, request, model_admin):
+        return [
+            (ct, ct)
+            for ct in ContentType.objects.filter(
+                hitcount_set_for_content__isnull=False
+            ).distinct()
+        ]
+
+    def queryset(self, request, queryset):
+        if value := self.value():
+            return queryset.filter(content_object_ct=value)
+        return queryset
+
+
+class ContextObjectCTFilter(admin.SimpleListFilter):
+    title = "Context object CT"
+    parameter_name = "content_object_ct"
+
+    def lookups(self, request, model_admin):
+        return [
+            (ct, ct)
+            for ct in ContentType.objects.filter(
+                hitcount_set_for_context__isnull=False
+            ).distinct()
+        ]
+
+    def queryset(self, request, queryset):
+        if value := self.value():
+            return queryset.filter(content_object_ct=value)
+        return queryset
 
 
 @admin.register(HitCount)
@@ -14,6 +51,8 @@ class HitCountAdmin(admin.ModelAdmin):
     )
     list_filter = (
         "site",
+        ContentObjectCTFilter,
+        ContextObjectCTFilter,
         "created",
     )
 
