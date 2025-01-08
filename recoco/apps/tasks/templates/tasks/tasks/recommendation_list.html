@@ -1,140 +1,122 @@
 {% extends "base.html" %}
 {% load static %}
 {% block title %}
-Configuration des suggestions automatiques
+    Configuration des suggestions automatiques
 {% endblock title %}
 {% block content %}
-
-
-<div class="col-12 fr-p-3w fr-mx-auto"
-    <div class="row recommendation-list fr-mb-2w">
-        <div class="col-sm-12 col-lg-8 col-xl-9 fr-mb-6w">
-            <h2>
-                <svg class="bi rounded-circle fr-p-2v" width="40" height="40">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#signpost-fill" />
-                </svg>
-                &nbsp;
-                <span class="align-middle">Configuration du Pré-fléchage</span>
-            </h2>
-            <span class="text-secondary">Vous pouvez configurer ici les ressources qui seront pré-fléchées à partir des
-                signaux collectés par les réponses aux questions de l'exploration.</span>
-        </div>
-
-        <!-- Sidebar -->
-        <div class="col-sm-12 col-lg-4 col-xl-3 border-start">
-            <!-- Ajouter -->
-            <div class="d-grid gap-2">
-                <a class="btn btn-light btn-sm" href="{% url 'projects-task-recommendation-create' %}" role="button">
-                    <svg class="bi" width="16" height="16" fill="currentColor">
-                        <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#plus-circle" />
+    <div class="col-12 fr-p-3w fr-mx-auto">
+        <div class="row recommendation-list fr-mb-2w">
+            <div class="col-sm-12 col-lg-8 col-xl-9 fr-mb-6w">
+                <h2>
+                    <svg class="bi rounded-circle fr-p-2v" width="40" height="40">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#signpost-fill" />
                     </svg>
                     &nbsp;
-                    Ajouter un pré-fléchage
-                </a>
+                    <span class="align-middle">Configuration du Pré-fléchage</span>
+                </h2>
+                <span class="text-secondary">Vous pouvez configurer ici les ressources qui seront pré-fléchées à partir des
+                signaux collectés par les réponses aux questions de l'exploration.</span>
             </div>
-        </div>
-
-        <!-- main content -->
-        <div>
-            {% for recommendation in recommendations %}
-
-            {% include "tasks/tasks/recommendation_delete_modal.html" with recommendation_id=recommendation.id %}
-
-            <div class="d-flex fr-mb-3w">
-                <div class="col-sm-12 col-lg-8 col-xl-9" id="q-{{ recommendation.id }}">
-                    <div class="fr-mt-2w d-flex justify-content-between fr-pr-3w">
-                        <div>
-                            <svg class="bi align-middle" width="20" height="20" fill="currentColor">
-                                <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#signpost" />
-                            </svg>
-                            &nbsp;
-                            <span class="text-secondary align-middle fw-bold d-inline-block">
-                                {% if recommendation.departments.all.count > 0 %}
-                                Limité à :
-                                {% for department in recommendation.departments.all %}
-                                {{ department.name }}
-                                {% if not forloop.last %},{% endif %}
-                                {% endfor %}
-                                {% else %}
-                                Toute la France
-                                {% endif %}
-                            </span>
-                            <div class="fr-ml-3w text-secondary align-middle d-inline-block">
-                                <svg class="bi fr-mr-1v align-middle" width="16" height="16" fill="currentColor">
-                                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#alt" />
-                                </svg>
-                                <span class="align-middle">
-                                    Condition :
-                                    {% for tag in recommendation.condition_tags %}
-                                    <span class="badge bg-dark rounded-pill">{{ tag }}</span>
-                                    {% if not forloop.last %}+{% endif %}
-                                    {% endfor %}
-                                </span>
+            <!-- Sidebar -->
+            <div class="col-sm-12 col-lg-4 col-xl-3 border-start">
+                <!-- Ajouter -->
+                <div class="d-grid gap-2">
+                    <a class="fr-btn fr-btn--sm fr-icon-add-circle-line fr-btn--icon-left w-100 justify-content-center"
+                       href="{% url 'projects-task-recommendation-create' %}"
+                       role="button">Ajouter un pré-fléchage</a>
+                </div>
+            </div>
+            <!-- main content -->
+            <div>
+                {% for recommendation in recommendations %}
+                    {% include "tasks/tasks/recommendation_delete_modal.html" with recommendation_id=recommendation.id %}
+                    <div class="row d-flex fr-mb-3w">
+                        <div class="col-sm-12 col-lg-8 col-xl-9" id="q-{{ recommendation.id }}">
+                            <div class="fr-mt-2w d-flex justify-content-between fr-pr-3w">
+                                <div class="col-8">
+                                    <svg class="bi align-middle" width="20" height="20" fill="currentColor">
+                                        <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#signpost" />
+                                    </svg>
+                                    &nbsp;
+                                    <span class="text-secondary align-middle fw-bold d-inline-block">
+                                        {% if recommendation.departments.all.count > 0 %}
+                                            Limité à :
+                                            {% for department in recommendation.departments.all %}
+                                                {{ department.name }}
+                                                {% if not forloop.last %},{% endif %}
+                                            {% endfor %}
+                                        {% else %}
+                                            Toute la France
+                                        {% endif %}
+                                    </span>
+                                    <div class="fr-ml-3w text-secondary align-middle d-inline-block">
+                                        <svg class="bi fr-mr-1v align-middle"
+                                             width="16"
+                                             height="16"
+                                             fill="currentColor">
+                                            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#alt" />
+                                        </svg>
+                                        <span class="align-middle">
+                                            Condition :
+                                            {% for tag in recommendation.condition_tags %}
+                                                <span class="badge bg-dark rounded-pill">{{ tag }}</span>
+                                                {% if not forloop.last %}+{% endif %}
+                                            {% endfor %}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="fr-ml-6w align-middle" role="group" aria-label="actions">
+                                    <a class="fr-btn fr-btn--sm fr-btn--icon-left fr-icon-pencil-line"
+                                       href="{% url 'projects-task-recommendation-update' recommendation.pk %}">
+                                        Éditer
+                                    </a>
+                                    <button class="fr-btn fr-btn--sm fr-btn--secondary fr-btn--icon-left fr-icon-delete-line"
+                                            aria-controls="task-recommendation-delete-modal-{{ recommendation.id }}"
+                                            data-fr-opened="false">Supprimer</button>
+                                </div>
+                            </div>
+                            <div class="d-block w-100 fr-pr-3w">
+                                <div class="text-secondary fr-my-2v">Message aiguilleuse : "{{ recommendation.text }}"</div>
+                                {% include "projects/project/fragments/action_list_item.html" with task=recommendation hide_comments=True disable_tracking=True disable_edit=True %}
                             </div>
                         </div>
-                        <div class="fr-btns-group fr-ml-6w align-middle" role="group" aria-label="actions">
-                            <a class="btn btn-light fr-mb-1v d-inline-block btn-outline-primary btn-sm"
-                                href="{% url 'projects-task-recommendation-update' recommendation.pk %}">
-                                <svg class="bi fr-mr-1v" width="16" height="16" fill="currentColor">
-                                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#pen" />
+                        <div class="col-sm-12 col-lg-4 col-xl-3 border-start fr-pl-3w fr-pt-2w">
+                            <div class="small">
+                                <svg class="bi fr-mr-1v align-middle"
+                                     width="16"
+                                     height="16"
+                                     fill="currentColor">
+                                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#info-circle" />
                                 </svg>
-                                Éditer
-                            </a>
-                            <button
-                                class="btn btn-light fr-mb-1v fr-ml-1w d-inline-block btn-outline-primary btn-sm"
-                                aria-controls="task-recommendation-delete-modal-{{ recommendation.id }}"
-                                data-fr-opened="false">
-                                <svg class="bi fr-mr-1v" width="16" height="16" fill="currentColor">
-                                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#trash" />
-                                </svg>
-                                Supprimer
-                            </button>
-                        </div>
-                    </div>
-                    <div class="d-block w-100 fr-pr-3w">
-                        <div class="text-secondary fr-my-2v">Message aiguilleuse : "{{ recommendation.text }}"</div>
-                        {% include "projects/project/fragments/action_list_item.html" with task=recommendation hide_comments=True disable_tracking=True disable_edit=True %}
-                    </div>
-                </div>
-
-                <div class="col-sm-12 col-lg-4 col-xl-3 border-start fr-pl-3w fr-pt-2w">
-                    <div class="small">
-                        <svg class="bi fr-mr-1v align-middle" width="16" height="16" fill="currentColor">
-                            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#info-circle" />
-                        </svg>
-                        <span class="align-middle">Déclencheurs</span>
-                        <ul>
-                            {% for trigger, choices in recommendation.trigged_by.items %}
-                            <li>
-                                {{ trigger }}
+                                <span class="align-middle">Déclencheurs</span>
                                 <ul>
-                                    {% for choice in choices %}
-                                    <li>
-                                        <a
-                                            href="{% url 'survey-editor-question-set-details' choice.question.question_set.pk %}#q-{{ choice.question.pk }}">
-                                            {{ choice.conclusion|default:choice.text }}
-                                        </a>
-                                    </li>
-                                    {% empty %}
-                                    <li class="text-danger">---Non déclenchable--</li>
+                                    {% for trigger, choices in recommendation.trigged_by.items %}
+                                        <li>
+                                            {{ trigger }}
+                                            <ul>
+                                                {% for choice in choices %}
+                                                    <li>
+                                                        <a href="{% url 'survey-editor-question-set-details' choice.question.question_set.pk %}#q-{{ choice.question.pk }}">
+                                                            {{ choice.conclusion|default:choice.text }}
+                                                        </a>
+                                                    </li>
+                                                {% empty %}
+                                                    <li class="text-danger">---Non déclenchable--</li>
+                                                {% endfor %}
+                                            </ul>
+                                        </li>
                                     {% endfor %}
                                 </ul>
-                            </li>
-                            {% endfor %}
-                        </ul>
+                            </div>
+                        </div>
                     </div>
-                </div>
+                {% empty %}
+                    <div class="bd-callout bd-callout-info">
+                        Il n'y a pas de pré-fléchage pour l'instant.
+                        <a href="{% url 'projects-task-recommendation-create' %}">Créez-en un</a>.
+                    </div>
+                {% endfor %}
             </div>
-
-            {% empty %}
-
-            <div class="bd-callout bd-callout-info">
-                Il n'y a pas de pré-fléchage pour l'instant.
-                <a href="{% url 'projects-task-recommendation-create' %}">Créez-en un</a>.
-            </div>
-
-            {% endfor %}
         </div>
     </div>
-</div>
 {% endblock content %}
