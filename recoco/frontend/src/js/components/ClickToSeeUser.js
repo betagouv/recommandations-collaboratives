@@ -1,11 +1,15 @@
 import Alpine from 'alpinejs';
 
-Alpine.data('ClickToSeeUser', (userId) => {
+Alpine.data('ClickToSeeUser', (ownerId, currentUserId, currentUserIsStaff) => {
   return {
-    userId: userId,
+    userId: ownerId,
     usersIdAlreadyDiscovered: [],
     displayUser: false,
     init() {
+      if (currentUserIsStaff || ownerId === currentUserId) {
+        this.displayUser = true;
+        return;
+      }
       this.usersIdAlreadyDiscovered =
         JSON.parse(localStorage.getItem('displayUsersContact')) || [];
       this.displayUser = this.usersIdAlreadyDiscovered.includes(this.userId);
