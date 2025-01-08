@@ -7,35 +7,35 @@ from .utils import ct_from_label
 
 
 class HitInputSerializer(serializers.Serializer):
-    content_ct = serializers.CharField()
+    content_object_ct = serializers.CharField()
     content_object_id = serializers.IntegerField()
-    context_ct = serializers.CharField(required=False)
+    context_object_ct = serializers.CharField(required=False)
     context_object_id = serializers.IntegerField(required=False)
 
     def validate(self, data):
-        content_ct = data.get("content_ct")
+        content_object_ct = data.get("content_object_ct")
         content_object_id = data.get("content_object_id")
-        context_ct = data.get("context_ct")
+        context_object_ct = data.get("context_object_ct")
         context_object_id = data.get("context_object_id")
 
-        if context_ct and not context_object_id:
+        if context_object_ct and not context_object_id:
             raise serializers.ValidationError(
-                "context_ct is required when context_object_id is provided"
+                "context_object_ct is required when context_object_id is provided"
             )
 
-        if context_object_id and not context_ct:
+        if context_object_id and not context_object_ct:
             raise serializers.ValidationError(
-                "context_object_id is required when context_ct is provided"
+                "context_object_id is required when context_object_ct is provided"
             )
 
-        content_obj_model = apps.get_model(content_ct)
+        content_obj_model = apps.get_model(content_object_ct)
         try:
             content_obj_model.objects.get(id=content_object_id)
         except content_obj_model.DoesNotExist as exc:
             raise serializers.ValidationError("Invalid content_object_id") from exc
 
-        if context_ct:
-            context_object_model = apps.get_model(context_ct)
+        if context_object_ct:
+            context_object_model = apps.get_model(context_object_ct)
             try:
                 context_object_model.objects.get(id=data.get("context_object_id"))
             except context_object_model.DoesNotExist as exc:
@@ -46,13 +46,17 @@ class HitInputSerializer(serializers.Serializer):
     @property
     def output_data(self) -> dict[str, Any]:
         data = {
-            "content_ct": ct_from_label(self.validated_data["content_ct"]),
+            "content_object_ct": ct_from_label(
+                self.validated_data["content_object_ct"]
+            ),
             "content_object_id": self.validated_data["content_object_id"],
         }
-        if not self.validated_data.get("context_ct"):
+        if not self.validated_data.get("context_object_ct"):
             data.update(
                 {
-                    "context_ct": ct_from_label(self.validated_data["context_ct"]),
+                    "context_object_ct": ct_from_label(
+                        self.validated_data["context_object_ct"]
+                    ),
                     "context_object_id": self.validated_data["context_object_id"],
                 }
             )

@@ -10,15 +10,15 @@ from model_utils.models import TimeStampedModel
 class HitCount(TimeStampedModel):
     site = models.ForeignKey(Site, on_delete=models.CASCADE)
 
-    content_ct = models.ForeignKey(
+    content_object_ct = models.ForeignKey(
         ContentType,
         on_delete=models.CASCADE,
         related_name="hitcount_set_for_content",
     )
     content_object_id = models.PositiveIntegerField()
-    content_object = GenericForeignKey("content_ct", "content_object_id")
+    content_object = GenericForeignKey("content_object_ct", "content_object_id")
 
-    context_ct = models.ForeignKey(
+    context_object_ct = models.ForeignKey(
         ContentType,
         on_delete=models.CASCADE,
         related_name="hitcount_set_for_context",
@@ -26,7 +26,7 @@ class HitCount(TimeStampedModel):
         blank=True,
     )
     context_object_id = models.PositiveIntegerField(null=True, blank=True)
-    context_object = GenericForeignKey("context_ct", "context_object_id")
+    context_object = GenericForeignKey("context_object_ct", "context_object_id")
 
     class Meta:
         verbose_name = _("hit count")
@@ -35,11 +35,19 @@ class HitCount(TimeStampedModel):
         get_latest_by = "modified"
         unique_together = (
             "site",
-            "content_ct",
+            "content_object_ct",
             "content_object_id",
-            "context_ct",
+            "context_object_ct",
             "context_object_id",
         )
+
+    def __str__(self):
+        hit_count_str = f"{self.content_object_ct.name}-{self.content_object_id}"
+        if self.context_object and self.context_object_id:
+            hit_count_str += (
+                f" ({self.context_object_ct.name}-{self.context_object_id})"
+            )
+        return hit_count_str
 
 
 class Hit(TimeStampedModel):
