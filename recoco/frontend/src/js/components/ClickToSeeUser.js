@@ -1,6 +1,5 @@
 import Alpine from 'alpinejs';
-import axios from 'axios';
-import { hitcountUrl } from '../utils/api';
+import api, { hitcountUrl } from '../utils/api';
 
 Alpine.data(
   'ClickToSeeUser',
@@ -27,11 +26,11 @@ Alpine.data(
           );
         }
 
-        this.axios.post(hitcountUrl(), {
-          content_object_ct: 'projects.member',
+        api.post(hitcountUrl(), {
+          content_object_ct: 'projects.projectmember',
           content_object_id: this.userId,
           context_object_ct: 'projects.project',
-          context_object_id: 1,
+          context_object_id: projetId,
         });
 
         this.displayUser = true;
