@@ -51,7 +51,7 @@ class HitInputSerializer(serializers.Serializer):
             ),
             "content_object_id": self.validated_data["content_object_id"],
         }
-        if not self.validated_data.get("context_object_ct"):
+        if self.validated_data.get("context_object_ct"):
             data.update(
                 {
                     "context_object_ct": ct_from_label(
