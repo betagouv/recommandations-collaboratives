@@ -2,7 +2,7 @@
 {% if not search == False %}
     <div x-data="Files({{ files.all.count }})" id="filesId">
         {% include "projects/project/fragments/files_links/file_search.html" with files=files %}
-        {% if files.count == 0 %}
+        {% if files.count == 0 and files_from_edl.count == 0 %}
             {% include "projects/project/fragments/files_links/empty_files.html" %}
         {% else %}
             <ul class="list d-flex flex-column list-unstyled">
@@ -14,7 +14,7 @@
     </div>
 {% else %}
     <div>
-        {% if files.count == 0 %}
+        {% if files.count == 0 and files_from_edl.count == 0 %}
             {% include "projects/project/fragments/files_links/empty_files.html" %}
         {% else %}
             <ul id="file-list" class="d-flex flex-column list-unstyled">
