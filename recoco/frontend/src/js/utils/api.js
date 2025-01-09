@@ -128,6 +128,11 @@ export function challengeDefinitionUrl(code) {
   return `/api/challenges/definitions/${code}`;
 }
 
+// hitcount
+export function hitCountUrl() {
+  return '/api/hit/';
+}
+
 // Non API routes
 // TODO : Make them into proper endpoints
 export function editTaskUrl(taskId, next = null) {

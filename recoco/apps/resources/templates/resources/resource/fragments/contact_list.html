@@ -30,7 +30,7 @@
                                 {{ contact.organization.name|truncatechars:120 }}</span>
                             </div>
                         </div>
-                        <template x-if="isLoaded('{{ contact }}')">
+                        <template x-if="isLoaded({{ contact.id }})">
                             <div class="d-flex flex-column">
                                 {% if contact.email %}
                                     <div class="text-blue fr-my-1v">
@@ -70,9 +70,11 @@
                                 {% endif %}
                             </div>
                         </template>
-                        <div x-show="!isLoaded('{{ contact }}')" class="fr-p-2v">
+                        <div x-show="!isLoaded({{ contact.id }})" class="fr-p-2v">
                             <button class="fr-btn w-100 justify-content-center"
-                                    @click="togglecliqueUser('{{ contact }}')">Voir les coordonnées</button>
+                                    @click="togglecliqueUser({{ contact.id }},{{ resource.id }})">
+                                Voir les coordonnées
+                            </button>
                         </div>
                     </div>
                 {% endfor %}
