@@ -34,7 +34,10 @@ class TestCommand(BaseClassTestMixin):
         call_command("update_materialized_views")
 
         with connection.cursor() as cursor:
-            for schema_name in ("metrics", "metrics_example_com"):
+            for schema_name in (
+                f"metrics_{random_prefix}",
+                f"metrics_{random_prefix}_example_com",
+            ):
                 cursor.execute(
                     f"SELECT COUNT(*) FROM pg_matviews WHERE matviewname = 'view_test_django_qs' AND schemaname = '{schema_name}';"
                 )
