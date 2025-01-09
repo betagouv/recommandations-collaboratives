@@ -9,6 +9,7 @@ created: 2021-06-01 10:11:56 CEST
 
 import datetime
 import uuid
+from unittest.mock import ANY, patch
 
 import pytest
 from actstream.models import Action
@@ -127,6 +128,54 @@ def test_task_recommendation_is_updated(request, client):
     assert models.TaskRecommendation.on_site.count() == 1
     updated_recommendation = models.TaskRecommendation.on_site.all()[0]
     assert updated_recommendation.text == data["text"]
+
+
+@pytest.mark.django_db
+def test_task_recommendation_delete_not_available_on_get(request, client):
+    url = reverse("projects-task-recommendation-delete", args=(999,))
+    with login(client):
+        response = client.get(url)
+    assert response.status_code == 405
+
+
+@pytest.mark.django_db
+def test_task_recommendation_delete_not_available_for_non_staff(request, client):
+    recommendation = Recipe(
+        models.TaskRecommendation, site=get_current_site(request)
+    ).make()
+    url = reverse("projects-task-recommendation-delete", args=(recommendation.pk,))
+    with login(client):
+        response = client.post(url)
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_task_recommendation_is_deleted(request, client):
+    recommendation = Recipe(
+        models.TaskRecommendation, site=get_current_site(request)
+    ).make()
+
+    recommendation_id = recommendation.pk
+
+    with patch("recoco.apps.tasks.views.tasks.messages") as mock_messages:
+        with login(client, groups=["example_com_staff"]):
+            response = client.post(
+                reverse(
+                    "projects-task-recommendation-delete", args=(recommendation_id,)
+                ),
+                data={"resource": recommendation.resource.pk},
+            )
+
+    assert response.status_code == 302
+    assertRedirects(response, reverse("projects-task-recommendation-list"))
+
+    mock_messages.success.assert_called_once_with(
+        request=ANY, message="Le pré-fléchage a bien été supprimé"
+    )
+
+    assert (
+        models.TaskRecommendation.on_site.filter(pk=recommendation_id).exists() is False
+    )
 
 
 @pytest.mark.django_db

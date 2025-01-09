@@ -107,10 +107,7 @@
                    {% if disable_tracking %} href="{% url 'resources-resource-detail' task.resource.id %}" {% else %} {% if can_administrate %} href="{% url 'projects-visit-task' task.id %}"{% else %}href="{% url 'resources-resource-detail' task.resource.id %}"{% endif %}
                    {% endif %}>
                     <div class="flex-shrink-1 fr-px-2w arrow-link text-primary align-items-center">
-                        <svg class="align-middle bi"
-                             width="26px"
-                             height="26px"
-                             fill="currentColor">
+                        <svg class="align-middle bi" width="26px" height="26px" fill="#000091">
                             <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#arrow-right-short" />
                         </svg>
                     </div>
@@ -127,7 +124,7 @@
                             <svg class="bi fr-mr-1v align-middle text-danger"
                                  width="16px"
                                  height="16px"
-                                 fill="currentColor">
+                                 fill="#000091">
                                 <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#x-lg" />
                             </svg>
                         </span>
@@ -142,7 +139,7 @@
                                 data-bs-toggle="tooltip"
                                 type="submit"
                                 class="btn btn-text align-middle fr-p-3w">
-                            <svg class="bi align-middle" width="24" height="24" fill="currentColor">
+                            <svg class="bi align-middle" width="24" height="24" fill="#000091">
                                 <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#arrow-counterclockwise" />
                             </svg>
                         </button>
