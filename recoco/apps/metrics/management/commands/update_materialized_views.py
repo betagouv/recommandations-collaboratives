@@ -16,15 +16,16 @@ class Command(BaseCommand):
     help = "Update materialized view used for metrics"
 
     def _check_user_exists_in_db(
-        self, cursor: CursorWrapper, schema_owner: str, **options: Any
+        self, cursor: CursorWrapper, role_name: str, **options: Any
     ) -> bool:
         cursor.execute(
-            sql=f"SELECT 1 FROM pg_roles WHERE rolname='{schema_owner}';"  # noqa: S608
+            sql=f"SELECT 1 FROM pg_roles WHERE rolname='{role_name}';"  # noqa: S608
         )
         role_exists = cursor.fetchone() is not None
 
         if not role_exists and options["create_roles"]:
-            cursor.execute(sql=f"CREATE ROLE {schema_owner} LOGIN;")
+            self.stdout.write(f"  ++ Creating role '{role_name}'")
+            cursor.execute(sql=f"CREATE ROLE {role_name} LOGIN;")
             return True
 
         return role_exists
@@ -111,7 +112,7 @@ class Command(BaseCommand):
         )
         parser.add_argument(
             "--create-roles",
-            action="store_false",
+            action="store_true",
             help="Create the missing roles in db.",
         )
 

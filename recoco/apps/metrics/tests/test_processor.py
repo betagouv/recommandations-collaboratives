@@ -1,10 +1,7 @@
-from io import StringIO
 from unittest.mock import Mock, call
 
 import pytest
 from django.contrib.sites.models import Site
-from django.core.management import call_command
-from django.db import connection
 from django.db.backends.utils import CursorWrapper
 
 from recoco.apps.metrics.processor import (
@@ -12,33 +9,7 @@ from recoco.apps.metrics.processor import (
     MaterializedViewSpecError,
 )
 
-
-class BaseClassTestMixin:
-    @pytest.fixture(autouse=True)
-    def _change_sql_dir(self, settings):
-        settings.METRICS_MATERIALIZED_VIEWS_SQL_DIR = (
-            settings.BASE_DIR / "apps/metrics/tests/sql_queries"
-        )
-        settings.METRICS_MATERIALIZED_VIEWS_SPEC = [
-            {
-                "name": "view_test_django_qs",
-                "indexes": [
-                    {
-                        "name": "test_idx",
-                        "columns": "id,site_domain",
-                        "unique": True,
-                        "for_site": False,
-                    },
-                    {
-                        "name": "task_count_idx",
-                        "columns": "task_count",
-                        "unique": False,
-                        "for_site": True,
-                    },
-                ],
-            },
-            {"name": "view_test_raw_sql"},
-        ]
+from .base import BaseClassTestMixin
 
 
 class TestMaterializedView(BaseClassTestMixin):
@@ -218,33 +189,3 @@ class TestMaterializedView(BaseClassTestMixin):
                 sql="GRANT SELECT ON ALL TABLES IN SCHEMA metrics_example_com TO metrics_owner_example_com;"
             ),
         ]
-
-
-class TestCommand(BaseClassTestMixin):
-    @pytest.mark.django_db(transaction=True)
-    def test_options_error(self):
-        output = StringIO()
-        call_command(
-            "update_materialized_views",
-            stdout=output,
-            drop_only=True,
-            refresh_only=True,
-        )
-        assert "You can't use both" in output.getvalue()
-
-    @pytest.mark.django_db(transaction=True)
-    def test_full_command(self):
-        assert Site.objects.count() == 1
-
-        call_command("update_materialized_views")
-
-        with connection.cursor() as cursor:
-            for schema_name in ("metrics", "metrics_example_com"):
-                cursor.execute(
-                    f"SELECT COUNT(*) FROM pg_matviews WHERE matviewname = 'view_test_django_qs' AND schemaname = '{schema_name}';"
-                )
-                assert cursor.fetchone()[0] == 1
-                cursor.execute(
-                    f"SELECT COUNT(*) FROM pg_matviews WHERE matviewname = 'view_test_raw_sql' AND schemaname = '{schema_name}';"
-                )
-                assert cursor.fetchone()[0] == 1
