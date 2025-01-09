@@ -3,121 +3,84 @@
 {% block js %}
     {% vite_asset 'js/apps/topicSearch.js' %}
 {% endblock js %}
-<!-- Action details -->
-<template x-if="push_type != 'multiple'">
-    <div class="message d-flex flex-row justify-content-between">
-        <div id="action-details"
-             class="form w-50 fr-pr-3w flex-fill d-flex flex-column">
-            <div class="bg-light fr-p-2w border-form">
-                <h4>
-                    <span class="text-muted fr-mr-1v"
-                          x-text="push_type == 'noresource' ? '3.' : '4.'"></span>Décrivez votre recommandation
-                </h4>
-                <div class="fr-mt-2v">
-                    <label class="fr-mb-2v text-info-custom text-grey-dark" for="intent">Titre</label>
-                    <div class="input-group fr-mb-2w">
-                        <input class="form-control"
-                               type="text"
-                               id="intent"
-                               name="intent"
-                               x-model="intent"
-                               required
-                               :readonly="push_type != 'noresource'">
-                        {% for error in form.intent.errors %}<div class="text-danger text-end">{{ error }}</div>{% endfor %}
-                    </div>
-                </div>
-                <div x-data='TopicSearch("{{ form.topic_name.value|default:"" }}", "recommendations")'
-                     class="fr-mt-2v fr-mb-2w">
-                    <label class="fr-mb-2v text-info-custom text-grey-dark" for="topic_name">Thématique</label>
-                    <div class="input-group">
-                        <input class="form-control"
-                               type="text"
-                               id="topic_name"
-                               name="topic_name"
-                               x-model="topic"
-                               x-on:input.change.debounce="handleTopicChange">
-                        {% for error in form.topic.errors %}<div class="text-danger text-end">{{ error }}</div>{% endfor %}
-                    </div>
-                    <template x-if="results.length > 0">
-                        <div class="d-flex align-items-center flex-wrap fr-mb-2v fr-mt-1v">
-                            <span class="d-block text-blue text-info-custom text-grey-dark font-small fw-normal">Suggestions :</span>
-                            <template x-for="result in results">
-                                <div class="d-flex align-item-center flex-wrap fr-mx-1v fr-mt-1v">
-                                    <button @click.prevent="handleResultClick(result.name)"
-                                            class="button secondary blue small"
-                                            x-text="result.name"></button>
-                                </div>
-                            </template>
-                        </div>
-                    </template>
-                </div>
-                <div class="d-flex flex-column">
-                    <label class="fr-mb-2v text-info-custom text-grey-dark" for="message">Message</label>
-                    {% include "tools/editor.html" with input_name="content" input_value="content" errors=form.content.errors is_task=True %}
-                </div>
-                <div class="fr-mb-3w">
-                    {% include "projects/project/fragments/files_links/file_upload_input_standalone.html" %}
-                    {% for error in document_form.the_file.errors %}
-                        <div class="text-danger text-start fr-mb-2v">{{ error }}</div>
-                    {% endfor %}
-                </div>
-                <template x-if="push_type == 'single'">
-                    <div class="buttons d-flex flex-row justify-content-between">
-                        {% if not disable_draft %}
-                            <button @click="set_draft(true)"
-                                    data-test-id="publish-draft-task-button"
-                                    class="button small"
-                                    :disabled="!selected_resource">Enregistrer comme Brouillon</button>
-                        {% endif %}
-                        <button @click="set_draft(false)"
-                                type="submit"
-                                class="button small filled"
-                                :disabled="!selected_resource">Publier</button>
-                    </div>
-                </template>
-                <template x-if="push_type == 'noresource'">
-                    <div class="buttons d-flex flex-row justify-content-between">
-                        {% if not disable_draft %}
-                            <button @click="set_draft(true)"
-                                    data-test-id="publish-draft-task-button"
-                                    class="button small">Enregister comme Brouillon</button>
-                        {% endif %}
-                        <button data-test-id="publish-task-button"
-                                @click="set_draft(false)"
-                                type="submit"
-                                class="button filled small">Publier</button>
-                    </div>
-                </template>
-            </div>
-        </div>
-        <div class="help w-50 fr-p-2w bg-light rounded">
-            <h6>Comment écrire une recommandation</h6>
-            <img class="fr-mt-2w fr-responsive-img"
-                 src="{% static 'projects/img/push_example.png'  %}" />
-            <ol class="fr-mt-2w fr-pl-4w">
-                <li>
-                    <strong>Donnez un titre actionnable à votre recommandation</strong>
-                    <p>
-                        Afin de faciliter la compréhension de votre interlocuteur, nous vous suggérons de donnez un titre à votre recommandation qui évoque une action à faire (de préférence avec un verbe) pour résoudre un problème concret.
-                    </p>
-                </li>
-                <li>
-                    <strong>Détaillez la marche à suivre pour mener à bien cette recommandation</strong>
-                    <p>
-                        Après avoir rappelé les enjeux de la recommandation, donnez une description claire des différentes étapes de cette recommandation, appuyées par des ressources externes et/ou des personnes à contacter pour progresser sur le sujet.
-                    </p>
-                </li>
-            </ol>
-        </div>
+<!-- Action title -->
+<div class="fr-mt-2v" x-show="push_type == 'noresource'">
+    <label class="push-reco__title-section" for="intent">Titre</label>
+    <input class="fr-input"
+           type="text"
+           id="intent"
+           name="intent"
+           x-model="intent"
+           required
+           :readonly="push_type != 'noresource'"
+           data-cy="input-title-task">
+    {% for error in form.intent.errors %}<div class="text-danger text-end">{{ error }}</div>{% endfor %}
+</div>
+<!-- Action theme -->
+<div x-data='TopicSearch("{{ form.topic_name.value|default:"" }}", "recommendations")'
+     class="fr-mt-2v fr-mb-2w">
+    <label class="push-reco__title-section" for="topic_name">Ajout d’une thématique</label>
+    <div class="thematic__search-bar">
+        <span class="fr-icon-search-line fr-icon--sm" aria-hidden="true"></span>
+        <input class="fr-input"
+               type="search"
+               id="topic_name"
+               name="topic_name"
+               x-model="topic"
+               x-on:input.change.debounce="handleTopicChange">
+        {% for error in form.topic.errors %}<div class="text-danger text-end">{{ error }}</div>{% endfor %}
     </div>
-</template>
-<template x-if="push_type == 'multiple'">
-    <div>
+    <template x-if="results.length > 0">
+        <div class="d-flex align-items-center flex-wrap fr-mb-2v fr-mt-1v">
+            <span class="d-block text-info-custom text-grey-dark font-small fw-normal">Suggestions :</span>
+            <template x-for="result in results">
+                <div class="d-flex align-item-center flex-wrap fr-mx-1v fr-mt-1v">
+                    <button @click.prevent="handleResultClick(result.name)"
+                            class="fr-btn fr-btn--secondary fr-btn--small"
+                            x-text="result.name"></button>
+                </div>
+            </template>
+        </div>
+    </template>
+</div>
+<!-- Action message -->
+<div class="fr-input-group">
+    <label class="push-reco__title-section" for="content">Commentaire personnalisé</label>
+    {% include "tools/editor_dsfr.html" with input_name="content" input_value="content" errors=form.content.errors is_task=True %}
+    <!-- Action file -->
+    <button class="fr-btn fr-btn--sm fr-btn--tertiary fr-icon-file-add-line fr-btn--icon-left file-upload-wrapper"
+            type="button"
+            @click="$refs.fileUploadInput.click()">
+        <span class="file-upload-text">Ajouter un fichier</span>
+        <span class="fr-ml-1w" x-text="fileName"></span>
+        <input x-ref="fileUploadInput"
+               x-model="currentFile"
+               type="file"
+               id="file-upload"
+               name="the_file"
+               @change='handleFileUpload'
+               class="d-none file-upload-input">
+    </button>
+</div>
+<div class="fr-mb-3w">
+    {% comment %} {% include "projects/project/fragments/files_links/file_upload_input_standalone.html" %} {% endcomment %}
+    {% for error in document_form.the_file.errors %}
+        <div class="text-danger text-start fr-mb-2v">{{ error }}</div>
+    {% endfor %}
+</div>
+<!-- Action submit -->
+<div class="d-flex justify-content-center">
+    {% if not disable_draft %}
         <button @click="set_draft(true)"
-                data-test-id="publish-draft-task-button"
-                class="btn btn-secondary"
-                :disabled="!selected_resources.length">Enregistrer comme Brouillon</button>
-        <span class="fr-ml-2v"
-              x-text="`${selected_resources.length} ressource(s) sélectionnée(s)`"></span>
-    </div>
-</template>
+                class="fr-btn fr-btn--secondary fr-btn--lg fr-mr-3w"
+                :disabled="(push_type == 'single' && !selected_resource) || !$store.actionPusher.isSelectedProject"
+                data-test-id="publish-draft-task-button">Enregistrer en brouillon</button>
+    {% endif %}
+    <button @click="set_draft(false)"
+            type="submit"
+            class="fr-btn fr-btn--lg"
+            data-cy="button-submit-task"
+            :disabled="(push_type == 'single' && !selected_resource) || !$store.actionPusher.isSelectedProject">
+        Publier la recommandation
+    </button>
+</div>

@@ -54,3 +54,7 @@ class ResourceSerializer(TaggitSerializer, serializers.HyperlinkedModelSerialize
     created_by = ResourceCreatorSerializer(read_only=True, many=False)
     category = CategorySerializer(read_only=True)
     has_dsresource = serializers.BooleanField(read_only=True, default=False)
+
+
+class ResourceURIImportSerializer(serializers.Serializer):
+    uri = serializers.URLField()

@@ -1,27 +1,43 @@
-function action_pusher_app() {
+import Alpine from 'alpinejs';
+import MiniSearch from 'minisearch';
+import api, { postExternalRessourceUrl } from '../utils/api';
+
+Alpine.data('ActionPusher', () => {
   return {
     isBusy: true,
+    isBusyExternalResource: false,
+    canLoadNewExternalResource: true,
     search: '',
 
     db: new MiniSearch({
       fields: ['title', 'subtitle', 'tags'], // fields to index for full-text search
-      storeFields: ['title', 'subtitle', 'url', 'url_embeded', 'has_dsresource'], //
+      storeFields: [
+        'title',
+        'subtitle',
+        'url',
+        'embeded_url',
+        'has_dsresource',
+      ], //
     }),
 
     push_type: 'single',
 
     intent: '',
     content: '',
+    currentFile: '',
+    isUploadedFile: false,
+    fileName: '',
 
     resources: [],
+    externalResource: [],
+    externalResourceError: null,
     results: [],
     suggestions: [],
-    selected_resource: null,
+    selected_resource: false,
     selected_resources: [],
     public: true,
     draft: false,
     next: null,
-
     searchResources(text = null) {
       if (!text) {
         text = this.search;
@@ -33,28 +49,13 @@ function action_pusher_app() {
       return true;
     },
 
-    resultsAndSelected() {
-      if (this.push_type == 'multiple') {
-        for (var resource of this.selected_resources) {
-          var f = _.find(this.resources, function (r) {
-            return resource == r.id;
-          });
-
-          /* Add it to the list of results */
-          if (
-            !_.find(this.results, function (r) {
-              return resource == r.id;
-            })
-          ) {
-            this.results.push(f);
-          }
-        }
-      }
-      return this.results;
-    },
-
     truncate(input, size = 30) {
       return input.length > size ? `${input.substring(0, size)}...` : input;
+    },
+    handleFileUpload() {
+      if (this.$refs.fileUploadInput.files.length > 0) {
+        this.fileName = this.$refs.fileUploadInput.files[0].name;
+      }
     },
 
     formatDateDisplay(date) {
@@ -79,7 +80,10 @@ function action_pusher_app() {
       await this.getResources();
 
       if (resource_id) {
-        this.results = _.where(this.resources, { id: resource_id });
+        // this.results = _.where(this.resources, { id: resource_id });
+        this.results = this.resources.filter(
+          (resource) => resource.id === resource_id
+        );
 
         if (this.results.length) {
           this.selected_resource = resource_id;
@@ -97,7 +101,10 @@ function action_pusher_app() {
       const selected_resource = parseInt(params.get('resource_id'));
 
       if (selected_resource) {
-        this.results = _.where(this.resources, { id: selected_resource });
+        // this.results = _.where(this.resources, { id: selected_resource });
+        this.results = this.resources.filter(
+          (resource) => resource.id === selected_resource
+        );
         if (this.results.length) {
           this.selected_resource = selected_resource;
           this.selected_resources = [selected_resource];
@@ -110,7 +117,7 @@ function action_pusher_app() {
       this.isBusy = true;
 
       const response = await fetch('/api/resources/');
-      resourcesFromApi = await response.json(); //extract JSON from the http response
+      const resourcesFromApi = await response.json(); //extract JSON from the http response
 
       resourcesFromApi.forEach((t) => {
         let entry = {
@@ -119,7 +126,7 @@ function action_pusher_app() {
           subtitle: t.subtitle,
           tags: t.tags,
           url: t.web_url,
-          url_embeded: t.embeded_url,
+          embeded_url: t.embeded_url,
           has_dsresource: t.has_dsresource,
           category: t.category,
         };
@@ -131,9 +138,38 @@ function action_pusher_app() {
       this.isBusy = false;
     },
 
+    async postExternalResource(externalRessourceUrl) {
+      this.isBusyExternalResource = true;
+      this.externalResourceError = null;
+      this.canLoadNewExternalResource = false;
+      try {
+        const response = await api.post(postExternalRessourceUrl(), {
+          uri: externalRessourceUrl,
+        });
+        this.externalResource = [response.data];
+        this.selected_resource = response.data.id;
+        this.setIntent(response.data);
+      } catch (error) {
+        this.canLoadNewExternalResource = true;
+        const errors = {
+          403: "Vous n'avez pas les droits pour récupérer cette ressource externe, contactez un administrateur",
+          500: "Erreur lors de la récupération de la ressource externe, merci d'essayez à nouveau plus tard",
+          501: "Il n'est pas encore possible de récupérer des ressources externes sur ce site",
+        };
+        if (!errors[error.response.status]) {
+          this.externalResourceError =
+            'Erreur lors de la récupération de la ressource externe, merci de nous contacter si le problème persiste';
+        }
+        this.externalResourceError = errors[error.response.status];
+
+        console.error(error);
+      }
+      this.isBusyExternalResource = false;
+    },
+
     set_draft(draft) {
       this.draft = draft;
       this.public = !this.draft;
     },
   };
-}
+});

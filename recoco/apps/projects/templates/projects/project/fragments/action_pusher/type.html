@@ -1,46 +1,54 @@
-<div class="fr-mb-3w">
-    <h4 class="fr-mb-2w">
-        <span class="text-muted fr-mr-1v">2.</span>Sélectionnez le type de recommandation
-    </h4>
-    <div id="push-type-selector" class="d-flex flex-row">
-        <div class="card fr-p-2v fr-pl-6w rounded fr-mx-2v">
-            <div class="card-body">
-                <label for="push-single">Attacher une ressource existante</label>
-                <input type="radio"
-                       id="push-single"
-                       name="push_type"
-                       value="single"
-                       x-model="push_type">
-                <h5>Attacher une ressource existante</h5>
-                <p class="fr-mb-0">Vous pourrez sélectionner la ressource que vous souhaitez attacher</p>
-            </div>
-        </div>
-        <div class="card fr-p-2v fr-pl-6w rounded fr-mr-2v">
-            <div class="card-body">
-                <label for="push-noresource">No Ressource</label>
-                <input type="radio"
-                       id="push-noresource"
-                       name="push_type"
-                       value="noresource"
-                       x-model="push_type"
-                       @click="intent = ''">
-                <h5>Proposer une recommandation sans ressource</h5>
-                <p class="fr-mb-0">Vous devrez spécifier les détails de votre recommandation</p>
-            </div>
-        </div>
-        {% if not disable_multi %}
-            <div class="card fr-p-2v fr-pl-6w rounded fr-ml-2v">
-                <div class="card-body">
-                    <label for="push-multiple">Multiple Ressources</label>
-                    <input type="radio"
-                           id="push-multiple"
-                           name="push_type"
-                           value="multiple"
-                           x-model="push_type">
-                    <h5>Proposer plusieurs ressources</h5>
-                    <p class="fr-mb-0">Vous devrez manuellement ajouter un message à votre brouillon avant de les publier</p>
+<div class="container-fluid">
+    <div class="row g-0">
+        <div class="col-12">
+            <fieldset class="fr-fieldset fr-mb-4w"
+                      id="radio-rich-hint-inline"
+                      aria-labelledby="radio-rich-hint-inline-legend radio-rich-hint-inline-messages">
+                <legend class="push-reco__title-section fr-mb-3v"
+                        id="radio-rich-hint-inline-legend">Type de ressource à recommander</legend>
+                <div class="row resource-selector">
+                    <div class="col fr-radio-group fr-radio-rich">
+                        <input type="radio"
+                               name="push_type"
+                               value="single"
+                               id="push-single"
+                               x-model="push_type"
+                               data-cy="radio-push-reco-single-resource">
+                        <label class="fr-label resource-selector__label" for="push-single">
+                            Ressource existante sur {{ request.site.name }}
+                            <span class="fr-hint-text resource-selector__subtitle">Vous sélectionnerez une ressource depuis bibliothèque de ressources {{ request.site.name }}.</span>
+                        </label>
+                    </div>
+                    <div class="col fr-radio-group fr-radio-rich">
+                        <input type="radio"
+                               name="push_type"
+                               value="external_resource"
+                               id="push-external"
+                               x-model="push_type"
+                               data-cy="radio-push-reco-external-resource">
+                        <label class="fr-label resource-selector__label" for="push-external">
+                            Ressource d’un autre site web
+                            <span class="fr-hint-text resource-selector__subtitle">Vous indiquerez l’URL d’une ressource publiée sur un autre site web.</span>
+                        </label>
+                    </div>
+                    <div class="col fr-radio-group fr-radio-rich">
+                        <input type="radio"
+                               name="push_type"
+                               value="noresource"
+                               id="push-noresource"
+                               x-model="push_type"
+                               @click="intent = ''"
+                               data-cy="radio-push-reco-no-resource">
+                        <label class="fr-label resource-selector__label" for="push-noresource">
+                            Pas de ressource associée
+                            <span class="fr-hint-text resource-selector__subtitle">Vous rédigerez la recommandation en texte libre uniquement, sans y joindre de ressource.</span>
+                        </label>
+                    </div>
                 </div>
-            </div>
-        {% endif %}
+                <div class="fr-messages-group"
+                     id="radio-rich-hint-inline-messages"
+                     aria-live="polite"></div>
+            </fieldset>
+        </div>
     </div>
 </div>

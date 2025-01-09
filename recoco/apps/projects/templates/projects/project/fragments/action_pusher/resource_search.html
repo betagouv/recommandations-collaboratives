@@ -1,23 +1,63 @@
-{% load static %}
-<!-- resources -->
+<!-- Resources externes -->
+<div x-show="push_type == 'external_resource'"
+     x-transition:enter-start="grow-enter-start"
+     x-transition:leave="grow-leave"
+     class="position-relative">
+    <div class="fr-search-bar fr-search-bar--lg" id="search-2" role="search">
+        <label class="fr-label" for="external-resource-url-input">
+            Url du site :
+            <span class="fr-hint-text">Saisissez une url valide, commençant par https://</span>
+        </label>
+        <input class="fr-input"
+               type="text"
+               placeholder="https://"
+               id="external-resource-url-input"
+               x-ref="external_resource_url"
+               @input="canLoadNewExternalResource = true"
+               name="external-resource-url-input"
+               data-cy="input-external-resource-url">
+        <button class="fr-btn"
+                type="button"
+                :disabled="!canLoadNewExternalResource"
+                @click="postExternalResource($refs.external_resource_url.value)"
+                data-cy="button-external-resource-load">Charger la ressource</button>
+    </div>
+    <div x-show="isBusyExternalResource"
+         x-transition
+         class="position-absolute top-0 text-center w-100">
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+    <div x-show="!isBusyExternalResource && externalResourceError"
+         class="fr-alert fr-alert--error fr-alert--sm fr-mt-1v">
+        <p x-text="externalResourceError"></p>
+    </div>
+    <div x-show="externalResource.length > 0 && !externalResourceError"
+         class="fr-alert fr-alert--success fr-alert--sm fr-mt-1v">
+        <p>Ressource importée avec succès, pensez à la relire et si besoin, modifiez la dans la bibliothèque de ressources</p>
+    </div>
+    <ul x-show="externalResource.length > 0"
+        class="cards d-flex row row-cols-3 g-4 fr-pl-0 fr-ml-0 fr-mt-1v">
+        <template x-for="resource in externalResource" :key="resource.id">
+            <li class="col-4">
+                {% include "projects/project/fragments/action_pusher/resource_short_element.html" with pre_selected="True" %}
+            </li>
+        </template>
+    </ul>
+</div>
+<!-- Resources internes -->
 <div id="resource-list"
-     class="fr-mb-3w grow"
-     x-show="push_type != 'noresource'"
+     class="push-reco__ressources fr-mb-3w grow"
+     x-show="push_type == 'single'"
      x-transition:enter-start="grow-enter-start"
      x-transition:leave="grow-leave">
-    <h4 class="fr-mb-2w">
-        <span class="text-muted fr-mr-1v">3.</span>Sélectionnez les ressources à publier
-    </h4>
-    <div class="search input-group-lg">
-        <svg class="bi fr-mr-1v text-muted"
-             width="24"
-             height="24"
-             fill="currentColor">
-            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#search" />
-        </svg>
+    <h3 class="push-reco__title-section fr-mb-3v">Recherche d'une ressource existante sur {{ request.site.name }}</h3>
+    <div class="ressources__search-bar">
+        <span class="fr-icon-search-line fr-icon--sm" aria-hidden="true"></span>
         <input data-test-id="search-resource-input"
-               class="w-100 fs-5 form-control"
-               type="text"
+               class="fr-input w-100"
+               type="search"
                x-on:input.debounce="searchResources()"
                x-model="search"
                placeholder="Rechercher une ressource...">
@@ -32,91 +72,20 @@
        x-text="`${results.length} ressource(s) trouvée(s)`"></p>
     <ul x-show="results.length > 0"
         class="cards d-flex row row-cols-3 g-4 fr-pl-0 fr-ml-0 fr-mt-1v">
-        <template x-for="resource in resultsAndSelected()" :key="resource.id">
-            <li class="col">
-                <div class="resource-card card fr-p-2v fr-pl-6w rounded">
-                    <div class="card-body position-relative fr-pb-1w">
-                        <template x-if="push_type == 'single'">
-                            <input :id="'resource-' + resource.id"
-                                   type="radio"
-                                   name="resource"
-                                   :value="resource.id"
-                                   x-model="selected_resource"
-                                   @click="setIntent(resource)">
-                        </template>
-                        <template x-if="push_type == 'multiple'">
-                            <input :id="'resource-' + resource.id"
-                                   type="checkbox"
-                                   name="resources"
-                                   :value="resource.id"
-                                   x-model="selected_resources">
-                        </template>
-                        <label class="fs-6" :for="'resource-' + resource.id" x-text="resource.title"></label>
-                        <h5 class="fs-6" x-text="resource.title"></h5>
-                        <p x-text="resource.subtitle" class="fr-fr-text--sm mb-0"></p>
-                    </div>
-                    <div class="card-body fr-pt-1w">
-                        <!-- Full screen modal -->
-                        <div class="modal fade"
-                             :id="`resource-preview-`+resource.id"
-                             tabindex="-1"
-                             :aria-labelledby="`resource-preview-`+resource.id"
-                             aria-hidden="true">
-                            <div class="modal-dialog modal-fullscreen">
-                                <div class="modal-content">
-                                    <div class="modal-header justify-content-between">
-                                        <h5 class="modal-title">Prévisualisation de la ressource</h5>
-                                        <button type="button"
-                                                class="fr-btn fr-btn-close"
-                                                data-bs-dismiss="modal"
-                                                aria-label="Close">Fermer</button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <iframe class="w-100 h-100" :src="resource.url_embeded"></iframe>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div>
-                            <ul class="fr-badge-group fr-p-0">
-                                <template x-if="resource.category && resource.category.name">
-                                    <li>
-                                        <span class="fr-badge fr-badge--sm fr-badge--green-menthe"
-                                              x-text="resource.category.name"></span>
-                                    </li>
-                                </template>
-                                <li x-show="resource.has_dsresource">
-                                    <span class="fr-badge fr-badge--sm text-transform-none">
-                                        <img height="8px"
-                                             width="18px"
-                                             src="{% static 'svg/picto-demarches_simplifiees--no-border.svg' %}"
-                                             alt="Pictogramme Démarches Simpliffiées"
-                                             class="fr-pr-1v">
-                                    Démarches Simplifiées</span>
-                                </li>
-                            </ul>
-                        </div>
-                        <hr>
-                        <button @click.prevent
-                                data-bs-toggle="modal"
-                                :data-bs-target="`#resource-preview-`+resource.id"
-                                class="fr-btn fr-btn--tertiary-no-outline fr-btn--icon-left fr-icon-eye-line">
-                            Prévisualiser
-                        </button>
-                    </div>
-                </div>
-            </li>
+        <template x-for="resource in results" :key="resource.id">
+            <li class="col-4 fr-mt-1w">{% include "projects/project/fragments/action_pusher/resource_short_element.html" %}</li>
         </template>
     </ul>
     <div x-show="results.length <= 0 && search != ''"
          class="fr-p-2w w-100 text-center rounded bg-light">
         <span class="fw-bolder">Aucune ressource correspondante</span>
         <div x-show="suggestions.length">
-            Vous cherchez peut être : <template x-for="suggestion in suggestions">
-            <a href="#"
-               @click.prevent="search = suggestion.suggestion; searchResources();"
-               x-text="suggestion.suggestion"></a>&nbsp;
-        </template>
+            Vous cherchez peut être :
+            <template x-for="suggestion in suggestions">
+                <a href="#"
+                   @click.prevent="search = suggestion.suggestion; searchResources();"
+                   x-text="suggestion.suggestion"></a>&nbsp;
+            </template>
+        </div>
     </div>
-</div>
 </div>

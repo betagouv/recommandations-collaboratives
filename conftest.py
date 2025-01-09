@@ -3,6 +3,7 @@ import pytest
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.management import call_command
 from model_bakery import baker
+from rest_framework.test import APIClient
 
 from recoco.apps.projects.models import Project
 
@@ -12,6 +13,11 @@ from recoco.apps.projects.models import Project
 def setup_db(django_db_setup, django_db_blocker):
     with django_db_blocker.unblock():
         call_command("update_permissions")
+
+
+@pytest.fixture
+def api_client():
+    return APIClient
 
 
 # -- Project Fixtures
