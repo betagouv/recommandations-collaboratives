@@ -7,6 +7,7 @@ author  : raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created : 2021-05-26 15:56:20 CEST
 """
 
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import Http404, HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render
@@ -390,6 +391,10 @@ def task_recommendation_delete(request, recommendation_id):
         models.TaskRecommendation, site=request.site, pk=recommendation_id
     )
     task_recommendation.delete()
+    messages.success(
+        request=request,
+        message="Le pré-fléchage a bien été supprimé",
+    )
 
     return redirect(reverse("projects-task-recommendation-list"))
 

@@ -9,6 +9,7 @@ created: 2021-06-01 10:11:56 CEST
 
 import datetime
 import uuid
+from unittest.mock import ANY, patch
 
 import pytest
 from actstream.models import Action
@@ -156,14 +157,21 @@ def test_task_recommendation_is_deleted(request, client):
 
     recommendation_id = recommendation.pk
 
-    with login(client, groups=["example_com_staff"]):
-        response = client.post(
-            reverse("projects-task-recommendation-delete", args=(recommendation_id,)),
-            data={"resource": recommendation.resource.pk},
-        )
+    with patch("recoco.apps.tasks.views.tasks.messages") as mock_messages:
+        with login(client, groups=["example_com_staff"]):
+            response = client.post(
+                reverse(
+                    "projects-task-recommendation-delete", args=(recommendation_id,)
+                ),
+                data={"resource": recommendation.resource.pk},
+            )
 
     assert response.status_code == 302
     assertRedirects(response, reverse("projects-task-recommendation-list"))
+
+    mock_messages.success.assert_called_once_with(
+        request=ANY, message="Le pré-fléchage a bien été supprimé"
+    )
 
     assert (
         models.TaskRecommendation.on_site.filter(pk=recommendation_id).exists() is False
