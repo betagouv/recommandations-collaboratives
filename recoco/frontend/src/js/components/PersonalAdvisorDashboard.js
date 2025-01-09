@@ -11,8 +11,9 @@ import 'leaflet/dist/leaflet.css';
 import 'leaflet-control-geocoder/dist/Control.Geocoder.css';
 import Fuse from 'fuse.js';
 
-function PersonalAdvisorDashboard() {
+function PersonalAdvisorDashboard(currentSiteId) {
   return {
+    currentSiteId: currentSiteId,
     data: [],
     rawData: [],
     displayedData: [],
@@ -41,7 +42,10 @@ function PersonalAdvisorDashboard() {
     },
     async getData(currentUser) {
       const projects = await this.$store.projects.getUserProjetsStatus();
-
+      await this.$store.projects.mapperProjetsProjectSites(
+        projects,
+        this.currentSiteId
+      );
       this.nbNewProjects = projects.filter((p) => p.status === 'NEW').length;
 
       this.extractAndCreateAdvisorDepartments(projects);

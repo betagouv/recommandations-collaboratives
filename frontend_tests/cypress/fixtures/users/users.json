@@ -206,5 +206,45 @@
             "groups": [],
             "user_permissions": []
         }
+    },
+    {
+        "model": "auth.user",
+        "pk": 12,
+        "fields": {
+            "password": "pbkdf2_sha256$260000$S2IZAAPKqcAhYhomW80hJr$xuPTtuI0I9JDgJ+fHKmZseqGrJJ1B5Y0hnJDL/yH2cA=",
+            "last_login": "2023-09-01T08:58:56.513Z",
+            "is_superuser": false,
+            "username": "conseiller-regional@test.fr",
+            "first_name": "regional",
+            "last_name": "Conseille",
+            "email": "conseiller-regional@test.fr",
+            "is_staff": false,
+            "is_active": true,
+            "date_joined": "2021-07-09T09:29:47.252Z",
+            "groups": [
+                4
+            ],
+            "user_permissions": []
+        }
+    },
+    {
+        "model": "auth.user",
+        "pk": 13,
+        "fields": {
+            "password": "pbkdf2_sha256$260000$S2IZAAPKqcAhYhomW80hJr$xuPTtuI0I9JDgJ+fHKmZseqGrJJ1B5Y0hnJDL/yH2cA=",
+            "last_login": "2023-09-01T08:58:56.513Z",
+            "is_superuser": false,
+            "username": "conseiller-regional-invited@test.fr",
+            "first_name": "regional2",
+            "last_name": "withInvite",
+            "email": "conseiller-regional-invited@test.fr",
+            "is_staff": false,
+            "is_active": true,
+            "date_joined": "2021-07-09T09:29:47.252Z",
+            "groups": [
+                4
+            ],
+            "user_permissions": []
+        }
     }
 ]

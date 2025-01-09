@@ -66,7 +66,7 @@ a {
 
 p a {
   text-decoration: underline;
-  color: #0000EE;
+  color: #0000ee;
 }
 
 p {
@@ -627,15 +627,37 @@ form > p {
   border-radius: 4px;
 }
 
-.specific-color-background{
-  background-color:#DFFDF7
+.specific-color-background {
+  background-color: #dffdf7;
 }
 
-.specific-background-grey{
+.specific-background-grey {
   background-color: #fafafa;
 }
 
-.centered-item{
+.centered-item {
   margin: auto;
   display: block;
+}
+
+.start-96 {
+  left: 96% !important;
+}
+
+/* ¯¯¯¯ *\
+  COLORS
+\* ˍˍˍˍ */
+.fr-color {
+  color: white;
+  &--success {
+    background-color: var(--success-425-625-hover, #27a959);
+  }
+  &--warning {
+    color: black;
+    background-color: #ffa500;
+  }
+
+  &--error {
+    background-color: #dc3444;
+  }
 }

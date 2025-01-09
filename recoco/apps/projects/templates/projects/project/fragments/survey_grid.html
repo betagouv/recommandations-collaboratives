@@ -2,6 +2,7 @@
 {% load static %}
 {% load sass_tags %}
 {% load django_vite %}
+{% load projects_extra %}
 {% block css %}
     <link href="{% sass_src 'projects/css/fragments/survey_grid.scss' %}"
           rel="stylesheet"
@@ -17,12 +18,12 @@
         <div class="col-3 knowledge__info">
             <!-- Barre de navigation de l'edl -->
             <div class="info__survey-navbar fr-mt-5v">
-                <div class="info__title">États des lieux</div>
+                <div class="info__title">État des lieux</div>
                 <nav>
-                    {% for session in project.survey_session.all %}
+                    {% for session in sorted_sessions %}
                         <div class="info__survey-title">
                             <span>{{ session.survey.name }}</span>
-                            <span class="badge {% if session.completion < 100 %}text-bg-danger {% else %}text-bg-light{% endif %} text-bg-danger">{{ session.completion }}%</span>
+                            <span class="badge {% if session.completion < 50 %}fr-color--error {% elif session.completion < 80 %}fr-color--warning {% else %}fr-color--success{% endif %} ">{{ session.completion }}%</span>
                         </div>
                         <ul class="info__survey-questions">
                             {% regroup session.the_answers.all by question.question_set as answer_list %}
@@ -65,42 +66,59 @@
                 projet envoyé par {{ project.project_sites.origin.site.name }}
             </div>
         </div>
+        {% get_advising_position user project request.site as position %}
         <div class="col-9 knowledge__surveys">
-            <div class="d-flex justify-content-between knowledge__surveys-header fr-mt-5v">
-                <h3 class="fr-m-0">État des lieux</h3>
-                {% comment %} TODO
+            {% if not is_staff and not position.is_advisor and not position.is_observer %}
+                <div class="d-flex justify-content-between knowledge__surveys-header fr-mt-5v">
+                    <h3 class="fr-m-0">État des lieux</h3>
+                    {% comment %} TODO
                 - refonte modal share EDL
-                {% endcomment %}
-                {% if "use_surveys" in user_project_perms %}
-                    <div x-data="ProjectShare" class="d-flex align-items-center">
-                        <button @click="openPublicShareModal"
-                                data-toggle="modal"
-                                data-target="#publicShareModal"
-                                data-test-id="public-share-button"
-                                {% if project.status == 'DRAFT' %}disabled{% endif %}
-                                class="fr-btn fr-btn--sm fr-btn--secondary {% if project.status == 'DRAFT' %}fr-btn--icon-left fr-icon-lock-line disabled{% endif %}">
-                            Partager l'état des lieux
-                        </button>
-                        {% include "projects/project/fragments/share/public_share_modal.html" %}
-                    </div>
-                {% endif %}
-            </div>
-            {% if "use_surveys" in user_project_perms %}
-                {% for session in project.survey_session.all %}
-                    <div class="survey-card-cta">
-                        <div class="survey-card-cta__title">
-                            <span class="badge {% if session.completion < 100 %}text-bg-danger {% else %}text-bg-light{% endif %} text-bg-danger">{{ session.completion }}%</span>
-                            {{ session.survey.name }}
+                    {% endcomment %}
+                    {% if "use_surveys" in user_project_perms %}
+                        <div x-data="ProjectShare" class="d-flex align-items-center">
+                            <button @click="openPublicShareModal"
+                                    data-toggle="modal"
+                                    data-target="#publicShareModal"
+                                    data-test-id="public-share-button"
+                                    {% if project.status == 'DRAFT' %}disabled{% endif %}
+                                    class="fr-btn fr-btn--sm fr-btn--secondary {% if project.status == 'DRAFT' %}fr-btn--icon-left fr-icon-lock-line disabled{% endif %}">
+                                Partager l'état des lieux
+                            </button>
+                            {% include "projects/project/fragments/share/public_share_modal.html" %}
                         </div>
-                        <a class="fr-btn fr-btn--sm"
-                           data-test-id="link-fill-survey"
-                           href="{% url 'survey-project-session' project_id=project.pk site_id=session.survey.site.id %}">Compléter le questionnaire</a>
-                    </div>
-                {% endfor %}
+                    {% endif %}
+                </div>
+                {% if "use_surveys" in user_project_perms %}
+                    {% for session in sorted_sessions %}
+                        <div class="survey-card-cta">
+                            <div class="survey-card-cta__title" data-cy="survey-name">{{ session.survey.name }}</div>
+                            <a class="fr-btn fr-btn--sm"
+                               data-test-id="link-fill-survey-cta"
+                               href="{% url 'survey-project-session' project_id=project.pk site_id=session.survey.site.id %}">Compléter le questionnaire</a>
+                        </div>
+                    {% endfor %}
+                {% endif %}
             {% endif %}
             <div class="fr-mt-3w">
-                {% for session in project.survey_session.all %}
-                    <h4>{{ session.survey.name }}</h4>
+                {% for session in sorted_sessions %}
+                    <div class="d-flex justify-content-between knowledge__surveys-header fr-mt-5v">
+                        <h4 class="fr-m-0">{{ session.survey.name }}</h4>
+                        {% if is_staff or position.is_advisor or position.is_observer %}
+                            {% if "use_surveys" in user_project_perms %}
+                                <div x-data="ProjectShare" class="d-flex align-items-center">
+                                    <button @click="openPublicShareModal"
+                                            data-toggle="modal"
+                                            data-target="#publicShareModal"
+                                            data-test-id="public-share-button"
+                                            {% if project.status == 'DRAFT' %}disabled{% endif %}
+                                            class="fr-btn fr-btn--sm fr-btn--secondary {% if project.status == 'DRAFT' %}fr-btn--icon-left fr-icon-lock-line disabled{% endif %}">
+                                        Partager l'état des lieux
+                                    </button>
+                                    {% include "projects/project/fragments/share/public_share_modal.html" %}
+                                </div>
+                            {% endif %}
+                        {% endif %}
+                    </div>
                     <div class="masonry-wrapper row"
                          data-masonry='{"percentPosition": true, "transitionDuration": 0 }'>
                         <!-- Show QS with progress -->
