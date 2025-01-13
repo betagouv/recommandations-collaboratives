@@ -19,7 +19,7 @@ class MediaWikiRIAdapter(BaseRIAdapter):
 
         return "mediawiki" in generator
 
-    def load_data(self, response):
+    def load_data(self, response) -> bool:
         edit_uri = response.html.find('head > link[rel="EditURI"]', first=True).attrs[
             "href"
         ]
