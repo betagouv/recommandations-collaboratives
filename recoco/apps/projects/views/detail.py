@@ -71,12 +71,13 @@ def project_overview(request, project_id=None):
         request.site, project, request.user, allow_national=True
     )
 
-    user_to_display = (
-        HitCount.objects.for_context_object(project)
+    users_to_display = list(
+        HitCount.on_site.for_context_object(project)
+        .for_user(request.user)
         .filter(
-            site=request.site, content_object_ct=ContentType.objects.get_for_model(User)
+            content_object_ct=ContentType.objects.get_for_model(User),
         )
-        .values_list("id", flat=True)
+        .values_list("content_object_id", flat=True)
     )
 
     advising = get_advisor_for_project(request.user, project)
