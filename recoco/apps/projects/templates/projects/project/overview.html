@@ -11,6 +11,7 @@
     {% vite_asset 'js/apps/projectDetails.js' %}
     {% vite_asset 'js/apps/projectShare.js' %}
     {% vite_asset 'js/apps/tutorial.js' %}
+    {% vite_asset 'js/components/MarkDiagAsDone.js' %}
 {% endblock js %}
 {% block css %}
     <link href="{% sass_src 'projects/css/overview.scss' %}"
@@ -87,11 +88,22 @@
                                                 </div>
                                                 <div class="col-12 col-lg-6 h-100 responsive-wrapper">
                                                     {% if is_staff %}
-                                                        <header>
-                                                            <h6 class="font-small text-uppercase fr-mb-1v">DIAGNOSTIC</h6>
-                                                        </header>
-                                                        <a class="fr-btn fr-btn--sm fr-btn--secondary fr-mt-2w fr-py-2w fr-mb-2w text-uppercase w-100 justify-content-center"
-                                                           href="#"><span class="fr-icon-check-line" aria-hidden="true"></span> Marquer l’appel de “diagnostic” comme fait</a>
+                                                        <div x-data="MarkDiagAsDone({{ request.user.id }}, {{ project.id }}, '{{ is_diag_done }}' == 'True')">
+                                                            <header>
+                                                                <h6 class="font-small text-uppercase fr-mb-1v">Diagnostic</h6>
+                                                            </header>
+                                                            <template x-if="!displayDiagButton">
+                                                                <button class="fr-btn fr-btn--sm fr-btn--secondary fr-mt-2w fr-py-2w fr-mb-2w text-uppercase w-100 justify-content-center"
+                                                                        @click='handleClickMarkDiagAsDone'>
+                                                                    <span class="fr-icon-check-line" aria-hidden="true"></span> Marquer l’appel de “diagnostic” comme fait
+                                                                </button>
+                                                            </template>
+                                                            <template x-if="displayDiagButton">
+                                                                <button class="fr-btn fr-btn--sm fr-btn--secondary fr-mt-2w fr-py-2w fr-mb-2w text-uppercase w-100 justify-content-center">
+                                                                    <span class="fr-icon-check-line" aria-hidden="true"></span> Le diagnostic a été fait
+                                                                </button>
+                                                            </template>
+                                                        </div>
                                                     {% endif %}
                                                     {% include "projects/project/fragments/advisor_note.html" %}
                                                 </div>
