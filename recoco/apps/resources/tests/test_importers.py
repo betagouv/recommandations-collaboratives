@@ -1,17 +1,42 @@
+import random
+import re
+import string
+
 import pytest
+import requests
 import requests_mock
 from django.contrib.sites.shortcuts import get_current_site
 from model_bakery import baker
 from requests_html import HTMLSession
 
 from .. import importers, models
+from ..importers.base import BaseRIAdapter
+
+
+class LoremIpsumRIAdapter(BaseRIAdapter):
+    """A test adapter that creates LoremIpsum resources"""
+
+    URL_PATTERN = "^mock:\\/\\/(www\\.)?lorem-ipsum\\.fr\\/(?P<slug>.*)$"
+
+    @staticmethod
+    def can_handle(response: requests.Response):
+        return re.match(LoremIpsumRIAdapter.URL_PATTERN, response.url) is not None
+
+    def load_data(self, response: requests.Response):
+        return True
+
+    def extract_data(self):
+        self.title = "A random generated resource"
+        self.content = "".join(
+            random.choices(string.ascii_lowercase, k=255)  # noqa: S311
+        )
 
 
 ########
 # Base Importer
 ########
 @pytest.mark.django_db
-def test_already_imported_resource(mocker, request):
+def test_already_imported_resource(request):
     current_site = get_current_site(request)
 
     importer = importers.ResourceImporter()
@@ -26,13 +51,73 @@ def test_already_imported_resource(mocker, request):
     assert models.Resource.objects.count() == 1
 
 
+@pytest.mark.django_db
+def test_already_imported_resource_does_not_import_from_other_sites(request):
+    current_site = get_current_site(request)
+
+    importer = importers.ResourceImporter()
+    importer.ADAPTERS["lorem"] = LoremIpsumRIAdapter
+
+    uri = "mock://lorem-ipsum.fr/test"
+
+    resource = baker.make(models.Resource, imported_from=uri)
+
+    with requests_mock.Mocker() as m:
+        m.get(uri, text="lorem ipsum")
+        imported_resource = importer.from_uri(uri)
+
+    imported_resource.save()
+    imported_resource.sites.add(current_site)
+
+    assert resource != imported_resource
+    assert models.Resource.objects.count() == 2
+
+
+@pytest.mark.django_db
+def test_imported_resource_triggers_adapter(request):
+    current_site = get_current_site(request)
+
+    importer = importers.ResourceImporter()
+    importer.ADAPTERS["lorem"] = LoremIpsumRIAdapter
+
+    uri = "mock://lorem-ipsum.fr/truc"
+
+    with requests_mock.Mocker() as m:
+        m.get(uri, text="lorem ipsum")
+        resource = importer.from_uri(uri)
+
+    assert resource is not None
+    assert resource.title is not None
+    assert resource.content is not None
+
+    resource.save()
+    resource.sites.add(current_site)
+
+    assert models.Resource.objects.count() == 1
+
+
+@pytest.mark.django_db
+def test_importer_no_uri_matching_adapter(request):
+    importer = importers.ResourceImporter()
+
+    uri = "mock://i-dont-know-you.com/"
+
+    with requests_mock.Mocker() as m:
+        m.get(uri, text="lorem ipsum")
+        resource = importer.from_uri(uri)
+
+    assert resource is None
+
+    assert models.Resource.objects.count() == 0
+
+
 # -- Mediawiki -- #
 def test_mediawiki_adapter(mocker):
     mwi_class = importers.wiki.MediaWikiRIAdapter
 
     adapter = requests_mock.Adapter()
     session = HTMLSession()
-    session.mount("mock://", adapter)
+    session.mount("mock", adapter)
 
     adapter.register_uri(
         "GET", "mock://mymediawiki.com/apage", text=MEDIAWIKI_SAMPLE_PAGE
