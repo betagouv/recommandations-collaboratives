@@ -230,6 +230,17 @@ class ResourceDetailView(UserPassesTestMixin, BaseResourceDetailView):
         context = super().get_context_data(**kwargs)
         resource = self.get_object()
 
+        # contacts_to_display = list(
+        #     HitCount.on_site.for_context_object(resource)
+        #     .for_user(request.user)
+        #     .filter(
+        #         content_object_ct=ContentType.objects.get_for_model(Contact),
+        #     )
+        #     .values_list("content_object_id", flat=True)
+        # )
+
+        context["contacts_to_display"] = [255]
+
         if check_if_advisor(self.request.user):
             context["projects_used_by"] = (
                 projects.Project.on_site.filter(

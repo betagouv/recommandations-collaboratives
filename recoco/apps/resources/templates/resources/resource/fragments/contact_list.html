@@ -16,7 +16,9 @@
             </div>
         {% else %}
             <h6 class="fw-bold text-uppercase d-block fr-mb-2w">👩‍💼 Contacts</h6>
-            <div class="d-flex flex-wrap flex-row" x-data="ContactAsk" x-init="init">
+            <div class="d-flex flex-wrap flex-row"
+                 x-data="ContactAsk({{ contact_to_display }})"
+                 x-init="init">
                 {% for contact in contacts.all %}
                     <div :class="currentHash === '#contact-{{ contact.pk }}' && 'component-focus'"
                          class="border fr-mx-1v fr-py-2v fr-px-2w fr-mb-2v"
@@ -75,7 +77,7 @@
                                     data-test-id="see-contact-info-button"
                                     id="caVaMarcher"
                                     @click="togglecliqueUser({{ contact.id }},{{ resource.id }})">
-                                Voir les coordonnées
+                                Voir les coordonnées de {{ contacts_to_display }}
                             </button>
                         </div>
                     </div>

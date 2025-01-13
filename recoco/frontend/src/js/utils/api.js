@@ -130,7 +130,7 @@ export function challengeDefinitionUrl(code) {
 
 // hitcount
 export function hitCountUrl() {
-  return '/api/hit/';
+  return '/hit/';
 }
 
 // Non API routes

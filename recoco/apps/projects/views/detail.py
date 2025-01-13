@@ -17,6 +17,9 @@ from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.decorators.csrf import csrf_exempt
 
 from recoco import verbs
+
+# from recoco.apps.addressbook.models import Contact
+# from recoco.apps.hitcount.models import HitCount
 from recoco.apps.invites.forms import InviteForm
 from recoco.apps.survey import models as survey_models
 
@@ -197,6 +200,17 @@ def project_actions(request, project_id=None):
     is_regional_actor = is_regional_actor_for_project(
         request.site, project, request.user, allow_national=True
     )
+
+    # contacts_to_display = list(
+    #     HitCount.on_site.for_context_object(resource)
+    #     .for_user(request.user)
+    #     .filter(
+    #         content_object_ct=ContentType.objects.get_for_model(Contact),
+    #     )
+    #     .values_list("content_object_id", flat=True)
+    # )
+
+    # contacts_to_display = [255]
 
     advising = get_advisor_for_project(request.user, project)
 
