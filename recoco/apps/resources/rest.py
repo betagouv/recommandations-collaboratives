@@ -77,10 +77,9 @@ class ResourceViewSet(viewsets.ModelViewSet):
             # Try to fetch it since we don't have it
             ri = ResourceImporter()
             resource = ri.from_uri(resource_uri)
-            resource.save()
-            resource.sites.add(request.site)
             resource.site_origin = request.site
             resource.save()
+            resource.sites.add(request.site)
 
             return Response(
                 ResourceSerializer(resource).data, status=status.HTTP_201_CREATED
