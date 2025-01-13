@@ -72,6 +72,8 @@
                         </template>
                         <div x-show="!isLoaded('{{ contact }}')" class="fr-p-2v">
                             <button class="fr-btn w-100 justify-content-center"
+                                    data-test-id="see-contact-info-button"
+                                    id="caVaMarcher"
                                     @click="togglecliqueUser('{{ contact }}')">Voir les coordonnées</button>
                         </div>
                     </div>
