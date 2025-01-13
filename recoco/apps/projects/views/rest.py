@@ -12,6 +12,7 @@ from copy import copy
 
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector
 from django.contrib.sites.models import Site
 from django.db.models import Count, F, Q, QuerySet
 from django.http import Http404
@@ -19,6 +20,7 @@ from django.shortcuts import get_object_or_404
 from notifications import models as notifications_models
 from rest_framework import permissions, status, viewsets
 from rest_framework.generics import ListAPIView
+from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -86,14 +88,19 @@ class ProjectDetail(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+class KanbanProjectListPagination(LimitOffsetPagination):
+    page_size = 30
+
+
 class ProjectList(ListAPIView):
     """List all user projects"""
 
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = ProjectForListSerializer
     filter_backends = [TagsFilterbackend]
+    pagination_class = KanbanProjectListPagination
 
-    def get_queryset(self):
+    def get_queryset(self) -> QuerySet[models.Project]:
         return (
             models.Project.on_site.for_user(self.request.user)
             .order_by("-created_on", "-updated_on")
@@ -101,17 +108,39 @@ class ProjectList(ListAPIView):
             .prefetch_related("commune__department")
             .prefetch_related("switchtenders__profile__organization")
             .prefetch_related("project_sites")
+            .order_by("-created_on", "-updated_on")
         )
 
     def list(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset())
+        queryset = self.get_queryset()
+        queryset = self.filter_queryset(queryset)
+
+        if search_term := self._get_non_empty_query_param("search"):
+            search_query = SearchQuery(search_term, config="french")
+
+            search_vector = (
+                SearchVector("name", config="french", weight="C")
+                + SearchVector("commune__name", config="french", weight="B")
+                + SearchVector("commune__department__name", config="french", weight="C")
+                + SearchVector("commune__insee", weight="A")
+            )
+            queryset = (
+                queryset.annotate(search_rank=SearchRank(search_vector, search_query))
+                .filter(search_rank__gte=0.3)
+                .order_by("search_rank")
+            )
 
         projects = self._update_the_site_projects(
             queryset=queryset, site=request.site, user=request.user
         )
 
-        serializer = self.get_serializer(projects, many=True)
-        return Response(serializer.data)
+        return super().list(projects, *args, **kwargs)
+
+    def _get_non_empty_query_param(self, query_param: str, default=None) -> str | None:
+        if value := self.request.GET.get(query_param):
+            return value
+
+        return default
 
     def _update_the_site_projects(
         self, queryset: QuerySet[models.Project], site: Site, user: User

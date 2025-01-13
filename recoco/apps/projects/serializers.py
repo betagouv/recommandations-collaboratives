@@ -152,34 +152,56 @@ class UserProjectSerializer(ProjectSerializer):
         }
 
 
-class ProjectForListSerializer(serializers.BaseSerializer):
+class ProjectForListSerializer(serializers.ModelSerializer):
+    commune = CommuneSerializer()
+    status = serializers.SerializerMethodField()
+    # is_switchtender = serializers.SerializerMethodField()
+    # notifications = serializers.SerializerMethodField()
+
+    # switchtenders = UserSerializer(read_only=True, many=True)
+    switchtenders = serializers.SerializerMethodField()
+    project_sites = serializers.SerializerMethodField()
+
+    tags = TagListSerializerField()
+
     class Meta:
         model = Project
-        fields = []
+        fields = [
+            "id",
+            "name",
+            "description",
+            "org_name",
+            "status",
+            "inactive_since",
+            "created_on",
+            "updated_on",
+            "switchtenders",
+            # "is_switchtender",
+            # "is_observer",
+            "commune",
+            "location",
+            # "notifications",
+            "project_sites",
+            "tags",
+        ]
 
-    def to_representation(self, data):
-        """Return a representation of data (optimized version)"""
-        # uses our optimized queryset and not project serializer
-        commune = data.commune
-        commune_data = format_commune(commune)
-        return {
-            "id": data.id,
-            "name": data.name,
-            "description": data.description,
-            "org_name": data.org_name,
-            "status": data.project_sites.current().status,
-            "inactive_since": data.inactive_since,
-            "created_on": data.created_on,
-            "updated_on": data.updated_on,
-            "switchtenders": format_switchtenders(data),
-            "is_switchtender": data.is_switchtender,
-            "is_observer": data.is_observer,
-            "commune": commune_data,
-            "location": data.location,
-            "notifications": data.notifications,
-            "project_sites": format_sites(data),
-            "tags": data.tags.names(),
-        }
+    def get_commune_data(self, obj: Project) -> str:
+        return format_commune(obj.commune)
+
+    def get_status(self, obj: Project) -> str:
+        return obj.project_sites.current().status
+
+    # def get_is_switchtender(self, obj: Project) -> str:
+    #     return obj.is_switchtender
+
+    # def get_notifications(self, obj: Project) -> str:
+    #     return obj.notifications
+
+    def get_project_sites(self, obj: Project) -> str:
+        return (format_sites(obj),)
+
+    def get_switchtenders(self, obj: Project) -> str:
+        return format_switchtenders(obj)
 
 
 class UserProjectStatusSerializer(serializers.HyperlinkedModelSerializer):

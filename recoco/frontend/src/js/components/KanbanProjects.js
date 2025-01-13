@@ -1,6 +1,5 @@
 import Alpine from 'alpinejs';
 import { generateUUID } from '../utils/uuid';
-import Fuse from 'fuse.js';
 
 import api, {
   projectsProjectSitesUrl,
@@ -13,7 +12,6 @@ Alpine.data('KanbanProjects', boardProjectsApp);
 function boardProjectsApp(currentSiteId) {
   return {
     projectList: [],
-    rawProjectList: [],
     currentSiteId: currentSiteId,
     isDisplayingOnlyUserProjects:
       JSON.parse(localStorage.getItem('isDisplayingOnlyUserProjects')) ?? false,
@@ -39,43 +37,30 @@ function boardProjectsApp(currentSiteId) {
         color_class: 'border-dark',
       },
     ],
-    fuse: null,
     searchText: '',
     async getData(postProcess = true) {
-      const projects = await api.get(projectsUrl());
+      const projects = await api.get(projectsUrl(this.searchText));
+
       await this.$store.projects.mapperProjetsProjectSites(
-        projects.data,
+        projects.data.results,
         this.currentSiteId
       );
 
-      const projectList = projects.data.map((d) =>
+      const projectList = projects.data.results.map((d) =>
         Object.assign(d, {
           uuid: generateUUID(),
         })
       );
 
+      // FIXME: check pagination in /api/regions is off
       if (postProcess) {
         await this.postProcessData(projectList);
       }
+
+      console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>")
+      console.log('projectList', projectList);
+
       this.projectList = [...projectList];
-      this.rawProjectList = [...projectList];
-      const fuseOptions = {
-        keys: [
-          'name',
-          'commune.name',
-          'commune.insee',
-          'commune.department.name',
-        ],
-        isCaseSensitive: false,
-        minMatchCharLength: 2,
-        threshold: 0.3,
-        findAllMatches: true,
-        ignoreLocation: true,
-      };
-      this.fuse = new Fuse(projectList, fuseOptions);
-      if (this.searchText) {
-        this.filterProject(this.searchText);
-      }
       return projectList;
     },
     async onDrop(event, status) {
@@ -111,9 +96,11 @@ function boardProjectsApp(currentSiteId) {
       return this.projectList.find((d) => d.id === id);
     },
     get view() {
+      // FIXME: filterProjectsByDepartments is not working anymore
+      // but we should move filter stuff to backend anyway
       return this.projectList
-        .filter(this.filterProjectsByDepartments.bind(this))
-        .sort(this.sortFn.bind(this));
+        // .filter(this.filterProjectsByDepartments.bind(this))
+        // .sort(this.sortFn.bind(this));
     },
     column(status) {
       if (status instanceof Array) {
@@ -157,15 +144,7 @@ function boardProjectsApp(currentSiteId) {
       event.dataTransfer.dropEffect = 'move';
     },
     onSearch() {
-      this.filterProject(this.searchText);
-    },
-    filterProject(search) {
-      if (search === '') {
-        this.projectList = [...this.rawProjectList];
-        return;
-      }
-      const filtered = this.fuse.search(search).map((r) => r.item);
-      this.projectList = [...filtered];
+      this.getData();
     },
     async postProcessData(projectList) {
       const departments = this.extractAndCreateAdvisorDepartments(projectList);
