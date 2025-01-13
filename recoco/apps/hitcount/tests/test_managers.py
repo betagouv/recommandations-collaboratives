@@ -9,7 +9,7 @@ from recoco.apps.tasks.models import Task
 
 
 @pytest.mark.django_db
-def test_manager():
+def test_manager_queryset():
     contact = baker.make(Contact)
     project = baker.make(Project)
     resource = baker.make(Task)
