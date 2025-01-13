@@ -26,5 +26,5 @@ class BaseRIAdapter(ABC):
         return NotImplemented
 
     @abstractmethod
-    def extract_data(self):
+    def extract_data(self) -> None:
         return NotImplemented
