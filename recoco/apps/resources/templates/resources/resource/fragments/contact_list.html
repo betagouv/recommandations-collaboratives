@@ -34,6 +34,7 @@
                                 {{ contact.organization.name|truncatechars:120 }}</span>
                             </div>
                         </div>
+                        {% comment %} {% if user == project.owner %} {% endcomment %}
                         <template x-if="isLoaded({{ contact.id }})">
                             <div class="d-flex flex-column">
                                 {% if contact.email %}
@@ -79,9 +80,37 @@
                                     data-test-id="see-contact-info-button"
                                     id="caVaMarcher"
                                     @click="togglecliqueUser({{ contact.id }},{{ resource.id }})">
-                                Voir les coordonnées de {{ contacts_to_display }}
+                                Voir les coordonnées
                             </button>
                         </div>
+                        {% comment %} {% else %}
+                            <div class="d-flex flex-column">
+                                {% if contact.email %}
+                                    <div class="text-blue fr-my-1v">
+                                        <svg class="bi fr-mr-1v" width="12" height="12" fill="var(--background-action-high-blue-france)">
+                                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#envelope" />
+                                        </svg>
+                                        <a class="text-blue text-decoration-none small" href="mailto:{{ contact.email }}">{{ contact.email }}</a>
+                                    </div>
+                                {% endif %}
+                                {% if contact.phone_no %}
+                                    <div class="text-blue d-flex align-items-center">
+                                        <svg class="bi fr-mr-2v" width="12" height="12" fill="var(--background-action-high-blue-france)">
+                                            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#telephone" />
+                                        </svg>
+                                        <a class="text-blue text-decoration-none small" href="tel:{{ contact.phone_no }}">{{ contact.phone_no }}</a>
+                                    </div>
+                                {% endif %}
+                                {% if contact.mobile_no %}
+                                    <div class="text-blue">
+                                        <svg class="bi fr-mr-2v" width="12" height="12" fill="var(--background-action-high-blue-france)">
+                                            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#phone" />
+                                        </svg>
+                                        <a class="text-blue text-decoration-none small" href="tel:{{ contact.mobile_no }}">{{ contact.mobile_no }}</a>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% endif %} {% endcomment %}
                     </div>
                 {% endfor %}
             </div>

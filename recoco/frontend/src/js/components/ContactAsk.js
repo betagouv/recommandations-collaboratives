@@ -5,9 +5,6 @@ function ContactAsk(isStaff, contactToDisplay = []) {
   return {
     contactsIds: contactToDisplay, //tableau des contacts
     init() {
-      console.log(this.contactsIds);
-
-      //  this.contactsIds = JSON.parse(localStorage.getItem('contacts')) || [];
     },
     isLoaded(contactId) {
       return isStaff || this.contactsIds.includes(contactId);
