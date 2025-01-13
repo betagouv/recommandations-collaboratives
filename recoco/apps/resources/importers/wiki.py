@@ -44,7 +44,7 @@ class MediaWikiRIAdapter(BaseRIAdapter):
 
         return True
 
-    def extract_data(self):
+    def extract_data(self) -> None:
         doc = pandoc.read(self.raw_data, format="mediawiki")
 
         self.title = self.page_name.replace("_", " ").capitalize()
