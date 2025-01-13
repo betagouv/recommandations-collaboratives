@@ -75,7 +75,9 @@
             <article>{% include 'projects/project/fragments/task/task_comment.html' %}</article>
         </template>
         <hr class="fr-mt-3w">
-        <template x-if="task.ds_folder">
+
+        <!-- DS integration -->
+        <template x-if="task.ds_folder && task.ds_folder.prefilled_count > 0">
             <div>
                 <h4 class="fw-bolder">
                     <img height="31px"
@@ -85,23 +87,21 @@
                     Dossier Démarches Simplifiées
                 </h4>
                 <p class="fr-text-mention--grey fr-text--sm fr-my-3v">
-                    Complétez l’état des lieux pour pré-remplir automatiquement le dossier de candidature.
+                    Un dossier a été pré-rempli sur Démarches simplifiées avec les éléments que vous avez renseignés ici.
                 </p>
                 <a class="fr-btn fr-btn--secondary fr-btn--sm"
-                   @click.stop=""
-                   x-bind:href="task.ds_folder.dossier_url">Voir mon dossier</a>
-                <span class="fr-ml-2w fr-text-label--blue-france fr-text--xs">
-                    {% if task.ds_folder.prefilled_count > 1 %}
-                        {{ task.ds_folder.prefilled_count }} données pré-remplies
-                    {% elif task.ds_folder.prefilled_count > 0 %}
-                        1 donnée pré-remplie
-                    {% else %}
-                        aucune donnée pré-remplie
-                    {% endif %}
+                    @click.stop=""
+                    x-bind:href="task.ds_folder.dossier_url"
+                    target="_blank">
+                    Voir mon dossier
+                </a>
+                <span class="fr-ml-2w fr-text-label--blue-france fr-text--xs"
+                    x-text="task.ds_folder.prefilled_count > 1 ? `${task.ds_folder.prefilled_count} champs pré-remplis` : '1 champ pré-rempli'">
                 </span>
                 <hr class="fr-mt-3w">
             </div>
         </template>
+
         <footer class="d-flex justify-content-between align-items-center">
             <div class="d-flex align-items-center">
                 {% if embed_view is not True %}

@@ -19,7 +19,6 @@ from multisite import SiteID
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
@@ -73,6 +72,7 @@ INSTALLED_APPS = [
     "phonenumber_field",
     "cookie_consent",
     "recoco.apps.feature_flag",
+    "recoco.apps.hitcount",
     "recoco.apps.dsrc",
     "recoco.apps.onboarding",
     "recoco.apps.home",
@@ -323,6 +323,9 @@ ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_LOGIN_ON_PASSWORD_RESET = True
 ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = "/login-redirect"
 
+# Common signup form shared by account and socialaccount
+ACCOUNT_SIGNUP_FORM_CLASS = "recoco.forms.BaseSignupForm"
+
 ACCOUNT_FORMS = {
     "login": "recoco.apps.home.forms.UVLoginForm",
     "signup": "recoco.apps.home.forms.UVSignupForm",
@@ -338,8 +341,14 @@ ACCOUNT_FORMS = {
 SOCIALACCOUNT_ADAPTER = "recoco.apps.social_account.adapters.SocialAccountAdapter"
 SOCIALACCOUNT_OPENID_CONNECT_URL_PREFIX = "oidc"
 SOCIALACCOUNT_LOGIN_ON_GET = True
-SOCIALACCOUNT_IS_OPEN_FOR_SIGNUP = False
-# SOCIALACCOUNT_AUTO_SIGNUP = False # TODO: make user fill the missing data at signup
+SOCIALACCOUNT_AUTO_SIGNUP = False
+SOCIALACCOUNT_EMAIL_REQUIRED = True
+SOCIALACCOUNT_EMAIL_AUTHENTICATION = True
+SOCIALACCOUNT_EMAIL_AUTHENTICATION_AUTO_CONNECT = True
+
+SOCIALACCOUNT_FORMS = {
+    "signup": "recoco.apps.social_account.forms.SignupForm",
+}
 
 SOCIALACCOUNT_PROVIDERS = {
     # https://docs.allauth.org/en/latest/socialaccount/providers/openid_connect.html
@@ -426,41 +435,94 @@ WAGTAIL_EMAIL_MANAGEMENT_ENABLED = False
 
 # WAGTAILADMIN_BASE_URL = define that
 
-# Materialized views for Metrics
+# Metrics
+METRICS_PREFIX = os.getenv("METRICS_PREFIX", default="metrics")
+
 METRICS_MATERIALIZED_VIEWS_SPEC = [
     {
         "name": "projects",
-        "unique_indexes": ["hash"],
-        "indexes": ["created_on"],
+        "indexes": [
+            {
+                "name": "hash_idx",
+                "columns": "hash,site_domain",
+                "unique": True,
+                "for_site": False,
+            },
+            {
+                "name": "created_on_idx",
+                "columns": "created_on",
+            },
+        ],
     },
     {
         "name": "recommendations",
-        "unique_indexes": ["hash"],
-        "indexes": ["created_on"],
+        "indexes": [
+            {
+                "name": "hash_idx",
+                "columns": "hash,site_domain",
+                "unique": True,
+                "for_site": False,
+            },
+            {
+                "name": "created_on_idx",
+                "columns": "created_on",
+            },
+        ],
     },
     {
         "name": "resources",
-        "unique_indexes": ["hash"],
+        "indexes": [
+            {
+                "name": "hash_idx",
+                "columns": "hash,site_domain",
+                "unique": True,
+                "for_site": False,
+            },
+        ],
     },
     {
         "name": "users",
-        "unique_indexes": ["hash"],
-        "indexes": ["last_login", "is_advisor"],
+        "indexes": [
+            {
+                "name": "hash_idx",
+                "columns": "hash,site_domain",
+                "unique": True,
+                "for_site": False,
+            },
+            {
+                "name": "last_login_idx",
+                "columns": "last_login",
+            },
+            {
+                "name": "is_advisor_idx",
+                "columns": "is_advisor",
+            },
+        ],
     },
     {
         "name": "user_activity",
-        "indexes": ["user_hash"],
+        "indexes": [
+            {
+                "name": "user_hash_idx",
+                "columns": "user_hash,site_domain",
+                "unique": False,
+                "for_site": False,
+            },
+            {
+                "name": "user_hash_idx",
+                "columns": "user_hash",
+            },
+        ],
     },
 ]
 
 METRICS_MATERIALIZED_VIEWS_SQL_DIR = BASE_DIR / "apps/metrics/sql_queries"
-METRICS_MATERIALIZED_VIEWS_OWNER_TPL = (
-    "metrics_owner_$site_slug"  # template string to apply persmissions on db schemes
-)
 METRICS_MATERIALIZED_VIEWS_OWNER_OVERRIDES = (
     {}
-)  # specific rules for the OWNER_TPL per site
-
+)  # specific rules for the schema owner per site
+METRICS_MATERIALIZED_VIEWS_OWNER_TPL = os.getenv(
+    "METRICS_MATERIALIZED_VIEWS_OWNER_TPL", default=None
+)
 
 # Baker
 # https://model-bakery.readthedocs.io/en/latest/how_bakery_behaves.html#customizing-baker

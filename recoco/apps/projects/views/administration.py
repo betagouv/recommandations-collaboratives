@@ -5,6 +5,7 @@ Views for projects
 author  : raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created : 2021-05-26 15:56:20 CEST
 """
+
 from actstream import action
 from django.contrib import messages
 from django.contrib.auth import models as auth_models
@@ -54,7 +55,13 @@ from ..utils import (
 @login_required
 def project_administration(request, project_id):
     """Handle ACL for a project"""
-    project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
+
+    project = get_object_or_404(
+        models.Project.objects.filter(sites=request.site).with_unread_notifications(
+            user_id=request.user.id
+        ),
+        pk=project_id,
+    )
 
     required_perms = (
         "invite_collaborators",

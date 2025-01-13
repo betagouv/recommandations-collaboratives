@@ -42,29 +42,54 @@ Alpine.store('projects', {
     if (this.sitesConfig.length === 0) {
       await this.getSitesConfig();
     }
-
     projects.forEach((project) => {
-      project.project_sites.forEach((projectSite) => {
-        projectSite.siteInfo = this.sitesConfig.find(
-          (site) => site.id === projectSite.site
-        );
-      });
-      project.origin = project.project_sites.find(
-        (projectSite) => projectSite.is_origin
-      );
-      project.currentSite = project.project_sites.find(
-        (projectSite) => projectSite.site === currentSiteId
-      );
-      project.publishTo = project.project_sites
-        .filter((projectSite) => !projectSite.is_origin)
-        .map((projectSite) => {
-          return {
-            ...projectSite,
-            siteInfo: this.sitesConfig.find(
-              (site) => site.id === projectSite.site
-            ),
-          };
+      if (project.project) {
+        project.project.project_sites.forEach((projectSite) => {
+          projectSite.siteInfo = this.sitesConfig.find(
+            (site) => site.id === projectSite.site
+          );
         });
+        project.project.origin = project.project.project_sites.find(
+          (projectSite) => projectSite.is_origin
+        );
+        project.project.currentSite = project.project.project_sites.find(
+          (projectSite) => projectSite.site === currentSiteId
+        );
+        project.project.publishTo = project.project.project_sites
+          .filter((projectSite) => !projectSite.is_origin)
+          .map((projectSite) => {
+            return {
+              ...projectSite,
+              siteInfo: this.sitesConfig.find(
+                (site) => site.id === projectSite.site
+              ),
+            };
+          });
+      }
+      else {
+        project.project_sites.forEach((projectSite) => {
+          projectSite.siteInfo = this.sitesConfig.find(
+            (site) => site.id === projectSite.site
+          );
+        });
+        project.origin = project.project_sites.find(
+          (projectSite) => projectSite.is_origin
+        );
+        project.currentSite = project.project_sites.find(
+          (projectSite) => projectSite.site === currentSiteId
+        );
+        project.publishTo = project.project_sites
+          .filter((projectSite) => !projectSite.is_origin)
+          .map((projectSite) => {
+            return {
+              ...projectSite,
+              siteInfo: this.sitesConfig.find(
+                (site) => site.id === projectSite.site
+              ),
+            };
+          });
+      }
+
     });
 
     return projects;
