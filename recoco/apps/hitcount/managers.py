@@ -1,4 +1,5 @@
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.sites.managers import CurrentSiteManager
 from django.db import models
 
 
@@ -17,3 +18,17 @@ class HitCountQuerySet(models.QuerySet):
 
     def for_user(self, user) -> models.QuerySet:
         return self.filter(hits__user=user)
+
+
+class HitCountOnSiteManagerBase(CurrentSiteManager):
+    pass
+
+
+HitCountOnSiteManager = HitCountOnSiteManagerBase.from_queryset(HitCountQuerySet)
+
+
+class HitCountManagerBase(models.Manager):
+    pass
+
+
+HitCountManager = HitCountManagerBase.from_queryset(HitCountQuerySet)
