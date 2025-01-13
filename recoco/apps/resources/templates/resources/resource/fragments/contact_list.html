@@ -1,10 +1,12 @@
 {% load static %}
 {% load django_vite %}
+{% load projects_extra %}
 {% block js %}
     {% vite_asset 'js/apps/contactList.js' %}
     {% vite_asset 'js/apps/contactAsk.js' %}
 {% endblock js %}
 {% if contacts.count %}
+    {% is_staff_for_current_site request.user as is_staff %}
     <div x-data="ContactList" id="contact-list" class="fr-mt-3w">
         {% if user.is_anonymous %}
             <div class="flag blue">
@@ -17,7 +19,7 @@
         {% else %}
             <h6 class="fw-bold text-uppercase d-block fr-mb-2w">👩‍💼 Contacts</h6>
             <div class="d-flex flex-wrap flex-row"
-                 x-data="ContactAsk({{ contact_to_display }})"
+                 x-data="ContactAsk('{{ is_staff }}' == 'True', {{ contacts_to_display }})"
                  x-init="init">
                 {% for contact in contacts.all %}
                     <div :class="currentHash === '#contact-{{ contact.pk }}' && 'component-focus'"

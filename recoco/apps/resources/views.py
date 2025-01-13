@@ -18,6 +18,7 @@ from django.contrib.auth.mixins import (
     PermissionRequiredMixin,
     UserPassesTestMixin,
 )
+from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.shortcuts import get_current_site
 from django.contrib.syndication.views import Feed
 from django.db import transaction
@@ -37,6 +38,7 @@ from reversion_compare.views import HistoryCompareDetailView
 
 from recoco.apps.addressbook import models as addressbook_models
 from recoco.apps.geomatics import models as geomatics_models
+from recoco.apps.hitcount.models import HitCount
 from recoco.apps.projects import models as projects
 from recoco.utils import check_if_advisor, has_perm, has_perm_or_403, is_staff_for_site
 
@@ -230,17 +232,6 @@ class ResourceDetailView(UserPassesTestMixin, BaseResourceDetailView):
         context = super().get_context_data(**kwargs)
         resource = self.get_object()
 
-        # contacts_to_display = list(
-        #     HitCount.on_site.for_context_object(resource)
-        #     .for_user(request.user)
-        #     .filter(
-        #         content_object_ct=ContentType.objects.get_for_model(Contact),
-        #     )
-        #     .values_list("content_object_id", flat=True)
-        # )
-
-        context["contacts_to_display"] = [255]
-
         if check_if_advisor(self.request.user):
             context["projects_used_by"] = (
                 projects.Project.on_site.filter(
@@ -265,6 +256,17 @@ class EmbededResourceDetailView(BaseResourceDetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
+        context["contacts_to_display"] = list(
+            HitCount.on_site.for_context_object(self.get_object())
+            .for_user(self.request.user)
+            .filter(
+                content_object_ct=ContentType.objects.get_for_model(
+                    addressbook_models.Contact
+                ),
+            )
+            .values_list("content_object_id", flat=True)
+        )
 
         if task_id := self.request.GET.get("task_id"):
             context["task"] = (
