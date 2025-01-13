@@ -18,9 +18,12 @@
          x-show="!displayUser"
          x-transition.duration.10ms>
         <button class="fr-btn w-100 justify-content-center"
-                @click='handleClickToSeeInfo()'>Voir les coordonnées</button>
+                @click='handleClickToSeeInfo()'
+                data-cy="btn-overview-reveal-contact">Voir les coordonnées</button>
     </div>
-    <div x-show="displayUser" x-transition.duration.300ms>
+    <div x-show="displayUser"
+         x-transition.duration.300ms
+         data-cy="container-revealed-contact">
         {% if project.owner %}
             <a class="d-flex align-items-center fr-mb-1v text-decoration-none a-specific-fontsize-14 specific-color-high-blue-france"
                href="mailto:{{ project.owner.email }}">
