@@ -18,7 +18,7 @@ class BaseRIAdapter(ABC):
 
     @staticmethod
     @abstractmethod
-    def can_handle(response: requests.Response):
+    def can_handle(response: requests.Response) -> bool:
         return NotImplemented
 
     @abstractmethod
