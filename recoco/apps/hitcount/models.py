@@ -6,6 +6,8 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from model_utils.models import TimeStampedModel
 
+from .managers import HitCountQuerySet
+
 
 class HitCount(TimeStampedModel):
     site = models.ForeignKey(Site, on_delete=models.CASCADE)
@@ -27,6 +29,8 @@ class HitCount(TimeStampedModel):
     )
     context_object_id = models.PositiveIntegerField(null=True, blank=True)
     context_object = GenericForeignKey("context_object_ct", "context_object_id")
+
+    objects = HitCountQuerySet.as_manager()
 
     class Meta:
         verbose_name = _("hit count")
