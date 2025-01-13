@@ -1,15 +1,29 @@
+import pytest
 import requests_mock
+from django.contrib.sites.shortcuts import get_current_site
+from model_bakery import baker
 from requests_html import HTMLSession
 
-from .. import importers
+from .. import importers, models
 
 
 ########
 # Base Importer
 ########
-def test_already_imported_resource(mocker):
-    # mwi_class = importers.wiki.MediaWikiRIAdapter
-    pass
+@pytest.mark.django_db
+def test_already_imported_resource(mocker, request):
+    current_site = get_current_site(request)
+
+    importer = importers.ResourceImporter()
+
+    uri = "https://somewhere.com"
+
+    resource = baker.make(models.Resource, sites=[current_site], imported_from=uri)
+
+    imported_resource = importer.from_uri(uri)
+
+    assert resource == imported_resource
+    assert models.Resource.objects.count() == 1
 
 
 # -- Mediawiki -- #
