@@ -10,7 +10,7 @@ from .base import BaseRIAdapter
 
 class MediaWikiRIAdapter(BaseRIAdapter):
     @staticmethod
-    def can_handle(response: requests.Response):
+    def can_handle(response: requests.Response) -> bool:
         generator = response.html.find("head > meta[name='generator']", first=True)
         if not generator:
             return False
