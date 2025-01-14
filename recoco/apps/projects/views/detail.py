@@ -19,8 +19,7 @@ from django.views.decorators.csrf import csrf_exempt
 from recoco import verbs
 from recoco.apps.invites.forms import InviteForm
 from recoco.apps.survey import models as survey_models
-
-# from recoco.apps.tasks import models as task_models
+from recoco.apps.tasks import models as tasks_models
 from recoco.utils import (
     get_site_config_or_503,
     has_perm,
@@ -330,6 +329,18 @@ def project_conversations_new(request, project_id=None):
                 "type": "reco",
                 "notifications": [],
                 "object": reco,
+            }
+        )
+
+    for followup in tasks_models.TaskFollowup.objects.filter(
+        task__in=project.tasks.filter(public=True)
+    ):
+        feed.append(
+            {
+                "timestamp": followup.timestamp,
+                "type": "followup",
+                "notifications": [],
+                "object": followup,
             }
         )
 
