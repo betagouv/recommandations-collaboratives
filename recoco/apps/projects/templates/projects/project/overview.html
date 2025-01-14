@@ -94,14 +94,15 @@
                                                             </header>
                                                             <template x-if="!displayDiagButton">
                                                                 <button class="fr-btn fr-btn--sm fr-btn--secondary fr-mt-2w fr-py-2w fr-mb-2w text-uppercase w-100 justify-content-center"
-                                                                        @click='handleClickMarkDiagAsDone'>
+                                                                        @click='handleClickMarkDiagAsDone'
+                                                                        data-cy="button-diag-project-done">
                                                                     <span class="fr-icon-check-line" aria-hidden="true"></span> Marquer l’appel de “diagnostic” comme fait
                                                                 </button>
                                                             </template>
                                                             <template x-if="displayDiagButton">
-                                                                <button class="fr-btn fr-btn--sm fr-btn--secondary fr-mt-2w fr-py-2w fr-mb-2w text-uppercase w-100 justify-content-center">
-                                                                    <span class="fr-icon-check-line" aria-hidden="true"></span> Le diagnostic a été fait
-                                                                </button>
+                                                                <div>
+                                                                    <span class="fr-icon-check-line" aria-hidden="true"></span> Appel de "diagnostic" effectué
+                                                                </div>
                                                             </template>
                                                         </div>
                                                     {% endif %}
