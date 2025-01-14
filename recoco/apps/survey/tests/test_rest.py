@@ -9,13 +9,6 @@ from recoco.apps.projects import utils
 from recoco.apps.survey.models import Answer, Question, Session
 
 
-@pytest.fixture
-def api_client():
-    from rest_framework.test import APIClient
-
-    return APIClient()
-
-
 @pytest.mark.django_db
 def test_session_view(request, api_client, project):
     user = baker.make(User)

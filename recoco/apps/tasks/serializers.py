@@ -11,6 +11,7 @@ from recoco.apps.home.serializers import UserSerializer
 from recoco.apps.projects.serializers import DocumentSerializer, TopicSerializer
 from recoco.apps.projects.utils import get_collaborators_for_project
 from recoco.apps.resources.serializers import ResourceSerializer
+from recoco.rest_api.serializers import BaseSerializerMixin
 
 from .models import Task, TaskFollowup
 
@@ -64,7 +65,9 @@ class TaskFollowupSerializer(serializers.HyperlinkedModelSerializer):
         return followup
 
 
-class TaskSerializer(serializers.HyperlinkedModelSerializer, OrderedModelSerializer):
+class TaskSerializer(
+    BaseSerializerMixin, serializers.HyperlinkedModelSerializer, OrderedModelSerializer
+):
     class Meta:
         model = Task
         fields = [
@@ -136,6 +139,11 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer, OrderedModelSeriali
 
     # FIXME : We should not send all the tasks to non switchtender users (filter
     # queryset on current_user)
+
+    def save(self, **kwargs):
+        return super().save(
+            created_by=self.current_user, site=self.current_site, **kwargs
+        )
 
 
 class TaskNotificationSerializer(serializers.HyperlinkedModelSerializer):
