@@ -61,7 +61,7 @@ export function sitesConfigUrl() {
 
 // Organization
 export function searchOrganizationsUrl(search) {
-  return `/api/organizations/?search=${search}`;
+  return `/api/addressbook/organizations/?search=${search}`;
 }
 
 // Topic

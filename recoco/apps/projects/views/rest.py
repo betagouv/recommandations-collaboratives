@@ -23,9 +23,9 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from recoco import verbs
-from recoco.rest_api.filters import TagsFilterbackend
+from recoco.rest_api.filters import SearchVectorFilter, TagsFilterbackend
+from recoco.rest_api.pagination import LargeResultsSetPagination
 from recoco.utils import (
-    TrigramSimilaritySearchFilter,
     get_group_for_site,
     has_perm,
     has_perm_or_403,
@@ -436,13 +436,11 @@ def fetch_site_projects_with_ids(site, ids):
 class TopicViewSet(viewsets.ReadOnlyModelViewSet):
     """API endpoint that allows searching for topics"""
 
-    permission_classes = [permissions.IsAuthenticated]
-
-    search_fields = ["name"]
-
-    filter_backends = [TrigramSimilaritySearchFilter]
-
     serializer_class = TopicSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    pagination_class = LargeResultsSetPagination
+    search_fields = ["name"]
+    filter_backends = [SearchVectorFilter]
 
     def get_queryset(self):
         """Return a list of all topics."""

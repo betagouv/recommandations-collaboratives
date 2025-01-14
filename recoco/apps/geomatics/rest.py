@@ -11,7 +11,11 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets
 
 from . import models
-from .serializers import CommuneSerializer, DepartmentSerializer, RegionSerializer
+from .serializers import (
+    CommuneSerializer,
+    DepartmentSerializer,
+    RegionWithDepartmentsSerializer,
+)
 
 
 ########################################################################
@@ -36,7 +40,7 @@ class RegionViewSet(viewsets.ReadOnlyModelViewSet):
     def get_queryset(self):
         return models.Region.objects.all().order_by("name")
 
-    serializer_class = RegionSerializer
+    serializer_class = RegionWithDepartmentsSerializer
 
 
 class CommuneViewSet(viewsets.ReadOnlyModelViewSet):
