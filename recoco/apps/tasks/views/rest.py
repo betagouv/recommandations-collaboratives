@@ -11,7 +11,6 @@ import logging
 from copy import copy
 
 from django.contrib.contenttypes.models import ContentType
-from django.contrib.sites.shortcuts import get_current_site
 from rest_framework import mixins, permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -67,13 +66,12 @@ class TaskViewSet(viewsets.ModelViewSet):
         )
 
     def perform_create(self, serializer: TaskSerializer):
-        site = get_current_site(self.request)
         project_id = int(self.kwargs["project_id"])
         project = projects_models.Project.on_site.get(pk=project_id)
 
         has_perm_or_403(self.request.user, "projects.manage_tasks", project)
 
-        serializer.save(created_by=self.request.user, site=site, project=project)
+        serializer.save(project=project)
 
     def perform_update(self, serializer: TaskSerializer):
         original_object = self.get_object()
