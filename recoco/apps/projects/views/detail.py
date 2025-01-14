@@ -312,46 +312,85 @@ def project_conversations_new(request, project_id=None):
     # Prepare a feed of different objects
     feed = []
 
-    for message in project.notes.filter(public=True):
+    messages = project.notes.filter(public=True)
+    message_ids = list(messages.values_list("id", flat=True))
+    message_ct = ContentType.objects.get_for_model(models.Note)
+    message_notifs = request.user.notifications.unread().filter(
+        action_object_object_id__in=message_ids, action_object_content_type=message_ct
+    )
+
+    for message in messages:
         feed.append(
             {
                 "timestamp": message.updated_on,
                 "type": "message",
-                "notifications": [],
+                "notifications": list(
+                    message_notifs.filter(
+                        action_object_object_id=message.id
+                    ).values_list("id", flat=True)
+                ),
                 "object": message,
             }
         )
 
-    for reco in project.tasks.filter(public=True):
+    recos = project.tasks.filter(public=True)
+    reco_ids = list(recos.values_list("id", flat=True))
+    reco_ct = ContentType.objects.get_for_model(tasks_models.Task)
+    reco_notifs = request.user.notifications.unread().filter(
+        action_object_object_id__in=reco_ids, action_object_content_type=reco_ct
+    )
+    for reco in recos:
         feed.append(
             {
                 "timestamp": reco.updated_on,
                 "type": "reco",
-                "notifications": [],
+                "notifications": list(
+                    reco_notifs.filter(action_object_object_id=reco.id).values_list(
+                        "id", flat=True
+                    )
+                ),
                 "object": reco,
             }
         )
 
-    for followup in tasks_models.TaskFollowup.objects.filter(
+    followups = tasks_models.TaskFollowup.objects.filter(
         task__in=project.tasks.filter(public=True)
-    ):
+    )
+    followup_ids = list(followups.values_list("id", flat=True))
+    followup_ct = ContentType.objects.get_for_model(tasks_models.TaskFollowup)
+    followup_notifs = request.user.notifications.unread().filter(
+        action_object_object_id__in=followup_ids, action_object_content_type=followup_ct
+    )
+    for followup in followups:
         feed.append(
             {
                 "timestamp": followup.timestamp,
                 "type": "followup",
-                "notifications": [],
+                "notifications": list(
+                    followup_notifs.filter(action_object_object_id=reco.id).values_list(
+                        "id", flat=True
+                    )
+                ),
                 "object": followup,
             }
         )
 
-    for activity in project.target_actions.filter(
-        verb__in=[verbs.Project.BECAME_OBSERVER, verbs.Project.BECAME_ADVISOR]
-    ):
+    activity_verbs = [verbs.Project.BECAME_OBSERVER, verbs.Project.BECAME_ADVISOR]
+    activities = project.target_actions.filter(verb__in=activity_verbs)
+    activity_notifs = request.user.notifications.unread().filter(
+        verb__in=activity_verbs
+    )
+
+    for activity in activities:
         feed.append(
             {
                 "timestamp": activity.timestamp,
                 "type": "activity",
-                "notifications": [],
+                "notifications": list(
+                    activity_notifs.filter(action_object_object_id=reco.id).values_list(
+                        "id", flat=True
+                    )
+                ),
                 "object": activity,
             }
         )
