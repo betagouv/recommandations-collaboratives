@@ -34,7 +34,7 @@
                                 {{ contact.organization.name|truncatechars:120 }}</span>
                             </div>
                         </div>
-                        {% comment %} {% if user == project.owner %} {% endcomment %}
+                        {% comment %} {% if user == project.owner %} canAdministrateProject {% endcomment %}
                         <template x-if="isLoaded({{ contact.id }})">
                             <div class="d-flex flex-column">
                                 {% if contact.email %}
