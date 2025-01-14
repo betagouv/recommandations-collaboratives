@@ -397,7 +397,6 @@ def task_recommendation_delete(request, recommendation_id):
         message="Le pré-fléchage a bien été supprimé",
     )
 
-
     return redirect(reverse("projects-task-recommendation-list"))
 
 
