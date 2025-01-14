@@ -312,16 +312,18 @@ def project_conversations_new(request, project_id=None):
 
     feed = []
 
-    message = project.notes.filter(public=True).last()
-    # feed.append([message.updated_on, "message", None, message])
+    for message in project.notes.filter(public=True):
+        feed.append([message.updated_on, "message", None, message])
 
-    reco = project.tasks.filter(public=True).first()
-    # feed.append([reco.updated_on, "reco", None, reco])
+    for reco in project.tasks.filter(public=True):
+        feed.append([reco.updated_on, "reco", None, reco])
 
-    activity = project.target_actions.filter(
+    for activity in project.target_actions.filter(
         verb__in=[verbs.Project.BECAME_OBSERVER, verbs.Project.BECAME_ADVISOR]
-    ).first()
-    feed.append([activity.timestamp, "activity", None, activity])
+    ):
+        feed.append([activity.timestamp, "activity", None, activity])
+
+    feed = reversed(sorted(feed, key=lambda x: x[0]))
 
     return render(request, "projects/project/conversations_new.html", locals())
 

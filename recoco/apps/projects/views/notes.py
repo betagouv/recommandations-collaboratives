@@ -68,6 +68,11 @@ def create_public_note(request, project_id=None):
                 user=request.user,
             )
 
+    if request.GET.get("new", None):
+        return redirect(
+            reverse("projects-project-detail-conversations-new", args=[project_id])
+        )
+
     return redirect(reverse("projects-project-detail-conversations", args=[project_id]))
 
 
