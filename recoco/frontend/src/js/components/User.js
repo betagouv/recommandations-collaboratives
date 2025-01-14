@@ -56,7 +56,7 @@ function User(user) {
       );
     },
     selectText: function (text) {
-      appStore.notification.message = `${text} a bien été copiée`;
+      appStore.notification.message = `${text} a bien été copié`;
       appStore.notification.isOpen = true;
     },
   };

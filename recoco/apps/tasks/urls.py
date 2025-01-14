@@ -32,6 +32,11 @@ urlpatterns = [
         name="projects-task-recommendation-update",
     ),
     path(
+        r"projects/task-recommendation/<int:recommendation_id>/delete",
+        tasks.task_recommendation_delete,
+        name="projects-task-recommendation-delete",
+    ),
+    path(
         r"projects/action/",
         tasks.create_task,
         name="projects-create-task",

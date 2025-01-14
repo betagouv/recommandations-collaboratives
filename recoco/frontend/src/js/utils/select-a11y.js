@@ -203,6 +203,11 @@ class Select {
             );
           }
           suggestion.classList.add('a11y-suggestion');
+          if (index === 0) {
+            suggestion.setAttribute('x-on:click', 'resetSelectedProject()');
+          } else {
+            suggestion.setAttribute('x-on:click', 'setSelectedProject()');
+          }
 
           // check if the option is selected
           if (option.selected) {

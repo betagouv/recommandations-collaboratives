@@ -1,0 +1,16 @@
+[
+    {
+        "model": "invites.invite",
+        "pk": "774e9444-ff9b-43e3-b26f-c91421c5ddc7",
+        "fields": {
+            "created_on": "2022-09-01T08:58:56.513Z",
+            "accepted_on": "2022-09-01T08:58:56.513Z",
+            "email": "conseiller-regional-invited@test.fr",
+            "message": "viens donc adviser ce projet",
+            "role": "OBSERVER",
+            "inviter_id": 1,
+            "project_id": 26,
+            "site_id": 1
+        }
+    }
+]
