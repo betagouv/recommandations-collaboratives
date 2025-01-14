@@ -41,8 +41,9 @@ function boardProjectsApp(currentSiteId) {
     ],
     fuse: null,
     searchText: '',
+    lastActivity: '30',
     async getData(postProcess = true) {
-      const projects = await api.get(projectsUrl());
+      const projects = await api.get(projectsUrl(this.lastActivity));
       await this.$store.projects.mapperProjetsProjectSites(
         projects.data,
         this.currentSiteId
@@ -158,6 +159,10 @@ function boardProjectsApp(currentSiteId) {
     },
     onSearch() {
       this.filterProject(this.searchText);
+    },
+    onLastActivityChange(event) {
+      this.lastActivity = event.target.value;
+      this.getData();
     },
     filterProject(search) {
       if (search === '') {

@@ -40,6 +40,7 @@
                 <div class="kanban-header__searchbar">
                     {% include "projects/project/fragments/search_bar.html" with action_search="onSearch(event)" x_model="searchText" %}
                 </div>
+                {% comment %} TODO: add last activity toggle {% endcomment %}
                 <div class="kanban-header__my-projects-toggle">
                     {% include "projects/project/fragments/only_my_projects_toggle.html" %}
                 </div>
