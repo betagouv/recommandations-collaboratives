@@ -40,7 +40,18 @@
                 <div class="kanban-header__searchbar">
                     {% include "projects/project/fragments/search_bar.html" with action_search="onSearch(event)" x_model="searchText" %}
                 </div>
-                {% comment %} TODO: add last activity toggle {% endcomment %}
+                <div class="fr-select-group">
+                    <label class="fr-label" for="select-filter-project-duration">Projets actifs depuis</label>
+                    <select class="fr-select"
+                            name="select-filter-project-duration"
+                            @change='onLastActivityChange'>
+                        <option value="" selected disabled hidden>1 mois</option>
+                        <option value="90">3 mois</option>
+                        <option value="180">6 mois</option>
+                        <option value="365">1 an</option>
+                        <option value="1460">Plus</option>
+                    </select>
+                </div>
                 <div class="kanban-header__my-projects-toggle">
                     {% include "projects/project/fragments/only_my_projects_toggle.html" %}
                 </div>
