@@ -9,6 +9,7 @@ created : 2021-05-26 15:56:20 CEST
 from __future__ import annotations
 
 from copy import copy
+from datetime import date, timedelta
 
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
@@ -126,12 +127,27 @@ class ProjectList(ListAPIView):
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
 
+        if last_activity_days := self._get_non_empty_query_param("last_activity"):
+            try:
+                from_date = date.today() - timedelta(days=int(last_activity_days))
+                queryset = queryset.filter(
+                    last_members_activity_at__date__gte=from_date
+                )
+            except ValueError:
+                pass
+
         projects = self._update_the_site_projects(
             queryset=queryset, site=request.site, user=request.user
         )
 
         serializer = self.get_serializer(projects, many=True)
         return Response(serializer.data)
+
+    def _get_non_empty_query_param(self, query_param: str, default=None) -> str | None:
+        if value := self.request.GET.get(query_param):
+            return value
+
+        return default
 
     def _update_the_site_projects(
         self, queryset: QuerySet[models.Project], site: Site, user: User
