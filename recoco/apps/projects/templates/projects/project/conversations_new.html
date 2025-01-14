@@ -23,11 +23,11 @@
     <!-- Message stream -->
     {% for element in feed %}
         {% ifchanged element.timestamp|date %}
-            {{ element.timestamp|date }}
+            <p class="text-center">{{ element.timestamp|date }}</p>
         {% endifchanged %}
         {% if element.type == "activity" %}
             <!-- Type Activity  -->
-            {% include "actstream/action.html" with action=element.object %}
+            <div class="text-center">{% include "actstream/action.html" with action=element.object %}</div>
         {% elif element.type == "reco" %}
             <!-- Type Reco + message -->
             <div class="conversation-new__task rounded-3 fr-p-2w fr-my-2v fr-mr-6w {% if request.user == element.object.created_by %}bg-blue-light{% else %}bg-grey-light {% endif %}">
@@ -68,15 +68,7 @@
                     {% endfor %}
                 {% endif %}
                 {% if element.object.created_by %}
-                    <div class="d-flex align-items-center">
-                        {% include "user/user_card.html" with user=element.object.created_by %}
-                        {% comment %} {% if message.created_by == request.user %}
-                        <span class="align-middle small text-dark fr-ml-2v">
-                            -
-                            <a class="fr-btn fr-btn--sm fr-btn--tertiary-no-outline fr-ml-1v" href="{% url 'projects-update-message' message.pk %}">éditer</a>
-                        </span>
-                        {% endif %} {% endcomment %}
-                    </div>
+                    <div class="d-flex align-items-center">{% include "user/user_card.html" with user=element.object.created_by %}</div>
                 {% endif %}
             </div>
         {% endif %}
