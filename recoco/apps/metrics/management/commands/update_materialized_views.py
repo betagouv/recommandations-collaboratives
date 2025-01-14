@@ -15,11 +15,20 @@ from recoco.apps.metrics.processor import (
 class Command(BaseCommand):
     help = "Update materialized view used for metrics"
 
-    def _check_user_exists_in_db(self, cursor: CursorWrapper, schema_owner: str):
+    def _check_user_exists_in_db(
+        self, cursor: CursorWrapper, role_name: str, **options: Any
+    ) -> bool:
         cursor.execute(
-            sql=f"SELECT 1 FROM pg_roles WHERE rolname='{schema_owner}';"  # noqa: S608
+            sql=f"SELECT 1 FROM pg_roles WHERE rolname='{role_name}';"  # noqa: S608
         )
-        return cursor.fetchone() is not None
+        role_exists = cursor.fetchone() is not None
+
+        if not role_exists and options["create_roles"]:
+            self.stdout.write(f"  ++ Creating role '{role_name}'")
+            cursor.execute(sql=f"CREATE ROLE {role_name} LOGIN;")
+            return True
+
+        return role_exists
 
     def create_views(self, **options: Any):
         for spec in settings.METRICS_MATERIALIZED_VIEWS_SPEC:
@@ -60,7 +69,7 @@ class Command(BaseCommand):
 
                 if not options["drop_only"] and not options["refresh_only"]:
                     if not self._check_user_exists_in_db(
-                        cursor, materialized_view.db_schema_owner
+                        cursor, materialized_view.db_schema_owner, **options
                     ):
                         self.stdout.write(
                             self.style.ERROR(
@@ -76,7 +85,9 @@ class Command(BaseCommand):
                     for site in Site.objects.order_by("id"):
                         site_schema_owner = materialized_view.site_db_schema_owner(site)
 
-                        if not self._check_user_exists_in_db(cursor, site_schema_owner):
+                        if not self._check_user_exists_in_db(
+                            cursor, site_schema_owner, **options
+                        ):
                             self.stdout.write(
                                 self.style.ERROR(
                                     f"  -- User '{site_schema_owner}' does not exist in the database"
@@ -98,6 +109,11 @@ class Command(BaseCommand):
             "--refresh-only",
             action="store_true",
             help="Refresh the materialized views only, do not drop them.",
+        )
+        parser.add_argument(
+            "--create-roles",
+            action="store_true",
+            help="Create the missing roles in db.",
         )
 
     def handle(self, *args, **options):
