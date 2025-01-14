@@ -57,13 +57,9 @@ class ProjectSearchFilter(SearchFilter):
         keywords = request.query_params.get(self.search_param)
         departments = request.query_params.getlist("departments", None)
 
-        # if no search_terms return
-        if not keywords:
-            return queryset.none()
+        if keywords:
+            queryset = watson.filter(queryset, keywords)
 
-        queryset = watson.filter(queryset, keywords)
-
-        print(departments)
         if departments:
             queryset = queryset.filter(commune__department__code__in=departments)
 
