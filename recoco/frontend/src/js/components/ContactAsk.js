@@ -1,15 +1,16 @@
 import Alpine from 'alpinejs';
 import api, { hitCountUrl } from '../utils/api';
 
-function ContactAsk(isStaff, contactToDisplay = []) {
+function ContactAsk(isStaff, isAdmin, isAdvisor, contactToDisplay = []) {
   return {
     contactsIds: contactToDisplay, //tableau des contacts
     init() {
     },
     isLoaded(contactId) {
-      return isStaff || this.contactsIds.includes(contactId);
+      // return  isStaff || isAdmin || isAdvisor ||this.contactsIds.includes(contactId);
+      return  this.contactsIds.includes(contactId);
     },
-    togglecliqueUser(contactId, resourceId) {
+    toggleUserClic(contactId, resourceId) {
       this.contactsIds = [...this.contactsIds, contactId];
       api.post(hitCountUrl(), {
         content_object_ct: 'addressbook.contact',
