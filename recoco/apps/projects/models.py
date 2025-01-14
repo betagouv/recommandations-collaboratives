@@ -891,6 +891,8 @@ class ProjectSearchAdapter(watson.SearchAdapter):
         "name",
         "tags_as_list",
         "commune__name",
+        "commune__insee",
+        "commune__postal",
     )
 
     def tags_as_list(self, obj):

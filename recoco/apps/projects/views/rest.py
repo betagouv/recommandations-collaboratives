@@ -18,9 +18,12 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404
 from notifications import models as notifications_models
 from rest_framework import permissions, status, viewsets
+from rest_framework.filters import SearchFilter
 from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
+from rest_framework.settings import api_settings
 from rest_framework.views import APIView
+from watson import search as watson
 
 from recoco import verbs
 from recoco.rest_api.filters import TagsFilterbackend
@@ -44,6 +47,27 @@ from ..serializers import (
 ########################################################################
 # Project API
 ########################################################################
+
+
+class ProjectSearchFilter(SearchFilter):
+    search_param = api_settings.SEARCH_PARAM
+    template = "rest_framework/filters/search.html"
+
+    def filter_queryset(self, request, queryset, view):
+        keywords = request.query_params.get(self.search_param)
+        departments = request.query_params.getlist("departments", None)
+
+        # if no search_terms return
+        if not keywords:
+            return queryset.none()
+
+        queryset = watson.filter(queryset, keywords)
+
+        print(departments)
+        if departments:
+            queryset = queryset.filter(commune__department__code__in=departments)
+
+        return queryset
 
 
 class ProjectDetail(APIView):
@@ -91,7 +115,7 @@ class ProjectList(ListAPIView):
 
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = ProjectForListSerializer
-    filter_backends = [TagsFilterbackend]
+    filter_backends = [TagsFilterbackend, ProjectSearchFilter]
 
     def get_queryset(self):
         return (
