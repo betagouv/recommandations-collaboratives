@@ -1,3 +1,4 @@
+import os
 import random
 import string
 from io import StringIO
@@ -55,6 +56,17 @@ class TestCommand(BaseClassTestMixin):
                 f"SELECT COUNT(*) FROM pg_roles WHERE rolname='metrics_{random_prefix}_owner_example_com';"
             )
             assert cursor.fetchone()[0] == 0
+
+    @pytest.mark.skipif(
+        os.environ.get("SKIP_TEST_METRICS_CREATE_ROLES") == "true",
+        reason="Skipping metrics tests that create roles",
+    )
+    @pytest.mark.django_db(transaction=True)
+    def test_full_command_create_roles(self, settings):
+        random_prefix = "".join(
+            random.choices(string.ascii_lowercase, k=10)  # noqa: S311
+        )
+        settings.METRICS_PREFIX = f"metrics_{random_prefix}"
 
         call_command("update_materialized_views", create_roles=True)
 
