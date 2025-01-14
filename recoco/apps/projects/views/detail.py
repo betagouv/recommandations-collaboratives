@@ -288,6 +288,32 @@ def project_conversations(request, project_id=None):
 
 
 @login_required
+def project_conversations_new(request, project_id=None):
+    """New Conversation page for project"""
+
+    project = get_object_or_404(
+        models.Project.objects.filter(sites=request.site).with_unread_notifications(
+            user_id=request.user.id
+        ),
+        pk=project_id,
+    )
+
+    is_regional_actor = is_regional_actor_for_project(
+        request.site, project, request.user, allow_national=True
+    )
+
+    advising = get_advisor_for_project(request.user, project)
+
+    is_regional_actor or has_perm_or_403(request.user, "view_public_notes", project)
+
+    public_note_form = PublicNoteForm()
+
+    recipients = get_notification_recipients_for_project(project)
+
+    return render(request, "projects/project/conversations_new.html", locals())
+
+
+@login_required
 def project_internal_followup(request, project_id=None):
     """Advisors chat for given project"""
 
