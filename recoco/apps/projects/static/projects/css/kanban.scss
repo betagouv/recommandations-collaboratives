@@ -152,7 +152,7 @@ h5 {
   color: #666666;
 }
 
-@media screen and (max-width: 1420px) {
+@media screen and (max-width: 1920px) {
   .kanban {
     &-header {
       flex-wrap: wrap;
@@ -170,19 +170,22 @@ h5 {
         margin-top: 0.626rem;
       }
       &__searchbar {
-        flex-grow: 1;
+        // flex-grow: 1;
         margin-left: 0;
         order: 1;
+      }
+      &__lastactivity-filter {
+        order: 3;
       }
       &__toolbar {
         order: 2;
       }
       &__my-projects-toggle {
-        order: 3;
+        order: 5;
         margin-right: 0;
       }
       &__region-filter {
-        order: 2;
+        order: 4;
       }
     }
   }
