@@ -22,7 +22,7 @@
                     </svg> {% endcomment %}
                     <span class="fr-icon-file-line fr-icon--sm fr-mr-2v" aria-hidden="true"></span>
                     <span class="text-info-custom text-black fw-medium description">{{ document.description|truncatechars:33 }}</span>
-                    <span class="text-info-custom text-black fr-ml-2v name">{{ document.filename|truncatechars:15 }}</span>
+                    <span class="text-info-custom text-black fr-ml-2v name">{{ document.filename|truncatechars:30 }}</span>
                     {% if document and document.the_file.size %}
                         <span class="text-info-custom text-black fr-ml-2v">({{ document.the_file.size|filesizeformat }})</span>
                     {% endif %}
