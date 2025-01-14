@@ -1,22 +1,17 @@
-structure:
-<pre>
-feed = (timestamp, type={"message", "reco", "activity"}, [RESERVE], object)
-</pre>
-<hr />
-reco: {{ reco }}
-<hr />
-activity: {{ activity }}
-<hr />
-message: {{ message }}
 {% extends "projects/project/detail.html" %}
 {% load guardian_tags %}
 {% load sass_tags %}
+{% load django_vite %}
 {% block title %}
     Nouvelle conversation - {{ block.super }}
 {% endblock title %}
 {% block og_title %}
     Nouvelle conversation - {{ block.super }}
 {% endblock og_title %}
+{% block js %}
+    {% vite_asset 'js/components/Task.js' %}
+    {% vite_asset 'js/components/TaskStatusSwitcher.js' %}
+{% endblock js %}
 {% block css %}
     <link href="{% sass_src 'projects/css/conversations_new.scss' %}"
           rel="stylesheet"
@@ -24,12 +19,86 @@ message: {{ message }}
 {% endblock css %}
 {% block project_detail %}
     {% get_obj_perms request.user for project as "user_project_perms" %}
+    {% include "projects/project/navigation.html" with conversation=True %}
     <!-- Message stream -->
-    {% for  in %}
+    {% comment %}
+    structure:
+    <pre>
+    feed = (timestamp, type={"message", "reco", "activity"}, [RESERVE], object)
+    </pre>
+    {% endcomment %}
+    <hr />
+    <!-- Type Reco + message -->
+    {% comment %} reco: {{ reco }} {% endcomment %}
+    {% comment %} {% include "projects/project/fragments/tasks_inline/task_item.html" with task=task %} {% endcomment %}
+    <div class="conversation-new__task rounded-3 fr-p-2w fr-my-2v fr-mr-6w {% if request.user == reco.created_by %}bg-blue-light{% else %}bg-grey-light {% endif %}">
+        <p class="task-item__content">{{ reco.content_rendered|safe }}</p>
+        <div class="task-item__resource">
+            <h4>{{ reco.intent|safe }}</h4>
+            <p class="fr-mt-1w fr-mb-0">{{ reco.resource.subtitle|safe }}</p>
+            {% if reco.document.count %}
+                {% for document in reco.document.all %}
+                    {% include "projects/project/fragments/files_links/file_list_item_embedded.html" with document=document %}
+                {% endfor %}
+            {% endif %}
+            <div class="resource-link fr-mt-1w">
+                <a href="{{ reco.resource.get_absolute_url }}">Lien vers la ressource</a>
+            </div>
+            {% include "projects/project/fragments/tasks_inline_kanban/tasks_status_buttons.html" %}
+        </div>
+        {% if reco.created_by %}
+            <div class="fr-mt-1w d-flex align-items-center">
+                {% include "user/user_card.html" with user=reco.created_by %}
+                {% if reco.created_by == request.user %}
+                    <span class="align-middle small text-dark fr-ml-2v">
+                        -
+                        <a class="fr-btn fr-btn--sm fr-btn--tertiary-no-outline fr-ml-1v"
+                           href="{% url 'projects-update-message' reco.pk %}">éditer</a>
+                    </span>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+    <hr />
+    <!-- Type Activity  -->
+    {% include "actstream/action.html" with action=activity %}
+    <hr />
+    <!-- Type message -->
+    message: {{ message }}
+    <div class="rounded-3 fr-p-2w fr-my-2v fr-mr-6w {% if request.user == message.created_by %}bg-blue-light{% else %}bg-grey-light {% endif %}">
+        {{ message.content_rendered|safe }}
+        {% if message.document.count %}
+            {% for document in message.document.all %}
+                {% include "projects/project/fragments/files_links/file_list_item_embedded.html" with document=document %}
+            {% endfor %}
+        {% endif %}
+        {% if message.created_by %}
+            <div class="d-flex align-items-center">
+                {% include "user/user_card.html" with user=message.created_by %}
+                {% comment %} {% if message.created_by == request.user %}
+                    <span class="align-middle small text-dark fr-ml-2v">
+                        -
+                        <a class="fr-btn fr-btn--sm fr-btn--tertiary-no-outline fr-ml-1v" href="{% url 'projects-update-message' message.pk %}">éditer</a>
+                    </span>
+                {% endif %} {% endcomment %}
+            </div>
+        {% endif %}
+    </div>
+    {% comment %} {% for element in feed %}
         <!-- Type Activity  -->
-        <!-- Type Reco + message -->
-        <!-- Type message -->
-    {% endfor %}
+        {% if element.type = "activity" %}
+            {{ element.object }}
+            {{ activity }}
+            <!-- Type Reco + message -->
+        {% elif element.type = "reco" %}
+            {{ element.object }}
+            {{ reco }}
+            <!-- Type message -->
+        {% elif element.type = "message" %}
+            {{ element.object }}
+            {{ message }}
+        {% endif %}
+    {% endfor %} {% endcomment %}
     {% if "use_public_notes" in user_project_perms %}
         <hr />
         <!-- Post message -->
@@ -40,9 +109,9 @@ message: {{ message }}
                   enctype="multipart/form-data"
                   id="conversation-form">
                 {% csrf_token %}
-                {% include "tools/editor.html" with input_name=public_note_form.content.name input_value=public_note_form.content.value|default:'' input_required=True %}
-                <label class="visually-hidden" for="input-project-content">{{ public_note_form.content.label }}</label>
-                {% for error in public_note_form.content.errors %}<div class="text-danger text-end">{{ error }}</div>{% endfor %}
+                {% include "tools/editor.html" with input_name=public_message_form.content.name input_value=public_message_form.content.value|default:'' input_required=True %}
+                <label class="visually-hidden" for="input-project-content">{{ public_message_form.content.label }}</label>
+                {% for error in public_message_form.content.errors %}<div class="text-danger text-end">{{ error }}</div>{% endfor %}
                 {% include "projects/project/fragments/files_links/file_upload_input_standalone.html" %}
                 <div class="d-flex justify-content-end fr-mt-3w">
                     <button data-test-id="send-message-conversation"

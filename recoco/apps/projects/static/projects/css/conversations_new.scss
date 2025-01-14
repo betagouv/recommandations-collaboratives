@@ -1,0 +1,46 @@
+.conversation-new {
+  &__activity {
+  }
+  &__task {
+    .task-item {
+      &__content {
+        color: var(--light-neutral-grey-200, #3a3a3a);
+        font-family: Marianne;
+        font-size: 14px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 150%; /* 21px */
+      }
+      &__resource {
+        border-radius: 2px;
+        border: 1px solid #eee;
+        background: #fff;
+        padding: 20px;
+        h4 {
+          color: #161616;
+          font-family: Marianne;
+          font-size: 16px;
+          font-style: normal;
+          font-weight: 700;
+          line-height: 20px; /* 125% */
+        }
+        .resource-link {
+          color: var(--light-background-action-high-blue-france, #000091);
+          font-family: Marianne;
+          font-size: 14px;
+          font-style: normal;
+          font-weight: 400;
+          line-height: normal;
+          text-decoration-line: underline;
+          text-decoration-style: solid;
+          text-decoration-skip-ink: none;
+          text-decoration-thickness: auto;
+          text-underline-offset: auto;
+          text-underline-position: from-font;
+        }
+      }
+    }
+  }
+  &__message {
+  }
+}

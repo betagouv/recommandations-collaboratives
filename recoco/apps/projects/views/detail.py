@@ -312,11 +312,11 @@ def project_conversations_new(request, project_id=None):
 
     feed = []
 
-    message = project.notes.filter(public=True).first()
-    feed.append([message.updated_on, "message", None, message])
+    message = project.notes.filter(public=True).last()
+    # feed.append([message.updated_on, "message", None, message])
 
     reco = project.tasks.filter(public=True).first()
-    feed.append([reco.updated_on, "reco", None, reco])
+    # feed.append([reco.updated_on, "reco", None, reco])
 
     activity = project.target_actions.filter(
         verb__in=[verbs.Project.BECAME_OBSERVER, verbs.Project.BECAME_ADVISOR]
