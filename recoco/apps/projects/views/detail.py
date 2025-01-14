@@ -310,20 +310,42 @@ def project_conversations_new(request, project_id=None):
 
     recipients = get_notification_recipients_for_project(project)
 
+    # Prepare a feed of different objects
     feed = []
 
     for message in project.notes.filter(public=True):
-        feed.append([message.updated_on, "message", None, message])
+        feed.append(
+            {
+                "timestamp": message.updated_on,
+                "type": "message",
+                "notifications": [],
+                "object": message,
+            }
+        )
 
     for reco in project.tasks.filter(public=True):
-        feed.append([reco.updated_on, "reco", None, reco])
+        feed.append(
+            {
+                "timestamp": reco.updated_on,
+                "type": "reco",
+                "notifications": [],
+                "object": reco,
+            }
+        )
 
     for activity in project.target_actions.filter(
         verb__in=[verbs.Project.BECAME_OBSERVER, verbs.Project.BECAME_ADVISOR]
     ):
-        feed.append([activity.timestamp, "activity", None, activity])
+        feed.append(
+            {
+                "timestamp": activity.timestamp,
+                "type": "activity",
+                "notifications": [],
+                "object": activity,
+            }
+        )
 
-    feed = reversed(sorted(feed, key=lambda x: x[0]))
+    feed.sort(key=lambda x: x["timestamp"])
 
     return render(request, "projects/project/conversations_new.html", locals())
 
