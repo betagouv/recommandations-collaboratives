@@ -1,18 +1,58 @@
 structure:
-
 <pre>
 feed = (timestamp, type={"message", "reco", "activity"}, [RESERVE], object)
 </pre>
-
-
-<hr/>
-
+<hr />
 reco: {{ reco }}
-
-<hr/>
-
+<hr />
 activity: {{ activity }}
-
-<hr/>
-
+<hr />
 message: {{ message }}
+{% extends "projects/project/detail.html" %}
+{% load guardian_tags %}
+{% load sass_tags %}
+{% block title %}
+    Nouvelle conversation - {{ block.super }}
+{% endblock title %}
+{% block og_title %}
+    Nouvelle conversation - {{ block.super }}
+{% endblock og_title %}
+{% block css %}
+    <link href="{% sass_src 'projects/css/conversations_new.scss' %}"
+          rel="stylesheet"
+          type="text/css">
+{% endblock css %}
+{% block project_detail %}
+    {% get_obj_perms request.user for project as "user_project_perms" %}
+    <!-- Message stream -->
+    {% for  in %}
+        <!-- Type Activity  -->
+        <!-- Type Reco + message -->
+        <!-- Type message -->
+    {% endfor %}
+    {% if "use_public_notes" in user_project_perms %}
+        <hr />
+        <!-- Post message -->
+        <div class="message-form fr-mt-3w fr-p-2w bg-light border-form">
+            <form class="form"
+                  method="post"
+                  action="{% url 'projects-conversation-create-message' project.pk %}"
+                  enctype="multipart/form-data"
+                  id="conversation-form">
+                {% csrf_token %}
+                {% include "tools/editor.html" with input_name=public_note_form.content.name input_value=public_note_form.content.value|default:'' input_required=True %}
+                <label class="visually-hidden" for="input-project-content">{{ public_note_form.content.label }}</label>
+                {% for error in public_note_form.content.errors %}<div class="text-danger text-end">{{ error }}</div>{% endfor %}
+                {% include "projects/project/fragments/files_links/file_upload_input_standalone.html" %}
+                <div class="d-flex justify-content-end fr-mt-3w">
+                    <button data-test-id="send-message-conversation"
+                            x-data
+                            :disabled="$store.editor.currentMessage === '' "
+                            form="conversation-form"
+                            class="fr-btn"
+                            type="submit">Envoyer</button>
+                </div>
+            </form>
+        </div>
+    {% endif %}
+{% endblock project_detail %}
