@@ -152,41 +152,39 @@ h5 {
   color: #666666;
 }
 
-@media screen and (max-width: 1920px) {
-  .kanban {
-    &-header {
-      flex-wrap: wrap;
-      &__view-selector {
-        order: 1;
-        flex-grow: 1;
-        justify-content: start;
-      }
-      &__view-selector {
-        order: 1;
-      }
-      &__middle-part {
-        order: 3;
-        width: 100%;
-        margin-top: 0.626rem;
-      }
-      &__searchbar {
-        // flex-grow: 1;
-        margin-left: 0;
-        order: 1;
-      }
-      &__lastactivity-filter {
-        order: 3;
-      }
-      &__toolbar {
-        order: 2;
-      }
-      &__my-projects-toggle {
-        order: 5;
-        margin-right: 0;
-      }
-      &__region-filter {
-        order: 4;
-      }
+.kanban {
+  &-header {
+    flex-wrap: wrap;
+    &__view-selector {
+      order: 1;
+      flex-grow: 1;
+      justify-content: start;
+    }
+    &__view-selector {
+      order: 1;
+    }
+    &__middle-part {
+      order: 3;
+      width: 100%;
+      margin-top: 0.626rem;
+    }
+    &__searchbar {
+      // flex-grow: 1;
+      margin-left: 0;
+      order: 1;
+    }
+    &__lastactivity-filter {
+      order: 3;
+    }
+    &__toolbar {
+      order: 2;
+    }
+    &__my-projects-toggle {
+      order: 5;
+      margin-right: 0;
+    }
+    &__region-filter {
+      order: 4;
     }
   }
 }
