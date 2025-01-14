@@ -166,6 +166,7 @@ def test_task_recommendation_is_deleted(request, client):
                 data={"resource": recommendation.resource.pk},
             )
 
+
     assert response.status_code == 302
     assertRedirects(response, reverse("projects-task-recommendation-list"))
 

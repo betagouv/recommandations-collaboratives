@@ -391,10 +391,12 @@ def task_recommendation_delete(request, recommendation_id):
         models.TaskRecommendation, site=request.site, pk=recommendation_id
     )
     task_recommendation.delete()
+
     messages.success(
         request=request,
         message="Le pré-fléchage a bien été supprimé",
     )
+
 
     return redirect(reverse("projects-task-recommendation-list"))
 
