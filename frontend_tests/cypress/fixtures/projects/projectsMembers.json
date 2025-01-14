@@ -322,8 +322,7 @@
       "project": 25,
       "site": 1
     }
-  }
-  ,
+  },
   {
     "model": "projects.projectswitchtender",
     "pk": 23,
