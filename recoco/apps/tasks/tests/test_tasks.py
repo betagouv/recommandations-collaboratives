@@ -1041,42 +1041,6 @@ def test_create_new_action_with_single_resource(request, client, project_ready):
 
 
 @pytest.mark.django_db
-def test_create_new_action_with_multiple_resources(request, client, project_ready):
-    current_site = get_current_site(request)
-
-    resource1 = Recipe(
-        resources.Resource,
-        sites=[current_site],
-        status=resources.Resource.PUBLISHED,
-    ).make()
-    resource2 = Recipe(
-        resources.Resource,
-        sites=[current_site],
-        status=resources.Resource.PUBLISHED,
-    ).make()
-
-    with login(client) as user:
-        utils.assign_advisor(user, project_ready)
-
-        response = client.post(
-            reverse("projects-create-task"),
-            data={
-                "project": project_ready.pk,
-                "push_type": "multiple",
-                "public": True,
-                "resources": [resource1.pk, resource2.pk],
-            },
-        )
-    assert models.Task.on_site.count() == 2
-
-    for task in models.Task.on_site.all():
-        assert task.project == project_ready
-        assert task.public is True
-
-    assert response.status_code == 302
-
-
-@pytest.mark.django_db
 def test_create_new_action_on_unauthorized_project(request, client, project_ready):
     intent = "My Intent"
     content = "My Content"

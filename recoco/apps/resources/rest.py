@@ -1,10 +1,13 @@
 from django.contrib.sites.shortcuts import get_current_site
-from rest_framework import permissions, viewsets
+from rest_framework import permissions, status, viewsets
+from rest_framework.decorators import action
+from rest_framework.response import Response
 
 from recoco.utils import has_perm
 
 from . import models
-from .serializers import ResourceSerializer
+from .importers import ResourceImporter
+from .serializers import ResourceSerializer, ResourceURIImportSerializer
 
 ########################################################################
 # REST API
@@ -44,6 +47,45 @@ class ResourceViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer: ResourceSerializer):
         site = get_current_site(self.request)
         serializer.save(created_by=self.request.user, sites=[site])
+
+    @action(
+        detail=False,
+        methods=["post"],
+        permission_classes=[permissions.IsAuthenticatedOrReadOnly],
+    )
+    def import_from_uri(self, request):
+        """Import (create) a resource from an external known site, miroring it.
+
+        FIXME The current permissions do not allow a fine grained access, thus it is
+        left open to authenticated users. It should be restricted to only advisors or
+        invited advisors.
+
+        """
+        serializer = ResourceURIImportSerializer(data=request.data)
+        if serializer.is_valid():
+            resource_uri = serializer.validated_data["uri"]
+
+            # Check if we already have this resource
+            resource = models.Resource.on_site.filter(
+                imported_from=resource_uri
+            ).first()
+            if resource:
+                return Response(
+                    ResourceSerializer(resource).data, status=status.HTTP_200_OK
+                )
+
+            # Try to fetch it since we don't have it
+            ri = ResourceImporter()
+            resource = ri.from_uri(resource_uri)
+            resource.site_origin = request.site
+            resource.save()
+            resource.sites.add(request.site)
+
+            return Response(
+                ResourceSerializer(resource).data, status=status.HTTP_201_CREATED
+            )
+
+        return Response(status=status.HTTP_501_NOT_IMPLEMENTED)
 
 
 # eof
