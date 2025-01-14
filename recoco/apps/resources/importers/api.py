@@ -73,7 +73,7 @@ class AidesTerritoiresRIAdapter(BaseRIAdapter):
         return pandoc.write(doc, format="markdown_strict")
 
     def extract_data(self):
-        self.title = self.raw_data["name"]
+        self.title = self.raw_data.get("name", "Sans Nom")
 
         sections = (
             ("description", "Description"),

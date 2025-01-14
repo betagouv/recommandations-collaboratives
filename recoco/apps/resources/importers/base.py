@@ -10,7 +10,7 @@ class BaseRIAdapter(ABC):
     def __init__(self, uri):
         self.uri = uri
         self.parsed_uri = urlparse(uri)
-        self.raw_data = None
+        self.raw_data = {}
 
         # Mirror fields of `Resource`
         self.title = None
