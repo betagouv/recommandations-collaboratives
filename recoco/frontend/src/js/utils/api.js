@@ -38,8 +38,8 @@ instance.interceptors.response.use(
 export default instance;
 
 // Projects :
-export function projectsUrl() {
-  return '/api/projects/';
+export function projectsUrl(lastActivity = '30') {
+  return '/api/projects/?last_activity=' + lastActivity;
 }
 
 export function projectsProjectSitesUrl() {

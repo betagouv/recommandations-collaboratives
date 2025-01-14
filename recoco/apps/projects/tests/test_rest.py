@@ -15,6 +15,7 @@ from django.contrib.sites import models as sites_models
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
 from django.utils import timezone
+from freezegun import freeze_time
 from guardian.shortcuts import assign_perm
 from model_bakery import baker
 from notifications.signals import notify
@@ -195,6 +196,44 @@ def test_project_list_tags_filter(request, client):
     response = client.get(f"{url}?tags=tag5,tag6")
     assert response.status_code == 200
     assert len(response.data) == 0
+
+
+@pytest.mark.django_db
+def test_project_list_last_activity_filter(request, client):
+    site = get_current_site(request)
+    user = baker.make(auth_models.User, is_superuser=True)
+
+    with freeze_time("2025-01-01"):
+        baker.make(models.Project, sites=[site])
+
+    with freeze_time("2025-01-10"):
+        baker.make(models.Project, sites=[site])
+
+    client = APIClient()
+    client.force_authenticate(user=user)
+
+    url = reverse("projects-list")
+
+    with freeze_time("2025-01-15"):
+        response = client.get(f"{url}?last_activity=3")
+        assert response.status_code == 200
+        assert len(response.data) == 0
+
+        response = client.get(f"{url}?last_activity=5")
+        assert response.status_code == 200
+        assert len(response.data) == 1
+
+        response = client.get(f"{url}?last_activity=15")
+        assert response.status_code == 200
+        assert len(response.data) == 2
+
+        response = client.get(f"{url}?last_activity=dummy")
+        assert response.status_code == 200
+        assert len(response.data) == 2
+
+        response = client.get(f"{url}?last_activity=")
+        assert response.status_code == 200
+        assert len(response.data) == 2
 
 
 ########################################################################
