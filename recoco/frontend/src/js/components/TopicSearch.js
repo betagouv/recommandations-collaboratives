@@ -15,7 +15,7 @@ function TopicSearch(currentTopic, restrict_to = null) {
           searchTopicsUrl(currentTopic, this.restrict_to)
         );
         if (results && results.data) {
-          return (this.results = results.data);
+          return (this.results = results.data.results);
         }
       }
     },
@@ -29,7 +29,7 @@ function TopicSearch(currentTopic, restrict_to = null) {
           );
 
           if (results && results.data) {
-            return (this.results = results.data);
+            return (this.results = results.data.results);
           }
         } else {
           return (this.results = []);

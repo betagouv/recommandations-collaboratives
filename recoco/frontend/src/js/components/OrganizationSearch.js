@@ -60,7 +60,7 @@ function OrganizationSearch(
           const results = await api.get(searchOrganizationsUrl(e.target.value));
 
           if (results && results.data) {
-            return (this.results = results.data);
+            return (this.results = results.data.results);
           }
         } else {
           return (this.results = []);
