@@ -52,13 +52,15 @@
                             <span class="align-middle small text-dark fr-ml-2v">
                                 -
                                 <a class="fr-btn fr-btn--sm fr-btn--tertiary-no-outline fr-ml-1v"
-                                   href="{% url 'projects-update-message' element.object.pk %}">éditer</a>
+                                   href="{% url 'projects-update-note' element.object.pk %}">éditer</a>
                             </span>
-                        {% endif %}
+                            {% endif %}
                     </div>
-                {% endif %}
+                    {% endif %}
             </div>
-        {% elif element.type == "message" %}
+            {% elif element.type == "followup" %}
+            FOLLOWUP {{ element.object }}
+            {% elif element.type == "message" %}
             <!-- Type message -->
             <div class="rounded-3 fr-p-2w fr-my-2v fr-mr-6w {% if request.user == element.object.created_by %}bg-blue-light{% else %}bg-grey-light {% endif %}">
                 {{ element.object.content_rendered|safe }}
@@ -73,7 +75,7 @@
                         {% comment %} {% if message.created_by == request.user %}
                         <span class="align-middle small text-dark fr-ml-2v">
                             -
-                            <a class="fr-btn fr-btn--sm fr-btn--tertiary-no-outline fr-ml-1v" href="{% url 'projects-update-message' message.pk %}">éditer</a>
+                            <a class="fr-btn fr-btn--sm fr-btn--tertiary-no-outline fr-ml-1v" href="{% url 'projects-update-note' message.pk %}">éditer</a>
                         </span>
                         {% endif %} {% endcomment %}
                     </div>
