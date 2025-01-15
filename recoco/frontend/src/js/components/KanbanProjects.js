@@ -6,6 +6,7 @@ import api, {
   projectsProjectSitesUrl,
   projectsUrl,
   regionsUrl,
+  searchProjectUrl,
 } from '../utils/api';
 
 Alpine.data('KanbanProjects', boardProjectsApp);
@@ -19,6 +20,10 @@ function boardProjectsApp(currentSiteId) {
       JSON.parse(localStorage.getItem('isDisplayingOnlyUserProjects')) ?? false,
     get isBusy() {
       return this.$store.app.isLoading;
+    },
+    backendSearch: {
+      searchText: '',
+      searchDepartment: [],
     },
     selectedDepartment: null,
     departments: [],
@@ -112,9 +117,7 @@ function boardProjectsApp(currentSiteId) {
       return this.projectList.find((d) => d.id === id);
     },
     get view() {
-      return this.projectList
-        .filter(this.filterProjectsByDepartments.bind(this))
-        .sort(this.sortFn.bind(this));
+      return this.projectList.sort(this.sortFn.bind(this));
     },
     column(status) {
       if (status instanceof Array) {
@@ -157,21 +160,18 @@ function boardProjectsApp(currentSiteId) {
       event.preventDefault();
       event.dataTransfer.dropEffect = 'move';
     },
-    onSearch() {
-      this.filterProject(this.searchText);
-    },
     onLastActivityChange(event) {
       this.lastActivity = event.target.value;
       this.getData();
     },
-    filterProject(search) {
-      if (search === '') {
-        this.projectList = [...this.rawProjectList];
-        return;
-      }
-      const filtered = this.fuse.search(search).map((r) => r.item);
-      this.projectList = [...filtered];
-    },
+    // filterProject(search) {
+    //   if (search === '') {
+    //     this.projectList = [...this.rawProjectList];
+    //     return;
+    //   }
+    //   const filtered = this.fuse.search(search).map((r) => r.item);
+    //   this.projectList = [...filtered];
+    // },
     async postProcessData(projectList) {
       const departments = this.extractAndCreateAdvisorDepartments(projectList);
       const regionsData = await api.get(regionsUrl());
@@ -233,7 +233,31 @@ function boardProjectsApp(currentSiteId) {
       });
       this.regions = currentRegions;
     },
-    handleTerritorySelectAll() {
+    async onSearch(event) {
+      this.backendSearch.searchText = event.target.value;
+      await this.backendSearchProjects();
+    },
+    async backendSearchProjects() {
+      this.$refs.selectFilterProjectDuration.disabled = true;
+      this.$refs.selectFilterProjectDuration.value = 1460;
+
+      const filteredProject = await api.get(
+        searchProjectUrl(
+          this.backendSearch.searchText,
+          this.backendSearch.searchDepartment
+        )
+      );
+      this.projectList = filteredProject.data;
+    },
+    saveSelectedDepartment() {
+      const extractedDepartements = this.regions
+        .filter((region) => region.active)
+        .flatMap((region) =>
+          region.departments.map((department) => department.code)
+        );
+      this.backendSearch.searchDepartment = [...extractedDepartements];
+    },
+    async handleTerritorySelectAll() {
       this.territorySelectAll = !this.territorySelectAll;
 
       this.regions = this.regions.map((region) => ({
@@ -244,8 +268,12 @@ function boardProjectsApp(currentSiteId) {
           active: this.territorySelectAll,
         })),
       }));
+
+      this.saveSelectedDepartment();
+
+      await this.backendSearchProjects();
     },
-    handleRegionFilter(selectedRegion) {
+    async handleRegionFilter(selectedRegion) {
       this.regions = this.regions.map((region) => {
         if (region.code === selectedRegion.code) {
           region.active = !region.active;
@@ -261,8 +289,12 @@ function boardProjectsApp(currentSiteId) {
       this.territorySelectAll =
         this.regions.filter((region) => region.active).length ===
         this.regions.length;
+
+      this.saveSelectedDepartment();
+
+      await this.backendSearchProjects();
     },
-    handleDepartmentFilter(selectedDepartment) {
+    async handleDepartmentFilter(selectedDepartment) {
       this.regions = this.regions.map((region) => ({
         ...region,
         departments: region.departments.map((department) => {
@@ -280,6 +312,10 @@ function boardProjectsApp(currentSiteId) {
       this.territorySelectAll =
         this.regions.filter((region) => region.active).length ===
         this.regions.length;
+
+      this.saveSelectedDepartment();
+
+      await this.backendSearchProjects();
     },
     filterProjectsByDepartments(project) {
       return this.regions.find(
