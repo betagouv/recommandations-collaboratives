@@ -38,8 +38,14 @@ instance.interceptors.response.use(
 export default instance;
 
 // Projects :
-export function searchProjectUrl(search = '', departments = []) {
-  return `/api/projects/?${search ? `search=${search}` : ''}${search && departments.length ? '&' : ''}${departments.length ? departments.map((code) => `departments=${code}`).join('&') : ''}`;
+export function searchProjectUrl(search, departments) {
+  if (search) {
+    search = `search=${search}`;
+  }
+  if (departments.length) {
+    departments = departments.map((code) => `departments=${code}`).join('&');
+  }
+  return `/api/projects/?${search}${search && departments.length && '&'}${departments}`;
 }
 
 export function projectsUrl(lastActivity = '30') {
