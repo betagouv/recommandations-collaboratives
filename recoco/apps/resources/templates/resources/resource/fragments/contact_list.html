@@ -8,7 +8,7 @@
 {% if contacts.count %}
     {% is_staff_for_current_site request.user as is_staff %}
     {% is_admin_for_current_site request.user as is_admin %}
-    {{ can_administrate|json_script:"canAdministrate" }}
+    {% comment %} {{ can_administrate|json_script:"canAdministrate" }} {% endcomment %}
     <div x-data="ContactList" id="contact-list" class="fr-mt-3w">
         {% if user.is_anonymous %}
             <div class="flag blue">
@@ -21,7 +21,7 @@
         {% else %}
             <h6 class="fw-bold text-uppercase d-block fr-mb-2w">👩‍💼 Contacts</h6>
             <div class="d-flex flex-wrap flex-row"
-                 x-data="ContactAsk('{{ is_staff }}', '{{ is_admin }}', '{{ canAdministrate }}', {{ contacts_to_display }})"
+                 x-data="ContactAsk('{{ is_staff }}', '{{ is_admin }}', '{{ is_administrating_project }}', {{ contacts_to_display }})"
                  x-init="init">
                 {% for contact in contacts.all %}
                     <div :class="currentHash === '#contact-{{ contact.pk }}' && 'component-focus'"
