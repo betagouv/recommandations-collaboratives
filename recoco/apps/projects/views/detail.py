@@ -8,7 +8,6 @@ created : 2022-03-07 15:56:20 CEST -- HB David!
 """
 
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.forms import formset_factory
 from django.http import HttpResponseForbidden
@@ -18,7 +17,6 @@ from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.decorators.csrf import csrf_exempt
 
 from recoco import verbs
-from recoco.apps.hitcount.models import HitCount
 from recoco.apps.invites.forms import InviteForm
 from recoco.apps.survey import models as survey_models
 
@@ -69,15 +67,6 @@ def project_overview(request, project_id=None):
 
     is_regional_actor = is_regional_actor_for_project(
         request.site, project, request.user, allow_national=True
-    )
-
-    is_diag_done = bool(
-        HitCount.on_site.for_context_object(project)
-        .for_user(request.user)
-        .filter(
-            content_object_ct=ContentType.objects.get_for_model(User),
-        )
-        .values_list("content_object_id", flat=True)
     )
 
     advising = get_advisor_for_project(request.user, project)

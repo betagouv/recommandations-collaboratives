@@ -88,19 +88,19 @@
                                                 </div>
                                                 <div class="col-12 col-lg-6 h-100 responsive-wrapper">
                                                     {% if is_staff %}
-                                                        <div x-data="MarkDiagAsDone({{ request.user.id }}, {{ project.id }}, '{{ is_diag_done }}' == 'True')">
+                                                        <div x-data="MarkDiagAsDone({{ request.user.id }}, {{ project.id }}, '{{ project.is_diagnostic_done }}' == 'True')">
                                                             <header>
                                                                 <h6 class="font-small text-uppercase fr-mb-1v">Diagnostic</h6>
                                                             </header>
-                                                            <template x-if="!displayDiagButton">
+                                                            <template x-if="displayDiagButton">
                                                                 <button class="fr-btn fr-btn--sm fr-btn--secondary fr-mt-2w fr-py-2w fr-mb-2w text-uppercase w-100 justify-content-center"
                                                                         @click='handleClickMarkDiagAsDone'
                                                                         data-cy="button-diag-project-done">
                                                                     <span class="fr-icon-double-check-line" aria-hidden="true"></span> Marquer l’appel de “diagnostic” comme fait
                                                                 </button>
                                                             </template>
-                                                            <template x-if="displayDiagButton">
-                                                                <div>
+                                                            <template x-if="!displayDiagButton">
+                                                                <div class="fw-700 fr-my-1w">
                                                                     <span class="fr-icon-double-check-line" aria-hidden="true"></span> Appel de "diagnostic" effectué
                                                                 </div>
                                                             </template>
