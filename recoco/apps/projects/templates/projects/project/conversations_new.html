@@ -25,6 +25,8 @@
         {% ifchanged element.timestamp|date %}
             <p class="text-center">{{ element.timestamp|date }}</p>
         {% endifchanged %}
+    <div>UNREAD NOTIFS={{ element.notifications }}</div>
+
         {% if element.type == "activity" %}
             <!-- Type Activity  -->
             <div class="text-center">{% include "actstream/action.html" with action=element.object %}</div>
