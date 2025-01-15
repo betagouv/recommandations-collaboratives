@@ -59,7 +59,23 @@
                 {% endif %}
             </div>
         {% elif element.type == "followup" %}
-            FOLLOWUP {{ element.object }}
+            {% if element.object.status %}
+                <p>
+                    <span class="strong">{{ element.object.who.first_name }} {{ element.object.who.last_name }}</span> a marqué la recommandation commme {{ element.object.status_txt }}
+                </p>
+            {% endif %}
+            <!-- Type followup -->
+            <div class="rounded-3 fr-p-2w fr-my-2v fr-mr-6w {% if request.user == element.object.created_by %}bg-blue-light{% else %}bg-grey-light {% endif %}">
+                {{ element.object.comment_rendered|safe }}
+                {% if element.object.document.count %}
+                    {% for document in element.object.document.all %}
+                        {% include "projects/project/fragments/files_links/file_list_item_embedded.html" with document=document %}
+                    {% endfor %}
+                {% endif %}
+                {% if element.object.who %}
+                    <div class="d-flex align-items-center">{% include "user/user_card.html" with user=element.object.who %}</div>
+                {% endif %}
+            </div>
         {% elif element.type == "message" %}
             <!-- Type message -->
             <div class="rounded-3 fr-p-2w fr-my-2v fr-mr-6w {% if request.user == element.object.created_by %}bg-blue-light{% else %}bg-grey-light {% endif %}">

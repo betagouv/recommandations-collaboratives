@@ -272,6 +272,11 @@ class TaskFollowup(models.Model):
         verbose_name = "suivi action"
         verbose_name_plural = "suivis actions"
 
+    @property
+    def comment_rendered(self):
+        """Return comment as markdown"""
+        return markdownify(self.comment)
+
     def __str__(self):  # pragma: nocover
         return f"TaskFollowup{self.id}"
 
