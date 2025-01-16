@@ -8,7 +8,6 @@
 {% if contacts.count %}
     {% is_staff_for_current_site request.user as is_staff %}
     {% is_admin_for_current_site request.user as is_admin %}
-    {% comment %} {{ can_administrate|json_script:"canAdministrate" }} {% endcomment %}
     <div x-data="ContactList" id="contact-list" class="fr-mt-3w">
         {% if user.is_anonymous %}
             <div class="flag blue">
