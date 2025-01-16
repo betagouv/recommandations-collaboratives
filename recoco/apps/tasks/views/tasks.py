@@ -7,12 +7,14 @@ author  : raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created : 2021-05-26 15:56:20 CEST
 """
 
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import Http404, HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.text import slugify
+from django.views.decorators.http import require_http_methods
 
 from recoco.apps.projects import models as project_models
 from recoco.apps.projects.forms import DocumentUploadForm
@@ -27,7 +29,6 @@ from .. import models, signals
 from ..forms import (
     CreateActionWithResourceForm,
     CreateActionWithoutResourceForm,
-    CreateActionsFromResourcesForm,
     PushTypeActionForm,
     RsvpTaskFollowupForm,
     TaskFollowupForm,
@@ -62,9 +63,9 @@ def create_task(request):
 
         try:
             push_form_type = {
-                "noresource": CreateActionWithoutResourceForm,
                 "single": CreateActionWithResourceForm,
-                "multiple": CreateActionsFromResourcesForm,
+                "external_resource": CreateActionWithResourceForm,
+                "noresource": CreateActionWithoutResourceForm,
             }[push_type]
         except KeyError:
             return render(request, "tasks/tasks/task_create.html", locals())
@@ -360,6 +361,7 @@ def task_recommendation_create(request):
 @login_required
 def task_recommendation_update(request, recommendation_id):
     """Update a task recommendation"""
+
     is_staff_for_site_or_403(request.user)
 
     recommendation = get_object_or_404(
@@ -375,6 +377,26 @@ def task_recommendation_update(request, recommendation_id):
         form = TaskRecommendationForm(instance=recommendation)
 
     return render(request, "tasks/tasks/recommendation_update.html", locals())
+
+
+@login_required
+@require_http_methods(["POST"])
+def task_recommendation_delete(request, recommendation_id):
+    """Delete a task recommendation"""
+
+    is_staff_for_site_or_403(request.user)
+
+    task_recommendation = get_object_or_404(
+        models.TaskRecommendation, site=request.site, pk=recommendation_id
+    )
+    task_recommendation.delete()
+
+    messages.success(
+        request=request,
+        message="Le pré-fléchage a bien été supprimé",
+    )
+
+    return redirect(reverse("projects-task-recommendation-list"))
 
 
 # retourne pour le projet les suggestions du système

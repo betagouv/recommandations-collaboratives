@@ -101,7 +101,7 @@
       "why": "Selon le type de propriétaire, les procédures, financements et acteurs à solliciter ne seront pas les mêmes pour renouveler le site.\r\n\r\nIl est généralement nécessaire de maîtriser le terrain d’une façon ou d’une autre pour permettre son renouvellement selon un scénario d’usage acceptable pour la collectivité :\r\n\r\n- soit en achetant le site (parfois pour un euro symbolique)\r\n- soit en le laissant en propriété privée mais en cadrant ses usages nouveaux (avec des documents d’urbanisme et de la négociation avec les propriétaires, par exemple)",
       "is_multiple": false,
       "deleted": null,
-      "upload_title": "",
+      "upload_title": "titre de propriété, acte de vente, bail, etc.",
       "comment_title": "Précisions éventuelles (propriétaire qui ne paie pas sa taxe foncière, complexités, droits d’usage etc.)"
     }
   },
@@ -119,7 +119,7 @@
       "why": "Pour anticiper les prescriptions éventuelles des services de l’État liés à la culture.\r\n\r\nCes services peuvent prescrire un diagnostic en fonction de la richesse pressentie du site, voire des fouilles archéologiques si le projet peut impacter les sols diagnostiqués.",
       "is_multiple": false,
       "deleted": null,
-      "upload_title": "",
+      "upload_title": "document archéologique, diagnostic, etc.",
       "comment_title": "Précisions éventuelles"
     }
   },

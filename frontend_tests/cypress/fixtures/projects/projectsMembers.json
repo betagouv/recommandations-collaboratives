@@ -322,5 +322,14 @@
       "project": 25,
       "site": 1
     }
+  },
+  {
+    "model": "projects.projectswitchtender",
+    "pk": 23,
+    "fields": {
+      "switchtender": 13,
+      "project": 26,
+      "site": 1
+    }
   }
 ]

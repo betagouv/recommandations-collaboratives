@@ -14,30 +14,26 @@
                     &nbsp;
                     <span class="align-middle">Configuration du Pré-fléchage</span>
                 </h2>
-                <span class="text-secondary">Vous pouvez configurer ici les ressources qui seront pré-fléchées à partir des signaux collectés par les réponses aux questions de l'exploration.</span>
+                <span class="text-secondary">Vous pouvez configurer ici les ressources qui seront pré-fléchées à partir des
+                signaux collectés par les réponses aux questions de l'exploration.</span>
             </div>
             <!-- Sidebar -->
             <div class="col-sm-12 col-lg-4 col-xl-3 border-start">
                 <!-- Ajouter -->
                 <div class="d-grid gap-2">
-                    <a class="btn btn-light btn-sm"
+                    <a class="fr-btn fr-btn--sm fr-icon-add-circle-line fr-btn--icon-left w-100 justify-content-center"
                        href="{% url 'projects-task-recommendation-create' %}"
-                       role="button">
-                        <svg class="bi" width="16" height="16" fill="currentColor">
-                            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#plus-circle" />
-                        </svg>
-                        &nbsp;
-                        Ajouter un pré-fléchage
-                    </a>
+                       role="button">Ajouter un pré-fléchage</a>
                 </div>
             </div>
             <!-- main content -->
             <div>
                 {% for recommendation in recommendations %}
-                    <div class="d-flex fr-mb-3w">
-                        <div class="col-8" id="q-{{ recommendation.id }}">
+                    {% include "tasks/tasks/recommendation_delete_modal.html" with recommendation_id=recommendation.id %}
+                    <div class="row d-flex fr-mb-3w">
+                        <div class="col-sm-12 col-lg-8 col-xl-9" id="q-{{ recommendation.id }}">
                             <div class="fr-mt-2w d-flex justify-content-between fr-pr-3w">
-                                <div>
+                                <div class="col-8">
                                     <svg class="bi align-middle" width="20" height="20" fill="currentColor">
                                         <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#signpost" />
                                     </svg>
@@ -69,16 +65,14 @@
                                         </span>
                                     </div>
                                 </div>
-                                <div class="btn-group fr-ml-6w align-middle"
-                                     role="group"
-                                     aria-label="actions">
-                                    <a class="btn btn-light fr-mb-1v d-inline-block btn-outline-primary btn-sm"
+                                <div class="fr-ml-6w align-middle" role="group" aria-label="actions">
+                                    <a class="fr-btn fr-btn--sm fr-btn--icon-left fr-icon-pencil-line"
                                        href="{% url 'projects-task-recommendation-update' recommendation.pk %}">
-                                        <svg class="bi fr-mr-1v" width="16" height="16" fill="currentColor">
-                                            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#pen" />
-                                        </svg>
                                         Éditer
                                     </a>
+                                    <button class="fr-btn fr-btn--sm fr-btn--secondary fr-btn--icon-left fr-icon-delete-line"
+                                            aria-controls="task-recommendation-delete-modal-{{ recommendation.id }}"
+                                            data-fr-opened="false">Supprimer</button>
                                 </div>
                             </div>
                             <div class="d-block w-100 fr-pr-3w">
@@ -86,7 +80,7 @@
                                 {% include "projects/project/fragments/action_list_item.html" with task=recommendation hide_comments=True disable_tracking=True disable_edit=True %}
                             </div>
                         </div>
-                        <div class="col-4 border-start fr-pl-3w fr-pt-2w">
+                        <div class="col-sm-12 col-lg-4 col-xl-3 border-start fr-pl-3w fr-pt-2w">
                             <div class="small">
                                 <svg class="bi fr-mr-1v align-middle"
                                      width="16"

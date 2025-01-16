@@ -45,6 +45,9 @@ def get_advising_position(user, project, site):
 
     {"is_observer": bool, "is_advisor": bool}
     """
+    if user is None or user.is_anonymous:
+        return {"is_observer": False, "is_advisor": False}
+
     try:
         ps = models.ProjectSwitchtender.objects.get(
             switchtender=user, project=project, site=site

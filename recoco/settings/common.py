@@ -562,9 +562,15 @@ DS_AUTOLOAD_SCHEMA = True
 DS_AUTOCREATE_FOLDER = True
 DS_ADAPTERS_DIR = BASE_DIR / "apps/demarches_simplifiees/adapters"
 
+
+# Resource importers
+AIDES_TERRITOIRES_TOKEN = os.environ.get("AIDES_TERRITOIRES_TOKEN")
+
+
 # Waffle (feature flags)
 WAFFLE_FLAG_MODEL = "feature_flag.Flag"
 WAFFLE_SWITCH_MODEL = "feature_flag.Switch"
 WAFFLE_SAMPLE_MODEL = "feature_flag.Sample"
+
 
 # eof

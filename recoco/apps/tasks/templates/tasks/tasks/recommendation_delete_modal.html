@@ -1,0 +1,52 @@
+{% load static %}
+
+<dialog class="fr-modal"
+    aria-labelledby="task-recommendation-delete-modal"
+    role="dialog"
+    id="task-recommendation-delete-modal-{{ recommendation_id }}">
+
+    <div class="fr-container fr-container--fluid fr-container-md">
+        <div class="fr-grid-row fr-grid-row--center">
+            <div class="fr-col-12 fr-col-md-8 fr-col-lg-6">
+                <div class="fr-modal__body">
+
+                    <div class="fr-modal__header">
+                        <button class="fr-btn--close fr-btn"
+                            title="Fermer la fenêtre modale"
+                            aria-controls="task-recommendation-delete-modal-{{ recommendation_id }}">
+                            Fermer
+                        </button>
+                    </div>
+
+                    <div class="fr-modal__content">
+                        <h1 id="fr-modal-title-modal-1" class="fr-modal__title">
+                            <span class="fr-icon-arrow-right-line fr-icon--lg"></span>Suppression d'un pré-fléchage
+                        </h1>
+                        <p>Etes-vous sûr de vouloir supprimer ce pré-fléchage ?</p>
+                    </div>
+
+                    <div class="fr-modal__footer">
+                        <div class="fr-btns-group fr-btns-group--right fr-btns-group--inline-reverse fr-btns-group--inline-lg fr-btns-group--icon-left">
+                            <form method="post"
+                                action="{% url 'projects-task-recommendation-delete' recommendation_id %}">
+                                {% csrf_token %}
+                                <button class="fr-btn fr-icon-checkbox-circle-line fr-btn--icon-left"
+                                    type="submit">
+                                    Oui
+                                </button>
+                            </form>
+                            <button class="fr-btn fr-icon-checkbox-circle-line fr-btn--icon-left fr-btn--secondary"
+                                aria-controls="task-recommendation-delete-modal-{{ recommendation_id }}">
+                                Non
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+</dialog>
+
+<!--  -->
