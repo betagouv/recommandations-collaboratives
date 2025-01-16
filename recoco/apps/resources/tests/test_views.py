@@ -982,6 +982,37 @@ def test_embedded_resource_detail_view_with_task_context(client, request):
     )
     assert response.status_code == 200
     assert response.context["task"] == task
+    assert response.context["contacts_to_display"] == []
+
+
+@pytest.mark.django_db
+def test_embedded_resource_detail_contacts_to_display(request, client):
+    site = get_current_site(request)
+
+    resource = Recipe(
+        models.Resource,
+        sites=[site],
+        status=models.Resource.PUBLISHED,
+    ).make()
+
+    task = Recipe(Task, resource=resource).make()
+
+    contact = baker.make(Contact)
+
+    url = f"{reverse('resources-resource-detail-embeded',args=[resource.id])}?task_id={task.id}"
+
+    with login(client) as user:
+        response = client.get(url)
+        assert response.status_code == 200
+        assert response.context["contacts_to_display"] == []
+
+        hitcount = baker.make(
+            HitCount, site=site, content_object=contact, context_object=resource
+        )
+        baker.make(Hit, hitcount=hitcount, user=user)
+
+        response = client.get(url)
+        assert response.context["contacts_to_display"] == [contact.id]
 
 
 # eof
