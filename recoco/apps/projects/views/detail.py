@@ -198,17 +198,6 @@ def project_actions(request, project_id=None):
         request.site, project, request.user, allow_national=True
     )
 
-    # contacts_to_display = list(
-    #     HitCount.on_site.for_context_object(resource)
-    #     .for_user(request.user)
-    #     .filter(
-    #         content_object_ct=ContentType.objects.get_for_model(Contact),
-    #     )
-    #     .values_list("content_object_id", flat=True)
-    # )
-
-    # contacts_to_display = [255]
-
     advising = get_advisor_for_project(request.user, project)
 
     has_perm(request.user, "list_projects", request.site) or has_perm_or_403(
