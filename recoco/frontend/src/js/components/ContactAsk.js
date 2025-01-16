@@ -1,14 +1,13 @@
 import Alpine from 'alpinejs';
 import api, { hitCountUrl } from '../utils/api';
 
-function ContactAsk(isStaff, isAdmin, isAdvisor, contactToDisplay = []) {
+function ContactAsk(isStaff, isAdmin, isAdvisor, contactsToDisplay = []) {
   return {
-    contactsIds: contactToDisplay, //tableau des contacts
+    contactsIds: contactsToDisplay, //tableau des contacts
     init() {
     },
     isLoaded(contactId) {
-      // return  isStaff || isAdmin || isAdvisor ||this.contactsIds.includes(contactId);
-      return  this.contactsIds.includes(contactId);
+      return isStaff || isAdmin || isAdvisor || this.contactsIds.includes(contactId);
     },
     toggleUserClic(contactId, resourceId) {
       this.contactsIds = [...this.contactsIds, contactId];
