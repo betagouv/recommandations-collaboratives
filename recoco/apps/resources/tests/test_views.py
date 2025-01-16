@@ -314,6 +314,22 @@ def test_resource_detail_does_not_contain_update_for_common_user(request, client
     assertNotContains(response, update_url)
 
 
+@pytest.mark.django_db
+def test_resource_detail_contacts_to_display(request, client):
+    resource = Recipe(
+        models.Resource,
+        sites=[get_current_site(request)],
+        status=models.Resource.PUBLISHED,
+    )
+    url = reverse("resources-resource-detail", args=[resource.id])
+
+    with login(client):
+        response = client.get(url)
+        assert response.context["contacts_to_display"] == []
+
+    # TODO: complete this test
+
+
 #
 # create
 

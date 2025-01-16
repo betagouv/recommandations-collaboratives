@@ -235,16 +235,19 @@ class ResourceDetailView(UserPassesTestMixin, BaseResourceDetailView):
         context = super().get_context_data(**kwargs)
         resource = self.get_object()
 
-        context["contacts_to_display"] = list(
-            HitCount.on_site.for_context_object(self.get_object())
-            .for_user(self.request.user)
-            .filter(
-                content_object_ct=ContentType.objects.get_for_model(
-                    addressbook_models.Contact
-                ),
+        if self.request.user.is_authenticated:
+            context["contacts_to_display"] = list(
+                HitCount.on_site.for_context_object(self.get_object())
+                .for_user(self.request.user)
+                .filter(
+                    content_object_ct=ContentType.objects.get_for_model(
+                        addressbook_models.Contact
+                    ),
+                )
+                .values_list("content_object_id", flat=True)
             )
-            .values_list("content_object_id", flat=True)
-        )
+        else:
+            context["contacts_to_display"] = []
 
         if check_if_advisor(self.request.user):
             context["projects_used_by"] = (
@@ -271,16 +274,19 @@ class EmbededResourceDetailView(BaseResourceDetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        context["contacts_to_display"] = list(
-            HitCount.on_site.for_context_object(self.get_object())
-            .for_user(self.request.user)
-            .filter(
-                content_object_ct=ContentType.objects.get_for_model(
-                    addressbook_models.Contact
-                ),
+        if self.request.user.is_authenticated:
+            context["contacts_to_display"] = list(
+                HitCount.on_site.for_context_object(self.get_object())
+                .for_user(self.request.user)
+                .filter(
+                    content_object_ct=ContentType.objects.get_for_model(
+                        addressbook_models.Contact
+                    ),
+                )
+                .values_list("content_object_id", flat=True)
             )
-            .values_list("content_object_id", flat=True)
-        )
+        else:
+            context["contacts_to_display"] = []
 
         if task_id := self.request.GET.get("task_id"):
             context["task"] = (
