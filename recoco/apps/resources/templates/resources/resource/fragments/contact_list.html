@@ -8,6 +8,7 @@
 {% if contacts.count %}
     {% is_staff_for_current_site request.user as is_staff %}
     {% is_admin_for_current_site request.user as is_admin %}
+
     <div x-data="ContactList" id="contact-list" class="fr-mt-3w">
         {% if user.is_anonymous %}
             <div class="flag blue">
@@ -20,7 +21,7 @@
         {% else %}
             <h6 class="fw-bold text-uppercase d-block fr-mb-2w">👩‍💼 Contacts</h6>
             <div class="d-flex flex-wrap flex-row"
-                 x-data="ContactAsk('{{ is_staff }}', '{{ is_admin }}', '{{ is_administrating_project }}', {{ contacts_to_display }})"
+                 x-data="ContactAsk('{% if is_staff or is_admin or is_administrating_project %}true{% else %}false{% endif %}', {{ contacts_to_display }})"
                  x-init="init">
                 {% for contact in contacts.all %}
                     <div :class="currentHash === '#contact-{{ contact.pk }}' && 'component-focus'"
@@ -80,7 +81,7 @@
                             <button class="fr-btn w-100 justify-content-center"
                                     data-test-id="see-contact-info-button"
                                     id="caVaMarcher"
-                                    @click="toggleUserClic({{ contact.id }},{{ resource.id }})">
+                                    @click="toggleUserClic({{ contact.id }},{{ resource.id }},'resources.resource')">
                                 Voir les coordonnées
                             </button>
                         </div>

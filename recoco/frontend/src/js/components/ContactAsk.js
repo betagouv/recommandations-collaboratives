@@ -1,21 +1,24 @@
 import Alpine from 'alpinejs';
 import api, { hitCountUrl } from '../utils/api';
 
-function ContactAsk(isStaff, isAdmin, isAdvisor, contactsToDisplay = []) {
+function ContactAsk(canSeeEverything, contactsToDisplay = []) {
   return {
-    contactsIds: contactsToDisplay, //tableau des contacts
+    contactsIds: [],
+    canSeeEverything: false,
     init() {
+      this.contactsIds = contactsToDisplay;
+      this.canSeeEverything = canSeeEverything;
     },
     isLoaded(contactId) {
-      return isStaff || isAdmin || isAdvisor || this.contactsIds.includes(contactId);
+      return this.canSeeEverything || this.contactsIds.includes(contactId);
     },
-    toggleUserClic(contactId, resourceId) {
+    toggleUserClic(contactId, contextObjectID, contextObjectCT) {
       this.contactsIds = [...this.contactsIds, contactId];
       api.post(hitCountUrl(), {
         content_object_ct: 'addressbook.contact',
         content_object_id: contactId,
-        context_object_ct: 'resources.resource',
-        context_object_id: resourceId,
+        context_object_ct: contextObjectCT,
+        context_object_id: contextObjectID,
       });
     },
   };
