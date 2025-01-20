@@ -24,106 +24,123 @@
     {{ project.pk|json_script:"djangoProjectId" }}
     {% get_obj_perms request.user for project as "user_project_perms" %}
     {% include "projects/project/navigation.html" with conversation=True %}
-    <div class="conversation-new__container fr-p-5v">
-        <!-- Message stream -->
-        {% for element in feed %}
-            {% ifchanged element.timestamp|date %}
-                <p class="text-center">{{ element.timestamp|date }}</p>
-            {% endifchanged %}
-            <div>UNREAD NOTIFS={{ element.notifications }}</div>
-            {% if element.type == "activity" %}
-                <!-- Type Activity  -->
-                <div class="text-center">{% include "actstream/action.html" with action=element.object %}</div>
-            {% elif element.type == "reco" %}
-                <!-- Type Reco + message -->
-                <div class="conversation-new__task rounded-3 fr-p-2w fr-my-2v fr-mr-6w {% if request.user == element.object.created_by %}bg-blue-light{% else %}bg-grey-light {% endif %}">
-                    {{ element.object.content_rendered|safe }}
-                    <div class="task-item__resource">
-                        <h4>{{ element.object.intent|safe }}</h4>
-                        <p class="fr-mt-1w fr-mb-0">{{ element.object.resource.subtitle|safe }}</p>
+    <div class="d-flex">
+        <div class="conversation-new__topics">
+            <div class="topic-item__container topic-item__container--open">
+                <div>
+                    <h3 class="topic-item__title">Général</h3>
+                    <p class="topic-item__description">Discussion générale entre le porteur de projet et l’équipe de conseil</p>
+                </div>
+                <div>
+                    <span class="fr-icon-arrow-right-line"
+                          aria-hidden="true"
+                          title="arrow-right-line"></span>
+                </div>
+            </div>
+            <div class="topic-item__container">Financement</div>
+            <div class="topic-item__container">Foncier</div>
+        </div>
+        <div class="conversation-new__container fr-p-5v">
+            <!-- Message stream -->
+            {% for element in feed %}
+                {% ifchanged element.timestamp|date %}
+                    <p class="text-center">{{ element.timestamp|date }}</p>
+                {% endifchanged %}
+                {% comment %} <div>UNREAD NOTIFS={{ element.notifications }}</div> {% endcomment %}
+                {% if element.type == "activity" %}
+                    <!-- Type Activity  -->
+                    <div class="text-center">{% include "actstream/action.html" with action=element.object %}</div>
+                {% elif element.type == "reco" %}
+                    <!-- Type Reco + message -->
+                    <div class="task-item rounded-3 fr-p-2w fr-my-2v fr-mr-6w {% if request.user == element.object.created_by %}bg-blue-light{% else %}bg-grey-light {% endif %}">
+                        {{ element.object.content_rendered|safe }}
+                        <div class="task-item__resource">
+                            <h4>{{ element.object.intent|safe }}</h4>
+                            <p class="fr-mt-1w fr-mb-0">{{ element.object.resource.subtitle|safe }}</p>
+                            {% if element.object.document.count %}
+                                {% for document in element.object.document.all %}
+                                    {% include "projects/project/fragments/files_links/file_list_item_embedded.html" with document=document %}
+                                {% endfor %}
+                            {% endif %}
+                            <div class="resource-link fr-mt-1w fr-mb-2w">
+                                <span class="fr-icon-newspaper-line fr-icon--sm fr-mr-1v"
+                                      aria-hidden="true"></span><a href="{{ element.object.resource.get_absolute_url }}">Lien vers la ressource</a>
+                            </div>
+                            {% include "projects/project/fragments/conversations_new/tasks_status_buttons.html" with task=element.object %}
+                        </div>
+                        {% if element.object.created_by %}
+                            <div class="fr-mt-1w d-flex align-items-center">
+                                {% include "user/user_card.html" with user=element.object.created_by %}
+                                {% if element.object.created_by == request.user %}
+                                    <span class="align-middle small text-dark fr-ml-2v">
+                                        -
+                                        <a class="fr-btn fr-btn--sm fr-btn--tertiary-no-outline fr-ml-1v"
+                                           href="{% url 'projects-update-note' element.object.pk %}">éditer</a>
+                                    </span>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                    </div>
+                {% elif element.type == "followup" %}
+                    {% if element.object.status %}
+                        <p>
+                            <span class="strong">{{ element.object.who.first_name }} {{ element.object.who.last_name }}</span> a marqué la recommandation commme {{ element.object.status_txt }}
+                        </p>
+                    {% endif %}
+                    <!-- Type followup -->
+                    <div class="rounded-3 fr-p-2w fr-my-2v fr-mr-6w {% if request.user == element.object.created_by %}bg-blue-light{% else %}bg-grey-light {% endif %}">
+                        {{ element.object.comment_rendered|safe }}
                         {% if element.object.document.count %}
                             {% for document in element.object.document.all %}
                                 {% include "projects/project/fragments/files_links/file_list_item_embedded.html" with document=document %}
                             {% endfor %}
                         {% endif %}
-                        <div class="resource-link fr-mt-1w fr-mb-2w">
-                            <span class="fr-icon-newspaper-line fr-icon--sm fr-mr-1v"
-                                  aria-hidden="true"></span><a href="{{ element.object.resource.get_absolute_url }}">Lien vers la ressource</a>
-                        </div>
-                        {% include "projects/project/fragments/conversations_new/tasks_status_buttons.html" with task=element.object %}
+                        {% if element.object.who %}
+                            <div class="d-flex align-items-center">{% include "user/user_card.html" with user=element.object.who %}</div>
+                        {% endif %}
                     </div>
-                    {% if element.object.created_by %}
-                        <div class="fr-mt-1w d-flex align-items-center">
-                            {% include "user/user_card.html" with user=element.object.created_by %}
-                            {% if element.object.created_by == request.user %}
-                                <span class="align-middle small text-dark fr-ml-2v">
-                                    -
-                                    <a class="fr-btn fr-btn--sm fr-btn--tertiary-no-outline fr-ml-1v"
-                                       href="{% url 'projects-update-note' element.object.pk %}">éditer</a>
-                                </span>
-                            {% endif %}
-                        </div>
-                    {% endif %}
-                </div>
-            {% elif element.type == "followup" %}
-                {% if element.object.status %}
-                    <p>
-                        <span class="strong">{{ element.object.who.first_name }} {{ element.object.who.last_name }}</span> a marqué la recommandation commme {{ element.object.status_txt }}
-                    </p>
+                {% elif element.type == "posting" %}
+                    <!-- Type message -->
+                    <div class="rounded-3 fr-p-2w fr-my-2v fr-mr-6w {% if request.user == element.object.created_by %}bg-blue-light{% else %}bg-grey-light {% endif %}">
+                        {{ element.object.content_rendered|safe }}
+                        {% if element.object.document.count %}
+                            {% for document in element.object.document.all %}
+                                {% include "projects/project/fragments/files_links/file_list_item_embedded.html" with document=document %}
+                            {% endfor %}
+                        {% endif %}
+                        {% if element.object.created_by %}
+                            <div class="d-flex align-items-center">{% include "user/user_card.html" with user=element.object.created_by %}</div>
+                        {% endif %}
+                    </div>
                 {% endif %}
-                <!-- Type followup -->
-                <div class="rounded-3 fr-p-2w fr-my-2v fr-mr-6w {% if request.user == element.object.created_by %}bg-blue-light{% else %}bg-grey-light {% endif %}">
-                    {{ element.object.comment_rendered|safe }}
-                    {% if element.object.document.count %}
-                        {% for document in element.object.document.all %}
-                            {% include "projects/project/fragments/files_links/file_list_item_embedded.html" with document=document %}
-                        {% endfor %}
-                    {% endif %}
-                    {% if element.object.who %}
-                        <div class="d-flex align-items-center">{% include "user/user_card.html" with user=element.object.who %}</div>
-                    {% endif %}
-                </div>
-            {% elif element.type == "message" %}
-                <!-- Type message -->
-                <div class="rounded-3 fr-p-2w fr-my-2v fr-mr-6w {% if request.user == element.object.created_by %}bg-blue-light{% else %}bg-grey-light {% endif %}">
-                    {{ element.object.content_rendered|safe }}
-                    {% if element.object.document.count %}
-                        {% for document in element.object.document.all %}
-                            {% include "projects/project/fragments/files_links/file_list_item_embedded.html" with document=document %}
-                        {% endfor %}
-                    {% endif %}
-                    {% if element.object.created_by %}
-                        <div class="d-flex align-items-center">{% include "user/user_card.html" with user=element.object.created_by %}</div>
-                    {% endif %}
+            {% endfor %}
+            {% if "use_public_notes" in user_project_perms %}
+                <hr />
+                <!-- Post message -->
+                <div class="message-form fr-mt-3w fr-p-2w bg-light border-form">
+                    <form class="form"
+                          method="post"
+                          action="{% url 'projects-conversation-create-message' project.pk %}"
+                          enctype="multipart/form-data"
+                          id="conversation-form">
+                        {% csrf_token %}
+                        {% include "tools/editor.html" with input_name=posting_form.content.name input_value=posting_form.content.value|default:'' input_required=True %}
+                        <label class="visually-hidden" for="input-project-content">{{ posting_form.content.label }}</label>
+                        {% for error in posting_form.content.errors %}<div class="text-danger text-end">{{ error }}</div>{% endfor %}
+                        {% include "projects/project/fragments/files_links/file_upload_input_standalone.html" %}
+                        <input type="hidden" name="new" value="1">
+                        <div class="d-flex justify-content-end fr-mt-3w">
+                            <button data-test-id="send-message-conversation"
+                                    x-data
+                                    :disabled="$store.editor.currentMessage === '' "
+                                    form="conversation-form"
+                                    class="fr-btn"
+                                    type="submit">Envoyer</button>
+                        </div>
+                    </form>
                 </div>
             {% endif %}
-        {% endfor %}
-        {% if "use_public_notes" in user_project_perms %}
-            <hr />
-            <!-- Post message -->
-            <div class="message-form fr-mt-3w fr-p-2w bg-light border-form">
-                <form class="form"
-                      method="post"
-                      action="{% url 'projects-conversation-create-message' project.pk %}"
-                      enctype="multipart/form-data"
-                      id="conversation-form">
-                    {% csrf_token %}
-                    {% include "tools/editor.html" with input_name=public_message_form.content.name input_value=public_message_form.content.value|default:'' input_required=True %}
-                    <label class="visually-hidden" for="input-project-content">{{ public_message_form.content.label }}</label>
-                    {% for error in public_message_form.content.errors %}<div class="text-danger text-end">{{ error }}</div>{% endfor %}
-                    {% include "projects/project/fragments/files_links/file_upload_input_standalone.html" %}
-                    <input type="hidden" name="new" value="1">
-                    <div class="d-flex justify-content-end fr-mt-3w">
-                        <button data-test-id="send-message-conversation"
-                                x-data
-                                :disabled="$store.editor.currentMessage === '' "
-                                form="conversation-form"
-                                class="fr-btn"
-                                type="submit">Envoyer</button>
-                    </div>
-                </form>
-            </div>
-        {% endif %}
-        {% include "projects/project/fragments/tasks_modal/feedback_modal.html" %}
+            {% include "projects/project/fragments/tasks_modal/feedback_modal.html" %}
+        </div>
     </div>
 {% endblock project_detail %}

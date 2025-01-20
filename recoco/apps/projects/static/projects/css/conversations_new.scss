@@ -1,17 +1,53 @@
+:root {
+  --width-right-col: 23%;
+  --width-left-col: 77%;
+}
 .conversation-new {
-  &__activity {
+  &__topics {
+    flex: 0 0 auto;
+    width: var(--width-right-col);
+    border-right: 1px solid var(--light-border-default-grey, #e5e5e5);
+    position: sticky;
+    height: calc(100vh - 128px);
+    top: 128px;
+    .topic-item {
+      &__container {
+        padding: 1.25rem;
+        display: flex;
+        &--open {
+          border-left: 4px solid
+            var(--light-background-action-high-blue-france, #000091);
+        }
+      }
+      &__title {
+        color: var(--light-background-action-high-blue-france, #000091);
+        font-size: 18px;
+        font-weight: 700;
+        line-height: 18px;
+      }
+      &__description {
+        color: var(--light-text-mention-grey, #666);
+        font-size: 12px;
+        font-weight: 400;
+        line-height: 18px;
+      }
+    }
   }
-  &__task {
-    & > p {
-      color: var(--light-neutral-grey-200, #3a3a3a);
-      font-family: Marianne;
-      font-size: 14px;
-      font-style: normal;
-      font-weight: 400;
-      line-height: 150%; /* 21px */
-      margin-bottom: 0.625rem;
+  &__container {
+    flex: 0 0 auto;
+    width: var(--width-left-col);
+    &__activity {
     }
     .task-item {
+      & > p {
+        color: var(--light-neutral-grey-200, #3a3a3a);
+        font-family: Marianne;
+        font-size: 14px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 150%; /* 21px */
+        margin-bottom: 0.625rem;
+      }
       &__content {
         color: var(--light-neutral-grey-200, #3a3a3a);
         font-family: Marianne;
