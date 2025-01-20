@@ -15,9 +15,9 @@ def setup_db(django_db_setup, django_db_blocker):
         call_command("update_permissions")
 
 
-@pytest.fixture
+@pytest.fixture(scope="function")
 def api_client():
-    return APIClient
+    return APIClient()
 
 
 # -- Project Fixtures

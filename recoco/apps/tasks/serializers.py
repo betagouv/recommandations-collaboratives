@@ -6,11 +6,13 @@ from notifications import models as notifications_models
 from ordered_model.serializers import OrderedModelSerializer
 from rest_framework import serializers
 
+from recoco.apps.addressbook.serializers import ContactSerializer
 from recoco.apps.demarches_simplifiees.serializers import DSFolderSerializer
 from recoco.apps.home.serializers import UserSerializer
 from recoco.apps.projects.serializers import DocumentSerializer, TopicSerializer
 from recoco.apps.projects.utils import get_collaborators_for_project
 from recoco.apps.resources.serializers import ResourceSerializer
+from recoco.rest_api.serializers import BaseSerializerMixin
 
 from .models import Task, TaskFollowup
 
@@ -27,11 +29,15 @@ class TaskFollowupSerializer(serializers.HyperlinkedModelSerializer):
             "timestamp",
             "task_id",
             "who_id",
+            "contact_id",
+            "contact",
         ]
         read_only_fields = ["id", "who", "timestamp"]
         extra_kwargs = {"task_id": {"write_only": True}, "who_id": {"write_only": True}}
 
     who = UserSerializer(read_only=True, many=False)
+
+    contact = ContactSerializer()
 
     task_id = serializers.PrimaryKeyRelatedField(
         many=False, write_only=True, queryset=Task.objects
@@ -64,7 +70,9 @@ class TaskFollowupSerializer(serializers.HyperlinkedModelSerializer):
         return followup
 
 
-class TaskSerializer(serializers.HyperlinkedModelSerializer, OrderedModelSerializer):
+class TaskSerializer(
+    BaseSerializerMixin, serializers.HyperlinkedModelSerializer, OrderedModelSerializer
+):
     class Meta:
         model = Task
         fields = [
@@ -136,6 +144,11 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer, OrderedModelSeriali
 
     # FIXME : We should not send all the tasks to non switchtender users (filter
     # queryset on current_user)
+
+    def save(self, **kwargs):
+        return super().save(
+            created_by=self.current_user, site=self.current_site, **kwargs
+        )
 
 
 class TaskNotificationSerializer(serializers.HyperlinkedModelSerializer):

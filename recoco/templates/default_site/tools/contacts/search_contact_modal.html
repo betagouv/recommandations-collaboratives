@@ -1,0 +1,109 @@
+{% load static %}
+{% load sass_tags %}
+{% block css %}
+    <link href="{% sass_src 'projects/css/fragments/share/invite.scss' %}"
+          rel="stylesheet"
+          type="text/css" />
+    <style>
+		[x-cloak] {
+			display: none;
+		}
+
+		.duration-300 {
+			transition-duration: 300ms;
+		}
+
+		.ease-in {
+			transition-timing-function: cubic-bezier(0.4, 0, 1, 1);
+		}
+
+		.ease-out {
+			transition-timing-function: cubic-bezier(0, 0, 0.2, 1);
+		}
+
+		.scale-90 {
+			transform: scale(.9);
+		}
+
+		.scale-100 {
+			transform: scale(1);
+		}
+
+        .modal-contact {
+            width: 450px;
+            position: fixed;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+    </style>
+{% endblock css %}
+<div class="bg-white w-11/12 md:max-w-md mx-auto rounded shadow-lg fr-p-2w text-left px-6 modal-contact"
+     x-show="isOpenModal"
+     @click.away="isOpenModal = false"
+     x-transition:enter="ease-out duration-300"
+     x-transition:enter-start="opacity-0 scale-90"
+     x-transition:enter-end="opacity-100 scale-100"
+     x-transition:leave="ease-in duration-300"
+     x-transition:leave-start="opacity-100 scale-100"
+     x-transition:leave-end="opacity-0 scale-90">
+    <!--Title-->
+    <div class="d-flex justify-content-between ">
+        <p class="text-2xl font-bold">ATTACHER UN CONTACT</p>
+        <div class="cursor-pointer z-50" @click="isOpenModal = false">
+            <svg class="fill-current text-black"
+                 xmlns="http://www.w3.org/2000/svg"
+                 width="18"
+                 height="18"
+                 viewBox="0 0 18 18">
+                <path d="M14.53 4.53l-1.06-1.06L9 7.94 4.53 3.47 3.47 4.53 7.94 9l-4.47 4.47 1.06 1.06L9 10.06l4.47 4.47 1.06-1.06L10.06 9z">
+                </path>
+            </svg>
+        </div>
+    </div>
+    <p>Rechercher un contact</p>
+    <input type="search"
+           class="w-100 border border-gray-300 p-2 rounded-lg"
+           placeholder="Nom d'organisation, contact, rôle"
+           @input.debounce="onSearch"
+           x-model="userInput"
+           aria-expanded="false"
+           aria-controls="show-research-results"
+           x-ref="test">
+    <div>
+        <div class="fr-collapse fr-menu menu-modal-correct-fr-menu"
+             id="show-research-results">
+            <template class="fr-menu__list specific-width-25rem"
+                      x-if="contactsFound.length > 0">
+                <div class="fr-menu__item"
+                     x-for="contact in contactsFound"
+                     :key="contact.id">
+                    {% comment %} @click="onSelect(contact)" {% endcomment %}
+                    <div class="fr-menu__item__content">
+                        <div class="fr-menu__item__content__title">
+                            <div class="fr-menu__item__content__title__text">
+                                <span x-text="contact.name"></span>
+                            </div>
+                        </div>
+                        <div class="fr-menu__item__content__subtitle">
+                            <span x-text="contact.email"></span>
+                        </div>
+                    </div>
+                    <hr class="divider-specific">
+                    <div class="d-flex flex-column"></div>
+                </div>
+            </template>
+            <template class="fr-menu__list specific-width-25rem"
+                      x-if="contactsFound.length = 0">
+                <div class="fr-menu__item">
+                    <div class="fr-menu__item__content">
+                        <span>aucun contact trouvé</span>
+                    </div>
+                </div>
+            </template>
+        </div>
+        {% comment %} <div class="flex justify-end pt-2">
+        <button class="px-4 bg-transparent p-3 rounded-lg text-indigo-500 hover:bg-gray-100 hover:text-indigo-400 mr-2" @click="alert('Additional Action');">Action</button>
+        </div> {% endcomment %}
+    </div>
+</div>
