@@ -305,31 +305,31 @@ def project_conversations_new(request, project_id=None):
 
     is_regional_actor or has_perm_or_403(request.user, "view_public_notes", project)
 
-    public_note_form = PublicNoteForm()
+    posting_form = PublicNoteForm()
 
     recipients = get_notification_recipients_for_project(project)
 
     # Prepare a feed of different objects
     feed = []
 
-    messages = project.notes.filter(public=True)
-    message_ids = list(messages.values_list("id", flat=True))
-    message_ct = ContentType.objects.get_for_model(models.Note)
-    message_notifs = request.user.notifications.unread().filter(
-        action_object_object_id__in=message_ids, action_object_content_type=message_ct
+    postings = project.notes.filter(public=True)
+    posting_ids = list(postings.values_list("id", flat=True))
+    posting_ct = ContentType.objects.get_for_model(models.Note)
+    posting_notifs = request.user.notifications.unread().filter(
+        action_object_object_id__in=posting_ids, action_object_content_type=posting_ct
     )
 
-    for message in messages:
+    for posting in postings:
         feed.append(
             {
-                "timestamp": message.updated_on,
-                "type": "message",
+                "timestamp": posting.updated_on,
+                "type": "posting",
                 "notifications": list(
-                    message_notifs.filter(
-                        action_object_object_id=message.id
+                    posting_notifs.filter(
+                        action_object_object_id=posting.id
                     ).values_list("id", flat=True)
                 ),
-                "object": message,
+                "object": posting,
             }
         )
 
@@ -367,9 +367,9 @@ def project_conversations_new(request, project_id=None):
                 "timestamp": followup.timestamp,
                 "type": "followup",
                 "notifications": list(
-                    followup_notifs.filter(action_object_object_id=reco.id).values_list(
-                        "id", flat=True
-                    )
+                    followup_notifs.filter(
+                        action_object_object_id=followup.id
+                    ).values_list("id", flat=True)
                 ),
                 "object": followup,
             }
@@ -387,9 +387,9 @@ def project_conversations_new(request, project_id=None):
                 "timestamp": activity.timestamp,
                 "type": "activity",
                 "notifications": list(
-                    activity_notifs.filter(action_object_object_id=reco.id).values_list(
-                        "id", flat=True
-                    )
+                    activity_notifs.filter(
+                        action_object_object_id=activity.id
+                    ).values_list("id", flat=True)
                 ),
                 "object": activity,
             }
