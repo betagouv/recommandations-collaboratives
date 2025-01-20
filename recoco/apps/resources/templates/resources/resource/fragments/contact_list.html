@@ -2,13 +2,11 @@
 {% load django_vite %}
 {% load projects_extra %}
 {% block js %}
-    {% vite_asset 'js/apps/contactList.js' %}
-    {% vite_asset 'js/apps/contactAsk.js' %}
+    {% vite_asset 'js/apps/contact.js' %}
 {% endblock js %}
 {% if contacts.count %}
     {% is_staff_for_current_site request.user as is_staff %}
     {% is_admin_for_current_site request.user as is_admin %}
-
     <div x-data="ContactList" id="contact-list" class="fr-mt-3w">
         {% if user.is_anonymous %}
             <div class="flag blue">
