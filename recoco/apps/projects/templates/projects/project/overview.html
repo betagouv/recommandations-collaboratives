@@ -11,6 +11,7 @@
     {% vite_asset 'js/apps/projectDetails.js' %}
     {% vite_asset 'js/apps/projectShare.js' %}
     {% vite_asset 'js/apps/tutorial.js' %}
+    {% vite_asset 'js/components/MarkDiagAsDone.js' %}
 {% endblock js %}
 {% block css %}
     <link href="{% sass_src 'projects/css/overview.scss' %}"
@@ -86,6 +87,25 @@
                                                     <div class="h-100">{% include "projects/project/fragments/topics/topic_list.html" %}</div>
                                                 </div>
                                                 <div class="col-12 col-lg-6 h-100 responsive-wrapper">
+                                                    {% if is_staff %}
+                                                        <div x-data="MarkDiagAsDone({{ project.id }}, '{{ project.is_diagnostic_done }}' == 'True')">
+                                                            <header>
+                                                                <h6 class="font-small text-uppercase fr-mb-1v">Diagnostic</h6>
+                                                            </header>
+                                                            <template x-if="displayDiagButton">
+                                                                <button class="fr-btn fr-btn--sm fr-btn--secondary fr-mt-2w fr-py-2w fr-mb-2w text-uppercase w-100 justify-content-center"
+                                                                        @click='handleClickMarkDiagAsDone'
+                                                                        data-cy="button-diag-project-done">
+                                                                    <span class="fr-icon-double-check-line" aria-hidden="true"></span> Marquer l’appel de “diagnostic” comme fait
+                                                                </button>
+                                                            </template>
+                                                            <template x-if="!displayDiagButton">
+                                                                <p class="fw-700 fr-my-1w" data-cy="diag-project-done">
+                                                                    <span class="fr-icon-double-check-line" aria-hidden="true"></span> Appel de "diagnostic" effectué
+                                                                </p>
+                                                            </template>
+                                                        </div>
+                                                    {% endif %}
                                                     {% include "projects/project/fragments/advisor_note.html" %}
                                                 </div>
                                             </div>

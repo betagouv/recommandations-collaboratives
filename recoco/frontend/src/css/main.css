@@ -1,0 +1,4 @@
+.fr-icon-double-check-line::after,
+.fr-icon-double-check-line::before {
+  mask-image: url(../assets/check-double-line.svg);
+}
