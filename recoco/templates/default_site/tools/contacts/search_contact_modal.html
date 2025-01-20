@@ -1,0 +1,21 @@
+{% load static %}
+{% load sass_tags %}
+{% block css %}
+    <link href="{% sass_src 'projects/css/fragments/share/invite.scss' %}"
+          rel="stylesheet"
+          type="text/css" />
+{% endblock css %}
+<div class="modal fade"
+     id="search-contact-modal"
+     tabindex="-1"
+     aria-labelledby="search-contact-modal-label"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6 class="fw-bold d-block fr-mb-0 h6-specific-fontsize-22">Attacher un contact</h6>
+            </div>
+            <div class="modal-body"></div>
+        </div>
+    </div>
+</div>

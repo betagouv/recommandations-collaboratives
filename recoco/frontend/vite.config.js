@@ -64,6 +64,7 @@ const config = {
         ExpandableMenuHandler: resolve(
           './src/js/components/ExpandableMenuHandler.js'
         ),
+        SearchContact: resolve('./src/js/components/SearchContact.js'),
         projectQueue: resolve('./src/js/store/projectQueue.js'),
         showRole: resolve('./src/js/store/showRole.js'),
         projects: resolve('./src/js/store/projects.js'),
