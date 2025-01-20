@@ -24,7 +24,7 @@ class HitView(APIView):
             )
             Hit.objects.create(
                 user=request.user,
-                user_agent=request.headers.get("user-agent"),
+                user_agent=request.headers.get("user-agent", "unknown"),
                 hitcount=hitcount,
             )
 

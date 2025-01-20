@@ -22,7 +22,7 @@ def test_hit_view():
     api_client.force_authenticate(user=user)
 
     url = reverse("api_hit")
-    headers = {"user-agent": "Mozilla/5.0"}
+
     payload = json.dumps(
         {
             "content_object_ct": ct_label(contact),
@@ -33,12 +33,18 @@ def test_hit_view():
     )
 
     response = api_client.post(
-        path=url, headers=headers, data=payload, content_type="application/json"
+        path=url,
+        headers={"user-agent": "Mozilla/5.0"},
+        data=payload,
+        content_type="application/json",
     )
     assert response.status_code == 200
 
     response = api_client.post(
-        path=url, headers=headers, data=payload, content_type="application/json"
+        path=url,
+        headers={},
+        data=payload,
+        content_type="application/json",
     )
     assert response.status_code == 200
 

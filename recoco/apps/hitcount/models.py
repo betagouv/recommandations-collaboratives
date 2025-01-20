@@ -10,6 +10,10 @@ from .managers import HitCountManager, HitCountOnSiteManager
 
 
 class HitCount(TimeStampedModel):
+    """
+    Inspired from the [django-hitcount](https://django-hitcount.readthedocs.io/en/latest/) 3rdparty lib, but adapted to our needs.
+    """
+
     site = models.ForeignKey(Site, on_delete=models.CASCADE)
 
     content_object_ct = models.ForeignKey(
