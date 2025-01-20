@@ -1,7 +1,3 @@
-import projects from '../../../../fixtures/projects/projects.json';
-
-const currentProject = projects[24]; // à adpater quand le code sera merge sur develop ou créer une commande pour sélectionner un projet par id
-
 describe('I can see contacts information', () => {
   beforeEach(() => {
     cy.login('bob');
