@@ -2,6 +2,15 @@
   &__activity {
   }
   &__task {
+    & > p {
+      color: var(--light-neutral-grey-200, #3a3a3a);
+      font-family: Marianne;
+      font-size: 14px;
+      font-style: normal;
+      font-weight: 400;
+      line-height: 150%; /* 21px */
+      margin-bottom: 0.625rem;
+    }
     .task-item {
       &__content {
         color: var(--light-neutral-grey-200, #3a3a3a);

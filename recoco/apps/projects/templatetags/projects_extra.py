@@ -7,8 +7,11 @@ authors: raphael.marvie@beta.gouv.fr, guillaume.libersat@beta.gouv.fr
 created: 2021-06-29 11:30:42 CEST
 """
 
+import json
+
 from django import template
 from django.contrib.sites.models import Site
+from django.forms import model_to_dict
 
 from recoco import utils as uv_utils
 
@@ -75,6 +78,17 @@ def get_project_moderation_count():
         project_sites__site=Site.objects.get_current(),
         deleted=None,
     ).count()
+
+
+@register.filter(name="to_json")
+def to_json(value, fields=None):
+    """Transforme un objet Python en JSON avec des champs spécifiques."""
+    if fields:
+        field_list = [field.strip() for field in fields.split(",")]
+        data = model_to_dict(value, fields=field_list)
+    else:
+        data = model_to_dict(value)
+    return json.dumps(data)
 
 
 # eof
