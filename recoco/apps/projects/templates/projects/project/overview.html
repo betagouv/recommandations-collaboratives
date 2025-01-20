@@ -88,7 +88,7 @@
                                                 </div>
                                                 <div class="col-12 col-lg-6 h-100 responsive-wrapper">
                                                     {% if is_staff %}
-                                                        <div x-data="MarkDiagAsDone({{ request.user.id }}, {{ project.id }}, '{{ project.is_diagnostic_done }}' == 'True')">
+                                                        <div x-data="MarkDiagAsDone({{ project.id }}, '{{ project.is_diagnostic_done }}' == 'True')">
                                                             <header>
                                                                 <h6 class="font-small text-uppercase fr-mb-1v">Diagnostic</h6>
                                                             </header>
