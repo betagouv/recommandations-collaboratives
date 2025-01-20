@@ -23,8 +23,7 @@
                  x-init="init">
                 {% for contact in contacts.all %}
                     <div :class="currentHash === '#contact-{{ contact.pk }}' && 'component-focus'"
-                         class="border fr-mx-1v fr-py-2v fr-px-2w fr-mb-2v"
-                         style="flex-basis: 48.8%"
+                         class="border fr-mx-1v fr-py-2v fr-px-2w fr-mb-2v specific-flex-basis"
                          id="contact-{{ contact.pk }}">
                         <div>
                             <span class="text-black fw-medium fr-my-1v">{{ contact.full_name }}</span>
