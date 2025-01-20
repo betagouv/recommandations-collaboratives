@@ -14,6 +14,7 @@ from markdownx.fields import MarkdownxFormField
 
 from recoco.apps.projects import models as projects_models
 from recoco.apps.resources import models as resources_models
+from recoco.utils import is_staff_for_site
 
 from . import models
 
@@ -68,22 +69,25 @@ class PushTypeActionForm(forms.Form):
 
         # Allow only projects on the current site with a usable status
         current_site = Site.objects.get_current()
-        self.fields["project"].queryset = (
-            projects_models.Project.objects.filter(
-                switchtenders=user,
-                sites=current_site,
-            )
-            .exclude(
-                Q(project_sites__status__in=["DRAFT", "REJECTED"]),
-                ~Q(project_sites__site=current_site),
-            )
-            .distinct()
+
+        project_qs = projects_models.Project.objects.filter(
+            sites=current_site,
         )
 
+        if not is_staff_for_site(user, site=current_site):
+            project_qs = project_qs.filter(switchtenders=user)
+
+        project_qs = project_qs.exclude(
+            Q(project_sites__status__in=["DRAFT", "REJECTED"]),
+            ~Q(project_sites__site=current_site),
+        ).distinct()
+
+        self.fields["project"].queryset = project_qs
+
     PUSH_TYPES = (
-        ("noresource", "noresource"),
         ("single", "single"),
-        ("multiple", "multiple"),
+        ("external_resource", "external_resource"),
+        ("noresource", "noresource"),
     )
 
     push_type = forms.ChoiceField(choices=PUSH_TYPES)

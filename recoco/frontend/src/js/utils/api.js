@@ -38,6 +38,10 @@ instance.interceptors.response.use(
 export default instance;
 
 // Projects :
+export function projectUrl(projectId) {
+  return `/api/projects/${projectId}/`;
+}
+
 export function projectsUrl() {
   return '/api/projects/';
 }
@@ -106,11 +110,16 @@ export function followupUrl(projectId, taskId, followupId) {
   return `/api/projects/${projectId}/tasks/${taskId}/followups/${followupId}/`;
 }
 
+// Resources :
 export function resourcePreviewUrl(resourceId, taskId) {
   if (taskId) {
     return `/ressource/${resourceId}/embed?task_id=${taskId}`;
   }
   return `/ressource/${resourceId}/embed/`;
+}
+
+export function postExternalRessourceUrl() {
+  return `/api/resources/import_from_uri/`;
 }
 
 // Regions :

@@ -1,0 +1,60 @@
+{% load static %}
+<div class="ressources__result-item fr-radio-group fr-radio-rich">
+    <input type="radio"
+           :value="resource.id"
+           :id="'resource-' + resource.id"
+           name="resource"
+           x-model="selected_resource"
+           data-cy="radio-resource-list-task"
+           @click="setIntent(resource)">
+    <label class="fr-label" :for="'resource-' + resource.id">
+        <span class="ressources__result-item-title"
+              x-text="truncate(resource.title, 100)"></span>
+        <span class="ressources__result-item-subtitle fr-hint-text"
+              x-text="resource.subtitle"></span>
+        <div>
+            <ul class="fr-badge-group fr-p-0">
+                <template x-if="resource.category && resource.category.name">
+                    <li>
+                        <span class="fr-badge fr-badge--sm fr-badge--green-menthe"
+                              x-text="resource.category.name"></span>
+                    </li>
+                </template>
+                <li x-show="resource.has_dsresource">
+                    <span class="fr-badge fr-badge--sm text-transform-none">
+                        <img height="8px"
+                             width="18px"
+                             src="{% static 'svg/picto-demarches_simplifiees--no-border.svg' %}"
+                             alt="Pictogramme Démarches Simpliffiées"
+                             class="fr-pr-1v">
+                    Démarches Simplifiées</span>
+                </li>
+            </ul>
+        </div>
+        <button @click.prevent
+                data-bs-toggle="modal"
+                :data-bs-target="`#resource-preview-`+resource.id"
+                class="fr-link text-start text-decoration-underline z-1 fr-mt-4v">Prévisualiser la ressource</button>
+    </label>
+    <!-- Full screen modal -->
+    <div class="modal fade"
+         :id="`resource-preview-`+resource.id"
+         tabindex="-1"
+         :aria-labelledby="`resource-preview-`+resource.id"
+         aria-hidden="true">
+        <div class="modal-dialog modal-fullscreen">
+            <div class="modal-content">
+                <div class="modal-header justify-content-between">
+                    <h5 class="modal-title">Prévisualisation de la ressource</h5>
+                    <button type="button"
+                            class="fr-btn fr-btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Close">Fermer</button>
+                </div>
+                <div class="modal-body">
+                    <iframe class="w-100 h-100" :src="resource.embeded_url"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
