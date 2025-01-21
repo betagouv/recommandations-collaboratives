@@ -36,6 +36,8 @@ class OrganizationSerializer(BaseSerializerMixin, HyperlinkedModelSerializer):
     )
     departments = DepartmentWithRegionSerializer(many=True, read_only=True)
 
+    _search_rank = FloatField(source="search_rank", read_only=True)
+
     class Meta:
         model = Organization
         fields = [
@@ -43,6 +45,7 @@ class OrganizationSerializer(BaseSerializerMixin, HyperlinkedModelSerializer):
             "name",
             "group",
             "departments",
+            "_search_rank",
         ]
 
     def save(self, **kwargs):

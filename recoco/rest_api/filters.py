@@ -72,8 +72,6 @@ class SearchVectorFilter(SearchFilter):
             else:
                 search_vector += _vector
 
-        # search_vector = SearchVector(*search_fields, config="french")
-
         search_query = SearchQuery(search_terms, config="french")
 
         return (
