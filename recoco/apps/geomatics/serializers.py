@@ -29,11 +29,3 @@ class RegionWithDepartmentsSerializer(serializers.ModelSerializer):
         fields = ["name", "code", "departments"]
 
     departments = DepartmentSerializer(read_only=True, many=True)
-
-
-class DepartmentWithRegionSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Department
-        fields = ["name", "code", "region"]
-
-    region = RegionSerializer(read_only=True)
