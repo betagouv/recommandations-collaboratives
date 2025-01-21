@@ -16,7 +16,6 @@ from rest_framework.serializers import (
     ModelSerializer,
 )
 
-from recoco.apps.geomatics.serializers import DepartmentWithRegionSerializer
 from recoco.rest_api.serializers import BaseSerializerMixin
 
 from .models import Contact, Organization, OrganizationGroup
@@ -34,7 +33,11 @@ class OrganizationSerializer(BaseSerializerMixin, HyperlinkedModelSerializer):
     group = HyperlinkedRelatedField(
         read_only=True, view_name="api-addressbook-organizationgroup-detail"
     )
-    departments = DepartmentWithRegionSerializer(many=True, read_only=True)
+    departments = HyperlinkedRelatedField(
+        many=True, read_only=True, view_name="departments-detail"
+    )
+
+    _search_rank = FloatField(source="search_rank", read_only=True)
 
     class Meta:
         model = Organization
@@ -43,6 +46,7 @@ class OrganizationSerializer(BaseSerializerMixin, HyperlinkedModelSerializer):
             "name",
             "group",
             "departments",
+            "_search_rank",
         ]
 
     def save(self, **kwargs):

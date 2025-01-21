@@ -1,6 +1,6 @@
 from rest_framework.viewsets import ModelViewSet
 
-from recoco.rest_api.filters import SearchVectorFilter
+from recoco.rest_api.filters import VectorSearchFilter
 from recoco.rest_api.pagination import StandardResultsSetPagination
 from recoco.rest_api.permissions import (
     IsStaffOrISAuthenticatedReadOnly,
@@ -21,27 +21,28 @@ class OrganizationGroupViewSet(ModelViewSet):
     queryset = OrganizationGroup.objects.all()
     permission_classes = [IsStaffOrReadOnly]
     pagination_class = StandardResultsSetPagination
+    filter_backends = [VectorSearchFilter]
     search_fields = ["name"]
-    filter_backends = [SearchVectorFilter]
+    search_min_rank = 0.05
 
 
 class OrganizationViewSet(ModelViewSet):
     serializer_class = OrganizationSerializer
-    queryset = Organization.on_site.all()
     permission_classes = [IsStaffOrReadOnly]
     pagination_class = StandardResultsSetPagination
+    filter_backends = [VectorSearchFilter]
     search_fields = ["name"]
-    filter_backends = [SearchVectorFilter]
+    search_min_rank = 0.05
 
     def get_queryset(self):
-        return super().get_queryset().prefetch_related("departments__region")
+        return Organization.on_site.all().prefetch_related("departments__region")
 
 
 class ContactViewSet(ModelViewSet):
     serializer_class = ContactSerializer
-    queryset = Contact.on_site.all()
     permission_classes = [IsStaffOrISAuthenticatedReadOnly]
     pagination_class = StandardResultsSetPagination
+    filter_backends = [VectorSearchFilter]
     search_fields = [
         (
             "last_name",
@@ -80,8 +81,10 @@ class ContactViewSet(ModelViewSet):
             {"weight": "C"},
         ),
     ]
-    search_min_rank = 0.2
-    filter_backends = [SearchVectorFilter]
+    search_min_rank = 0.05
+
+    def get_queryset(self):
+        return Contact.on_site.all()
 
     def get_serializer_class(self):
         return ContactCreateSerializer if self.action == "create" else ContactSerializer

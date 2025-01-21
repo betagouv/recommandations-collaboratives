@@ -9,12 +9,6 @@ class DepartmentSerializer(serializers.ModelSerializer):
         fields = ["name", "code"]
 
 
-class RegionSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Region
-        fields = ["name", "code"]
-
-
 class CommuneSerializer(serializers.ModelSerializer):
     class Meta:
         model = Commune
@@ -23,17 +17,9 @@ class CommuneSerializer(serializers.ModelSerializer):
     department = DepartmentSerializer(read_only=True)
 
 
-class RegionWithDepartmentsSerializer(serializers.ModelSerializer):
+class RegionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Region
         fields = ["name", "code", "departments"]
 
     departments = DepartmentSerializer(read_only=True, many=True)
-
-
-class DepartmentWithRegionSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Department
-        fields = ["name", "code", "region"]
-
-    region = RegionSerializer(read_only=True)
