@@ -69,7 +69,12 @@
   &__container {
     flex: 0 0 auto;
     width: var(--width-left-col);
-    &__activity {
+    .notification-line {
+      border-top: 2px solid var(--light-background-flat-error, #ce0500);
+      background-image: none;
+      opacity: 1;
+      margin-top: 12px;
+      padding-bottom: 10px;
     }
     .task-item {
       & > p {

@@ -24,7 +24,9 @@
     {{ project.pk|json_script:"djangoProjectId" }}
     {% get_obj_perms request.user for project as "user_project_perms" %}
     {% include "projects/project/navigation.html" with conversation=True %}
-    <div class="d-flex">
+    <div class="d-flex"
+         x-data
+         x-init="() => window.scroll({top: $refs.notificationLine.offsetTop - 250, behavior:'smooth'}) ">
         <div class="conversation-new__topics">
             {% include "projects/project/fragments/conversations_new/conversation_topic.html" with is_open=True topic_name="Général" message_number=feed %}
             {% for topic in topics %}
@@ -34,10 +36,10 @@
         <div class="conversation-new__container fr-p-5v">
             <!-- Message stream -->
             {% for element in feed %}
+                {% if element.notifications %}<hr class="notification-line" x-ref="notificationLine">{% endif %}
                 {% ifchanged element.timestamp|date %}
                     <p class="text-center">{{ element.timestamp|date }}</p>
                 {% endifchanged %}
-                {% comment %} <div>UNREAD NOTIFS={{ element.notifications }}</div> {% endcomment %}
                 {% if element.type == "activity" %}
                     <!-- Type Activity  -->
                     <div class="text-center">{% include "actstream/action.html" with action=element.object %}</div>
