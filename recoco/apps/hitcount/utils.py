@@ -7,7 +7,6 @@ def ct_label(obj: Model) -> str:
     return f"{obj_content_type.app_label}.{obj_content_type.model}"
 
 
-
 def ct_from_label(content_type: str) -> ContentType | None:
     try:
         app_label, model = content_type.split(".")
