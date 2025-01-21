@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 {% load sass_tags %}
+{% load django_vite %}
 {% block css %}
     <link href="{% sass_src 'resources/resources.scss' %}"
           rel="stylesheet"
@@ -10,12 +11,11 @@
           type="text/css">
 {% endblock css %}
 {% block js %}
-    <script src="https://cdn.jsdelivr.net/npm/minisearch@4.0.3/dist/umd/index.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/underscore@1.13.2/underscore-umd-min.js"></script>
-    <script src="{% static 'projects/js/action_pusher.js' %}"></script>
+    {% vite_asset 'js/components/ActionPusher.js' %}
+    {% vite_asset 'js/store/actionPusher.js' %}
 {% endblock js %}
 {% block content %}
-    <div class="col-12 fr-p-3w fr-mx-auto">
+    <div class="col-12 fr-p-3w fr-mx-auto push-reco">
         <h1 class=" align-items-center">
             <svg class="bi" width="40" height="40" fill="currentColor">
                 <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#card-checklist" />
@@ -23,7 +23,7 @@
             Mettre à jour une recommandation
         </h1>
         <section>
-            <div x-data="action_pusher_app()"
+            <div x-data="ActionPusher()"
                  x-init="update_recommendation({{ task.pk }}, '{{ task.intent|escapejs }}', '{{ task.content|escapejs }}', {{ task.resource_id|default:'null' }})"
                  x-cloak>
                 <form id="form-projects-update-task"
