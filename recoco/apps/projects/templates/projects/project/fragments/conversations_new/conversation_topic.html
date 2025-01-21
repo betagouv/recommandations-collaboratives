@@ -1,0 +1,14 @@
+<div class="topic-item__container {% if is_open %}topic-item__container--open{% endif %}">
+    <div>
+        <h3 class="topic-item__title">{{ topic_name }}</h3>
+        <div class="topic-item__description">
+            <p class="topic-item__description-content">Discussion générale entre le porteur de projet et l’équipe de conseil</p>
+            <span class="topic-item__description-icon fr-icon-arrow-right-line fr-icon--sm"
+                  aria-hidden="true"></span>
+        </div>
+        <p class="topic-item__message-len">
+            <span class="fr-icon-chat-2-line fr-icon--sm" aria-hidden="true"></span> {{ message_number|length }} message{{ message_number|length|pluralize }}
+            <span class="topic-item__message-len--new">({{ message_number|length }} {{ message_number|pluralize:"nouveau,nouveaux" }})</span>
+        </p>
+    </div>
+</div>
