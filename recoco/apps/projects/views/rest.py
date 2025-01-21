@@ -441,6 +441,7 @@ class TopicViewSet(viewsets.ReadOnlyModelViewSet):
     pagination_class = LargeResultsSetPagination
     search_fields = ["name"]
     filter_backends = [SearchVectorFilter]
+    search_min_rank = 0.05
 
     def get_queryset(self):
         """Return a list of all topics."""
