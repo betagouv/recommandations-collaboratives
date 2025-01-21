@@ -77,6 +77,7 @@ def project_overview(request, project_id=None):
         .filter(
             content_object_ct=ContentType.objects.get_for_model(User),
         )
+        .distinct()
         .values_list("content_object_id", flat=True)
     )
 
