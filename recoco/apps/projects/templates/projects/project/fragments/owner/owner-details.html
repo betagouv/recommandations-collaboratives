@@ -11,7 +11,8 @@
           type="text/css">
 {% endblock css %}
 {% load phone_filters %}
-<div x-data='ClickToSeeUser({{ project.owner.id }}, {{ request.user.id }}, "{{ is_staff }}" == "True", {{ project.id }}, {{ user_to_display|safe }})'>
+{{ users_to_display|json_script:"usersToDisplay" }}
+<div x-data='ClickToSeeUser({{ project.owner.id }}, {{ request.user.id }}, "{{ is_staff }}" == "True", {{ project.id }}, JSON.parse(document.getElementById("usersToDisplay").textContent))'>
     {% get_advising_position request.user project request.site as position %}
     <div class="fr-pt-1v fr-pb-3v fr-px-2w"
          x-show="!displayUser"

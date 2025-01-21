@@ -6,7 +6,6 @@ Alpine.data(
   (ownerId, currentUserId, currentUserIsStaff, projetId, userToDiplay = []) => {
     return {
       userId: ownerId,
-      usersIdAlreadyDiscovered: [],
       displayUser: false,
       init() {
         if (
