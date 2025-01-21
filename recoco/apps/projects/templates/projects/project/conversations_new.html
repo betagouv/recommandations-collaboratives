@@ -29,16 +29,33 @@
             <div class="topic-item__container topic-item__container--open">
                 <div>
                     <h3 class="topic-item__title">Général</h3>
-                    <p class="topic-item__description">Discussion générale entre le porteur de projet et l’équipe de conseil</p>
-                </div>
-                <div>
-                    <span class="fr-icon-arrow-right-line"
-                          aria-hidden="true"
-                          title="arrow-right-line"></span>
+                    <div class="topic-item__description">
+                        <p class="topic-item__description-content">Discussion générale entre le porteur de projet et l’équipe de conseil</p>
+                        <span class="topic-item__description-icon fr-icon-arrow-right-line fr-icon--sm"
+                              aria-hidden="true"></span>
+                    </div>
+                    <p class="topic-item__message-len">
+                        <span class="fr-icon-chat-2-line fr-icon--sm" aria-hidden="true"></span> {{ feed|length }} message{{ feed|length|pluralize }}
+                        <span class="topic-item__message-len--new">({{ feed|length }} {{ feed|pluralize:"nouveau,nouveaux" }})</span>
+                    </p>
                 </div>
             </div>
-            <div class="topic-item__container">Financement</div>
-            <div class="topic-item__container">Foncier</div>
+            {% for topic in topics %}
+                <div class="topic-item__container">
+                    <div>
+                        <h3 class="topic-item__title">{{ topic }}</h3>
+                        <div class="topic-item__description">
+                            <p class="topic-item__description-content">Discussion générale entre le porteur de projet et l’équipe de conseil</p>
+                            <span class="topic-item__description-icon fr-icon-arrow-right-line fr-icon--sm"
+                                  aria-hidden="true"></span>
+                        </div>
+                        <p class="topic-item__message-len">
+                            <span class="fr-icon-chat-2-line fr-icon--sm" aria-hidden="true"></span> {{ feed|length }} message{{ feed|length|pluralize }}
+                            <span class="topic-item__message-len--new">({{ feed|length }} {{ feed|pluralize:"nouveau,nouveaux" }})</span>
+                        </p>
+                    </div>
+                </div>
+            {% endfor %}
         </div>
         <div class="conversation-new__container fr-p-5v">
             <!-- Message stream -->

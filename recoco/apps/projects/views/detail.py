@@ -307,6 +307,8 @@ def project_conversations_new(request, project_id=None):
 
     posting_form = PublicNoteForm()
 
+    topics = ["Financement", "Foncier"]
+
     recipients = get_notification_recipients_for_project(project)
 
     # Prepare a feed of different objects
