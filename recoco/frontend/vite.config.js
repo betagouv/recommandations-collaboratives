@@ -68,6 +68,7 @@ const config = {
         showRole: resolve('./src/js/store/showRole.js'),
         projects: resolve('./src/js/store/projects.js'),
         ActionPusher: resolve('./src/js/components/ActionPusher.js'),
+        NotificationEater: resolve('./src/js/components/NotificationEater.js'),
       },
       output: {
         chunkFileNames: undefined,
