@@ -100,17 +100,15 @@ def test_can_not_create_contact_with_wrong_organization(api_client, staff_user):
     )
 
 
-# TODO: complete these tests
-
-
 @pytest.mark.parametrize(
     "search_terms,expected_result",
     [
         ("skywalker", [999]),
         ("jedi", [777, 888]),
         ("maître jedi", [777, 888]),
-        # ("conseil", [777, 888]),
-        # ("obscure", [999]),
+        ("coté obscure", [999]),
+        # On pourrait aller plus loin dans le tests ici,
+        # mais à voir avant si on passe par une recherche basée sur watson
     ],
 )
 @pytest.mark.django_db

@@ -50,7 +50,7 @@ class SearchVectorFilter(SearchFilter):
         return getattr(view, "search_fields", None)
 
     def get_search_min_rank(self, view, request) -> float:
-        return getattr(view, "search_min_rank", 0.3)
+        return getattr(view, "search_min_rank", 0.0)
 
     def filter_queryset(self, request, queryset, view):
         search_terms = self.get_search_terms(request)
@@ -72,14 +72,12 @@ class SearchVectorFilter(SearchFilter):
             else:
                 search_vector += _vector
 
-        # search_vector = SearchVector(*search_fields, config="french")
-
         search_query = SearchQuery(search_terms, config="french")
 
         return (
             queryset.annotate(rank=SearchRank(search_vector, search_query))
             .filter(rank__gte=self.get_search_min_rank(view, request))
-            .annotate(search_rank=Round(Coalesce(F("rank"), 0.0), precision=2))
+            .annotate(search_rank=Round(Coalesce(F("rank"), 0.0), precision=4))
             .order_by("-search_rank")
         )
         # return queryset.annotate(search=search_vector).filter(search=search_query)
