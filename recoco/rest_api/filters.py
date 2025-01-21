@@ -7,6 +7,7 @@ from django.utils.translation import gettext_lazy as _
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter
 from rest_framework.settings import api_settings
+from watson import search as watson_search
 
 
 class TagsFilterbackend(DjangoFilterBackend):
@@ -21,7 +22,7 @@ class TagsFilterbackend(DjangoFilterBackend):
         return queryset
 
 
-class VectorSearchFilter(SearchFilter):
+class BaseSearchFilter(SearchFilter):
     # Adapted from https://medium.com/@dumanov/powerfull-and-simple-search-engine-in-django-rest-framework-cb24213f5ef5
 
     search_param = api_settings.SEARCH_PARAM
@@ -52,6 +53,9 @@ class VectorSearchFilter(SearchFilter):
     def get_search_min_rank(self, view, request) -> float:
         return getattr(view, "search_min_rank", 0.0)
 
+
+class VectorSearchFilter(BaseSearchFilter):
+
     def filter_queryset(self, request, queryset, view):
         search_terms = self.get_search_terms(request)
         search_fields = self.get_search_fields(view, request)
@@ -80,4 +84,13 @@ class VectorSearchFilter(SearchFilter):
             .annotate(search_rank=Round(Coalesce(F("rank"), 0.0), precision=4))
             .order_by("-search_rank")
         )
-        # return queryset.annotate(search=search_vector).filter(search=search_query)
+
+
+class WatsonSearchFilter(BaseSearchFilter):
+    def filter_queryset(self, request, queryset, view):
+        search_terms = " ".join(self.get_search_terms(request))
+        return (
+            watson_search.filter(queryset, search_text=search_terms)
+            .annotate(search_rank=F("watson_rank"))
+            .filter(search_rank__gte=self.get_search_min_rank(view, request))
+        )
