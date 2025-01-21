@@ -1,5 +1,6 @@
 from rest_framework.viewsets import ModelViewSet
 
+# from recoco.rest_api.filters import WatsonSearchFilter
 from recoco.rest_api.filters import VectorSearchFilter
 from recoco.rest_api.pagination import StandardResultsSetPagination
 from recoco.rest_api.permissions import (
@@ -42,6 +43,9 @@ class ContactViewSet(ModelViewSet):
     serializer_class = ContactSerializer
     permission_classes = [IsStaffOrISAuthenticatedReadOnly]
     pagination_class = StandardResultsSetPagination
+
+    # filter_backends = [WatsonSearchFilter]
+
     filter_backends = [VectorSearchFilter]
     search_fields = [
         (
