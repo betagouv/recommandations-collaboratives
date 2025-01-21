@@ -5,10 +5,6 @@
           rel="stylesheet"
           type="text/css">
 {% endblock css %}
-{% load django_vite %}
-{% block js %}
-    {% vite_asset 'js/components/SearchContact.js' %}
-{% endblock js %}
 <div class="w-100"
      {% if escapejs %} x-data='editor("{{ input_value|escapejs }}")' {% elif is_task_comment %}x-data='editor(task.content)' {% else %} x-data='editor({{ input_value }})'{% endif %}
      @set-comment.window="setMarkdownContentFromTaskModal($event)"
@@ -77,13 +73,15 @@
             </template>
         {% endif %}
         {% if is_task_modal_comment %}
-            <div class="d-flex justify-content-end" x-data="SearchContact">
-                <button @click="openSearchContactModal"
-                        data-toggle="modal"
-                        data-target="#SearchContactModal"
-                        data-cy="add-contact-button"
-                        class="fr-btn fr-btn--tertiary fr-btn--sm justify-content-center fr-text--sm"
-                        x-init="initSearchContactModal()">Ajouter un contact</button>
+            <div x-data='SearchContact()'
+                 @keydown.escape="isOpenModal = false"
+                 x-cloak
+                 class="d-flex justify-content-end">
+                <button @click="isOpenModal = true"
+                        class="fr-btn fr-btn--tertiary fr-btn--sm justify-content-center fr-text--sm">
+                    Ajouter un contact
+                </button>
+                {% include "tools/contacts/search_contact_modal.html" %}
                 <button class="fr-btn fr-btn--sm"
                         :disabled="$store.editor.isSubmitted === true"
                         @click.stop="onSubmitComment(markdownContent)"
@@ -107,4 +105,3 @@
         {% endif %}
     </div>
 </div>
-{% include "tools/contacts/search_contact_modal.html" %}

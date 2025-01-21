@@ -3,15 +3,16 @@ import { Modal } from 'bootstrap';
 
 function SearchContact() {
   return {
+    searchResults: [],
+    isOpenModal: false,
+    userInput: '',
     init() {
      console.log('coucou');
     },
-    initSearchContactModal() {
-      const element = document.getElementById('search-contact-modal');
-      this.searchContactModal = new Modal(element);
-    },
-    openSearchContactModal() {
-      this.searchContactModal.show();
+    onSearch() {
+      // call api get users by text sur addressbook/contacts
+      console.log('searching : ', this.userInput); // console log retour api
+      // le mettre dans une variable résultat de recherche
     },
   };
 }

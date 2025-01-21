@@ -94,25 +94,6 @@
                                         {% endif %}
                                     </div>
                                     <div class="fr-mt-3w">
-                                        {% comment %} <div class="d-flex w-full flex-wrap" x-data>
-                                            <button @click.prevent data-bs-toggle="modal" :data-bs-target="modal" class="fr-link text-start text-decoration-underline z-1 fr-mt-4v">
-                                                Open modal
-                                            </button>
-                                            <div class="modal fade" :id="modal" tabindex="-1" :aria-labelledby="modal" aria-hidden="true">
-                                                <div class="model-inner">
-                                                    <div class="modal-header">
-                                                        <h3>Hello World</h3>
-                                                        <button type="button" class="fr-btn fr-btn-close" data-bs-dismiss="modal" aria-label="Close">✖</button>
-                                                    </div>
-                                                    <p>
-                                                        Natus earum velit ab nobis eos. Sed et exercitationem voluptatum omnis
-                                                        dolor voluptates. Velit ut ipsam sunt ipsam nostrum. Maiores officia
-                                                        accusamus qui sapiente. Dolor qui vel placeat dolor nesciunt quo dolor
-                                                        dolores. Quo accusamus hic atque nisi minima.
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </div> {% endcomment %}
                                         <div class="d-flex w-full flex-wrap">
                                             <!-- Contexte -->
                                             {% include "projects/project/fragments/information_card.html" with full_width=True padding_end=True padding_top=True full_height=True project=project title="Résumé du projet" description=project.description updated_on=project.created_on card_user=project.submitted_by org_name=project.submitted_by.profile.organization.name data_test="context" %}
