@@ -14,7 +14,7 @@ from . import models
 from .serializers import (
     CommuneSerializer,
     DepartmentSerializer,
-    RegionWithDepartmentsSerializer,
+    RegionSerializer,
 )
 
 
@@ -40,7 +40,7 @@ class RegionViewSet(viewsets.ReadOnlyModelViewSet):
     def get_queryset(self):
         return models.Region.objects.all().order_by("name")
 
-    serializer_class = RegionWithDepartmentsSerializer
+    serializer_class = RegionSerializer
 
 
 class CommuneViewSet(viewsets.ReadOnlyModelViewSet):
