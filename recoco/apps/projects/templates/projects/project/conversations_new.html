@@ -26,7 +26,7 @@
     {% include "projects/project/navigation.html" with conversation=True %}
     <div class="d-flex"
          x-data
-         x-init="() => window.scroll({top: $refs.notificationLine.offsetTop - 250, behavior:'smooth'}) ">
+         x-init="() => window.scroll({top: $refs.scrollLine.offsetTop - 260, behavior:'smooth'}) ">
         <div class="conversation-new__topics">
             {% include "projects/project/fragments/conversations_new/conversation_topic.html" with is_open=True topic_name="Général" message_number=feed %}
             {% for topic in topics %}
@@ -36,7 +36,8 @@
         <div class="conversation-new__container fr-p-5v">
             <!-- Message stream -->
             {% for element in feed %}
-                {% if element.notifications %}<hr class="notification-line" x-ref="notificationLine">{% endif %}
+                {% if forloop.last %}<div class="d-hide" x-ref="scrollLine"></div>{% endif %}
+                {% if element.notifications %}<hr class="notification-line" x-ref="scrollLine">{% endif %}
                 {% ifchanged element.timestamp|date %}
                     <p class="text-center">{{ element.timestamp|date }}</p>
                 {% endifchanged %}
@@ -45,7 +46,7 @@
                     <div class="text-center">{% include "actstream/action.html" with action=element.object %}</div>
                 {% elif element.type == "reco" %}
                     <!-- Type Reco + message -->
-                    <div class="task-item rounded-3 fr-p-2w fr-my-2v fr-mr-6w {% if request.user == element.object.created_by %}bg-blue-light{% else %}bg-grey-light {% endif %}">
+                    <div class="task-item rounded-3 fr-p-2w fr-my-2v {% if request.user == element.object.created_by %}bg-blue-light fr-ml-6w{% else %}bg-grey-light fr-mr-6w{% endif %}">
                         {{ element.object.content_rendered|safe }}
                         <div class="task-item__resource">
                             <h4>{{ element.object.intent|safe }}</h4>
@@ -75,35 +76,39 @@
                         {% endif %}
                     </div>
                 {% elif element.type == "followup" %}
-                    {% if element.object.status %}
-                        <p>
-                            <span class="strong">{{ element.object.who.first_name }} {{ element.object.who.last_name }}</span> a marqué la recommandation commme {{ element.object.status_txt }}
-                        </p>
-                    {% endif %}
                     <!-- Type followup -->
-                    <div class="rounded-3 fr-p-2w fr-my-2v fr-mr-6w {% if request.user == element.object.created_by %}bg-blue-light{% else %}bg-grey-light {% endif %}">
-                        {{ element.object.comment_rendered|safe }}
-                        {% if element.object.document.count %}
-                            {% for document in element.object.document.all %}
-                                {% include "projects/project/fragments/files_links/file_list_item_embedded.html" with document=document %}
-                            {% endfor %}
+                    <div>
+                        {% if element.object.status %}
+                            <p>
+                                <span class="strong">{{ element.object.who.first_name }} {{ element.object.who.last_name }}</span> a marqué la recommandation commme {{ element.object.status_txt }}
+                            </p>
                         {% endif %}
-                        {% if element.object.who %}
-                            <div class="d-flex align-items-center">{% include "user/user_card.html" with user=element.object.who %}</div>
-                        {% endif %}
+                        <div class="rounded-3 fr-p-2w fr-my-2v {% if request.user == element.object.created_by %}bg-blue-light fr-ml-6w{% else %}bg-grey-light fr-mr-6w{% endif %}">
+                            {{ element.object.comment_rendered|safe }}
+                            {% if element.object.document.count %}
+                                {% for document in element.object.document.all %}
+                                    {% include "projects/project/fragments/files_links/file_list_item_embedded.html" with document=document %}
+                                {% endfor %}
+                            {% endif %}
+                            {% if element.object.who %}
+                                <div class="d-flex align-items-center">{% include "user/user_card.html" with user=element.object.who %}</div>
+                            {% endif %}
+                        </div>
                     </div>
                 {% elif element.type == "posting" %}
                     <!-- Type message -->
-                    <div class="rounded-3 fr-p-2w fr-my-2v fr-mr-6w {% if request.user == element.object.created_by %}bg-blue-light{% else %}bg-grey-light {% endif %}">
-                        {{ element.object.content_rendered|safe }}
-                        {% if element.object.document.count %}
-                            {% for document in element.object.document.all %}
-                                {% include "projects/project/fragments/files_links/file_list_item_embedded.html" with document=document %}
-                            {% endfor %}
-                        {% endif %}
-                        {% if element.object.created_by %}
-                            <div class="d-flex align-items-center">{% include "user/user_card.html" with user=element.object.created_by %}</div>
-                        {% endif %}
+                    <div>
+                        <div class="rounded-3 fr-p-2w fr-my-2v {% if request.user == element.object.created_by %}bg-blue-light fr-ml-6w{% else %}bg-grey-light fr-mr-6w{% endif %}">
+                            {{ element.object.content_rendered|safe }}
+                            {% if element.object.document.count %}
+                                {% for document in element.object.document.all %}
+                                    {% include "projects/project/fragments/files_links/file_list_item_embedded.html" with document=document %}
+                                {% endfor %}
+                            {% endif %}
+                            {% if element.object.created_by %}
+                                <div class="d-flex align-items-center">{% include "user/user_card.html" with user=element.object.created_by %}</div>
+                            {% endif %}
+                        </div>
                     </div>
                 {% endif %}
             {% endfor %}
