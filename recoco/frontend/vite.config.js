@@ -68,6 +68,7 @@ const config = {
         projectQueue: resolve('./src/js/store/projectQueue.js'),
         showRole: resolve('./src/js/store/showRole.js'),
         projects: resolve('./src/js/store/projects.js'),
+        MarkDiagAsDone: resolve('./src/js/components/MarkDiagAsDone.js'),
         ActionPusher: resolve('./src/js/components/ActionPusher.js'),
       },
       output: {

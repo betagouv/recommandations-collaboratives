@@ -32,42 +32,100 @@
                      class="fr-mb-3w fr-pt-3w fr-mx-auto fw-bold"
                      x-data="WordCloud(topicsArray, '{{ crmSearchUrl }}')"></div>
             </div>
-            <section class="w-100 d-flex flex-column justify-content-center font-marianne">
-                <div class="d-flex justify-content-center">
-                    <table class="w-100 fr-my-auto table table-striped table-hover">
-                        <thead>
-                            <tr>
-                                <th scope="col">Nom</th>
-                                <th scope="col">Occurences</th>
-                                <th scope="col">Projets</th>
-                                <th scope="col">Recommandations</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for key, value in topics.items %}
-                                <tr>
-                                    <td>
-                                        <a href="{% url 'crm-search' %}?query={{ key }}">{{ key }}</a>
-                                    </td>
-                                    <td>{{ value.0 }}</td>
-                                    <td>
-                                        {% for project in value.1 %}
-                                            <a href="{% url 'projects-project-detail-overview' project.pk %}">{{ project.commune }} - {{ project.name }}</a>
-                                            {% if not forloop.last %}<br />{% endif %}
-                                        {% endfor %}
-                                    </td>
-                                    <td>
-                                        {% for task in value.2 %}
-                                            <a href="{% url 'projects-project-detail-overview' task.project.pk %}#action-{{ task.pk }}">{{ task.project.commune }} - {{ task.project.name }} / {{ task }} </a>
-                                            {% if not forloop.last %}<br />{% endif %}
-                                        {% endfor %}
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+            <div class="fr-tabs">
+                <ul class="fr-tabs__list"
+                    role="tablist"
+                    aria-label="Tableau index des thématiques">
+                    <li role="presentation">
+                        <button id="tabpanel-byprojects"
+                                class="fr-tabs__tab fr-icon-checkbox-line fr-tabs__tab--icon-left"
+                                tabindex="0"
+                                role="tab"
+                                aria-selected="true"
+                                aria-controls="tabpanel-byprojects-panel">Thématique par projets</button>
+                    </li>
+                    <li role="presentation">
+                        <button id="tabpanel-bytasks"
+                                class="fr-tabs__tab fr-icon-checkbox-line fr-tabs__tab--icon-left"
+                                tabindex="-1"
+                                role="tab"
+                                aria-selected="false"
+                                aria-controls="tabpanel-bytasks-panel">Thématique par recommandations</button>
+                    </li>
+                </ul>
+                <div id="tabpanel-byprojects-panel"
+                     class="fr-tabs__panel fr-tabs__panel--selected"
+                     role="tabpanel"
+                     aria-labelledby="tabpanel-byprojects"
+                     tabindex="0">
+                    <section class="w-100 d-flex flex-column justify-content-center font-marianne">
+                        <div class="d-flex justify-content-center">
+                            <table class="w-100 fr-my-auto table table-striped table-hover">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Nom</th>
+                                        <th scope="col">Occurences</th>
+                                        <th scope="col">Projets</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for key, value in topics.items %}
+                                        {% if value.1 > 0 %}
+                                            <tr>
+                                                <td>
+                                                    <a href="{% url 'crm-search' %}?query={{ key }}">{{ key }}</a>
+                                                </td>
+                                                <td>{{ value.1 }}</td>
+                                                <td>
+                                                    {% for project in value.3 %}
+                                                        <a href="{% url 'projects-project-detail-overview' project.pk %}">{{ project.commune }} - {{ project.name }}</a>
+                                                        {% if not forloop.last %}<br />{% endif %}
+                                                    {% endfor %}
+                                                </td>
+                                            </tr>
+                                        {% endif %}
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
                 </div>
-            </section>
+                <div id="tabpanel-bytasks-panel"
+                     class="fr-tabs__panel"
+                     role="tabpanel"
+                     aria-labelledby="tabpanel-bytasks"
+                     tabindex="0">
+                    <section class="w-100 d-flex flex-column justify-content-center font-marianne">
+                        <div class="d-flex justify-content-center">
+                            <table class="w-100 fr-my-auto table table-striped table-hover">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Nom</th>
+                                        <th scope="col">Occurences</th>
+                                        <th scope="col">Recommandations</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for key, value in topics.items %}
+                                        <tr>
+                                            <td>
+                                                <a href="{% url 'crm-search' %}?query={{ key }}">{{ key }}</a>
+                                            </td>
+                                            <td>{{ value.2 }}</td>
+                                            <td>
+                                                {% for task in value.4 %}
+                                                    <a href="{% url 'projects-project-detail-overview' task.project.pk %}#action-{{ task.pk }}">{{ task.project.commune }} - {{ task.project.name }} / {{ task }} </a>
+                                                    {% if not forloop.last %}<br />{% endif %}
+                                                {% endfor %}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+                </div>
+            </div>
         </div>
     </div>
 {% endblock content %}

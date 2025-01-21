@@ -38,6 +38,10 @@ instance.interceptors.response.use(
 export default instance;
 
 // Projects :
+export function projectUrl(projectId) {
+  return `/api/projects/${projectId}/`;
+}
+
 export function projectsUrl() {
   return '/api/projects/';
 }
@@ -57,7 +61,7 @@ export function sitesConfigUrl() {
 
 // Organization
 export function searchOrganizationsUrl(search) {
-  return `/api/organizations/?search=${search}`;
+  return `/api/addressbook/organizations/?search=${search}`;
 }
 
 // Topic
