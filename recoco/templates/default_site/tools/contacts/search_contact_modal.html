@@ -66,8 +66,44 @@
            class="w-100 border border-gray-300 p-2 rounded-lg"
            placeholder="Nom d'organisation, contact, rôle"
            @input.debounce="onSearch"
-           x-model="userInput">
-    {% comment %} <div class="flex justify-end pt-2">
+           x-model="userInput"
+           aria-expanded="false"
+           aria-controls="show-research-results"
+           x-ref="test">
+    <div>
+        <div class="fr-collapse fr-menu menu-modal-correct-fr-menu"
+             id="show-research-results">
+            <template class="fr-menu__list specific-width-25rem"
+                      x-if="contactsFound.length > 0">
+                <div class="fr-menu__item"
+                     x-for="contact in contactsFound"
+                     :key="contact.id">
+                    {% comment %} @click="onSelect(contact)" {% endcomment %}
+                    <div class="fr-menu__item__content">
+                        <div class="fr-menu__item__content__title">
+                            <div class="fr-menu__item__content__title__text">
+                                <span x-text="contact.name"></span>
+                            </div>
+                        </div>
+                        <div class="fr-menu__item__content__subtitle">
+                            <span x-text="contact.email"></span>
+                        </div>
+                    </div>
+                    <hr class="divider-specific">
+                    <div class="d-flex flex-column"></div>
+                </div>
+            </template>
+            <template class="fr-menu__list specific-width-25rem"
+                      x-if="contactsFound.length = 0">
+                <div class="fr-menu__item">
+                    <div class="fr-menu__item__content">
+                        <span>aucun contact trouvé</span>
+                    </div>
+                </div>
+            </template>
+        </div>
+        {% comment %} <div class="flex justify-end pt-2">
         <button class="px-4 bg-transparent p-3 rounded-lg text-indigo-500 hover:bg-gray-100 hover:text-indigo-400 mr-2" @click="alert('Additional Action');">Action</button>
-    </div> {% endcomment %}
+        </div> {% endcomment %}
+    </div>
 </div>
