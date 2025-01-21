@@ -21,8 +21,9 @@ class OrganizationGroupViewSet(ModelViewSet):
     queryset = OrganizationGroup.objects.all()
     permission_classes = [IsStaffOrReadOnly]
     pagination_class = StandardResultsSetPagination
-    search_fields = ["name"]
     filter_backends = [SearchVectorFilter]
+    search_fields = ["name"]
+    search_min_rank = 0.3
 
 
 class OrganizationViewSet(ModelViewSet):
@@ -30,8 +31,9 @@ class OrganizationViewSet(ModelViewSet):
     queryset = Organization.on_site.all()
     permission_classes = [IsStaffOrReadOnly]
     pagination_class = StandardResultsSetPagination
-    search_fields = ["name"]
     filter_backends = [SearchVectorFilter]
+    search_fields = ["name"]
+    search_min_rank = 0.1
 
     def get_queryset(self):
         return super().get_queryset().prefetch_related("departments__region")
@@ -42,6 +44,7 @@ class ContactViewSet(ModelViewSet):
     queryset = Contact.on_site.all()
     permission_classes = [IsStaffOrISAuthenticatedReadOnly]
     pagination_class = StandardResultsSetPagination
+    filter_backends = [SearchVectorFilter]
     search_fields = [
         (
             "last_name",
@@ -81,7 +84,6 @@ class ContactViewSet(ModelViewSet):
         ),
     ]
     search_min_rank = 0.2
-    filter_backends = [SearchVectorFilter]
 
     def get_serializer_class(self):
         return ContactCreateSerializer if self.action == "create" else ContactSerializer

@@ -50,7 +50,7 @@ class SearchVectorFilter(SearchFilter):
         return getattr(view, "search_fields", None)
 
     def get_search_min_rank(self, view, request) -> float:
-        return getattr(view, "search_min_rank", 0.3)
+        return getattr(view, "search_min_rank", 0.0)
 
     def filter_queryset(self, request, queryset, view):
         search_terms = self.get_search_terms(request)
