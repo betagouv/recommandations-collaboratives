@@ -51,3 +51,15 @@ def test_hit_view():
     assert HitCount.objects.count() == 1
     hitcount = HitCount.objects.first()
     assert hitcount.hits.count() == 2
+
+    user.is_hijacked = True
+    response = api_client.post(
+        path=url,
+        data=payload,
+        content_type="application/json",
+    )
+    assert response.status_code == 200
+    assert HitCount.objects.count() == 1
+    assert (
+        hitcount.hits.count() == 2
+    ), "no hit should be registered when user is hijacked"
