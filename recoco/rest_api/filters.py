@@ -77,7 +77,7 @@ class SearchVectorFilter(SearchFilter):
         return (
             queryset.annotate(rank=SearchRank(search_vector, search_query))
             .filter(rank__gte=self.get_search_min_rank(view, request))
-            .annotate(search_rank=Round(Coalesce(F("rank"), 0.0), precision=2))
+            .annotate(search_rank=Round(Coalesce(F("rank"), 0.0), precision=4))
             .order_by("-search_rank")
         )
         # return queryset.annotate(search=search_vector).filter(search=search_query)
