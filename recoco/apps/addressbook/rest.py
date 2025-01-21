@@ -1,6 +1,6 @@
 from rest_framework.viewsets import ModelViewSet
 
-from recoco.rest_api.filters import SearchVectorFilter
+from recoco.rest_api.filters import VectorSearchFilter
 from recoco.rest_api.pagination import StandardResultsSetPagination
 from recoco.rest_api.permissions import (
     IsStaffOrISAuthenticatedReadOnly,
@@ -21,7 +21,7 @@ class OrganizationGroupViewSet(ModelViewSet):
     queryset = OrganizationGroup.objects.all()
     permission_classes = [IsStaffOrReadOnly]
     pagination_class = StandardResultsSetPagination
-    filter_backends = [SearchVectorFilter]
+    filter_backends = [VectorSearchFilter]
     search_fields = ["name"]
     search_min_rank = 0.05
 
@@ -30,7 +30,7 @@ class OrganizationViewSet(ModelViewSet):
     serializer_class = OrganizationSerializer
     permission_classes = [IsStaffOrReadOnly]
     pagination_class = StandardResultsSetPagination
-    filter_backends = [SearchVectorFilter]
+    filter_backends = [VectorSearchFilter]
     search_fields = ["name"]
     search_min_rank = 0.05
 
@@ -42,7 +42,7 @@ class ContactViewSet(ModelViewSet):
     serializer_class = ContactSerializer
     permission_classes = [IsStaffOrISAuthenticatedReadOnly]
     pagination_class = StandardResultsSetPagination
-    filter_backends = [SearchVectorFilter]
+    filter_backends = [VectorSearchFilter]
     search_fields = [
         (
             "last_name",

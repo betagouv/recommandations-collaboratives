@@ -23,7 +23,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from recoco import verbs
-from recoco.rest_api.filters import SearchVectorFilter, TagsFilterbackend
+from recoco.rest_api.filters import TagsFilterbackend, VectorSearchFilter
 from recoco.rest_api.pagination import LargeResultsSetPagination
 from recoco.utils import (
     get_group_for_site,
@@ -440,7 +440,7 @@ class TopicViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     pagination_class = LargeResultsSetPagination
     search_fields = ["name"]
-    filter_backends = [SearchVectorFilter]
+    filter_backends = [VectorSearchFilter]
     search_min_rank = 0.05
 
     def get_queryset(self):

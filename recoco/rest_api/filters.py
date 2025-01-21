@@ -21,7 +21,7 @@ class TagsFilterbackend(DjangoFilterBackend):
         return queryset
 
 
-class SearchVectorFilter(SearchFilter):
+class VectorSearchFilter(SearchFilter):
     # Adapted from https://medium.com/@dumanov/powerfull-and-simple-search-engine-in-django-rest-framework-cb24213f5ef5
 
     search_param = api_settings.SEARCH_PARAM
