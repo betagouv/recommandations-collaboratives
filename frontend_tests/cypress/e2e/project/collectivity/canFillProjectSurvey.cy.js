@@ -8,14 +8,20 @@ describe('I can fill a project survey @critical', () => {
     cy.login('collectivité1');
   });
 
+  it.skip('displays the tutorial on a pristine survey', () => {
+    cy.visit(`/project/${currentProject.pk}/connaissance`);
+
+    cy.get('[data-test-id="link-fill-survey"]').first().click({ force: true });
+
+    cy.get("[data-test-id='survey-tutorial']").should.exist;
+  });
+
   it('fills up the survey and upload a file', () => {
     cy.visit(`/project/${currentProject.pk}/connaissance`);
 
     cy.get('[data-test-id="link-fill-survey-cta"]')
       .first()
       .click({ force: true });
-
-    // cy.url().should('include', '/projects/survey/')
 
     cy.get('#form_answer-1').check({ force: true });
 
@@ -46,6 +52,10 @@ describe('I can fill a project survey @critical', () => {
     cy.contains('Propriété du site');
     cy.contains('100%');
     cy.contains('Fake comment on first survey question');
+
+    // Reload the survey: it should not load tutorial
+    cy.get('[data-cy="edit-survey"]').first().click();
+    cy.get('[data-test-id="survey-tutorial"]').should('not.exist');
   });
 
   it('can see and download the file', () => {

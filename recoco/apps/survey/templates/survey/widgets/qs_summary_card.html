@@ -57,6 +57,7 @@
                                     <ul class="list-unstyled fr-mt-0">
                                         {% if "use_surveys" in user_project_perms and not show_question %}
                                             <a class="link-edit stretched-link text-decoration-none"
+                                               data-cy="edit-survey"
                                                href="{% url 'survey-question-details' session.id answer.question.id %}">
                                             {% endif %}
                                             {% for choice in choices %}
