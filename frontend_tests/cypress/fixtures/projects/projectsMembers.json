@@ -171,6 +171,15 @@
     }
   },
   {
+    "model": "projects.projectmember",
+    "pk": 20,
+    "fields": {
+      "member": 5,
+      "project": 23,
+      "is_owner": true
+    }
+  },
+  {
     "model": "projects.projectswitchtender",
     "pk": 1,
     "fields": {
