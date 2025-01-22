@@ -7,22 +7,42 @@ function SearchContact() {
     contactsFound: [],
     isOpenModal: false,
     userInput: '',
+    showContactsresults: false,
+    isAContactSelected: false,
+    selectedContact: null,
+    delayDisplay: false,
     init() {
     },
     onSearch() {
-      // call api get users by text sur addressbook/contacts
-      if (this.userInput.length > 0) {
-      api.get(searchContactsUrl(this.userInput)).then((response) => {
-        this.searchResults = response.data;
-        this.contactsFound = this.searchResults.results;
-          this.$refs.test.ariaExpanded = 'true';
-          console.log('searching : ', this.searchResults); // console log retour api
-          console.log('searching : ', this.contactsFound); // console log retour api
-        });
+      this.delayDisplay = true;
+      if (this.userInput.length > 0 && !this.isAContactSelected) {
+        api.get(searchContactsUrl(this.userInput)).then((response) => {
+          this.searchResults = response.data;
+          this.contactsFound = this.searchResults.results;
+            if(this.contactsFound.length > 0) {
+              this.showContactsresults = true;
+            }
+            else {
+              this.showContactsresults = false;
+            }
+          });
       }
-
-      console.log("is expend : ",this.$refs.test.ariaExpanded);
-
+    },
+    onSelect(contact) {
+      console.log('selected contact : ', contact);
+      this.selectedContact = contact;
+      this.isAContactSelected = true;
+    },
+    addContact() {
+      let textArea = document.querySelector('.tiptap.ProseMirror');
+      textArea.innerHTML += `<p>@${this.selectedContact.first_name} ${this.selectedContact.last_name}</p>`;
+      this.closeModal();
+    },
+    closeModal() {
+      this.isAContactSelected = false;
+      this.showContactsresults = false
+      this.userInput = '';
+      this.isOpenModal = false;
     },
   };
 }
