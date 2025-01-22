@@ -21,6 +21,7 @@ class HitCountQuerySet(models.QuerySet):
 
 
 class HitCountOnSiteManagerBase(CurrentSiteManager):
+    use_in_migrations = False
     pass
 
 
