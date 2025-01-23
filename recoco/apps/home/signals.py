@@ -9,6 +9,7 @@ from actstream import action
 from allauth.account.signals import user_logged_in as allauth_user_logged_in
 from django.contrib.auth.models import update_last_login
 from django.contrib.auth.signals import user_logged_in
+from django.contrib.sites.shortcuts import get_current_site
 from django.dispatch import receiver
 from magicauth.signals import user_logged_in as magicauth_user_logged_in
 
@@ -30,6 +31,9 @@ def update_login_fields(sender, user, request, **kwargs):
 
     # Call the original django handler
     update_last_login(sender, user, **kwargs)
+
+    # Add the current site so that the user can access all the features
+    user.profile.sites.add(get_current_site(request))
 
 
 allauth_user_logged_in.connect(log_connection_on_user_login)
