@@ -2,6 +2,7 @@
 {% load django_vite %}
 {% load sass_tags %}
 {% load projects_extra %}
+{% load common_tags %}
 {% block js %}
     {% vite_asset 'js/components/ClickToSeeUser.js' %}
 {% endblock js %}
@@ -12,7 +13,11 @@
 {% endblock css %}
 {% load phone_filters %}
 {{ users_to_display|json_script:"usersToDisplay" }}
-<div x-data='ClickToSeeUser({{ project.owner.id }}, {{ request.user.id }}, "{{ is_staff }}" == "True", {{ project.id }}, JSON.parse(document.getElementById("usersToDisplay").textContent))'>
+{% is_staff_for_current_site request.user as is_staff %}
+{% is_admin_for_current_site request.user as is_admin %}
+{% is_advisor_for_site request.user as is_site_advisor %}
+{% firstof is_site_advisor advising as advise_on %}
+<div x-data="ClickToSeeUser({{ project.owner.id }}, {{ request.user.id }},  {% if not is_staff and not is_admin and advise_on %}false {% else %} true{% endif %}, {{ project.id }}, JSON.parse(document.getElementById('usersToDisplay').textContent))">
     {% get_advising_position request.user project request.site as position %}
     <div class="fr-pt-1v fr-pb-3v fr-px-2w"
          x-show="!displayUser"
