@@ -70,6 +70,7 @@ function SelectSearchable(params) {
       option.text = text;
       if (selected) {
         option.selected = true;
+        this.setSelectedProject();
       }
       return option;
     },

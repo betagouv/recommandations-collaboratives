@@ -70,6 +70,7 @@ const config = {
         ClickToSeeUser: resolve('./src/js/components/ClickToSeeUser.js'),
         MarkDiagAsDone: resolve('./src/js/components/MarkDiagAsDone.js'),
         ActionPusher: resolve('./src/js/components/ActionPusher.js'),
+        actionPusher: resolve('./src/js/store/actionPusher.js'),
       },
       output: {
         chunkFileNames: undefined,
