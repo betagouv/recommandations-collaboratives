@@ -106,3 +106,16 @@
 .add-borders {
     border-bottom: 1px solid var(--light-border-default-grey, #E5E5E5);
 }
+
+.design-dropdown {
+    border-radius: 0px 0px 4px 4px;
+    border: 1px solid var(--light-border-default-grey, #E5E5E5);
+}
+.border-radius-4px {
+    border-radius: 4px;
+}
+
+.correct-centering-text{
+    text-align: center;
+    display: inline;
+}

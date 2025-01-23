@@ -1,9 +1,7 @@
 {% load static %}
 {% load sass_tags %}
 {% block css %}
-    <link href="{% sass_src 'projects/css/fragments/share/invite.scss' %}"
-          rel="stylesheet"
-          type="text/css" />
+    {% comment %} <link href="{% sass_src 'projects/css/fragments/share/invite.scss' %}" rel="stylesheet" type="text/css" /> {% endcomment %}
     <link href="{% sass_src 'css/tools/contact/search-contact-modal.scss' %}"
           rel="stylesheet"
           type="text/css" />
@@ -39,9 +37,9 @@
         </div>
     </div>
     <div>
-        <div class="fr-menu menu-modal-correct-fr-menu better-positionning">
-            <div class="fr-menu__list specific-width-26rem">
-                <div class="fr-menu__list specific-width-26rem overflow-auto specific-height">
+        <div class="fr-menu menu-modal-correct-fr-menu better-positionning border-radius-4px">
+            <div class="fr-menu__list specific-width-26rem border-radius-4px">
+                <div class="fr-menu__list specific-width-26rem overflow-auto specific-height border-radius-4px">
                     <template x-if="userInput.length > 0 && showContactsresults && !isAContactSelected">
                         <template class="fr-menu__item"
                                   x-for="(contact, index) in contactsFound"
@@ -73,8 +71,8 @@
                     </template>
                     <template class="fr-menu__item" x-if="isAContactSelected">
                         {% comment %} futur composant carte ici qui récupère un contact à afficher {% endcomment %}
-                        <div>
-                            <div class="fr-menu__item__content__title">
+                        <div class="design-dropdown">
+                            {% comment %} <div class="fr-menu__item__content__title">
                                 <div class="d-flex justify-content-between">
                                     <div class="fr-menu__item__content__title__text d-flex">
                                         <template x-if="selectedContact.first_name">
@@ -86,18 +84,22 @@
                                             </div>
                                         </template>
                                     </div>
-                                    <span class="fr-icon-close-line"
-                                          aria-hidden="true"
-                                          @click="isAContactSelected=false"></span>
+                                    <span class="fr-icon-close-line" aria-hidden="true" @click="isAContactSelected=false"></span>
                                 </div>
                             </div>
                             <div class="fr-menu__item__content__subtitle">
                                 <template x-if="selectedContact.email">
                                     <span x-text="selectedContact.email"></span>
                                 </template>
+                            </div> {% endcomment %}
+                            <div class="d-flex justify-content-between add-borders">
+                                {% include "tools/contacts/contact_card.html" %}
+                                <span class="fr-icon-close-line color-666 cursor-pointer fr-pt-3v fr-pr-3v"
+                                      aria-hidden="true"
+                                      @click="isAContactSelected=false"></span>
                             </div>
-                            <div>
-                                <button @click="addContact">Ajouter</button>
+                            <div class="fr-p-3v text-align-center">
+                                <button @click="addContact" class="fr-btn w-100 correct-centering-text">Envoyer le contact</button>
                             </div>
                         </div>
                     </template>
