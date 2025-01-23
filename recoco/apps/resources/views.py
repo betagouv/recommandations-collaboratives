@@ -228,6 +228,7 @@ class BaseResourceDetailView(DetailView):
                         addressbook_models.Contact
                     ),
                 )
+                .distinct()
                 .values_list("content_object_id", flat=True)
             )
         else:
