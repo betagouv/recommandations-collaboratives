@@ -19,14 +19,20 @@ Alpine.data('NotificationEater', () => {
       this.scrollToFirstNotification();
     },
     scrollToFirstNotification() {
+      const scrollLine = document.querySelectorAll('[x-ref="scrollLine"]');
+      let scrollTo = this.$refs.scrollLineLastMessage;
+      if (scrollLine.length > 0) {
+        scrollTo = scrollLine[0];
+      }
       window.scroll({
-        top: this.$refs.scrollLine.offsetTop - 260,
+        top: scrollTo.offsetTop - 260,
         behavior: 'smooth',
       });
     },
     hideScrollLine() {
-      document.querySelectorAll('[x-ref="scrollLine"]').forEach((el, i) => {
-        if (i == 1) return;
+      const scrollLine = document.querySelectorAll('[x-ref="scrollLine"]');
+      scrollLine.forEach((el, i) => {
+        if (i == 0) return;
         el.classList.add('d-none');
       });
     },

@@ -35,83 +35,24 @@
         <div class="conversation-new__container fr-p-5v">
             <!-- Message stream -->
             {% for element in feed %}
-                {% if forloop.last %}<div class="d-hide" x-ref="scrollLine"></div>{% endif %}
+                <div>UNREAD NOTIFS={{ element.notifications }}</div>
+                {% if forloop.last %}<div class="d-hide" x-ref="scrollLineLastMessage"></div>{% endif %}
                 {% if element.notifications %}<hr class="notification-line" x-ref="scrollLine">{% endif %}
                 {% ifchanged element.timestamp|date %}
                     <p class="text-center">{{ element.timestamp|date }}</p>
                 {% endifchanged %}
                 {% if element.type == "activity" %}
                     <!-- Type Activity  -->
-                    <div class="text-center observed-element" data="{{ element.object.id }}">
-                        {% include "actstream/action.html" with action=element.object %}
-                    </div>
+                    {% include "projects/project/fragments/conversations_new/message_type/type_activity_item.html" %}
                 {% elif element.type == "reco" %}
                     <!-- Type Reco + message -->
-                    <div class="task-item observed-element rounded-3 fr-p-2w fr-my-2v {% if request.user == element.object.created_by %}bg-blue-light fr-ml-6w{% else %}bg-grey-light fr-mr-6w{% endif %}"
-                         data="{{ element.object.id }}">
-                        {{ element.object.content_rendered|safe }}
-                        <div class="task-item__resource">
-                            <h4>{{ element.object.intent|safe }}</h4>
-                            <p class="fr-mt-1w fr-mb-0">{{ element.object.resource.subtitle|safe }}</p>
-                            {% if element.object.document.count %}
-                                {% for document in element.object.document.all %}
-                                    {% include "projects/project/fragments/files_links/file_list_item_embedded.html" with document=document %}
-                                {% endfor %}
-                            {% endif %}
-                            <div class="resource-link fr-mt-1w fr-mb-2w">
-                                <span class="fr-icon-newspaper-line fr-icon--sm fr-mr-1v"
-                                      aria-hidden="true"></span><a href="{{ element.object.resource.get_absolute_url }}">Lien vers la ressource</a>
-                            </div>
-                            {% include "projects/project/fragments/conversations_new/tasks_status_buttons.html" with task=element.object %}
-                        </div>
-                        {% if element.object.created_by %}
-                            <div class="fr-mt-1w d-flex align-items-center">
-                                {% include "user/user_card.html" with user=element.object.created_by %}
-                                {% if element.object.created_by == request.user %}
-                                    <span class="align-middle small text-dark fr-ml-2v">
-                                        -
-                                        <a class="fr-btn fr-btn--sm fr-btn--tertiary-no-outline fr-ml-1v"
-                                           href="{% url 'projects-update-note' element.object.pk %}">éditer</a>
-                                    </span>
-                                {% endif %}
-                            </div>
-                        {% endif %}
-                    </div>
+                    {% include "projects/project/fragments/conversations_new/message_type/type_task_message_item.html" %}
                 {% elif element.type == "followup" %}
                     <!-- Type followup -->
-                    <div class="observed-element" data="{{ element.object.id }}">
-                        {% if element.object.status %}
-                            <p>
-                                <span class="strong">{{ element.object.who.first_name }} {{ element.object.who.last_name }}</span> a marqué la recommandation commme {{ element.object.status_txt }}
-                            </p>
-                        {% endif %}
-                        <div class="rounded-3 fr-p-2w fr-my-2v {% if request.user == element.object.created_by %}bg-blue-light fr-ml-6w{% else %}bg-grey-light fr-mr-6w{% endif %}">
-                            {{ element.object.comment_rendered|safe }}
-                            {% if element.object.document.count %}
-                                {% for document in element.object.document.all %}
-                                    {% include "projects/project/fragments/files_links/file_list_item_embedded.html" with document=document %}
-                                {% endfor %}
-                            {% endif %}
-                            {% if element.object.who %}
-                                <div class="d-flex align-items-center">{% include "user/user_card.html" with user=element.object.who %}</div>
-                            {% endif %}
-                        </div>
-                    </div>
+                    {% include "projects/project/fragments/conversations_new/message_type/type_followup_item.html" %}
                 {% elif element.type == "posting" %}
                     <!-- Type message -->
-                    <div class="observed-element" data="{{ element.object.id }}">
-                        <div class="rounded-3 fr-p-2w fr-my-2v {% if request.user == element.object.created_by %}bg-blue-light fr-ml-6w{% else %}bg-grey-light fr-mr-6w{% endif %}">
-                            {{ element.object.content_rendered|safe }}
-                            {% if element.object.document.count %}
-                                {% for document in element.object.document.all %}
-                                    {% include "projects/project/fragments/files_links/file_list_item_embedded.html" with document=document %}
-                                {% endfor %}
-                            {% endif %}
-                            {% if element.object.created_by %}
-                                <div class="d-flex align-items-center">{% include "user/user_card.html" with user=element.object.created_by %}</div>
-                            {% endif %}
-                        </div>
-                    </div>
+                    {% include "projects/project/fragments/conversations_new/message_type/type_posting_item.html" %}
                 {% endif %}
             {% endfor %}
             {% if "use_public_notes" in user_project_perms %}
