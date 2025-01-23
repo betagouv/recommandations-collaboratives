@@ -9,7 +9,7 @@ describe('I can invite people', () => {
   it('goes to share a project page', () => {
     cy.visit(`/project/${currentProject.pk}`);
 
-    cy.contains('Inviter un membre de la collectivité').click({ force: true });
+    cy.get('[data-cy="invite-project-member-button"]').click();
 
     cy.get('#invite-member-modal')
       .get('#invite-email')

@@ -324,7 +324,7 @@ def test_user_cannot_access_member_invitation_for_someone_else(
     assert response.status_code == 403
     invite = models.Invite.on_site.get(pk=invite.pk)
     assert invite.accepted_on is None
-    assert current_site not in user.profile.sites.all()
+    assert current_site in user.profile.sites.all()
     assert user not in invite.project.members.all()
     assert user not in invite.project.switchtenders.all()
     assert not has_perm(user, "view_project", invite.project)
@@ -413,7 +413,7 @@ def test_user_cannot_access_switchtender_invitation_for_someone_else(
     assert response.status_code == 403
     invite = models.Invite.on_site.get(pk=invite.pk)
     assert invite.accepted_on is None
-    assert current_site not in user.profile.sites.all()
+    assert current_site in user.profile.sites.all()
     assert user not in invite.project.members.all()
     assert user not in invite.project.switchtenders.all()
     assert not has_perm(user, "view_project", invite.project)

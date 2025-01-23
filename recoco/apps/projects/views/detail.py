@@ -156,11 +156,6 @@ def project_knowledge(request, project_id=None):
         pk=project_id,
     )
 
-    sorted_sessions = sorted(
-        project.survey_session.all(),
-        key=lambda session: session.survey.site != request.site,
-    )
-
     is_regional_actor = is_regional_actor_for_project(
         request.site, project, request.user, allow_national=True
     )
@@ -180,6 +175,11 @@ def project_knowledge(request, project_id=None):
     site_config = get_site_config_or_503(request.site)
     session, created = survey_models.Session.objects.get_or_create(
         project=project, survey=site_config.project_survey
+    )
+
+    sorted_sessions = sorted(
+        project.survey_session.all(),
+        key=lambda session: session.survey.site != request.site,
     )
 
     # Mark this project survey notifications as read

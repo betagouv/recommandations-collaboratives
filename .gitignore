@@ -30,6 +30,7 @@ venv
 **/.npmrc
 .npmrc
 screenshots
+frontend_tests/cypress/downloads
 .idea
 .tool-versions
 .python-version
