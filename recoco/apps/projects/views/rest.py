@@ -116,11 +116,14 @@ class ProjectDepartmentList(ListAPIView):
     serializer_class = geomatics_serializers.DepartmentSerializer
 
     def get_queryset(self):
-        return geomatics_models.Department.objects.filter(
-            code__in=models.Project.on_site.for_user(self.request.user)
-            .order_by("-created_on", "-updated_on")
-            .prefetch_related("commune__department")
-            .values_list("commune__department", flat=True)
+        return (
+            geomatics_models.Department.objects.filter(
+                code__in=models.Project.on_site.for_user(self.request.user)
+                .order_by("-created_on", "-updated_on")
+                .prefetch_related("commune__department")
+                .values_list("commune__department", flat=True)
+            )
+            | self.request.user.profile.departments.all()
         ).distinct()
 
     def list(self, request, *args, **kwargs):
