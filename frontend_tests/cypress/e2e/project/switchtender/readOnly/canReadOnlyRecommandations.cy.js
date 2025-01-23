@@ -7,7 +7,7 @@ describe('I can read only recommandations', () => {
   });
 
   it('goes to recommandations and read only content', () => {
-    cy.viscy.visit(`/project/${currentProject.pk}/actions`);
+    cy.visit(`/project/${currentProject.pk}/actions`);
 
     cy.contains('Ajouter une recommandation').should('not.exist');
   });

@@ -195,7 +195,7 @@
                                                 <button @click="openInviteMemberModal"
                                                         data-toggle="modal"
                                                         data-target="#InviteMemberModal"
-                                                        data-cy="invite-advisor-button"
+                                                        data-cy="invite-project-member-button"
                                                         class="{% if project.status == 'DRAFT' or not "invite_collaborators" in user_project_perms %} disabled fr-btn--icon-left fr-icon-lock-line{% endif %} fr-btn fr-btn--tertiary fr-btn--sm justify-content-center fr-text--sm"
                                                         {% if project.status == 'DRAFT' or not "invite_collaborators" in user_project_perms %}disabled{% endif %}>
                                                     Inviter
@@ -220,6 +220,7 @@
                                                         <button @click="openInviteSwitchtenderModal"
                                                                 data-toggle="modal"
                                                                 data-target="#InviteSwitchtenderModal"
+                                                                data-cy="invite-advisor-button"
                                                                 class="{% if project.status == 'DRAFT' %} disabled fr-btn--icon-left fr-icon-lock-line{% endif %} fr-btn fr-btn--tertiary fr-btn--sm justify-content-center"
                                                                 {% if project.status == 'DRAFT' %}disabled{% endif %}>
                                                             Inviter
