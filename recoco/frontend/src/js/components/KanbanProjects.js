@@ -62,6 +62,12 @@ function boardProjectsApp(currentSiteId) {
       );
 
       this.projectList = [...projectList];
+      if (this.projectList.length === 0) {
+        this.$refs.selectFilterProjectDuration.value = 90;
+        this.$refs.selectFilterProjectDuration.dispatchEvent(
+          new Event('change')
+        );
+      }
 
       if (postProcess) {
         await this.postProcessData();
