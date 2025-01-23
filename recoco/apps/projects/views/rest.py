@@ -27,6 +27,8 @@ from rest_framework.views import APIView
 from watson import search as watson
 
 from recoco import verbs
+from recoco.apps.geomatics import models as geomatics_models
+from recoco.apps.geomatics import serializers as geomatics_serializers
 from recoco.rest_api.filters import TagsFilterbackend
 from recoco.utils import (
     TrigramSimilaritySearchFilter,
@@ -105,6 +107,27 @@ class ProjectDetail(APIView):
             #     )
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ProjectDepartmentList(ListAPIView):
+    """List all usable departments for the current user"""
+
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = geomatics_serializers.DepartmentSerializer
+
+    def get_queryset(self):
+        return geomatics_models.Department.objects.filter(
+            code__in=models.Project.on_site.for_user(self.request.user)
+            .order_by("-created_on", "-updated_on")
+            .prefetch_related("commune__department")
+            .values_list("commune__department", flat=True)
+        ).distinct()
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
 
 class ProjectList(ListAPIView):
