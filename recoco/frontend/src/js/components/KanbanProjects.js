@@ -6,6 +6,7 @@ import api, {
   projectsProjectSitesUrl,
   projectsUrl,
   regionsUrl,
+  projectsMyDepartmentsUrl,
   searchProjectUrl,
 } from '../utils/api';
 
@@ -48,6 +49,9 @@ function boardProjectsApp(currentSiteId) {
     searchText: '',
     lastActivity: '30',
     async getData(postProcess = true) {
+      // const myDepartments = await api.get(projectsMyDepartmentsUrl());
+      // debugger;
+
       const projects = await api.get(projectsUrl(this.lastActivity));
       await this.$store.projects.mapperProjetsProjectSites(
         projects.data,
@@ -61,7 +65,7 @@ function boardProjectsApp(currentSiteId) {
       );
 
       if (postProcess) {
-        await this.postProcessData(projectList);
+        await this.postProcessData();
       }
       this.projectList = [...projectList];
       this.rawProjectList = [...projectList];
@@ -172,10 +176,10 @@ function boardProjectsApp(currentSiteId) {
     //   const filtered = this.fuse.search(search).map((r) => r.item);
     //   this.projectList = [...filtered];
     // },
-    async postProcessData(projectList) {
-      const departments = this.extractAndCreateAdvisorDepartments(projectList);
+    async postProcessData() {
+      const departments = await api.get(projectsMyDepartmentsUrl());
       const regionsData = await api.get(regionsUrl());
-      this.constructRegionsFilter(departments, regionsData.data);
+      this.constructRegionsFilter(departments.data, regionsData.data);
     },
     toggleMyProjectsFilter() {
       this.isDisplayingOnlyUserProjects = !this.isDisplayingOnlyUserProjects;

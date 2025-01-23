@@ -45,7 +45,11 @@ export function searchProjectUrl(search, departments) {
   if (departments.length) {
     departments = departments.map((code) => `departments=${code}`).join('&');
   }
-  return `/api/projects/?${search}${search && departments.length && '&'}${departments}`;
+  return `/api/projects/?${search}${search && departments.length > 0 ? '&' : ''}${departments}`;
+}
+
+export function projectsMyDepartmentsUrl() {
+  return '/api/projects/my_departments';
 }
 
 export function projectsUrl(lastActivity = '30') {
