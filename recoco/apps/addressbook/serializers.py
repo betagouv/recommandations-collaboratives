@@ -14,6 +14,7 @@ from rest_framework.serializers import (
     HyperlinkedModelSerializer,
     HyperlinkedRelatedField,
     ModelSerializer,
+    SerializerMethodField,
 )
 
 from recoco.rest_api.serializers import BaseSerializerMixin
@@ -33,9 +34,7 @@ class OrganizationSerializer(BaseSerializerMixin, HyperlinkedModelSerializer):
     group = HyperlinkedRelatedField(
         read_only=True, view_name="api-addressbook-organizationgroup-detail"
     )
-    departments = HyperlinkedRelatedField(
-        many=True, read_only=True, view_name="departments-detail"
-    )
+    departments = SerializerMethodField()
 
     _search_rank = FloatField(source="search_rank", read_only=True)
 
@@ -51,6 +50,18 @@ class OrganizationSerializer(BaseSerializerMixin, HyperlinkedModelSerializer):
 
     def save(self, **kwargs):
         return super().save(sites=[self.current_site], **kwargs)
+
+    def get_departments(self, obj):
+        return [dep.code for dep in obj.departments.all()]
+
+
+class NestedOrganizationSerializer(ModelSerializer):
+    class Meta:
+        model = Organization
+        fields = [
+            "id",
+            "name",
+        ]
 
 
 class ContactCreateSerializer(BaseSerializerMixin, ModelSerializer):
