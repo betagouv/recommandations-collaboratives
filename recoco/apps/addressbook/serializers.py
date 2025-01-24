@@ -84,10 +84,11 @@ class ContactCreateSerializer(BaseSerializerMixin, ModelSerializer):
 
 
 class ContactSerializer(BaseSerializerMixin, ModelSerializer):
-    organization = HyperlinkedRelatedField(
-        view_name="api-addressbook-organization-detail",
-        read_only=True,
-    )
+    # organization = HyperlinkedRelatedField(
+    #     view_name="api-addressbook-organization-detail",
+    #     read_only=True,
+    # )
+    organization = NestedOrganizationSerializer(read_only=True, many=False)
 
     _search_rank = FloatField(source="search_rank", read_only=True)
 
