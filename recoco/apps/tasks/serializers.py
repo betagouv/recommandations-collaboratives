@@ -41,7 +41,7 @@ class TaskFollowupSerializer(serializers.HyperlinkedModelSerializer):
 
     who = UserSerializer(read_only=True, many=False)
 
-    contact = NestedContactSerializer()
+    contact = NestedContactSerializer(read_only=True)
 
     task_id = serializers.PrimaryKeyRelatedField(
         many=False, write_only=True, queryset=Task.objects
