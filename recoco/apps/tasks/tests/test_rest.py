@@ -18,6 +18,7 @@ from notifications.signals import notify
 from rest_framework.test import APIClient
 
 from recoco import verbs
+from recoco.apps.addressbook.models import Contact
 from recoco.apps.projects import utils
 from recoco.apps.resources import models as resource_models
 from recoco.utils import login
@@ -468,67 +469,65 @@ def test_project_advisor_can_move_project_tasks_for_site(request, project):
 
 
 @pytest.mark.django_db
-def test_project_task_followup_list_closed_to_anonymous_user(request, project):
-    site = get_current_site(request)
-    task = baker.make(models.Task, project=project, site=site, public=True)
+def test_project_task_followup_list_closed_to_anonymous_user(
+    api_client, current_site, project
+):
+    task = baker.make(models.Task, project=project, site=current_site, public=True)
 
-    client = APIClient()
     url = reverse("project-tasks-followups-list", args=[project.id, task.id])
-    response = client.get(url)
+    response = api_client.get(url)
 
     assert response.status_code == 403
 
 
 @pytest.mark.django_db
-def test_project_task_followup_list_closed_to_user_wo_permission(request, project):
+def test_project_task_followup_list_closed_to_user_wo_permission(
+    api_client, current_site, project
+):
     user = baker.make(auth_models.User)
-    site = get_current_site(request)
-    task = baker.make(models.Task, project=project, site=site, public=True)
+    task = baker.make(models.Task, project=project, site=current_site, public=True)
 
-    client = APIClient()
-    client.force_authenticate(user=user)
+    api_client.force_authenticate(user=user)
     url = reverse("project-tasks-followups-list", args=[project.id, task.id])
-    response = client.get(url)
+    response = api_client.get(url)
 
     assert response.status_code == 403
 
 
 @pytest.mark.django_db
 def test_project_task_followup_list_closed_for_dissociate_task_and_project(
-    request, project, make_project
+    api_client, current_site, project, make_project
 ):
     user = baker.make(auth_models.User)
-    site = get_current_site(request)
     project1 = project
-    _ = baker.make(models.Task, project=project1, site=site, public=True)
+    _ = baker.make(models.Task, project=project1, site=current_site, public=True)
     utils.assign_advisor(user, project1)
 
-    project2 = make_project(site=site)
-    task2 = baker.make(models.Task, project=project2, site=site, public=True)
+    project2 = make_project(site=current_site)
+    task2 = baker.make(models.Task, project=project2, site=current_site, public=True)
     _ = baker.make(models.TaskFollowup, task=task2, status=models.Task.PROPOSED)
 
-    client = APIClient()
-    client.force_authenticate(user=user)
+    api_client.force_authenticate(user=user)
     url = reverse("project-tasks-followups-list", args=[project1.id, task2.id])
-    response = client.get(url)
+    response = api_client.get(url)
 
     assert response.status_code == 200
     assert len(response.data) == 0
 
 
 @pytest.mark.django_db
-def test_project_task_followup_list_returns_followups_to_collaborator(request, project):
+def test_project_task_followup_list_returns_followups_to_collaborator(
+    api_client, current_site, project
+):
     user = baker.make(auth_models.User)
-    site = get_current_site(request)
-    task = baker.make(models.Task, project=project, site=site, public=True)
+    task = baker.make(models.Task, project=project, site=current_site, public=True)
     followup = baker.make(models.TaskFollowup, task=task, status=models.Task.PROPOSED)
 
     utils.assign_collaborator(user, project)
 
-    client = APIClient()
-    client.force_authenticate(user=user)
+    api_client.force_authenticate(user=user)
     url = reverse("project-tasks-followups-list", args=[project.id, task.id])
-    response = client.get(url)
+    response = api_client.get(url)
 
     assert response.status_code == 200
     assert len(response.data) == 1
@@ -536,6 +535,7 @@ def test_project_task_followup_list_returns_followups_to_collaborator(request, p
     first = response.data[0]
     expected_fields = [
         "comment",
+        "contact",
         "id",
         "status",
         "status_txt",
@@ -581,31 +581,43 @@ def test_project_task_followup_create_not_allowed_for_simple_auth_user(
 
 
 @pytest.mark.django_db
-def test_project_task_followup_create_is_processed_for_auth_user(request, project):
+def test_project_task_followup_create_is_processed_for_auth_user(
+    api_client, current_site, project
+):
     user = baker.make(auth_models.User)
-    site = get_current_site(request)
-    task = baker.make(models.Task, project=project, site=site, public=True)
+    task = baker.make(models.Task, project=project, site=current_site, public=True)
+    contact = baker.make(Contact)
 
-    client = APIClient()
-    client.force_authenticate(user=user)
+    api_client.force_authenticate(user=user)
     utils.assign_advisor(user, project)
-    data = {"comment": "a new followup for tasks"}
+
+    data = {
+        "comment": "a new followup for tasks",
+        "contact": contact.id,
+    }
     url = reverse("project-tasks-followups-list", args=[project.id, task.id])
-    response = client.post(url, data=data)
+    response = api_client.post(url, data=data)
 
     assert response.status_code == 201
 
     # new followup created
-    followups = models.TaskFollowup.objects.filter(task=task)
+    followups = models.TaskFollowup.objects.filter(task_id=task.id)
     assert followups.count() == 1
-
     followup = followups.first()
     assert followup.status is None  # FIXME should we have a default status ?
-    assert followup.comment == data["comment"]
+    assert followup.comment == "a new followup for tasks"
+    assert followup.contact_id == contact.id
+    assert followup.who_id == user.id
 
     # returned value
-    assert response.data["id"] == followup.id
-    assert response.data["comment"] == data["comment"]
+    assert response.data == {
+        "id": followup.id,
+        "status": None,
+        "comment": "a new followup for tasks",
+        "contact": contact.id,
+        "who": user.id,
+        "task": task.id,
+    }
 
 
 #

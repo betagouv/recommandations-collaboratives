@@ -6,6 +6,7 @@ from notifications import models as notifications_models
 from ordered_model.serializers import OrderedModelSerializer
 from rest_framework import serializers
 
+from recoco.apps.addressbook.serializers import NestedContactSerializer
 from recoco.apps.demarches_simplifiees.serializers import DSFolderSerializer
 from recoco.apps.home.serializers import UserSerializer
 from recoco.apps.projects.serializers import DocumentSerializer, TopicSerializer
@@ -16,53 +17,62 @@ from recoco.rest_api.serializers import BaseSerializerMixin
 from .models import Task, TaskFollowup
 
 
-class TaskFollowupSerializer(serializers.HyperlinkedModelSerializer):
+class TaskFollowupCreateSerializer(BaseSerializerMixin, serializers.ModelSerializer):
     class Meta:
         model = TaskFollowup
         fields = [
             "id",
             "status",
+            "contact",
+            "status",
+            "comment",
+            "who",
+            "task",
+        ]
+        read_only_fields = [
+            "who",
+            "task",
+        ]
+
+    def create(self, validated_data):
+        followup = super().create(
+            validated_data
+            | {
+                "who": self.current_user,
+                "task_id": self.context.get("task_id"),
+            }
+        )
+
+        task = followup.task
+        project = task.project
+
+        # update activity flags and states
+        if followup.who in get_collaborators_for_project(project):
+            project.last_members_activity_at = timezone.now()
+            if project.inactive_since:
+                project.reactivate()
+            project.save()
+
+        return followup
+
+
+class TaskFollowupSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TaskFollowup
+        fields = [
+            "id",
+            "status",
+            "status",
             "status_txt",
             "comment",
             "who",
+            "contact",
             "timestamp",
-            "task_id",
-            "who_id",
         ]
-        read_only_fields = ["id", "who", "timestamp"]
-        extra_kwargs = {"task_id": {"write_only": True}, "who_id": {"write_only": True}}
+        # read_only_fields = fields
 
     who = UserSerializer(read_only=True, many=False)
-
-    task_id = serializers.PrimaryKeyRelatedField(
-        many=False, write_only=True, queryset=Task.objects
-    )
-    who_id = serializers.PrimaryKeyRelatedField(
-        many=False, write_only=True, queryset=auth_models.User.objects
-    )
-
-    def create(self, validated_data):
-        followup = TaskFollowup(
-            status=validated_data.get("status", None),
-            comment=validated_data["comment"],
-        )
-        followup.task = validated_data["task_id"]
-        followup.who = validated_data["who_id"]
-
-        followup.save()
-
-        task = followup.task
-
-        # update activity flags and states
-        if followup.who in get_collaborators_for_project(task.project):
-            task.project.last_members_activity_at = timezone.now()
-
-            if task.project.inactive_since:
-                task.project.reactivate()
-
-            task.project.save()
-
-        return followup
+    contact = NestedContactSerializer(read_only=True)
 
 
 class TaskSerializer(
