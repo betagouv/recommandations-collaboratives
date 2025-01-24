@@ -95,12 +95,16 @@ class ContactSerializer(BaseSerializerMixin, ModelSerializer):
         ]
 
 
-class SimpleContactSerializer(ModelSerializer):
+class NestedContactSerializer(ModelSerializer):
     class Meta:
         model = Contact
         fields = [
             "id",
             "first_name",
             "last_name",
+            "email",
+            "phone_no",
+            "mobile_no",
             "division",
+            "organization",
         ]
