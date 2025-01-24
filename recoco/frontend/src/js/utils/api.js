@@ -48,9 +48,9 @@ export default instance;
 //   return `/api/projects/?${search}${search && departments.length > 0 ? '&' : ''}${departments}`;
 // }
 
-export function projectsMyDepartmentsUrl() {
-  return '/api/projects/my_departments';
-}
+// export function projectsMyDepartmentsUrl() {
+//   return '/api/projects/my_departments';
+// }
 
 export function projectsUrl(search, departments, lastActivity) {
   const params = new URLSearchParams({
@@ -145,9 +145,9 @@ export function postExternalRessourceUrl() {
 }
 
 // Regions :
-export function regionsUrl() {
-  return `/api/regions/`;
-}
+// export function regionsUrl() {
+//   return `/api/regions/`;
+// }
 
 // Challenges
 export function challengeUrl(code) {

@@ -4,13 +4,13 @@ import { generateUUID } from '../utils/uuid';
 import api, {
   projectsProjectSitesUrl,
   projectsUrl,
-  regionsUrl,
-  projectsMyDepartmentsUrl,
+  // regionsUrl,
+  // projectsMyDepartmentsUrl,
 } from '../utils/api';
 
 Alpine.data('KanbanProjects', boardProjectsApp);
 
-function boardProjectsApp(currentSiteId) {
+function boardProjectsApp(currentSiteId, departments, regions) {
   return {
     projectList: [],
     currentSiteId: currentSiteId,
@@ -25,8 +25,10 @@ function boardProjectsApp(currentSiteId) {
       lastActivity: '30',
     },
     selectedDepartment: null,
-    departments: [],
-    regions: [],
+    // departments: [],
+    // regions: [],
+    departments: departments,
+    regions: regions,
     territorySelectAll: true,
     boards: [
       {
@@ -45,10 +47,11 @@ function boardProjectsApp(currentSiteId) {
     ],
     searchText: '',
     async getData(postProcess = true) {
+      const { searchText, searchDepartment, lastActivity } = this.backendSearch;
       const projects = await api.get(projectsUrl(
-        this.backendSearch.searchText,
-        this.backendSearch.searchDepartment,
-        this.backendSearch.lastActivity,
+        searchText,
+        searchDepartment,
+        lastActivity
       ));
       await this.$store.projects.mapperProjetsProjectSites(
         projects.data,
@@ -156,10 +159,10 @@ function boardProjectsApp(currentSiteId) {
       this.getData();
     },
     async postProcessData() {
-      // TODO: pass departments and regions in init
-      const departments = await api.get(projectsMyDepartmentsUrl());
-      const regionsData = await api.get(regionsUrl());
-      this.constructRegionsFilter(departments.data, regionsData.data);
+      // const departments = await api.get(projectsMyDepartmentsUrl());
+      // const regionsData = await api.get(regionsUrl());
+      // this.constructRegionsFilter(departments.data, regionsData.data);
+      this.constructRegionsFilter(this.departments, this.regions);
     },
     toggleMyProjectsFilter() {
       this.isDisplayingOnlyUserProjects = !this.isDisplayingOnlyUserProjects;
@@ -229,8 +232,8 @@ function boardProjectsApp(currentSiteId) {
         this.backendSearch.lastActivity = '30';
       }
 
-      // TODO: call this.getData ?
       this.getData(false);
+
       // const filteredProject = await api.get(
       //   projectsUrl(
       //     this.backendSearch.searchText,
@@ -239,7 +242,7 @@ function boardProjectsApp(currentSiteId) {
       //   )
       // );
 
-      this.projectList = filteredProject.data;
+      // this.projectList = filteredProject.data;
     },
     saveSelectedDepartment() {
       const extractedDepartements = this.regions

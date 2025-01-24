@@ -24,6 +24,8 @@ from recoco.apps.communication import constants as communication_constants
 from recoco.apps.communication import digests
 from recoco.apps.communication.api import send_email
 from recoco.apps.communication.digests import normalize_user_name
+from recoco.apps.geomatics import models as geomatics_models
+from recoco.apps.geomatics.serializers import DepartmentSerializer, RegionSerializer
 from recoco.utils import (
     check_if_advisor,
     get_site_config_or_503,
@@ -279,7 +281,29 @@ def project_list_for_staff(request):
 
     mark_general_notifications_as_seen(request.user)
 
-    return render(request, "projects/project/list-kanban.html", locals())
+    department_queryset = (
+        geomatics_models.Department.objects.filter(
+            code__in=(
+                models.Project.on_site.for_user(request.user)
+                .order_by("-created_on", "-updated_on")
+                .prefetch_related("commune__department")
+                .values_list("commune__department", flat=True)
+            )
+        )
+        | request.user.profile.departments.all()
+    ).distinct()
+
+    region_queryset = geomatics_models.Region.objects.all()
+
+    context = {
+        "site_config": site_config,
+        "unread_notifications": unread_notifications,
+        "departments": list(DepartmentSerializer(department_queryset, many=True).data),
+        "regions": list(RegionSerializer(region_queryset, many=True).data),
+        **locals(),
+    }
+
+    return render(request, "projects/project/list-kanban.html", context)
 
 
 @login_required

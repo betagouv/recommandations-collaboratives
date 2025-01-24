@@ -109,6 +109,7 @@ class ProjectDetail(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+# TODO: no longer needed if we use the project_list_for_staff view
 class ProjectDepartmentList(ListAPIView):
     """List all usable departments for the current user"""
 
