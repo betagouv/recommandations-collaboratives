@@ -38,22 +38,34 @@ instance.interceptors.response.use(
 export default instance;
 
 // Projects :
-export function searchProjectUrl(search, departments) {
-  if (search) {
-    search = `search=${search}`;
-  }
-  if (departments.length) {
-    departments = departments.map((code) => `departments=${code}`).join('&');
-  }
-  return `/api/projects/?${search}${search && departments.length > 0 ? '&' : ''}${departments}`;
-}
+// export function searchProjectUrl(search, departments) {
+//   if (search) {
+//     search = `search=${search}`;
+//   }
+//   if (departments.length) {
+//     departments = departments.map((code) => `departments=${code}`).join('&');
+//   }
+//   return `/api/projects/?${search}${search && departments.length > 0 ? '&' : ''}${departments}`;
+// }
 
 export function projectsMyDepartmentsUrl() {
   return '/api/projects/my_departments';
 }
 
-export function projectsUrl(lastActivity = '30') {
-  return '/api/projects/?last_activity=' + lastActivity;
+export function projectsUrl(search, departments, lastActivity) {
+  const params = new URLSearchParams({
+    'search': search,
+    'lastActivity': lastActivity,
+  });
+
+  const url = '/api/projects/?' + params.toString()
+
+  if (departments.length) {
+    departments = departments.map((code) => `departments=${code}`).join('&');
+    url = url + '&' + departments
+  }
+
+  return url
 }
 
 export function projectsProjectSitesUrl() {
