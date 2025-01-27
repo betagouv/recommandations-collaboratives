@@ -25,11 +25,14 @@
     {{ project.pk|json_script:"djangoProjectId" }}
     {% get_obj_perms request.user for project as "user_project_perms" %}
     {% include "projects/project/navigation.html" with conversation=True %}
+
+
+    {% regroup feed by topic as topic_list %}
     <div class="d-flex" x-data="NotificationEater()">
         <div class="conversation-new__topics">
             {% include "projects/project/fragments/conversations_new/conversation_topic.html" with is_open=True topic_name="Général" message_number=feed %}
-            {% for topic in topics %}
-                {% include "projects/project/fragments/conversations_new/conversation_topic.html" with is_open=False topic_name=topic message_number=feed %}
+            {% for topic in topic_list %}
+                {% include "projects/project/fragments/conversations_new/conversation_topic.html" with is_open=False topic_name=topic.grouper message_number=topic.list %}
             {% endfor %}
         </div>
         <div class="conversation-new__container fr-p-5v">

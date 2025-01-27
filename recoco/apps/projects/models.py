@@ -740,6 +740,10 @@ class Note(models.Model):
     )
     tags = models.CharField(max_length=256, blank=True, default="")
 
+    topic = models.ForeignKey(
+        Topic, related_name="notes", on_delete=models.SET_NULL, blank=True, null=True
+    )
+
     notifications_as_action = CastedGenericRelation(
         notifications_models.Notification,
         related_query_name="action_notes",

@@ -307,8 +307,6 @@ def project_conversations_new(request, project_id=None):
 
     posting_form = PublicNoteForm()
 
-    topics = ["Financement", "Foncier"]
-
     recipients = get_notification_recipients_for_project(project)
 
     # Prepare a feed of different objects
@@ -325,6 +323,7 @@ def project_conversations_new(request, project_id=None):
         feed.append(
             {
                 "timestamp": posting.updated_on,
+                "topic": posting.topic.name if posting.topic else "",
                 "type": "posting",
                 "notifications": list(
                     posting_notifs.filter(
@@ -345,6 +344,7 @@ def project_conversations_new(request, project_id=None):
         feed.append(
             {
                 "timestamp": reco.updated_on,
+                "topic": reco.topic.name if reco.topic else "",
                 "type": "reco",
                 "notifications": list(
                     reco_notifs.filter(action_object_object_id=reco.id).values_list(
@@ -367,6 +367,7 @@ def project_conversations_new(request, project_id=None):
         feed.append(
             {
                 "timestamp": followup.timestamp,
+                "topic": followup.task.topic.name if followup.task.topic else "",
                 "type": "followup",
                 "notifications": list(
                     followup_notifs.filter(
@@ -387,6 +388,7 @@ def project_conversations_new(request, project_id=None):
         feed.append(
             {
                 "timestamp": activity.timestamp,
+                "topic": "",
                 "type": "activity",
                 "notifications": list(
                     activity_notifs.filter(
@@ -397,9 +399,20 @@ def project_conversations_new(request, project_id=None):
             }
         )
 
-    feed.sort(key=lambda x: x["timestamp"])
+    feed.sort(key=lambda x: (x["topic"], x["timestamp"]))
 
-    return render(request, "projects/project/conversations_new.html", locals())
+    return render(
+        request,
+        "projects/project/conversations_new.html",
+        context={
+            "project": project,
+            "is_regional_actor": is_regional_actor,
+            "advising": advising,
+            "posting_form": posting_form,
+            "recipients": recipients,
+            "feed": feed,
+        },
+    )
 
 
 @login_required
