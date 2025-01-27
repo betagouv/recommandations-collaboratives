@@ -7,6 +7,8 @@ author  : raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created : 2022-03-07 15:56:20 CEST -- HB David!
 """
 
+from datetime import timedelta
+
 from django.contrib.auth.decorators import login_required
 from django.contrib.contenttypes.models import ContentType
 from django.forms import formset_factory
@@ -385,6 +387,9 @@ def project_conversations_new(request, project_id=None):
     )
 
     for activity in activities:
+        max_date = activity.timestamp + timedelta(seconds=2)
+        min_date = activity.timestamp - timedelta(seconds=2)
+
         feed.append(
             {
                 "timestamp": activity.timestamp,
@@ -395,6 +400,8 @@ def project_conversations_new(request, project_id=None):
                         verb=activity.verb,
                         action_object_object_id=activity.action_object_object_id,
                         action_object_content_type=activity.action_object_content_type,
+                        timestamp__lte=max_date,
+                        timestamp__gte=min_date,
                     ).values_list("id", flat=True)
                 ),
                 "object": activity,
