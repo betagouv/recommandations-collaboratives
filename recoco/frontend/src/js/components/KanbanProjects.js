@@ -1,17 +1,12 @@
 import Alpine from 'alpinejs';
 import { generateUUID } from '../utils/uuid';
+import { makeProjectURL } from '../utils/createProjectUrl';
 
-import api, {
-  projectsProjectSitesUrl,
-  projectsUrl,
-  // regionsUrl,
-  // projectsMyDepartmentsUrl,
-} from '../utils/api';
+import api, { projectsProjectSitesUrl, projectsUrl } from '../utils/api';
 
-Alpine.data('KanbanProjects', boardProjectsApp);
-
-function boardProjectsApp(currentSiteId, departments, regions) {
+Alpine.data('KanbanProjects', function (currentSiteId, departments, regions) {
   return {
+    makeProjectURL,
     projectList: [],
     currentSiteId: currentSiteId,
     isDisplayingOnlyUserProjects:
@@ -24,9 +19,8 @@ function boardProjectsApp(currentSiteId, departments, regions) {
       searchDepartment: [],
       lastActivity: '30',
     },
+    searchText: '',
     selectedDepartment: null,
-    // departments: [],
-    // regions: [],
     departments: departments,
     regions: regions,
     territorySelectAll: true,
@@ -45,8 +39,11 @@ function boardProjectsApp(currentSiteId, departments, regions) {
         color_class: 'border-dark',
       },
     ],
-    searchText: '',
-    async getData(postProcess = true) {
+    async init() {
+      await this.getData();
+      await this.postProcessData();
+    },
+    async getData() {
       const { searchText, searchDepartment, lastActivity } = this.backendSearch;
       const projects = await api.get(
         projectsUrl(searchText, searchDepartment, lastActivity)
@@ -56,25 +53,18 @@ function boardProjectsApp(currentSiteId, departments, regions) {
         this.currentSiteId
       );
 
-      const projectList = projects.data.map((d) =>
+      this.projectList = projects.data.map((d) =>
         Object.assign(d, {
           uuid: generateUUID(),
         })
       );
 
-      this.projectList = [...projectList];
       if (this.projectList.length === 0) {
         this.$refs.selectFilterProjectDuration.value = 90;
         this.$refs.selectFilterProjectDuration.dispatchEvent(
           new Event('change')
         );
       }
-
-      if (postProcess) {
-        await this.postProcessData();
-      }
-
-      return projectList;
     },
     findByUuid(uuid) {
       return this.projectList.find((d) => d.uuid === uuid);
@@ -150,16 +140,13 @@ function boardProjectsApp(currentSiteId, departments, regions) {
         status: status,
       });
 
-      await this.getData(false);
+      await this.getData();
     },
     onLastActivityChange(event) {
       this.backendSearch.lastActivity = event.target.value;
       this.getData();
     },
     async postProcessData() {
-      // const departments = await api.get(projectsMyDepartmentsUrl());
-      // const regionsData = await api.get(regionsUrl());
-      // this.constructRegionsFilter(departments.data, regionsData.data);
       this.constructRegionsFilter(this.departments, this.regions);
     },
     toggleMyProjectsFilter() {
@@ -230,17 +217,7 @@ function boardProjectsApp(currentSiteId, departments, regions) {
         this.backendSearch.lastActivity = '30';
       }
 
-      this.getData(false);
-
-      // const filteredProject = await api.get(
-      //   projectsUrl(
-      //     this.backendSearch.searchText,
-      //     this.backendSearch.searchDepartment,
-      //     this.backendSearch.lastActivity,
-      //   )
-      // );
-
-      // this.projectList = filteredProject.data;
+      this.getData();
     },
     saveSelectedDepartment() {
       const extractedDepartements = this.regions
@@ -312,35 +289,12 @@ function boardProjectsApp(currentSiteId, departments, regions) {
 
       await this.backendSearchProjects();
     },
-    /**
-     * TODO Delete this function
-     */
-    filterProjectsByDepartments(project) {
-      return this.regions.find(
-        (region) =>
-          region.departments.find(
-            (department) =>
-              department.code === project?.commune?.department?.code
-          )?.active
-      );
-    },
+
     sortFn(a, b) {
       if (b.notifications.count - a.notifications.count)
         return b.notifications.count - a.notifications.count;
       else {
         return b.created_on - a.created_on;
-      }
-    },
-    /**
-     * TODO Delete this function
-     */
-    filterFn(d) {
-      if (this.selectedDepartment && this.selectedDepartment !== '') {
-        return (
-          d.commune && d.commune.department.code == this.selectedDepartment
-        );
-      } else {
-        return true;
       }
     },
     truncate(input, size = 30) {
@@ -349,11 +303,5 @@ function boardProjectsApp(currentSiteId, departments, regions) {
     formatDateDisplay(date) {
       return new Date(date).toLocaleDateString('fr-FR');
     },
-    /**
-     * TODO Delete this function
-     */
-    // isInactive(project) {
-    //   return project.inactive_since;
-    // },
   };
-}
+});

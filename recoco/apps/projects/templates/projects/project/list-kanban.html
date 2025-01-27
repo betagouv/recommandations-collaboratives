@@ -4,6 +4,7 @@
 {% load notifications_tags %}
 {% load gravatar %}
 {% load sass_tags %}
+{% load django_vite %}
 {% block css %}
     <link href="{% sass_src 'home/css/dsfr/custom-dsfr.scss' %}"
           rel="stylesheet"
@@ -15,6 +16,9 @@
           rel="stylesheet"
           type="text/css">
 {% endblock css %}
+{% block js %}
+    {% vite_asset 'js/apps/boardProjects.js' %}
+{% endblock js %}
 {% block title %}
     Tableau de bord administrateur {{ block.super }}
 {% endblock title %}
@@ -22,6 +26,8 @@
     Tableau de bord administrateur {{ block.super }}
 {% endblock og_title %}
 {% block project_list_content %}
+    {{ departments|json_script:"departmentsArray" }}
+    {{ regions|json_script:"regionsArray" }}
     <div x-data="KanbanProjects({{ request.site.id }}, {{ departments }}, {{ regions }})">
         <div x-show="isBusy"
              x-transition
@@ -62,7 +68,7 @@
             </div>
             <div class="kanban-header__toolbar">{% include "projects/project/fragments/list-toolbars.html" %}</div>
         </div>
-        <div x-init="getData()" x-cloak class="d-flex">
+        <div x-cloak class="d-flex">
             <div class="flex-grow-1 kanban-container">
                 <div class="fr-py-3w md-py-8">
                     <div class="d-flex fr-pb-2v">
@@ -101,7 +107,7 @@
                                                      @dragleave="onDragLeave(event)"
                                                      @dragstart="onDragStart(event, t.uuid)"
                                                      @dragend="onDragEnd(event)">
-                                                    <a :href="makeProjectURL(t.id)">
+                                                    <a :href="makeProjectURL('{% url 'projects-project-detail' 0 %}', t.id)">
                                                         <div class="kanban-card rounded fr-p-2v w-100 position-relative"
                                                              :class="{'kanban-card__border--is-switchtender': t.is_switchtender, 'kanban-card__border--is-observer': t.is_observer}"
                                                              draggable="true"
