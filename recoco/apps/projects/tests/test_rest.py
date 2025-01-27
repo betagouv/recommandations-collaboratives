@@ -235,6 +235,136 @@ def test_project_list_last_activity_filter(request, client):
         assert len(response.data) == 2
 
 
+@pytest.mark.django_db
+def test_project_list_search_filter_fulltext(request, client):
+    site = get_current_site(request)
+    user = baker.make(auth_models.User, is_superuser=True)
+
+    # useful one
+    baker.make(
+        models.Project,
+        sites=[site],
+        name="The super niceproject",
+        commune__name="Maville",
+        commune__postal="99666",
+        commune__insee="AZ37",
+    )
+
+    # honeypot one
+    baker.make(
+        models.Project,
+        sites=[site],
+        name="Noise noise noise",
+        commune__name="Autreville",
+        commune__postal="99333",
+        commune__insee="28838",
+    )
+
+    client = APIClient()
+    client.force_authenticate(user=user)
+
+    url = reverse("projects-list")
+
+    response = client.get(url)
+    assert response.status_code == 200
+    assert len(response.data) == 2
+
+    # project title
+    response = client.get(f"{url}?search=niceproject")
+    assert response.status_code == 200
+    assert len(response.data) == 1
+
+    # city name
+    response = client.get(f"{url}?search=maville")
+    assert response.status_code == 200
+    assert len(response.data) == 1
+
+    # postcode
+    response = client.get(f"{url}?search=99666")
+    assert response.status_code == 200
+    assert len(response.data) == 1
+
+    # insee
+    response = client.get(f"{url}?search=AZ37")
+    assert response.status_code == 200
+    assert len(response.data) == 1
+
+    # no result is fine?
+    response = client.get(f"{url}?search=XIDJISJDI")
+    assert response.status_code == 200
+    assert len(response.data) == 0
+
+
+@pytest.mark.django_db
+def test_project_list_search_filter_departments(request, client):
+    site = get_current_site(request)
+    user = baker.make(auth_models.User, is_superuser=True)
+
+    # useful one
+    baker.make(
+        models.Project,
+        sites=[site],
+        name="The super niceproject",
+        commune__name="Maville",
+        commune__postal="99666",
+        commune__insee="AZ37",
+        commune__department__code="62",
+    )
+
+    # honeypot one
+    baker.make(
+        models.Project,
+        sites=[site],
+        name="Noise noise noise",
+        commune__name="Autreville",
+        commune__postal="99333",
+        commune__insee="28838",
+        commune__department__code="10",
+    )
+
+    client = APIClient()
+    client.force_authenticate(user=user)
+
+    url = reverse("projects-list")
+
+    response = client.get(url)
+    assert response.status_code == 200
+    assert len(response.data) == 2
+
+    # cumulative query FTS+filter
+    response = client.get(f"{url}?search=niceproject&departments=62")
+    assert response.status_code == 200
+    assert len(response.data) == 1
+
+    # Multiple departments
+    response = client.get(f"{url}?departments=10&departments=62")
+    assert response.status_code == 200
+    assert len(response.data) == 2
+
+    # No department filter
+    response = client.get(f"{url}?search=niceproject")
+    assert response.status_code == 200
+    assert len(response.data) == 1
+
+
+@pytest.mark.django_db
+def test_project_list_search_filter_is_cumulative(request, client):
+    site = get_current_site(request)
+    user = baker.make(auth_models.User, is_superuser=True)
+
+    project_1 = baker.make(models.Project, name="ABC", sites=[site])
+    project_1.tags.add("tag1", "tag2")
+
+    client = APIClient()
+    client.force_authenticate(user=user)
+
+    url = reverse("projects-list")
+
+    response = client.get(f"{url}?search=ABC&tags=tag1")
+    assert response.status_code == 200
+    assert len(response.data) == 1
+
+
 ########################################################################
 # get project details
 ########################################################################
