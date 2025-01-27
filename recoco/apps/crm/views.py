@@ -1140,6 +1140,8 @@ def compute_topics_occurences(site):
     for key in project_topics.keys() | task_topics.keys():
         topics[key] = (
             len(project_topics[key]) + len(task_topics[key]),
+            len(project_topics[key]),
+            len(task_topics[key]),
             project_topics[key],
             task_topics[key],
         )
@@ -1184,6 +1186,8 @@ def crm_list_topics_as_csv(request):
         [
             "topic",
             "usage_count",
+            "usage_count_by_project",
+            "usage_count_by_task",
             "project_ids",
             "reco_ids",
         ]
@@ -1194,8 +1198,10 @@ def crm_list_topics_as_csv(request):
             [
                 name,
                 usage[0],
-                [project.pk for project in usage[1]],
-                [task.pk for task in usage[2]],
+                usage[1],
+                usage[2],
+                [project.pk for project in usage[3]],
+                [task.pk for task in usage[4]],
             ]
         )
 

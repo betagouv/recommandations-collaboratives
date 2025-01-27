@@ -21,7 +21,9 @@ from model_bakery.recipe import Recipe
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 from reversion.models import Version
 
+from recoco.apps.addressbook.models import Contact
 from recoco.apps.geomatics import models as geomatics
+from recoco.apps.hitcount.models import Hit, HitCount
 from recoco.apps.projects import models as projects_models
 from recoco.apps.tasks.models import Task
 from recoco.utils import login
@@ -312,6 +314,32 @@ def test_resource_detail_does_not_contain_update_for_common_user(request, client
         response = client.get(url)
     update_url = reverse("resources-resource-update", args=[resource.id])
     assertNotContains(response, update_url)
+
+
+@pytest.mark.django_db
+def test_resource_detail_contacts_to_display(request, client):
+    site = get_current_site(request)
+    resource = Recipe(
+        models.Resource,
+        sites=[site],
+        status=models.Resource.PUBLISHED,
+    ).make()
+
+    contact = baker.make(Contact)
+
+    url = reverse("resources-resource-detail", args=[resource.id])
+
+    with login(client) as user:
+        response = client.get(url)
+        assert response.context["contacts_to_display"] == []
+
+        hitcount = baker.make(
+            HitCount, site=site, content_object=contact, context_object=resource
+        )
+        baker.make(Hit, hitcount=hitcount, user=user)
+
+        response = client.get(url)
+        assert response.context["contacts_to_display"] == [contact.id]
 
 
 #
@@ -954,6 +982,37 @@ def test_embedded_resource_detail_view_with_task_context(client, request):
     )
     assert response.status_code == 200
     assert response.context["task"] == task
+    assert response.context["contacts_to_display"] == []
+
+
+@pytest.mark.django_db
+def test_embedded_resource_detail_contacts_to_display(request, client):
+    site = get_current_site(request)
+
+    resource = Recipe(
+        models.Resource,
+        sites=[site],
+        status=models.Resource.PUBLISHED,
+    ).make()
+
+    task = Recipe(Task, resource=resource).make()
+
+    contact = baker.make(Contact)
+
+    url = f"{reverse('resources-resource-detail-embeded',args=[resource.id])}?task_id={task.id}"
+
+    with login(client) as user:
+        response = client.get(url)
+        assert response.status_code == 200
+        assert response.context["contacts_to_display"] == []
+
+        hitcount = baker.make(
+            HitCount, site=site, content_object=contact, context_object=resource
+        )
+        baker.make(Hit, hitcount=hitcount, user=user)
+
+        response = client.get(url)
+        assert response.context["contacts_to_display"] == [contact.id]
 
 
 # eof

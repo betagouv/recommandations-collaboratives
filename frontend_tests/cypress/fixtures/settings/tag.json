@@ -32,5 +32,23 @@
       "content_type_id": 50,
       "tag_id": 2
     }
+  },
+  {
+    "model": "taggit.taggeditem",
+    "pk": 1,
+    "fields": {
+      "object_id": 1,
+      "content_type_id": 2,
+      "tag_id": 1
+    }
+  },
+  {
+    "model": "taggit.taggeditem",
+    "pk": 2,
+    "fields": {
+      "object_id": 1,
+      "content_type_id": 2,
+      "tag_id": 2
+    }
   }
 ]

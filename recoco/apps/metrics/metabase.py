@@ -174,7 +174,9 @@ def clone_card(
         if i["table_name"] in target_table_names and i["schema"] == source_schema
     }
 
-    res = re.findall("\['field', .*?\]", query_data_str)
+    res = re.findall(
+        "\['field', .*?\]", query_data_str
+    )  # FIXME: Escape sequence is wrong!
     source_column_IDs = [ast.literal_eval(i)[1] for i in res]
 
     # replace column IDs from old table with the column IDs from new table

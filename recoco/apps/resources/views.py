@@ -18,6 +18,7 @@ from django.contrib.auth.mixins import (
     PermissionRequiredMixin,
     UserPassesTestMixin,
 )
+from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.shortcuts import get_current_site
 from django.contrib.syndication.views import Feed
 from django.db import transaction
@@ -37,6 +38,7 @@ from reversion_compare.views import HistoryCompareDetailView
 
 from recoco.apps.addressbook import models as addressbook_models
 from recoco.apps.geomatics import models as geomatics_models
+from recoco.apps.hitcount.models import HitCount
 from recoco.apps.projects import models as projects
 from recoco.utils import check_if_advisor, has_perm, has_perm_or_403, is_staff_for_site
 
@@ -216,6 +218,21 @@ class BaseResourceDetailView(DetailView):
                     Q(organization__departments__in=user_depts)
                     | Q(organization__departments=None)
                 )
+
+        if self.request.user.is_authenticated:
+            context["contacts_to_display"] = list(
+                HitCount.on_site.for_context_object(self.get_object())
+                .for_user(self.request.user)
+                .filter(
+                    content_object_ct=ContentType.objects.get_for_model(
+                        addressbook_models.Contact
+                    ),
+                )
+                .distinct()
+                .values_list("content_object_id", flat=True)
+            )
+        else:
+            context["contacts_to_display"] = []
 
         return context
 

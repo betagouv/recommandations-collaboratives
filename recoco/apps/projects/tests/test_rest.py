@@ -7,7 +7,6 @@ authors: raphael.marvie@beta.gouv.fr, guillaume.libersat@beta.gouv.fr
 created: 2021-06-01 10:11:56 CEST
 """
 
-
 import pytest
 from actstream.models import user_stream
 from django.contrib.auth import models as auth_models
@@ -314,6 +313,7 @@ def check_project_content(project, data):
         "description",
         "project_sites",
         "tags",
+        "is_diagnostic_done",
     ]
     assert set(data.keys()) == set(expected)
 

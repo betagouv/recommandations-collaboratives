@@ -396,6 +396,10 @@ class Project(models.Model):
         verbose_name="Publier sur cartofriches", default=False
     )
 
+    is_diagnostic_done = models.BooleanField(
+        verbose_name="Appel de diagnostic réalisé", default=False
+    )
+
     @property
     def full_name(self):
         return f"{self.first_name} {self.last_name}"

@@ -166,6 +166,26 @@ def test_create_public_note_for_project_collaborator_and_redirect(
 
 
 @pytest.mark.django_db
+def test_create_public_note_with_topic_and_redirect(request, client, project):
+    membership = baker.make(models.ProjectMember, member__is_staff=False)
+
+    project.projectmember_set.add(membership)
+
+    topic = baker.make(models.Topic, name="TchatchaTcha")
+
+    with login(client) as user:
+        assign_collaborator(user, project)
+        response = client.post(
+            reverse("projects-conversation-create-message", args=[project.id]),
+            data={"content": "this is some content", "topic": "tchatchatcha"},
+        )
+    assert response.status_code == 302
+
+    note = models.Note.on_site.all()[0]
+    assert note.topic == topic
+
+
+@pytest.mark.django_db
 def test_private_note_hidden_from_project_members(request, client, project):
     membership = baker.make(models.ProjectMember, member__is_staff=False)
     project.projectmember_set.add(membership)

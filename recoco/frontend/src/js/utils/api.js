@@ -38,6 +38,10 @@ instance.interceptors.response.use(
 export default instance;
 
 // Projects :
+export function projectUrl(projectId) {
+  return `/api/projects/${projectId}/`;
+}
+
 export function projectsUrl() {
   return '/api/projects/';
 }
@@ -131,6 +135,11 @@ export function challengeUrl(code) {
 // Challenges Definitions
 export function challengeDefinitionUrl(code) {
   return `/api/challenges/definitions/${code}`;
+}
+
+// Hitcount
+export function hitcountUrl() {
+  return '/hit/';
 }
 
 // Non API routes

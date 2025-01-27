@@ -10,6 +10,7 @@ created : 2022-03-07 15:56:20 CEST -- HB David!
 from datetime import timedelta
 
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.forms import formset_factory
 from django.http import HttpResponseForbidden
@@ -19,6 +20,7 @@ from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.decorators.csrf import csrf_exempt
 
 from recoco import verbs
+from recoco.apps.hitcount.models import HitCount
 from recoco.apps.invites.forms import InviteForm
 from recoco.apps.survey import models as survey_models
 from recoco.apps.tasks import models as tasks_models
@@ -68,6 +70,16 @@ def project_overview(request, project_id=None):
 
     is_regional_actor = is_regional_actor_for_project(
         request.site, project, request.user, allow_national=True
+    )
+
+    users_to_display = list(
+        HitCount.on_site.for_context_object(project)
+        .for_user(request.user)
+        .filter(
+            content_object_ct=ContentType.objects.get_for_model(User),
+        )
+        .distinct()
+        .values_list("content_object_id", flat=True)
     )
 
     advising = get_advisor_for_project(request.user, project)
@@ -145,11 +157,6 @@ def project_knowledge(request, project_id=None):
         pk=project_id,
     )
 
-    sorted_sessions = sorted(
-        project.survey_session.all(),
-        key=lambda session: session.survey.site != request.site,
-    )
-
     is_regional_actor = is_regional_actor_for_project(
         request.site, project, request.user, allow_national=True
     )
@@ -169,6 +176,11 @@ def project_knowledge(request, project_id=None):
     site_config = get_site_config_or_503(request.site)
     session, created = survey_models.Session.objects.get_or_create(
         project=project, survey=site_config.project_survey
+    )
+
+    sorted_sessions = sorted(
+        project.survey_session.all(),
+        key=lambda session: session.survey.site != request.site,
     )
 
     # Mark this project survey notifications as read
