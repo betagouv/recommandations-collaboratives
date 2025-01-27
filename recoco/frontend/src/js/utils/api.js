@@ -54,18 +54,18 @@ export default instance;
 
 export function projectsUrl(search, departments, lastActivity) {
   const params = new URLSearchParams({
-    'search': search,
-    'lastActivity': lastActivity,
+    search: search,
+    last_activity: lastActivity,
   });
 
-  const url = '/api/projects/?' + params.toString()
+  let url = '/api/projects/?' + params.toString();
 
   if (departments.length) {
     departments = departments.map((code) => `departments=${code}`).join('&');
-    url = url + '&' + departments
+    url = url + '&' + departments;
   }
 
-  return url
+  return url;
 }
 
 export function projectsProjectSitesUrl() {

@@ -48,11 +48,9 @@ function boardProjectsApp(currentSiteId, departments, regions) {
     searchText: '',
     async getData(postProcess = true) {
       const { searchText, searchDepartment, lastActivity } = this.backendSearch;
-      const projects = await api.get(projectsUrl(
-        searchText,
-        searchDepartment,
-        lastActivity
-      ));
+      const projects = await api.get(
+        projectsUrl(searchText, searchDepartment, lastActivity)
+      );
       await this.$store.projects.mapperProjetsProjectSites(
         projects.data,
         this.currentSiteId
@@ -228,7 +226,7 @@ function boardProjectsApp(currentSiteId, departments, regions) {
         this.backendSearch.lastActivity = '';
       } else {
         this.$refs.selectFilterProjectDuration.disabled = false;
-        this.$refs.selectFilterProjectDuration.value = "";
+        this.$refs.selectFilterProjectDuration.value = 30;
         this.backendSearch.lastActivity = '30';
       }
 
