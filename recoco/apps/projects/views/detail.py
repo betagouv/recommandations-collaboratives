@@ -392,6 +392,7 @@ def project_conversations_new(request, project_id=None):
                 "type": "activity",
                 "notifications": list(
                     activity_notifs.filter(
+                        verb=activity.verb,
                         action_object_object_id=activity.action_object_object_id,
                         action_object_content_type=activity.action_object_content_type,
                     ).values_list("id", flat=True)
