@@ -188,14 +188,14 @@ Alpine.data('KanbanProjects', function (currentSiteId, departments, regions) {
     },
     async onSearch(event) {
       this.backendSearch.searchText = event.target.value;
-      await this.backendSearchProjects();
+      await this.backendSearchProjects({ resetLastActivity: true });
     },
-    async backendSearchProjects(options = { reset: false }) {
+    async backendSearchProjects(options = { resetLastActivity: false }) {
       if (this.backendSearch.searchText !== '') {
         this.$refs.selectFilterProjectDuration.disabled = true;
         this.$refs.selectFilterProjectDuration.value = 1460;
         this.backendSearch.lastActivity = '';
-      } else if (options.reset) {
+      } else if (options.resetLastActivity) {
         this.$refs.selectFilterProjectDuration.disabled = false;
         this.$refs.selectFilterProjectDuration.value = 30;
         this.backendSearch.lastActivity = '30';
