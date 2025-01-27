@@ -1,4 +1,5 @@
-<div class="observed-element" data="{{ element.object.id }}">
+<div class="observed-element"
+     data-notifications="{{ element.notifications }}">
     <div class="rounded-3 fr-p-2w fr-my-2v {% if request.user == element.object.created_by %}bg-blue-light fr-ml-6w{% else %}bg-grey-light fr-mr-6w{% endif %}">
         {{ element.object.content_rendered|safe }}
         {% if element.object.document.count %}

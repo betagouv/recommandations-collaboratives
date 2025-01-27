@@ -1,5 +1,5 @@
 <div class="task-item observed-element rounded-3 fr-p-2w fr-my-2v {% if request.user == element.object.created_by %}bg-blue-light fr-ml-6w{% else %}bg-grey-light fr-mr-6w{% endif %}"
-     data="{{ element.object.id }}">
+     data-notifications="{{ element.notifications }}">
     {{ element.object.content_rendered|safe }}
     <div class="task-item__resource">
         <h4>{{ element.object.intent|safe }}</h4>
