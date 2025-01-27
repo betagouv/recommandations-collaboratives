@@ -10,85 +10,170 @@
 <template x-if="selectedContact">
     <div class="fr-p-3v">
         <div class="d-flex">
+            <template x-if="selectedContact.first_name">
+                <div>
+                    <span x-text="selectedContact.first_name"
+                          class="same-for-all-text contact-names fr-pr-1v"></span>
+                </div>
+            </template>
+            <template x-if="selectedContact.last_name">
+                <div>
+                    <span x-text="selectedContact.last_name"
+                          class="same-for-all-text contact-names fr-pr-1v"></span>
+                </div>
+            </template>
+            <template x-if="selectedContact.division">
+                <div>
+                    <span x-text="selectedContact.division" class="color-3a3a3a text-position"></span>
+                </div>
+            </template>
+        </div>
+        <template x-if="selectedContact.organization.name">
             <div>
-                <span x-text="selectedContact.first_name"
-                      class="same-for-all-text contact-names fr-pr-1v"></span>
+                <span x-text="selectedContact.organization.name"
+                      class="color-3a3a3a text-organisation"></span>
             </div>
+        </template>
+        <template x-if="selectedContact.email">
             <div>
-                <span x-text="selectedContact.last_name"
-                      class="same-for-all-text contact-names fr-pr-1v"></span>
+                <a :href="'mailto:' +selectedContact.email"
+                   class="same-for-all-text text-position">
+                    <span class="fr-icon--sm fr-icon-link" x-text="selectedContact.email"></span>
+                </a>
             </div>
+        </template>
+        <template x-if="selectedContact.phone_no">
             <div>
-                <span class="color-3a3a3a text-position">role organisation</span>
+                <a href="'tel:'+selectedContact.phone_no"
+                   class="same-for-all-text text-position">
+                    <span class="fr-icon--sm fr-icon-phone-line"
+                          x-text="selectedContact.phone_no"></span>
+                </a>
             </div>
-        </div>
+        </template>
+        <template x-if="selectedContact.mobile_no">
+            <div>
+                <a href="'tel:'+selectedContact.mobile_no"
+                   class="same-for-all-text text-position">
+                    <span class="fr-icon--sm fr-icon-phone-line"
+                          x-text="selectedContact.mobile_no"></span>
+                </a>
+            </div>
+        </template>
         <div>
-            {% comment %} <span x-text="selectedContact.organisation" class="color-3a3a3a text-organisation"></span> {% endcomment %}
-            <span class="color-3a3a3a text-organisation">Organisation</span>
-        </div>
-        <div>
-            <a :href="'mailto:' +selectedContact.email"
-               class="same-for-all-text text-position">
-                <span class="fr-icon--sm fr-icon-link" x-text="selectedContact.email"></span>
-            </a>
-        </div>
-        <div>
-            {% comment %} <a href="'tel:'+selectedContact.tel" class="same-for-all-text text-position">
-            <span class="fr-icon--sm fr-icon-phone-line" x-text="selectedContact.tel"></span>
-            </a> {% endcomment %}
-            <a href="tel:+0606060606" class="same-for-all-text text-position"><span class="fr-icon--sm fr-icon-phone-line" aria-hidden="true"></span> tel user</a>
-        </div>
-        <div>
-            {% comment %} <a href="'tel:'+selectedContact.num" class="same-for-all-text text-position">
-            <span class="fr-icon--sm fr-icon-phone-line" x-text="selectedContact.num"></span>
-            </a> {% endcomment %}
-            <a href="tel:+0606060606" class="same-for-all-text text-position"><span class="fr-icon--sm fr-icon-phone-line" aria-hidden="true"></span> num user</a>
-        </div>
-        <div>
-            {% comment %} <span class="same-for-all-text text-date">mis à jour le </span> <span x-text="selectedContact.date" class="same-for-all-text text-date"></span> {% endcomment %}
             <span class="same-for-all-text text-date">mis à jour le xxxxxx</span>
         </div>
     </div>
 </template>
-<template x-if="f.contact">
+<template x-if="f && f.contact">
     <div class="fr-p-3v bg-white">
         <div class="d-flex">
+            <template x-if="f.contact.first_name">
+                <div>
+                    <span x-text="f.contact.first_name"
+                          class="same-for-all-text contact-names fr-pr-1v"></span>
+                </div>
+            </template>
+            <template x-if="f.contact.last_name">
+                <div>
+                    <span x-text="f.contact.last_name"
+                          class="same-for-all-text contact-names fr-pr-1v"></span>
+                </div>
+            </template>
+            <template x-if="f.contact.organization.name">
+                <div>
+                    <span x-text="f.contact.organization.name"
+                          class="color-3a3a3a text-position"></span>
+                </div>
+            </template>
+        </div>
+        <template x-if="f.contact.division">
             <div>
-                <span x-text="f.contact.first_name"
-                      class="same-for-all-text contact-names fr-pr-1v"></span>
+                <span x-text="f.contact.division" class="color-3a3a3a text-organisation"></span>
             </div>
+        </template>
+        <template x-if="f.contact.email">
             <div>
-                <span x-text="f.contact.last_name"
-                      class="same-for-all-text contact-names fr-pr-1v"></span>
+                <a :href="'mailto:' +f.contact.email"
+                   class="same-for-all-text text-position">
+                    <span class="fr-icon--sm fr-icon-link" x-text="f.contact.email"></span>
+                </a>
             </div>
+        </template>
+        <template x-if="f.contact.phone_no">
             <div>
-                <span class="color-3a3a3a text-position">role organisation</span>
+                <a href="'tel:'+f.contact.phone_no"
+                   class="same-for-all-text text-position">
+                    <span class="fr-icon--sm fr-icon-phone-line" x-text="f.contact.phone_no"></span>
+                </a>
             </div>
-        </div>
-        <div>
-            {% comment %} <span x-text="f.contact.organisation" class="color-3a3a3a text-organisation"></span> {% endcomment %}
-            <span class="color-3a3a3a text-organisation">Organisation</span>
-        </div>
-        <div>
-            <a :href="'mailto:' +f.contact.email"
-               class="same-for-all-text text-position">
-                <span class="fr-icon--sm fr-icon-link" x-text="f.contact.email"></span>
-            </a>
-        </div>
-        <div>
-            {% comment %} <a href="'tel:'+f.contact.tel" class="same-for-all-text text-position">
-            <span class="fr-icon--sm fr-icon-phone-line" x-text="f.contact.tel"></span>
-            </a> {% endcomment %}
-            <a href="tel:+0606060606" class="same-for-all-text text-position"><span class="fr-icon--sm fr-icon-phone-line" aria-hidden="true"></span> tel user</a>
-        </div>
-        <div>
-            {% comment %} <a href="'tel:'+f.contact.num" class="same-for-all-text text-position">
-            <span class="fr-icon--sm fr-icon-phone-line" x-text="f.contact.num"></span>
-            </a> {% endcomment %}
-            <a href="tel:+0606060606" class="same-for-all-text text-position"><span class="fr-icon--sm fr-icon-phone-line" aria-hidden="true"></span> num user</a>
-        </div>
+        </template>
+        <template x-if="f.contact.mobile_no">
+            <div>
+                <a href="'tel:'+f.contact.mobile_no"
+                   class="same-for-all-text text-position">
+                    <span class="fr-icon--sm fr-icon-phone-line" x-text="f.contact.mobile_no"></span>
+                </a>
+            </div>
+        </template>
         <div>
             {% comment %} <span class="same-for-all-text text-date">mis à jour le </span> <span x-text="f.contact.date" class="same-for-all-text text-date"></span> {% endcomment %}
+            <span class="same-for-all-text text-date">mis à jour le xxxxxx</span>
+        </div>
+    </div>
+</template>
+<template x-if="contact">
+    <div class="fr-p-3v">
+        <div class="d-flex">
+            <template x-if="contact.first_name">
+                <div>
+                    <span x-text="contact.first_name"
+                          class="same-for-all-text contact-names fr-pr-1v"></span>
+                </div>
+            </template>
+            <template x-if="contact.last_name">
+                <div>
+                    <span x-text="contact.last_name"
+                          class="same-for-all-text contact-names fr-pr-1v"></span>
+                </div>
+            </template>
+            <template x-if="contact.division">
+                <div>
+                    <span x-text="contact.division" class="color-3a3a3a text-position"></span>
+                </div>
+            </template>
+        </div>
+        <template x-if="contact.organization.name">
+            <div>
+                <span x-text="contact.organization.name"
+                      class="color-3a3a3a text-organisation"></span>
+            </div>
+        </template>
+        <template x-if="contact.email">
+            <div>
+                <a :href="'mailto:' +contact.email"
+                   class="same-for-all-text text-position">
+                    <span class="fr-icon--sm fr-icon-link" x-text="contact.email"></span>
+                </a>
+            </div>
+        </template>
+        <template x-if="contact.phone_no">
+            <div>
+                <a href="'tel:'+contact.phone_no"
+                   class="same-for-all-text text-position">
+                    <span class="fr-icon--sm fr-icon-phone-line" x-text="contact.phone_no"></span>
+                </a>
+            </div>
+        </template>
+        <template x-if="contact.mobile_no">
+            <div>
+                <a href="'tel:'+contact.mobile_no"
+                   class="same-for-all-text text-position">
+                    <span class="fr-icon--sm fr-icon-phone-line" x-text="contact.mobile_no"></span>
+                </a>
+            </div>
+        </template>
+        <div>
             <span class="same-for-all-text text-date">mis à jour le xxxxxx</span>
         </div>
     </div>
