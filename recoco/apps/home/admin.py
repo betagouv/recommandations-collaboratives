@@ -2,6 +2,7 @@ from csvexport.actions import csvexport
 from django.contrib import admin
 from django.contrib.auth import models as auth_models
 from django.contrib.auth.admin import UserAdmin
+from django.db.models import Count
 
 from . import models
 
@@ -18,6 +19,21 @@ class ProfileInline(admin.StackedInline):
     fk_name = "user"
 
 
+class IsMultipleSiteFilter(admin.SimpleListFilter):
+    title = "Muti-site"
+    parameter_name = "multisite"
+
+    def lookups(self, request, model_admin):
+        return (("yes", "Yes"), ("no", "No"))
+
+    def queryset(self, request, queryset):
+        queryset = queryset.annotate(sites_count=Count("profile__sites"))
+        if self.value() == "yes":
+            return queryset.filter(sites_count__gt=1)
+        if self.value() == "no":
+            return queryset.filter(sites_count=1)
+
+
 class CustomUserAdmin(UserAdmin):
     inlines = (ProfileInline,)
     list_display = (
@@ -27,6 +43,7 @@ class CustomUserAdmin(UserAdmin):
         "last_name",
         "is_staff",
         "organization",
+        "sites",
     )
 
     actions = [csvexport]
@@ -36,15 +53,28 @@ class CustomUserAdmin(UserAdmin):
         "is_staff",
         "is_superuser",
         "is_active",
+        IsMultipleSiteFilter,
         "groups",
         "profile__sites",
     )
 
-    list_select_related = ("profile",)
+    list_per_page = 50
+
+    def get_queryset(self, request):
+        return (
+            super()
+            .get_queryset(request)
+            .prefetch_related("profile__sites")
+            .select_related("profile__organization")
+        )
 
     @admin.display(description="Organization")
     def organization(self, instance):
         return instance.profile.organization
+
+    @admin.display(description="Sites")
+    def sites(self, instance):
+        return ",".join([site.name for site in instance.profile.sites.all()])
 
     def get_inline_instances(self, request, obj=None):
         if not obj:

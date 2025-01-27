@@ -68,6 +68,10 @@ export function projectsUrl(search, departments, lastActivity) {
   return url;
 }
 
+export function projectUrl(projectId) {
+  return `/api/projects/${projectId}/`;
+}
+
 export function projectsProjectSitesUrl() {
   return '/api/projects/projectsites/';
 }
@@ -157,6 +161,11 @@ export function challengeUrl(code) {
 // Challenges Definitions
 export function challengeDefinitionUrl(code) {
   return `/api/challenges/definitions/${code}`;
+}
+
+// Hitcount
+export function hitcountUrl() {
+  return '/hit/';
 }
 
 // Non API routes

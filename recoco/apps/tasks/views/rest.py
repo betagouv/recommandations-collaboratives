@@ -7,6 +7,7 @@ author  : raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created : 2021-05-26 15:56:20 CEST
 """
 
+import logging
 from copy import copy
 
 from django.contrib.contenttypes.models import ContentType
@@ -25,6 +26,8 @@ from ..serializers import (
     TaskNotificationSerializer,
     TaskSerializer,
 )
+
+logger = logging.getLogger(__name__)
 
 ########################################################################
 # Task
@@ -159,10 +162,21 @@ class TaskNotificationViewSet(
     """
 
     def get_queryset(self):
-        task_id = int(self.kwargs["task_id"])
-        task = models.Task.objects.get(pk=task_id)
-
         notifications = self.request.user.notifications.unread()
+
+        task_id = self.kwargs["task_id"]
+
+        try:
+            task_id = int(self.kwargs["task_id"])
+        except ValueError:
+            logger.error(f"Task ID {task_id} should be an integer")
+            return notifications.none()
+
+        try:
+            task = models.Task.objects.get(pk=task_id)
+        except models.Task.DoesNotExist:
+            logger.error(f"Task {task_id} does not exist")
+            return notifications.none()
 
         task_ct = ContentType.objects.get_for_model(models.Task)
         followup_ct = ContentType.objects.get_for_model(models.TaskFollowup)

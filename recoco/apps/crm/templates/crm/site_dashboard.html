@@ -93,7 +93,7 @@
                         </li>
                     </ul>
                 </div>
-                {% if is_staff or "manage_surveys" in user_site_perms or perms.wagtailadmin.can_access %}
+                {% if is_staff or "manage_surveys" in user_site_perms or perms.wagtailadmin.access_admin %}
                     <div class="fr-pb-2w fr-px-3w">
                         <h5 class="d-flex align-items-center relative fr-pb-2v text-info-custom text-grey-dark">
                             <svg class="fr-mr-2v bi align-middle" width="18" height="18">
@@ -108,7 +108,7 @@
                                     {% include "crm/fragments/crm_icon_button.html" with link_url=url name="Réglages du Site" icon="gear" %}
                                 </li>
                             {% endif %}
-                            {% if perms.wagtailadmin.can_access %}
+                            {% if perms.wagtailadmin.access_admin %}
                                 <li class="fr-mr-2v col-2">
                                     {% url 'wagtailadmin_home' as url %}
                                     {% include "crm/fragments/crm_icon_button.html" with link_url=url name="Pages Statiques" icon="pen" %}

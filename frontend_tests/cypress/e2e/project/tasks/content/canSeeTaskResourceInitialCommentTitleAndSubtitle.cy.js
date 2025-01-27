@@ -1,3 +1,6 @@
+import resources from '../../../../fixtures/resources/resources.json';
+
+const currentResource = resources[4];
 const taskName = 'task intent';
 let currentProjectId;
 

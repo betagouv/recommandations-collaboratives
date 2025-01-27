@@ -62,6 +62,7 @@ class ProjectSerializer(TaggitSerializer, serializers.HyperlinkedModelSerializer
             "private_message_count",
             "project_sites",
             "tags",
+            "is_diagnostic_done",
         ]
 
     switchtenders = UserSerializer(read_only=True, many=True)

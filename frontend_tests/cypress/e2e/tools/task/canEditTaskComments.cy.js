@@ -1,22 +1,13 @@
 import projects from '../../../fixtures/projects/projects.json';
-import projectView from '../../../support/views/project';
-import editor from '../../../support/tools/editor';
 
 const currentProject = projects[2];
 const message = 'Message - Test comment on task';
-const taskName = 'task intent';
 
 describe('As advisor, I can make a comment on a task', () => {
-  beforeEach(() => {
-    cy.login('conseiller1');
-  });
-
   it('adds a new comment, and stops from submitting the comment more than once', () => {
-    cy.visit(`/project/${currentProject.pk}`);
-    cy.becomeAdvisor(currentProject.pk);
+    cy.login('conseiller1');
     cy.visit(`/project/${currentProject.pk}/actions`);
 
-    cy.createTask(taskName, '', true);
     cy.get('[data-test-id="list-tasks-switch-button"]').should('be.checked');
     cy.get('[data-test-id="task-initial-comment"]').should('exist');
 

@@ -74,6 +74,7 @@ Alpine.data('ActionPusher', () => {
     async update_recommendation(task_id, intent, content, resource_id) {
       this.intent = intent;
       this.content = content;
+      Alpine.store('actionPusher').isSelectedProject = true;
 
       if (resource_id) this.push_type = 'single';
       else this.push_type = 'noresource';
