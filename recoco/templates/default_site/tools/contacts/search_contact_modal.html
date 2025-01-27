@@ -46,32 +46,14 @@
                                   :key="index">
                             <div class="fr-menu__item__content cursor-pointer fr-pt-1w fr-px-1w add-borders"
                                  @click="onSelect(contact)">
-                                {% comment %} <div class="fr-menu__item__content__title">
-                                    <div class="fr-menu__item__content__title__text d-flex contact-names same-for-all-text fr-mb-1v">
-                                        <template x-if="contact.first_name">
-                                            <span x-text="contact.first_name" class="fr-mr-1v"></span>
-                                        </template>
-                                        <template x-if="contact.last_name">
-                                            <span x-text="contact.last_name"></span>
-                                        </template>
-                                    </div>
-                                </div>
-                                <div class="fr-menu__item__content__subtitle d-flex color-3a3a3a">
-                                    <span class="fr-mr-1w text-position same-for-all-text">Organization_position</span>
-                                    <span class="text-organisation same-for-all-text">Organisation</span>
-
-                                </div>
-                                <div class="fr-menu__item__content__subtitle d-flex color-3a3a3a text-date">
-                                    <span>Mis à jour le ????</span>
-                                </div> {% endcomment %}
-                                {% include "tools/contacts/contact_card.html" %}
+                                <div x-data="{contact:contact}">{% include "tools/contacts/contact_card.html" %}</div>
                             </div>
                         </template>
                     </template>
                     <template class="fr-menu__item" x-if="isAContactSelected">
                         <div class="design-dropdown">
                             <div class="d-flex justify-content-between add-borders">
-                                {% include "tools/contacts/contact_card.html" %}
+                                <div x-data="{contact:selectedContact}">{% include "tools/contacts/contact_card.html" %}</div>
                                 <span class="fr-icon-close-line color-666 cursor-pointer fr-pt-3v fr-pr-3v"
                                       aria-hidden="true"
                                       @click="onCancelSelectContact"></span>
