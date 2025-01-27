@@ -265,13 +265,6 @@ class TaskFollowup(models.Model):
         null=True,
         blank=True,
     )
-    # TODO check on_delete behavior
-    contact = models.ForeignKey(
-        addressbook_models.Contact,
-        on_delete=models.CASCADE,
-        related_name="addressbook_contact",
-        null=True,
-    )
     status = models.IntegerField(choices=Task.STATUS_CHOICES, blank=True, null=True)
 
     @property
