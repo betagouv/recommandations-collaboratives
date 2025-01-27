@@ -55,6 +55,11 @@ class HitCountAdmin(admin.ModelAdmin):
         ContextObjectCTFilter,
         "created",
     )
+    list_select_related = (
+        "site",
+        "content_object_ct",
+        "context_object_ct",
+    )
 
     def get_queryset(self, request):
         return super().get_queryset(request).annotate(hit_count=Count("hits"))
@@ -76,3 +81,5 @@ class HitAdmin(admin.ModelAdmin):
         "created",
     )
     list_filter = ("created",)
+    search_fields = ("user__username",)
+    list_select_related = ("user", "hitcount")

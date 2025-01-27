@@ -21,15 +21,9 @@ class HitCountQuerySet(models.QuerySet):
         return self.filter(hits__user=user)
 
 
-class HitCountOnSiteManagerBase(CurrentSiteManager):
-    pass
+class HitCountOnSiteManager(CurrentSiteManager.from_queryset(HitCountQuerySet)):
+    use_in_migrations = False
 
 
-HitCountOnSiteManager = HitCountOnSiteManagerBase.from_queryset(HitCountQuerySet)
-
-
-class HitCountManagerBase(models.Manager):
-    pass
-
-
-HitCountManager = HitCountManagerBase.from_queryset(HitCountQuerySet)
+class HitCountManager(models.Manager.from_queryset(HitCountQuerySet)):
+    use_in_migrations = False
