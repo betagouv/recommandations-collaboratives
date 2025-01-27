@@ -49,10 +49,10 @@
                                 <div class="fr-menu__item__content__title">
                                     <div class="fr-menu__item__content__title__text d-flex contact-names same-for-all-text fr-mb-1v">
                                         <template x-if="contact.first_name">
-                                            <span x-text="contact.first_name"></span>
+                                            <span x-text="contact.first_name" class="fr-mr-1v"></span>
                                         </template>
                                         <template x-if="contact.last_name">
-                                            <span>&emsp;</span><span x-text="contact.last_name"></span>
+                                            <span x-text="contact.last_name"></span>
                                         </template>
                                     </div>
                                 </div>
@@ -70,28 +70,7 @@
                         </template>
                     </template>
                     <template class="fr-menu__item" x-if="isAContactSelected">
-                        {% comment %} futur composant carte ici qui récupère un contact à afficher {% endcomment %}
                         <div class="design-dropdown">
-                            {% comment %} <div class="fr-menu__item__content__title">
-                                <div class="d-flex justify-content-between">
-                                    <div class="fr-menu__item__content__title__text d-flex">
-                                        <template x-if="selectedContact.first_name">
-                                            <span x-text="selectedContact.first_name"></span>
-                                        </template>
-                                        <template x-if="selectedContact.last_name">
-                                            <div>
-                                                <span>&emsp;</span><span x-text="selectedContact.last_name"></span>
-                                            </div>
-                                        </template>
-                                    </div>
-                                    <span class="fr-icon-close-line" aria-hidden="true" @click="isAContactSelected=false"></span>
-                                </div>
-                            </div>
-                            <div class="fr-menu__item__content__subtitle">
-                                <template x-if="selectedContact.email">
-                                    <span x-text="selectedContact.email"></span>
-                                </template>
-                            </div> {% endcomment %}
                             <div class="d-flex justify-content-between add-borders">
                                 {% include "tools/contacts/contact_card.html" %}
                                 <span class="fr-icon-close-line color-666 cursor-pointer fr-pt-3v fr-pr-3v"

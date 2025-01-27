@@ -63,6 +63,10 @@ export function sitesConfigUrl() {
 export function searchOrganizationsUrl(search) {
   return `/api/addressbook/organizations/?search=${search}`;
 }
+// Contacts
+export function searchContactsUrl(search) {
+  return `/api/addressbook/contacts/?search=${search}`;
+}
 
 // Topic
 export function searchTopicsUrl(search, restrict_to) {
