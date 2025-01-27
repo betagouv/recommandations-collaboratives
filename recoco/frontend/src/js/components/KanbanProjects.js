@@ -7,7 +7,7 @@ import api, { projectsProjectSitesUrl, projectsUrl } from '../utils/api';
 Alpine.data('KanbanProjects', function (currentSiteId, departments, regions) {
   return {
     makeProjectURL,
-    projectList: [],
+    projectList: null,
     currentSiteId: currentSiteId,
     isDisplayingOnlyUserProjects:
       JSON.parse(localStorage.getItem('isDisplayingOnlyUserProjects')) ?? false,
@@ -41,7 +41,7 @@ Alpine.data('KanbanProjects', function (currentSiteId, departments, regions) {
     ],
     async init() {
       await this.getData();
-      await this.postProcessData();
+      this.constructRegionsFilter(this.departments, this.regions);
     },
     async getData() {
       const { searchText, searchDepartment, lastActivity } = this.backendSearch;
@@ -58,19 +58,6 @@ Alpine.data('KanbanProjects', function (currentSiteId, departments, regions) {
           uuid: generateUUID(),
         })
       );
-
-      if (this.projectList.length === 0) {
-        this.$refs.selectFilterProjectDuration.value = 90;
-        this.$refs.selectFilterProjectDuration.dispatchEvent(
-          new Event('change')
-        );
-      }
-    },
-    findByUuid(uuid) {
-      return this.projectList.find((d) => d.uuid === uuid);
-    },
-    findById(id) {
-      return this.projectList.find((d) => d.id === id);
     },
     get view() {
       return this.projectList.sort(this.sortFn.bind(this));
@@ -142,12 +129,9 @@ Alpine.data('KanbanProjects', function (currentSiteId, departments, regions) {
 
       await this.getData();
     },
-    onLastActivityChange(event) {
+    async onLastActivityChange(event) {
       this.backendSearch.lastActivity = event.target.value;
-      this.getData();
-    },
-    async postProcessData() {
-      this.constructRegionsFilter(this.departments, this.regions);
+      await this.getData();
     },
     toggleMyProjectsFilter() {
       this.isDisplayingOnlyUserProjects = !this.isDisplayingOnlyUserProjects;
@@ -206,18 +190,18 @@ Alpine.data('KanbanProjects', function (currentSiteId, departments, regions) {
       this.backendSearch.searchText = event.target.value;
       await this.backendSearchProjects();
     },
-    async backendSearchProjects() {
+    async backendSearchProjects(options = { reset: false }) {
       if (this.backendSearch.searchText !== '') {
         this.$refs.selectFilterProjectDuration.disabled = true;
         this.$refs.selectFilterProjectDuration.value = 1460;
         this.backendSearch.lastActivity = '';
-      } else {
+      } else if (options.reset) {
         this.$refs.selectFilterProjectDuration.disabled = false;
         this.$refs.selectFilterProjectDuration.value = 30;
         this.backendSearch.lastActivity = '30';
       }
 
-      this.getData();
+      await this.getData();
     },
     saveSelectedDepartment() {
       const extractedDepartements = this.regions

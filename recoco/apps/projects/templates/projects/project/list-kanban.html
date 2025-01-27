@@ -68,132 +68,149 @@
             </div>
             <div class="kanban-header__toolbar">{% include "projects/project/fragments/list-toolbars.html" %}</div>
         </div>
-        <div x-cloak class="d-flex">
-            <div class="flex-grow-1 kanban-container">
-                <div class="fr-py-3w md-py-8">
-                    <div class="d-flex fr-pb-2v">
-                        <template x-for="(board, index) in boards" :key="board.code">
-                            <div class="fr-px-2v flex-shrink-0 kanban-column-container">
-                                <div class="rounded border-4 kanban-column"
-                                     :class="board.color_class"
-                                     :data-test-id="`board-targetable-${index}`">
-                                    <div class="d-flex justify-content-between justify-items-center fr-px-2v fr-py-2v sticky top-0">
-                                        <h5 x-text="board.title" class="font-medium text-gray-800 fr-mb-0"></h5>
-                                    </div>
-                                    <div class="kanban-column__content">
-                                        <div class="fr-px-2v fr-py-1v fr-pb-1v h-100">
-                                            <template x-if="column(board.code).length === 0">
-                                                <div class="drag-targetable fr-py-2v h-100"
-                                                     @dragover="onDragOver(event, null)"
-                                                     @drop="onDrop(event, board.code, null)"
-                                                     @dragenter="onDragEnter(event)"
-                                                     @dragleave="onDragLeave(event)"
-                                                     @dragstart="onDragStart(event, t.uuid)"
-                                                     @dragend="onDragEnd(event)"
-                                                     data-test-id="drag-target">
-                                                    <div class="drag-placeholder"></div>
-                                                    <span x-text=board.status></span>
-                                                </div>
-                                            </template>
-                                            <!-- Task Template -->
-                                            <template x-for="(t, taskIndex) in column(board.code)" :key="t.id">
-                                                <div :id="t.id"
-                                                     x-show="((t.is_observer || t.is_switchtender) && isDisplayingOnlyUserProjects) || !isDisplayingOnlyUserProjects"
-                                                     class="drag-targetable kanban-card-container"
-                                                     data-cy="card-project"
-                                                     @dragover="onDragOver(event)"
-                                                     @drop="onDrop(event, board.code, t.uuid)"
-                                                     @dragenter="onDragEnter(event)"
-                                                     @dragleave="onDragLeave(event)"
-                                                     @dragstart="onDragStart(event, t.uuid)"
-                                                     @dragend="onDragEnd(event)">
-                                                    <a :href="makeProjectURL('{% url 'projects-project-detail' 0 %}', t.id)">
-                                                        <div class="kanban-card rounded fr-p-2v w-100 position-relative"
-                                                             :class="{'kanban-card__border--is-switchtender': t.is_switchtender, 'kanban-card__border--is-observer': t.is_observer}"
-                                                             draggable="true"
-                                                             :data-test-id="`item-draggable-${taskIndex}`">
-                                                            <template x-if="t.inactive_since !== null">
-                                                                <div class="kanban-card__state-container">
-                                                                    <div class="left-0">
-                                                                        <div class="kanban-card__state--pause">En pause</div>
-                                                                    </div>
-                                                                </div>
-                                                            </template>
-                                                            <template x-if="t.notifications.count > 0">
-                                                                <span class="kanban-card__notification-container position-absolute top-25 start-100 badge bg-info"
-                                                                      :class="{'bg-danger': t.notifications.has_collaborator_activity == true}"><span x-text="t.notifications.count"></span> <span class="visually-hidden">nouvelle activité</span></span>
-                                                            </template>
-                                                            <template x-if="t.commune">
-                                                                <div class="kanban-card__commune-container fw-bold">
-                                                                    <span class="kanban-card__commune-name" x-text="t.commune.name"></span>
-                                                                    <span class="kanban-card__commune-postal" x-text="`(${t.commune.postal})`"></span>
-                                                                </div>
-                                                            </template>
-                                                            <div class="kanban-card__project-container fw-semibold fr-mb-2v">
-                                                                <span class="kanban-card__project-name project-link"
-                                                                      x-text="truncate(t.name)"></span>
-                                                            </div>
-                                                            <template x-if="t.origin">
-                                                                <div class="kanban-card__project-push-by-container"
-                                                                     data-cy="kanban-project-shared-by-origin"
-                                                                     x-show="t.origin && {{ site_config.site_id }} !== t.origin?.site">
-                                                                    <img x-show="t.origin.siteInfo.configuration.logo_small"
-                                                                         :src="t.origin.siteInfo.configuration.logo_small"
-                                                                         width="16px"
-                                                                         height="auto"
-                                                                         :alt="`Logo ${t.origin.siteInfo.name}`" />
-                                                                    <span x-show="!t.origin.siteInfo.configuration.logo_small"
-                                                                          class="fr-icon--sm fr-icon-window-line"
-                                                                          aria-hidden="true"></span>
-                                                                    <span class="not-a-link kanban">projet envoyé par</span>
-                                                                    <span x-text="t.origin.siteInfo.name"></span>
-                                                                </div>
-                                                            </template>
-                                                            <template x-for="portal in t.publishTo">
-                                                                <template x-if="portal.site !== {{ site_config.site_id }}">
-                                                                    <div class="kanban-card__project-push-by-container"
-                                                                         data-cy="kanban-project-shared-with">
-                                                                        <img x-show="portal.siteInfo.configuration.logo_small"
-                                                                             :src="portal.siteInfo.configuration.logo_small"
-                                                                             width="16px"
-                                                                             height="auto"
-                                                                             :alt="`Logo ${portal.siteInfo.name}`" />
-                                                                        <span x-show="!portal.siteInfo.configuration.logo_small"
-                                                                              class="fr-icon--sm fr-icon-window-line"
-                                                                              aria-hidden="true"></span>
-                                                                        <span class="not-a-link kanban">projet envoyé sur</span>
-                                                                        <span x-text="portal.siteInfo.name"></span>
-                                                                    </div>
-                                                                </template>
-                                                            </template>
-                                                            <div>
-                                                                <span class="kanban-card__project-insee fr-icon--sm fr-icon-map-pin-2-line not-a-link">INSEE: <span x-text="truncate(t.commune.insee)"></span></span>
-                                                            </div>
-                                                            <div class="d-flex justify-content-between">
-                                                                <div class="kanban-card__project-date-container text-secondary">
-                                                                    <span x-text="`Déposé le ${formatDateDisplay(t.created_on)}`"
-                                                                          class="kanban-card__project-date fr-icon--sm fr-icon-calendar-event-line align-middle not-a-link"></span>
-                                                                </div>
-                                                                <div class="d-flex justify-content-end fr-mr-1v">
-                                                                    <template x-for="switchtender in t.switchtenders">
-                                                                        <div class="got-my-style">
-                                                                            {% include "projects/project/fragments/advisor_gravatar_list_item.html" with wide_margin=True transparent_background=True %}
-                                                                        </div>
-                                                                    </template>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </a>
-                                                </div>
-                                            </template>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </template>
+        <template x-if="projectList.length == 0">
+            <div class="fr-notice fr-notice--info">
+                <div class="fr-container">
+                    <div class="fr-notice__body">
+                        <p>
+                            <span class="fr-notice__title">Aucun projet correspondant aux critères de recherche selectionnés</span>
+                            <span class="fr-notice__desc">Essayer de modifier vos critères pour obtenir un résultat</span>
+                        </p>
+                        <button title="Masquer le message"
+                                onclick="const notice = this.parentNode.parentNode.parentNode; notice.parentNode.removeChild(notice)"
+                                class="fr-btn--close fr-btn">Masquer le message</button>
                     </div>
                 </div>
             </div>
-        </div>
+        </template>
+        <template x-if="projectList.length > 0">
+            <div x-cloak class="d-flex">
+                <div class="flex-grow-1 kanban-container">
+                    <div class="fr-py-3w md-py-8">
+                        <div class="d-flex fr-pb-2v">
+                            <template x-for="(board, index) in boards" :key="board.code">
+                                <div class="fr-px-2v flex-shrink-0 kanban-column-container">
+                                    <div class="rounded border-4 kanban-column"
+                                         :class="board.color_class"
+                                         :data-test-id="`board-targetable-${index}`">
+                                        <div class="d-flex justify-content-between justify-items-center fr-px-2v fr-py-2v sticky top-0">
+                                            <h5 x-text="board.title" class="font-medium text-gray-800 fr-mb-0"></h5>
+                                        </div>
+                                        <div class="kanban-column__content">
+                                            <div class="fr-px-2v fr-py-1v fr-pb-1v h-100">
+                                                <template x-if="column(board.code).length === 0">
+                                                    <div class="drag-targetable fr-py-2v h-100"
+                                                         @dragover="onDragOver(event, null)"
+                                                         @drop="onDrop(event, board.code, null)"
+                                                         @dragenter="onDragEnter(event)"
+                                                         @dragleave="onDragLeave(event)"
+                                                         @dragstart="onDragStart(event, t.uuid)"
+                                                         @dragend="onDragEnd(event)"
+                                                         data-test-id="drag-target">
+                                                        <div class="drag-placeholder"></div>
+                                                        <span x-text=board.status></span>
+                                                    </div>
+                                                </template>
+                                                <!-- Task Template -->
+                                                <template x-for="(t, taskIndex) in column(board.code)" :key="t.id">
+                                                    <div :id="t.id"
+                                                         x-show="((t.is_observer || t.is_switchtender) && isDisplayingOnlyUserProjects) || !isDisplayingOnlyUserProjects"
+                                                         class="drag-targetable kanban-card-container"
+                                                         data-cy="card-project"
+                                                         @dragover="onDragOver(event)"
+                                                         @drop="onDrop(event, board.code, t.uuid)"
+                                                         @dragenter="onDragEnter(event)"
+                                                         @dragleave="onDragLeave(event)"
+                                                         @dragstart="onDragStart(event, t.uuid)"
+                                                         @dragend="onDragEnd(event)">
+                                                        <a :href="makeProjectURL('{% url 'projects-project-detail' 0 %}', t.id)">
+                                                            <div class="kanban-card rounded fr-p-2v w-100 position-relative"
+                                                                 :class="{'kanban-card__border--is-switchtender': t.is_switchtender, 'kanban-card__border--is-observer': t.is_observer}"
+                                                                 draggable="true"
+                                                                 :data-test-id="`item-draggable-${taskIndex}`">
+                                                                <template x-if="t.inactive_since !== null">
+                                                                    <div class="kanban-card__state-container">
+                                                                        <div class="left-0">
+                                                                            <div class="kanban-card__state--pause">En pause</div>
+                                                                        </div>
+                                                                    </div>
+                                                                </template>
+                                                                <template x-if="t.notifications.count > 0">
+                                                                    <span class="kanban-card__notification-container position-absolute top-25 start-100 badge bg-info"
+                                                                          :class="{'bg-danger': t.notifications.has_collaborator_activity == true}"><span x-text="t.notifications.count"></span> <span class="visually-hidden">nouvelle activité</span></span>
+                                                                </template>
+                                                                <template x-if="t.commune">
+                                                                    <div class="kanban-card__commune-container fw-bold">
+                                                                        <span class="kanban-card__commune-name" x-text="t.commune.name"></span>
+                                                                        <span class="kanban-card__commune-postal" x-text="`(${t.commune.postal})`"></span>
+                                                                    </div>
+                                                                </template>
+                                                                <div class="kanban-card__project-container fw-semibold fr-mb-2v">
+                                                                    <span class="kanban-card__project-name project-link"
+                                                                          x-text="truncate(t.name)"></span>
+                                                                </div>
+                                                                <template x-if="t.origin">
+                                                                    <div class="kanban-card__project-push-by-container"
+                                                                         data-cy="kanban-project-shared-by-origin"
+                                                                         x-show="t.origin && {{ site_config.site_id }} !== t.origin?.site">
+                                                                        <img x-show="t.origin.siteInfo.configuration.logo_small"
+                                                                             :src="t.origin.siteInfo.configuration.logo_small"
+                                                                             width="16px"
+                                                                             height="auto"
+                                                                             :alt="`Logo ${t.origin.siteInfo.name}`" />
+                                                                        <span x-show="!t.origin.siteInfo.configuration.logo_small"
+                                                                              class="fr-icon--sm fr-icon-window-line"
+                                                                              aria-hidden="true"></span>
+                                                                        <span class="not-a-link kanban">projet envoyé par</span>
+                                                                        <span x-text="t.origin.siteInfo.name"></span>
+                                                                    </div>
+                                                                </template>
+                                                                <template x-for="portal in t.publishTo">
+                                                                    <template x-if="portal.site !== {{ site_config.site_id }}">
+                                                                        <div class="kanban-card__project-push-by-container"
+                                                                             data-cy="kanban-project-shared-with">
+                                                                            <img x-show="portal.siteInfo.configuration.logo_small"
+                                                                                 :src="portal.siteInfo.configuration.logo_small"
+                                                                                 width="16px"
+                                                                                 height="auto"
+                                                                                 :alt="`Logo ${portal.siteInfo.name}`" />
+                                                                            <span x-show="!portal.siteInfo.configuration.logo_small"
+                                                                                  class="fr-icon--sm fr-icon-window-line"
+                                                                                  aria-hidden="true"></span>
+                                                                            <span class="not-a-link kanban">projet envoyé sur</span>
+                                                                            <span x-text="portal.siteInfo.name"></span>
+                                                                        </div>
+                                                                    </template>
+                                                                </template>
+                                                                <div>
+                                                                    <span class="kanban-card__project-insee fr-icon--sm fr-icon-map-pin-2-line not-a-link">INSEE: <span x-text="truncate(t.commune.insee)"></span></span>
+                                                                </div>
+                                                                <div class="d-flex justify-content-between">
+                                                                    <div class="kanban-card__project-date-container text-secondary">
+                                                                        <span x-text="`Déposé le ${formatDateDisplay(t.created_on)}`"
+                                                                              class="kanban-card__project-date fr-icon--sm fr-icon-calendar-event-line align-middle not-a-link"></span>
+                                                                    </div>
+                                                                    <div class="d-flex justify-content-end fr-mr-1v">
+                                                                        <template x-for="switchtender in t.switchtenders">
+                                                                            <div class="got-my-style">
+                                                                                {% include "projects/project/fragments/advisor_gravatar_list_item.html" with wide_margin=True transparent_background=True %}
+                                                                            </div>
+                                                                        </template>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </a>
+                                                    </div>
+                                                </template>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </template>
     </div>
 {% endblock project_list_content %}
