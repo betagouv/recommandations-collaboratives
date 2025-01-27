@@ -2,6 +2,9 @@
 <div class="text-justified font-marianne">
     {% include "resources/resource/fragments/title.html" %}
     {% include "resources/resource/fragments/summary.html" %}
+
+    <div id="task-contacts">{% include "resources/resource/fragments/contact_list.html" %}</div>
+
     {% if resource.imported_from and resource.content %}
         <div class="fr-p-3w d-flex fr-mb-3w specific-color-background">
             <img src="{% static 'home/img/actors/progress.png' %}" alt="">

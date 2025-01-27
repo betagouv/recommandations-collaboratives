@@ -17,16 +17,17 @@ class HitView(APIView):
         serializer = HitInputSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        with transaction.atomic():
-            hitcount, _ = HitCount.objects.get_or_create(
-                site=request.site,
-                **serializer.output_data,
-            )
-            Hit.objects.create(
-                user=request.user,
-                user_agent=request.headers.get("user-agent", "unknown"),
-                hitcount=hitcount,
-            )
+        if not getattr(request.user, "is_hijacked", False):
+            with transaction.atomic():
+                hitcount, _ = HitCount.objects.get_or_create(
+                    site=request.site,
+                    **serializer.output_data,
+                )
+                Hit.objects.create(
+                    user=request.user,
+                    user_agent=request.headers.get("user-agent", "unknown"),
+                    hitcount=hitcount,
+                )
 
         return Response(
             status=status.HTTP_200_OK,

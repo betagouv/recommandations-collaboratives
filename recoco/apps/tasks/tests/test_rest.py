@@ -536,6 +536,7 @@ def test_project_task_followup_list_returns_followups_to_collaborator(request, p
     first = response.data[0]
     expected_fields = [
         "comment",
+        "contact",
         "id",
         "status",
         "status_txt",
@@ -581,19 +582,20 @@ def test_project_task_followup_create_not_allowed_for_simple_auth_user(
 
 
 @pytest.mark.django_db
-def test_project_task_followup_create_is_processed_for_auth_user(request, project):
+def test_project_task_followup_create_is_processed_for_auth_user(
+    api_client, current_site, project
+):
     user = baker.make(auth_models.User)
-    site = get_current_site(request)
-    task = baker.make(models.Task, project=project, site=site, public=True)
+    task = baker.make(models.Task, project=project, site=current_site, public=True)
 
-    client = APIClient()
-    client.force_authenticate(user=user)
+    api_client.force_authenticate(user=user)
     utils.assign_advisor(user, project)
+
     data = {"comment": "a new followup for tasks"}
     url = reverse("project-tasks-followups-list", args=[project.id, task.id])
-    response = client.post(url, data=data)
+    response = api_client.post(url, data=data)
 
-    assert response.status_code == 201
+    assert response.status_code == 201, response.data
 
     # new followup created
     followups = models.TaskFollowup.objects.filter(task=task)

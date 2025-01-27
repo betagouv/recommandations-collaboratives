@@ -6,7 +6,7 @@ from notifications import models as notifications_models
 from ordered_model.serializers import OrderedModelSerializer
 from rest_framework import serializers
 
-from recoco.apps.addressbook.serializers import ContactSerializer
+from recoco.apps.addressbook.serializers import NestedContactSerializer
 from recoco.apps.demarches_simplifiees.serializers import DSFolderSerializer
 from recoco.apps.home.serializers import UserSerializer
 from recoco.apps.projects.serializers import DocumentSerializer, TopicSerializer
@@ -29,15 +29,19 @@ class TaskFollowupSerializer(serializers.HyperlinkedModelSerializer):
             "timestamp",
             "task_id",
             "who_id",
-            "contact_id",
             "contact",
         ]
-        read_only_fields = ["id", "who", "timestamp"]
+        read_only_fields = [
+            "id",
+            "who",
+            "contact",
+            "timestamp",
+        ]
         extra_kwargs = {"task_id": {"write_only": True}, "who_id": {"write_only": True}}
 
     who = UserSerializer(read_only=True, many=False)
 
-    contact = ContactSerializer()
+    contact = NestedContactSerializer(read_only=True)
 
     task_id = serializers.PrimaryKeyRelatedField(
         many=False, write_only=True, queryset=Task.objects

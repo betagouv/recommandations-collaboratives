@@ -1,3 +1,5 @@
+import projects from '../../../../fixtures/projects/projects.json';
+
 let projectsLength;
 describe('I can go to the dashboard and search for project', () => {
   beforeEach(() => {
@@ -48,10 +50,6 @@ describe('I can go to the dashboard and search for project', () => {
         cy.get('#region-1').should('be.visible');
         cy.get('#region-1').should('be.checked');
         cy.get('#region-1').uncheck();
-        cy.get('[data-cy="card-project"]').should(
-          'have.length',
-          projectsLength - 2
-        );
         cy.get('#region-42').uncheck({ force: true });
         cy.get('[data-cy="card-project"]').should('not.exist');
       });

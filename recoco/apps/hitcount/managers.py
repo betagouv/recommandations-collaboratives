@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.managers import CurrentSiteManager
 from django.db import models
@@ -16,20 +17,13 @@ class HitCountQuerySet(models.QuerySet):
             context_object_ct=content_type, context_object_id=context_object.pk
         )
 
-    def for_user(self, user) -> models.QuerySet:
+    def for_user(self, user: User) -> models.QuerySet:
         return self.filter(hits__user=user)
 
 
-class HitCountOnSiteManagerBase(CurrentSiteManager):
+class HitCountOnSiteManager(CurrentSiteManager.from_queryset(HitCountQuerySet)):
     use_in_migrations = False
-    pass
 
 
-HitCountOnSiteManager = HitCountOnSiteManagerBase.from_queryset(HitCountQuerySet)
-
-
-class HitCountManagerBase(models.Manager):
-    pass
-
-
-HitCountManager = HitCountManagerBase.from_queryset(HitCountQuerySet)
+class HitCountManager(models.Manager.from_queryset(HitCountQuerySet)):
+    use_in_migrations = False

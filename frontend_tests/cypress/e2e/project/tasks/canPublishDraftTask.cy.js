@@ -14,8 +14,6 @@ describe('I can go to tasks tab', () => {
       cy.becomeAdvisor(currentProjectId);
       cy.visit(`/project/${currentProjectId}/actions`);
 
-      // cy.createTask('draft project');
-
       cy.get('[data-test-id="submit-task-button"]').click();
       cy.get('[data-cy="reco-pusher-selected-project"]').should(
         'contains.text',
@@ -43,6 +41,16 @@ describe('I can go to tasks tab', () => {
       cy.get('[data-test-id="task-draft-status"]').should('be.visible');
       cy.get('#publish-task-button').click({ force: true });
       cy.get('[data-test-id="task-draft-status"]').should('not.exist');
+      cy.get('[data-test-id="update-task-action-button"]').click({
+        force: true,
+      });
+      cy.get('textarea').type(
+        `reco test from action description modification`,
+        { force: true, delay: 0 }
+      );
+      cy.get('[data-cy="button-submit-task"]').click();
+      cy.url().should('include', '/actions');
+      cy.contains('reco test from action description modification');
     });
   });
 });

@@ -14,7 +14,7 @@ describe('I can go to administration area of a project and send back an invite f
     });
     cy.url().should('include', '/administration');
 
-    cy.contains('Inviter un membre de la collectivité').click({ force: true });
+    cy.get('[data-cy="button-invite-project-member"]').click();
 
     cy.get('#invite-member-modal')
       .get('#invite-email')

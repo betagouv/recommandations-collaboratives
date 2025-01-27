@@ -10,6 +10,7 @@
 {% get_obj_perms request.user for request.site as "user_site_perms" %}
 {% get_obj_perms request.user for project as "user_project_perms" %}
 <div x-data="Task(task)"
+     data-test-id="task-item"
      :class="`border${getTaskColor(task)}`"
      class="rounded fr-mb-2w fr-px-2w d-flex fr-pt-2w fr-pb-2w justify-content-between align-items-start task-item {% if embed_view is not True %}cursor-pointer{% endif %} hover-shadow hover-border-blue transition-all"
      {% if embed_view is not True %}@click="handleOpenPreviewModal()"{% endif %}
@@ -72,10 +73,9 @@
             </article>
         {% endif %}
         <template x-if="task.resource">
-            <article>{% include 'projects/project/fragments/task/task_comment.html' %}</article>
+            <article>{% include "projects/project/fragments/task/task_comment.html" %}</article>
         </template>
         <hr class="fr-mt-3w">
-
         <!-- DS integration -->
         <template x-if="task.ds_folder && task.ds_folder.prefilled_count > 0">
             <div>
@@ -90,18 +90,15 @@
                     Un dossier a été pré-rempli sur Démarches simplifiées avec les éléments que vous avez renseignés ici.
                 </p>
                 <a class="fr-btn fr-btn--secondary fr-btn--sm"
-                    @click.stop=""
-                    x-bind:href="task.ds_folder.dossier_url"
-                    target="_blank">
-                    Voir mon dossier
-                </a>
+                   @click.stop=""
+                   x-bind:href="task.ds_folder.dossier_url"
+                   target="_blank">Voir mon dossier</a>
                 <span class="fr-ml-2w fr-text-label--blue-france fr-text--xs"
-                    x-text="task.ds_folder.prefilled_count > 1 ? `${task.ds_folder.prefilled_count} champs pré-remplis` : '1 champ pré-rempli'">
+                      x-text="task.ds_folder.prefilled_count > 1 ? `${task.ds_folder.prefilled_count} champs pré-remplis` : '1 champ pré-rempli'">
                 </span>
                 <hr class="fr-mt-3w">
             </div>
         </template>
-
         <footer class="d-flex justify-content-between align-items-center">
             <div class="d-flex align-items-center">
                 {% if embed_view is not True %}
