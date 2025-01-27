@@ -326,72 +326,70 @@ def project_conversations_new(request, project_id=None):
     # Prepare a feed of different objects
     feed = []
 
-    postings = project.notes.filter(public=True)
-    posting_ids = list(postings.values_list("id", flat=True))
-    posting_ct = ContentType.objects.get_for_model(models.Note)
-    posting_notifs = request.user.notifications.unread().filter(
-        action_object_object_id__in=posting_ids, action_object_content_type=posting_ct
-    )
-
-    for posting in postings:
+    def feed_add_item(timestamp, topic, item_type, notifications, related_object):
         feed.append(
             {
-                "timestamp": posting.updated_on,
-                "topic": posting.topic.name if posting.topic else "",
-                "type": "posting",
-                "notifications": list(
-                    posting_notifs.filter(
-                        action_object_object_id=posting.id
-                    ).values_list("id", flat=True)
-                ),
-                "object": posting,
+                "timestamp": timestamp,
+                "topic": topic,
+                "type": item_type,
+                "notifications": notifications,
+                "object": related_object,
             }
         )
 
-    recos = project.tasks.filter(public=True)
-    reco_ids = list(recos.values_list("id", flat=True))
-    reco_ct = ContentType.objects.get_for_model(tasks_models.Task)
-    reco_notifs = request.user.notifications.unread().filter(
-        action_object_object_id__in=reco_ids, action_object_content_type=reco_ct
-    )
-    for reco in recos:
-        feed.append(
-            {
-                "timestamp": reco.updated_on,
-                "topic": reco.topic.name if reco.topic else "",
-                "type": "reco",
-                "notifications": list(
-                    reco_notifs.filter(action_object_object_id=reco.id).values_list(
+    feed_object_templates = [
+        (
+            "posting",  # feed item type
+            models.Note,  # model
+            project.notes.filter(public=True),  # initial queryset
+            lambda item: item.updated_on,  # timestamp
+            lambda item: item.topic.name if item.topic else "",  # topic
+        ),
+        (
+            "reco",
+            tasks_models.Task,
+            project.tasks.filter(public=True),
+            lambda item: item.updated_on,
+            lambda item: item.topic.name if item.topic else "",
+        ),
+        (
+            "followup",
+            tasks_models.TaskFollowup,
+            tasks_models.TaskFollowup.objects.filter(
+                task__in=project.tasks.filter(public=True)
+            ),
+            lambda item: item.timestamp,
+            lambda item: item.task.topic.name if item.task.topic else "",
+        ),
+    ]
+
+    for (
+        item_type,
+        model_instance,
+        queryset,
+        ts_lambda,
+        topic_lambda,
+    ) in feed_object_templates:
+        object_ids = list(queryset.values_list("id", flat=True))
+        object_ct = ContentType.objects.get_for_model(model_instance)
+        object_notifs = request.user.notifications.unread().filter(
+            action_object_object_id__in=object_ids, action_object_content_type=object_ct
+        )
+
+        for item in queryset.all():
+            feed_add_item(
+                timestamp=ts_lambda(item),
+                topic=topic_lambda(item),
+                item_type=item_type,
+                notifications=list(
+                    object_notifs.filter(action_object_object_id=item.id).values_list(
                         "id", flat=True
                     )
                 ),
-                "object": reco,
-            }
-        )
+                related_object=item,
+            )
 
-    followups = tasks_models.TaskFollowup.objects.filter(
-        task__in=project.tasks.filter(public=True)
-    )
-    followup_ids = list(followups.values_list("id", flat=True))
-    followup_ct = ContentType.objects.get_for_model(tasks_models.TaskFollowup)
-    followup_notifs = request.user.notifications.unread().filter(
-        action_object_object_id__in=followup_ids, action_object_content_type=followup_ct
-    )
-    for followup in followups:
-        feed.append(
-            {
-                "timestamp": followup.timestamp,
-                "topic": followup.task.topic.name if followup.task.topic else "",
-                "type": "followup",
-                "notifications": list(
-                    followup_notifs.filter(
-                        action_object_object_id=followup.id
-                    ).values_list("id", flat=True)
-                ),
-                "object": followup,
-            }
-        )
-
+    # Activities are a special case
     activity_verbs = [verbs.Project.BECAME_OBSERVER, verbs.Project.BECAME_ADVISOR]
     activities = project.target_actions.filter(verb__in=activity_verbs)
     activity_notifs = request.user.notifications.unread().filter(
@@ -402,24 +400,23 @@ def project_conversations_new(request, project_id=None):
         max_date = activity.timestamp + timedelta(seconds=2)
         min_date = activity.timestamp - timedelta(seconds=2)
 
-        feed.append(
-            {
-                "timestamp": activity.timestamp,
-                "topic": "",
-                "type": "activity",
-                "notifications": list(
-                    activity_notifs.filter(
-                        verb=activity.verb,
-                        action_object_object_id=activity.action_object_object_id,
-                        action_object_content_type=activity.action_object_content_type,
-                        timestamp__lte=max_date,
-                        timestamp__gte=min_date,
-                    ).values_list("id", flat=True)
-                ),
-                "object": activity,
-            }
+        feed_add_item(
+            timestamp=activity.timestamp,
+            topic="",
+            item_type="activity",
+            notifications=list(
+                activity_notifs.filter(
+                    verb=activity.verb,
+                    action_object_object_id=activity.action_object_object_id,
+                    action_object_content_type=activity.action_object_content_type,
+                    timestamp__lte=max_date,
+                    timestamp__gte=min_date,
+                ).values_list("id", flat=True)
+            ),
+            related_object=activity,
         )
 
+    # Pre-sort so it's easier to use in the template
     feed.sort(key=lambda x: (x["topic"], x["timestamp"]))
 
     return render(
