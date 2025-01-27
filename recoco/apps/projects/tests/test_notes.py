@@ -171,18 +171,58 @@ def test_create_public_note_with_topic_and_redirect(request, client, project):
 
     project.projectmember_set.add(membership)
 
-    topic = baker.make(models.Topic, name="TchatchaTcha")
+    topic = baker.make(
+        models.Topic, site=get_current_site(request), name="TchatchaTcha"
+    )
 
     with login(client) as user:
         assign_collaborator(user, project)
         response = client.post(
             reverse("projects-conversation-create-message", args=[project.id]),
-            data={"content": "this is some content", "topic": "tchatchatcha"},
+            data={"content": "this is some content", "topic_name": "tchatchatcha"},
         )
     assert response.status_code == 302
 
     note = models.Note.on_site.all()[0]
     assert note.topic == topic
+
+
+@pytest.mark.django_db
+def test_create_public_note_with_nonexisting_topic(request, client, project):
+    membership = baker.make(models.ProjectMember, member__is_staff=False)
+
+    project.projectmember_set.add(membership)
+
+    baker.make(models.Topic, site=get_current_site(request), name="TchatchaTcha")
+
+    with login(client) as user:
+        assign_collaborator(user, project)
+        response = client.post(
+            reverse("projects-conversation-create-message", args=[project.id]),
+            data={"content": "this is some content", "topic_name": "Lalalal"},
+        )
+    assert response.status_code == 400
+
+    assert models.Note.on_site.count() == 0
+
+
+@pytest.mark.django_db
+def test_create_public_note_with_topic_of_another_site(request, client, project):
+    membership = baker.make(models.ProjectMember, member__is_staff=False)
+
+    project.projectmember_set.add(membership)
+
+    baker.make(models.Topic, name="TchatchaTcha")
+
+    with login(client) as user:
+        assign_collaborator(user, project)
+        response = client.post(
+            reverse("projects-conversation-create-message", args=[project.id]),
+            data={"content": "this is some content", "topic_name": "TchatchaTcha"},
+        )
+    assert response.status_code == 400
+
+    assert models.Note.on_site.count() == 0
 
 
 @pytest.mark.django_db
