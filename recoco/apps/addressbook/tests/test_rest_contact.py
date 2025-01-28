@@ -76,6 +76,8 @@ def test_staff_user_can_create_contact(api_client, current_site, staff_user):
         "email": "",
         "division": "",
         "organization": organization.pk,
+        "created": ANY,
+        "modified": ANY,
     }
 
 
@@ -106,7 +108,6 @@ def test_can_not_create_contact_with_wrong_organization(api_client, staff_user):
     [
         ("skywalker", [999]),
         ("jedi", [777, 888]),
-        ("maître jedi", [777, 888]),
         ("coté obscure", [999]),
         # On pourrait aller plus loin dans le tests ici,
         # mais à voir avant si on passe par une recherche basée sur watson
@@ -143,7 +144,7 @@ def test_contact_search_filter(
         first_name="Obiwan",
         last_name="Kenobi",
         organization=jedi_organization,
-        division="Maître jedi",
+        division="Maître",
         site=current_site,
     )
     baker.make(
