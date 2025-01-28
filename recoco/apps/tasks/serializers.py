@@ -24,7 +24,6 @@ class TaskFollowupCreateSerializer(BaseSerializerMixin, serializers.ModelSeriali
             "id",
             "status",
             "contact",
-            "status",
             "comment",
             "who",
             "task",
@@ -62,14 +61,12 @@ class TaskFollowupSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "status",
-            "status",
             "status_txt",
             "comment",
             "who",
             "contact",
             "timestamp",
         ]
-        # read_only_fields = fields
 
     who = UserSerializer(read_only=True, many=False)
     contact = NestedContactSerializer(read_only=True)

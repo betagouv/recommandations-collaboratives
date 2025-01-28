@@ -19,7 +19,7 @@ from recoco.rest_api.serializers import BaseSerializerMixin
 
 from .models import Contact, Organization, OrganizationGroup
 
-# OrganizationGroup seraializers
+# OrganizationGroup serializers
 
 
 class OrganizationGroupSerializer(BaseSerializerMixin, ModelSerializer):
@@ -51,7 +51,7 @@ class OrganizationListSerializer(OrganizationSerializer):
     departments = SerializerMethodField()
     group = OrganizationGroupSerializer(read_only=True)
 
-    _detail = HyperlinkedIdentityField(view_name="api-addressbook-organization-detail")
+    _link = HyperlinkedIdentityField(view_name="api-addressbook-organization-detail")
     _search_rank = FloatField(source="search_rank", read_only=True)
 
     class Meta:
@@ -61,7 +61,7 @@ class OrganizationListSerializer(OrganizationSerializer):
             "name",
             "group",
             "departments",
-            "_detail",
+            "_link",
             "_search_rank",
         ]
 
@@ -86,7 +86,7 @@ class NestedOrganizationSerializer(OrganizationListSerializer):
         fields = [
             "id",
             "name",
-            "_detail",
+            "_link",
         ]
 
 
@@ -115,7 +115,7 @@ class ContactSerializer(BaseSerializerMixin, ModelSerializer):
 class ContactListSerializer(ContactSerializer):
     organization = NestedOrganizationSerializer(read_only=True, many=False)
 
-    _detail = HyperlinkedIdentityField(view_name="api-addressbook-contact-detail")
+    _link = HyperlinkedIdentityField(view_name="api-addressbook-contact-detail")
     _search_rank = FloatField(source="search_rank", read_only=True)
 
     class Meta:
@@ -129,7 +129,7 @@ class ContactListSerializer(ContactSerializer):
             "mobile_no",
             "division",
             "organization",
-            "_detail",
+            "_link",
             "_search_rank",
         ]
         read_only_fields = fields
@@ -162,6 +162,6 @@ class NestedContactSerializer(ContactListSerializer):
             "mobile_no",
             "division",
             "organization",
-            "_detail",
+            "_link",
         ]
         read_only_fields = fields
