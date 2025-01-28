@@ -1,9 +1,9 @@
 {% load static %}
 <div x-data="TaskComment()">
-    <template x-if="currentTask.content !== '' && !isEditing">
+    <template x-if="!isEditing && currentTask.content !== ''">
         <div data-test-id="task-initial-comment"
              class="position-relative fr-p-2w bg-grey-light rounded-3 fr-p-2w">
-            <div x-html="truncate(renderMarkdown(currentTask.content),100)"
+            <div x-html="truncate(renderMarkdown(task.content),100)"
                  class="text-info-custom font-small text-dark fr-mb-2w"></div>
             {% include "projects/project/fragments/task/task_user_card.html" %}
             {% if embed_view is not True %}

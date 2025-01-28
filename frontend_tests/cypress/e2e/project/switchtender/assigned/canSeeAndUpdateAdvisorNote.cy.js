@@ -11,7 +11,7 @@ describe('I can see and update an advisor note', () => {
 
     cy.contains('Note interne');
 
-    cy.contains('Non visible par la collectivité')
+    cy.contains('Non visible par le porteur de projet')
       .parent()
       .siblings('a')
       .click({ force: true });

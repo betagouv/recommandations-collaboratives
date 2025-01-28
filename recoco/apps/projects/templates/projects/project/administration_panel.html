@@ -204,6 +204,7 @@
                                     <button @click="openInviteMemberModal"
                                             data-toggle="modal"
                                             data-target="#InviteMemberModal"
+                                            data-cy="button-invite-project-member"
                                             class="{% if project.status == 'DRAFT' %} disabled{% endif %} button d-inline-flex justify-content-center w-100 fr-mb-3w cursor-pointer">
                                         {% if project.status == 'DRAFT' %}
                                             <svg class="bi align-middle" width="18" height="18" fill="currentColor">

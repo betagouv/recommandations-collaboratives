@@ -1,21 +1,7 @@
-import projects from '../../../fixtures/projects/projects.json';
-
-let currentProject = projects[9];
-
-describe('I can go to overview tab and check invitation advisor button', () => {
-  before(() => {
-    cy.login('staff');
-    cy.createProject('non advisor project');
-    cy.visit('/projects/moderation');
-    cy.get('[data-test-id="accept-project"]').first().click();
-    cy.logout();
-  });
-
-  it('shows disabled button to invite new advisor', () => {
+describe('I can go to overview tab and check invitation project member button', () => {
+  it('shows disabled button to invite new project member', () => {
     cy.login('national');
-    cy.visit('/projects/advisor/');
-    cy.contains('non advisor project').click({ force: true });
-    cy.url('should.include', '/presentation');
-    cy.get('[data-cy="invite-advisor-button"]').should('be.disabled');
+    cy.visit('/project/1/presentation');
+    cy.get('[data-cy="invite-project-member-button"]').should('be.disabled');
   });
 });

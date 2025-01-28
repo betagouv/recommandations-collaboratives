@@ -7,13 +7,21 @@ describe('I can go to the dashboard and see only my projects', () => {
   });
 
   it('search project by name', () => {
-    projectsLength = cy.get('[data-cy="card-project"]').length;
-    cy.get('[data-test-id="my-projects-toggle"]').should('be.visible');
-    cy.get('[data-test-id="my-projects-toggle"]').should('be.unchecked');
+    cy.get('[data-cy="card-project"]').then(($projects) => {
+      const visibleProjects = $projects.filter((_, project) => {
+        return Cypress.$(project).css('display') !== 'none';
+      });
+      projectsLength = visibleProjects.length;
+      cy.log(`Nombre initial de projets: ${projectsLength}`);
+    });
+
+    cy.get('[data-test-id="my-projects-toggle"]').should('be.not.checked');
     cy.get('[data-test-id="my-projects-toggle"]').check();
-    cy.get('[data-cy="card-project"]').should(
-      'have.length.lowerThan',
-      projectsLength
-    );
+    cy.get('[data-cy="card-project"]').should(($projects) => {
+      const visibleProjects = $projects.filter((_, project) => {
+        return Cypress.$(project).css('display') !== 'none';
+      });
+      expect(visibleProjects.length).to.be.lessThan(projectsLength);
+    });
   });
 });

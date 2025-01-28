@@ -52,7 +52,8 @@
                                                    target="_new"
                                                    download>
                                                     <span class="fr-icon-file-line fr-icon--sm fr-mr-2v" aria-hidden="true"></span>
-                                                    <span class="text-info-custom text-black fr-ml-2v name">{{ answer.attachment|filename|truncatechars:30 }}</span>
+                                                    <span class="text-info-custom text-black fr-ml-2v name"
+                                                          data-cy="attachment-filename">{{ answer.attachment|filename|truncatechars:30 }}</span>
                                                     {% if answer.attachment.size %}
                                                         <span class="text-info-custom text-black fr-ml-2v">({{ answer.attachment.size|filesizeformat }})</span>
                                                     {% endif %}
