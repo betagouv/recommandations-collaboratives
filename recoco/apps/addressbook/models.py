@@ -16,6 +16,7 @@ from django.db import models
 from django.db.models.functions import Lower
 from django.db.models.signals import post_migrate
 from django.dispatch import receiver
+from model_utils.models import TimeStampedModel
 
 from recoco.apps.geomatics import models as geomatics_models
 
@@ -37,7 +38,7 @@ def create_site_permissions(sender, **kwargs):
     )
 
 
-class OrganizationGroup(models.Model):
+class OrganizationGroup(TimeStampedModel):
     name = models.CharField(max_length=90, verbose_name="Nom")
 
     class Meta:
@@ -57,7 +58,7 @@ class OrganizationOnSiteManager(CurrentSiteManager, OrganizationManager):
     pass
 
 
-class Organization(models.Model):
+class Organization(TimeStampedModel):
     objects = OrganizationManager()
     on_site = OrganizationOnSiteManager()
 
@@ -103,7 +104,7 @@ class ContactOnSiteManager(CurrentSiteManager, ContactManager):
 @reversion.register(
     fields=("first_name", "last_name", "phone_no", "mobile_no", "email", "division")
 )
-class Contact(models.Model):
+class Contact(TimeStampedModel):
     objects = ContactManager()
     on_site = ContactOnSiteManager()
 

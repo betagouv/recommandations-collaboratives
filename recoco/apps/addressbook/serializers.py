@@ -130,6 +130,8 @@ class ContactListSerializer(ContactSerializer):
             "mobile_no",
             "division",
             "organization",
+            "created",
+            "modified",
             "_link",
             "_search_rank",
         ]
@@ -148,6 +150,8 @@ class ContactDetailSerializer(ContactListSerializer):
             "mobile_no",
             "division",
             "organization",
+            "created",
+            "modified",
         ]
 
 
