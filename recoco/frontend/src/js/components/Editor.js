@@ -14,6 +14,7 @@ Alpine.data('editor', (content) => {
   return {
     updatedAt: Date.now(), // force Alpine to rerender on selection change
     markdownContent: content ? content : '',
+    contact: null,
     init() {
       const _this = this;
 
@@ -107,6 +108,10 @@ Alpine.data('editor', (content) => {
     },
     renderMarkdown() {
       this.markdownContent = editor.getMarkdown().replaceAll('\\', '');
+    },
+    addContact(contact) {
+      console.log('contact : ', contact);
+      this.contact = contact;
     },
   };
 });

@@ -74,6 +74,7 @@
         {% endif %}
         {% if is_task_modal_comment %}
             <div x-data='SearchContact()'
+                 @contactSelected.window="addContact($event)"
                  @keydown.escape="isOpenModal = false"
                  x-cloak
                  class="d-flex justify-content-between">
