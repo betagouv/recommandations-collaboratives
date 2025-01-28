@@ -20,7 +20,7 @@ from recoco.rest_api.serializers import BaseSerializerMixin
 
 from .models import Contact, Organization, OrganizationGroup
 
-# OrganizationGroup seraializers
+# OrganizationGroup serializers
 
 
 class OrganizationGroupSerializer(BaseSerializerMixin, ModelSerializer):
