@@ -1,7 +1,7 @@
 <div class="observed-element"
      data-notifications="{{ element.notifications }}">
     {% if element.object.status %}
-        <p>
+        <p class="fr-mb-0">
             <span class="strong">{{ element.object.who.first_name }} {{ element.object.who.last_name }}</span> a marqué la recommandation commme {{ element.object.status_txt }}
         </p>
     {% endif %}

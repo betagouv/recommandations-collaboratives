@@ -23,6 +23,7 @@
           type="text/css">
 {% endblock css %}
 {% block project_detail %}
+    {{ project.pk|json_script:"djangoProjectId" }}
     {% get_obj_perms request.user for project as "user_project_perms" %}
     {% include "projects/project/navigation.html" with conversation=True %}
     {% regroup feed by topic as topic_list %}
