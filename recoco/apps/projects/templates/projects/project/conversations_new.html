@@ -26,8 +26,11 @@
     {% get_obj_perms request.user for project as "user_project_perms" %}
     {% include "projects/project/navigation.html" with conversation=True %}
     {% regroup feed by topic as topic_list %}
-    <div class="d-flex" x-data="ConversationTopicSwitch()">
+    <div class="conversation-new d-flex" x-data="ConversationTopicSwitch()">
         <div class="conversation-new__topics">
+            <div class="conversation-new__header">
+                <h3>Fils de discussion</h3>
+            </div>
             {% for topic in topic_list %}
                 {% include "projects/project/fragments/conversations_new/conversation_topic.html" with topic_name=topic.grouper message_number=topic.list %}
             {% endfor %}

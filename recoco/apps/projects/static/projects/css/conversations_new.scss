@@ -3,6 +3,18 @@
   --width-left-col: 77%;
 }
 .conversation-new {
+  &__header {
+    padding: 1rem;
+    border-bottom: 1px solid var(--light-border-default-grey, #e5e5e5);
+    h3 {
+      color: var(--light-text-default-grey, #3a3a3a);
+      font-size: 14px;
+      font-weight: 700;
+      line-height: 22px;
+      text-transform: uppercase;
+      margin: 0;
+    }
+  }
   &__topics {
     flex: 0 0 auto;
     width: var(--width-right-col);
