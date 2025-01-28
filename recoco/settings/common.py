@@ -133,6 +133,7 @@ MIDDLEWARE = [
     "waffle.middleware.WaffleMiddleware",
 ]
 
+
 ROOT_URLCONF = "recoco.urls"
 
 TEMPLATES = [

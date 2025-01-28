@@ -184,6 +184,10 @@ class SiteConfiguration(models.Model):
         blank=True,
     )
 
+    crisp_token = models.CharField(
+        verbose_name="Clé pour activer CRISP", null=True, blank=True
+    )
+
     def logo_email_upload_path(self, filename):
         return self._logo_upload_path(filename, prefix="email")
 
