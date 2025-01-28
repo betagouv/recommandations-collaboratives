@@ -9,17 +9,19 @@ created : 2021-05-26 15:56:20 CEST
 from __future__ import annotations
 
 from copy import copy
-from datetime import date, timedelta
+from datetime import timedelta
 
+from actstream.models import Action
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 from django.db.models import Count, F, Q, QuerySet
 from django.http import Http404
 from django.shortcuts import get_object_or_404
+from django.utils import timezone
 from notifications import models as notifications_models
 from rest_framework import permissions, status, viewsets
-from rest_framework.filters import SearchFilter
+from rest_framework.filters import BaseFilterBackend, SearchFilter
 from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from rest_framework.settings import api_settings
@@ -27,8 +29,6 @@ from rest_framework.views import APIView
 from watson import search as watson
 
 from recoco import verbs
-from recoco.apps.geomatics import models as geomatics_models
-from recoco.apps.geomatics import serializers as geomatics_serializers
 from recoco.rest_api.filters import TagsFilterbackend
 from recoco.utils import (
     TrigramSimilaritySearchFilter,
@@ -65,6 +65,46 @@ class ProjectSearchFilter(SearchFilter):
 
         if departments:
             queryset = queryset.filter(commune__department__code__in=departments)
+
+        return queryset
+
+
+class ProjectActivityFilter(BaseFilterBackend):
+    """
+    Filter on users activity using action streams and project annotation
+    """
+
+    def filter_queryset(self, request, queryset, view):
+        last_activity_days = request.GET.get("last_activity", None)
+
+        project_ct = ContentType.objects.get_for_model(models.Project)
+
+        if last_activity_days:
+            try:
+                from_ts = timezone.now() - timedelta(days=int(last_activity_days))
+            except ValueError:
+                return queryset
+
+            # Filter on members activity recorded on model
+            members_queryset = queryset.filter(last_members_activity_at__gte=from_ts)
+
+            # Fetch activity from acstream
+            activity_queryset = queryset.filter(
+                id__in=list(
+                    Action.objects.filter(
+                        target_content_type=project_ct.pk,
+                        target_object_id__in=list(
+                            queryset.values_list("pk", flat=True)
+                        ),
+                        timestamp__gte=from_ts,
+                    )
+                    .order_by("timestamp")
+                    .values_list("target_object_id", flat=True)
+                )
+            )
+
+            # We want both to cover members and advisors activities
+            queryset = (members_queryset | activity_queryset).distinct()
 
         return queryset
 
@@ -109,37 +149,12 @@ class ProjectDetail(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-# TODO: no longer needed if we use the project_list_for_staff view
-class ProjectDepartmentList(ListAPIView):
-    """List all usable departments for the current user"""
-
-    permission_classes = [permissions.IsAuthenticated]
-    serializer_class = geomatics_serializers.DepartmentSerializer
-
-    def get_queryset(self):
-        return (
-            geomatics_models.Department.objects.filter(
-                code__in=models.Project.on_site.for_user(self.request.user)
-                .order_by("-created_on", "-updated_on")
-                .prefetch_related("commune__department")
-                .values_list("commune__department", flat=True)
-            )
-            | self.request.user.profile.departments.all()
-        ).distinct()
-
-    def list(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset())
-
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
-
-
 class ProjectList(ListAPIView):
     """List all user projects"""
 
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = ProjectForListSerializer
-    filter_backends = [TagsFilterbackend, ProjectSearchFilter]
+    filter_backends = [TagsFilterbackend, ProjectSearchFilter, ProjectActivityFilter]
 
     def get_queryset(self):
         return (
@@ -154,27 +169,12 @@ class ProjectList(ListAPIView):
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
 
-        if last_activity_days := self._get_non_empty_query_param("last_activity"):
-            try:
-                from_date = date.today() - timedelta(days=int(last_activity_days))
-                queryset = queryset.filter(
-                    last_members_activity_at__date__gte=from_date
-                )
-            except ValueError:
-                pass
-
         projects = self._update_the_site_projects(
             queryset=queryset, site=request.site, user=request.user
         )
 
         serializer = self.get_serializer(projects, many=True)
         return Response(serializer.data)
-
-    def _get_non_empty_query_param(self, query_param: str, default=None) -> str | None:
-        if value := self.request.GET.get(query_param):
-            return value
-
-        return default
 
     def _update_the_site_projects(
         self, queryset: QuerySet[models.Project], site: Site, user: User

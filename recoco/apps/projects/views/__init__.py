@@ -270,15 +270,6 @@ def project_list_for_staff(request):
 
     site_config = get_site_config_or_503(request.site)
 
-    unread_notifications = (
-        notifications_models.Notification.on_site.unread()
-        .filter(recipient=request.user, public=True)
-        .prefetch_related("actor__profile__organization")
-        .prefetch_related("action_object")
-        .prefetch_related("target")
-        .order_by("-timestamp")[:100]
-    )
-
     mark_general_notifications_as_seen(request.user)
 
     department_queryset = (
@@ -293,11 +284,12 @@ def project_list_for_staff(request):
         | request.user.profile.departments.all()
     ).distinct()
 
-    region_queryset = geomatics_models.Region.objects.all()
+    region_queryset = geomatics_models.Region.objects.filter(
+        departments__in=department_queryset
+    )
 
     context = {
         "site_config": site_config,
-        "unread_notifications": unread_notifications,
         "departments": list(DepartmentSerializer(department_queryset, many=True).data),
         "regions": list(RegionSerializer(region_queryset, many=True).data),
         **locals(),
