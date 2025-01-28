@@ -68,7 +68,7 @@
             </div>
             <div class="kanban-header__toolbar">{% include "projects/project/fragments/list-toolbars.html" %}</div>
         </div>
-        <template x-if="projectList.length == 0">
+        <template x-if="isViewInitialized && projectList.length == 0">
             <div class="fr-notice fr-notice--info fr-my-8w">
                 <div class="fr-container">
                     <div class="fr-notice__body">
@@ -83,7 +83,7 @@
                 </div>
             </div>
         </template>
-        <template x-if="projectList.length > 0">
+        <template x-if="isViewInitialized && projectList.length > 0">
             <div x-cloak class="d-flex">
                 <div class="flex-grow-1 kanban-container">
                     <div class="fr-py-3w md-py-8">

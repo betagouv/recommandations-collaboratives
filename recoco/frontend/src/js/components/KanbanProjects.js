@@ -8,6 +8,7 @@ Alpine.data('KanbanProjects', function (currentSiteId, departments, regions) {
   return {
     makeProjectURL,
     projectList: null,
+    isViewInitialized: false,
     currentSiteId: currentSiteId,
     isDisplayingOnlyUserProjects:
       JSON.parse(localStorage.getItem('isDisplayingOnlyUserProjects')) ?? false,
@@ -17,7 +18,9 @@ Alpine.data('KanbanProjects', function (currentSiteId, departments, regions) {
     backendSearch: {
       searchText: '',
       searchDepartment: [],
-      lastActivity: '30',
+      lastActivity: JSON.parse(localStorage.getItem('lastActivity')) ?? '30',
+      // lastActivity:
+      //   JSON.parse(localStorage.getItem('lastActivity') || '') ?? '30',
     },
     searchText: '',
     selectedDepartment: null,
@@ -40,8 +43,12 @@ Alpine.data('KanbanProjects', function (currentSiteId, departments, regions) {
       },
     ],
     async init() {
+      this.$refs.selectFilterProjectDuration.value =
+        this.backendSearch.lastActivity;
+
       await this.getData();
       this.constructRegionsFilter(this.departments, this.regions);
+      this.isViewInitialized = true;
     },
     async getData() {
       const { searchText, searchDepartment, lastActivity } = this.backendSearch;
@@ -131,6 +138,7 @@ Alpine.data('KanbanProjects', function (currentSiteId, departments, regions) {
     },
     async onLastActivityChange(event) {
       this.backendSearch.lastActivity = event.target.value;
+      localStorage.setItem('lastActivity', this.backendSearch.lastActivity);
       await this.getData();
     },
     toggleMyProjectsFilter() {
