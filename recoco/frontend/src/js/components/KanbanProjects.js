@@ -19,8 +19,6 @@ Alpine.data('KanbanProjects', function (currentSiteId, departments, regions) {
       searchText: '',
       searchDepartment: [],
       lastActivity: JSON.parse(localStorage.getItem('lastActivity')) ?? '30',
-      // lastActivity:
-      //   JSON.parse(localStorage.getItem('lastActivity') || '') ?? '30',
     },
     searchText: '',
     selectedDepartment: null,
