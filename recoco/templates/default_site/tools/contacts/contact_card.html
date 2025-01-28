@@ -8,7 +8,7 @@
           type="text/css" />
 {% endblock css %}
 <template x-if="contact">
-    <div class="fr-p-3v bg-white">
+    <div class="contact-card fr-p-3v bg-white">
         <div class="d-flex">
             <template x-if="contact.first_name">
                 <div>
@@ -38,7 +38,7 @@
         <template x-if="contact.email">
             <div>
                 <a :href="'mailto:' +contact.email"
-                   class="same-for-all-text text-position">
+                   class="contact-card__link same-for-all-text text-position">
                     <span class="fr-icon--sm fr-icon-link" x-text="contact.email"></span>
                 </a>
             </div>
@@ -46,7 +46,7 @@
         <template x-if="contact.phone_no">
             <div>
                 <a href="'tel:'+contact.phone_no"
-                   class="same-for-all-text text-position">
+                   class="contact-card__link same-for-all-text text-position">
                     <span class="fr-icon--sm fr-icon-phone-line" x-text="contact.phone_no"></span>
                 </a>
             </div>
@@ -54,7 +54,7 @@
         <template x-if="contact.mobile_no">
             <div>
                 <a href="'tel:'+contact.mobile_no"
-                   class="same-for-all-text text-position">
+                   class="contact-card__link same-for-all-text text-position">
                     <span class="fr-icon--sm fr-icon-phone-line" x-text="contact.mobile_no"></span>
                 </a>
             </div>

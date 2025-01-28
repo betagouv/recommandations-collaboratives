@@ -1,7 +1,6 @@
-a {
-    // text-decoration: underline;
-    // font-weight: 700;
-    // font-size: 40px;
-    // color: #0000ee;
-
+.contact-card {
+    &__link {
+            text-decoration: underline;
+            color: #0000ee;
+        }
 }

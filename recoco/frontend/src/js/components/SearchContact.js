@@ -16,6 +16,7 @@ function SearchContact() {
     onSearch() {
       this.delayDisplay = true;
       if (this.userInput.length > 0 && !this.isAContactSelected) {
+        this.contactsFound = [];
         api.get(searchContactsUrl(this.userInput)).then((response) => {
           this.searchResults = response.data;
           this.contactsFound = this.searchResults.results;
