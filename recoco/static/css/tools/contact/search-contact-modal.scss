@@ -119,3 +119,13 @@
     text-align: center;
     display: inline;
 }
+
+.long-text-adaptation {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    height: 20px;
+    width: 150px;
+    white-space: nowrap;
+    padding-top: 2px;
+}

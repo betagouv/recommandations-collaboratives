@@ -96,7 +96,7 @@ document.addEventListener('alpine:init', () => {
       return data;
     },
     async issueFollowup(task, status, comment = '') {
-      const body = { comment, status, contact: {id:1} };
+      const body = { comment, status, contact: 3 };
 
       if (body.status === task.status && body.comment === '') return;
 
