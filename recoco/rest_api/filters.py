@@ -81,16 +81,23 @@ class VectorSearchFilter(BaseSearchFilter):
         return (
             queryset.annotate(rank=SearchRank(search_vector, search_query))
             .filter(rank__gte=self.get_search_min_rank(view, request))
-            .annotate(search_rank=Round(Coalesce(F("rank"), 0.0), precision=4))
+            .annotate(search_rank=Round(Coalesce(F("rank"), 0.0), precision=2))
             .order_by("-search_rank")
         )
 
 
 class WatsonSearchFilter(BaseSearchFilter):
     def filter_queryset(self, request, queryset, view):
-        search_terms = " ".join(self.get_search_terms(request))
+        search_terms = self.get_search_terms(request)
+
+        if not search_terms or not len(search_terms):
+            return queryset.annotate(search_rank=Value(0.0, output_field=FloatField()))
+
+        search_min_rank = self.get_search_min_rank(view, request)
+        search_text = " ".join(search_terms)
+
         return (
-            watson_search.filter(queryset, search_text=search_terms)
+            watson_search.filter(queryset, search_text=search_text)
             .annotate(search_rank=F("watson_rank"))
-            .filter(search_rank__gte=self.get_search_min_rank(view, request))
+            .filter(search_rank__gte=search_min_rank)
         )
