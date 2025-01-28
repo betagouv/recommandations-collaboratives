@@ -12,7 +12,7 @@ from django.contrib.auth import models as auth_models
 from django.contrib.sites import models as sites_models
 from rest_framework import serializers
 
-from recoco.apps.addressbook.serializers import OrganizationSerializer
+from recoco.apps.addressbook.serializers import NestedOrganizationSerializer
 
 from .models import SiteConfiguration, UserProfile
 
@@ -23,7 +23,7 @@ class UserProfileSerializer(serializers.HyperlinkedModelSerializer):
 
         fields = ["organization", "organization_position"]
 
-    organization = OrganizationSerializer(read_only=True, many=False)
+    organization = NestedOrganizationSerializer(read_only=True, many=False)
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
