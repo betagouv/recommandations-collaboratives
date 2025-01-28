@@ -92,10 +92,10 @@ class ContactViewSet(ModelViewSet):
     def filter_queryset(self, queryset):
         backends = list(self.filter_backends)
 
-        if switch_is_active("addressbook_contact_use_vector_search"):
-            backends.append(VectorSearchFilter)
-        else:
+        if switch_is_active("addressbook_contact_use_watson_search"):
             backends.append(WatsonSearchFilter)
+        else:
+            backends.append(VectorSearchFilter)
 
         for backend in backends:
             queryset = backend().filter_queryset(self.request, queryset, self)
