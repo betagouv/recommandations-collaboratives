@@ -7,7 +7,6 @@ authors: guillaume.libersat@beta.gouv.fr, raphael.marvie@beta.gouv.fr
 created: 2022-05-16 17:44:55 CET
 """
 
-
 from rest_framework.exceptions import ValidationError
 from rest_framework.serializers import (
     FloatField,

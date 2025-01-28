@@ -73,7 +73,16 @@
             </template>
         {% endif %}
         {% if is_task_modal_comment %}
-            <div class="d-flex justify-content-end">
+            <div x-data='SearchContact()'
+                 @contactSelected.window="addContact($event)"
+                 @keydown.escape="isOpenModal = false"
+                 x-cloak
+                 class="d-flex justify-content-between">
+                <button @click="isOpenModal = true"
+                        class="fr-btn fr-btn--tertiary fr-btn--sm justify-content-center fr-text--sm">
+                    Ajouter un contact
+                </button>
+                {% include "tools/contacts/search_contact_modal.html" %}
                 <button class="fr-btn fr-btn--sm"
                         :disabled="$store.editor.isSubmitted === true"
                         @click.stop="onSubmitComment(markdownContent)"
@@ -93,7 +102,7 @@
             <textarea class="position-absolute top-0 opacity-0 specific-height-0"
                       x-model="markdownContent"
                       name="{{input_name}}"
-                      {% if input_required %} required {% endif %}></textarea>
+                      {% if input_required %}required{% endif %}></textarea>
         {% endif %}
     </div>
 </div>

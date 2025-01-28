@@ -17,6 +17,8 @@ document.addEventListener('alpine:init', () => {
     index: null,
     scrollY: null,
 
+    contact: null,
+
     get projectId() {
       return Alpine.store('djangoData').projectId;
     },

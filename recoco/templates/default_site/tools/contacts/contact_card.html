@@ -1,0 +1,66 @@
+{% load sass_tags %}
+{% block css %}
+    <link href="{% sass_src 'css/tools/contact/contact-card.scss' %}"
+          rel="stylesheet"
+          type="text/css" />
+    <link href="{% sass_src 'css/tools/contact/search-contact-modal.scss' %}"
+          rel="stylesheet"
+          type="text/css" />
+{% endblock css %}
+<template x-if="contact">
+    <div class="contact-card fr-p-3v bg-white">
+        <div class="d-flex">
+            <template x-if="contact.first_name">
+                <div>
+                    <span x-text="contact.first_name"
+                          class="same-for-all-text contact-names fr-pr-1v"></span>
+                </div>
+            </template>
+            <template x-if="contact.last_name">
+                <div>
+                    <span x-text="contact.last_name"
+                          class="same-for-all-text contact-names fr-pr-1v"></span>
+                </div>
+            </template>
+            <template x-if="contact.division">
+                <div>
+                    <span x-text="contact.division"
+                          class="color-3a3a3a text-position long-text-adaptation"></span>
+                </div>
+            </template>
+        </div>
+        <template x-if="contact.organization.name">
+            <div>
+                <span x-text="contact.organization.name"
+                      class="color-3a3a3a text-organisation"></span>
+            </div>
+        </template>
+        <template x-if="contact.email">
+            <div>
+                <a :href="'mailto:' +contact.email"
+                   class="contact-card__link same-for-all-text text-position">
+                    <span class="fr-icon--sm fr-icon-link" x-text="contact.email"></span>
+                </a>
+            </div>
+        </template>
+        <template x-if="contact.phone_no">
+            <div>
+                <a href="'tel:'+contact.phone_no"
+                   class="contact-card__link same-for-all-text text-position">
+                    <span class="fr-icon--sm fr-icon-phone-line" x-text="contact.phone_no"></span>
+                </a>
+            </div>
+        </template>
+        <template x-if="contact.mobile_no">
+            <div>
+                <a href="'tel:'+contact.mobile_no"
+                   class="contact-card__link same-for-all-text text-position">
+                    <span class="fr-icon--sm fr-icon-phone-line" x-text="contact.mobile_no"></span>
+                </a>
+            </div>
+        </template>
+        <div>
+            <span class="same-for-all-text text-date">mis à jour le xxxxxx</span>
+        </div>
+    </div>
+</template>

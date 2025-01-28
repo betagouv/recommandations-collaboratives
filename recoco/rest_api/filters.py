@@ -55,7 +55,6 @@ class BaseSearchFilter(SearchFilter):
 
 
 class VectorSearchFilter(BaseSearchFilter):
-
     def filter_queryset(self, request, queryset, view):
         search_terms = self.get_search_terms(request)
         search_fields = self.get_search_fields(view, request)
