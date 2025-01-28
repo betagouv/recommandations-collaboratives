@@ -168,6 +168,16 @@ class SiteConfigurationUpdateView(LoginRequiredMixin, UserPassesTestMixin, Updat
     def get_object(self, queryset=None):
         return self.request.site.configuration
 
+    def form_valid(self, form):
+        # Invalidate cache for CRISP token
+        from django.core.cache import cache
+        from django.core.cache.utils import make_template_fragment_key
+
+        key = make_template_fragment_key("crisp", [self.request.site])
+        cache.delete(key)
+
+        return super().form_valid(form)
+
 
 ########################################################################
 # organizations
