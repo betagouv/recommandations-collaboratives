@@ -4,6 +4,7 @@ import pytest
 from django.contrib.sites.models import Site
 from django.urls import reverse
 from model_bakery import baker
+from waffle.testutils import override_switch
 
 from ..models import Contact, Organization
 
@@ -15,6 +16,7 @@ def test_anonymous_can_not_reach_contact_list_endpoint(api_client):
 
 
 @pytest.mark.django_db
+@override_switch("addressbook_contact_use_vector_search", active=True)
 def test_non_staff_user_can_list_contacts_but_not_create(api_client):
     user = baker.make("User")
     api_client.force_authenticate(user)
@@ -29,6 +31,7 @@ def test_non_staff_user_can_list_contacts_but_not_create(api_client):
 
 
 @pytest.mark.django_db
+@override_switch("addressbook_contact_use_vector_search", active=True)
 def test_non_staff_user_can_read_contact_but_not_update(api_client, current_site):
     contact = baker.make(Contact, site=current_site)
 
@@ -51,6 +54,7 @@ def test_non_staff_user_can_read_contact_but_not_update(api_client, current_site
 
 
 @pytest.mark.django_db
+@override_switch("addressbook_contact_use_vector_search", active=True)
 def test_staff_user_can_create_contact(api_client, current_site, staff_user):
     organization = baker.make(Organization, sites=[current_site])
 
@@ -79,6 +83,7 @@ def test_staff_user_can_create_contact(api_client, current_site, staff_user):
 
 
 @pytest.mark.django_db
+@override_switch("addressbook_contact_use_vector_search", active=True)
 def test_can_not_create_contact_with_wrong_organization(api_client, staff_user):
     other_site = baker.make(Site)
     organization = baker.make(Organization, sites=[other_site])
@@ -112,10 +117,10 @@ def test_can_not_create_contact_with_wrong_organization(api_client, staff_user):
     ],
 )
 @pytest.mark.django_db
+@override_switch("addressbook_contact_use_vector_search", active=False)
 def test_contact_search_filter(
     api_client, staff_user, current_site, search_terms, expected_result
 ):
-
     jedi_organization = baker.make(
         Organization,
         name="Le conseil des Jedi",

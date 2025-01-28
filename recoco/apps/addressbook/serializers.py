@@ -132,6 +132,7 @@ class ContactListSerializer(ContactSerializer):
             "_detail",
             "_search_rank",
         ]
+        read_only_fields = fields
 
 
 class ContactDetailSerializer(ContactListSerializer):
@@ -163,3 +164,4 @@ class NestedContactSerializer(ContactListSerializer):
             "organization",
             "_detail",
         ]
+        read_only_fields = fields

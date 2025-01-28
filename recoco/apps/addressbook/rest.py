@@ -1,7 +1,7 @@
 from rest_framework.viewsets import ModelViewSet
+from waffle import switch_is_active
 
-# from recoco.rest_api.filters import WatsonSearchFilter
-from recoco.rest_api.filters import VectorSearchFilter
+from recoco.rest_api.filters import VectorSearchFilter, WatsonSearchFilter
 from recoco.rest_api.pagination import StandardResultsSetPagination
 from recoco.rest_api.permissions import (
     IsStaffOrISAuthenticatedReadOnly,
@@ -46,9 +46,6 @@ class ContactViewSet(ModelViewSet):
     permission_classes = [IsStaffOrISAuthenticatedReadOnly]
     pagination_class = StandardResultsSetPagination
 
-    # filter_backends = [WatsonSearchFilter]
-
-    filter_backends = [VectorSearchFilter]
     search_fields = [
         (
             "last_name",
@@ -91,6 +88,19 @@ class ContactViewSet(ModelViewSet):
 
     def get_queryset(self):
         return Contact.on_site.all()
+
+    def filter_queryset(self, queryset):
+        backends = list(self.filter_backends)
+
+        if switch_is_active("addressbook_contact_use_vector_search"):
+            backends.append(VectorSearchFilter)
+        else:
+            backends.append(WatsonSearchFilter)
+
+        for backend in backends:
+            queryset = backend().filter_queryset(self.request, queryset, self)
+
+        return queryset
 
     def get_serializer_class(self):
         match self.action:

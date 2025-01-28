@@ -8,7 +8,6 @@ created : 2021-05-26 15:56:20 CEST
 """
 
 import logging
-from copy import copy
 
 from django.contrib.contenttypes.models import ContentType
 from rest_framework import mixins, permissions, status, viewsets
@@ -21,6 +20,7 @@ from recoco.utils import has_perm, has_perm_or_403
 
 from .. import models, signals
 from ..serializers import (
+    TaskFollowupCreateSerializer,
     TaskFollowupSerializer,
     TaskNotificationSerializer,
     TaskSerializer,
@@ -239,35 +239,35 @@ class TaskFollowupViewSet(viewsets.ModelViewSet):
     API endpoint for TaskFollowups
     """
 
-    serializer_class = TaskFollowupSerializer
     permission_classes = [
         permissions.IsAuthenticated,
         IsTaskUser,
     ]
 
-    def get_queryset(self):
-        project_id = int(self.kwargs["project_id"])
-        task_id = int(self.kwargs["task_id"])
+    @property
+    def task_id(self) -> int:
+        return int(self.kwargs["task_id"])
 
+    @property
+    def project_id(self) -> int:
+        return int(self.kwargs["project_id"])
+
+    def get_queryset(self):
         # also filter with project_id to ensure the given task and project are consistent
         return models.TaskFollowup.objects.filter(
-            task_id=task_id, task__project_id=project_id
+            task_id=self.task_id, task__project_id=self.project_id
         )
 
-    def create(self, request, project_id, task_id):
-        data = copy(request.data)
-        data["task_id"] = task_id
-        data["who_id"] = request.user.id
+    def get_serializer_context(self):
+        return super().get_serializer_context() | {
+            "task_id": self.task_id,
+            "project_id": self.project_id,
+        }
 
-        serializer = self.get_serializer(data=data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-
-        headers = self.get_success_headers(serializer.data)
-
-        return Response(
-            serializer.data, status=status.HTTP_201_CREATED, headers=headers
-        )
+    def get_serializer_class(self):
+        if self.action == "create":
+            return TaskFollowupCreateSerializer
+        return TaskFollowupSerializer
 
 
 # eof
