@@ -25,6 +25,8 @@ from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 from django.contrib.syndication.views import Feed
+from django.core.cache import cache
+from django.core.cache.utils import make_template_fragment_key
 from django.db import transaction
 from django.db.models import Count, ExpressionWrapper, F, FloatField, Max, Q, Value
 from django.db.models.functions import Cast
@@ -170,9 +172,6 @@ class SiteConfigurationUpdateView(LoginRequiredMixin, UserPassesTestMixin, Updat
 
     def form_valid(self, form):
         # Invalidate cache for CRISP token
-        from django.core.cache import cache
-        from django.core.cache.utils import make_template_fragment_key
-
         key = make_template_fragment_key("crisp", [self.request.site])
         cache.delete(key)
 
