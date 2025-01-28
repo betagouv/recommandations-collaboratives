@@ -1,15 +1,14 @@
 export function stringToColor(str, palette) {
   const defaultPalette = [
-    '#fbaff5',
-    '#79e7d5',
-    '#fcb0a2',
-    '#b6cffb',
-    '#fde39c',
-    '#fd9c9c',
-    '#d6fd9c',
-    '#af9cfd',
-    '#9cb1fd',
-    '#9cf2fd',
+    '#fbaff5', // Rose
+    '#79e7d5', // Turquoise
+    '#fcb0a2', // Rouge
+    '#b6cffb', // Bleu
+    '#fde39c', // Jaune
+    '#9cb1fd', // Bleu foncé
+    '#d6fd9c', // Vert
+    '#af9cfd', // Violet
+    '#9cf2fd', // Bleu clair
   ];
   const colors = palette || defaultPalette;
 
