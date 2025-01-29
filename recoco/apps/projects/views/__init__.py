@@ -284,8 +284,10 @@ def project_list_for_staff(request):
         | request.user.profile.departments.all()
     ).distinct()
 
-    region_queryset = geomatics_models.Region.objects.filter(
-        departments__in=department_queryset
+    region_queryset = (
+        geomatics_models.Region.objects.filter(departments__in=department_queryset)
+        .distinct()
+        .order_by("name")
     )
 
     context = {
