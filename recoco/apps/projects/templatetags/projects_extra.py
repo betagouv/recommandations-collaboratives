@@ -91,4 +91,10 @@ def to_json(value, fields=None):
     return json.dumps(data)
 
 
+@register.simple_tag
+def count_has_notifications(feed_items):
+    """Count elements with notifications (new message)"""
+    return len([item for item in feed_items if item.get("notifications")])
+
+
 # eof
