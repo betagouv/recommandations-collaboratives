@@ -29,12 +29,35 @@
     {% regroup feed by topic as topic_list %}
     <div class="conversation-new d-flex" x-data="ConversationTopicSwitch()">
         <div class="conversation-new__topics">
-            <div class="conversation-new__header">
-                <h3>Fils de discussion</h3>
+            <div class="justify-content-between">
+                <div class="conversation-new__topics-header">
+                    <h2 class="conversation-new__topics-header-title">Fils de discussion</h2>
+                </div>
+                {% for topic in topic_list %}
+                    {% include "projects/project/fragments/conversations_new/conversation_topic.html" with topic_name=topic.grouper message_number=topic.list %}
+                {% endfor %}
             </div>
-            {% for topic in topic_list %}
-                {% include "projects/project/fragments/conversations_new/conversation_topic.html" with topic_name=topic.grouper message_number=topic.list %}
-            {% endfor %}
+            <div class="conversation-new__topics-list-member fr-p-2w">
+                <h2 class="conversation-new__topics-list-member-title">Participants</h2>
+                <h3 class="fr-mt-2w conversation-new__topics-list-member-subtitle">Porteur de projet et partenaires</h3>
+                <ul class="flex-column list-unstyled fr-mb-0">
+                    {% for projectmember in project.projectmember_set.all %}
+                        {% if projectmember.is_owner and projectmember.member.is_active %}
+                            <li>{% include "user/user_card.html" with user=project.owner project_owner=True user_activity=True %}</li>
+                        {% elif projectmember.member.is_active %}
+                            <li>{% include "user/user_card.html" with user=projectmember.member user_activity=True %}</li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+                <h3 class="fr-mt-2w conversation-new__topics-list-member-subtitle">Equipe de suivi</h3>
+                <ul class="d-flex flex-column list-unstyled fr-mb-0">
+                    {% for advisor in project.switchtender_sites.all %}
+                        {% if advisor.switchtender.is_active %}
+                            <li>{% include "user/user_card.html" with user=advisor.switchtender user_activity=True %}</li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            </div>
         </div>
         <div class="conversation-new__container fr-p-5v"
              x-data="NotificationEater({{ project.id }})">
