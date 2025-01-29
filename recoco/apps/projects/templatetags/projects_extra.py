@@ -97,4 +97,10 @@ def count_has_notifications(feed_items):
     return len([item for item in feed_items if item.get("notifications")])
 
 
+@register.simple_tag
+def count_task(feed_items):
+    """Count tasks in elements"""
+    return len([item for item in feed_items if item.get("type") == "reco"])
+
+
 # eof

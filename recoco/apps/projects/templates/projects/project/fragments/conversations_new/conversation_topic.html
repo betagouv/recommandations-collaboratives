@@ -1,5 +1,6 @@
 {% load projects_extra %}
 {% count_has_notifications topic.list as new_message_count %}
+{% count_task topic.list as reco_count %}
 {% with clean_topic=topic_name|default:"general"|slugify %}
     <div class="topic-item__container position-relative {% if is_open %}topic-item__container--open{% endif %}">
         <label class="topic-item__title stretched-link"
@@ -24,6 +25,9 @@
                 <span class="fr-icon-chat-2-line fr-icon--sm" aria-hidden="true"></span> {{ message_number|length }} message{{ message_number|length|pluralize }}
                 {% if new_message_count > 0 %}
                     <span class="topic-item__message-len--new">({{ new_message_count }} {{ new_message_count|pluralize:"nouveau,nouveaux" }})</span>
+                {% endif %}
+                {% if reco_count > 0 %}
+                    <span class="fr-icon-list-check-line fr-icon--sm" aria-hidden="true"></span> <span>{{ reco_count }} recommandation{{ reco_count|pluralize }}</span>
                 {% endif %}
             </p>
         </label>
