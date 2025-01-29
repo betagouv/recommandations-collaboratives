@@ -1,6 +1,6 @@
 {% load projects_extra %}
 {% count_has_notifications topic.list as new_message_count %}
-{% count_task topic.list as reco_count %}
+{% count_message_by_type topic.list "reco" as reco_count %}
 {% with clean_topic=topic_name|default:"general"|slugify %}
     <div class="topic-item__container position-relative {% if is_open %}topic-item__container--open{% endif %}">
         <label class="topic-item__title stretched-link"

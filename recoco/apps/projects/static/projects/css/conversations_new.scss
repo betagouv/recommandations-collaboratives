@@ -184,3 +184,25 @@
   &__message {
   }
 }
+
+.empty-message-list {
+  display: flex;
+  padding: 24px;
+  align-items: center;
+  align-self: stretch;
+  border-radius: 1px;
+  background: var(--light-background-alt-blue-france, #f5f5fe);
+  color: #3a3a3a;
+  line-height: 24px;
+
+  &__title {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 800;
+  }
+  &__subtitle {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 400;
+  }
+}

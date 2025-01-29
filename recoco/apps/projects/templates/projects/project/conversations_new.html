@@ -85,6 +85,9 @@
                     {% endif %}
                 </div>
             {% endfor %}
+            {% comment %} <div class="feed-element-item">
+                {% include "projects/project/fragments/conversations_new/message_type/empty_message_list.html" %}
+            </div> {% endcomment %}
             {% if "use_public_notes" in user_project_perms %}
                 <hr />
                 <!-- Post message -->
