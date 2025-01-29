@@ -39,7 +39,6 @@
                         {% if "change_project" in user_project_perms %}
                             <div class="col-12">
                                 <h6 class="text-uppercase fw-bold d-block fr-mb-2w font-small">informations générales</h6>
-                                <h6 class="text-uppercase fw-bold d-block fr-mb-2w font-small">{{ user_project_perms }}</h6>
                                 <form method="post"
                                       action="{% url 'projects-project-administration' project.pk %}"
                                       class="{% if project_form.errors %}was-validated{% endif %}">
@@ -221,10 +220,6 @@
                                             <li class="d-flex align-items-start justify-content-between fr-mb-1v">
                                                 {% include "user/user_card.html" with user=pm.member project_owner=True user_activity=True %}
                                                 <span class="fr-ml-1v text-lowercase fst-italic font-weight-light specific-color-666">Référent du projet</span>
-                                            </li>
-                                            <li class="d-flex align-items-start justify-content-between fr-mb-1v">
-                                                <span class="">{{ pm }}</span>
-                                                <span class="">{{ project }}</span>
                                             </li>
                                         {% else %}
                                             <li class="d-flex align-items-start justify-content-between fr-mb-1v">
