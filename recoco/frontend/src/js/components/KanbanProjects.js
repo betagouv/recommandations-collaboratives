@@ -18,12 +18,13 @@ Alpine.data('KanbanProjects', function (currentSiteId, departments, regions) {
     backendSearch: {
       searchText: '',
       searchDepartment: [],
-      lastActivity: JSON.parse(localStorage.getItem('lastActivity')) ?? '30',
+      lastActivity: localStorage.getItem('lastActivity') ?? '30',
     },
+    filterProjectLastActivity: localStorage.getItem('lastActivity') ?? '30',
     searchText: '',
     selectedDepartment: null,
-    departments: departments,
-    regions: regions,
+    departments: JSON.parse(departments.textContent),
+    regions: JSON.parse(regions.textContent),
     territorySelectAll: true,
     boards: [
       {
@@ -41,9 +42,6 @@ Alpine.data('KanbanProjects', function (currentSiteId, departments, regions) {
       },
     ],
     async init() {
-      this.$refs.selectFilterProjectDuration.value =
-        this.backendSearch.lastActivity;
-
       await this.getData();
       this.constructRegionsFilter(this.departments, this.regions);
       this.isViewInitialized = true;
@@ -53,7 +51,7 @@ Alpine.data('KanbanProjects', function (currentSiteId, departments, regions) {
       const projects = await api.get(
         projectsUrl(searchText, searchDepartment, lastActivity)
       );
-      await this.$store.projects.mapperProjetsProjectSites(
+      this.projectList = await this.$store.projects.mapperProjetsProjectSites(
         projects.data,
         this.currentSiteId
       );
