@@ -103,6 +103,7 @@
                                         {% if pm.member.is_active %}
                                             {% if pm.is_owner %}
                                                 <li>{% include "user/user_card.html" with user=pm.member project_owner=True user_activity=True %}</li>
+                                                <li>{% include "projects/project/fragments/owner/invite-not-accepted-banner.html" with invites=pending_invites %}</li>
                                             {% else %}
                                                 <li>{% include "user/user_card.html" with user=pm.member user_activity=True %}</li>
                                             {% endif %}

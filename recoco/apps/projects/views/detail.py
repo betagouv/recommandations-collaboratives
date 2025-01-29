@@ -304,6 +304,13 @@ def project_conversations(request, project_id=None):
             target_object_id=project.pk,
         ).mark_all_as_read()
 
+    # Fetch pending invites
+    pending_invites = []
+    for invite in invites_models.Invite.on_site.filter(
+        project=project, accepted_on=None
+    ):
+        pending_invites.append(invite)
+
     return render(request, "projects/project/conversations.html", locals())
 
 
