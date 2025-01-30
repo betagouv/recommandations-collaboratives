@@ -55,6 +55,9 @@ class BaseSearchFilter(SearchFilter):
 
 
 class VectorSearchFilter(BaseSearchFilter):
+    """
+    Search filter that uses the Postgres full-text search vector to rank results.
+    """
 
     def filter_queryset(self, request, queryset, view):
         search_terms = self.get_search_terms(request)
@@ -87,6 +90,10 @@ class VectorSearchFilter(BaseSearchFilter):
 
 
 class WatsonSearchFilter(BaseSearchFilter):
+    """
+    Search filter that uses the Watson search engine to filter results.
+    """
+
     def filter_queryset(self, request, queryset, view):
         search_terms = self.get_search_terms(request)
 

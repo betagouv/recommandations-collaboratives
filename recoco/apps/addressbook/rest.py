@@ -4,8 +4,8 @@ from waffle import switch_is_active
 from recoco.rest_api.filters import VectorSearchFilter, WatsonSearchFilter
 from recoco.rest_api.pagination import StandardResultsSetPagination
 from recoco.rest_api.permissions import (
-    IsStaffOrISAuthenticatedReadOnly,
-    IsStaffOrReadOnly,
+    IsStaffForSiteOrISAuthenticatedReadOnly,
+    IsStaffForSiteOrReadOnly,
 )
 
 from . import serializers
@@ -15,7 +15,7 @@ from .models import Contact, Organization, OrganizationGroup
 class OrganizationGroupViewSet(ModelViewSet):
     serializer_class = serializers.OrganizationGroupSerializer
     queryset = OrganizationGroup.objects.all()
-    permission_classes = [IsStaffOrReadOnly]
+    permission_classes = [IsStaffForSiteOrReadOnly]
     pagination_class = StandardResultsSetPagination
     filter_backends = [VectorSearchFilter]
     search_fields = ["name"]
@@ -23,7 +23,7 @@ class OrganizationGroupViewSet(ModelViewSet):
 
 
 class OrganizationViewSet(ModelViewSet):
-    permission_classes = [IsStaffOrReadOnly]
+    permission_classes = [IsStaffForSiteOrReadOnly]
     pagination_class = StandardResultsSetPagination
     filter_backends = [VectorSearchFilter]
     search_fields = ["name"]
@@ -43,7 +43,7 @@ class OrganizationViewSet(ModelViewSet):
 
 
 class ContactViewSet(ModelViewSet):
-    permission_classes = [IsStaffOrISAuthenticatedReadOnly]
+    permission_classes = [IsStaffForSiteOrISAuthenticatedReadOnly]
     pagination_class = StandardResultsSetPagination
 
     search_fields = [
