@@ -40,7 +40,7 @@ from recoco.apps.addressbook import models as addressbook_models
 from recoco.apps.geomatics import models as geomatics_models
 from recoco.apps.hitcount.models import HitCount
 from recoco.apps.projects import models as projects
-from recoco.utils import check_if_advisor, has_perm, has_perm_or_403, is_staff_for_site
+from recoco.utils import check_if_advisor, has_perm, has_perm_or_403
 
 from . import models
 
@@ -244,7 +244,7 @@ class ResourceDetailView(UserPassesTestMixin, BaseResourceDetailView):
 
     def test_func(self):
         resource = self.get_object()
-        return resource.public or is_staff_for_site(self.request.user)
+        return resource.public or self.request.user.is_authenticated
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
