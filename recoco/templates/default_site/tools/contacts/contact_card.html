@@ -59,8 +59,19 @@
                 </a>
             </div>
         </template>
-        <div>
-            <span class="same-for-all-text text-date">mis à jour le xxxxxx</span>
-        </div>
+        <template x-if="contact.modified">
+            <div>
+                <span class="same-for-all-text text-date">mis à jour le</span>
+                <span class="same-for-all-text text-date"
+                      x-text="contact.modified.split('T')[0]"></span>
+            </div>
+        </template>
+        <template x-if="contact.created && !contact.modified">
+            <div>
+                <span class="same-for-all-text text-date">mis à jour le</span>
+                <span class="same-for-all-text text-date"
+                      x-text="contact.created.split('T')[0]"></span>
+            </div>
+        </template>
     </div>
 </template>
