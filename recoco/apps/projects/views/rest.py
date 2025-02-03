@@ -15,7 +15,8 @@ from actstream.models import Action
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
-from django.db.models import Count, F, Q, QuerySet
+from django.db.models import CharField, Count, F, Func, OuterRef, Q, QuerySet, Subquery
+from django.db.models.functions import Cast
 from django.http import Http404
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
@@ -85,26 +86,27 @@ class ProjectActivityFilter(BaseFilterBackend):
             except ValueError:
                 return queryset
 
-            # Filter on members activity recorded on model
-            members_queryset = queryset.filter(last_members_activity_at__gte=from_ts)
-
-            # Fetch activity from acstream
-            activity_queryset = queryset.filter(
-                id__in=list(
-                    Action.objects.filter(
-                        target_content_type=project_ct.pk,
-                        target_object_id__in=list(
-                            queryset.values_list("pk", flat=True)
-                        ),
-                        timestamp__gte=from_ts,
-                    )
-                    .order_by("timestamp")
-                    .values_list("target_object_id", flat=True)
+            # Fetch activity from actstream
+            queryset = (
+                queryset.annotate(
+                    recent_actions_count=Subquery(
+                        Action.objects.filter(
+                            target_content_type_id=project_ct.pk,
+                            target_object_id=Cast(OuterRef("pk"), CharField()),
+                            timestamp__gte=from_ts,
+                        )
+                        .order_by()
+                        .annotate(count=Func(F("id"), function="Count"))
+                        .values("count")
+                    ),
                 )
+                .filter(
+                    # We want both to cover members and advisors activities
+                    Q(last_members_activity_at__gte=from_ts)
+                    | Q(recent_actions_count__gt=0)
+                )
+                .distinct()
             )
-
-            # We want both to cover members and advisors activities
-            queryset = (members_queryset | activity_queryset).distinct()
 
         return queryset
 
