@@ -5,11 +5,9 @@ from django.contrib.auth import models as auth_models
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
-from django.utils import timezone
 from model_bakery import baker
 
 from recoco.apps.home import models as home_models
-from recoco.apps.projects import models as projects_models
 from recoco.utils import login
 
 
@@ -52,7 +50,6 @@ def test_site_configuration_available_for_admin_users(request, client):
     assert response.status_code == 200
 
 
-@pytest.mark.skip(reason="no error listed, need work on crispy/dsrc")
 @pytest.mark.django_db
 def test_crm_site_configuration(request, client):
     site = get_current_site(request)
@@ -62,12 +59,6 @@ def test_crm_site_configuration(request, client):
         sender_email="yyo@yo.com",
         sender_name="Yoo",
         contact_form_recipient="othr@yo.com",
-    )
-
-    project = baker.make(
-        projects_models.Project,
-        sites=[site],
-        deleted=timezone.now(),
     )
 
     url = reverse("crm-site-configuration")
@@ -91,12 +82,50 @@ def test_crm_site_configuration(request, client):
                 "logo_small": logo,
             },
         )
-        print(response.content)
 
     assert response.status_code == 302
 
-    updated = projects_models.Project.objects.first()
-    assert updated.id == project.id
+
+@pytest.mark.django_db
+def test_crm_site_configuration_crisp_integration(request, client, settings):
+    site = get_current_site(request)
+    crisp_token = "a-fake-crisp-token"
+
+    baker.make(
+        home_models.SiteConfiguration,
+        site=site,
+        sender_email="yyo@yo.com",
+        sender_name="Yoo",
+        contact_form_recipient="othr@yo.com",
+        crisp_token=None,
+    )
+
+    url = reverse("crm-site-configuration")
+
+    # Crisp should not be active
+    response = client.get(reverse("home"))
+    assert response.status_code == 200
+    assert 'data-testid="crisp"' not in str(response.content)
+
+    # Activate crisp by entering a token
+    with login(client, groups=["example_com_admin"]):
+        response = client.post(
+            url,
+            data={
+                "sender_email": "yyo@yo.com",
+                "sender_name": "Yoo",
+                "contact_form_recipient": "othr@yo.com",
+                "reminder_interval": 42,
+                "crisp_token": crisp_token,
+            },
+        )
+        assert response.status_code == 302
+
+    # crisp should now be active on our site
+    response = client.get(reverse("home"))
+    assert response.status_code == 200
+    assert 'data-testid="crisp"' in str(response.content)
+    assert crisp_token in str(response.content)
 
 
 # eof
