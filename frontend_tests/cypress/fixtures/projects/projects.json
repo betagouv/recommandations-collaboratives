@@ -717,5 +717,33 @@
       "deleted": null,
       "sites": [1]
     }
+  },
+  {
+    "model": "projects.project",
+    "pk": 27,
+    "fields": {
+      "submitted_by": 2,
+      "ro_key": "427c0b01b71f49ea8878f52ec14ad80e",
+      "last_name": "Inviteur",
+      "first_name": "Conseiller",
+      "publish_to_cartofriches": false,
+      "exclude_stats": true,
+      "muted": false,
+      "org_name": "testing world company",
+      "created_on": "2025-01-29T14:31:39Z",
+      "updated_on": "2025-01-19T13:08:07.795Z",
+      "tags": "",
+      "name": "test referant pas accepter invite",
+      "phone": "01 01 01 01 01",
+      "description": "projet dont le referant est invité mais n'a pas accepté l'invitation",
+      "advisors_note": "j'ai créé le projet pour vous",
+      "advisors_note_on": "2025-01-29T14:51:12Z",
+      "advisors_note_by": 2,
+      "location": "91 rue du test",
+      "commune": 3,
+      "impediments": "",
+      "deleted": null,
+      "sites": [1]
+    }
   }
 ]

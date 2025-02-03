@@ -7,7 +7,8 @@
 {% if project.owner != project.submitted_by %}
     {% for invite in invites %}
         {% if invite.role == "COLLABORATOR" and invite.email == project.owner.email %}
-            <div class="invite-not-accepted-banner fr-p-2v">
+            <div class="invite-not-accepted-banner fr-p-2v"
+                 data-test-id="invite-not-accepted-banner">
                 <span class="fr-icon-warning-line invite-not-accepted-banner__span fr-mx-2v"
                       aria-hidden="true"
                       title="warning-line"></span><span class="invite-not-accepted-banner__span">Cette personne n’a pas encore rejoint le projet</span>
