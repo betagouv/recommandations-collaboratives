@@ -305,9 +305,9 @@ def project_conversations_new(request, project_id=None):
     """New Conversation page for project"""
 
     project = get_object_or_404(
-        models.Project.objects.filter(sites=request.site).with_unread_notifications(
-            user_id=request.user.id
-        ).select_related("commune__department"),
+        models.Project.objects.filter(sites=request.site)
+        .with_unread_notifications(user_id=request.user.id)
+        .select_related("commune__department"),
         pk=project_id,
     )
 
