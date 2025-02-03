@@ -5,8 +5,9 @@ Alpine.data('ConversationTopicSwitch', (topicList) => {
   return {
     topicList: topicList,
     topicSelector: 'general',
+    valueTopicFormMessageSend: '',
     stringToColor,
-    setActiveTopic(event) {
+    setActiveTopic(event, topicName) {
       Array.from(document.querySelectorAll('.feed-element-item')).forEach(
         (element) => {
           if (
@@ -20,6 +21,7 @@ Alpine.data('ConversationTopicSwitch', (topicList) => {
           element.classList.add('d-none');
         }
       );
+      this.valueTopicFormMessageSend = topicName;
     },
   };
 });

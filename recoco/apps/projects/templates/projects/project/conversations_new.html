@@ -103,6 +103,7 @@
                         {% for error in posting_form.content.errors %}<div class="text-danger text-end">{{ error }}</div>{% endfor %}
                         {% include "projects/project/fragments/files_links/file_upload_input_standalone.html" %}
                         <input type="hidden" name="new" value="1">
+                        <input type="hidden" name="topic_name" :value="valueTopicFormMessageSend">
                         <div class="d-flex justify-content-end fr-mt-3w">
                             <button data-test-id="send-message-conversation"
                                     x-data

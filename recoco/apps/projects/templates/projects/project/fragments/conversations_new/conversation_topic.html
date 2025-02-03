@@ -11,7 +11,7 @@
                    class="d-none"
                    id="selector-{{ clean_topic }}"
                    value="{{ clean_topic }}"
-                   @change="setActiveTopic">
+                   @change="setActiveTopic($event, '{{ topic_name }}')">
             <span class="topic-item__label {% if topic_name %}color{% endif %}"
                   :style="{ '--current-bg-color': stringToColor('{{ clean_topic }}')}">{{ topic_name|default:"Général" }}</span>
             {% if not topic_name %}
