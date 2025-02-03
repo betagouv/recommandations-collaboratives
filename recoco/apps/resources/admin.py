@@ -28,6 +28,7 @@ class ResourceAdmin(CompareVersionAdmin):
     search_fields = ["title", "content"]
     list_filter = ["sites", "status", "updated_on"]
     list_display = ["title", "status", "category", "updated_on"]
+    list_select_related = ("category",)
 
 
 @admin.register(models.Bookmark)
