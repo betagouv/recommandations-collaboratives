@@ -160,9 +160,6 @@
                         {% include "resources/resource/fragments/departments.html" %}
                     {% endif %}
                 </div>
-                {% if request.user %}
-                    {% include "resources/resource/fragments/contact_list.html" %}
-                {% endif %}
             </div>
             <div id="project_used" class="fr-mt-3w">
                 {% if projects_used_by %}
