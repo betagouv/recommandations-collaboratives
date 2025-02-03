@@ -30,14 +30,12 @@ function SearchContact() {
       }
     },
     onSelect(contact) {
-      console.log('selected contact : ', contact);
       this.selectedContact = contact;
       this.isAContactSelected = true;
     },
     addContact() {
       let textArea = document.querySelector('.tiptap.ProseMirror');
       textArea.innerHTML += `@ ${this.selectedContact.first_name} ${this.selectedContact.last_name}`;
-      this.$dispatch('contactSelected', this.selectedContact);
       this.$store.previewModal.contact = this.selectedContact;
       this.closeModal();
     },
