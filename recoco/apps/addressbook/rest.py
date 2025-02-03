@@ -100,7 +100,7 @@ class ContactViewSet(ModelViewSet):
         for backend in backends:
             queryset = backend().filter_queryset(self.request, queryset, self)
 
-        return queryset
+        return queryset.distinct()
 
     def get_serializer_class(self):
         match self.action:
