@@ -11,7 +11,7 @@ from recoco.utils import check_if_advisor
 from .utils import can_administrate_project
 
 
-def exclude_path(excluded_path):
+def exclude_path(excluded_path: str):
     def decorator(view_func):
         @wraps(view_func)
         def _wrapped_view(request, *args, **kwargs):

@@ -168,7 +168,7 @@ class ProjectForListSerializer(serializers.BaseSerializer):
             "name": data.name,
             "description": data.description,
             "org_name": data.org_name,
-            "status": data.project_sites.current().status,
+            "status": data.project_site_status,
             "inactive_since": data.inactive_since,
             "created_on": data.created_on,
             "updated_on": data.updated_on,
@@ -179,7 +179,7 @@ class ProjectForListSerializer(serializers.BaseSerializer):
             "location": data.location,
             "notifications": data.notifications,
             "project_sites": format_sites(data),
-            "tags": data.tags.names(),
+            "tags": [tag.name for tag in data.tags.all()],
         }
 
 
