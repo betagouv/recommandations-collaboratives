@@ -315,9 +315,9 @@ def project_conversations_new(request, project_id=None):
         request.site, project, request.user, allow_national=True
     )
 
-    advising = get_advisor_for_project(request.user, project)
-
     is_regional_actor or has_perm_or_403(request.user, "view_public_notes", project)
+
+    advising = get_advisor_for_project(request.user, project)
 
     posting_form = PublicNoteForm()
 
