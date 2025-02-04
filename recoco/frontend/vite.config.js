@@ -69,7 +69,6 @@ const config = {
         showRole: resolve('./src/js/store/showRole.js'),
         projects: resolve('./src/js/store/projects.js'),
         ClickToSeeUser: resolve('./src/js/components/ClickToSeeUser.js'),
-        MarkDiagAsDone: resolve('./src/js/components/MarkDiagAsDone.js'),
         ActionPusher: resolve('./src/js/components/ActionPusher.js'),
         actionPusher: resolve('./src/js/store/actionPusher.js'),
       },
