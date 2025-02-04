@@ -162,10 +162,19 @@ class ProjectList(ListAPIView):
         return (
             models.Project.on_site.for_user(self.request.user)
             .order_by("-created_on", "-updated_on")
-            .prefetch_related("commune")
-            .prefetch_related("commune__department")
-            .prefetch_related("switchtenders__profile__organization")
-            .prefetch_related("project_sites")
+            .annotate(
+                project_site_status=Subquery(
+                    models.ProjectSite.objects.filter(
+                        project_id=OuterRef("pk"), site=self.request.site
+                    ).values("status")
+                )
+            )
+            .prefetch_related(
+                "commune__department",
+                "switchtenders__profile__organization",
+                "project_sites",
+                "tags",
+            )
         )
 
     def list(self, request, *args, **kwargs):
