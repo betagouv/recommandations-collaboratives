@@ -22,7 +22,7 @@
             {{ request.site.name }} est une plateforme supportée par le logiciel Recommandations-collaboratives.
             Le Cerema porte Recommandations-collaboratives, qui permet aux administrations françaises de créer
             des plateformes thématiques de conseil aux porteurs de projet, sur un même modèle d’application web.
-            D’un point de vue technique, l’application Mon Espace Collectivité est gérée par l’équipe de Recommandations-collaboratives,
+            D’un point de vue technique, l’application {{ request.site.name }} est gérée par l’équipe de Recommandations-collaboratives,
             notamment en ce qui concerne l’accessibilité.
             Le Cerema s’engage à rendre son service accessible, conformément à l’article 47 de la loi n° 2005-102 du 11 février 2005.
             À cette fin, nous mettons en œuvre la stratégie et les actions suivantes : <a href="{% url 'multi-annual-schema' %}">schéma pluri-annuel 2024-2026</a>.
@@ -133,7 +133,7 @@
             Le Schéma Pluri-Annuel 2024-2026 cité plus haut donne plus de détails à ce sujet.
         </p>
         <p>
-            Si dans l’attente de cette refonte ou après, vous rencontrez des blocages pour utiliser le site, vous pouvez nous contacter à <a href="mailto:{{ sender_email }}">{{ sender_email }}</a>
+            Si dans l’attente de cette refonte ou après, vous rencontrez des blocages pour utiliser le site, vous pouvez nous contacter à <a href="mailto:{{ request.site.configuration.contact_form_recipient }}">{{ request.site.configuration.contact_form_recipient }}</a>
         </p>
         <h2>Établissement de cette déclaration d’accessibilité</h2>
         <p>Cette déclaration a été établie le 23 janvier 2025.</p>
@@ -163,7 +163,8 @@
         </p>
         <ul>
             <li>
-                E-mail : <a class="correct-link-display" href="mailto:{{ sender_email }}">{{ sender_email }}</a>
+                E-mail : <a class="correct-link-display"
+    href="mailto:{{ request.site.configuration.contact_form_recipient }}">{{ request.site.configuration.contact_form_recipient }}</a>
             </li>
         </ul>
         <br />
