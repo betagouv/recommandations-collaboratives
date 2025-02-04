@@ -964,6 +964,7 @@ def crm_list_recommendation_without_resources(request):
     recommendations = (
         Task.on_site.filter(public=True, resource=None)
         .exclude(project__exclude_stats=True)
+        .select_related("project__commune", "created_by")
         .order_by("-created_on", "project")
     )
 
@@ -1138,7 +1139,7 @@ def compute_topics_occurences(site):
             (topic.name, list(topic.projects.all()))
             for topic in (
                 Topic.objects.filter(projects__sites=site, projects__deleted=None)
-                .prefetch_related("projects")
+                .prefetch_related("projects__commune")
                 .distinct()
             )
         ),
@@ -1150,8 +1151,7 @@ def compute_topics_occurences(site):
             (topic.name, list(topic.tasks.all()))
             for topic in (
                 Topic.objects.filter(tasks__site=site, tasks__deleted=None)
-                .prefetch_related("tasks")
-                .prefetch_related("tasks__project")
+                .prefetch_related("tasks__project__commune")
                 .distinct()
             )
         ),
