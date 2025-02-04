@@ -26,14 +26,9 @@ export default function TaskModal() {
     statusText,
     deleteTaskUrl,
     currentDeletingTask: {},
-    currentFeedbackTask: {},
     feedbackComment: '',
     DONE_STATUS: TASK_STATUSES.DONE,
     isArchivedStatus,
-    //Event listener dispatched by another component
-    async handleIssueFollowup(e) {
-      await this.$store.tasksData.issueFollowup(e.detail.task, e.detail.status);
-    },
     initDeleteTaskConfirmationModal() {
       const element = document.getElementById('delete-task-confirmation-modal');
       this.$store.taskModal.deleteModalHandle = new Modal(element);
@@ -45,34 +40,6 @@ export default function TaskModal() {
       const task = e.detail;
       this.$store.taskModal.onDeleteClick(task);
       this.currentDeletingTask = task;
-    },
-    //feedback
-    initFeedbackModal() {
-      const element = document.getElementById('feedback-modal');
-      this.$store.taskModal.feedbackModalHandle = new Modal(element);
-      const cleanup = () => {
-        this.feedbackStatus = 3;
-        this.feedbackComment = '';
-        this.currentFeedbackTask = null;
-      };
-      element.addEventListener('hidePrevented.bs.modal', cleanup);
-      element.addEventListener('hidden.bs.modal', cleanup);
-    },
-    openFeedbackModal(e) {
-      const task = e.detail.task;
-      const status = e.detail.status;
-      this.currentFeedbackTask = task;
-      this.$store.taskModal.onFeedbackClick(task, status);
-    },
-    async onSubmitFeedback() {
-      await this.$store.tasksData.issueFollowup(
-        this.$store.taskModal.currentTask,
-        this.$store.taskModal.feedbackModalStatus,
-        this.feedbackComment
-      );
-      this.feedbackComment = '';
-      this.$store.taskModal.feedbackModalHandle.hide();
-      await this.$store.tasksView.updateView();
     },
   };
 }
