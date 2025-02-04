@@ -89,6 +89,7 @@ class CRMSiteDashboardView(LoginRequiredMixin, UserPassesTestMixin, TemplateView
                 | Q(actor_content_type=ctype)
             )
             .order_by("-timestamp")
+            # TODO: https://docs.djangoproject.com/en/5.1/ref/contrib/contenttypes/#genericprefetch
             .prefetch_related("actor", "action_object", "target")[:100]
         )
 
