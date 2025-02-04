@@ -8,7 +8,7 @@
           type="text/css" />
 {% endblock css %}
 <template x-if="contact">
-    <div class="contact-card fr-p-3v bg-white">
+    <div class="contact-card fr-p-3v bg-white" data-test-id="contact-card">
         <div class="d-flex">
             <template x-if="contact.first_name">
                 <div>

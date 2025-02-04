@@ -60,7 +60,9 @@
                                       @click="onCancelSelectContact"></span>
                             </div>
                             <div class="fr-p-3v text-align-center">
-                                <button @click="addContact" class="fr-btn w-100 correct-centering-text">Envoyer le contact</button>
+                                <button @click="addContact"
+                                        data-test-id="button-add-contact-to-tiptap-editor"
+                                        class="fr-btn w-100 correct-centering-text">Envoyer le contact</button>
                             </div>
                         </div>
                     </template>
