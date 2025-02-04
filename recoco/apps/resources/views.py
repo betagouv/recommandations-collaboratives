@@ -135,7 +135,9 @@ def resource_search(request):
         request,
         "resources/resource/list.html",
         {
-            "user_bookmarks": list(request.user.bookmarks.values_list("id", flat=True)),
+            "user_bookmarks": list(
+                request.user.bookmarks.values_list("resource_id", flat=True)
+            ),
             **locals(),
         },
     )
