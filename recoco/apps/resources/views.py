@@ -277,7 +277,7 @@ class EmbededResourceDetailView(BaseResourceDetailView):
 
         if task_id := self.request.GET.get("task_id"):
             context["task"] = (
-                self.object.task_set.filter(pk=task_id)
+                self.object.recommandations.filter(pk=task_id)
                 .select_related("ds_folder")
                 .first()
             )
