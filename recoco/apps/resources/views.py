@@ -64,7 +64,11 @@ def resource_search(request):
 
     categories = form.selected_categories
 
-    resources = models.Resource.search(query, categories)
+    resources = (
+        models.Resource.search(query, categories)
+        .select_related("category")
+        .prefetch_related("task_recommendations")
+    )
 
     # If we are not allowed to manage resources, filter out DRAFT/TO_REVIEW items and
     # imported resources
@@ -135,6 +139,7 @@ def resource_search(request):
         request,
         "resources/resource/list.html",
         {
+            "resources_count": resources.count(),
             "user_bookmarks": list(
                 request.user.bookmarks.values_list("resource_id", flat=True)
             ),
