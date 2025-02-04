@@ -85,14 +85,12 @@ export default function boardTasksApp(projectId) {
 
       // In progress & not interest status
       if (status instanceof Array) {
-        debugger;
         if (status.find((s) => s === TASK_STATUSES.NOT_INTERESTED)) {
           await this.moveTask(data, TASK_STATUSES.NOT_INTERESTED, nextData);
         } else if (status.find((s) => s === TASK_STATUSES.INPROGRESS)) {
           await this.moveTask(data, TASK_STATUSES.INPROGRESS, nextData);
         }
       } else {
-        debugger;
         await this.moveTask(data, status, nextData);
       }
 
