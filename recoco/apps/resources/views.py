@@ -140,8 +140,10 @@ def resource_search(request):
         "resources/resource/list.html",
         {
             "resources_count": resources.count(),
-            "user_bookmarks": list(
-                request.user.bookmarks.values_list("resource_id", flat=True)
+            "user_bookmarks": (
+                list(request.user.bookmarks.values_list("resource_id", flat=True))
+                if request.user.is_authenticated
+                else []
             ),
             **locals(),
         },
