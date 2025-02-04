@@ -34,7 +34,9 @@ class RegionViewSet(viewsets.ReadOnlyModelViewSet):
     """
 
     def get_queryset(self):
-        return models.Region.objects.all().order_by("name")
+        return (
+            models.Region.objects.all().order_by("name").prefetch_related("departments")
+        )
 
     serializer_class = RegionSerializer
 
