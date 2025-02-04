@@ -19,7 +19,6 @@ from django.views.decorators.csrf import csrf_exempt
 
 from recoco import verbs
 from recoco.apps.hitcount.models import HitCount
-from recoco.apps.invites import models as invites_models
 from recoco.apps.invites.forms import InviteForm
 from recoco.apps.survey import models as survey_models
 
@@ -101,13 +100,6 @@ def project_overview(request, project_id=None):
             update_user_project_status(request.site, request.user, project)
 
     invite_form = InviteForm()
-
-    # Fetch pending invites
-    pending_invites = []
-    for invite in invites_models.Invite.on_site.filter(
-        project=project, accepted_on=None
-    ):
-        pending_invites.append(invite)
 
     return render(request, "projects/project/overview.html", locals())
 
@@ -303,13 +295,6 @@ def project_conversations(request, project_id=None):
             target_content_type=project_ct.pk,
             target_object_id=project.pk,
         ).mark_all_as_read()
-
-    # Fetch pending invites
-    pending_invites = []
-    for invite in invites_models.Invite.on_site.filter(
-        project=project, accepted_on=None
-    ):
-        pending_invites.append(invite)
 
     return render(request, "projects/project/conversations.html", locals())
 
