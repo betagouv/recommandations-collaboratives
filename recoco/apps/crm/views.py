@@ -979,7 +979,13 @@ def make_low_reach_project_query(request):
             project_sites__site=request.site,
         )
         .exclude(exclude_stats=True)
-        .prefetch_related("tasks", "notes", "switchtenders")
+        .prefetch_related(
+            "tasks",
+            "notes",
+            "switchtenders__profile__organization",
+            "crm_annotations__tags",
+        )
+        .select_related("commune")
         .annotate(
             reco_total=Count(
                 "tasks",
