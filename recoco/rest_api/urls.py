@@ -99,6 +99,11 @@ api_urls = [
         projects_rest.ProjectList.as_view(),
         name="projects-list",
     ),
+    # path(
+    #     "projects/my_departments",
+    #     projects_rest.ProjectDepartmentList.as_view(),
+    #     name="projects-list-my-departments",
+    # ),
     path(
         "userprojectstatus/<int:pk>/",
         projects_rest.UserProjectStatusDetail.as_view(),

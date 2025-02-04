@@ -35,12 +35,14 @@ Alpine.store('projects', {
   },
   async getSitesConfig() {
     const json = await api.get(sitesConfigUrl());
-
+    localStorage.setItem('sitesConfig', JSON.stringify(json.data));
     return (this.sitesConfig = json.data);
   },
   async mapperProjetsProjectSites(projects, currentSiteId) {
     if (this.sitesConfig.length === 0) {
-      await this.getSitesConfig();
+      this.sitesConfig =
+        JSON.parse(localStorage.getItem('sitesConfig')) ||
+        (await this.getSitesConfig());
     }
     projects.forEach((project) => {
       if (project.project) {
@@ -65,8 +67,7 @@ Alpine.store('projects', {
               ),
             };
           });
-      }
-      else {
+      } else {
         project.project_sites.forEach((projectSite) => {
           projectSite.siteInfo = this.sitesConfig.find(
             (site) => site.id === projectSite.site
@@ -89,7 +90,6 @@ Alpine.store('projects', {
             };
           });
       }
-
     });
 
     return projects;

@@ -13,8 +13,16 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path(r"ressource/", views.resource_search, name="resources-resource-search"),
-    path(r"ressource/feed/", views.LatestResourcesFeed(), name="resources-feed"),
+    path(
+        r"ressource/",
+        views.resource_search,
+        name="resources-resource-search",
+    ),
+    path(
+        r"ressource/feed/",
+        views.LatestResourcesFeed(),
+        name="resources-feed",
+    ),
     path(
         r"ressource/create/",
         views.resource_create,
