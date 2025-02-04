@@ -268,25 +268,18 @@ def test_public_resource_detail_available_for_all_users(request, client):
 
 
 @pytest.mark.django_db
-def test_draft_resource_not_visible_to_non_staff(request, client):
+def test_draft_resource_visible_to_any_authenticated_user(request, client):
     site = get_current_site(request)
     resource = Recipe(
         models.Resource, sites=[site], status=models.Resource.DRAFT
     ).make()
+
     url = reverse("resources-resource-detail", args=[resource.id])
+
+    response = client.get(url)
+    assert response.status_code == 302
+
     with login(client):
-        response = client.get(url)
-    assert response.status_code == 403
-
-
-@pytest.mark.django_db
-def test_draft_resource_visible_to_staff(request, client):
-    site = get_current_site(request)
-    resource = Recipe(
-        models.Resource, sites=[site], status=models.Resource.DRAFT
-    ).make()
-    url = reverse("resources-resource-detail", args=[resource.id])
-    with login(client, groups=["example_com_staff"]):
         response = client.get(url)
     assert response.status_code == 200
 

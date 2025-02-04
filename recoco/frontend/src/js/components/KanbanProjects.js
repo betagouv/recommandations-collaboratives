@@ -1,28 +1,30 @@
 import Alpine from 'alpinejs';
 import { generateUUID } from '../utils/uuid';
-import Fuse from 'fuse.js';
+import { makeProjectURL } from '../utils/createProjectUrl';
 
-import api, {
-  projectsProjectSitesUrl,
-  projectsUrl,
-  regionsUrl,
-} from '../utils/api';
+import api, { projectsProjectSitesUrl, projectsUrl } from '../utils/api';
 
-Alpine.data('KanbanProjects', boardProjectsApp);
-
-function boardProjectsApp(currentSiteId) {
+Alpine.data('KanbanProjects', function (currentSiteId, departments, regions) {
   return {
-    projectList: [],
-    rawProjectList: [],
+    makeProjectURL,
+    projectList: null,
+    isViewInitialized: false,
     currentSiteId: currentSiteId,
     isDisplayingOnlyUserProjects:
       JSON.parse(localStorage.getItem('isDisplayingOnlyUserProjects')) ?? false,
     get isBusy() {
       return this.$store.app.isLoading;
     },
+    backendSearch: {
+      searchText: '',
+      searchDepartment: [],
+      lastActivity: localStorage.getItem('lastActivity') ?? '30',
+    },
+    filterProjectLastActivity: localStorage.getItem('lastActivity') ?? '30',
+    searchText: '',
     selectedDepartment: null,
-    departments: [],
-    regions: [],
+    departments: JSON.parse(departments.textContent),
+    regions: JSON.parse(regions.textContent),
     territorySelectAll: true,
     boards: [
       {
@@ -39,81 +41,29 @@ function boardProjectsApp(currentSiteId) {
         color_class: 'border-dark',
       },
     ],
-    fuse: null,
-    searchText: '',
-    async getData(postProcess = true) {
-      const projects = await api.get(projectsUrl());
-      await this.$store.projects.mapperProjetsProjectSites(
+    async init() {
+      await this.getData();
+      this.constructRegionsFilter(this.departments, this.regions);
+      this.isViewInitialized = true;
+    },
+    async getData() {
+      const { searchText, searchDepartment, lastActivity } = this.backendSearch;
+      const projects = await api.get(
+        projectsUrl(searchText, searchDepartment, lastActivity)
+      );
+      this.projectList = await this.$store.projects.mapperProjetsProjectSites(
         projects.data,
         this.currentSiteId
       );
 
-      const projectList = projects.data.map((d) =>
+      this.projectList = projects.data.map((d) =>
         Object.assign(d, {
           uuid: generateUUID(),
         })
       );
-
-      if (postProcess) {
-        await this.postProcessData(projectList);
-      }
-      this.projectList = [...projectList];
-      this.rawProjectList = [...projectList];
-      const fuseOptions = {
-        keys: [
-          'name',
-          'commune.name',
-          'commune.insee',
-          'commune.department.name',
-        ],
-        isCaseSensitive: false,
-        minMatchCharLength: 2,
-        threshold: 0.3,
-        findAllMatches: true,
-        ignoreLocation: true,
-      };
-      this.fuse = new Fuse(projectList, fuseOptions);
-      if (this.searchText) {
-        this.filterProject(this.searchText);
-      }
-      return projectList;
-    },
-    async onDrop(event, status) {
-      event.preventDefault();
-
-      this.currentlyHoveredElement.classList.remove('drag-target');
-      this.currentlyHoveredElement = null;
-
-      const uuid = event.dataTransfer.getData('application/uuid');
-      if (!uuid) {
-        return;
-      }
-      const droppedProject = this.projectList.find((d) => d.uuid === uuid);
-      if (!droppedProject) {
-        return;
-      }
-      const projectSite = droppedProject.project_sites.find(
-        (project_site) => project_site.site === this.currentSiteId
-      );
-      if (!projectSite) {
-        return;
-      }
-      await api.patch(`${projectsProjectSitesUrl()}${projectSite.id}/`, {
-        status: status,
-      });
-
-      await this.getData(false);
-    },
-    findByUuid(uuid) {
-      return this.projectList.find((d) => d.uuid === uuid);
-    },
-    findById(id) {
-      return this.projectList.find((d) => d.id === id);
     },
     get view() {
-      return this.projectList
-        .filter(this.filterProjectsByDepartments.bind(this))
-        .sort(this.sortFn.bind(this));
+      return this.projectList.sort(this.sortFn.bind(this));
     },
     column(status) {
       if (status instanceof Array) {
@@ -156,21 +106,36 @@ function boardProjectsApp(currentSiteId) {
       event.preventDefault();
       event.dataTransfer.dropEffect = 'move';
     },
-    onSearch() {
-      this.filterProject(this.searchText);
-    },
-    filterProject(search) {
-      if (search === '') {
-        this.projectList = [...this.rawProjectList];
+    async onDrop(event, status) {
+      event.preventDefault();
+
+      this.currentlyHoveredElement.classList.remove('drag-target');
+      this.currentlyHoveredElement = null;
+
+      const uuid = event.dataTransfer.getData('application/uuid');
+      if (!uuid) {
         return;
       }
-      const filtered = this.fuse.search(search).map((r) => r.item);
-      this.projectList = [...filtered];
+      const droppedProject = this.projectList.find((d) => d.uuid === uuid);
+      if (!droppedProject) {
+        return;
+      }
+      const projectSite = droppedProject.project_sites.find(
+        (project_site) => project_site.site === this.currentSiteId
+      );
+      if (!projectSite) {
+        return;
+      }
+      await api.patch(`${projectsProjectSitesUrl()}${projectSite.id}/`, {
+        status: status,
+      });
+
+      await this.getData();
     },
-    async postProcessData(projectList) {
-      const departments = this.extractAndCreateAdvisorDepartments(projectList);
-      const regionsData = await api.get(regionsUrl());
-      this.constructRegionsFilter(departments, regionsData.data);
+    async onLastActivityChange(event) {
+      this.backendSearch.lastActivity = event.target.value;
+      localStorage.setItem('lastActivity', this.backendSearch.lastActivity);
+      await this.getData();
     },
     toggleMyProjectsFilter() {
       this.isDisplayingOnlyUserProjects = !this.isDisplayingOnlyUserProjects;
@@ -179,48 +144,39 @@ function boardProjectsApp(currentSiteId) {
         this.isDisplayingOnlyUserProjects
       );
     },
-    extractAndCreateAdvisorDepartments(projects) {
-      const departments = [];
-
-      projects.forEach((project) => {
-        const foundDepartment = departments.find(
-          (department) => department.code === project?.commune?.department?.code
-        );
-
-        if (foundDepartment) {
-          return foundDepartment.nbProjects++;
-        }
-
-        const deparmentItem = {
-          ...project?.commune?.department,
-          active: true,
-          nbProjects: 1,
-        };
-
-        departments.push(deparmentItem);
-      });
-
-      return (this.departments = departments.sort((a, b) =>
-        a.name?.localeCompare(b.name)
-      ));
-    },
     constructRegionsFilter(departments, regions) {
       const currentRegions = [];
+      const displayedProjectsDepartments =
+        this.extractDepartmentFromDisplayedProjects(this.projectList);
 
       regions.forEach((region) => {
         //Iterate through regions.departments and look for advisors departments
-        const foundDepartments = departments.filter((department) =>
-          region.departments.find(
-            (regionDepartment) => regionDepartment.code === department.code
+        const foundDepartments = departments
+          .filter((department) =>
+            region.departments.find(
+              (regionDepartment) => regionDepartment.code === department.code
+            )
           )
-        );
+          .map((department) => {
+            const isIncludeInDisplayedProjects =
+              displayedProjectsDepartments.includes(department.code);
+            const departmentData = {
+              ...department,
+              active: isIncludeInDisplayedProjects,
+            };
+            if (isIncludeInDisplayedProjects)
+              this.departments.push(departmentData);
+            return departmentData;
+          });
 
         if (foundDepartments.length > 0) {
           const currentRegion = {
             code: region.code,
             departments: foundDepartments,
             name: region.name,
-            active: true,
+            active:
+              foundDepartments.length ===
+              foundDepartments.filter((department) => department.active).length,
           };
 
           return currentRegions.push(currentRegion);
@@ -228,7 +184,40 @@ function boardProjectsApp(currentSiteId) {
       });
       this.regions = currentRegions;
     },
-    handleTerritorySelectAll() {
+    extractDepartmentFromDisplayedProjects(projects) {
+      const departments = projects.map(
+        (project) => project.commune.department.code
+      );
+      return [...new Set(departments)];
+    },
+    async onSearch(event) {
+      this.backendSearch.searchText = event.target.value;
+      await this.backendSearchProjects({ resetLastActivity: true });
+    },
+    async backendSearchProjects(options = { resetLastActivity: false }) {
+      if (this.backendSearch.searchText !== '') {
+        this.$refs.selectFilterProjectDuration.disabled = true;
+        this.$refs.selectFilterProjectDuration.value = 1460;
+        this.backendSearch.lastActivity = '';
+      } else if (options.resetLastActivity) {
+        this.$refs.selectFilterProjectDuration.disabled = false;
+        this.$refs.selectFilterProjectDuration.value = 30;
+        this.backendSearch.lastActivity = '30';
+      }
+
+      await this.getData();
+    },
+    saveSelectedDepartment() {
+      const extractedDepartements = this.regions
+        .flatMap((region) =>
+          region.departments.map(
+            (department) => department.active && department.code
+          )
+        )
+        .filter((department) => department);
+      this.backendSearch.searchDepartment = [...extractedDepartements];
+    },
+    async handleTerritorySelectAll() {
       this.territorySelectAll = !this.territorySelectAll;
 
       this.regions = this.regions.map((region) => ({
@@ -239,8 +228,12 @@ function boardProjectsApp(currentSiteId) {
           active: this.territorySelectAll,
         })),
       }));
+
+      this.saveSelectedDepartment();
+
+      await this.backendSearchProjects();
     },
-    handleRegionFilter(selectedRegion) {
+    async handleRegionFilter(selectedRegion) {
       this.regions = this.regions.map((region) => {
         if (region.code === selectedRegion.code) {
           region.active = !region.active;
@@ -256,8 +249,12 @@ function boardProjectsApp(currentSiteId) {
       this.territorySelectAll =
         this.regions.filter((region) => region.active).length ===
         this.regions.length;
+
+      this.saveSelectedDepartment();
+
+      await this.backendSearchProjects();
     },
-    handleDepartmentFilter(selectedDepartment) {
+    async handleDepartmentFilter(selectedDepartment) {
       this.regions = this.regions.map((region) => ({
         ...region,
         departments: region.departments.map((department) => {
@@ -275,30 +272,17 @@ function boardProjectsApp(currentSiteId) {
       this.territorySelectAll =
         this.regions.filter((region) => region.active).length ===
         this.regions.length;
+
+      this.saveSelectedDepartment();
+
+      await this.backendSearchProjects();
     },
-    filterProjectsByDepartments(project) {
-      return this.regions.find(
-        (region) =>
-          region.departments.find(
-            (department) =>
-              department.code === project?.commune?.department?.code
-          )?.active
-      );
-    },
+
     sortFn(a, b) {
       if (b.notifications.count - a.notifications.count)
         return b.notifications.count - a.notifications.count;
       else {
         return b.created_on - a.created_on;
-      }
-    },
-    filterFn(d) {
-      if (this.selectedDepartment && this.selectedDepartment !== '') {
-        return (
-          d.commune && d.commune.department.code == this.selectedDepartment
-        );
-      } else {
-        return true;
       }
     },
     truncate(input, size = 30) {
@@ -307,8 +291,5 @@ function boardProjectsApp(currentSiteId) {
     formatDateDisplay(date) {
       return new Date(date).toLocaleDateString('fr-FR');
     },
-    isInactive(project) {
-      return project.inactive_since;
-    },
   };
-}
+});

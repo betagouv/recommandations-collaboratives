@@ -1,4 +1,5 @@
 from collections import defaultdict
+from functools import wraps
 
 from django.core.serializers import serialize
 from django.utils.timezone import localtime
@@ -10,6 +11,21 @@ from recoco.utils import check_if_advisor
 from .utils import can_administrate_project
 
 
+def exclude_path(excluded_path: str):
+    def decorator(view_func):
+        @wraps(view_func)
+        def _wrapped_view(request, *args, **kwargs):
+            path_info = request.META["PATH_INFO"]
+            if path_info.startswith(excluded_path):
+                return {}
+            return view_func(request, *args, **kwargs)
+
+        return _wrapped_view
+
+    return decorator
+
+
+@exclude_path("/nimda")
 def is_switchtender_processor(request):
     return {
         "is_switchtender": check_if_advisor(request.user),
@@ -19,6 +35,8 @@ def is_switchtender_processor(request):
     }
 
 
+@exclude_path("/nimda")
+@exclude_path("/api")
 def unread_notifications_processor(request):
     if not request.user.is_authenticated:
         return {}

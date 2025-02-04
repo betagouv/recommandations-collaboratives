@@ -35,8 +35,12 @@ class ResourceViewSet(viewsets.ModelViewSet):
         qs = models.Resource.on_site
         if not has_perm(self.request.user, "sites.manage_resources", self.request.site):
             qs = qs.filter(status__gt=models.Resource.TO_REVIEW)
-        qs = qs.with_ds_annotations().select_related("created_by", "category")
-        return qs.order_by("-created_on", "-updated_on")
+        return (
+            qs.with_ds_annotations()
+            .select_related("created_by", "category")
+            .prefetch_related("tags")
+            .order_by("-created_on", "-updated_on")
+        )
 
     serializer_class = ResourceSerializer
     permission_classes = [
