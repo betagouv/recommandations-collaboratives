@@ -9,18 +9,25 @@ created : 2021-05-26 15:56:20 CEST
 from __future__ import annotations
 
 from copy import copy
+from datetime import timedelta
 
+from actstream.models import Action
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
-from django.db.models import Count, F, Q, QuerySet
+from django.db.models import CharField, Count, F, Func, OuterRef, Q, QuerySet, Subquery
+from django.db.models.functions import Cast
 from django.http import Http404
 from django.shortcuts import get_object_or_404
+from django.utils import timezone
 from notifications import models as notifications_models
 from rest_framework import permissions, status, viewsets
+from rest_framework.filters import BaseFilterBackend, SearchFilter
 from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
+from rest_framework.settings import api_settings
 from rest_framework.views import APIView
+from watson import search as watson
 
 from recoco import verbs
 from recoco.rest_api.filters import TagsFilterbackend
@@ -44,6 +51,64 @@ from ..serializers import (
 ########################################################################
 # Project API
 ########################################################################
+
+
+class ProjectSearchFilter(SearchFilter):
+    search_param = api_settings.SEARCH_PARAM
+    template = "rest_framework/filters/search.html"
+
+    def filter_queryset(self, request, queryset, view):
+        keywords = request.query_params.get(self.search_param)
+        departments = request.query_params.getlist("departments", None)
+
+        if keywords:
+            queryset = watson.filter(queryset, keywords)
+
+        if departments:
+            queryset = queryset.filter(commune__department__code__in=departments)
+
+        return queryset
+
+
+class ProjectActivityFilter(BaseFilterBackend):
+    """
+    Filter on users activity using action streams and project annotation
+    """
+
+    def filter_queryset(self, request, queryset, view):
+        last_activity_days = request.GET.get("last_activity", None)
+
+        project_ct = ContentType.objects.get_for_model(models.Project)
+
+        if last_activity_days:
+            try:
+                from_ts = timezone.now() - timedelta(days=int(last_activity_days))
+            except ValueError:
+                return queryset
+
+            # Fetch activity from actstream
+            queryset = (
+                queryset.annotate(
+                    recent_actions_count=Subquery(
+                        Action.objects.filter(
+                            target_content_type_id=project_ct.pk,
+                            target_object_id=Cast(OuterRef("pk"), CharField()),
+                            timestamp__gte=from_ts,
+                        )
+                        .order_by()
+                        .annotate(count=Func(F("id"), function="Count"))
+                        .values("count")
+                    ),
+                )
+                .filter(
+                    # We want both to cover members and advisors activities
+                    Q(last_members_activity_at__gte=from_ts)
+                    | Q(recent_actions_count__gt=0)
+                )
+                .distinct()
+            )
+
+        return queryset
 
 
 class ProjectDetail(APIView):
@@ -91,7 +156,7 @@ class ProjectList(ListAPIView):
 
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = ProjectForListSerializer
-    filter_backends = [TagsFilterbackend]
+    filter_backends = [TagsFilterbackend, ProjectSearchFilter, ProjectActivityFilter]
 
     def get_queryset(self):
         return (
