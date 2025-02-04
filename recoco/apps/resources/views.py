@@ -51,6 +51,7 @@ from . import models
 
 def resource_search(request):
     """Search existing resources"""
+
     form = SearchForm(request.GET)
     form.is_valid()
     query = form.cleaned_data.get("query", "")
@@ -130,7 +131,14 @@ def resource_search(request):
 
     resources = resources.filter(staff_redux)
 
-    return render(request, "resources/resource/list.html", locals())
+    return render(
+        request,
+        "resources/resource/list.html",
+        {
+            "user_bookmarks": list(request.user.bookmarks.values_list("id", flat=True)),
+            **locals(),
+        },
+    )
 
 
 # NOTE both using search and filter in same action is slippy

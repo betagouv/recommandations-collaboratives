@@ -268,7 +268,11 @@ class Resource(CloneMixin, models.Model):
     @classmethod
     def search(cls, query="", categories=None):
         categories = categories or []
-        resources = cls.on_site.all()
+        resources = (
+            cls.on_site.all()
+            .select_related("category")
+            .prefetch_related("task_recommendations")
+        )
         if categories:
             resources = resources.filter(
                 models.Q(category__in=categories) | models.Q(category=None)

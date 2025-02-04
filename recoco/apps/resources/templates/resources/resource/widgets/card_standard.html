@@ -90,8 +90,9 @@
             </div>
             <!-- Action toolbar -->
             <div class="btn-group" role="group" aria-label="Actions">
+                {{ resource.id }} / {{ user_bookmarks }}
                 <!-- Bookmark -->
-                {% if resource.id in user.bookmarks.as_list %}
+                {% if resource.id in user_bookmarks %}
                     <form method="post"
                           action="{% url "resources-bookmark-delete" resource.id %}">
                         {% csrf_token %}
