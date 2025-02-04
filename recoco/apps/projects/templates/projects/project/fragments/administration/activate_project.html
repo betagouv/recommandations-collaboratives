@@ -2,8 +2,8 @@
 {% load guardian_tags %}
 {% load projects_extra %}
 {% get_obj_perms request.user for project as "user_project_perms" %}
-{% is_staff_for_current_site request.user as is_staff %}
-{% if request.user == project.owner or is_staff and "change_project" in user_project_perms %}
+{% is_staff_for_current_site request.user as is_staff_for_site %}
+{% if request.user == project.owner or is_staff_for_site and "change_project" in user_project_perms %}
     {% if project.inactive_since != None %}
         <!-- Activate project -->
         <div data-test-id="admin-banner-activate-project"
