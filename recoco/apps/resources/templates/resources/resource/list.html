@@ -38,7 +38,7 @@
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#key" />
                     </svg>
                     Ressources
-                    {% if resources.count %}<span class="text-secondary">({{ resources.count }})</span>{% endif %}
+                    {% if resources_count %}<span class="text-secondary">({{ resources_count }})</span>{% endif %}
                 </h1>
                 <div class="text-secondary small fr-mb-2w">
                     Nous créons des ressources en fonction des besoins que vous nous soumettez !
@@ -160,7 +160,7 @@
         <!-- Results -->
         {% if query %}
             <div class="row align-center fr-mb-2w">
-                {% if not resources %}
+                {% if not resources_count %}
                     <div class="col-6 offset-md-3 fs-5">
                         <svg class="bi" width="20" height="20" fill="currentColor">
                             <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#signpost-split-fill" />
@@ -175,7 +175,7 @@
                 {% else %}
                     <div class="col-12">
                         <span class="text-secondary">
-                            {{ resources.count }} résultat{{ resources|pluralize }} trouvé{{ resources|pluralize }} pour "<em>{{ query }}</em>".
+                            {{ resources_count }} résultat{{ resources|pluralize }} trouvé{{ resources|pluralize }} pour "<em>{{ query }}</em>".
                         </span>
                     </div>
                 {% endif %}
