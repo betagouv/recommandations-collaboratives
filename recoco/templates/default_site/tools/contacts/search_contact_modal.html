@@ -45,6 +45,7 @@
                                   x-for="(contact, index) in contactsFound"
                                   :key="index">
                             <div class="fr-menu__item__content cursor-pointer fr-pt-1w fr-px-1w add-borders"
+                                 data-test-id="contact-to-select"
                                  @click="onSelect(contact)">
                                 <div x-data="{contact:contact}">{% include "tools/contacts/contact_card.html" %}</div>
                             </div>
