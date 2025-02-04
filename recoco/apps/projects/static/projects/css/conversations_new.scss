@@ -206,3 +206,7 @@
     font-weight: 400;
   }
 }
+
+.stretched-link::after {
+  cursor: pointer;
+}
