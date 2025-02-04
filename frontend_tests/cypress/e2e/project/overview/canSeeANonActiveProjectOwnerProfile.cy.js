@@ -4,7 +4,7 @@ let currentProject = projects[9];
 
 describe('I can go to overview tab', () => {
   beforeEach(() => {
-    cy.login('staff');
+    cy.login('staff'); // TODO replace by staffOnSite and check behaviour
     cy.visit(`/project/${currentProject.pk}`);
   });
 

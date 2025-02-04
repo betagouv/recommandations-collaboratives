@@ -195,7 +195,11 @@ class Task(OrderedModel):
     deadline = models.DateField(null=True, blank=True)
 
     resource = models.ForeignKey(
-        resources.Resource, on_delete=models.CASCADE, null=True, blank=True
+        resources.Resource,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="recommandations",
     )
 
     document = GenericRelation(projects_models.Document)

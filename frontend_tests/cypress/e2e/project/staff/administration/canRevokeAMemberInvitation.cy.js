@@ -6,7 +6,7 @@ const userToInvite = users[6];
 
 describe('I can go to administration area of a project and revoke an invite for a member', () => {
   beforeEach(() => {
-    cy.login('staff');
+    cy.login('staff'); // TODO replace by staffOnSite and check behaviour
   });
 
   it('goes to the administration tab of a project and revoke the member invitation', () => {

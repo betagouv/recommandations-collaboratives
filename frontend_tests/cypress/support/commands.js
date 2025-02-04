@@ -61,6 +61,9 @@ Cypress.Commands.add('login', (role) => {
     case 'staff': //staff
       username = users[0].fields.username;
       break;
+    case 'staffOnSite': //staffOnSite
+      username = users[13].fields.username;
+      break;
     case 'nonactive': //non active user
       username = users[8].fields.username;
       break;
@@ -338,7 +341,7 @@ Cypress.Commands.add(
  * @param {number} index - The index of the project to approve.
  */
 Cypress.Commands.add('approveProject', (index) => {
-  cy.login('staff');
+  cy.login('staff'); // TODO replace by staffOnSite and check behaviour
   cy.visit('nimda/projects/project/');
   cy.contains(`${project.name} ${index}`)
     .siblings('th.field-created_on.nowrap')

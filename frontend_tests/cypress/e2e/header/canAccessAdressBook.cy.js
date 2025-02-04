@@ -1,6 +1,6 @@
 describe('I can access to my adress book', () => {
   beforeEach(() => {
-    cy.login('staff');
+    cy.login('staff'); // TODO replace by staffOnSite and check behaviour
   });
 
   it('', () => {
