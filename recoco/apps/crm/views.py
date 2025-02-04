@@ -89,7 +89,9 @@ class CRMSiteDashboardView(LoginRequiredMixin, UserPassesTestMixin, TemplateView
                 | Q(actor_content_type=ctype)
             )
             .order_by("-timestamp")
-            .prefetch_related("actor", "action_object", "target")[:100]
+            .prefetch_related(
+                "actor__profile__organization", "action_object", "target"
+            )[:100]
         )
 
         context["crm_notif_stream"] = (
@@ -185,9 +187,11 @@ class SiteConfigurationUpdateView(LoginRequiredMixin, UserPassesTestMixin, Updat
 
 def get_queryset_for_site_organizations(site):
     """Return queryset of organizations from addressbook site or w/ user on site"""
-    return Organization.objects.filter(
-        Q(sites=site) | Q(registered_profiles__sites=site)
-    ).distinct()
+    return (
+        Organization.objects.filter(Q(sites=site) | Q(registered_profiles__sites=site))
+        .prefetch_related("departments")
+        .distinct()
+    )
 
 
 @login_required
@@ -656,7 +660,9 @@ def project_list(request):
     # filtered projects
     projects = filters.ProjectFilter(
         request.GET,
-        queryset=Project.all_on_site.order_by("name").prefetch_related("commune"),
+        queryset=Project.all_on_site.order_by("name")
+        .select_related("commune__department")
+        .prefetch_related("project_sites__site"),
     )
 
     # required by default on crm
