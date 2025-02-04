@@ -1,6 +1,6 @@
 describe('I can assign new deparments when I edit a resource', () => {
   beforeEach(() => {
-    cy.login('staff');
+    cy.login('staff'); // TODO replace by staffOnSite and check behaviour
   });
 
   it('goes to edit a resource and assign 3 new deparments', () => {
