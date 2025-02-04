@@ -11,7 +11,8 @@ from recoco.apps.projects import models as projects_models
 
 
 class InviteManager(models.Manager):
-    pass
+    def pending(self):
+        return self.filter(accepted_on=None)
 
 
 class InviteOnSiteManager(CurrentSiteManager, InviteManager):
