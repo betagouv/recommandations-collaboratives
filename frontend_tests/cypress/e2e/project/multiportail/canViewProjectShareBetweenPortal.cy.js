@@ -1,6 +1,6 @@
 describe('Project share between portal', () => {
   it('display share by and with portal on kanban', () => {
-    cy.login('staff');
+    cy.login('staff'); // TODO replace by staffOnSite and check behaviour
     cy.visit('/projects');
     cy.get('[data-cy="kanban-project-shared-by-origin"]')
       .should('be.visible')
@@ -11,7 +11,7 @@ describe('Project share between portal', () => {
   });
 
   it('display share by portal on moderation', () => {
-    cy.login('staff');
+    cy.login('staff'); // TODO replace by staffOnSite and check behaviour
     cy.visit('/projects/moderation');
     cy.get('[data-cy="moderation-projet-shared-by"]')
       .should('be.visible')
@@ -19,7 +19,7 @@ describe('Project share between portal', () => {
   });
 
   it('display share by and with portal on list advisor dashboard', () => {
-    cy.login('staff');
+    cy.login('staff'); // TODO replace by staffOnSite and check behaviour
     cy.visit('/projects/advisor');
     cy.get('[data-cy="list-project-shared-by-origin"]')
       .should('be.visible')

@@ -1,6 +1,6 @@
 describe('I can access documentation', () => {
   it('displays as staff member', () => {
-    cy.login('staff');
+    cy.login('staff'); // TODO replace by staffOnSite and check behaviour
     cy.get("[data-test-id='open-dropdown-profil-option-button']").click({
       force: true,
     });

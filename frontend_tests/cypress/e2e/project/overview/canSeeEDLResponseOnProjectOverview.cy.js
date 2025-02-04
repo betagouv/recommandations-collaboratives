@@ -16,7 +16,7 @@ describe('I can see onboarding answer on the overview tab', () => {
   });
 
   it('should see the project description on overview tab as staff', () => {
-    cy.login('staff');
+    cy.login('staff'); // TODO replace by staffOnSite and check behaviour
     cy.visit(`/project/${projetId}`);
     cy.get('[data-test-id="project-information-card-context"]').should(
       'contain.text',

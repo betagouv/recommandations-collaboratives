@@ -14,7 +14,7 @@ const resource = {
 
 describe('I can edit a resource as a staff', () => {
   it('edits a resource', () => {
-    cy.login('staff');
+    cy.login('staff'); // TODO replace by staffOnSite and check behaviour
     cy.visit('/ressource/1/');
     cy.get('[data-test-id="edit-resource"]').click();
     cy.url().should('include', '/ressource/1/update/');

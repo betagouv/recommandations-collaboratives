@@ -3,7 +3,7 @@ import projects from '../../../../fixtures/projects/projects.json';
 let projectsLength;
 describe('I can go to the dashboard and search for project', () => {
   beforeEach(() => {
-    cy.login('staff');
+    cy.login('staff'); // TODO replace by staffOnSite and check behaviour
     cy.visit('/projects/staff/');
   });
 

@@ -186,7 +186,7 @@ Alpine.data('KanbanProjects', function (currentSiteId, departments, regions) {
     },
     extractDepartmentFromDisplayedProjects(projects) {
       const departments = projects.map(
-        (project) => project.commune.department.code
+        (project) => project?.commune?.department.code
       );
       return [...new Set(departments)];
     },

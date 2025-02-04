@@ -51,6 +51,7 @@ from . import models
 
 def resource_search(request):
     """Search existing resources"""
+
     form = SearchForm(request.GET)
     form.is_valid()
     query = form.cleaned_data.get("query", "")
@@ -63,7 +64,11 @@ def resource_search(request):
 
     categories = form.selected_categories
 
-    resources = models.Resource.search(query, categories)
+    resources = (
+        models.Resource.search(query, categories)
+        .select_related("category")
+        .prefetch_related("task_recommendations")
+    )
 
     # If we are not allowed to manage resources, filter out DRAFT/TO_REVIEW items and
     # imported resources
@@ -130,7 +135,19 @@ def resource_search(request):
 
     resources = resources.filter(staff_redux)
 
-    return render(request, "resources/resource/list.html", locals())
+    return render(
+        request,
+        "resources/resource/list.html",
+        {
+            "resources_count": resources.count(),
+            "user_bookmarks": (
+                list(request.user.bookmarks.values_list("resource_id", flat=True))
+                if request.user.is_authenticated
+                else []
+            ),
+            **locals(),
+        },
+    )
 
 
 # NOTE both using search and filter in same action is slippy
@@ -277,7 +294,7 @@ class EmbededResourceDetailView(BaseResourceDetailView):
 
         if task_id := self.request.GET.get("task_id"):
             context["task"] = (
-                self.object.task_set.filter(pk=task_id)
+                self.object.recommandations.filter(pk=task_id)
                 .select_related("ds_folder")
                 .first()
             )
