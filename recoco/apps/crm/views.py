@@ -89,9 +89,7 @@ class CRMSiteDashboardView(LoginRequiredMixin, UserPassesTestMixin, TemplateView
                 | Q(actor_content_type=ctype)
             )
             .order_by("-timestamp")
-            .prefetch_related(
-                "actor__profile__organization", "action_object", "target"
-            )[:100]
+            .prefetch_related("actor", "action_object", "target")[:100]
         )
 
         context["crm_notif_stream"] = (
