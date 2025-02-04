@@ -6,7 +6,7 @@ const currentProject = projects[17];
 describe(`As project advisor, I can see a project's active status`, () => {
   before(() => {
     // First: login as owner and deactivate project
-    cy.login('staff');
+    cy.login('staff'); // TODO replace by staffOnSite and check behaviour
     cy.visit(`/project/${currentProject.pk}`);
 
     projectView.navigateToPreferencesTab();

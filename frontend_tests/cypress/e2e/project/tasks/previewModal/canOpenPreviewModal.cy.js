@@ -6,7 +6,7 @@ const task2 = tasks[1];
 
 describe('I can go tasks tab', () => {
   beforeEach(() => {
-    cy.login('staff');
+    cy.login('staff'); // TODO replace by staffOnSite and check behaviour
     cy.becomeAdvisor(currentProject.pk); // A remplacer par une fixture avec un user déjà advisor du projet
   });
 

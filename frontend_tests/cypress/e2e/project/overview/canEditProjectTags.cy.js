@@ -4,7 +4,7 @@ let currentProject = projects[9];
 
 describe('I can edit project tags on overview page', () => {
   beforeEach(() => {
-    cy.login('staff');
+    cy.login('staff'); // TODO replace by staffOnSite and check behaviour
     cy.visit(`/project/1`);
   });
 

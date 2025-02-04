@@ -2,7 +2,7 @@ import contacts from '../../../fixtures/addressbook/contacts.json';
 
 describe('I can assign new contacts when I edit a resource', () => {
   beforeEach(() => {
-    cy.login('staff');
+    cy.login('staff'); // TODO replace by staffOnSite and check behaviour
   });
 
   it('goes to edit a resource and assign 3 new contacts', () => {
