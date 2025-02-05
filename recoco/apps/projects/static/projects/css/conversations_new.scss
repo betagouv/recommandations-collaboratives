@@ -232,6 +232,29 @@
       font-weight: 700;
     }
   }
+  .editor-form {
+    position: sticky;
+    bottom: 0;
+    background-color: #fff;
+    border-top: 1px solid var(--light-border-default-grey, #e5e5e5);
+    &__container {
+      position: relative;
+      z-index: 1;
+      .tiptap-menu-custom {
+        top: 0.5rem;
+      }
+      .file-upload-wrapper {
+        position: absolute;
+        bottom: 0.5rem;
+        left: 0.5rem;
+      }
+      .send-message {
+        position: absolute;
+        bottom: 0.5rem;
+        right: 0.5rem;
+      }
+    }
+  }
 }
 
 .empty-message-list {
