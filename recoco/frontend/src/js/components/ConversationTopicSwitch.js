@@ -7,21 +7,25 @@ Alpine.data('ConversationTopicSwitch', (topicList) => {
     topicSelector: 'general',
     valueTopicFormMessageSend: '',
     stringToColor,
-    setActiveTopic(event, topicName) {
-      Array.from(document.querySelectorAll('.feed-element-item')).forEach(
-        (element) => {
-          if (
-            (event.target.value === 'general' &&
-              element.getAttribute('data-topic') === '') ||
-            element.getAttribute('data-topic') === event.target.value
-          ) {
-            element.classList.remove('d-none');
-            return;
-          }
-          element.classList.add('d-none');
+    init() {
+      this.setActiveTopic('general', '');
+    },
+    setActiveTopic(topicSlug, topicName) {
+      Array.from(
+        document.querySelectorAll('[data-type-element="feed-element-item"]')
+      ).forEach((element) => {
+        if (
+          (topicSlug === 'general' &&
+            element.getAttribute('data-topic') === '') ||
+          element.getAttribute('data-topic') === topicSlug
+        ) {
+          element.classList.remove('d-none');
+          return;
         }
-      );
+        element.classList.add('d-none');
+      });
       this.valueTopicFormMessageSend = topicName;
+      this.$dispatch('topic-switched');
     },
   };
 });

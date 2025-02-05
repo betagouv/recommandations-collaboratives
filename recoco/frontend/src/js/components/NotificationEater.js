@@ -24,12 +24,13 @@ Alpine.data('NotificationEater', (projectId) => {
       this.hideScrollLine();
       this.scrollToFirstNotification();
     },
-    scrollToFirstNotification() {
+    scrollToFirstNotification(topic = 'general') {
       const scrollLine = document.querySelectorAll('[x-ref="scrollLine"]');
-      let scrollTo = this.$refs.scrollLineLastMessage;
+      let scrollTo = this.$refs[`scrollLineLastMessage_${topic}`];
       if (scrollLine.length > 0) {
         scrollTo = scrollLine[0];
       }
+
       window.scroll({
         top: scrollTo.offsetTop - 260,
         behavior: 'smooth',

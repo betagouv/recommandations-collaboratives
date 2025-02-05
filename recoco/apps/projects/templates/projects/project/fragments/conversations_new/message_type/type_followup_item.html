@@ -1,11 +1,13 @@
 <div class="observed-element"
      data-notifications="{{ element.notifications }}">
     {% if element.object.status %}
-        <p class="fr-mb-0">
-            <span class="strong">{{ element.object.who.first_name }} {{ element.object.who.last_name }}</span> a marqué la recommandation commme {{ element.object.status_txt }}
-        </p>
+        <div class="fr-mb-0 d-flex align-items-center justify-content-center">
+            {% comment %} <strong>{{ element.object.who.first_name }} {{ element.object.who.last_name }}</strong> a changé le statut de la recommandation en <strong>{{ element.object.status_txt }}</strong> {% endcomment %}
+            {% include "user/user_card.html" with user=element.object.who %}
+            <span class="followup-item__action fr-ml-1v">a changé le statut de la recommandation en <strong>{{ element.object.status_txt }}</strong></span>
+        </div>
     {% endif %}
-    <div class="rounded-3 fr-p-2w fr-my-2v {% if request.user == element.object.created_by %}bg-blue-light fr-ml-6w{% else %}bg-grey-light fr-mr-6w{% endif %}">
+    {% comment %} <div class="rounded-3 fr-p-2w fr-my-2v {% if request.user == element.object.created_by %}bg-blue-light fr-ml-6w{% else %}bg-grey-light fr-mr-6w{% endif %}">
         {{ element.object.comment_rendered|safe }}
         {% if element.object.document.count %}
             {% for document in element.object.document.all %}
@@ -15,5 +17,5 @@
         {% if element.object.who %}
             <div class="d-flex align-items-center">{% include "user/user_card.html" with user=element.object.who %}</div>
         {% endif %}
-    </div>
+    </div> {% endcomment %}
 </div>
