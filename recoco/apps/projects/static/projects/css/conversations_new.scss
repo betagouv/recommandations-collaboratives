@@ -29,6 +29,10 @@
     }
     &-list-member {
       border-top: 1px solid var(--light-border-default-grey, #e5e5e5);
+      position: sticky;
+      max-height: 30vh;
+      bottom: 0;
+      background-color: #fff;
       &-title {
         color: var(--light-text-default-grey, #3a3a3a);
         font-size: 0.875rem;
@@ -216,6 +220,7 @@
   }
   &__message {
   }
+
   .user-card {
     &__gravatar {
       width: 1rem;
@@ -232,6 +237,7 @@
       font-weight: 700;
     }
   }
+
   .editor-form {
     position: sticky;
     bottom: 0;
