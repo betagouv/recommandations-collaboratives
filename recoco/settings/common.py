@@ -378,6 +378,7 @@ SOCIALACCOUNT_PROVIDERS = {
             "email",
             "profile",
             "organization",
+            "phone",
         ],
         "AUTH_PARAMS": {
             "acr_values": "eidas1",
