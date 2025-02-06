@@ -3,17 +3,18 @@
      x-transition:enter-start="grow-enter-start"
      x-transition:leave="grow-leave"
      class="position-relative">
+    <label class="fr-label push-reco__title-section"
+           for="external-resource-url-input">
+        Url du site :
+        <span class="fr-hint-text">Saisissez une url valide, commençant par https:// puis appuyez sur Charger la ressource</span>
+    </label>
     <div class="fr-search-bar fr-search-bar--lg" id="search-2" role="search">
-        <label class="fr-label" for="external-resource-url-input">
-            Url du site :
-            <span class="fr-hint-text">Saisissez une url valide, commençant par https://</span>
-        </label>
         <input class="fr-input"
                type="text"
                placeholder="https://"
                id="external-resource-url-input"
                x-ref="external_resource_url"
-               @input="canLoadNewExternalResource = true"
+               @input="canLoadNewExternalResource = $refs.external_resource_url.value != ''"
                name="external-resource-url-input"
                data-cy="input-external-resource-url">
         <button class="fr-btn"

@@ -11,6 +11,6 @@ describe('I can read only overview page', () => {
 
     cy.url().should('include', '/presentation');
 
-    cy.contains('Note interne').should('not.exist');
+    cy.contains('Note interne aux conseillers').should('not.exist');
   });
 });

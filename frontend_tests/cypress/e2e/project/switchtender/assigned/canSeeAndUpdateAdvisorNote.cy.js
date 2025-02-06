@@ -9,12 +9,9 @@ describe('I can see and update an advisor note', () => {
   it('goes to project overview and update advisor note', () => {
     cy.visit(`/project/${currentProject.pk}`);
 
-    cy.contains('Note interne');
+    cy.contains('Note interne aux conseillers');
 
-    cy.contains('Non visible par le porteur de projet')
-      .parent()
-      .siblings('a')
-      .click({ force: true });
+    cy.get('[data-cy="edit-internal-note"]').click({ force: true });
 
     const now = new Date();
 
