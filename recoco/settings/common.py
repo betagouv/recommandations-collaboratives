@@ -378,10 +378,8 @@ SOCIALACCOUNT_PROVIDERS = {
             "uid",
             "given_name",
             "usual_name",
-            "siren",
             "siret",
-            "organizational_unit",
-            "phone_number",
+            "phone",
             "idp_id",
         ],
         "AUTH_PARAMS": {
