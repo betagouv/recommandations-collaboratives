@@ -15,10 +15,10 @@
               aria-hidden="true"
               @click="closeCreateContactModal"></span>
     </div>
-    <div class="fr-p-3v modal-create-contact__block">
+    <div x-data="SearchOrganisation"
+         class="fr-p-3v modal-create-contact__block">
         <span>Organisation</span><span class="color-important">*</span>
-        <input type="text" class="fr-input">
-        {% comment %} {% include "tools/contacts/search_organisation_modal.html" %} {% endcomment %}
+        <div>{% include "tools/contacts/search_organisation.html" %}</div>
     </div>
     <div class="fr-p-3v modal-create-contact__block">
         <label>Nom</label>

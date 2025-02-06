@@ -1,39 +1,49 @@
 import Alpine from 'alpinejs';
-import api, { searchContactsUrl } from '../utils/api';
-import { use } from 'marked';
+import api, { searchOrganizationsUrl } from '../utils/api';
 
-function CreateContact() {
+function SearchOrganisation() {
   return {
     orgaFound: [],
     userInput: '',
+    showOrgasresults: false,
+    isAnOrgaSelected: false,
     init() {
     },
     onSearch() {
+      console.log('onSearch');
       if (this.userInput.length > 0) {
         this.orgaFound = [];
-        // api.get(searchContactsUrl(this.userInput)).then((response) => {
-        //   this.searchResults = response.data;
-        //   this.contactsFound = this.searchResults.results;
-        //     if(this.contactsFound.length > 0) {
-        //       this.showContactsresults = true;
-        //     }
-        //     else {
-        //       this.showContactsresults = false;
-        //     }
-        //   });
+        api.get(searchOrganizationsUrl(this.userInput)).then((response) => {
+          this.searchResults = response.data;
+          this.orgaFound = this.searchResults.results;
+          console.log('orgaFound : ', this.orgaFound);
+            if(this.orgaFound.length > 0) {
+              this.showOrgasresults = true;
+            }
+            else {
+              this.showOrgasresults = false;
+            }
+          });
       }
     },
-    closeModal() {
-      this.isAContactSelected = false;
-      this.showContactsresults = false
-      this.userInput = '';
-      this.isOpenCreateContactModal = false;
+    onSelectOrga(orga) {
+      console.log('mon orga : ', orga);
+      this.isAnOrgaSelected = true;
+      this.selectedOrga = orga;
+      this.userInput = orga.name;
+      this.showOrgasresults = false;
     },
-    onCancelSelectContact(){
-      this.isAContactSelected=false;
-       this.selectedContact = null;
-    }
+    // closeModal() {
+    //   this.isAContactSelected = false;
+    //   this.showContactsresults = false
+    //   this.userInput = '';
+    //   this.isOpenCreateContactModal = false;
+    // },
+    // onCancelSelectContact(){
+    //   this.isAContactSelected=false;
+    //    this.selectedContact = null;
+    // }
   };
 }
 
-Alpine.data('SearchContact', SearchContact);
+Alpine.data('SearchOrganisation', SearchOrganisation);

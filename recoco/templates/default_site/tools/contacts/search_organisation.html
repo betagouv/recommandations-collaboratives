@@ -1,0 +1,54 @@
+{% load static %}
+{% load sass_tags %}
+{% block css %}
+    <link href="{% sass_src 'css/tools/contact/search-organisation.scss' %}"
+          rel="stylesheet"
+          type="text/css" />
+{% endblock css %}
+<div>
+    <div class="fr-p-3v">
+        <div class="fr-search-bar" id="header-search" role="search">
+            <input class="fr-input"
+                   placeholder="ADEME 44"
+                   type="search"
+                   id="search-organisation-input"
+                   name="search-organisation-input"
+                   @input.debounce="onSearch"
+                   x-model="userInput">
+            <button class="fr-btn" title="Rechercher" @click="onSearch">Rechercher</button>
+        </div>
+    </div>
+    <div>
+        <div class="fr-menu menu-modal-correct-fr-menu better-positionning-dropdown border-radius-4px">
+            <div class="fr-menu__list specific-width-26rem border-radius-4px">
+                <div class="fr-menu__list specific-width-26rem overflow-auto specific-height border-radius-4px">
+                    <template x-if="userInput.length > 0 && showOrgasresults && !isAnOrgaSelected">
+                        <template class="fr-menu__item" x-for="(orga, index) in orgaFound" :key="index">
+                            <div class="fr-menu__item__content cursor-pointer fr-pt-1w fr-px-1w add-borders"
+                                 data-test-id="orga-to-select"
+                                 @click="onSelectOrga(orga)">
+                                <div>
+                                    <span x-text="orga.name"></span>
+                                </div>
+                            </div>
+                        </template>
+                    </template>
+                    <template class="fr-menu__item"
+                              x-if="userInput.length > 0 && !isAnOrgaSelected && !showOrgasresults && delayDisplay">
+                        <div>
+                            <div class="fr-m-1w fr-p-3v specific-banner">
+                                <span class="text-style">Aucun résultat</span>
+                            </div>
+                            {% comment %} <div class="btn-create-orga fr-p-1w cursor-pointer" @click="openModalCreateorga">
+                                <span class="fr-icon-add-line" aria-hidden="true"></span><span>Créer un nouveau orga</span>
+                            </div> {% endcomment %}
+                        </div>
+                    </template>
+                </div>
+            </div>
+        </div>
+        {% comment %} <div class="flex justify-end pt-2">
+            <button class="px-4 bg-transparent p-3 rounded-lg text-indigo-500 hover:bg-gray-100 hover:text-indigo-400 mr-2" @click="alert('Additional Action');">Action</button>
+        </div> {% endcomment %}
+    </div>
+</div>
