@@ -40,6 +40,8 @@ class SocialAccountAdapter(DefaultSocialAccountAdapter):
         user.phone_no = data.get("phone", "")
         user.profile.organization = data.get("label", "")
         user.profile.organization_position = data.get("job", "")
+        # TODO: register siret in the profile
+        # user.profile.siret = data.get("siret", "")
 
         return user
 
