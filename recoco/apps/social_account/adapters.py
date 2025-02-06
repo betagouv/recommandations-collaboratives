@@ -4,6 +4,7 @@ from allauth.socialaccount.models import SocialToken
 from allauth.socialaccount.providers.openid_connect.views import (
     OpenIDConnectOAuth2Adapter,
 )
+from django.contrib.auth.models import User
 from django.utils.crypto import get_random_string
 
 
@@ -26,7 +27,16 @@ class SocialAccountAdapter(DefaultSocialAccountAdapter):
         You can use this hook to intervene, e.g. abort the login by
         raising an ImmediateHttpResponse
         """
-        return super().pre_social_login(request, sociallogin)
+
+        user = sociallogin.user
+        if user.id:
+            return
+
+        try:
+            user = User.objects.get(email=user.email)
+            sociallogin.connect(request, user)
+        except User.DoesNotExist:
+            pass
 
     def is_open_for_signup(self, request, sociallogin) -> bool:
         """
