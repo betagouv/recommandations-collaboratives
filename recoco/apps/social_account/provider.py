@@ -32,6 +32,10 @@ class ProConnectProvider(OpenIDConnectProvider):
             "usual_name",
             "siret",
             "idp_id",
+            # TODO: the following ones don't work at the moment
+            # "phone",
+            # "organizational_unit",
+            # "is_service_public",
         ]
 
 
