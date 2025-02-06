@@ -1,0 +1,54 @@
+{% load sass_tags %}
+{% block css %}
+    <link href="{% sass_src 'css/tools/contact/create-contact-modal.scss' %}"
+          rel="stylesheet"
+          type="text/css" />
+{% endblock css %}
+{% comment %} <div> {% endcomment %}
+<div x-data="CreateContact()"
+     id="create-contact-modal"
+     class="modal-create-contact d-none z-2"
+     @click.away="isOpenCreateContactModal = false">
+    <div class="d-flex justify-content-between border-bottom-666 fr-p-3v modal-create-contact__block">
+        <p class="fw-bold color-666 correct-p">ATTACHER UN CONTACT</p>
+        <span class="fr-icon-close-line color-666 cursor-pointer"
+              aria-hidden="true"
+              @click="closeCreateContactModal"></span>
+    </div>
+    <div class="fr-p-3v modal-create-contact__block">
+        <span>Organisation</span><span class="color-important">*</span>
+        <input type="text" class="fr-input">
+        {% comment %} {% include "tools/contacts/search_organisation_modal.html" %} {% endcomment %}
+    </div>
+    <div class="fr-p-3v modal-create-contact__block">
+        <label>Nom</label>
+        <input type="text" class="fr-input" x-model="contactLastName">
+    </div>
+    <div class="fr-p-3v modal-create-contact__block">
+        <label>Prénom</label>
+        <input type="text" class="fr-input" x-model="contactFirstName">
+    </div>
+    <div class="fr-p-3v modal-create-contact__block">
+        <label>Poste</label>
+        <span class="color-important">*</span>
+        <input type="text" class="fr-input" x-model="contactJob">
+    </div>
+    <div class="fr-p-3v modal-create-contact__block">
+        <label>Email</label>
+        <input type="text" class="fr-input" x-model="contactEmail">
+    </div>
+    <div class="fr-p-3v modal-create-contact__block">
+        <label>Téléphone Principal</label>
+        <input type="text" class="fr-input" x-model="contactTel">
+    </div>
+    <div class="fr-p-3v modal-create-contact__block">
+        <label>Téléphone Secondaire</label>
+        <input type="text" class="fr-input" x-model="contactPhone">
+    </div>
+    <div class="fr-p-3v modal-create-contact__block d-flex">
+        <button class="fr-btn fr-btn--secondary fr-mr-3v w-100 justify-content-center"
+                @click="closeCreateContactModal()">Annuler</button>
+        <button class="fr-btn w-100 justify-content-center" @click="createContact">Créer le contact</button>
+    </div>
+</div>
+{% comment %} </div> {% endcomment %}

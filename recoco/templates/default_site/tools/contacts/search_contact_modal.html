@@ -6,8 +6,8 @@
           rel="stylesheet"
           type="text/css" />
 {% endblock css %}
-<div class="modal-contact"
-     x-show="isOpenModal"
+<div class="modal-contact d-none"
+     id="search-contact-modal"
      @click.away="isOpenModal = false"
      x-transition:enter="ease-out duration-300"
      x-transition:enter-start="opacity-0 scale-90"
@@ -68,15 +68,23 @@
                     </template>
                     <template class="fr-menu__item"
                               x-if="userInput.length > 0 && !isAContactSelected && !showContactsresults && delayDisplay">
-                        <div class="fr-m-1w fr-p-3v specific-banner">
-                            <span class="text-style">Aucun résultat</span>
+                        <div>
+                            <div class="fr-m-1w fr-p-3v specific-banner">
+                                <span class="text-style">Aucun résultat</span>
+                            </div>
+                            <div class="btn-create-contact fr-p-1w cursor-pointer"
+                                 @click="openModalCreateContact">
+                                {% comment %} @click="isOpenCreateContactModal=true"> {% endcomment %}
+                                <span class="fr-icon-add-line" aria-hidden="true"></span><span>Créer un nouveau contact</span>
+                            </div>
                         </div>
                     </template>
                 </div>
             </div>
         </div>
-        {% comment %} <div class="flex justify-end pt-2">
-        <button class="px-4 bg-transparent p-3 rounded-lg text-indigo-500 hover:bg-gray-100 hover:text-indigo-400 mr-2" @click="alert('Additional Action');">Action</button>
-        </div> {% endcomment %}
+        <div class="flex justify-end pt-2">
+            <button class="px-4 bg-transparent p-3 rounded-lg text-indigo-500 hover:bg-gray-100 hover:text-indigo-400 mr-2"
+                    @click="alert('Additional Action');">Action</button>
+        </div>
     </div>
 </div>

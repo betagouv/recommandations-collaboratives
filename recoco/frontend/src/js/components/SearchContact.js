@@ -11,6 +11,8 @@ function SearchContact() {
     isAContactSelected: false,
     selectedContact: null,
     delayDisplay: false,
+    modalCreateContact: null,
+    modalSearchContact : null,
     init() {
     },
     onSearch() {
@@ -43,11 +45,24 @@ function SearchContact() {
       this.isAContactSelected = false;
       this.showContactsresults = false
       this.userInput = '';
-      this.isOpenModal = false;
+      this.modalSearchContact.classList.toggle('d-none');
     },
     onCancelSelectContact(){
       this.isAContactSelected=false;
        this.selectedContact = null;
+    },
+    openModalSearchContact() {
+      this.modalSearchContact = document.querySelector('#search-contact-modal');
+      this.modalSearchContact.classList.toggle('d-none');
+    },
+    openModalCreateContact() {
+      this.modalCreateContact = document.querySelector('#create-contact-modal');
+      this.modalCreateContact.classList.toggle('d-none');
+      this.closeModalWithData();
+    },
+    closeModalWithData() {
+      this.modalSearchContact = document.querySelector('#search-contact-modal');
+      this.modalSearchContact.classList.toggle('d-none');
     }
   };
 }

@@ -1,0 +1,18 @@
+.modal-create-contact {
+    width: 450px;
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 4px;
+    border: 1px solid var(--light-border-default-grey, #E5E5E5);
+    background: #FFF;
+    box-shadow: 4px 8px 6px 0px rgba(0, 0, 0, 0.2);
+    &__block {
+        border: 1px solid var(--light-border-default-grey, #E5E5E5);
+    }
+}
+
+.color-important {
+    color: var(--color-important, #FF0000);
+}

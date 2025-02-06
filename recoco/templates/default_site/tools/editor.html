@@ -76,12 +76,13 @@
             <div x-data='SearchContact()'
                  x-cloak
                  class="d-flex justify-content-between">
-                <button @click="isOpenModal = true"
+                <button @click="openModalSearchContact"
                         data-test-id="button-add-contact"
                         class="fr-btn fr-btn--tertiary fr-btn--sm justify-content-center fr-text--sm">
                     Ajouter un contact
                 </button>
                 {% include "tools/contacts/search_contact_modal.html" %}
+                {% include "tools/contacts/create_contact_modal.html" %}
                 <button class="fr-btn fr-btn--sm"
                         :disabled="$store.editor.isSubmitted === true"
                         @click.stop="onSubmitComment(markdownContent)"
