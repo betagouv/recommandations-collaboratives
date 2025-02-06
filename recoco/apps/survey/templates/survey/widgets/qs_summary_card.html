@@ -114,7 +114,7 @@
                 </ul>
             </p>
         </div>
-        {% if "use_surveys" in user_project_perms and completion < 100 %}
+        {% if "use_surveys" in user_project_perms and completion < 100 and question_set.questions.count %}
             <a href="{% url 'survey-question-details' session.pk question_set.questions.all.0.pk %}"
                class="border-0 btn btn-primary w-100 fr-mt-1v fw-bold fr-py-2v tmp-usevar"
                data-test-id="link-fill-survey"
