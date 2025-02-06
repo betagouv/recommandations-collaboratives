@@ -364,7 +364,7 @@ SOCIALACCOUNT_PROVIDERS = {
                 "settings": {
                     "server_url": os.getenv(
                         "PROCONNECT_SERVER_URL",
-                        "https://app.moncomptepro.beta.gouv.fr/.well-known/openid-configuration",
+                        "https://auth.agentconnect.gouv.fr/api/v2/.well-known/openid-configuration",
                     ),
                     "token_auth_method": "client_secret_post",
                 },
@@ -372,13 +372,15 @@ SOCIALACCOUNT_PROVIDERS = {
         ],
         # https://github.com/numerique-gouv/proconnect-documentation/blob/main/doc_fs/scope-claims.md
         # https://github.com/numerique-gouv/proconnect-documentation/blob/main/doc_fs/connaitre-le-fi-utilise.md
-        # https://github.com/numerique-gouv/moncomptepro/pkgs/container/moncomptepro#2--documentation-technique
         "SCOPE": [
             "openid",
             "email",
-            "profile",
-            "organization",
+            "uid",
+            "given_name",
+            "usual_name",
+            "siret",
             "phone",
+            "idp_id",
         ],
         "AUTH_PARAMS": {
             "acr_values": "eidas1",
