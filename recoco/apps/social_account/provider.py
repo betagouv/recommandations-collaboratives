@@ -18,7 +18,25 @@ class ProConnectProvider(OpenIDConnectProvider):
         """
         Override this method to extract common fields from the data
         """
-        return super().extract_common_fields(data)
+        return super().extract_common_fields(data) | {
+            "siret": data.get("siret", ""),
+            "first_name": data.get("given_name", ""),
+            "last_name": data.get("usual_name", ""),
+            "phone_no": data.get("phone", ""),
+        }
+
+    def get_default_scope(self):
+        # https://github.com/numerique-gouv/proconnect-documentation/blob/main/doc_fs/scope-claims.md
+        return super().get_default_scope() + [
+            "given_name",
+            "usual_name",
+            "siret",
+            "idp_id",
+            # TODO: the following ones don't work at the moment
+            # "phone",
+            # "organizational_unit",
+            # "is_service_public",
+        ]
 
 
 provider_classes = [ProConnectProvider]
