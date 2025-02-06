@@ -159,6 +159,9 @@ def project_moderation_accept(request, project_pk):
                 # Invite her to fill in a new form
                 # Send an email to the project owner
 
+                # TODO: We should iterate over the collaborator list to assign them the
+                # project permission for this site (permisssion = COLLABORATOR)
+
                 params = {
                     "project": digests.make_project_digest(project, owner),
                     "site": digests.make_site_digest(
