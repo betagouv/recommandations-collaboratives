@@ -15,20 +15,7 @@ class SocialAccountAdapter(DefaultSocialAccountAdapter):
         """
         Hook that can be used to further populate the user instance.
         """
-        user = super().populate_user(request, sociallogin, data)
-
-        # TODO: compléter les informations de l'utilisateur
-        # https://github.com/numerique-gouv/proconnect-documentation/blob/main/doc_fs/donnees_fournies.md
-
-        user.first_name = data.get("given_name", "")
-        user.last_name = data.get("usual_name", "")
-        user.phone_no = data.get("phone", "")
-        # TODO: est-ce qu'o peut recup l'organisation de l'utilisateur ?
-        # user.profile.organization = data.get("organizational_unit", "")
-        # TODO: register siret in the profile
-        # user.profile.siret = data.get("siret", "")
-
-        return user
+        return super().populate_user(request, sociallogin, data)
 
     def pre_social_login(self, request, sociallogin) -> None:
         """
