@@ -12,12 +12,6 @@ class SocialAccountAdapter(DefaultSocialAccountAdapter):
     def generate_state_param(self, state: dict) -> str:
         return get_random_string(32)
 
-    def populate_user(self, request, sociallogin, data):
-        """
-        Hook that can be used to further populate the user instance.
-        """
-        return super().populate_user(request, sociallogin, data)
-
     def pre_social_login(self, request, sociallogin) -> None:
         """
         Invoked just after a user successfully authenticates via a
@@ -38,14 +32,12 @@ class SocialAccountAdapter(DefaultSocialAccountAdapter):
         except User.DoesNotExist:
             pass
 
-    def is_open_for_signup(self, request, sociallogin) -> bool:
-        """
-        Checks whether or not the site is open for signups.
-
-        Next to simply returning True/False you can also intervene the
-        regular flow by raising an ImmediateHttpResponse
-        """
-        return super().is_open_for_signup(request, sociallogin)
+    def get_signup_form_initial_data(self, sociallogin):
+        return super().get_signup_form_initial_data(sociallogin) | {
+            "phone_no": sociallogin.account.extra_data.get("phone_number", ""),
+            # TODO: add siret to signup form
+            # "siret": sociallogin.account.extra_data.get("siret", ""),
+        }
 
 
 class CustomOpenIDConnectOAuth2Adapter(OpenIDConnectOAuth2Adapter):
