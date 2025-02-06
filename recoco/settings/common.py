@@ -370,18 +370,6 @@ SOCIALACCOUNT_PROVIDERS = {
                 },
             },
         ],
-        # https://github.com/numerique-gouv/proconnect-documentation/blob/main/doc_fs/scope-claims.md
-        # https://github.com/numerique-gouv/proconnect-documentation/blob/main/doc_fs/connaitre-le-fi-utilise.md
-        "SCOPE": [
-            "openid",
-            "email",
-            "uid",
-            "given_name",
-            "usual_name",
-            "siret",
-            "phone",
-            "idp_id",
-        ],
         "AUTH_PARAMS": {
             "acr_values": "eidas1",
         },
