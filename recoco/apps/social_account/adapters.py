@@ -18,13 +18,28 @@ class SocialAccountAdapter(DefaultSocialAccountAdapter):
         user = super().populate_user(request, sociallogin, data)
 
         # TODO: compléter les informations de l'utilisateur si possible
-        # https://github.com/numerique-gouv/proconnect-documentation/blob/main/doc_fs/donnees_fournies.md
-        # user.organization = ...
-        # user.organization_position = ...
-        # user.siret = ...
+        # sample:
+        # {
+        #     "sub": "6670",
+        #     "email": "recocodev@yopmail.com",
+        #     "email_verified": true,
+        #     "family_name": "Etchegoyen",
+        #     "given_name": "Matthieu",
+        #     "updated_at": "2025-02-06T08:02:41.743Z",
+        #     "job": "Dev recoco",
+        #     "label": "Departement de seine et marne - Maison departementale des solidarites de chelles",
+        #     "siret": "22770001000555",
+        #     "is_commune": false,
+        #     "is_external": false,
+        #     "is_public_service": true,
+        #     "is_service_public": true,
+        # }
 
-        if "phone_number" in data:
-            user.phone_no = data.get("phone_number")
+        user.first_name = data.get("given_name", "")
+        user.last_name = data.get("family_name", "")
+        user.phone_no = data.get("phone", "")
+        user.profile.organization = data.get("label", "")
+        user.profile.organization_position = data.get("job", "")
 
         return user
 
