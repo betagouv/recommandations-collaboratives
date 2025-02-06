@@ -17,8 +17,8 @@ class SocialAccountAdapter(DefaultSocialAccountAdapter):
         """
         user = super().populate_user(request, sociallogin, data)
 
-        # TODO: compléter les informations de l'utilisateur si possible
-        # sample:
+        # TODO: compléter les informations de l'utilisateur
+        # sample taken from https://test.moncomptepro.beta.gouv.fr/:
         # {
         #     "sub": "6670",
         #     "email": "recocodev@yopmail.com",
