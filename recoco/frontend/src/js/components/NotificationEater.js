@@ -25,6 +25,7 @@ Alpine.data('NotificationEater', (projectId) => {
       this.scrollToFirstNotification();
     },
     scrollToFirstNotification(topic = 'general') {
+      if (topic.detail) topic = topic.detail;
       this.hideScrollLine(topic);
       const scrollLineNewNotification = document.querySelectorAll(
         `[x-ref="scrollLine_${topic}"]`

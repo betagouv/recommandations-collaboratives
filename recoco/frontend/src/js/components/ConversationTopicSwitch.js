@@ -1,13 +1,21 @@
 import Alpine from 'alpinejs';
 import { stringToColor } from '../utils/utils';
 
-Alpine.data('ConversationTopicSwitch', (topicList) => {
+Alpine.data('ConversationTopicSwitch', (currentTopic = 'general') => {
   return {
-    topicList: topicList,
-    topicSelector: 'general',
+    topicSelector: currentTopic,
     valueTopicFormMessageSend: '',
     stringToColor,
     init() {
+      const params = new URLSearchParams(document.location.search);
+      const topicSlug = params.get('topic-slug');
+      const topicName = params.get('topic-name');
+
+      if (topicSlug && topicName) {
+        this.topicSelector = topicSlug;
+        this.setActiveTopic(topicSlug, topicName);
+        return;
+      }
       this.setActiveTopic('general', '');
     },
     setActiveTopic(topicSlug, topicName) {
@@ -25,7 +33,7 @@ Alpine.data('ConversationTopicSwitch', (topicList) => {
         element.classList.add('d-none');
       });
       this.valueTopicFormMessageSend = topicName;
-      this.$dispatch('topic-switched'); // trigger method scrollToFirstNotification
+      this.$dispatch('topic-switched', topicSlug); // trigger method scrollToFirstNotification
     },
   };
 });

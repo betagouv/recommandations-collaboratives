@@ -62,7 +62,7 @@
         </div>
         <div class="conversation-new__container"
              x-data="NotificationEater({{ project.id }})"
-             @topic-switched.window="scrollToFirstNotification(topicSelector)">
+             @topic-switched.window="scrollToFirstNotification">
             <div class="fr-p-5v">
                 <!-- Message stream -->
                 {% for topic in topic_list %}
