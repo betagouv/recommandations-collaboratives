@@ -10,13 +10,7 @@
     Nouvelle conversation - {{ block.super }}
 {% endblock og_title %}
 {% block js %}
-    {% vite_asset 'js/components/Task.js' %}
-    {% vite_asset 'js/store/tasks.js' %}
-    {% vite_asset 'js/store/tasksData.js' %}
-    {% vite_asset 'js/components/TaskModal.js' %}
-    {% vite_asset 'js/components/TaskStatusSwitcherConversations.js' %}
-    {% vite_asset 'js/components/NotificationEater.js' %}
-    {% vite_asset 'js/components/ConversationTopicSwitch.js' %}
+    {% vite_asset 'js/apps/conversationsNew.js' %}
 {% endblock js %}
 {% block css %}
     <link href="{% sass_src 'projects/css/conversations_new.scss' %}"
@@ -63,7 +57,7 @@
         <div class="conversation-new__container"
              x-data="NotificationEater({{ project.id }})"
              @topic-switched.window="scrollToFirstNotification">
-            <div class="fr-p-5v">
+            <div class="fr-p-5v flex-grow-1">
                 <!-- Message stream -->
                 {% for topic in topic_list %}
                     {% count_has_notifications topic.list as new_message_count %}
@@ -104,9 +98,12 @@
                     </div>
                 {% endfor %}
             </div>
-            {% comment %} <div class="feed-element-item">
-                {% include "projects/project/fragments/conversations_new/message_type/empty_message_list.html" %}
-            </div> {% endcomment %}
+            {% if topic_list|length == 0 %}
+                <div class="feed-element-item fr-px-5v fr-mb-5v">
+                    {% include "projects/project/fragments/conversations_new/message_type/empty_message_list.html" %}
+                    <div x-ref="scrollLineLastMessage_{{ topic.grouper|default:"general"|slugify }}"></div>
+                </div>
+            {% endif %}
             {% if "use_public_notes" in user_project_perms %}
                 <!-- Post message -->
                 <form class="form editor-form fr-px-5v"

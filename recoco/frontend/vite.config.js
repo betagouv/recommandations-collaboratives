@@ -72,6 +72,7 @@ const config = {
         ActionPusher: resolve('./src/js/components/ActionPusher.js'),
         NotificationEater: resolve('./src/js/components/NotificationEater.js'),
         actionPusher: resolve('./src/js/store/actionPusher.js'),
+        conversationsNew: resolve('./src/js/apps/conversationsNew.js'),
       },
       output: {
         chunkFileNames: undefined,
