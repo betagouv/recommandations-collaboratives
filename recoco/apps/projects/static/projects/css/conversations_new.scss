@@ -129,7 +129,9 @@
     }
   }
   &__container {
+    display: flex;
     flex: 0 0 auto;
+    flex-direction: column;
     width: var(--width-left-col);
 
     &-topic {
