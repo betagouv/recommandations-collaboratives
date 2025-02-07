@@ -25,20 +25,29 @@ Alpine.data('NotificationEater', (projectId) => {
       this.scrollToFirstNotification();
     },
     scrollToFirstNotification(topic = 'general') {
-      const scrollLine = document.querySelectorAll('[x-ref="scrollLine"]');
-      let scrollTo = this.$refs[`scrollLineLastMessage_${topic}`];
-      if (scrollLine.length > 0) {
-        scrollTo = scrollLine[0];
-      }
-
-      window.scroll({
-        top: scrollTo.offsetTop - 260,
-        behavior: 'smooth',
-      });
+      this.hideScrollLine(topic);
+      const scrollLineNewNotification = document.querySelectorAll(
+        `[x-ref="scrollLine_${topic}"]`
+      );
+      setTimeout(() => {
+        if (scrollLineNewNotification.length > 0) {
+          window.scroll({
+            top: scrollLineNewNotification[0].offsetTop - 260,
+            behavior: 'smooth',
+          });
+        } else {
+          window.scroll({
+            top: this.$refs[`scrollLineLastMessage_${topic}`].offsetTop,
+            behavior: 'smooth',
+          });
+        }
+      }, 100);
     },
-    hideScrollLine() {
-      const scrollLine = document.querySelectorAll('[x-ref="scrollLine"]');
-      scrollLine.forEach((el, i) => {
+    hideScrollLine(topic) {
+      const scrollLineNewNotification = document.querySelectorAll(
+        `[x-ref="scrollLine_${topic}"]`
+      );
+      scrollLineNewNotification.forEach((el, i) => {
         if (i == 0) return;
         el.classList.add('d-none');
       });

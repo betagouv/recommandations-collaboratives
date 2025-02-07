@@ -25,7 +25,7 @@ Alpine.data('ConversationTopicSwitch', (topicList) => {
         element.classList.add('d-none');
       });
       this.valueTopicFormMessageSend = topicName;
-      this.$dispatch('topic-switched');
+      this.$dispatch('topic-switched'); // trigger method scrollToFirstNotification
     },
   };
 });

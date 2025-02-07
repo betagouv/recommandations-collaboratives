@@ -22,6 +22,9 @@
       background-color: inherit;
     }
   }
+  .fr-segmented input + label {
+    padding: 0.5rem 0.75rem;
+  }
 }
 
 .divider-specific {

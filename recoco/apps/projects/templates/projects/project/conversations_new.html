@@ -2,6 +2,7 @@
 {% load guardian_tags %}
 {% load sass_tags %}
 {% load django_vite %}
+{% load projects_extra %}
 {% block title %}
     Nouvelle conversation - {{ block.super }}
 {% endblock title %}
@@ -65,13 +66,21 @@
             <div class="fr-p-5v">
                 <!-- Message stream -->
                 {% for topic in topic_list %}
-                    <div data-type-element="feed-element-item"
+                    {% count_has_notifications topic.list as new_message_count %}
+                    <div class="conversation-new__container-topic"
+                         data-type-element="feed-element-item"
                          data-topic='{{ topic.grouper|default:"general"|slugify }}'>
                         {% for element in topic.list %}
-                            {% if forloop.last %}
-                                <div x-ref="scrollLineLastMessage_{{ topic.grouper|default:"general"|slugify }}"></div>
+                            {% if element.notifications %}
+                                <div class="notification-limit"
+                                     x-ref="scrollLine_{{ topic.grouper|default:"general"|slugify }}">
+                                    <div class="notification-limit__line"></div>
+                                    <p class="notification-limit__message-number fr-mx-2w">
+                                        {{ new_message_count }} message{{ new_message_count|length|pluralize }} non lu{{ new_message_count|length|pluralize }}
+                                    </p>
+                                    <div class="notification-limit__line"></div>
+                                </div>
                             {% endif %}
-                            {% if element.notifications %}<hr class="notification-line" x-ref="scrollLine">{% endif %}
                             {% ifchanged element.timestamp|date %}
                                 <p class="conversation-new__date">{{ element.timestamp|date }}</p>
                             {% endifchanged %}
@@ -87,6 +96,9 @@
                             {% elif element.type == "posting" %}
                                 <!-- Type message -->
                                 {% include "projects/project/fragments/conversations_new/message_type/type_posting_item.html" %}
+                            {% endif %}
+                            {% if forloop.last %}
+                                <div x-ref="scrollLineLastMessage_{{ topic.grouper|default:"general"|slugify }}"></div>
                             {% endif %}
                         {% endfor %}
                     </div>
