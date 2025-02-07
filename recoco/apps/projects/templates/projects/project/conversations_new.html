@@ -26,7 +26,7 @@
 {% block project_detail %}
     {{ project.pk|json_script:"djangoProjectId" }}
     {% get_obj_perms request.user for project as "user_project_perms" %}
-    {% include "projects/project/navigation.html" with conversation=True %}
+    {% include "projects/project/navigation.html" with conversations_new=True %}
     {% regroup feed by topic as topic_list %}
     <div class="conversation-new d-flex" x-data="ConversationTopicSwitch()">
         <div class="conversation-new__topics">

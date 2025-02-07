@@ -116,10 +116,10 @@
                      id="overview-step-3"
                      {% if "view_public_notes" not in user_project_perms and "use_public_notes" not in user_project_perms %} aria-describedby="tooltip-lock-access-conversations" {% endif %}>
                     {% include "projects/project/fragments/navigation/tooltip_lock_access.html" with id="tooltip-lock-access-conversations" %}
-                    <input value="conversations"
+                    <input value="conversations_new"
                            type="radio"
-                           {% if conversation %}checked{% endif %}
-                           aria-checked="{% if conversation %}true{% else %}false{% endif %}"
+                           {% if conversations_new %}checked{% endif %}
+                           aria-checked="{% if conversations_new %}true{% else %}false{% endif %}"
                            {% if "view_public_notes" in user_project_perms or "use_public_notes" in user_project_perms %} @click="window.location='{% url 'projects-project-detail-conversations-new' project.pk %}'" {% else %} disabled {% endif %}
                            id="segmented-control-tasks"
                            name="segmented-control-project">
