@@ -71,6 +71,7 @@ const config = {
         ClickToSeeUser: resolve('./src/js/components/ClickToSeeUser.js'),
         ActionPusher: resolve('./src/js/components/ActionPusher.js'),
         actionPusher: resolve('./src/js/store/actionPusher.js'),
+        htmx: resolve('./src/js/utils/htmx.js'),
       },
       output: {
         chunkFileNames: undefined,
