@@ -10,7 +10,7 @@ created: 2022-05-16 17:44:55 CET
 from rest_framework.exceptions import ValidationError
 from rest_framework.serializers import (
     FloatField,
-    HyperlinkedIdentityField,
+    # HyperlinkedIdentityField,
     ModelSerializer,
     SerializerMethodField,
 )
@@ -51,7 +51,8 @@ class OrganizationListSerializer(OrganizationSerializer):
     departments = SerializerMethodField()
     group = OrganizationGroupSerializer(read_only=True)
 
-    _link = HyperlinkedIdentityField(view_name="api-addressbook-organization-detail")
+    # FIXME: https://sentry.incubateur.net/organizations/betagouv/issues/149134/?project=178&query=is%3Aunresolved&referrer=issue-stream&stream_index=0
+    # _link = HyperlinkedIdentityField(view_name="api-addressbook-organization-detail")
     _search_rank = FloatField(source="search_rank", read_only=True)
 
     class Meta:
@@ -115,7 +116,7 @@ class ContactSerializer(BaseSerializerMixin, ModelSerializer):
 class ContactListSerializer(ContactSerializer):
     organization = NestedOrganizationSerializer(read_only=True, many=False)
 
-    _link = HyperlinkedIdentityField(view_name="api-addressbook-contact-detail")
+    # _link = HyperlinkedIdentityField(view_name="api-addressbook-contact-detail")
     _search_rank = FloatField(source="search_rank", read_only=True)
 
     class Meta:
