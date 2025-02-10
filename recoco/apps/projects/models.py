@@ -586,18 +586,15 @@ class ProjectMember(models.Model):
     is_owner = models.BooleanField(default=False)
 
 
-class UserProjectStatusManager(models.Manager):
-    pass
-
-
-class UserProjectStatusOnSiteManager(UserProjectStatusManager, CurrentSiteManager):
+class UserProjectStatusOnSiteManager(CurrentSiteManager):
     use_for_related_fields = True
+    use_in_migrations = False
 
 
 class UserProjectStatus(models.Model):
     """Project status for a given user"""
 
-    objects = UserProjectStatusManager()
+    objects = models.Manager()
     on_site = UserProjectStatusOnSiteManager()
 
     USERPROJECT_STATES = (
