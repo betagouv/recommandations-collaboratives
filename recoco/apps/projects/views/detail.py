@@ -442,7 +442,7 @@ def project_conversations_new(request, project_id=None):
 
 @login_required
 @require_http_methods(["POST"])
-@require_htmx()
+@require_htmx
 def project_conversations_new_partial(request, project_id=None):
 
     project = get_object_or_404(
