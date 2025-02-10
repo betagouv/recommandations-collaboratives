@@ -446,7 +446,7 @@ def project_conversations_new(request, project_id=None):
 
 @login_required
 @require_http_methods(["POST"])
-def project_conversations_new_container(request, project_id=None):
+def project_conversations_new_partial(request, project_id=None):
     project = get_object_or_404(
         models.Project.objects.filter(sites=request.site)
         .with_unread_notifications(user_id=request.user.id)
@@ -470,7 +470,7 @@ def project_conversations_new_container(request, project_id=None):
 
     return render(
         request,
-        "projects/project/partials/conversations_new_container.html",
+        "projects/project/partials/conversations_new_partial.html",
         context={
             "project": project,
             "feed": feed,
