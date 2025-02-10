@@ -64,7 +64,7 @@
 {% if "use_public_notes" in user_project_perms %}
    <!-- Post message -->
    <form class="form editor-form fr-px-5v"
-        hx-post="{% url 'projects-project-detail-conversations-new-container' project.pk %}"
+        hx-post="{% url 'projects-project-detail-conversations-new-partial' project.pk %}"
         hx-trigger="submit"
         hx-swap="outerHTML"
         hx-target="#conversation-new-container"
