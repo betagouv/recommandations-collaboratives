@@ -3,9 +3,9 @@ import projectView from '../../../../support/views/project';
 
 const currentProject = projects[19];
 
-describe('As site staff, I can pause and reactivate a project', () => {
+describe('As site staffOnSite, I can pause and reactivate a project', () => {
   beforeEach(() => {
-    cy.login('staff');
+    cy.login('staffOnSite');
     cy.visit(`/project/${currentProject.pk}`);
   });
 

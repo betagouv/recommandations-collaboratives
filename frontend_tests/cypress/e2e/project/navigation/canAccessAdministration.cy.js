@@ -3,7 +3,7 @@ const currentProject = projects[1];
 
 describe('I can access administration tab in a project as staff', () => {
   beforeEach(() => {
-    cy.login('staff');
+    cy.login('staff'); // TODO replace by staffOnSite and check behaviour
   });
 
   it('goes to the administration page of my project', () => {

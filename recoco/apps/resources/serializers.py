@@ -2,6 +2,8 @@ from django.contrib.auth import models as auth_models
 from rest_framework import serializers
 from taggit.serializers import TagListSerializerField, TaggitSerializer
 
+from recoco.rest_api.serializers import BaseSerializerMixin
+
 from .models import Category, Resource
 
 
@@ -25,7 +27,9 @@ class CategorySerializer(serializers.HyperlinkedModelSerializer):
         ]
 
 
-class ResourceSerializer(TaggitSerializer, serializers.HyperlinkedModelSerializer):
+class ResourceSerializer(
+    BaseSerializerMixin, TaggitSerializer, serializers.HyperlinkedModelSerializer
+):
     class Meta:
         model = Resource
         fields = [
@@ -54,6 +58,11 @@ class ResourceSerializer(TaggitSerializer, serializers.HyperlinkedModelSerialize
     created_by = ResourceCreatorSerializer(read_only=True, many=False)
     category = CategorySerializer(read_only=True)
     has_dsresource = serializers.BooleanField(read_only=True, default=False)
+
+    def save(self, **kwargs):
+        return super().save(
+            created_by=self.current_user, sites=[self.current_site], **kwargs
+        )
 
 
 class ResourceURIImportSerializer(serializers.Serializer):

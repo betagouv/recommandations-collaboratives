@@ -1,4 +1,3 @@
-from django.contrib.sites.shortcuts import get_current_site
 from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -47,10 +46,6 @@ class ResourceViewSet(viewsets.ModelViewSet):
         permissions.IsAuthenticatedOrReadOnly,
         IsResourceManagerOrReadOnly,
     ]
-
-    def perform_create(self, serializer: ResourceSerializer):
-        site = get_current_site(self.request)
-        serializer.save(created_by=self.request.user, sites=[site])
 
     @action(
         detail=False,

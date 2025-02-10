@@ -1,6 +1,6 @@
 describe('I can go to the dashboard and see the pending projects, and approve one', () => {
   beforeEach(() => {
-    cy.login('staff');
+    cy.login('staff'); // TODO replace by staffOnSite and check behaviour
   });
 
   it('approves a project', () => {

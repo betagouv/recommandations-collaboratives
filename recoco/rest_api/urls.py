@@ -50,11 +50,6 @@ router.register(
     basename="communes",
 )
 router.register(
-    r"organizations",
-    addressbook_rest.OrganizationViewSet,
-    basename="organizations",
-)
-router.register(
     r"topics",
     projects_rest.TopicViewSet,
     basename="topics",
@@ -73,6 +68,23 @@ router.register(
     r"sites",
     home_rest.SiteViewSet,
     basename="sites",
+)
+
+# addressbook
+router.register(
+    r"addressbook/organizationgroups",
+    addressbook_rest.OrganizationGroupViewSet,
+    basename="api-addressbook-organization-group",
+)
+router.register(
+    r"addressbook/organizations",
+    addressbook_rest.OrganizationViewSet,
+    basename="api-addressbook-organization",
+)
+router.register(
+    r"addressbook/contacts",
+    addressbook_rest.ContactViewSet,
+    basename="api-addressbook-contact",
 )
 
 

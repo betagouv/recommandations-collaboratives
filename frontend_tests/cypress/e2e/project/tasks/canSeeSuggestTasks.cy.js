@@ -12,7 +12,7 @@ describe('I can see suggest task', () => {
   });
 
   it('as staff I can see ', () => {
-    cy.login('staff');
+    cy.login('staff'); // TODO replace by staffOnSite and check behaviour
     cy.visit(`/project/${currentProject.pk}`);
     cy.becomeAdvisor(currentProject.pk); // A remplacer par une fixture avec un user déjà advisor du projet
     cy.visit(`/project/${currentProject.pk}/actions`);

@@ -36,7 +36,7 @@ describe('I can invite a member', () => {
   });
 
   it('can see a notification of the invitation on the project activity feed', () => {
-    cy.login('staff');
+    cy.login('staff'); // TODO replace by staffOnSite and check behaviour
     cy.visit(`/project/${currentProject.pk}`);
     cy.get('[data-test-id="fr-consent-banner"]')
       .find('[data-test-id="button-consent-accept-all"]')

@@ -195,13 +195,17 @@ class Task(OrderedModel):
     deadline = models.DateField(null=True, blank=True)
 
     resource = models.ForeignKey(
-        resources.Resource, on_delete=models.CASCADE, null=True, blank=True
+        resources.Resource,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="recommandations",
     )
 
     document = GenericRelation(projects_models.Document)
 
     contact = models.ForeignKey(
-        addressbook_models.Contact, on_delete=models.CASCADE, null=True, blank=True
+        addressbook_models.Contact, on_delete=models.SET_NULL, null=True, blank=True
     )
 
     #     @property
@@ -248,9 +252,22 @@ class TaskFollowup(models.Model):
 
     objects = TaskFollowupManager()
 
-    task = models.ForeignKey("Task", on_delete=models.CASCADE, related_name="followups")
+    task = models.ForeignKey(
+        "Task",
+        on_delete=models.CASCADE,
+        related_name="followups",
+    )
     who = models.ForeignKey(
-        auth_models.User, on_delete=models.CASCADE, related_name="task_followups"
+        auth_models.User,
+        on_delete=models.CASCADE,
+        related_name="task_followups",
+    )
+    contact = models.ForeignKey(
+        addressbook_models.Contact,
+        on_delete=models.SET_NULL,
+        related_name="task_followups",
+        null=True,
+        blank=True,
     )
     status = models.IntegerField(choices=Task.STATUS_CHOICES, blank=True, null=True)
 
