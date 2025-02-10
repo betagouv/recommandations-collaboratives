@@ -8,6 +8,7 @@ created : 2022-03-07 15:56:20 CEST -- HB David!
 """
 
 from datetime import timedelta
+from typing import Any
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
@@ -18,6 +19,7 @@ from django.shortcuts import get_object_or_404, redirect, render, reverse
 from django.utils import timezone
 from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_http_methods
 
 from recoco import verbs
 from recoco.apps.hitcount.models import HitCount
@@ -300,29 +302,7 @@ def project_conversations(request, project_id=None):
     return render(request, "projects/project/conversations.html", locals())
 
 
-@login_required
-def project_conversations_new(request, project_id=None):
-    """New Conversation page for project"""
-
-    project = get_object_or_404(
-        models.Project.objects.filter(sites=request.site)
-        .with_unread_notifications(user_id=request.user.id)
-        .select_related("commune__department"),
-        pk=project_id,
-    )
-
-    is_regional_actor = is_regional_actor_for_project(
-        request.site, project, request.user, allow_national=True
-    )
-
-    is_regional_actor or has_perm_or_403(request.user, "view_public_notes", project)
-
-    advising = get_advisor_for_project(request.user, project)
-
-    posting_form = PublicNoteForm()
-
-    recipients = get_notification_recipients_for_project(project)
-
+def _build_feeds(project: models.Project, user: User) -> list[dict[str, Any]]:
     # Prepare a feed of different objects
     feed = []
 
@@ -372,7 +352,7 @@ def project_conversations_new(request, project_id=None):
     ) in feed_object_templates:
         object_ids = list(queryset.values_list("id", flat=True))
         object_ct = ContentType.objects.get_for_model(model_instance)
-        object_notifs = request.user.notifications.unread().filter(
+        object_notifs = user.notifications.unread().filter(
             action_object_object_id__in=object_ids, action_object_content_type=object_ct
         )
 
@@ -392,9 +372,7 @@ def project_conversations_new(request, project_id=None):
     # Activities are a special case
     activity_verbs = [verbs.Project.BECAME_OBSERVER, verbs.Project.BECAME_ADVISOR]
     activities = project.target_actions.filter(verb__in=activity_verbs)
-    activity_notifs = request.user.notifications.unread().filter(
-        verb__in=activity_verbs
-    )
+    activity_notifs = user.notifications.unread().filter(verb__in=activity_verbs)
 
     for activity in activities:
         max_date = activity.timestamp + timedelta(seconds=2)
@@ -419,6 +397,34 @@ def project_conversations_new(request, project_id=None):
     # Pre-sort so it's easier to use in the template
     feed.sort(key=lambda x: (x["topic"], x["timestamp"]))
 
+    return feed
+
+
+@login_required
+def project_conversations_new(request, project_id=None):
+    """New Conversation page for project"""
+
+    project = get_object_or_404(
+        models.Project.objects.filter(sites=request.site)
+        .with_unread_notifications(user_id=request.user.id)
+        .select_related("commune__department"),
+        pk=project_id,
+    )
+
+    is_regional_actor = is_regional_actor_for_project(
+        request.site, project, request.user, allow_national=True
+    )
+
+    is_regional_actor or has_perm_or_403(request.user, "view_public_notes", project)
+
+    advising = get_advisor_for_project(request.user, project)
+
+    posting_form = PublicNoteForm()
+
+    recipients = get_notification_recipients_for_project(project)
+
+    feed = _build_feeds(project=project, user=request.user)
+
     return render(
         request,
         "projects/project/conversations_new.html",
@@ -428,6 +434,40 @@ def project_conversations_new(request, project_id=None):
             "advising": advising,
             "posting_form": posting_form,
             "recipients": recipients,
+            "feed": feed,
+        },
+    )
+
+
+@login_required
+@require_http_methods(["POST"])
+def project_conversations_new_container(request, project_id=None):
+    project = get_object_or_404(
+        models.Project.objects.filter(sites=request.site)
+        .with_unread_notifications(user_id=request.user.id)
+        .select_related("commune__department"),
+        pk=project_id,
+    )
+
+    # TODO: incomplete, only for demo purpose
+    # we need all that is in create_public_note
+    # refacto in a service method to avoid code duplication, and complete this part
+    form = PublicNoteForm(request.POST)
+    if form.is_valid():
+        instance = form.save(commit=False)
+        instance.project = project
+        instance.created_by = request.user
+        instance.site = request.site
+        instance.public = True
+        instance.save()
+
+    feed = _build_feeds(project=project, user=request.user)
+
+    return render(
+        request,
+        "projects/project/partials/conversations_new_container.html",
+        context={
+            "project": project,
             "feed": feed,
         },
     )
