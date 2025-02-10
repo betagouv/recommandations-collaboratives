@@ -25,11 +25,14 @@ from . import models
 
 
 @transaction.atomic
-def assign_collaborator(user, project, is_owner=False):
-    """Make someone becomes a project collaborator and assign permissions"""
+def assign_collaborator_permissions(user, project):
+    """
+    Assign permissions to project collaborator.
 
+    If the project is still in draft (not accepted by moderators)
+    """
     permissions = models.COLLABORATOR_DRAFT_PERMISSIONS
-    if project.project_sites.origin().status != "DRAFT":
+    if project.project_sites.current().status != "DRAFT":
         permissions += models.COLLABORATOR_PERMISSIONS
 
     for perm in permissions:
@@ -38,6 +41,13 @@ def assign_collaborator(user, project, is_owner=False):
         except auth_models.Permission.DoesNotExist as e:
             print(f"Unable to find permission <{perm}>, aborting.")
             raise e
+
+
+@transaction.atomic
+def assign_collaborator(user, project, is_owner=False):
+    """Make someone becomes a project collaborator and assign permissions"""
+
+    assign_collaborator_permissions(user, project)
 
     # if we already have an owner, don't allow her to be replaced
     if is_owner:
