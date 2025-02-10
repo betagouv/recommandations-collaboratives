@@ -17,32 +17,34 @@
     </div>
     <div x-data="SearchOrganisation"
          class="fr-p-3v modal-create-contact__block">
-        <span>Organisation</span><span class="color-important">*</span>
+        <span class="modal-create-contact__label">Organisation</span><span class="color-important">*</span>
         <div>{% include "tools/contacts/search_organisation.html" %}</div>
     </div>
     <div class="fr-p-3v modal-create-contact__block">
-        <label>Nom</label>
+        <label class="modal-create-contact__label">Nom</label>
         <input type="text" class="fr-input" x-model="contactLastName">
     </div>
     <div class="fr-p-3v modal-create-contact__block">
-        <label>Prénom</label>
+        <label class="modal-create-contact__label">Prénom</label>
         <input type="text" class="fr-input" x-model="contactFirstName">
     </div>
     <div class="fr-p-3v modal-create-contact__block">
-        <label>Poste</label>
+        <label class="modal-create-contact__label">Poste</label>
         <span class="color-important">*</span>
-        <input type="text" class="fr-input" x-model="contactJob">
+        <input type="text" class="fr-input" x-model="contactJob" required>
     </div>
     <div class="fr-p-3v modal-create-contact__block">
-        <label>Email</label>
+        <label class="modal-create-contact__label">Email</label>
+        <p class="modal-create-contact__label-info">Renseigner au minimum l’email ou un numéro de téléphone</p>
         <input type="text" class="fr-input" x-model="contactEmail">
     </div>
     <div class="fr-p-3v modal-create-contact__block">
-        <label>Téléphone Principal</label>
+        <label class="modal-create-contact__label">Téléphone Principal</label>
+        <p class="modal-create-contact__label-info">Renseigner au minimum l’email ou un numéro de téléphone</p>
         <input type="text" class="fr-input" x-model="contactTel">
     </div>
     <div class="fr-p-3v modal-create-contact__block">
-        <label>Téléphone Secondaire</label>
+        <label class="modal-create-contact__label">Téléphone Secondaire</label>
         <input type="text" class="fr-input" x-model="contactPhone">
     </div>
     <div class="fr-p-3v modal-create-contact__block d-flex">

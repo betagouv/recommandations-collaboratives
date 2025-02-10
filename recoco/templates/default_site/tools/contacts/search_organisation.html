@@ -6,7 +6,7 @@
           type="text/css" />
 {% endblock css %}
 <div>
-    <div class="fr-p-3v">
+    <div>
         <div class="fr-search-bar" id="header-search" role="search">
             <input class="fr-input"
                    placeholder="ADEME 44"
@@ -14,7 +14,8 @@
                    id="search-organisation-input"
                    name="search-organisation-input"
                    @input.debounce="onSearch"
-                   x-model="userInput">
+                   x-model="userInput"
+                   required>
             <button class="fr-btn" title="Rechercher" @click="onSearch">Rechercher</button>
         </div>
     </div>

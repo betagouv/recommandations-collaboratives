@@ -11,6 +11,17 @@
     &__block {
         border: 1px solid var(--light-border-default-grey, #E5E5E5);
     }
+    &__label {
+        color: #3A3A3A;
+        font-size: 12px;
+        font-weight: 700;
+    }
+    &__label-info {
+        font-size: 10px;
+        font-weight: 400;
+        margin-bottom: 0px;
+        color: var(--color-grey, #666666);
+    }
 }
 
 .color-important {
