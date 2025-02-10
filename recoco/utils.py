@@ -8,6 +8,7 @@ created: 2021-06-29 09:16:14 CEST
 """
 
 from contextlib import contextmanager
+from functools import wraps
 from pathlib import Path
 from typing import AnyStr
 from urllib.parse import urldefrag, urljoin
@@ -20,6 +21,7 @@ from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.db import migrations
 from django.db import models as db_models
 from django.db.models.functions import Cast
+from django.http import HttpResponseBadRequest
 from django.utils.translation import gettext_lazy as _
 from rest_framework.filters import SearchFilter
 from rest_framework.settings import api_settings
@@ -281,6 +283,21 @@ class TrigramSimilaritySearchFilter(SearchFilter):
         queryset = queryset.annotate(search=vectors).filter(search=search_terms)
 
         return queryset
+
+
+########
+# HTMX #
+########
+
+
+def require_htmx(view_func):
+    @wraps(view_func)
+    def _wrapped_view(request, *args, **kwargs):
+        if not request.htmx:
+            return HttpResponseBadRequest("This view is only accessible via htmx")
+        return view_func(request, *args, **kwargs)
+
+    return _wrapped_view
 
 
 # eof
