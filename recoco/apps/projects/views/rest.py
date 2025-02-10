@@ -349,7 +349,7 @@ def fetch_the_site_project_statuses_for_user(site, user):
     """
     project_statuses = models.UserProjectStatus.objects.filter(
         user=user, project__deleted=None, project__sites=site
-    ).exclude(project__projectsites__status__in=["DRAFT", "REJECTED"])
+    ).exclude(project__project_sites__status__in=["DRAFT", "REJECTED"])
 
     # create missing user project status
     create_missing_user_project_statuses(site, user, project_statuses)
