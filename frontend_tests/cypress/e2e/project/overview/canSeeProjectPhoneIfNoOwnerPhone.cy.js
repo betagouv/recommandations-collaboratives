@@ -4,7 +4,7 @@ const currentProject = projects[1];
 
 describe('I can go to overview tab', () => {
   beforeEach(() => {
-    cy.login('staff');
+    cy.login('staff'); // TODO replace by staffOnSite and check behaviour
   });
 
   it('see the project phone if no project owner phone number', () => {

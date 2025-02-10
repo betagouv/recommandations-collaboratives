@@ -588,13 +588,14 @@ class ProjectMember(models.Model):
 
 class UserProjectStatusOnSiteManager(CurrentSiteManager):
     use_for_related_fields = True
+    use_in_migrations = False
 
 
 class UserProjectStatus(models.Model):
     """Project status for a given user"""
 
-    # XXX would be better named on_site
-    objects = UserProjectStatusOnSiteManager()
+    objects = models.Manager()
+    on_site = UserProjectStatusOnSiteManager()
 
     USERPROJECT_STATES = (
         ("NEW", "Nouveau"),

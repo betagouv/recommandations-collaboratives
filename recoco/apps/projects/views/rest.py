@@ -30,9 +30,9 @@ from rest_framework.views import APIView
 from watson import search as watson
 
 from recoco import verbs
-from recoco.rest_api.filters import TagsFilterbackend
+from recoco.rest_api.filters import TagsFilterbackend, VectorSearchFilter
+from recoco.rest_api.pagination import LargeResultsSetPagination
 from recoco.utils import (
-    TrigramSimilaritySearchFilter,
     get_group_for_site,
     has_perm,
     has_perm_or_403,
@@ -162,10 +162,19 @@ class ProjectList(ListAPIView):
         return (
             models.Project.on_site.for_user(self.request.user)
             .order_by("-created_on", "-updated_on")
-            .prefetch_related("commune")
-            .prefetch_related("commune__department")
-            .prefetch_related("switchtenders__profile__organization")
-            .prefetch_related("project_sites")
+            .annotate(
+                project_site_status=Subquery(
+                    models.ProjectSite.objects.filter(
+                        project_id=OuterRef("pk"), site=self.request.site
+                    ).values("status")
+                )
+            )
+            .prefetch_related(
+                "commune__department",
+                "switchtenders__profile__organization",
+                "project_sites",
+                "tags",
+            )
         )
 
     def list(self, request, *args, **kwargs):
@@ -339,7 +348,7 @@ def fetch_the_site_project_statuses_for_user(site, user):
     reattache the information to the appropriate object.
     """
     project_statuses = models.UserProjectStatus.objects.filter(
-        user=user, project__deleted=None
+        user=user, project__deleted=None, project__sites=site
     )
 
     # create missing user project status
@@ -501,13 +510,12 @@ def fetch_site_projects_with_ids(site, ids):
 class TopicViewSet(viewsets.ReadOnlyModelViewSet):
     """API endpoint that allows searching for topics"""
 
-    permission_classes = [permissions.IsAuthenticated]
-
-    search_fields = ["name"]
-
-    filter_backends = [TrigramSimilaritySearchFilter]
-
     serializer_class = TopicSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    pagination_class = LargeResultsSetPagination
+    search_fields = ["name"]
+    filter_backends = [VectorSearchFilter]
+    search_min_rank = 0.05
 
     def get_queryset(self):
         """Return a list of all topics."""

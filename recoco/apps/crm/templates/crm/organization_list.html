@@ -54,7 +54,9 @@
                 <form method="get" action="{% url 'crm-organization-merge' %}">
                     <table class="table table-striped table-hover caption-top">
                         <div class="d-flex justify-content-between fr-mx-2v">
-                            <span class="fr-ml-2v text-secondary">{{ organizations.qs.count }} résultat{{ organizations.qs.count|pluralize }}</span>
+                            {% with organizations.qs.count as organizations_count %}
+                            <span class="fr-ml-2v text-secondary">{{ organizations_count }} résultat{{ organizations_count|pluralize }}</span>
+                            {% endwith %}
                             <div class="btn-group">
                                 <button class="btn btn-outline-primary">Fusionner</button>
                             </div>

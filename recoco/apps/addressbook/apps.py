@@ -14,4 +14,21 @@ class AddressbookConfig(AppConfig):
             Organization,
             fields=("name", "departments__name", "departments__code"),
         )
+
+        Contact = self.get_model("Contact")
+        watson.register(
+            Contact,
+            fields=(
+                "last_name",
+                "first_name",
+                "division",
+                "organization__name",
+                "organization__group__name",
+                "organization__departments__name",
+                "organization__departments__code",
+                "organization__departments__region__name",
+                "organization__departments__region__code",
+            ),
+        )
+
         registry.register(Organization)

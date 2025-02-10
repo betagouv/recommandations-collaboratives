@@ -28,4 +28,12 @@
             </p>
         </div>
     {% endif %}
+{% else %}
+    {% if not resource.public %}
+        <div class="flag orange fr-mb-3w d-flex align-items-center justify-content-start">
+            <p class="text-info-custom fr-my-0">
+                Cette ressource est en cours d'écriture.
+            </p>
+        </div>
+    {% endif %}
 {% endif %}

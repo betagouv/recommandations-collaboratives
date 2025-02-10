@@ -4,7 +4,7 @@ const currentProject = projects[1];
 
 describe('I can go to tasks tab', () => {
   beforeEach(() => {
-    cy.login('staff');
+    cy.login('staff'); // TODO replace by staffOnSite and check behaviour
   });
 
   it('list all kanban tasks', () => {

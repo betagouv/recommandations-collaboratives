@@ -286,6 +286,7 @@ def project_list_for_staff(request):
 
     region_queryset = (
         geomatics_models.Region.objects.filter(departments__in=department_queryset)
+        .prefetch_related("departments")
         .distinct()
         .order_by("name")
     )

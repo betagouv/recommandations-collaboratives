@@ -40,7 +40,7 @@ from recoco.apps.addressbook import models as addressbook_models
 from recoco.apps.geomatics import models as geomatics_models
 from recoco.apps.hitcount.models import HitCount
 from recoco.apps.projects import models as projects
-from recoco.utils import check_if_advisor, has_perm, has_perm_or_403, is_staff_for_site
+from recoco.utils import check_if_advisor, has_perm, has_perm_or_403
 
 from . import models
 
@@ -51,6 +51,7 @@ from . import models
 
 def resource_search(request):
     """Search existing resources"""
+
     form = SearchForm(request.GET)
     form.is_valid()
     query = form.cleaned_data.get("query", "")
@@ -63,7 +64,11 @@ def resource_search(request):
 
     categories = form.selected_categories
 
-    resources = models.Resource.search(query, categories)
+    resources = (
+        models.Resource.search(query, categories)
+        .select_related("category")
+        .prefetch_related("task_recommendations")
+    )
 
     # If we are not allowed to manage resources, filter out DRAFT/TO_REVIEW items and
     # imported resources
@@ -130,7 +135,19 @@ def resource_search(request):
 
     resources = resources.filter(staff_redux)
 
-    return render(request, "resources/resource/list.html", locals())
+    return render(
+        request,
+        "resources/resource/list.html",
+        {
+            "resources_count": resources.count(),
+            "user_bookmarks": (
+                list(request.user.bookmarks.values_list("resource_id", flat=True))
+                if request.user.is_authenticated
+                else []
+            ),
+            **locals(),
+        },
+    )
 
 
 # NOTE both using search and filter in same action is slippy
@@ -244,7 +261,7 @@ class ResourceDetailView(UserPassesTestMixin, BaseResourceDetailView):
 
     def test_func(self):
         resource = self.get_object()
-        return resource.public or is_staff_for_site(self.request.user)
+        return resource.public or self.request.user.is_authenticated
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -277,7 +294,7 @@ class EmbededResourceDetailView(BaseResourceDetailView):
 
         if task_id := self.request.GET.get("task_id"):
             context["task"] = (
-                self.object.task_set.filter(pk=task_id)
+                self.object.recommandations.filter(pk=task_id)
                 .select_related("ds_folder")
                 .first()
             )

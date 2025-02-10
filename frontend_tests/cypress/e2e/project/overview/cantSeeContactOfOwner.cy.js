@@ -1,6 +1,6 @@
 describe('I can not see owner contact', () => {
   it('display owner contact (as staff)', () => {
-    cy.login('staff');
+    cy.login('staff'); // TODO replace by staffOnSite and check behaviour
     cy.visit(`/project/2/presentation`);
     cy.get('[data-cy="container-revealed-contact"]').should(
       'contains.text',
