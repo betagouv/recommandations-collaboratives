@@ -119,7 +119,7 @@
                         {% block content %}
                         {% endblock content %}
                     </div>
-                    {% if not request.user.is_authenticated %} <!-- oui, R? -->
+                    {% if not request.user.is_authenticated %}
                       {% if url_name != "projects-project-detail-recommandations-embed" %}
                           <div class="row justify-content-center" id="footer">{% include "footer.html" %}</div>
                       {% endif %}
