@@ -6,7 +6,11 @@ from django.contrib.sites.models import Site
 from django.test.client import RequestFactory
 from model_bakery import baker
 
-from ..permissions import IsStaff, IsStaffOrISAuthenticatedReadOnly, IsStaffOrReadOnly
+from ..permissions import (
+    IsStaffForSite,
+    IsStaffForSiteOrISAuthenticatedReadOnly,
+    IsStaffForSiteOrReadOnly,
+)
 
 
 @pytest.fixture
@@ -19,8 +23,8 @@ def std_request():
     return request
 
 
-def test_is_staff(std_request):
-    permission = IsStaff()
+def test_is_staff_for_site(std_request):
+    permission = IsStaffForSite()
 
     with patch(
         "recoco.rest_api.permissions.is_staff_for_site", Mock(return_value=True)
@@ -56,12 +60,12 @@ def test_is_staff(std_request):
         ("DELETE", False, False),
     ],
 )
-def test_is_staff_or_read_only(
+def test_is_staff_for_site_or_read_only(
     std_request, request_method, is_staff_return_value, expected_result
 ):
     std_request.method = request_method
 
-    permission = IsStaffOrReadOnly()
+    permission = IsStaffForSiteOrReadOnly()
 
     with patch(
         "recoco.rest_api.permissions.is_staff_for_site",
@@ -89,7 +93,7 @@ def test_is_staff_or_read_only(
         ("DELETE", True, True, True),
     ],
 )
-def test_is_staff_or_is_authenticated_read_only(
+def test_is_staff_for_site_or_is_authenticated_read_only(
     std_request,
     request_method,
     user_is_authenticated,
@@ -106,5 +110,5 @@ def test_is_staff_or_is_authenticated_read_only(
         mock_is_authenticated.return_value = user_is_authenticated
         mock_is_staff_for_site.return_value = is_staff_return_value
 
-        permission = IsStaffOrISAuthenticatedReadOnly()
+        permission = IsStaffForSiteOrISAuthenticatedReadOnly()
         assert permission.has_permission(std_request, None) is expected_result
