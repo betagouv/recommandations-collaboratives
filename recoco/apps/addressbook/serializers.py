@@ -62,7 +62,7 @@ class OrganizationListSerializer(OrganizationSerializer):
             "name",
             "group",
             "departments",
-            "_link",
+            # "_link",
             "_search_rank",
         ]
 
@@ -87,7 +87,7 @@ class NestedOrganizationSerializer(OrganizationListSerializer):
         fields = [
             "id",
             "name",
-            "_link",
+            # "_link",
         ]
 
 
@@ -132,7 +132,7 @@ class ContactListSerializer(ContactSerializer):
             "organization",
             "created",
             "modified",
-            "_link",
+            # "_link",
             "_search_rank",
         ]
         read_only_fields = fields
@@ -167,6 +167,6 @@ class NestedContactSerializer(ContactListSerializer):
             "mobile_no",
             "division",
             "organization",
-            "_link",
+            # "_link",
         ]
         read_only_fields = fields
