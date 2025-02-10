@@ -88,7 +88,7 @@
                                                 </div>
                                                 <div class="col-12 col-lg-6 h-100 responsive-wrapper">
                                                     {% if is_staff %}
-                                                        <div x-data="{displayDiagnosticButton: '{{ project.is_diagnostic_done }}' == 'False'}"
+                                                        <div x-data="{displayDiagnosticButton: '{{ project.is_diagnostic_done }}' == 'False', }"
                                                             <header>
                                                                 <h6 class="font-small text-uppercase fr-mb-1v">Diagnostic</h6>
                                                             </header>
@@ -100,7 +100,10 @@
                                                                         hx-vals='js:{is_diagnostic_done: true}'
                                                                         hx-swap="none"
                                                                         hx-ext="submitjson"
-                                                                        @htmx:after-request="displayDiagnosticButton = false">
+                                                                        @htmx:after-request="
+                                                                            if (event.detail.xhr.status === 200) {
+                                                                                displayDiagnosticButton = false;
+                                                                            }">
                                                                     <span class="fr-icon-double-check-line" aria-hidden="true"></span> Marquer l’appel de “diagnostic” comme fait
                                                                 </button>
                                                             </template>
