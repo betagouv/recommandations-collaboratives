@@ -80,3 +80,5 @@ lxml[html_clean]
 mwclient==0.11.0
 pandoc==2.4
 beautifulsoup4==4.12.3
+
+django-htmx==1.21.0

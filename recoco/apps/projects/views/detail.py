@@ -31,6 +31,7 @@ from recoco.utils import (
     has_perm,
     has_perm_or_403,
     is_staff_for_site,
+    require_htmx,
 )
 
 from .. import models
@@ -446,7 +447,9 @@ def project_conversations_new(request, project_id=None):
 
 @login_required
 @require_http_methods(["POST"])
+@require_htmx()
 def project_conversations_new_partial(request, project_id=None):
+
     project = get_object_or_404(
         models.Project.objects.filter(sites=request.site)
         .with_unread_notifications(user_id=request.user.id)
