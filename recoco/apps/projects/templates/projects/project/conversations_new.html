@@ -11,6 +11,7 @@
 {% endblock og_title %}
 {% block js %}
     {% vite_asset 'js/apps/conversationsNew.js' %}
+    {% vite_asset 'js/utils/htmx.js' %}
 {% endblock js %}
 {% block css %}
     <link href="{% sass_src 'projects/css/conversations_new.scss' %}"
@@ -19,8 +20,8 @@
 {% endblock css %}
 {% block project_detail %}
     {{ project.pk|json_script:"djangoProjectId" }}
-    {% get_obj_perms request.user for project as "user_project_perms" %}
     {% include "projects/project/navigation.html" with conversations_new=True %}
+    {% comment %} TODO: build topic_list in django view {% endcomment %}
     {% regroup feed by topic as topic_list %}
     <div class="conversation-new d-flex" x-data="ConversationTopicSwitch()">
         <div class="conversation-new__topics">
@@ -54,96 +55,8 @@
                 </ul>
             </div>
         </div>
-        <div class="conversation-new__container"
-             x-data="NotificationEater({{ project.id }})"
-             @topic-switched.window="scrollToFirstNotification">
-            <div class="fr-p-5v flex-grow-1 conversation-new__container-feed">
-                <!-- Message stream -->
-                {% if topic_list|length > 0 %}
-                    {% for topic in topic_list %}
-                        {% count_has_notifications topic.list as new_message_count %}
-                        <div class="conversation-new__container-topic"
-                             data-type-element="feed-element-item"
-                             data-topic='{{ topic.grouper|default:"general"|slugify }}'>
-                            {% for element in topic.list %}
-                                {% if element.notifications %}
-                                    <div class="notification-limit d-none"
-                                         x-ref="scrollLine_{{ topic.grouper|default:"general"|slugify }}">
-                                        <div class="notification-limit__line"></div>
-                                        <p class="notification-limit__message-number fr-mx-2w">
-                                            {{ new_message_count }} message{{ new_message_count|length|pluralize }} non lu{{ new_message_count|length|pluralize }}
-                                        </p>
-                                        <div class="notification-limit__line"></div>
-                                    </div>
-                                {% endif %}
-                                {% ifchanged element.timestamp|date %}
-                                    <p class="conversation-new__date">{{ element.timestamp|date }}</p>
-                                {% endifchanged %}
-                                {% if element.type == "activity" %}
-                                    <!-- Type Activity  -->
-                                    {% include "projects/project/fragments/conversations_new/message_type/type_activity_item.html" %}
-                                {% elif element.type == "reco" %}
-                                    <!-- Type Reco + message -->
-                                    {% include "projects/project/fragments/conversations_new/message_type/type_task_message_item.html" %}
-                                {% elif element.type == "followup" %}
-                                    <!-- Type followup -->
-                                    {% include "projects/project/fragments/conversations_new/message_type/type_followup_item.html" %}
-                                {% elif element.type == "posting" %}
-                                    <!-- Type message -->
-                                    {% include "projects/project/fragments/conversations_new/message_type/type_posting_item.html" %}
-                                {% endif %}
-                                {% if forloop.last %}
-                                    <div x-ref="scrollLineLastMessage_{{ topic.grouper|default:"general"|slugify }}"></div>
-                                {% endif %}
-                            {% endfor %}
-                        </div>
-                    {% endfor %}
-                {% else %}
-                    <div class="feed-element-item fr-px-5v fr-mb-5v">
-                        {% include "projects/project/fragments/conversations_new/message_type/empty_message_list.html" %}
-                        <div x-ref="scrollLineLastMessage_{{ topic.grouper|default:"general"|slugify }}"></div>
-                    </div>
-                {% endif %}
-            </div>
-            {% if "use_public_notes" in user_project_perms %}
-                <!-- Post message -->
-                <form class="form editor-form fr-px-5v"
-                      method="post"
-                      action="{% url 'projects-conversation-create-message' project.pk %}"
-                      enctype="multipart/form-data"
-                      id="conversation-form">
-                    <div class="message-form fr-mt-3w bg-light border-form editor-form__container fr-input-group">
-                        {% csrf_token %}
-                        {% include "tools/editor_dsfr.html" with input_name=posting_form.content.name input_value=posting_form.content.value|default:'' errors=posting_form.content.errors input_required=True %}
-                        {% comment %} {% include "projects/project/fragments/files_links/file_upload_input_standalone.html" %} {% endcomment %}
-                        <!-- Action file -->
-                        <button x-data="{fileName: ''}"
-                                class="fr-btn fr-btn--sm fr-btn--tertiary fr-icon-file-add-line fr-btn--icon-left file-upload-wrapper"
-                                type="button"
-                                @click="$refs.fileUploadInput.click()">
-                            <span class="file-upload-text">Ajouter un fichier</span>
-                            <span class="fr-ml-1w" x-text="fileName"></span>
-                            <input x-ref="fileUploadInput"
-                                   type="file"
-                                   id="file-upload"
-                                   name="the_file"
-                                   @change="fileName = $refs.fileUploadInput.files.length > 0 ? $refs.fileUploadInput.files[0].name : ''"
-                                   class="d-none file-upload-input">
-                        </button>
-                        <button data-test-id="send-message-conversation"
-                                x-data
-                                :disabled="$store.editor.currentMessage === '' "
-                                form="conversation-form"
-                                class="fr-btn send-message"
-                                type="submit">Envoyer</button>
-                    </div>
-                    {% for error in posting_form.content.errors %}<div class="text-danger text-end">{{ error }}</div>{% endfor %}
-                    <label class="visually-hidden" for="input-project-content">{{ posting_form.content.label }}</label>
-                    <input type="hidden" name="new" value="1">
-                    <input type="hidden" name="topic_name" :value="valueTopicFormMessageSend">
-                    <div class="d-flex justify-content-end fr-mt-3w"></div>
-                </form>
-            {% endif %}
+        <div id="conversation-new-container" hx-boost="true">
+            {% include "projects/project/partials/conversations_new_container.html" %}
         </div>
     </div>
 {% endblock project_detail %}

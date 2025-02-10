@@ -126,6 +126,11 @@ urlpatterns = [
         name="projects-project-detail-conversations-new",
     ),
     path(
+        r"project/<int:project_id>/conversations-new-container",
+        detail.project_conversations_new_container,
+        name="projects-project-detail-conversations-new-container",
+    ),
+    path(
         r"project/<int:project_id>/switchtender/join",
         views.project_switchtender_join,
         name="projects-project-switchtender-join",
