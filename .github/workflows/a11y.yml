@@ -1,8 +1,12 @@
 name: Lighthouse CI
-on: push
+on:
+    workflow_run:
+        workflows: ['Django Tests CI']
+        types: [completed]
 jobs:
   lighthouse:
     runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
       - uses: actions/checkout@v4
       - name: Audit URLs using Lighthouse
