@@ -136,6 +136,9 @@
                                                     <div class="rounded bg-light fr-p-2v fr-m-2w message"
                                                          :class="hasNotification(f.id) && 'is-new-followup'">
                                                         <p x-html="renderMarkdown(f.comment)" class="fr-mb-2v text-break"></p>
+                                                        <template x-if="f.contact">
+                                                            <div x-data="{contact:f.contact}">{% include "tools/contacts/contact_card.html" %}</div>
+                                                        </template>
                                                         <div class="d-flex justify-content-between align-items-center specific-fontsize-09">
                                                             <div class="d-flex flex-column">
                                                                 {% include "projects/project/fragments/task/task_followup_user_card.html" %}

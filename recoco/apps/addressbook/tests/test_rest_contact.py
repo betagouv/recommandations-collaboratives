@@ -118,7 +118,6 @@ def test_can_not_create_contact_with_wrong_organization(api_client, staff_user):
 def test_contact_search_filter(
     api_client, staff_user, current_site, search_terms, expected_result
 ):
-
     jedi_organization = baker.make(
         Organization,
         name="Le conseil des Jedi",

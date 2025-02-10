@@ -7,7 +7,6 @@ authors: raphael.marvie@beta.gouv.fr, guillaume.libersat@beta.gouv.fr
 created: 2021-06-01 10:11:56 CEST
 """
 
-
 import pytest
 from django.contrib.auth import models as auth_models
 from django.contrib.sites.shortcuts import get_current_site
