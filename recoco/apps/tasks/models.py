@@ -359,7 +359,12 @@ class TaskRecommendation(models.Model):
 
         triggers = {}
         for tag in self.condition_tags:
-            triggers[tag] = TaggedItem.objects.get_by_model(survey_models.Choice, tag)
+            triggers[tag] = TaggedItem.objects.get_by_model(
+                survey_models.Choice.objects.prefetch_related(
+                    "question__question_set"
+                ).select_related("question"),
+                tag,
+            )
 
         return triggers
 
