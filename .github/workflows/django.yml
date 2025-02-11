@@ -39,7 +39,7 @@ jobs:
         uses: actions/checkout@v4.1.5
 
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5.1.0
+        uses: actions/setup-python@v5.4.0
         with:
           python-version: ${{ matrix.python-version }}
 
@@ -91,4 +91,4 @@ jobs:
           DJANGO_DB_PORT: 5432
           DJANGO_DB_ENGINE: django.db.backends.postgresql
         run: |
-          pytest --create-db
+          uv run pytest --create-db
