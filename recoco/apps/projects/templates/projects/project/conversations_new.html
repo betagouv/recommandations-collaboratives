@@ -67,7 +67,7 @@
                              data-topic='{{ topic.grouper|default:"general"|slugify }}'>
                             {% for element in topic.list %}
                                 {% if element.notifications %}
-                                    <div class="notification-limit"
+                                    <div class="notification-limit d-none"
                                          x-ref="scrollLine_{{ topic.grouper|default:"general"|slugify }}">
                                         <div class="notification-limit__line"></div>
                                         <p class="notification-limit__message-number fr-mx-2w">
