@@ -16,7 +16,12 @@ Alpine.data('ConversationTopicSwitch', (currentTopic = 'general') => {
         this.setActiveTopic(topicSlug, topicName);
         return;
       }
-      this.setActiveTopic('general', '');
+      const firstTopic = document.querySelector('[name="topic-selector"]');
+      this.setActiveTopic(
+        firstTopic.value,
+        firstTopic.getAttribute('data-topic-name')
+      );
+      this.topicSelector = firstTopic.value;
     },
     setActiveTopic(topicSlug, topicName) {
       Array.from(

@@ -11,6 +11,7 @@
                    class="d-none"
                    id="selector-{{ topic_slug }}"
                    value="{{ topic_slug }}"
+                   data-topic-name="{{ topic_name }}"
                    @change="setActiveTopic($event.target.value, '{{ topic_name }}')">
             <span class="topic-item__label {% if topic_name %}color{% endif %}"
                   :style="{ '--current-bg-color': stringToColor('{{ topic_slug }}')}">{{ topic_name|default:"Général" }}</span>
