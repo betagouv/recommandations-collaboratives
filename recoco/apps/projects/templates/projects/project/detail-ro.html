@@ -3,6 +3,12 @@
 {% load static %}
 {% load django_vite %}
 {% load sass_tags %}
+{% block title %}
+    État des lieux du projet {{ project.name }} {{ block.super }}
+{% endblock title %}
+{% block og_title %}
+    État des lieux du projet {{ project.name }} {{ block.super }}
+{% endblock og_title %}
 {% block css %}
     <link href="{% sass_src 'resources/resources.scss' %}"
           rel="stylesheet"

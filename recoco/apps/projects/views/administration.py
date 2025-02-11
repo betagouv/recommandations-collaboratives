@@ -57,9 +57,9 @@ def project_administration(request, project_id):
     """Handle ACL for a project"""
 
     project = get_object_or_404(
-        models.Project.objects.filter(sites=request.site).with_unread_notifications(
-            user_id=request.user.id
-        ),
+        models.Project.objects.filter(sites=request.site)
+        .with_unread_notifications(user_id=request.user.id)
+        .select_related("commune__department"),
         pk=project_id,
     )
 
@@ -276,7 +276,12 @@ def promote_collaborator_as_referent(request, project_id, user_id=None):
 @require_http_methods(["POST"])
 def access_collaborator_invite(request, project_id):
     """Invite a collectivity member"""
-    project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
+
+    project = get_object_or_404(
+        models.Project.objects.select_related("commune__department"),
+        sites=request.site,
+        pk=project_id,
+    )
 
     # can also be a regional actor.
     # FIXME: should we still use allow_national or move to is_staff_for_site?
@@ -378,7 +383,11 @@ def access_collaborator_delete(request, project_id: int, username: str):
 @require_http_methods(["POST"])
 def access_advisor_invite(request, project_id):
     """Invite an advisor"""
-    project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
+    project = get_object_or_404(
+        models.Project.objects.select_related("commune__department"),
+        sites=request.site,
+        pk=project_id,
+    )
 
     # can also be regional actor
     is_regional_actor = is_regional_actor_for_project(
@@ -395,7 +404,11 @@ def access_advisor_invite(request, project_id):
 @require_http_methods(["POST"])
 def access_advisor_resend_invite(request, project_id, invite_id):
     """Resend invitation for an advisor"""
-    project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
+    project = get_object_or_404(
+        models.Project.objects.select_related("commune__department"),
+        sites=request.site,
+        pk=project_id,
+    )
 
     # can also be regional actor
     # FIXME: should we still use allow_national or move to is_staff_for_site?

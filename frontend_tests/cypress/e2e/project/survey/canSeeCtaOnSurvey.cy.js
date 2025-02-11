@@ -6,7 +6,7 @@ describe('I can see CTA on survey page', () => {
   });
 
   it('should not display CTA as staff', () => {
-    cy.login('staff');
+    cy.login('staff'); // TODO replace by staffOnSite and check behaviour
     cy.visit(`/project/2/connaissance`);
     cy.get('[data-test-id="link-fill-survey-cta"]').should('not.exist');
   });
