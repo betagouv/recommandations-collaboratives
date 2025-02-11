@@ -30,18 +30,14 @@ jobs:
           # Maps tcp port 5432 on service container to the host
           - 5432:5432
 
-    strategy:
-      matrix:
-        python-version: ['3.11']
-
     steps:
       - name: Check out repository code
         uses: actions/checkout@v4.1.5
 
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5.4.0
+        uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version-file: "pyproject.toml"
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -62,8 +58,11 @@ jobs:
           sudo apt-get update
           sudo apt-get install python3-gdal pandoc
 
-      - name: Install uv
+      - name: Install uv and python
         uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          cache-dependency-glob: "uv.lock"
 
       - name: Compile JS
         working-directory: ./recoco/frontend
