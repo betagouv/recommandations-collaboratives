@@ -22,7 +22,9 @@ Alpine.data('NotificationEater', (projectId) => {
       const observedElements = document.querySelectorAll('.observed-element');
       observedElements.forEach((el) => observer.observe(el));
       this.hideScrollLine();
-      this.scrollToFirstNotification();
+      document.addEventListener('alpine:initialized', () => {
+        this.scrollToFirstNotification();
+      });
     },
     scrollToFirstNotification(topic = 'general') {
       if (topic.detail) topic = topic.detail;
@@ -30,19 +32,17 @@ Alpine.data('NotificationEater', (projectId) => {
       const scrollLineNewNotification = document.querySelectorAll(
         `[x-ref="scrollLine_${topic}"]`
       );
-      setTimeout(() => {
-        if (scrollLineNewNotification.length > 0) {
-          window.scroll({
-            top: scrollLineNewNotification[0].offsetTop - 260,
-            behavior: 'smooth',
-          });
-        } else {
-          window.scroll({
-            top: this.$refs[`scrollLineLastMessage_${topic}`].offsetTop,
-            behavior: 'smooth',
-          });
-        }
-      }, 100);
+      if (scrollLineNewNotification.length > 0) {
+        window.scroll({
+          top: scrollLineNewNotification[0].offsetTop - 260,
+          behavior: 'instant',
+        });
+      } else {
+        window.scroll({
+          top: this.$refs[`scrollLineLastMessage_${topic}`].offsetTop,
+          behavior: 'instant',
+        });
+      }
     },
     hideScrollLine(topic) {
       const scrollLineNewNotification = document.querySelectorAll(
