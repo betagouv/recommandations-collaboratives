@@ -106,6 +106,7 @@ INSTALLED_APPS = [
     "django_celery_results",
     "django_json_widget",
     "waffle",
+    "django_linear_migrations",
 ]
 
 SITE_ID = SiteID(default=1)
