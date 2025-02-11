@@ -18,3 +18,12 @@ register = template.Library()
 def projects_for_tag(tag_name):
     """Return a list of projects tagged with the given tag"""
     return Project.on_site.filter(tags__name=tag_name).order_by("name")
+
+
+@register.simple_tag
+def note_update_url_name(related_ct: str) -> str | None:
+    return {
+        "organisation": "crm-organization-note-update",
+        "utilisateur": "crm-user-note-update",
+        "project": "crm-project-note-update",
+    }.get(related_ct.lower(), None)

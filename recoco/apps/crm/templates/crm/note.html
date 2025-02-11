@@ -1,10 +1,14 @@
 {% load static %}
 {% load sass_tags %}
+{% load crm_tags %}
 {% block css %}
     <link href="{% sass_src 'crm/css/fragments/note.scss' %}"
           rel="stylesheet"
           type="text/css">
 {% endblock css %}
+
+{% with note.content_type.name|lower as related_ct %}
+
 <div x-data="Note"
      x-ref="note"
      class="relative crm-note"
@@ -20,7 +24,8 @@
                     &nbsp;
                 </span>
             {% endif %}
-            {% if get_user_profile and note.related and note.content_type.name == "utilisateur" %}
+
+            {% if get_user_profile and note.related and related_ct == "utilisateur" %}
                 <div class="position-relative d-flex justify-content-center align-items-center fr-mr-2w border border-dark rounded bg-white fr-px-2v fr-py-1v">
                     <svg class="bi fr-mr-2v" width="18" height="18" fill="currentColor">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#person-circle" />
@@ -29,6 +34,7 @@
                        class="{% if not note.related.is_active %}text-decoration-line-through{% endif %}">{{ note.related.first_name }} {{ note.related.last_name }}</a>
                 </div>
             {% endif %}
+
             <span class="crm-note-tag-title d-flex flex-wrap">
                 {% if note.kind == 0 %}
                     <svg class="bi fr-mr-1v" width="18" height="18" fill="currentColor">
@@ -48,10 +54,12 @@
                     {% endif %}
                 {% endif %}
                 {% if note.title %}{{ note.title }}{% endif %}
-                <span class="d-flex fr-ml-1v ">(Publié sur
-                    {% include "crm/user_item.html" with user=note.related %}
-                    )
-                </span>
+                {% if related_ct == "utilisateur" %}
+                    <span class="d-flex fr-ml-1v ">(Publié sur
+                        {% include "crm/user_item.html" with user=note.related %}
+                        )
+                    </span>
+                {% endif %}
             </span>
         </div>
         <div class="d-flex justify-content-center align-items-center">
@@ -71,12 +79,15 @@
                     {{ note.created_on }}
                 {% endif %}
             </span>
-            <span class="d-flex align-items-center position-relative specific-fontsize-08 specific-color-grey specific-ml-15px">
-                <svg class="bi fr-mr-1v" width="15" height="15" fill="currentColor">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#pencil-fill" />
-                </svg>
-                <a href="{% url update_url_name note.related.pk note.pk %}">éditer</a>
-            </span>
+            {% note_update_url_name related_ct as update_url_name %}
+            {% if update_url_name %}
+                <span class="d-flex align-items-center position-relative specific-fontsize-08 specific-color-grey specific-ml-15px">
+                    <svg class="bi fr-mr-1v" width="15" height="15" fill="currentColor">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#pencil-fill" />
+                    </svg>
+                    <a href="{% url update_url_name note.related.pk note.pk %}">éditer</a>
+                </span>
+            {% endif %}
         </div>
     </div>
     <div class="d-flex fr-mb-2v">
@@ -90,3 +101,5 @@
               x-text="isOpen ? '[Voir moins]': '[Voir plus]'"></span>
     </article>
 </div>
+
+{% endwith %}
