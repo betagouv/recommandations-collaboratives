@@ -1,6 +1,11 @@
 {% load projects_extra %}
 <div x-data="TaskStatusSwitcherConversations({{ project.id }}, {{ task|to_json:"status, id" }})"
      class="d-flex align-items-center">
+    <div x-show="task.isLoading"
+         class="fr-ml-2v item-loader z-1 specific-size">
+        <div class="spinner-border spinner-border spinner-border-sm text-primary"
+             role="status"></div>
+    </div>
     <button data-test-id="in-progress-status-task-button"
             class="button tiny black inherit fw-medium fr-mr-2v"
             :class="(activeStatus(STATUSES.INPROGRESS) || {{ task|to_json:"status" }}.status === STATUSES.BLOCKED) && 'bg-blue text-white border-blue pointer-events-none'"
