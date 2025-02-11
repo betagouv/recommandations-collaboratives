@@ -329,6 +329,7 @@ def organization_details(request, organization_id):
             actor_content_type=user_ct,
             actor_object_id__in=participant_ids,
         )
+        .prefetch_related("actor", "action_object", "target")
         .order_by("-timestamp")
     )
 
@@ -345,7 +346,7 @@ def organization_details(request, organization_id):
             object_id=organization.pk,
             content_type=organization_ct,
         )
-        .prefetch_related("tags")
+        .prefetch_related("tags", "related")
         .select_related("created_by", "content_type")
         .order_by("-updated_on")
     )
@@ -355,7 +356,7 @@ def organization_details(request, organization_id):
             object_id__in=participant_ids,
             content_type=user_ct,
         )
-        .prefetch_related("tags")
+        .prefetch_related("tags", "related")
         .select_related("created_by", "content_type")
         .order_by("-updated_on")
     )
