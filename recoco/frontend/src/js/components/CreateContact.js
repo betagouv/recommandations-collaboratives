@@ -1,9 +1,12 @@
 import Alpine from 'alpinejs';
+import api, { contactsUrl } from '../utils/api';
 
 function CreateContact() {
   return {
     modalCreateContact : null,
     modalSearchContact : null,
+    contact : null,
+    contactOrganization: null,
     contactLastName: '',
     contactFirstName: '',
     contactJob: '',
@@ -22,7 +25,25 @@ function CreateContact() {
         this.modalSearchContact.classList.toggle('d-none');
     },
     createContact() {
-      alert('createContact');
+      console.log('jkesako dans mon store : ', this.$store.contact.orgaSelected);
+      if(this.$store.contact.orgaSelected) {
+        alert('mon orga se passe bien');
+        this.contactOrganization = this.$store.contact.orgaSelected;
+        console.log('jkesako dans mon orga : ', this.contactOrganization);
+      }
+      if(this.contactOrganization && this.contactJob.length > 0 && (this.contactEmail.length > 0 || this.contactTel.length > 0)) {
+        alert('createContact');
+        this.contact = {
+          "organization": this.contactOrganization.id,
+          "last_name": this.contactLastName,
+          "first_name": this.contactFirstName,
+          "division": this.contactJob,
+          "email": this.contactEmail,
+          "tel": this.contactTel,
+          "phone": this.contactPhone
+        };
+        api.post(contactsUrl(),this.contact);
+      }
     }
   };
 }

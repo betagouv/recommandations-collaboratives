@@ -32,6 +32,7 @@ function SearchOrganisation() {
       this.selectedOrga = orga;
       this.userInput = orga.name;
       this.showOrgasresults = false;
+      this.$store.contact.orgaSelected = orga;
     },
     // closeModal() {
     //   this.isAContactSelected = false;
