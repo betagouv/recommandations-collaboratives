@@ -79,13 +79,13 @@
                     {{ note.created_on }}
                 {% endif %}
             </span>
-            {% note_update_url_name related_ct as update_url_name %}
-            {% if update_url_name %}
+            {% get_note_update_url note as update_url %}
+            {% if update_url %}
                 <span class="d-flex align-items-center position-relative specific-fontsize-08 specific-color-grey specific-ml-15px">
                     <svg class="bi fr-mr-1v" width="15" height="15" fill="currentColor">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#pencil-fill" />
                     </svg>
-                    <a href="{% url update_url_name note.related.pk note.pk %}">éditer</a>
+                    <a href="{{ update_url }}">éditer</a>
                 </span>
             {% endif %}
         </div>

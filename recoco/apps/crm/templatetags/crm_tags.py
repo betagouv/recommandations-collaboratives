@@ -8,7 +8,9 @@ created: 2021-06-29 11:30:42 CEST
 """
 
 from django import template
+from django.urls import reverse
 
+from recoco.apps.crm.models import Note
 from recoco.apps.projects.models import Project
 
 register = template.Library()
@@ -21,9 +23,15 @@ def projects_for_tag(tag_name):
 
 
 @register.simple_tag
-def note_update_url_name(related_ct: str) -> str | None:
-    return {
-        "organisation": "crm-organization-note-update",
-        "utilisateur": "crm-user-note-update",
-        "project": "crm-project-note-update",
-    }.get(related_ct.lower(), None)
+def get_note_update_url(note: Note) -> str | None:
+    match note.content_type.name.lower():
+        case "project":
+            return reverse("crm-project-note-update", args=(note.object_id, note.id))
+        case "utilisateur":
+            return reverse("crm-user-note-update", args=(note.object_id, note.id))
+        case "organization":
+            return reverse(
+                "crm-organization-note-update", args=(note.object_id, note.id)
+            )
+        case _:
+            return None
