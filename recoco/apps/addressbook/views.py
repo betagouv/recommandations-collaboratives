@@ -110,6 +110,14 @@ class ContactForm(forms.ModelForm):
 
 
 @login_required
+def contact_list(request):
+    """Return the Contact list"""
+    has_perm_or_403(request.user, "use_addressbook", request.site)
+
+    return render(request, "addressbook/contact_list.html", locals())
+
+
+@login_required
 def contact_create(request, organization_id: int):
     """Create a new Contact"""
     has_perm_or_403(request.user, "use_addressbook", request.site)

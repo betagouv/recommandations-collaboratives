@@ -1,0 +1,28 @@
+.contact-list {
+  .header {
+    &__actions {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      .actions {
+        &__search-bar {
+          position: relative;
+          width: 75%;
+          max-width: 852px;
+          span {
+            position: absolute;
+            top: 0.5rem;
+            left: 0.75rem;
+            color: var(--light-text-mention-grey, #666);
+          }
+          input {
+            padding-left: 2rem;
+          }
+        }
+        &__add-contact {
+          align-self: flex-end;
+        }
+      }
+    }
+  }
+}

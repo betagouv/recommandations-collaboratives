@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% load guardian_tags %}
+{% load static %}
+{% load sass_tags %}
+{% block title %}
+    Carnet de contacts {{ block.super }}
+{% endblock title %}
+{% block og_title %}
+    Carnet de contacts {{ block.super }}
+{% endblock og_title %}
+{% block css %}
+    <link href="{% sass_src 'addressbook/contact_list.scss' %}"
+          rel="stylesheet"
+          type="text/css">
+{% endblock css %}
+{% block content %}
+    <div class="contact-list col-12 fr-px-15w fr-mx-auto">
+        <!-- Breadcrumb -->
+        <nav role="navigation" class="fr-breadcrumb" aria-label="vous êtes ici :">
+            <button class="fr-breadcrumb__button"
+                    aria-expanded="false"
+                    aria-controls="breadcrumb-1">Voir le fil d’Ariane</button>
+            <div class="fr-collapse" id="breadcrumb-1">
+                <ol class="fr-breadcrumb__list">
+                    <li>
+                        <a class="fr-breadcrumb__link" href="{% url 'home' %}">Accueil</a>
+                    </li>
+                    <li>
+                        <a class="fr-breadcrumb__link" aria-current="page">Contacts</a>
+                    </li>
+                </ol>
+            </div>
+        </nav>
+        <div class="header">
+            <h2>Contact</h2>
+            <div class="header__actions">
+                <div class="actions__search-bar">
+                    <span class="fr-icon-search-line fr-icon--sm" aria-hidden="true"></span>
+                    <input data-test-id="search-resource-input"
+                           class="fr-input w-100"
+                           type="search"
+                           x-on:input.debounce="searchResources()"
+                           x-model="search"
+                           placeholder="Rechercher">
+                </div>
+                <button class="actions__add-contact no-wrap fr-btn fr-btn--icon-left fr-icon-add-line">Créer un contact</button>
+            </div>
+        </div>
+        <div class="contact-list__list"></div>
+    </div>
+{% endblock content %}

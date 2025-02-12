@@ -7,7 +7,6 @@ author  : raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created : 2021-07-16 16:22:25 CEST
 """
 
-
 from django.urls import path
 
 from . import views
@@ -37,6 +36,11 @@ urlpatterns = [
         r"addressbook/organization/<int:organization_id>/create",
         views.contact_create,
         name="addressbook-organization-contact-create",
+    ),
+    path(
+        r"addressbook/contacts/",
+        views.contact_list,
+        name="addressbook-contact-list",
     ),
     path(
         r"addressbook/contact/<int:contact_id>/update/",
