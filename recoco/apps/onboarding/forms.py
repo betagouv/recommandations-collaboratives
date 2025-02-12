@@ -198,7 +198,7 @@ class OnboardingSignupForm(DsrcBaseForm):
         max_length=16,
         label="Téléphone *",
         initial="",
-        help_text="Format attendu: 0102030405",
+        help_text="Votre téléphone ne sera jamais diffusé en dehors du site. Il permet aux administrateurs ou aux partenaires de votre dossier de vous joindre plus facilement. Format attendu: 0102030405.",
         required=True,
     )
     captcha = ReCaptchaField(widget=ReCaptchaV2Checkbox(api_params={"hl": "fr"}))
