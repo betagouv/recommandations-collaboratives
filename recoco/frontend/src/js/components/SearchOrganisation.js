@@ -7,33 +7,48 @@ function SearchOrganisation() {
     userInput: '',
     showOrgasresults: false,
     isAnOrgaSelected: false,
-    init() {
-    },
+    init() {},
     onSearch() {
-      console.log('onSearch');
+      this.isAnOrgaSelected = false;
       if (this.userInput.length > 0) {
         this.orgaFound = [];
         api.get(searchOrganizationsUrl(this.userInput)).then((response) => {
           this.searchResults = response.data;
           this.orgaFound = this.searchResults.results;
-          console.log('orgaFound : ', this.orgaFound);
-            if(this.orgaFound.length > 0) {
-              this.showOrgasresults = true;
-            }
-            else {
-              this.showOrgasresults = false;
-            }
-          });
+          if (this.orgaFound.length > 0) {
+            // this.sortOrgasResults();
+            console.log('orgas found : ', this.orgaFound);
+            this.showOrgasresults = true;
+          } else {
+            this.showOrgasresults = false;
+          }
+        });
       }
     },
     onSelectOrga(orga) {
-      console.log('mon orga : ', orga);
       this.isAnOrgaSelected = true;
       this.selectedOrga = orga;
       this.userInput = orga.name;
       this.showOrgasresults = false;
       this.$store.contact.orgaSelected = orga;
     },
+    sortOrgasResults() {
+      this.orgaFound.sort((a, b) => {
+        return (
+          this.assignNullValueGroupOrgaAtEnd(a.group.name) -
+          this.assignNullValueGroupOrgaAtEnd(b.group.name)
+        );
+      });
+      console.log('orgas sorted : ', this.orgaFound);
+    },
+    assignNullValueGroupOrgaAtEnd(value) {
+      if (value == null) {
+        return 'zz';
+      } else {
+        return value;
+      }
+    },
+
     // closeModal() {
     //   this.isAContactSelected = false;
     //   this.showContactsresults = false
