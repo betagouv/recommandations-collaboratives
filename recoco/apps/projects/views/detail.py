@@ -7,6 +7,8 @@ author  : raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created : 2022-03-07 15:56:20 CEST -- HB David!
 """
 
+from datetime import timedelta
+
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
@@ -21,8 +23,7 @@ from recoco import verbs
 from recoco.apps.hitcount.models import HitCount
 from recoco.apps.invites.forms import InviteForm
 from recoco.apps.survey import models as survey_models
-
-# from recoco.apps.tasks import models as task_models
+from recoco.apps.tasks import models as tasks_models
 from recoco.utils import (
     get_site_config_or_503,
     has_perm,
@@ -302,6 +303,139 @@ def project_conversations(request, project_id=None):
         ).mark_all_as_read()
 
     return render(request, "projects/project/conversations.html", locals())
+
+
+@login_required
+def project_conversations_new(request, project_id=None):
+    """New Conversation page for project"""
+
+    project = get_object_or_404(
+        models.Project.objects.filter(sites=request.site)
+        .with_unread_notifications(user_id=request.user.id)
+        .select_related("commune__department"),
+        pk=project_id,
+    )
+
+    is_regional_actor = is_regional_actor_for_project(
+        request.site, project, request.user, allow_national=True
+    )
+
+    is_regional_actor or has_perm_or_403(request.user, "view_public_notes", project)
+
+    advising = get_advisor_for_project(request.user, project)
+
+    posting_form = PublicNoteForm()
+
+    recipients = get_notification_recipients_for_project(project)
+
+    # Prepare a feed of different objects
+    feed = []
+
+    def feed_add_item(timestamp, topic, item_type, notifications, related_object):
+        feed.append(
+            {
+                "timestamp": timestamp,
+                "topic": topic,
+                "type": item_type,
+                "notifications": notifications,
+                "object": related_object,
+            }
+        )
+
+    feed_object_templates = [
+        (
+            "posting",  # feed item type
+            models.Note,  # model
+            project.notes.filter(public=True),  # initial queryset
+            lambda item: item.updated_on,  # timestamp
+            lambda item: item.topic.name if item.topic else "",  # topic
+        ),
+        (
+            "reco",
+            tasks_models.Task,
+            project.tasks.filter(public=True),
+            lambda item: item.updated_on,
+            lambda item: item.topic.name if item.topic else "",
+        ),
+        (
+            "followup",
+            tasks_models.TaskFollowup,
+            tasks_models.TaskFollowup.objects.filter(
+                task__in=project.tasks.filter(public=True)
+            ),
+            lambda item: item.timestamp,
+            lambda item: item.task.topic.name if item.task.topic else "",
+        ),
+    ]
+
+    for (
+        item_type,
+        model_instance,
+        queryset,
+        ts_lambda,
+        topic_lambda,
+    ) in feed_object_templates:
+        object_ids = list(queryset.values_list("id", flat=True))
+        object_ct = ContentType.objects.get_for_model(model_instance)
+        object_notifs = request.user.notifications.unread().filter(
+            action_object_object_id__in=object_ids, action_object_content_type=object_ct
+        )
+
+        for item in queryset.all():
+            feed_add_item(
+                timestamp=ts_lambda(item),
+                topic=topic_lambda(item),
+                item_type=item_type,
+                notifications=list(
+                    object_notifs.filter(action_object_object_id=item.id).values_list(
+                        "id", flat=True
+                    )
+                ),
+                related_object=item,
+            )
+
+    # Activities are a special case
+    activity_verbs = [verbs.Project.BECAME_OBSERVER, verbs.Project.BECAME_ADVISOR]
+    activities = project.target_actions.filter(verb__in=activity_verbs)
+    activity_notifs = request.user.notifications.unread().filter(
+        verb__in=activity_verbs
+    )
+
+    for activity in activities:
+        max_date = activity.timestamp + timedelta(seconds=2)
+        min_date = activity.timestamp - timedelta(seconds=2)
+
+        feed_add_item(
+            timestamp=activity.timestamp,
+            topic="",
+            item_type="activity",
+            notifications=list(
+                activity_notifs.filter(
+                    verb=activity.verb,
+                    action_object_object_id=activity.action_object_object_id,
+                    action_object_content_type=activity.action_object_content_type,
+                    timestamp__lte=max_date,
+                    timestamp__gte=min_date,
+                ).values_list("id", flat=True)
+            ),
+            related_object=activity,
+        )
+
+    # Pre-sort so it's easier to use in the template
+    feed.sort(key=lambda x: (x["topic"], x["timestamp"]))
+
+    return render(
+        request,
+        "projects/project/conversations_new.html",
+        context={
+            "project": project,
+            "is_regional_actor": is_regional_actor,
+            "advising": advising,
+            "posting_form": posting_form,
+            "recipients": recipients,
+            "feed": feed,
+        },
+    )
 
 
 @login_required

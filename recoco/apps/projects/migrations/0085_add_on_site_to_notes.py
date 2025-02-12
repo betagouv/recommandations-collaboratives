@@ -4,11 +4,10 @@ from django.db import migrations, models
 import django.db.models.deletion
 import recoco.apps.projects.models
 
-from recoco.apps.projects.models import Note
-
 
 def assign_note_site_based_on_project_site(apps, schema_editor):
-    for note in Note.objects.all():
+    Note = apps.get_model("projects", "Note")
+    for note in Note.on_site.all():
         project_site = note.project.sites.first()
         if project_site:
             note.site = project_site
@@ -34,7 +33,7 @@ class Migration(migrations.Migration):
             field=models.ForeignKey(
                 default=1,
                 on_delete=django.db.models.deletion.CASCADE,
-                related_name="ptroject_notes",
+                related_name="project_notes",
                 to="sites.site",
             ),
             preserve_default=False,
