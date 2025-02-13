@@ -4,9 +4,11 @@ import api, { searchOrganizationsUrl } from '../utils/api';
 function SearchOrganisation() {
   return {
     orgaFound: [],
+    orgaSorted: [],
     userInput: '',
     showOrgasresults: false,
     isAnOrgaSelected: false,
+
     init() {},
     onSearch() {
       this.isAnOrgaSelected = false;
@@ -16,8 +18,7 @@ function SearchOrganisation() {
           this.searchResults = response.data;
           this.orgaFound = this.searchResults.results;
           if (this.orgaFound.length > 0) {
-            // this.sortOrgasResults();
-            console.log('orgas found : ', this.orgaFound);
+            this.sortOrgasResults();
             this.showOrgasresults = true;
           } else {
             this.showOrgasresults = false;
@@ -33,32 +34,36 @@ function SearchOrganisation() {
       this.$store.contact.orgaSelected = orga;
     },
     sortOrgasResults() {
+
+      this.orgaSorted = [];
       this.orgaFound.sort((a, b) => {
-        return (
-          this.assignNullValueGroupOrgaAtEnd(a.group.name) -
-          this.assignNullValueGroupOrgaAtEnd(b.group.name)
-        );
+        if (a.name < b.name) {
+          return -1;
+        }
+        if (a.name > b.name) {
+          return 1;
+        }
+        return 0;
       });
-      console.log('orgas sorted : ', this.orgaFound);
-    },
-    assignNullValueGroupOrgaAtEnd(value) {
-      if (value == null) {
-        return 'zz';
-      } else {
-        return value;
+
+      const tempSortOrgas = Object.groupBy(this.orgaFound, ({group})=>group);
+
+      for (const prop in tempSortOrgas) {
+        if (tempSortOrgas[prop][0].group == null){
+          for (let i = 0; i < tempSortOrgas[prop].length; i++){
+            tempSortOrgas[prop][i].group = {name: 'AUTRES'};
+          }
+        }
+        else {
+          this.orgaSorted.push(tempSortOrgas[prop]);
+        }
+      }
+      for (const prop in tempSortOrgas) {
+        if (tempSortOrgas[prop][0].group.name === 'AUTRES'){
+          this.orgaSorted.push(tempSortOrgas[prop]);
+        }
       }
     },
-
-    // closeModal() {
-    //   this.isAContactSelected = false;
-    //   this.showContactsresults = false
-    //   this.userInput = '';
-    //   this.isOpenCreateContactModal = false;
-    // },
-    // onCancelSelectContact(){
-    //   this.isAContactSelected=false;
-    //    this.selectedContact = null;
-    // }
   };
 }
 

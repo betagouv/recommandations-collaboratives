@@ -39,7 +39,6 @@ function SearchContact() {
       this.isAContactSelected = true;
     },
     addContact() {
-      console.log('add contact : ', this.selectedContact);
       let textArea = document.querySelector('.tiptap.ProseMirror');
       textArea.innerHTML += `@ ${this.selectedContact.first_name} ${this.selectedContact.last_name}`;
       this.$store.previewModal.contact = this.selectedContact;

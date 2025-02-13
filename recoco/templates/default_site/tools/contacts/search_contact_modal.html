@@ -7,7 +7,7 @@
           type="text/css" />
 {% endblock css %}
 <div class="modal-contact d-none"
-     x-init="$watch('$store.contact.createdContact', value => {value?selectedContact = value:selectedContact = null; value?isAContactSelected = true: selectedContact = null;alert('oi oui oui', value);})"
+     x-init="$watch('$store.contact.createdContact', value => {value?selectedContact = value:selectedContact = null; value?isAContactSelected = true: selectedContact = null;})"
      id="search-contact-modal"
      @click.away="isOpenModal = false"
      x-transition:enter="ease-out duration-300"
@@ -36,7 +36,6 @@
                    x-model="userInput">
             <button class="fr-btn" title="Rechercher" @click="onSearch">Rechercher</button>
         </div>
-
     </div>
     <div>
         <div class="fr-menu menu-modal-correct-fr-menu better-positionning border-radius-4px">
@@ -44,11 +43,11 @@
                 <div class="fr-menu__list specific-width-26rem overflow-auto specific-height border-radius-4px fr-mb-0">
                     <template x-if="userInput.length > 0 && showContactsresults && !isAContactSelected">
                         <template class="fr-menu__item"
-                                x-for="(contact, index) in contactsFound"
-                                :key="index">
+                                  x-for="(contact, index) in contactsFound"
+                                  :key="index">
                             <div class="fr-menu__item__content cursor-pointer fr-pt-1w fr-px-1w add-borders"
-                                data-test-id="contact-to-select"
-                                @click="onSelect(contact)">
+                                 data-test-id="contact-to-select"
+                                 @click="onSelect(contact)">
                                 <div x-data="{contact:contact}">{% include "tools/contacts/contact_card.html" %}</div>
                             </div>
                         </template>
