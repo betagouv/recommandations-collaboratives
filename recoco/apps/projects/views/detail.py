@@ -14,7 +14,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.forms import formset_factory
-from django.http import HttpResponseForbidden
+from django.http import HttpResponseBadRequest, HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render, reverse
 from django.utils import timezone
 from django.views.decorators.clickjacking import xframe_options_exempt
@@ -24,6 +24,7 @@ from django.views.decorators.http import require_http_methods
 from recoco import verbs
 from recoco.apps.hitcount.models import HitCount
 from recoco.apps.invites.forms import InviteForm
+from recoco.apps.projects.views.notes import create_public_note
 from recoco.apps.survey import models as survey_models
 from recoco.apps.tasks import models as tasks_models
 from recoco.utils import (
@@ -34,8 +35,9 @@ from recoco.utils import (
     require_htmx,
 )
 
-from .. import models
+from .. import models, signals
 from ..forms import (
+    DocumentUploadForm,
     PrivateNoteForm,
     ProjectLocationForm,
     ProjectTagsForm,
@@ -45,6 +47,7 @@ from ..forms import (
 )
 from ..utils import (
     get_advisor_for_project,
+    get_collaborators_for_project,
     get_notification_recipients_for_project,
     is_advisor_for_project,
     is_member,
@@ -449,7 +452,6 @@ def project_conversations_new(request, project_id=None):
 @require_http_methods(["POST"])
 @require_htmx
 def project_conversations_new_partial(request, project_id=None):
-
     project = get_object_or_404(
         models.Project.objects.filter(sites=request.site)
         .with_unread_notifications(user_id=request.user.id)
@@ -467,7 +469,43 @@ def project_conversations_new_partial(request, project_id=None):
         instance.created_by = request.user
         instance.site = request.site
         instance.public = True
+        topic_name = form.cleaned_data.get("topic_name", None)
+        if topic_name:
+            try:
+                instance.topic = models.Topic.objects.get(
+                    site__in=project.sites.all(), name__iexact=topic_name
+                )
+            except models.Topic.DoesNotExist:
+                return HttpResponseBadRequest("Topic unknown")
         instance.save()
+
+        # Check if we have a file or link
+        document_form = DocumentUploadForm(request.POST, request.FILES)
+        if document_form.is_valid():
+            if document_form.cleaned_data["the_file"]:
+                document = document_form.save(commit=False)
+                document.attached_object = instance
+                document.site = request.site
+                document.uploaded_by = request.user
+                document.project = instance.project
+
+                document.save()
+
+        # Reactivate project if was set inactive
+        if request.user in get_collaborators_for_project(project):
+            project.last_members_activity_at = timezone.now()
+
+            if project.inactive_since:
+                project.reactivate()
+
+            project.save()
+
+        signals.note_created.send(
+            sender=create_public_note,
+            note=instance,
+            project=project,
+            user=request.user,
+        )
 
     feed = _build_feeds(project=project, user=request.user)
 

@@ -5,6 +5,10 @@ Alpine.data('ConversationTopicSwitch', (currentTopic = 'general') => {
   return {
     topicSelector: currentTopic,
     valueTopicFormMessageSend: '',
+    lastTopic: {
+      slug: '',
+      name: '',
+    },
     stringToColor,
     init() {
       const params = new URLSearchParams(document.location.search);
@@ -22,8 +26,19 @@ Alpine.data('ConversationTopicSwitch', (currentTopic = 'general') => {
         firstTopic.getAttribute('data-topic-name')
       );
       this.topicSelector = firstTopic.value;
+      document.addEventListener('htmx:afterSwap', () => {
+        this.setActiveTopic();
+        document.querySelector('.tiptap.ProseMirror').innerText = '';
+      });
     },
-    setActiveTopic(topicSlug, topicName) {
+    setActiveTopic(
+      topicSlug = this.lastTopic.slug,
+      topicName = this.lastTopic.name
+    ) {
+      this.lastTopic = {
+        slug: topicSlug,
+        name: topicName,
+      };
       Array.from(
         document.querySelectorAll('[data-type-element="feed-element-item"]')
       ).forEach((element) => {

@@ -131,6 +131,7 @@
   &__container {
     display: flex;
     flex-direction: column;
+    width: var(--width-left-col);
     &-feed {
       min-height: calc(100vh - 274px); //555px
       display: flex;
