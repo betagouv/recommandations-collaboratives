@@ -259,7 +259,7 @@ class ProjectSiteQuerySet(models.QuerySet):
 
     def moderated(self):
         """Filter out sites where this project is not yet validated"""
-        return self.exclude(status="DRAFT")
+        return self.exclude(status__in=["DRAFT", "REJECTED"])
 
     def to_moderate(self):
         """List only sites where this project needs moderation"""

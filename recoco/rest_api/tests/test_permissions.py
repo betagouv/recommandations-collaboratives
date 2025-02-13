@@ -102,11 +102,15 @@ def test_is_staff_for_site_or_is_authenticated_read_only(
 ):
     std_request.method = request_method
 
-    with patch(
-        "django.contrib.auth.models.User.is_authenticated", new_callable=PropertyMock
-    ) as mock_is_authenticated, patch(
-        "recoco.rest_api.permissions.is_staff_for_site"
-    ) as mock_is_staff_for_site:
+    with (
+        patch(
+            "django.contrib.auth.models.User.is_authenticated",
+            new_callable=PropertyMock,
+        ) as mock_is_authenticated,
+        patch(
+            "recoco.rest_api.permissions.is_staff_for_site"
+        ) as mock_is_staff_for_site,
+    ):
         mock_is_authenticated.return_value = user_is_authenticated
         mock_is_staff_for_site.return_value = is_staff_return_value
 
