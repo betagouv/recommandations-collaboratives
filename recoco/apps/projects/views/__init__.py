@@ -37,6 +37,7 @@ from .. import forms, models, signals
 from ..utils import (
     assign_advisor,
     assign_collaborator,
+    assign_collaborator_permissions,
     assign_observer,
     can_administrate_project,
     is_advisor_for_project,
@@ -158,6 +159,11 @@ def project_moderation_accept(request, project_pk):
             else:
                 # Invite her to fill in a new form
                 # Send an email to the project owner
+
+                # We assign permissions to use their project on this website in
+                # case of multiplication
+                for membership in project.projectmember_set.all():
+                    assign_collaborator_permissions(membership.member, project)
 
                 params = {
                     "project": digests.make_project_digest(project, owner),

@@ -1347,6 +1347,7 @@ def project_site_handover(request, project_id):
                 is_origin=False,
                 status="DRAFT",
             )
+
             onboarding_utils.notify_new_project(
                 site=site, project=project, owner=project.owner
             )
