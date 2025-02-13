@@ -378,7 +378,9 @@ def create_missing_user_project_statuses(site, user, project_statuses):
         models.UserProjectStatus(user=user, site=site, project=p, status="NEW")
         for p in projects
     ]
-    models.UserProjectStatus.objects.bulk_create(new_statuses)
+    models.UserProjectStatus.objects.bulk_create(
+        new_statuses, ignore_conflicts=True
+    )  # XXX Might be a better way
 
 
 def update_user_project_status_with_their_project(site, user, project_statuses):
