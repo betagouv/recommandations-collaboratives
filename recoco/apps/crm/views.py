@@ -601,26 +601,50 @@ def user_notifications(request, user_id):
 def user_reminders(request, user_id):
     has_perm_or_403(request.user, "use_crm", request.site)
 
-    crm_user = get_object_or_404(User, pk=user_id, profile__sites=request.site)
+    crm_user = get_object_or_404(
+        User.objects.select_related("profile__organization"),
+        pk=user_id,
+        profile__sites=request.site,
+    )
 
+    # FIXME: can't we remove this one?..
     if request.site not in crm_user.profile.sites.all():
         # only for user of current site
         raise Http404
 
     search_form = forms.CRMSearchForm()
 
-    sent_reminders = reminders_models.Reminder.on_site.filter(
-        sent_to=crm_user
-    ).order_by("-deadline")[:100]
+    sent_reminders = (
+        reminders_models.Reminder.on_site.filter(sent_to=crm_user)
+        .select_related("project__commune")
+        .prefetch_related("transactions")
+        .order_by("-deadline")[:100]
+    )
 
-    future_reminders = reminders_models.Reminder.on_site.filter(
-        project__in=Project.on_site.filter(
-            projectmember__member=crm_user, projectmember__is_owner=True
-        ),
-        sent_on=None,
-    ).order_by("-deadline")
+    future_reminders = (
+        reminders_models.Reminder.on_site.filter(
+            project__in=Project.on_site.filter(
+                inactive_since__isnull=True,
+                projectmember__member=crm_user,
+                projectmember__is_owner=True,
+            ),
+            sent_on=None,
+        )
+        .select_related("project__commune")
+        .prefetch_related("transactions")
+        .order_by("-deadline")
+    )
 
-    return render(request, "crm/user_reminders.html", locals())
+    return render(
+        request,
+        "crm/user_reminders.html",
+        context={
+            "crm_user": crm_user,
+            "search_form": search_form,
+            "sent_reminders": sent_reminders,
+            "future_reminders": future_reminders,
+        },
+    )
 
 
 @login_required
