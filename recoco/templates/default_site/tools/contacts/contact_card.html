@@ -43,6 +43,10 @@
                 </a>
             </div>
         </template>
+        {% comment %} TODO WIP {% endcomment %}
+        <template x-if="!contact.email">
+            <div></div>
+        </template>
         <template x-if="contact.phone_no">
             <div>
                 <a href="'tel:'+contact.phone_no"
@@ -60,14 +64,14 @@
             </div>
         </template>
         <template x-if="contact.modified">
-            <div>
+            <div class="contact-card__updated-at">
                 <span class="same-for-all-text text-date">mis à jour le</span>
                 <span class="same-for-all-text text-date"
                       x-text="contact.modified.split('T')[0]"></span>
             </div>
         </template>
         <template x-if="contact.created && !contact.modified">
-            <div>
+            <div class="contact-card__updated-at">
                 <span class="same-for-all-text text-date">mis à jour le</span>
                 <span class="same-for-all-text text-date"
                       x-text="contact.created.split('T')[0]"></span>

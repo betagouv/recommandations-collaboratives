@@ -93,8 +93,14 @@ export function searchOrganizationsUrl(search) {
 export function searchContactsUrl(search) {
   return `/api/addressbook/contacts/?search=${search}`;
 }
-export function contactsUrl() {
-  return `/api/addressbook/contacts/`;
+export function contactsUrl(limit) {
+  if (limit) {
+    const params = new URLSearchParams({
+      limit: limit,
+    });
+    return `/api/addressbook/contacts/?${params}`;
+  }
+  return `/api/addressbook/contacts`;
 }
 
 // Topic

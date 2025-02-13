@@ -25,4 +25,23 @@
       }
     }
   }
+  &__list {
+    display: flex;
+    gap: 2%;
+    flex-wrap: wrap;
+    align-content: start;
+    flex-direction: row;
+    justify-content: start;
+    &-item {
+      width: 23.5%;
+    }
+    .contact-card {
+      height: 9rem;
+      position: relative;
+      border: 1px solid var(--light-border-default-grey, #e5e5e5);
+      &__updated-at {
+        bottom: 0;
+      }
+    }
+  }
 }

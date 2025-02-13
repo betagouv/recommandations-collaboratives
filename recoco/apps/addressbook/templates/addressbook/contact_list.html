@@ -2,6 +2,7 @@
 {% load guardian_tags %}
 {% load static %}
 {% load sass_tags %}
+{% load django_vite %}
 {% block title %}
     Carnet de contacts {{ block.super }}
 {% endblock title %}
@@ -13,8 +14,11 @@
           rel="stylesheet"
           type="text/css">
 {% endblock css %}
+{% block js %}
+    {% vite_asset 'js/components/ContactBook.js' %}
+{% endblock js %}
 {% block content %}
-    <div class="contact-list col-12 fr-px-15w fr-mx-auto">
+    <div x-data="ContactBook" class="contact-list col-12 fr-px-15w fr-mx-auto">
         <!-- Breadcrumb -->
         <nav role="navigation" class="fr-breadcrumb" aria-label="vous êtes ici :">
             <button class="fr-breadcrumb__button"
@@ -46,6 +50,10 @@
                 <button class="actions__add-contact no-wrap fr-btn fr-btn--icon-left fr-icon-add-line">Créer un contact</button>
             </div>
         </div>
-        <div class="contact-list__list"></div>
+        <div class="contact-list__list">
+            <template x-for="contact in contacts" :key="contact.id">
+                <div x-data="{contact:contact}" class="contact-list__list-item">{% include "tools/contacts/contact_card.html" %}</div>
+            </template>
+        </div>
     </div>
 {% endblock content %}
