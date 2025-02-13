@@ -1,0 +1,62 @@
+{% load sass_tags %}
+{% block css %}
+    <link href="{% sass_src 'css/tools/contact/create-contact-modal.scss' %}"
+          rel="stylesheet"
+          type="text/css" />
+{% endblock css %}
+{% comment %} <div> {% endcomment %}
+<div x-data="CreateContact()"
+     id="create-contact-modal"
+     class="modal-create-contact d-none z-2"
+     @click.away="isOpenCreateContactModal = false">
+    <div class="d-flex justify-content-between border-bottom-666 fr-p-3v modal-create-contact__block">
+        <p class="fw-bold color-666 correct-p">ATTACHER UN CONTACT</p>
+        <span class="fr-icon-close-line color-666 cursor-pointer"
+              aria-hidden="true"
+              @click="closeCreateContactModal"></span>
+    </div>
+    <div x-data="SearchOrganisation"
+         class="fr-p-3v modal-create-contact__block">
+        <span class="modal-create-contact__label">Organisation</span><span class="color-important">*</span>
+        <template x-if="verifOrga">
+            <p class="modal-create-contact__label-info red-text">La sélection de votre organisation est obligatoire *</p>
+        </template>
+        <div>{% include "tools/contacts/search_organisation.html" %}</div>
+    </div>
+    <div class="fr-p-3v modal-create-contact__block">
+        <label class="modal-create-contact__label">Nom</label>
+        <input type="text" class="fr-input" x-model="contactLastName">
+    </div>
+    <div class="fr-p-3v modal-create-contact__block">
+        <label class="modal-create-contact__label">Prénom</label>
+        <input type="text" class="fr-input" x-model="contactFirstName">
+    </div>
+    <div class="fr-p-3v modal-create-contact__block">
+        <label class="modal-create-contact__label">Poste</label>
+        <span class="color-important">*</span>
+        <template x-if="verifPoste">
+            <p class="modal-create-contact__label-info red-text">Le champ de votre poste est obligatoire *</p>
+        </template>
+        <input type="text" class="fr-input" :class="{'fr-input--error': verifPoste}" x-model="contactJob" required>
+    </div>
+    <div class="fr-p-3v modal-create-contact__block">
+        <label class="modal-create-contact__label">Email</label>
+        <p class="modal-create-contact__label-info" :class="{'red-text': verifMailOrPhone}">Renseigner au minimum l’email ou un numéro de téléphone</p>
+        <input type="text" class="fr-input" :class="{'fr-input--error': verifMailOrPhone}" x-model="contactEmail">
+    </div>
+    <div class="fr-p-3v modal-create-contact__block">
+        <label class="modal-create-contact__label">Téléphone Principal</label>
+        <p class="modal-create-contact__label-info" :class="{'red-text': verifMailOrPhone}">Renseigner au minimum l’email ou un numéro de téléphone</p>
+        <input type="text" class="fr-input" :class="{'fr-input--error': verifMailOrPhone}" x-model="contactTel">
+    </div>
+    <div class="fr-p-3v modal-create-contact__block">
+        <label class="modal-create-contact__label">Téléphone Secondaire</label>
+        <input type="text" class="fr-input" x-model="contactPhone">
+    </div>
+    <div class="fr-p-3v modal-create-contact__block d-flex">
+        <button class="fr-btn fr-btn--secondary fr-mr-3v w-100 justify-content-center"
+                @click="closeCreateContactModal()">Annuler</button>
+        <button class="fr-btn w-100 justify-content-center" @click="createContact">Créer le contact</button>
+    </div>
+</div>
+{% comment %} </div> {% endcomment %}

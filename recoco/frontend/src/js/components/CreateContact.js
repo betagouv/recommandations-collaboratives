@@ -1,0 +1,82 @@
+import Alpine from 'alpinejs';
+import api, { contactsUrl } from '../utils/api';
+
+function CreateContact() {
+  return {
+    modalCreateContact: null,
+    modalSearchContact: null,
+    contact: null,
+    contactOrganization: null,
+    contactLastName: '',
+    contactFirstName: '',
+    contactJob: '',
+    contactEmail: '',
+    contactTel: '',
+    contactPhone: '',
+    verifOrga: false,
+    verifPoste: false,
+    verifMailOrPhone: false,
+    init() {},
+    closeCreateContactModal() {
+      this.modalCreateContact = document.querySelector('#create-contact-modal');
+      this.modalCreateContact.classList.toggle('d-none');
+      this.reOpenModalSearchContact();
+    },
+    reOpenModalSearchContact() {
+      this.modalSearchContact = document.querySelector('#search-contact-modal');
+      this.modalSearchContact.classList.toggle('d-none');
+    },
+    createContact() {
+      if (this.$store.contact.orgaSelected) {
+        this.contactOrganization = this.$store.contact.orgaSelected;
+        this.verifOrga = false;
+      } else {
+        this.verifOrga = true;
+      }
+      if (this.contactJob.length === 0) {
+        this.verifPoste = true;
+      } else {
+        this.verifPoste = false;
+      }
+      if (this.contactEmail.length === 0 || this.contactTel.length === 0) {
+        this.verifMailOrPhone = true;
+      } else {
+        this.verifMailOrPhone = false;
+      }
+      if (
+        this.contactOrganization &&
+        this.contactJob.length > 0 &&
+        (this.contactEmail.length > 0 || this.contactTel.length > 0)
+      ) {
+        this.contact = {
+          organization: this.contactOrganization.id,
+          last_name: this.contactLastName,
+          first_name: this.contactFirstName,
+          division: this.contactJob,
+          email: this.contactEmail,
+          phone_no: this.contactTel,
+          mobile_no: this.contactPhone,
+        };
+        api.post(contactsUrl(), this.contact).then((response) => {
+          this.contact = response.data;
+          this.$store.contact.createdContact = this.contact;
+        });
+        this.resetFormValue();
+        this.closeCreateContactModal();
+      }
+    },
+    resetFormValue() {
+      this.contactLastName = '';
+      this.contactFirstName = '';
+      this.contactJob = '';
+      this.contactEmail = '';
+      this.contactTel = '';
+      this.contactPhone = '';
+      this.contactOrganization = null;
+      this.$store.contact.orgaSelected = null;
+      // this.$store.contact.createdContact = null;
+    },
+  };
+}
+
+Alpine.data('CreateContact', CreateContact);
