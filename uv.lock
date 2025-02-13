@@ -3105,8 +3105,7 @@ wheels = [
 
 [[package]]
 name = "recoco"
-version = "6.2.2"
-source = { virtual = "." }
+source = { editable = "." }
 dependencies = [
     { name = "beautifulsoup4" },
     { name = "celery" },

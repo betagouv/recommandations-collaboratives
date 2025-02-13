@@ -1,6 +1,13 @@
 [project]
 name = "recoco"
-version = "6.2.2"
+dynamic = ["version"]
+
+authors = [{name = "Recoco Dev Team"}]
+maintainers = [
+  {name = "Guillaume Libersat", email = "guillaume.libersat@beta.gouv.fr"}
+]
+license = {name = "AGPL-v3", file="LICENSE"}
+
 description = "Recommandations Collaboratives"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -64,6 +71,21 @@ dependencies = [
     "sib-api-v3-sdk>=7.6.0",
     "wagtail==6.2.2",
 ]
+
+[project.urls]
+Homepage = "https://recommandations-collaboratives.beta.gouv.fr/"
+Documentation = "https://reco-co.gitbook.io/"
+Repository = "https://github.com/betagouv/recommandations-collaboratives/"
+
+[tool.setuptools]
+packages = ["recoco"]
+
+[tool.setuptools.dynamic]
+version = {attr = "recoco.__version__"}
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
 
 [tool.djlint]
 # ignore = "W013"
