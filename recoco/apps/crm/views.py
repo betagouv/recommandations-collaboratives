@@ -608,9 +608,9 @@ def user_reminders(request, user_id):
     )
 
     # FIXME: can't we remove this one?..
-    if request.site not in crm_user.profile.sites.all():
-        # only for user of current site
-        raise Http404
+    # if request.site not in crm_user.profile.sites.all():
+    #     # only for user of current site
+    #     raise Http404
 
     search_form = forms.CRMSearchForm()
 
