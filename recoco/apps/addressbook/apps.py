@@ -21,6 +21,7 @@ class AddressbookConfig(AppConfig):
             fields=(
                 "last_name",
                 "first_name",
+                "email",
                 "division",
                 "organization__name",
                 "organization__group__name",
