@@ -886,7 +886,7 @@ wheels = [
 
 [[package]]
 name = "django-dbtemplates"
-version = "0.0.post529+g233a401"
+version = "3.0.post60+g233a401"
 source = { git = "https://github.com/jazzband/django-dbtemplates.git?rev=master#233a401e75d9b6133dd4c9fdc17bf85d2660cc41" }
 dependencies = [
     { name = "django-appconf" },
@@ -960,6 +960,19 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/fc/42/61d10027f80eae71079a7940c3f01fa033220463f927defbe564acb09fb5/django-hijack-3.4.5.tar.gz", hash = "sha256:7e45b1de786bdc130628e4230b359dde6d8744ecd3bcd668d2b27c5d614a071c", size = 274261 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/04/0e/4250a37c87dab92c65a328e38a21093fffaff583259aa4b7e5ae796aa6e1/django_hijack-3.4.5-py3-none-any.whl", hash = "sha256:129cbe75444b163135871a947d38ffb72181f4f2583544703fc9efe083c9ddad", size = 39730 },
+]
+
+[[package]]
+name = "django-htmx"
+version = "1.22.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "asgiref" },
+    { name = "django" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/e2/59/bac8c1873a676ea661babd5d8bc1a04cfcfe1176b0bf526bcd058e6ec05a/django_htmx-1.22.0.tar.gz", hash = "sha256:7306e1aba4e407496f30a57ec2e0b2974a9b96c8c6036f7ec6a8b5753ea0abdd", size = 9621 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/62/6d/c99d5d5a9edb759ebd295ec96479254b6cc7b80f40d1ee66ebb7d677fc0d/django_htmx-1.22.0-py3-none-any.whl", hash = "sha256:9f1fcf239125a42d6dadc814b3796b8d6faad8ded444a14ae021d0241fa9a40f", size = 6904 },
 ]
 
 [[package]]
@@ -3124,6 +3137,7 @@ dependencies = [
     { name = "django-gravatar2" },
     { name = "django-guardian" },
     { name = "django-hijack" },
+    { name = "django-htmx" },
     { name = "django-json-widget" },
     { name = "django-leaflet" },
     { name = "django-magicauth" },
@@ -3226,6 +3240,7 @@ requires-dist = [
     { name = "django-gravatar2", specifier = ">=1.4.5" },
     { name = "django-guardian", specifier = "==2.4.0" },
     { name = "django-hijack", specifier = "==3.4.5" },
+    { name = "django-htmx", specifier = ">=1.22.0" },
     { name = "django-json-widget", specifier = "==2.0.1" },
     { name = "django-leaflet", specifier = ">=0.31.0" },
     { name = "django-magicauth", git = "https://github.com/glibersat/django-magicauth?rev=55eab0b91c95012944933b342748540b2c1b31bf" },
