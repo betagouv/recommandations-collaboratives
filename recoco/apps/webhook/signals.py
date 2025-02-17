@@ -36,11 +36,13 @@ class WebhookSignalListener(SignalListener):
         )
 
     def model_dict(self, instance: Any) -> dict[str, Any]:
+        kwargs = {"context": {"request": None}}
+
         if isinstance(instance, Project):
-            return ProjectSerializer(instance).data
+            return ProjectSerializer(instance, **kwargs).data
         if isinstance(instance, Answer):
-            return AnswerSerializer(instance).data
+            return AnswerSerializer(instance, **kwargs).data
         if isinstance(instance, TaggedItem):
             if isinstance(project := instance.content_object, Project):
-                return ProjectSerializer(project).data
+                return ProjectSerializer(project, **kwargs).data
         return {}
