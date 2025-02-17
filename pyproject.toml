@@ -29,6 +29,7 @@ dependencies = [
     "django-gravatar2>=1.4.5",
     "django-guardian==2.4.0",
     "django-hijack==3.4.5",
+    "django-htmx>=1.22.0",
     "django-json-widget==2.0.1",
     "django-leaflet>=0.31.0",
     "django-magicauth",
