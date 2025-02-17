@@ -104,7 +104,7 @@
             </div>
             {% if task.resource %}
                 <a class="stretched-link"
-                   {% if disable_tracking %} href="{% url 'resources-resource-detail' task.resource.id %}" {% else %} {% if can_administrate %} href="{% url 'projects-visit-task' task.id %}"{% else %}href="{% url 'resources-resource-detail' task.resource.id %}"{% endif %}
+                   {% if disable_tracking %} href="{% url 'resources-resource-detail' task.resource.id %}" {% else %} {% if can_administrate %} href="{% url 'projects-visit-task' task.id %}"{% else %}href="{% url "projects-create-task" %}?resource_id={{ task.resource.id }}"{% endif %}
                    {% endif %}>
                     <div class="flex-shrink-1 fr-px-2w arrow-link text-primary align-items-center">
                         <svg class="align-middle bi" width="26px" height="26px" fill="#000091">

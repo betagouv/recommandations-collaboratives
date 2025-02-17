@@ -1,3 +1,92 @@
+[project]
+name = "recoco"
+dynamic = ["version"]
+
+authors = [{name = "Recoco Dev Team"}]
+maintainers = [
+  {name = "Guillaume Libersat", email = "guillaume.libersat@beta.gouv.fr"}
+]
+license = {name = "AGPL-v3", file="LICENSE"}
+
+description = "Recommandations Collaboratives"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "beautifulsoup4==4.12.3",
+    "celery==5.4.0",
+    "django>4,<5.0",
+    "django-activity-stream",
+    "django-admin-csvexport==2.2",
+    "django-allauth[openid,socialaccount]==0.63.6",
+    "django-autoslug==1.9.9",
+    "django-celery-results==2.5.1",
+    "django-clone==5.3.3",
+    "django-compressor==4.4",
+    "django-cookie-consent",
+    "django-crispy-forms==2.0",
+    "django-dbtemplates",
+    "django-filter>=24.3",
+    "django-gravatar2>=1.4.5",
+    "django-guardian==2.4.0",
+    "django-hijack==3.4.5",
+    "django-json-widget==2.0.1",
+    "django-leaflet>=0.31.0",
+    "django-magicauth",
+    "django-markdownx==4.0.7",
+    "django-multisite",
+    "django-notifications-hq",
+    "django-ordered-model==3.7.4",
+    "django-otp==1.3.0",
+    "django-phonenumber-field[phonenumbers]==6.3.0",
+    "django-recaptcha==3.0.0",
+    "django-reversion==5.0.2",
+    "django-reversion-compare==0.17.0",
+    "django-sass-processor==1.4",
+    "django-sesame[ua]==3.2.2",
+    "django-tagging",
+    "django-taggit==5.0.1",
+    "django-vite==3.0.3",
+    "django-waffle==4.1.0",
+    "django-watson==1.6.3",
+    "django-webhook",
+    "djangorestframework==3.15.2",
+    "djangorestframework-simplejwt>=5.4.0",
+    "djangorestframework-xml>=2.0.0",
+    "drf-spectacular[sidecar]>=0.28.0",
+    "dynamic-django-forms>=0.1.11",
+    "ipython>=8.32.0",
+    "libsass>=0.23.0",
+    "lxml[html-clean]>=5.3.1",
+    "markdown-link-attr-modifier==0.2.1",
+    "metabase-api==3.4",
+    "multimethod==1.7",
+    "mwclient==0.11.0",
+    "pandoc==2.4",
+    "psycopg[binary]>3",
+    "redis==5.0.4",
+    "requests-html==0.10.0",
+    "rest-framework-generic-relations>=2.2.0",
+    "sentry-sdk>=2.20.0",
+    "setuptools==70.2.0",
+    "sib-api-v3-sdk>=7.6.0",
+    "wagtail==6.2.2",
+]
+
+[project.urls]
+Homepage = "https://recommandations-collaboratives.beta.gouv.fr/"
+Documentation = "https://reco-co.gitbook.io/"
+Repository = "https://github.com/betagouv/recommandations-collaboratives/"
+
+[tool.setuptools]
+packages = ["recoco"]
+
+[tool.setuptools.dynamic]
+version = {attr = "recoco.__version__"}
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
 [tool.djlint]
 # ignore = "W013"
 extension = "html"
@@ -91,3 +180,53 @@ section-order = [
 
 [tool.ruff.lint.flake8-bandit]
 check-typed-exception = true
+
+[tool.uv.sources]
+django-magicauth = { git = "https://github.com/glibersat/django-magicauth", rev = "55eab0b91c95012944933b342748540b2c1b31bf" }
+django-notifications-hq = { git = "https://github.com/glibersat/django-notifications.git", rev = "feature/sites-framework" }
+django-activity-stream = { git = "https://github.com/glibersat/django-activity-stream.git", rev = "django4" }
+django-multisite = { git = "https://github.com/protoroto/django-multisite.git", rev = "feature/add-django4-support" }
+django-dbtemplates = { git = "https://github.com/jazzband/django-dbtemplates.git", rev = "master" }
+django-cookie-consent = { git = "https://github.com/jazzband/django-cookie-consent", rev = "master" }
+django-tagging = { git = "https://github.com/nextories/django-tagging.git", rev = "bug/usage_for_model_with_filters_none" }
+django-webhook = { git = "https://github.com/etchegom/django-webhook.git", rev = "recoco" }
+
+[dependency-groups]
+dev = [
+    "black>=25.1.0",
+    "coverage==7.4.1",
+    "django-coverage-plugin>=3.1.0",
+    "django-debug-toolbar==4.3.0",
+    "django-extensions==3.2.1",
+    "fabric==3.2.2",
+    "freezegun>=1.5.1",
+    "graphviz==0.20.1",
+    "ipykernel==6.20.1",
+    "ipython>=8.32.0",
+    "jupyter==1.0.0",
+    "jupytext==1.16.1",
+    "model-bakery==1.17.0",
+    "notebook==6.4.12",
+    "pre-commit==3.6.0",
+    "pylint>=3.3.4",
+    "pylint-django>=2.6.1",
+    "pytest==8.0.1",
+    "pytest-cov==4.1.0",
+    "pytest-django==4.8.0",
+    "pytest-icdiff==0.9",
+    "pytest-mock==3.12.0",
+    "pytest-subtests==0.11.0",
+    "pytest-sugar==1.0.0",
+    "pytest-xdist==3.5.0",
+    "python-dotenv>=1.0.1",
+    "pytz>=2025.1",
+    "requests-mock==1.12.1",
+    "responses==0.25.3",
+    "rich>=13.9.4",
+    "semgrep==1.61.1",
+    "sphinx-autodoc-annotation>=1.0.post1",
+    "sphinx-js>=4.0.0",
+    "sphinx-toolbox>=3.8.2",
+    "sphinxcontrib-django>=2.5",
+    "sphinxcontrib-django-urls>=0.3",
+]

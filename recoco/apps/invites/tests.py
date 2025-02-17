@@ -693,4 +693,33 @@ def test_logged_in_user_accepts_invite_but_is_already_advisor(
     assert user not in invite.project.members.all()
 
 
+# Managers
+@pytest.mark.django_db
+def test_manager_active_filter(request, project):
+    current_site = get_current_site(request)
+
+    pending_invite = baker.make(
+        models.Invite,
+        role="COLLABORATOR",
+        accepted_on=None,
+        site=current_site,
+        project=project,
+        email="a@new.one",
+    )
+
+    baker.make(
+        models.Invite,
+        role="COLLABORATOR",
+        accepted_on=timezone.now(),
+        site=current_site,
+        project=project,
+        email="a@new.one",
+    )
+
+    assert models.Invite.objects.count() == 2
+    assert models.Invite.objects.pending().count() == 1
+
+    assert models.Invite.objects.pending().first() == pending_invite
+
+
 # eof

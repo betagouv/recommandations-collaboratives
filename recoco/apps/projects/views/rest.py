@@ -348,8 +348,8 @@ def fetch_the_site_project_statuses_for_user(site, user):
     reattache the information to the appropriate object.
     """
     project_statuses = models.UserProjectStatus.objects.filter(
-        user=user, project__deleted=None
-    )
+        user=user, project__deleted=None, project__sites=site
+    ).exclude(project__project_sites__status__in=["DRAFT", "REJECTED"])
 
     # create missing user project status
     create_missing_user_project_statuses(site, user, project_statuses)
@@ -378,7 +378,9 @@ def create_missing_user_project_statuses(site, user, project_statuses):
         models.UserProjectStatus(user=user, site=site, project=p, status="NEW")
         for p in projects
     ]
-    models.UserProjectStatus.objects.bulk_create(new_statuses)
+    models.UserProjectStatus.objects.bulk_create(
+        new_statuses, ignore_conflicts=True
+    )  # XXX Might be a better way
 
 
 def update_user_project_status_with_their_project(site, user, project_statuses):

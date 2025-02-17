@@ -179,7 +179,7 @@
                     </div>
                 </form>
             </div>
-            <div class="col col-lg-5">
+            <div class="col col-lg-5" x-data="{ showMore: false }">
                 {% if question.why %}
                     <div id="section-why" class="fr-mb-6w">
                         <svg class="d-inline-block bi fr-mr-1v"
@@ -191,18 +191,16 @@
                         &nbsp;
                         <h5 class="d-inline-block">Pourquoi c'est important</h5>
                         <p class="text-secondary">
-                            <div id="excerpt-why d-iline">{{ question.why_rendered|safe|truncatechars_html:150 }}</div>
+                            <div x-show="!showMore">{{ question.why_rendered|safe|truncatechars_html:150 }}</div>
                             {% if question.why_rendered|safe|truncatechars_html:151|length > 150 %}
-                                <span id="more-why d-none">{{ question.why_rendered|safe }}</span>
-                                <a href="javascript:void(0);"
-                                   onclick="textFoldToggle('why')"
-                                   id="foldBtn-why">[Lire tout]</a>
+                                <span x-show="showMore">{{ question.why_rendered|safe }}</span>
+                                <button @click="showMore = true" x-show="!showMore">[Lire tout]</button>
                             {% endif %}
                         </p>
                     </div>
                 {% endif %}
                 {% if question.how %}
-                    <div id="section-how">
+                    <div id="section-how" x-data="{ showMore: false }">
                         <svg class="d-inline-block bi fr-mr-1v"
                              width="18"
                              height="18"
@@ -212,12 +210,10 @@
                         &nbsp;
                         <h5 class="d-inline-block">Où chercher l'information</h5>
                         <p class="text-secondary">
-                            <div id="excerpt-how">{{ question.how_rendered|safe|truncatechars_html:500 }}</div>
+                            <div x-show="!showMore">{{ question.how_rendered|safe|truncatechars_html:500 }}</div>
                             {% if question.how_rendered|safe|truncatechars_html:501|length > 500 %}
-                                <span id="more-how d-none">{{ question.how_rendered|safe }}</span>
-                                <a href="javascript:void(0);"
-                                   onclick="textFoldToggle('how')"
-                                   id="foldBtn-how">[Lire tout]</a>
+                                <span x-show="showMore">{{ question.how_rendered|safe }}</span>
+                                <button @click="showMore = true" x-show="!showMore">[Lire tout]</button>
                             {% endif %}
                         </p>
                     </div>

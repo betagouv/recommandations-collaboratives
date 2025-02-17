@@ -298,5 +298,15 @@
       "project_id": 27,
       "site_id": 1
     }
+  },
+  {
+    "pk": 31,
+    "model": "projects.projectsite",
+    "fields": {
+      "status": "TO_PROCESS",
+      "is_origin": true,
+      "project_id": 28,
+      "site_id": 1
+    }
   }
 ]
