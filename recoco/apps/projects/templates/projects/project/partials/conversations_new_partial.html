@@ -17,7 +17,7 @@
                          x-ref="scrollLine_{{ topic.grouper|default:"general"|slugify }}">
                         <div class="notification-limit__line"></div>
                         <p class="notification-limit__message-number fr-mx-2w">
-                            {{ new_message_count }} message{{ new_message_count|length|pluralize }} non lu{{ new_message_count|length|pluralize }}
+                            {{ new_message_count }} message{{ new_message_count|pluralize }} non lu{{ new_message_count|pluralize }}
                         </p>
                         <div class="notification-limit__line"></div>
                     </div>
