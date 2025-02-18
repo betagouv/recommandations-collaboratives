@@ -349,6 +349,7 @@ SOCIALACCOUNT_EMAIL_REQUIRED = True
 SOCIALACCOUNT_EMAIL_AUTHENTICATION = True
 SOCIALACCOUNT_EMAIL_AUTHENTICATION_AUTO_CONNECT = True
 
+
 SOCIALACCOUNT_FORMS = {
     "signup": "recoco.apps.social_account.forms.SignupForm",
 }
@@ -371,20 +372,6 @@ SOCIALACCOUNT_PROVIDERS = {
                     "token_auth_method": "client_secret_post",
                 },
             },
-        ],
-        # https://github.com/numerique-gouv/proconnect-documentation/blob/main/doc_fs/scope-claims.md
-        # https://github.com/numerique-gouv/proconnect-documentation/blob/main/doc_fs/connaitre-le-fi-utilise.md
-        "SCOPE": [
-            "openid",
-            "email",
-            "uid",
-            "given_name",
-            "usual_name",
-            "siren",
-            "siret",
-            "organizational_unit",
-            "phone_number",
-            "idp_id",
         ],
         "AUTH_PARAMS": {
             "acr_values": "eidas1",

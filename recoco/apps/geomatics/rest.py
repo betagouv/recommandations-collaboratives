@@ -11,7 +11,11 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets
 
 from . import models
-from .serializers import CommuneSerializer, DepartmentSerializer, RegionSerializer
+from .serializers import (
+    CommuneSerializer,
+    DepartmentSerializer,
+    RegionSerializer,
+)
 
 
 ########################################################################

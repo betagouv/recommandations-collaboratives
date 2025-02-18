@@ -6,7 +6,7 @@ Alpine.data('ActionPusher', () => {
   return {
     isBusy: true,
     isBusyExternalResource: false,
-    canLoadNewExternalResource: true,
+    canLoadNewExternalResource: false,
     search: '',
 
     db: new MiniSearch({
@@ -48,7 +48,6 @@ Alpine.data('ActionPusher', () => {
 
       return true;
     },
-
     truncate(input, size = 30) {
       return input.length > size ? `${input.substring(0, size)}...` : input;
     },

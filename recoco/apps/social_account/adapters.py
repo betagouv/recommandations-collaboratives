@@ -4,29 +4,13 @@ from allauth.socialaccount.models import SocialToken
 from allauth.socialaccount.providers.openid_connect.views import (
     OpenIDConnectOAuth2Adapter,
 )
+from django.contrib.auth.models import User
 from django.utils.crypto import get_random_string
 
 
 class SocialAccountAdapter(DefaultSocialAccountAdapter):
     def generate_state_param(self, state: dict) -> str:
         return get_random_string(32)
-
-    def populate_user(self, request, sociallogin, data):
-        """
-        Hook that can be used to further populate the user instance.
-        """
-        user = super().populate_user(request, sociallogin, data)
-
-        # TODO: compléter les informations de l'utilisateur si possible
-        # https://github.com/numerique-gouv/proconnect-documentation/blob/main/doc_fs/donnees_fournies.md
-        # user.organization = ...
-        # user.organization_position = ...
-        # user.siret = ...
-
-        if "phone_number" in data:
-            user.phone_no = data.get("phone_number")
-
-        return user
 
     def pre_social_login(self, request, sociallogin) -> None:
         """
@@ -37,16 +21,23 @@ class SocialAccountAdapter(DefaultSocialAccountAdapter):
         You can use this hook to intervene, e.g. abort the login by
         raising an ImmediateHttpResponse
         """
-        return super().pre_social_login(request, sociallogin)
 
-    def is_open_for_signup(self, request, sociallogin) -> bool:
-        """
-        Checks whether or not the site is open for signups.
+        user = sociallogin.user
+        if user.id:
+            return
 
-        Next to simply returning True/False you can also intervene the
-        regular flow by raising an ImmediateHttpResponse
-        """
-        return super().is_open_for_signup(request, sociallogin)
+        try:
+            user = User.objects.get(email=user.email)
+            sociallogin.connect(request, user)
+        except User.DoesNotExist:
+            pass
+
+    def get_signup_form_initial_data(self, sociallogin):
+        return super().get_signup_form_initial_data(sociallogin) | {
+            "phone_no": sociallogin.account.extra_data.get("phone_number", ""),
+            # TODO: add siret to signup form
+            # "siret": sociallogin.account.extra_data.get("siret", ""),
+        }
 
 
 class CustomOpenIDConnectOAuth2Adapter(OpenIDConnectOAuth2Adapter):

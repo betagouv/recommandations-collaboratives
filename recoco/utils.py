@@ -15,7 +15,6 @@ from urllib.parse import urldefrag, urljoin
 
 from django.contrib.auth import models as auth
 from django.contrib.contenttypes.fields import GenericRelation
-from django.contrib.postgres.search import SearchVector
 from django.contrib.sites.models import Site
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.db import migrations

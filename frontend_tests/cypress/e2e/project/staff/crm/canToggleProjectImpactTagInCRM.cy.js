@@ -1,6 +1,6 @@
 describe('I can go to CRM and toggle project impact tag', () => {
   beforeEach(() => {
-    cy.login('staff');
+    cy.login('staff'); // TODO replace by staffOnSite and check behaviour
     cy.visit('/crm/project');
     cy.contains('Friche numéro 1').click();
   });

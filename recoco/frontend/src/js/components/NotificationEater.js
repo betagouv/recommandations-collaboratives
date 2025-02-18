@@ -21,37 +21,50 @@ Alpine.data('NotificationEater', (projectId) => {
       );
       const observedElements = document.querySelectorAll('.observed-element');
       observedElements.forEach((el) => observer.observe(el));
-      this.hideScrollLine();
-      this.scrollToFirstNotification();
+      setTimeout(() => {
+        this.hideScrollLine();
+        this.scrollToFirstNotification();
+        console.log('scroll init');
+      }, 500);
     },
-    scrollToFirstNotification(topic = 'general') {
-      if (topic.detail) topic = topic.detail;
+    scrollToFirstNotification(topic) {
+      if (topic?.detail) topic = topic.detail;
       this.hideScrollLine(topic);
-      const scrollLineNewNotification = document.querySelectorAll(
+      let scrollLineNewNotification = document.querySelectorAll(
         `[x-ref="scrollLine_${topic}"]`
       );
-      setTimeout(() => {
-        if (scrollLineNewNotification.length > 0) {
-          window.scroll({
-            top: scrollLineNewNotification[0].offsetTop - 260,
-            behavior: 'smooth',
-          });
-        } else {
-          window.scroll({
-            top: this.$refs[`scrollLineLastMessage_${topic}`].offsetTop,
-            behavior: 'smooth',
-          });
-        }
-      }, 100);
+
+      if (scrollLineNewNotification.length == 0) {
+        scrollLineNewNotification = document.querySelectorAll(
+          `[x-ref^="scrollLine_"]`
+        );
+      }
+
+      if (scrollLineNewNotification.length > 0) {
+        window.scroll({
+          top: scrollLineNewNotification[0].offsetTop - 260,
+          behavior: 'instant',
+        });
+      } else {
+        console.log('scrollLineNewNotification not found');
+
+        window.scroll({
+          top: document.body.scrollHeight,
+          behavior: 'instant',
+        });
+      }
     },
     hideScrollLine(topic) {
-      const scrollLineNewNotification = document.querySelectorAll(
+      let scrollLineNewNotification = document.querySelectorAll(
         `[x-ref="scrollLine_${topic}"]`
       );
-      scrollLineNewNotification.forEach((el, i) => {
-        if (i == 0) return;
-        el.classList.add('d-none');
-      });
+      if (scrollLineNewNotification.length == 0) {
+        scrollLineNewNotification = document.querySelectorAll(
+          `[x-ref^="scrollLine_"]`
+        );
+      }
+      if (scrollLineNewNotification.length == 0) return;
+      scrollLineNewNotification[0].classList.remove('d-none');
     },
     consumeNotifiction(notificationId) {
       api.patch(notificationsMarkAsReadByIdUrl(notificationId));

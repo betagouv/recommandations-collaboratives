@@ -22,18 +22,18 @@ Alpine.data('TaskStatusSwitcherConversations', function (projectId, task) {
     async handleStatusClick(status) {
       this.task.isLoading = true;
 
-      if (status === STATUSES.DONE || isArchivedStatus(status)) {
-        this.$dispatch('open-feedback-modal', { task: task, status: status });
-      } else {
-        if (status === task.status) return;
+      if (status === task.status) return;
+      try {
         await api.post(followupsUrl(this.projectId, task.id), {
           status,
           comment: '',
         });
+        this.task.status = status;
+      } catch (error) {
+        throw new Error('Failed to update task status');
       }
 
-      await this.$store.tasksView.updateViewWithTask(task.id);
-      task.isLoading = false;
+      this.task.isLoading = false;
     },
   };
 });
