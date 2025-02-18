@@ -106,6 +106,7 @@ INSTALLED_APPS = [
     "django_celery_results",
     "django_json_widget",
     "waffle",
+    "django_htmx",
 ]
 
 SITE_ID = SiteID(default=1)
@@ -131,6 +132,7 @@ MIDDLEWARE = [
     "hijack.middleware.HijackUserMiddleware",
     "wagtail.contrib.redirects.middleware.RedirectMiddleware",
     "waffle.middleware.WaffleMiddleware",
+    "django_htmx.middleware.HtmxMiddleware",
 ]
 
 
