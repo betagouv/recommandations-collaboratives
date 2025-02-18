@@ -584,10 +584,6 @@ def user_notifications(request, user_id):
 
     crm_user = get_object_or_404(User, pk=user_id, profile__sites=request.site)
 
-    if request.site not in crm_user.profile.sites.all():
-        # only for user of current site
-        raise Http404
-
     search_form = forms.CRMSearchForm()
 
     notifications = notifications_models.Notification.on_site.filter(
@@ -606,11 +602,6 @@ def user_reminders(request, user_id):
         pk=user_id,
         profile__sites=request.site,
     )
-
-    # FIXME: can't we remove this one?..
-    # if request.site not in crm_user.profile.sites.all():
-    #     # only for user of current site
-    #     raise Http404
 
     search_form = forms.CRMSearchForm()
 
@@ -652,9 +643,6 @@ def user_reminder_details(request, user_id, reminder_pk):
     has_perm_or_403(request.user, "use_crm", request.site)
 
     crm_user = get_object_or_404(User, pk=user_id, profile__sites=request.site)
-    if request.site not in crm_user.profile.sites.all():
-        # only for user of current site
-        raise Http404
 
     reminder = get_object_or_404(
         reminders_models.Reminder, pk=reminder_pk, site=request.site, sent_to=crm_user
