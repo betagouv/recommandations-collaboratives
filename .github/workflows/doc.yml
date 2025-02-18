@@ -46,10 +46,10 @@ jobs:
           uv sync --no-dev
           uv sync --only-dev
 
-      - uses: borales/actions-yarn@v3.0.0
+      - uses: borales/actions-yarn@v5.0.0
 
       - id: install_jsdoc
-        run: sudo yarn add jsdoc
+        run: yarn add jsdoc
 
       - id: deployment
         uses: sphinx-notes/pages@v3
