@@ -134,6 +134,7 @@ def test_contact_search_filter(
         id=777,
         first_name="Qui-Gon",
         last_name="Jinn",
+        email="quiqui@coruscant.com",
         organization=jedi_organization,
         division="Maître jedi",
         site=current_site,
@@ -143,6 +144,7 @@ def test_contact_search_filter(
         id=888,
         first_name="Obiwan",
         last_name="Kenobi",
+        email="obi@tatooine.com",
         organization=jedi_organization,
         division="Maître",
         site=current_site,
@@ -165,3 +167,47 @@ def test_contact_search_filter(
     assert [
         contact["id"] for contact in response.data["results"]
     ] == expected_result, f"failure for search terms: {search_terms}"
+
+
+@pytest.mark.parametrize(
+    "filter_value,expected_result",
+    [
+        ("E", ["vador"]),
+        ("e", ["vador"]),
+        ("C", ["obiwan"]),
+        ("conseil", ["obiwan"]),
+        ("Z", []),
+    ],
+)
+@pytest.mark.django_db
+def test_organization_group_filter(
+    api_client, staff_user, current_site, filter_value, expected_result
+):
+    jedi_organization = baker.make(
+        Organization, name="Conseil des Jedi", sites=[current_site]
+    )
+    baker.make(
+        Contact,
+        first_name="obiwan",
+        organization=jedi_organization,
+        site=current_site,
+    )
+
+    sith_organization = baker.make(
+        Organization, name="Empire Sith", sites=[current_site]
+    )
+    baker.make(
+        Contact,
+        first_name="vador",
+        organization=sith_organization,
+        site=current_site,
+    )
+
+    api_client.force_authenticate(staff_user)
+    response = api_client.get(
+        f"{reverse('api-addressbook-contact-list')}?orga-startswith={filter_value}"
+    )
+    assert response.status_code == 200
+    assert [
+        contact["first_name"] for contact in response.data["results"]
+    ] == expected_result, f"failure for filter value: {filter_value}"
