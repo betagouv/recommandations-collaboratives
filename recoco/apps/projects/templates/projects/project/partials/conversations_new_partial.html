@@ -11,6 +11,15 @@
         <div class="conversation-new__container-topic"
              data-type-element="feed-element-item"
              data-topic='{{ topic.grouper|default:"general"|slugify }}'>
+            <div class="welcome-message">
+                <span class="fr-icon-chat-2-line fr-icon--sm"
+                      aria-hidden="true"
+                      title="chat-2-line"></span>
+                <p>Ceci est le début de votre conversation dans le canal {{ topic.grouper|default:"Général" }}</p>
+                <span class="fr-icon-chat-2-line fr-icon--sm"
+                      aria-hidden="true"
+                      title="chat-2-line"></span>
+            </div>
             {% for element in topic.list %}
                 {% if element.notifications %}
                     <div class="notification-limit d-none"
@@ -40,6 +49,12 @@
                 {% endif %}
             {% endfor %}
         </div>
+        {% count_message_by_type topic.list "posting" "followup" as message_count %}
+        {% if message_count == 0 and topic.grouper == "" %}
+            <div class="feed-element-item fr-px-5v fr-mb-5v">
+                {% include "projects/project/fragments/conversations_new/message_type/empty_message_list.html" %}
+            </div>
+        {% endif %}
     {% endfor %}
 </div>
 {% if topic_list|length == 0 %}
