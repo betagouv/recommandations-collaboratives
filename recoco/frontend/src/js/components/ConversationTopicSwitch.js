@@ -35,6 +35,16 @@ Alpine.data('ConversationTopicSwitch', (currentTopic = 'general') => {
       topicSlug = this.lastTopic.slug,
       topicName = this.lastTopic.name
     ) {
+      window.history.pushState(
+        {
+          topicSlug: topicSlug,
+          topicName: topicName,
+        },
+        '',
+        `?topic-slug=${topicSlug}&topic-name=${topicName || 'Général'}`
+      );
+      // window.location = `?topic-slug=${topicSlug}&topic-name=${topicName}`;
+      // window.location.replace(`https://example.com/#${location.pathname}`);
       this.lastTopic = {
         slug: topicSlug,
         name: topicName,
