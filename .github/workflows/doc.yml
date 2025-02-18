@@ -49,7 +49,7 @@ jobs:
       - uses: borales/actions-yarn@v3.0.0
 
       - id: install_jsdoc
-        run: yarn add jsdoc
+        run: sudo yarn add jsdoc
 
       - id: deployment
         uses: sphinx-notes/pages@v3
