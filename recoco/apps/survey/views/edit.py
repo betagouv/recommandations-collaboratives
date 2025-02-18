@@ -160,7 +160,7 @@ def question_create(request, question_set_id=None):
     if request.method == "POST":
         form = forms.EditQuestionForm(request.POST)
         if form.is_valid():
-            question = form.save(commit=False)
+            question = form.save()
             question.question_set = question_set
             question.save()
             next_url = reverse(
