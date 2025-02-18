@@ -1,0 +1,47 @@
+.modal-create-organisation {
+    width: 450px;
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 4px;
+    border: 1px solid var(--light-border-default-grey, #e5e5e5);
+    background: #fff;
+    box-shadow: 4px 8px 6px 0px rgba(0, 0, 0, 0.2);
+
+    &__block {
+        border: 1px solid var(--light-border-default-grey, #e5e5e5);
+    }
+
+    &__label {
+        color: #3a3a3a;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    &__label-info {
+        font-size: 12px;
+        font-weight: 400;
+        margin-bottom: 0px;
+        color: var(--color-grey, #666666);
+    }
+
+    &__yes {
+        border-bottom: 1px solid var(--light-border-default-grey, #e5e5e5) !important;
+    }
+}
+.color-important {
+    color: var(--color-important, #ff0000);
+}
+
+.red-text {
+    color: var(--color-important, #ff0000);
+}
+
+.grey-text {
+    color: var(--color-grey, #666666);
+}
+
+.correct-p {
+    margin-bottom: 0px;
+}

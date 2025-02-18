@@ -6,7 +6,7 @@
           type="text/css" />
 {% endblock css %}
 <div>
-    <div style="position:relative;">
+    <div class="position-relative">
         <div class="fr-search-bar" id="header-search" role="search">
             <input class="fr-input"
                    :class="{'fr-input--error': verifOrga}"
@@ -21,7 +21,7 @@
         </div>
         <div class="fr-menu menu-modal-correct-fr-menu better-positionning-dropdown border-radius-4px">
             <div class="fr-menu__list specific-width-26rem border-radius-4px">
-                <div class="fr-menu__list specific-width-26rem overflow-auto specific-height border-radius-4px">
+                <div class="fr-menu__list specific-width-26rem overflow-auto specific-height border-radius-4px fr-mb-0">
                     <template x-if="userInput.length > 0 && showOrgasresults && !isAnOrgaSelected">
                         <template class="fr-menu__item" x-for="(group) in orgaSorted">
                             <div class="fr-menu__item__content"
@@ -44,16 +44,25 @@
                         </template>
                     </template>
                     <template class="fr-menu__item"
-                              x-if="userInput.length > 0 && !isAnOrgaSelected && !showOrgasresults && delayDisplay">
+                              x-if="userInput.length > 0 && !isAnOrgaSelected && !showOrgasresults">
                         <div>
                             <div class="fr-m-1w fr-p-3v specific-banner">
                                 <span class="text-style">Aucun résultat</span>
                             </div>
+                            <div class="btn-create-orga fr-p-1w cursor-pointer"
+                                 @click="openCreateOrganisationModal">
+                                <span class="fr-icon-add-line" aria-hidden="true"></span><span>Créer une nouvelle organisation</span>
+                            </div>
                         </div>
                     </template>
                 </div>
+                <template x-if="userInput.length > 0 && showOrgasresults && !isAnOrgaSelected">
+                    <div class="btn-create-orga fr-p-1w cursor-pointer"
+                         @click="openCreateOrganisationModal">
+                        <span class="fr-icon-add-line" aria-hidden="true"></span><span>Créer une nouvelle organisation</span>
+                    </div>
+                </template>
             </div>
         </div>
     </div>
-    <div></div>
 </div>

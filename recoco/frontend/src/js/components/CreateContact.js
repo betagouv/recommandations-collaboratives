@@ -26,6 +26,12 @@ function CreateContact() {
       this.modalSearchContact = document.querySelector('#search-contact-modal');
       this.modalSearchContact.classList.toggle('d-none');
     },
+    openCreateOrganisationModal() {
+      this.modalCreateOrganisation = document.querySelector('#create-organisation-modal');
+      this.modalCreateOrganisation.classList.toggle('d-none');
+      this.modalCreateContact = document.querySelector('#create-contact-modal');
+      this.modalCreateContact.classList.toggle('d-none');
+    },
     createContact() {
       if (this.$store.contact.orgaSelected) {
         this.contactOrganization = this.$store.contact.orgaSelected;

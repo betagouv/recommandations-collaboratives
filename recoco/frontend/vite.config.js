@@ -66,6 +66,7 @@ const config = {
         ),
         SearchContact: resolve('./src/js/components/SearchContact.js'),
         CreateContact: resolve('./src/js/components/CreateContact.js'),
+        CreateOrganisation: resolve('./src/js/components/CreateOrganisation.js'),
         SearchOrganisation: resolve('./src/js/components/SearchOrganisation.js'),
         projectQueue: resolve('./src/js/store/projectQueue.js'),
         showRole: resolve('./src/js/store/showRole.js'),

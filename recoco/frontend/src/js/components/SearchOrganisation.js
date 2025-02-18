@@ -8,7 +8,6 @@ function SearchOrganisation() {
     userInput: '',
     showOrgasresults: false,
     isAnOrgaSelected: false,
-
     init() {},
     onSearch() {
       this.isAnOrgaSelected = false;
