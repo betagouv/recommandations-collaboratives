@@ -132,8 +132,13 @@
     display: flex;
     flex-direction: column;
     width: var(--width-left-col);
+    &-partial {
+      display: flex;
+      flex-direction: column-reverse;
+      height: 100vh;
+    }
     &-feed {
-      min-height: calc(100vh - 274px); //555px
+      min-height: calc(100vh - 174px); //555px
       display: flex;
       flex-direction: column;
       justify-content: end;
