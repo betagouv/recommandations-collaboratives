@@ -35,7 +35,7 @@ Alpine.data('ConversationTopicSwitch', (currentTopic = 'general') => {
       topicSlug = this.lastTopic.slug,
       topicName = this.lastTopic.name
     ) {
-      window.history.pushState(
+      window.history.replaceState(
         {
           topicSlug: topicSlug,
           topicName: topicName,
