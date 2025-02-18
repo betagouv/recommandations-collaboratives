@@ -264,7 +264,7 @@ def test_question_delete_and_redirect(request, client):
     with login(client, groups=["example_com_admin"]):
         response = client.post(url)
 
-    question = models.Question.objects_deleted.get(id=question.id)
+    question = models.Question.objects_all.get(id=question.id)
     assert question.deleted
 
     new_url = reverse(
