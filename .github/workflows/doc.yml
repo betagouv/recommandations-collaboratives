@@ -1,0 +1,40 @@
+name: Deploy documentation to Pages
+
+# Runs on pushes targeting the default branch
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: ['main', 'develop']
+
+
+concurrency:
+  group: ${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  pages:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    permissions:
+      pages: write
+      id-token: write
+    steps:
+      - name: Install uv and python
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          cache-dependency-glob: "uv.lock"
+
+      - name: Install Dependencies
+        run: |
+          uv sync --no-dev
+          uv sync --only-dev
+
+      - id: install_jsdoc
+        run: sudo npm -g install jsdoc
+
+      - id: deployment
+        uses: sphinx-notes/pages@v3
