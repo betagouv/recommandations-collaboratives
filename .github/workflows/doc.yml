@@ -22,6 +22,19 @@ jobs:
       pages: write
       id-token: write
     steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4.1.5
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version-file: "pyproject.toml"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
       - name: Install uv and python
         uses: astral-sh/setup-uv@v5
         with:
@@ -33,8 +46,10 @@ jobs:
           uv sync --no-dev
           uv sync --only-dev
 
+      - uses: borales/actions-yarn@v3.0.0
+
       - id: install_jsdoc
-        run: sudo npm -g install jsdoc
+        run: yarn add jsdoc
 
       - id: deployment
         uses: sphinx-notes/pages@v3
