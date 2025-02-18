@@ -72,15 +72,22 @@ class VectorSearchFilter(BaseSearchFilter):
         search_vector = None
         for search_field in search_fields:
             if isinstance(search_field, tuple):
-                _vector = SearchVector(search_field[0], **search_field[1])
+                _vector = SearchVector(
+                    search_field[0],
+                    **{"config": "french_unaccent", **search_field[1]},
+                )
             else:
-                _vector = SearchVector(search_field, config="french")
+                _vector = SearchVector(
+                    search_field,
+                    config="french_unaccent",
+                )
+
             if search_vector is None:
                 search_vector = _vector
             else:
                 search_vector += _vector
 
-        search_query = SearchQuery(search_terms, config="french")
+        search_query = SearchQuery(search_terms, config="french_unaccent")
 
         return (
             queryset.annotate(rank=SearchRank(search_vector, search_query))

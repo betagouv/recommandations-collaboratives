@@ -104,19 +104,32 @@ def test_can_not_create_contact_with_wrong_organization(api_client, staff_user):
 
 
 @pytest.mark.parametrize(
-    "search_terms,expected_result",
+    "search_terms,expected_result,use_watson",
     [
-        ("skywalker", [999]),
-        ("jedi", [777, 888]),
-        ("coté obscure", [999]),
-        # On pourrait aller plus loin dans le tests ici,
-        # mais à voir avant si on passe par une recherche basée sur watson
+        ("skywalker", [999], False),
+        ("jedi", [777, 888], False),
+        ("coté obscure", [999], False),
+        ("cote", [999], False),
+        ("Maître", [777, 888], False),
+        ("maitre", [777, 888], False),
+        # watson search
+        # FIXME: watson search is case sensitive only
+        ("skywalker", [999], True),
+        ("jedi", [777, 888], True),
+        ("coté obscure", [999], True),
+        # ("cote", [999], True),
+        ("Maître", [777, 888], True),
+        # ("maitre", [777, 888], True),
     ],
 )
 @pytest.mark.django_db
-@override_switch("addressbook_contact_use_watson_search", active=False)
 def test_contact_search_filter(
-    api_client, staff_user, current_site, search_terms, expected_result
+    api_client,
+    staff_user,
+    current_site,
+    search_terms,
+    expected_result,
+    use_watson,
 ):
     jedi_organization = baker.make(
         Organization,
@@ -160,9 +173,12 @@ def test_contact_search_filter(
     )
 
     api_client.force_authenticate(staff_user)
-    response = api_client.get(
-        reverse("api-addressbook-contact-list"), {"search": search_terms}
-    )
+
+    with override_switch("addressbook_contact_use_watson_search", active=use_watson):
+        response = api_client.get(
+            reverse("api-addressbook-contact-list"), {"search": search_terms}
+        )
+
     assert response.status_code == 200
     assert [
         contact["id"] for contact in response.data["results"]
