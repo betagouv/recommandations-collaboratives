@@ -23,7 +23,8 @@ class TagsFilterbackend(DjangoFilterBackend):
 
 
 class BaseSearchFilter(SearchFilter):
-    # Adapted from https://medium.com/@dumanov/powerfull-and-simple-search-engine-in-django-rest-framework-cb24213f5ef5
+    # Adapted from
+    # https://medium.com/@dumanov/powerfull-and-simple-search-engine-in-django-rest-framework-cb24213f5ef5
 
     search_param = api_settings.SEARCH_PARAM
     template = "rest_framework/filters/search.html"
@@ -35,6 +36,7 @@ class BaseSearchFilter(SearchFilter):
         Search terms are set by a ?search=... query parameter,
         and may be comma and/or whitespace delimited.
         """
+
         params = request.query_params.get(self.search_param, "")
         params = params.replace("\x00", "")  # strip null characters
         params = params.replace(",", " ")
@@ -48,6 +50,7 @@ class BaseSearchFilter(SearchFilter):
         passed to this method. Sub-classes can override this method to
         dynamically change the search fields based on request content.
         """
+
         return getattr(view, "search_fields", None)
 
     def get_search_min_rank(self, view, request) -> float:
@@ -55,6 +58,8 @@ class BaseSearchFilter(SearchFilter):
 
 
 class VectorSearchFilter(BaseSearchFilter):
+    """Search filter that uses the Postgres full-text search vector to rank results."""
+
     def filter_queryset(self, request, queryset, view):
         search_terms = self.get_search_terms(request)
         search_fields = self.get_search_fields(view, request)
@@ -86,6 +91,8 @@ class VectorSearchFilter(BaseSearchFilter):
 
 
 class WatsonSearchFilter(BaseSearchFilter):
+    """Search filter that uses the Watson search engine to filter results."""
+
     def filter_queryset(self, request, queryset, view):
         search_terms = self.get_search_terms(request)
 

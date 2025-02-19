@@ -89,6 +89,7 @@ class CRMSiteDashboardView(LoginRequiredMixin, UserPassesTestMixin, TemplateView
                 | Q(actor_content_type=ctype)
             )
             .order_by("-timestamp")
+            # TODO: https://docs.djangoproject.com/en/5.1/ref/contrib/contenttypes/#genericprefetch
             .prefetch_related("actor", "action_object", "target")[:100]
         )
 
@@ -185,9 +186,11 @@ class SiteConfigurationUpdateView(LoginRequiredMixin, UserPassesTestMixin, Updat
 
 def get_queryset_for_site_organizations(site):
     """Return queryset of organizations from addressbook site or w/ user on site"""
-    return Organization.objects.filter(
-        Q(sites=site) | Q(registered_profiles__sites=site)
-    ).distinct()
+    return (
+        Organization.objects.filter(Q(sites=site) | Q(registered_profiles__sites=site))
+        .prefetch_related("departments")
+        .distinct()
+    )
 
 
 @login_required
@@ -656,7 +659,9 @@ def project_list(request):
     # filtered projects
     projects = filters.ProjectFilter(
         request.GET,
-        queryset=Project.all_on_site.order_by("name").prefetch_related("commune"),
+        queryset=Project.all_on_site.order_by("name")
+        .select_related("commune__department")
+        .prefetch_related("project_sites__site"),
     )
 
     # required by default on crm
@@ -958,6 +963,7 @@ def crm_list_recommendation_without_resources(request):
     recommendations = (
         Task.on_site.filter(public=True, resource=None)
         .exclude(project__exclude_stats=True)
+        .select_related("project__commune", "created_by")
         .order_by("-created_on", "project")
     )
 
@@ -973,7 +979,13 @@ def make_low_reach_project_query(request):
             project_sites__site=request.site,
         )
         .exclude(exclude_stats=True)
-        .prefetch_related("tasks", "notes", "switchtenders")
+        .prefetch_related(
+            "tasks",
+            "notes",
+            "switchtenders__profile__organization",
+            "crm_annotations__tags",
+        )
+        .select_related("commune")
         .annotate(
             reco_total=Count(
                 "tasks",
@@ -1126,7 +1138,7 @@ def compute_topics_occurences(site):
             (topic.name, list(topic.projects.all()))
             for topic in (
                 Topic.objects.filter(projects__sites=site, projects__deleted=None)
-                .prefetch_related("projects")
+                .prefetch_related("projects__commune")
                 .distinct()
             )
         ),
@@ -1138,8 +1150,7 @@ def compute_topics_occurences(site):
             (topic.name, list(topic.tasks.all()))
             for topic in (
                 Topic.objects.filter(tasks__site=site, tasks__deleted=None)
-                .prefetch_related("tasks")
-                .prefetch_related("tasks__project")
+                .prefetch_related("tasks__project__commune")
                 .distinct()
             )
         ),
@@ -1336,6 +1347,7 @@ def project_site_handover(request, project_id):
                 is_origin=False,
                 status="DRAFT",
             )
+
             onboarding_utils.notify_new_project(
                 site=site, project=project, owner=project.owner
             )

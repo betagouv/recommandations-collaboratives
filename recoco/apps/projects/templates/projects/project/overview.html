@@ -11,7 +11,6 @@
     {% vite_asset 'js/apps/projectDetails.js' %}
     {% vite_asset 'js/apps/projectShare.js' %}
     {% vite_asset 'js/apps/tutorial.js' %}
-    {% vite_asset 'js/components/MarkDiagAsDone.js' %}
 {% endblock js %}
 {% block css %}
     <link href="{% sass_src 'projects/css/overview.scss' %}"
@@ -88,18 +87,23 @@
                                                 </div>
                                                 <div class="col-12 col-lg-6 h-100 responsive-wrapper">
                                                     {% if is_staff %}
-                                                        <div x-data="MarkDiagAsDone({{ project.id }}, '{{ project.is_diagnostic_done }}' == 'True')">
+                                                        <div x-data="{displayDiagnosticButton: '{{ project.is_diagnostic_done }}' == 'False', }"
                                                             <header>
                                                                 <h6 class="font-small text-uppercase fr-mb-1v">Diagnostic</h6>
                                                             </header>
-                                                            <template x-if="displayDiagButton">
+                                                            <template x-if="displayDiagnosticButton">
                                                                 <button class="fr-btn fr-btn--sm fr-btn--secondary fr-mt-2w fr-py-2w fr-mb-2w text-uppercase w-100 justify-content-center"
-                                                                        @click='handleClickMarkDiagAsDone'
-                                                                        data-cy="button-diag-project-done">
+                                                                        data-cy="button-diag-project-done"
+                                                                        hx-patch="{% url 'projects-detail' project.id %}"
+                                                                        hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+                                                                        hx-vals='js:{is_diagnostic_done: true}'
+                                                                        hx-swap="none"
+                                                                        hx-ext="submitjson"
+                                                                        @htmx:after-request=" if (event.detail.xhr.status === 200) { displayDiagnosticButton = false; }">
                                                                     <span class="fr-icon-double-check-line" aria-hidden="true"></span> Marquer l’appel de “diagnostic” comme fait
                                                                 </button>
                                                             </template>
-                                                            <template x-if="!displayDiagButton">
+                                                            <template x-if="!displayDiagnosticButton">
                                                                 <p class="fw-700 fr-my-1w" data-cy="diag-project-done">
                                                                     <span class="fr-icon-double-check-line" aria-hidden="true"></span> Appel de "diagnostic" effectué
                                                                 </p>
@@ -183,6 +187,7 @@
                                             <h6 class="text-uppercase fw-bold d-block fr-mb-2w h6-specific-fontsize-14">Référent porteur de projet</h6>
                                             {% include "projects/project/fragments/project_owner.html" with project=project %}
                                             {% include "projects/project/fragments/owner/owner-details.html" with project=project %}
+                                            {% include "projects/project/fragments/owner/invite-not-accepted-banner.html" with invites=project.invites.pending %}
                                         </div>
                                     </div>
                                     <!-- User lists -->

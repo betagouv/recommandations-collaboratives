@@ -9,7 +9,6 @@ created : 2021-06-01 09:54:36 CEST
 
 import json
 import os
-from distutils.core import run_setup
 
 import requests
 from dotenv import load_dotenv
@@ -20,7 +19,7 @@ import recoco
 
 load_dotenv()
 
-PACKAGE = f"recoco-{recoco.VERSION}.tar.gz"
+PACKAGE = f"recoco-{recoco.__version__}.tar.gz"
 
 # TODO make target folder being
 # - prod if branch == main,
@@ -62,8 +61,8 @@ def deploy(cnx, site=None):
         return
 
     local("cd recoco/frontend && yarn build")
+    local("uv build")
 
-    run_setup("setup.py", script_args=["sdist"])
     cnx.put(
         f"./dist/{PACKAGE}",
         remote=f"./recoco-{site}/dist/{PACKAGE}",
