@@ -24,7 +24,6 @@ Alpine.data('NotificationEater', (projectId) => {
       setTimeout(() => {
         this.hideScrollLine();
         this.scrollToFirstNotification();
-        console.log('scroll init');
       }, 500);
     },
     scrollToFirstNotification(topic) {
@@ -46,8 +45,6 @@ Alpine.data('NotificationEater', (projectId) => {
           behavior: 'instant',
         });
       } else {
-        console.log('scrollLineNewNotification not found');
-
         window.scroll({
           top: document.body.scrollHeight,
           behavior: 'instant',

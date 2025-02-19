@@ -23,7 +23,7 @@
     {% comment %} TODO: build topic_list in django view {% endcomment %}
     {% regroup feed by topic as topic_list %}
     <div class="conversation-new d-flex"
-         x-data="ConversationTopicSwitch()"
+         x-data="ConversationTopicSwitch({{ project.pk }})"
          hx-history="false">
         <div class="conversation-new__topics">
             <div class="justify-content-between">

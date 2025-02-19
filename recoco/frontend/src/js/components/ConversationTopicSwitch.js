@@ -1,9 +1,10 @@
 import Alpine from 'alpinejs';
 import { stringToColor } from '../utils/utils';
 
-Alpine.data('ConversationTopicSwitch', (currentTopic = 'general') => {
+Alpine.data('ConversationTopicSwitch', (projectId) => {
   return {
-    topicSelector: currentTopic,
+    topicSelector: 'general',
+    historicSaveName: `conv-new-${projectId}`,
     valueTopicFormMessageSend: '',
     lastTopic: {
       slug: '',
@@ -11,23 +12,34 @@ Alpine.data('ConversationTopicSwitch', (currentTopic = 'general') => {
     },
     stringToColor,
     init() {
-      const params = new URLSearchParams(document.location.search);
-      const topicSlug = params.get('topic-slug');
-      const topicName = params.get('topic-name');
+      // Get the saved topic from local storage
+      const { topicSlug: savedTopicSlug, topicName: savedTopicName } =
+        JSON.parse(localStorage.getItem(this.historicSaveName)) || {
+          savedTopicSlug: null,
+          savedTopicName: null,
+        };
+      if (savedTopicSlug && savedTopicName) {
+        // Select the saved topic
+        this.setActiveTopic(savedTopicSlug, savedTopicName);
+      } else {
+        // Get the topic from the URL
+        const params = new URLSearchParams(document.location.search);
+        const topicSlug = params.get('topic-slug');
+        const topicName = params.get('topic-name');
 
-      if (topicSlug && topicName) {
-        this.topicSelector = topicSlug;
-        this.setActiveTopic(topicSlug, topicName);
-        return;
+        if (topicSlug && topicName) {
+          this.setActiveTopic(topicSlug, topicName);
+        } else {
+          const firstTopic = document.querySelector('[name="topic-selector"]');
+          this.setActiveTopic(
+            firstTopic.value,
+            firstTopic.getAttribute('data-topic-name')
+          );
+          this.topicSelector = firstTopic.value;
+        }
       }
-      const firstTopic = document.querySelector('[name="topic-selector"]');
-      this.setActiveTopic(
-        firstTopic.value,
-        firstTopic.getAttribute('data-topic-name')
-      );
-      this.topicSelector = firstTopic.value;
       document.addEventListener('htmx:afterSwap', () => {
-        this.setActiveTopic();
+        this.showActiveTopicFeed();
         const inputMessage = document.querySelector('.tiptap.ProseMirror');
         if (!inputMessage) return;
         inputMessage.innerText = '';
@@ -37,6 +49,17 @@ Alpine.data('ConversationTopicSwitch', (currentTopic = 'general') => {
       topicSlug = this.lastTopic.slug,
       topicName = this.lastTopic.name
     ) {
+      this.topicSelector = topicSlug;
+      this.showActiveTopicFeed(topicSlug, topicName);
+    },
+    showActiveTopicFeed(
+      topicSlug = this.lastTopic.slug,
+      topicName = this.lastTopic.name
+    ) {
+      localStorage.setItem(
+        this.historicSaveName,
+        JSON.stringify({ topicSlug, topicName })
+      );
       window.history.pushState(
         {
           topicSlug: topicSlug,
