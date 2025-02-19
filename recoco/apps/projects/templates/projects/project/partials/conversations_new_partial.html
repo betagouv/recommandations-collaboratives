@@ -1,7 +1,6 @@
 {% load projects_extra %}
 <div class="conversation-new__container-feed fr-p-5v flex-grow-1"
-     id="conversation-new-container"
-     hx-boost="true">
+     id="conversation-new-container">
     {% if not topic_list %}
         {% regroup feed by topic as topic_list %}
     {% endif %}

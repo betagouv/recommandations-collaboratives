@@ -26,16 +26,22 @@ Alpine.data('ConversationTopicSwitch', (currentTopic = 'general') => {
         firstTopic.getAttribute('data-topic-name')
       );
       this.topicSelector = firstTopic.value;
+      document.addEventListener('htmx:load', () => {
+        console.log('htmx:load');
+      });
       document.addEventListener('htmx:afterSwap', () => {
+        console.log('htmx:afterSwap');
         this.setActiveTopic();
-        document.querySelector('.tiptap.ProseMirror').innerText = '';
+        const inputMessage = document.querySelector('.tiptap.ProseMirror');
+        if (!inputMessage) return;
+        inputMessage.innerText = '';
       });
     },
     setActiveTopic(
       topicSlug = this.lastTopic.slug,
       topicName = this.lastTopic.name
     ) {
-      window.history.replaceState(
+      window.history.pushState(
         {
           topicSlug: topicSlug,
           topicName: topicName,
@@ -45,6 +51,7 @@ Alpine.data('ConversationTopicSwitch', (currentTopic = 'general') => {
       );
       // window.location = `?topic-slug=${topicSlug}&topic-name=${topicName}`;
       // window.location.replace(`https://example.com/#${location.pathname}`);
+      debugger;
       this.lastTopic = {
         slug: topicSlug,
         name: topicName,
@@ -62,7 +69,7 @@ Alpine.data('ConversationTopicSwitch', (currentTopic = 'general') => {
         }
         element.classList.add('d-none');
       });
-      this.valueTopicFormMessageSend = topicName;
+      this.valueTopicFormMessageSend = topicName == 'Général' ? '' : topicName;
       this.$dispatch('topic-switched', topicSlug); // trigger method scrollToFirstNotification
     },
   };
