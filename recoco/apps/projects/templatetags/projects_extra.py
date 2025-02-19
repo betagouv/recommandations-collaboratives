@@ -98,9 +98,9 @@ def count_has_notifications(feed_items):
 
 
 @register.simple_tag
-def count_message_by_type(feed_items, type_label):
+def count_message_by_type(feed_items, *args):
     """Count message by type in feed"""
-    return len([item for item in feed_items if item.get("type") == type_label])
+    return len([item for item in feed_items if item.get("type") in args])
 
 
 # eof

@@ -9,10 +9,12 @@
                 {% include "projects/project/fragments/files_links/file_list_item_embedded.html" with document=document %}
             {% endfor %}
         {% endif %}
-        <div class="resource-link fr-mt-1w fr-mb-2w">
-            <span class="fr-icon-newspaper-line fr-icon--sm fr-mr-1v"
-                  aria-hidden="true"></span><a href="{{ element.object.resource.get_absolute_url }}">Lien vers la ressource</a>
-        </div>
+        {% if element.object.resource %}
+            <div class="resource-link fr-mt-1w fr-mb-2w">
+                <span class="fr-icon-newspaper-line fr-icon--sm fr-mr-1v"
+                      aria-hidden="true"></span><a href="{{ element.object.resource.get_absolute_url }}" target="_blank">Lien vers la ressource</a>
+            </div>
+        {% endif %}
         {% include "projects/project/fragments/conversations_new/tasks_status_buttons.html" with task=element.object %}
     </div>
     {% if element.object.created_by %}
@@ -22,7 +24,7 @@
                 <span class="align-middle small text-dark fr-ml-2v">
                     -
                     <a class="fr-btn fr-btn--sm fr-btn--tertiary-no-outline fr-ml-1v"
-                       href="{% url 'projects-update-note' element.object.pk %}">éditer</a>
+                       href="{% url 'projects-update-task' element.object.pk %}?next={{ request.get_full_path }}">éditer</a>
                 </span>
             {% endif %}
         </div>
