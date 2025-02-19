@@ -26,11 +26,7 @@ Alpine.data('ConversationTopicSwitch', (currentTopic = 'general') => {
         firstTopic.getAttribute('data-topic-name')
       );
       this.topicSelector = firstTopic.value;
-      document.addEventListener('htmx:load', () => {
-        console.log('htmx:load');
-      });
       document.addEventListener('htmx:afterSwap', () => {
-        console.log('htmx:afterSwap');
         this.setActiveTopic();
         const inputMessage = document.querySelector('.tiptap.ProseMirror');
         if (!inputMessage) return;
@@ -49,9 +45,6 @@ Alpine.data('ConversationTopicSwitch', (currentTopic = 'general') => {
         '',
         `?topic-slug=${topicSlug}&topic-name=${topicName || 'Général'}`
       );
-      // window.location = `?topic-slug=${topicSlug}&topic-name=${topicName}`;
-      // window.location.replace(`https://example.com/#${location.pathname}`);
-      debugger;
       this.lastTopic = {
         slug: topicSlug,
         name: topicName,
