@@ -28,6 +28,7 @@
       }
     }
     &-list-member {
+      box-shadow: 0px -4px 4px 0px #0000001a;
       border-top: 1px solid var(--light-border-default-grey, #e5e5e5);
       position: sticky;
       max-height: 30vh;
