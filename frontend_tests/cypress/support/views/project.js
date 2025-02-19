@@ -213,7 +213,7 @@ class Project {
     } else if (role === 'staff') {
       cy.get(this.dom.MESSAGE_NO_REMINDER).should('exist');
     } else if (role === 'advisor') {
-      cy.get(this.dom.MESSAGE_NO_REMINDER).should('not.exist');
+      cy.get(this.dom.MESSAGE_NO_REMINDER).should('exist');
     }
   }
 
