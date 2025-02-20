@@ -50,15 +50,21 @@
                             <button class="fr-btn" title="Rechercher" @click="onSearch">Rechercher</button>
                         </div>
                         <div class="fr-menu menu-modal-correct-fr-menu position-relative border-radius-4px">
-                            <div class="fr-menu__list specific-width-26rem border-radius-4px">
+                            <div class="fr-menu__list specific-width-26rem position-absolute border-radius-4px">
                                 <div class="fr-menu__list specific-width-26rem overflow-auto specific-height border-radius-4px fr-mb-0">
                                     <template x-if="userInput.length > 0 && showOrgaGroupsresults && !isAnOrgaGroupSelected">
-                                        <template class="fr-menu__item" x-for="group in orgaGroupsFound">
-                                            <div class="fr-pt-1w fr-px-1w add-borders cursor-pointer"
-                                                 @click="onSelectOrga(orga)">
-                                                <span x-text="group.name"></span>
+                                        <div>
+                                            <template class="fr-menu__item" x-for="group in orgaGroupsFound">
+                                                <div class="fr-pt-1w fr-px-1w add-borders cursor-pointer"
+                                                     @click="onSelectGroup(group)">
+                                                    <span x-text="group.name"></span>
+                                                </div>
+                                            </template>
+                                            <div class="btn-create-orga fr-p-1w cursor-pointer"
+                                                 @click="createOrganisationGroup">
+                                                <span class="fr-icon-add-line" aria-hidden="true"></span><span>Créer une nouvelle structure nationale : "</span> <span x-text="userInput"></span><span>"</span>
                                             </div>
-                                        </template>
+                                        </div>
                                     </template>
                                     <template class="fr-menu__item"
                                               x-if="userInput.length > 0 && !isAnOrgaGroupSelected && !showOrgaGroupsresults">
@@ -66,9 +72,10 @@
                                             <div class="fr-m-1w fr-p-3v specific-banner">
                                                 <span class="text-style">Aucun résultat</span>
                                             </div>
-                                            {% comment %} <div class="btn-create-orga fr-p-1w cursor-pointer" @click="openCreateOrganisationModal">
-                                                <span class="fr-icon-add-line" aria-hidden="true"></span><span>Créer une nouvelle organisation</span>
-                                            </div> {% endcomment %}
+                                            <div class="btn-create-orga fr-p-1w cursor-pointer"
+                                                 @click="createOrganisationGroup">
+                                                <span class="fr-icon-add-line" aria-hidden="true"></span><span>Créer une nouvelle structure nationale : "</span> <span x-text="userInput"></span><span>"</span>
+                                            </div>
                                         </div>
                                     </template>
                                 </div>
@@ -95,8 +102,20 @@
     </div>
     <div class="fr-p-3v modal-create-organisation__block">
         <span class="modal-create-organisation__label">Départements</span>
-        <select class="fr-select" x-model="organisationGroup" required>
-            <option value="" disabled selected>Choisir un groupe national</option>
+        <select class="fr-select" multiple required>
+            {% comment %} x-model="organisationDepartements" {% endcomment %}
+            {% comment %} <option value="" disabled selected>Choisir un ou des départements</option> {% endcomment %}
+            <template x-for="department in departments" :key="department.code">
+                {% comment %} <template x-if="department.selected"> {% endcomment %}
+                <option :value="department.code"
+                        x-text="'(' + department.code + ')' + ' ' + department.name"
+                        :selected="department.selected"
+                        @click="selectThisDepartment" />
+                {% comment %} </template> {% endcomment %}
+                {% comment %} <template x-if="!department.selected">
+                        <option :value="department.code" x-text="'(' + department.code + ')' + ' ' + department.name" />
+                </template> {% endcomment %}
+            </template>
         </select>
     </div>
     <div class="fr-p-3v modal-create-organisation__block d-flex">

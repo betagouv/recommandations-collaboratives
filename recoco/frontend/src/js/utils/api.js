@@ -89,9 +89,21 @@ export function sitesConfigUrl() {
 export function searchOrganizationsUrl(search) {
   return `/api/addressbook/organizations/?search=${search}`;
 }
+
+export function organizationsUrl() {
+  return `/api/addressbook/organizations/`;
+}
+
 // Organization Group
 export function searchOrganizationGroupsUrl(search) {
   return `/api/addressbook/organizationgroups/?search=${search}`;
+}
+export function organizationGroupsUrl() {
+  return `/api/addressbook/organizationgroups/`;
+}
+// department
+export function departmentsUrl() {
+  return `/api/departments/`;
 }
 // Contacts
 export function searchContactsUrl(search) {
