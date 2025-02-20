@@ -19,10 +19,12 @@
 {% endblock css %}
 {% block project_detail %}
     {{ project.pk|json_script:"djangoProjectId" }}
-    {% get_obj_perms request.user for project as "user_project_perms" %}
     {% include "projects/project/navigation.html" with conversations_new=True %}
+    {% comment %} TODO: build topic_list in django view {% endcomment %}
     {% regroup feed by topic as topic_list %}
-    <div class="conversation-new d-flex" x-data="ConversationTopicSwitch()">
+    <div class="conversation-new d-flex"
+         x-data="ConversationTopicSwitch({{ project.pk }})"
+         hx-history="false">
         <div class="conversation-new__topics">
             <div class="justify-content-between">
                 <div class="conversation-new__topics-header">
@@ -56,64 +58,20 @@
         </div>
         <div class="conversation-new__container"
              x-data="NotificationEater({{ project.id }})"
-             @topic-switched.window="scrollToFirstNotification">
-            <div class="fr-p-5v flex-grow-1 conversation-new__container-feed">
-                <!-- Message stream -->
-                {% if topic_list|length > 0 %}
-                    {% for topic in topic_list %}
-                        {% count_has_notifications topic.list as new_message_count %}
-                        <div class="conversation-new__container-topic"
-                             data-type-element="feed-element-item"
-                             data-topic='{{ topic.grouper|default:"general"|slugify }}'>
-                            {% for element in topic.list %}
-                                {% if element.notifications %}
-                                    <div class="notification-limit d-none"
-                                         x-ref="scrollLine_{{ topic.grouper|default:"general"|slugify }}">
-                                        <div class="notification-limit__line"></div>
-                                        <p class="notification-limit__message-number fr-mx-2w">
-                                            {{ new_message_count }} message{{ new_message_count|length|pluralize }} non lu{{ new_message_count|length|pluralize }}
-                                        </p>
-                                        <div class="notification-limit__line"></div>
-                                    </div>
-                                {% endif %}
-                                {% ifchanged element.timestamp|date %}
-                                    <p class="conversation-new__date">{{ element.timestamp|date }}</p>
-                                {% endifchanged %}
-                                {% if element.type == "activity" %}
-                                    <!-- Type Activity  -->
-                                    {% include "projects/project/fragments/conversations_new/message_type/type_activity_item.html" %}
-                                {% elif element.type == "reco" %}
-                                    <!-- Type Reco + message -->
-                                    {% include "projects/project/fragments/conversations_new/message_type/type_task_message_item.html" %}
-                                {% elif element.type == "followup" %}
-                                    <!-- Type followup -->
-                                    {% include "projects/project/fragments/conversations_new/message_type/type_followup_item.html" %}
-                                {% elif element.type == "posting" %}
-                                    <!-- Type message -->
-                                    {% include "projects/project/fragments/conversations_new/message_type/type_posting_item.html" %}
-                                {% endif %}
-                                {% if forloop.last %}
-                                    <div x-ref="scrollLineLastMessage_{{ topic.grouper|default:"general"|slugify }}"></div>
-                                {% endif %}
-                            {% endfor %}
-                        </div>
-                    {% endfor %}
-                {% else %}
-                    <div class="feed-element-item fr-px-5v fr-mb-5v">
-                        {% include "projects/project/fragments/conversations_new/message_type/empty_message_list.html" %}
-                        <div x-ref="scrollLineLastMessage_{{ topic.grouper|default:"general"|slugify }}"></div>
-                    </div>
-                {% endif %}
-            </div>
+             @topic-switched.window="scrollToFirstNotification($event.detail)">
+            {% get_obj_perms request.user for project as "user_project_perms" %}
+            {% include "projects/project/partials/conversations_new_partial.html" %}
             {% if "use_public_notes" in user_project_perms %}
                 <!-- Post message -->
                 <form class="form editor-form fr-px-5v"
-                      method="post"
-                      action="{% url 'projects-conversation-create-message' project.pk %}"
+                      hx-post="{% url 'projects-project-detail-conversations-new-partial' project.pk %}"
+                      hx-trigger="submit"
+                      hx-swap="outerHTML"
+                      hx-target="#conversation-new-container"
                       enctype="multipart/form-data"
                       id="conversation-form">
+                    {% csrf_token %}
                     <div class="message-form fr-mt-3w bg-light border-form editor-form__container fr-input-group">
-                        {% csrf_token %}
                         {% include "tools/editor_dsfr.html" with input_name=posting_form.content.name input_value=posting_form.content.value|default:'' errors=posting_form.content.errors input_required=True %}
                         {% comment %} {% include "projects/project/fragments/files_links/file_upload_input_standalone.html" %} {% endcomment %}
                         <!-- Action file -->

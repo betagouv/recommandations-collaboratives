@@ -1,7 +1,7 @@
 .navigation {
   --padding-navigation: 6px;
   --padding-y-navigation: 1rem 0;
-  border-bottom: solid 1px #ccc;
+  border-bottom: solid 1px var(--light-border-default-grey, #e5e5e5);
   &__menu-top-logo {
     padding: var(--padding-y-navigation);
   }
@@ -20,7 +20,7 @@
         --padding-x-item: 1rem;
         padding: var(--padding-y-item) var(--padding-x-item)
           var(--padding-y-item) 0;
-        border-right: 1px solid #ccc;
+        border-right: 1px solid var(--light-border-default-grey, #e5e5e5);
       }
       span {
         text-decoration: underline;
