@@ -1,3 +1,4 @@
+from rest_framework.filters import BaseFilterBackend
 from rest_framework.viewsets import ModelViewSet
 from waffle import switch_is_active
 
@@ -30,7 +31,9 @@ class OrganizationViewSet(ModelViewSet):
     search_min_rank = 0.05
 
     def get_queryset(self):
-        return Organization.on_site.all().prefetch_related("departments__region")
+        return Organization.on_site.with_contacts_only().prefetch_related(
+            "departments__region"
+        )
 
     def get_serializer_class(self):
         match self.action:
@@ -42,9 +45,18 @@ class OrganizationViewSet(ModelViewSet):
                 return serializers.OrganizationSerializer
 
 
+class OrgaStartswithFilterBackend(BaseFilterBackend):
+    def filter_queryset(self, request, queryset, view):
+        orga_sw = request.query_params.get("orga-startswith")
+        if not orga_sw:
+            return queryset
+        return queryset.filter(organization__name__istartswith=orga_sw)
+
+
 class ContactViewSet(ModelViewSet):
     permission_classes = [IsStaffForSiteOrISAuthenticatedReadOnly]
     pagination_class = StandardResultsSetPagination
+    filter_backends = [OrgaStartswithFilterBackend]
 
     search_fields = [
         (
@@ -53,6 +65,10 @@ class ContactViewSet(ModelViewSet):
         ),
         (
             "first_name",
+            {"config": "french", "weight": "A"},
+        ),
+        (
+            "email",
             {"config": "french", "weight": "A"},
         ),
         (

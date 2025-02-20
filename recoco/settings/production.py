@@ -11,7 +11,7 @@ import sentry_sdk
 from sentry_sdk.integrations.celery import CeleryIntegration
 from sentry_sdk.integrations.django import DjangoIntegration
 
-from recoco import VERSION
+from recoco import __version__ as VERSION
 
 DEBUG = False
 

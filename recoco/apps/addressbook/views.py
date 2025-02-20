@@ -1,6 +1,5 @@
 from django import forms
 from django.contrib.auth.decorators import login_required
-from django.db.models import Count
 from django.shortcuts import get_object_or_404, redirect, render, reverse
 
 from recoco.utils import has_perm_or_403
@@ -65,16 +64,22 @@ def organization_update(request, organization_id=None):
 @login_required
 def organization_list(request):
     """Return the Organization list"""
+
     has_perm_or_403(request.user, "use_addressbook", request.site)
 
     organizations = (
-        models.Organization.on_site.annotate(contact_count=Count("contacts"))
-        .filter(contact_count__gt=0)
+        models.Organization.on_site.with_contacts_only()
         .order_by("name")
         .prefetch_related("departments")
     )
 
-    return render(request, "addressbook/organization_list.html", locals())
+    return render(
+        request,
+        "addressbook/organization_list.html",
+        context={
+            "organizations": organizations,
+        },
+    )
 
 
 @login_required

@@ -38,9 +38,7 @@ class RegionViewSet(viewsets.ReadOnlyModelViewSet):
     """
 
     def get_queryset(self):
-        return (
-            models.Region.objects.all().order_by("name").prefetch_related("departments")
-        )
+        return models.Region.objects.prefetch_related("departments").order_by("name")
 
     serializer_class = RegionSerializer
 
@@ -51,7 +49,7 @@ class CommuneViewSet(viewsets.ReadOnlyModelViewSet):
     """
 
     def get_queryset(self):
-        return models.Commune.objects.all().order_by("name")
+        return models.Commune.objects.select_related("department").order_by("name")
 
     serializer_class = CommuneSerializer
     filter_backends = [DjangoFilterBackend]

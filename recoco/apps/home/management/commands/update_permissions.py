@@ -16,23 +16,21 @@ from recoco.apps.home.models import SITE_GROUP_PERMISSIONS
 from recoco.apps.projects.models import Project, ProjectSwitchtender
 from recoco.apps.projects.utils import (
     assign_advisor,
-    assign_collaborator,
+    assign_collaborator_permissions,
     assign_observer,
 )
 from recoco.utils import get_group_for_site
 
 
 def assign_user_permissions_by_projects():
-    """Per project permission for user"""
+    """Per project permission for user."""
     for project in Project.objects.all():
         print("Updating perms for project:", project.name)
         for site in project.sites.all():
             print("\t* Updating permissions for collaborators...")
             with settings.SITE_ID.override(site.id):
                 for membership in project.projectmember_set.all():
-                    assign_collaborator(
-                        membership.member, project, is_owner=membership.is_owner
-                    )
+                    assign_collaborator_permissions(membership.member, project)
 
                 print("\t* Updating permissions for advisors/observers...")
                 print(f"\t== On site {site} ==")
@@ -63,7 +61,7 @@ def assign_user_permissions_by_projects():
 
 
 def assign_group_permissions_by_sites():
-    """Per site permissions for Group"""
+    """Per site permissions for Group."""
     for site in Site.objects.all():
         print("site:", site)
         with settings.SITE_ID.override(site.id):

@@ -13,6 +13,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.managers import CurrentSiteManager
 from django.contrib.sites.models import Site
 from django.db import models
+from django.db.models import Count
 from django.db.models.functions import Lower
 from django.db.models.signals import post_migrate
 from django.dispatch import receiver
@@ -49,7 +50,14 @@ class OrganizationGroup(TimeStampedModel):
         return self.name
 
 
-class OrganizationManager(models.Manager):
+class OrganizationQuerySet(models.QuerySet):
+    def with_contacts_only(self):
+        return self.annotate(contact_count=Count("contacts")).filter(
+            contact_count__gt=0
+        )
+
+
+class OrganizationManager(models.Manager.from_queryset(OrganizationQuerySet)):
     def get_queryset(self):
         return super().get_queryset().order_by(Lower("name"))
 
