@@ -25,9 +25,6 @@
                 <a href="{% url 'projects-project-list' %}"
                    class="fr-link {% if url_name == 'projects-project-list-advisor' or url_name == 'projects-project-list-staff' or url_name == 'projects-project-list-map' %}active{% endif %}">
                     <span class="fr-ml-1v align-middle no-wrap">Tous les projets</span></a>
-                {% if unread_notifications_count %}
-                    <span class="badge text-bg-danger no-underline">{{ unread_notifications_count }}</span>
-                {% endif %}
             </li>
         {% endif %}
         <!-- Projects -->

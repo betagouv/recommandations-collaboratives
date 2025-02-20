@@ -55,12 +55,15 @@ export default function PreviewModal() {
       );
     },
     async onSubmitComment(content) {
+      const contactAdded = this.$store.previewModal.contact;
+      this.$store.previewModal.contact = null;
       this.$store.editor.setIsSubmitted(true);
       if (!this.currentlyEditing) {
         await this.$store.tasksData.issueFollowup(
           this.currentTask,
           undefined,
-          content
+          content,
+          contactAdded??null
         );
         await this.$store.previewModal.loadFollowups();
         await this.$store.tasksView.updateView();

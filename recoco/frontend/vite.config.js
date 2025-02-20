@@ -64,6 +64,7 @@ const config = {
         ExpandableMenuHandler: resolve(
           './src/js/components/ExpandableMenuHandler.js'
         ),
+        SearchContact: resolve('./src/js/components/SearchContact.js'),
         projectQueue: resolve('./src/js/store/projectQueue.js'),
         showRole: resolve('./src/js/store/showRole.js'),
         projects: resolve('./src/js/store/projects.js'),
@@ -72,6 +73,7 @@ const config = {
         ActionPusher: resolve('./src/js/components/ActionPusher.js'),
         NotificationEater: resolve('./src/js/components/NotificationEater.js'),
         actionPusher: resolve('./src/js/store/actionPusher.js'),
+        conversationsNew: resolve('./src/js/apps/conversationsNew.js'),
       },
       output: {
         chunkFileNames: undefined,

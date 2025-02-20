@@ -57,10 +57,9 @@ function OrganizationSearch(
 
       try {
         if (e.target.value.length > 2) {
-          const results = await api.get(searchOrganizationsUrl(e.target.value));
-
-          if (results && results.data) {
-            return (this.results = results.data);
+          const response = await api.get(searchOrganizationsUrl(e.target.value));
+          if (response && response.data) {
+            return (this.results = response.data.results);
           }
         } else {
           return (this.results = []);

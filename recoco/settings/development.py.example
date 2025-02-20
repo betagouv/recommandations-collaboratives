@@ -16,7 +16,7 @@ from .common import *
 load_dotenv()
 
 for k, v in {
-    "PROCONNECT_SERVER_URL": "https://fca.integ01.dev-agentconnect.fr/api/v2/.well-known/openid-configuration"
+    "PROCONNECT_SERVER_URL": "https://app-sandbox.moncomptepro.beta.gouv.fr/.well-known/openid-configuration"
 }.items():
     os.environ.setdefault(k, v)
 

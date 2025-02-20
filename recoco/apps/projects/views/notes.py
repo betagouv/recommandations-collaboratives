@@ -15,6 +15,8 @@ from django.http import HttpResponseBadRequest
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.http import urlencode
+from django.utils.text import slugify
 
 from recoco.utils import has_perm, has_perm_or_403
 
@@ -83,8 +85,9 @@ def create_public_note(request, project_id=None):
             )
 
     if request.POST.get("new", None):
+        url = reverse("projects-project-detail-conversations-new", args=[project_id])
         return redirect(
-            reverse("projects-project-detail-conversations-new", args=[project_id])
+            f"{url}?{urlencode({'topic-slug':slugify(topic_name or 'general'),'topic-name':topic_name})}"
         )
 
     return redirect(reverse("projects-project-detail-conversations", args=[project_id]))

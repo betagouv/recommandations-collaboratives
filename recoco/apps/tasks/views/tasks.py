@@ -333,7 +333,11 @@ def task_recommendation_list(request):
     """List task recommendations for a project"""
     is_staff_for_site_or_403(request.user)
 
-    recommendations = models.TaskRecommendation.on_site.all()
+    recommendations = (
+        models.TaskRecommendation.on_site.all()
+        .select_related("resource__category")
+        .prefetch_related("departments")
+    )
 
     return render(request, "tasks/tasks/recommendation_list.html", locals())
 

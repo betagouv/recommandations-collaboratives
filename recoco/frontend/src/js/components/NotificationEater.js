@@ -21,26 +21,45 @@ Alpine.data('NotificationEater', (projectId) => {
       );
       const observedElements = document.querySelectorAll('.observed-element');
       observedElements.forEach((el) => observer.observe(el));
-      this.hideScrollLine();
-      this.scrollToFirstNotification();
+      setTimeout(() => {
+        this.hideScrollLine();
+        this.scrollToFirstNotification();
+      }, 500);
     },
-    scrollToFirstNotification() {
-      const scrollLine = document.querySelectorAll('[x-ref="scrollLine"]');
-      let scrollTo = this.$refs.scrollLineLastMessage;
-      if (scrollLine.length > 0) {
-        scrollTo = scrollLine[0];
+    scrollToFirstNotification(topic = 'general') {
+      if (topic.detail) topic = topic.detail;
+      this.hideScrollLine(topic);
+      let scrollLineNewNotification = document.querySelectorAll(
+        `[x-ref="scrollLine_${topic}"]`
+      );
+
+      if (scrollLineNewNotification.length == 0) {
+        scrollLineNewNotification = document.querySelectorAll(
+          `[x-ref^="scrollLine"]`
+        );
       }
-      window.scroll({
-        top: scrollTo.offsetTop - 260,
-        behavior: 'smooth',
-      });
+      if (scrollLineNewNotification.length > 0) {
+        window.scroll({
+          top: scrollLineNewNotification[0].offsetTop - 260,
+          behavior: 'instant',
+        });
+      } else {
+        window.scroll({
+          top: this.$refs[`scrollLineLastMessage_${topic}`].offsetTop,
+          behavior: 'instant',
+        });
+      }
     },
-    hideScrollLine() {
-      const scrollLine = document.querySelectorAll('[x-ref="scrollLine"]');
-      scrollLine.forEach((el, i) => {
-        if (i == 0) return;
-        el.classList.add('d-none');
-      });
+    hideScrollLine(topic) {
+      let scrollLineNewNotification = document.querySelectorAll(
+        `[x-ref="scrollLine_${topic}"]`
+      );
+      if (scrollLineNewNotification.length == 0) {
+        scrollLineNewNotification = document.querySelectorAll(
+          `[x-ref^="scrollLine_"]`
+        );
+      }
+      scrollLineNewNotification[0].classList.remove('d-none');
     },
     consumeNotifiction(notificationId) {
       api.patch(notificationsMarkAsReadByIdUrl(notificationId));

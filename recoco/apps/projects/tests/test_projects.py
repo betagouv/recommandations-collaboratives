@@ -341,6 +341,27 @@ def test_project_knowledge_available_for_restricted_switchtender(
     assert response.status_code == 200
 
 
+@pytest.mark.django_db
+def test_project_knowledge_allows_empty_questionset(request, client, project):
+    current_site = get_current_site(request)
+
+    onboarding = onboarding_models.Onboarding.objects.first()
+
+    baker.make(
+        home_models.SiteConfiguration,
+        site=current_site,
+        onboarding=onboarding,
+        project_survey__name="Test survey",
+        project_survey__question_sets__0__heading="Empty QS",
+    )
+
+    url = reverse("projects-project-detail-knowledge", args=[project.id])
+    with login(client, groups=["example_com_advisor"]) as user:
+        utils.assign_advisor(user, project, current_site)
+        response = client.get(url)
+    assert response.status_code == 200
+
+
 # actions
 @pytest.mark.django_db
 def test_project_actions_not_available_for_non_switchtender(request, client):
