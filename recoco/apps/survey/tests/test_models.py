@@ -8,6 +8,7 @@ created: 2021-06-27 12:06:10 CEST
 """
 
 import pytest
+from django.utils import timezone
 from model_bakery.recipe import Recipe
 
 from .. import models, utils
@@ -272,6 +273,16 @@ def test_question_slug():
         text_short="Description précise",
     )
     assert q.slug == "description-precise-2"
+
+    q.deleted = timezone.now()
+    q.save()
+
+    q = models.Question.objects.create(
+        question_set=q_set,
+        text="Description précise de l'Action ?",
+        text_short="Description précise",
+    )
+    assert q.slug == "description-precise-3"
 
 
 ########################################################################
