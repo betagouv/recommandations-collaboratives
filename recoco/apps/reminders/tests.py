@@ -962,6 +962,30 @@ def test_due_reminder_honors_current_site(request, mocker):
     assert reminder is None
 
 
+@pytest.mark.django_db
+def test_reminder_is_due_but_project_is_inactive(current_site, project):
+    today = timezone.localdate()
+    user = baker.make(auth_models.User)
+    assign_collaborator(user, project, is_owner=True)
+
+    kind = models.Reminder.NEW_RECO
+
+    project.inactive_since = timezone.now()
+    project.save()
+
+    baker.make(
+        models.Reminder,
+        deadline=today,
+        project=project,
+        site=current_site,
+        kind=kind,
+    )
+
+    reminder = api.get_due_reminder_for_project(current_site, project, kind=kind)
+
+    assert reminder is None
+
+
 #################################################################
 # Getting Recommendation
 #################################################################
