@@ -32,6 +32,33 @@
     align-content: start;
     flex-direction: row;
     justify-content: start;
+    .organization-container {
+      width: 100%;
+      .organization {
+        &__name {
+          font-weight: 400;
+          font-size: 18px;
+          line-height: 36px;
+          letter-spacing: 0%;
+        }
+        &__departments {
+          &-item {
+            display: inline-block;
+            margin-left: 0.625rem;
+            padding: 2px 4px;
+            align-items: center;
+            border-radius: 2px;
+            background: var(--light-background-contrast-info, #e8edff);
+            color: var(--light-text-default-info, #0063cb);
+            font-family: Marianne;
+            font-size: 11px;
+            font-style: normal;
+            font-weight: 700;
+            line-height: 1rem;
+          }
+        }
+      }
+    }
     &-item {
       width: 23.5%;
     }
@@ -43,5 +70,10 @@
         bottom: 0;
       }
     }
+  }
+  &__list-container {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
   }
 }

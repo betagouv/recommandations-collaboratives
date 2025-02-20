@@ -91,8 +91,10 @@ export function searchOrganizationsUrl(search) {
 }
 // Contacts
 export function searchContactsUrl(search) {
+  // ...?orga-startswith=
   return `/api/addressbook/contacts/?search=${search}`;
 }
+
 export function contactsUrl(limit) {
   if (limit) {
     const params = new URLSearchParams({
