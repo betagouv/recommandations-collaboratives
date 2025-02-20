@@ -1,9 +1,10 @@
-<div class="task-item observed-element rounded-3 fr-p-3v fr-my-2v {% if request.user == element.object.created_by %}bg-blue-light fr-ml-5w{% else %}bg-grey-light fr-mr-5w{% endif %}"
+<div class="task-item position-relative observed-element rounded-3 fr-p-3v fr-my-2v {% if request.user == element.object.created_by %}bg-blue-light fr-ml-5w{% else %}bg-grey-light fr-mr-5w{% endif %}"
      data-notifications="{{ element.notifications }}">
-    {{ element.object.content_rendered|safe }}
+    {% if element.object.resource %}{{ element.object.content_rendered|safe }}{% endif %}
     <div class="task-item__resource">
         <h4>{{ element.object.intent|safe }}</h4>
         <p class="fr-mt-1w fr-mb-0">{{ element.object.resource.subtitle|safe }}</p>
+        {% if not element.object.resource %}{{ element.object.content_rendered|safe }}{% endif %}
         {% if element.object.document.count %}
             {% for document in element.object.document.all %}
                 {% include "projects/project/fragments/files_links/file_list_item_embedded.html" with document=document %}
@@ -12,7 +13,8 @@
         {% if element.object.resource %}
             <div class="resource-link fr-mt-1w fr-mb-2w">
                 <span class="fr-icon-newspaper-line fr-icon--sm fr-mr-1v"
-                      aria-hidden="true"></span><a href="{{ element.object.resource.get_absolute_url }}" target="_blank">Lien vers la ressource</a>
+                      aria-hidden="true"></span>
+                <a href="{{ element.object.resource.get_absolute_url }}" target="_blank">Consulter la ressource</a>
             </div>
         {% endif %}
         {% include "projects/project/fragments/conversations_new/tasks_status_buttons.html" with task=element.object %}

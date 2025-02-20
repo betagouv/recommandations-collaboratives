@@ -47,13 +47,13 @@
                     {% include "projects/project/fragments/conversations_new/message_type/type_posting_item.html" %}
                 {% endif %}
             {% endfor %}
+            {% count_message_by_type topic.list "posting" "followup" as message_count %}
+            {% if message_count == 0 and topic.grouper == "" %}
+                <div class="feed-element-item fr-px-5v fr-mb-5v">
+                    {% include "projects/project/fragments/conversations_new/message_type/empty_message_list.html" %}
+                </div>
+            {% endif %}
         </div>
-        {% count_message_by_type topic.list "posting" "followup" as message_count %}
-        {% if message_count == 0 and topic.grouper == "" %}
-            <div class="feed-element-item fr-px-5v fr-mb-5v">
-                {% include "projects/project/fragments/conversations_new/message_type/empty_message_list.html" %}
-            </div>
-        {% endif %}
     {% endfor %}
 </div>
 {% if topic_list|length == 0 %}
