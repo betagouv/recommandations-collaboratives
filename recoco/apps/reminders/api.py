@@ -49,6 +49,7 @@ def make_or_update_reminder(site, project, kind, deadline):
                 f" ({project.pk})"
             )
 
+        # FIXME: on ne crée pas le nouveau??
         return None
 
     if existing_reminder:
