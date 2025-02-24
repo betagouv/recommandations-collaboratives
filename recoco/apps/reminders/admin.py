@@ -24,10 +24,7 @@ class ReminderAdmin(admin.ModelAdmin):
     list_display = ["deadline", "project", "kind", "sent_on"]
     list_select_related = ("project__commune",)
 
-    actions = [
-        "send_reminder",
-        "update_or_create_recommendation_reminders",
-    ]
+    actions = ["send_reminder"]
 
     inlines = (ReminderTransactionTabularInline,)
 
