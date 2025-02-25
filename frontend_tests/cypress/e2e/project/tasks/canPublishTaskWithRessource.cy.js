@@ -1,4 +1,4 @@
-describe('I can attach miscellanious ressource to task', () => {
+describe('I can attach miscellanious ressource to task @page-projet-recommandations-creation', () => {
   beforeEach(() => {
     cy.login('conseiller1');
   });
@@ -67,5 +67,3 @@ describe('I can attach miscellanious ressource to task', () => {
     cy.url().should('include', '/actions');
   });
 });
-
-// @page-projet-recommandations-creation
