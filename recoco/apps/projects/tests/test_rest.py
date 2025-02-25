@@ -300,7 +300,6 @@ def test_project_list_search_filter_fulltext(request, api_client):
     assert len(response.data) == 0
 
     # unaccent
-    # FIXME: this test is failing
     response = api_client.get(f"{url}?search=verite")
     assert response.status_code == 200
     assert len(response.data) == 1
