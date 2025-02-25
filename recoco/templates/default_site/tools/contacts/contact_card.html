@@ -8,7 +8,8 @@
           type="text/css" />
 {% endblock css %}
 <template x-if="contact">
-    <div class="contact-card fr-p-3v bg-white" data-test-id="contact-card">
+    <div class="contact-card fr-p-3v bg-white {% if button_actions %}actions{% endif %}"
+         data-test-id="contact-card">
         <div class="d-flex">
             <template x-if="contact.first_name">
                 <div>
@@ -37,7 +38,7 @@
         </template>
         <template x-if="contact.email">
             <div>
-                <a :href="'mailto:' +contact.email"
+                <a :href="'mailto:'+contact.email"
                    class="contact-card__link same-for-all-text text-position">
                     <span class="fr-icon--sm fr-icon-link" x-text="contact.email"></span>
                 </a>
@@ -49,7 +50,7 @@
         </template>
         <template x-if="contact.phone_no">
             <div>
-                <a href="'tel:'+contact.phone_no"
+                <a :href="'tel:'+contact.phone_no"
                    class="contact-card__link same-for-all-text text-position">
                     <span class="fr-icon--sm fr-icon-phone-line" x-text="contact.phone_no"></span>
                 </a>
@@ -57,7 +58,7 @@
         </template>
         <template x-if="contact.mobile_no">
             <div>
-                <a href="'tel:'+contact.mobile_no"
+                <a :href="'tel:'+contact.mobile_no"
                    class="contact-card__link same-for-all-text text-position">
                     <span class="fr-icon--sm fr-icon-phone-line" x-text="contact.mobile_no"></span>
                 </a>
@@ -77,5 +78,14 @@
                       x-text="contact.created.split('T')[0]"></span>
             </div>
         </template>
+        {% if button_actions %}
+            <div class="button__actions">
+                <a class="fr-btn fr-btn--tertiary-no-outline fr-btn--sm fr-icon-pencil-line button__actions-edit"
+                   :href="`/addressbook/contact/${contact.id}/update/`">Éditer le contact</a>
+                <button class="fr-btn fr-btn--tertiary-no-outline fr-btn--sm fr-icon-delete-line button__actions-delete">
+                    Supprimer le contact
+                </button>
+            </div>
+        {% endif %}
     </div>
 </template>

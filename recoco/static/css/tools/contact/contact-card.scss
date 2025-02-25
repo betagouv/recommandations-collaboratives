@@ -1,6 +1,31 @@
 .contact-card {
-    &__link {
-            text-decoration: underline;
-            color: #0000ee;
-        }
+  &__link {
+    text-decoration: underline;
+    color: #0000ee;
+  }
+  .button__actions {
+    display: none;
+  }
+  &:hover.actions {
+    border: 1px solid var(--light-border-action-high-blue-france, #000091);
+    .button__actions {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      display: grid;
+      gap: 4px;
+      &-edit {
+        height: 16px;
+        border-radius: 1px;
+        color: #000000;
+        background: var(--light-background-alt-grey, #f6f6f6);
+      }
+      &-delete {
+        height: 16px;
+        border-radius: 1px;
+        color: var(--background-flat-error);
+        background: var(--light-background-contrast-error, #ffe9e9);
+      }
+    }
+  }
 }
