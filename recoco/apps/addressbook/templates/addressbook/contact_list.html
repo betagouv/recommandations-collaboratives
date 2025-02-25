@@ -40,18 +40,19 @@
             <div class="header__actions">
                 <div class="actions__search-bar">
                     <span class="fr-icon-search-line fr-icon--sm" aria-hidden="true"></span>
-                    <input data-test-id="search-resource-input"
-                           class="fr-input w-100"
+                    <input class="fr-input w-100"
                            type="search"
-                           x-on:input.debounce="searchResources()"
-                           x-model="search"
+                           @input.debounce.500ms="searchContacts($event.target.value)"
+                           x-model="searchParams.search"
                            placeholder="Rechercher">
                 </div>
                 <button class="actions__add-contact no-wrap fr-btn fr-btn--icon-left fr-icon-add-line">Créer un contact</button>
             </div>
-            <div>
+            <div class="header__filter">
                 <template x-for="letter of letters">
-                    <button class="" x-text="letter"></button>
+                    <button class="header__filter-letter"
+                            x-text="letter"
+                            @click="loadOrganizationStartingWith(letter)"></button>
                 </template>
             </div>
         </div>

@@ -24,6 +24,18 @@
         }
       }
     }
+    &__filter-letter {
+      color: var(--light-background-action-high-blue-france, #000091);
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 36px;
+      text-decoration-line: underline;
+      text-decoration-style: solid;
+      text-decoration-skip-ink: none;
+      text-decoration-thickness: auto;
+      text-underline-offset: auto;
+      text-underline-position: from-font;
+    }
   }
   &__list {
     display: flex;
@@ -36,6 +48,7 @@
       width: 100%;
       .organization {
         &__name {
+          color: #161616;
           font-weight: 400;
           font-size: 18px;
           line-height: 36px;
@@ -60,7 +73,7 @@
       }
     }
     &-item {
-      width: 23.5%;
+      width: 33.3%;
     }
     .contact-card {
       height: 9rem;

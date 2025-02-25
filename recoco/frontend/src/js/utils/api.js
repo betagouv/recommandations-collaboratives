@@ -90,9 +90,12 @@ export function searchOrganizationsUrl(search) {
   return `/api/addressbook/organizations/?search=${search}`;
 }
 // Contacts
-export function searchContactsUrl(search) {
-  // ...?orga-startswith=
-  return `/api/addressbook/contacts/?search=${search}`;
+export function searchContactsUrl(search, orgaFirstLetter) {
+  const params = new URLSearchParams({ search });
+  if (orgaFirstLetter) {
+    params.append('orga-startswith', orgaFirstLetter);
+  }
+  return `/api/addressbook/contacts/?${params}`;
 }
 
 export function contactsUrl(limit) {
