@@ -246,7 +246,7 @@ def test_project_list_search_filter_fulltext(request, api_client):
         commune__insee="AZ37",
     )
 
-    # a econd one with accent
+    # second one with accent
     baker.make(
         models.Project,
         sites=[site],
