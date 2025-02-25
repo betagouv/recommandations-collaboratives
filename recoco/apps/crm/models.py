@@ -6,7 +6,7 @@ from django.contrib.sites.models import Site
 from django.db import models
 from django.db.models.signals import post_migrate
 from django.dispatch import receiver
-from django.shortcuts import reverse
+from django.urls import reverse
 from django.utils import timezone
 from markdownx.utils import markdownify
 from taggit.managers import TaggableManager
