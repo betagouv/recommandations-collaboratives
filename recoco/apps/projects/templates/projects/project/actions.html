@@ -21,7 +21,10 @@
     {% vite_asset 'js/components/CreateContact.js' %}
     {% vite_asset 'js/components/CreateOrganisation.js' %}
     {% vite_asset 'js/components/SearchOrganisation.js' %}
+    {% vite_asset 'js/components/MultiSelect.js' %}
     {% vite_asset 'js/store/contact.js' %}
+    <script defer
+            src="https://cdn.jsdelivr.net/npm/@alpinejs/focus@3.x.x/dist/cdn.min.js"></script>
 {% endblock js %}
 {% block css %}
     <link href="{% sass_src 'projects/css/board.scss' %}"

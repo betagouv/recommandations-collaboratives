@@ -6,7 +6,6 @@
 {% endblock css %}
 {% comment %} <div> {% endcomment %}
 <div x-data="CreateContact()"
-     x-init="$watch('$store.contact.createdOrganisation', value => {value?selectedContact = value:selectedContact = null; value?isAContactSelected = true: selectedContact = null;})"
      id="create-contact-modal"
      class="modal-create-contact d-none z-2"
      @click.away="isOpenCreateContactModal = false">

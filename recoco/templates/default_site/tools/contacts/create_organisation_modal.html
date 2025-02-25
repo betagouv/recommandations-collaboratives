@@ -27,7 +27,7 @@
         <fieldset class="fr-fieldset fr-mb-0"
                   id="radio-hint"
                   aria-labelledby="radio-hint-legend radio-hint-messages">
-            <legend class="fr-fieldset__legend--regular fr-fieldset__legend fw-700"
+            <legend class="fr-fieldset__legend--regular fr-fieldset__legend fw-700 fr-pb-0"
                     id="radio-hint-legend">
                 Rattachement national
                 <span class="fr-hint-text">Cette organisation est-elle rattachée à une structure-mère ou un réseau national ? Ex : le Cerema Occitanie se rattache à la structure Cerema.</span>
@@ -50,8 +50,8 @@
                             <button class="fr-btn" title="Rechercher" @click="onSearch">Rechercher</button>
                         </div>
                         <div class="fr-menu menu-modal-correct-fr-menu position-relative border-radius-4px">
-                            <div class="fr-menu__list specific-width-26rem position-absolute border-radius-4px">
-                                <div class="fr-menu__list specific-width-26rem overflow-auto specific-height border-radius-4px fr-mb-0">
+                            <div class="fr-menu__list w-100 position-absolute border-radius-4px">
+                                <div class="fr-menu__list w-100 overflow-auto specific-height border-radius-4px fr-mb-0">
                                     <template x-if="userInput.length > 0 && showOrgaGroupsresults && !isAnOrgaGroupSelected">
                                         <div>
                                             <template class="fr-menu__item" x-for="group in orgaGroupsFound">
@@ -100,24 +100,15 @@
                  aria-live="assertive"></div>
         </fieldset>
     </div>
-    <div class="fr-p-3v modal-create-organisation__block">
+    {% comment %} <div class="fr-p-3v modal-create-organisation__block">
         <span class="modal-create-organisation__label">Départements</span>
         <select class="fr-select" multiple required>
-            {% comment %} x-model="organisationDepartements" {% endcomment %}
-            {% comment %} <option value="" disabled selected>Choisir un ou des départements</option> {% endcomment %}
             <template x-for="department in departments" :key="department.code">
-                {% comment %} <template x-if="department.selected"> {% endcomment %}
-                <option :value="department.code"
-                        x-text="'(' + department.code + ')' + ' ' + department.name"
-                        :selected="department.selected"
-                        @click="selectThisDepartment" />
-                {% comment %} </template> {% endcomment %}
-                {% comment %} <template x-if="!department.selected">
-                        <option :value="department.code" x-text="'(' + department.code + ')' + ' ' + department.name" />
-                </template> {% endcomment %}
+                <option :value="department.code" x-text="'(' + department.code + ')' + ' ' + department.name" :selected="department.selected" @click="selectThisDepartment" />
             </template>
         </select>
-    </div>
+    </div> {% endcomment %}
+    <div class="fr-p-3v modal-create-organisation__block">{% include "tools/contacts/multi_select.html" %}</div>
     <div class="fr-p-3v modal-create-organisation__block d-flex">
         <button class="fr-btn fr-btn--secondary fr-mr-3v w-100 justify-content-center"
                 @click="closeCreateOrganisationModal()">Annuler</button>

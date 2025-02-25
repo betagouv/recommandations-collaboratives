@@ -5,7 +5,9 @@
           rel="stylesheet"
           type="text/css" />
 {% endblock css %}
-<div>
+<div x-data
+     x-init="$watch('$store.contact.orgaCreated', value => setSearch())"
+     @reset-orga-name.window="resetSearch()">
     <div class="position-relative">
         <div class="fr-search-bar" id="header-search" role="search">
             <input class="fr-input"

@@ -66,6 +66,7 @@ function CreateContact() {
         api.post(contactsUrl(), this.contact).then((response) => {
           this.contact = response.data;
           this.$store.contact.createdContact = this.contact;
+          console.log('createdContact', this.$store.contact.createdContact);
         });
         this.resetFormValue();
         this.closeCreateContactModal();
@@ -78,8 +79,11 @@ function CreateContact() {
       this.contactEmail = '';
       this.contactTel = '';
       this.contactPhone = '';
+      this.verifMailOrPhone = false;
       this.contactOrganization = null;
       this.$store.contact.orgaSelected = null;
+      this.$store.contact.orgaCreated = null;
+      this.$dispatch('reset-orga-name');
       // this.$store.contact.createdContact = null;
     },
   };

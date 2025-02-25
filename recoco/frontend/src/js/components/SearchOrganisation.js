@@ -8,7 +8,8 @@ function SearchOrganisation() {
     userInput: '',
     showOrgasresults: false,
     isAnOrgaSelected: false,
-    init() {},
+    init() {
+    },
     onSearch() {
       this.isAnOrgaSelected = false;
       if (this.userInput.length > 0) {
@@ -62,6 +63,17 @@ function SearchOrganisation() {
           this.orgaSorted.push(tempSortOrgas[prop]);
         }
       }
+    },
+    setSearch() {
+      this.userInput = this.$store.contact.orgaSelected.name;
+      this.showOrgasresults = false;
+      this.isAnOrgaSelected = true;
+    },
+    resetSearch() {
+      this.userInput = '';
+      this.showOrgasresults = false;
+      this.isAnOrgaSelected = false;
+      this.$store.contact.orgaSelected = null;
     },
   };
 }

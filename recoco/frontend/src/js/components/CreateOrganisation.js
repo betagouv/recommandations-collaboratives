@@ -15,9 +15,8 @@ function CreateOrganisation() {
     selectedDepartments: [],
     organisationToCreate: null,
     orgaToCreateFormIsOk: false,
-    init() {
-        this.showDepartments();
-
+    async init() {
+       await this.showDepartments();
     },
     closeCreateOrganisationModal() {
       this.modalCreateOrganisation = document.querySelector('#create-organisation-modal');
@@ -55,23 +54,16 @@ function CreateOrganisation() {
         });
       }
     },
-    showDepartments() {
-      api.get(departmentsUrl()).then((response) => {
-        this.departments = response.data;
-      });
-      // forEach(this.departments, (department) => {
-      //   department.selected = false;
-      // });
-      this.departments.forEach((department) => {
-        department.selected = false;
-      });
+    async showDepartments() {
+      const response = await api.get(departmentsUrl());
+      this.departments = response.data;
+      this.$dispatch('on-department-fetch', this.departments);
     },
     onSelectGroup(group) {
       this.isAnOrgaGroupSelected = true;
       this.organisationGroup = group;
       this.userInput = group.name;
       this.showOrgaGroupsresults = false;
-    //   this.$store.contact.groupSelected = group;
     },
     createOrganisationGroup() {
       this.organisationGroup = {
@@ -81,23 +73,10 @@ function CreateOrganisation() {
       this.showOrgaGroupsresults = false;
       api.post(organizationGroupsUrl(), this.organisationGroup).then((response) => {
                 this.organisationGroup = response.data;
-                // this.$store.contact.createdOrganisation = this.organisationToCreate;
-                console.log(this.organisationGroup);
             });
     },
-    selectThisDepartment(event) {
-
-        console.log('departmentCode', event.target.value);
-        // this.selectedDepartments = [...this.selectedDepartments,department];
-        // console.log('selectedDepartment', this.selectedDepartments);
-    },
     createOrganisation() {
-        // if (this.$store.contact.groupSelected) {
-        //   this.organisationGroup = this.$store.contact.groupSelected;
-        //   this.verifOrga = false;
-        // }
-        this.selectedDepartments = ["01"];
-        console.log('organisationGroup', this.organisationGroup);
+        this.selectedDepartments = [...this.$store.contact.selectedDepartments];
 
         if(this.isGroupNat && this.organisationGroup === null){
           alert('Veuillez selectionner un groupe');
@@ -109,9 +88,21 @@ function CreateOrganisation() {
         }
         else {
           this.verifNomOrga = false;
-          if (this.organisationGroup === null) {
+          if (this.organisationGroup === null && this.selectedDepartments.length === 0) {
             this.organisationToCreate = {
                 name: this.organisationName,
+              };
+          }
+          else if (this.organisationGroup !== null && this.selectedDepartments.length === 0) {
+            this.organisationToCreate = {
+                name: this.organisationName,
+                group: this.organisationGroup.id,
+              };
+          }
+          else if (this.organisationGroup === null && this.selectedDepartments.length > 0) {
+            this.organisationToCreate = {
+                name: this.organisationName,
+                departments: this.selectedDepartments,
               };
           }
           else {
@@ -123,51 +114,25 @@ function CreateOrganisation() {
           }
             api.post(organizationsUrl(), this.organisationToCreate).then((response) => {
                 this.organisationToCreate = response.data;
-                this.$store.contact.createdOrganisation = this.organisationToCreate;
-                console.log(this.organisationToCreate);
+                this.$store.contact.orgaSelected = this.organisationToCreate;
+                this.$store.contact.orgaCreated = this.organisationToCreate;
+                this.resetFormValue();
+                this.closeCreateOrganisationModal();
             });
         }
     },
-    // createContact() {
-    //   if (this.$store.contact.orgaSelected) {
-    //     this.contactOrganization = this.$store.contact.orgaSelected;
-    //     this.verifOrga = false;
-    //   } else {
-    //     this.verifOrga = true;
-    //   }
-    //   if (this.contactJob.length === 0) {
-    //     this.verifPoste = true;
-    //   } else {
-    //     this.verifPoste = false;
-    //   }
-    //   if (this.contactEmail.length === 0 || this.contactTel.length === 0) {
-    //     this.verifMailOrPhone = true;
-    //   } else {
-    //     this.verifMailOrPhone = false;
-    //   }
-    //   if (
-    //     this.contactOrganization &&
-    //     this.contactJob.length > 0 &&
-    //     (this.contactEmail.length > 0 || this.contactTel.length > 0)
-    //   ) {
-    //     this.contact = {
-    //       organization: this.contactOrganization.id,
-    //       last_name: this.contactLastName,
-    //       first_name: this.contactFirstName,
-    //       division: this.contactJob,
-    //       email: this.contactEmail,
-    //       phone_no: this.contactTel,
-    //       mobile_no: this.contactPhone,
-    //     };
-    //     api.post(contactsUrl(), this.contact).then((response) => {
-    //       this.contact = response.data;
-    //       this.$store.contact.createdContact = this.contact;
-    //     });
-    //     this.resetFormValue();
-    //     this.closeCreateContactModal();
-    //   }
-    // },
     resetFormValue() {
+      this.organisationName = '';
+      this.organisationGroup = null;
+      this.verifNomOrga = false;
+      this.isGroupNat = false;
+      this.isAnOrgaGroupSelected = false;
+      this.userInput = '';
+      this.showOrgaGroupsresults = false;
+      this.selectedDepartments = [];
+      const radioButton = document.querySelector('input[name="natGroup"]');
+      radioButton.checked = false;
+      this.$dispatch('reset-form-create-orga');
     },
   };
 }
