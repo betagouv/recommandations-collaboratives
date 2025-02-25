@@ -563,4 +563,9 @@ WAFFLE_SWITCH_MODEL = "feature_flag.Switch"
 WAFFLE_SAMPLE_MODEL = "feature_flag.Sample"
 
 
+# Watson
+
+# https://github.com/etianen/django-watson/wiki/language-support
+WATSON_POSTGRES_SEARCH_CONFIG = "pg_catalog.french"
+
 # eof
