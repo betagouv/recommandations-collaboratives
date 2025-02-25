@@ -7,7 +7,6 @@ authors: raphael.marvie@beta.gouv.fr, guillaume.libersat@beta.gouv.fr
 created: 2023-06-20 14:10:36 CEST
 """
 
-
 import pytest
 from django.contrib.auth import models as auth_models
 from django.contrib.sites import models as site_models

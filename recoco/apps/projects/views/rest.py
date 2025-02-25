@@ -6,6 +6,7 @@ Views for projects application
 author  : raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created : 2021-05-26 15:56:20 CEST
 """
+
 from __future__ import annotations
 
 from copy import copy

@@ -164,9 +164,9 @@ def test_contact_search_filter(
         reverse("api-addressbook-contact-list"), {"search": search_terms}
     )
     assert response.status_code == 200
-    assert [
-        contact["id"] for contact in response.data["results"]
-    ] == expected_result, f"failure for search terms: {search_terms}"
+    assert [contact["id"] for contact in response.data["results"]] == expected_result, (
+        f"failure for search terms: {search_terms}"
+    )
 
 
 @pytest.mark.parametrize(

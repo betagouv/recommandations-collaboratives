@@ -6,6 +6,7 @@ Models for resources application
 authors: raphael.marvie@beta.gouv.fr, guillaume.libersat@beta.gouv.fr
 created: 2021-06-16 10:57:13 CEST
 """
+
 import datetime
 
 import reversion

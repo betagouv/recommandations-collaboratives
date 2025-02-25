@@ -2,11 +2,11 @@
 name = "recoco"
 dynamic = ["version"]
 
-authors = [{name = "Recoco Dev Team"}]
+authors = [{ name = "Recoco Dev Team" }]
 maintainers = [
-  {name = "Guillaume Libersat", email = "guillaume.libersat@beta.gouv.fr"}
+    { name = "Guillaume Libersat", email = "guillaume.libersat@beta.gouv.fr" },
 ]
-license = {name = "AGPL-v3", file="LICENSE"}
+license = { name = "AGPL-v3", file = "LICENSE" }
 
 description = "Recommandations Collaboratives"
 readme = "README.md"
@@ -82,7 +82,7 @@ Repository = "https://github.com/betagouv/recommandations-collaboratives/"
 packages = ["recoco"]
 
 [tool.setuptools.dynamic]
-version = {attr = "recoco.__version__"}
+version = { attr = "recoco.__version__" }
 
 [build-system]
 requires = ["setuptools"]
@@ -194,7 +194,6 @@ django-webhook = { git = "https://github.com/etchegom/django-webhook.git", rev =
 
 [dependency-groups]
 dev = [
-    "black>=25.1.0",
     "coverage==7.4.1",
     "django-coverage-plugin>=3.1.0",
     "django-debug-toolbar==4.3.0",
@@ -231,3 +230,11 @@ dev = [
     "sphinxcontrib-django>=2.5",
     "sphinxcontrib-django-urls>=0.3",
 ]
+
+
+[tool.ruff]
+line-length = 88
+
+[tool.ruff.format]
+skip-magic-trailing-comma = false
+exclude = ["*.ipynb", "fabfile.py", "notebooks/*", "sql/*", "frontend_tests/*", "docs/*", "node_modules/*"]
