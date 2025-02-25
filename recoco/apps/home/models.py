@@ -27,6 +27,7 @@ from guardian.models import (
     UserObjectPermissionAbstract,
     UserObjectPermissionBase,
 )
+from model_utils.models import TimeStampedModel
 from phonenumber_field.modelfields import PhoneNumberField
 from taggit.managers import TaggableManager
 
@@ -117,6 +118,7 @@ class UserProfile(models.Model):
 
     organization_position = models.CharField(null=True, blank=True, max_length=200)
 
+    # DEPRECATED: use UserLoginEntry instead
     previous_login_at = models.DateTimeField(null=True, blank=True)
 
     deleted = models.DateTimeField(null=True, blank=True)
@@ -127,6 +129,28 @@ class UserProfile(models.Model):
 
     def __str__(self):
         return f"<UserProfile: {self.user.username}>"
+
+
+class UserLoginEntry(TimeStampedModel):
+    ACTION_LOGGED_IN = "logged_in"
+    ACTION_LOGGED_OUT = "logged_out"
+
+    ACTION_CHOICES = (
+        (ACTION_LOGGED_IN, "User logged in"),
+        (ACTION_LOGGED_OUT, "User logged out"),
+    )
+
+    profile = models.ForeignKey(
+        UserProfile, on_delete=models.CASCADE, related_name="login_entries"
+    )
+    site = models.ForeignKey(Site, on_delete=models.CASCADE)
+    action = models.CharField(max_length=64, choices=ACTION_CHOICES, editable=False)
+    ip = models.GenericIPAddressField(null=True)
+
+    class Meta:
+        verbose_name = "Journal des connexions"
+        verbose_name_plural = "Journal des connexions"
+        ordering = ("-created",)
 
 
 class SiteConfiguration(models.Model):
