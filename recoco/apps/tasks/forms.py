@@ -122,6 +122,8 @@ class CreateActionWithResourceForm(CreateActionBaseForm):
         ),
     )
 
+    content = forms.CharField(required=False)
+
     def clean_resource(self):
         resource = self.cleaned_data["resource"]
 

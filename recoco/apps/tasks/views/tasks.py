@@ -75,6 +75,7 @@ def create_task(request):
             project = type_form.cleaned_data.get("project")
             has_perm_or_403(request.user, "projects.manage_tasks", project)
 
+            # TODO remove this part (multiple tasks creation doesn't exist anymore)
             if push_type == "multiple":
                 for resource in form.cleaned_data.get("resources", []):
                     public = form.cleaned_data.get("public", False)
