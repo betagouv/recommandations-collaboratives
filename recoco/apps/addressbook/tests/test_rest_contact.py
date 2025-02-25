@@ -106,6 +106,7 @@ def test_can_not_create_contact_with_wrong_organization(api_client, staff_user):
 @pytest.mark.parametrize(
     "search_terms,expected_result,use_watson",
     [
+        # vector search
         ("skywalker", [999], False),
         ("jedi", [777, 888], False),
         ("coté obscure", [999], False),
@@ -113,13 +114,12 @@ def test_can_not_create_contact_with_wrong_organization(api_client, staff_user):
         ("Maître", [777, 888], False),
         ("maitre", [777, 888], False),
         # watson search
-        # FIXME: watson search is case sensitive only
         ("skywalker", [999], True),
         ("jedi", [777, 888], True),
         ("coté obscure", [999], True),
-        # ("cote", [999], True),
+        ("cote", [999], True),
         ("Maître", [777, 888], True),
-        # ("maitre", [777, 888], True),
+        ("maitre", [777, 888], True),
     ],
 )
 @pytest.mark.django_db

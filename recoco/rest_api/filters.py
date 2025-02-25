@@ -9,6 +9,8 @@ from rest_framework.filters import SearchFilter
 from rest_framework.settings import api_settings
 from watson import search as watson_search
 
+from recoco.utils import strip_accents
+
 
 class TagsFilterbackend(DjangoFilterBackend):
     def filter_queryset(self, request, queryset, view):
@@ -107,7 +109,7 @@ class WatsonSearchFilter(BaseSearchFilter):
             return queryset.annotate(search_rank=Value(0.0, output_field=FloatField()))
 
         search_min_rank = self.get_search_min_rank(view, request)
-        search_text = " ".join(search_terms)
+        search_text = strip_accents(" ".join(search_terms))
 
         return (
             watson_search.filter(queryset, search_text=search_text)

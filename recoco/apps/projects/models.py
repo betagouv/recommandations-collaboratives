@@ -30,7 +30,12 @@ from taggit.managers import TaggableManager
 from watson import search as watson
 
 from recoco.apps.geomatics import models as geomatics_models
-from recoco.utils import CastedGenericRelation, check_if_advisor, has_perm
+from recoco.utils import (
+    CastedGenericRelation,
+    check_if_advisor,
+    has_perm,
+    strip_accents,
+)
 
 from . import apps
 from .utils import generate_ro_key
@@ -902,6 +907,10 @@ class ProjectSearchAdapter(watson.SearchAdapter):
 
     def tags_as_list(self, obj):
         return list(obj.tags.names())
+
+    def prepare_content(self, content):
+        content = super().prepare_content(content)
+        return strip_accents(content)
 
 
 def truncate_string(s, max_length):
