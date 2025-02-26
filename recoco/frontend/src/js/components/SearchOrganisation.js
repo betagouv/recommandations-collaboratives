@@ -28,6 +28,7 @@ function SearchOrganisation() {
         }
       } catch (error) {
         console.log(error);
+        throw new Error('Error while searching for organizations ', error);
       }
     },
     onSelectOrga(orga) {

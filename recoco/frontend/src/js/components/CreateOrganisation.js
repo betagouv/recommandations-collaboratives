@@ -55,6 +55,7 @@ function CreateOrganisation() {
         }
       } catch (error) {
         console.log(error);
+         throw new Error('Error while fetching organizations ', error);
       }
     },
     async showDepartments() {
@@ -65,6 +66,7 @@ function CreateOrganisation() {
       }
       catch (error) {
         console.log(error);
+         throw new Error('Error while fetching departments ', error);
       }
 
     },
