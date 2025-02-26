@@ -52,7 +52,7 @@
                                     <span class="no-underline list-project__project-name">Pas de dossier récent</span>
                                 </template>
                                 <template x-if="displayedProjectList.length > 0">
-                                    <span class="no-underline list-project__project-name">Projets récents</span>
+                                    <span class="no-underline list-project__project-name">Dossiers récents</span>
                                 </template>
                             </div>
                         </template>
@@ -66,7 +66,7 @@
                         {% if project %}
                             <li class="list-project__header">
                                 <template x-if="displayedProjectList.length > 0">
-                                    <div class="list-project__header-text">Projets récents</div>
+                                    <div class="list-project__header-text">Dossiers récents</div>
                                 </template>
                                 <template x-if="displayedProjectList.length == 0">
                                     <div class="list-project__header-text">Pas de dossiers récents</div>
@@ -94,7 +94,7 @@
             <!-- Projects moderation -->
             <li class="navigation__item-moderation d-flex">
                 <a href="{% url "projects-moderation-list" %}"
-                   class="{% if url_name == 'projects-moderation-list' %}active{% endif %}"><span class="fr-link underline no-wrap">Projets à examiner</span></a>
+                   class="{% if url_name == 'projects-moderation-list' %}active{% endif %}"><span class="fr-link underline no-wrap">Dossiers à examiner</span></a>
                 {% if projects_to_moderate_count %}
                     <span class="badge text-bg-danger no-underline">{{ projects_to_moderate_count }}</span>
                 {% endif %}
