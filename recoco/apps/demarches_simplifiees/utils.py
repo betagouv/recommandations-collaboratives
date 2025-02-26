@@ -19,42 +19,42 @@ class MappingField:
 project_mapping_fields: list[MappingField] = [
     MappingField(
         id="project.name",
-        label="Nom du projet",
+        label="Nom du dossier",
         lookup="name",
     ),
     MappingField(
         id="project.owner_first_name",
-        label="Prénom du porteur du projet",
+        label="Prénom du porteur du dossier",
         lookup="owner.first_name",
     ),
     MappingField(
         id="project.owner_last_name",
-        label="Nom du porteur du projet",
+        label="Nom du porteur du dossier",
         lookup="owner.last_name",
     ),
     MappingField(
         id="project.owner_full_name",
-        label="Nom complet du porteur du projet (Prénom + Nom)",
+        label="Nom complet du porteur du dossier (Prénom + Nom)",
         lookup="owner.full_name",
     ),
     MappingField(
         id="project.owner_full_name_reversed",
-        label="Nom complet du porteur du projet (Nom + Prénom)",
+        label="Nom complet du porteur du dossier (Nom + Prénom)",
         lookup="owner.full_name_reversed",
     ),
     MappingField(
         id="project.owner_email",
-        label="Email du porteur du projet",
+        label="Email du porteur du dossier",
         lookup="owner.email",
     ),
     MappingField(
         id="project.owner_organization_position",
-        label="Email du porteur du projet",
+        label="Email du porteur du dossier",
         lookup="owner.profile.organization_position",
     ),
     MappingField(
         id="project.owner_phone_number",
-        label="Téléphone du porteur du projet",
+        label="Téléphone du porteur du dossier",
         lookup="owner.profile.phone_no.as_international",
     ),
     MappingField(

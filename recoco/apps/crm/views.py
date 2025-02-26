@@ -1367,7 +1367,7 @@ def project_site_handover(request, project_id):
             messages.add_message(
                 request,
                 messages.SUCCESS,
-                f"Le projet {project.name} a bien été proposé au portail '{site.name}'",
+                f"Le dossier {project.name} a bien été proposé au portail '{site.name}'",
             )
 
             return redirect(reverse("crm-project-handover", args=(project.pk,)))

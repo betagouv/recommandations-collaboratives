@@ -10,11 +10,11 @@ headers = [
     "# reco",
     "# ressource",
     "Titre resource",
-    "# projet",
-    "Desc projet",
+    "# dossier",
+    "Desc dossier",
     "Commune insee",
     "Commune nom",
-    "Thematiques projets",
+    "Thematiques dossiers",
     "Contenu reco",
 ]
 

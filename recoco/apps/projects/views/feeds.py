@@ -18,9 +18,9 @@ from .. import models
 
 
 class LatestProjectsFeed(Feed):
-    title = "Derniers projets"
+    title = "Derniers dossiers"
     link = "/projects/feed"
-    description = "Derniers ajouts de projets"
+    description = "Derniers ajouts de dossiers"
 
     def items(self):
         return models.Project.on_site.order_by("-created_on")[:5]
