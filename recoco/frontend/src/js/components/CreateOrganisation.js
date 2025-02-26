@@ -37,27 +37,36 @@ function CreateOrganisation() {
     },
     onSearchOrgaGroup() {
       this.isAnOrgaSelected = false;
-      if (this.userInput.length > 0) {
-        this.organisationGroup = null;
-        this.showOrgaGroupsresults = true
-        this.isAnOrgaGroupSelected = false;
-        this.orgaGroupFound = [];
-        api.get(searchOrganizationGroupsUrl(this.userInput)).then((response) => {
-          this.searchResults = response.data;
-          this.orgaGroupsFound = this.searchResults.results;
-          if (this.orgaGroupsFound.length > 0) {
-            this.showOrgaGroupsresults = true;
-            console.log('orgaGroupsFound', this.orgaGroupsFound);
-          } else {
-            this.showOrgaGroupsresults = false;
-          }
-        });
+      try {
+        if (this.userInput.length > 0) {
+          this.organisationGroup = null;
+          this.showOrgaGroupsresults = true
+          this.isAnOrgaGroupSelected = false;
+          this.orgaGroupFound = [];
+          api.get(searchOrganizationGroupsUrl(this.userInput)).then((response) => {
+            this.searchResults = response.data;
+            this.orgaGroupsFound = this.searchResults.results;
+            if (this.orgaGroupsFound.length > 0) {
+              this.showOrgaGroupsresults = true;
+            } else {
+              this.showOrgaGroupsresults = false;
+            }
+          });
+        }
+      } catch (error) {
+        console.log(error);
       }
     },
     async showDepartments() {
-      const response = await api.get(departmentsUrl());
-      this.departments = response.data;
-      this.$dispatch('on-department-fetch', this.departments);
+      try {
+        const response = await api.get(departmentsUrl());
+        this.departments = response.data;
+        this.$dispatch('on-department-fetch', this.departments);
+      }
+      catch (error) {
+        console.log(error);
+      }
+
     },
     onSelectGroup(group) {
       this.isAnOrgaGroupSelected = true;
@@ -71,9 +80,13 @@ function CreateOrganisation() {
       };
       this.isAnOrgaGroupSelected = true;
       this.showOrgaGroupsresults = false;
-      api.post(organizationGroupsUrl(), this.organisationGroup).then((response) => {
+      try {
+            api.post(organizationGroupsUrl(), this.organisationGroup).then((response) => {
                 this.organisationGroup = response.data;
             });
+          } catch (error) {
+            console.log(error);
+          }
     },
     createOrganisation() {
         this.selectedDepartments = [...this.$store.contact.selectedDepartments];
@@ -112,6 +125,7 @@ function CreateOrganisation() {
                 departments: this.selectedDepartments,
               };
           }
+          try {
             api.post(organizationsUrl(), this.organisationToCreate).then((response) => {
                 this.organisationToCreate = response.data;
                 this.$store.contact.orgaSelected = this.organisationToCreate;
@@ -119,6 +133,9 @@ function CreateOrganisation() {
                 this.resetFormValue();
                 this.closeCreateOrganisationModal();
             });
+          } catch (error) {
+            console.log(error);
+          }
         }
     },
     resetFormValue() {

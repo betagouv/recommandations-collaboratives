@@ -33,43 +33,47 @@ function CreateContact() {
       this.modalCreateContact.classList.toggle('d-none');
     },
     createContact() {
-      if (this.$store.contact.orgaSelected) {
-        this.contactOrganization = this.$store.contact.orgaSelected;
-        this.verifOrga = false;
-      } else {
-        this.verifOrga = true;
-      }
-      if (this.contactJob.length === 0) {
-        this.verifPoste = true;
-      } else {
-        this.verifPoste = false;
-      }
-      if (this.contactEmail.length === 0 || this.contactTel.length === 0) {
-        this.verifMailOrPhone = true;
-      } else {
-        this.verifMailOrPhone = false;
-      }
-      if (
-        this.contactOrganization &&
-        this.contactJob.length > 0 &&
-        (this.contactEmail.length > 0 || this.contactTel.length > 0)
-      ) {
-        this.contact = {
-          organization: this.contactOrganization.id,
-          last_name: this.contactLastName,
-          first_name: this.contactFirstName,
-          division: this.contactJob,
-          email: this.contactEmail,
-          phone_no: this.contactTel,
-          mobile_no: this.contactPhone,
-        };
-        api.post(contactsUrl(), this.contact).then((response) => {
-          this.contact = response.data;
-          this.$store.contact.createdContact = this.contact;
-          console.log('createdContact', this.$store.contact.createdContact);
-        });
-        this.resetFormValue();
-        this.closeCreateContactModal();
+      try {
+        if (this.$store.contact.orgaSelected) {
+          this.contactOrganization = this.$store.contact.orgaSelected;
+          this.verifOrga = false;
+        } else {
+          this.verifOrga = true;
+        }
+        if (this.contactJob.length === 0) {
+          this.verifPoste = true;
+        } else {
+          this.verifPoste = false;
+        }
+        if (this.contactEmail.length === 0 || this.contactTel.length === 0) {
+          this.verifMailOrPhone = true;
+        } else {
+          this.verifMailOrPhone = false;
+        }
+        if (
+          this.contactOrganization &&
+          this.contactJob.length > 0 &&
+          (this.contactEmail.length > 0 || this.contactTel.length > 0)
+        ) {
+          this.contact = {
+            organization: this.contactOrganization.id,
+            last_name: this.contactLastName,
+            first_name: this.contactFirstName,
+            division: this.contactJob,
+            email: this.contactEmail,
+            phone_no: this.contactTel,
+            mobile_no: this.contactPhone,
+          };
+          api.post(contactsUrl(), this.contact).then((response) => {
+            this.contact = response.data;
+            this.$store.contact.createdContact = this.contact;
+            console.log('createdContact', this.$store.contact.createdContact);
+          });
+          this.resetFormValue();
+          this.closeCreateContactModal();
+        }
+      } catch (error) {
+        console.log(error);
       }
     },
     resetFormValue() {
@@ -84,7 +88,6 @@ function CreateContact() {
       this.$store.contact.orgaSelected = null;
       this.$store.contact.orgaCreated = null;
       this.$dispatch('reset-orga-name');
-      // this.$store.contact.createdContact = null;
     },
   };
 }

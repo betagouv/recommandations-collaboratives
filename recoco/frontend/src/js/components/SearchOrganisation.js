@@ -12,18 +12,22 @@ function SearchOrganisation() {
     },
     onSearch() {
       this.isAnOrgaSelected = false;
-      if (this.userInput.length > 0) {
-        this.orgaFound = [];
-        api.get(searchOrganizationsUrl(this.userInput)).then((response) => {
-          this.searchResults = response.data;
-          this.orgaFound = this.searchResults.results;
-          if (this.orgaFound.length > 0) {
-            this.sortOrgasResults();
-            this.showOrgasresults = true;
-          } else {
-            this.showOrgasresults = false;
-          }
-        });
+      try {
+        if (this.userInput.length > 0) {
+          this.orgaFound = [];
+          api.get(searchOrganizationsUrl(this.userInput)).then((response) => {
+            this.searchResults = response.data;
+            this.orgaFound = this.searchResults.results;
+            if (this.orgaFound.length > 0) {
+              this.sortOrgasResults();
+              this.showOrgasresults = true;
+            } else {
+              this.showOrgasresults = false;
+            }
+          });
+        }
+      } catch (error) {
+        console.log(error);
       }
     },
     onSelectOrga(orga) {
