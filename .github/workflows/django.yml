@@ -79,6 +79,10 @@ jobs:
         run: |
           cp recoco/settings/development.py.example recoco/settings/development.py
 
+      - name: Check migrations
+        run: |
+          uv run manage.py makemigrations --check --dry-run --settings=recoco.settings.testing
+
       - name: Run Tests
         env:
           SECRET_KEY: 'this-is-not-a-secret-key'
