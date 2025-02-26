@@ -3,8 +3,8 @@
 {% load static %}
 {% load humanize %}
 {% load crm_tags %}
-{% block title %}Utilisation des tags sur les projets - CRM{% endblock %}
-{% block og_title %}Utilisation des tags sur les projets - CRM{% endblock %}
+{% block title %}Utilisation des tags sur les dossiers - CRM{% endblock %}
+{% block og_title %}Utilisation des tags sur les dossiers - CRM{% endblock %}
 {% load sass_tags %}
 {% block css %}
     <link href="{% sass_src 'crm/css/tags.scss' %}"
@@ -66,7 +66,7 @@
         {% include "crm/fragments/sidebar.html" with back_button=True map=True tools=True search=True %}
         <div class="w-75 d-flex flex-column justify-content-start">
             <div class="d-flex justify-content-between align-items-center fr-px-3w fr-pt-3w">
-                <h2>Relation Projets-Tags</h2>
+                <h2>Relation Dossiers-Tags</h2>
                 <a href="{% url 'crm-project-list-by-tags-csv' %}"
                    class="btn btn-primary">Export CSV</a>
             </div>
@@ -79,7 +79,7 @@
                     <tr>
                         <th>Tag</th>
                         <th>Utilisation</th>
-                        <th>Projets</th>
+                        <th>Dossiers</th>
                     </tr>
                 </thead>
                 <tbody>

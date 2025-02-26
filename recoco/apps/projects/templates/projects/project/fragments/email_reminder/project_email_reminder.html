@@ -15,7 +15,7 @@
                  class="highlighted highlighted--blue d-flex justify-content-between align-items-center fr-mt-5v fr-mb-3w fr-mr-3w">
                 <p class="fr-mb-0">
                     <span class="fr-icon-notification-3-line fr-icon--sm fr-mr-1w"
-                          aria-hidden="true"></span>Prochain rappel au porteur de projet prévu le <span data-test-id="email-date">{{ reminder.deadline }}</span>
+                          aria-hidden="true"></span>Prochain rappel au porteur de dossier prévu le <span data-test-id="email-date">{{ reminder.deadline }}</span>
                 </p>
                 {% if request.user in project.members.all or position.is_advisor or position.is_observer %}
                     {% include "projects/project/fragments/email_reminder/learn_more_reminder.html" %}

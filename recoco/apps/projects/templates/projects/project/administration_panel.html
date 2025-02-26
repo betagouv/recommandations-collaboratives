@@ -56,7 +56,7 @@
                                                    class="fr-py-2w placeholder-grey form-control {% if project_form.name.errors %}is-invalid{% endif %}"
                                                    id="{{ project_form.name.id_for_label }}"
                                                    name="{{ project_form.name.name }}"
-                                                   placeholder="Nom du projet"
+                                                   placeholder="Nom du dossier"
                                                    value="{{ project_form.name.value }}"
                                                    required />
                                             {% for error in project_form.name.errors %}<div class="invalid-feedback">{{ error }}</div>{% endfor %}
@@ -129,7 +129,7 @@
                                             </template>
                                         </div>
                                     </div>
-                                    <button id="bouton-modifier-les-info" type="submit" class="button filled">Modifier les informations du projet</button>
+                                    <button id="bouton-modifier-les-info" type="submit" class="button filled">Modifier les informations du dossier</button>
                                 </form>
                             </div>
                         {% endif %}
@@ -155,7 +155,7 @@
                                 {% endif %}
                                 {% if project.switchtender_sites.all.count == 0 %}
                                     <div class="bg-light d-flex flex-column justify-content-center align-items-center fr-py-3w rounded">
-                                        <p class="fr-m-0 text-info-custom text-grey fw-normal fr-pb-2w">Le projet n'est pas encore suivi</p>
+                                        <p class="fr-m-0 text-info-custom text-grey fw-normal fr-pb-2w">Le dossier n'est pas encore suivi</p>
                                         <svg class="bi align-baseline fr-mr-2v fr-mt-1v"
                                              width="30"
                                              height="30"
@@ -199,7 +199,7 @@
                                 {% endif %}
                             </div>
                             <div class="col">
-                                <p class="text-info-custom fr-mb-2v">Equipe du porteur de projet et partenaires</p>
+                                <p class="text-info-custom fr-mb-2v">Equipe du porteur de dossier et partenaires</p>
                                 {% if "invite_collaborators" in user_project_perms %}
                                     <button @click="openInviteMemberModal"
                                             data-toggle="modal"
@@ -211,7 +211,7 @@
                                                 <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#lock-fill" />
                                             </svg>
                                         {% endif %}
-                                        <span>Inviter un membre porteur de projet ou un partenaire</span>
+                                        <span>Inviter un membre porteur de dossier ou un partenaire</span>
                                     </button>
                                 {% endif %}
                                 <ul class="flex-column list-unstyled fr-mb-0">
@@ -219,7 +219,7 @@
                                         {% if pm.is_owner %}
                                             <li class="d-flex align-items-start justify-content-between fr-mb-1v">
                                                 {% include "user/user_card.html" with user=pm.member project_owner=True user_activity=True %}
-                                                <span class="fr-ml-1v text-lowercase fst-italic font-weight-light specific-color-666">Référent du projet</span>
+                                                <span class="fr-ml-1v text-lowercase fst-italic font-weight-light specific-color-666">Référent du dossier</span>
                                             </li>
                                         {% else %}
                                             <li class="d-flex align-items-start justify-content-between fr-mb-1v">
@@ -328,7 +328,7 @@
                                 {% else %}
                                     <p data-test-id="administration-member-invitation-list"
                                        class="text-info-custom fr-mb-3w fr-mt-1v">
-                                        Invitations en attente porteur de projet et partenaires
+                                        Invitations en attente porteur de dossier et partenaires
                                     </p>
                                     <ul class="list-group">
                                         {% for invite in pending_invites %}

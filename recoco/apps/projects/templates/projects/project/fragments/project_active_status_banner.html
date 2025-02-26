@@ -20,11 +20,11 @@
             {% if user == project.owner %}
                 <p class="title">Le conseil est en pause</p>
                 <p>
-                    Vous ne recevez aucune notification par email sur l’activité du projet. Vous pouvez tout de même écrire dans votre projet. Dans ce cas, les participants seront notifiés de sa réactivation.
+                    Vous ne recevez aucune notification par email sur l’activité du dossier. Vous pouvez tout de même écrire dans votre dossier. Dans ce cas, les participants seront notifiés de sa réactivation.
                 </p>
             {% else %}
-                <p class="title">Le projet est à l’arrêt</p>
-                <p>Le porteur de projet et partenaires ne reçoivent aucune notification sur l’activité du projet.</p>
+                <p class="title">Le dossier est à l’arrêt</p>
+                <p>Le porteur de dossier et partenaires ne reçoivent aucune notification sur l’activité du dossier.</p>
             {% endif %}
         </div>
         {% if user == project.owner or 'change_site' in user_site_perms %}
@@ -35,7 +35,7 @@
                       action="{% url 'projects-project-set-active' project.pk %}">
                     {% csrf_token %}
                     <button data-test-id="button-activate-project"
-                            class="button blue outline text-nowrap inherit small">Réactiver le projet</button>
+                            class="button blue outline text-nowrap inherit small">Réactiver le dossier</button>
                 </form>
             </div>
         {% endif %}

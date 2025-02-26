@@ -12,7 +12,7 @@
 <div class="fr-pt-3w fr-pr-3w w-100 h-100"
      data-test-id="project-activity-tracking-observer">
     <div class="d-flex align-items-center justify-content-between fr-mb-2v">
-        <h6 class="text-uppercase fw-bold fr-m-0 fr-p-0 h6-specific-fontsize-14">Activité du projet</h6>
+        <h6 class="text-uppercase fw-bold fr-m-0 fr-p-0 h6-specific-fontsize-14">Activité du dossier</h6>
     </div>
     <div class="fr-p-0 h-100 w-100 d-inline-flex flex-column justify-content-between align-items-center">
         <article class="overflow-hidden timeline-blur w-100">
@@ -28,12 +28,12 @@
                         </div>
                     </li>
                 {% empty %}
-                    <span class="text-custom-info text-grey-dark fw-light fr-mb-3w">Vous trouverez ici l'activité de vos projets suivis</span>
+                    <span class="text-custom-info text-grey-dark fw-light fr-mb-3w">Vous trouverez ici l'activité de vos dossiers suivis</span>
                 {% endfor %}
             </ul>
         </article>
         <a class="timeline-button fr-btn fr-btn--sm fr-btn--tertiary"
            data-test-id="project-activity-link"
-           href="{% url 'projects-project-detail-internal-followup-tracking' project.pk %}">Voir toute l'activité du projet</a>
+           href="{% url 'projects-project-detail-internal-followup-tracking' project.pk %}">Voir toute l'activité du dossier</a>
     </div>
 </div>

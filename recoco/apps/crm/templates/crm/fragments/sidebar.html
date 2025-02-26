@@ -23,7 +23,7 @@
                     <svg class="bi fr-mr-2v d-inline" width="16" height="16">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#folder-fill" />
                     </svg>
-                    <a href="{% url 'crm-project-list' %}">Projets</a>
+                    <a href="{% url 'crm-project-list' %}">Dossiers</a>
                 </li>
                 <li class="dropdown-item border-0 d-inline-block position-relative fr-mb-1v">
                     <svg class="bi fr-mr-2v d-inline" width="16" height="16">
@@ -53,13 +53,13 @@
         {% if followed_projects %}
             <div class="fr-px-3w fr-mt-3w crm-border crm-border-bottom fr-pb-2v">
                 <h5 class="crm-project-decoration d-inline-block">
-                    Projets suivis <strong>({{ advised_projects|length }})</strong>
+                    Dossiers suivis <strong>({{ advised_projects|length }})</strong>
                 </h5>
                 <ul class="list-unstyled">
                     {% for project in advised_projects %}
                         {% include "crm/project_item.html" %}
                     {% empty %}
-                        <li>Désolé, pas encore de projet pour cette organisation</li>
+                        <li>Désolé, pas encore de dossier pour cette organisation</li>
                     {% endfor %}
                 </ul>
             </div>
@@ -67,13 +67,13 @@
         {% if unfollowed_projects %}
             <div class="fr-px-3w fr-mt-3w crm-border-bottom fr-pb-2v">
                 <h5 class="crm-project-decoration d-inline-block relative">
-                    Projets régionaux non suivis <strong>({{ unadvised_projects|length }})</strong>
+                    Dossiers régionaux non suivis <strong>({{ unadvised_projects|length }})</strong>
                 </h5>
                 <ul class="list-unstyled">
                     {% for project in unadvised_projects %}
                         {% include "crm/project_item.html" %}
                     {% empty %}
-                        <li>Aucun projet régionaux non suivis</li>
+                        <li>Aucun dossier régionaux non suivis</li>
                     {% endfor %}
                 </ul>
             </div>
@@ -111,7 +111,7 @@
         {% if project_members %}
             <div class="fr-px-3w crm-border-bottom fr-pb-2v">
                 <h5 class="crm-user-decoration d-inline-block relative">
-                    Porteur de projet et partenaires <strong>({{ project.members.all|length }})</strong>
+                    Porteur de dossier et partenaires <strong>({{ project.members.all|length }})</strong>
                 </h5>
                 <ul class="list-unstyled">
                     {% for member in project.members.all %}
@@ -125,7 +125,7 @@
         {% if user_advised_projects %}
             <div class="fr-pt-2w crm-border-bottom fr-pb-2v fr-px-3w">
                 <h5 class="crm-project-decoration d-inline-block relative">
-                    Projets conseillés <strong>({{ crm_user.projects_switchtended_per_site.all|length }})</strong>
+                    Dossiers conseillés <strong>({{ crm_user.projects_switchtended_per_site.all|length }})</strong>
                 </h5>
                 <ul class="list-unstyled">
                     {% for switchtending in crm_user.projects_switchtended_per_site.all %}
@@ -139,7 +139,7 @@
         {% if user_projects %}
             <div class="fr-pt-2w crm-border-bottom fr-pb-2v fr-px-3w">
                 <h5 class="crm-project-decoration d-inline-block relative">
-                    Participe aux projets <strong>({{ crm_user.projectmember_set.all|length }})</strong>
+                    Participe aux dossiers <strong>({{ crm_user.projectmember_set.all|length }})</strong>
                 </h5>
                 <ul class="list-unstyled">
                     {% for membership in crm_user.projectmember_set.all %}

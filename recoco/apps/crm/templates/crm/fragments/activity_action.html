@@ -27,7 +27,7 @@
                                             {% if action.action_object.role == "SWITCHTENDER" or action.action_object.role == "OBSERVER" or action.action_object.role == "ADVISOR" %}
                                                 <strong class="text-dark">conseiller·e</strong> sur le project
                                             {% else %}
-                                                <strong class="text-dark">porteur de projet</strong>
+                                                <strong class="text-dark">porteur de dossier</strong>
                                             {% endif %}
                                             {% if action.target.commune %}
                                                 {% if action.target.get_absolute_url %}
@@ -47,7 +47,7 @@
                                            href="{{ action.action_object.get_absolute_url }}">
                                             {% if action.action_object %}"{{ action.action_object }}"{% endif %}
                                         </a>
-                                        sur le projet
+                                        sur le dossier
                                         <a class="d-inline hover-underline"
                                            href="{{ action.action_object.get_absolute_url }}">
                                             {{ action.action_object.feed_label }}
@@ -79,7 +79,7 @@
                                                 {% if action.verb == verbs.Conversation.PUBLIC_MESSAGE or  action.verb == verbs.Conversation.PRIVATE_MESSAGE %}
                                                     <span>à propos de</span>
                                                 {% else %}
-                                                    <span>sur le projet</span>
+                                                    <span>sur le dossier</span>
                                                 {% endif %}
                                                 {% if action.target.get_absolute_url %}
                                                     <a class="hover-underline" href="{{ action.target.get_absolute_url }}">{{ action.target }}</a>
