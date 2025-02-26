@@ -24,37 +24,37 @@ project_mapping_fields: list[MappingField] = [
     ),
     MappingField(
         id="project.owner_first_name",
-        label="Prénom du porteur du dossier",
+        label="Prénom du demandeur",
         lookup="owner.first_name",
     ),
     MappingField(
         id="project.owner_last_name",
-        label="Nom du porteur du dossier",
+        label="Nom du demandeur",
         lookup="owner.last_name",
     ),
     MappingField(
         id="project.owner_full_name",
-        label="Nom complet du porteur du dossier (Prénom + Nom)",
+        label="Nom complet du demandeur (Prénom + Nom)",
         lookup="owner.full_name",
     ),
     MappingField(
         id="project.owner_full_name_reversed",
-        label="Nom complet du porteur du dossier (Nom + Prénom)",
+        label="Nom complet du demandeur (Nom + Prénom)",
         lookup="owner.full_name_reversed",
     ),
     MappingField(
         id="project.owner_email",
-        label="Email du porteur du dossier",
+        label="Email du demandeur",
         lookup="owner.email",
     ),
     MappingField(
         id="project.owner_organization_position",
-        label="Email du porteur du dossier",
+        label="Email du demandeur",
         lookup="owner.profile.organization_position",
     ),
     MappingField(
         id="project.owner_phone_number",
-        label="Téléphone du porteur du dossier",
+        label="Téléphone du demandeur",
         lookup="owner.profile.phone_no.as_international",
     ),
     MappingField(

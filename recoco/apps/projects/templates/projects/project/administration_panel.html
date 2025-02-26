@@ -199,7 +199,7 @@
                                 {% endif %}
                             </div>
                             <div class="col">
-                                <p class="text-info-custom fr-mb-2v">Equipe du porteur de dossier et partenaires</p>
+                                <p class="text-info-custom fr-mb-2v">Equipe du demandeur et partenaires</p>
                                 {% if "invite_collaborators" in user_project_perms %}
                                     <button @click="openInviteMemberModal"
                                             data-toggle="modal"
@@ -211,7 +211,7 @@
                                                 <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#lock-fill" />
                                             </svg>
                                         {% endif %}
-                                        <span>Inviter un membre porteur de dossier ou un partenaire</span>
+                                        <span>Inviter un membre demandeur ou un partenaire</span>
                                     </button>
                                 {% endif %}
                                 <ul class="flex-column list-unstyled fr-mb-0">
@@ -328,7 +328,7 @@
                                 {% else %}
                                     <p data-test-id="administration-member-invitation-list"
                                        class="text-info-custom fr-mb-3w fr-mt-1v">
-                                        Invitations en attente porteur de dossier et partenaires
+                                        Invitations en attente demandeur et partenaires
                                     </p>
                                     <ul class="list-group">
                                         {% for invite in pending_invites %}

@@ -49,7 +49,7 @@ describe('I can invite a member', () => {
         cy.contains(inviterFullName);
         cy.contains('a invité ');
         cy.contains(invitedEmail);
-        cy.contains('en tant que porteur du dossier ou partenaire');
+        cy.contains('en tant que demandeur ou partenaire');
       });
   });
 });

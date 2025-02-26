@@ -28,7 +28,7 @@
                 <template x-if="!task.visited && task.public">
                     <div class="left-0">
                         <span class="bg-blue text-white"
-                              x-text="!$store.djangoData.isAdvisor ? 'Nouveau' : 'Non lu par le porteur de dossier' "></span>
+                              x-text="!$store.djangoData.isAdvisor ? 'Nouveau' : 'Non lu par le demandeur' "></span>
                     </div>
                 </template>
             {% endif %}

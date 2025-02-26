@@ -27,7 +27,7 @@
                                             {% if action.action_object.role == "SWITCHTENDER" or action.action_object.role == "OBSERVER" or action.action_object.role == "ADVISOR" %}
                                                 <strong class="text-dark">conseiller·e</strong> sur le project
                                             {% else %}
-                                                <strong class="text-dark">porteur de dossier</strong>
+                                                <strong class="text-dark">demandeur</strong>
                                             {% endif %}
                                             {% if action.target.commune %}
                                                 {% if action.target.get_absolute_url %}

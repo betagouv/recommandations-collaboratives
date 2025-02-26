@@ -34,7 +34,7 @@
         "element": "#overview-step-1"
       },
       {
-        "intro": "Le service et les acteurs locaux comme vous, conseillent le porteur de dossier ici.",
+        "intro": "Le service et les acteurs locaux comme vous, conseillent le demandeur ici.",
         "element": "#overview-step-2"
       },
       {
@@ -42,7 +42,7 @@
         "element": "#overview-step-3"
       },
       {
-        "intro": "Le porteur de dossier et ses partenaires n’ont pas accès à cet onglet d’échanges.",
+        "intro": "Le demandeur et ses partenaires n’ont pas accès à cet onglet d’échanges.",
         "element": "#overview-step-4"
       },
       {

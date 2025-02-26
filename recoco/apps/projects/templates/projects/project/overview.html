@@ -184,7 +184,7 @@
                                     </div>
                                     <div class="fr-mb-3w">
                                         <div class="d-flex flex-column">
-                                            <h6 class="text-uppercase fw-bold d-block fr-mb-2w h6-specific-fontsize-14">Référent porteur de dossier</h6>
+                                            <h6 class="text-uppercase fw-bold d-block fr-mb-2w h6-specific-fontsize-14">Référent demandeur</h6>
                                             {% include "projects/project/fragments/project_owner.html" with project=project %}
                                             {% include "projects/project/fragments/owner/owner-details.html" with project=project %}
                                             {% include "projects/project/fragments/owner/invite-not-accepted-banner.html" with invites=project.invites.pending %}
@@ -194,7 +194,7 @@
                                     <div class="d-flex flex-column fr-my-3w">
                                         <!-- Collectivity -->
                                         <div class="d-flex justify-content-between fr-mb-2w">
-                                            <h6 class="text-uppercase fw-bold fr-m-0 d-block h6-specific-fontsize-14">Porteur de dossier et partenaires</h6>
+                                            <h6 class="text-uppercase fw-bold fr-m-0 d-block h6-specific-fontsize-14">Demandeur et partenaires</h6>
                                             <div class="d-block"
                                                  {% if not "invite_collaborators" in user_project_perms %} data-bs-toggle="tooltip" data-bs-title="Vous devez être Conseiller ou Observateur pour cela" {% endif %}>
                                                 <button @click="openInviteMemberModal"
