@@ -89,6 +89,10 @@ export function sitesConfigUrl() {
 export function searchOrganizationsUrl(search) {
   return `/api/addressbook/organizations/?search=${search}`;
 }
+
+export function getOrganizationById(id) {
+  return `/api/addressbook/organizations/${id}`;
+}
 // Contacts
 export function searchContactsUrl(search, orgaFirstLetter) {
   const params = new URLSearchParams({ search });

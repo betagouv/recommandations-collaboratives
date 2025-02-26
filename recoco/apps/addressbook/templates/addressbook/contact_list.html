@@ -57,20 +57,21 @@
             </div>
         </div>
         <div class="contact-list__list">
-            <template x-for="organization in Object.entries(contactListGroupByOrganization)"
-                      :key="index">
+            <template x-for="organization in contactListGroupByOrganization" :key="index">
                 <div class="organization-container">
                     <div class="d-flex align-items-center">
-                        <h3 class="organization__name fr-mb-0" x-text="organization[0]"></h3>
-                        {% comment %} TODO get department and merge {% endcomment %}
-                        {% comment %} <div class="organization__departments">
-                            <template x-for="department in organization[1]">
-                                <span class="organization__departments-item" x-text="department"></span>
+                        <h3 class="organization__name fr-mb-0 no-wrap" x-text="organization.name"></h3>
+                        <div class="organization__departments">
+                            <template x-for="department in organization.departments">
+                                <template x-if="department.name">
+                                    <span class="organization__departments-item"
+                                          x-text="`${department.name} (${department.code})`"></span>
+                                </template>
                             </template>
-                        </div> {% endcomment %}
+                        </div>
                     </div>
                     <div class="contact-list__list-container">
-                        <template x-for="contact in organization[1]" :key="contact.id">
+                        <template x-for="contact in organization.contacts" :key="contact.id">
                             <div x-data="{contact:contact}" class="contact-list__list-item">
                                 {% include "tools/contacts/contact_card.html" with button_actions=True %}
                             </div>
