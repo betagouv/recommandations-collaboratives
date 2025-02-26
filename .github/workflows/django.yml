@@ -79,10 +79,6 @@ jobs:
         run: |
           cp recoco/settings/development.py.example recoco/settings/development.py
 
-      - name: Check migrations
-        run: |
-          uv run manage.py makemigrations --check --dry-run --settings=recoco.settings.testing
-
       - name: Run Tests
         env:
           SECRET_KEY: 'this-is-not-a-secret-key'
@@ -94,4 +90,5 @@ jobs:
           DJANGO_DB_PORT: 5432
           DJANGO_DB_ENGINE: django.db.backends.postgresql
         run: |
+          uv run manage.py makemigrations --check --dry-run --settings=recoco.settings.testing
           uv run pytest --create-db
