@@ -38,7 +38,7 @@ Actuellement, les modèles principaux sont : :class:`Project<recoco.apps.project
 Adaptateurs de recherche
 ========================
 
-Dans certains cas, il est nécessaire d'écrire des adaptateurs pour améliorer l'indexation. Voici un exemple avec les projets :
+Dans certains cas, il est nécessaire d'écrire des adaptateurs pour améliorer l'indexation. Voici un exemple avec les dossiers :
 
 .. autoclass:: recoco.apps.projects.models.ProjectSearchAdapter
    :members:

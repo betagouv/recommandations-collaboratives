@@ -524,7 +524,7 @@ function markerPopupTemplate(item) {
   if (item.status === 'NEW') {
     roleTemplate = `
         <div class="project-card-top-information new">
-            <span>Nouveau projet</span>
+            <span>Nouveau dossier</span>
         </div>
         `;
   }

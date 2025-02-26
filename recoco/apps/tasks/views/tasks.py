@@ -403,7 +403,7 @@ def task_recommendation_delete(request, recommendation_id):
     return redirect(reverse("projects-task-recommendation-list"))
 
 
-# retourne pour le projet les suggestions du système
+# retourne pour le dossier les suggestions du système
 @login_required
 def presuggest_task(request, project_id):
     """Suggest tasks"""

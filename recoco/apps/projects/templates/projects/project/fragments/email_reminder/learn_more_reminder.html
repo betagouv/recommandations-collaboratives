@@ -27,17 +27,17 @@
         </div>
     {% endif %}
     <div class="border-bottom-grey fr-p-2v d-flex flex-column">
-        <span class="tiny fw-medium">Activité du projet</span>
-        <span class="tiny fw-normal fr-mb-2v">Vous recevez une notification par email à chaque nouvelle activité sur le projet dans un récapitulatif journalier.</span>
+        <span class="tiny fw-medium">Activité du dossier</span>
+        <span class="tiny fw-normal fr-mb-2v">Vous recevez une notification par email à chaque nouvelle activité sur le dossier dans un récapitulatif journalier.</span>
     </div>
     <div class="fr-p-2v d-flex flex-column">
         {% if request.user == project.owner %}
-            <span class="tiny fw-normal fr-mb-1v">Pour couper les notifications vous pouvez mettre le projet en pause depuis l’onglet
+            <span class="tiny fw-normal fr-mb-1v">Pour couper les notifications vous pouvez mettre le dossier en pause depuis l’onglet
                 <a class="fr-link"
                    href="{% url 'projects-project-administration' project.pk %}#project-status-settings">Paramètres</a>
             </span>
         {% else %}
-            <span class="tiny fw-normal fr-mb-1v">Si vous ne souhaitez plus recevoir de notifications vous pouvez quitter le projet depuis l’onglet
+            <span class="tiny fw-normal fr-mb-1v">Si vous ne souhaitez plus recevoir de notifications vous pouvez quitter le dossier depuis l’onglet
                 <a class="fr-link text-underline"
                    href="{% url 'projects-project-administration' project.pk %}#project-status-settings">Paramètres</a>
             </span>

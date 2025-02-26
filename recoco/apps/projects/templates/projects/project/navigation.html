@@ -26,7 +26,7 @@
     {% with active_project_action_notifications_count=project.action_notifications_count active_project_conversation_notifications_count=project.conversation_notifications_count active_project_document_notifications_count=project.document_notifications_count active_project_private_conversation_notifications_count=project.private_conversation_notifications_count %}
         <fieldset class="fr-segmented fr-segmented--md fr-px-3w"
                   x-init="$nextTick(() => $store.projectQueue.addCurrentProjectId({{ project.id }}, `{{ project.name }}`, `{{ project.commune.name }}`,`{{ project.commune.insee }}`))">
-            <legend class="fr-segmented__legend visually-hidden">Onglets du projet</legend>
+            <legend class="fr-segmented__legend visually-hidden">Onglets du dossier</legend>
             {% if overview %}
                 {% if position.is_advisor or position.is_observer or is_regional_actor %}
                     {% include "tutorial/tutorial_hint.html" %}
@@ -255,7 +255,7 @@
                                     </div>
                                     <div>
                                         <p class="fr-pl-8v fr-mb-0 specific-fontsize-14px">
-                                            Vous avez accès à l'intégralité du projet et recevez les notifications de mises à jour,
+                                            Vous avez accès à l'intégralité du dossier et recevez les notifications de mises à jour,
                                             mais vous n'êtes pas identifié comme un interlocuteur actif.
                                         </p>
                                     </div>
@@ -274,8 +274,8 @@
                                     </div>
                                     <div>
                                         <p class="fr-pl-8v fr-mb-0 specific-fontsize-14px">
-                                            Vous avez accès à l'intégralité du projet et à ses notifications par email,
-                                            et êtes identifié comme un interlocuteur disponible sur ce projet.
+                                            Vous avez accès à l'intégralité du dossier et à ses notifications par email,
+                                            et êtes identifié comme un interlocuteur disponible sur ce dossier.
                                         </p>
                                     </div>
                                 </div>
@@ -299,7 +299,7 @@
                                               action="{% url 'projects-project-access-advisor-delete' project.pk request.user.username %}">
                                             {% csrf_token %}
                                             <button class="fr-btn fr-btn--sm fr-btn--tertiary w-100 justify-content-center"
-                                                    data-test-id="button-quit-role">Quitter le projet</button>
+                                                    data-test-id="button-quit-role">Quitter le dossier</button>
                                         </form>
                                     </div>
                                 {% endif %}

@@ -1,4 +1,4 @@
-Terminologies utilisées au sein du projet
+Terminologies utilisées au sein du dossier
 =========================================
 
 Conseiller

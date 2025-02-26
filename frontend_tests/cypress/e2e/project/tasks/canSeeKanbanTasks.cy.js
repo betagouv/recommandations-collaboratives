@@ -9,7 +9,7 @@ describe('I can go to tasks tab', () => {
 
   it('list all kanban tasks', () => {
     cy.visit(`/project/${currentProject.pk}`);
-    cy.becomeAdvisor(currentProject.pk); // A remplacer par une fixture avec un user déjà advisor du projet
+    cy.becomeAdvisor(currentProject.pk); // A remplacer par une fixture avec un user déjà advisor du dossier
     cy.visit(`/project/${currentProject.pk}/actions`);
     cy.createTask('test');
 

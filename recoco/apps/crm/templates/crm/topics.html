@@ -23,7 +23,7 @@
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#tags" />
                     </svg>
                     &nbsp;
-                    <span>Index des thématiques (projets et recommandations)</span>
+                    <span>Index des thématiques (dossiers et recommandations)</span>
                 </h2>
                 <div>
                     <a href="{% url 'crm-list-topics-as-csv' %}">Télécharger en CSV</a>
@@ -42,7 +42,7 @@
                                 tabindex="0"
                                 role="tab"
                                 aria-selected="true"
-                                aria-controls="tabpanel-byprojects-panel">Thématique par projets</button>
+                                aria-controls="tabpanel-byprojects-panel">Thématique par dossiers</button>
                     </li>
                     <li role="presentation">
                         <button id="tabpanel-bytasks"
@@ -65,7 +65,7 @@
                                     <tr>
                                         <th scope="col">Nom</th>
                                         <th scope="col">Occurences</th>
-                                        <th scope="col">Projets</th>
+                                        <th scope="col">Dossiers</th>
                                     </tr>
                                 </thead>
                                 <tbody>

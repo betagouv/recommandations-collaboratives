@@ -7,7 +7,6 @@ author  : raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created : 2021-12-14 10:36:20 CEST
 """
 
-
 from django import forms
 from markdownx.fields import MarkdownxFormField
 
@@ -71,7 +70,7 @@ class ProjectForm(forms.ModelForm):
 
         labels = {
             "location": "Adresse",
-            "description": "Contexte du projet",
+            "description": "Contexte du dossier",
         }
 
 

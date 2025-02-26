@@ -32,7 +32,7 @@ describe('I can go to administration area of a project and change the project lo
       .type(`${currentProject.fields.name} updated`, { force: true })
       .should('have.value', `${currentProject.fields.name} updated`);
 
-    cy.contains('Modifier les informations du projet').click({ force: true });
+    cy.contains('Modifier les informations du dossier').click({ force: true });
 
     cy.url().should('include', '/presentation');
 

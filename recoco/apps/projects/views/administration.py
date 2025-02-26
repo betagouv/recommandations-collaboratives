@@ -114,7 +114,7 @@ def project_administration(request, project_id):
                     original_value = form.initial[field_name]
                 if str(original_value) != str(submitted_value):
                     edited_fields.append(
-                        form.fields[field_name].label.lower().replace(" du projet", "")
+                        form.fields[field_name].label.lower().replace(" du dossier", "")
                     )
 
             if edited_fields:
@@ -181,7 +181,7 @@ def access_invite(request, role, project):
             messages.success(
                 request,
                 (
-                    "Un courriel d'invitation à rejoindre le projet"
+                    "Un courriel d'invitation à rejoindre le dossier"
                     f" a été envoyé à {email}."
                 ),
                 extra_tags=["email"],
@@ -191,7 +191,7 @@ def access_invite(request, role, project):
             messages.warning(
                 request,
                 (
-                    f"Cet usager ({email}) est déjà membre du projet, il n'a"
+                    f"Cet usager ({email}) est déjà membre du dossier, il n'a"
                     " donc pas été réinvité."
                 ),
             )
@@ -344,7 +344,7 @@ def access_collaborator_delete(request, project_id: int, username: str):
         if membership.is_owner:
             messages.error(
                 request,
-                "Vous ne pouvez pas retirer le propriétaire de son propre projet.",
+                "Vous ne pouvez pas retirer le propriétaire de son propre dossier.",
                 extra_tags=["auth"],
             )
 

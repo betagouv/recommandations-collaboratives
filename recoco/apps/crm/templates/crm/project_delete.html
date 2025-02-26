@@ -24,18 +24,18 @@
         <div class="w-75 d-flex flex-column justify-content-start">
             <div class="crm-header fr-px-3w fr-py-3w fr-mb-2w">
                 <div class="d-flex justify-content-between align-items-center fr-mb-2v">
-                    <h3>Gérer le projet « {{ project.name }} »</h3>
+                    <h3>Gérer le dossier « {{ project.name }} »</h3>
                 </div>
             </div>
             <div class="fr-m-3w">
-                <p class="fw-bolder">Vous êtes sur le point de supprimer le projet « {{ project.name }} » ({{ project.commune }})</p>
+                <p class="fw-bolder">Vous êtes sur le point de supprimer le dossier « {{ project.name }} » ({{ project.commune }})</p>
                 <p>
                     Ceci signifie que :
                     <ul>
                         <li>
-                            Ce projet ne pourra <strong>plus</strong> être vu sur aucun portail, dont {{ request.site.name }}
+                            Ce dossier ne pourra <strong>plus</strong> être vu sur aucun portail, dont {{ request.site.name }}
                         </li>
-                        <li>Il sera possible de réactiver le projet si nécessaire</li>
+                        <li>Il sera possible de réactiver le dossier si nécessaire</li>
                     </ul>
                 </p>
                 <div class="fr-mt-3w">
@@ -43,7 +43,7 @@
                         {% csrf_token %}
                         <button type="submit"
                                 href="{% url 'crm-project-delete' project.pk %}"
-                                class="btn btn-danger">Oui, supprimer ce projet</button>
+                                class="btn btn-danger">Oui, supprimer ce dossier</button>
                         <a href="{% url 'crm-project-details' project.pk %}"
                            class="btn btn-outline-secondary">Non, annuler la suppression</a>
                     </form>

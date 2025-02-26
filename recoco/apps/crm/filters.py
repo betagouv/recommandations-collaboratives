@@ -132,7 +132,7 @@ class ProjectFilter(django_filters.FilterSet):
         ),
         # labels do not need to retain order
         field_labels={
-            "name": "Nom du projet",
+            "name": "Nom du dossier",
             "commune": "Commune",
             "created_on": "Date de dépôt",
         },

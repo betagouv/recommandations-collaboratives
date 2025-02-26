@@ -11,8 +11,8 @@ describe('I can invite a member', () => {
 
   it('goes to the overview page and invite a member', () => {
     cy.login('collectivité2');
-    const message = `Bonjour ${invitedFullName}, je t'invite à conseiller mon projet ${project} ${invitedEmail}`;
-    const sentNotification = `Un courriel d'invitation à rejoindre le projet a été envoyé à ${invitedEmail}`;
+    const message = `Bonjour ${invitedFullName}, je t'invite à conseiller mon dossier ${project} ${invitedEmail}`;
+    const sentNotification = `Un courriel d'invitation à rejoindre le dossier a été envoyé à ${invitedEmail}`;
 
     cy.visit(`/project/${currentProject.pk}`);
 
@@ -49,7 +49,7 @@ describe('I can invite a member', () => {
         cy.contains(inviterFullName);
         cy.contains('a invité ');
         cy.contains(invitedEmail);
-        cy.contains('en tant que porteur du projet ou partenaire');
+        cy.contains('en tant que demandeur ou partenaire');
       });
   });
 });

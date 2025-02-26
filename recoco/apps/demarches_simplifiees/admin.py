@@ -71,7 +71,7 @@ class DSFolderAdmin(admin.ModelAdmin):
         "recommendation",
     )
 
-    @admin.action(description="Mettre à jour le matching projet / démarche simplifiée")
+    @admin.action(description="Mettre à jour le matching dossier / démarche simplifiée")
     def update_matching(self, request: HttpRequest, queryset: QuerySet[DSResource]):
         for ds_folder in queryset:
             if not ds_folder.recommendation_id:

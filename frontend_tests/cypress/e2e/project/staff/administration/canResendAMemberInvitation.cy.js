@@ -26,12 +26,12 @@ describe('I can go to administration area of a project and send back an invite f
     cy.get('#invite-member-modal')
       .get('#invite-message')
       .type(
-        `Bonjour ${userToInvite.fields.first_name}, je t'invite à conseiller mon projet ${currentProject.fields.name}`,
+        `Bonjour ${userToInvite.fields.first_name}, je t'invite à conseiller mon dossier ${currentProject.fields.name}`,
         { force: true }
       )
       .should(
         'have.value',
-        `Bonjour ${userToInvite.fields.first_name}, je t'invite à conseiller mon projet ${currentProject.fields.name}`
+        `Bonjour ${userToInvite.fields.first_name}, je t'invite à conseiller mon dossier ${currentProject.fields.name}`
       );
 
     cy.get('#invite-member-modal')

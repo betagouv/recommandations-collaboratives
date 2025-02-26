@@ -9,9 +9,9 @@ describe('I can advice a project', () => {
   xit('goes to overview page and advise the project', () => {
     cy.visit(`/project/${currentProject.pk}`);
 
-    // cy.contains("Conseiller ce projet").click({ force: true })
+    // cy.contains("Conseiller ce dossier").click({ force: true })
     // cy.wait(500);
-    // cy.contains("Ne plus conseiller ce projet")
+    // cy.contains("Ne plus conseiller ce dossier")
     // cy.contains("Jeanne Conseille")
   });
 });
