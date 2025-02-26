@@ -82,6 +82,89 @@
       &__updated-at {
         bottom: 0;
       }
+      .button__actions {
+        // display: none; //TODO: Uncomment this line
+        .modal__confirm-delete {
+          --ul-type: none;
+          --ul-start: 0;
+          z-index: 2;
+          position: absolute;
+          background: #fff;
+          border: 1px solid var(--light-border-default-grey, #e5e5e5);
+          border-radius: 4px;
+          box-shadow: 4px 8px 8px -16px rgba(0, 0, 0, 0.2);
+          right: 0;
+          top: 25px;
+          width: 450px;
+          .modal__header {
+            padding: 0.625rem;
+            color: #3a3a3a;
+            font-size: 12px;
+            font-weight: 700;
+            line-height: 1.125rem;
+            display: flex;
+            justify-content: space-between;
+          }
+          .modal__body {
+            padding: 0.625rem;
+            .modal__text {
+              color: var(--light-border-plain-error, #ce0500);
+              font-size: 13px;
+              font-weight: 700;
+              line-height: 150%;
+            }
+          }
+
+          .modal__footer {
+            padding: 0.625rem;
+            width: 100%;
+            &-cancel,
+            &-confirm {
+              border-radius: 1px;
+              font-size: 12px;
+              font-weight: 700;
+              line-height: 1.125rem;
+              display: flex;
+              padding: 6px 8px;
+              justify-content: center;
+              align-items: flex-start;
+              gap: 10px;
+              flex: 1 0 0;
+            }
+            &-cancel {
+              background: var(--light-background-alt-grey, #f6f6f6);
+              color: var(--light-text-default-grey, #3a3a3a);
+            }
+            &-confirm {
+              color: #fff;
+              background: var(--light-background-flat-error, #ce0500);
+            }
+          }
+        }
+      }
+      // &:hover.actions { //TODO: Uncomment this line and delete the next line
+      &.actions {
+        border: 1px solid var(--light-border-action-high-blue-france, #000091);
+        .button__actions {
+          position: absolute;
+          top: 1rem;
+          right: 1rem;
+          display: grid;
+          gap: 4px;
+          &-edit {
+            height: 16px;
+            border-radius: 1px;
+            color: #000000;
+            background: var(--light-background-alt-grey, #f6f6f6);
+          }
+          &-delete {
+            height: 16px;
+            border-radius: 1px;
+            color: var(--background-flat-error);
+            background: var(--light-background-contrast-error, #ffe9e9);
+          }
+        }
+      }
     }
   }
   &__list-container {

@@ -1,4 +1,5 @@
 {% load sass_tags %}
+{% load static %}
 {% block css %}
     <link href="{% sass_src 'css/tools/contact/contact-card.scss' %}"
           rel="stylesheet"
@@ -82,9 +83,49 @@
             <div class="button__actions">
                 <a class="fr-btn fr-btn--tertiary-no-outline fr-btn--sm fr-icon-pencil-line button__actions-edit"
                    :href="`/addressbook/contact/${contact.id}/update/`">Éditer le contact</a>
-                <button class="fr-btn fr-btn--tertiary-no-outline fr-btn--sm fr-icon-delete-line button__actions-delete">
-                    Supprimer le contact
-                </button>
+                <div x-data="{ openDeleteContact: false }"
+                     @click.outside="openDeleteContact = false"
+                     class="position-relative">
+                    <button class="fr-btn fr-btn--tertiary-no-outline fr-btn--sm fr-icon-delete-line button__actions-delete"
+                            @click="openDeleteContact = !openDeleteContact">Supprimer le contact</button>
+                    <ul x-show="openDeleteContact"
+                        :class="{'openDeleteContact':open}"
+                        class="modal__confirm-delete positioning-dropdown">
+                        <li class="modal__header">
+                            Supprimer un contact
+                            <button class="notification__icon"
+                                    title="Fermer le menu"
+                                    @click="openDeleteContact = false">
+                                <svg class="bi fr-mr-1v" width="16" height="16" fill="currentColor">
+                                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#x-lg" />
+                                </svg>
+                            </button>
+                        </li>
+                        <li>
+                            <hr class="dropdown-divider fr-pb-0">
+                        </li>
+                        <li class="modal__body">
+                            <p class="modal__text">Êtes-vous sûr de vouloir supprimer le contact suivant :</p>
+                            <div class="contact__resume">
+                                <span x-text="contact.first_name"
+                                      class="same-for-all-text contact-names fr-pr-1v no-wrap"></span>
+                                <span x-text="contact.last_name"
+                                      class="same-for-all-text contact-names fr-pr-1v no-wrap"></span>
+                                <span x-text="contact.division"
+                                      class="color-3a3a3a text-position long-text-adaptation no-wrap"></span>
+                                <span x-text="contact.organization.name"
+                                      class="color-3a3a3a text-organisation"></span>
+                            </div>
+                        </li>
+                        <li>
+                            <hr class="dropdown-divider fr-pb-0">
+                        </li>
+                        <li class="modal__footer d-inline-flex gap-1">
+                            <button class="modal__footer-cancel" @click="openDeleteContact = false">Annuler</button>
+                            <button class="modal__footer-confirm">Confirmer la suppression</button>
+                        </li>
+                    </ul>
+                </div>
             </div>
         {% endif %}
     </div>
