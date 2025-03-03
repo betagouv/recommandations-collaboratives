@@ -27,6 +27,7 @@ class OrganizationGroupSerializer(BaseSerializerMixin, ModelSerializer):
     class Meta:
         model = OrganizationGroup
         fields = [
+            "id",
             "name",
         ]
 

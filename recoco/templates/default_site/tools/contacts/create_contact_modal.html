@@ -37,17 +37,29 @@
         <template x-if="verifPoste">
             <p class="modal-create-contact__label-info red-text">Le champ de votre poste est obligatoire *</p>
         </template>
-        <input type="text" class="fr-input" :class="{'fr-input--error': verifPoste}" x-model="contactJob" required>
+        <input type="text"
+               class="fr-input"
+               :class="{'fr-input--error': verifPoste}"
+               x-model="contactJob"
+               required>
     </div>
     <div class="fr-p-3v modal-create-contact__block">
         <label class="modal-create-contact__label">Email</label>
-        <p class="modal-create-contact__label-info" :class="{'red-text': verifMailOrPhone}">Renseigner au minimum l’email ou un numéro de téléphone</p>
-        <input type="text" class="fr-input" :class="{'fr-input--error': verifMailOrPhone}" x-model="contactEmail">
+        <p class="modal-create-contact__label-info"
+           :class="{'red-text': verifMailOrPhone}">Renseigner au minimum l’email ou un numéro de téléphone</p>
+        <input type="text"
+               class="fr-input"
+               :class="{'fr-input--error': verifMailOrPhone}"
+               x-model="contactEmail">
     </div>
     <div class="fr-p-3v modal-create-contact__block">
         <label class="modal-create-contact__label">Téléphone Principal</label>
-        <p class="modal-create-contact__label-info" :class="{'red-text': verifMailOrPhone}">Renseigner au minimum l’email ou un numéro de téléphone</p>
-        <input type="text" class="fr-input" :class="{'fr-input--error': verifMailOrPhone}" x-model="contactTel">
+        <p class="modal-create-contact__label-info"
+           :class="{'red-text': verifMailOrPhone}">Renseigner au minimum l’email ou un numéro de téléphone</p>
+        <input type="text"
+               class="fr-input"
+               :class="{'fr-input--error': verifMailOrPhone}"
+               x-model="contactTel">
     </div>
     <div class="fr-p-3v modal-create-contact__block">
         <label class="modal-create-contact__label">Téléphone Secondaire</label>

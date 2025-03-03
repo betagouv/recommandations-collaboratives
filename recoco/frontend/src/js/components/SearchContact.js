@@ -20,15 +20,19 @@ function SearchContact() {
       this.noSearch = false;
       if (this.userInput.length > 0 && !this.isAContactSelected) {
         this.contactsFound = [];
-        api.get(searchContactsUrl(this.userInput)).then((response) => {
-          this.searchResults = response.data;
-          this.contactsFound = this.searchResults.results;
-          if (this.contactsFound.length > 0) {
-            this.showContactsresults = true;
-          } else {
-            this.showContactsresults = false;
-          }
-        });
+        try {
+          api.get(searchContactsUrl(this.userInput)).then((response) => {
+            this.searchResults = response.data;
+            this.contactsFound = this.searchResults.results;
+            if (this.contactsFound.length > 0) {
+              this.showContactsresults = true;
+            } else {
+              this.showContactsresults = false;
+            }
+          });
+        } catch (error) {
+          console.log(error);
+        }
       } else if (this.userInput.length === 0) {
         this.noSearch = true;
       }
@@ -39,10 +43,10 @@ function SearchContact() {
       this.isAContactSelected = true;
     },
     addContact() {
-      console.log('add contact : ', this.selectedContact);
       let textArea = document.querySelector('.tiptap.ProseMirror');
       textArea.innerHTML += `@ ${this.selectedContact.first_name} ${this.selectedContact.last_name}`;
       this.$store.previewModal.contact = this.selectedContact;
+      this.noSearch = true;
       this.closeModal();
     },
     closeModal() {

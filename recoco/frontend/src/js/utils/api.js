@@ -93,6 +93,22 @@ export function searchOrganizationsUrl(search) {
 export function getOrganizationById(id) {
   return `/api/addressbook/organizations/${id}`;
 }
+
+export function organizationsUrl() {
+  return `/api/addressbook/organizations/`;
+}
+
+// Organization Group
+export function searchOrganizationGroupsUrl(search) {
+  return `/api/addressbook/organizationgroups/?search=${search}`;
+}
+export function organizationGroupsUrl() {
+  return `/api/addressbook/organizationgroups/`;
+}
+// department
+export function departmentsUrl() {
+  return `/api/departments/`;
+}
 // Contacts
 export function searchContactsUrl(search, orgaFirstLetter) {
   const params = new URLSearchParams({ search });

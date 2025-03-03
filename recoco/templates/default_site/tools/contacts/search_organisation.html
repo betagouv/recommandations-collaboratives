@@ -5,8 +5,10 @@
           rel="stylesheet"
           type="text/css" />
 {% endblock css %}
-<div>
-    <div style="position:relative;">
+<div x-data
+     x-init="$watch('$store.contact.orgaCreated', value => setSearch())"
+     @reset-orga-name.window="resetSearch()">
+    <div class="position-relative">
         <div class="fr-search-bar" id="header-search" role="search">
             <input class="fr-input"
                    :class="{'fr-input--error': verifOrga}"
@@ -21,37 +23,48 @@
         </div>
         <div class="fr-menu menu-modal-correct-fr-menu better-positionning-dropdown border-radius-4px">
             <div class="fr-menu__list specific-width-26rem border-radius-4px">
-                <div class="fr-menu__list specific-width-26rem overflow-auto specific-height border-radius-4px">
+                <div class="fr-menu__list specific-width-26rem overflow-auto specific-height border-radius-4px fr-mb-0">
                     <template x-if="userInput.length > 0 && showOrgasresults && !isAnOrgaSelected">
-                        <template class="fr-menu__item" x-for="(orga, index) in orgaFound" :key="index">
-                            <div class="fr-menu__item__content cursor-pointer fr-pt-1w fr-px-1w add-borders"
+                        <template class="fr-menu__item" x-for="(group) in orgaSorted">
+                            <div class="fr-menu__item__content"
                                  data-test-id="orga-to-select"
                                  @click="onSelectOrga(orga)">
-                                <div>
-                                    <span x-text="orga.name"></span>
-                                </div>
+                                <template x-for="(orga, index) in group" :key="index">
+                                    <div>
+                                        <template x-if="index == 0">
+                                            <div class="fr-pt-1w fr-px-1w add-borders">
+                                                <span class="fw-700" x-text="orga.group.name"></span>
+                                            </div>
+                                        </template>
+                                        <div class="fr-pt-1w fr-px-1w add-borders cursor-pointer"
+                                             @click="onSelectOrga(orga)">
+                                            <span x-text="orga.name"></span>
+                                        </div>
+                                    </div>
+                                </template>
                             </div>
                         </template>
                     </template>
                     <template class="fr-menu__item"
-                              x-if="userInput.length > 0 && !isAnOrgaSelected && !showOrgasresults && delayDisplay">
+                              x-if="userInput.length > 0 && !isAnOrgaSelected && !showOrgasresults">
                         <div>
                             <div class="fr-m-1w fr-p-3v specific-banner">
                                 <span class="text-style">Aucun résultat</span>
                             </div>
-                            {% comment %} <div class="btn-create-orga fr-p-1w cursor-pointer" @click="openModalCreateorga">
-                                <span class="fr-icon-add-line" aria-hidden="true"></span><span>Créer un nouveau orga</span>
-                            </div> {% endcomment %}
+                            <div class="btn-create-orga fr-p-1w cursor-pointer"
+                                 @click="openCreateOrganisationModal">
+                                <span class="fr-icon-add-line" aria-hidden="true"></span><span>Créer une nouvelle organisation</span>
+                            </div>
                         </div>
                     </template>
                 </div>
+                <template x-if="userInput.length > 0 && showOrgasresults && !isAnOrgaSelected">
+                    <div class="btn-create-orga fr-p-1w cursor-pointer"
+                         @click="openCreateOrganisationModal">
+                        <span class="fr-icon-add-line" aria-hidden="true"></span><span>Créer une nouvelle organisation</span>
+                    </div>
+                </template>
             </div>
         </div>
-    </div>
-    <div>
-
-        {% comment %} <div class="flex justify-end pt-2">
-            <button class="px-4 bg-transparent p-3 rounded-lg text-indigo-500 hover:bg-gray-100 hover:text-indigo-400 mr-2" @click="alert('Additional Action');">Action</button>
-        </div> {% endcomment %}
     </div>
 </div>
