@@ -53,9 +53,11 @@
           font-size: 18px;
           line-height: 36px;
           letter-spacing: 0%;
+          margin-top: 10px;
         }
         &__departments {
           &-item {
+            margin-top: 10px;
             display: inline-block;
             margin-left: 0.625rem;
             padding: 2px 4px;
@@ -83,7 +85,7 @@
         bottom: 0;
       }
       .button__actions {
-        // display: none; //TODO: Uncomment this line
+        display: none; //TODO: Uncomment this line
         .modal__confirm-delete {
           --ul-type: none;
           --ul-start: 0;
@@ -112,6 +114,15 @@
               font-size: 13px;
               font-weight: 700;
               line-height: 150%;
+            }
+            .contact__resume {
+              border: 1px solid var(--light-border-plain-error, #ce0500);
+              padding: 10px;
+              display: flex;
+              flex-direction: column;
+              div {
+                line-height: 150%; /* 16.5px */
+              }
             }
           }
 
@@ -142,8 +153,9 @@
           }
         }
       }
-      // &:hover.actions { //TODO: Uncomment this line and delete the next line
-      &.actions {
+      &:hover.actions {
+        //TODO: Uncomment this line and delete the next line
+        // &.actions {
         border: 1px solid var(--light-border-action-high-blue-france, #000091);
         .button__actions {
           position: absolute;
