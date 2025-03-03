@@ -1,6 +1,43 @@
 .contact-card {
+  div {
+    line-height: 1rem;
+  }
   &__link {
     text-decoration: underline;
     color: #0000ee;
+  }
+  &__firstline-container {
+    display: flex;
+    align-items: baseline;
+    width: 100%;
+  }
+  .contact-info {
+    &__name,
+    &__organization,
+    &__division,
+    &__email,
+    &__phone,
+    &__updated-at {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    &__organization,
+    &__division,
+    &__email,
+    &__phone {
+      padding-top: 0.25rem;
+    }
+    &__updated-at {
+      padding-top: 0.625rem;
+    }
+  }
+  .contact-info-empty {
+    &__organization,
+    &__division,
+    &__email,
+    &__phone {
+      height: 1rem;
+    }
   }
 }
