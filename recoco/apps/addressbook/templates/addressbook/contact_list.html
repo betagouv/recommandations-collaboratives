@@ -61,7 +61,8 @@
                 <div class="organization-container">
                     <div class="d-flex align-items-center">
                         <h3 class="organization__name fr-mb-0 no-wrap" x-text="organization.name"></h3>
-                        <div class="organization__departments">
+                        <div class="organization__departments"
+                             :title="organization.departments.map(department => `${department.name} (${department.code})`).join(', ')">
                             <template x-for="department in organization.departments">
                                 <template x-if="department.name">
                                     <span class="organization__departments-item"

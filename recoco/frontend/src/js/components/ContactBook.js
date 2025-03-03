@@ -5,8 +5,11 @@ import api, {
   getOrganizationById,
 } from '../utils/api';
 
+import { formatDate } from '../utils/date';
+
 Alpine.data('ContactBook', () => {
   return {
+    formatDate,
     searchParams: {
       search: '',
       letter: null,
