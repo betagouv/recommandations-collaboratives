@@ -72,7 +72,7 @@ class PushTypeActionForm(forms.Form):
 
         project_qs = projects_models.Project.objects.filter(
             sites=current_site,
-        )
+        ).select_related("commune__department")
 
         if not is_staff_for_site(user, site=current_site):
             project_qs = project_qs.filter(switchtenders=user)
