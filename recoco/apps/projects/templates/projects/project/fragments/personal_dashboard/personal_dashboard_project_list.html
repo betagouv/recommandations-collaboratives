@@ -26,7 +26,7 @@
                 </header>
             </div>
         </template>
-        <template x-for="item in displayedData" :key="item.project.id">
+        <template x-for="item in displayedData" :key="item.id">
             <div :id=`project-${item.project.id}` class="project-card position-relative rounded fr-mb-3w fr-px-2w d-flex flex-column fr-py-2w justify-content-between align-items-start task-item position-relative cursor-pointer hover-shadow transition-all tmp-usevar" :style="(item.status === 'NEW') ? {'border':'solid 1px #FDCD6D'} : {'border':'solid 1px #dee2e6'}"
                 :class="getProjectStatusClass(item)">
                 <div x-show="item.isLoading"

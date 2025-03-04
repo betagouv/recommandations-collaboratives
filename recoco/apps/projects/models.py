@@ -586,16 +586,10 @@ class ProjectMember(models.Model):
     is_owner = models.BooleanField(default=False)
 
 
-class UserProjectStatusOnSiteManager(CurrentSiteManager):
-    use_for_related_fields = True
-    use_in_migrations = False
-
-
 class UserProjectStatus(models.Model):
     """Project status for a given user"""
 
     objects = models.Manager()
-    on_site = UserProjectStatusOnSiteManager()
 
     USERPROJECT_STATES = (
         ("NEW", "Nouveau"),
@@ -606,11 +600,10 @@ class UserProjectStatus(models.Model):
     )
 
     class Meta:
-        unique_together = ("site", "user", "project")
+        unique_together = ("user", "project")
 
     # FIXME Ajouter "updated_on"
 
-    site = models.ForeignKey(Site, on_delete=models.CASCADE)
     user = models.ForeignKey(
         auth_models.User, on_delete=models.CASCADE, related_name="project_states"
     )

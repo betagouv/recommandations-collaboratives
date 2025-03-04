@@ -347,9 +347,26 @@ def fetch_the_site_project_statuses_for_user(site, user):
     The intent is to fetch each kind of objects in on request and then to
     reattache the information to the appropriate object.
     """
-    project_statuses = models.UserProjectStatus.objects.filter(
-        user=user, project__deleted=None, project__sites=site
-    ).exclude(project__project_sites__status__in=["DRAFT", "REJECTED"])
+    project_statuses = (
+        models.UserProjectStatus.objects.filter(
+            user=user,
+            project__deleted=None,
+        )
+        .prefetch_related("project__project_sites")
+        .filter(
+            Q(
+                project__project_sites__status__in=[
+                    "TO_PROCESS",
+                    "READY",
+                    "IN_PROGRESS",
+                    "DONE",
+                    "STUCK",
+                ],
+                project__project_sites__site=site,
+            )
+        )
+        .distinct()
+    )
 
     # create missing user project status
     create_missing_user_project_statuses(site, user, project_statuses)
