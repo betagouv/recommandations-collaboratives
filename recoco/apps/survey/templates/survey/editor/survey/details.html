@@ -84,9 +84,11 @@
                         </div>
                         <span class="align-middle text-secondary">{{ question_set.subheading }}</span>
                     </div>
-                    {% if question_set.questions.count %}
-                        <span class="badge bg-primary rounded-pill">{{ question_set.questions.count }} question{{ question_set.questions.count|pluralize }}</span>
-                    {% endif %}
+                    {% with question_set.questions.count as questions_count %}
+                        {% if questions_count > 0 %}
+                            <span class="badge bg-primary rounded-pill">{{ questions_count }} question{{ questions_count|pluralize }}</span>
+                        {% endif %}
+                    {% endwith %}
                 </li>
             {% endfor %}
         </ul>
