@@ -183,9 +183,11 @@
                                                                         </div>
                                                                     </template>
                                                                 </template>
-                                                                <div>
-                                                                    <span class="kanban-card__project-insee fr-icon--sm fr-icon-map-pin-2-line not-a-link">INSEE: <span x-text="truncate(t.commune.insee)"></span></span>
-                                                                </div>
+                                                                <template x-if="t.commune">
+                                                                    <div>
+                                                                        <span class="kanban-card__project-insee fr-icon--sm fr-icon-map-pin-2-line not-a-link">INSEE: <span x-text="truncate(t.commune.insee)"></span></span>
+                                                                    </div>
+                                                                </template>
                                                                 <div class="d-flex justify-content-between">
                                                                     <div class="kanban-card__project-date-container text-secondary">
                                                                         <span x-text="`Déposé le ${formatDateDisplay(t.created_on)}`"
