@@ -6,9 +6,11 @@ describe('I can read only public notes', () => {
     cy.login('conseiller3');
   });
 
-  it('goes to public notes and read only content', () => {
-    cy.visit(`/project/${currentProject.pk}/conversations`);
+  it('cant goes to public notes ', () => {
+    cy.visit(`/project/${currentProject.pk}/`);
 
-    cy.get('textarea').should('not.exist');
+    cy.get('[data-test-id="project-navigation-conversations"]').should(
+      'be.disabled'
+    );
   });
 });
