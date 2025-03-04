@@ -50,5 +50,33 @@
         "element": "#overview-step-5"
       }
     ]
+  },
+  "external-resources-proper-functioning": {
+    "steps": [
+      {
+        "intro": "Allez sur l'autre site web (ex : Aides-territoires),",
+        "element": "#external-resources-step-1"
+      },
+      {
+        "intro": "Allez sur la page de la ressource que vous souhaitez recommander,",
+        "element": "#external-resources-step-2"
+      },
+      {
+        "intro": "Copiez l'URL de cette page spécifique,",
+        "element": "#external-resources-step-3"
+      },
+      {
+        "intro": "Collez-la dans le champ ci-dessous,",
+        "element": "#external-resources-step-4"
+      },
+      {
+        "intro": "Cliquez sur Charger.",
+        "element": "#external-resources-step-5"
+      },
+      {
+        "intro": "Note : actuellement seuls Aides-territoires et certains wiki sont supportés ici. <a href=''>Vous pouvez demander l'ajout d'autres sites ici.</a>",
+        "element": "#external-resources-step-6"
+      }
+    ]
   }
 }
