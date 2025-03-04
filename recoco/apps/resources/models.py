@@ -19,7 +19,7 @@ from django.db.models import BooleanField, Case, Count, When
 from django.db.models.functions import Lower
 from django.db.models.signals import post_migrate
 from django.dispatch import receiver
-from django.shortcuts import reverse
+from django.urls import reverse
 from django.utils import timezone
 from markdownx.utils import markdownify
 from model_clone.models import CloneMixin
