@@ -22,7 +22,7 @@ repos:
   rev: "1.22.1"
   hooks:
     - id: django-upgrade
-      args: [--target-version, "5.1"]
+      args: [--target-version, "5.0"]
 
 - repo: https://github.com/astral-sh/uv-pre-commit
   # uv version.
