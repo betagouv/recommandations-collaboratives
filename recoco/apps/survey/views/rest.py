@@ -36,7 +36,7 @@ class SessionAnswersView(ListAPIView):
                 project__in=project_ids, id=self.kwargs["session_id"]
             )
             return session.answers.select_related("question").prefetch_related(
-                "choices"
+                "choices", "question__choices"
             )
         except Session.DoesNotExist:
             return Answer.objects.none()
