@@ -551,7 +551,13 @@ def user_unset_advisor(request, user_id=None):
 def user_details(request, user_id):
     has_perm_or_403(request.user, "use_crm", request.site)
 
-    crm_user = get_object_or_404(User, pk=user_id, profile__sites=request.site)
+    crm_user = get_object_or_404(
+        User.objects.select_related("profile__organization").prefetch_related(
+            "projects_switchtended_per_site", "projectmember_set"
+        ),
+        pk=user_id,
+        profile__sites=request.site,
+    )
 
     group_name = make_group_name_for_site("advisor", request.site)
     crm_user_is_advisor = crm_user.groups.filter(name=group_name).exists()
