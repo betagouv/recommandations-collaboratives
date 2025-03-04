@@ -98,6 +98,7 @@
                            aria-checked="{% if conversation %}true{% else %}false{% endif %}"
                            {% if "view_public_notes" in user_project_perms or "use_public_notes" in user_project_perms %} @click="window.location='{% url 'projects-project-detail-conversations' project.pk %}'" {% else %} disabled {% endif %}
                            id="segmented-control-tasks"
+                           data-test-id="project-navigation-conversations"
                            name="segmented-control-project">
                     <label class="fr-label" for="segmented-control-tasks">
                         <a class="stretched-link"
