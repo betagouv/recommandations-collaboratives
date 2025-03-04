@@ -134,7 +134,7 @@ class CreateActionWithResourceForm(CreateActionBaseForm):
                 .get(pk=resource.pk)
             )
         except resources_models.Resource.DoesNotExist:
-            self.add_error("resource_unknown", "Cette ressource n'existe pas")
+            self.add_error(field="resource", error="Cette ressource n'existe pas")
             raise
 
         return resource
