@@ -42,7 +42,7 @@
                     {% endif %}
                     {% if note.title %}{{ note.title }}{% endif %}
                 </span>
-                {% if get_user_profile and note.related and related_ct == "utilisateur" %}
+                {% if get_user_profile and note.related and note.content_type == user_ct %}
                     <div class="d-flex justify-content-center align-items-center fr-mr-2w border border-dark rounded bg-white fr-ml-1w fr-mb-0 fr-px-2v fr-py-1v fr-text--sm">
                         <svg class="bi fr-mr-2v" width="18" height="18" fill="currentColor">
                             <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#person-circle" />
