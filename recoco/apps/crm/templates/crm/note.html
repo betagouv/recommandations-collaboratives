@@ -1,5 +1,6 @@
 {% load static %}
 {% load sass_tags %}
+{% load crm_tags %}
 {% block css %}
     <link href="{% sass_src 'crm/css/fragments/note.scss' %}"
           rel="stylesheet"
@@ -20,16 +21,7 @@
                     &nbsp;
                 </span>
             {% endif %}
-            {% if get_user_profile and note.related and note.content_type.name == "utilisateur" %}
-                <div class="position-relative d-flex justify-content-center align-items-center fr-mr-2w border border-dark rounded bg-white fr-px-2v fr-py-1v">
-                    <svg class="bi fr-mr-2v" width="18" height="18" fill="currentColor">
-                        <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#person-circle" />
-                    </svg>
-                    <a href="{% url 'crm-user-details' note.related.pk %}"
-                       class="{% if not note.related.is_active %}text-decoration-line-through{% endif %}">{{ note.related.first_name }} {{ note.related.last_name }}</a>
-                </div>
-            {% endif %}
-            <span class="crm-note-tag-title">
+            <span class="crm-note-tag-title d-flex flex-wrap">
                 {% if note.kind == 0 %}
                     <svg class="bi fr-mr-1v" width="18" height="18" fill="currentColor">
                         <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#telephone-outbound" />
@@ -49,6 +41,15 @@
                 {% endif %}
                 {% if note.title %}{{ note.title }}{% endif %}
             </span>
+            {% if get_user_profile and note.related and note.content_type == user_ct %}
+                <div class="d-flex justify-content-center align-items-center fr-mr-2w border border-dark rounded bg-white fr-ml-1w fr-mb-0 fr-px-2v fr-py-1v fr-text--sm">
+                    <svg class="bi fr-mr-2v" width="18" height="18" fill="currentColor">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#person-circle" />
+                    </svg>
+                    <a href="{% url 'crm-user-details' note.related.pk %}"
+                       class="no-wrap{% if not note.related.is_active %}text-decoration-line-through{% endif %}">Liée à {{ note.related.first_name }} {{ note.related.last_name }}</a>
+                </div>
+            {% endif %}
         </div>
         <div class="d-flex justify-content-center align-items-center">
             <span class="d-flex align-items-center {% if note.title %} fr-ml-2w {% else %} fr-ml-0{% endif %} specific-fontsize-08 specific-color-grey">
@@ -67,12 +68,15 @@
                     {{ note.created_on }}
                 {% endif %}
             </span>
-            <span class="d-flex align-items-center position-relative specific-fontsize-08 specific-color-grey specific-ml-15px">
-                <svg class="bi fr-mr-1v" width="15" height="15" fill="currentColor">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#pencil-fill" />
-                </svg>
-                <a href="{% url update_url_name note.related.pk note.pk %}">éditer</a>
-            </span>
+            {% get_note_update_url note as update_url %}
+            {% if update_url %}
+                <span class="d-flex align-items-center position-relative specific-fontsize-08 specific-color-grey specific-ml-15px">
+                    <svg class="bi fr-mr-1v" width="15" height="15" fill="currentColor">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#pencil-fill" />
+                    </svg>
+                    <a href="{{ update_url }}">éditer</a>
+                </span>
+            {% endif %}
         </div>
     </div>
     <div class="d-flex fr-mb-2v">
