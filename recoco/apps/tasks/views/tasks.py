@@ -75,63 +75,40 @@ def create_task(request):
             project = type_form.cleaned_data.get("project")
             has_perm_or_403(request.user, "projects.manage_tasks", project)
 
-            if push_type == "multiple":
-                for resource in form.cleaned_data.get("resources", []):
-                    public = form.cleaned_data.get("public", False)
+            action = form.save(commit=False)
+            action.project = project
+            action.site = request.site
+            action.created_by = request.user
 
-                    action = models.Task.on_site.create(
-                        project=project,
-                        site=request.site,
-                        resource=resource,
-                        intent=resource.title,
-                        created_by=request.user,
-                        public=public,
-                    )
-                    action.top()
-
-                    # Notify other switchtenders
-                    signals.action_created.send(
-                        sender=create_task,
-                        task=action,
-                        project=project,
-                        user=request.user,
-                    )
-
-            else:
-                action = form.save(commit=False)
-                action.project = project
-                action.site = request.site
-                action.created_by = request.user
-                # get or create topic
-                name = form.cleaned_data["topic_name"]
-                if name:
-                    topic, _ = project_models.Topic.objects.get_or_create(
-                        name__iexact=name.lower(),
-                        defaults={"name": name.capitalize(), "site": request.site},
-                    )
-                    action.topic = topic
-                action.save()
-                action.top()
-
-                # Check if we have a file or link
-                document_form = DocumentUploadForm(request.POST, request.FILES)
-                if document_form.is_valid():
-                    if document_form.cleaned_data["the_file"]:
-                        document = document_form.save(commit=False)
-                        document.attached_object = action
-                        document.site = request.site
-                        document.uploaded_by = request.user
-                        document.project = action.project
-
-                        document.save()
-
-                # Notify other switchtenders
-                signals.action_created.send(
-                    sender=create_task,
-                    task=action,
-                    project=project,
-                    user=request.user,
+            # get or create topic
+            name = form.cleaned_data["topic_name"]
+            if name:
+                topic, _ = project_models.Topic.objects.get_or_create(
+                    name__iexact=name.lower(),
+                    defaults={"name": name.capitalize(), "site": request.site},
                 )
+                action.topic = topic
+            action.save()
+            action.top()
+
+            # Check if we have a file or link
+            document_form = DocumentUploadForm(request.POST, request.FILES)
+            if document_form.is_valid():
+                if document_form.cleaned_data["the_file"]:
+                    document = document_form.save(commit=False)
+                    document.attached_object = action
+                    document.site = request.site
+                    document.uploaded_by = request.user
+                    document.project = action.project
+                    document.save()
+
+            # Notify other switchtenders
+            signals.action_created.send(
+                sender=create_task,
+                task=action,
+                project=project,
+                user=request.user,
+            )
 
             # Redirect to `action-inline` if we're coming
             # from `action-inline` after create
