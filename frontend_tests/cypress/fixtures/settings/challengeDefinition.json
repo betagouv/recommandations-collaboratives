@@ -24,5 +24,18 @@
       "site_id": 1,
       "week_inactivity_repeat": 0
     }
+  },
+  {
+    "model": "training.challengedefinition",
+    "pk": 3,
+    "fields": {
+      "name": "external-resources-proper-functioning",
+      "description": "external-resources-proper-functioning",
+      "next_challenge": null,
+      "code": "external-resources-proper-functioning",
+      "icon_name": null,
+      "site_id": 1,
+      "week_inactivity_repeat": 0
+    }
   }
 ]

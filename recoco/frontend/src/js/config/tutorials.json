@@ -50,5 +50,13 @@
         "element": "#overview-step-5"
       }
     ]
+  },
+  "external-resources-proper-functioning": {
+    "steps": [
+      {
+        "intro": "<h2>Comment ça marche ?</h2> <p>1. Allez sur l'autre site web (ex : Aides-territoires), <br>2. Allez sur la page de la ressource que vous souhaitez recommander, <br>3. Copiez l'URL de cette page spécifique, <br>4. Collez-la dans le champ ci-dessous, <br>5. Cliquez sur Charger. <br> Note : actuellement seuls Aides-territoires et certains wiki sont supportés ici. <a class='' href='mailto:recommandations-collaboratives@beta.gouv.fr?subject=Ressource externe'>Vous pouvez demander l'ajout d'autres sites ici.</a></p>",
+        "element": "#external-resources-step"
+      }
+    ]
   }
 }
