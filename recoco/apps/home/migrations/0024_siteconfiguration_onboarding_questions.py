@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("survey", "0033_alter_session_project"),
         ("home", "0023_auto_20240206_1216"),

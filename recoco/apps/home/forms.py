@@ -28,9 +28,9 @@ class UVSignupForm(SignupForm):
     def __init__(self, *args, **kwargs):
         super(UVSignupForm, self).__init__(*args, **kwargs)
 
-        self.fields["password1"].label = (
-            "Définissez votre mot de passe (8 caractères minimum)"
-        )
+        self.fields[
+            "password1"
+        ].label = "Définissez votre mot de passe (8 caractères minimum)"
         self.fields["password1"].widget = forms.PasswordInput(
             attrs={"class": "fr-input fr-mt-2v fr-mb-4v"}
         )

@@ -7,7 +7,6 @@ author  : raphael.marvie@beta.gouv.fr, guillaume.libersat@beta.gouv.fr
 created : 2021-09-28 12:40:54 CEST
 """
 
-
 from django.contrib.auth import models as auth_models
 from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.sites.managers import CurrentSiteManager

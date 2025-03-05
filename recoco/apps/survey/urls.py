@@ -7,7 +7,6 @@ author  : guillaume.libersat@beta.gouv.fr,raphael.marvie@beta.gouv.fr
 created : 2021-07-27 10:06:23 CEST
 """
 
-
 from django.urls import path
 
 from .views import edit, fill

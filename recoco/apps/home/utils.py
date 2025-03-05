@@ -6,6 +6,7 @@ Utilities for home application
 authors: raphael@beta.gouv.fr, guillaume.libersat@beta.gouv.fr
 created: 2021-06-08 09:56:53 CEST
 """
+
 import os
 from typing import Optional
 

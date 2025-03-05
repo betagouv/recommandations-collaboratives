@@ -6,7 +6,6 @@ import model_utils.fields
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("addressbook", "0010_organizationgroup_organization_group"),
     ]

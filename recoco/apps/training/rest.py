@@ -7,7 +7,6 @@ author  : raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created : 2021-05-26 15:56:20 CEST
 """
 
-
 from django.http import Http404
 from django.utils import timezone
 from rest_framework import generics, permissions, status, viewsets

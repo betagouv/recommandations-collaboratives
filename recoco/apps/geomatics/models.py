@@ -7,7 +7,6 @@ authors: guillaume.libersat@beta.gouv.fr, raphael.marvie@beta.gouv.fr
 created: 2021-07-12 12:05:28 CEST
 """
 
-
 from django.db import models
 
 

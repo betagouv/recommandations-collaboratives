@@ -7,7 +7,6 @@ authors: guillaume.libersat@beta.gouv.fr, raphael.marvie@beta.gouv.fr
 created: 2023-08-21 12:07:45 CEST
 """
 
-
 import pytest
 from django.utils import timezone
 from model_bakery import baker

@@ -457,11 +457,7 @@ def create_initial_note(
 
     projects.Note.objects.create(
         project=project,
-        content=(
-            f"# Demande initiale\n\n"
-            f"{project.description}\n\n"
-            f"{ markdown_content }"
-        ),
+        content=(f"# Demande initiale\n\n{project.description}\n\n{markdown_content}"),
         public=True,
         site=site,
     )

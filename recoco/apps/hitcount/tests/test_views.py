@@ -60,6 +60,6 @@ def test_hit_view():
     )
     assert response.status_code == 200
     assert HitCount.objects.count() == 1
-    assert (
-        hitcount.hits.count() == 2
-    ), "no hit should be registered when user is hijacked"
+    assert hitcount.hits.count() == 2, (
+        "no hit should be registered when user is hijacked"
+    )

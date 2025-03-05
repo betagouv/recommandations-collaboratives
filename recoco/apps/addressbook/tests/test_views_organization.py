@@ -56,7 +56,6 @@ def test_organization_list_not_available_for_non_staff(client):
 
 @pytest.mark.django_db
 def test_create_existing_organization_and_redirect(current_site, client):
-
     organization = Recipe(
         Organization, sites=[current_site], name="my organization"
     ).make()

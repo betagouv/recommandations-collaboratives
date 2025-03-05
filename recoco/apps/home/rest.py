@@ -12,7 +12,6 @@ from .serializers import SiteSerializer
 
 
 class UserNotificationsMarkOneAsRead(APIView):
-
     permission_classes = [IsAuthenticated]
 
     def patch(self, request, pk):
@@ -33,7 +32,6 @@ class UserNotificationsMarkOneAsRead(APIView):
 
 
 class UserNotificationsMarkAllAsRead(APIView):
-
     permission_classes = [IsAuthenticated]
 
     def patch(self, request, *args, **kwargs):

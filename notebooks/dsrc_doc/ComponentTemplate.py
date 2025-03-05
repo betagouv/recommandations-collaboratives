@@ -96,7 +96,10 @@ template = Template(
 )
 
 context = Context(
-    {"projects": projects.order_by("-created_on")[:5], "csscore": csscore.data}
+    {
+        "projects": projects.order_by("-created_on")[:5],
+        "csscore": csscore.data,
+    }
 )
 
 HTML(template.render(context))

@@ -12,7 +12,6 @@ cards_old_vs_new_ids = {}
 def clone_collection(
     source_collection_id: int, new_collection_name: str, target_schema: str
 ):
-
     # https://pypi.org/project/metabase-api/
     # https://www.metabase.com/docs/latest/api-documentation
     # authentication using API key (is_admin=False is set to avoid friendly table name alert)
@@ -88,7 +87,6 @@ def clone_collection(
 
     dashcards = []
     for dashcard in source_dashboard_data["dashcards"]:
-
         # init new card with id card switch
         new_dashcard = {
             "id": -1,

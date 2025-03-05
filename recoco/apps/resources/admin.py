@@ -7,7 +7,6 @@ authors: raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created: 2021-06-16 11:10:27 CEST
 """
 
-
 from csvexport.actions import csvexport
 from django.contrib import admin
 from reversion_compare.admin import CompareVersionAdmin

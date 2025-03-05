@@ -7,7 +7,6 @@ authors: raphael.marvie@beta.gouv.fr, guillaume.libersat@beta.gouv.fr
 created: 2022-01-24 22:39:27 CEST
 """
 
-
 import logging
 
 from django.conf import settings

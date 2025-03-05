@@ -5,7 +5,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("projects", "0096_alter_note_site"),
         ("sites", "0002_alter_domain_unique"),

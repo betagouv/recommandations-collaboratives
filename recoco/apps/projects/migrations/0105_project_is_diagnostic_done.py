@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("projects", "0104_projectsite_sent_by_projectsite_sent_from"),
     ]

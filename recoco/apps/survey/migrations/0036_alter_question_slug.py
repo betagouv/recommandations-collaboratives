@@ -6,7 +6,6 @@ import recoco.apps.survey.models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("survey", "0035_fill_question_slugs"),
     ]

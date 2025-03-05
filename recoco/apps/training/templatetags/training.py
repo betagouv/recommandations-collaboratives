@@ -7,7 +7,6 @@ authors: guillaume.libersat@beta.gouv.fr, raphael.marvie@beta.gouv.fr
 created: 2023-08-21 14:54:48 CEST
 """
 
-
 from django import template
 from django.utils import timezone
 

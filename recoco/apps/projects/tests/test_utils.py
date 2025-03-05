@@ -6,6 +6,7 @@ Tests for project application
 authors: raphael.marvie@beta.gouv.fr, guillaume.libersat@beta.gouv.fr
 created: 2022-01-18 10:11:56 CEST
 """
+
 import pytest
 from django.conf import settings
 from django.contrib.auth import models as auth
