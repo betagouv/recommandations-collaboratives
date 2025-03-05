@@ -246,6 +246,16 @@ def test_project_list_search_filter_fulltext(request, api_client):
         commune__insee="AZ37",
     )
 
+    # second one with accent
+    baker.make(
+        models.Project,
+        sites=[site],
+        name="Le projet de la vérité",
+        commune__name="Bayonne",
+        commune__postal="64100",
+        commune__insee="64102",
+    )
+
     # honeypot one
     baker.make(
         models.Project,
@@ -262,7 +272,7 @@ def test_project_list_search_filter_fulltext(request, api_client):
 
     response = api_client.get(url)
     assert response.status_code == 200
-    assert len(response.data) == 2
+    assert len(response.data) == 3
 
     # project title
     response = api_client.get(f"{url}?search=niceproject")
@@ -288,6 +298,11 @@ def test_project_list_search_filter_fulltext(request, api_client):
     response = api_client.get(f"{url}?search=XIDJISJDI")
     assert response.status_code == 200
     assert len(response.data) == 0
+
+    # unaccent
+    response = api_client.get(f"{url}?search=verite")
+    assert response.status_code == 200
+    assert len(response.data) == 1
 
 
 @pytest.mark.django_db
@@ -334,6 +349,10 @@ def test_project_list_search_filter_departments(request, api_client):
     response = api_client.get(f"{url}?departments=10&departments=62")
     assert response.status_code == 200
     assert len(response.data) == 2
+
+    response = api_client.get(f"{url}?departments=10&departments=33")
+    assert response.status_code == 200
+    assert len(response.data) == 1
 
     # No department filter
     response = api_client.get(f"{url}?search=niceproject")
