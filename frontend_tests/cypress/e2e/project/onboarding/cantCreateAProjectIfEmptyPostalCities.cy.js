@@ -5,7 +5,7 @@ const projectCommune = communes.find(
   (c) => c.fields.postal == project.postcode
 );
 
-describe('I cant create a dossierc if the postal cities are empty', () => {
+describe('I cant create a folder if the postal cities are empty', () => {
   beforeEach(() => {
     cy.login('collectivité1');
   });
