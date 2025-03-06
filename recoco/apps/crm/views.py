@@ -332,6 +332,7 @@ def organization_details(request, organization_id):
             actor_content_type=user_ct,
             actor_object_id__in=participant_ids,
         )
+        .prefetch_related("actor", "action_object", "target")
         .order_by("-timestamp")
     )
 
@@ -343,15 +344,25 @@ def organization_details(request, organization_id):
         .filter(target_content_type=organization_ct, target_object_id=organization.pk)
     )
 
-    org_notes = models.Note.on_site.filter(
-        object_id=organization.pk,
-        content_type=organization_ct,
-    ).order_by("-updated_on")
+    org_notes = (
+        models.Note.on_site.filter(
+            object_id=organization.pk,
+            content_type=organization_ct,
+        )
+        .prefetch_related("tags", "related")
+        .select_related("created_by", "content_type")
+        .order_by("-updated_on")
+    )
 
-    participant_notes = models.Note.on_site.filter(
-        object_id__in=participant_ids,
-        content_type=user_ct,
-    ).order_by("-updated_on")
+    participant_notes = (
+        models.Note.on_site.filter(
+            object_id__in=participant_ids,
+            content_type=user_ct,
+        )
+        .prefetch_related("tags", "related")
+        .select_related("created_by", "content_type")
+        .order_by("-updated_on")
+    )
 
     sticky_notes = org_notes.filter(sticky=True)
     notes = org_notes.exclude(sticky=True) | participant_notes
