@@ -4,7 +4,7 @@ describe('The Signup Page', () => {
     '[name=last_name]': 'Successful',
     '[name=organization]': 'Signup Corp',
     '[name=organization_position]': 'Tester',
-    '[name=email]': 'signup@success.test',
+    '[name=email]': 'signup3@success.test',
     '[name=phone_no]': '0102030405',
     '[name=password1]': 'derpderp',
     '[name=password2]': 'derpderp',
@@ -25,7 +25,7 @@ describe('The Signup Page', () => {
       var iframe = doc.getElementById('id_captcha').querySelector('iframe');
       var innerDoc = iframe.contentDocument || iframe.contentWindow.document;
       innerDoc.querySelector('.recaptcha-checkbox').click();
-      cy.wait(200);
+      cy.wait(400);
       cy.get('[type=submit]').click();
 
       cy.location().should((loc) => {
