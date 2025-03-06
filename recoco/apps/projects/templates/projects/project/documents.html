@@ -33,8 +33,10 @@
                         <div class="col-8">
                             <div class="d-flex align-items-center justify-content-between fr-mb-3w">
                                 <h6 class="text-uppercase small fr-mb-0">
-                                    {% if all_files.count > 0 %}{{ all_files.count }}{% endif %}
-                                    fichier{{ all_files.count|pluralize }} partagé{{ all_files.count|pluralize }}
+                                    {% with all_files.count as files_count %}
+                                        {% if files_count > 0 %}{{ files_count }}{% endif %}
+                                        fichier{{ files_count|pluralize }} partagé{{ files_count|pluralize }}
+                                    {% endwith %}
                                 </h6>
                                 {% if "manage_documents" in user_project_perms %}
                                     {% url 'projects-documents-upload-document' project.pk as upload_action %}
@@ -52,7 +54,8 @@
                                                    target="_new"
                                                    download>
                                                     <span class="fr-icon-file-line fr-icon--sm fr-mr-2v" aria-hidden="true"></span>
-                                                    <span class="text-info-custom text-black fr-ml-2v name">{{ answer.attachment|filename|truncatechars:30 }}</span>
+                                                    <span class="text-info-custom text-black fr-ml-2v name"
+                                                          data-cy="attachment-filename">{{ answer.attachment|filename|truncatechars:30 }}</span>
                                                     {% if answer.attachment.size %}
                                                         <span class="text-info-custom text-black fr-ml-2v">({{ answer.attachment.size|filesizeformat }})</span>
                                                     {% endif %}

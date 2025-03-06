@@ -12,6 +12,7 @@ import os
 from django import template
 
 from recoco import verbs
+from recoco.utils import check_if_advisor
 
 register = template.Library()
 
@@ -25,6 +26,11 @@ def get_verbs():
 @register.filter
 def filename(value):
     return os.path.basename(value.file.name)
+
+
+@register.simple_tag
+def is_advisor_for_site(user, site=None):
+    return check_if_advisor(user, site)
 
 
 # eof

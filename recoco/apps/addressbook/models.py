@@ -13,9 +13,11 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.managers import CurrentSiteManager
 from django.contrib.sites.models import Site
 from django.db import models
+from django.db.models import Count
 from django.db.models.functions import Lower
 from django.db.models.signals import post_migrate
 from django.dispatch import receiver
+from model_utils.models import TimeStampedModel
 
 from recoco.apps.geomatics import models as geomatics_models
 
@@ -37,7 +39,25 @@ def create_site_permissions(sender, **kwargs):
     )
 
 
-class OrganizationManager(models.Manager):
+class OrganizationGroup(TimeStampedModel):
+    name = models.CharField(max_length=90, verbose_name="Nom")
+
+    class Meta:
+        verbose_name = "Groupement d'organisations"
+        verbose_name_plural = "Groupements d'organisations"
+
+    def __str__(self):
+        return self.name
+
+
+class OrganizationQuerySet(models.QuerySet):
+    def with_contacts_only(self):
+        return self.annotate(contact_count=Count("contacts")).filter(
+            contact_count__gt=0
+        )
+
+
+class OrganizationManager(models.Manager.from_queryset(OrganizationQuerySet)):
     def get_queryset(self):
         return super().get_queryset().order_by(Lower("name"))
 
@@ -46,7 +66,7 @@ class OrganizationOnSiteManager(CurrentSiteManager, OrganizationManager):
     pass
 
 
-class Organization(models.Model):
+class Organization(TimeStampedModel):
     objects = OrganizationManager()
     on_site = OrganizationOnSiteManager()
 
@@ -58,6 +78,14 @@ class Organization(models.Model):
         blank=True,
         related_name="organizations",
         verbose_name="Départements concernés",
+    )
+
+    group = models.ForeignKey(
+        OrganizationGroup,
+        on_delete=models.CASCADE,
+        related_name="organizations",
+        blank=True,
+        null=True,
     )
 
     def __str__(self):  # pragma: nocover
@@ -84,7 +112,7 @@ class ContactOnSiteManager(CurrentSiteManager, ContactManager):
 @reversion.register(
     fields=("first_name", "last_name", "phone_no", "mobile_no", "email", "division")
 )
-class Contact(models.Model):
+class Contact(TimeStampedModel):
     objects = ContactManager()
     on_site = ContactOnSiteManager()
 
@@ -94,11 +122,6 @@ class Contact(models.Model):
     last_name = models.CharField(
         max_length=50, blank=True, verbose_name="Nom de famille"
     )
-
-    @property
-    def full_name(self):
-        return "{0} {1}".format(self.first_name, self.last_name)
-
     phone_no = models.CharField(blank=True, max_length=20, verbose_name="Téléphone")
     mobile_no = models.CharField(blank=True, max_length=20, verbose_name="GSM")
     email = models.EmailField(blank=True, verbose_name="Courriel")
@@ -106,6 +129,10 @@ class Contact(models.Model):
     organization = models.ForeignKey(
         Organization, related_name="contacts", on_delete=models.CASCADE
     )
+
+    @property
+    def full_name(self):
+        return "{0} {1}".format(self.first_name, self.last_name)
 
     def __str__(self):  # pragma: nocover
         return "{0} {1}".format(self.last_name, self.first_name)

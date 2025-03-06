@@ -60,10 +60,10 @@ class HitCount(TimeStampedModel):
 
 
 class Hit(TimeStampedModel):
-    user_agent = models.CharField(max_length=255, editable=False)
-    user = models.ForeignKey(User, editable=False, on_delete=models.CASCADE)
+    user_agent = models.CharField(max_length=255, blank=True, null=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     hitcount = models.ForeignKey(
-        HitCount, editable=False, on_delete=models.CASCADE, related_name="hits"
+        HitCount, on_delete=models.CASCADE, related_name="hits"
     )
 
     class Meta:

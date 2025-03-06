@@ -324,7 +324,7 @@ def test_user_cannot_access_member_invitation_for_someone_else(
     assert response.status_code == 403
     invite = models.Invite.on_site.get(pk=invite.pk)
     assert invite.accepted_on is None
-    assert current_site not in user.profile.sites.all()
+    assert current_site in user.profile.sites.all()
     assert user not in invite.project.members.all()
     assert user not in invite.project.switchtenders.all()
     assert not has_perm(user, "view_project", invite.project)
@@ -413,7 +413,7 @@ def test_user_cannot_access_switchtender_invitation_for_someone_else(
     assert response.status_code == 403
     invite = models.Invite.on_site.get(pk=invite.pk)
     assert invite.accepted_on is None
-    assert current_site not in user.profile.sites.all()
+    assert current_site in user.profile.sites.all()
     assert user not in invite.project.members.all()
     assert user not in invite.project.switchtenders.all()
     assert not has_perm(user, "view_project", invite.project)
@@ -691,6 +691,35 @@ def test_logged_in_user_accepts_invite_but_is_already_advisor(
     assert current_site in user.profile.sites.all()
     assert user in invite.project.switchtenders.all()
     assert user not in invite.project.members.all()
+
+
+# Managers
+@pytest.mark.django_db
+def test_manager_active_filter(request, project):
+    current_site = get_current_site(request)
+
+    pending_invite = baker.make(
+        models.Invite,
+        role="COLLABORATOR",
+        accepted_on=None,
+        site=current_site,
+        project=project,
+        email="a@new.one",
+    )
+
+    baker.make(
+        models.Invite,
+        role="COLLABORATOR",
+        accepted_on=timezone.now(),
+        site=current_site,
+        project=project,
+        email="a@new.one",
+    )
+
+    assert models.Invite.objects.count() == 2
+    assert models.Invite.objects.pending().count() == 1
+
+    assert models.Invite.objects.pending().first() == pending_invite
 
 
 # eof

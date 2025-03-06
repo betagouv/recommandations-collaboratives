@@ -50,11 +50,6 @@ router.register(
     basename="communes",
 )
 router.register(
-    r"organizations",
-    addressbook_rest.OrganizationViewSet,
-    basename="organizations",
-)
-router.register(
     r"topics",
     projects_rest.TopicViewSet,
     basename="topics",
@@ -75,6 +70,23 @@ router.register(
     basename="sites",
 )
 
+# addressbook
+router.register(
+    r"addressbook/organizationgroups",
+    addressbook_rest.OrganizationGroupViewSet,
+    basename="api-addressbook-organization-group",
+)
+router.register(
+    r"addressbook/organizations",
+    addressbook_rest.OrganizationViewSet,
+    basename="api-addressbook-organization",
+)
+router.register(
+    r"addressbook/contacts",
+    addressbook_rest.ContactViewSet,
+    basename="api-addressbook-contact",
+)
+
 
 api_urls = [
     path(
@@ -87,6 +99,11 @@ api_urls = [
         projects_rest.ProjectList.as_view(),
         name="projects-list",
     ),
+    # path(
+    #     "projects/my_departments",
+    #     projects_rest.ProjectDepartmentList.as_view(),
+    #     name="projects-list-my-departments",
+    # ),
     path(
         "userprojectstatus/<int:pk>/",
         projects_rest.UserProjectStatusDetail.as_view(),
@@ -142,6 +159,11 @@ survey_urls = [
         "survey/sessions/<int:session_id>/answers/",
         survey_rest.SessionAnswersView.as_view(),
         name="api-survey-session-answers",
+    ),
+    path(
+        "survey/questions/",
+        survey_rest.SurveyQuestionsView.as_view(),
+        name="api-survey-questions",
     ),
 ]
 

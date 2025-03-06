@@ -106,6 +106,7 @@ INSTALLED_APPS = [
     "django_celery_results",
     "django_json_widget",
     "waffle",
+    "django_htmx",
 ]
 
 SITE_ID = SiteID(default=1)
@@ -131,7 +132,9 @@ MIDDLEWARE = [
     "hijack.middleware.HijackUserMiddleware",
     "wagtail.contrib.redirects.middleware.RedirectMiddleware",
     "waffle.middleware.WaffleMiddleware",
+    "django_htmx.middleware.HtmxMiddleware",
 ]
+
 
 ROOT_URLCONF = "recoco.urls"
 
@@ -346,6 +349,7 @@ SOCIALACCOUNT_EMAIL_REQUIRED = True
 SOCIALACCOUNT_EMAIL_AUTHENTICATION = True
 SOCIALACCOUNT_EMAIL_AUTHENTICATION_AUTO_CONNECT = True
 
+
 SOCIALACCOUNT_FORMS = {
     "signup": "recoco.apps.social_account.forms.SignupForm",
 }
@@ -368,20 +372,6 @@ SOCIALACCOUNT_PROVIDERS = {
                     "token_auth_method": "client_secret_post",
                 },
             },
-        ],
-        # https://github.com/numerique-gouv/proconnect-documentation/blob/main/doc_fs/scope-claims.md
-        # https://github.com/numerique-gouv/proconnect-documentation/blob/main/doc_fs/connaitre-le-fi-utilise.md
-        "SCOPE": [
-            "openid",
-            "email",
-            "uid",
-            "given_name",
-            "usual_name",
-            "siren",
-            "siret",
-            "organizational_unit",
-            "phone_number",
-            "idp_id",
         ],
         "AUTH_PARAMS": {
             "acr_values": "eidas1",
@@ -572,5 +562,10 @@ WAFFLE_FLAG_MODEL = "feature_flag.Flag"
 WAFFLE_SWITCH_MODEL = "feature_flag.Switch"
 WAFFLE_SAMPLE_MODEL = "feature_flag.Sample"
 
+
+# Watson
+
+# https://github.com/etianen/django-watson/wiki/language-support
+WATSON_POSTGRES_SEARCH_CONFIG = "pg_catalog.french"
 
 # eof

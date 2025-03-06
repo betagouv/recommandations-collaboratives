@@ -30,7 +30,12 @@ from taggit.managers import TaggableManager
 from watson import search as watson
 
 from recoco.apps.geomatics import models as geomatics_models
-from recoco.utils import CastedGenericRelation, check_if_advisor, has_perm
+from recoco.utils import (
+    CastedGenericRelation,
+    check_if_advisor,
+    has_perm,
+    strip_accents,
+)
 
 from . import apps
 from .utils import generate_ro_key
@@ -259,7 +264,7 @@ class ProjectSiteQuerySet(models.QuerySet):
 
     def moderated(self):
         """Filter out sites where this project is not yet validated"""
-        return self.exclude(status="DRAFT")
+        return self.exclude(status__in=["DRAFT", "REJECTED"])
 
     def to_moderate(self):
         """List only sites where this project needs moderation"""
@@ -588,13 +593,14 @@ class ProjectMember(models.Model):
 
 class UserProjectStatusOnSiteManager(CurrentSiteManager):
     use_for_related_fields = True
+    use_in_migrations = False
 
 
 class UserProjectStatus(models.Model):
     """Project status for a given user"""
 
-    # XXX would be better named on_site
-    objects = UserProjectStatusOnSiteManager()
+    objects = models.Manager()
+    on_site = UserProjectStatusOnSiteManager()
 
     USERPROJECT_STATES = (
         ("NEW", "Nouveau"),
@@ -895,10 +901,16 @@ class ProjectSearchAdapter(watson.SearchAdapter):
         "name",
         "tags_as_list",
         "commune__name",
+        "commune__insee",
+        "commune__postal",
     )
 
     def tags_as_list(self, obj):
         return list(obj.tags.names())
+
+    def prepare_content(self, content):
+        content = super().prepare_content(content)
+        return strip_accents(content)
 
 
 def truncate_string(s, max_length):

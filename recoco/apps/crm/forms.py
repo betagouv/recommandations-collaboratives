@@ -27,6 +27,7 @@ class SiteConfigurationForm(forms.ModelForm):
             "crm_available_tags",
             "reminder_interval",
             "accept_handover",
+            "crisp_token",
         ]
 
         widgets = {

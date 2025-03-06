@@ -1,5 +1,7 @@
 # global personal configuration of pytest
 import pytest
+from django.contrib.auth.models import Group, User
+from django.contrib.sites.models import Site
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.management import call_command
 from model_bakery import baker
@@ -15,9 +17,24 @@ def setup_db(django_db_setup, django_db_blocker):
         call_command("update_permissions")
 
 
-@pytest.fixture
+@pytest.fixture(scope="function")
 def api_client():
-    return APIClient
+    return APIClient()
+
+
+@pytest.fixture
+def current_site():
+    return Site.objects.filter(domain="example.com").first()
+
+
+@pytest.fixture
+def staff_user():
+    site = Site.objects.filter(domain="example.com").first()
+    staff = baker.make(User)
+    staff.profile.sites.add(site)
+    gstaff = Group.objects.get(name="example_com_staff")
+    staff.groups.add(gstaff)
+    return staff
 
 
 # -- Project Fixtures

@@ -4,8 +4,6 @@ describe('I can go to tasks tab', () => {
     cy.login('conseiller1');
     cy.createProject('Count Published Project').then((projectId) => {
       currentProjectId = projectId;
-      cy.visit('/projects/advisor');
-      cy.get('[data-test-id="project-link"]').first().click();
       cy.becomeAdvisor(currentProjectId);
       cy.visit(`/project/${currentProjectId}/actions`);
       cy.createTask('published task');

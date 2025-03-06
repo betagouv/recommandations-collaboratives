@@ -13,15 +13,13 @@ describe('As an advisor, I can quit a project', () => {
     cy.get('[data-test-id="header-banner-advising-position"]').click({
       force: true,
     });
-    projectView.quitProjectRole();
-    projectView.joinAsAdvisorWithBanner();
+    projectView.joinAsAdvisorWithSelector();
     projectView.joinAsObserverWithSelector();
     cy.get('[data-test-id="show-banner"]').click({ force: true });
     projectView.quitProjectRole();
-    projectView.joinAsObserverWithBanner();
+    projectView.joinAsObserverWithSelector();
     projectView.joinAsAdvisorWithSelector();
     cy.get('[data-test-id="show-banner"]').click({ force: true });
     projectView.quitProjectRole();
-    cy.get('[data-test-id="button-join-as-advisor"]').should('exist');
   });
 });

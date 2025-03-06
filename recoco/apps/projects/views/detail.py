@@ -12,7 +12,8 @@ from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.forms import formset_factory
 from django.http import HttpResponseForbidden
-from django.shortcuts import get_object_or_404, redirect, render, reverse
+from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from django.utils import timezone
 from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.decorators.csrf import csrf_exempt
@@ -59,9 +60,9 @@ def project_overview(request, project_id=None):
     """Return the details of given project for switchtender"""
 
     project = get_object_or_404(
-        models.Project.objects.filter(sites=request.site).with_unread_notifications(
-            user_id=request.user.id
-        ),
+        models.Project.objects.filter(sites=request.site)
+        .with_unread_notifications(user_id=request.user.id)
+        .select_related("commune__department"),
         pk=project_id,
     )
 
@@ -150,15 +151,10 @@ def project_knowledge(request, project_id=None):
     """Return the survey results for a given project"""
 
     project = get_object_or_404(
-        models.Project.objects.filter(sites=request.site).with_unread_notifications(
-            user_id=request.user.id
-        ),
+        models.Project.objects.filter(sites=request.site)
+        .with_unread_notifications(user_id=request.user.id)
+        .select_related("commune__department"),
         pk=project_id,
-    )
-
-    sorted_sessions = sorted(
-        project.survey_session.all(),
-        key=lambda session: session.survey.site != request.site,
     )
 
     is_regional_actor = is_regional_actor_for_project(
@@ -182,6 +178,11 @@ def project_knowledge(request, project_id=None):
         project=project, survey=site_config.project_survey
     )
 
+    sorted_sessions = sorted(
+        project.survey_session.all(),
+        key=lambda session: session.survey.site != request.site,
+    )
+
     # Mark this project survey notifications as read
     if not request.user.is_hijacked:
         project_ct = ContentType.objects.get_for_model(project)
@@ -200,9 +201,9 @@ def project_actions(request, project_id=None):
     """Action page for given project"""
 
     project = get_object_or_404(
-        models.Project.objects.filter(sites=request.site).with_unread_notifications(
-            user_id=request.user.id
-        ),
+        models.Project.objects.filter(sites=request.site)
+        .with_unread_notifications(user_id=request.user.id)
+        .select_related("commune__department"),
         pk=project_id,
     )
 
@@ -247,7 +248,12 @@ def project_recommendations_embed(request, project_id=None):
 @login_required
 def project_actions_inline(request, project_id=None):
     """Inline Action page for given project"""
-    project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
+
+    project = get_object_or_404(
+        models.Project.objects.select_related("commune__department"),
+        sites=request.site,
+        pk=project_id,
+    )
 
     is_regional_actor = is_regional_actor_for_project(
         request.site, project, request.user, allow_national=True
@@ -267,9 +273,9 @@ def project_conversations(request, project_id=None):
     """Conversation page for project"""
 
     project = get_object_or_404(
-        models.Project.objects.filter(sites=request.site).with_unread_notifications(
-            user_id=request.user.id
-        ),
+        models.Project.objects.filter(sites=request.site)
+        .with_unread_notifications(user_id=request.user.id)
+        .select_related("commune__department"),
         pk=project_id,
     )
 

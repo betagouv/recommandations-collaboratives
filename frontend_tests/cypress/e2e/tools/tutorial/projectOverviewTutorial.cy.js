@@ -23,7 +23,6 @@ describe('I can follow the project tutorial', () => {
     cy.login('conseiller2');
     cy.visit(`/project/2`);
 
-    cy.get('[data-test-id="button-join-as-advisor"]').click();
     cy.get('[data-test-id="launch-tutorial"]').click();
     cy.get('[data-test-id="tutorial-project-launcher"]').should(
       'not.be.visible'
@@ -33,7 +32,6 @@ describe('I can follow the project tutorial', () => {
     cy.get('[data-test-id="project-overview-tutorial"]').should('not.exist');
   });
 
-
   it('displays the launcher tutorial on the overview window as advisor', () => {
     cy.login('conseiller3');
     cy.visit(`/project/${currentProject.pk}`);
@@ -42,7 +40,7 @@ describe('I can follow the project tutorial', () => {
   });
 
   it('displays the launcher tutorial on the overview window as observer', () => {
-    cy.login('staff');
+    cy.login('staff'); // TODO replace by staffOnSite and check behaviour
     cy.visit(`/project/${currentProject.pk}`);
     cy.becomeObserver(currentProject.pk);
     cy.get('[data-test-id="tutorial-project-launcher"]').should.exist;

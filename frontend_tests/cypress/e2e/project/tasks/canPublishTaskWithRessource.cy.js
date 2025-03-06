@@ -1,9 +1,9 @@
-describe('I can attach miscellanious ressource to task', () => {
+describe('I can attach miscellanious ressource to task @page-projet-recommandations-creation', () => {
   beforeEach(() => {
     cy.login('conseiller1');
   });
 
-  it('publishes a task with resource', () => {
+  it('publishes a task with resource comment / no comment', () => {
     cy.visit(`/projects/action/?project_id=25`);
 
     cy.get('[data-cy="radio-push-reco-single-resource"]').should('be.checked');
@@ -13,6 +13,10 @@ describe('I can attach miscellanious ressource to task', () => {
       .first()
       .check({ force: true });
 
+    // Test with no comment
+    cy.get('[data-cy="button-submit-task"]').should('be.enabled');
+
+    // Test with comment
     cy.get('.ProseMirror p')
       .invoke('text', 'reco test from action description')
       .should('have.text', 'reco test from action description');

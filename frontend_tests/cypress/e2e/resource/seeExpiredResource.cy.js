@@ -1,6 +1,6 @@
 describe('I can see an expired resource as a switchtender', () => {
   beforeEach(() => {
-    cy.login('staff');
+    cy.login('staff'); // TODO replace by staffOnSite and check behaviour
   });
 
   it('sees an expired resource', () => {

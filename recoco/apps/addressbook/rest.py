@@ -1,26 +1,104 @@
-from rest_framework import viewsets
+from rest_framework.filters import BaseFilterBackend
+from rest_framework.viewsets import ModelViewSet
+from waffle import switch_is_active
 
-from recoco.utils import TrigramSimilaritySearchFilter
+from recoco.rest_api.filters import VectorSearchFilter, WatsonSearchFilter
+from recoco.rest_api.pagination import StandardResultsSetPagination
+from recoco.rest_api.permissions import (
+    IsStaffForSiteOrISAuthenticatedReadOnly,
+    IsStaffForSiteOrReadOnly,
+)
 
-from . import models, serializers
-
-########################################################################
-# REST API
-########################################################################
+from . import serializers
+from .models import Contact, Organization, OrganizationGroup
 
 
-class OrganizationViewSet(viewsets.ReadOnlyModelViewSet):
-    """API endpoint that allows searching for organizations"""
-
+class OrganizationGroupViewSet(ModelViewSet):
+    serializer_class = serializers.OrganizationGroupSerializer
+    queryset = OrganizationGroup.objects.all()
+    permission_classes = [IsStaffForSiteOrReadOnly]
+    pagination_class = StandardResultsSetPagination
+    filter_backends = [VectorSearchFilter]
     search_fields = ["name"]
+    search_min_rank = 0.05
 
-    filter_backends = [TrigramSimilaritySearchFilter]
 
-    serializer_class = serializers.OrganizationSerializer
+class OrganizationViewSet(ModelViewSet):
+    permission_classes = [IsStaffForSiteOrReadOnly]
+    pagination_class = StandardResultsSetPagination
+    filter_backends = [VectorSearchFilter]
+    search_fields = ["name"]
+    search_min_rank = 0.05
 
     def get_queryset(self):
-        """Return a list of all organizations."""
-        return models.Organization.on_site.all()
+        return Organization.on_site.with_contacts_only().prefetch_related(
+            "departments__region"
+        )
+
+    def get_serializer_class(self):
+        match self.action:
+            case "list":
+                return serializers.OrganizationListSerializer
+            case "retrieve":
+                return serializers.OrganizationDetailSerializer
+            case _:
+                return serializers.OrganizationSerializer
 
 
-# eof
+class OrgaStartswithFilterBackend(BaseFilterBackend):
+    def filter_queryset(self, request, queryset, view):
+        orga_sw = request.query_params.get("orga-startswith")
+        if not orga_sw:
+            return queryset
+        return queryset.filter(organization__name__istartswith=orga_sw)
+
+
+class ContactViewSet(ModelViewSet):
+    permission_classes = [IsStaffForSiteOrISAuthenticatedReadOnly]
+    pagination_class = StandardResultsSetPagination
+    filter_backends = [OrgaStartswithFilterBackend]
+
+    search_fields = [
+        ("last_name", {"weight": "A"}),
+        ("first_name", {"weight": "A"}),
+        ("email", {"weight": "A"}),
+        ("division", {"weight": "B"}),
+        ("organization__name", {"weight": "B"}),
+        ("organization__group__name", {"weight": "B"}),
+        ("organization__departments__name", {"weight": "C"}),
+        (
+            "organization__departments__code",
+            {"config": "simple", "weight": "C"},
+        ),
+        ("organization__departments__region__name", {"weight": "C"}),
+        (
+            "organization__departments__region__code",
+            {"config": "simple", "weight": "C"},
+        ),
+    ]
+    search_min_rank = 0.05
+
+    def get_queryset(self):
+        return Contact.on_site.all()
+
+    def filter_queryset(self, queryset):
+        backends = list(self.filter_backends)
+
+        if switch_is_active("addressbook_contact_use_watson_search"):
+            backends.append(WatsonSearchFilter)
+        else:
+            backends.append(VectorSearchFilter)
+
+        for backend in backends:
+            queryset = backend().filter_queryset(self.request, queryset, self)
+
+        return queryset.distinct()
+
+    def get_serializer_class(self):
+        match self.action:
+            case "list":
+                return serializers.ContactListSerializer
+            case "retrieve":
+                return serializers.ContactDetailSerializer
+            case _:
+                return serializers.ContactSerializer

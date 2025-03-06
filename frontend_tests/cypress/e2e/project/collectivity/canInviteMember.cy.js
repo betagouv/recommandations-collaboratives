@@ -16,7 +16,7 @@ describe('I can invite a member', () => {
 
     cy.visit(`/project/${currentProject.pk}`);
 
-    cy.contains('Inviter un membre de la collectivité').click({ force: true });
+    cy.get('[data-cy="invite-project-member-button"]').click();
 
     cy.get('#invite-member-modal')
       .get('#invite-email')
@@ -36,8 +36,7 @@ describe('I can invite a member', () => {
   });
 
   it('can see a notification of the invitation on the project activity feed', () => {
-    const activityNotification = `${inviterFullName} a invité ${invitedEmail} en tant que porteur de projet`;
-    cy.login('staff');
+    cy.login('staff'); // TODO replace by staffOnSite and check behaviour
     cy.visit(`/project/${currentProject.pk}`);
     cy.get('[data-test-id="fr-consent-banner"]')
       .find('[data-test-id="button-consent-accept-all"]')
@@ -48,9 +47,9 @@ describe('I can invite a member', () => {
       .find('[data-test-id="project-activity-notification"]')
       .then(() => {
         cy.contains(inviterFullName);
-        cy.contains(' a invité ');
+        cy.contains('a invité ');
         cy.contains(invitedEmail);
-        cy.contains(' en tant que porteur de projet');
+        cy.contains('en tant que porteur du projet ou partenaire');
       });
   });
 });

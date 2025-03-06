@@ -19,7 +19,10 @@ function MenuNotifications(notificationNumber, listNofification) {
     async clickConsummeNotificationAndRedirect(notificationId, targetUrl) {
       await api.patch(notificationsMarkAsReadByIdUrl(notificationId), {});
       // redirect to the notification target
-      window.location.href = targetUrl;
+      window.open(`${window.location.origin}${targetUrl}`, '_blank');
+    },
+    getNotificationLink(targetUrl) {
+      return `${window.location.origin}${targetUrl}`;
     },
     async markNotificationAsRead(notificationId, el, notificationIndex) {
       try {

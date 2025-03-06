@@ -1,0 +1,82 @@
+{% load static %}
+{% load sass_tags %}
+{% block css %}
+    {% comment %} <link href="{% sass_src 'projects/css/fragments/share/invite.scss' %}" rel="stylesheet" type="text/css" /> {% endcomment %}
+    <link href="{% sass_src 'css/tools/contact/search-contact-modal.scss' %}"
+          rel="stylesheet"
+          type="text/css" />
+{% endblock css %}
+<div class="modal-contact"
+     x-show="isOpenModal"
+     @click.away="isOpenModal = false"
+     x-transition:enter="ease-out duration-300"
+     x-transition:enter-start="opacity-0 scale-90"
+     x-transition:enter-end="opacity-100 scale-100"
+     x-transition:leave="ease-in duration-300"
+     x-transition:leave-start="opacity-100 scale-100"
+     x-transition:leave-end="opacity-0 scale-90">
+    <!--Title-->
+    <div class="d-flex justify-content-between border-bottom-666 fr-p-3v">
+        <p class="fw-bold color-666 correct-p">ATTACHER UN CONTACT</p>
+        <span class="fr-icon-close-line color-666 cursor-pointer"
+              aria-hidden="true"
+              @click="closeModal"></span>
+    </div>
+    <div class="fr-p-3v">
+        <p class="fw-bold correct-p fr-pb-1w">Rechercher un contact</p>
+        <div class="fr-search-bar" id="header-search" role="search">
+            <label class="fr-label" for="search-contact-input">Recherche</label>
+            <input class="fr-input"
+                   placeholder="Nom d'organisation, contact, rôle"
+                   type="search"
+                   id="search-contact-input"
+                   name="search-contact-input"
+                   @input.debounce="onSearch"
+                   x-model="userInput">
+            <button class="fr-btn" title="Rechercher" @click="onSearch">Rechercher</button>
+        </div>
+    </div>
+    <div>
+        <div class="fr-menu menu-modal-correct-fr-menu better-positionning border-radius-4px">
+            <div class="fr-menu__list specific-width-26rem border-radius-4px">
+                <div class="fr-menu__list specific-width-26rem overflow-auto specific-height border-radius-4px">
+                    <template x-if="userInput.length > 0 && showContactsresults && !isAContactSelected">
+                        <template class="fr-menu__item"
+                                  x-for="(contact, index) in contactsFound"
+                                  :key="index">
+                            <div class="fr-menu__item__content cursor-pointer fr-pt-1w fr-px-1w add-borders"
+                                 data-test-id="contact-to-select"
+                                 @click="onSelect(contact)">
+                                <div x-data="{contact:contact}">{% include "tools/contacts/contact_card.html" %}</div>
+                            </div>
+                        </template>
+                    </template>
+                    <template class="fr-menu__item" x-if="isAContactSelected">
+                        <div class="design-dropdown">
+                            <div class="d-flex justify-content-between add-borders">
+                                <div x-data="{contact:selectedContact}">{% include "tools/contacts/contact_card.html" %}</div>
+                                <span class="fr-icon-close-line color-666 cursor-pointer fr-pt-3v fr-pr-3v"
+                                      aria-hidden="true"
+                                      @click="onCancelSelectContact"></span>
+                            </div>
+                            <div class="fr-p-3v text-align-center">
+                                <button @click="addContact"
+                                        data-test-id="button-add-contact-to-tiptap-editor"
+                                        class="fr-btn w-100 correct-centering-text">Envoyer le contact</button>
+                            </div>
+                        </div>
+                    </template>
+                    <template class="fr-menu__item"
+                              x-if="userInput.length > 0 && !isAContactSelected && !showContactsresults && delayDisplay">
+                        <div class="fr-m-1w fr-p-3v specific-banner">
+                            <span class="text-style">Aucun résultat</span>
+                        </div>
+                    </template>
+                </div>
+            </div>
+        </div>
+        {% comment %} <div class="flex justify-end pt-2">
+        <button class="px-4 bg-transparent p-3 rounded-lg text-indigo-500 hover:bg-gray-100 hover:text-indigo-400 mr-2" @click="alert('Additional Action');">Action</button>
+        </div> {% endcomment %}
+    </div>
+</div>

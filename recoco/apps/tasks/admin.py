@@ -66,7 +66,8 @@ class TaskAdmin(admin.ModelAdmin):
 
 @admin.register(models.TaskFollowup)
 class TaskFollowupAdmin(admin.ModelAdmin):
-    pass
+    list_display = ["id", "task", "who", "status"]
+    list_filter = ["status"]
 
 
 @admin.register(models.TaskFollowupRsvp)

@@ -17,6 +17,8 @@ document.addEventListener('alpine:init', () => {
     index: null,
     scrollY: null,
 
+    contact: null,
+
     get projectId() {
       return Alpine.store('djangoData').projectId;
     },
@@ -61,12 +63,21 @@ document.addEventListener('alpine:init', () => {
       if (urlFromHash) {
         this.taskId = parseInt(urlFromHash[1], 10);
         if (this.newTasks.length === 0) {
-          await Alpine.store('tasksData').loadTasks();
+          const tasks = await Alpine.store('tasksData').loadTasks();
+          this.open(
+            tasks
+              .filter((task) => task.public)
+              .find((task) => task.id === this.taskId)
+          );
+        } else {
+          this.open(this.newTasks.find((task) => task.id === this.taskId));
         }
-        this.open(this.newTasks.find((task) => task.id === this.taskId));
       }
     },
     open(task) {
+      if (!task) {
+        throw new Error('Error while open task modal - task not found');
+      }
       this.isPaginated = false;
       this.setLocation(task.id);
       this.visitTask(task);

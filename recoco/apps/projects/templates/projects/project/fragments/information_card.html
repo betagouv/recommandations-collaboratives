@@ -17,24 +17,22 @@
             {% if onboarding_information %}
                 Compléments
             {% else %}
+                {% if is_advisor_note %}<span class="fr-icon-lock-line fr-icon--sm" aria-hidden="true"></span>{% endif %}
                 {{ title }}
             {% endif %}
         </h6>
-        {% if is_advisor_note %}
-            <span class="fr-ml-2v fr-mr-3w text-danger tiny d-flex align-items-center"
-                  href="{% url "projects-project-topics" project.id %}#advisor-note">
-                <svg class="bi fr-ml-2v " width="10" height="10" fill="currentColor">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#lock" />
-                </svg>
-                <span>Non visible par le porteur de projet</span>
-            </span>
-        {% endif %}
         {% if "use_advisor_note" in user_project_perms and is_editable %}
             <a class="fr-btn fr-btn--sm fr-btn--tertiary-no-outline fr-btn--icon-right fr-icon-pencil-line fr-text--xs"
-               href="{% url "projects-project-topics" project.id %}#advisor-note">Éditer</a>
+               href="{% url "projects-project-topics" project.id %}#advisor-note"
+               data-cy="edit-internal-note">Éditer</a>
         {% endif %}
     </div>
-    <div class="project-card-details h-100 fr-p-3w d-flex flex-column justify-content-between project-card__description">
+    {% if is_advisor_note %}
+        <div class="fr-ml-2v fr-mr-3w text-danger d-flex align-items-center">
+            <p class="fr-text--xs fr-mb-0" data-cy="info-internal-note">(Non visible par le porteur de projet)</p>
+        </div>
+    {% endif %}
+    <div class="project-card-details fr-p-3w d-flex flex-column justify-content-between project-card__description">
         <article class="overflow-hidden">{% include "projects/project/fragments/information_card_description.html" %}</article>
         {% if display_user is not False %}
             <footer class="d-flex fr-mt-3w justify-content-between {% if full_width %}align-items-center{% else %}flex-column{% endif %}">

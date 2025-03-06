@@ -13,7 +13,7 @@ from captcha.fields import ReCaptchaField
 from captcha.widgets import ReCaptchaV2Checkbox
 from crispy_forms.layout import Fieldset, Layout
 from django import forms
-from django.shortcuts import reverse
+from django.urls import reverse
 
 from recoco.apps.dsrc.forms import DsrcBaseForm
 
@@ -196,9 +196,9 @@ class OnboardingSignupForm(DsrcBaseForm):
     # TODO: add a phone number validation, pattern / mask
     phone = forms.CharField(
         max_length=16,
-        label="Téléphone *",
+        label="Numéro de téléphone *",
         initial="",
-        help_text="Format attendu: 0102030405",
+        help_text="Votre numéro de téléphone ne sera jamais diffusé en dehors du site. Il permet aux administrateurs ou aux partenaires de votre dossier de vous joindre plus facilement. Format attendu: 0102030405.",
         required=True,
     )
     captcha = ReCaptchaField(widget=ReCaptchaV2Checkbox(api_params={"hl": "fr"}))

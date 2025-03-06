@@ -14,11 +14,11 @@ from django.contrib.sites import models as sites_models
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
 from django.utils import timezone
+from freezegun import freeze_time
 from guardian.shortcuts import assign_perm
 from model_bakery import baker
 from notifications.signals import notify
 from pytest_django.asserts import assertContains
-from rest_framework.test import APIClient
 
 from recoco import verbs
 from recoco.apps.tasks import models as tasks_models
@@ -72,7 +72,7 @@ def test_project_list_includes_project_for_staff(request, client, project):
 
 @pytest.mark.django_db
 def test_project_list_includes_only_projects_in_switchtender_departments(
-    request, client, make_project
+    request, api_client, make_project
 ):
     user = baker.make(auth_models.User, email="me@example.com")
     site = get_current_site(request)
@@ -118,11 +118,10 @@ def test_project_list_includes_only_projects_in_switchtender_departments(
 
     utils.assign_advisor(user, project, site)
 
-    client = APIClient()
-    client.force_authenticate(user=user)
+    api_client.force_authenticate(user=user)
 
     url = reverse("projects-list")
-    response = client.get(url)
+    response = api_client.get(url)
 
     assert response.status_code == 200
     assert len(response.data) == 1
@@ -164,7 +163,7 @@ def test_project_list_includes_only_projects_in_switchtender_departments(
 
 
 @pytest.mark.django_db
-def test_project_list_tags_filter(request, client):
+def test_project_list_tags_filter(request, api_client):
     site = get_current_site(request)
     user = baker.make(auth_models.User, is_superuser=True)
 
@@ -174,26 +173,208 @@ def test_project_list_tags_filter(request, client):
     project_2 = baker.make(models.Project, sites=[site])
     project_2.tags.add("tag3")
 
-    client = APIClient()
-    client.force_authenticate(user=user)
+    api_client.force_authenticate(user=user)
 
     url = reverse("projects-list")
 
-    response = client.get(url)
+    response = api_client.get(url)
     assert response.status_code == 200
     assert len(response.data) == 2
 
-    response = client.get(f"{url}?tags=tag1,tag3")
+    response = api_client.get(f"{url}?tags=tag1,tag3")
     assert response.status_code == 200
     assert len(response.data) == 2
 
-    response = client.get(f"{url}?tags=tag3")
+    response = api_client.get(f"{url}?tags=tag3")
     assert response.status_code == 200
     assert len(response.data) == 1
 
-    response = client.get(f"{url}?tags=tag5,tag6")
+    response = api_client.get(f"{url}?tags=tag5,tag6")
     assert response.status_code == 200
     assert len(response.data) == 0
+
+
+@pytest.mark.django_db
+def test_project_list_last_activity_filter(request, api_client):
+    site = get_current_site(request)
+    user = baker.make(auth_models.User, is_superuser=True)
+
+    with freeze_time("2025-01-01"):
+        baker.make(models.Project, sites=[site])
+
+    with freeze_time("2025-01-10"):
+        baker.make(models.Project, sites=[site])
+
+    api_client.force_authenticate(user=user)
+
+    url = reverse("projects-list")
+
+    with freeze_time("2025-01-15"):
+        response = api_client.get(f"{url}?last_activity=3")
+        assert response.status_code == 200
+        assert len(response.data) == 0
+
+        response = api_client.get(f"{url}?last_activity=5")
+        assert response.status_code == 200
+        assert len(response.data) == 1
+
+        response = api_client.get(f"{url}?last_activity=15")
+        assert response.status_code == 200
+        assert len(response.data) == 2
+
+        response = api_client.get(f"{url}?last_activity=dummy")
+        assert response.status_code == 200
+        assert len(response.data) == 2
+
+        response = api_client.get(f"{url}?last_activity=")
+        assert response.status_code == 200
+        assert len(response.data) == 2
+
+
+@pytest.mark.django_db
+def test_project_list_search_filter_fulltext(request, api_client):
+    site = get_current_site(request)
+    user = baker.make(auth_models.User, is_superuser=True)
+
+    # useful one
+    baker.make(
+        models.Project,
+        sites=[site],
+        name="The super niceproject",
+        commune__name="Maville",
+        commune__postal="99666",
+        commune__insee="AZ37",
+    )
+
+    # second one with accent
+    baker.make(
+        models.Project,
+        sites=[site],
+        name="Le projet de la vérité",
+        commune__name="Bayonne",
+        commune__postal="64100",
+        commune__insee="64102",
+    )
+
+    # honeypot one
+    baker.make(
+        models.Project,
+        sites=[site],
+        name="Noise noise noise",
+        commune__name="Autreville",
+        commune__postal="99333",
+        commune__insee="28838",
+    )
+
+    api_client.force_authenticate(user=user)
+
+    url = reverse("projects-list")
+
+    response = api_client.get(url)
+    assert response.status_code == 200
+    assert len(response.data) == 3
+
+    # project title
+    response = api_client.get(f"{url}?search=niceproject")
+    assert response.status_code == 200
+    assert len(response.data) == 1
+
+    # city name
+    response = api_client.get(f"{url}?search=maville")
+    assert response.status_code == 200
+    assert len(response.data) == 1
+
+    # postcode
+    response = api_client.get(f"{url}?search=99666")
+    assert response.status_code == 200
+    assert len(response.data) == 1
+
+    # insee
+    response = api_client.get(f"{url}?search=AZ37")
+    assert response.status_code == 200
+    assert len(response.data) == 1
+
+    # no result is fine?
+    response = api_client.get(f"{url}?search=XIDJISJDI")
+    assert response.status_code == 200
+    assert len(response.data) == 0
+
+    # unaccent
+    response = api_client.get(f"{url}?search=verite")
+    assert response.status_code == 200
+    assert len(response.data) == 1
+
+
+@pytest.mark.django_db
+def test_project_list_search_filter_departments(request, api_client):
+    site = get_current_site(request)
+    user = baker.make(auth_models.User, is_superuser=True)
+
+    # useful one
+    baker.make(
+        models.Project,
+        sites=[site],
+        name="The super niceproject",
+        commune__name="Maville",
+        commune__postal="99666",
+        commune__insee="AZ37",
+        commune__department__code="62",
+    )
+
+    # honeypot one
+    baker.make(
+        models.Project,
+        sites=[site],
+        name="Noise noise noise",
+        commune__name="Autreville",
+        commune__postal="99333",
+        commune__insee="28838",
+        commune__department__code="10",
+    )
+
+    api_client.force_authenticate(user=user)
+
+    url = reverse("projects-list")
+
+    response = api_client.get(url)
+    assert response.status_code == 200
+    assert len(response.data) == 2
+
+    # cumulative query FTS+filter
+    response = api_client.get(f"{url}?search=niceproject&departments=62")
+    assert response.status_code == 200
+    assert len(response.data) == 1
+
+    # Multiple departments
+    response = api_client.get(f"{url}?departments=10&departments=62")
+    assert response.status_code == 200
+    assert len(response.data) == 2
+
+    response = api_client.get(f"{url}?departments=10&departments=33")
+    assert response.status_code == 200
+    assert len(response.data) == 1
+
+    # No department filter
+    response = api_client.get(f"{url}?search=niceproject")
+    assert response.status_code == 200
+    assert len(response.data) == 1
+
+
+@pytest.mark.django_db
+def test_project_list_search_filter_is_cumulative(request, api_client):
+    site = get_current_site(request)
+    user = baker.make(auth_models.User, is_superuser=True)
+
+    project_1 = baker.make(models.Project, name="ABC", sites=[site])
+    project_1.tags.add("tag1", "tag2")
+
+    api_client.force_authenticate(user=user)
+
+    url = reverse("projects-list")
+
+    response = api_client.get(f"{url}?search=ABC&tags=tag1")
+    assert response.status_code == 200
+    assert len(response.data) == 1
 
 
 ########################################################################
@@ -202,43 +383,38 @@ def test_project_list_tags_filter(request, client):
 
 
 @pytest.mark.django_db
-def test_anonymous_cannot_use_project_detail_api(request, client, project):
-    client = APIClient()
-
+def test_anonymous_cannot_use_project_detail_api(request, api_client, project):
     url = reverse("projects-detail", args=[project.id])
-    response = client.get(url)
-
+    response = api_client.get(url)
     assert response.status_code == 403
 
 
 @pytest.mark.django_db
-def test_simple_user_cannot_use_project_detail_api(request, client, make_project):
+def test_simple_user_cannot_use_project_detail_api(request, api_client, make_project):
     site = get_current_site(request)
     user = baker.make(auth_models.User, email="me@example.com")
     project = create_project_with_notifications(site, user, make_project)
 
-    client = APIClient()
-    client.force_authenticate(user=user)
+    api_client.force_authenticate(user=user)
 
     url = reverse("projects-detail", args=[project.id])
-    response = client.get(url)
+    response = api_client.get(url)
 
     assert response.status_code == 403
 
 
 @pytest.mark.django_db
-def test_project_detail_contains_project_info(request, client, make_project):
+def test_project_detail_contains_project_info(request, api_client, make_project):
     site = get_current_site(request)
     user = baker.make(auth_models.User, email="me@example.com")
     project = create_project_with_notifications(site, user, make_project)
 
     utils.assign_advisor(user, project, site)
 
-    client = APIClient()
-    client.force_authenticate(user=user)
+    api_client.force_authenticate(user=user)
 
     url = reverse("projects-detail", args=[project.id])
-    response = client.get(url)
+    response = api_client.get(url)
 
     assert response.status_code == 200
 
@@ -335,24 +511,21 @@ def check_project_content(project, data):
 
 
 @pytest.mark.django_db
-def test_anonymous_cannot_use_project_patch_api(request, client, project_draft):
-    client = APIClient()
-
+def test_anonymous_cannot_use_project_patch_api(request, api_client, project_draft):
     url = reverse("projects-detail", args=[project_draft.id])
-    response = client.patch(url, data={"name": "lalala"})
+    response = api_client.patch(url, data={"name": "lalala"})
 
     assert response.status_code == 403
 
 
 @pytest.mark.django_db
-def test_bad_project_is_reported_by_project_patch_api(client):
+def test_bad_project_is_reported_by_project_patch_api(api_client):
     user = baker.make(auth_models.User, email="me@example.com")
 
-    client = APIClient()
-    client.force_authenticate(user)
+    api_client.force_authenticate(user)
 
     url = reverse("projects-detail", args=[0])
-    response = client.patch(url, data={"name": "lalala"})
+    response = api_client.patch(url, data={"name": "lalala"})
 
     assert response.status_code == 404
 
@@ -375,15 +548,14 @@ def test_bad_project_is_reported_by_project_patch_api(client):
 
 @pytest.mark.django_db
 def test_project_simple_user_cannot_update_by_project_patch_api(
-    request, client, project_draft
+    request, api_client, project_draft
 ):
     user = baker.make(auth_models.User, email="me@example.com")
 
-    client = APIClient()
-    client.force_authenticate(user)
+    api_client.force_authenticate(user)
 
     url = reverse("projects-detail", args=[project_draft.id])
-    response = client.patch(url, data={"name": "allala"})
+    response = api_client.patch(url, data={"name": "allala"})
 
     assert response.status_code == 403
 
@@ -392,7 +564,7 @@ def test_project_simple_user_cannot_update_by_project_patch_api(
 
 
 @pytest.mark.django_db
-def test_project_is_updated_by_project_patch_api(request, client, project_draft):
+def test_project_is_updated_by_project_patch_api(request, api_client, project_draft):
     site = get_current_site(request)
     user = baker.make(auth_models.User, email="me@example.com")
 
@@ -400,11 +572,10 @@ def test_project_is_updated_by_project_patch_api(request, client, project_draft)
 
     new_name = "new name"
 
-    client = APIClient()
-    client.force_authenticate(user)
+    api_client.force_authenticate(user)
 
     url = reverse("projects-detail", args=[project_draft.id])
-    response = client.patch(url, data={"name": new_name})
+    response = api_client.patch(url, data={"name": new_name})
 
     assert response.status_code == 200
     assert response.data["name"] == new_name
@@ -419,16 +590,17 @@ def test_project_is_updated_by_project_patch_api(request, client, project_draft)
 
 
 @pytest.mark.django_db
-def test_list_project_statuses_for_non_moderator(request, project, project_draft):
+def test_list_project_statuses_for_non_moderator(
+    request, project, project_draft, api_client
+):
     site = get_current_site(request)
     user = baker.make(auth_models.User, email="me@example.com")
     assign_perm("list_projects", user, site)
 
-    client = APIClient()
-    client.force_authenticate(user=user)
+    api_client.force_authenticate(user=user)
 
     url = reverse("projects-projectsites-list")
-    response = client.get(url)
+    response = api_client.get(url)
 
     ps = project.project_sites.current()
 
@@ -448,17 +620,18 @@ def test_list_project_statuses_for_non_moderator(request, project, project_draft
 
 
 @pytest.mark.django_db
-def test_list_project_statuses_for_moderators(request, project, project_draft):
+def test_list_project_statuses_for_moderators(
+    request, project, project_draft, api_client
+):
     site = get_current_site(request)
     user = baker.make(auth_models.User, email="me@example.com")
     assign_perm("list_projects", user, site)
     assign_perm("moderate_projects", user, site)
 
-    client = APIClient()
-    client.force_authenticate(user=user)
+    api_client.force_authenticate(user=user)
 
     url = reverse("projects-projectsites-list")
-    response = client.get(url)
+    response = api_client.get(url)
 
     # we are expecting project and project_draft
     expected_ids = set([project.pk, project_draft.pk])
@@ -470,20 +643,19 @@ def test_list_project_statuses_for_moderators(request, project, project_draft):
 
 
 @pytest.mark.django_db
-def test_project_status_is_updated_by_patch_api(request, client, project):
+def test_project_status_is_updated_by_patch_api(request, api_client, project):
     site = get_current_site(request)
     user = baker.make(auth_models.User, email="me@example.com")
     assign_perm("list_projects", user, site)
 
     new_status = "DONE"
 
-    client = APIClient()
-    client.force_authenticate(user)
+    api_client.force_authenticate(user)
 
     ps = project.project_sites.current()
 
     url = reverse("projects-projectsites-detail", args=[ps.id])
-    response = client.patch(url, data={"status": new_status})
+    response = api_client.patch(url, data={"status": new_status})
 
     assert response.status_code == 204
 
@@ -497,10 +669,9 @@ def test_project_status_is_updated_by_patch_api(request, client, project):
 
 
 @pytest.mark.django_db
-def test_project_status_needs_authentication():
-    client = APIClient()
+def test_project_status_needs_authentication(request, api_client):
     url = reverse("userprojectstatus-list")
-    response = client.get(url)
+    response = api_client.get(url)
     assert response.status_code == 403
 
 
@@ -515,7 +686,9 @@ def test_user_cannot_change_some_one_else_project_status(request, project):
 
 
 @pytest.mark.django_db
-def test_user_project_status_contains_only_my_projects(request, make_project):
+def test_user_project_status_contains_only_my_projects(
+    request, api_client, make_project
+):
     user = baker.make(auth_models.User, email="me@example.com")
     site = get_current_site(request)
     # my project and details
@@ -558,11 +731,10 @@ def test_user_project_status_contains_only_my_projects(request, make_project):
     # another one not for me
     other = baker.make(models.UserProjectStatus, site=site)  # noqa
 
-    client = APIClient()
-    client.force_authenticate(user=user)
+    api_client.force_authenticate(user=user)
 
     url = reverse("userprojectstatus-list")
-    response = client.get(url)
+    response = api_client.get(url)
 
     assert response.status_code == 200
     assert len(response.data) == 1
@@ -612,7 +784,7 @@ def test_user_project_status_contains_only_my_projects(request, make_project):
 
 @pytest.mark.django_db
 def test_user_project_status_contains_only_my_projects_for_site(
-    request, project, make_project
+    request, api_client, project, make_project
 ):
     user = baker.make(auth_models.User)
     site = get_current_site(request)
@@ -620,10 +792,9 @@ def test_user_project_status_contains_only_my_projects_for_site(
     local = baker.make(models.UserProjectStatus, project=project, user=user, site=site)
     baker.make(models.UserProjectStatus, project=make_project(site=other), user=user)
 
-    client = APIClient()
-    client.force_authenticate(user=user)
+    api_client.force_authenticate(user=user)
     url = reverse("userprojectstatus-list")
-    response = client.get(url)
+    response = api_client.get(url)
 
     assert response.status_code == 200
     assert len(response.data) == 1
@@ -634,7 +805,7 @@ def test_user_project_status_contains_only_my_projects_for_site(
 
 @pytest.mark.django_db
 def test_user_project_status_dont_list_unmoderated_projects_for_regional_advisors(
-    request, make_project
+    request, api_client, make_project
 ):
     project = make_project(
         site=get_current_site(request),
@@ -646,17 +817,16 @@ def test_user_project_status_dont_list_unmoderated_projects_for_regional_advisor
     user = baker.make(auth_models.User, groups=[group])
     user.profile.departments.add(project.commune.department)
 
-    client = APIClient()
-    client.force_authenticate(user=user)
+    api_client.force_authenticate(user=user)
     url = reverse("userprojectstatus-list")
-    response = client.get(url)
+    response = api_client.get(url)
 
     assert response.status_code == 200
     assert len(response.data) == 0
 
 
 @pytest.mark.django_db
-def test_advisor_access_new_regional_project_status(request, make_project):
+def test_advisor_access_new_regional_project_status(request, api_client, make_project):
     project = make_project(
         site=get_current_site(request),
         commune__department__code="01",
@@ -667,10 +837,9 @@ def test_advisor_access_new_regional_project_status(request, make_project):
     user = baker.make(auth_models.User, groups=[group])
     user.profile.departments.add(project.commune.department)
 
-    client = APIClient()
-    client.force_authenticate(user=user)
+    api_client.force_authenticate(user=user)
     url = reverse("userprojectstatus-list")
-    response = client.get(url)
+    response = api_client.get(url)
 
     assert response.status_code == 200
     ups = response.data
@@ -679,7 +848,9 @@ def test_advisor_access_new_regional_project_status(request, make_project):
 
 
 @pytest.mark.django_db
-def test_advisor_access_makes_no_user_project_status_duplicate(request, make_project):
+def test_advisor_access_makes_no_user_project_status_duplicate(
+    request, api_client, make_project
+):
     project = make_project(
         site=get_current_site(request),
         commune__department__code="01",
@@ -696,10 +867,9 @@ def test_advisor_access_makes_no_user_project_status_duplicate(request, make_pro
         user=user,
     )
 
-    client = APIClient()
-    client.force_authenticate(user=user)
+    api_client.force_authenticate(user=user)
     url = reverse("userprojectstatus-list")
-    response = client.get(url)
+    response = api_client.get(url)
     assert response.status_code == 200
     ups = response.data
     assert len(ups) == 1
@@ -712,54 +882,48 @@ def test_advisor_access_makes_no_user_project_status_duplicate(request, make_pro
 
 
 @pytest.mark.django_db
-def test_project_status_detail_needs_authentication(request, project):
-    client = APIClient()
-
+def test_project_status_detail_needs_authentication(request, api_client, project):
     url = reverse("userprojectstatus-detail", args=[project.id])
-    response = client.get(url)
-
+    response = api_client.get(url)
     assert response.status_code == 403
 
 
 @pytest.mark.django_db
-def test_project_status_detail_signals_unknown_object(request):
+def test_project_status_detail_signals_unknown_object(request, api_client):
     user = baker.make(auth_models.User)
 
-    client = APIClient()
-    client.force_authenticate(user=user)
+    api_client.force_authenticate(user=user)
 
     url = reverse("userprojectstatus-detail", args=[0])
-    response = client.get(url)
+    response = api_client.get(url)
 
     assert response.status_code == 404
 
 
 @pytest.mark.django_db
-def test_cannot_access_other_user_project_status(request):
+def test_cannot_access_other_user_project_status(request, api_client):
     user = baker.make(auth_models.User)
     site = get_current_site(request)
     other = baker.make(models.UserProjectStatus, site=site)
 
-    client = APIClient()
-    client.force_authenticate(user=user)
+    api_client.force_authenticate(user=user)
 
     url = reverse("userprojectstatus-detail", args=[other.id])
-    response = client.get(url)
+    response = api_client.get(url)
 
     assert response.status_code == 404
 
 
 @pytest.mark.django_db
-def test_access_my_user_project_status(request, project):
+def test_access_my_user_project_status(request, api_client, project):
     user = baker.make(auth_models.User)
     site = get_current_site(request)
     mine = baker.make(models.UserProjectStatus, project=project, user=user, site=site)
 
-    client = APIClient()
-    client.force_authenticate(user=user)
+    api_client.force_authenticate(user=user)
 
     url = reverse("userprojectstatus-detail", args=[mine.id])
-    response = client.get(url)
+    response = api_client.get(url)
 
     assert response.status_code == 200
     ups = response.data
@@ -773,27 +937,24 @@ def test_access_my_user_project_status(request, project):
 
 
 @pytest.mark.django_db
-def test_project_status_patch_needs_authentication(request, project):
-    client = APIClient()
-
+def test_project_status_patch_needs_authentication(request, api_client, project):
     url = reverse("userprojectstatus-detail", args=[project.id])
-    response = client.patch(url, data={"status": "DONE"})
+    response = api_client.patch(url, data={"status": "DONE"})
 
     assert response.status_code == 403
 
 
 @pytest.mark.django_db
-def test_project_status_patch_dont_update_others_object(request):
+def test_project_status_patch_dont_update_others_object(request, api_client):
     user = baker.make(auth_models.User, username="Bob")
     site = get_current_site(request)
     ups = baker.make(models.UserProjectStatus, site=site, status="DRAFT")
 
     new_status = "DONE"
 
-    client = APIClient()
-    client.force_authenticate(user=user)
+    api_client.force_authenticate(user=user)
     url = reverse("userprojectstatus-detail", args=[ups.id])
-    response = client.patch(url, data={"status": new_status})
+    response = api_client.patch(url, data={"status": new_status})
 
     assert response.status_code == 404
 
@@ -803,7 +964,7 @@ def test_project_status_patch_dont_update_others_object(request):
 
 
 @pytest.mark.django_db
-def test_project_status_patch_updates_object_and_log(request, project):
+def test_project_status_patch_updates_object_and_log(request, api_client, project):
     user = baker.make(auth_models.User, username="Bob")
     site = get_current_site(request)
     ups = baker.make(
@@ -812,10 +973,9 @@ def test_project_status_patch_updates_object_and_log(request, project):
 
     new_status = "DONE"
 
-    client = APIClient()
-    client.force_authenticate(user=user)
+    api_client.force_authenticate(user=user)
     url = reverse("userprojectstatus-detail", args=[ups.id])
-    response = client.patch(url, data={"status": new_status})
+    response = api_client.patch(url, data={"status": new_status})
 
     # response is ok with new content
     assert response.status_code == 200
@@ -859,119 +1019,119 @@ def test_anonymous_cannot_search_topic_api(client, request):
 
 
 @pytest.mark.django_db
-def test_unused_topics_are_not_suggested_via_rest_api(request):
+def test_unused_topics_are_not_suggested_via_rest_api(request, api_client):
     current_site = get_current_site(request)
     user = baker.make(auth_models.User)
-    client = APIClient()
-    client.force_authenticate(user=user)
+
+    api_client.force_authenticate(user=user)
 
     baker.make(models.Topic, name="acme topic", site=current_site)
 
     url = reverse("topics-list")
-    response = client.get(
+    response = api_client.get(
         url, {"search": "acme", "restrict_to": "projects"}, format="json"
     )
 
     assert response.status_code == 200
-    assert len(response.data) == 0
+    assert len(response.data.get("results")) == 0
 
 
 @pytest.mark.django_db
-def test_topics_on_deleted_task_are_not_suggested_via_rest_api(request):
+def test_topics_on_deleted_task_are_not_suggested_via_rest_api(request, api_client):
     current_site = get_current_site(request)
     user = baker.make(auth_models.User)
-    client = APIClient()
-    client.force_authenticate(user=user)
+
+    api_client.force_authenticate(user=user)
 
     topic = baker.make(models.Topic, name="acme topic", site=current_site)
     task = baker.make(tasks_models.Task, deleted=timezone.now())
     topic.tasks.add(task)
 
     url = reverse("topics-list")
-    response = client.get(
+    response = api_client.get(
         url, {"search": "acm topc", "restrict_to": "recommendations"}, format="json"
     )
 
     assert response.status_code == 200
-    assert len(response.data) == 0
+    assert len(response.data.get("results")) == 0
 
 
 @pytest.mark.django_db
-def test_topics_on_deleted_project_are_not_suggested_via_rest_api(request):
+def test_topics_on_deleted_project_are_not_suggested_via_rest_api(request, api_client):
     current_site = get_current_site(request)
     user = baker.make(auth_models.User)
-    client = APIClient()
-    client.force_authenticate(user=user)
+
+    api_client.force_authenticate(user=user)
 
     topic = baker.make(models.Topic, name="acme topic", site=current_site)
     project = baker.make(models.Project, deleted=timezone.now())
     topic.projects.add(project)
 
     url = reverse("topics-list")
-    response = client.get(
+    response = api_client.get(
         url, {"search": "acm topc", "restrict_to": "projects"}, format="json"
     )
 
     assert response.status_code == 200
-    assert len(response.data) == 0
+    assert len(response.data.get("results")) == 0
 
 
 @pytest.mark.django_db
-def test_topics_are_restricted_to_projects_via_rest_api(request):
+def test_topics_are_restricted_to_projects_via_rest_api(request, api_client):
     current_site = get_current_site(request)
     user = baker.make(auth_models.User)
-    client = APIClient()
-    client.force_authenticate(user=user)
+
+    api_client.force_authenticate(user=user)
 
     topic = baker.make(models.Topic, name="acme topic", site=current_site)
     task = baker.make(tasks_models.Task)
     topic.tasks.add(task)
 
     url = reverse("topics-list")
-    response = client.get(
+    response = api_client.get(
         url, {"search": "acm topc", "restrict_to": "projects"}, format="json"
     )
 
     assert response.status_code == 200
-    assert len(response.data) == 0
+    assert len(response.data.get("results")) == 0
 
 
 @pytest.mark.django_db
-def test_topics_are_restricted_to_recommendations_via_rest_api(request):
+def test_topics_are_restricted_to_recommendations_via_rest_api(request, api_client):
     current_site = get_current_site(request)
     user = baker.make(auth_models.User)
-    client = APIClient()
-    client.force_authenticate(user=user)
+
+    api_client.force_authenticate(user=user)
 
     topic = baker.make(models.Topic, name="acme topic", site=current_site)
     project = baker.make(models.Project)
     topic.projects.add(project)
 
     url = reverse("topics-list")
-    response = client.get(
+    response = api_client.get(
         url, {"search": "acm topc", "restrict_to": "recommendations"}, format="json"
     )
 
     assert response.status_code == 200
-    assert len(response.data) == 0
+    assert len(response.data.get("results")) == 0
 
 
 @pytest.mark.django_db
-def test_topics_are_restricted_to_nonexistent_via_rest_api(request):
+def test_topics_are_restricted_to_nonexistent_via_rest_api(request, api_client):
     current_site = get_current_site(request)
     user = baker.make(auth_models.User)
-    client = APIClient()
-    client.force_authenticate(user=user)
+
+    api_client.force_authenticate(user=user)
 
     baker.make(models.Topic, name="acme topic", site=current_site)
 
     url = reverse("topics-list")
-    response = client.get(
+    response = api_client.get(
         url, {"search": "acme topic", "restrict_to": "gne"}, format="json"
     )
 
     assert response.status_code == 200
-    assert len(response.data) == 0
+    assert len(response.data.get("results")) == 0
 
 
 # eof

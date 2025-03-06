@@ -1,6 +1,6 @@
 describe('I can ask a question on a resource', () => {
   beforeEach(() => {
-    cy.login('staff');
+    cy.login('staff'); // TODO replace by staffOnSite and check behaviour
   });
 
   it('asks a question', () => {

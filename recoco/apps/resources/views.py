@@ -18,6 +18,7 @@ from django.contrib.auth.mixins import (
     PermissionRequiredMixin,
     UserPassesTestMixin,
 )
+from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.shortcuts import get_current_site
 from django.contrib.syndication.views import Feed
 from django.db import transaction
@@ -37,8 +38,9 @@ from reversion_compare.views import HistoryCompareDetailView
 
 from recoco.apps.addressbook import models as addressbook_models
 from recoco.apps.geomatics import models as geomatics_models
+from recoco.apps.hitcount.models import HitCount
 from recoco.apps.projects import models as projects
-from recoco.utils import check_if_advisor, has_perm, has_perm_or_403, is_staff_for_site
+from recoco.utils import check_if_advisor, has_perm, has_perm_or_403
 
 from . import models
 
@@ -49,6 +51,7 @@ from . import models
 
 def resource_search(request):
     """Search existing resources"""
+
     form = SearchForm(request.GET)
     form.is_valid()
     query = form.cleaned_data.get("query", "")
@@ -61,7 +64,11 @@ def resource_search(request):
 
     categories = form.selected_categories
 
-    resources = models.Resource.search(query, categories)
+    resources = (
+        models.Resource.search(query, categories)
+        .select_related("category")
+        .prefetch_related("task_recommendations")
+    )
 
     # If we are not allowed to manage resources, filter out DRAFT/TO_REVIEW items and
     # imported resources
@@ -128,7 +135,19 @@ def resource_search(request):
 
     resources = resources.filter(staff_redux)
 
-    return render(request, "resources/resource/list.html", locals())
+    return render(
+        request,
+        "resources/resource/list.html",
+        {
+            "resources_count": resources.count(),
+            "user_bookmarks": (
+                list(request.user.bookmarks.values_list("resource_id", flat=True))
+                if request.user.is_authenticated
+                else []
+            ),
+            **locals(),
+        },
+    )
 
 
 # NOTE both using search and filter in same action is slippy
@@ -217,6 +236,21 @@ class BaseResourceDetailView(DetailView):
                     | Q(organization__departments=None)
                 )
 
+        if self.request.user.is_authenticated:
+            context["contacts_to_display"] = list(
+                HitCount.on_site.for_context_object(self.get_object())
+                .for_user(self.request.user)
+                .filter(
+                    content_object_ct=ContentType.objects.get_for_model(
+                        addressbook_models.Contact
+                    ),
+                )
+                .distinct()
+                .values_list("content_object_id", flat=True)
+            )
+        else:
+            context["contacts_to_display"] = []
+
         return context
 
 
@@ -227,7 +261,7 @@ class ResourceDetailView(UserPassesTestMixin, BaseResourceDetailView):
 
     def test_func(self):
         resource = self.get_object()
-        return resource.public or is_staff_for_site(self.request.user)
+        return resource.public or self.request.user.is_authenticated
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -260,7 +294,7 @@ class EmbededResourceDetailView(BaseResourceDetailView):
 
         if task_id := self.request.GET.get("task_id"):
             context["task"] = (
-                self.object.task_set.filter(pk=task_id)
+                self.object.recommandations.filter(pk=task_id)
                 .select_related("ds_folder")
                 .first()
             )

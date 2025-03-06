@@ -6,7 +6,7 @@ const userToInvite = users[3];
 
 describe('I can go to administration area of a project and invite a switchtender', () => {
   beforeEach(() => {
-    cy.login('staff');
+    cy.login('staff'); // TODO replace by staffOnSite and check behaviour
   });
 
   it('goes to the administration tab of a project and invite a switchtender', () => {

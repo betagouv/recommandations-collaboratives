@@ -25,12 +25,14 @@ from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 from django.contrib.syndication.views import Feed
+from django.core.cache import cache
+from django.core.cache.utils import make_template_fragment_key
 from django.db import transaction
 from django.db.models import Count, ExpressionWrapper, F, FloatField, Max, Q, Value
 from django.db.models.functions import Cast
 from django.http import Http404, HttpResponse
-from django.shortcuts import get_object_or_404, redirect, render, reverse
-from django.urls import reverse_lazy
+from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.utils.safestring import mark_safe
 from django.views.decorators.http import require_http_methods
@@ -87,6 +89,7 @@ class CRMSiteDashboardView(LoginRequiredMixin, UserPassesTestMixin, TemplateView
                 | Q(actor_content_type=ctype)
             )
             .order_by("-timestamp")
+            # TODO: https://docs.djangoproject.com/en/5.1/ref/contrib/contenttypes/#genericprefetch
             .prefetch_related("actor", "action_object", "target")[:100]
         )
 
@@ -168,6 +171,13 @@ class SiteConfigurationUpdateView(LoginRequiredMixin, UserPassesTestMixin, Updat
     def get_object(self, queryset=None):
         return self.request.site.configuration
 
+    def form_valid(self, form):
+        # Invalidate cache for CRISP token
+        key = make_template_fragment_key("crisp", [self.request.site])
+        cache.delete(key)
+
+        return super().form_valid(form)
+
 
 ########################################################################
 # organizations
@@ -176,9 +186,11 @@ class SiteConfigurationUpdateView(LoginRequiredMixin, UserPassesTestMixin, Updat
 
 def get_queryset_for_site_organizations(site):
     """Return queryset of organizations from addressbook site or w/ user on site"""
-    return Organization.objects.filter(
-        Q(sites=site) | Q(registered_profiles__sites=site)
-    ).distinct()
+    return (
+        Organization.objects.filter(Q(sites=site) | Q(registered_profiles__sites=site))
+        .prefetch_related("departments")
+        .distinct()
+    )
 
 
 @login_required
@@ -539,7 +551,13 @@ def user_unset_advisor(request, user_id=None):
 def user_details(request, user_id):
     has_perm_or_403(request.user, "use_crm", request.site)
 
-    crm_user = get_object_or_404(User, pk=user_id, profile__sites=request.site)
+    crm_user = get_object_or_404(
+        User.objects.select_related("profile__organization").prefetch_related(
+            "projects_switchtended_per_site", "projectmember_set"
+        ),
+        pk=user_id,
+        profile__sites=request.site,
+    )
 
     group_name = make_group_name_for_site("advisor", request.site)
     crm_user_is_advisor = crm_user.groups.filter(name=group_name).exists()
@@ -572,10 +590,6 @@ def user_notifications(request, user_id):
 
     crm_user = get_object_or_404(User, pk=user_id, profile__sites=request.site)
 
-    if request.site not in crm_user.profile.sites.all():
-        # only for user of current site
-        raise Http404
-
     search_form = forms.CRMSearchForm()
 
     notifications = notifications_models.Notification.on_site.filter(
@@ -589,26 +603,45 @@ def user_notifications(request, user_id):
 def user_reminders(request, user_id):
     has_perm_or_403(request.user, "use_crm", request.site)
 
-    crm_user = get_object_or_404(User, pk=user_id, profile__sites=request.site)
-
-    if request.site not in crm_user.profile.sites.all():
-        # only for user of current site
-        raise Http404
+    crm_user = get_object_or_404(
+        User.objects.select_related("profile__organization"),
+        pk=user_id,
+        profile__sites=request.site,
+    )
 
     search_form = forms.CRMSearchForm()
 
-    sent_reminders = reminders_models.Reminder.on_site.filter(
-        sent_to=crm_user
-    ).order_by("-deadline")[:100]
+    sent_reminders = (
+        reminders_models.Reminder.on_site.filter(sent_to=crm_user)
+        .select_related("project__commune")
+        .prefetch_related("transactions")
+        .order_by("-deadline")[:100]
+    )
 
-    future_reminders = reminders_models.Reminder.on_site.filter(
-        project__in=Project.on_site.filter(
-            projectmember__member=crm_user, projectmember__is_owner=True
-        ),
-        sent_on=None,
-    ).order_by("-deadline")
+    future_reminders = (
+        reminders_models.Reminder.on_site.filter(
+            project__in=Project.on_site.filter(
+                inactive_since__isnull=True,
+                projectmember__member=crm_user,
+                projectmember__is_owner=True,
+            ),
+            sent_on=None,
+        )
+        .select_related("project__commune")
+        .prefetch_related("transactions")
+        .order_by("-deadline")
+    )
 
-    return render(request, "crm/user_reminders.html", locals())
+    return render(
+        request,
+        "crm/user_reminders.html",
+        context={
+            "crm_user": crm_user,
+            "search_form": search_form,
+            "sent_reminders": sent_reminders,
+            "future_reminders": future_reminders,
+        },
+    )
 
 
 @login_required
@@ -616,9 +649,6 @@ def user_reminder_details(request, user_id, reminder_pk):
     has_perm_or_403(request.user, "use_crm", request.site)
 
     crm_user = get_object_or_404(User, pk=user_id, profile__sites=request.site)
-    if request.site not in crm_user.profile.sites.all():
-        # only for user of current site
-        raise Http404
 
     reminder = get_object_or_404(
         reminders_models.Reminder, pk=reminder_pk, site=request.site, sent_to=crm_user
@@ -647,7 +677,9 @@ def project_list(request):
     # filtered projects
     projects = filters.ProjectFilter(
         request.GET,
-        queryset=Project.all_on_site.order_by("name").prefetch_related("commune"),
+        queryset=Project.all_on_site.order_by("name")
+        .select_related("commune__department")
+        .prefetch_related("project_sites__site"),
     )
 
     # required by default on crm
@@ -949,6 +981,7 @@ def crm_list_recommendation_without_resources(request):
     recommendations = (
         Task.on_site.filter(public=True, resource=None)
         .exclude(project__exclude_stats=True)
+        .select_related("project__commune", "created_by")
         .order_by("-created_on", "project")
     )
 
@@ -964,7 +997,13 @@ def make_low_reach_project_query(request):
             project_sites__site=request.site,
         )
         .exclude(exclude_stats=True)
-        .prefetch_related("tasks", "notes", "switchtenders")
+        .prefetch_related(
+            "tasks",
+            "notes",
+            "switchtenders__profile__organization",
+            "crm_annotations__tags",
+        )
+        .select_related("commune")
         .annotate(
             reco_total=Count(
                 "tasks",
@@ -1117,7 +1156,7 @@ def compute_topics_occurences(site):
             (topic.name, list(topic.projects.all()))
             for topic in (
                 Topic.objects.filter(projects__sites=site, projects__deleted=None)
-                .prefetch_related("projects")
+                .prefetch_related("projects__commune")
                 .distinct()
             )
         ),
@@ -1129,8 +1168,7 @@ def compute_topics_occurences(site):
             (topic.name, list(topic.tasks.all()))
             for topic in (
                 Topic.objects.filter(tasks__site=site, tasks__deleted=None)
-                .prefetch_related("tasks")
-                .prefetch_related("tasks__project")
+                .prefetch_related("tasks__project__commune")
                 .distinct()
             )
         ),
@@ -1327,6 +1365,7 @@ def project_site_handover(request, project_id):
                 is_origin=False,
                 status="DRAFT",
             )
+
             onboarding_utils.notify_new_project(
                 site=site, project=project, owner=project.owner
             )

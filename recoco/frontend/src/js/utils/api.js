@@ -38,12 +38,38 @@ instance.interceptors.response.use(
 export default instance;
 
 // Projects :
-export function projectUrl(projectId) {
-  return `/api/projects/${projectId}/`;
+// export function searchProjectUrl(search, departments) {
+//   if (search) {
+//     search = `search=${search}`;
+//   }
+//   if (departments.length) {
+//     departments = departments.map((code) => `departments=${code}`).join('&');
+//   }
+//   return `/api/projects/?${search}${search && departments.length > 0 ? '&' : ''}${departments}`;
+// }
+
+// export function projectsMyDepartmentsUrl() {
+//   return '/api/projects/my_departments';
+// }
+
+export function projectsUrl(search, departments, lastActivity) {
+  const params = new URLSearchParams({
+    search: search,
+    last_activity: lastActivity,
+  });
+
+  let url = '/api/projects/?' + params.toString();
+
+  if (departments.length) {
+    departments = departments.map((code) => `departments=${code}`).join('&');
+    url = url + '&' + departments;
+  }
+
+  return url;
 }
 
-export function projectsUrl() {
-  return '/api/projects/';
+export function projectUrl(projectId) {
+  return `/api/projects/${projectId}/`;
 }
 
 export function projectsProjectSitesUrl() {
@@ -61,7 +87,11 @@ export function sitesConfigUrl() {
 
 // Organization
 export function searchOrganizationsUrl(search) {
-  return `/api/organizations/?search=${search}`;
+  return `/api/addressbook/organizations/?search=${search}`;
+}
+// Contacts
+export function searchContactsUrl(search) {
+  return `/api/addressbook/contacts/?search=${search}`;
 }
 
 // Topic
@@ -123,9 +153,9 @@ export function postExternalRessourceUrl() {
 }
 
 // Regions :
-export function regionsUrl() {
-  return `/api/regions/`;
-}
+// export function regionsUrl() {
+//   return `/api/regions/`;
+// }
 
 // Challenges
 export function challengeUrl(code) {

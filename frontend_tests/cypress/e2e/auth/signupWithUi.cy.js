@@ -21,11 +21,16 @@ describe('The Signup Page', () => {
         cy.get(key).type(element, { delay: 0 });
       }
     }
+    cy.document().then((doc) => {
+      var iframe = doc.getElementById('id_captcha').querySelector('iframe');
+      var innerDoc = iframe.contentDocument || iframe.contentWindow.document;
+      innerDoc.querySelector('.recaptcha-checkbox').click();
+      cy.wait(200);
+      cy.get('[type=submit]').click();
 
-    cy.get('[type=submit]').click();
-
-    cy.location().should((loc) => {
-      expect(loc.pathname).to.eq('/');
+      cy.location().should((loc) => {
+        expect(loc.pathname).to.eq('/');
+      });
     });
   });
 });

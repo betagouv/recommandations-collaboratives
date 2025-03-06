@@ -24,6 +24,8 @@ from recoco.apps.communication import constants as communication_constants
 from recoco.apps.communication import digests
 from recoco.apps.communication.api import send_email
 from recoco.apps.communication.digests import normalize_user_name
+from recoco.apps.geomatics import models as geomatics_models
+from recoco.apps.geomatics.serializers import DepartmentSerializer, RegionSerializer
 from recoco.utils import (
     check_if_advisor,
     get_site_config_or_503,
@@ -35,6 +37,7 @@ from .. import forms, models, signals
 from ..utils import (
     assign_advisor,
     assign_collaborator,
+    assign_collaborator_permissions,
     assign_observer,
     can_administrate_project,
     is_advisor_for_project,
@@ -157,6 +160,11 @@ def project_moderation_accept(request, project_pk):
                 # Invite her to fill in a new form
                 # Send an email to the project owner
 
+                # We assign permissions to use their project on this website in
+                # case of multiplication
+                for membership in project.projectmember_set.all():
+                    assign_collaborator_permissions(membership.member, project)
+
                 params = {
                     "project": digests.make_project_digest(project, owner),
                     "site": digests.make_site_digest(
@@ -268,18 +276,35 @@ def project_list_for_staff(request):
 
     site_config = get_site_config_or_503(request.site)
 
-    unread_notifications = (
-        notifications_models.Notification.on_site.unread()
-        .filter(recipient=request.user, public=True)
-        .prefetch_related("actor__profile__organization")
-        .prefetch_related("action_object")
-        .prefetch_related("target")
-        .order_by("-timestamp")[:100]
-    )
-
     mark_general_notifications_as_seen(request.user)
 
-    return render(request, "projects/project/list-kanban.html", locals())
+    department_queryset = (
+        geomatics_models.Department.objects.filter(
+            code__in=(
+                models.Project.on_site.for_user(request.user)
+                .order_by("-created_on", "-updated_on")
+                .prefetch_related("commune__department")
+                .values_list("commune__department", flat=True)
+            )
+        )
+        | request.user.profile.departments.all()
+    ).distinct()
+
+    region_queryset = (
+        geomatics_models.Region.objects.filter(departments__in=department_queryset)
+        .prefetch_related("departments")
+        .distinct()
+        .order_by("name")
+    )
+
+    context = {
+        "site_config": site_config,
+        "departments": list(DepartmentSerializer(department_queryset, many=True).data),
+        "regions": list(RegionSerializer(region_queryset, many=True).data),
+        **locals(),
+    }
+
+    return render(request, "projects/project/list-kanban.html", context)
 
 
 @login_required

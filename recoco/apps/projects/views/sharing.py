@@ -28,6 +28,10 @@ def project_detail_from_sharing_link(request, project_ro_key):
         session, created = survey_models.Session.objects.get_or_create(
             project=project, survey=site_config.project_survey
         )
+        sorted_sessions = sorted(
+            project.survey_session.all(),
+            key=lambda session: session.survey.site != request.site,
+        )
     except Exception:  # nosec
         pass
 

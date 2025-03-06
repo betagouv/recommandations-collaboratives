@@ -1,16 +1,30 @@
 [
-    {
-        "model": "invites.invite",
-        "pk": "774e9444-ff9b-43e3-b26f-c91421c5ddc7",
-        "fields": {
-            "created_on": "2022-09-01T08:58:56.513Z",
-            "accepted_on": "2022-09-01T08:58:56.513Z",
-            "email": "conseiller-regional-invited@test.fr",
-            "message": "viens donc adviser ce projet",
-            "role": "OBSERVER",
-            "inviter_id": 1,
-            "project_id": 26,
-            "site_id": 1
-        }
+  {
+    "model": "invites.invite",
+    "pk": "774e9444-ff9b-43e3-b26f-c91421c5ddc7",
+    "fields": {
+      "created_on": "2022-09-01T08:58:56.513Z",
+      "accepted_on": "2022-09-01T08:58:56.513Z",
+      "email": "conseiller-regional-invited@test.fr",
+      "message": "viens donc adviser ce projet",
+      "role": "OBSERVER",
+      "inviter_id": 1,
+      "project_id": 26,
+      "site_id": 1
     }
+  },
+  {
+    "model": "invites.invite",
+    "pk": "e6f6e766-5e64-4bae-965d-1ce551cf659a",
+    "fields": {
+      "created_on": "2025-01-29T14:31:39Z",
+      "accepted_on": null,
+      "email": "bob@test.fr",
+      "message": "viens donc référer ce projet",
+      "role": "COLLABORATOR",
+      "inviter_id": 2,
+      "project_id": 27,
+      "site_id": 1
+    }
+  }
 ]

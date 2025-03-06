@@ -94,7 +94,13 @@
             </div>
             <div class="fr-mb-2w" class="table-responsive">
                 <table class="table table-striped table-hover caption-top">
-                    <caption class="fr-ml-2v">{{ users.qs.count }} résultat{{ users.qs.count|pluralize }}</caption>
+                    {% with users.qs.count as users_count %}
+                        {% if users_count > 0 %}
+                            <caption class="fr-ml-2v">{{ users_count }} résultat{{ users_count|pluralize }}</caption>
+                        {% else %}
+                            <caption class="fr-ml-2v">Aucun résultat</caption>
+                        {% endif %}
+                    {% endwith %}
                     <thead>
                         <tr>
                             <th scope="col">Identifiant de connexion</th>

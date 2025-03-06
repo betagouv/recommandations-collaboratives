@@ -10,7 +10,7 @@ created: 2021-06-29 11:30:42 CEST
 from django import template
 from django.contrib.sites.models import Site
 
-from recoco import utils as uv_utils
+from recoco import utils as recoco_utils
 
 from .. import models
 
@@ -30,13 +30,13 @@ def current_project(session):
 @register.simple_tag
 def is_staff_for_current_site(user):
     """Return True if the given user is staff for the active site"""
-    return uv_utils.is_staff_for_site(user)
+    return recoco_utils.is_staff_for_site(user)
 
 
 @register.simple_tag
 def is_admin_for_current_site(user):
     """Return True if the given user is admin for the active site"""
-    return uv_utils.is_admin_for_site(user)
+    return recoco_utils.is_admin_for_site(user)
 
 
 @register.simple_tag

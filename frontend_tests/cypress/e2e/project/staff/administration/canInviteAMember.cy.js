@@ -6,7 +6,7 @@ const userToInvite = users[6];
 
 describe('I can go to administration area of a project and invite a member', () => {
   beforeEach(() => {
-    cy.login('staff');
+    cy.login('staff'); // TODO replace by staffOnSite and check behaviour
   });
 
   it('goes to the administration tab of a project and invite a member', () => {
@@ -16,7 +16,7 @@ describe('I can go to administration area of a project and invite a member', () 
     });
     cy.url().should('include', '/administration');
 
-    cy.contains('Inviter un membre de la collectivité').click({ force: true });
+    cy.get('[data-cy="button-invite-project-member"]').click();
 
     cy.get('#invite-member-modal')
       .get('#invite-email')
