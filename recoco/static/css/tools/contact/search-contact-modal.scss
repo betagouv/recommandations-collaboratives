@@ -21,6 +21,7 @@
 .border-bottom-666 {
     border-bottom: 1px solid var(--light-border-default-grey, #E5E5E5);
 }
+
 .correct-p {
     margin-bottom: 0px;
 }
@@ -104,4 +105,9 @@
     width: 150px;
     white-space: nowrap;
     padding-top: 2px;
+}
+
+.btn-create-contact {
+    background: #F5F5FE;
+    color: #000091;
 }
