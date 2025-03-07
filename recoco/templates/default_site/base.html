@@ -116,11 +116,11 @@
                     {% block content %}
                     {% endblock content %}
                 </div>
-                {% if not request.user.is_authenticated or request.resolver_match.url_name == "home" %}
-                    {% if url_name != "projects-project-detail-recommandations-embed" %}
+                {% block footer %}
+                    {% if not request.user.is_authenticated or request.resolver_match.url_name == "home" %}
                         <div class="row justify-content-center" id="footer">{% include "footer.html" %}</div>
                     {% endif %}
-                {% endif %}
+                {% endblock footer %}
             </div>
         </main>
         {% if not debug %}
