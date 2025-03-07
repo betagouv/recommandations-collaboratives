@@ -65,12 +65,15 @@ const config = {
           './src/js/components/ExpandableMenuHandler.js'
         ),
         SearchContact: resolve('./src/js/components/SearchContact.js'),
+        CreateContact: resolve('./src/js/components/CreateContact.js'),
+        SearchOrganisation: resolve('./src/js/components/SearchOrganisation.js'),
         projectQueue: resolve('./src/js/store/projectQueue.js'),
         showRole: resolve('./src/js/store/showRole.js'),
         projects: resolve('./src/js/store/projects.js'),
         ClickToSeeUser: resolve('./src/js/components/ClickToSeeUser.js'),
         ActionPusher: resolve('./src/js/components/ActionPusher.js'),
         actionPusher: resolve('./src/js/store/actionPusher.js'),
+        contact: resolve('./src/js/store/contact.js'),
       },
       output: {
         chunkFileNames: undefined,
