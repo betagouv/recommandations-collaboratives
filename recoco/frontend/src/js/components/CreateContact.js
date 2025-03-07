@@ -1,5 +1,6 @@
 import Alpine from 'alpinejs';
 import api, { contactsUrl } from '../utils/api';
+import appStore from '../store/app';
 
 function CreateContact() {
   return {
@@ -27,7 +28,9 @@ function CreateContact() {
       this.modalSearchContact.classList.toggle('d-none');
     },
     openCreateOrganisationModal() {
-      this.modalCreateOrganisation = document.querySelector('#create-organisation-modal');
+      this.modalCreateOrganisation = document.querySelector(
+        '#create-organisation-modal'
+      );
       this.modalCreateOrganisation.classList.toggle('d-none');
       this.modalCreateContact = document.querySelector('#create-contact-modal');
       this.modalCreateContact.classList.toggle('d-none');
@@ -71,10 +74,11 @@ function CreateContact() {
           });
           this.resetFormValue();
           this.closeCreateContactModal();
+          this.showToast('Contact créé avec succès', 'success');
         }
       } catch (error) {
         console.log(error);
-         throw new Error('Error while creating a contact ', error);
+        throw new Error('Error while creating a contact ', error);
       }
     },
     resetFormValue() {
@@ -89,6 +93,12 @@ function CreateContact() {
       this.$store.contact.orgaSelected = null;
       this.$store.contact.orgaCreated = null;
       this.$dispatch('reset-orga-name');
+    },
+    showToast(message, type) {
+      appStore.notification.message = message;
+      appStore.notification.timeout = 5000;
+      appStore.notification.isOpen = true;
+      appStore.notification.type = type || ToastType.error;
     },
   };
 }

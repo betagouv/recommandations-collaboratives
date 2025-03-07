@@ -5,6 +5,7 @@ import '../components/SearchOrganisation.js';
 import '../components/MultiSelect.js';
 import '../store/contact.js';
 import '../store/previewModal.js';
+import '../store/app.js';
 
 import Alpine from 'alpinejs';
 import focus from '@alpinejs/focus';

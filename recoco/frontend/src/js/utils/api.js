@@ -125,7 +125,7 @@ export function contactsUrl(limit) {
     });
     return `/api/addressbook/contacts/?${params}`;
   }
-  return `/api/addressbook/contacts`;
+  return `/api/addressbook/contacts/`;
 }
 
 // Topic

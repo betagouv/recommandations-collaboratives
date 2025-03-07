@@ -29,6 +29,8 @@ document.addEventListener('alpine:init', () => {
 
     async init() {
       const element = document.getElementById('task-modal');
+      if (!element) return;
+
       const body = document.querySelector('body');
       this.handle = new Modal(element);
 
