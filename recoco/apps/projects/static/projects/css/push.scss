@@ -65,10 +65,15 @@
     }
   }
 
-  .file-upload-wrapper {
+  // .file-upload-wrapper {
+  //   position: absolute;
+  //   bottom: 0.5rem;
+  //   left: 0.5rem;
+  // }
+  &__button-container{
     position: absolute;
-    bottom: 0.5rem;
-    left: 0.5rem;
+      bottom: 0.5rem;
+      left: 0.5rem;
   }
 }
 
