@@ -20,6 +20,7 @@ from recoco.utils import has_perm, has_perm_or_403
 
 from .. import models, signals
 from ..serializers import (
+    TaskCreateUpdateSerializer,
     TaskFollowupCreateSerializer,
     TaskFollowupSerializer,
     TaskNotificationSerializer,
@@ -56,14 +57,30 @@ class TaskViewSet(viewsets.ModelViewSet):
     """
 
     queryset = models.Task.objects
-    serializer_class = TaskSerializer
     permission_classes = [permissions.IsAuthenticated, IsTaskViewerOrManagerToWrite]
 
     def get_queryset(self):
         project_id = int(self.kwargs["project_id"])
-        return self.queryset.filter(project_id=project_id).order_by(
-            "-created_on", "-updated_on"
-        )
+        queryset = self.queryset.filter(project_id=project_id)
+
+        match self.action:
+            case "create" | "update":
+                return queryset
+            case _:
+                return (
+                    queryset.select_related(
+                        "ds_folder", "topic", "created_by__profile", "site", "project"
+                    )
+                    .prefetch_related("followups")
+                    .order_by("-created_on", "-updated_on")
+                )
+
+    def get_serializer_class(self):
+        match self.action:
+            case "create" | "update":
+                return TaskCreateUpdateSerializer
+            case _:
+                return TaskSerializer
 
     def perform_create(self, serializer: TaskSerializer):
         project_id = int(self.kwargs["project_id"])
