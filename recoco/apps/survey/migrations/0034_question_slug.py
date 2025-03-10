@@ -6,7 +6,6 @@ import recoco.apps.survey.models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("survey", "0033_alter_session_project"),
     ]

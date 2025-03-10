@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("projects", "0100_remove_projectsite_unique_origin_site_and_more"),
     ]

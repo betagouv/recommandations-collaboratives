@@ -9,7 +9,6 @@ from recoco.apps.survey.models import (
 
 
 def run():
-
     for sc in SiteConfiguration.objects.all():
         print(f"\n************ {sc.site} ************\n\n")
         onboarding = sc.onboarding
