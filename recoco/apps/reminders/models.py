@@ -115,6 +115,12 @@ class Reminder(models.Model):
     class Meta:
         verbose_name = "rappel"
         verbose_name_plural = "rappels"
+        indexes = [
+            models.Index(
+                fields=["kind", "sent_on", "site", "project"],
+                name="kind_sent_on_site_project",
+            ),
+        ]
 
     def __str__(self):  # pragma: nocover
         return f"{self.project.name} - {self.kind} - {self.deadline}"
