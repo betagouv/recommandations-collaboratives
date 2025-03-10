@@ -80,6 +80,10 @@
                                         {% csrf_token %}
                                         {% include "tools/editor.html" with input_name=public_note_form.content.name input_value=public_note_form.content.value|default:'' input_required=True %}
                                         <label class="visually-hidden" for="input-project-content">{{ public_note_form.content.label }}</label>
+
+                                        <!-- TODO: add contact for input (public_note_form.contact)-->
+                                        {{ public_note_form.contact }}
+
                                         {% for error in public_note_form.content.errors %}<div class="text-danger text-end">{{ error }}</div>{% endfor %}
                                         {% include "projects/project/fragments/files_links/file_upload_input_standalone.html" %}
                                         <div class="d-flex justify-content-end fr-mt-3w">

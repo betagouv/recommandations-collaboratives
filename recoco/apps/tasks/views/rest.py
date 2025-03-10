@@ -10,6 +10,7 @@ created : 2021-05-26 15:56:20 CEST
 import logging
 
 from django.contrib.contenttypes.models import ContentType
+from django.db.models import Count, Q
 from rest_framework import mixins, permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -56,13 +57,24 @@ class TaskViewSet(viewsets.ModelViewSet):
     """
 
     queryset = models.Task.objects
-    serializer_class = TaskSerializer
     permission_classes = [permissions.IsAuthenticated, IsTaskViewerOrManagerToWrite]
+    serializer_class = TaskSerializer
 
     def get_queryset(self):
         project_id = int(self.kwargs["project_id"])
-        return self.queryset.filter(project_id=project_id).order_by(
-            "-created_on", "-updated_on"
+        return (
+            self.queryset.filter(project_id=project_id)
+            .annotate(
+                followups_count=Count("followups"),
+                commented_followups_count=Count(
+                    "followups", filter=~Q(followups__comment="")
+                ),
+            )
+            .select_related(
+                "ds_folder", "topic", "created_by__profile", "site", "project"
+            )
+            .prefetch_related("followups")
+            .order_by("-created_on", "-updated_on")
         )
 
     def perform_create(self, serializer: TaskSerializer):
