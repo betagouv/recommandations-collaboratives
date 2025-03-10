@@ -29,7 +29,7 @@
             <legend class="fr-segmented__legend visually-hidden">Onglets du projet</legend>
             {% if overview %}
                 {% if position.is_advisor or position.is_observer or is_regional_actor %}
-                    {% include "tutorial/tutorial_hint.html" %}
+                    {% include "tutorial/tutorial_hint.html" with type="navTuto" %}
                 {% endif %}
             {% endif %}
             <div class="fr-segmented__elements">
