@@ -18,6 +18,14 @@ class ProfileInline(admin.StackedInline):
     verbose_name_plural = "Profile"
     fk_name = "user"
 
+    def get_queryset(self, request):
+        return (
+            super()
+            .get_queryset(request)
+            .prefetch_related("departments", "sites")
+            .select_related("organization")
+        )
+
 
 class IsMultipleSiteFilter(admin.SimpleListFilter):
     title = "Muti-site"
@@ -85,3 +93,19 @@ class CustomUserAdmin(UserAdmin):
 
 admin.site.unregister(auth_models.User)
 admin.site.register(auth_models.User, CustomUserAdmin)
+
+
+@admin.register(models.UserLoginEntry)
+class UserLoginEntryAdmin(admin.ModelAdmin):
+    list_display = ("user_email", "site", "action", "created")
+    list_select_related = ("profile__user", "site")
+    list_filter = ("created", "action", "site")
+    search_fields = ("profile__user__email",)
+    readonly_fields = (
+        "profile",
+        "site",
+    )
+
+    @admin.display(description="User email")
+    def user_email(self, obj):
+        return obj.profile.user.email
