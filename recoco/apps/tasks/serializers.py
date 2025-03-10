@@ -72,9 +72,7 @@ class TaskFollowupSerializer(serializers.ModelSerializer):
     contact = NestedContactSerializer(read_only=True)
 
 
-class TaskSerializer(
-    BaseSerializerMixin, serializers.HyperlinkedModelSerializer, OrderedModelSerializer
-):
+class TaskCreateUpdateSerializer(BaseSerializerMixin, serializers.ModelSerializer):
     class Meta:
         model = Task
         fields = [
@@ -84,35 +82,63 @@ class TaskSerializer(
             "public",
             "priority",
             "order",
+            "intent",
+            "content",
+            "contact",
+        ]
+
+    def create(self, validated_data):
+        return super().create(
+            validated_data
+            | {
+                "site": self.current_site,
+                "created_by": self.current_user,
+            }
+        )
+
+
+class TaskSerializer(BaseSerializerMixin, OrderedModelSerializer):
+    class Meta:
+        model = Task
+        fields = [
+            "id",
+            "status",
+            "visited",
+            "public",
+            "priority",
+            "order",
+            "intent",
+            "content",
+            "contact",
             "created_on",
             "updated_on",
             "created_by",
-            "intent",
-            "content",
             "document",
-            "resource_id",
             "resource",
+            "topic",
+            "ds_folder",
             "notifications",
             "followups_count",
             "comments_count",
-            "topic",
             "site",
-            "ds_folder",
         ]
-        read_only_fields = ["created_on", "updated_on", "created_by"]
+        read_only_fields = [
+            "created_on",
+            "updated_on",
+            "created_by",
+        ]
+
+    contact = NestedContactSerializer(read_only=True)
 
     created_by = UserSerializer(read_only=True, many=False)
-
     document = DocumentSerializer(read_only=True, many=True)
-
     resource = ResourceSerializer(read_only=True, many=False)
+    topic = TopicSerializer(read_only=True)
+    ds_folder = DSFolderSerializer(read_only=True)
 
     notifications = serializers.SerializerMethodField()
     followups_count = serializers.SerializerMethodField()
     comments_count = serializers.SerializerMethodField()
-    topic = TopicSerializer(read_only=True)
-    ds_folder = DSFolderSerializer(read_only=True)
-
     site = serializers.SerializerMethodField()
 
     def get_site(self, obj):
@@ -146,11 +172,6 @@ class TaskSerializer(
 
     # FIXME : We should not send all the tasks to non switchtender users (filter
     # queryset on current_user)
-
-    def save(self, **kwargs):
-        return super().save(
-            created_by=self.current_user, site=self.current_site, **kwargs
-        )
 
 
 class TaskNotificationSerializer(serializers.HyperlinkedModelSerializer):

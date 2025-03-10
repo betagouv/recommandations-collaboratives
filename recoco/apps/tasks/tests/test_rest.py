@@ -17,6 +17,7 @@ from notifications.signals import notify
 from rest_framework.test import APIClient
 
 from recoco import verbs
+from recoco.apps.addressbook.models import Contact
 from recoco.apps.projects import utils
 from recoco.apps.resources import models as resource_models
 from recoco.utils import login
@@ -188,10 +189,12 @@ def test_project_collaborator_cannot_create_project_task_for_site(request, proje
 
 @pytest.mark.django_db
 def test_project_advisor_can_create_project_task_for_site(request, project):
-    user = baker.make(auth_models.User)
     site = get_current_site(request)
 
+    user = baker.make(auth_models.User)
     utils.assign_advisor(user, project)
+
+    contact = baker.make(Contact, site=site)
 
     client = APIClient()
     client.force_authenticate(user=user)
@@ -204,6 +207,7 @@ def test_project_advisor_can_create_project_task_for_site(request, project):
         "order": 0,
         "intent": "the intent",
         "content": "the content",
+        "contact": contact.id,
     }
     response = client.post(url, data=data)
     assert response.status_code == 201
@@ -213,6 +217,7 @@ def test_project_advisor_can_create_project_task_for_site(request, project):
     assert created_task.project == project
     assert created_task.created_by == user
     assert created_task.intent == data["intent"]
+    assert created_task.contact == contact
 
 
 #

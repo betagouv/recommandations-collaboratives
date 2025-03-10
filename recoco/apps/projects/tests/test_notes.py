@@ -21,6 +21,7 @@ from notifications import notify
 from pytest_django.asserts import assertContains
 
 from recoco import verbs
+from recoco.apps.addressbook.models import Contact
 from recoco.utils import login
 
 from .. import models
@@ -224,6 +225,27 @@ def test_create_conversation_message_with_attachment_for_project_collaborator(
     assert document
     assert document.the_file != ""
     assert document.attached_object == note
+
+
+@pytest.mark.django_db
+def test_create_conversation_message_with_contact(client, project):
+    contact = baker.make(Contact)
+
+    with login(client, username="collaborator") as user:
+        assign_collaborator(user, project)
+        response = client.post(
+            reverse("projects-conversation-create-message", args=[project.id]),
+            data={
+                "content": "this is some content",
+                "contact": contact.pk,
+            },
+        )
+
+    assert response.status_code == 302
+
+    note = models.Note.on_site.first()
+    assert note
+    assert note.contact == contact
 
 
 #

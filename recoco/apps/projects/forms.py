@@ -47,7 +47,10 @@ class PublicNoteForm(forms.ModelForm):
 
     class Meta:
         model = models.Note
-        fields = ["content"]
+        fields = [
+            "content",
+            "contact",
+        ]
 
 
 ##################################################
