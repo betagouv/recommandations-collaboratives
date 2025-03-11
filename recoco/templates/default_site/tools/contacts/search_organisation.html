@@ -6,7 +6,7 @@
           type="text/css" />
 {% endblock css %}
 <div>
-    <div style="position:relative;">
+    <div class="position-relative" @reset-orga.window="resetOrga($event)">
         <div class="fr-search-bar" id="header-search" role="search">
             <input class="fr-input"
                    :class="{'fr-input--error': isOrgaSelected}"

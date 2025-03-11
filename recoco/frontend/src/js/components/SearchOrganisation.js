@@ -8,8 +8,10 @@ function SearchOrganisation() {
     userInput: '',
     showOrgasresults: false,
     isAnOrgaSelected: false,
-
     init() {},
+    resetOrga() {
+      this.userInput = '';
+    },
     onSearch() {
       this.isAnOrgaSelected = false;
       if (this.userInput.length > 0) {

@@ -70,6 +70,7 @@ function CreateContact() {
       this.contactPhone = '';
       this.contactOrganization = null;
       this.$store.contact.orgaSelected = null;
+      this.isMailOrPhone = false;
       // this.$store.contact.createdContact = null;
     },
   };
