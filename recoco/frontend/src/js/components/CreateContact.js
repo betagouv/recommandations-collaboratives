@@ -13,9 +13,9 @@ function CreateContact() {
     contactEmail: '',
     contactTel: '',
     contactPhone: '',
-    verifOrga: false,
-    verifPoste: false,
-    verifMailOrPhone: false,
+    isOrgaSelected: false,
+    isJobSelected: false,
+    isMailOrPhone: false,
     init() {},
     closeCreateContactModal() {
       this.modalCreateContact = document.querySelector('#create-contact-modal');
@@ -29,20 +29,16 @@ function CreateContact() {
     createContact() {
       if (this.$store.contact.orgaSelected) {
         this.contactOrganization = this.$store.contact.orgaSelected;
-        this.verifOrga = false;
+        this.isOrgaSelected = false;
       } else {
-        this.verifOrga = true;
+        this.isOrgaSelected = true;
       }
       if (this.contactJob.length === 0) {
-        this.verifPoste = true;
+        this.isJobSelected = true;
       } else {
-        this.verifPoste = false;
+        this.isJobSelected = false;
       }
-      if (this.contactEmail.length === 0 || this.contactTel.length === 0) {
-        this.verifMailOrPhone = true;
-      } else {
-        this.verifMailOrPhone = false;
-      }
+      this.isMailOrPhone = this.contactEmail.length === 0 || this.contactTel.length === 0;
       if (
         this.contactOrganization &&
         this.contactJob.length > 0 &&

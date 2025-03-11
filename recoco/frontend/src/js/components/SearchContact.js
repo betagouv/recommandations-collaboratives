@@ -23,11 +23,7 @@ function SearchContact() {
         api.get(searchContactsUrl(this.userInput)).then((response) => {
           this.searchResults = response.data;
           this.contactsFound = this.searchResults.results;
-          if (this.contactsFound.length > 0) {
-            this.showContactsresults = true;
-          } else {
-            this.showContactsresults = false;
-          }
+          this.showContactsresults = this.contactsFound.length > 0;
         });
       } else if (this.userInput.length === 0) {
         this.noSearch = true;
