@@ -73,9 +73,10 @@
             </template>
         {% endif %}
         {% if is_task_modal_comment %}
-                <div x-data='SearchContact()'
+            <div x-data='SearchContact()'
                  x-cloak
                  class="d-flex justify-content-between">
+                {% comment %} {% if isNotACollectivity %} {% endcomment %}
                 <button @click="openModalSearchContact"
                         data-test-id="button-add-contact"
                         class="fr-btn fr-btn--tertiary fr-btn--sm justify-content-center fr-text--sm">
@@ -83,6 +84,7 @@
                 </button>
                 {% include "tools/contacts/search_contact_modal.html" %}
                 {% include "tools/contacts/create_contact_modal.html" %}
+                {% comment %} {% endif %} {% endcomment %}
                 <button class="fr-btn fr-btn--sm"
                         :disabled="$store.editor.isSubmitted === true"
                         @click.stop="onSubmitComment(markdownContent)"

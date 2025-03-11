@@ -21,6 +21,9 @@ function CreateContact() {
     closeCreateContactModal() {
       this.modalCreateContact = document.querySelector('#create-contact-modal');
       this.modalCreateContact.classList.toggle('d-none');
+      this.isOrgaSelected = false;
+      this.isJobSelected = false;
+      this.isMailOrPhone = false;
       this.reOpenModalSearchContact();
     },
     reOpenModalSearchContact() {
@@ -40,7 +43,7 @@ function CreateContact() {
       } else {
         this.isJobSelected = false;
       }
-      this.isMailOrPhone = this.contact.email.length === 0 || this.contact.phone_no.length === 0;
+      this.isMailOrPhone = this.contact.email.length === 0 && this.contact.phone_no.length === 0;
       if (
         this.contact.organization &&
         this.contact.division.length > 0 &&
@@ -48,6 +51,7 @@ function CreateContact() {
       ) {
         api.post(contactsUrl(), this.contact).then((response) => {
           this.$store.contact.createdContact = response.data;
+          this.$dispatch('reset-orga', null);
           this.resetFormValue();
           this.closeCreateContactModal();
         });

@@ -16,7 +16,8 @@
     </div>
     <div x-data="SearchOrganisation"
          class="fr-p-3v modal-create-contact__block">
-        <span class="modal-create-contact__label">Organisation</span><span class="color-important">*</span>
+        <span class="modal-create-contact__label"
+              :class="{'red-text': isOrgaSelected}">Organisation</span><span class="color-important">*</span>
         <template x-if="isOrgaSelected">
             <p class="modal-create-contact__label-info red-text">La sélection de votre organisation est obligatoire *</p>
         </template>
@@ -30,7 +31,8 @@
         <label class="modal-create-contact__label">Prénom</label>
         <input type="text" class="fr-input" x-model="contact.first_name">
     </div>
-    <div class="fr-p-3v modal-create-contact__block">
+    <div class="fr-p-3v modal-create-contact__block"
+         :class="{'fr-input-group--error': isJobSelected}">
         <label class="modal-create-contact__label">Poste</label>
         <span class="color-important">*</span>
         <template x-if="isJobSelected">
@@ -42,7 +44,8 @@
                x-model="contact.division"
                required>
     </div>
-    <div class="fr-p-3v modal-create-contact__block">
+    <div class="fr-p-3v modal-create-contact__block"
+         :class="{'fr-input-group--error': isMailOrPhone}">
         <label class="modal-create-contact__label">Email</label>
         <p class="modal-create-contact__label-info"
            :class="{'red-text': isMailOrPhone}">Renseigner au minimum l’email ou un numéro de téléphone</p>
@@ -51,7 +54,8 @@
                :class="{'fr-input--error': isMailOrPhone}"
                x-model="contact.email">
     </div>
-    <div class="fr-p-3v modal-create-contact__block">
+    <div class="fr-p-3v modal-create-contact__block"
+         :class="{'fr-input-group--error': isMailOrPhone}">
         <label class="modal-create-contact__label">Téléphone Principal</label>
         <p class="modal-create-contact__label-info"
            :class="{'red-text': isMailOrPhone}">Renseigner au minimum l’email ou un numéro de téléphone</p>

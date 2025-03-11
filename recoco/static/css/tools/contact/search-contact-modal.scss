@@ -9,6 +9,12 @@
     background: #FFF;
     box-shadow: 4px 8px 6px 0px rgba(0, 0, 0, 0.2);
 }
+@media (max-height: 850px) {
+    .modal-contact {
+        top:25%;
+    }
+
+}
 
 .specific-height {
     max-height: 20rem;

@@ -36,7 +36,6 @@ function SearchContact() {
       let textArea = document.querySelector('.tiptap.ProseMirror');
       textArea.innerHTML += `@ ${this.selectedContact.first_name} ${this.selectedContact.last_name}`;
       this.$store.previewModal.contact = this.selectedContact;
-      this.$dispatch('reset-orga', null);
       this.closeModal();
     },
     closeModal() {
