@@ -5,14 +5,15 @@ function CreateContact() {
   return {
     modalCreateContact: null,
     modalSearchContact: null,
-    contact: null,
-    contactOrganization: null,
-    contactLastName: '',
-    contactFirstName: '',
-    contactJob: '',
-    contactEmail: '',
-    contactTel: '',
-    contactPhone: '',
+    contact: {
+          organization: '',
+          last_name: '',
+          first_name: '',
+          division: '',
+          email: '',
+          phone_no: '',
+          mobile_no: '',
+        },
     isOrgaSelected: false,
     isJobSelected: false,
     isMailOrPhone: false,
@@ -28,31 +29,23 @@ function CreateContact() {
     },
     createContact() {
       if (this.$store.contact.orgaSelected) {
-        this.contactOrganization = this.$store.contact.orgaSelected;
+        const tempOrg = this.$store.contact.orgaSelected;
+        this.contact.organization = tempOrg.id;
         this.isOrgaSelected = false;
       } else {
         this.isOrgaSelected = true;
       }
-      if (this.contactJob.length === 0) {
+      if (this.contact.division.length === 0) {
         this.isJobSelected = true;
       } else {
         this.isJobSelected = false;
       }
-      this.isMailOrPhone = this.contactEmail.length === 0 || this.contactTel.length === 0;
+      this.isMailOrPhone = this.contact.email.length === 0 || this.contact.phone_no.length === 0;
       if (
-        this.contactOrganization &&
-        this.contactJob.length > 0 &&
-        (this.contactEmail.length > 0 || this.contactTel.length > 0)
+        this.contact.organization &&
+        this.contact.division.length > 0 &&
+        (this.contact.email.length > 0 || this.contact.phone_no.length > 0)
       ) {
-        this.contact = {
-          organization: this.contactOrganization.id,
-          last_name: this.contactLastName,
-          first_name: this.contactFirstName,
-          division: this.contactJob,
-          email: this.contactEmail,
-          phone_no: this.contactTel,
-          mobile_no: this.contactPhone,
-        };
         api.post(contactsUrl(), this.contact).then((response) => {
           this.$store.contact.createdContact = response.data;
           this.resetFormValue();
@@ -61,16 +54,15 @@ function CreateContact() {
       }
     },
     resetFormValue() {
-      this.contactLastName = '';
-      this.contactFirstName = '';
-      this.contactJob = '';
-      this.contactEmail = '';
-      this.contactTel = '';
-      this.contactPhone = '';
-      this.contactOrganization = null;
+      this.contact.last_name = '';
+      this.contact.first_name = '';
+      this.contact.division = '';
+      this.contact.email = '';
+      this.contact.phone_no = '';
+      this.contact.mobile_no = '';
+      this.contact.organization = '';
       this.$store.contact.orgaSelected = null;
       this.isMailOrPhone = false;
-      // this.$store.contact.createdContact = null;
     },
   };
 }

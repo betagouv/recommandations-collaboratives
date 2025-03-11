@@ -4,7 +4,6 @@
           rel="stylesheet"
           type="text/css" />
 {% endblock css %}
-{% comment %} <div> {% endcomment %}
 <div x-data="CreateContact()"
      id="create-contact-modal"
      class="modal-create-contact d-none z-2"
@@ -25,11 +24,11 @@
     </div>
     <div class="fr-p-3v modal-create-contact__block">
         <label class="modal-create-contact__label">Nom</label>
-        <input type="text" class="fr-input" x-model="contactLastName">
+        <input type="text" class="fr-input" x-model="contact.last_name">
     </div>
     <div class="fr-p-3v modal-create-contact__block">
         <label class="modal-create-contact__label">Prénom</label>
-        <input type="text" class="fr-input" x-model="contactFirstName">
+        <input type="text" class="fr-input" x-model="contact.first_name">
     </div>
     <div class="fr-p-3v modal-create-contact__block">
         <label class="modal-create-contact__label">Poste</label>
@@ -40,7 +39,7 @@
         <input type="text"
                class="fr-input"
                :class="{'fr-input--error': isJobSelected}"
-               x-model="contactJob"
+               x-model="contact.division"
                required>
     </div>
     <div class="fr-p-3v modal-create-contact__block">
@@ -50,7 +49,7 @@
         <input type="text"
                class="fr-input"
                :class="{'fr-input--error': isMailOrPhone}"
-               x-model="contactEmail">
+               x-model="contact.email">
     </div>
     <div class="fr-p-3v modal-create-contact__block">
         <label class="modal-create-contact__label">Téléphone Principal</label>
@@ -59,11 +58,11 @@
         <input type="text"
                class="fr-input"
                :class="{'fr-input--error': isMailOrPhone}"
-               x-model="contactTel">
+               x-model="contact.phone_no">
     </div>
     <div class="fr-p-3v modal-create-contact__block">
         <label class="modal-create-contact__label">Téléphone Secondaire</label>
-        <input type="text" class="fr-input" x-model="contactPhone">
+        <input type="text" class="fr-input" x-model="contact.mobile_no">
     </div>
     <div class="fr-p-3v modal-create-contact__block d-flex">
         <button class="fr-btn fr-btn--secondary fr-mr-3v w-100 justify-content-center"
@@ -71,4 +70,3 @@
         <button class="fr-btn w-100 justify-content-center" @click="createContact">Créer le contact</button>
     </div>
 </div>
-{% comment %} </div> {% endcomment %}
