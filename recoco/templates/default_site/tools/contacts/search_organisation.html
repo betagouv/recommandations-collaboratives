@@ -22,7 +22,7 @@
         <div class="fr-menu menu-modal-correct-fr-menu better-positionning-dropdown border-radius-4px">
             <div class="fr-menu__list specific-width-26rem border-radius-4px">
                 <div class="fr-menu__list specific-width-26rem overflow-auto specific-height border-radius-4px">
-                    <template x-if="userInput.length > 0 && showOrgasresults && !isAnOrgaSelected">
+                    <template x-if="userInput.length > 0 && showOrgAsResults && selectedOrga == null">
                         <template class="fr-menu__item" x-for="(group) in orgaSorted">
                             <div class="fr-menu__item__content"
                                  data-test-id="orga-to-select"
@@ -44,7 +44,7 @@
                         </template>
                     </template>
                     <template class="fr-menu__item"
-                              x-if="userInput.length > 0 && !isAnOrgaSelected && !showOrgasresults && delayDisplay">
+                              x-if="userInput.length > 0 && selectedOrga == null && !showOrgAsResults">
                         <div>
                             <div class="fr-m-1w fr-p-3v specific-banner">
                                 <span class="text-style">Aucun résultat</span>
@@ -55,5 +55,4 @@
             </div>
         </div>
     </div>
-    <div></div>
 </div>

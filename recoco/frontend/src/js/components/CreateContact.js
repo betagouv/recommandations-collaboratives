@@ -54,11 +54,10 @@ function CreateContact() {
           mobile_no: this.contactPhone,
         };
         api.post(contactsUrl(), this.contact).then((response) => {
-          this.contact = response.data;
-          this.$store.contact.createdContact = this.contact;
+          this.$store.contact.createdContact = response.data;
+          this.resetFormValue();
+          this.closeCreateContactModal();
         });
-        this.resetFormValue();
-        this.closeCreateContactModal();
       }
     },
     resetFormValue() {

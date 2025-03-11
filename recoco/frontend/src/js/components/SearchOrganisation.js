@@ -6,14 +6,14 @@ function SearchOrganisation() {
     orgaFound: [],
     orgaSorted: [],
     userInput: '',
-    showOrgasresults: false,
-    isAnOrgaSelected: false,
+    showOrgAsResults: false,
+    selectedOrga: null,
     init() {},
     resetOrga() {
       this.userInput = '';
     },
     onSearch() {
-      this.isAnOrgaSelected = false;
+      this.selectedOrga = null;
       if (this.userInput.length > 0) {
         this.orgaFound = [];
         api.get(searchOrganizationsUrl(this.userInput)).then((response) => {
@@ -21,18 +21,17 @@ function SearchOrganisation() {
           this.orgaFound = this.searchResults.results;
           if (this.orgaFound.length > 0) {
             this.sortOrgasResults();
-            this.showOrgasresults = true;
+            this.showOrgAsResults = true;
           } else {
-            this.showOrgasresults = false;
+            this.showOrgAsResults = false;
           }
         });
       }
     },
     onSelectOrga(orga) {
-      this.isAnOrgaSelected = true;
       this.selectedOrga = orga;
       this.userInput = orga.name;
-      this.showOrgasresults = false;
+      this.showOrgAsResults = false;
       this.$store.contact.orgaSelected = orga;
     },
     sortOrgasResults() {
