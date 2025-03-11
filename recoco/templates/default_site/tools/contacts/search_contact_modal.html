@@ -38,8 +38,8 @@
         </div>
     </div>
     <div>
-        <div class="fr-menu menu-modal-correct-fr-menu better-positionning border-radius-4px">
-            <div class="fr-menu__list specific-width-26rem border-radius-4px">
+        <div class="fr-menu menu-modal-correct-fr-menu better-positionning border-radius-4px correct-position">
+            <div class="fr-menu__list specific-width-26rem border-radius-4px position-absolute rwd-resize">
                 <div class="fr-menu__list specific-width-26rem overflow-auto specific-height border-radius-4px fr-mb-0">
                     <template x-if="userInput.length > 0 && showContactsresults && selectedContact === null">
                         <template class="fr-menu__item"
@@ -53,6 +53,7 @@
                         </template>
                     </template>
                     <template class="fr-menu__item" x-if="selectedContact != null">
+                        {% comment %} <div class="position-relative"> {% endcomment %}
                         <div class="design-dropdown">
                             <div class="d-flex justify-content-between add-borders">
                                 <div x-data="{contact:selectedContact}">{% include "tools/contacts/contact_card.html" %}</div>
@@ -66,6 +67,7 @@
                                         class="fr-btn w-100 correct-centering-text">Envoyer le contact</button>
                             </div>
                         </div>
+                        {% comment %} </div> {% endcomment %}
                     </template>
                     <template class="fr-menu__item"
                               x-if="userInput.length > 0 && selectedContact === null && !showContactsresults && delayDisplay">
@@ -89,7 +91,7 @@
             </div>
         </div>
         <div class="flex justify-end pt-2">
-            <template x-if="noSearch">
+            <template x-if="noSearch && selectedContact === null">
                 <div class="btn-create-contact fr-p-1w cursor-pointer"
                      @click="openModalCreateContact">
                     <span class="fr-icon-add-line" aria-hidden="true"></span><span>Créer un nouveau contact</span>

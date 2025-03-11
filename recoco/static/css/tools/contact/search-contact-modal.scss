@@ -9,12 +9,7 @@
     background: #FFF;
     box-shadow: 4px 8px 6px 0px rgba(0, 0, 0, 0.2);
 }
-@media (max-height: 850px) {
-    .modal-contact {
-        top:25%;
-    }
 
-}
 
 .specific-height {
     max-height: 20rem;
@@ -115,4 +110,21 @@
 .btn-create-contact {
     background: #F5F5FE;
     color: #000091;
+}
+
+.correct-position {
+    top: 0px;
+    left: 24px;
+    position: relative;
+}
+
+@media (max-height: 850px) {
+    .modal-contact {
+        top: 25%;
+    }
+
+    .rwd-resize {
+        width: 26.5rem !important;
+    }
+
 }

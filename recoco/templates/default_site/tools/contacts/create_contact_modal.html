@@ -19,7 +19,9 @@
         <span class="modal-create-contact__label"
               :class="{'red-text': isOrgaSelected}">Organisation</span><span class="color-important">*</span>
         <template x-if="isOrgaSelected">
-            <p class="modal-create-contact__label-info red-text">La sélection de votre organisation est obligatoire *</p>
+            <p class="modal-create-contact__label-info red-text">
+                Merci de sélectionner une organisation existante ou d'en créer une nouvelle si besoin.*
+            </p>
         </template>
         <div>{% include "tools/contacts/search_organisation.html" %}</div>
     </div>
@@ -48,7 +50,7 @@
          :class="{'fr-input-group--error': isMailOrPhone}">
         <label class="modal-create-contact__label">Email</label>
         <p class="modal-create-contact__label-info"
-           :class="{'red-text': isMailOrPhone}">Renseigner au minimum l’email ou un numéro de téléphone</p>
+           :class="{'red-text': isMailOrPhone}">Merci de renseigner A MINIMA l'email OU un numéro de téléphone</p>
         <input type="text"
                class="fr-input"
                :class="{'fr-input--error': isMailOrPhone}"
@@ -58,7 +60,7 @@
          :class="{'fr-input-group--error': isMailOrPhone}">
         <label class="modal-create-contact__label">Téléphone Principal</label>
         <p class="modal-create-contact__label-info"
-           :class="{'red-text': isMailOrPhone}">Renseigner au minimum l’email ou un numéro de téléphone</p>
+           :class="{'red-text': isMailOrPhone}">Merci de renseigner A MINIMA l'email OU un numéro de téléphone</p>
         <input type="text"
                class="fr-input"
                :class="{'fr-input--error': isMailOrPhone}"
