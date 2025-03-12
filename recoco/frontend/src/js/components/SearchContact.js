@@ -17,6 +17,7 @@ function SearchContact() {
     onSearch() {
       this.delayDisplay = true;
       this.noSearch = false;
+      this.selectedContact = null;
       if (this.userInput.length > 0 && this.selectedContact === null) {
         this.contactsFound = [];
         api.get(searchContactsUrl(this.userInput)).then((response) => {
@@ -42,6 +43,7 @@ function SearchContact() {
       this.selectedContact = null;
       this.showContactsresults = false;
       this.userInput = '';
+      this.noSearch = true;
       this.modalSearchContact.classList.toggle('d-none');
     },
     onCancelSelectContact() {
