@@ -187,7 +187,7 @@
                             </div>
                             <template x-if="currentTask.public || showEdition">
                                 <div class="w-100 fr-p-2w specific-border-top-solid1pxEEE">
-                                    {% include "tools/editor.html" with is_task_modal_comment=True %}
+                                    {% include "tools/editor.html" with is_task_modal_comment=True can_attach_contact=True  %}
                                 </div>
                             </template>
                             <template x-if="!currentTask.public">
