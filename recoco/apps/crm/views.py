@@ -31,8 +31,8 @@ from django.db import transaction
 from django.db.models import Count, ExpressionWrapper, F, FloatField, Max, Q, Value
 from django.db.models.functions import Cast
 from django.http import Http404, HttpResponse
-from django.shortcuts import get_object_or_404, redirect, render, reverse
-from django.urls import reverse_lazy
+from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.utils.safestring import mark_safe
 from django.views.decorators.http import require_http_methods
@@ -332,6 +332,7 @@ def organization_details(request, organization_id):
             actor_content_type=user_ct,
             actor_object_id__in=participant_ids,
         )
+        .prefetch_related("actor", "action_object", "target")
         .order_by("-timestamp")
     )
 
@@ -343,15 +344,25 @@ def organization_details(request, organization_id):
         .filter(target_content_type=organization_ct, target_object_id=organization.pk)
     )
 
-    org_notes = models.Note.on_site.filter(
-        object_id=organization.pk,
-        content_type=organization_ct,
-    ).order_by("-updated_on")
+    org_notes = (
+        models.Note.on_site.filter(
+            object_id=organization.pk,
+            content_type=organization_ct,
+        )
+        .prefetch_related("tags", "related")
+        .select_related("created_by", "content_type")
+        .order_by("-updated_on")
+    )
 
-    participant_notes = models.Note.on_site.filter(
-        object_id__in=participant_ids,
-        content_type=user_ct,
-    ).order_by("-updated_on")
+    participant_notes = (
+        models.Note.on_site.filter(
+            object_id__in=participant_ids,
+            content_type=user_ct,
+        )
+        .prefetch_related("tags", "related")
+        .select_related("created_by", "content_type")
+        .order_by("-updated_on")
+    )
 
     sticky_notes = org_notes.filter(sticky=True)
     notes = org_notes.exclude(sticky=True) | participant_notes
@@ -551,7 +562,13 @@ def user_unset_advisor(request, user_id=None):
 def user_details(request, user_id):
     has_perm_or_403(request.user, "use_crm", request.site)
 
-    crm_user = get_object_or_404(User, pk=user_id, profile__sites=request.site)
+    crm_user = get_object_or_404(
+        User.objects.select_related("profile__organization").prefetch_related(
+            "projects_switchtended_per_site", "projectmember_set"
+        ),
+        pk=user_id,
+        profile__sites=request.site,
+    )
 
     group_name = make_group_name_for_site("advisor", request.site)
     crm_user_is_advisor = crm_user.groups.filter(name=group_name).exists()
@@ -584,10 +601,6 @@ def user_notifications(request, user_id):
 
     crm_user = get_object_or_404(User, pk=user_id, profile__sites=request.site)
 
-    if request.site not in crm_user.profile.sites.all():
-        # only for user of current site
-        raise Http404
-
     search_form = forms.CRMSearchForm()
 
     notifications = notifications_models.Notification.on_site.filter(
@@ -601,26 +614,45 @@ def user_notifications(request, user_id):
 def user_reminders(request, user_id):
     has_perm_or_403(request.user, "use_crm", request.site)
 
-    crm_user = get_object_or_404(User, pk=user_id, profile__sites=request.site)
-
-    if request.site not in crm_user.profile.sites.all():
-        # only for user of current site
-        raise Http404
+    crm_user = get_object_or_404(
+        User.objects.select_related("profile__organization"),
+        pk=user_id,
+        profile__sites=request.site,
+    )
 
     search_form = forms.CRMSearchForm()
 
-    sent_reminders = reminders_models.Reminder.on_site.filter(
-        sent_to=crm_user
-    ).order_by("-deadline")[:100]
+    sent_reminders = (
+        reminders_models.Reminder.on_site.filter(sent_to=crm_user)
+        .select_related("project__commune")
+        .prefetch_related("transactions")
+        .order_by("-deadline")[:100]
+    )
 
-    future_reminders = reminders_models.Reminder.on_site.filter(
-        project__in=Project.on_site.filter(
-            projectmember__member=crm_user, projectmember__is_owner=True
-        ),
-        sent_on=None,
-    ).order_by("-deadline")
+    future_reminders = (
+        reminders_models.Reminder.on_site.filter(
+            project__in=Project.on_site.filter(
+                inactive_since__isnull=True,
+                projectmember__member=crm_user,
+                projectmember__is_owner=True,
+            ),
+            sent_on=None,
+        )
+        .select_related("project__commune")
+        .prefetch_related("transactions")
+        .order_by("-deadline")
+    )
 
-    return render(request, "crm/user_reminders.html", locals())
+    return render(
+        request,
+        "crm/user_reminders.html",
+        context={
+            "crm_user": crm_user,
+            "search_form": search_form,
+            "sent_reminders": sent_reminders,
+            "future_reminders": future_reminders,
+        },
+    )
 
 
 @login_required
@@ -628,9 +660,6 @@ def user_reminder_details(request, user_id, reminder_pk):
     has_perm_or_403(request.user, "use_crm", request.site)
 
     crm_user = get_object_or_404(User, pk=user_id, profile__sites=request.site)
-    if request.site not in crm_user.profile.sites.all():
-        # only for user of current site
-        raise Http404
 
     reminder = get_object_or_404(
         reminders_models.Reminder, pk=reminder_pk, site=request.site, sent_to=crm_user

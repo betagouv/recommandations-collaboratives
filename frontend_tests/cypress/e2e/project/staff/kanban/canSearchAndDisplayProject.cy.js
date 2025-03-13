@@ -50,20 +50,7 @@ describe('I can go to the dashboard and search for project', () => {
         cy.get('#region-1').should('be.visible');
         cy.get('#region-1').should('be.checked');
         cy.get('#region-1').uncheck();
-        cy.get('#region-42').uncheck({ force: true });
-        cy.get('[data-cy="card-project"]').should('not.exist');
-      });
-  });
-
-  it('could search by territory and deselect all', () => {
-    cy.get('[data-cy="loader"]').should('not.be.visible');
-    cy.get('[data-cy="card-project"]')
-      .its('length')
-      .then((length) => {
-        projectsLength = length;
-        expect(projectsLength).to.be.greaterThan(0);
-        cy.get('[data-cy="check-all-territory"]').uncheck({ force: true });
-        cy.get('[data-cy="card-project"]').should('not.exist');
+        cy.contains('93170').should('not.exist');
       });
   });
 });

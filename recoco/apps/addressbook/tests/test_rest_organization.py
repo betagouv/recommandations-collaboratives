@@ -2,7 +2,16 @@ import pytest
 from django.urls import reverse
 from model_bakery import baker
 
-from ..models import Organization
+from ..models import Contact, Organization
+
+
+@pytest.fixture
+def acme_organization(current_site):
+    organization = baker.make(
+        Organization, name="acme corporation", sites=[current_site]
+    )
+    baker.make(Contact, organization=organization)
+    return organization
 
 
 @pytest.mark.django_db
@@ -17,9 +26,7 @@ def test_anonymous_can_list_organizations_but_not_create(api_client):
 
 
 @pytest.mark.django_db
-def test_anonymous_can_search_organizations(api_client, current_site):
-    baker.make(Organization, name="acme corporation", sites=[current_site])
-
+def test_anonymous_can_search_organizations(api_client, acme_organization):
     url = reverse("api-addressbook-organization-list")
     response = api_client.get(url, {"search": "acme"})
 
@@ -28,10 +35,8 @@ def test_anonymous_can_search_organizations(api_client, current_site):
 
 
 @pytest.mark.django_db
-def test_anonymous_can_read_organization_but_not_update(api_client, current_site):
-    organization = baker.make(Organization, sites=[current_site])
-
-    url = reverse("api-addressbook-organization-detail", args=[organization.pk])
+def test_anonymous_can_read_organization_but_not_update(api_client, acme_organization):
+    url = reverse("api-addressbook-organization-detail", args=[acme_organization.pk])
 
     response = api_client.get(url)
     assert response.status_code == 200

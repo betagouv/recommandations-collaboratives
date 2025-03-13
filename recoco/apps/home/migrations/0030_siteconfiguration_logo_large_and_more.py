@@ -5,7 +5,6 @@ import recoco.apps.home.models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("home", "0029_siteconfiguration_description"),
     ]

@@ -72,7 +72,7 @@ class PushTypeActionForm(forms.Form):
 
         project_qs = projects_models.Project.objects.filter(
             sites=current_site,
-        )
+        ).select_related("commune__department")
 
         if not is_staff_for_site(user, site=current_site):
             project_qs = project_qs.filter(switchtenders=user)
@@ -122,6 +122,8 @@ class CreateActionWithResourceForm(CreateActionBaseForm):
         ),
     )
 
+    content = forms.CharField(required=False)
+
     def clean_resource(self):
         resource = self.cleaned_data["resource"]
 
@@ -134,7 +136,7 @@ class CreateActionWithResourceForm(CreateActionBaseForm):
                 .get(pk=resource.pk)
             )
         except resources_models.Resource.DoesNotExist:
-            self.add_error("resource_unknown", "Cette ressource n'existe pas")
+            self.add_error(field="resource", error="Cette ressource n'existe pas")
             raise
 
         return resource
@@ -142,36 +144,6 @@ class CreateActionWithResourceForm(CreateActionBaseForm):
     class Meta:
         model = models.Task
         fields = ["intent", "content", "public", "resource"]
-
-
-class CreateActionsFromResourcesForm(CreateActionBaseForm):
-    resources = forms.ModelMultipleChoiceField(
-        queryset=resources_models.Resource.objects.exclude(
-            status=resources_models.Resource.DRAFT
-        ).with_ds_annotations(),
-        required=True,
-    )
-
-    def clean_resources(self):
-        resources = self.cleaned_data["resources"]
-
-        resources = (
-            resources_models.Resource.on_site.exclude(
-                status=resources_models.Resource.DRAFT
-            )
-            .with_ds_annotations()
-            .filter(pk__in=[resource.pk for resource in resources.all()])
-        )
-
-        if resources.count() == 0:
-            self.add_error("no_valid_resource", "Aucune ressource")
-            raise ValueError("Aucune ressource")
-
-        return resources
-
-    class Meta:
-        model = models.Task
-        fields = ["resources", "public"]
 
 
 class CreateTaskForm(forms.ModelForm):

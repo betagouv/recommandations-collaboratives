@@ -18,7 +18,7 @@ load_dotenv()
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 DJANGO_DEBUG = True
-
+ACCOUNT_RATE_LIMITS = False
 ALLOWED_HOSTS = ["localhost", "example.localhost"]
 
 INSTALLED_APPS += (

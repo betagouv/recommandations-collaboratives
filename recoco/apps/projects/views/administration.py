@@ -133,7 +133,10 @@ def project_administration(request, project_id):
                     insee=form.cleaned_data["insee"]
                 )
                 instance.commune = commune
-            except geomatics_models.Commune.DoesNotExist:
+            except (
+                geomatics_models.Commune.DoesNotExist,
+                geomatics_models.Commune.MultipleObjectsReturned,
+            ):
                 pass
 
             instance.updated_on = timezone.now()

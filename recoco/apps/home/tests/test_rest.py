@@ -11,7 +11,6 @@ from recoco.apps.projects import models as project_models
 
 @pytest.mark.django_db
 def test_user_notifications_try_mark_one_as_read_unauthorized(request):
-
     site = get_current_site(request)
     project = baker.make(project_models.Project, sites=[site])
     user = baker.make(auth_models.User)
@@ -34,7 +33,6 @@ def test_user_notifications_try_mark_one_as_read_unauthorized(request):
 
 @pytest.mark.django_db
 def test_user_notifications_mark_one_as_read(request):
-
     site = get_current_site(request)
     project = baker.make(project_models.Project, sites=[site])
     user = baker.make(auth_models.User)
@@ -67,7 +65,6 @@ def test_user_notifications_mark_one_as_read(request):
 
 @pytest.mark.django_db
 def test_user_notifications_mark_all_as_read(request):
-
     site = get_current_site(request)
     project = baker.make(project_models.Project, sites=[site])
 

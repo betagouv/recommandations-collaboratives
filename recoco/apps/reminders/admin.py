@@ -39,7 +39,7 @@ class ReminderAdmin(admin.ModelAdmin):
                 self.message_user(
                     request,
                     f'Rappel "{models.Reminder.KIND_CHOICES[reminder.kind][1]}"'
-                    f"(B) envoyé à { reminder.project.owner }.",
+                    f"(B) envoyé à {reminder.project.owner}.",
                     messages.SUCCESS,
                 )
 
@@ -52,7 +52,7 @@ class ReminderAdmin(admin.ModelAdmin):
                 self.message_user(
                     request,
                     f'Rappel "{models.Reminder.KIND_CHOICES[reminder.kind][1]}"'
-                    f"(C) envoyé à { reminder.project.owner }.",
+                    f"(C) envoyé à {reminder.project.owner}.",
                     messages.SUCCESS,
                 )
 

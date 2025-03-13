@@ -160,6 +160,11 @@ survey_urls = [
         survey_rest.SessionAnswersView.as_view(),
         name="api-survey-session-answers",
     ),
+    path(
+        "survey/questions/",
+        survey_rest.SurveyQuestionsView.as_view(),
+        name="api-survey-questions",
+    ),
 ]
 
 urlpatterns = router.urls + api_urls + auth_urls + survey_urls

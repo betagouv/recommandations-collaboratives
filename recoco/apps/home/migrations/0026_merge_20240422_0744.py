@@ -4,7 +4,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("home", "0024_siteconfiguration_onboarding_questions"),
         ("home", "0025_siteconfiguration_legal_address"),
