@@ -7,7 +7,6 @@ authors: raphael.marvie@beta.gouv.fr, guillaume.libersat@beta.gouv.fr
 created: 2023-01-31 14:24:56 CEST
 """
 
-
 import pytest
 from django.contrib.sites.shortcuts import get_current_site
 from django.shortcuts import reverse

@@ -8,7 +8,6 @@ authors: sebastien.reuiller@beta.gouv.fr, guillaume.libersat@beta.gouv.fr
 created: 2024-01-22 16:39:27 CEST
 """
 
-
 import logging
 from datetime import timedelta
 

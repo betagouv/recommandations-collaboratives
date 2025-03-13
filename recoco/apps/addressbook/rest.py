@@ -1,3 +1,4 @@
+from rest_framework.filters import BaseFilterBackend
 from rest_framework.viewsets import ModelViewSet
 from waffle import switch_is_active
 
@@ -30,7 +31,9 @@ class OrganizationViewSet(ModelViewSet):
     search_min_rank = 0.05
 
     def get_queryset(self):
-        return Organization.on_site.all().prefetch_related("departments__region")
+        return Organization.on_site.with_contacts_only().prefetch_related(
+            "departments__region"
+        )
 
     def get_serializer_class(self):
         match self.action:
@@ -42,46 +45,35 @@ class OrganizationViewSet(ModelViewSet):
                 return serializers.OrganizationSerializer
 
 
+class OrgaStartswithFilterBackend(BaseFilterBackend):
+    def filter_queryset(self, request, queryset, view):
+        orga_sw = request.query_params.get("orga-startswith")
+        if not orga_sw:
+            return queryset
+        return queryset.filter(organization__name__istartswith=orga_sw)
+
+
 class ContactViewSet(ModelViewSet):
     permission_classes = [IsStaffForSiteOrISAuthenticatedReadOnly]
     pagination_class = StandardResultsSetPagination
+    filter_backends = [OrgaStartswithFilterBackend]
 
     search_fields = [
-        (
-            "last_name",
-            {"config": "french", "weight": "A"},
-        ),
-        (
-            "first_name",
-            {"config": "french", "weight": "A"},
-        ),
-        (
-            "division",
-            {"config": "french", "weight": "B"},
-        ),
-        (
-            "organization__name",
-            {"config": "french", "weight": "B"},
-        ),
-        (
-            "organization__group__name",
-            {"config": "french", "weight": "B"},
-        ),
-        (
-            "organization__departments__name",
-            {"config": "french", "weight": "C"},
-        ),
+        ("last_name", {"weight": "A"}),
+        ("first_name", {"weight": "A"}),
+        ("email", {"weight": "A"}),
+        ("division", {"weight": "B"}),
+        ("organization__name", {"weight": "B"}),
+        ("organization__group__name", {"weight": "B"}),
+        ("organization__departments__name", {"weight": "C"}),
         (
             "organization__departments__code",
-            {"weight": "C"},
+            {"config": "simple", "weight": "C"},
         ),
-        (
-            "organization__departments__region__name",
-            {"config": "french", "weight": "C"},
-        ),
+        ("organization__departments__region__name", {"weight": "C"}),
         (
             "organization__departments__region__code",
-            {"weight": "C"},
+            {"config": "simple", "weight": "C"},
         ),
     ]
     search_min_rank = 0.05

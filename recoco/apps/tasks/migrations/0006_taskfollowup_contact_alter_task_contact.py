@@ -5,7 +5,6 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("addressbook", "0011_contact_created_contact_modified_and_more"),
         ("tasks", "0005_alter_task_resource"),

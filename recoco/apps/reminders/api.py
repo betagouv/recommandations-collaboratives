@@ -90,6 +90,7 @@ def get_due_reminder_for_project(site, project, kind):
     try:
         reminder = models.Reminder.on_site_to_send.get(
             project=project,
+            project__inactive_since__isnull=True,
             site=site,
             kind=kind,
             deadline__lte=timezone.localdate(),  # today

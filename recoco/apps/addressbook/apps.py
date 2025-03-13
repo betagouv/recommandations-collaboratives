@@ -6,29 +6,17 @@ class AddressbookConfig(AppConfig):
     default_auto_field = "django.db.models.BigAutoField"
     name = "recoco.apps.addressbook"
 
-    def ready(self):
+    def _watson_registrations(self):
+        from .adapters import ContactSearchAdapter, OrganizationSearchAdapter
+
+        watson.register(self.get_model("Organization"), OrganizationSearchAdapter)
+        watson.register(self.get_model("Contact"), ContactSearchAdapter)
+
+    def _actstream_registrations(self):
         from actstream import registry
 
-        Organization = self.get_model("Organization")
-        watson.register(
-            Organization,
-            fields=("name", "departments__name", "departments__code"),
-        )
+        registry.register(self.get_model("Organization"))
 
-        Contact = self.get_model("Contact")
-        watson.register(
-            Contact,
-            fields=(
-                "last_name",
-                "first_name",
-                "division",
-                "organization__name",
-                "organization__group__name",
-                "organization__departments__name",
-                "organization__departments__code",
-                "organization__departments__region__name",
-                "organization__departments__region__code",
-            ),
-        )
-
-        registry.register(Organization)
+    def ready(self):
+        self._watson_registrations()
+        self._actstream_registrations()

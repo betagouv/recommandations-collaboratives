@@ -6,6 +6,7 @@ Models for resources application
 authors: raphael.marvie@beta.gouv.fr, guillaume.libersat@beta.gouv.fr
 created: 2021-06-16 10:57:13 CEST
 """
+
 import datetime
 
 import reversion
@@ -19,7 +20,7 @@ from django.db.models import BooleanField, Case, Count, When
 from django.db.models.functions import Lower
 from django.db.models.signals import post_migrate
 from django.dispatch import receiver
-from django.shortcuts import reverse
+from django.urls import reverse
 from django.utils import timezone
 from markdownx.utils import markdownify
 from model_clone.models import CloneMixin

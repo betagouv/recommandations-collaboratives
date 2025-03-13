@@ -13,8 +13,9 @@ from django.contrib.auth import models as auth
 from django.contrib.auth.decorators import login_required
 from django.contrib.sites import models as sites
 from django.db import transaction
-from django.shortcuts import get_object_or_404, redirect, render, reverse
+from django.shortcuts import get_object_or_404, redirect, render
 from django.template.loader import render_to_string
+from django.urls import reverse
 from django.utils.http import urlencode
 from django.views.generic import FormView
 
@@ -456,11 +457,7 @@ def create_initial_note(
 
     projects.Note.objects.create(
         project=project,
-        content=(
-            f"# Demande initiale\n\n"
-            f"{project.description}\n\n"
-            f"{ markdown_content }"
-        ),
+        content=(f"# Demande initiale\n\n{project.description}\n\n{markdown_content}"),
         public=True,
         site=site,
     )

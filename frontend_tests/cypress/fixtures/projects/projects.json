@@ -773,5 +773,33 @@
       "deleted": null,
       "sites": [1]
     }
+  },
+  {
+    "model": "projects.project",
+    "pk": 29,
+    "fields": {
+      "submitted_by": 5,
+      "ro_key": "29d60d22ed4d4724a54d1c12d6eb08f7",
+      "last_name": "Johnna",
+      "first_name": "Doa",
+      "publish_to_cartofriches": false,
+      "exclude_stats": true,
+      "muted": false,
+      "org_name": "Collectivité 1",
+      "created_on": "2025-03-29T14:31:39Z",
+      "updated_on": "2025-09-19T13:08:07.795Z",
+      "tags": "",
+      "name": "Dossier test non accessible",
+      "phone": "01 01 01 01 01",
+      "description": "",
+      "advisors_note": "Eos non sit quis repudiandae in nesciunt sed. Error modi quia ipsam temporibus. Dolorum nesciunt eveniet voluptate suscipit. Maiores voluptatum voluptatem cum et id quod incidunt. Dolor consequuntur itaque minima. Expedita earum id doloribus numquam est quaerat quo architecto.",
+      "advisors_note_on": "2025-08-29T14:51:12Z",
+      "advisors_note_by": 5,
+      "location": "861 chemin rural 53",
+      "commune": 42,
+      "impediments": "",
+      "deleted": null,
+      "sites": [1]
+    }
   }
 ]

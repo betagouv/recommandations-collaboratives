@@ -7,6 +7,7 @@ authors: raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created: 2021-06-29 09:16:14 CEST
 """
 
+import unicodedata
 from contextlib import contextmanager
 from pathlib import Path
 from typing import AnyStr
@@ -231,6 +232,11 @@ class RunSQLFile(migrations.RunSQL):
             hints=hints,
             elidable=elidable,
         )
+
+
+def strip_accents(input: str) -> str:
+    normalized = unicodedata.normalize("NFD", input)
+    return "".join([char for char in normalized if unicodedata.category(char) != "Mn"])
 
 
 # eof
