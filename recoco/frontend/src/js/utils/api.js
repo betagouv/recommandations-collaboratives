@@ -89,9 +89,43 @@ export function sitesConfigUrl() {
 export function searchOrganizationsUrl(search) {
   return `/api/addressbook/organizations/?search=${search}`;
 }
+
+export function getOrganizationById(id) {
+  return `/api/addressbook/organizations/${id}`;
+}
+
+export function organizationsUrl() {
+  return `/api/addressbook/organizations/`;
+}
+
+// Organization Group
+export function searchOrganizationGroupsUrl(search) {
+  return `/api/addressbook/organizationgroups/?search=${search}`;
+}
+export function organizationGroupsUrl() {
+  return `/api/addressbook/organizationgroups/`;
+}
+// department
+export function departmentsUrl() {
+  return `/api/departments/`;
+}
 // Contacts
-export function searchContactsUrl(search) {
-  return `/api/addressbook/contacts/?search=${search}`;
+export function searchContactsUrl(search, orgaFirstLetter) {
+  const params = new URLSearchParams({ search });
+  if (orgaFirstLetter) {
+    params.append('orga-startswith', orgaFirstLetter);
+  }
+  return `/api/addressbook/contacts/?${params}`;
+}
+
+export function contactsUrl(limit) {
+  if (limit) {
+    const params = new URLSearchParams({
+      limit: limit,
+    });
+    return `/api/addressbook/contacts/?${params}`;
+  }
+  return `/api/addressbook/contacts/`;
 }
 
 // Topic

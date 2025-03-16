@@ -64,13 +64,17 @@ const config = {
         ExpandableMenuHandler: resolve(
           './src/js/components/ExpandableMenuHandler.js'
         ),
-        SearchContact: resolve('./src/js/components/SearchContact.js'),
+        createAndShareContact: resolve(
+          './src/js/apps/createAndShareContact.js'
+        ),
         projectQueue: resolve('./src/js/store/projectQueue.js'),
         showRole: resolve('./src/js/store/showRole.js'),
         projects: resolve('./src/js/store/projects.js'),
         ClickToSeeUser: resolve('./src/js/components/ClickToSeeUser.js'),
         ActionPusher: resolve('./src/js/components/ActionPusher.js'),
         actionPusher: resolve('./src/js/store/actionPusher.js'),
+        contact: resolve('./src/js/store/contact.js'),
+        ContactBook: resolve('./src/js/store/ContactBook.js'),
       },
       output: {
         chunkFileNames: undefined,
