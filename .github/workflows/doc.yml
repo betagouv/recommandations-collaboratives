@@ -38,6 +38,7 @@ jobs:
 
       - name: Install Dependencies
         run: |
+          uv venv
           uv sync --only-dev
 
       - name: Setup Node.js
