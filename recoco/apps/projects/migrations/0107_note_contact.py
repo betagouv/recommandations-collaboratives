@@ -5,7 +5,6 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("addressbook", "0012_search_config_french_unaccent"),
         ("projects", "0106_alter_userprojectstatus_managers"),
