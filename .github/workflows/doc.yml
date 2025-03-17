@@ -41,14 +41,14 @@ jobs:
           enable-cache: true
           cache-dependency-glob: "uv.lock"
 
+      - name: Configure
+        run: |
+          cp recoco/settings/development.py.example recoco/settings/development.py
+
       - name: Install Dependencies
         run: |
           uv sync --no-dev
           uv sync --only-dev
-
-      - name: Configure
-        run: |
-          cp recoco/settings/development.py.example recoco/settings/development.py
 
       - uses: borales/actions-yarn@v5.0.0
         with:
