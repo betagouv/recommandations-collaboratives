@@ -46,7 +46,9 @@ class PublicNoteForm(forms.ModelForm):
 
     class Meta:
         model = models.Note
-        fields = ["content"]
+        fields = ["content", "topic_name"]
+
+    topic_name = forms.CharField(label="Thématique", max_length=100, required=False)
 
 
 ##################################################
