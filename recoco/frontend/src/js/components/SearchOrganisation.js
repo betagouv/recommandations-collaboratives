@@ -1,6 +1,7 @@
 import Alpine from 'alpinejs';
 import api, { searchOrganizationsUrl } from '../utils/api';
-import { groupBy } from 'lodash/groupBy';
+import { groupBy } from 'lodash.groupby';
+
 
 function SearchOrganisation() {
   return {
@@ -49,9 +50,8 @@ function SearchOrganisation() {
       });
 
       console.log(this.orgaFound);
-
       // const tempSortOrgas = Object.groupBy(this.orgaFound, ({group})=>group);
-      const tempSortOrgas = _.groupBy(this.orgaFound, ({group})=>group);
+      const tempSortOrgas = groupBy(this.orgaFound, orga=>orga.group);
 
       console.log(tempSortOrgas);
 
