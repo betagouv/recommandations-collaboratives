@@ -35,12 +35,6 @@ jobs:
         with:
           node-version: 20
 
-      - name: Install uv and python
-        uses: astral-sh/setup-uv@v5
-        with:
-          enable-cache: true
-          cache-dependency-glob: "uv.lock"
-
       - name: Configure
         run: |
           cp recoco/settings/development.py.example recoco/settings/development.py
