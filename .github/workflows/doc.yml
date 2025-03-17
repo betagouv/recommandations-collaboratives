@@ -46,6 +46,10 @@ jobs:
           uv sync --no-dev
           uv sync --only-dev
 
+      - name: Configure
+        run: |
+          cp recoco/settings/development.py.example recoco/settings/development.py
+
       - uses: borales/actions-yarn@v5.0.0
         with:
           cmd: add jsdoc
