@@ -23,23 +23,14 @@ jobs:
       id-token: write
     steps:
       - name: Check out repository code
-        uses: actions/checkout@v4.1.5
+        uses: actions/checkout@master
+        with:
+          fetch-depth: 0
 
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
           python-version-file: "pyproject.toml"
-
-      - name: Install uv and python
-        uses: astral-sh/setup-uv@v5
-        with:
-          enable-cache: true
-          cache-dependency-glob: "uv.lock"
-
-      - name: Install Dependencies
-        run: |
-          uv venv
-          uv sync --only-dev
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -49,6 +40,11 @@ jobs:
       - name: Configure
         run: |
           cp recoco/settings/development.py.example recoco/settings/development.py
+
+      - name: Add dev deps
+        run: |
+          pip install python-dotenv
+
 
       - uses: borales/actions-yarn@v5.0.0
         with:
