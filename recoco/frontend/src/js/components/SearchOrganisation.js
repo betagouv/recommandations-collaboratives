@@ -1,5 +1,7 @@
 import Alpine from 'alpinejs';
 import api, { searchOrganizationsUrl } from '../utils/api';
+import { groupBy } from 'lodash.groupby';
+
 
 function SearchOrganisation() {
   return {
@@ -47,7 +49,11 @@ function SearchOrganisation() {
         return 0;
       });
 
-      const tempSortOrgas = Object.groupBy(this.orgaFound, ({group})=>group);
+      console.log(this.orgaFound);
+      // const tempSortOrgas = Object.groupBy(this.orgaFound, ({group})=>group);
+      const tempSortOrgas = groupBy(this.orgaFound, orga=>orga.group);
+
+      console.log(tempSortOrgas);
 
       for (const prop in tempSortOrgas) {
         if (tempSortOrgas[prop][0].group == null){
