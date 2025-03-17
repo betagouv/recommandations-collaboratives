@@ -871,7 +871,7 @@ class Document(models.Model):
     class Meta:
         constraints = [
             models.CheckConstraint(
-                condition=~Q(Q(the_file__exact="") & Q(the_link__isnull=True)),
+                check=~Q(Q(the_file__exact="") & Q(the_link__isnull=True)),
                 name="not_both_link_and_file_are_null",
             )
         ]
