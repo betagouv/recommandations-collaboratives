@@ -30,6 +30,16 @@ jobs:
         with:
           python-version-file: "pyproject.toml"
 
+      - name: Install uv and python
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          cache-dependency-glob: "uv.lock"
+
+      - name: Install Dependencies
+        run: |
+          uv sync --only-dev
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
