@@ -59,45 +59,21 @@ class ContactViewSet(ModelViewSet):
     filter_backends = [OrgaStartswithFilterBackend]
 
     search_fields = [
-        (
-            "last_name",
-            {"config": "french", "weight": "A"},
-        ),
-        (
-            "first_name",
-            {"config": "french", "weight": "A"},
-        ),
-        (
-            "email",
-            {"config": "french", "weight": "A"},
-        ),
-        (
-            "division",
-            {"config": "french", "weight": "B"},
-        ),
-        (
-            "organization__name",
-            {"config": "french", "weight": "B"},
-        ),
-        (
-            "organization__group__name",
-            {"config": "french", "weight": "B"},
-        ),
-        (
-            "organization__departments__name",
-            {"config": "french", "weight": "C"},
-        ),
+        ("last_name", {"weight": "A"}),
+        ("first_name", {"weight": "A"}),
+        ("email", {"weight": "A"}),
+        ("division", {"weight": "B"}),
+        ("organization__name", {"weight": "B"}),
+        ("organization__group__name", {"weight": "B"}),
+        ("organization__departments__name", {"weight": "C"}),
         (
             "organization__departments__code",
-            {"weight": "C"},
+            {"config": "simple", "weight": "C"},
         ),
-        (
-            "organization__departments__region__name",
-            {"config": "french", "weight": "C"},
-        ),
+        ("organization__departments__region__name", {"weight": "C"}),
         (
             "organization__departments__region__code",
-            {"weight": "C"},
+            {"config": "simple", "weight": "C"},
         ),
     ]
     search_min_rank = 0.05

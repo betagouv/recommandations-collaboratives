@@ -21,7 +21,6 @@ def repopulate_sites_m2m(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("projects", "0097_projectsite_project_project_sites"),
     ]

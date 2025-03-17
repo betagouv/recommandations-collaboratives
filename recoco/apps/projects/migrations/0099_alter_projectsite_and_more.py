@@ -5,7 +5,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     replaces = [
         ("projects", "0099_alter_projectsite_unique_together"),
         ("projects", "0100_remove_project_sites"),

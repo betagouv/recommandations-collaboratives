@@ -9,6 +9,8 @@ from rest_framework.filters import SearchFilter
 from rest_framework.settings import api_settings
 from watson import search as watson_search
 
+from recoco.utils import strip_accents
+
 
 class TagsFilterbackend(DjangoFilterBackend):
     def filter_queryset(self, request, queryset, view):
@@ -72,15 +74,22 @@ class VectorSearchFilter(BaseSearchFilter):
         search_vector = None
         for search_field in search_fields:
             if isinstance(search_field, tuple):
-                _vector = SearchVector(search_field[0], **search_field[1])
+                _vector = SearchVector(
+                    search_field[0],
+                    **{"config": "french_unaccent", **search_field[1]},
+                )
             else:
-                _vector = SearchVector(search_field, config="french")
+                _vector = SearchVector(
+                    search_field,
+                    config="french_unaccent",
+                )
+
             if search_vector is None:
                 search_vector = _vector
             else:
                 search_vector += _vector
 
-        search_query = SearchQuery(search_terms, config="french")
+        search_query = SearchQuery(search_terms, config="french_unaccent")
 
         return (
             queryset.annotate(rank=SearchRank(search_vector, search_query))
@@ -100,7 +109,7 @@ class WatsonSearchFilter(BaseSearchFilter):
             return queryset.annotate(search_rank=Value(0.0, output_field=FloatField()))
 
         search_min_rank = self.get_search_min_rank(view, request)
-        search_text = " ".join(search_terms)
+        search_text = strip_accents(" ".join(search_terms))
 
         return (
             watson_search.filter(queryset, search_text=search_text)

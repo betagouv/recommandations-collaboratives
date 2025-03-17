@@ -25,6 +25,17 @@
   }
 }
 
+.center-cropped {
+  object-fit: none;
+  object-position: center;
+  height: 550px;
+  width: 550px;
+}
+
+.img-shadow {
+  filter: drop-shadow(32px 32px 0px #000091);
+}
+
 #headline:before {
   content: ' ';
   display: block;
@@ -80,16 +91,20 @@ span.step {
 }
 
 .custom-banner {
-  background-color: var(--background-action-high-blue-france);;
-  color: white;
-  position: absolute;
-  right: -10px;
-  top: 15px;
+  background-color: white;
+  border: 1px solid var(--background-action-high-blue-france);
+  color: var(--background-action-high-blue-france);
   padding: 10px 20px;
-
+  width: fit-content;
+  position:absolute;
+  top:25px;
   display: flex;
   align-items: center;
   border-radius: 1px;
+}
+
+.custom-banner a {
+  text-decoration: underline;
 }
 
 .custom-banner.left-banner {
@@ -101,20 +116,20 @@ span.step {
   left: 0;
 }
 
-.custom-banner::after {
-  content: '';
+// .custom-banner::after {
+//   content: '';
 
-  position: absolute;
-  right: 0;
-  top: 100%;
-  z-index: 1;
+//   position: absolute;
+//   right: 0;
+//   top: 100%;
+//   z-index: 1;
 
-  width: 0px;
-  height: 0px;
-  border-left: 10px solid transparent;
-  border-right: 10px solid transparent;
-  border-top: 10px solid #3558a2;
-}
+//   width: 0px;
+//   height: 0px;
+//   border-left: 10px solid transparent;
+//   border-right: 10px solid transparent;
+//   border-top: 10px solid #3558a2;
+// }
 
 @media (max-width: 48em) {
   .custom-banner {
@@ -148,4 +163,9 @@ span.step {
 .correct-link-display {
   color: #0000ee;
   text-decoration: underline;
+}
+
+.dark-section {
+  background: var(--dark-accent-green-archipel-125, #1F2C2E);
+  color: white;
 }

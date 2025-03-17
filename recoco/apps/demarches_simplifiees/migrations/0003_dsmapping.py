@@ -7,7 +7,6 @@ import model_utils.fields
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("sites", "0002_alter_domain_unique"),
         ("demarches_simplifiees", "0002_remove_dsresource_type"),

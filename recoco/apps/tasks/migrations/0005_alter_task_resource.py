@@ -5,7 +5,6 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("resources", "0031_resource_imported_from"),
         ("tasks", "0004_alter_task_topic"),

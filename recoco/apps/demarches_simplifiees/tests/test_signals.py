@@ -16,7 +16,6 @@ def test_trigger_load_ds_resource_schema(settings, autoload_enabled, expected_ca
     with patch(
         "recoco.apps.demarches_simplifiees.signals.load_ds_resource_schema"
     ) as mock_load_ds_resource_schema:
-
         ds_resource = baker.make(DSResource)
         ds_resource.schema = {"number": 123}
         ds_resource.save()
