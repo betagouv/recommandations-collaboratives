@@ -1,0 +1,56 @@
+name: Deploy documentation to Pages
+
+# Runs on pushes targeting the default branch
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: ['main', 'develop']
+
+
+concurrency:
+  group: ${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  pages:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    permissions:
+      pages: write
+      id-token: write
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@master
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version-file: "pyproject.toml"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Configure
+        run: |
+          cp recoco/settings/development.py.example recoco/settings/development.py
+
+      - name: Add dev deps
+        run: |
+          pip install python-dotenv
+
+
+      - uses: borales/actions-yarn@v5.0.0
+        with:
+          cmd: add jsdoc
+
+      - id: deployment
+        uses: sphinx-notes/pages@v3
+        with:
+          checkout: false
