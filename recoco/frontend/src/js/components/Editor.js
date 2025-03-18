@@ -103,7 +103,7 @@ Alpine.data('editor', (content) => {
     unsetLink() {
       editor.chain().focus().unsetLink().run();
     },
-    setMarkdownContentFromTaskModal(event) {
+    setMarkdownContent(event) {
       editor.commands.setContent(event.detail);
     },
     renderMarkdown() {
@@ -111,7 +111,7 @@ Alpine.data('editor', (content) => {
       console.debug('rerender markdown...');
     },
     handleSetContact(contact) {
-      this.contact = contact;
+      this.contact = { ...contact }; // XXX Copy since it can be destroyed from an inner scope and values result to null
 
       // FIXME Update UI
     },

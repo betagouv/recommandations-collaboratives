@@ -33,7 +33,8 @@ function SearchOrganisation() {
       this.selectedOrga = orga;
       this.userInput = orga.name;
       this.showOrgAsResults = false;
-      this.$store.contact.orgaSelected = orga;
+
+      this.$dispatch('set-organization', orga);
     },
     sortOrgasResults() {
       this.orgaSorted = [];
@@ -47,11 +48,7 @@ function SearchOrganisation() {
         return 0;
       });
 
-      console.log(this.orgaFound);
-      // const tempSortOrgas = Object.groupBy(this.orgaFound, ({group})=>group);
       const tempSortOrgas = _.groupBy(this.orgaFound, (orga) => orga.group);
-
-      console.log(tempSortOrgas);
 
       for (const prop in tempSortOrgas) {
         if (tempSortOrgas[prop][0].group == null) {

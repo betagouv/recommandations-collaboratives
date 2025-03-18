@@ -24,6 +24,7 @@ Parameters:
 <div class="w-100"
      x-data='editor()' data-initial-content="{{ initial_content }}"
      @set-contact="handleSetContact($event.detail)"
+     @set-comment.window="setMarkdownContent(event)"
      x-ref="editor"
      data-test-id="tiptap-editor">
     <template x-if="isLoaded()">

@@ -6,24 +6,29 @@ function CreateContact() {
     modalCreateContact: null,
     modalSearchContact: null,
     contact: {
-          organization: '',
-          last_name: '',
-          first_name: '',
-          division: '',
-          email: '',
-          phone_no: '',
-          mobile_no: '',
-        },
+      organization: '',
+      last_name: '',
+      first_name: '',
+      division: '',
+      email: '',
+      phone_no: '',
+      mobile_no: '',
+    },
     isOrgaSelected: false,
     isJobSelected: false,
     isMailOrPhone: false,
     init() {},
-    closeCreateContactModal() {
+    closeModal(clearForm = false) {
       this.modalCreateContact = document.querySelector('#create-contact-modal');
       this.modalCreateContact.classList.toggle('d-none');
       this.isOrgaSelected = false;
       this.isJobSelected = false;
       this.isMailOrPhone = false;
+
+      if (clearForm) {
+        this.resetFormValue();
+      }
+
       this.reOpenModalSearchContact();
     },
     reOpenModalSearchContact() {
@@ -31,29 +36,27 @@ function CreateContact() {
       this.modalSearchContact.classList.toggle('d-none');
     },
     createContact() {
-      if (this.$store.contact.orgaSelected) {
-        const tempOrg = this.$store.contact.orgaSelected;
-        this.contact.organization = tempOrg.id;
-        this.isOrgaSelected = false;
-      } else {
-        this.isOrgaSelected = true;
-      }
-      if (this.contact.division.length === 0) {
-        this.isJobSelected = true;
-      } else {
-        this.isJobSelected = false;
-      }
-      this.isMailOrPhone = this.contact.email.length === 0 && this.contact.phone_no.length === 0;
+      this.isOrgaSelected = this.contact.organization != null;
+
+      this.isJobSelected = Boolean(this.contact.division);
+
+      this.isMailOrPhone =
+        this.contact.email.length === 0 && this.contact.phone_no.length === 0;
       if (
         this.contact.organization &&
         this.contact.division.length > 0 &&
         (this.contact.email.length > 0 || this.contact.phone_no.length > 0)
       ) {
-        api.post(contactsUrl(), this.contact).then((response) => {
-          this.$store.contact.createdContact = response.data;
-          this.$dispatch('reset-orga', null);
-          this.resetFormValue();
-          this.closeCreateContactModal();
+        let payload = {
+          ...this.contact,
+          organization: this.contact.organization.id,
+        };
+
+        api.post(contactsUrl(), payload).then((response) => {
+          this.$dispatch('set-contact', this.contact);
+          this.$dispatch('reset-orga', null); // FIXME
+
+          this.closeModal((clearForm = true));
         });
       }
     },
@@ -67,6 +70,10 @@ function CreateContact() {
       this.contact.organization = '';
       this.$store.contact.orgaSelected = null;
       this.isMailOrPhone = false;
+    },
+
+    handleSetOrganization(organization) {
+      this.contact.organization = organization;
     },
   };
 }
