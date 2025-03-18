@@ -22,7 +22,11 @@ Parameters:
 {% endblock css %}
 
 <div class="w-100"
+     {% if initial_content_escapejs %}
+     x-data='editor("{{ initial_content|escapejs }}")'
+     {% else  %}
      x-data='editor({{ initial_content }})'
+     {% endif %}
      @set-contact="handleSetContact($event.detail)"
      @set-comment.window="setMarkdownContent(event)"
      x-ref="editor"
@@ -92,7 +96,15 @@ Parameters:
                     </template>
                     {% include "tools/contacts/search_contact_modal.html" %}
                     {% include "tools/contacts/create_contact_modal.html" %}
-                    <input type="hidden" x-model="{{ model }}.contact" x-modelable="contact">
+                    <input type="hidden"
+                           {% if model %}
+                           x-model="{{ model }}.contact"
+                           x-modelable="contact"
+                           {% else %}
+                           x-model="contact"
+                           {% endif %}
+                           >
+
                 </div>
             {% endif %}
         </div>
@@ -102,8 +114,13 @@ Parameters:
         {% endif %}
 
         <textarea class="position-absolute top-0 opacity-0 specific-height-0"
+                  {% if model %}
                   x-model="{{ model }}.text"
                   x-modelable="markdownContent"
+                  {% else %}
+                  x-model="markdownContent"
+                  {% endif  %}
+
                   name="{{input_name|default:"content"}}"
                   {% if input_required %} required {% endif %}>
         </textarea>
