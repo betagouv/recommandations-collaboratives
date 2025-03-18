@@ -22,7 +22,7 @@ Parameters:
 {% endblock css %}
 
 <div class="w-100"
-     x-data='editor()' data-initial-content="{{ initial_content }}"
+     x-data='editor({{ initial_content }})'
      @set-contact="handleSetContact($event.detail)"
      @set-comment.window="setMarkdownContent(event)"
      x-ref="editor"

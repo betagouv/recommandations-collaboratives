@@ -14,7 +14,7 @@ Alpine.data('editor', (content) => {
   return {
     updatedAt: Date.now(), // force Alpine to rerender on selection change
     contact: null,
-    markdownContent: content ? content : '',
+    markdownContent: null,
     init() {
       const _this = this;
 
@@ -57,6 +57,8 @@ Alpine.data('editor', (content) => {
           _this.updatedAt = Date.now();
         },
       });
+
+      this.renderMarkdown();
     },
     isLoaded() {
       return editor;
@@ -108,7 +110,6 @@ Alpine.data('editor', (content) => {
     },
     renderMarkdown() {
       this.markdownContent = editor.getMarkdown().replaceAll('\\', '');
-      console.debug('rerender markdown...');
     },
     handleSetContact(contact) {
       this.contact = { ...contact }; // XXX Copy since it can be destroyed from an inner scope and values result to null
