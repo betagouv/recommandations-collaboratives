@@ -16,6 +16,12 @@ export default function PreviewModal() {
     followupsIsLoading: false,
     contentIsLoading: false,
     showEdition: false,
+
+    comment: {
+      text: '',
+      contact: '',
+    },
+
     get index() {
       return this.$store.previewModal.index;
     },
@@ -54,16 +60,15 @@ export default function PreviewModal() {
         ).length > 0
       );
     },
-    async onSubmitComment(content) {
-      const contactAdded = this.$store.previewModal.contact;
-      this.$store.previewModal.contact = null;
+    async onSubmitComment() {
       this.$store.editor.setIsSubmitted(true);
+
       if (!this.currentlyEditing) {
         await this.$store.tasksData.issueFollowup(
           this.currentTask,
           undefined,
-          content,
-          contactAdded??null
+          this.comment.text,
+          this.comment.contact ?? null
         );
         await this.$store.previewModal.loadFollowups();
         await this.$store.tasksView.updateView();

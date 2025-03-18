@@ -30,7 +30,7 @@
         <div class="fr-py-2w fr-px-2w fr-mb-2v border-blue task-comment medium-border-radius position-relative">
             <button class="fr-btn fr-btn--sm fr-btn--tertiary fr-icon-close-line position-absolute top-0 end-0 fr-m-2w"
                     @click.stop="isEditing = false">Annuler la modification</button>
-            {% include "tools/editor.html" with is_task_comment=True %}
+            {% include "tools/editor.html" with save_label="la tache" %}
         </div>
     </template>
 </div>

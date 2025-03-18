@@ -13,6 +13,7 @@ Alpine.data('editor', (content) => {
 
   return {
     updatedAt: Date.now(), // force Alpine to rerender on selection change
+    contact: null,
     markdownContent: content ? content : '',
     init() {
       const _this = this;
@@ -107,6 +108,12 @@ Alpine.data('editor', (content) => {
     },
     renderMarkdown() {
       this.markdownContent = editor.getMarkdown().replaceAll('\\', '');
+      console.debug('rerender markdown...');
+    },
+    handleSetContact(contact) {
+      this.contact = contact;
+
+      // FIXME Update UI
     },
   };
 });

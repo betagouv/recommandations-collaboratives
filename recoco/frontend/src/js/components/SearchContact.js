@@ -13,6 +13,7 @@ function SearchContact() {
     modalCreateContact: null,
     modalSearchContact: null,
     noSearch: true,
+
     init() {},
     onSearch() {
       this.delayDisplay = true;
@@ -34,9 +35,8 @@ function SearchContact() {
       this.selectedContact = contact;
     },
     addContact() {
-      let textArea = document.querySelector('.tiptap.ProseMirror');
-      textArea.innerHTML += `@ ${this.selectedContact.first_name} ${this.selectedContact.last_name}`;
-      this.$store.previewModal.contact = this.selectedContact;
+      this.$dispatch('set-contact', this.selectedContact);
+
       this.closeModal();
     },
     closeModal() {
@@ -50,16 +50,16 @@ function SearchContact() {
       this.selectedContact = null;
     },
     openModalSearchContact() {
-      this.modalSearchContact = document.querySelector('#search-contact-modal');
+      this.modalSearchContact = document.querySelector('#search-contact-modal'); // FIXME jquery style
       this.modalSearchContact.classList.toggle('d-none');
     },
     openModalCreateContact() {
-      this.modalCreateContact = document.querySelector('#create-contact-modal');
+      this.modalCreateContact = document.querySelector('#create-contact-modal'); // FIXME jquery style
       this.modalCreateContact.classList.toggle('d-none');
       this.closeModalWithData();
     },
     closeModalWithData() {
-      this.modalSearchContact = document.querySelector('#search-contact-modal');
+      this.modalSearchContact = document.querySelector('#search-contact-modal'); // FIXME jquery style
       this.modalSearchContact.classList.toggle('d-none');
     },
   };

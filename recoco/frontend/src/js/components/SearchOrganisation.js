@@ -1,7 +1,6 @@
 import Alpine from 'alpinejs';
 import api, { searchOrganizationsUrl } from '../utils/api';
-import { groupBy } from 'lodash.groupby';
-
+import _ from 'lodash';
 
 function SearchOrganisation() {
   return {
@@ -37,7 +36,6 @@ function SearchOrganisation() {
       this.$store.contact.orgaSelected = orga;
     },
     sortOrgasResults() {
-
       this.orgaSorted = [];
       this.orgaFound.sort((a, b) => {
         if (a.name < b.name) {
@@ -51,22 +49,21 @@ function SearchOrganisation() {
 
       console.log(this.orgaFound);
       // const tempSortOrgas = Object.groupBy(this.orgaFound, ({group})=>group);
-      const tempSortOrgas = groupBy(this.orgaFound, orga=>orga.group);
+      const tempSortOrgas = _.groupBy(this.orgaFound, (orga) => orga.group);
 
       console.log(tempSortOrgas);
 
       for (const prop in tempSortOrgas) {
-        if (tempSortOrgas[prop][0].group == null){
-          for (let i = 0; i < tempSortOrgas[prop].length; i++){
-            tempSortOrgas[prop][i].group = {name: 'AUTRES'};
+        if (tempSortOrgas[prop][0].group == null) {
+          for (let i = 0; i < tempSortOrgas[prop].length; i++) {
+            tempSortOrgas[prop][i].group = { name: 'AUTRES' };
           }
-        }
-        else {
+        } else {
           this.orgaSorted.push(tempSortOrgas[prop]);
         }
       }
       for (const prop in tempSortOrgas) {
-        if (tempSortOrgas[prop][0].group.name === 'AUTRES'){
+        if (tempSortOrgas[prop][0].group.name === 'AUTRES') {
           this.orgaSorted.push(tempSortOrgas[prop]);
         }
       }

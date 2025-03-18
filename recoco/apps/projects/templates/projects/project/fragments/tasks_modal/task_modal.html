@@ -186,14 +186,23 @@
                                 </div>
                             </div>
                             <template x-if="currentTask.public || showEdition">
-                                <div class="w-100 fr-p-2w specific-border-top-solid1pxEEE">
-                                    {% include "tools/editor.html" with is_task_modal_comment=True can_attach_contact=True  %}
-                                </div>
+                                <form @submit.prevent="onSubmitComment()" novalidate>
+                                    <div class="w-100 fr-p-2w specific-border-top-solid1pxEEE">
+                                        {% include "tools/editor.html" with model="comment" can_attach_contact=True tools_disabled="title" %}
+
+                                        <!--                                                 :disabled="$store.editor.isSubmitted === true" -->
+                                        <button type="submit"
+                                                class="fr-btn fr-btn--sm"
+                                                data-test-id="button-submit-new">{{ save_label|default:"Envoyer"}}
+                                        </button>
+                                    </div>
+                                </form>
+
                             </template>
                             <template x-if="!currentTask.public">
                                 <div class="w-100 fr-p-2w specific-border-top-solid1pxEEE">
                                     <div class="text-center">
-                                        <span class="text-muted">Vous devez publier votre recommandation pour ajouter un commentaire</span>
+                                        <span class="text-muted">Cette recommandation est en brouillon. Vous devez la publier pour ajouter un commentaire</span>
                                     </div>
                                 </div>
                             </template>
