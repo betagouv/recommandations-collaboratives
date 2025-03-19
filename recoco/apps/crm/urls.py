@@ -58,6 +58,11 @@ urlpatterns = [
         views.SiteConfigurationUpdateView.as_view(),
         name="crm-site-configuration",
     ),
+    path(
+        "crm/site_config/tags",
+        views.siteconfiguration_tags,
+        name="crm-site-configuration-tags",
+    ),
     #
     # users
     path(

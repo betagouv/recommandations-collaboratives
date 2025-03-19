@@ -1,0 +1,59 @@
+<div id="tags-table" class="fr-px-3w fr-pt-3w fr-mb-2w">
+    {% for tag in tags %}
+        {% include "crm/siteconfiguration_tags_modal.html" with action="remove" tag_name=tag.name %}
+        {% include "crm/siteconfiguration_tags_modal.html" with action="rename" tag_name=tag.name %}
+
+        <div class="fr-ml-6w align-middle" role="group">
+            <div class="fr-container">
+                <div class="fr-grid-row">
+                    <div class="fr-col-8">
+                        <p class="fr-tag fr-fi-arrow-right-line fr-tag--icon-left fr-mb-2w">{{ tag }}</p>
+                    </div>
+                    <div class="fr-col-4">
+                        <button
+                            class="fr-btn fr-btn--sm fr-btn--icon-left fr-icon-pencil-line"
+                            aria-controls="site-configuration-tags-modal-rename-{{ tag.name }}"
+                            data-fr-opened="false">
+                            Renommer
+                        </button>
+                        <button
+                            class="fr-btn fr-btn--sm fr-btn--secondary fr-btn--icon-left fr-icon-delete-line"
+                            aria-controls="site-configuration-tags-modal-remove-{{ tag.name }}"
+                            data-fr-opened="false">
+                            Supprimer
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    {% endfor %}
+
+    <hr class="fr-my-3w">
+
+    <div class="fr-container">
+        <div class="fr-mb-2w">Ajouter un nouveau tag:</div>
+            <div class="fr-grid-row">
+                <div class="fr-col-12">
+                    <form method="POST"
+                        hx-post="{% url 'crm-site-configuration-tags' %}"
+                        hx-trigger="submit"
+                        hx-target="#tags-table"
+                        hx-swap="outerHTML">
+
+                        {% csrf_token %}
+
+                        <input type="hidden" name="action" value="add">
+                        <input class="fr-input fr-mb-2w" type="text" id="text-input-text" name="new_tag_name" value="">
+
+                        <button class="fr-btn fr-icon-checkbox-circle-line fr-btn--icon-left"
+                            aria-controls="site-configuration-tags-modal-{{ action }}-{{ tag_name }}"
+                            type="submit">
+                            Ajouter
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

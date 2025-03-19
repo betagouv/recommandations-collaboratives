@@ -24,3 +24,9 @@ def test_get_note_update_url():
 
     note.content_type = ContentType.objects.get_for_model(Contact)
     assert get_note_update_url(note) is None
+
+
+@pytest.mark.django_db
+def test_site_configuration_tags():
+    pass
+    # TODO: test siteconfiguration_tags
