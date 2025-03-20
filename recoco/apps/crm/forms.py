@@ -1,5 +1,6 @@
 from django import forms
 from django.contrib.sites import models as sites_models
+from django.utils.safestring import mark_safe
 from markdownx.fields import MarkdownxFormField
 from taggit.forms import TagWidget
 
@@ -10,6 +11,25 @@ from . import models
 
 
 class SiteConfigurationForm(forms.ModelForm):
+    crm_available_tags = forms.CharField(
+        max_length=255,
+        required=False,
+        widget=TagWidget(
+            attrs={
+                "class": "form-control",
+                "id": "crm_available_tags",
+                "placeholder": "Ajouter des tags",
+                "data-role": "tagsinput",
+                "data_role": "tagsinput",
+                "readonly": True,
+            }
+        ),
+        label="Tags d'impact disponibles sur les projets dans le CRM",
+        help_text=mark_safe(  # noqa: S308
+            "<a href='/crm/site_config/tags' target='_blank' class='fr-link'>Editer les tags</a>"
+        ),
+    )
+
     class Meta:
         model = home_models.SiteConfiguration
 
@@ -29,18 +49,6 @@ class SiteConfigurationForm(forms.ModelForm):
             "accept_handover",
             "crisp_token",
         ]
-
-        widgets = {
-            "crm_available_tags": TagWidget(
-                attrs={
-                    "class": "form-control",
-                    "id": "crm_available_tags",
-                    "placeholder": "Enter tags by comma separated",
-                    "data-role": "tagsinput",
-                    "data_role": "tagsinput",
-                }
-            )
-        }
 
 
 class CRMProfileForm(forms.ModelForm):

@@ -30,7 +30,7 @@ from django.core.cache.utils import make_template_fragment_key
 from django.db import transaction
 from django.db.models import Count, ExpressionWrapper, F, FloatField, Max, Q, Value
 from django.db.models.functions import Cast
-from django.http import Http404, HttpResponse
+from django.http import Http404, HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
@@ -177,6 +177,60 @@ class SiteConfigurationUpdateView(LoginRequiredMixin, UserPassesTestMixin, Updat
         cache.delete(key)
 
         return super().form_valid(form)
+
+
+@login_required
+def siteconfiguration_tags(request: HttpRequest):
+    has_perm_or_403(request.user, "sites.manage_configuration", request.site)
+
+    site_configuration = request.site.configuration
+
+    template_name = "crm/siteconfiguration_tags.html"
+
+    if request.method == "POST" and request.htmx:
+        template_name = "crm/siteconfiguration_tags_table.html"
+
+        match request.POST.get("action"):
+            case "remove":
+                tag_name = request.POST.get("tag_name")
+                if tag_name:
+                    with transaction.atomic():
+                        site_configuration.crm_available_tags.remove(tag_name)
+                        for project in Project.on_site.filter(
+                            crm_annotations__tags__name__in=[tag_name]
+                        ):
+                            project.crm_annotations.tags.remove(tag_name)
+
+            case "rename":
+                tag_name = request.POST.get("tag_name")
+                new_tag_name = request.POST.get("new_tag_name")
+                if (
+                    tag_name
+                    and new_tag_name
+                    and tag_name in site_configuration.crm_available_tags.names()
+                ):
+                    with transaction.atomic():
+                        site_configuration.crm_available_tags.remove(tag_name)
+                        site_configuration.crm_available_tags.add(new_tag_name)
+                        for project in Project.on_site.filter(
+                            crm_annotations__tags__name__in=[tag_name]
+                        ):
+                            project.crm_annotations.tags.remove(tag_name)
+                            project.crm_annotations.tags.add(new_tag_name)
+
+            case "add":
+                new_tag_name = request.POST.get("new_tag_name")
+                if new_tag_name:
+                    site_configuration.crm_available_tags.add(new_tag_name)
+
+            case _:
+                pass
+
+    context = {
+        "tags": site_configuration.crm_available_tags.order_by("name"),
+    }
+
+    return render(request, template_name, context)
 
 
 ########################################################################
