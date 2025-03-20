@@ -63,7 +63,7 @@ class TestMakeDSDataFromProject:
         survey = baker.make(Survey, site=site)
         baker.make(SiteConfiguration, site=site, project_survey=survey)
 
-        project = baker.make(Project, name="Mon projet")
+        project = baker.make(Project, name="Mon dossier")
         session = baker.make(Session, survey=survey, project=project)
         question_set = baker.make(QuestionSet, survey=survey)
         question = baker.make(
@@ -99,7 +99,7 @@ class TestMakeDSDataFromProject:
             site=site, project=project, ds_resource=ds_resource
         )
         assert data == {
-            "champ_Q2hhbXAtMjk3MTQ0NA": "Mon projet",
+            "champ_Q2hhbXAtMjk3MTQ0NA": "Mon dossier",
             "champ_Q2hhbXAtMzYwNjk5NQ": "anakin.skywalker@test.com",
             "champ_Q2hhbXAtODgwNDAy": "Jedi",
             "champ_Q2hhbXAtMzI5MzU1Mw": "Non pas encore",

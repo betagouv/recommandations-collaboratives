@@ -118,7 +118,7 @@ class ProjectFilter(django_filters.FilterSet):
     )
 
     inactive = django_filters.BooleanFilter(
-        label="Projet inactifs",
+        label="Dossier inactifs",
         method="inactive_filter",
         widget=forms.widgets.CheckboxInput,
     )
