@@ -19,6 +19,7 @@ class ProConnectProvider(OpenIDConnectProvider):
         Override this method to extract common fields from the data
         """
         return super().extract_common_fields(data) | {
+            "username": data.get("email", ""),
             "siret": data.get("siret", ""),
             "first_name": data.get("given_name", ""),
             "last_name": data.get("usual_name", ""),
