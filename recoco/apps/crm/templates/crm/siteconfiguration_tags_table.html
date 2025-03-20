@@ -1,4 +1,4 @@
-<div id="tags-table" class="fr-px-3w fr-pt-3w fr-mb-2w">
+<div id="tags-table" class="fr-px-3w fr-pt-3w fr-mb-2w" hx-boost="true">
     {% for tag in tags %}
         {% include "crm/siteconfiguration_tags_modal.html" with action="remove" tag_name=tag.name %}
         {% include "crm/siteconfiguration_tags_modal.html" with action="rename" tag_name=tag.name %}
