@@ -10,8 +10,8 @@ TPL_PROJECT_REMINDERS_WHATS_UP_DIGEST = "project_reminders_whats_up_digest"
 TPL_PROJECT_ADDED_TO_NEW_SITE = "project_added_to_new_site"
 
 TPL_CHOICES = (
-    (TPL_PROJECT_RECEIVED, "Projet bien reçu"),
-    (TPL_PROJECT_ACCEPTED, "Projet accepté par l'équipe de modération"),
+    (TPL_PROJECT_RECEIVED, "Dossier bien reçu"),
+    (TPL_PROJECT_ACCEPTED, "Dossier accepté par l'équipe de modération"),
     (TPL_DIGEST_FOR_NON_SWITCHTENDER, "Résumé quotidien général de notifications"),
     (TPL_DIGEST_FOR_SWITCHTENDER, "Résumé quotidien des conseillers"),
     (TPL_NEW_RECOMMENDATIONS_DIGEST, "Résumé des nouvelles recommandations"),
@@ -25,5 +25,5 @@ TPL_CHOICES = (
         "Rappel des nouvelles recommandations (mail dossier B)",
     ),
     (TPL_PROJECT_REMINDERS_WHATS_UP_DIGEST, "Où en êtes-vous ? (mail dossier C)"),
-    (TPL_PROJECT_ADDED_TO_NEW_SITE, "Le Projet a été validé sur un nouveau portail"),
+    (TPL_PROJECT_ADDED_TO_NEW_SITE, "Le Dossier a été validé sur un nouveau portail"),
 )
