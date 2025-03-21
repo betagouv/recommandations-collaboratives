@@ -7,6 +7,8 @@ author  : raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created : 2021-07-20 15:56:20 CEST
 """
 
+import logging
+
 import reversion
 from django.contrib.auth import models as auth_models
 from django.contrib.contenttypes.models import ContentType
@@ -22,6 +24,8 @@ from model_utils.models import TimeStampedModel
 from recoco.apps.geomatics import models as geomatics_models
 
 from . import apps
+
+logger = logging.getLogger(__name__)
 
 
 # We need the permission to be associated to the site and not to the projects
@@ -94,9 +98,17 @@ class Organization(TimeStampedModel):
     @classmethod
     def get_or_create(cls, name):
         """Return existing organization with casefree name or new one"""
-        organization, _ = cls.objects.get_or_create(
-            name__iexact=name, defaults={"name": name}
-        )
+        try:
+            organization, _ = cls.objects.get_or_create(
+                name__iexact=name, defaults={"name": name}
+            )
+        except cls.MultipleObjectsReturned:
+            organization = (
+                cls.objects.filter(name__iexact=name).order_by("-created").first()
+            )
+            logger.error(
+                f"Multiple organizations found with name {name} (case insensitive)"
+            )
         return organization
 
 
