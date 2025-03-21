@@ -73,6 +73,11 @@ p a {
   color: #0000ee;
 }
 
+.normal-link-style {
+  text-decoration: underline;
+  color: #0000ee;
+}
+
 p {
   &:has(input),
   &:has(select),
