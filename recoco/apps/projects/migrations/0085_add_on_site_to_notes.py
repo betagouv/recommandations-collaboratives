@@ -38,5 +38,5 @@ class Migration(migrations.Migration):
             ),
             preserve_default=False,
         ),
-        migrations.RunPython(assign_note_site_based_on_project_site, lambda x, y: None),
+        # migrations.RunPython(assign_note_site_based_on_project_site, lambda x, y: None),
     ]
