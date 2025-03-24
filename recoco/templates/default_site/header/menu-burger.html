@@ -9,7 +9,7 @@
         role="dialog"
         id="fr-modal-menu"
         class="fr-modal fr-pr-0">
-    <div class="fr-grid-row fr-grid-row--center">
+    <div class="fr-grid-row fr-grid-row--center responsive-header">
         <div class="fr-modal__body">
             <div class="fr-modal__header">
                 <h1 id="fr-modal-title-menu-burger" class="fr-modal__title">
@@ -23,18 +23,19 @@
                 <ul class="fr-menu__list">
                     <li>
                         <a class="responsive-header__element-mobile fr-nav__link" href="{% url 'account_login' %}" {% if 'login' in url_name %}aria-current="page"{% endif %}>
-
                             <span class="align-middle">Se connecter</span>
                         </a>
                     </li>
+                    {% include "header/menu-top-secondary-left.html" %}
                     <li>
                         <a href="{% url 'resources-resource-search' %}"
                            class="responsive-header__element-mobile fr-link fr-nav__link"
                            {% if url_name == 'resources-resource-search' %}aria-current="page"{% endif %}
                            data-test-id="link-ressources">
-                            <span class="fr-mx-1v align-middle">Ressources</span>
+                            <span class="align-middle">Ressources</span>
                         </a>
                     </li>
+                    {% include "header/menu-top-secondary-right.html" %}
                 </ul>
             </div>
         </div>

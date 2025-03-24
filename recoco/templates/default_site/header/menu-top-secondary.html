@@ -13,9 +13,10 @@
     {% if 'moderate_projects' in user_site_perms %}
         {% get_project_moderation_count as projects_to_moderate_count %}
     {% endif %}
-    <ul x-data="MenuProjects({% if is_switchtender or is_administrating_project %}false{% else %}true{% endif %})"
+    <ul x-data="MenuProjects({% if is_switchtender or is_administrating_project %}false{% else %}true{% endif %}),{ width: window.innerWidth}"
+        x-on:resize.window="width = window.innerWidth"
         {% if user.is_authenticated %}x-init="getProjetctsData"{% endif %}
-        class="navigation__menu-top-secondary list-unstyled fr-mb-0 d-flex align-items-center header-specific-pl-15 tmp-usevar"
+        class="navigation__menu-top-secondary list-unstyled fr-mb-0 d-flex align-items-center header-specific-pl-15 tmp-usevar responsive-header__element-not-mobile"
         data-test-id="secondary-menu"
         style="{% if not user.is_authenticated %}border-left: 0.1rem solid #d5d5d5;
                {% endif %}">

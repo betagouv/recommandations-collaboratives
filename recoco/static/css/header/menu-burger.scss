@@ -20,7 +20,7 @@
 @media (max-width: 991px) {
   .fr-modal--opened {
     display: block;
-    top: -60px;
+    top: -92px;
   }
 }
 @media (max-width: 768px) {
@@ -28,3 +28,15 @@
     top: -32px;
   }
 }
+
+ .responsive-header .responsive-header__element-not-mobile {
+  display: inline !important;
+ }
+
+ .responsive-header span {
+  margin-left: 0px !important;
+ }
+
+ .fr-modal--opened {
+  height: 150%;
+ }
