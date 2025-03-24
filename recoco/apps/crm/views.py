@@ -1263,8 +1263,7 @@ def project_list_by_tags(request):
     has_perm_or_403(request.user, "use_crm", request.site)
 
     tags = (
-        Project.tags.filter(project__sites=request.site)
-        .exclude(project__exclude_stats=True)
+        Project.tags.filter(project__sites=request.site, project__exclude_stats=False)
         .annotate(Count("project", distinct=True))
         .order_by("-project__count")
         .distinct()
@@ -1272,7 +1271,14 @@ def project_list_by_tags(request):
 
     search_form = forms.CRMSearchForm()
 
-    return render(request, "crm/tags_for_projects.html", locals())
+    return render(
+        request,
+        "crm/tags_for_projects.html",
+        context={
+            "tags": tags,
+            "search_form": search_form,
+        },
+    )
 
 
 @login_required
