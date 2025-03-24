@@ -21,6 +21,20 @@
                     <span class="fr-icon-arrow-right-line fr-icon--lg"></span>Menu
                 </h1>
                 <p>Menu en construction</p>
+                <ul>
+                    <li>
+                        <a class="responsive-header__element-mobile" href="{% url 'account_login' %}">
+                            <span class="align-middle">Se connecter</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'resources-resource-search' %}"
+                           class="responsive-header__element-mobile fr-link {% if url_name == 'resources-resource-search' %}active{% endif %}"
+                           data-test-id="link-ressources">
+                            <span class="fr-mx-1v align-middle">Ressources</span>
+                        </a>
+                    </li>
+                </ul>
             </div>
         </div>
     </div>
