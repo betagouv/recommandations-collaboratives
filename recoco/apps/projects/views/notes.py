@@ -15,6 +15,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
 
+from recoco.apps.addressbook.models import Contact
 from recoco.utils import has_perm, has_perm_or_403
 
 from .. import models, signals
@@ -31,6 +32,9 @@ def create_public_note(request, project_id=None):
 
     if request.method == "POST":
         form = PublicNoteForm(request.POST)
+        form.set_contact_queryset(
+            Contact.objects.filter(site_id=request.site.id),
+        )
 
         if form.is_valid():
             instance = form.save(commit=False)
