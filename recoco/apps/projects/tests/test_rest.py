@@ -132,6 +132,8 @@ def test_project_list_includes_only_projects_in_switchtender_departments(
     expected = [
         "commune",
         "location",
+        "latitude",
+        "longitude",
         "created_on",
         "id",
         "inactive_since",
@@ -473,6 +475,8 @@ def check_project_content(project, data):
     expected = [
         "commune",
         "location",
+        "latitude",
+        "longitude",
         "created_on",
         "id",
         "inactive_since",
