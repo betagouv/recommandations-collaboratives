@@ -4,10 +4,9 @@ from django.db import migrations, models
 import django.db.models.deletion
 import recoco.apps.projects.models
 
-from recoco.apps.projects.models import Note
-
 
 def assign_note_site_based_on_project_site(apps, schema_editor):
+    Note = apps.get_model("projects", "Note")
     for note in Note.objects.all():
         project_site = note.project.sites.first()
         if project_site:
