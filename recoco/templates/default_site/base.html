@@ -117,7 +117,7 @@
                     {% endblock content %}
                 </div>
                 {% block footer %}
-                    {% if not request.user.is_authenticated or request.resolver_match.url_name == "home" %}
+                    {% if not request.user.is_authenticated %}
                         <div class="row justify-content-center" id="footer">{% include "footer.html" %}</div>
                     {% endif %}
                 {% endblock footer %}
