@@ -188,3 +188,8 @@
     display: block;
   }
 }
+ @media (max-width: 991.98px) {
+  .responsive-header__element-not-mobile {
+    display: none;
+  }
+}

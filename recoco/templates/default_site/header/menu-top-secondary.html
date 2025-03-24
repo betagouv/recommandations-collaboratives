@@ -103,7 +103,7 @@
         {% comment %} surcharge pour ajouter des éléments au menu top à gauche de ressources {% endcomment %}
         {% include "header/menu-top-secondary-left.html" %}
         <!-- Ressources -->
-        <li class="navigation__item-resource"
+        <li class="navigation__item-resource responsive-header__element-not-mobile"
             style="{% if url_name == 'resources-resource-search' %}activated{% endif %}">
             <a href="{% url 'resources-resource-search' %}"
                class="fr-link {% if url_name == 'resources-resource-search' %}active{% endif %}"

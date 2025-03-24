@@ -3,3 +3,28 @@
     display: none;
   }
 }
+
+.fr-modal__header h1 {
+  margin-bottom: 0px;
+}
+
+.fr-menu__list li {
+  list-style: none;
+}
+
+.correct-margin {
+  margin-top: 32px;
+  margin-bottom: 0px;
+}
+
+@media (max-width: 991px) {
+  .fr-modal--opened {
+    display: block;
+    top: -60px;
+  }
+}
+@media (max-width: 768px) {
+  .fr-modal--opened {
+    top: -32px;
+  }
+}
