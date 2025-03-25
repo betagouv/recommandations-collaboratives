@@ -113,7 +113,7 @@ class TaskSerializer(BaseSerializerMixin, OrderedModelSerializer):
     contact_id = serializers.IntegerField(write_only=True, required=False)
 
     resource = ResourceSerializer(read_only=True)
-    resource_id = serializers.IntegerField(write_only=True, required=False)
+    resource_id = serializers.IntegerField(required=False)
 
     created_by = UserSerializer(read_only=True)
     document = DocumentSerializer(read_only=True, many=True)
