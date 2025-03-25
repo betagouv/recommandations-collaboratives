@@ -17,6 +17,8 @@ document.addEventListener('alpine:init', () => {
     index: null,
     scrollY: null,
 
+    notifications: [],
+
     contact: null,
 
     get projectId() {
