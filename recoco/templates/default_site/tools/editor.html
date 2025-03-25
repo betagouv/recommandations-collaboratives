@@ -25,7 +25,7 @@ Parameters:
      {% if initial_content_escapejs %}
      x-data='editor("{{ initial_content|escapejs }}")'
      {% else  %}
-     x-data='editor({{ initial_content }})'
+     x-data='editor("{{ initial_content }}")'
      {% endif %}
      @set-contact="handleSetContact($event.detail)"
      @set-comment.window="setMarkdownContent(event)"
