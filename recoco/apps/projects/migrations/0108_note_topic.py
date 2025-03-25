@@ -6,7 +6,7 @@ import django.db.models.deletion
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("projects", "0105_project_is_diagnostic_done"),
+        ("projects", "0107_note_contact"),
     ]
 
     operations = [
