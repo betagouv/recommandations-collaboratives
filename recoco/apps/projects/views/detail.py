@@ -22,6 +22,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 
 from recoco import verbs
+from recoco.apps.addressbook.models import Contact
 from recoco.apps.hitcount.models import HitCount
 from recoco.apps.invites.forms import InviteForm
 from recoco.apps.projects.views.notes import create_public_note
@@ -294,6 +295,9 @@ def project_conversations(request, project_id=None):
     is_regional_actor or has_perm_or_403(request.user, "view_public_notes", project)
 
     public_note_form = PublicNoteForm()
+    public_note_form.set_contact_queryset(
+        Contact.objects.filter(site_id=request.site.id)
+    )
 
     recipients = get_notification_recipients_for_project(project)
 

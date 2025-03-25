@@ -7,7 +7,7 @@ import recoco.apps.projects.models
 
 def assign_note_site_based_on_project_site(apps, schema_editor):
     Note = apps.get_model("projects", "Note")
-    for note in Note.on_site.all():
+    for note in Note.objects.all():
         project_site = note.project.sites.first()
         if project_site:
             note.site = project_site
@@ -38,5 +38,5 @@ class Migration(migrations.Migration):
             ),
             preserve_default=False,
         ),
-        migrations.RunPython(assign_note_site_based_on_project_site, lambda x, y: None),
+        # migrations.RunPython(assign_note_site_based_on_project_site, lambda x, y: None),
     ]

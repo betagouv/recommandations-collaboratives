@@ -111,17 +111,16 @@
                     {% endfor %}
                 </div>
             {% endif %}
-            <!--             <div class="b-page-divider"></div> -->
             <div class="container-fluid bg-white" id="content">
                 <div class="row background--grey-light">
                     {% block content %}
                     {% endblock content %}
                 </div>
-                {% if not request.user.is_authenticated %}
-                    {% if url_name != "projects-project-detail-recommandations-embed" %}
+                {% block footer %}
+                    {% if not request.user.is_authenticated %}
                         <div class="row justify-content-center" id="footer">{% include "footer.html" %}</div>
                     {% endif %}
-                {% endif %}
+                {% endblock footer %}
             </div>
         </main>
         {% if not debug %}

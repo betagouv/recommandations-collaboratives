@@ -20,6 +20,7 @@ from notifications import notify
 from pytest_django.asserts import assertContains
 
 from recoco import verbs
+from recoco.apps.addressbook.models import Contact
 from recoco.utils import login
 
 from .. import models
@@ -283,6 +284,32 @@ def test_create_conversation_message_with_attachment_for_project_collaborator(
     assert document
     assert document.the_file != ""
     assert document.attached_object == note
+
+
+@pytest.mark.django_db
+def test_create_conversation_message_with_contact(current_site, client, project):
+    contact_on_site = baker.make(Contact, site=current_site)
+    contact_not_on_site = baker.make(Contact)
+
+    url = reverse("projects-conversation-create-message", args=[project.id])
+
+    with login(client, username="collaborator") as user:
+        assign_collaborator(user, project)
+
+        response = client.post(
+            url,
+            data={"content": "content", "contact": contact_not_on_site.pk},
+        )
+        assert response.status_code == 302
+        assert models.Note.on_site.count() == 0
+
+        response = client.post(
+            url,
+            data={"content": "content", "contact": contact_on_site.pk},
+        )
+        note = models.Note.on_site.first()
+        assert note is not None
+        assert note.contact == contact_on_site
 
 
 #

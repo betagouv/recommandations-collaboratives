@@ -17,8 +17,9 @@ from notifications.signals import notify
 from rest_framework.test import APIClient
 
 from recoco import verbs
+from recoco.apps.addressbook.models import Contact
 from recoco.apps.projects import utils
-from recoco.apps.resources import models as resource_models
+from recoco.apps.resources.models import Resource
 from recoco.utils import login
 
 from .. import models
@@ -53,7 +54,7 @@ def test_project_collaborator_can_see_project_tasks_for_site(request, project):
 def test_task_includes_resource_content_bug_fix(request, project):
     user = baker.make(auth_models.User)
     site = get_current_site(request)
-    resource = baker.make(resource_models.Resource, sites=[site])
+    resource = baker.make(Resource, sites=[site])
     baker.make(models.Task, project=project, resource=resource, site=site, public=True)
     utils.assign_observer(user, project, site)
 
@@ -144,58 +145,36 @@ def test_user_cannot_see_project_tasks_when_not_in_relation(request, project):
 
 
 @pytest.mark.django_db
-def test_project_simple_user_cannot_create_project_task(request, project):
+def test_project_simple_user_cannot_create_project_task(api_client, project):
     user = baker.make(auth_models.User)
-
-    client = APIClient()
-    client.force_authenticate(user=user)
+    api_client.force_authenticate(user=user)
     url = reverse("project-tasks-list", args=[project.id])
-    data = {
-        "status": 1,
-        "visited": False,
-        "public": True,
-        "priority": 9,
-        "order": 0,
-        "intent": "the intent",
-        "content": "the content",
-    }
-    response = client.post(url, data=data)
-
+    response = api_client.post(url, data={"order": 0})
     assert response.status_code == 403
 
 
 @pytest.mark.django_db
-def test_project_collaborator_cannot_create_project_task_for_site(request, project):
+def test_project_collaborator_cannot_create_project_task_for_site(api_client, project):
     user = baker.make(auth_models.User)
-
     utils.assign_collaborator(user, project)
-
-    client = APIClient()
-    client.force_authenticate(user=user)
+    api_client.force_authenticate(user=user)
     url = reverse("project-tasks-list", args=[project.id])
-    data = {
-        "status": 1,
-        "visited": False,
-        "public": True,
-        "priority": 9,
-        "order": 0,
-        "intent": "the intent",
-        "content": "the content",
-    }
-    response = client.post(url, data=data)
+    response = api_client.post(url, data={"order": 0})
     assert response.status_code == 403
 
 
 @pytest.mark.django_db
-def test_project_advisor_can_create_project_task_for_site(request, project):
+def test_project_advisor_can_create_project_task_for_site(
+    api_client, current_site, project
+):
     user = baker.make(auth_models.User)
-    site = get_current_site(request)
-
     utils.assign_advisor(user, project)
-
-    client = APIClient()
-    client.force_authenticate(user=user)
+    api_client.force_authenticate(user=user)
     url = reverse("project-tasks-list", args=[project.id])
+
+    contact = baker.make(Contact, site=current_site)
+    resource = baker.make(Resource, sites=[current_site])
+
     data = {
         "status": 1,
         "visited": False,
@@ -204,15 +183,39 @@ def test_project_advisor_can_create_project_task_for_site(request, project):
         "order": 0,
         "intent": "the intent",
         "content": "the content",
+        "contact_id": contact.id,
+        "resource_id": resource.id,
     }
-    response = client.post(url, data=data)
+    response = api_client.post(url, data=data)
     assert response.status_code == 201
 
     created_task = models.Task.objects.filter(project=project).first()
-    assert created_task.site == site
+    assert created_task.site == current_site
     assert created_task.project == project
     assert created_task.created_by == user
     assert created_task.intent == data["intent"]
+    assert created_task.contact == contact
+    assert created_task.resource == resource
+
+
+@pytest.mark.django_db
+def test_cannot_create_project_task_for_site_invalid_contact_or_resource(
+    api_client, project
+):
+    user = baker.make(auth_models.User)
+    utils.assign_advisor(user, project)
+    api_client.force_authenticate(user=user)
+    url = reverse("project-tasks-list", args=[project.id])
+
+    contact = baker.make(Contact)
+    response = api_client.post(url, data={"order": 1, "contact_id": contact.id})
+    assert response.status_code == 400
+    assert "contact_id" in response.data.keys()
+
+    resource = baker.make(Resource)
+    response = api_client.post(url, data={"order": 1, "resource_id": resource.id})
+    assert response.status_code == 400
+    assert "resource_id" in response.data.keys()
 
 
 #

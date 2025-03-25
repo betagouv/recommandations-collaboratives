@@ -18,6 +18,7 @@ from django.utils import timezone
 from django.utils.http import urlencode
 from django.utils.text import slugify
 
+from recoco.apps.addressbook.models import Contact
 from recoco.utils import has_perm, has_perm_or_403
 
 from .. import models, signals
@@ -34,6 +35,9 @@ def create_public_note(request, project_id=None):
 
     if request.method == "POST":
         form = PublicNoteForm(request.POST)
+        form.set_contact_queryset(
+            Contact.objects.filter(site_id=request.site.id),
+        )
 
         if form.is_valid():
             instance = form.save(commit=False)
@@ -87,7 +91,7 @@ def create_public_note(request, project_id=None):
     if request.POST.get("new", None):
         url = reverse("projects-project-detail-conversations-new", args=[project_id])
         return redirect(
-            f"{url}?{urlencode({'topic-slug':slugify(topic_name or 'general'),'topic-name':topic_name})}"
+            f"{url}?{urlencode({'topic-slug': slugify(topic_name or 'general'), 'topic-name': topic_name})}"
         )
 
     return redirect(reverse("projects-project-detail-conversations", args=[project_id]))
