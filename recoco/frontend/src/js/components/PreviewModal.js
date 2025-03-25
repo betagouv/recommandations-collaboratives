@@ -16,6 +16,12 @@ export default function PreviewModal() {
     followupsIsLoading: false,
     contentIsLoading: false,
     showEdition: false,
+
+    comment: {
+      text: '',
+      contact: '',
+    },
+
     get index() {
       return this.$store.previewModal.index;
     },
@@ -54,32 +60,35 @@ export default function PreviewModal() {
         ).length > 0
       );
     },
-    async onSubmitComment(content) {
-      const contactAdded = this.$store.previewModal.contact;
-      this.$store.previewModal.contact = null;
+    async onSubmitComment() {
       this.$store.editor.setIsSubmitted(true);
+
+      // We are not editing a comment atm
       if (!this.currentlyEditing) {
         await this.$store.tasksData.issueFollowup(
           this.currentTask,
           undefined,
-          content,
-          contactAdded??null
+          this.comment.text,
+          this.comment.contact ?? null
         );
+        // Refresh messages
         await this.$store.previewModal.loadFollowups();
         await this.$store.tasksView.updateView();
       } else {
+        // We are editing a comment
         const [type, id] = this.currentlyEditing;
         if (type === 'followup') {
           await this.$store.tasksData.editComment(
             this.currentTask.id,
             id,
-            content
+            this.comment.text
           );
           await this.$store.previewModal.loadFollowups();
           await this.$store.tasksView.updateView();
         } else if (type === 'content') {
+          // We are editing the initial comment (contained in Task model)
           await this.$store.tasksData.patchTask(this.currentTask.id, {
-            content: content,
+            content: this.comment.text,
           });
           await this.$store.tasksView.updateViewWithTask(this.currentTask.id);
         }

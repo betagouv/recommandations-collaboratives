@@ -35,9 +35,8 @@ function SearchContact() {
       this.selectedContact = contact;
     },
     addContact() {
-      let textArea = document.querySelector('.tiptap.ProseMirror');
-      textArea.innerHTML += `@ ${this.selectedContact.first_name} ${this.selectedContact.last_name}`;
-      this.$store.previewModal.contact = this.selectedContact;
+      this.$dispatch('set-contact', this.selectedContact);
+
       this.closeModal();
     },
     closeModal() {

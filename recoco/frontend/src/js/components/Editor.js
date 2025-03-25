@@ -13,7 +13,8 @@ Alpine.data('editor', (content) => {
 
   return {
     updatedAt: Date.now(), // force Alpine to rerender on selection change
-    markdownContent: content ? content : '',
+    contact: null,
+    markdownContent: null,
     init() {
       const _this = this;
 
@@ -56,6 +57,8 @@ Alpine.data('editor', (content) => {
           _this.updatedAt = Date.now();
         },
       });
+
+      this.renderMarkdown();
     },
     isLoaded() {
       return editor;
@@ -102,11 +105,16 @@ Alpine.data('editor', (content) => {
     unsetLink() {
       editor.chain().focus().unsetLink().run();
     },
-    setMarkdownContentFromTaskModal(event) {
+    setMarkdownContent(event) {
       editor.commands.setContent(event.detail);
     },
     renderMarkdown() {
       this.markdownContent = editor.getMarkdown().replaceAll('\\', '');
+    },
+    handleSetContact(contact) {
+      this.contact = { ...contact }; // XXX Copy since it can be destroyed from an inner scope and values result to null
+
+      // FIXME Update UI
     },
   };
 });
