@@ -19,16 +19,17 @@ function CreateContact() {
     isMailOrPhone: false,
     init() {},
     closeCreateContactModal() {
-      this.modalCreateContact = document.querySelector('#create-contact-modal');
-      this.modalCreateContact.classList.toggle('d-none');
+      // this.modalCreateContact = document.querySelector('#create-contact-modal');
+      // this.modalCreateContact.classList.toggle('d-none');
       this.isOrgaSelected = false;
       this.isJobSelected = false;
       this.isMailOrPhone = false;
       this.reOpenModalSearchContact();
     },
     reOpenModalSearchContact() {
-      this.modalSearchContact = document.querySelector('#search-contact-modal');
-      this.modalSearchContact.classList.toggle('d-none');
+      openModal = 'searchContact';
+      // this.modalSearchContact = document.querySelector('#search-contact-modal');
+      // this.modalSearchContact.classList.toggle('d-none');
     },
     createContact() {
       if (this.$store.contact.orgaSelected) {

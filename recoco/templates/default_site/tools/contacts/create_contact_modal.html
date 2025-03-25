@@ -5,8 +5,9 @@
           type="text/css" />
 {% endblock css %}
 <div x-data="CreateContact()"
+     x-show="openModal=='createContact'"
      id="create-contact-modal"
-     class="modal-create-contact d-none z-2"
+     class="modal-create-contact z-2"
      @click.away="isOpenCreateContactModal = false">
     <div class="d-flex justify-content-between border-bottom-666 fr-p-3v modal-create-contact__block">
         <p class="fw-bold color-666 correct-p">ATTACHER UN CONTACT</p>

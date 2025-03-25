@@ -13,7 +13,8 @@ function SearchContact() {
     modalCreateContact: null,
     modalSearchContact: null,
     noSearch: true,
-    init() {},
+    openModal: '',
+    init() {console.log(this.openModal);},
     onSearch() {
       this.delayDisplay = true;
       this.noSearch = false;
@@ -44,24 +45,27 @@ function SearchContact() {
       this.showContactsresults = false;
       this.userInput = '';
       this.noSearch = true;
-      this.modalSearchContact.classList.toggle('d-none');
+      // this.modalSearchContact.classList.toggle('d-none');
     },
     onCancelSelectContact() {
       this.selectedContact = null;
     },
     openModalSearchContact() {
-      this.modalSearchContact = document.querySelector('#search-contact-modal');
-      this.modalSearchContact.classList.toggle('d-none');
+      this.openModal = 'searchContact';
+      console.log(this.openModal);
+      // this.modalSearchContact = document.querySelector('#search-contact-modal');
+      // this.modalSearchContact.classList.toggle('d-none');
     },
     openModalCreateContact() {
-      this.modalCreateContact = document.querySelector('#create-contact-modal');
-      this.modalCreateContact.classList.toggle('d-none');
-      this.closeModalWithData();
+      this.openModal = 'createContact';
+      // this.modalCreateContact = document.querySelector('#create-contact-modal');
+      // this.modalCreateContact.classList.toggle('d-none');
+      // this.closeModalWithData();
     },
-    closeModalWithData() {
-      this.modalSearchContact = document.querySelector('#search-contact-modal');
-      this.modalSearchContact.classList.toggle('d-none');
-    },
+    // closeModalWithData() {
+      // this.modalSearchContact = document.querySelector('#search-contact-modal');
+      // this.modalSearchContact.classList.toggle('d-none');
+    // },
   };
 }
 

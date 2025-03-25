@@ -1,13 +1,13 @@
 {% load static %}
 {% load sass_tags %}
 {% block css %}
-    {% comment %} <link href="{% sass_src 'projects/css/fragments/share/invite.scss' %}" rel="stylesheet" type="text/css" /> {% endcomment %}
     <link href="{% sass_src 'css/tools/contact/search-contact-modal.scss' %}"
           rel="stylesheet"
           type="text/css" />
 {% endblock css %}
-<div class="modal-contact d-none"
+<div class="modal-contact"
      x-init="$watch('$store.contact.createdContact', value => {value?selectedContact = value:selectedContact = null;})"
+     x-show="openModal=='searchContact'"
      id="search-contact-modal"
      @click.away="isOpenModal = false"
      x-transition:enter="ease-out duration-300"
