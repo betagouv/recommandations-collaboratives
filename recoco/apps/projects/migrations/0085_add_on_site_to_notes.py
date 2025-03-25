@@ -33,7 +33,7 @@ class Migration(migrations.Migration):
             field=models.ForeignKey(
                 default=1,
                 on_delete=django.db.models.deletion.CASCADE,
-                related_name="ptroject_notes",
+                related_name="project_notes",
                 to="sites.site",
             ),
             preserve_default=False,

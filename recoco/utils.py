@@ -9,6 +9,7 @@ created: 2021-06-29 09:16:14 CEST
 
 import unicodedata
 from contextlib import contextmanager
+from functools import wraps
 from pathlib import Path
 from typing import AnyStr
 from urllib.parse import urldefrag, urljoin
@@ -20,6 +21,7 @@ from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.db import migrations
 from django.db import models as db_models
 from django.db.models.functions import Cast
+from django.http import HttpResponseBadRequest
 from sesame.utils import get_query_string
 
 from recoco.apps.home.models import SiteConfiguration
@@ -237,6 +239,21 @@ class RunSQLFile(migrations.RunSQL):
 def strip_accents(input: str) -> str:
     normalized = unicodedata.normalize("NFD", input)
     return "".join([char for char in normalized if unicodedata.category(char) != "Mn"])
+
+
+########
+# HTMX #
+########
+
+
+def require_htmx(view_func):
+    @wraps(view_func)
+    def _wrapped_view(request, *args, **kwargs):
+        if not request.htmx:
+            return HttpResponseBadRequest("This view is only accessible via htmx")
+        return view_func(request, *args, **kwargs)
+
+    return _wrapped_view
 
 
 # eof

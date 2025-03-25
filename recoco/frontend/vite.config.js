@@ -71,7 +71,9 @@ const config = {
         projects: resolve('./src/js/store/projects.js'),
         ClickToSeeUser: resolve('./src/js/components/ClickToSeeUser.js'),
         ActionPusher: resolve('./src/js/components/ActionPusher.js'),
+        NotificationEater: resolve('./src/js/components/NotificationEater.js'),
         actionPusher: resolve('./src/js/store/actionPusher.js'),
+        conversationsNew: resolve('./src/js/apps/conversationsNew.js'),
       },
       output: {
         chunkFileNames: undefined,
