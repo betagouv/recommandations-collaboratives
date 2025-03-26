@@ -76,6 +76,14 @@ export default function PreviewModal() {
         // Refresh messages
         await this.$store.previewModal.loadFollowups();
         await this.$store.tasksView.updateView();
+
+        // if the comment is not empty, we reset the contact info to avoid suppress the contact and create a followup with it but nothing showing up on the UI
+        if(this.comment.text != '') {
+          // reset every contact info after submitting
+          this.comment.contact = '';
+          // reset comment text after submitting to avoir adding another contact to re-send the same message
+          this.comment.text = '';
+        }
       } else {
         // We are editing a comment
         const [type, id] = this.currentlyEditing;
@@ -95,7 +103,6 @@ export default function PreviewModal() {
           await this.$store.tasksView.updateViewWithTask(this.currentTask.id);
         }
       }
-
       this.pendingComment = '';
       this.currentlyEditing = null;
       this.$dispatch('set-comment', this.pendingComment);

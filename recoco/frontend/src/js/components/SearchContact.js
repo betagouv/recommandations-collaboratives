@@ -13,8 +13,7 @@ function SearchContact() {
     modalCreateContact: null,
     modalSearchContact: null,
     noSearch: true,
-    openModal: '',
-    init() {console.log(this.openModal);},
+    init() {},
     onSearch() {
       this.delayDisplay = true;
       this.noSearch = false;
@@ -44,27 +43,17 @@ function SearchContact() {
       this.showContactsresults = false;
       this.userInput = '';
       this.noSearch = true;
-      // this.modalSearchContact.classList.toggle('d-none');
+      this.$store.contact.openModal = '';
     },
     onCancelSelectContact() {
       this.selectedContact = null;
     },
     openModalSearchContact() {
-      this.openModal = 'searchContact';
-      console.log(this.openModal);
-      // this.modalSearchContact = document.querySelector('#search-contact-modal');
-      // this.modalSearchContact.classList.toggle('d-none');
+      this.$store.contact.openModal = 'searchContact';
     },
     openModalCreateContact() {
-      this.openModal = 'createContact';
-      // this.modalCreateContact = document.querySelector('#create-contact-modal');
-      // this.modalCreateContact.classList.toggle('d-none');
-      // this.closeModalWithData();
+      this.$store.contact.openModal = 'createContact';
     },
-    // closeModalWithData() {
-      // this.modalSearchContact = document.querySelector('#search-contact-modal');
-      // this.modalSearchContact.classList.toggle('d-none');
-    // },
   };
 }
 

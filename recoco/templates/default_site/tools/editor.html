@@ -28,6 +28,7 @@ Parameters:
      x-data='editor("{{ initial_content }}")'
      {% endif %}
      @set-contact="handleSetContact($event.detail)"
+     @reset-contact="handleResetContact()"
      @set-comment.window="setMarkdownContent(event)"
      x-ref="editor"
      data-test-id="tiptap-editor">
@@ -92,7 +93,14 @@ Parameters:
                         </button>
                     </template>
                     <template x-if="contact">
-                        <span x-text="contact.first_name"></span>
+                        <div class="d-flex">
+                            <div class="border" x-data="{contact:contact}">{% include "tools/contacts/contact_card.html" %}</div>
+                            <button @click="resetContact"
+                                    data-test-id="button-remove-contact"
+                                    class="fr-btn fr-btn--tertiary fr-btn--sm justify-content-center fr-text--sm close-contact-button-style">
+                               <span class="fr-icon-close-line" aria-hidden="true"></span>
+                            </button>
+                        </div>
                     </template>
                     {% include "tools/contacts/search_contact_modal.html" %}
                     {% include "tools/contacts/create_contact_modal.html" %}
@@ -104,7 +112,6 @@ Parameters:
                            x-model="contact"
                            {% endif %}
                            >
-
                 </div>
             {% endif %}
         </div>

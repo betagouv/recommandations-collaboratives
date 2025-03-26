@@ -9,7 +9,7 @@
     <div class="position-relative" @reset-orga.window="resetOrga($event)">
         <div class="fr-search-bar" id="header-search" role="search">
             <input class="fr-input"
-                   :class="{'fr-input--error': isOrgaSelected}"
+                   :class="{'fr-input--error': !isOrgaSelected}"
                    placeholder="ADEME 44"
                    type="search"
                    id="search-organisation-input"
@@ -25,8 +25,7 @@
                     <template x-if="userInput.length > 0 && showOrgAsResults && selectedOrga == null">
                         <template class="fr-menu__item" x-for="(group) in orgaSorted">
                             <div class="fr-menu__item__content"
-                                 data-test-id="orga-to-select"
-                                 @click="onSelectOrga(orga)">
+                                 data-test-id="orga-to-select">
                                 <template x-for="(orga, index) in group" :key="index">
                                     <div>
                                         <template x-if="index == 0">

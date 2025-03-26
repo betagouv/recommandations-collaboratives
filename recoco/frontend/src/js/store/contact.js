@@ -4,8 +4,6 @@ document.addEventListener('alpine:init', () => {
   Alpine.store('contact', {
     orgaSelected: null,
     createdContact: null,
-    // setOrgaSelected(orga) {
-    //   this.orgaSelected = orga;
-    // },
+    openModal: '',
   });
 });

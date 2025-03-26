@@ -113,8 +113,9 @@ Alpine.data('editor', (content) => {
     },
     handleSetContact(contact) {
       this.contact = { ...contact }; // XXX Copy since it can be destroyed from an inner scope and values result to null
-
-      // FIXME Update UI
+    },
+    resetContact() {
+      this.contact = null;
     },
   };
 });

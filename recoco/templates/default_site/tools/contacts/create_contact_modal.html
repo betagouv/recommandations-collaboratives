@@ -5,7 +5,7 @@
           type="text/css" />
 {% endblock css %}
 <div x-data="CreateContact()"
-     x-show="openModal=='createContact'"
+     x-show="$store.contact.openModal=='createContact'"
      id="create-contact-modal"
      class="modal-create-contact z-2"
      @set-organization="handleSetOrganization($event.detail)"
@@ -15,14 +15,15 @@
         <p class="fw-bold color-666 correct-p">ATTACHER UN CONTACT</p>
         <span class="fr-icon-close-line color-666 cursor-pointer"
               aria-hidden="true"
-              @click="closeCreateContactModal"></span>
+              @click="closeModal(false,true)"></span>
     </div>
     <div x-data="SearchOrganisation"
-         class="fr-p-3v modal-create-contact__block">
-        <span class="modal-create-contact__label"
-              :class="{'red-text': !isOrgaSelected}">Organisation</span><span class="color-important">*</span>
+         class="fr-p-3v modal-create-contact__block" :class="{'fr-input-group--error': !isOrgaSelected}">
+        <label class="modal-create-contact__label"
+              for="search-organisation-input"
+              :class="{'color-important': !isOrgaSelected}">Organisation</label><span :class="{'color-important': !isOrgaSelected}">*</span>
         <template x-if="!isOrgaSelected">
-            <p class="modal-create-contact__label-info red-text">
+            <p class="modal-create-contact__label-info color-important">
                 Merci de sélectionner une organisation existante ou d'en créer une nouvelle si besoin.*
             </p>
         </template>
@@ -39,9 +40,9 @@
     <div class="fr-p-3v modal-create-contact__block"
          :class="{'fr-input-group--error': !isJobSelected}">
         <label class="modal-create-contact__label">Poste</label>
-        <span class="color-important">*</span>
+        <span :class="{'color-important': !isJobSelected}">*</span>
         <template x-if="!isJobSelected">
-            <p class="modal-create-contact__label-info red-text">Le champ de votre poste est obligatoire *</p>
+            <p class="modal-create-contact__label-info color-important">Le champ de votre poste est obligatoire *</p>
         </template>
         <input type="text"
                class="fr-input"
@@ -53,7 +54,7 @@
          :class="{'fr-input-group--error': isMailOrPhone}">
         <label class="modal-create-contact__label">Email</label>
         <p class="modal-create-contact__label-info"
-           :class="{'red-text': isMailOrPhone}">Merci de renseigner A MINIMA l'email OU un numéro de téléphone</p>
+           :class="{'color-important': isMailOrPhone}">Merci de renseigner A MINIMA l'email OU un numéro de téléphone</p>
         <input type="text"
                class="fr-input"
                :class="{'fr-input--error': isMailOrPhone}"
@@ -63,7 +64,7 @@
          :class="{'fr-input-group--error': isMailOrPhone}">
         <label class="modal-create-contact__label">Téléphone Principal</label>
         <p class="modal-create-contact__label-info"
-           :class="{'red-text': isMailOrPhone}">Merci de renseigner A MINIMA l'email OU un numéro de téléphone</p>
+           :class="{'color-important': isMailOrPhone}">Merci de renseigner A MINIMA l'email OU un numéro de téléphone</p>
         <input type="text"
                class="fr-input"
                :class="{'fr-input--error': isMailOrPhone}"
@@ -75,7 +76,7 @@
     </div>
     <div class="fr-p-3v modal-create-contact__block d-flex">
         <button class="fr-btn fr-btn--secondary fr-mr-3v w-100 justify-content-center"
-                @click="closeCreateContactModal()">Annuler</button>
+                @click="closeModal(false,true)">Annuler</button>
         <button class="fr-btn w-100 justify-content-center" @click="createContact">Créer le contact</button>
     </div>
     </form>

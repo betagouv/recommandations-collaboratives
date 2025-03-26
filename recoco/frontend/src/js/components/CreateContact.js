@@ -14,30 +14,30 @@ function CreateContact() {
       phone_no: '',
       mobile_no: '',
     },
-    isOrgaSelected: false,
-    isJobSelected: false,
+    isOrgaSelected: true,
+    isJobSelected: true,
     isMailOrPhone: false,
     init() {},
-    closeModal(clearForm = false) {
-      // this.modalCreateContact = document.querySelector('#create-contact-modal');
-      // this.modalCreateContact.classList.toggle('d-none');
-      this.isOrgaSelected = false;
-      this.isJobSelected = false;
+    closeModal(clearForm = false, reOpenSearchContact = false) {
+      this.isOrgaSelected = true;
+      this.isJobSelected = true;
       this.isMailOrPhone = false;
 
       if (clearForm) {
         this.resetFormValue();
       }
-
-      this.reOpenModalSearchContact();
+      if (reOpenSearchContact) {
+        this.reOpenModalSearchContact();
+      }
+      else {
+        this.$store.contact.openModal = '';
+      }
     },
     reOpenModalSearchContact() {
-      openModal = 'searchContact';
-      // this.modalSearchContact = document.querySelector('#search-contact-modal');
-      // this.modalSearchContact.classList.toggle('d-none');
+      this.$store.contact.openModal = 'searchContact';
     },
     createContact() {
-      this.isOrgaSelected = this.contact.organization != null;
+      this.isOrgaSelected = this.contact.organization == null;
 
       this.isJobSelected = Boolean(this.contact.division);
 
@@ -54,10 +54,10 @@ function CreateContact() {
         };
 
         api.post(contactsUrl(), payload).then((response) => {
-          this.$dispatch('set-contact', this.contact);
+          this.$dispatch('set-contact', response.data);
           this.$dispatch('reset-orga', null); // FIXME
 
-          this.closeModal((clearForm = true));
+          this.closeModal(true);
         });
       }
     },
