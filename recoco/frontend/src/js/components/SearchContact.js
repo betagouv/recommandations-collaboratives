@@ -8,47 +8,52 @@ function SearchContact() {
     isOpenModal: false,
     userInput: '',
     showContactsresults: false,
-    isAContactSelected: false,
     selectedContact: null,
     delayDisplay: false,
-    init() {
-    },
+    modalCreateContact: null,
+    modalSearchContact: null,
+    noSearch: true,
+    init() {},
     onSearch() {
       this.delayDisplay = true;
-      if (this.userInput.length > 0 && !this.isAContactSelected) {
+      this.noSearch = false;
+      this.selectedContact = null;
+      if (this.userInput.length > 0 && this.selectedContact === null) {
         this.contactsFound = [];
         api.get(searchContactsUrl(this.userInput)).then((response) => {
           this.searchResults = response.data;
           this.contactsFound = this.searchResults.results;
-            if(this.contactsFound.length > 0) {
-              this.showContactsresults = true;
-            }
-            else {
-              this.showContactsresults = false;
-            }
-          });
+          this.showContactsresults = this.contactsFound.length > 0;
+        });
+      } else if (this.userInput.length === 0) {
+        this.noSearch = true;
       }
     },
     onSelect(contact) {
+      this.noSearch = false;
       this.selectedContact = contact;
-      this.isAContactSelected = true;
     },
     addContact() {
-      let textArea = document.querySelector('.tiptap.ProseMirror');
-      textArea.innerHTML += `@ ${this.selectedContact.first_name} ${this.selectedContact.last_name}`;
-      this.$store.previewModal.contact = this.selectedContact;
+      this.$dispatch('set-contact', this.selectedContact);
+
       this.closeModal();
     },
     closeModal() {
-      this.isAContactSelected = false;
-      this.showContactsresults = false
+      this.selectedContact = null;
+      this.showContactsresults = false;
       this.userInput = '';
-      this.isOpenModal = false;
+      this.noSearch = true;
+      this.$store.contact.openModal = '';
     },
-    onCancelSelectContact(){
-      this.isAContactSelected=false;
-       this.selectedContact = null;
-    }
+    onCancelSelectContact() {
+      this.selectedContact = null;
+    },
+    openModalSearchContact() {
+      this.$store.contact.openModal = 'searchContact';
+    },
+    openModalCreateContact() {
+      this.$store.contact.openModal = 'createContact';
+    },
   };
 }
 

@@ -16,6 +16,12 @@ export default function PreviewModal() {
     followupsIsLoading: false,
     contentIsLoading: false,
     showEdition: false,
+
+    comment: {
+      text: '',
+      contact: '',
+    },
+
     get index() {
       return this.$store.previewModal.index;
     },
@@ -56,37 +62,47 @@ export default function PreviewModal() {
         ).length > 0
       );
     },
-    async onSubmitComment(content) {
-      const contactAdded = this.$store.previewModal.contact;
-      this.$store.previewModal.contact = null;
+    async onSubmitComment() {
       this.$store.editor.setIsSubmitted(true);
+
+      // We are not editing a comment atm
       if (!this.currentlyEditing) {
         await this.$store.tasksData.issueFollowup(
           this.currentTask,
           undefined,
-          content,
-          contactAdded ?? null
+          this.comment.text,
+          this.comment.contact ?? null
         );
+        // Refresh messages
         await this.$store.previewModal.loadFollowups();
         await this.$store.tasksView.updateView();
+
+        // if the comment is not empty, we reset the contact info to avoid suppress the contact and create a followup with it but nothing showing up on the UI
+        if(this.comment.text != '') {
+          // reset every contact info after submitting
+          this.comment.contact = '';
+          // reset comment text after submitting to avoir adding another contact to re-send the same message
+          this.comment.text = '';
+        }
       } else {
+        // We are editing a comment
         const [type, id] = this.currentlyEditing;
         if (type === 'followup') {
           await this.$store.tasksData.editComment(
             this.currentTask.id,
             id,
-            content
+            this.comment.text
           );
           await this.$store.previewModal.loadFollowups();
           await this.$store.tasksView.updateView();
         } else if (type === 'content') {
+          // We are editing the initial comment (contained in Task model)
           await this.$store.tasksData.patchTask(this.currentTask.id, {
-            content: content,
+            content: this.comment.text,
           });
           await this.$store.tasksView.updateViewWithTask(this.currentTask.id);
         }
       }
-
       this.pendingComment = '';
       this.currentlyEditing = null;
       this.$dispatch('set-comment', this.pendingComment);
