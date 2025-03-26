@@ -54,6 +54,8 @@ export default function PreviewModal() {
       return `${this.index + 1} sur ${this.newTasks.length} nouvelle${this.newTasks.length > 0 ? 's' : ''} recommandation${this.newTasks.length > 0 ? 's' : ''}`;
     },
     hasNotification(followupId) {
+      if (this.notifications) return false;
+
       return (
         this.notifications.filter(
           (n) => n.action_object.who && n.action_object.id === followupId

@@ -55,11 +55,11 @@
                         <div class="d-flex flex-grow-1 align-items-stretch w-65 task-modal-content"
                              :class="!contentIsLoading && 'visible'"
                              x-effect="taskId && loadContent()">
-                            <template x-if="currentTask && taskId && currentTask?.resource_id">
+                            <template x-if="taskId && currentTask.resource_id">
                                 <iframe class="w-100 d-flex flex-column rounded"
-                                        :src="resourcePreviewUrl(currentTask?.resource_id, taskId)"></iframe>
+                                        :src="resourcePreviewUrl(currentTask.resource_id, taskId)"></iframe>
                             </template>
-                            <template x-if="currentTask && taskId && !currentTask?.resource_id">
+                            <template x-if="taskId && !currentTask.resource_id">
                                 <div class="w-100 text-break fr-p-2w specific-maxheight-90vh scroll-gestion">
                                     <div class="resource-details">
                                         <h1 x-text="currentTask?.intent" class="fr-mb-2w"></h1>

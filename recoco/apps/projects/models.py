@@ -29,6 +29,7 @@ from notifications.models import Notification
 from taggit.managers import TaggableManager
 from watson import search as watson
 
+from recoco.apps.addressbook.models import Contact
 from recoco.apps.geomatics import models as geomatics_models
 from recoco.utils import (
     CastedGenericRelation,
@@ -750,6 +751,10 @@ class Note(models.Model):
     )
     tags = models.CharField(max_length=256, blank=True, default="")
 
+    topic = models.ForeignKey(
+        Topic, related_name="notes", on_delete=models.SET_NULL, blank=True, null=True
+    )
+
     notifications_as_action = CastedGenericRelation(
         notifications_models.Notification,
         related_query_name="action_notes",
@@ -758,6 +763,10 @@ class Note(models.Model):
     )
 
     document = GenericRelation("Document")
+
+    contact = models.ForeignKey(
+        Contact, on_delete=models.SET_NULL, null=True, blank=True
+    )
 
     def get_absolute_url(self):
         if self.public:
