@@ -31,7 +31,10 @@
 
                         {% if action == "remove" %}
 
-                            <p>Etes-vous sûr de vouloir supprimer le tag "{{ tag.name }}" ?</p>
+                            <p>Etes-vous sûr de vouloir supprimer le tag <strong>"{{ tag.name }}"</strong> ?
+                            <br><span class="fr-icon-warning-line" aria-hidden="true"></span>
+                            Le tag sera retiré de {{ impacted_count }} projets, ainsi que de la liste des tags proposés.
+                            </p>
 
                             <form method="POST" id="form-remove-{{ tag.name }}"
                                 hx-post="{% url 'crm-site-configuration-tags' %}"
@@ -48,7 +51,10 @@
 
                         {% elif action == "rename" %}
 
-                            <p>Entrez le nouveau nom du tag "{{ tag.name }}" :</p>
+                            <p>Entrez le nouveau nom du tag <strong>"{{ tag.name }}"</strong>.
+                            <br><span class="fr-icon-warning-line" aria-hidden="true"></span>
+                            Le nom du tag sera modifié sur {{ impacted_count }} projets, ainsi que dans la liste des tags proposés.
+                            </p>
 
                             <form method="POST" id="form-rename-{{ tag.name }}"
                                 hx-post="{% url 'crm-site-configuration-tags' %}"
