@@ -1,7 +1,7 @@
 <div id="tags-table" class="fr-px-3w fr-pt-3w fr-mb-2w" hx-boost="true">
     {% for tag in tags %}
-        {% include "crm/siteconfiguration_tags_modal.html" with action="remove" tag_name=tag.name %}
-        {% include "crm/siteconfiguration_tags_modal.html" with action="rename" tag_name=tag.name %}
+        {% include "crm/siteconfiguration_tags_modal.html" with action="remove" tag_name=tag.name impacted_count=tag.impacted_count %}
+        {% include "crm/siteconfiguration_tags_modal.html" with action="rename" tag_name=tag.name impacted_count=tag.impacted_count %}
 
         <div class="fr-ml-6w align-middle" role="group">
             <div class="fr-container">
