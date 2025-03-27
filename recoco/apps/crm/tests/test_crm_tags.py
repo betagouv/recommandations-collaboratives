@@ -2,6 +2,7 @@ import pytest
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.urls import reverse
+from django.utils import timezone
 from guardian.shortcuts import assign_perm
 from model_bakery import baker
 
@@ -43,9 +44,23 @@ class TestViewSiteConfigurationTags:
     def test_view_perms(self, client, current_site_with_config):
         user = baker.make(User)
         client.force_login(user)
-
         response = client.get(self.url)
         assert response.status_code == 403
+
+    def test_get_context(self, client, current_site_with_config):
+        user = baker.make(User)
+        client.force_login(user)
+
+        # Create 3 projects with tag_one, with one of them marked as deleted
+        for _ in range(3):
+            project = baker.make(Project, sites=[current_site_with_config])
+            project_annotations = baker.make(
+                ProjectAnnotations, project=project, site=current_site_with_config
+            )
+            project_annotations.tags.add("tag_one")
+        project = Project.objects.filter(sites=current_site_with_config).first()
+        project.deleted = timezone.now()
+        project.save()
 
         assign_perm("manage_configuration", user, current_site_with_config)
 
@@ -54,6 +69,10 @@ class TestViewSiteConfigurationTags:
         assert [tag.name for tag in response.context["tags"]] == [
             "tag_one",
             "tag_two",
+        ]
+        assert [tag.impacted_count for tag in response.context["tags"]] == [
+            2,
+            0,
         ]
         assert list(
             current_site_with_config.configuration.crm_available_tags.names()

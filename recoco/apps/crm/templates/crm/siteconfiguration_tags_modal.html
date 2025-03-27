@@ -32,8 +32,10 @@
                         {% if action == "remove" %}
 
                             <p>Etes-vous sûr de vouloir supprimer le tag <strong>"{{ tag.name }}"</strong> ?
+                            {% if impacted_count > 0 %}
                             <br><span class="fr-icon-warning-line" aria-hidden="true"></span>
                             Le tag sera retiré de {{ impacted_count }} projets, ainsi que de la liste des tags proposés.
+                            {% endif %}
                             </p>
 
                             <form method="POST" id="form-remove-{{ tag.name }}"
@@ -52,8 +54,10 @@
                         {% elif action == "rename" %}
 
                             <p>Entrez le nouveau nom du tag <strong>"{{ tag.name }}"</strong>.
+                            {% if impacted_count > 0 %}
                             <br><span class="fr-icon-warning-line" aria-hidden="true"></span>
                             Le nom du tag sera modifié sur {{ impacted_count }} projets, ainsi que dans la liste des tags proposés.
+                            {% endif %}
                             </p>
 
                             <form method="POST" id="form-rename-{{ tag.name }}"
