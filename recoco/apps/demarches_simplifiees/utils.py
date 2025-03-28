@@ -87,4 +87,9 @@ project_mapping_fields: list[MappingField] = [
         label="Code INSEE de la commune",
         lookup="commune.postal_and_insee_codes",
     ),
+    MappingField(
+        id="project.location",
+        label="Localisation",
+        lookup="location",
+    ),
 ]
