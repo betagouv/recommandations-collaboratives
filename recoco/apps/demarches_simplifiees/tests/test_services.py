@@ -92,6 +92,7 @@ class TestMakeDSDataFromProject:
                 "champ_Q2hhbXAtMjk0NTM2Mg": "project.owner.dummy",
                 "champ_Q2hhbXAtMzI5MzU1Mw": "edl.avez-vous-deja-identifie-des-subventions",
                 "Q2hhbXAtMzI5MzU1NA": "edl.dummy-question-slug",
+                "champ_Q2hhbXAtMzgwNTc2MA": "raw[Oui]",
             },
         )
 
@@ -103,4 +104,5 @@ class TestMakeDSDataFromProject:
             "champ_Q2hhbXAtMzYwNjk5NQ": "anakin.skywalker@test.com",
             "champ_Q2hhbXAtODgwNDAy": "Jedi",
             "champ_Q2hhbXAtMzI5MzU1Mw": "Non pas encore",
+            "champ_Q2hhbXAtMzgwNTc2MA": "Oui",
         }, print(data)

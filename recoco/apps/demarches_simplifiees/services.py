@@ -41,6 +41,10 @@ def make_ds_data_from_project(
     session = _get_session(site=site, project=project)
 
     for ds_field_id, recoco_field_id in ds_mapping.mapping.items():
+        if recoco_field_id.startswith("raw["):
+            data[ds_field_id] = recoco_field_id[4:-1]
+            continue
+
         recoco_field = ds_mapping.indexed_recoco_fields.get(recoco_field_id)
         if recoco_field is None:
             continue
@@ -53,6 +57,7 @@ def make_ds_data_from_project(
         if recoco_field_id.startswith("edl.") and session:
             if res := resolve_edl_lookup(session, recoco_field.lookup):
                 data[ds_field_id] = res
+            continue
 
     return data
 
