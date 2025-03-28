@@ -1,3 +1,5 @@
+import logging
+import re
 from typing import Any
 
 from django.contrib.sites.models import Site
@@ -8,6 +10,8 @@ from recoco.apps.resources.models import Resource
 from recoco.apps.survey.models import Answer, Session
 
 from .models import DSMapping, DSResource
+
+logger = logging.getLogger(__name__)
 
 
 def find_ds_resource_for_project(
@@ -41,6 +45,31 @@ def make_ds_data_from_project(
     session = _get_session(site=site, project=project)
 
     for ds_field_id, recoco_field_id in ds_mapping.mapping.items():
+        if recoco_field_id.startswith("raw["):
+            data[ds_field_id] = recoco_field_id[4:-1]
+            continue
+
+        if recoco_field_id.startswith("eval["):
+            expression = recoco_field_id[5:-1]
+
+            for var in re.findall(r"\$\((.*?)\)", expression):
+                recoco_field = ds_mapping.indexed_recoco_fields.get(var)
+                if recoco_field is None:
+                    continue
+
+                if var.startswith("project."):
+                    if res := resolve_project_lookup(project, recoco_field.lookup):
+                        expression = expression.replace(f"$({var})", str(res))
+
+                elif var.startswith("edl.") and session:
+                    if res := resolve_edl_lookup(session, recoco_field.lookup):
+                        expression = expression.replace(f"$({var})", str(res))
+
+            try:
+                data[ds_field_id] = eval(expression)  # noqa: S307
+            except Exception:
+                logger.error(f"DS mapping: unable to evaluate expression: {expression}")
+
         recoco_field = ds_mapping.indexed_recoco_fields.get(recoco_field_id)
         if recoco_field is None:
             continue
@@ -53,6 +82,7 @@ def make_ds_data_from_project(
         if recoco_field_id.startswith("edl.") and session:
             if res := resolve_edl_lookup(session, recoco_field.lookup):
                 data[ds_field_id] = res
+            continue
 
     return data
 
@@ -78,7 +108,12 @@ def resolve_project_lookup(project: Project, lookup: str) -> Any | None:
 
 
 def resolve_edl_lookup(session: Session, lookup: str) -> Any | None:
+    _take_comment = False
+    if lookup.endswith(".comment"):
+        lookup = lookup[:-8]
+        _take_comment = True
+
     if answer := Answer.objects.filter(
         session_id=session.id, question__slug=lookup
     ).first():
-        return answer.formatted_value
+        return answer.comment if _take_comment else answer.formatted_value

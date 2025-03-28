@@ -23,6 +23,11 @@ project_mapping_fields: list[MappingField] = [
         lookup="name",
     ),
     MappingField(
+        id="project.description",
+        label="Description du projet",
+        lookup="description",
+    ),
+    MappingField(
         id="project.owner_first_name",
         label="Prénom du porteur du projet",
         lookup="owner.first_name",
@@ -76,5 +81,15 @@ project_mapping_fields: list[MappingField] = [
         id="project.region_code",
         label="Code de la région",
         lookup="commune.department.region.code",
+    ),
+    MappingField(
+        id="project.postal_and_insee_codes",
+        label="Code INSEE de la commune",
+        lookup="commune.postal_and_insee_codes",
+    ),
+    MappingField(
+        id="project.location",
+        label="Localisation",
+        lookup="location",
     ),
 ]
