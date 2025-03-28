@@ -113,6 +113,7 @@ class TestMakeDSDataFromProject:
                 "champ_Q2hhbXAtMzgwNTc2MA": "raw[Non]",
                 "champ_Q2hhbXAtMjk4Nzc5MA": "edl.est-ce-que-le-site-est-actuellement-utilise",
                 "champ_Q2hhbXAtMjk4Nzc5NA": "eval['OK' if '$(edl.est-ce-que-le-site-est-actuellement-utilise)' == 'Oui' else 'NOK']",
+                "champ_Q2hhbXAtMzAyMDUwMA": "edl.est-ce-que-le-site-est-actuellement-utilise.comment",
             },
         )
 
@@ -127,4 +128,5 @@ class TestMakeDSDataFromProject:
             "champ_Q2hhbXAtMzgwNTc2MA": "Non",
             "champ_Q2hhbXAtMjk4Nzc5MA": "Oui",
             "champ_Q2hhbXAtMjk4Nzc5NA": "OK",
+            "champ_Q2hhbXAtMzAyMDUwMA": "extra comment",
         }, print(data)

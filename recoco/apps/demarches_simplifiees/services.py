@@ -108,7 +108,12 @@ def resolve_project_lookup(project: Project, lookup: str) -> Any | None:
 
 
 def resolve_edl_lookup(session: Session, lookup: str) -> Any | None:
+    _take_comment = False
+    if lookup.endswith(".comment"):
+        lookup = lookup[:-8]
+        _take_comment = True
+
     if answer := Answer.objects.filter(
         session_id=session.id, question__slug=lookup
     ).first():
-        return answer.formatted_value
+        return answer.comment if _take_comment else answer.formatted_value
