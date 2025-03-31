@@ -142,7 +142,7 @@ def test_project_list_available_for_switchtender_user(request, client):
     with login(client, groups=["example_com_advisor"]):
         response = client.get(url, follow=True)
 
-    advisor_url = reverse("projects-project-list-advisor")
+    advisor_url = reverse("projects-project-list-staff")
     url, code = response.redirect_chain[-1]
     assert code == 302
     assert url == advisor_url
