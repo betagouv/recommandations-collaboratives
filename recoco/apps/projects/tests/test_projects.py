@@ -139,7 +139,7 @@ def test_project_list_not_available_for_non_staff_users(client):
 def test_project_list_available_for_switchtender_user(request, client):
     get_current_site(request)
     url = reverse("projects-project-list")
-    with login(client, groups=["example_com_advisor"]):
+    with login(client, groups=["example_com_staff", "example_com_advisor"]):
         response = client.get(url, follow=True)
 
     advisor_url = reverse("projects-project-list-staff")
