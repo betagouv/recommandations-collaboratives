@@ -43,16 +43,19 @@ function SearchContact() {
       this.showContactsresults = false;
       this.userInput = '';
       this.noSearch = true;
-      this.$store.contact.openModal = '';
+      this.modalSearchContact.classList.toggle('d-none');
     },
     onCancelSelectContact() {
       this.selectedContact = null;
     },
     openModalSearchContact() {
-      this.$store.contact.openModal = 'searchContact';
+      this.modalSearchContact = document.querySelector('#search-contact-modal');
+      this.modalSearchContact.classList.toggle('d-none');
     },
     openModalCreateContact() {
-      this.$store.contact.openModal = 'createContact';
+      this.modalCreateContact = document.querySelector('#create-contact-modal');
+      this.modalCreateContact.classList.toggle('d-none');
+      this.closeModal();
     },
   };
 }

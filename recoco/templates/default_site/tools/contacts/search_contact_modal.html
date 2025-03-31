@@ -5,9 +5,8 @@
           rel="stylesheet"
           type="text/css" />
 {% endblock css %}
-<div class="modal-contact"
+<div class="modal-contact d-none"
      x-init="$watch('$store.contact.createdContact', value => {value?selectedContact = value:selectedContact = null;})"
-     x-show="$store.contact.openModal=='searchContact'"
      id="search-contact-modal"
      @click.away="isOpenModal = false"
      x-transition:enter="ease-out duration-300"

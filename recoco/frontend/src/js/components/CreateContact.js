@@ -19,6 +19,8 @@ function CreateContact() {
     isMailOrPhone: false,
     init() {},
     closeModal(clearForm = false, reOpenSearchContact = false) {
+      this.modalCreateContact = document.querySelector('#create-contact-modal');
+      this.modalCreateContact.classList.toggle('d-none');
       this.isOrgaSelected = true;
       this.isJobSelected = true;
       this.isMailOrPhone = false;
@@ -29,12 +31,14 @@ function CreateContact() {
       if (reOpenSearchContact) {
         this.reOpenModalSearchContact();
       }
-      else {
-        this.$store.contact.openModal = '';
-      }
+      // else {
+      //   this.$store.contact.openModal = '';
+      // }
     },
     reOpenModalSearchContact() {
-      this.$store.contact.openModal = 'searchContact';
+      this.modalSearchContact = document.querySelector('#search-contact-modal');
+      this.modalSearchContact.classList.toggle('d-none');
+      // this.$store.contact.openModal = 'searchContact';
     },
     createContact() {
       this.isOrgaSelected = this.contact.organization == null;

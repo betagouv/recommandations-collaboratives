@@ -5,9 +5,8 @@
           type="text/css" />
 {% endblock css %}
 <div x-data="CreateContact()"
-     x-show="$store.contact.openModal=='createContact'"
      id="create-contact-modal"
-     class="modal-create-contact z-2"
+     class="modal-create-contact z-2 d-none"
      @set-organization="handleSetOrganization($event.detail)"
      @click.away="isOpenCreateContactModal = false">
     <form @submit.prevent>
