@@ -103,7 +103,8 @@ document.addEventListener('alpine:init', () => {
 
       if (body.status === task.status && body.comment === '') return;
 
-      await api.post(followupsUrl(this.projectId, task.id), body);
+
+      return await api.post(followupsUrl(this.projectId, task.id), body);
     },
     async editComment(taskId, followupId, comment) {
       await api.patch(followupUrl(this.projectId, taskId, followupId), {

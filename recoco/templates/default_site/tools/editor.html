@@ -86,7 +86,7 @@ Parameters:
             {% if can_attach_contact %}
                 <div x-cloak x-data='SearchContact()'>
                     <template x-if="!contact">
-                        <button @click="openModalSearchContact"
+                        <button @click.prevent="openModalSearchContact"
                                 data-test-id="button-add-contact"
                                 class="fr-btn fr-btn--tertiary fr-btn--sm justify-content-center fr-text--sm">
                             Ajouter un contact
@@ -95,7 +95,7 @@ Parameters:
                     <template x-if="contact">
                         <div class="d-flex">
                             <div class="border" x-data="{contact:contact}">{% include "tools/contacts/contact_card.html" %}</div>
-                            <button @click="resetContact"
+                            <button @click.prevent="resetContact"
                                     data-test-id="button-remove-contact"
                                     class="fr-btn fr-btn--tertiary fr-btn--sm justify-content-center fr-text--sm close-contact-button-style">
                                <span class="fr-icon-close-line" aria-hidden="true"></span>

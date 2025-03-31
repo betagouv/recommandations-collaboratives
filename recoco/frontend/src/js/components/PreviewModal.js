@@ -67,23 +67,23 @@ export default function PreviewModal() {
 
       // We are not editing a comment atm
       if (!this.currentlyEditing) {
-        await this.$store.tasksData.issueFollowup(
+         await this.$store.tasksData.issueFollowup(
           this.currentTask,
           undefined,
           this.comment.text,
           this.comment.contact ?? null
-        );
-        // Refresh messages
-        await this.$store.previewModal.loadFollowups();
-        await this.$store.tasksView.updateView();
-
-        // if the comment is not empty, we reset the contact info to avoid suppress the contact and create a followup with it but nothing showing up on the UI
-        if(this.comment.text != '') {
+        ).then(async() => {
+           // Refresh messages
+          await this.$store.previewModal.loadFollowups();
+          await this.$store.tasksView.updateView();
           // reset every contact info after submitting
           this.comment.contact = '';
-          // reset comment text after submitting to avoir adding another contact to re-send the same message
           this.comment.text = '';
-        }
+
+        }).catch((error) => {
+          console.error('Error while creating followup', error);
+        });
+
       } else {
         // We are editing a comment
         const [type, id] = this.currentlyEditing;
