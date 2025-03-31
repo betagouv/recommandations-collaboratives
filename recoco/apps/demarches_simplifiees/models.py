@@ -169,14 +169,18 @@ class DSMapping(TimeStampedModel):
                         survey_id=survey.id
                     ).values("id")
                 ):
-                    fields.append(
+                    fields += [
                         MappingField(
                             id=f"edl.{question.slug}",
                             label=question.text_short,
                             lookup=question.slug,
                         ),
-                    )
-
+                        MappingField(
+                            id=f"edl.{question.slug}.comment",
+                            label=question.text_short,
+                            lookup=f"{question.slug}.comment",
+                        ),
+                    ]
         return fields
 
     @cached_property
