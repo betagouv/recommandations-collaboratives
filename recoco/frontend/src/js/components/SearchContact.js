@@ -1,6 +1,7 @@
 import Alpine from 'alpinejs';
 import api, { searchContactsUrl } from '../utils/api';
 
+// TODO Modal controller search contact
 function SearchContact() {
   return {
     searchResults: [],
@@ -35,27 +36,15 @@ function SearchContact() {
     },
     addContact() {
       this.$dispatch('set-contact', this.selectedContact);
-
-      this.closeModal();
-    },
-    closeModal() {
-      this.selectedContact = null;
-      this.showContactsresults = false;
-      this.userInput = '';
-      this.noSearch = true;
-      this.modalSearchContact.classList.toggle('d-none');
     },
     onCancelSelectContact() {
       this.selectedContact = null;
     },
-    openModalSearchContact() {
-      this.modalSearchContact = document.querySelector('#search-contact-modal');
-      this.modalSearchContact.classList.toggle('d-none');
-    },
     openModalCreateContact() {
-      this.modalCreateContact = document.querySelector('#create-contact-modal');
+      this.modalCreateContact = this.$refs.createContactModal;
       this.modalCreateContact.classList.toggle('d-none');
-      this.closeModal();
+      // TODO hide search contact modal
+      // this.closeModal();
     },
   };
 }

@@ -11,22 +11,17 @@ Parameters:
 - tools_disabled (list of tool names: <title>)
 
 {% endcomment %}
-
 {% load static %}
 {% load sass_tags %}
-
 {% block css %}
     <link href="{% sass_src 'css/tools/editor.scss' %}"
           rel="stylesheet"
           type="text/css">
 {% endblock css %}
-
+{% comment %} TODO refacto lot 2 @reset-contact{% endcomment %}
+{% comment %} TODO @reset-contact{% endcomment %}
 <div class="w-100"
-     {% if initial_content_escapejs %}
-     x-data='editor("{{ initial_content|escapejs }}")'
-     {% else  %}
-     x-data='editor("{{ initial_content }}")'
-     {% endif %}
+     {% if initial_content_escapejs %} x-data='editor("{{ initial_content|escapejs }}")' {% else %} x-data='editor("{{ initial_content }}")' {% endif %}
      @set-contact="handleSetContact($event.detail)"
      @reset-contact="handleResetContact()"
      @set-comment.window="setMarkdownContent(event)"
@@ -34,11 +29,11 @@ Parameters:
      data-test-id="tiptap-editor">
     <template x-if="isLoaded()">
         <div class="tiptap-menu">
-            {% if not "title" in tools_disabled  %}
-            <button @click.stop.prevent="toggleHeading({ level: 3 })"
-                    :class="{ 'is-active': isActive('heading', { level: 3 }, updatedAt) }">
-                <span class="specific-fontweight-500">Titre</span>
-            </button>
+            {% if not "title" in tools_disabled %}
+                <button @click.stop.prevent="toggleHeading({ level: 3 })"
+                        :class="{ 'is-active': isActive('heading', { level: 3 }, updatedAt) }">
+                    <span class="specific-fontweight-500">Titre</span>
+                </button>
             {% endif %}
             <button @click.stop.prevent="toggleBold()"
                     :class="{ 'is-active' : isActive('bold', updatedAt) }">
@@ -79,10 +74,7 @@ Parameters:
              x-ref="element"
              @click.stop
              id="comment-text-ref"></div>
-
-        <div x-cloak
-             class="d-flex justify-content-between">
-
+        <div x-cloak class="d-flex justify-content-between">
             {% if can_attach_contact %}
                 <div x-cloak x-data='SearchContact()'>
                     <template x-if="!contact">
@@ -95,42 +87,25 @@ Parameters:
                     <template x-if="contact">
                         <div class="d-flex">
                             <div class="border" x-data="{contact:contact}">{% include "tools/contacts/contact_card.html" %}</div>
-                            <button @click.prevent="resetContact"
+                            <button @click.prevent="handleResetContact"
                                     data-test-id="button-remove-contact"
                                     class="fr-btn fr-btn--tertiary fr-btn--sm justify-content-center fr-text--sm close-contact-button-style">
-                               <span class="fr-icon-close-line" aria-hidden="true"></span>
+                                <span class="fr-icon-close-line" aria-hidden="true"></span>
                             </button>
                         </div>
                     </template>
                     {% include "tools/contacts/search_contact_modal.html" %}
-                    {% include "tools/contacts/create_contact_modal.html" %}
                     <input type="hidden"
-                           {% if model %}
-                           x-model="{{ model }}.contact"
-                           x-modelable="contact"
-                           {% else %}
-                           x-model="contact"
-                           {% endif %}
-                           >
+                           {% if model %} x-model="{{ model }}.contact" x-modelable="contact" {% else %} x-model="contact" {% endif %}>
                 </div>
             {% endif %}
         </div>
-
         {% if errors %}
             {% for error in errors %}<div class="text-danger text-start fr-mb-2v">{{ error }}</div>{% endfor %}
         {% endif %}
-
         <textarea class="position-absolute top-0 opacity-0 specific-height-0"
-                  {% if model %}
-                  x-model="{{ model }}.text"
-                  x-modelable="markdownContent"
-                  {% else %}
-                  x-model="markdownContent"
-                  {% endif  %}
-
+                  {% if model %} x-model="{{ model }}.text" x-modelable="markdownContent" {% else %} x-model="markdownContent" {% endif  %}
                   name="{{input_name|default:"content"}}"
-                  {% if input_required %} required {% endif %}>
-        </textarea>
-
+                  {% if input_required %} required {% endif %}></textarea>
     </div>
 </div>

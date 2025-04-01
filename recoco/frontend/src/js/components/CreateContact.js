@@ -19,7 +19,8 @@ function CreateContact() {
     isMailOrPhone: false,
     init() {},
     closeModal(clearForm = false, reOpenSearchContact = false) {
-      this.modalCreateContact = document.querySelector('#create-contact-modal');
+      this.modalCreateContact = this.$refs.createContactModal;
+
       this.modalCreateContact.classList.toggle('d-none');
       this.isOrgaSelected = true;
       this.isJobSelected = true;
@@ -36,7 +37,7 @@ function CreateContact() {
       // }
     },
     reOpenModalSearchContact() {
-      this.modalSearchContact = document.querySelector('#search-contact-modal');
+      this.modalSearchContact = this.$refs.searchContactModal;
       this.modalSearchContact.classList.toggle('d-none');
       // this.$store.contact.openModal = 'searchContact';
     },

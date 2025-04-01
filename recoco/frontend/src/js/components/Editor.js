@@ -111,11 +111,25 @@ Alpine.data('editor', (content) => {
     renderMarkdown() {
       this.markdownContent = editor.getMarkdown().replaceAll('\\', '');
     },
+    // Plugin contact
     handleSetContact(contact) {
       this.contact = { ...contact }; // XXX Copy since it can be destroyed from an inner scope and values result to null
+      // TODO destroy contact modal with x-if
     },
-    resetContact() {
+    handleResetContact() {
       this.contact = null;
+    },
+    closeModal() {
+      // this.selectedContact = null;
+      // this.showContactsresults = false;
+      // this.userInput = '';
+      // this.noSearch = true;
+      // this.modalSearchContact.classList.toggle('d-none');
+      // TODO destroy search contact modal with x-if
+    },
+    openModalSearchContact() {
+      this.modalSearchContact = this.$refs.searchContactModal;
+      this.modalSearchContact.classList.toggle('d-none');
     },
   };
 });
