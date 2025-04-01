@@ -211,12 +211,12 @@ def project_moderation_accept(request, project_pk):
 # ----
 @login_required
 def project_list(request):
-    if is_staff_for_site(request.user, request.site):
+    if is_staff_for_site(request.user, request.site) or check_if_advisor(
+        request.user, request.site
+    ):
         return redirect("projects-project-list-staff")
 
-    if check_if_advisor(request.user, request.site) or can_administrate_project(
-        project=None, user=request.user
-    ):
+    if can_administrate_project(project=None, user=request.user):
         return redirect("projects-project-list-advisor")
 
     raise PermissionDenied("Vous n'avez pas le droit d'accéder à ceci.")
