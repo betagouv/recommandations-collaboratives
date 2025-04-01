@@ -40,23 +40,38 @@ def make_ds_data_from_project(
 
     session = _get_session(site=site, project=project)
 
-    for ds_field_id, recoco_field_id in ds_mapping.mapping.items():
-        if recoco_field_id.startswith("raw["):
-            data[ds_field_id] = recoco_field_id[4:-1]
-            continue
+    for ds_field_id, mapping_items in ds_mapping.mapping.items():
+        ds_value = None
 
-        recoco_field = ds_mapping.indexed_recoco_fields.get(recoco_field_id)
-        if recoco_field is None:
-            continue
+        for mapping_item in mapping_items:
+            value = mapping_item.get("value")
 
-        if recoco_field_id.startswith("project."):
-            if res := resolve_project_lookup(project, recoco_field.lookup):
-                data[ds_field_id] = res
-            continue
+            if value.startswith("raw["):
+                ds_value = value[4:-1]
+                continue
 
-        if recoco_field_id.startswith("edl.") and session:
-            if res := resolve_edl_lookup(session, recoco_field.lookup):
-                data[ds_field_id] = res
+            recoco_field = ds_mapping.indexed_recoco_fields.get(value)
+            if recoco_field is None:
+                continue
+
+            if value.startswith("project."):
+                if res := resolve_project_lookup(
+                    project=project, lookup=recoco_field.lookup
+                ):
+                    ds_value = res
+                continue
+
+            if value.startswith("edl.") and session:
+                if res := resolve_edl_lookup(
+                    session=session,
+                    lookup=recoco_field.lookup,
+                    condition=mapping_item.get("condition", []),
+                ):
+                    ds_value = res
+                continue
+
+        if ds_value is not None:
+            data[ds_field_id] = ds_value
 
     return data
 
@@ -81,13 +96,21 @@ def resolve_project_lookup(project: Project, lookup: str) -> Any | None:
     return _recursive_get_attr(project, lookup)
 
 
-def resolve_edl_lookup(session: Session, lookup: str) -> Any | None:
+def resolve_edl_lookup(
+    session: Session, lookup: str, condition: list[str] = None
+) -> Any | None:
     _take_comment = False
     if lookup.endswith(".comment"):
         lookup = lookup[:-8]
         _take_comment = True
 
-    if answer := Answer.objects.filter(
-        session_id=session.id, question__slug=lookup
-    ).first():
-        return answer.comment if _take_comment else answer.formatted_value
+    answer = Answer.objects.filter(session_id=session.id, question__slug=lookup).first()
+    if answer is None:
+        return None
+
+    if condition:
+        answer_tags = [tag.strip() for tag in answer.signals.split(",") if tag]
+        if not all(tag in answer_tags for tag in condition):
+            return None
+
+    return answer.comment if _take_comment else answer.formatted_value
