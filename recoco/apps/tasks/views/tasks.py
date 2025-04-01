@@ -7,6 +7,8 @@ author  : raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created : 2021-05-26 15:56:20 CEST
 """
 
+import datetime
+
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import Http404, HttpResponseForbidden
@@ -79,7 +81,6 @@ def create_task(request):
             action.project = project
             action.site = request.site
             action.created_by = request.user
-
             # get or create topic
             name = form.cleaned_data["topic_name"]
             if name:
@@ -89,7 +90,22 @@ def create_task(request):
                 )
                 action.topic = topic
             action.save()
-            action.top()
+
+            # Depending on wether we already have a recommandation on the same day:
+            # - move the new action after the existing one on the same day
+            # - let it on top if the following one was at least yesterday
+            today = datetime.date.today()
+            previous_today_action = (
+                models.Task.objects.filter(project=action.project)
+                .exclude(id=action.id)
+                .filter(created_on__date=today)
+                .order_by("-created_on")
+                .first()
+            )
+            if previous_today_action:
+                action.below(previous_today_action)
+            else:
+                action.top()
 
             # Check if we have a file or link
             document_form = DocumentUploadForm(request.POST, request.FILES)
