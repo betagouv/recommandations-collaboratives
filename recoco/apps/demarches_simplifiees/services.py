@@ -41,6 +41,10 @@ def make_ds_data_from_project(
     session = _get_session(site=site, project=project)
 
     for ds_field_id, recoco_field_id in ds_mapping.mapping.items():
+        if recoco_field_id.startswith("raw["):
+            data[ds_field_id] = recoco_field_id[4:-1]
+            continue
+
         recoco_field = ds_mapping.indexed_recoco_fields.get(recoco_field_id)
         if recoco_field is None:
             continue
@@ -78,7 +82,12 @@ def resolve_project_lookup(project: Project, lookup: str) -> Any | None:
 
 
 def resolve_edl_lookup(session: Session, lookup: str) -> Any | None:
+    _take_comment = False
+    if lookup.endswith(".comment"):
+        lookup = lookup[:-8]
+        _take_comment = True
+
     if answer := Answer.objects.filter(
         session_id=session.id, question__slug=lookup
     ).first():
-        return answer.formatted_value
+        return answer.comment if _take_comment else answer.formatted_value
