@@ -7,16 +7,13 @@ Alpine.data('SearchContactModal', () => ({
   contactsFound: [],
   userInput: '',
   selectedContact: null,
-  delayDisplay: false,
   modalCreateContact: null,
   modalSearchContact: null,
-  isVisible: false,
   noSearch: true,
   init() {
     this.Modal = Modal(this);
   },
   onSearch() {
-    this.delayDisplay = true;
     this.noSearch = false;
     this.selectedContact = null;
     if (this.userInput.length > 0) {
