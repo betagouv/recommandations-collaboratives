@@ -67,23 +67,24 @@ export default function PreviewModal() {
 
       // We are not editing a comment atm
       if (!this.currentlyEditing) {
-         await this.$store.tasksData.issueFollowup(
-          this.currentTask,
-          undefined,
-          this.comment.text,
-          this.comment.contact ?? null
-        ).then(async() => {
-           // Refresh messages
-          await this.$store.previewModal.loadFollowups();
-          await this.$store.tasksView.updateView();
-          // reset every contact info after submitting
-          this.comment.contact = '';
-          this.comment.text = '';
-
-        }).catch((error) => {
-          console.error('Error while creating followup', error);
-        });
-
+        await this.$store.tasksData
+          .issueFollowup(
+            this.currentTask,
+            undefined,
+            this.comment.text,
+            this.comment.contact ?? null
+          )
+          .then(async () => {
+            // Refresh messages
+            await this.$store.previewModal.loadFollowups();
+            await this.$store.tasksView.updateView();
+            // reset every contact info after submitting
+            this.comment.contact = '';
+            this.comment.text = '';
+          })
+          .catch((error) => {
+            console.error('Error while creating followup', error);
+          });
       } else {
         // We are editing a comment
         const [type, id] = this.currentlyEditing;

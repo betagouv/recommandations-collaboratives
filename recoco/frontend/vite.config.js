@@ -65,9 +65,13 @@ const config = {
         ExpandableMenuHandler: resolve(
           './src/js/components/ExpandableMenuHandler.js'
         ),
-        SearchContact: resolve('./src/js/components/SearchContact.js'),
+        SearchContactModal: resolve(
+          './src/js/components/FeatureAddContact/SearchContactModal.js'
+        ),
         CreateContact: resolve('./src/js/components/CreateContact.js'),
-        SearchOrganisation: resolve('./src/js/components/SearchOrganisation.js'),
+        SearchOrganisation: resolve(
+          './src/js/components/SearchOrganisation.js'
+        ),
         projectQueue: resolve('./src/js/store/projectQueue.js'),
         showRole: resolve('./src/js/store/showRole.js'),
         projects: resolve('./src/js/store/projects.js'),

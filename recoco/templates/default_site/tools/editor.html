@@ -20,11 +20,12 @@ Parameters:
 {% endblock css %}
 {% comment %} TODO refacto lot 2 @reset-contact{% endcomment %}
 {% comment %} TODO @reset-contact{% endcomment %}
+{% comment %} TODO @set-comment.window to fix{% endcomment %}
 <div class="w-100"
      {% if initial_content_escapejs %} x-data='editor("{{ initial_content|escapejs }}")' {% else %} x-data='editor("{{ initial_content }}")' {% endif %}
-     @set-contact="handleSetContact($event.detail)"
      @reset-contact="handleResetContact()"
      @set-comment.window="setMarkdownContent(event)"
+     @modal-response="closeModalSearchContact($event.detail)"
      x-ref="editor"
      data-test-id="tiptap-editor">
     <template x-if="isLoaded()">
@@ -76,7 +77,7 @@ Parameters:
              id="comment-text-ref"></div>
         <div x-cloak class="d-flex justify-content-between">
             {% if can_attach_contact %}
-                <div x-cloak x-data='SearchContact()'>
+                <div x-cloak>
                     <template x-if="!contact">
                         <button @click.prevent="openModalSearchContact"
                                 data-test-id="button-add-contact"

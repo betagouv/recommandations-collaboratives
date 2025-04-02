@@ -13,7 +13,6 @@ Alpine.data('editor', (content) => {
 
   return {
     updatedAt: Date.now(), // force Alpine to rerender on selection change
-    contact: null,
     markdownContent: null,
     init() {
       const _this = this;
@@ -111,25 +110,25 @@ Alpine.data('editor', (content) => {
     renderMarkdown() {
       this.markdownContent = editor.getMarkdown().replaceAll('\\', '');
     },
-    // Plugin contact
+    /****************
+     * Plugin contact
+     */
+    contact: null,
+    isSearchContactModalOpen: false,
     handleSetContact(contact) {
       this.contact = { ...contact }; // XXX Copy since it can be destroyed from an inner scope and values result to null
-      // TODO destroy contact modal with x-if
     },
     handleResetContact() {
       this.contact = null;
     },
-    closeModal() {
-      // this.selectedContact = null;
-      // this.showContactsresults = false;
-      // this.userInput = '';
-      // this.noSearch = true;
-      // this.modalSearchContact.classList.toggle('d-none');
-      // TODO destroy search contact modal with x-if
-    },
     openModalSearchContact() {
-      this.modalSearchContact = this.$refs.searchContactModal;
-      this.modalSearchContact.classList.toggle('d-none');
+      this.isSearchContactModalOpen = true;
+    },
+    closeModalSearchContact(contact) {
+      if (contact) {
+        this.handleSetContact(contact);
+      }
+      this.isSearchContactModalOpen = false;
     },
   };
 });
