@@ -1,6 +1,6 @@
 import Alpine from 'alpinejs';
 import api, { searchContactsUrl } from '../../utils/api';
-import { Modal } from '../../models/modal';
+import { Modal } from '../../models/Modal';
 
 Alpine.data('SearchContactModal', () => ({
   Modal: null,
