@@ -111,7 +111,7 @@
                                                           x-text="`le ${formatDate(currentTask?.created_on)}`"></span>
                                                 </div>
                                                 <template x-if="$store.djangoData.canManageTasks">
-                                                    <a class="text-muted cursor-pointer tiny" @click="onEditContent()">Editer</a>
+                                                    <button class="text-muted cursor-pointer tiny" @click="onEditContent()">Editer</button>
                                                 </template>
                                             </div>
                                         </div>
@@ -146,9 +146,9 @@
                                                                       x-text="`le ${formatDate(f.timestamp)}`"></span>
                                                             </div>
                                                             <template x-if="$store.djangoData.canUseTasks && f.who.email === $store.djangoData.userEmail">
-                                                                <a data-test-id="task-edit-followup-button"
-                                                                   class="text-muted cursor-pointer tiny"
-                                                                   @click="onEditComment(f)">Editer</a>
+                                                                <button data-test-id="task-edit-followup-button"
+                                                                        class="text-muted cursor-pointer tiny"
+                                                                        @click="onEditComment(f)">Editer</button>
                                                             </template>
                                                         </div>
                                                     </div>
@@ -189,15 +189,12 @@
                                 <form @submit.prevent="onSubmitComment()" novalidate>
                                     <div class="w-100 fr-p-2w specific-border-top-solid1pxEEE">
                                         {% include "tools/editor.html" with model="comment" can_attach_contact=True tools_disabled="title" %}
-
                                         <!--                                                 :disabled="$store.editor.isSubmitted === true" -->
                                         <button type="submit"
                                                 class="fr-btn fr-btn--sm repositionning-in-modal"
-                                                data-test-id="button-submit-new">Envoyer
-                                        </button>
+                                                data-test-id="button-submit-new">Envoyer</button>
                                     </div>
                                 </form>
-
                             </template>
                             <template x-if="!currentTask.public">
                                 <div class="w-100 fr-p-2w specific-border-top-solid1pxEEE">
