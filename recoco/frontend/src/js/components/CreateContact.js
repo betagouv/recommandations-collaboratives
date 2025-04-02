@@ -5,8 +5,6 @@ import { Modal } from '../models/Modal';
 function CreateContact() {
   return {
     Modal: null,
-    modalCreateContact: null,
-    // modalSearchContact: null,
     contact: {
       organization: '',
       last_name: '',
@@ -22,14 +20,14 @@ function CreateContact() {
     init() {
       this.Modal = Modal(this, 'create-contact-modal');
     },
-    closeModal() {
-      this.modalCreateContact = this.$refs.createContactModal;
+    // closeModal() {
+    //   this.modalCreateContact = this.$refs.createContactModal;
 
-      // this.modalCreateContact.classList.toggle('d-none');
-      this.isOrgaSelected = true;
-      this.isJobSelected = true;
-      this.isMailOrPhone = false;
-    },
+    //   // this.modalCreateContact.classList.toggle('d-none');
+    //   this.isOrgaSelected = true;
+    //   this.isJobSelected = true;
+    //   this.isMailOrPhone = false;
+    // },
     createContact() {
       this.isOrgaSelected = this.contact.organization == null;
 
@@ -51,7 +49,7 @@ function CreateContact() {
           this.$dispatch('set-contact', response.data);
           this.$dispatch('reset-orga', null); // FIXME
 
-          this.closeModal(true);
+          this.Modal.responseModal(response.data);
         });
       }
     },

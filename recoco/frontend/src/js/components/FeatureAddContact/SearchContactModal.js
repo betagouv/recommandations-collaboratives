@@ -47,6 +47,9 @@ Alpine.data('SearchContactModal', () => ({
     if (event.target.id !== 'create-contact-modal') {
       return;
     }
+    if (event.detail) {
+      this.onSelect(event.detail);
+    }
     this.isCreateContactModalOpen = false;
     this.modalSearchContact.classList.toggle('d-none');
   },
