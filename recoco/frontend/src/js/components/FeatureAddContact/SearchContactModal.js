@@ -11,7 +11,7 @@ Alpine.data('SearchContactModal', () => ({
   modalSearchContact: null,
   noSearch: true,
   init() {
-    this.Modal = Modal(this);
+    this.Modal = Modal(this, 'search-contact-modal');
   },
   onSearch() {
     this.noSearch = false;
@@ -35,16 +35,19 @@ Alpine.data('SearchContactModal', () => ({
   onCancelSelectContact() {
     this.selectedContact = null;
   },
-  isModalCreateContactOpen: false,
+  isCreateContactModalOpen: false,
   openModalCreateContact() {
     // hide search contact modal
     this.modalSearchContact = this.$refs.searchContactModal;
     this.modalSearchContact.classList.toggle('d-none');
     // create contact modal
-    this.isModalCreateContactOpen = true;
+    this.isCreateContactModalOpen = true;
   },
-  closeModalCreateContact() {
-    this.isModalCreateContactOpen = false;
+  closeCreateContactModal(event) {
+    if (event.target.id !== 'create-contact-modal') {
+      return;
+    }
+    this.isCreateContactModalOpen = false;
     this.modalSearchContact.classList.toggle('d-none');
   },
 }));

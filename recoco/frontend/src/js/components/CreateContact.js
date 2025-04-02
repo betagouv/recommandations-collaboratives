@@ -1,10 +1,12 @@
 import Alpine from 'alpinejs';
 import api, { contactsUrl } from '../utils/api';
+import { Modal } from '../models/Modal';
 
 function CreateContact() {
   return {
+    Modal: null,
     modalCreateContact: null,
-    modalSearchContact: null,
+    // modalSearchContact: null,
     contact: {
       organization: '',
       last_name: '',
@@ -17,29 +19,16 @@ function CreateContact() {
     isOrgaSelected: true,
     isJobSelected: true,
     isMailOrPhone: false,
-    init() {},
-    closeModal(clearForm = false, reOpenSearchContact = false) {
+    init() {
+      this.Modal = Modal(this, 'create-contact-modal');
+    },
+    closeModal() {
       this.modalCreateContact = this.$refs.createContactModal;
 
-      this.modalCreateContact.classList.toggle('d-none');
+      // this.modalCreateContact.classList.toggle('d-none');
       this.isOrgaSelected = true;
       this.isJobSelected = true;
       this.isMailOrPhone = false;
-
-      if (clearForm) {
-        this.resetFormValue();
-      }
-      if (reOpenSearchContact) {
-        this.reOpenModalSearchContact();
-      }
-      // else {
-      //   this.$store.contact.openModal = '';
-      // }
-    },
-    reOpenModalSearchContact() {
-      this.modalSearchContact = this.$refs.searchContactModal;
-      this.modalSearchContact.classList.toggle('d-none');
-      // this.$store.contact.openModal = 'searchContact';
     },
     createContact() {
       this.isOrgaSelected = this.contact.organization == null;
@@ -66,17 +55,17 @@ function CreateContact() {
         });
       }
     },
-    resetFormValue() {
-      this.contact.last_name = '';
-      this.contact.first_name = '';
-      this.contact.division = '';
-      this.contact.email = '';
-      this.contact.phone_no = '';
-      this.contact.mobile_no = '';
-      this.contact.organization = '';
-      this.$store.contact.orgaSelected = null;
-      this.isMailOrPhone = false;
-    },
+    // resetFormValue() {
+    //   this.contact.last_name = '';
+    //   this.contact.first_name = '';
+    //   this.contact.division = '';
+    //   this.contact.email = '';
+    //   this.contact.phone_no = '';
+    //   this.contact.mobile_no = '';
+    //   this.contact.organization = '';
+    //   this.$store.contact.orgaSelected = null;
+    //   this.isMailOrPhone = false;
+    // },
 
     handleSetOrganization(organization) {
       this.contact.organization = organization;

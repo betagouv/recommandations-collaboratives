@@ -124,7 +124,11 @@ Alpine.data('editor', (content) => {
     openModalSearchContact() {
       this.isSearchContactModalOpen = true;
     },
-    closeModalSearchContact(contact) {
+    closeSearchContactModal(event) {
+      if (event.target.id !== 'search-contact-modal') {
+        return;
+      }
+      const contact = event.detail;
       if (contact) {
         this.handleSetContact(contact);
       }

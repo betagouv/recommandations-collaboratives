@@ -18,7 +18,7 @@ Ces fonctions utilisent un evènement qui devra être écouté dans le composant
 Exemple dans le template du composant parent :
 
 ```html
-<div @modal-response="handleModalResponse($event.detail)">
+<div @modal-response="handleModalResponse($event)">
   <!-- Modal component --->
 </div>
 ```

@@ -25,7 +25,7 @@ Parameters:
      {% if initial_content_escapejs %} x-data='editor("{{ initial_content|escapejs }}")' {% else %} x-data='editor("{{ initial_content }}")' {% endif %}
      @reset-contact="handleResetContact()"
      @set-comment.window="setMarkdownContent(event)"
-     @modal-response="closeModalSearchContact($event.detail)"
+     @modal-response="closeSearchContactModal($event)"
      x-ref="editor"
      data-test-id="tiptap-editor">
     <template x-if="isLoaded()">
