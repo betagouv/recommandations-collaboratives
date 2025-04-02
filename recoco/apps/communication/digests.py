@@ -17,7 +17,6 @@ from django.urls import reverse
 
 from recoco import utils, verbs
 from recoco.apps.projects import models as projects_models
-from recoco.apps.projects import utils as projects_utils
 from recoco.apps.reminders.api import (
     get_due_new_recommendations_reminder_for_project,
     get_due_whatsup_reminder_for_project,
@@ -97,9 +96,14 @@ def send_new_recommendations_reminders_digest_by_project(site, project, dry_run)
             .order_by("-created_on")
         )
 
-        # Send to ALL project collaborators, not only project owner
-        recipients = projects_utils.get_collaborators_for_project(project)
-        for recipient in recipients:
+        # Send to ALL project owners
+        for project_owner in (
+            projects_models.ProjectMember.objects.filter(project=project, is_owner=True)
+            .select_related("member")
+            .distinct()
+        ):
+            recipient = project_owner.member
+
             digest = make_digest_of_project_recommendations(project, tasks, recipient)
             send_email(
                 communication_constants.TPL_PROJECT_REMINDERS_NEW_RECO_DIGEST,
@@ -137,13 +141,21 @@ def send_whatsup_reminders_digest_by_project(site, project, dry_run):
             .order_by("-created_on")
         )
 
-        # Send to ALL project collaborators, not only project owner
-        recipients = projects_utils.get_collaborators_for_project(project)
-        for recipient in recipients:
+        # Send to ALL project owners
+        for project_owner in (
+            projects_models.ProjectMember.objects.filter(project=project, is_owner=True)
+            .select_related("member")
+            .distinct()
+        ):
+            recipient = project_owner.member
+
             digest = make_digest_of_project_recommendations(project, tasks, recipient)
             send_email(
                 communication_constants.TPL_PROJECT_REMINDERS_WHATS_UP_DIGEST,
-                {"name": normalize_user_name(recipient), "email": recipient.email},
+                {
+                    "name": normalize_user_name(recipient),
+                    "email": recipient.email,
+                },
                 params=digest,
                 related=due_reminder,
             )
