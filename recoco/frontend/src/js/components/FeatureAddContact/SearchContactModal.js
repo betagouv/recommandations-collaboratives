@@ -4,15 +4,13 @@ import { Modal } from '../../models/modal';
 
 Alpine.data('SearchContactModal', () => ({
   Modal: null,
-  searchResults: [],
   contactsFound: [],
-  isOpenModal: false,
   userInput: '',
-  showContactsresults: false,
   selectedContact: null,
   delayDisplay: false,
   modalCreateContact: null,
   modalSearchContact: null,
+  isVisible: false,
   noSearch: true,
   init() {
     this.Modal = Modal(this);
@@ -21,12 +19,10 @@ Alpine.data('SearchContactModal', () => ({
     this.delayDisplay = true;
     this.noSearch = false;
     this.selectedContact = null;
-    if (this.userInput.length > 0 && this.selectedContact === null) {
-      this.contactsFound = [];
+    if (this.userInput.length > 0) {
       api.get(searchContactsUrl(this.userInput)).then((response) => {
-        this.searchResults = response.data;
-        this.contactsFound = this.searchResults.results;
-        this.showContactsresults = this.contactsFound.length > 0;
+        const searchResults = response.data;
+        this.contactsFound = searchResults.results;
       });
     } else if (this.userInput.length === 0) {
       this.noSearch = true;
@@ -47,6 +43,7 @@ Alpine.data('SearchContactModal', () => ({
     // hide search contact modal
     this.modalSearchContact = this.$refs.searchContactModal;
     this.modalSearchContact.classList.toggle('d-none');
+    // create contact modal
     this.isModalCreateContactOpen = true;
   },
   closeModalCreateContact() {

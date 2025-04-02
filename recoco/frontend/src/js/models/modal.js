@@ -5,5 +5,8 @@ export const Modal = (_this) => {
       console.log('responseModal', data);
       _this.$dispatch('modal-response', data);
     },
+    closeModal() {
+      _this.$dispatch('modal-response', null);
+    },
   };
 };
