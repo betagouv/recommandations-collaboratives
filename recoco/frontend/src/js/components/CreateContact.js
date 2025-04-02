@@ -20,14 +20,6 @@ function CreateContact() {
     init() {
       this.Modal = Modal(this, 'create-contact-modal');
     },
-    // closeModal() {
-    //   this.modalCreateContact = this.$refs.createContactModal;
-
-    //   // this.modalCreateContact.classList.toggle('d-none');
-    //   this.isOrgaSelected = true;
-    //   this.isJobSelected = true;
-    //   this.isMailOrPhone = false;
-    // },
     createContact() {
       this.isOrgaSelected = this.contact.organization == null;
 
@@ -46,7 +38,6 @@ function CreateContact() {
         };
 
         api.post(contactsUrl(), payload).then((response) => {
-          this.$dispatch('set-contact', response.data);
           this.$dispatch('reset-orga', null); // FIXME
 
           this.Modal.responseModal(response.data);
