@@ -5,7 +5,6 @@
           rel="stylesheet"
           type="text/css" />
 {% endblock css %}
-{% comment %} x-init="$watch('$store.contact.createdContact', value => {value?selectedContact = value:selectedContact = null;})" {% endcomment %}
 <template x-if="isSearchContactModalOpen">
     <div x-data="SearchContactModal"
          @modal-response="closeCreateContactModal($event)"

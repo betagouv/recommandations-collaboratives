@@ -68,7 +68,9 @@ const config = {
         SearchContactModal: resolve(
           './src/js/components/FeatureAddContact/SearchContactModal.js'
         ),
-        CreateContact: resolve('./src/js/components/CreateContact.js'),
+        CreateContactModal: resolve(
+          './src/js/components/FeatureAddContact/CreateContactModal.js'
+        ),
         SearchOrganisation: resolve(
           './src/js/components/SearchOrganisation.js'
         ),

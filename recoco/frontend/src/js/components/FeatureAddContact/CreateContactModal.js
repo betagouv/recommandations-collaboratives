@@ -1,8 +1,8 @@
 import Alpine from 'alpinejs';
-import api, { contactsUrl } from '../utils/api';
-import { Modal } from '../models/Modal';
+import api, { contactsUrl } from '../../utils/api';
+import { Modal } from '../../models/Modal';
 
-function CreateContact() {
+Alpine.data('CreateContactModal', () => {
   return {
     Modal: null,
     contact: {
@@ -14,19 +14,27 @@ function CreateContact() {
       phone_no: '',
       mobile_no: '',
     },
-    isOrgaSelected: true,
-    isJobSelected: true,
-    isMailOrPhone: false,
+    formState: {
+      isSubmitted: false,
+      isValid: false,
+      fields: {
+        isOrgaSelected: false,
+        isJobSelected: false,
+        isMailOrPhone: false,
+      },
+    },
     init() {
       this.Modal = Modal(this, 'create-contact-modal');
     },
     createContact() {
-      this.isOrgaSelected = this.contact.organization == null;
+      this.formState.fields = {
+        isOrgaSelected: this.contact.organization !== null,
+        isJobSelected: Boolean(this.contact.division),
+        isMailOrPhone:
+          this.contact.email.length !== 0 || this.contact.phone_no.length !== 0,
+      };
 
-      this.isJobSelected = Boolean(this.contact.division);
-
-      this.isMailOrPhone =
-        this.contact.email.length === 0 && this.contact.phone_no.length === 0;
+      this.formState.isSubmitted = true;
       if (
         this.contact.organization &&
         this.contact.division.length > 0 &&
@@ -44,22 +52,8 @@ function CreateContact() {
         });
       }
     },
-    // resetFormValue() {
-    //   this.contact.last_name = '';
-    //   this.contact.first_name = '';
-    //   this.contact.division = '';
-    //   this.contact.email = '';
-    //   this.contact.phone_no = '';
-    //   this.contact.mobile_no = '';
-    //   this.contact.organization = '';
-    //   this.$store.contact.orgaSelected = null;
-    //   this.isMailOrPhone = false;
-    // },
-
     handleSetOrganization(organization) {
       this.contact.organization = organization;
     },
   };
-}
-
-Alpine.data('CreateContact', CreateContact);
+});
