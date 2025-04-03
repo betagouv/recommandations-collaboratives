@@ -9,8 +9,10 @@ created: <2021-09-13 lun. 15:38>
 """
 
 import uuid
+from typing import TYPE_CHECKING
 
 from django.contrib.auth import models as auth_models
+from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import PermissionDenied
@@ -22,6 +24,9 @@ from notifications.signals import notify
 from recoco import utils as uv_utils
 
 from . import models
+
+if TYPE_CHECKING:
+    from .models import Project, ProjectSwitchtender
 
 
 @transaction.atomic
@@ -279,19 +284,29 @@ def get_advisors_for_project(project):
     ).distinct()
 
 
-def get_advisor_for_project(user, project):
-    """Return a advisor position for the given user on the given project"""
-    # NOTE currently do not take observer into account
+def get_advising_context_for_project(
+    user: User, project: "Project"
+) -> tuple["ProjectSwitchtender", dict[str, bool]]:
     try:
-        return models.ProjectSwitchtender.objects.get(
+        advisor = models.ProjectSwitchtender.objects.get(
             switchtender=user, project=project, site=get_current_site(request=None)
         )
     except models.ProjectSwitchtender.DoesNotExist:
-        return None
+        return None, {
+            "is_observer": False,
+            "is_advisor": False,
+        }
+
+    return advisor, {
+        "is_observer": advisor.is_observer,
+        "is_advisor": not advisor.is_observer,
+    }
 
 
-def is_advisor_for_project(user, project):
-    return get_advisor_for_project(user, project) is not None
+def is_advisor_for_project(user: User, project: "Project") -> bool:
+    return models.ProjectSwitchtender.objects.filter(
+        switchtender=user, project=project, site=get_current_site(request=None)
+    ).exists()
 
 
 def get_collaborators_for_project(project):
