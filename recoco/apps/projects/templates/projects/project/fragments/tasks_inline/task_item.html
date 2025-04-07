@@ -76,6 +76,7 @@
             <article>{% include "projects/project/fragments/task/task_comment.html" %}</article>
         </template>
         <hr class="fr-mt-3w">
+
         <!-- DS integration -->
         <template x-if="task.ds_folder && task.ds_folder.prefilled_count > 0">
             <div>
@@ -84,21 +85,23 @@
                          width="32px"
                          src="{% static 'svg/picto-demarches_simplifiees.svg' %}"
                          alt="Pictogramme Démarches Simplifiées">
-                    Dossier Démarches Simplifiées
+                    Pré-créer un dossier sur Demarches-simplifiees.fr
                 </h4>
                 <p class="fr-text-mention--grey fr-text--sm fr-my-3v">
-                    Un dossier a été pré-rempli sur Démarches simplifiées avec les éléments que vous avez renseignés ici.
+                    En cliquant ci-dessous, vous créerez un dossier en brouillon sur Demarches-Simplifiees.fr.
+                    <br>
+                    <span x-text="task.ds_folder.prefilled_count > 1 ? `${task.ds_folder.prefilled_count} champs seront pré-remplis avec les informations déjà renseignées ici.` : '1 champ sera pré-rempli avec les informations déjà renseignées ici.'">
                 </p>
                 <a class="fr-btn fr-btn--secondary fr-btn--sm"
                    @click.stop=""
                    x-bind:href="task.ds_folder.dossier_url"
-                   target="_blank">Voir mon dossier</a>
-                <span class="fr-ml-2w fr-text-label--blue-france fr-text--xs"
-                      x-text="task.ds_folder.prefilled_count > 1 ? `${task.ds_folder.prefilled_count} champs pré-remplis` : '1 champ pré-rempli'">
-                </span>
-                <hr class="fr-mt-3w">
+                   target="_blank">Aller sur Demarches-simplifiees.fr
+                </a>
             </div>
         </template>
+
+        <hr class="fr-mt-3w">
+
         <footer class="d-flex justify-content-between align-items-center">
             <div class="d-flex align-items-center">
                 {% if embed_view is not True %}

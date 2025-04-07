@@ -85,5 +85,9 @@ class Commune(models.Model):
         except IndexError:
             return
 
+    @property
+    def postal_and_insee_codes(self) -> list[str]:
+        return [self.postal, self.insee]
+
 
 # eof

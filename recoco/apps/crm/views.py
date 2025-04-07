@@ -28,7 +28,18 @@ from django.contrib.syndication.views import Feed
 from django.core.cache import cache
 from django.core.cache.utils import make_template_fragment_key
 from django.db import transaction
-from django.db.models import Count, ExpressionWrapper, F, FloatField, Max, Q, Value
+from django.db.models import (
+    Count,
+    ExpressionWrapper,
+    F,
+    FloatField,
+    Func,
+    Max,
+    OuterRef,
+    Q,
+    Subquery,
+    Value,
+)
 from django.db.models.functions import Cast
 from django.http import Http404, HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -226,11 +237,24 @@ def siteconfiguration_tags(request: HttpRequest):
             case _:
                 pass
 
-    context = {
-        "tags": site_configuration.crm_available_tags.order_by("name"),
-    }
+    tags = site_configuration.crm_available_tags.annotate(
+        impacted_count=Subquery(
+            Project.objects.filter(
+                crm_annotations__tags__name=OuterRef("name"),
+                sites=request.site.id,
+                deleted__isnull=True,
+            )
+            .order_by()
+            .annotate(count=Func(F("id"), function="Count"))
+            .values("count")
+        )
+    ).order_by("name")
 
-    return render(request, template_name, context)
+    return render(
+        request,
+        template_name,
+        context={"tags": tags},
+    )
 
 
 ########################################################################
