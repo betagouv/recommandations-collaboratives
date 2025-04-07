@@ -303,9 +303,9 @@ dill==0.3.9 \
 distlib==0.3.9 \
     --hash=sha256:47f8c22fd27c27e25a65601af709b38e4f0a45ea4fc2e710f65755fa8caaaf87 \
     --hash=sha256:a60f20dea646b8a33f3e7772f74dc0b2d0772d2837ee1342a00645c81edf9403
-django==4.2.20 \
-    --hash=sha256:213381b6e4405f5c8703fffc29cd719efdf189dec60c67c04f76272b3dc845b9 \
-    --hash=sha256:92bac5b4432a64532abb73b2ac27203f485e40225d2640a7fbef2b62b876e789
+django==4.2.19 \
+    --hash=sha256:6c833be4b0ca614f0a919472a1028a3bbdeb6f056fa04023aeb923346ba2c306 \
+    --hash=sha256:a104e13f219fc55996a4e416ef7d18ab4eeb44e0aa95174c192f16cda9f94e75
 django-activity-stream @ git+https://github.com/glibersat/django-activity-stream.git@1bd39ed638f3a0d613fbd3d550ca140debeade7e
 django-admin-csvexport==2.2 \
     --hash=sha256:29567ea1454984434aa1e5053916e7f5b252aa5bf82e8f4a028c571a2b24d7b8 \
@@ -528,9 +528,9 @@ isort==6.0.0 \
 jedi==0.19.2 \
     --hash=sha256:4770dc3de41bde3966b02eb84fbcf557fb33cce26ad23da12c742fb50ecb11f0 \
     --hash=sha256:a8ef22bde8490f57fe5c7681a3c83cb58874daf72b4784de3cce5b6ef6edb5b9
-jinja2==3.1.6 \
-    --hash=sha256:0137fb05990d35f1275a587e9aee6d56da821fc83491a0fb838183be43f66d6d \
-    --hash=sha256:85ece4451f492d0c13c5dd7c13a64681a86afae63a5f347908daf103ce6d2f67
+jinja2==3.1.5 \
+    --hash=sha256:8fefff8dc3034e27bb80d67c671eb8a9bc424c0ef4c0826edbff304cceff43bb \
+    --hash=sha256:aba0f4dc9ed8013c424088f68a5c226f7d6097ed89b246d7749c2ec4175c6adb
 jsonfield==3.1.0 \
     --hash=sha256:7e4e84597de21eeaeeaaa7cc5da08c61c48a9b64d0c446b2d71255d01812887a \
     --hash=sha256:df857811587f252b97bafba42e02805e70a398a7a47870bc6358a0308dd689ed
