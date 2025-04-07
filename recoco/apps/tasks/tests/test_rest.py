@@ -1,7 +1,7 @@
 # encoding: utf-8
 
 """
-Tests for project application
+kTests for project application
 
 authors: raphael.marvie@beta.gouv.fr, guillaume.libersat@beta.gouv.fr
 created: 2021-06-01 10:11:56 CEST
@@ -441,6 +441,46 @@ def test_project_observer_can_move_project_tasks_for_site(request, project):
 
     assert response.status_code == 200
     assert response.data == {"status": "insert below done"}
+
+
+@pytest.mark.django_db
+def test_project_observer_can_move_project_task_to_top(request, project):
+    user = baker.make(auth_models.User)
+    site = get_current_site(request)
+    tasks = baker.make(
+        models.Task, project=project, site=site, public=True, _quantity=2
+    )
+    utils.assign_observer(user, project)
+
+    client = APIClient()
+    client.force_authenticate(user=user)
+    url = reverse(
+        "project-tasks-move", args=[project.id, tasks[1].id]
+    )  # On veut mettre tasks[1] tout en haut
+    response = client.post(url, data={"top": True})
+
+    assert response.status_code == 200
+    assert response.data == {"status": "insert top done"}
+
+
+@pytest.mark.django_db
+def test_project_observer_can_move_project_task_to_bottom(request, project):
+    user = baker.make(auth_models.User)
+    site = get_current_site(request)
+    tasks = baker.make(
+        models.Task, project=project, site=site, public=True, _quantity=2
+    )
+    utils.assign_observer(user, project)
+
+    client = APIClient()
+    client.force_authenticate(user=user)
+    url = reverse(
+        "project-tasks-move", args=[project.id, tasks[0].id]
+    )  # On veut mettre tasks[0] tout en bas
+    response = client.post(url, data={"bottom": True})
+
+    assert response.status_code == 200
+    assert response.data == {"status": "insert bottom done"}
 
 
 @pytest.mark.django_db
