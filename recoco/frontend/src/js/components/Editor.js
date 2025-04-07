@@ -113,13 +113,13 @@ Alpine.data('editor', (content) => {
     /****************
      * Plugin contact
      */
-    contact: null,
+    selectedContact: null,
     isSearchContactModalOpen: false,
     handleSetContact(contact) {
-      this.contact = { ...contact }; // XXX Copy since it can be destroyed from an inner scope and values result to null
+      this.selectedContact = { ...contact }; // XXX Copy since it can be destroyed from an inner scope and values result to null
     },
     handleResetContact() {
-      this.contact = null;
+      this.selectedContact = null;
     },
     openModalSearchContact() {
       this.isSearchContactModalOpen = true;

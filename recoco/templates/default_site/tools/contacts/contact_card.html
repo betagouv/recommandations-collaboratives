@@ -1,3 +1,17 @@
+{% comment %}
+
+Contact Card Component.
+Be sure to include the following data transfer in your parent template.
+
+Parameters:
+- contact (object)
+
+Example usage in parent:
+<div x-data="{contact:myContactInParent}">
+    {% include "tools/contacts/contact_card.html" %}
+</div>
+
+{% endcomment %}
 {% load sass_tags %}
 {% block css %}
     <link href="{% sass_src 'css/tools/contact/contact-card.scss' %}"

@@ -78,16 +78,16 @@ Parameters:
         <div x-cloak class="d-flex justify-content-between">
             {% if can_attach_contact %}
                 <div x-cloak>
-                    <template x-if="!contact">
+                    <template x-if="!selectedContact">
                         <button @click.prevent="openModalSearchContact"
                                 data-test-id="button-add-contact"
                                 class="fr-btn fr-btn--tertiary fr-btn--sm justify-content-center fr-text--sm">
                             Ajouter un contact
                         </button>
                     </template>
-                    <template x-if="contact">
+                    <template x-if="selectedContact">
                         <div class="d-flex flex-column">
-                            <div class="border position-relative" x-data="{contact:contact}">
+                            <div class="border position-relative" x-data="{contact:selectedContact}">
                                 {% include "tools/contacts/contact_card.html" %}
                                 <button @click.prevent="handleResetContact"
                                         data-test-id="button-remove-contact"
@@ -99,7 +99,7 @@ Parameters:
                     </template>
                     {% include "tools/contacts/search_contact_modal.html" %}
                     <input type="hidden"
-                           {% if model %} x-model="{{ model }}.contact" x-modelable="contact" {% else %} x-model="contact" {% endif %}>
+                           {% if model %} x-model="{{ model }}.contact" x-modelable="selectedContact" {% else %} x-model="selectedContact" {% endif %}>
                 </div>
             {% endif %}
         </div>
