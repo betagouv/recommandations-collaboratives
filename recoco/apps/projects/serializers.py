@@ -51,6 +51,7 @@ class ProjectSerializer(TaggitSerializer, serializers.HyperlinkedModelSerializer
             "name",
             "description",
             "inactive_since",
+            "status",
             "created_on",
             "updated_on",
             "org_name",
