@@ -480,6 +480,7 @@ def check_project_content(project, data):
         "created_on",
         "id",
         "inactive_since",
+        "status",
         "is_observer",
         "is_switchtender",
         "name",
