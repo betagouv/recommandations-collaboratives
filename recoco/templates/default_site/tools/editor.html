@@ -86,7 +86,7 @@ Parameters:
                         </button>
                     </template>
                     <template x-if="contact">
-                        <div class="d-flex">
+                        <div class="d-flex flex-column">
                             <div class="border" x-data="{contact:contact}">{% include "tools/contacts/contact_card.html" %}</div>
                             <button @click.prevent="handleResetContact"
                                     data-test-id="button-remove-contact"
