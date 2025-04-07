@@ -87,12 +87,14 @@ Parameters:
                     </template>
                     <template x-if="contact">
                         <div class="d-flex flex-column">
-                            <div class="border" x-data="{contact:contact}">{% include "tools/contacts/contact_card.html" %}</div>
-                            <button @click.prevent="handleResetContact"
-                                    data-test-id="button-remove-contact"
-                                    class="fr-btn fr-btn--tertiary fr-btn--sm justify-content-center fr-text--sm close-contact-button-style">
-                                <span class="fr-icon-close-line" aria-hidden="true"></span>
-                            </button>
+                            <div class="border position-relative" x-data="{contact:contact}">
+                                {% include "tools/contacts/contact_card.html" %}
+                                <button @click.prevent="handleResetContact"
+                                        data-test-id="button-remove-contact"
+                                        class="fr-btn fr-btn--tertiary fr-btn--sm justify-content-center fr-text--sm close-contact-button-style position-absolute top-0 end-0">
+                                    <span class="fr-icon-close-line" aria-hidden="true"></span>
+                                </button>
+                            </div>
                         </div>
                     </template>
                     {% include "tools/contacts/search_contact_modal.html" %}
