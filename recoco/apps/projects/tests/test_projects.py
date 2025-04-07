@@ -137,7 +137,8 @@ def test_project_list_not_available_for_non_staff_users(client):
 
 @pytest.mark.django_db
 def test_project_list_available_for_switchtender_user(request, client):
-    get_current_site(request)
+    current_site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=current_site)
     url = reverse("projects-project-list")
     with login(client, groups=["example_com_staff", "example_com_advisor"]):
         response = client.get(url, follow=True)
