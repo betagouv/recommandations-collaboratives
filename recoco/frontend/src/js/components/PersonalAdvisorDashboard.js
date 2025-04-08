@@ -94,7 +94,7 @@ function PersonalAdvisorDashboard(currentSiteId) {
         this.departments = JSON.parse(currentDepartments);
       }
 
-      //If we can't find an active department in state
+      //If we can find an inactive department in state
       // then uncheck select all departments in filter
       if (
         this.departments.findIndex((department) => department.active) === -1

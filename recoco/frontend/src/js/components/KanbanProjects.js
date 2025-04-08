@@ -210,14 +210,7 @@ Alpine.data('KanbanProjects', function (currentSiteId, departments, regions) {
     async saveSelectedDepartment(event) {
       if (!event.detail) return;
 
-      const extractedDepartements = event.detail
-        .flatMap((region) =>
-          region.departments.map(
-            (department) => department.active && department.code
-          )
-        )
-        .filter((department) => department);
-      this.backendSearch.searchDepartment = [...extractedDepartements];
+      this.backendSearch.searchDepartment = [...event.detail];
       await this.backendSearchProjects();
     },
 
