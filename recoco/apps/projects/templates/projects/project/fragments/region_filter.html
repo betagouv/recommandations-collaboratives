@@ -14,13 +14,19 @@
     Region filter component
 
     Parameters:
+        - label (string): label to display in the filter button (default="Projets de mon territoire")
         - filter_by_regions (boolean): if true, filter by regions, else filter by departments
+        - zone_objects (list): list of regions or departments to display in filter
+
+    Event to listen in parent component:
+        - selected-regions: when a region is selected, the event is triggered with the selected regions
+        - selected-departments: when a department is selected, the event is triggered with the selected departments
 
 {% endcomment %}
 <div class="d-flex align-items-center fr-mr-6v">
     <span class="fr-segmented__legend inline text-nowrap">Filtrer :</span>
     <div class="input-item position-relative active specific-border-solid1pxE5E5E5"
-         x-data="RegionFilter(regions)"
+         x-data="RegionFilter({{ zone_objects }})"
          x-on:click.outside="open = false">
         <div class="d-flex align-items-center fr-pr-3w bg-white rounded-pill"
              x-on:click="open = !open"
@@ -28,10 +34,7 @@
              :class="{'input-active':open}">
             {% comment %} TODO Param this label {% endcomment %}
             <button class="input-field bg-transparent fr-px-2w fw-normal text-dark appearance-none"
-                    data-cy="check-display-project">
-                Projets de mon
-                territoire
-            </button>
+                    data-cy="check-display-project">{{ label |default:"Projets de mon territoire" }}</button>
             {% comment %} TODO Use DSFR icon {% endcomment %}
             <svg class="input-icon right black bi align-baseline fr-mr-2v"
                  width="15"
@@ -45,7 +48,7 @@
             class="region-filter list-unstyled flex-column">
             <li class="bg-white appearance-none w-100 d-flex justify-content-start align-items-center border-bottom department-item">
                 <div class="form-check w-100 d-flex align-items-center fr-p-0">
-                    <input x-on:input.change="handleTerritorySelectAll"
+                    <input {% if filter_by_regions %} x-on:input.change="handleTerritorySelectAll" {% else %} x-on:input.change="handleTerritorySelectAllDepartements" {% endif %}
                            class="form-check-input fw-normal fr-ml-2v fr-px-2v fr-py-2v fr-mr-2v"
                            type="checkbox"
                            data-cy="check-all-territory"

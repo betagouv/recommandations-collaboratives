@@ -65,7 +65,7 @@
                     {% include "projects/project/fragments/only_my_projects_toggle.html" %}
                 </div>
                 <div class="kanban-header__region-filter">
-                    {% include "projects/project/fragments/region_filter.html" with filter_by_regions=True %}
+                    {% include "projects/project/fragments/region_filter.html" with label="Projets de mon territoire" filter_by_regions=True zone_objects="regions" %}
                 </div>
             </div>
             <div class="kanban-header__toolbar">{% include "projects/project/fragments/list-toolbars.html" %}</div>
