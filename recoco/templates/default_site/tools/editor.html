@@ -18,8 +18,6 @@ Parameters:
           rel="stylesheet"
           type="text/css">
 {% endblock css %}
-{% comment %} TODO refacto lot 2 @reset-contact{% endcomment %}
-{% comment %} TODO @reset-contact{% endcomment %}
 {% comment %} TODO @set-comment.window to fix{% endcomment %}
 <div class="w-100"
      {% if initial_content_escapejs %} x-data='editor("{{ initial_content|escapejs }}")' {% else %} x-data='editor("{{ initial_content }}")' {% endif %}
@@ -75,7 +73,11 @@ Parameters:
              x-ref="element"
              @click.stop
              id="comment-text-ref"></div>
-        <div x-cloak class="d-flex justify-content-between">
+        <textarea class="position-absolute top-0 opacity-0 specific-height-0"
+                  {% if model %} x-model="{{ model }}.text" x-modelable="markdownContent" {% else %} x-model="markdownContent" {% endif  %}
+                  name="{{input_name|default:"content"}}"
+                  {% if input_required %} required {% endif %}></textarea>
+        <div x-cloak class="d-flex flex-column">
             {% if can_attach_contact %}
                 <div x-cloak>
                     <template x-if="!selectedContact">
@@ -106,9 +108,5 @@ Parameters:
         {% if errors %}
             {% for error in errors %}<div class="text-danger text-start fr-mb-2v">{{ error }}</div>{% endfor %}
         {% endif %}
-        <textarea class="position-absolute top-0 opacity-0 specific-height-0"
-                  {% if model %} x-model="{{ model }}.text" x-modelable="markdownContent" {% else %} x-model="markdownContent" {% endif  %}
-                  name="{{input_name|default:"content"}}"
-                  {% if input_required %} required {% endif %}></textarea>
     </div>
 </div>
