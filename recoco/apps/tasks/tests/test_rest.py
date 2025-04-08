@@ -454,9 +454,7 @@ def test_project_observer_can_move_project_task_to_top(request, project):
 
     client = APIClient()
     client.force_authenticate(user=user)
-    url = reverse(
-        "project-tasks-move", args=[project.id, tasks[1].id]
-    )
+    url = reverse("project-tasks-move", args=[project.id, tasks[1].id])
     response = client.post(url, data={"top": True})
 
     assert response.status_code == 200
@@ -474,9 +472,7 @@ def test_project_observer_can_move_project_task_to_bottom(request, project):
 
     client = APIClient()
     client.force_authenticate(user=user)
-    url = reverse(
-        "project-tasks-move", args=[project.id, tasks[0].id]
-    )
+    url = reverse("project-tasks-move", args=[project.id, tasks[0].id])
     response = client.post(url, data={"bottom": True})
 
     assert response.status_code == 200
