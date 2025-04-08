@@ -21,6 +21,7 @@ Alpine.data('CreateContactModal', () => {
         isOrgaSelected: false,
         isJobSelected: false,
         isMailOrPhone: false,
+        isFormatEmailValid: false,
       },
     },
     init() {
@@ -28,10 +29,13 @@ Alpine.data('CreateContactModal', () => {
     },
     createContact() {
       this.formState.fields = {
-        isOrgaSelected: this.contact.organization !== null,
+        isOrgaSelected: this.contact.organization !== '',
         isJobSelected: Boolean(this.contact.division),
         isMailOrPhone:
           this.contact.email.length !== 0 || this.contact.phone_no.length !== 0,
+        isFormatEmailValid: this.contact.email.match(
+          /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/
+        ),
       };
 
       this.formState.isSubmitted = true;

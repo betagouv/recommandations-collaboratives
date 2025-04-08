@@ -39,15 +39,21 @@
                            required>
                 </div>
                 <div class="fr-p-3v modal-create-contact__block"
-                     :class="{'fr-input-group--error': formState.isSubmitted && !formState.fields.isMailOrPhone}">
+                     :class="{'fr-input-group--error': formState.isSubmitted && (!formState.fields.isMailOrPhone || !formState.fields.isFormatEmailValid)}">
                     <label class="modal-create-contact__label">Email</label>
                     <p class="modal-create-contact__label-info"
                        :class="{'color-important': formState.isSubmitted && !formState.fields.isMailOrPhone}">
                         Merci de renseigner A MINIMA l'email OU un numéro de téléphone
                     </p>
-                    <input type="text"
+                    <template x-if="formState.isSubmitted && formState.fields.isMailOrPhone && !formState.fields.isFormatEmailValid">
+                        <p class="modal-create-contact__label-info color-important">
+                            Le format de l'email est incorrect : marie.curie@email.fr
+                        </p>
+                    </template>
+                    <input type="email"
+                           pattern="^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$"
                            class="fr-input"
-                           :class="{'fr-input--error': formState.isSubmitted && !formState.fields.isMailOrPhone}"
+                           :class="{'fr-input--error': formState.isSubmitted && (!formState.fields.isMailOrPhone || !formState.fields.isFormatEmailValid)}"
                            x-model="contact.email">
                 </div>
                 <div class="fr-p-3v modal-create-contact__block"
