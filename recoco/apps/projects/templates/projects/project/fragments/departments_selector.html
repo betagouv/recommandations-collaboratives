@@ -2,12 +2,12 @@
 {% load sass_tags %}
 {% load django_vite %}
 {% block css %}
-    <link href="{% sass_src 'projects/css/region_filter.scss' %}"
+    <link href="{% sass_src 'projects/css/departments_selector.scss' %}"
           rel="stylesheet"
           type="text/css">
 {% endblock css %}
 {% block js %}
-    {% vite_asset 'js/components/RegionFilter.js' %}
+    {% vite_asset 'js/components/DepartmentsSelector.js' %}
 {% endblock js %}
 {% comment %}
 
@@ -26,13 +26,12 @@
 <div class="d-flex align-items-center fr-mr-6v">
     <span class="fr-segmented__legend inline text-nowrap">Filtrer :</span>
     <div class="input-item position-relative active specific-border-solid1pxE5E5E5"
-         x-data="RegionFilter({{ zone_objects }})"
+         x-data="DepartmentsSelector({{ zone_objects }})"
          x-on:click.outside="open = false">
         <div class="d-flex align-items-center fr-pr-3w bg-white rounded-pill"
              x-on:click="open = !open"
              type="button"
              :class="{'input-active':open}">
-            {% comment %} TODO Param this label {% endcomment %}
             <button class="input-field bg-transparent fr-px-2w fw-normal text-dark appearance-none"
                     data-cy="check-display-project">{{ label |default:"Projets de mon territoire" }}</button>
             {% comment %} TODO Use DSFR icon {% endcomment %}

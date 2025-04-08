@@ -1,6 +1,6 @@
 import Alpine from 'alpinejs';
 
-Alpine.data('RegionFilter', (regions) => {
+Alpine.data('DepartmentsSelector', (regions) => {
   return {
     open: false,
     territorySelectAll: true,
