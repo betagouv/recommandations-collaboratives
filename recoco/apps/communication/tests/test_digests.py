@@ -314,6 +314,54 @@ def test_send_digests_for_switchtender_by_user(request, client, make_project):
 
 
 @pytest.mark.django_db
+def test_send_digests_for_switchtender_includes_new_recos(
+    client, request, make_project
+):
+    current_site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=current_site)
+
+    publishing_advisor = Recipe(
+        auth.User, username="pub_advisor", email="pub-advisor@example.com"
+    ).make()
+
+    another_advisor = Recipe(
+        auth.User, username="another_advisor", email="another-advisor@example.com"
+    ).make()
+
+    collaborator = Recipe(
+        auth.User, username="collaborator", email="collab@example.com"
+    ).make()
+
+    project = make_project(
+        site=current_site,
+        status="TO_PROCESS",
+    )
+
+    assign_advisor(publishing_advisor, project, current_site)
+    assign_advisor(another_advisor, project, current_site)
+    assign_collaborator(collaborator, project, is_owner=True)
+
+    # Generate a notification
+    tasks_signals.action_created.send(
+        sender=test_send_digests_for_new_reco_should_not_trigger_for_advisors,
+        task=tasks_models.Task.objects.create(
+            public=True,
+            project=project,
+            site=current_site,
+            created_by=publishing_advisor,
+        ),
+        project=project,
+        user=publishing_advisor,
+    )
+
+    assert another_advisor.notifications.unsent().count() == 1
+
+    digests.send_digest_for_switchtender_by_user(another_advisor)
+
+    assert another_advisor.notifications.unsent().count() == 0
+
+
+@pytest.mark.django_db
 def test_notification_formatter(request, make_project):
     formatter = digests.NotificationFormatter()
 
