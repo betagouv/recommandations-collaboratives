@@ -76,7 +76,6 @@
             <article>{% include "projects/project/fragments/task/task_comment.html" %}</article>
         </template>
         <hr class="fr-mt-3w">
-
         <!-- DS integration -->
         <template x-if="task.ds_folder && task.ds_folder.prefilled_count > 0">
             <div>
@@ -90,18 +89,15 @@
                 <p class="fr-text-mention--grey fr-text--sm fr-my-3v">
                     En cliquant ci-dessous, vous créerez un dossier en brouillon sur Demarches-Simplifiees.fr.
                     <br>
-                    <span x-text="task.ds_folder.prefilled_count > 1 ? `${task.ds_folder.prefilled_count} champs seront pré-remplis avec les informations déjà renseignées ici.` : '1 champ sera pré-rempli avec les informations déjà renseignées ici.'">
+                    <span x-text="task.ds_folder.prefilled_count > 1 ? `${task.ds_folder.prefilled_count} champs seront pré-remplis avec les informations déjà renseignées ici.` : '1 champ sera pré-rempli avec les informations déjà renseignées ici.'"></span>
                 </p>
                 <a class="fr-btn fr-btn--secondary fr-btn--sm"
                    @click.stop=""
                    x-bind:href="task.ds_folder.dossier_url"
-                   target="_blank">Aller sur Demarches-simplifiees.fr
-                </a>
+                   target="_blank">Aller sur Demarches-simplifiees.fr</a>
             </div>
+            <hr class="fr-mt-3w">
         </template>
-
-        <hr class="fr-mt-3w">
-
         <footer class="d-flex justify-content-between align-items-center">
             <div class="d-flex align-items-center">
                 {% if embed_view is not True %}

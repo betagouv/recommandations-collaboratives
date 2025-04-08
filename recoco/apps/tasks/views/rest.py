@@ -109,6 +109,19 @@ class TaskViewSet(viewsets.ModelViewSet):
     def move(self, request, project_id, pk):
         task = self.get_object()
 
+        # Insert at top of bottom
+        top = request.POST.get("top", None)
+        bottom = request.POST.get("bottom", None)
+
+        if top:
+            task.top()
+            return Response({"status": "insert top done"})
+
+        if bottom:
+            task.bottom()
+            return Response({"status": "insert bottom done"})
+
+        # Insert after or before another object
         above_id = request.POST.get("above", None)
         below_id = request.POST.get("below", None)
 

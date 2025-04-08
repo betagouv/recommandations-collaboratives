@@ -64,31 +64,42 @@ document.addEventListener('alpine:init', () => {
     getTaskById(id) {
       return this.tasks.find((task) => task.id == id);
     },
-    async moveTask(taskId, otherTaskId, below) {
-      const params = new URLSearchParams(
-        `${below ? 'below' : 'above'}=${otherTaskId}`
-      );
+    async moveTask(taskId, otherTaskId, { direction }) {
+      const params = new URLSearchParams(`${direction}=${otherTaskId}`);
+      await api.post(moveTaskUrl(this.projectId, taskId), params, {
+        headers: { 'content-type': 'application/x-www-form-urlencoded' },
+      });
+    },
+    async moveTaskFast(taskId, { direction }) {
+      const params = new URLSearchParams(`${direction}=true`);
       await api.post(moveTaskUrl(this.projectId, taskId), params, {
         headers: { 'content-type': 'application/x-www-form-urlencoded' },
       });
     },
     // Movement Buttons
     async moveAbove(task, otherTask) {
-      await this.moveTask(task.id, otherTask.id);
+      await this.moveTask(task.id, otherTask.id, { direction: 'above' });
     },
     async moveBelow(task, otherTask) {
-      await this.moveTask(task.id, otherTask.id, true);
+      await this.moveTask(task.id, otherTask.id, { direction: 'below' });
+    },
+    async moveTop(task) {
+      await this.moveTaskFast(task.id, { direction: 'top' });
+    },
+    async moveBottom(task) {
+      await this.moveTaskFast(task.id, { direction: 'bottom' });
     },
     async patchTask(taskId, patch) {
       await api.patch(taskUrl(this.projectId, taskId), patch);
       await this.loadTasks();
     },
 
-    // TODO : Plus tard
+    // TODO : To remove ?
     async loadFollowups(taskId) {
       const { data } = await api.get(followupsUrl(this.projectId, taskId));
       return data;
     },
+    // TODO : To remove ?
     async loadNotifications(taskId) {
       const { data } = await api.get(
         taskNotificationsUrl(this.projectId, taskId)
@@ -96,9 +107,9 @@ document.addEventListener('alpine:init', () => {
       return data;
     },
     async issueFollowup(task, status, comment = '', contact = null) {
-      const body = { comment, status};
-      if(contact){
-        body.contact =  contact.id ;
+      const body = { comment, status };
+      if (contact) {
+        body.contact = contact.id;
       }
 
       if (body.status === task.status && body.comment === '') return;

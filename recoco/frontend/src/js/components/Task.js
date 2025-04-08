@@ -44,8 +44,8 @@ export default function Task(currentTask) {
       const taskToChange = this.$store.tasksView.findById(task.id);
       const otherTaskToChange = this.$store.tasksView.findById(otherTask.id);
 
-      taskToChange.isLoading = true;
-      otherTaskToChange.isLoading = true;
+      // taskToChange.isLoading = true;
+      // otherTaskToChange.isLoading = true;
 
       if (direction === 'above') {
         await this.$store.tasksData.moveAbove(task, otherTask);
@@ -56,8 +56,29 @@ export default function Task(currentTask) {
       await this.$store.tasksView.updateViewWithTask(task.id);
       await this.$store.tasksView.updateViewWithTask(otherTask.id);
 
+      taskToChange.isLoading = false;
+      otherTaskToChange.isLoading = false;
+    },
+    async handleMoveFast(direction, task) {
+      const taskToChange = this.$store.tasksView.findById(task.id);
+      const otherTaskToChange =
+        direction == 'top'
+          ? this.$store.tasksView.findFirst()
+          : this.$store.tasksView.findLast();
+
       taskToChange.isLoading = true;
       otherTaskToChange.isLoading = true;
+
+      if (direction === 'top') {
+        await this.$store.tasksData.moveTop(task);
+      } else if (direction === 'bottom') {
+        await this.$store.tasksData.moveBottom(task);
+      }
+
+      await this.$store.tasksView.updateView();
+
+      taskToChange.isLoading = false;
+      otherTaskToChange.isLoading = false;
     },
     formatDateDisplay(date) {
       return new Date(date).toLocaleDateString('fr-FR');
