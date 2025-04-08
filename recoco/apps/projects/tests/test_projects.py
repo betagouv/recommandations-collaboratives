@@ -1173,7 +1173,7 @@ def test_switchtender_exports_csv(request, client, make_project):
 # Tags
 #################################################################
 @pytest.mark.django_db
-def test_advisor_cannot_updates_tags(request, client, project):
+def test_advisor_updates_tags(request, client, project):
     current_site = get_current_site(request)
 
     data = {"tags": "blah"}
@@ -1185,9 +1185,9 @@ def test_advisor_cannot_updates_tags(request, client, project):
             reverse("projects-project-tags", args=[project.id]), data=data
         )
 
-    assert response.status_code == 403
+    assert response.status_code == 302
     project = models.Project.objects.all()[0]
-    assert list(project.tags.names()) == []
+    assert list(project.tags.names()) == [data["tags"]]
 
 
 @pytest.mark.django_db
