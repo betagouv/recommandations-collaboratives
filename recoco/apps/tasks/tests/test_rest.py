@@ -456,7 +456,7 @@ def test_project_observer_can_move_project_task_to_top(request, project):
     client.force_authenticate(user=user)
     url = reverse(
         "project-tasks-move", args=[project.id, tasks[1].id]
-    )  # On veut mettre tasks[1] tout en haut
+    )
     response = client.post(url, data={"top": True})
 
     assert response.status_code == 200
@@ -476,7 +476,7 @@ def test_project_observer_can_move_project_task_to_bottom(request, project):
     client.force_authenticate(user=user)
     url = reverse(
         "project-tasks-move", args=[project.id, tasks[0].id]
-    )  # On veut mettre tasks[0] tout en bas
+    )
     response = client.post(url, data={"bottom": True})
 
     assert response.status_code == 200
