@@ -9,25 +9,27 @@
     <template x-if="i > 0">
         <button class="fr-btn fr-btn--sm fr-btn--tertiary fr-mr-1v no-wrap"
                 title="Déplacer en haut"
-                @click.stop="handleMoveFast('top', task)">Déplacer en haut</button>
+                @click.stop="handleMoveFast('top', task)"
+                data-cy="move-task-to-top">Déplacer en haut</button>
     </template>
     <template x-if="i < column(board.status).length - 1">
         <button class="fr-btn fr-btn--sm fr-btn--tertiary fr-mr-1v no-wrap"
                 title="Déplacer en bas"
-                @click.stop="handleMoveFast('bottom', task)">Déplacer en bas</button>
+                @click.stop="handleMoveFast('bottom', task)"
+                data-cy="move-task-to-bottom">Déplacer en bas</button>
     </template>
     <template x-if="i > 0">
-        <button id="task-move-above"
-                class="fr-btn fr-btn--sm fr-btn--tertiary fr-icon-arrow-up-line fr-mr-1v"
+        <button class="fr-btn fr-btn--sm fr-btn--tertiary fr-icon-arrow-up-line fr-mr-1v"
                 title="Monter la recommandation"
-                @click.stop="handleMove('above',task, column(board.status)[i - 1])">Monter la recommandation</button>
+                @click.stop="handleMove('above',task, column(board.status)[i - 1])"
+                data-cy="move-task-above">Monter la recommandation</button>
     </template>
     <template x-if="i < column(board.status).length - 1">
-        <button id="task-move-below"
-                class="fr-btn fr-btn--sm fr-btn--tertiary fr-icon-arrow-down-line fr-mr-1v"
+        <button class="fr-btn fr-btn--sm fr-btn--tertiary fr-icon-arrow-down-line fr-mr-1v"
+                :class="{'active':open}"
                 title="Descendre la recommandation"
                 @click.stop="handleMove('below',task, column(board.status)[i + 1])"
-                :class="{'active':open}">Descendre la recommandation</button>
+                data-cy="move-task-below">Descendre la recommandation</button>
     </template>
     <div x-data="{ open: false }" x-on:click.outside="open = false">
         <button data-test-id="open-task-actions-button"
