@@ -83,6 +83,7 @@ const config = {
         actionPusher: resolve('./src/js/store/actionPusher.js'),
         conversationsNew: resolve('./src/js/apps/conversationsNew.js'),
         contact: resolve('./src/js/store/contact.js'),
+        featureAddContact: resolve('./src/js/apps/featureAddContact.js'),
       },
       output: {
         chunkFileNames: undefined,
