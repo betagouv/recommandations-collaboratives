@@ -4,7 +4,7 @@ Alpine.data(
   'DepartmentsSelector',
   (
     regions,
-    { selectedDepartments, selectAll } = {
+    { selectAll } = {
       selectedDepartments: [],
       selectAll: true,
     }
@@ -13,7 +13,6 @@ Alpine.data(
       open: false,
       territorySelectAll: true,
       regions: regions,
-      selectedDepartments: selectedDepartments,
       init() {
         console.log(this.regions);
         if (selectAll) {
