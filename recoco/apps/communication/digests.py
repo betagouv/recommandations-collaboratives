@@ -203,6 +203,12 @@ def send_recommendation_digest_by_project(user, notifications, dry_run):
             # Probably a deleted project?
             continue
 
+        # Make sure we are not advisor on this project, otherwise abort
+        # since we’ll consume these notifications in an another digest.
+        if user in project.switchtenders.all():
+            skipped_projects.append(project.id)
+            continue
+
         digest = make_digest_of_project_recommendations_from_notifications(
             project, project_notifications, user
         )
