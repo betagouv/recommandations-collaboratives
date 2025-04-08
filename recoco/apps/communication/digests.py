@@ -198,7 +198,9 @@ def send_recommendation_digest_by_project(user, notifications, dry_run):
         notifications, key=lambda x: x.target_object_id
     ):
         try:
-            project = projects_models.Project.objects.get(pk=project_id)
+            project = projects_models.Project.objects.prefetch_related(
+                "switchtenders"
+            ).get(pk=project_id)
         except projects_models.Project.DoesNotExist:
             # Probably a deleted project?
             continue
