@@ -181,6 +181,33 @@ def test_command_pending_recommendation_reminder_sent(request, mocker, project):
 
 @pytest.mark.django_db
 @override_settings(BREVO_FORCE_DEBUG=True)
+def test_command_pending_recommendation_reminder_not_sent_if_advisor(
+    request, mocker, project
+):
+    current_site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=current_site)
+    advisor = baker.make(auth_models.User)
+    collaborator = baker.make(auth_models.User)
+
+    assign_advisor(advisor, project, current_site)
+    assign_collaborator(collaborator, project, is_owner=True)
+
+    mocker.patch(
+        "recoco.apps.communication.digests.send_new_recommendations_reminders_digest_by_project"
+    )
+
+    mocker.patch(
+        "recoco.apps.communication.digests.send_whatsup_reminders_digest_by_project"
+    )
+
+    call_command("senddigests")
+
+    digests.send_new_recommendations_reminders_digest_by_project.assert_called_once()
+    digests.send_whatsup_reminders_digest_by_project.assert_called_once()
+
+
+@pytest.mark.django_db
+@override_settings(BREVO_FORCE_DEBUG=True)
 def test_command_pending_reminder_sent_and_rescheduled(request, mocker, make_project):
     current_site = get_current_site(request)
     baker.make(home_models.SiteConfiguration, site=current_site)
