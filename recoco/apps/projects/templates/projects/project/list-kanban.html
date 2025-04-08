@@ -28,7 +28,8 @@
 {% block project_list_content %}
     {{ departments|json_script:"departmentsArray" }}
     {{ regions|json_script:"regionsArray" }}
-    <div x-data="KanbanProjects({{ request.site.id }}, departmentsArray, regionsArray )">
+    <div x-data="KanbanProjects({{ request.site.id }}, departmentsArray, regionsArray )"
+         @selected-regions="saveSelectedDepartment($event)">
         <div x-show="isBusy"
              x-transition
              class="position-absolute text-center w-100"

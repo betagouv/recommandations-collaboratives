@@ -1,24 +1,38 @@
 {% load static %}
 {% load sass_tags %}
+{% load django_vite %}
 {% block css %}
     <link href="{% sass_src 'projects/css/region_filter.scss' %}"
           rel="stylesheet"
           type="text/css">
 {% endblock css %}
+{% block js %}
+    {% vite_asset 'js/components/RegionFilter.js' %}
+{% endblock js %}
+{% comment %}
+
+    Region filter component
+
+    Parameters:
+        - filter_by_regions (boolean): if true, filter by regions, else filter by departments
+
+{% endcomment %}
 <div class="d-flex align-items-center fr-mr-6v">
     <span class="fr-segmented__legend inline text-nowrap">Filtrer :</span>
     <div class="input-item position-relative active specific-border-solid1pxE5E5E5"
-         x-data="{ open: false }"
+         x-data="RegionFilter(regions)"
          x-on:click.outside="open = false">
         <div class="d-flex align-items-center fr-pr-3w bg-white rounded-pill"
              x-on:click="open = !open"
              type="button"
              :class="{'input-active':open}">
+            {% comment %} TODO Param this label {% endcomment %}
             <button class="input-field bg-transparent fr-px-2w fw-normal text-dark appearance-none"
                     data-cy="check-display-project">
                 Projets de mon
                 territoire
             </button>
+            {% comment %} TODO Use DSFR icon {% endcomment %}
             <svg class="input-icon right black bi align-baseline fr-mr-2v"
                  width="15"
                  height="15"
