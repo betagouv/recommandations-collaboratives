@@ -1,0 +1,69 @@
+{% load static %}
+{% load sass_tags %}
+{% block css %}
+    <link href="{% sass_src 'css/tools/contact/search-organisation.scss' %}"
+          rel="stylesheet"
+          type="text/css" />
+{% endblock css %}
+<div x-data="SearchOrganisation"
+     class="fr-p-3v modal-create-contact__block"
+     :class="{'fr-input-group--error': formState.isSubmitted && !formState.fields.isOrgaSelected}">
+    <label class="modal-create-contact__label"
+           for="search-organisation-input"
+           :class="{'color-important': formState.isSubmitted && !formState.fields.isOrgaSelected}">Organisation</label>
+    <span :class="{'color-important': formState.isSubmitted && !formState.fields.isOrgaSelected}">*</span>
+    <template x-if="formState.isSubmitted && !formState.fields.isOrgaSelected">
+        <p class="modal-create-contact__label-info color-important">
+            Merci de sélectionner une organisation existante ou d'en créer une nouvelle si besoin.*
+        </p>
+    </template>
+    <div>
+        <div class="position-relative">
+            <div class="fr-search-bar" id="header-search" role="search">
+                <input class="fr-input"
+                       :class="{'fr-input--error': formState.isSubmitted && !formState.fields.isOrgaSelected}"
+                       placeholder="ADEME 44"
+                       type="search"
+                       id="search-organisation-input"
+                       name="search-organisation-input"
+                       @input.debounce="onSearch"
+                       x-model="userInput"
+                       required>
+                <button class="fr-btn" title="Rechercher" @click="onSearch">Rechercher</button>
+            </div>
+            <div class="fr-menu menu-modal-correct-fr-menu better-positionning-dropdown border-radius-4px">
+                <div class="fr-menu__list specific-width-26rem border-radius-4px">
+                    <div class="fr-menu__list specific-width-26rem overflow-auto specific-height border-radius-4px">
+                        <template x-if="userInput.length > 0 && showOrgAsResults && selectedOrga == null">
+                            <template class="fr-menu__item" x-for="(group) in orgaSorted">
+                                <div class="fr-menu__item__content" data-test-id="orga-to-select">
+                                    <template x-for="(orga, index) in group" :key="index">
+                                        <div>
+                                            <template x-if="index == 0">
+                                                <div class="fr-pt-1w fr-px-1w add-borders">
+                                                    <span class="fw-700" x-text="orga.group.name"></span>
+                                                </div>
+                                            </template>
+                                            <div class="fr-pt-1w fr-px-1w add-borders cursor-pointer"
+                                                 @click="onSelectOrga(orga)">
+                                                <span x-text="orga.name"></span>
+                                            </div>
+                                        </div>
+                                    </template>
+                                </div>
+                            </template>
+                        </template>
+                        <template class="fr-menu__item"
+                                  x-if="userInput.length > 0 && selectedOrga == null && !showOrgAsResults">
+                            <div>
+                                <div class="fr-m-1w fr-p-3v specific-banner">
+                                    <span class="text-style">Aucun résultat</span>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

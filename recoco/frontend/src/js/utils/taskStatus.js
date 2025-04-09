@@ -48,7 +48,7 @@ export function isArchivedStatus(status) {
 }
 
 export function isStatusUpdate(followup) {
-  return isArchivedStatus(followup.status) || followup.comment === '';
+  return isArchivedStatus(followup.status) || (followup.comment === '' && followup.contact == null);
 }
 
 export function truncate(input, size = 30) {
