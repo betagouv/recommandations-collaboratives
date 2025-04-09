@@ -9,10 +9,6 @@ function SearchOrganisation() {
     userInput: '',
     showOrgAsResults: false,
     selectedOrga: null,
-    init() {},
-    resetOrga() {
-      this.userInput = '';
-    },
     onSearch() {
       this.selectedOrga = null;
       if (this.userInput.length > 0) {

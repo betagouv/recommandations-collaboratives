@@ -51,7 +51,7 @@
                         </p>
                     </template>
                     <input type="email"
-                           pattern="^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$"
+                           pattern="^[\w.\-]+@([\w\-]+\.)+[\w\-]{2,4}$"
                            class="fr-input"
                            :class="{'fr-input--error': formState.isSubmitted && (!formState.fields.isMailOrPhone || !formState.fields.isFormatEmailValid)}"
                            x-model="contact.email">

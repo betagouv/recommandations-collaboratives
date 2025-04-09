@@ -16,7 +16,6 @@ Alpine.data('CreateContactModal', () => {
     },
     formState: {
       isSubmitted: false,
-      isValid: false,
       fields: {
         isOrgaSelected: false,
         isJobSelected: false,
@@ -34,7 +33,7 @@ Alpine.data('CreateContactModal', () => {
         isMailOrPhone:
           this.contact.email.length !== 0 || this.contact.phone_no.length !== 0,
         isFormatEmailValid: this.contact.email.match(
-          /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/
+          /^[\w.\-]+@([\w\-]+\.)+[\w\-]{2,4}$/
         ),
       };
 
@@ -50,8 +49,6 @@ Alpine.data('CreateContactModal', () => {
         };
 
         api.post(contactsUrl(), payload).then((response) => {
-          this.$dispatch('reset-orga', null); // FIXME
-
           this.Modal.responseModal(response.data);
         });
       }
