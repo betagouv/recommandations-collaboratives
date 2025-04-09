@@ -189,10 +189,15 @@
                                 <form @submit.prevent="onSubmitComment()" novalidate>
                                     <div class="w-100 fr-p-2w specific-border-top-solid1pxEEE">
                                         {% include "tools/editor.html" with model="comment" can_attach_contact=True tools_disabled="title" %}
-                                        <!--                                                 :disabled="$store.editor.isSubmitted === true" -->
+                                        <template x-if="currentlyEditing">
+                                            <button type="button"
+                                                    class="fr-btn fr-btn--sm fr-btn--tertiary button-cancel-edit"
+                                                    @click="onCancelEdit()">Annuler</button>
+                                        </template>
                                         <button type="submit"
                                                 class="fr-btn fr-btn--sm repositionning-in-modal"
-                                                data-test-id="button-submit-new">Envoyer</button>
+                                                data-test-id="button-submit-new"
+                                                x-text="currentlyEditing ? 'Modifier' : 'Envoyer'"></button>
                                     </div>
                                 </form>
                             </template>

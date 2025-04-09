@@ -96,19 +96,19 @@ document.addEventListener('alpine:init', () => {
       return data;
     },
     async issueFollowup(task, status, comment = '', contact = null) {
-      const body = { comment, status};
-      if(contact){
-        body.contact =  contact.id ;
+      const body = { comment, status };
+      if (contact) {
+        body.contact = contact.id;
       }
 
       if (body.status === task.status && body.comment === '') return;
 
-
       return await api.post(followupsUrl(this.projectId, task.id), body);
     },
-    async editComment(taskId, followupId, comment) {
+    async editComment(taskId, followupId, { comment, contact }) {
       await api.patch(followupUrl(this.projectId, taskId, followupId), {
         comment,
+        contact: contact ? contact.id : null,
       });
     },
     async markAllAsRead(taskId) {

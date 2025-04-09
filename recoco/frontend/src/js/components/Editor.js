@@ -105,7 +105,13 @@ Alpine.data('editor', (content) => {
       editor.chain().focus().unsetLink().run();
     },
     setMarkdownContent(event) {
-      editor.commands.setContent(event.detail);
+      editor.commands.setContent(event.detail.text);
+      debugger;
+      if (event.detail.contact) {
+        this.selectedContact = event.detail.contact;
+      } else {
+        this.selectedContact = null;
+      }
     },
     renderMarkdown() {
       this.markdownContent = editor.getMarkdown().replaceAll('\\', '');
