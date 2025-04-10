@@ -1,6 +1,6 @@
 import '../components/KanbanProjects';
 import '../components/GravatarCache';
 
-import '../../css/regionFilter.css';
+import '../../css/departmentsSelector.css';
 
 import '../store/projects';
