@@ -20,7 +20,6 @@
         - select_all (boolean): to select all departments (default=true)
         - input_region_name (string): name of the input for regions
         - input_department_name (string): name of the input for departments
-        - init_with (regions|departments): initial values of the filter
 
     Event to listen in parent component:
         - selected-departments: when a department is selected, the event is triggered with the selected departments
@@ -29,7 +28,7 @@
 <div class="d-flex align-items-center fr-mr-6v">
     <span class="fr-segmented__legend inline text-nowrap">Filtrer :</span>
     <div class="input-item position-relative active specific-border-solid1pxE5E5E5"
-         x-data="DepartmentsSelector({ listZone: {{ zone_objects|default:'null' }}, selectAll : '{{ select_all | default:'False' }}' == 'True', initWith : '{{ init_with | default:'null' }}' })"
+         x-data="DepartmentsSelector({ listZone: {{ zone_objects|default:'null' }}, selectAll : '{{ select_all | default:'False' }}' == 'True', filterByRegions : '{{ filter_by_regions }}' == 'True' })"
          x-on:click.outside="open = false">
         <div class="d-flex align-items-center fr-pr-3w bg-white rounded-pill"
              x-on:click="open = !open"
