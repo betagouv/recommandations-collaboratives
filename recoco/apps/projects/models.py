@@ -220,6 +220,16 @@ class ProjectQuerySet(models.QuerySet):
             ),
         )
 
+    def with_site_status(self):
+        return self.annotate(
+            site_status=Subquery(
+                ProjectSite.objects.filter(
+                    site=Site.objects.get_current(),
+                    project=OuterRef("pk"),
+                ).values("status")[:1]
+            )
+        )
+
 
 class ProjectOnSiteManager(CurrentSiteManager, ProjectManager):
     pass
