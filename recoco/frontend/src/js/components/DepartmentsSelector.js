@@ -14,7 +14,6 @@ Alpine.data(
       territorySelectAll: true,
       regions: regions,
       init() {
-        console.log(this.regions);
         if (selectAll) {
           this.handleTerritorySelectAll(selectAll);
         }
