@@ -19,6 +19,7 @@ from notifications import models as notifications_models
 from notifications.models import Notification
 from notifications.signals import notify
 from recoco.apps.addressbook import models as addressbook_models
+from recoco.apps.projects.utils import assign_advisor, assign_collaborator
 from recoco.apps.geomatics import models as geomatics_models
 from recoco.apps.home import models as home_models
 from recoco.apps.projects import models as projects_models
@@ -36,36 +37,94 @@ from .. import digests
 
 
 @pytest.mark.django_db
-def test_send_digests_for_new_reco(client, request, make_project):
+def test_send_digests_for_new_reco_for_collaborators(client, request, make_project):
     current_site = get_current_site(request)
     baker.make(home_models.SiteConfiguration, site=current_site)
-    membership = baker.make(projects_models.ProjectMember)
 
-    switchtender = Recipe(
-        auth.User, username="advisor", email="advisor@example.com"
+    publishing_advisor = Recipe(
+        auth.User, username="pub_advisor", email="pub-advisor@example.com"
+    ).make()
+
+    collaborator = Recipe(
+        auth.User, username="collaborator", email="collab@example.com"
     ).make()
 
     project = make_project(
         site=current_site,
-        status="DONE",
-        projectmember_set=[membership],
+        status="TO_PROCESS",
     )
+
+    assign_advisor(publishing_advisor, project, current_site)
+    assign_collaborator(collaborator, project, is_owner=True)
 
     # Generate a notification
     tasks_signals.action_created.send(
-        sender=test_send_digests_for_new_reco,
+        sender=test_send_digests_for_new_reco_for_collaborators,
         task=tasks_models.Task.objects.create(
-            project=project, site=current_site, created_by=switchtender
+            public=True,
+            project=project,
+            site=current_site,
+            created_by=publishing_advisor,
         ),
         project=project,
-        user=switchtender,
+        user=publishing_advisor,
     )
 
-    digests.send_digests_for_new_recommendations_by_user(
-        membership.member, dry_run=False
+    assert collaborator.notifications.unsent().count() == 1
+
+    digests.send_digests_for_new_recommendations_by_user(collaborator, dry_run=False)
+
+    assert collaborator.notifications.unsent().count() == 0
+
+
+@pytest.mark.django_db
+def test_send_digests_for_new_reco_should_not_trigger_for_advisors(
+    client, request, make_project
+):
+    current_site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=current_site)
+
+    publishing_advisor = Recipe(
+        auth.User, username="pub_advisor", email="pub-advisor@example.com"
+    ).make()
+
+    another_advisor = Recipe(
+        auth.User, username="another_advisor", email="another-advisor@example.com"
+    ).make()
+
+    collaborator = Recipe(
+        auth.User, username="collaborator", email="collab@example.com"
+    ).make()
+
+    project = make_project(
+        site=current_site,
+        status="TO_PROCESS",
     )
 
-    assert membership.member.notifications.unsent().count() == 0
+    assign_advisor(publishing_advisor, project, current_site)
+    assign_advisor(another_advisor, project, current_site)
+    assign_collaborator(collaborator, project, is_owner=True)
+
+    # Generate a notification
+    tasks_signals.action_created.send(
+        sender=test_send_digests_for_new_reco_should_not_trigger_for_advisors,
+        task=tasks_models.Task.objects.create(
+            public=True,
+            project=project,
+            site=current_site,
+            created_by=publishing_advisor,
+        ),
+        project=project,
+        user=publishing_advisor,
+    )
+
+    assert publishing_advisor.notifications.unsent().count() == 0
+    assert another_advisor.notifications.unsent().count() == 1
+
+    digests.send_digests_for_new_recommendations_by_user(another_advisor, dry_run=False)
+
+    assert publishing_advisor.notifications.unsent().count() == 0
+    assert another_advisor.notifications.unsent().count() == 1
 
 
 @pytest.mark.django_db
@@ -252,6 +311,54 @@ def test_send_digests_for_switchtender_by_user(request, client, make_project):
     assert regional_actor.notifications.unsent().count() == 0
     assert regional_actor2.notifications.unsent().count() == 0
     assert non_regional_actor.notifications.unsent().count() == 0
+
+
+@pytest.mark.django_db
+def test_send_digests_for_switchtender_includes_new_recos(
+    client, request, make_project
+):
+    current_site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=current_site)
+
+    publishing_advisor = Recipe(
+        auth.User, username="pub_advisor", email="pub-advisor@example.com"
+    ).make()
+
+    another_advisor = Recipe(
+        auth.User, username="another_advisor", email="another-advisor@example.com"
+    ).make()
+
+    collaborator = Recipe(
+        auth.User, username="collaborator", email="collab@example.com"
+    ).make()
+
+    project = make_project(
+        site=current_site,
+        status="TO_PROCESS",
+    )
+
+    assign_advisor(publishing_advisor, project, current_site)
+    assign_advisor(another_advisor, project, current_site)
+    assign_collaborator(collaborator, project, is_owner=True)
+
+    # Generate a notification
+    tasks_signals.action_created.send(
+        sender=test_send_digests_for_new_reco_should_not_trigger_for_advisors,
+        task=tasks_models.Task.objects.create(
+            public=True,
+            project=project,
+            site=current_site,
+            created_by=publishing_advisor,
+        ),
+        project=project,
+        user=publishing_advisor,
+    )
+
+    assert another_advisor.notifications.unsent().count() == 1
+
+    digests.send_digest_for_switchtender_by_user(another_advisor)
+
+    assert another_advisor.notifications.unsent().count() == 0
 
 
 @pytest.mark.django_db

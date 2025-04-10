@@ -127,6 +127,7 @@ def serialized_project(project, organization):
             "my_tag",
         ],
         "is_diagnostic_done": False,
+        "status": "READY",
     }
 
 

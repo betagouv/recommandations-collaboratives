@@ -181,4 +181,14 @@ def test_project_queryset_unread_notifications():
     assert annotated_project.document_notifications_count == 2
 
 
+@pytest.mark.django_db
+def test_project_queryset_with_site_status(current_site, django_assert_num_queries):
+    project = baker.make(models.Project)
+    baker.make(models.ProjectSite, project=project, site=current_site, status="DRAFT")
+
+    annotated_project = models.Project.objects.with_site_status().first()
+    with django_assert_num_queries(0):
+        assert annotated_project.site_status == "DRAFT"
+
+
 # eof
