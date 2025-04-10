@@ -60,6 +60,11 @@ class UserFilter(django_filters.FilterSet):
         widget=forms.widgets.RadioSelect,
     )
 
+    departments = django_filters.MultipleChoiceFilter(
+        label="Départements conseillés",
+        method="departments_filter",
+    )
+
     inactive = django_filters.BooleanFilter(
         label="Compte inactif",
         method="inactive_filter",
@@ -106,6 +111,10 @@ class UserFilter(django_filters.FilterSet):
         site = site_models.Site.objects.get_current()
         group_name = make_group_name_for_site(name, site)
         return queryset.filter(groups__name=group_name)
+
+    def departments_filter(self, queryset, name, value):
+        if name != "departments" or not value:
+            return queryset
 
 
 class ProjectFilter(django_filters.FilterSet):
