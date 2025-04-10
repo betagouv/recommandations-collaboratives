@@ -21,7 +21,7 @@ from recoco.utils import has_perm, has_perm_or_403
 
 from .. import models, signals
 from ..serializers import (
-    TaskFollowupCreateSerializer,
+    TaskFollowupCreateUpdateSerializer,
     TaskFollowupSerializer,
     TaskNotificationSerializer,
     TaskSerializer,
@@ -290,8 +290,8 @@ class TaskFollowupViewSet(viewsets.ModelViewSet):
         }
 
     def get_serializer_class(self):
-        if self.action == "create":
-            return TaskFollowupCreateSerializer
+        if self.action in ("create", "update", "partial_update"):
+            return TaskFollowupCreateUpdateSerializer
         return TaskFollowupSerializer
 
 
