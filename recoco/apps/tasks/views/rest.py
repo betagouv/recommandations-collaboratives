@@ -17,7 +17,7 @@ from rest_framework.response import Response
 
 from recoco.apps.projects import models as projects_models
 from recoco.apps.projects.utils import is_member
-from recoco.utils import has_perm, has_perm_or_403
+from recoco.utils import check_if_advisor, has_perm, has_perm_or_403
 
 from .. import models, signals
 from ..serializers import (
@@ -246,13 +246,17 @@ class IsTaskUser(permissions.BasePermission):
     """
 
     def has_permission(self, request, view):
+        if request.method in permissions.SAFE_METHODS and check_if_advisor(
+            user=request.user, site=request.site
+        ):
+            return True
+
         project_id = view.kwargs.get("project_id")
-        user_projects = list(
-            projects_models.Project.on_site.for_user(request.user).values_list(
-                flat=True
-            )
-        )
-        if project_id in user_projects:
+        if (
+            projects_models.Project.on_site.for_user(request.user)
+            .filter(pk=project_id)
+            .exists()
+        ):
             return True
 
         project = projects_models.Project.on_site.get(pk=project_id)
