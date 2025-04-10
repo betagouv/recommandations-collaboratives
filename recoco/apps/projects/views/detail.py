@@ -47,7 +47,7 @@ from ..forms import (
     TopicForm,
 )
 from ..utils import (
-    get_advisor_for_project,
+    get_advising_context_for_project,
     get_collaborators_for_project,
     get_notification_recipients_for_project,
     is_advisor_for_project,
@@ -89,7 +89,9 @@ def project_overview(request, project_id=None):
         .values_list("content_object_id", flat=True)
     )
 
-    advising = get_advisor_for_project(request.user, project)
+    advising, advising_position = get_advising_context_for_project(
+        request.user, project
+    )
 
     has_perm(request.user, "list_projects", request.site) or has_perm_or_403(
         request.user, "view_project", project
@@ -168,7 +170,9 @@ def project_knowledge(request, project_id=None):
         request.site, project, request.user, allow_national=True
     )
 
-    advising = get_advisor_for_project(request.user, project)
+    advising, advising_position = get_advising_context_for_project(
+        request.user, project
+    )
 
     can_view_updated_answers = (
         advising
@@ -218,7 +222,9 @@ def project_actions(request, project_id=None):
         request.site, project, request.user, allow_national=True
     )
 
-    advising = get_advisor_for_project(request.user, project)
+    advising, advising_position = get_advising_context_for_project(
+        request.user, project
+    )
 
     has_perm(request.user, "list_projects", request.site) or has_perm_or_403(
         request.user, "view_tasks", project
@@ -266,7 +272,9 @@ def project_actions_inline(request, project_id=None):
         request.site, project, request.user, allow_national=True
     )
 
-    advising = get_advisor_for_project(request.user, project)
+    advising, advising_position = get_advising_context_for_project(
+        request.user, project
+    )
 
     has_perm(request.user, "list_projects", request.site) or has_perm_or_403(
         request.user, "view_tasks", project
@@ -290,7 +298,9 @@ def project_conversations(request, project_id=None):
         request.site, project, request.user, allow_national=True
     )
 
-    advising = get_advisor_for_project(request.user, project)
+    advising, advising_position = get_advising_context_for_project(
+        request.user, project
+    )
 
     is_regional_actor or has_perm_or_403(request.user, "view_public_notes", project)
 
@@ -430,7 +440,9 @@ def project_conversations_new(request, project_id=None):
 
     is_regional_actor or has_perm_or_403(request.user, "view_public_notes", project)
 
-    advising = get_advisor_for_project(request.user, project)
+    advising, advising_position = get_advising_context_for_project(
+        request.user, project
+    )
 
     posting_form = PublicNoteForm()
 
@@ -536,7 +548,9 @@ def project_internal_followup(request, project_id=None):
 
     has_perm_or_403(request.user, "projects.use_private_notes", project)
 
-    advising = get_advisor_for_project(request.user, project)
+    advising, advising_position = get_advising_context_for_project(
+        request.user, project
+    )
 
     # Mark this project notifications as read
     if not request.user.is_hijacked:
@@ -561,7 +575,9 @@ def project_internal_followup_tracking(request, project_id=None):
 
     has_perm_or_403(request.user, "projects.use_private_notes", project)
 
-    advising = get_advisor_for_project(request.user, project)
+    advising, advising_position = get_advising_context_for_project(
+        request.user, project
+    )
 
     return render(request, "projects/project/internal_followup_tracking.html", locals())
 
@@ -571,7 +587,9 @@ def project_create_or_update_topics(request, project_id=None):
     """Create/Update topics for a project"""
     project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
 
-    advising = get_advisor_for_project(request.user, project)
+    advising, advising_position = get_advising_context_for_project(
+        request.user, project
+    )
 
     has_perm_or_403(request.user, "projects.change_topics", project)
 
@@ -620,7 +638,9 @@ def project_update_tags(request, project_id=None):
     """Create/Update tags for a project"""
     project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
 
-    advising = get_advisor_for_project(request.user, project)
+    advising, advising_position = get_advising_context_for_project(
+        request.user, project
+    )
 
     has_perm_or_403(request.user, "sites.use_project_tags", request.site)
 

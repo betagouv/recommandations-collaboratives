@@ -66,9 +66,8 @@
                 projet envoyé par {{ project.project_sites.origin.site.name }}
             </div>
         </div>
-        {% get_advising_position user project request.site as position %}
         <div class="col-9 knowledge__surveys">
-            {% if not is_staff and not position.is_advisor and not position.is_observer %}
+            {% if not is_staff and not advising_position.is_advisor and not advising_position.is_observer %}
                 <div class="d-flex justify-content-between knowledge__surveys-header fr-mt-5v">
                     <h3 class="fr-m-0">État des lieux</h3>
                     {% comment %} TODO
@@ -103,7 +102,7 @@
                 {% for session in sorted_sessions %}
                     <div class="d-flex justify-content-between knowledge__surveys-header fr-mt-5v">
                         <h4 class="fr-m-0">{{ session.survey.name }}</h4>
-                        {% if is_staff or position.is_advisor or position.is_observer %}
+                        {% if is_staff or advising_position.is_advisor or advising_position.is_observer %}
                             {% if "use_surveys" in user_project_perms %}
                                 <div x-data="ProjectShare" class="d-flex align-items-center">
                                     <button @click="openPublicShareModal"

@@ -43,25 +43,6 @@ def is_admin_for_current_site(user):
 
 
 @register.simple_tag
-def get_advising_position(user, project, site):
-    """Return position of user for project on current site as dict
-
-    {"is_observer": bool, "is_advisor": bool}
-    """
-    if user is None or user.is_anonymous:
-        return {"is_observer": False, "is_advisor": False}
-
-    try:
-        ps = models.ProjectSwitchtender.objects.get(
-            switchtender=user, project=project, site=site
-        )
-        # obsevrer and advisor and in mutual exclusion
-        return {"is_observer": ps.is_observer, "is_advisor": not ps.is_observer}
-    except models.ProjectSwitchtender.DoesNotExist:
-        return {"is_observer": False, "is_advisor": False}
-
-
-@register.simple_tag
 def get_projectsite_for_site(project, site):
     """Return the ProjectSite for the given site"""
     try:
