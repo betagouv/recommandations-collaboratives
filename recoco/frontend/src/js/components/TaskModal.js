@@ -15,7 +15,6 @@ import {
 export default function TaskModal() {
   return {
     currentlyEditing: null,
-    pendingComment: '',
     renderMarkdown,
     formatDate,
     resourcePreviewUrl,

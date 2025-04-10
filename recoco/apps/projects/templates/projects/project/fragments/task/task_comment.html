@@ -30,7 +30,14 @@
         <div class="fr-py-2w fr-px-2w fr-mb-2v border-blue task-comment medium-border-radius position-relative">
             <button class="fr-btn fr-btn--sm fr-btn--tertiary fr-icon-close-line position-absolute top-0 end-0 fr-m-2w"
                     @click.stop="isEditing = false">Annuler la modification</button>
-            {% include "tools/editor.html" with is_task_comment=True %}
+            <form @submit.prevent="handleEditComment(task)" novalidate>
+                {% include "tools/editor.html" with model="comment" initial_content="task.content" %}
+                <button @click.stop
+                        type="submit"
+                        class="fr-btn fr-btn--sm repositionning"
+                        data-test-id="button-submit-new">Enregistrer
+                </button>
+            </form>
         </div>
     </template>
 </div>
