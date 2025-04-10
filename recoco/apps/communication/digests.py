@@ -11,8 +11,10 @@ import logging
 from dataclasses import asdict, dataclass
 from itertools import groupby
 
+from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
+from django.db.models.query import QuerySet
 from django.urls import reverse
 
 from recoco import utils, verbs
@@ -24,6 +26,7 @@ from recoco.apps.reminders.api import (
     make_or_update_whatsup_reminder,
 )
 from recoco.apps.tasks import models as tasks_models
+from recoco.apps.tasks.models import Task
 
 from . import constants as communication_constants
 from .api import send_email
@@ -258,7 +261,9 @@ def make_digest_of_project_recommendations_from_notifications(
     return make_digest_of_project_recommendations(project, actions, user)
 
 
-def make_digest_of_project_recommendations(project, tasks, user):
+def make_digest_of_project_recommendations(
+    project: projects_models.Project, tasks: QuerySet[Task], user: User
+) -> dict[str, any]:
     """Return digest for project recommendations to be sent to user"""
     recommendations = make_recommendations_digest(tasks, user)
     project_digest = make_project_digest(project, user, url_name="actions")
