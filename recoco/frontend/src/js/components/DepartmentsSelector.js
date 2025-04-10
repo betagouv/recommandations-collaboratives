@@ -4,7 +4,7 @@ import api, { regionsUrl, departmentsUrl } from '../utils/api';
 Alpine.data(
   'DepartmentsSelector',
   (
-    { listZone, selectAll, initWith } = {
+    { listZone, selectAll, filterByRegions } = {
       selectAll: true,
     }
   ) => {
@@ -13,10 +13,21 @@ Alpine.data(
       territorySelectAll: true,
       regions: listZone,
       async init() {
-        if (initWith == 'regions') {
-          this.regions = await api.get(regionsUrl());
-        } else if (initWith == 'departments') {
-          this.departments = await api.get(departmentsUrl());
+        try {
+          if (!listZone && filterByRegions) {
+            this.regions = await api.get(regionsUrl());
+            this.regions = (await api.get(regionsUrl())).data.map((region) => {
+              return { ...region, active: false };
+            });
+          } else if (!listZone && !filterByRegions) {
+            this.departments = (await api.get(departmentsUrl())).data.map(
+              (department) => {
+                return { ...department, active: false };
+              }
+            );
+          }
+        } catch (error) {
+          throw new Error('Error fetching regions or departments', error);
         }
 
         if (selectAll) {
