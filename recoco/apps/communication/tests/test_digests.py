@@ -7,27 +7,36 @@ authors: guillaume.libersat@beta.gouv.fr, raphael.marvie@beta.gouv.fr
 created: 2022-02-03 16:14:54 CET
 """
 
-import test  # noqa
+from datetime import datetime, timezone
+from unittest.mock import ANY, patch
 
 import pytest
+import test  # noqa
 from django.contrib.auth import models as auth
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ImproperlyConfigured
+from freezegun import freeze_time
 from model_bakery import baker
 from model_bakery.recipe import Recipe
 from notifications import models as notifications_models
 from notifications.models import Notification
 from notifications.signals import notify
+
+from recoco import verbs
 from recoco.apps.addressbook import models as addressbook_models
-from recoco.apps.projects.utils import assign_advisor, assign_collaborator
+from recoco.apps.communication.digests import (
+    send_new_recommendations_reminders_digest_by_project,
+    send_whatsup_reminders_digest_by_project,
+)
 from recoco.apps.geomatics import models as geomatics_models
 from recoco.apps.home import models as home_models
 from recoco.apps.projects import models as projects_models
 from recoco.apps.projects import signals as projects_signals
-from recoco.apps.tasks import signals as tasks_signals
+from recoco.apps.projects.utils import assign_advisor, assign_collaborator
+from recoco.apps.reminders.models import Reminder
 from recoco.apps.resources import models as resources_models
 from recoco.apps.tasks import models as tasks_models
-from recoco import verbs
+from recoco.apps.tasks import signals as tasks_signals
 
 from .. import digests
 
@@ -500,6 +509,192 @@ def test_notification_formatter_with_bogus_user():
 
     fmt_reco = formatter.format(notification)
     assert "compte indisponible" in str(fmt_reco)
+
+
+@pytest.mark.django_db
+@patch("recoco.apps.communication.digests.make_or_update_new_recommendations_reminder")
+@patch(
+    "recoco.apps.communication.digests.get_due_new_recommendations_reminder_for_project"
+)
+@patch("recoco.apps.communication.digests.make_digest_of_project_recommendations")
+class TestSendNewRecommendationsRemindersDigestByProject:
+    def test_dryrun(
+        self, mock_make_digest, mock_get_due_reminder, mock_make_reminder, current_site
+    ):
+        project = baker.make(projects_models.Project, sites=[current_site])
+        res = send_new_recommendations_reminders_digest_by_project(
+            site=current_site, project=project, dry_run=True
+        )
+
+        assert res is True
+        mock_make_reminder.assert_called_once_with(current_site, project)
+        mock_get_due_reminder.assert_called_once_with(current_site, project)
+        mock_make_digest.assert_not_called()
+
+    def test_no_due_reminder(
+        self, mock_make_digest, mock_get_due_reminder, mock_make_reminder, current_site
+    ):
+        mock_get_due_reminder.return_value = baker.make(Reminder)
+
+        project = baker.make(projects_models.Project, sites=[current_site])
+        res = send_new_recommendations_reminders_digest_by_project(
+            site=current_site, project=project, dry_run=False
+        )
+
+        assert res is False
+        mock_make_reminder.assert_called_once_with(current_site, project)
+        mock_get_due_reminder.assert_called_once_with(current_site, project)
+        mock_make_digest.assert_not_called()
+
+    def test_no_project_owner(
+        self, mock_make_digest, mock_get_due_reminder, mock_make_reminder, current_site
+    ):
+        project = baker.make(projects_models.Project, sites=[current_site])
+        project.projectmember_set.all().delete()
+
+        res = send_new_recommendations_reminders_digest_by_project(
+            site=current_site, project=project, dry_run=False
+        )
+
+        assert res is False
+        mock_make_digest.assert_not_called()
+
+    @freeze_time("2025-04-10 08:00:00")
+    def test_digest_sent(
+        self, mock_make_digest, mock_get_due_reminder, mock_make_reminder, current_site
+    ):
+        due_reminder = baker.make(Reminder)
+        project = baker.make(projects_models.Project, sites=[current_site])
+        owner = baker.make(
+            auth.User,
+            email="anakin@jedi.com",
+            first_name="Anakin",
+            last_name="Skywalker",
+        )
+        baker.make(
+            projects_models.ProjectMember, project=project, is_owner=True, member=owner
+        )
+
+        mock_get_due_reminder.return_value = due_reminder
+        mock_make_digest.return_value = {"any": "digest"}
+
+        with patch("recoco.apps.communication.digests.send_email") as mock_send_email:
+            res = send_new_recommendations_reminders_digest_by_project(
+                site=current_site, project=project, dry_run=False
+            )
+
+        assert res is True
+        mock_make_reminder.assert_called_once_with(current_site, project)
+        mock_get_due_reminder.assert_called_once_with(current_site, project)
+        mock_make_digest.assert_called_once_with(project, ANY, owner)
+
+        mock_send_email.assert_called_once_with(
+            template_name="project_reminders_new_reco_digest",
+            recipients={
+                "name": "Anakin Skywalker",
+                "email": "anakin@jedi.com",
+            },
+            params={"any": "digest"},
+            related=due_reminder,
+        )
+
+        due_reminder.refresh_from_db()
+        assert due_reminder.sent_to == owner
+        assert due_reminder.sent_on == datetime(
+            2025, 4, 10, 8, 0, 0, tzinfo=timezone.utc
+        )
+
+
+@pytest.mark.django_db
+@patch("recoco.apps.communication.digests.make_or_update_whatsup_reminder")
+@patch("recoco.apps.communication.digests.get_due_whatsup_reminder_for_project")
+@patch("recoco.apps.communication.digests.make_digest_of_project_recommendations")
+class TestSendWhatsupRemindersDigestByProject:
+    def test_dryrun(
+        self, mock_make_digest, mock_get_due_reminder, mock_make_reminder, current_site
+    ):
+        project = baker.make(projects_models.Project, sites=[current_site])
+        res = send_whatsup_reminders_digest_by_project(
+            site=current_site, project=project, dry_run=True
+        )
+
+        assert res is True
+        mock_make_reminder.assert_called_once_with(current_site, project)
+        mock_get_due_reminder.assert_called_once_with(current_site, project)
+        mock_make_digest.assert_not_called()
+
+    def test_no_due_reminder(
+        self, mock_make_digest, mock_get_due_reminder, mock_make_reminder, current_site
+    ):
+        mock_get_due_reminder.return_value = baker.make(Reminder)
+
+        project = baker.make(projects_models.Project, sites=[current_site])
+        res = send_whatsup_reminders_digest_by_project(
+            site=current_site, project=project, dry_run=False
+        )
+
+        assert res is False
+        mock_make_reminder.assert_called_once_with(current_site, project)
+        mock_get_due_reminder.assert_called_once_with(current_site, project)
+        mock_make_digest.assert_not_called()
+
+    def test_no_project_owner(
+        self, mock_make_digest, mock_get_due_reminder, mock_make_reminder, current_site
+    ):
+        project = baker.make(projects_models.Project, sites=[current_site])
+        project.projectmember_set.all().delete()
+
+        res = send_whatsup_reminders_digest_by_project(
+            site=current_site, project=project, dry_run=False
+        )
+
+        assert res is False
+        mock_make_digest.assert_not_called()
+
+    @freeze_time("2025-04-10 08:00:00")
+    def test_digest_sent(
+        self, mock_make_digest, mock_get_due_reminder, mock_make_reminder, current_site
+    ):
+        due_reminder = baker.make(Reminder)
+        project = baker.make(projects_models.Project, sites=[current_site])
+        owner = baker.make(
+            auth.User,
+            email="anakin@jedi.com",
+            first_name="Anakin",
+            last_name="Skywalker",
+        )
+        baker.make(
+            projects_models.ProjectMember, project=project, is_owner=True, member=owner
+        )
+
+        mock_get_due_reminder.return_value = due_reminder
+        mock_make_digest.return_value = {"any": "digest"}
+
+        with patch("recoco.apps.communication.digests.send_email") as mock_send_email:
+            res = send_whatsup_reminders_digest_by_project(
+                site=current_site, project=project, dry_run=False
+            )
+
+        assert res is True
+        mock_make_reminder.assert_called_once_with(current_site, project)
+        mock_get_due_reminder.assert_called_once_with(current_site, project)
+        mock_make_digest.assert_called_once_with(project, ANY, owner)
+
+        mock_send_email.assert_called_once_with(
+            template_name="project_reminders_whats_up_digest",
+            recipients={
+                "name": "Anakin Skywalker",
+                "email": "anakin@jedi.com",
+            },
+            params={"any": "digest"},
+            related=due_reminder,
+        )
+
+        due_reminder.refresh_from_db()
+        assert due_reminder.sent_to == owner
+        assert due_reminder.sent_on == datetime(
+            2025, 4, 10, 8, 0, 0, tzinfo=timezone.utc
+        )
 
 
 # eof
