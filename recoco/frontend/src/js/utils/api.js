@@ -160,9 +160,13 @@ export function postExternalRessourceUrl() {
 }
 
 // Regions :
-// export function regionsUrl() {
-//   return `/api/regions/`;
-// }
+export function regionsUrl() {
+  return `/api/regions/`;
+}
+
+export function departmentsUrl() {
+  return `/api/departments/`;
+}
 
 // Challenges
 export function challengeUrl(code) {

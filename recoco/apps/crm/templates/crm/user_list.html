@@ -73,6 +73,11 @@
                                     {% endfor %}
                                 </div>
                             </div>
+                            <!-- departements -->
+                            <div class="fr-mb-2v">
+                                {% include "projects/project/fragments/departments_selector.html" with label="Départements conseillés" input_department_name="departments" filter_by_regions=True %}
+                            </div>
+
                             <hr />
                             <div>
                                 <label for="{{ form.ordering.name }}" class="form-label fr-mr-2v">Trier par :</label>
