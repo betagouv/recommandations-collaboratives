@@ -106,7 +106,6 @@ Alpine.data('editor', (content) => {
     },
     setMarkdownContent(event) {
       editor.commands.setContent(event.detail.text);
-      debugger;
       if (event.detail.contact) {
         this.selectedContact = event.detail.contact;
       } else {
