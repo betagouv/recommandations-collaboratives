@@ -15,7 +15,6 @@ Alpine.data(
       async init() {
         try {
           if (!listZone && filterByRegions) {
-            this.regions = await api.get(regionsUrl());
             this.regions = (await api.get(regionsUrl())).data.map((region) => {
               return { ...region, active: false };
             });
