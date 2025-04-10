@@ -18,6 +18,9 @@
         - filter_by_regions (boolean): if true, filter by regions, else filter by departments
         - zone_objects (list): list of regions or departments to display in filter
         - select_all (boolean): to select all departments (default=true)
+        - input_region_name (string): name of the input for regions
+        - input_department_name (string): name of the input for departments
+        - init_with (regions|department): initial values of the filter
 
     Event to listen in parent component:
         - selected-departments: when a department is selected, the event is triggered with the selected departments
@@ -25,19 +28,9 @@
 {% endcomment %}
 <div class="d-flex align-items-center fr-mr-6v">
     <span class="fr-segmented__legend inline text-nowrap">Filtrer :</span>
-    <div class="input-item position-relative active specific-border-solid1pxE5E5E5" x-data="DepartmentsSelector({{ zone_objects }}, {selectedDepartments :
-        {% if selected_departments %}
-            {{ selected_departments }}
-        {% else %}
-            []
-        {% endif %}
-        , selectAll :
-        {% if select_all %}
-            true
-        {% else %}
-            false
-        {% endif %}
-        })" x-on:click.outside="open = false">
+    <div class="input-item position-relative active specific-border-solid1pxE5E5E5"
+         x-data="DepartmentsSelector({ listZone: {{ zone_objects|default:'null' }}, selectAll : '{{ select_all | default:'False' }}' == 'True', initWith : '{{ init_with | default:'null' }}' })"
+         x-on:click.outside="open = false">
         <div class="d-flex align-items-center fr-pr-3w bg-white rounded-pill"
              x-on:click="open = !open"
              type="button"
@@ -81,6 +74,7 @@
                                        type="checkbox"
                                        :value="region.active"
                                        :checked="region.active"
+                                       {% if input_region_name %}:name="`{{ input_region_name }}-region-${region.code}`"{% endif %}
                                        :id="`region-${region.code}`" />
                                 <label class="w-100 fr-pr-2v fr-pt-2v d-flex align-items-center"
                                        :for="`region-${region.code}`">
@@ -97,6 +91,7 @@
                                                type="checkbox"
                                                :value="department.active"
                                                :checked="department.active"
+                                               {% if input_department_name %}:name="`{{ input_department_name }}-${department.code}`"{% endif %}
                                                :id="department.code" />
                                         <label class=" w-100 fr-pr-2v fr-py-1v d-flex align-items-center"
                                                :for="department.code">
@@ -121,6 +116,7 @@
                                    type="checkbox"
                                    :value="department.active"
                                    :checked="department.active"
+                                   {% if input_department_name %}:name="`{{ input_department_name }}-${department.code}`"{% endif %}
                                    :id="department.code" />
                             <label class=" w-100 fr-pr-2v fr-py-1v d-flex align-items-center"
                                    :for="department.code">

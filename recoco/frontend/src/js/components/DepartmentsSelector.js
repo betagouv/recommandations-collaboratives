@@ -1,20 +1,23 @@
 import Alpine from 'alpinejs';
+import api, { regionsUrl, departmentsUrl } from '../utils/api';
 
 Alpine.data(
   'DepartmentsSelector',
   (
-    regions,
-    { selectAll } = {
-      selectedDepartments: [],
+    { listZone, selectAll, initWith } = {
       selectAll: true,
     }
   ) => {
     return {
       open: false,
       territorySelectAll: true,
-      regions: regions,
-      init() {
-        console.log(this.regions);
+      regions: listZone,
+      async init() {
+        if (initWith == 'regions') {
+          this.regions = await api.get(regionsUrl());
+        } else if (initWith == 'departments') {
+          this.departments = await api.get(departmentsUrl());
+        }
         if (selectAll) {
           this.handleTerritorySelectAll(selectAll);
         }
