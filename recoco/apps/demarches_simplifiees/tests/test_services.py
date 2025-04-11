@@ -132,7 +132,7 @@ class TestMakeDSDataFromProject:
                         "condition": ["tag_a", "tag_b"],
                     },
                 ],
-                "champ_Q2hhbXAtMjk3ODA3NQ": [
+                "champ_Q2hhbXAtMzI3Njk1Nw": [
                     {
                         "value": "edl.avez-vous-deja-identifie-des-subventions",
                         "condition": ["tag_c"],
@@ -141,14 +141,23 @@ class TestMakeDSDataFromProject:
                 "champ_Q2hhbXAtMzI5MzU1NA": [
                     {"value": "edl.dummy-question-slug"},
                 ],
-                "champ_Q2hhbXAtMzgwNTc2MA": [
+                "champ_Q2hhbXAtMzMzNTgyNw": [
                     {"value": "raw[Non]"},
                 ],
-                "champ_Q2hhbXAtMjk4Nzc5MA": [
+                "champ_Q2hhbXAtMzMzNTgyNQ": [
                     {"value": "edl.est-ce-que-le-site-est-actuellement-utilise"}
                 ],
                 "champ_Q2hhbXAtMzAyMDUwMA": [
                     {"value": "edl.est-ce-que-le-site-est-actuellement-utilise.comment"}
+                ],
+                "champ_Q2hhbXAtMTk3NzQ0NQ": [
+                    {"value": "option[1]"},
+                ],
+                "champ_Q2hhbXAtMjk0NzQzNQ": [
+                    {"value": "option[22]"},
+                ],
+                "champ_Q2hhbXAtMjkzNDM2NA": [
+                    {"value": "option[dummy-value]"},
                 ],
             },
         )
@@ -162,7 +171,8 @@ class TestMakeDSDataFromProject:
             "champ_Q2hhbXAtODgwNDAy": "Jedi",
             "champ_Q2hhbXAtMzI5MzU1Mw": "Non pas encore",
             "champ_Q2hhbXAtMjkzNDQwMQ": "Non pas encore",
-            "champ_Q2hhbXAtMzgwNTc2MA": "Non",
-            "champ_Q2hhbXAtMjk4Nzc5MA": "Oui",
+            "champ_Q2hhbXAtMzMzNTgyNw": "Non",
+            "champ_Q2hhbXAtMzMzNTgyNQ": "Oui",
             "champ_Q2hhbXAtMzAyMDUwMA": "extra comment",
+            "champ_Q2hhbXAtMTk3NzQ0NQ": "EPCI",
         }, print(data)
