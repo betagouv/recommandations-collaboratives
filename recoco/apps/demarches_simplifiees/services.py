@@ -1,3 +1,4 @@
+import logging
 from typing import Any
 
 from django.contrib.sites.models import Site
@@ -8,6 +9,8 @@ from recoco.apps.resources.models import Resource
 from recoco.apps.survey.models import Answer, Session
 
 from .models import DSMapping, DSResource
+
+logger = logging.getLogger(__name__)
 
 
 def find_ds_resource_for_project(
@@ -41,15 +44,41 @@ def make_ds_data_from_project(
     session = _get_session(site=site, project=project)
 
     for ds_field_id, mapping_items in ds_mapping.mapping.items():
+        # retrieve the DS field from the DS schema
+        ds_field = ds_mapping.indexed_ds_fields.get(ds_field_id)
+        if ds_field is None:
+            logger.error(
+                f"DS field {ds_field_id} not found in DS schema for resource {ds_resource.name}"
+            )
+            continue
+
         ds_value = None
 
         for mapping_item in mapping_items:
             value = mapping_item.get("value")
 
+            # raw value expected
             if value.startswith("raw["):
                 ds_value = value[4:-1]
                 continue
 
+            # DS field option value expected
+            if value.startswith("option["):
+                try:
+                    option = int(value[7:-1])
+                except ValueError:
+                    logger.error(
+                        f"Invalid option value {value} for DS field {ds_field_id} in resource {ds_resource.name}"
+                    )
+                try:
+                    ds_value = ds_field.options[option]
+                except IndexError:
+                    logger.error(
+                        f"DS field {ds_field_id} option {option} not found in DS schema for resource {ds_resource.name}"
+                    )
+                continue
+
+            # Recoco field value expected (project or EDL)
             recoco_field = ds_mapping.indexed_recoco_fields.get(value)
             if recoco_field is None:
                 continue
