@@ -14,6 +14,7 @@ from django.contrib.sites import models as site_models
 from watson import search as watson
 
 from recoco.apps.addressbook import models as addressbook_models
+from recoco.apps.geomatics import models as geomatics_models
 from recoco.apps.projects import models as projects_models
 from recoco.utils import make_group_name_for_site
 
@@ -60,9 +61,10 @@ class UserFilter(django_filters.FilterSet):
         widget=forms.widgets.RadioSelect,
     )
 
-    departments = django_filters.MultipleChoiceFilter(
+    departments = django_filters.ModelMultipleChoiceFilter(
         label="Départements conseillés",
-        method="departments_filter",
+        field_name="profile__departments",
+        queryset=geomatics_models.Department.objects.all(),
     )
 
     inactive = django_filters.BooleanFilter(
@@ -111,10 +113,6 @@ class UserFilter(django_filters.FilterSet):
         site = site_models.Site.objects.get_current()
         group_name = make_group_name_for_site(name, site)
         return queryset.filter(groups__name=group_name)
-
-    def departments_filter(self, queryset, name, value):
-        if name != "departments" or not value:
-            return queryset
 
 
 class ProjectFilter(django_filters.FilterSet):
