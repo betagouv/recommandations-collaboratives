@@ -41,13 +41,21 @@ Alpine.data(
           this.regions = this.regions.map((region) => {
             return {
               ...region,
-              active: selectedDepartments.includes(region.code),
               departments: region.departments.map((department) => ({
                 ...department,
                 active: selectedDepartments.includes(department.code),
               })),
             };
           });
+          this.regions.forEach((region) => {
+            region.active =
+              region.departments.length ===
+              region.departments.filter((department) => department.active)
+                .length;
+          });
+          this.territorySelectAll =
+            this.regions.filter((region) => region.active).length ===
+            this.regions.length;
         } else {
           this.departments = this.departments.map((department) => {
             return {

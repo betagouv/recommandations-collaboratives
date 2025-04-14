@@ -73,9 +73,9 @@
                                 <input x-on:input.change="handleRegionFilter(region)"
                                        class="region-checkbox form-check-input fw-normal fr-ml-2v fr-px-2v fr-py-2v fr-mr-2v"
                                        type="checkbox"
-                                       :value="region.active"
+                                       :value="region.code"
                                        :checked="region.active"
-                                       {% if input_region_name %}:name="`{{ input_region_name }}-region-${region.code}`"{% endif %}
+                                       {% if input_region_name %}:name="`{{ input_region_name }}-region`"{% endif %}
                                        :id="`region-${region.code}`" />
                                 <label class="w-100 fr-pr-2v fr-pt-2v d-flex align-items-center"
                                        :for="`region-${region.code}`">
@@ -115,9 +115,9 @@
                             <input x-on:input.change="handleTerritoryFilter(department)"
                                    class="form-check-input fw-normal fr-ml-2v fr-px-2v fr-py-2v fr-mr-2v"
                                    type="checkbox"
-                                   :value="department.active"
+                                   :value="department.code"
                                    :checked="department.active"
-                                   {% if input_department_name %}:name="`{{ input_department_name }}-${department.code}`"{% endif %}
+                                   {% if input_department_name %}:name="`{{ input_department_name }}"{% endif %}
                                    :id="department.code" />
                             <label class=" w-100 fr-pr-2v fr-py-1v d-flex align-items-center"
                                    :for="department.code">
