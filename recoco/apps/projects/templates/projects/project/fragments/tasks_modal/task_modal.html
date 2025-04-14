@@ -126,7 +126,7 @@
                                             </div>
                                         </div>
                                     </template>
-                                    <template x-if="followups">
+                                    <template x-if="!followupsIsLoading && followups">
                                         <template x-for="f in followups"
                                                   x-key="f.timestamp"
                                                   x-effect="followups"

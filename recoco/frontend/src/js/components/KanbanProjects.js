@@ -207,74 +207,10 @@ Alpine.data('KanbanProjects', function (currentSiteId, departments, regions) {
 
       await this.getData();
     },
-    saveSelectedDepartment() {
-      const extractedDepartements = this.regions
-        .flatMap((region) =>
-          region.departments.map(
-            (department) => department.active && department.code
-          )
-        )
-        .filter((department) => department);
-      this.backendSearch.searchDepartment = [...extractedDepartements];
-    },
-    async handleTerritorySelectAll() {
-      this.territorySelectAll = !this.territorySelectAll;
+    async saveSelectedDepartment(event) {
+      if (!event.detail) return;
 
-      this.regions = this.regions.map((region) => ({
-        ...region,
-        active: this.territorySelectAll,
-        departments: region.departments.map((department) => ({
-          ...department,
-          active: this.territorySelectAll,
-        })),
-      }));
-
-      this.saveSelectedDepartment();
-
-      await this.backendSearchProjects();
-    },
-    async handleRegionFilter(selectedRegion) {
-      this.regions = this.regions.map((region) => {
-        if (region.code === selectedRegion.code) {
-          region.active = !region.active;
-          region.departments = region.departments.map((department) => ({
-            ...department,
-            active: region.active,
-          }));
-        }
-
-        return region;
-      });
-
-      this.territorySelectAll =
-        this.regions.filter((region) => region.active).length ===
-        this.regions.length;
-
-      this.saveSelectedDepartment();
-
-      await this.backendSearchProjects();
-    },
-    async handleDepartmentFilter(selectedDepartment) {
-      this.regions = this.regions.map((region) => ({
-        ...region,
-        departments: region.departments.map((department) => {
-          if (department.code === selectedDepartment.code) {
-            department.active = !department.active;
-          }
-
-          return department;
-        }),
-        active:
-          region.departments.length ===
-          region.departments.filter((department) => department.active).length,
-      }));
-
-      this.territorySelectAll =
-        this.regions.filter((region) => region.active).length ===
-        this.regions.length;
-
-      this.saveSelectedDepartment();
-
+      this.backendSearch.searchDepartment = [...event.detail];
       await this.backendSearchProjects();
     },
 

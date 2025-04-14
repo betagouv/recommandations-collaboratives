@@ -58,8 +58,10 @@ def project_administration(request, project_id):
 
     project = get_object_or_404(
         models.Project.objects.filter(sites=request.site)
+        .with_site_status()
         .with_unread_notifications(user_id=request.user.id)
-        .select_related("commune__department"),
+        .select_related("commune__department")
+        .prefetch_related("switchtender_sites"),
         pk=project_id,
     )
 
@@ -155,7 +157,18 @@ def project_administration(request, project_id):
             initial={"postcode": postcode, "insee": insee},
         )
 
-    return render(request, "projects/project/administration_panel.html", locals())
+    return render(
+        request,
+        "projects/project/administration_panel.html",
+        context={
+            "project": project,
+            "project_form": project_form,
+            "invite_form": invite_form,
+            "pending_invites": pending_invites,
+            "is_regional_actor": is_regional_actor,
+            "has_any_required_perm": has_any_required_perm,
+        },
+    )
 
 
 def access_invite(request, role, project):
