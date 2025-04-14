@@ -53,6 +53,8 @@ def project(commune, organization, make_project, current_site):
             org_name="My organization",
             commune=commune,
             location="rue des basques",
+            location_x=635731.78681425,
+            location_y=3644425.1077159,
             description="My description",
         )
         project.tags.add("my_tag")  # taggit doesn't support initialization
@@ -100,6 +102,8 @@ def serialized_project(project, organization):
             }
         ],
         "location": "rue des basques",
+        "latitude": 3644425.1077159,
+        "longitude": 635731.78681425,
         "commune": {
             "name": "Bayonne",
             "insee": "64102",
@@ -123,6 +127,7 @@ def serialized_project(project, organization):
             "my_tag",
         ],
         "is_diagnostic_done": False,
+        "status": "READY",
     }
 
 

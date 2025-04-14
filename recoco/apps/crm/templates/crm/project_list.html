@@ -77,7 +77,13 @@
             </div>
             <div class="fr-mb-2w table-responsive">
                 <table class="table table-striped table-hover caption-top">
-                    <caption class="fr-ml-2v">{{ projects.qs.count }} résultat{{ projects.qs.count|pluralize }}</caption>
+                    {% with projects.qs.count as projects_count %}
+                        {% if projects_count > 0 %}
+                            <caption class="fr-ml-2v">{{ projects_count }} résultat{{ projects_count|pluralize }}</caption>
+                        {% else %}
+                            <caption class="fr-ml-2v">Aucun résultat</caption>
+                        {% endif %}
+                    {% endwith %}
                     <thead>
                         <tr>
                             <th scope="col">Nom</th>

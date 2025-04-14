@@ -9,7 +9,6 @@ created: 2021-11-15 14:44:55 CET
 Inspired by django-gamification (https://github.com/mattjegan/django-gamification/)
 """
 
-
 from django.contrib.auth import models as auth_models
 from django.contrib.sites import models as site_models
 from django.contrib.sites.managers import CurrentSiteManager

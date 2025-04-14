@@ -28,11 +28,22 @@ from django.contrib.syndication.views import Feed
 from django.core.cache import cache
 from django.core.cache.utils import make_template_fragment_key
 from django.db import transaction
-from django.db.models import Count, ExpressionWrapper, F, FloatField, Max, Q, Value
+from django.db.models import (
+    Count,
+    ExpressionWrapper,
+    F,
+    FloatField,
+    Func,
+    Max,
+    OuterRef,
+    Q,
+    Subquery,
+    Value,
+)
 from django.db.models.functions import Cast
-from django.http import Http404, HttpResponse
-from django.shortcuts import get_object_or_404, redirect, render, reverse
-from django.urls import reverse_lazy
+from django.http import Http404, HttpRequest, HttpResponse
+from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.utils.safestring import mark_safe
 from django.views.decorators.http import require_http_methods
@@ -177,6 +188,73 @@ class SiteConfigurationUpdateView(LoginRequiredMixin, UserPassesTestMixin, Updat
         cache.delete(key)
 
         return super().form_valid(form)
+
+
+@login_required
+def siteconfiguration_tags(request: HttpRequest):
+    has_perm_or_403(request.user, "sites.manage_configuration", request.site)
+
+    site_configuration = request.site.configuration
+
+    template_name = "crm/siteconfiguration_tags.html"
+
+    if request.method == "POST" and request.htmx:
+        template_name = "crm/siteconfiguration_tags_table.html"
+
+        match request.POST.get("action"):
+            case "remove":
+                tag_name = request.POST.get("tag_name")
+                if tag_name:
+                    with transaction.atomic():
+                        site_configuration.crm_available_tags.remove(tag_name)
+                        for project in Project.on_site.filter(
+                            crm_annotations__tags__name__in=[tag_name]
+                        ):
+                            project.crm_annotations.tags.remove(tag_name)
+
+            case "rename":
+                tag_name = request.POST.get("tag_name")
+                new_tag_name = request.POST.get("new_tag_name")
+                if (
+                    tag_name
+                    and new_tag_name
+                    and tag_name in site_configuration.crm_available_tags.names()
+                ):
+                    with transaction.atomic():
+                        site_configuration.crm_available_tags.remove(tag_name)
+                        site_configuration.crm_available_tags.add(new_tag_name)
+                        for project in Project.on_site.filter(
+                            crm_annotations__tags__name__in=[tag_name]
+                        ):
+                            project.crm_annotations.tags.remove(tag_name)
+                            project.crm_annotations.tags.add(new_tag_name)
+
+            case "add":
+                new_tag_name = request.POST.get("new_tag_name")
+                if new_tag_name:
+                    site_configuration.crm_available_tags.add(new_tag_name)
+
+            case _:
+                pass
+
+    tags = site_configuration.crm_available_tags.annotate(
+        impacted_count=Subquery(
+            Project.objects.filter(
+                crm_annotations__tags__name=OuterRef("name"),
+                sites=request.site.id,
+                deleted__isnull=True,
+            )
+            .order_by()
+            .annotate(count=Func(F("id"), function="Count"))
+            .values("count")
+        )
+    ).order_by("name")
+
+    return render(
+        request,
+        template_name,
+        context={"tags": tags},
+    )
 
 
 ########################################################################
@@ -332,6 +410,7 @@ def organization_details(request, organization_id):
             actor_content_type=user_ct,
             actor_object_id__in=participant_ids,
         )
+        .prefetch_related("actor", "action_object", "target")
         .order_by("-timestamp")
     )
 
@@ -343,15 +422,25 @@ def organization_details(request, organization_id):
         .filter(target_content_type=organization_ct, target_object_id=organization.pk)
     )
 
-    org_notes = models.Note.on_site.filter(
-        object_id=organization.pk,
-        content_type=organization_ct,
-    ).order_by("-updated_on")
+    org_notes = (
+        models.Note.on_site.filter(
+            object_id=organization.pk,
+            content_type=organization_ct,
+        )
+        .prefetch_related("tags", "related")
+        .select_related("created_by", "content_type")
+        .order_by("-updated_on")
+    )
 
-    participant_notes = models.Note.on_site.filter(
-        object_id__in=participant_ids,
-        content_type=user_ct,
-    ).order_by("-updated_on")
+    participant_notes = (
+        models.Note.on_site.filter(
+            object_id__in=participant_ids,
+            content_type=user_ct,
+        )
+        .prefetch_related("tags", "related")
+        .select_related("created_by", "content_type")
+        .order_by("-updated_on")
+    )
 
     sticky_notes = org_notes.filter(sticky=True)
     notes = org_notes.exclude(sticky=True) | participant_notes
@@ -551,7 +640,13 @@ def user_unset_advisor(request, user_id=None):
 def user_details(request, user_id):
     has_perm_or_403(request.user, "use_crm", request.site)
 
-    crm_user = get_object_or_404(User, pk=user_id, profile__sites=request.site)
+    crm_user = get_object_or_404(
+        User.objects.select_related("profile__organization").prefetch_related(
+            "projects_switchtended_per_site", "projectmember_set"
+        ),
+        pk=user_id,
+        profile__sites=request.site,
+    )
 
     group_name = make_group_name_for_site("advisor", request.site)
     crm_user_is_advisor = crm_user.groups.filter(name=group_name).exists()
@@ -1246,8 +1341,7 @@ def project_list_by_tags(request):
     has_perm_or_403(request.user, "use_crm", request.site)
 
     tags = (
-        Project.tags.filter(project__sites=request.site)
-        .exclude(project__exclude_stats=True)
+        Project.tags.filter(project__sites=request.site, project__exclude_stats=False)
         .annotate(Count("project", distinct=True))
         .order_by("-project__count")
         .distinct()
@@ -1255,7 +1349,14 @@ def project_list_by_tags(request):
 
     search_form = forms.CRMSearchForm()
 
-    return render(request, "crm/tags_for_projects.html", locals())
+    return render(
+        request,
+        "crm/tags_for_projects.html",
+        context={
+            "tags": tags,
+            "search_form": search_form,
+        },
+    )
 
 
 @login_required

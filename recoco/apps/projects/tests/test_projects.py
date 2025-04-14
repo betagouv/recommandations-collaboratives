@@ -137,15 +137,31 @@ def test_project_list_not_available_for_non_staff_users(client):
 
 @pytest.mark.django_db
 def test_project_list_available_for_switchtender_user(request, client):
-    get_current_site(request)
+    current_site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=current_site)
+    url = reverse("projects-project-list")
+    with login(client, groups=["example_com_staff", "example_com_advisor"]):
+        response = client.get(url, follow=True)
+
+    advisor_url = reverse("projects-project-list-staff")
+    url, code = response.redirect_chain[-1]
+    assert code == 302
+    assert url == advisor_url
+
+
+@pytest.mark.django_db
+def test_project_list_available_for_advisor(request, client):
+    current_site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=current_site)
+
     url = reverse("projects-project-list")
     with login(client, groups=["example_com_advisor"]):
         response = client.get(url, follow=True)
 
-    advisor_url = reverse("projects-project-list-advisor")
+    staff_url = reverse("projects-project-list-staff")
     url, code = response.redirect_chain[-1]
     assert code == 302
-    assert url == advisor_url
+    assert url == staff_url
 
 
 @pytest.mark.django_db
@@ -154,7 +170,7 @@ def test_project_list_available_for_staff(request, client):
     baker.make(home_models.SiteConfiguration, site=current_site)
 
     url = reverse("projects-project-list")
-    with login(client, groups=["example_com_staff", "example_com_advisor"]):
+    with login(client, groups=["example_com_staff"]):
         response = client.get(url, follow=True)
 
     staff_url = reverse("projects-project-list-staff")
@@ -1173,7 +1189,7 @@ def test_switchtender_exports_csv(request, client, make_project):
 # Tags
 #################################################################
 @pytest.mark.django_db
-def test_advisor_cannot_updates_tags(request, client, project):
+def test_advisor_updates_tags(request, client, project):
     current_site = get_current_site(request)
 
     data = {"tags": "blah"}
@@ -1185,9 +1201,9 @@ def test_advisor_cannot_updates_tags(request, client, project):
             reverse("projects-project-tags", args=[project.id]), data=data
         )
 
-    assert response.status_code == 403
+    assert response.status_code == 302
     project = models.Project.objects.all()[0]
-    assert list(project.tags.names()) == []
+    assert list(project.tags.names()) == [data["tags"]]
 
 
 @pytest.mark.django_db

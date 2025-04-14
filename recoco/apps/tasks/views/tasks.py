@@ -7,6 +7,8 @@ author  : raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created : 2021-05-26 15:56:20 CEST
 """
 
+import datetime
+
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import Http404, HttpResponseForbidden
@@ -75,63 +77,54 @@ def create_task(request):
             project = type_form.cleaned_data.get("project")
             has_perm_or_403(request.user, "projects.manage_tasks", project)
 
-            if push_type == "multiple":
-                for resource in form.cleaned_data.get("resources", []):
-                    public = form.cleaned_data.get("public", False)
+            action = form.save(commit=False)
+            action.project = project
+            action.site = request.site
+            action.created_by = request.user
+            # get or create topic
+            name = form.cleaned_data["topic_name"]
+            if name:
+                topic, _ = project_models.Topic.objects.get_or_create(
+                    name__iexact=name.lower(),
+                    defaults={"name": name.capitalize(), "site": request.site},
+                )
+                action.topic = topic
+            action.save()
 
-                    action = models.Task.on_site.create(
-                        project=project,
-                        site=request.site,
-                        resource=resource,
-                        intent=resource.title,
-                        created_by=request.user,
-                        public=public,
-                    )
-                    action.top()
-
-                    # Notify other switchtenders
-                    signals.action_created.send(
-                        sender=create_task,
-                        task=action,
-                        project=project,
-                        user=request.user,
-                    )
-
+            # Depending on wether we already have a recommandation on the same day:
+            # - move the new action after the existing one on the same day
+            # - let it on top if the following one was at least yesterday
+            today = datetime.date.today()
+            previous_today_action = (
+                models.Task.objects.filter(project=action.project)
+                .exclude(id=action.id)
+                .filter(created_on__date=today)
+                .order_by("-created_on")
+                .first()
+            )
+            if previous_today_action:
+                action.below(previous_today_action)
             else:
-                action = form.save(commit=False)
-                action.project = project
-                action.site = request.site
-                action.created_by = request.user
-                # get or create topic
-                name = form.cleaned_data["topic_name"]
-                if name:
-                    topic, _ = project_models.Topic.objects.get_or_create(
-                        name__iexact=name.lower(),
-                        defaults={"name": name.capitalize(), "site": request.site},
-                    )
-                    action.topic = topic
-                action.save()
                 action.top()
 
-                # Check if we have a file or link
-                document_form = DocumentUploadForm(request.POST, request.FILES)
-                if document_form.is_valid():
-                    if document_form.cleaned_data["the_file"]:
-                        document = document_form.save(commit=False)
-                        document.attached_object = action
-                        document.site = request.site
-                        document.uploaded_by = request.user
-                        document.project = action.project
+            # Check if we have a file or link
+            document_form = DocumentUploadForm(request.POST, request.FILES)
+            if document_form.is_valid():
+                if document_form.cleaned_data["the_file"]:
+                    document = document_form.save(commit=False)
+                    document.attached_object = action
+                    document.site = request.site
+                    document.uploaded_by = request.user
+                    document.project = action.project
+                    document.save()
 
-                        document.save()
-
-                # Notify other switchtenders
-                signals.action_created.send(
-                    sender=create_task,
-                    task=action,
-                    project=project,
-                    user=request.user,
-                )
+            # Notify other switchtenders
+            signals.action_created.send(
+                sender=create_task,
+                task=action,
+                project=project,
+                user=request.user,
+            )
 
             # Redirect to `action-inline` if we're coming
             # from `action-inline` after create

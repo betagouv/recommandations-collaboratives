@@ -287,7 +287,11 @@ def test_notifications_are_not_dispatched_to_collaborators_if_project_is_inactiv
     collaborator = baker.make(auth_models.User, email="collab@notif.com")
     assign_collaborator(collaborator, project)
 
-    invited_collab = baker.make(auth_models.User, email="invited_collab@notif.com")
+    invited_collab = baker.make(
+        auth_models.User,
+        email="invited_collab@notif.com",
+        username="invited_collab@notif.com",
+    )
 
     advisor = baker.make(auth_models.User, email="advisor@notif.com")
     assign_advisor(advisor, project, site)

@@ -10,6 +10,7 @@ import 'leaflet-providers';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-control-geocoder/dist/Control.Geocoder.css';
 import Fuse from 'fuse.js';
+import _ from 'lodash';
 
 function PersonalAdvisorDashboard(currentSiteId) {
   return {
@@ -22,20 +23,20 @@ function PersonalAdvisorDashboard(currentSiteId) {
     formatDate,
     gravatar_url,
     makeProjectURL,
-    // filters
+    //*** filters
     currentSort: this.sortProjectDate,
     search: '',
     select: '',
     fuse: null,
-    //departments
+    //*** departments
     departments: [],
     territorySelectAll: true,
-    // map
+    //*** map
     map: null,
     mapIsSmall: false,
     markersLayer: '',
-    //options
-    //header's height + some px
+    //*** options
+    //*** header's height + some px
     bodyScrollTopPadding: 80,
     init() {
       this.handleBodyTopPaddingScroll(this.bodyScrollTopPadding);
@@ -55,7 +56,7 @@ function PersonalAdvisorDashboard(currentSiteId) {
       this.fuse = new Fuse(this.rawData, {
         keys: ['project.name', 'project.commune.name', 'project.commune.insee'],
       });
-
+      this.data = _.unionBy(this.data, 'project.id');
       this.displayedData = this.data.sort(this.sortProjectDate);
       const { map, markersLayer } = initMap(projects);
 
@@ -93,7 +94,7 @@ function PersonalAdvisorDashboard(currentSiteId) {
         this.departments = JSON.parse(currentDepartments);
       }
 
-      //If we can't find an active department in state
+      //If we can find an inactive department in state
       // then uncheck select all departments in filter
       if (
         this.departments.findIndex((department) => department.active) === -1
@@ -211,31 +212,10 @@ function PersonalAdvisorDashboard(currentSiteId) {
 
       return (this.departments = departments.sort(this.sortDepartments));
     },
+    regionsFilterResponse(event) {
+      if (!event.detail) return;
 
-    handleTerritorySelectAll() {
-      this.territorySelectAll = !this.territorySelectAll;
-
-      this.departments = this.departments.map((department) => ({
-        ...department,
-        active: this.territorySelectAll,
-      }));
-
-      return (this.displayedData = this.filterProjectsByDepartments(
-        this.searchProjects(this.search)
-      ).sort(this.currentSort));
-    },
-    handleTerritoryFilter(selectedDepartment) {
-      this.departments = this.departments.map((department) => {
-        if (department.code === selectedDepartment.code) {
-          department.active = !department.active;
-        }
-
-        return department;
-      });
-
-      this.territorySelectAll =
-        this.departments.filter((department) => department.active).length ===
-        this.departments.length;
+      this.departments = event.detail;
 
       return (this.displayedData = this.filterProjectsByDepartments(
         this.searchProjects(this.search)

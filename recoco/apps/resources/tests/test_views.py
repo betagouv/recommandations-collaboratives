@@ -992,7 +992,7 @@ def test_embedded_resource_detail_contacts_to_display(request, client):
 
     contact = baker.make(Contact)
 
-    url = f"{reverse('resources-resource-detail-embeded',args=[resource.id])}?task_id={task.id}"
+    url = f"{reverse('resources-resource-detail-embeded', args=[resource.id])}?task_id={task.id}"
 
     with login(client) as user:
         response = client.get(url)

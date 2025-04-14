@@ -9,10 +9,13 @@ created: 2021-09-28 12:59:08 CEST
 
 import datetime
 import logging
+from datetime import date
 
+from django.contrib.sites.models import Site
 from django.utils import timezone
 
 from recoco.apps.home.models import SiteConfiguration
+from recoco.apps.projects.models import Project
 from recoco.apps.tasks.models import Task
 
 from . import models
@@ -20,12 +23,14 @@ from . import models
 logger = logging.getLogger("main")
 
 
-def make_or_update_reminder(site, project, kind, deadline):
+def make_or_update_reminder(
+    site: Site, project: Project, kind: str, deadline: date
+) -> models.Reminder | None:
     if site not in project.sites.all():
         return None
 
     existing_reminder = (
-        models.Reminder.on_site_to_send.filter(project=project, kind=kind)
+        models.Reminder.to_send.filter(project=project, site=site, kind=kind)
         .order_by("-deadline")
         .first()
     )
@@ -48,12 +53,12 @@ def make_or_update_reminder(site, project, kind, deadline):
                 f"for project <{project.name}>"
                 f" ({project.pk})"
             )
-
         return None
 
     if existing_reminder:
         # check if this reminder still makes sense ; i.e. we still have unattended
         # Recommendations to remind. Delete it otherwise
+
         if task_count == 0:
             logger.warning(
                 f"Deleting bogus {kind} reminder since there are no more"
@@ -62,15 +67,16 @@ def make_or_update_reminder(site, project, kind, deadline):
             )
             existing_reminder.delete()
             return None
-        else:
-            if existing_reminder.deadline != deadline:
-                existing_reminder.deadline = deadline
-                existing_reminder.save()
-                logger.info(
-                    f"Updating reminder <{existing_reminder.kind}> "
-                    f"for project <{project.name}>(id={project.pk})"
-                )
-            return existing_reminder
+
+        if existing_reminder.deadline != deadline:
+            existing_reminder.deadline = deadline
+            existing_reminder.save()
+            logger.info(
+                f"Updating reminder <{existing_reminder.kind}> "
+                f"for project <{project.name}>(id={project.pk})"
+            )
+
+        return existing_reminder
 
     logger.info(
         f"Creating reminder <{kind}> for project <{project.name}> "
@@ -108,7 +114,9 @@ def get_due_reminder_for_project(site, project, kind):
 #################################################################
 # New Recommendations Reminder
 #################################################################
-def make_or_update_new_recommendations_reminder(site, project, interval_in_days=7 * 6):
+def make_or_update_new_recommendations_reminder(
+    site: Site, project: Project, interval_in_days: int = 7 * 6
+) -> models.Reminder | None:
     """Given a project, generate reminders for new recommendations that may have been
     missed by the council. Default interval is 6 weeks.
     """
@@ -121,8 +129,8 @@ def make_or_update_new_recommendations_reminder(site, project, interval_in_days=
     )
 
     last_sent_reminder = (
-        models.Reminder.on_site_sent.filter(
-            kind=models.Reminder.NEW_RECO, project=project
+        models.Reminder.sent.filter(
+            kind=models.Reminder.NEW_RECO, project=project, site=site
         )
         .order_by("-sent_on")
         .first()
@@ -147,7 +155,9 @@ def make_or_update_new_recommendations_reminder(site, project, interval_in_days=
     )
 
 
-def get_due_new_recommendations_reminder_for_project(site, project):
+def get_due_new_recommendations_reminder_for_project(
+    site: Site, project: Project
+) -> models.Reminder | None:
     return get_due_reminder_for_project(site, project, kind=models.Reminder.NEW_RECO)
 
 
@@ -156,7 +166,9 @@ def get_due_new_recommendations_reminder_for_project(site, project):
 #################################################################
 
 
-def make_or_update_whatsup_reminder(site, project):
+def make_or_update_whatsup_reminder(
+    site: Site, project: Project
+) -> models.Reminder | None:
     """Given a project, generate a whats up email to the project owner to try to get her
     attention back. Interval is configured by the SiteConfiguration model.
     """
@@ -200,7 +212,9 @@ def make_or_update_whatsup_reminder(site, project):
     )
 
 
-def get_due_whatsup_reminder_for_project(site, project):
+def get_due_whatsup_reminder_for_project(
+    site: Site, project: Project
+) -> models.Reminder | None:
     return get_due_reminder_for_project(site, project, kind=models.Reminder.WHATS_UP)
 
 

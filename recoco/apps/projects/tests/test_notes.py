@@ -7,7 +7,6 @@ authors: raphael.marvie@beta.gouv.fr, guillaume.libersat@beta.gouv.fr
 created: 2021-06-01 10:11:56 CEST
 """
 
-
 import notifications
 import pytest
 from actstream.models import action_object_stream
@@ -21,6 +20,7 @@ from notifications import notify
 from pytest_django.asserts import assertContains
 
 from recoco import verbs
+from recoco.apps.addressbook.models import Contact
 from recoco.utils import login
 
 from .. import models
@@ -166,6 +166,66 @@ def test_create_public_note_for_project_collaborator_and_redirect(
 
 
 @pytest.mark.django_db
+def test_create_public_note_with_topic_and_redirect(request, client, project):
+    membership = baker.make(models.ProjectMember, member__is_staff=False)
+
+    project.projectmember_set.add(membership)
+
+    topic = baker.make(
+        models.Topic, site=get_current_site(request), name="TchatchaTcha"
+    )
+
+    with login(client) as user:
+        assign_collaborator(user, project)
+        response = client.post(
+            reverse("projects-conversation-create-message", args=[project.id]),
+            data={"content": "this is some content", "topic_name": "tchatchatcha"},
+        )
+    assert response.status_code == 302
+
+    note = models.Note.on_site.all()[0]
+    assert note.topic == topic
+
+
+@pytest.mark.django_db
+def test_create_public_note_with_nonexisting_topic(request, client, project):
+    membership = baker.make(models.ProjectMember, member__is_staff=False)
+
+    project.projectmember_set.add(membership)
+
+    baker.make(models.Topic, site=get_current_site(request), name="TchatchaTcha")
+
+    with login(client) as user:
+        assign_collaborator(user, project)
+        response = client.post(
+            reverse("projects-conversation-create-message", args=[project.id]),
+            data={"content": "this is some content", "topic_name": "Lalalal"},
+        )
+    assert response.status_code == 400
+
+    assert models.Note.on_site.count() == 0
+
+
+@pytest.mark.django_db
+def test_create_public_note_with_topic_of_another_site(request, client, project):
+    membership = baker.make(models.ProjectMember, member__is_staff=False)
+
+    project.projectmember_set.add(membership)
+
+    baker.make(models.Topic, name="TchatchaTcha")
+
+    with login(client) as user:
+        assign_collaborator(user, project)
+        response = client.post(
+            reverse("projects-conversation-create-message", args=[project.id]),
+            data={"content": "this is some content", "topic_name": "TchatchaTcha"},
+        )
+    assert response.status_code == 400
+
+    assert models.Note.on_site.count() == 0
+
+
+@pytest.mark.django_db
 def test_private_note_hidden_from_project_members(request, client, project):
     membership = baker.make(models.ProjectMember, member__is_staff=False)
     project.projectmember_set.add(membership)
@@ -224,6 +284,32 @@ def test_create_conversation_message_with_attachment_for_project_collaborator(
     assert document
     assert document.the_file != ""
     assert document.attached_object == note
+
+
+@pytest.mark.django_db
+def test_create_conversation_message_with_contact(current_site, client, project):
+    contact_on_site = baker.make(Contact, site=current_site)
+    contact_not_on_site = baker.make(Contact)
+
+    url = reverse("projects-conversation-create-message", args=[project.id])
+
+    with login(client, username="collaborator") as user:
+        assign_collaborator(user, project)
+
+        response = client.post(
+            url,
+            data={"content": "content", "contact": contact_not_on_site.pk},
+        )
+        assert response.status_code == 302
+        assert models.Note.on_site.count() == 0
+
+        response = client.post(
+            url,
+            data={"content": "content", "contact": contact_on_site.pk},
+        )
+        note = models.Note.on_site.first()
+        assert note is not None
+        assert note.contact == contact_on_site
 
 
 #

@@ -21,7 +21,7 @@ function Tutorial(challengeCode) {
       this.challengeCode = challengeCode;
       const challengeDefinition =
         await this.getChallengeDefinition(challengeCode);
-
+      if (!challengeDefinition) return;
       //Get current challenge for current user
       //Can be empty object
       const challenge = await this.getChallenge(this.challengeCode);

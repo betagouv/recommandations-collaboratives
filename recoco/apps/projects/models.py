@@ -29,8 +29,14 @@ from notifications.models import Notification
 from taggit.managers import TaggableManager
 from watson import search as watson
 
+from recoco.apps.addressbook.models import Contact
 from recoco.apps.geomatics import models as geomatics_models
-from recoco.utils import CastedGenericRelation, check_if_advisor, has_perm
+from recoco.utils import (
+    CastedGenericRelation,
+    check_if_advisor,
+    has_perm,
+    strip_accents,
+)
 
 from . import apps
 from .utils import generate_ro_key
@@ -212,6 +218,16 @@ class ProjectQuerySet(models.QuerySet):
                 .annotate(count=Func(F("id"), function="Count"))
                 .values("count")
             ),
+        )
+
+    def with_site_status(self):
+        return self.annotate(
+            site_status=Subquery(
+                ProjectSite.objects.filter(
+                    site=Site.objects.get_current(),
+                    project=OuterRef("pk"),
+                ).values("status")[:1]
+            )
         )
 
 
@@ -745,6 +761,10 @@ class Note(models.Model):
     )
     tags = models.CharField(max_length=256, blank=True, default="")
 
+    topic = models.ForeignKey(
+        Topic, related_name="notes", on_delete=models.SET_NULL, blank=True, null=True
+    )
+
     notifications_as_action = CastedGenericRelation(
         notifications_models.Notification,
         related_query_name="action_notes",
@@ -753,6 +773,10 @@ class Note(models.Model):
     )
 
     document = GenericRelation("Document")
+
+    contact = models.ForeignKey(
+        Contact, on_delete=models.SET_NULL, null=True, blank=True
+    )
 
     def get_absolute_url(self):
         if self.public:
@@ -902,6 +926,10 @@ class ProjectSearchAdapter(watson.SearchAdapter):
 
     def tags_as_list(self, obj):
         return list(obj.tags.names())
+
+    def prepare_content(self, content):
+        content = super().prepare_content(content)
+        return strip_accents(content)
 
 
 def truncate_string(s, max_length):

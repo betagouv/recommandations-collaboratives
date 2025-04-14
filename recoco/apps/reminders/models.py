@@ -7,7 +7,6 @@ author  : raphael.marvie@beta.gouv.fr, guillaume.libersat@beta.gouv.fr
 created : 2021-09-28 12:40:54 CEST
 """
 
-
 from django.contrib.auth import models as auth_models
 from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.sites.managers import CurrentSiteManager
@@ -115,6 +114,12 @@ class Reminder(models.Model):
     class Meta:
         verbose_name = "rappel"
         verbose_name_plural = "rappels"
+        indexes = [
+            models.Index(
+                fields=["kind", "sent_on", "site", "project"],
+                name="kind_sent_on_site_project",
+            ),
+        ]
 
     def __str__(self):  # pragma: nocover
         return f"{self.project.name} - {self.kind} - {self.deadline}"

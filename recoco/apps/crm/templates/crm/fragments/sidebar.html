@@ -43,7 +43,7 @@
                 </h5>
                 <ul class="list-unstyled">
                     {% for participant in participants %}
-                        {% include "crm/user_item.html" with user=participant %}
+                        <li>{% include "crm/user_item.html" with user=participant %}</li>
                     {% empty %}
                         <li>Désolé, aucune personne n'est encore assignée</li>
                     {% endfor %}
@@ -98,7 +98,7 @@
                             {% endif %}
                             <ul class="list-unstyled fr-mx-3w fr-mb-3w">
                                 {% for switchtender in group.list %}
-                                    {% include "crm/user_item.html" with user=switchtender %}
+                                    <li>{% include "crm/user_item.html" with user=switchtender %}</li>
                                 {% endfor %}
                             </ul>
                         </div>
@@ -115,7 +115,7 @@
                 </h5>
                 <ul class="list-unstyled">
                     {% for member in project.members.all %}
-                        {% include "crm/user_item.html" with user=member %}
+                        <li>{% include "crm/user_item.html" with user=member %}</li>
                     {% empty %}
                         <li>no one</li>
                     {% endfor %}
