@@ -129,13 +129,23 @@ class TestMakeDSDataFromProject:
                 "champ_Q2hhbXAtMjkzNDQwMQ": [
                     {
                         "value": "edl.avez-vous-deja-identifie-des-subventions",
-                        "condition": ["tag_a", "tag_b"],
+                        "conditions": [
+                            {
+                                "value": "edl.avez-vous-deja-identifie-des-subventions",
+                                "tags": ["tag_a", "tag_b"],
+                            }
+                        ],
                     },
                 ],
                 "champ_Q2hhbXAtMzI3Njk1Nw": [
                     {
                         "value": "edl.avez-vous-deja-identifie-des-subventions",
-                        "condition": ["tag_c"],
+                        "conditions": [
+                            {
+                                "value": "edl.avez-vous-deja-identifie-des-subventions",
+                                "tags": ["tag_c"],
+                            }
+                        ],
                     },
                 ],
                 "champ_Q2hhbXAtMzI5MzU1NA": [
@@ -159,6 +169,26 @@ class TestMakeDSDataFromProject:
                 "champ_Q2hhbXAtMjkzNDM2NA": [
                     {"value": "option[dummy-value]"},
                 ],
+                "champ_Q2hhbXAtMzI4MDE4Mw": [
+                    {
+                        "value": "option[0]",
+                        "conditions": [
+                            {
+                                "value": "edl.avez-vous-deja-identifie-des-subventions",
+                                "tags": ["tag_c"],
+                            }
+                        ],
+                    },
+                    {
+                        "value": "option[1]",
+                        "conditions": [
+                            {
+                                "value": "edl.avez-vous-deja-identifie-des-subventions",
+                                "tags": ["tag_a"],
+                            }
+                        ],
+                    },
+                ],
             },
         )
 
@@ -175,4 +205,5 @@ class TestMakeDSDataFromProject:
             "champ_Q2hhbXAtMzMzNTgyNQ": "Oui",
             "champ_Q2hhbXAtMzAyMDUwMA": "extra comment",
             "champ_Q2hhbXAtMTk3NzQ0NQ": "EPCI",
+            "champ_Q2hhbXAtMzI4MDE4Mw": "Adaptation au changement climatique et prévention des risques naturels",
         }, print(data)
