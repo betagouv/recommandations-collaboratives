@@ -1,18 +1,28 @@
 {% load gravatar %}
 {% load static %}
 {% load sass_tags %}
+{% load django_vite %}
+{% block js %}
+    {% vite_asset 'js/components/User.js' %}
+{% endblock js %}
 {% block css %}
     <link href="{% sass_src 'projects/css/fragments/user_invited.scss' %}"
           rel="stylesheet"
           type="text/css">
 {% endblock css %}
-<div class="d-flex flex-column align-items-start fr-mb-2v">
+<div x-data="User()" class="d-flex flex-column align-items-start fr-mb-2v">
     <div class="w-100 d-flex align-items-center justify-content-between">
         <span class="fr-mr-2v d-flex align-items-center font-very-small">
             <img class="rounded-circle fr-mr-2v"
                  src="{% gravatar_url user_invited.email size=24 %}"
                  alt="{{ action.actor }}" />
             <strong class="text-nowrap">{{ user_invited.email }}</strong>
+            <button class="fr-ml-3w fr-px-2v fr-py-0 btn small btn-outline-primary"
+                    @click="clipboardCopy(`L'email`, '{{ user_invited.email }}')">
+                <svg class="bi align-baseline" width="10" height="10" fill="currentColor">
+                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#clipboard" />
+                </svg>
+            </button>
         </span>
     </div>
     <div class="d-flex align-items-center">
