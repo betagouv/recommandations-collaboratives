@@ -25,7 +25,9 @@ Alpine.data(
               }
             );
           }
-          this.initSelectedDepartments();
+          if (selectedDepartments) {
+            this.initSelectedDepartments();
+          }
         } catch (error) {
           throw new Error('Error fetching regions or departments', error);
         }
