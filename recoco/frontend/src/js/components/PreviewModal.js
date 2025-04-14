@@ -88,17 +88,19 @@ export default function PreviewModal() {
         // We are editing a comment
         const [type, id] = this.currentlyEditing;
         if (type === 'followup') {
+          this.followupsIsLoading = true;
           await this.$store.tasksData.editComment(this.currentTask.id, id, {
             comment: this.comment.text,
             contact: this.comment.contact,
           });
           await this.$store.previewModal.loadFollowups();
           await this.$store.tasksView.updateView();
+          this.followupsIsLoading = false;
         } else if (type === 'content') {
           // We are editing the initial comment (contained in Task model)
           await this.$store.tasksData.patchTask(this.currentTask.id, {
             content: this.comment.text,
-            contact: this.comment.contact,
+            contact: this.comment.contact.id,
           });
           await this.$store.tasksView.updateViewWithTask(this.currentTask.id);
         }
