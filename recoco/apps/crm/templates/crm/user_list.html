@@ -33,6 +33,7 @@
                     <form x-data=""
                           class="row g-3"
                           method="get"
+                          x-ref="myForm"
                           action="{% url 'crm-user-list' %}">
                         {{ form.non_field_errors }}
                         <div class="col-md-6">
@@ -74,10 +75,9 @@
                                 </div>
                             </div>
                             <!-- departements -->
-                            <div class="fr-mb-2v">
+                            <div class="fr-mb-2v" @user-close-selector="$refs.myForm.submit()">
                                 {% include "projects/project/fragments/departments_selector.html" with label="Départements conseillés" input_department_name="departments" filter_by_regions=True %}
                             </div>
-
                             <hr />
                             <div>
                                 <label for="{{ form.ordering.name }}" class="form-label fr-mr-2v">Trier par :</label>

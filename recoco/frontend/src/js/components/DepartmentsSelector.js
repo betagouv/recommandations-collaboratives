@@ -4,7 +4,7 @@ import api, { regionsUrl, departmentsUrl } from '../utils/api';
 Alpine.data(
   'DepartmentsSelector',
   (
-    { listZone, selectAll, filterByRegions } = {
+    { listZone, selectAll, filterByRegions, selectedDepartments } = {
       selectAll: true,
     }
   ) => {
@@ -15,7 +15,6 @@ Alpine.data(
       async init() {
         try {
           if (!listZone && filterByRegions) {
-            this.regions = await api.get(regionsUrl());
             this.regions = (await api.get(regionsUrl())).data.map((region) => {
               return { ...region, active: false };
             });
@@ -26,12 +25,34 @@ Alpine.data(
               }
             );
           }
+          this.initSelectedDepartments();
         } catch (error) {
           throw new Error('Error fetching regions or departments', error);
         }
 
         if (selectAll) {
           this.handleTerritorySelectAll(selectAll);
+        }
+      },
+      initSelectedDepartments() {
+        if (this.regions) {
+          this.regions = this.regions.map((region) => {
+            return {
+              ...region,
+              active: selectedDepartments.includes(region.code),
+              departments: region.departments.map((department) => ({
+                ...department,
+                active: selectedDepartments.includes(department.code),
+              })),
+            };
+          });
+        } else {
+          this.departments = this.departments.map((department) => {
+            return {
+              ...department,
+              active: selectedDepartments.includes(department.code),
+            };
+          });
         }
       },
       handleTerritorySelectAll(selectAll = !this.territorySelectAll) {
