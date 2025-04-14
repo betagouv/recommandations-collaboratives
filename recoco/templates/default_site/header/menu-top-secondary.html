@@ -25,7 +25,7 @@
             <li class="navigation__item-dashboard d-flex">
                 <a href="{% url 'projects-project-list' %}"
                    class="fr-link {% if url_name == 'projects-project-list-advisor' or url_name == 'projects-project-list-staff' or url_name == 'projects-project-list-map' %}active{% endif %}">
-                    <span class="fr-ml-1v align-middle no-wrap">Tous les projets</span></a>
+                    <span class="fr-ml-1v align-middle no-wrap">Tous les dossiers</span></a>
             </li>
         {% endif %}
         <!-- Projects -->
@@ -50,10 +50,10 @@
                         <template x-if="!currentProject">
                             <div>
                                 <template x-if="displayedProjectList.length == 0">
-                                    <span class="no-underline list-project__project-name">Pas de projet récent</span>
+                                    <span class="no-underline list-project__project-name">Pas de dossier récent</span>
                                 </template>
                                 <template x-if="displayedProjectList.length > 0">
-                                    <span class="no-underline list-project__project-name">Projets récents</span>
+                                    <span class="no-underline list-project__project-name">Dossiers récents</span>
                                 </template>
                             </div>
                         </template>
@@ -62,15 +62,15 @@
                 <div class="fr-collapse fr-menu" id="project_list">
                     <ul x-data="{search:''}"class="fr-menu__list list-project">
                         {% comment %} <li class="list-project__search-container">
-                                <input type="search" class="fr-input" placeholder="Rechercher votre projet" @input.debounce.400ms="onSearch()" x-model="search">
+                                <input type="search" class="fr-input" placeholder="Rechercher votre dossier" @input.debounce.400ms="onSearch()" x-model="search">
                         </li> {% endcomment %}
                         {% if project %}
                             <li class="list-project__header">
                                 <template x-if="displayedProjectList.length > 0">
-                                    <div class="list-project__header-text">Projets récents</div>
+                                    <div class="list-project__header-text">Dossiers récents</div>
                                 </template>
                                 <template x-if="displayedProjectList.length == 0">
-                                    <div class="list-project__header-text">Pas de projets récents</div>
+                                    <div class="list-project__header-text">Pas de dossiers récents</div>
                                 </template>
                             </li>
                         {% endif %}
@@ -85,7 +85,7 @@
                         {% if not is_switchtender %}
                             <a class="fr-btn justify-content-center w-100"
                                data-test-id="create-project"
-                               href="{% url 'onboarding' %}">Créer un projet</a>
+                               href="{% url 'onboarding' %}">Créer un dossier</a>
                         {% endif %}
                     </ul>
                 </div>
@@ -95,7 +95,7 @@
             <!-- Projects moderation -->
             <li class="navigation__item-moderation d-flex">
                 <a href="{% url "projects-moderation-list" %}"
-                   class="{% if url_name == 'projects-moderation-list' %}active{% endif %}"><span class="fr-link underline no-wrap">Projets à examiner</span></a>
+                   class="{% if url_name == 'projects-moderation-list' %}active{% endif %}"><span class="fr-link underline no-wrap">Dossiers à examiner</span></a>
                 {% if projects_to_moderate_count %}
                     <span class="badge text-bg-danger no-underline">{{ projects_to_moderate_count }}</span>
                 {% endif %}

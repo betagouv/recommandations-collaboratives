@@ -39,7 +39,7 @@ function getDefaultLatLngForLayers(project, geoData) {
 }
 
 async function getDefaultLatLngForMap(project) {
-  // TODO Geocoder l'adresse du projet pour obtenir les coordonnées
+  // TODO Geocoder l'adresse du dossier pour obtenir les coordonnées
   const latLongProject = await addressGeocoder(
     `${project.location} ${project.commune.name}`
   );
@@ -214,7 +214,7 @@ function initMapControllerBAN(map, geoData, onUpdate, project, markers) {
 function addLayerMarkerProjectCoordinates(map, project) {
   if (!project.location_x || !project.location_x) {
     throw Error(
-      `Coordonnées de localisation du projet indisponibles pour "${project.name}"`
+      `Coordonnées de localisation du dossier indisponibles pour "${project.name}"`
     );
   }
   const coordinates = [project.location_y, project.location_x];

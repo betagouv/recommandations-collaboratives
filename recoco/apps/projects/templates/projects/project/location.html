@@ -4,10 +4,10 @@
 {% load django_vite %}
 {% load guardian_tags %}
 {% block title %}
-    Modifier la localisation du projet - {{ request.site.name }}
+    Modifier la localisation du dossier - {{ request.site.name }}
 {% endblock title %}
 {% block og_title %}
-    Modifier la localisation du projet - {{ request.site.name }}
+    Modifier la localisation du dossier - {{ request.site.name }}
 {% endblock og_title %}
 {% current_project request.session as project %}
 {% get_obj_perms request.user for project as "user_project_perms" %}
@@ -72,12 +72,12 @@
             </nav>
             <div class="row">
                 <header class="location-header qs-heading">
-                    <h2 id="location-edit-label" class="fw-bold d-block fr-mb-0">Où se situe votre projet ?</h2>
+                    <h2 id="location-edit-label" class="fw-bold d-block fr-mb-0">Où se situe votre dossier ?</h2>
                 </header>
             </div>
             <div class="location-body row fr-mt-2v">
                 <div class="col col-lg-9 fr-pr-6w">
-                    <p class="location-label">Adresse du projet</p>
+                    <p class="location-label">Adresse du dossier</p>
                     <p class="location-address text-muted">
                         {{ project.location }}
                         {% if project.commune %}, {{ project.commune.postal|default:"" }} {{ project.commune.name|default:"" }}{% endif %}

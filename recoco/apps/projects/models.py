@@ -433,14 +433,14 @@ class Project(models.Model):
     exclude_stats = models.BooleanField(default=False, blank=True)
 
     inactive_since = models.DateTimeField(
-        null=True, blank=True, verbose_name="Quand le projet a été déclaré inactif"
+        null=True, blank=True, verbose_name="Quand le dossier a été déclaré inactif"
     )
     inactive_reason = models.CharField(
         max_length=256,
         blank=True,
         null=True,
         default="",
-        verbose_name="Raison de l'inactivité du projet",
+        verbose_name="Raison de l'inactivité du dossier",
     )
 
     def reactivate(self):
@@ -475,7 +475,7 @@ class Project(models.Model):
 
     tags = TaggableManager(blank=True)
 
-    name = models.CharField(max_length=128, verbose_name="Nom du projet")
+    name = models.CharField(max_length=128, verbose_name="Nom du dossier")
     phone = models.CharField(
         max_length=16, default="", blank=True, verbose_name="Téléphone"
     )
@@ -671,7 +671,7 @@ class TopicOnSiteManager(CurrentSiteManager):
 class Topic(models.Model):
     """Topic to classify projects and tasks.
 
-    Représente un thème / une thématique pour classifier projets et recommandations.
+    Représente un thème / une thématique pour classifier dossiers et recommandations.
     """
 
     objects = TopicOnSiteManager()

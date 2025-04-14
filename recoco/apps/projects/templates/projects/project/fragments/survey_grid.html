@@ -47,12 +47,12 @@
                 </nav>
             </div>
             <hr class="info__separator">
-            <!-- Informations du projet -->
+            <!-- Informations du dossier -->
             <div class="info__title">Localisation</div>
             {% include "projects/project/fragments/geolocation/location_knowledge.html" with project=project %}
-            <div class="info__title">Informations projet</div>
+            <div class="info__title">Informations dossier</div>
             {% comment %} TODO
-            - projet déposé depuis ...
+            - dossier déposé depuis ...
             {% endcomment %}
             <div class="info__project-origin">
                 {% if project.project_sites.origin.site.configuration.logo_small %}
@@ -63,7 +63,7 @@
                 {% else %}
                     <span class="fr-icon--sm fr-icon-window-line" aria-hidden="true"></span>
                 {% endif %}
-                projet envoyé par {{ project.project_sites.origin.site.name }}
+                dossier envoyé par {{ project.project_sites.origin.site.name }}
             </div>
         </div>
         {% get_advising_position user project request.site as position %}

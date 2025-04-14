@@ -3,7 +3,7 @@
 COPY (
     SELECT
         n.created_on AS quand,
-        p.name AS projet,
+        p.name AS dossier,
         u.username AS qui,
         n.tags AS tags
     FROM

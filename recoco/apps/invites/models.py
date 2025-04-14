@@ -54,7 +54,7 @@ class Invite(models.Model):
     project = models.ForeignKey(
         projects_models.Project,
         on_delete=models.CASCADE,
-        verbose_name="projet",
+        verbose_name="dossier",
         related_name="invites",
     )
 

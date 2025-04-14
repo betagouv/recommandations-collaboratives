@@ -25,4 +25,4 @@ describe('I can access actions tab in a project as an advisor', () => {
   });
 });
 
-// page projet
+// page dossier

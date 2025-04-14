@@ -235,10 +235,10 @@ class SiteConfiguration(models.Model):
 
     crm_available_tags = TaggableManager(
         blank=True,
-        verbose_name="Tags d'impact disponibles sur les projets dans le CRM",
+        verbose_name="Tags d'impact disponibles sur les dossiers dans le CRM",
         help_text=(
             "Liste de tags séparés par une virgule. Si le tag contient plusieurs mots les encadrer par des guillemets."
-            "Attention, veillez à ne pas retirer un tag utilisé dans un projet, "
+            "Attention, veillez à ne pas retirer un tag utilisé dans un dossier, "
             'celui-ci ne pourra plus être retiré depuis le CRM. ex: "signature convention", diagnostic, "lancement travaux"'
         ),
     )
@@ -250,7 +250,7 @@ class SiteConfiguration(models.Model):
 
     accept_handover = models.BooleanField(
         default=True,
-        verbose_name="Accepter des propositions de projets venant d'autres portails",
+        verbose_name="Accepter des propositions de dossiers venant d'autres portails",
     )
 
     def __str__(self):

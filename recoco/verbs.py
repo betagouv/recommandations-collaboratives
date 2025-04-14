@@ -40,34 +40,34 @@ class Recommendation:
 
 
 class Project:
-    INVITATION = "a invité un·e collaborateur·rice à rejoindre le projet"
+    INVITATION = "a invité un·e collaborateur·rice à rejoindre le dossier"
 
-    JOINED = "a rejoint le projet"
+    JOINED = "a rejoint le dossier"
 
     SUBMITTED = "a été déposé"  # FIXME to be removed and keep _BY
-    SUBMITTED_BY = "a déposé un nouveau projet, qui est en attente de validation"
+    SUBMITTED_BY = "a déposé un nouveau dossier, qui est en attente de validation"
 
     VALIDATED = "a été validé"
-    VALIDATED_BY = "a validé le projet"
+    VALIDATED_BY = "a validé le dossier"
 
     # FIXME redondant avec VALIDATED
-    AVAILABLE = "a déposé le projet"
+    AVAILABLE = "a déposé le dossier"
 
     # FIXME to be removed
-    BECAME_SWITCHTENDER = "est devenu·e aiguilleur·se sur le projet"
+    BECAME_SWITCHTENDER = "est devenu·e aiguilleur·se sur le dossier"
 
-    BECAME_ADVISOR = "est devenu·e conseiller·ère sur le projet"
-    BECAME_OBSERVER = "est devenu·e observateur·rice sur le projet"
-    LEFT_ADVISING = "ne suit plus le projet"
-    LEFT_OBSERVING = "ne suit plus le projet"
+    BECAME_ADVISOR = "est devenu·e conseiller·ère sur le dossier"
+    BECAME_OBSERVER = "est devenu·e observateur·rice sur le dossier"
+    LEFT_ADVISING = "ne suit plus le dossier"
+    LEFT_OBSERVING = "ne suit plus le dossier"
 
     # Only related to advisor kanban
-    USER_STATUS_UPDATED = "a changé l'état de son suivi projet"
+    USER_STATUS_UPDATED = "a changé l'état de son suivi dossier"
 
-    SET_INACTIVE = "a mis en pause le projet"
-    SET_ACTIVE = "a réactivé le projet"
+    SET_INACTIVE = "a mis en pause le dossier"
+    SET_ACTIVE = "a réactivé le dossier"
 
-    EDITED = "a modifé les informations du projet"
+    EDITED = "a modifé les informations du dossier"
 
 
 class Survey:

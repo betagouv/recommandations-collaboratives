@@ -21,9 +21,9 @@
                     <path fill-rule="evenodd" clip-rule="evenodd" d="M36.8518 14.9867H47.1424C47.6161 14.9867 48 15.3711 48 15.8451V22.7124L47.9942 22.8125C47.9447 23.2394 47.5822 23.5708 47.1424 23.5708H43.9146L40.6655 25.197L40.5748 25.2363C40.0266 25.4381 39.4245 25.0338 39.4245 24.4292V23.5708H36.8518C36.3782 23.5708 35.9942 23.1865 35.9942 22.7124V15.8451C35.9942 15.3711 36.3782 14.9867 36.8518 14.9867ZM37.7093 16.7036V21.854H40.282L40.382 21.8598C40.8085 21.9094 41.1396 22.2722 41.1396 22.7124V23.0403L43.3287 21.9446L43.4202 21.9053C43.5136 21.8715 43.6124 21.854 43.7122 21.854H46.2849V16.7036H37.7093Z" fill="var(--background-action-high-blue-france)" />
                 </svg>
                 <div class="d-flex flex-column">
-                    <span class="font-medium fw-medium">Réactiver le projet</span>
+                    <span class="font-medium fw-medium">Réactiver le dossier</span>
                     <p class="font-small fw-normal text-black-secondary fr-mb-0">
-                        Votre projet reprend ? Signalez-le nous et réactivez les notifications et les rappels.
+                        Votre dossier reprend ? Signalez-le nous et réactivez les notifications et les rappels.
                     </p>
                 </div>
             </div>
@@ -33,7 +33,7 @@
                       action="{% url 'projects-project-set-active' project.pk %}">
                     {% csrf_token %}
                     <button data-test-id="button-activate-project"
-                            class="button blue filled flex-grow-1 text-nowrap inherit">Réactiver le projet</button>
+                            class="button blue filled flex-grow-1 text-nowrap inherit">Réactiver le dossier</button>
                 </form>
             </div>
         </div>

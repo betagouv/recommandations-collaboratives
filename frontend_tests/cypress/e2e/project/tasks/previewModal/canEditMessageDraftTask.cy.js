@@ -8,7 +8,7 @@ describe('I can not comment a draft task', () => {
 
   it('opens a modal with the task', () => {
     cy.visit(`/project/${currentProject.pk}`);
-    cy.becomeAdvisor(currentProject.pk); // A remplacer par une fixture avec un user déjà advisor du projet
+    cy.becomeAdvisor(currentProject.pk); // A remplacer par une fixture avec un user déjà advisor du dossier
     cy.visit(`/project/${currentProject.pk}/actions`);
     cy.createTask('test');
 
