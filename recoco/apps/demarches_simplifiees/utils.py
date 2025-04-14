@@ -14,6 +14,7 @@ class MappingField:
     id: str
     label: str
     lookup: str | None = None
+    options: list[str] | None = None
 
 
 project_mapping_fields: list[MappingField] = [
