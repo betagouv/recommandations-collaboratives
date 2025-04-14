@@ -100,7 +100,7 @@ export default function PreviewModal() {
           // We are editing the initial comment (contained in Task model)
           await this.$store.tasksData.patchTask(this.currentTask.id, {
             content: this.comment.text,
-            contact: this.comment.contact.id,
+            contact: this.comment.contact,
           });
           await this.$store.tasksView.updateViewWithTask(this.currentTask.id);
         }

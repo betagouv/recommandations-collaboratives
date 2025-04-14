@@ -43,6 +43,7 @@ Alpine.data('editor', (content) => {
         content: content,
         onCreate({ editor }) {
           _this.updatedAt = Date.now();
+          _this.renderMarkdown();
         },
         onUpdate({ editor }) {
           _this.updatedAt = Date.now();
@@ -54,6 +55,7 @@ Alpine.data('editor', (content) => {
         },
         onSelectionUpdate({ editor }) {
           _this.updatedAt = Date.now();
+          _this.renderMarkdown();
         },
       });
 
