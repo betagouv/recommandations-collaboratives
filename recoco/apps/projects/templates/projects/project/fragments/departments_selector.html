@@ -90,9 +90,9 @@
                                         <input x-on:input.change="handleDepartmentFilter(department)"
                                                class="form-check-input fw-normal fr-ml-2v fr-px-2v fr-py-2v fr-mr-2v"
                                                type="checkbox"
-                                               :value="department.active"
+                                               :value="department.code"
                                                :checked="department.active"
-                                               {% if input_department_name %}:name="`{{ input_department_name }}-${department.code}`"{% endif %}
+                                               {% if input_department_name %}:name="`{{ input_department_name }}`"{% endif %}
                                                :id="department.code" />
                                         <label class=" w-100 fr-pr-2v fr-py-1v d-flex align-items-center"
                                                :for="department.code">
