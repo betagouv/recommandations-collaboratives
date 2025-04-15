@@ -55,7 +55,11 @@
                     <table class="table table-striped table-hover caption-top">
                         <div class="d-flex justify-content-between fr-mx-2v">
                             {% with organizations.qs.count as organizations_count %}
-                            <span class="fr-ml-2v text-secondary">{{ organizations_count }} résultat{{ organizations_count|pluralize }}</span>
+                                {% if organizations_count > 0 %}
+                                    <span class="fr-ml-2v text-secondary">{{ organizations_count }} résultat{{ organizations_count|pluralize }}</span>
+                                {% else %}
+                                    <caption class="fr-ml-2v">Aucun résultat</caption>
+                                {% endif %}
                             {% endwith %}
                             <div class="btn-group">
                                 <button class="btn btn-outline-primary">Fusionner</button>

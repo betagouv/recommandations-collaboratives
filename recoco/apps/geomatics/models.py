@@ -7,7 +7,6 @@ authors: guillaume.libersat@beta.gouv.fr, raphael.marvie@beta.gouv.fr
 created: 2021-07-12 12:05:28 CEST
 """
 
-
 from django.db import models
 
 
@@ -85,6 +84,10 @@ class Commune(models.Model):
             return cls.objects.filter(insee=code).first()
         except IndexError:
             return
+
+    @property
+    def postal_and_insee_codes(self) -> list[str]:
+        return [self.postal, self.insee]
 
 
 # eof

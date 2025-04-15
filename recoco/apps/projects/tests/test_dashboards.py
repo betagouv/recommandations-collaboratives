@@ -7,7 +7,6 @@ authors: guillaume.libersat@beta.gouv.fr
 created: 2024-07-29 09:19:52 CEST
 """
 
-
 import pytest
 from django.urls import reverse
 

@@ -7,9 +7,11 @@ author  : raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created : 2021-12-14 10:36:20 CEST
 """
 
-
 from django import forms
+from django.db.models import QuerySet
 from markdownx.fields import MarkdownxFormField
+
+from recoco.apps.addressbook.models import Contact
 
 from . import models
 
@@ -47,7 +49,12 @@ class PublicNoteForm(forms.ModelForm):
 
     class Meta:
         model = models.Note
-        fields = ["content"]
+        fields = ["content", "contact", "topic_name"]
+
+    topic_name = forms.CharField(label="Thématique", max_length=100, required=False)
+
+    def set_contact_queryset(self, contact_queryset: QuerySet[Contact]):
+        self.fields["contact"].queryset = contact_queryset
 
 
 ##################################################

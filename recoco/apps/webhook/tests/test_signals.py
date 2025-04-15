@@ -1,4 +1,5 @@
 import pytest
+from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 from django_webhook.models import WebhookTopic
@@ -6,8 +7,9 @@ from freezegun import freeze_time
 from model_bakery import baker
 from taggit.models import TaggedItem
 
+from recoco.apps.addressbook.models import Organization
 from recoco.apps.geomatics.models import Commune
-from recoco.apps.projects.models import Project
+from recoco.apps.projects.models import Project, ProjectSwitchtender
 
 from ..models import WebhookSite
 from ..signals import WebhookSignalListener
@@ -39,21 +41,41 @@ def commune():
 
 
 @pytest.fixture
-def project(commune, make_project):
+def organization():
+    return baker.make(Organization, name="Jedi corp")
+
+
+@pytest.fixture
+def project(commune, organization, make_project, current_site):
     with freeze_time("2024-05-22"):
         project = make_project(
             name="My project",
             org_name="My organization",
             commune=commune,
             location="rue des basques",
+            location_x=635731.78681425,
+            location_y=3644425.1077159,
             description="My description",
         )
         project.tags.add("my_tag")  # taggit doesn't support initialization
+
+        user = User.objects.get_or_create(
+            email="anakin@jedi.com",
+            username="anakin",
+        )[0]
+        user.profile.organization_position = "Padawan"
+        user.profile.organization = organization
+        user.profile.save()
+
+        baker.make(
+            ProjectSwitchtender, site=current_site, switchtender=user, project=project
+        )
+
         yield project
 
 
 @pytest.fixture
-def serialized_project(project):
+def serialized_project(project, organization):
     return {
         "id": project.id,
         "name": "My project",
@@ -62,8 +84,26 @@ def serialized_project(project):
         "created_on": "2024-05-22T02:00:00+02:00",
         "updated_on": "2024-05-22T02:00:00+02:00",
         "org_name": "My organization",
-        "switchtenders": [],
+        "switchtenders": [
+            {
+                "email": "anakin@jedi.com",
+                "first_name": "",
+                "is_active": True,
+                "last_name": "",
+                "profile": {
+                    "organization": {
+                        "_link": f"/api/addressbook/organizations/{organization.id}/",
+                        "id": organization.id,
+                        "name": "Jedi corp",
+                    },
+                    "organization_position": "Padawan",
+                },
+                "username": "anakin",
+            }
+        ],
         "location": "rue des basques",
+        "latitude": 3644425.1077159,
+        "longitude": 635731.78681425,
         "commune": {
             "name": "Bayonne",
             "insee": "64102",
@@ -87,6 +127,7 @@ def serialized_project(project):
             "my_tag",
         ],
         "is_diagnostic_done": False,
+        "status": "READY",
     }
 
 

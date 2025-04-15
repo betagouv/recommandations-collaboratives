@@ -27,7 +27,7 @@ class SocialAccountAdapter(DefaultSocialAccountAdapter):
             return
 
         try:
-            user = User.objects.get(email=user.email)
+            user = User.objects.get(username=user.email)
             sociallogin.connect(request, user)
         except User.DoesNotExist:
             pass

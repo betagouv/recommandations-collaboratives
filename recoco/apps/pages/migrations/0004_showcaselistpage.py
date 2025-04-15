@@ -5,7 +5,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("pages", "0003_alter_showcasepage_content_and_more"),
         ("wagtailcore", "0093_uploadedfile"),

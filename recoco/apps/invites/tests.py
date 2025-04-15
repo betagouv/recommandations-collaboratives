@@ -7,7 +7,6 @@ authors: raphael.marvie@beta.gouv.fr, guillaume.libersat@beta.gouv.fr
 created: 2022-04-20 10:11:56 CEST
 """
 
-
 import pytest
 from django.contrib.auth import models as auth_models
 from django.contrib.sites.shortcuts import get_current_site
@@ -194,7 +193,7 @@ def test_invite_does_not_match_existing_account(request, client):
 def test_invite_matches_existing_account_for_logged_in_user(request, client):
     current_site = get_current_site(request)
     baker.make(home_models.SiteConfiguration, site=current_site)
-    with login(client) as user:
+    with login(client, email="invited@here.tld", username="invited@here.tld") as user:
         invite = Recipe(models.Invite, site=current_site, email=user.email).make()
         url = reverse("invites-invite-details", args=[invite.pk])
         response = client.get(url)
@@ -210,7 +209,7 @@ def test_invite_matches_existing_account_redirects_anonyous_user_to_login(
     current_site = get_current_site(request)
     baker.make(home_models.SiteConfiguration, site=current_site)
     invited = Recipe(
-        auth_models.User, username="invited", email="invited@example.com"
+        auth_models.User, username="invited@example.com", email="invited@example.com"
     ).make()
 
     invite = Recipe(models.Invite, site=current_site, email=invited.email).make()
@@ -240,7 +239,7 @@ def test_accept_invite_returns_to_details_if_get(request, client):
 def test_accept_invite_matches_existing_account(request, client, project):
     current_site = get_current_site(request)
     baker.make(home_models.SiteConfiguration, site=current_site)
-    with login(client) as user:
+    with login(client, email="invited@here.tld", username="invited@here.tld") as user:
         invite = Recipe(
             models.Invite, project=project, site=current_site, email=user.email
         ).make()
@@ -262,7 +261,7 @@ def test_accept_invite_as_switchtender_triggers_notification(request, client, pr
     )
     project.projectmember_set.add(membership)
 
-    with login(client) as user:
+    with login(client, email="invited@here.tld", username="invited@here.tld") as user:
         user.profile.sites.add(current_site)
         invite = Recipe(
             models.Invite,
@@ -289,7 +288,7 @@ def test_accept_invite_as_team_member_triggers_notification(request, client, pro
 
     project.projectmember_set.add(membership)
 
-    with login(client) as user:
+    with login(client, email="invited@here.tld", username="invited@here.tld") as user:
         invite = Recipe(
             models.Invite,
             project=project,
@@ -337,7 +336,7 @@ def test_logged_in_user_accepts_invite_advisor_with_matching_existing_account(
     current_site = get_current_site(request)
     baker.make(home_models.SiteConfiguration, site=current_site)
 
-    with login(client, email="invited@here.tld") as user:
+    with login(client, email="invited@here.tld", username="invited@here.tld") as user:
         invite = Recipe(
             models.Invite,
             site=current_site,
@@ -366,7 +365,7 @@ def test_logged_in_user_accepts_invite_observer_with_matching_existing_account(
     current_site = get_current_site(request)
     baker.make(home_models.SiteConfiguration, site=current_site)
 
-    with login(client, email="invited@here.tld") as user:
+    with login(client, email="invited@here.tld", username="invited@here.tld") as user:
         invite = Recipe(
             models.Invite,
             site=current_site,
@@ -425,7 +424,7 @@ def test_logged_in_user_accepts_invite_collaborator_with_matching_existing_accou
 ):
     current_site = get_current_site(request)
     baker.make(home_models.SiteConfiguration, site=current_site)
-    with login(client, email="invited@here.tld") as user:
+    with login(client, email="invited@here.tld", username="invited@here.tld") as user:
         invite = Recipe(
             models.Invite,
             role="COLLABORATOR",
@@ -484,7 +483,7 @@ def test_anonymous_accepts_invite_with_existing_account_fails(
     baker.make(home_models.SiteConfiguration, site=current_site)
 
     invited = Recipe(
-        auth_models.User, username="invited", email="invited@example.com"
+        auth_models.User, username="invited@example.com", email="invited@example.com"
     ).make()
 
     invite = Recipe(
@@ -643,7 +642,7 @@ def test_accepting_invitation_updates_organization_with_current_site(
 def test_logged_in_user_accepts_invite_but_is_already_member(request, client, project):
     current_site = get_current_site(request)
     baker.make(home_models.SiteConfiguration, site=current_site)
-    with login(client, email="invited@here.tld") as user:
+    with login(client, email="invited@here.tld", username="invited@here.tld") as user:
         invite = Recipe(
             models.Invite,
             role="COLLABORATOR",
@@ -671,7 +670,7 @@ def test_logged_in_user_accepts_invite_but_is_already_advisor(
 ):
     current_site = get_current_site(request)
     baker.make(home_models.SiteConfiguration, site=current_site)
-    with login(client, email="invited@here.tld") as user:
+    with login(client, email="invited@here.tld", username="invited@here.tld") as user:
         invite = Recipe(
             models.Invite,
             role="OBSERVER",

@@ -10,7 +10,7 @@ created: 2022-05-16 17:44:55 CET
 from rest_framework.exceptions import ValidationError
 from rest_framework.serializers import (
     FloatField,
-    # HyperlinkedIdentityField,
+    HyperlinkedIdentityField,
     ModelSerializer,
     SerializerMethodField,
 )
@@ -52,8 +52,7 @@ class OrganizationListSerializer(OrganizationSerializer):
     departments = SerializerMethodField()
     group = OrganizationGroupSerializer(read_only=True)
 
-    # FIXME: https://sentry.incubateur.net/organizations/betagouv/issues/149134/?project=178&query=is%3Aunresolved&referrer=issue-stream&stream_index=0
-    # _link = HyperlinkedIdentityField(view_name="api-addressbook-organization-detail")
+    _link = HyperlinkedIdentityField(view_name="api-addressbook-organization-detail")
     _search_rank = FloatField(source="search_rank", read_only=True)
 
     class Meta:
@@ -63,7 +62,7 @@ class OrganizationListSerializer(OrganizationSerializer):
             "name",
             "group",
             "departments",
-            # "_link",
+            "_link",
             "_search_rank",
         ]
 
@@ -88,7 +87,7 @@ class NestedOrganizationSerializer(OrganizationListSerializer):
         fields = [
             "id",
             "name",
-            # "_link",
+            "_link",
         ]
 
 
@@ -117,7 +116,7 @@ class ContactSerializer(BaseSerializerMixin, ModelSerializer):
 class ContactListSerializer(ContactSerializer):
     organization = NestedOrganizationSerializer(read_only=True, many=False)
 
-    # _link = HyperlinkedIdentityField(view_name="api-addressbook-contact-detail")
+    _link = HyperlinkedIdentityField(view_name="api-addressbook-contact-detail")
     _search_rank = FloatField(source="search_rank", read_only=True)
 
     class Meta:
@@ -133,7 +132,7 @@ class ContactListSerializer(ContactSerializer):
             "organization",
             "created",
             "modified",
-            # "_link",
+            "_link",
             "_search_rank",
         ]
         read_only_fields = fields
@@ -168,6 +167,6 @@ class NestedContactSerializer(ContactListSerializer):
             "mobile_no",
             "division",
             "organization",
-            # "_link",
+            "_link",
         ]
         read_only_fields = fields

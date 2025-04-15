@@ -7,12 +7,15 @@ author  : raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created : 2021-07-20 15:56:20 CEST
 """
 
+import logging
+
 import reversion
 from django.contrib.auth import models as auth_models
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.managers import CurrentSiteManager
 from django.contrib.sites.models import Site
 from django.db import models
+from django.db.models import Count
 from django.db.models.functions import Lower
 from django.db.models.signals import post_migrate
 from django.dispatch import receiver
@@ -21,6 +24,8 @@ from model_utils.models import TimeStampedModel
 from recoco.apps.geomatics import models as geomatics_models
 
 from . import apps
+
+logger = logging.getLogger(__name__)
 
 
 # We need the permission to be associated to the site and not to the projects
@@ -49,7 +54,14 @@ class OrganizationGroup(TimeStampedModel):
         return self.name
 
 
-class OrganizationManager(models.Manager):
+class OrganizationQuerySet(models.QuerySet):
+    def with_contacts_only(self):
+        return self.annotate(contact_count=Count("contacts")).filter(
+            contact_count__gt=0
+        )
+
+
+class OrganizationManager(models.Manager.from_queryset(OrganizationQuerySet)):
     def get_queryset(self):
         return super().get_queryset().order_by(Lower("name"))
 
@@ -86,9 +98,17 @@ class Organization(TimeStampedModel):
     @classmethod
     def get_or_create(cls, name):
         """Return existing organization with casefree name or new one"""
-        organization, _ = cls.objects.get_or_create(
-            name__iexact=name, defaults={"name": name}
-        )
+        try:
+            organization, _ = cls.objects.get_or_create(
+                name__iexact=name, defaults={"name": name}
+            )
+        except cls.MultipleObjectsReturned:
+            organization = (
+                cls.objects.filter(name__iexact=name).order_by("-created").first()
+            )
+            logger.error(
+                f"Multiple organizations found with name {name} (case insensitive)"
+            )
         return organization
 
 

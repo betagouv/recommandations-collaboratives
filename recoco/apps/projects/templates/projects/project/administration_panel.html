@@ -28,7 +28,7 @@
         <div class="specific-border-4pxsolid1e1e1e">
             {% include "projects/project/fragments/project_banner/paused_project_banner.html" %}
             <div>
-            {% elif project.status == 'DRAFT' %}
+            {% elif project.site_status == 'DRAFT' %}
                 <div class="specific-border-4pxsolid000091">
                     {% include "projects/project/fragments/project_banner/non_published_project_banner.html" %}
                 {% endif %}
@@ -83,7 +83,7 @@
                                                    for="input-project-description">
                                                 {{ project_form.description.label }}
                                             </label>
-                                            <textarea maxlength="500"
+                                            <textarea
                                                       class="placeholder-grey form-control {% if project_form.description.errors %}is-invalid{% endif %} textarea-size"
                                                       id="input-project-description"
                                                       name="{{ project_form.description.name }}"
@@ -143,8 +143,8 @@
                                     <button @click="openInviteSwitchtenderModal"
                                             data-toggle="modal"
                                             data-target="#InviteSwitchtenderModal"
-                                            class="{% if project.status == 'DRAFT' %} disabled{% endif %} button d-inline-flex justify-content-center w-100 fr-mb-3w cursor-pointer">
-                                        {% if project.status == 'DRAFT' %}
+                                            class="{% if project.site_status == 'DRAFT' %} disabled{% endif %} button d-inline-flex justify-content-center w-100 fr-mb-3w cursor-pointer">
+                                        {% if project.site_status == 'DRAFT' %}
                                             <svg class="bi align-middle" width="18" height="18" fill="currentColor">
                                                 <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#lock-fill" />
                                             </svg>
@@ -205,8 +205,8 @@
                                             data-toggle="modal"
                                             data-target="#InviteMemberModal"
                                             data-cy="button-invite-project-member"
-                                            class="{% if project.status == 'DRAFT' %} disabled{% endif %} button d-inline-flex justify-content-center w-100 fr-mb-3w cursor-pointer">
-                                        {% if project.status == 'DRAFT' %}
+                                            class="{% if project.site_status == 'DRAFT' %} disabled{% endif %} button d-inline-flex justify-content-center w-100 fr-mb-3w cursor-pointer">
+                                        {% if project.site_status == 'DRAFT' %}
                                             <svg class="bi align-middle" width="18" height="18" fill="currentColor">
                                                 <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#lock-fill" />
                                             </svg>
@@ -389,7 +389,7 @@
                 {% if project.inactive_since != None %}
                 </div>
             </div>
-        {% elif project.status == 'DRAFT' %}
+        {% elif project.site_status == 'DRAFT' %}
         </div>
     {% endif %}
     <div class="fr-mt-2w fr-px-2w">

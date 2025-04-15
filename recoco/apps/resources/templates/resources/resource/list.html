@@ -175,7 +175,7 @@
                 {% else %}
                     <div class="col-12">
                         <span class="text-secondary">
-                            {{ resources_count }} résultat{{ resources|pluralize }} trouvé{{ resources|pluralize }} pour "<em>{{ query }}</em>".
+                            {{ resources_count }} résultat{{ resources_count|pluralize }} trouvé{{ resources_count|pluralize }} pour "<em>{{ query }}</em>".
                         </span>
                     </div>
                 {% endif %}

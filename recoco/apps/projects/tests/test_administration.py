@@ -7,7 +7,6 @@ authors: raphael.marvie@beta.gouv.fr, guillaume.libersat@beta.gouv.fr
 created: 2022-12-26 11:54:56 CEST
 """
 
-
 import pytest
 from actstream.models import action_object_stream
 from django.contrib.auth import models as auth_models
@@ -303,7 +302,6 @@ def test_owner_cannot_be_removed_from_project_acl(request, client, project):
 def test_collaborator_can_remove_other_collaborator_from_project(
     request, client, project
 ):
-
     collaborator = baker.make(
         auth_models.User,
         email="owner@ab.fr",
@@ -329,7 +327,6 @@ def test_collaborator_can_remove_other_collaborator_from_project(
 
 @pytest.mark.django_db
 def test_collaborator_can_remove_herself_project(request, client, project):
-
     with login(client) as user:
         assign_collaborator(user, project, is_owner=False)
         url = reverse(
@@ -409,7 +406,6 @@ def test_unassigning_a_collaborator_cleans_notifications(request, client, projec
 
 @pytest.mark.django_db
 def test_staff_can_remove_collaborator_from_project(request, client, project):
-
     collaborator = baker.make(
         auth_models.User,
         email="owner@ab.fr",

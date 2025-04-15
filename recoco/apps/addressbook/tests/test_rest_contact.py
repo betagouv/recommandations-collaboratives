@@ -104,19 +104,32 @@ def test_can_not_create_contact_with_wrong_organization(api_client, staff_user):
 
 
 @pytest.mark.parametrize(
-    "search_terms,expected_result",
+    "search_terms,expected_result,use_watson",
     [
-        ("skywalker", [999]),
-        ("jedi", [777, 888]),
-        ("coté obscure", [999]),
-        # On pourrait aller plus loin dans le tests ici,
-        # mais à voir avant si on passe par une recherche basée sur watson
+        # vector search
+        ("skywalker", [999], False),
+        ("jedi", [777, 888], False),
+        ("coté obscure", [999], False),
+        ("cote", [999], False),
+        ("Maître", [777, 888], False),
+        ("maitre", [777, 888], False),
+        # watson search
+        ("skywalker", [999], True),
+        ("jedi", [777, 888], True),
+        ("coté obscure", [999], True),
+        ("cote", [999], True),
+        ("Maître", [777, 888], True),
+        ("maitre", [777, 888], True),
     ],
 )
 @pytest.mark.django_db
-@override_switch("addressbook_contact_use_watson_search", active=False)
 def test_contact_search_filter(
-    api_client, staff_user, current_site, search_terms, expected_result
+    api_client,
+    staff_user,
+    current_site,
+    search_terms,
+    expected_result,
+    use_watson,
 ):
     jedi_organization = baker.make(
         Organization,
@@ -134,6 +147,7 @@ def test_contact_search_filter(
         id=777,
         first_name="Qui-Gon",
         last_name="Jinn",
+        email="quiqui@coruscant.com",
         organization=jedi_organization,
         division="Maître jedi",
         site=current_site,
@@ -143,6 +157,7 @@ def test_contact_search_filter(
         id=888,
         first_name="Obiwan",
         last_name="Kenobi",
+        email="obi@tatooine.com",
         organization=jedi_organization,
         division="Maître",
         site=current_site,
@@ -158,10 +173,57 @@ def test_contact_search_filter(
     )
 
     api_client.force_authenticate(staff_user)
+
+    with override_switch("addressbook_contact_use_watson_search", active=use_watson):
+        response = api_client.get(
+            reverse("api-addressbook-contact-list"), {"search": search_terms}
+        )
+
+    assert response.status_code == 200
+    assert [contact["id"] for contact in response.data["results"]] == expected_result, (
+        f"failure for search terms: {search_terms}"
+    )
+
+
+@pytest.mark.parametrize(
+    "filter_value,expected_result",
+    [
+        ("E", ["vador"]),
+        ("e", ["vador"]),
+        ("C", ["obiwan"]),
+        ("conseil", ["obiwan"]),
+        ("Z", []),
+    ],
+)
+@pytest.mark.django_db
+def test_organization_group_filter(
+    api_client, staff_user, current_site, filter_value, expected_result
+):
+    jedi_organization = baker.make(
+        Organization, name="Conseil des Jedi", sites=[current_site]
+    )
+    baker.make(
+        Contact,
+        first_name="obiwan",
+        organization=jedi_organization,
+        site=current_site,
+    )
+
+    sith_organization = baker.make(
+        Organization, name="Empire Sith", sites=[current_site]
+    )
+    baker.make(
+        Contact,
+        first_name="vador",
+        organization=sith_organization,
+        site=current_site,
+    )
+
+    api_client.force_authenticate(staff_user)
     response = api_client.get(
-        reverse("api-addressbook-contact-list"), {"search": search_terms}
+        f"{reverse('api-addressbook-contact-list')}?orga-startswith={filter_value}"
     )
     assert response.status_code == 200
     assert [
-        contact["id"] for contact in response.data["results"]
-    ] == expected_result, f"failure for search terms: {search_terms}"
+        contact["first_name"] for contact in response.data["results"]
+    ] == expected_result, f"failure for filter value: {filter_value}"

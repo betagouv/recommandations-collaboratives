@@ -51,12 +51,15 @@ class ProjectSerializer(TaggitSerializer, serializers.HyperlinkedModelSerializer
             "name",
             "description",
             "inactive_since",
+            "status",
             "created_on",
             "updated_on",
             "org_name",
             "switchtenders",
             "commune",
             "location",
+            "latitude",
+            "longitude",
             "recommendation_count",
             "public_message_count",
             "private_message_count",
@@ -86,6 +89,16 @@ class ProjectSerializer(TaggitSerializer, serializers.HyperlinkedModelSerializer
         return Note.on_site.private().filter(project=obj).count()
 
     commune = CommuneSerializer(read_only=True)
+
+    latitude = serializers.SerializerMethodField()
+
+    def get_latitude(self, obj):
+        return obj.location_y
+
+    longitude = serializers.SerializerMethodField()
+
+    def get_longitude(self, obj):
+        return obj.location_x
 
 
 class UserProjectSerializer(ProjectSerializer):
@@ -177,6 +190,8 @@ class ProjectForListSerializer(serializers.BaseSerializer):
             "is_observer": data.is_observer,
             "commune": commune_data,
             "location": data.location,
+            "latitude": data.location_y,
+            "longitude": data.location_x,
             "notifications": data.notifications,
             "project_sites": format_sites(data),
             "tags": [tag.name for tag in data.tags.all()],

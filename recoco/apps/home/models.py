@@ -45,8 +45,14 @@ SITE_GROUP_PERMISSIONS = {
         "sites.use_addressbook",
         "sites.use_project_tags",
     ),
-    "admin": ("sites.manage_surveys", "sites.manage_configuration"),
-    "advisor": ("sites.list_projects",),
+    "admin": (
+        "sites.manage_surveys",
+        "sites.manage_configuration",
+    ),
+    "advisor": (
+        "sites.list_projects",
+        "sites.use_project_tags",
+    ),
 }
 
 

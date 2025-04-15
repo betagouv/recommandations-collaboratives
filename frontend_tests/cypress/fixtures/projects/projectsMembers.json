@@ -184,7 +184,25 @@
     "pk": 21,
     "fields": {
       "member": 5,
-      "project": 28,
+      "project": 27,
+      "is_owner": true
+    }
+  },
+  {
+    "model": "projects.projectmember",
+    "pk": 22,
+    "fields": {
+      "member": 6,
+      "project": 29,
+      "is_owner": false
+    }
+  },
+  {
+    "model": "projects.projectmember",
+    "pk": 23,
+    "fields": {
+      "member": 5,
+      "project": 30,
       "is_owner": true
     }
   },
@@ -365,6 +383,24 @@
     "fields": {
       "switchtender": 2,
       "project": 27,
+      "site": 1
+    }
+  },
+  {
+    "model": "projects.projectswitchtender",
+    "pk": 26,
+    "fields": {
+      "switchtender": 2,
+      "project": 29,
+      "site": 1
+    }
+  },
+  {
+    "model": "projects.projectswitchtender",
+    "pk": 27,
+    "fields": {
+      "switchtender": 2,
+      "project": 30,
       "site": 1
     }
   }

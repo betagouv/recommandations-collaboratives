@@ -28,7 +28,8 @@
 {% block project_list_content %}
     {{ departments|json_script:"departmentsArray" }}
     {{ regions|json_script:"regionsArray" }}
-    <div x-data="KanbanProjects({{ request.site.id }}, departmentsArray, regionsArray )">
+    <div x-data="KanbanProjects({{ request.site.id }}, departmentsArray, regionsArray )"
+         @selected-departments="saveSelectedDepartment($event)">
         <div x-show="isBusy"
              x-transition
              class="position-absolute text-center w-100"
@@ -64,7 +65,7 @@
                     {% include "projects/project/fragments/only_my_projects_toggle.html" %}
                 </div>
                 <div class="kanban-header__region-filter">
-                    {% include "projects/project/fragments/region_filter.html" with filter_by_regions=True %}
+                    {% include "projects/project/fragments/departments_selector.html" with label="Projets de mon territoire" filter_by_regions=True zone_objects="regions" select_all=True %}
                 </div>
             </div>
             <div class="kanban-header__toolbar">{% include "projects/project/fragments/list-toolbars.html" %}</div>
@@ -183,9 +184,11 @@
                                                                         </div>
                                                                     </template>
                                                                 </template>
-                                                                <div>
-                                                                    <span class="kanban-card__project-insee fr-icon--sm fr-icon-map-pin-2-line not-a-link">INSEE: <span x-text="truncate(t.commune.insee)"></span></span>
-                                                                </div>
+                                                                <template x-if="t.commune">
+                                                                    <div>
+                                                                        <span class="kanban-card__project-insee fr-icon--sm fr-icon-map-pin-2-line not-a-link">INSEE: <span x-text="truncate(t.commune.insee)"></span></span>
+                                                                    </div>
+                                                                </template>
                                                                 <div class="d-flex justify-content-between">
                                                                     <div class="kanban-card__project-date-container text-secondary">
                                                                         <span x-text="`Déposé le ${formatDateDisplay(t.created_on)}`"

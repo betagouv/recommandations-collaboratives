@@ -2,11 +2,11 @@
 name = "recoco"
 dynamic = ["version"]
 
-authors = [{name = "Recoco Dev Team"}]
+authors = [{ name = "Recoco Dev Team" }]
 maintainers = [
-  {name = "Guillaume Libersat", email = "guillaume.libersat@beta.gouv.fr"}
+    { name = "Guillaume Libersat", email = "guillaume.libersat@beta.gouv.fr" },
 ]
-license = {name = "AGPL-v3", file="LICENSE"}
+license = { name = "AGPL-v3", file = "LICENSE" }
 
 description = "Recommandations Collaboratives"
 readme = "README.md"
@@ -29,6 +29,7 @@ dependencies = [
     "django-gravatar2>=1.4.5",
     "django-guardian==2.4.0",
     "django-hijack==3.4.5",
+    "django-htmx>=1.22.0",
     "django-json-widget==2.0.1",
     "django-leaflet>=0.31.0",
     "django-magicauth",
@@ -77,11 +78,13 @@ Homepage = "https://recommandations-collaboratives.beta.gouv.fr/"
 Documentation = "https://reco-co.gitbook.io/"
 Repository = "https://github.com/betagouv/recommandations-collaboratives/"
 
-[tool.setuptools]
-packages = ["recoco"]
+[tool.setuptools.packages.find]
+include = ["recoco*"] # package names should match these glob patterns (["*"] by default)
+namespaces = false  # to disable scanning PEP 420 namespaces (true by default)
+
 
 [tool.setuptools.dynamic]
-version = {attr = "recoco.__version__"}
+version = { attr = "recoco.__version__" }
 
 [build-system]
 requires = ["setuptools"]
@@ -193,7 +196,6 @@ django-webhook = { git = "https://github.com/etchegom/django-webhook.git", rev =
 
 [dependency-groups]
 dev = [
-    "black>=25.1.0",
     "coverage==7.4.1",
     "django-coverage-plugin>=3.1.0",
     "django-debug-toolbar==4.3.0",
@@ -230,3 +232,11 @@ dev = [
     "sphinxcontrib-django>=2.5",
     "sphinxcontrib-django-urls>=0.3",
 ]
+
+
+[tool.ruff]
+line-length = 88
+
+[tool.ruff.format]
+skip-magic-trailing-comma = false
+exclude = ["*.ipynb", "fabfile.py", "notebooks/*", "sql/*", "frontend_tests/*", "docs/*", "node_modules/*"]
