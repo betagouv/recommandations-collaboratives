@@ -1,17 +1,19 @@
 import Alpine from 'alpinejs';
 import api, { searchOrganizationsUrl } from '../utils/api';
+import _ from 'lodash';
 
 function SearchOrganisation() {
   return {
     orgaFound: [],
     orgaSorted: [],
     userInput: '',
-    showOrgasresults: false,
+    showOrgAsResults: false,
+    selectedOrga: null,
     isAnOrgaSelected: false,
     init() {
     },
     onSearch() {
-      this.isAnOrgaSelected = false;
+      this.selectedOrga = null;
       try {
         if (this.userInput.length > 0) {
           this.orgaFound = [];
@@ -20,9 +22,9 @@ function SearchOrganisation() {
             this.orgaFound = this.searchResults.results;
             if (this.orgaFound.length > 0) {
               this.sortOrgasResults();
-              this.showOrgasresults = true;
+              this.showOrgAsResults = true;
             } else {
-              this.showOrgasresults = false;
+              this.showOrgAsResults = false;
             }
           });
         }
@@ -32,14 +34,13 @@ function SearchOrganisation() {
       }
     },
     onSelectOrga(orga) {
-      this.isAnOrgaSelected = true;
       this.selectedOrga = orga;
       this.userInput = orga.name;
-      this.showOrgasresults = false;
-      this.$store.contact.orgaSelected = orga;
+      this.showOrgAsResults = false;
+
+      this.$dispatch('set-organization', orga);
     },
     sortOrgasResults() {
-
       this.orgaSorted = [];
       this.orgaFound.sort((a, b) => {
         if (a.name < b.name) {
@@ -51,20 +52,19 @@ function SearchOrganisation() {
         return 0;
       });
 
-      const tempSortOrgas = Object.groupBy(this.orgaFound, ({group})=>group);
+      const tempSortOrgas = _.groupBy(this.orgaFound, (orga) => orga.group);
 
       for (const prop in tempSortOrgas) {
-        if (tempSortOrgas[prop][0].group == null){
-          for (let i = 0; i < tempSortOrgas[prop].length; i++){
-            tempSortOrgas[prop][i].group = {name: 'AUTRES'};
+        if (tempSortOrgas[prop][0].group == null) {
+          for (let i = 0; i < tempSortOrgas[prop].length; i++) {
+            tempSortOrgas[prop][i].group = { name: 'AUTRES' };
           }
-        }
-        else {
+        } else {
           this.orgaSorted.push(tempSortOrgas[prop]);
         }
       }
       for (const prop in tempSortOrgas) {
-        if (tempSortOrgas[prop][0].group.name === 'AUTRES'){
+        if (tempSortOrgas[prop][0].group.name === 'AUTRES') {
           this.orgaSorted.push(tempSortOrgas[prop]);
         }
       }
