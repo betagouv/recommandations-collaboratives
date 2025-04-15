@@ -42,10 +42,10 @@
             Mettre à jour une note
         </h2>
         <section>
-            <form id="form-projects-update-note" method="post" action="." class="form">
+            <form id="form-projects-update-note" method="post" action="." class="form" novalidate>
                 {% csrf_token %}
                 <div class="d-flex">
-                    {% include "tools/editor.html" with input_name=form.content.name input_value=form.content.value|default:'' input_required=True escapejs=True %}
+                    {% include "tools/editor.html" with input_name=form.content.name input_required=True initial_content=form.content.value initial_content_escapejs=True  %}
                 </div>
                 <button type="submit" class="btn btn-primary">Enregistrer</button>
             </form>
