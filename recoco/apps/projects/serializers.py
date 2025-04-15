@@ -7,6 +7,7 @@ from recoco import verbs
 from recoco.apps.geomatics.serializers import CommuneSerializer
 from recoco.apps.home.serializers import UserSerializer
 from recoco.apps.tasks import models as task_models
+from recoco.rest_api.serializers import BaseSerializerMixin
 from recoco.utils import get_group_for_site
 
 from .models import Document, Note, Project, ProjectSite, Topic, UserProjectStatus
@@ -43,7 +44,9 @@ class ProjectSiteSerializer(serializers.ModelSerializer):
         read_only_fields = ["id", "project", "site", "is_origin"]
 
 
-class ProjectSerializer(TaggitSerializer, serializers.HyperlinkedModelSerializer):
+class ProjectSerializer(
+    TaggitSerializer, BaseSerializerMixin, serializers.HyperlinkedModelSerializer
+):
     class Meta:
         model = Project
         fields = [
@@ -100,6 +103,11 @@ class ProjectSerializer(TaggitSerializer, serializers.HyperlinkedModelSerializer
 
     def get_longitude(self, obj):
         return obj.location_x
+
+    advisors_note = serializers.SerializerMethodField()
+
+    def get_advisors_note(self, obj):
+        return obj.advisors_note if self.is_staff_for_site else None
 
 
 class UserProjectSerializer(ProjectSerializer):
@@ -167,7 +175,7 @@ class UserProjectSerializer(ProjectSerializer):
         }
 
 
-class ProjectForListSerializer(serializers.BaseSerializer):
+class ProjectForListSerializer(BaseSerializerMixin):
     class Meta:
         model = Project
         fields = []
@@ -177,6 +185,7 @@ class ProjectForListSerializer(serializers.BaseSerializer):
         # uses our optimized queryset and not project serializer
         commune = data.commune
         commune_data = format_commune(commune)
+
         return {
             "id": data.id,
             "name": data.name,
@@ -196,7 +205,7 @@ class ProjectForListSerializer(serializers.BaseSerializer):
             "notifications": data.notifications,
             "project_sites": format_sites(data),
             "tags": [tag.name for tag in data.tags.all()],
-            "advisors_note": data.advisors_note,
+            "advisors_note": data.advisors_note if self.is_staff_for_site else None,
         }
 
 
