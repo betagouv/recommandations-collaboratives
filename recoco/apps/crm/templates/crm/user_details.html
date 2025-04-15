@@ -7,10 +7,20 @@
 {% load hijack %}
 {% load phone_filters %}
 {% block title %}
-    {{ crm_user.get_full_name }} - CRM
+    {% if crm_user.get_full_name %}
+        {{ crm_user.get_full_name }}
+    {% else %}
+        Utilisateur
+    {% endif %}
+    - CRM
 {% endblock title %}
 {% block og_title %}
-    {{ crm_user.get_full_name }} - CRM
+    {% if crm_user.get_full_name %}
+        {{ crm_user.get_full_name }}
+    {% else %}
+        Utilisateur
+    {% endif %}
+    - CRM
 {% endblock og_title %}
 {% block js %}
     {% vite_asset 'js/apps/crm.js' %}
