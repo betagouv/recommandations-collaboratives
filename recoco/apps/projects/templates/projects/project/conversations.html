@@ -49,6 +49,9 @@
                                             {% for note in notes reversed %}
                                                 <div class="rounded-3 fr-p-2w fr-my-2v fr-mr-6w {% if request.user == note.created_by %}bg-blue-light{% else %}bg-grey-light {% endif %}">
                                                     {{ note.content_rendered|safe }}
+                                                    {% if note.contact %}
+                                                        <div x-data="GetContactObject({{ note.contact.id }})">{% include "tools/contacts/contact_card.html" %}</div>
+                                                    {% endif %}
                                                     {% if note.document.count %}
                                                         {% for document in note.document.all %}
                                                             {% include "projects/project/fragments/files_links/file_list_item_embedded.html" with document=document %}
@@ -76,7 +79,7 @@
                                 <hr />
                                 <!-- Post message -->
                                 <div class="message-form fr-mt-3w fr-p-2w bg-light border-form"
-                                     x-data="{contact: nullb}">
+                                     x-data="{message: {text: '', contact: ''}}">
                                     <form class="form"
                                           method="post"
                                           action="{% url 'projects-conversation-create-message' project.pk %}"
@@ -84,11 +87,10 @@
                                           id="conversation-form"
                                           novalidate>
                                         {% csrf_token %}
-                                        {% include "tools/editor.html" with can_attach_contact=True input_name=public_note_form.content.name input_value=public_note_form.content.value|default:'' input_required=True %}
+                                        {% include "tools/editor.html" with model="message" can_attach_contact=True input_name=public_note_form.content.name input_value=public_note_form.content.value|default:'' input_required=True %}
                                         <label class="visually-hidden" for="input-project-content">{{ public_note_form.content.label }}</label>
                                         <!-- TODO: add contact for input (public_note_form.contact) -->
                                         {% comment %} {{ public_note_form.contact }} {% endcomment %}
-                                        <input type="hidden" name="{{ public_note_form.contact.name }}" :value="">
                                         {% for error in public_note_form.content.errors %}<div class="text-danger text-end">{{ error }}</div>{% endfor %}
                                         {% include "projects/project/fragments/files_links/file_upload_input_standalone.html" %}
                                         <div class="d-flex justify-content-end fr-mt-3w">
@@ -99,6 +101,9 @@
                                                     class="fr-btn"
                                                     type="submit">Envoyer</button>
                                         </div>
+                                        <input type="hidden"
+                                               name="{{ public_note_form.contact.name }}"
+                                               :value="message.contact.id">
                                     </form>
                                 </div>
                             {% endif %}
