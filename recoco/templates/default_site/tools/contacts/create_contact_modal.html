@@ -16,7 +16,7 @@
                           aria-hidden="true"
                           @click.prevent="Modal.closeModal()"></span>
                 </div>
-                {% include "tools/contacts/search_organisation.html" %}
+                {% include "tools/contacts/search_organization.html" %}
                 <div class="fr-p-3v modal-create-contact__block">
                     <label class="modal-create-contact__label">Nom</label>
                     <input type="text" class="fr-input" x-model="contact.last_name">
@@ -79,6 +79,6 @@
                 </div>
             </form>
         </div>
-        {% include "tools/contacts/create_organisation_modal.html" %}
+        {% include "tools/contacts/create_organization_modal.html" %}
     </div>
 </template>

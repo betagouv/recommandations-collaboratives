@@ -26,9 +26,9 @@ function CreateContact() {
       this.modalSearchContact = document.querySelector('#search-contact-modal');
       this.modalSearchContact.classList.toggle('d-none');
     },
-    openCreateOrganisationModal() {
-      this.modalCreateOrganisation = document.querySelector('#create-organisation-modal');
-      this.modalCreateOrganisation.classList.toggle('d-none');
+    openCreateOrganizationModal() {
+      this.modalCreateOrganization = document.querySelector('#create-organization-modal');
+      this.modalCreateOrganization.classList.toggle('d-none');
       this.modalCreateContact = document.querySelector('#create-contact-modal');
       this.modalCreateContact.classList.toggle('d-none');
     },
