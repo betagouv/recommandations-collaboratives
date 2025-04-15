@@ -70,13 +70,27 @@ Alpine.data('SearchOrganization', () => ({
   },
   setSearch() {
     this.userInput = this.$store.contact.orgaSelected.name;
-    this.showOrgasresults = false;
+    this.showOrgAsResults = false;
     this.isAnOrgaSelected = true;
   },
   resetSearch() {
     this.userInput = '';
-    this.showOrgasresults = false;
+    this.showOrgAsResults = false;
     this.isAnOrgaSelected = false;
     this.$store.contact.orgaSelected = null;
+  },
+  // openCreateOrganizationModal() {
+  //   this.$dispatch('open-create-organization-modal', {
+  //     userInput: this.userInput,
+  //   });
+  // },
+  isCreateOrganizationModalOpen: false,
+  openModalCreateOrganization() {
+    // hide create contact modal
+    this.modalCreateContact = this.$refs.createContactModal;
+    this.modalCreateContact.classList.toggle('d-none');
+    // create organization modal
+    this.isCreateOrganizationModalOpen = true;
+    console.log('open create organization modal', this.isCreateOrganizationModalOpen);
   },
 }));

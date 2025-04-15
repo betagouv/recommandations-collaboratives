@@ -61,15 +61,15 @@
                                     <span class="text-style">Aucun résultat</span>
                                 </div>
                                 <div class="btn-create-orga fr-p-1w cursor-pointer"
-                                    @click="openCreateOrganizationModal">
+                                    @click="openModalCreateOrganization">
                                     <span class="fr-icon-add-line" aria-hidden="true"></span><span>Créer une nouvelle organisation</span>
                                 </div>
                             </div>
                         </template>
                     </div>
-                    <template x-if="userInput.length > 0 && showOrgasresults && !isAnOrgaSelected">
+                    <template x-if="userInput.length > 0 && showOrgAsResults && !isAnOrgaSelected">
                         <div class="btn-create-orga fr-p-1w cursor-pointer"
-                            @click="openCreateOrganizationModal">
+                            @click="openModalCreateOrganization">
                             <span class="fr-icon-add-line" aria-hidden="true"></span><span>Créer une nouvelle organisation</span>
                         </div>
                     </template>
@@ -77,4 +77,5 @@
             </div>
         </div>
     </div>
+    {% include "tools/contacts/create_organization_modal.html" %}
 </div>

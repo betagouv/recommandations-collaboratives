@@ -1,8 +1,10 @@
 import Alpine from 'alpinejs';
-import api, { searchOrganizationGroupsUrl, departmentsUrl, organizationsUrl, organizationGroupsUrl } from '../utils/api';
+import api, { searchOrganizationGroupsUrl, departmentsUrl, organizationsUrl, organizationGroupsUrl } from '../../utils/api';
+import { Modal } from '../../models/Modal.model';
 
 Alpine.data('CreateOrganizationModal', () => {
   return {
+    Modal: null,
     verifNomOrga: false,
     organizationName: '',
     isGroupNat: false,
@@ -16,7 +18,8 @@ Alpine.data('CreateOrganizationModal', () => {
     organizationToCreate: null,
     orgaToCreateFormIsOk: false,
     async init() {
-       await this.showDepartments();
+      this.Modal = Modal(this, 'create-organization-modal');
+      await this.showDepartments();
     },
     closeCreateOrganizationModal() {
       this.modalCreateOrganization = document.querySelector('#create-organization-modal');

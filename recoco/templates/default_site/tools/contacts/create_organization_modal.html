@@ -5,9 +5,9 @@
           type="text/css" />
 {% endblock css %}
 <template x-if="isCreateOrganizationModalOpen">
-    <div x-data="CreateOrganization()"
+    <div x-data="CreateOrganizationModal()"
         id="create-organization-modal"
-        class="modal-create-organization d-none z-2">
+        class="modal-create-organization z-2">
         <div class="d-flex justify-content-between border-bottom-666 fr-p-3v modal-create-contact__block">
             <p class="fw-bold color-666 correct-p">CREER UNE ORGANISATION</p>
             <span class="fr-icon-close-line color-666 cursor-pointer"
@@ -80,7 +80,7 @@
                                             </div>
                                         </template>
                                     </div>
-                                    {% comment %} <template x-if="userInput.length > 0 && showOrgasresults && !isAnOrgaSelected">
+                                    {% comment %} <template x-if="userInput.length > 0 && showOrgAsResults && !isAnOrgaSelected">
                                         <div class="btn-create-orga fr-p-1w cursor-pointer" @click="openCreateOrganizationModal">
                                             <span class="fr-icon-add-line" aria-hidden="true"></span><span>Créer une nouvelle organisation</span>
                                         </div>
