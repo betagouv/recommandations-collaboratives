@@ -18,7 +18,8 @@
                  alt="{{ action.actor }}" />
             <strong class="text-nowrap">{{ user_invited.email }}</strong>
             <button class="fr-ml-3w fr-px-2v fr-py-0 fr-btn fr-btn--secondary fr-btn--xs"
-                    @click="clipboardCopy(`L'email`, '{{ user_invited.email }}')">
+                    @click="clipboardCopy(`L'email`, '{{ user_invited.email }}')"
+                    title="Copier l'email">
                 <svg class="bi align-baseline" width="10" height="10" fill="currentColor">
                     <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#clipboard" />
                 </svg>

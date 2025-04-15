@@ -63,7 +63,8 @@
                                     </svg>  
                                     <span>{{ crm_user.email }}</span>
                                     <button class="fr-ml-3w fr-px-2v fr-py-0 fr-btn fr-btn--secondary fr-btn--xs"
-                                            @click="clipboardCopy(`L'email`, '{{ crm_user.email }}')">
+                                            @click="clipboardCopy(`L'email`, '{{ crm_user.email }}')"
+                                            title="Copier l'email">
                                         <svg class="bi align-baseline" width="10" height="10" fill="currentColor">
                                             <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#clipboard" />
                                         </svg>
