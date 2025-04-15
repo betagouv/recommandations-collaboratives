@@ -76,11 +76,9 @@ function SelectSearchable(params) {
     },
     setSelectedProject() {
       this.$store.actionPusher.isSelectedProject = true;
-      console.log(this.$store.actionPusher.isSelectedProject);
     },
     resetSelectedProject() {
       this.$store.actionPusher.isSelectedProject = false;
-      console.log(this.$store.actionPusher.isSelectedProject);
     },
   };
 }
