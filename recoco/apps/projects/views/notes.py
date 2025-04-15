@@ -152,8 +152,14 @@ def update_note(request, note_id=None):
     if request.method == "POST":
         if is_advisor:
             form = StaffNoteForm(request.POST, instance=note)
+            form.set_contact_queryset(
+                Contact.objects.filter(site_id=request.site.id),
+            )
         else:
             form = NoteForm(request.POST, instance=note)
+            form.set_contact_queryset(
+                Contact.objects.filter(site_id=request.site.id),
+            )
         if form.is_valid():
             instance = form.save(commit=False)
             instance.updated_on = timezone.now()
