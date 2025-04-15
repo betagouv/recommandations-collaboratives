@@ -66,6 +66,7 @@ class ProjectSerializer(TaggitSerializer, serializers.HyperlinkedModelSerializer
             "project_sites",
             "tags",
             "is_diagnostic_done",
+            "advisors_note",
         ]
 
     switchtenders = UserSerializer(read_only=True, many=True)
@@ -195,6 +196,7 @@ class ProjectForListSerializer(serializers.BaseSerializer):
             "notifications": data.notifications,
             "project_sites": format_sites(data),
             "tags": [tag.name for tag in data.tags.all()],
+            "advisors_note": data.advisors_note,
         }
 
 
