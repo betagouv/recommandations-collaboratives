@@ -2,7 +2,7 @@
     width: 600px;
     position: fixed;
     left: 50%;
-    top: 30%;
+    top: 40%;
     transform: translate(-50%, -50%);
     border-radius: 4px;
     border: 1px solid var(--light-border-default-grey, #e5e5e5);
@@ -76,7 +76,7 @@
 }
 
 .max-h-80 {
-    max-height: 20rem;
+    max-height: 12rem;
 }
 
 .selected-item {
@@ -89,4 +89,23 @@
     list-style: none;
     margin: 0;
     padding: 0;
+}
+
+@media screen and (max-height: 720px) {
+    .max-h-80 {
+        max-height: 10rem;
+    }
+
+}
+@media screen and (max-height: 665px) {
+    .max-h-80 {
+        max-height: 8rem;
+    }
+
+}
+@media screen and (max-height: 650px) {
+    .modal-create-organization {
+        top: 42%;
+    }
+
 }
