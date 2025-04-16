@@ -5,17 +5,19 @@ import { Modal } from '../../models/Modal.model';
 Alpine.data('CreateOrganizationModal', () => {
   return {
     Modal: null,
-    verifNomOrga: false,
-    organizationName: '',
-    organizationGroup: null,
     orgaGroupsFound: [],
     userInput: '',
     showOrgaGroupsresults: false,
     isAnOrgaGroupSelected: false,
     departments: [],
-    selectedDepartments: [],
+    // selectedDepartments: [],
+    radiobuttonForGroup: 'no',
     organizationToCreate: null,
-    orgaToCreateFormIsOk: false,
+    organization: {
+      name: '',
+      group: null,
+      departments: [],
+    },
     formState: {
       isSubmitted: false,
       fields: {
@@ -28,12 +30,6 @@ Alpine.data('CreateOrganizationModal', () => {
       this.Modal = Modal(this, 'create-organization-modal');
       await this.showDepartments();
     },
-    // closeCreateOrganizationModal() {
-    //   // this.modalCreateOrganization = document.querySelector('#create-organization-modal');
-    //   // this.modalCreateOrganization.classList.toggle('d-none');
-    //   // this.reOpenModalCreateContact();
-    //   this.Modal.closeModal();
-    // },
     reOpenModalCreateContact() {
       this.modalSearchOrganization = document.querySelector('#create-contact-modal');
       this.modalSearchOrganization.classList.toggle('d-none');
@@ -44,13 +40,13 @@ Alpine.data('CreateOrganizationModal', () => {
     setGroupNatToFalse() {
       this.formState.fields.isGroupNat = false;
       this.userInput = '';
-      this.organizationGroup = null;
+      this.organization.group = null;
     },
     onSearchOrgaGroup() {
       this.isAnOrgaSelected = false;
       try {
         if (this.userInput.length > 0) {
-          this.organizationGroup = null;
+          this.organization.group = null;
           this.showOrgaGroupsresults = true
           this.isAnOrgaGroupSelected = false;
           this.orgaGroupFound = [];
@@ -83,98 +79,45 @@ Alpine.data('CreateOrganizationModal', () => {
     },
     onSelectGroup(group) {
       this.isAnOrgaGroupSelected = true;
-      this.organizationGroup = group;
+      this.organization.group = group.id;
       this.userInput = group.name;
       this.showOrgaGroupsresults = false;
     },
     createOrganizationGroup() {
 
-      this.organizationGroup = {
+      this.organization.group = {
         name: this.userInput,
       };
       this.isAnOrgaGroupSelected = true;
       this.showOrgaGroupsresults = false;
       try {
-            api.post(organizationGroupsUrl(), this.organizationGroup).then((response) => {
-                this.organizationGroup = response.data;
+            api.post(organizationGroupsUrl(), this.organization.group).then((response) => {
+                this.organization.group = response.data.id;
             });
           } catch (error) {
             console.log(error);
           }
     },
     createOrganization() {
-
-      // TODO check form state
-
       this.formState.fields = {
-        isOrgaName: this.organizationName !== '',
-        isGroupNatName: this.userInput !== '' && this.formState.fields.isGroupNat,
+        isOrgaName: this.organization.name !== '',
+        isGroupNat: this.radiobuttonForGroup === 'yes',
+        isGroupNatName: this.organization.group !== null && this.formState.fields.isGroupNat,
       };
       this.formState.isSubmitted = true;
 
-
       // TODO suppress store use
-        this.selectedDepartments = [...this.$store.contact.selectedDepartments];
+        this.organization.departments = [...this.$store.contact.selectedDepartments];
+      // TODO suppress store use
 
-        if(this.isGroupNat && this.organizationGroup === null){
-          alert('Veuillez selectionner un groupe');
-          this.orgaToCreateFormIsOk = false;
-        }
 
-        if (this.organizationName.length === 0) {
-          this.verifNomOrga = true;
-        }
-        else {
-          this.verifNomOrga = false;
-          if (this.organizationGroup === null && this.selectedDepartments.length === 0) {
-            this.organizationToCreate = {
-                name: this.organizationName,
-              };
-          }
-          else if (this.organizationGroup !== null && this.selectedDepartments.length === 0) {
-            this.organizationToCreate = {
-                name: this.organizationName,
-                group: this.organizationGroup.id,
-              };
-          }
-          else if (this.organizationGroup === null && this.selectedDepartments.length > 0) {
-            this.organizationToCreate = {
-                name: this.organizationName,
-                departments: this.selectedDepartments,
-              };
-          }
-          else {
-              this.organizationToCreate = {
-                name: this.organizationName,
-                group: this.organizationGroup.id,
-                departments: this.selectedDepartments,
-              };
-          }
-
-            api.post(organizationsUrl(), this.organizationToCreate).then((response) => {
-                // this.organizationToCreate = response.data;
-                // this.$store.contact.orgaSelected = this.organizationToCreate;
-                // this.$store.contact.orgaCreated = this.organizationToCreate;
-                // this.resetFormValue();
-                // this.closeCreateOrganizationModal();
-                this.Modal.responseModal(response.data);
-            }).catch ((error) =>{
-            console.log(error);
-          });
-        }
+      if(this.formState.fields.isGroupNatName && this.formState.fields.isOrgaName || !this.formState.fields.isGroupNat && this.formState.fields.isOrgaName) {
+        api.post(organizationsUrl(), this.organization).then((response) => {
+            this.Modal.responseModal(response.data);
+        }).catch ((error) =>{
+          console.log(error);
+        });
+      }
     },
-    // resetFormValue() {
-    //   this.organizationName = '';
-    //   this.organizationGroup = null;
-    //   this.verifNomOrga = false;
-    //   this.isGroupNat = false;
-    //   this.isAnOrgaGroupSelected = false;
-    //   this.userInput = '';
-    //   this.showOrgaGroupsresults = false;
-    //   this.selectedDepartments = [];
-    //   const radioButton = document.querySelector('input[name="natGroup"]');
-    //   radioButton.checked = false;
-    //   this.$dispatch('reset-form-create-orga');
-    // },
   };
 })

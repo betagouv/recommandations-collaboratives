@@ -15,15 +15,16 @@
                     aria-hidden="true"
                     @click.prevent="Modal.closeModal()"></span>
             </div>
-            <div class="fr-p-3v modal-create-organization__block">
-                {% comment %} x-data="SearchNationalGroup" {% endcomment %}
-                <span class="modal-create-organization__label">Nom de l'organisation</span><span class="color-important">*</span>
+            <div class="fr-p-3v modal-create-organization__block"
+                 :class="{'fr-input-group--error': formState.isSubmitted && !formState.fields.isOrgaName}">
+                <label class="modal-create-organization__label">Nom de l'organisation</label><span class="color-important">*</span>
                 <p class="modal-create-organization__label-info grey-text">
                     Préciser sa zone géographique éventuelle (ex : Cerema Occitanie)
                 </p>
-                <template x-if="verifNomOrga">
+                <template x-if="formState.isSubmitted && !formState.fields.isOrgaName">
+                    <p class="modal-create-organization__label-info color-important">Le nom de votre organisation est obligatoire *</p>
                 </template>
-                <input type="text" class="fr-input" x-model="organizationName" required>
+                <input type="text" class="fr-input" :class="{'fr-input--error': formState.isSubmitted && !formState.fields.isOrgaName}" x-model="organization.name" required>
             </div>
             <div class="fr-p-3v modal-create-organization__block">
                 <fieldset class="fr-fieldset fr-mb-0"
@@ -36,20 +37,26 @@
                     </legend>
                     <div class="fr-fieldset__element modal-create-organization__yes fr-mb-0 fr-pb-2v">
                         <div class="fr-radio-group">
-                            <input type="radio" id="natGroup-yes" name="natGroup">
+                            <input type="radio" id="natGroup-yes" name="natGroup" value="yes" x-model="radiobuttonForGroup" @click="setGroupNatToTrue">
                             <label class="fr-label" for="natGroup-yes" @click="setGroupNatToTrue">Oui</label>
                         </div>
-                        <template x-if="isGroupNat">
+                        <template x-if="formState.fields.isGroupNat">
                             {% comment %} a remplacer par un composant search group nat {% endcomment %}
                             <div>
-                                <span class="modal-create-organization__label-info grey-text">Nom de la structure ou du réseau national :</span>
-                                <div class="fr-search-bar" id="header-search" role="search">
-                                    <input type="search"
-                                        class="fr-input"
-                                        x-model="userInput"
-                                        required
-                                        @input.debounce="onSearchOrgaGroup">
-                                    <button class="fr-btn" title="Rechercher" @click="onSearch">Rechercher</button>
+                                <div :class="{'fr-input-group--error': formState.isSubmitted && !formState.fields.isGroupNatName}">
+                                    <label class="modal-create-organization__label-info grey-text">Nom de la structure ou du réseau national :</label>
+                                    <template x-if="formState.isSubmitted && !formState.fields.isGroupNatName">
+                                        <p class="modal-create-organization__label-info color-important">Sélectionnez ou créez un réseau national *</p>
+                                    </template>
+                                    <div class="fr-search-bar" id="header-search" role="search">
+                                        <input type="search"
+                                            class="fr-input"
+                                            :class="{'fr-input--error': formState.isSubmitted && !formState.fields.isGroupNatName}"
+                                            x-model="userInput"
+                                            required
+                                            @input.debounce="onSearchOrgaGroup">
+                                        <button class="fr-btn" title="Rechercher" @click="onSearch">Rechercher</button>
+                                    </div>
                                 </div>
                                 <div class="fr-menu menu-modal-correct-fr-menu position-relative border-radius-4px">
                                     <div class="fr-menu__list w-100 position-absolute border-radius-4px">
@@ -93,7 +100,7 @@
                     </div>
                     <div class="fr-fieldset__element fr-pt-2v fr-mb-0">
                         <div class="fr-radio-group">
-                            <input type="radio" id="natGroup-no" name="natGroup" checked>
+                            <input type="radio" id="natGroup-no" name="natGroup" value="no" x-model="radiobuttonForGroup" checked>
                             <label class="fr-label" for="natGroup-no" @click="setGroupNatToFalse">Non</label>
                         </div>
                     </div>
