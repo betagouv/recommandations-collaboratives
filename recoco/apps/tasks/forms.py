@@ -9,9 +9,10 @@ created : 2021-12-14 10:36:20 CEST
 
 from django import forms
 from django.contrib.sites.models import Site
-from django.db.models import Q
+from django.db.models import Q, QuerySet
 from markdownx.fields import MarkdownxFormField
 
+from recoco.apps.addressbook.models import Contact
 from recoco.apps.projects import models as projects_models
 from recoco.apps.resources import models as resources_models
 from recoco.utils import is_staff_for_site
@@ -143,7 +144,10 @@ class CreateActionWithResourceForm(CreateActionBaseForm):
 
     class Meta:
         model = models.Task
-        fields = ["intent", "content", "public", "resource"]
+        fields = ["intent", "content", "public", "resource", "contact"]
+
+    def set_contact_queryset(self, contact_queryset: QuerySet[Contact]):
+        self.fields["contact"].queryset = contact_queryset
 
 
 class CreateTaskForm(forms.ModelForm):

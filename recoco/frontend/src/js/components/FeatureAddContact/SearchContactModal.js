@@ -1,9 +1,11 @@
 import Alpine from 'alpinejs';
 import api, { searchContactsUrl } from '../../utils/api';
 import { Modal } from '../../models/Modal.model';
+import { formatDate } from '../../utils/date';
 
 Alpine.data('SearchContactModal', () => ({
   Modal: null,
+  formatDate,
   contactsFound: [],
   userInput: '',
   selectedContact: null,

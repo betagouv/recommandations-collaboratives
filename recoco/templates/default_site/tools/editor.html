@@ -19,7 +19,7 @@ Parameters:
           type="text/css">
 {% endblock css %}
 {% comment %} TODO @set-comment.window to fix{% endcomment %}
-<div class="w-100"
+<div class="w-100 position-relative"
      {% if initial_content_escapejs %} x-data='editor("{{ initial_content|escapejs }}")' {% else %} x-data='editor("{{ initial_content }}")' {% endif %}
      @reset-contact="handleResetContact()"
      @set-comment.window="setMarkdownContent(event)"
@@ -27,44 +27,43 @@ Parameters:
      x-ref="editor"
      data-test-id="tiptap-editor">
     <template x-if="isLoaded()">
-        <div class="tiptap-menu">
+        <div class="tiptap-menu-custom">
             {% if not "title" in tools_disabled %}
                 <button @click.stop.prevent="toggleHeading({ level: 3 })"
-                        :class="{ 'is-active': isActive('heading', { level: 3 }, updatedAt) }">
-                    <span class="specific-fontweight-500">Titre</span>
+                        title="Titre"
+                        class="fr-btn fr-btn--sm fr-icon-h-1"
+                        :class="{ 'fr-btn--secondary': isActive('heading', { level: 3 }, updatedAt), 'fr-btn--tertiary': !isActive('heading', { level: 3 }, updatedAt), }">
+                    Titre
                 </button>
             {% endif %}
             <button @click.stop.prevent="toggleBold()"
-                    :class="{ 'is-active' : isActive('bold', updatedAt) }">
-                <svg class="bi align-middle" width="18" height="18" fill="currentColor">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#type-bold" />
-                </svg>
+                    title="Gras"
+                    class="fr-btn fr-btn--sm fr-icon-bold"
+                    :class="{ 'fr-btn--secondary': isActive('bold', updatedAt), 'fr-btn--tertiary': !isActive('bold', updatedAt), }">
+                Gras
             </button>
             <button @click.stop.prevent="toggleItalic()"
-                    :class="{ 'is-active' : isActive('italic', updatedAt) }">
-                <svg class="bi align-middle" width="18" height="18" fill="currentColor">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#type-italic" />
-                </svg>
+                    title="Italique"
+                    class="fr-btn fr-btn--sm fr-icon-italic"
+                    :class="{ 'fr-btn--secondary': isActive('italic', updatedAt), 'fr-btn--tertiary': !isActive('italic', updatedAt), }">
+                Italique
             </button>
             <button @click.stop.prevent="toggleBulletList()"
-                    :class="{ 'is-active' : isActive('bulletList', updatedAt) }">
-                <svg class="bi align-middle" width="18" height="18" fill="currentColor">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#list-ul" />
-                </svg>
+                    title="Liste"
+                    class="fr-btn fr-btn--sm fr-icon-list-unordered"
+                    :class="{ 'fr-btn--secondary': isActive('bulletList', updatedAt), 'fr-btn--tertiary': !isActive('bulletList', updatedAt), }">
+                Liste
             </button>
             <button @click.stop.prevent="setLink()"
-                    :class="{ 'is-active' : isActive('link', updatedAt) }">
-                <svg class="bi align-middle" width="18" height="18" fill="currentColor">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#link" />
-                </svg>
+                    title="Attacher un lien"
+                    class="fr-btn fr-btn--sm fr-icon-link"
+                    :class="{ 'fr-btn--secondary': isActive('link', updatedAt), 'fr-btn--tertiary': !isActive('link', updatedAt), }">
+                Attacher un lien
             </button>
-            <button class="unset-link"
-                    @click.stop.prevent="unsetLink()"
-                    x-bind:disabled="!isActive('link', updatedAt)">
-                <svg class="bi align-middle" width="18" height="18" fill="currentColor">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#link" />
-                </svg>
-            </button>
+            <button @click.stop.prevent="unsetLink()"
+                    title="Détacher un lien"
+                    class="fr-btn fr-btn--sm fr-icon-link-unlink text-white"
+                    x-bind:disabled="!isActive('link', updatedAt)">Détacher un lien</button>
         </div>
     </template>
     <div class="position-relative">
@@ -83,7 +82,7 @@ Parameters:
                     <template x-if="!selectedContact">
                         <button @click.prevent="openModalSearchContact"
                                 data-test-id="button-add-contact"
-                                class="fr-btn fr-btn--tertiary fr-btn--sm justify-content-center fr-text--sm">
+                                class="fr-btn fr-btn--tertiary fr-btn--sm justify-content-center fr-text--sm button-add-contact">
                             Ajouter un contact
                         </button>
                     </template>
