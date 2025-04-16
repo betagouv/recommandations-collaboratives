@@ -7,7 +7,6 @@ Alpine.data('CreateOrganizationModal', () => {
     Modal: null,
     verifNomOrga: false,
     organizationName: '',
-    isGroupNat: false,
     organizationGroup: null,
     orgaGroupsFound: [],
     userInput: '',
@@ -17,6 +16,14 @@ Alpine.data('CreateOrganizationModal', () => {
     selectedDepartments: [],
     organizationToCreate: null,
     orgaToCreateFormIsOk: false,
+    formState: {
+      isSubmitted: false,
+      fields: {
+        isOrgaName: false,
+        isGroupNat: false,
+        isGroupNatName: false,
+      },
+    },
     async init() {
       this.Modal = Modal(this, 'create-organization-modal');
       await this.showDepartments();
@@ -32,10 +39,10 @@ Alpine.data('CreateOrganizationModal', () => {
       this.modalSearchOrganization.classList.toggle('d-none');
     },
     setGroupNatToTrue() {
-      this.isGroupNat = true;
+      this.formState.fields.isGroupNat = true;
     },
     setGroupNatToFalse() {
-      this.isGroupNat = false;
+      this.formState.fields.isGroupNat = false;
       this.userInput = '';
       this.organizationGroup = null;
     },
@@ -81,6 +88,7 @@ Alpine.data('CreateOrganizationModal', () => {
       this.showOrgaGroupsresults = false;
     },
     createOrganizationGroup() {
+
       this.organizationGroup = {
         name: this.userInput,
       };
@@ -95,6 +103,16 @@ Alpine.data('CreateOrganizationModal', () => {
           }
     },
     createOrganization() {
+
+      // TODO check form state
+
+      this.formState.fields = {
+        isOrgaName: this.organizationName !== '',
+        isGroupNatName: this.userInput !== '' && this.formState.fields.isGroupNat,
+      };
+      this.formState.isSubmitted = true;
+
+
       // TODO suppress store use
         this.selectedDepartments = [...this.$store.contact.selectedDepartments];
 
