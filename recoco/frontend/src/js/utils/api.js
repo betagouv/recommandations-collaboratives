@@ -97,6 +97,10 @@ export function contactsUrl() {
   return `/api/addressbook/contacts/`;
 }
 
+export function contactUrl(contactId) {
+  return `/api/addressbook/contacts/${contactId}`;
+}
+
 // Topic
 export function searchTopicsUrl(search, restrict_to) {
   return `/api/topics/?search=${search}&restrict_to=${restrict_to}`;
