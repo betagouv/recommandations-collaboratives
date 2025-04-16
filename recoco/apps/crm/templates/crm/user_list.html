@@ -18,6 +18,9 @@
     <link href="{% sass_src 'home/css/dsfr/marianne.css' %}"
           rel="stylesheet"
           type="text/css">
+    <link href="{% sass_src 'projects/css/departments_selector.scss' %}"
+          rel="stylesheet"
+          type="text/css">
 {% endblock css %}
 {% block content %}
     <div x-data="Crm" class="d-flex fr-px-0">
@@ -30,9 +33,10 @@
             </div>
             <div class="fr-px-3w fr-pt-3w fr-mb-2w">
                 {% with users.form as form %}
-                    <form x-data=""
+                    <form x-data="{selectedDepartments : new URLSearchParams(document.location.search).getAll('departments')}"
                           class="row g-3"
                           method="get"
+                          x-ref="myForm"
                           action="{% url 'crm-user-list' %}">
                         {{ form.non_field_errors }}
                         <div class="col-md-6">
@@ -72,6 +76,10 @@
                                         <label class="btn btn-outline-primary" for="btnradio-{{ choice.0 }}">{{ choice.1 }}</label>
                                     {% endfor %}
                                 </div>
+                            </div>
+                            <!-- departements -->
+                            <div class="fr-mb-2v" @user-close-selector="$refs.myForm.submit()">
+                                {% include "projects/project/fragments/departments_selector.html" with label="Départements conseillés" input_department_name="departments" filter_by_regions=True selected_departments="selectedDepartments" %}
                             </div>
                             <hr />
                             <div>
