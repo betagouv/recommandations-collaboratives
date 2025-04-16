@@ -76,7 +76,7 @@
                                           method="post"
                                           action="{% url 'projects-conversation-create-message' project.pk %}"
                                           enctype="multipart/form-data"
-                                          id="conversation-form">
+                                          id="conversation-form" novalidate>
                                         {% csrf_token %}
                                         {% include "tools/editor.html" with input_name=public_note_form.content.name input_value=public_note_form.content.value|default:'' input_required=True %}
                                         <label class="visually-hidden" for="input-project-content">{{ public_note_form.content.label }}</label>
