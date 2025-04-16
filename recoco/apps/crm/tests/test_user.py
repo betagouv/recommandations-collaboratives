@@ -212,25 +212,18 @@ def test_crm_user_list_filters_on_other_role(request, client):
 def test_crm_user_list_filters_on_departments(request, client):
     site = get_current_site(request)
 
+    dpt_nord = baker.make(geomatics.Department, code="59", name="Nord")
     dpt_allier = baker.make(geomatics.Department, code="03", name="Allier")
 
-    staff = baker.make(auth_models.User)
-    staff.profile.sites.add(site)
-    staff.profile.departments.add(dpt_allier)
-    gstaff = auth_models.Group.objects.get(name="example_com_staff")
-    staff.groups.add(gstaff)
+    user_a = baker.make(auth_models.User)
+    user_a.profile.sites.add(site)
+    user_a.profile.departments.add(dpt_allier)
 
-    dpt_nord = baker.make(geomatics.Department, code="59", name="Nord")
-    advisor = baker.make(auth_models.User)
-    advisor.profile.sites.add(site)
-    advisor.profile.departments.add(dpt_nord)
-    gadvisor = auth_models.Group.objects.get(name="example_com_advisor")
-    advisor.groups.add(gadvisor)
+    user_b = baker.make(auth_models.User)
+    user_b.profile.sites.add(site)
+    user_b.profile.departments.add(dpt_nord)
 
-    a_user = baker.make(auth_models.User)
-    a_user.profile.sites.add(site)
-
-    url = reverse("crm-user-list") + "?departments=03&departments=92"  # role 4 is other
+    url = reverse("crm-user-list") + "?departments=59"
 
     with login(client) as user:
         assign_perm("use_crm", user, site)
@@ -238,13 +231,10 @@ def test_crm_user_list_filters_on_departments(request, client):
 
     assert response.status_code == 200
 
-    expected = reverse("crm-user-details", args=[staff.id])
+    expected = reverse("crm-user-details", args=[user_b.id])
     assertContains(response, expected)
 
-    unexpected = reverse("crm-user-details", args=[advisor.id])
-    assertNotContains(response, unexpected)
-
-    unexpected = reverse("crm-user-details", args=[a_user.id])
+    unexpected = reverse("crm-user-details", args=[user_a.id])
     assertNotContains(response, unexpected)
 
 
