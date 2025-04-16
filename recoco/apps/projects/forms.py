@@ -36,7 +36,7 @@ class NoteForm(forms.ModelForm):
 class StaffNoteForm(NoteForm):
     class Meta:
         model = models.Note
-        fields = ["content"]
+        fields = ["content", "contact"]
 
 
 class PrivateNoteForm(forms.ModelForm):

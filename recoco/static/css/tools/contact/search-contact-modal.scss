@@ -8,6 +8,15 @@
   border: 1px solid var(--light-border-default-grey, #e5e5e5);
   background: #fff;
   box-shadow: 4px 8px 6px 0px rgba(0, 0, 0, 0.2);
+  z-index: 1020;
+
+  .contact-card {
+    max-width: 26rem;
+  }
+  .button-cancel-contact {
+    position: absolute;
+    right: 0;
+  }
 }
 
 .specific-height {

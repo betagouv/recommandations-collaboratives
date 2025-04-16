@@ -18,28 +18,22 @@
         - filter_by_regions (boolean): if true, filter by regions, else filter by departments
         - zone_objects (list): list of regions or departments to display in filter
         - select_all (boolean): to select all departments (default=true)
+        - input_region_name (string): name of the input for regions
+        - input_department_name (string): name of the input for departments
+        - selected_departments (list): list of selected departments (default=null)
 
     Event to listen in parent component:
         - selected-departments: when a department is selected, the event is triggered with the selected departments
+        - user-close-selector: when the user closes the selector, the event is triggered with the selected departments
 
 {% endcomment %}
 <div class="d-flex align-items-center fr-mr-6v">
     <span class="fr-segmented__legend inline text-nowrap">Filtrer :</span>
-    <div class="input-item position-relative active specific-border-solid1pxE5E5E5" x-data="DepartmentsSelector({{ zone_objects }}, {selectedDepartments :
-        {% if selected_departments %}
-            {{ selected_departments }}
-        {% else %}
-            []
-        {% endif %}
-        , selectAll :
-        {% if select_all %}
-            true
-        {% else %}
-            false
-        {% endif %}
-        })" x-on:click.outside="open = false">
+    <div class="input-item position-relative active specific-border-solid1pxE5E5E5"
+         x-data="DepartmentsSelector({ listZone: {{ zone_objects|default:'null' }}, selectAll : '{{ select_all | default:'False' }}' == 'True', filterByRegions : '{{ filter_by_regions }}' == 'True' , selectedDepartments: {{ selected_departments|default:'null' }} })"
+         x-on:click.outside="open && $dispatch('user-close-selector'); open = false; ">
         <div class="d-flex align-items-center fr-pr-3w bg-white rounded-pill"
-             x-on:click="open = !open"
+             x-on:click.prevent="open = !open"
              type="button"
              :class="{'input-active':open}">
             <button class="input-field bg-transparent fr-px-2w fw-normal text-dark appearance-none"
@@ -79,8 +73,9 @@
                                 <input x-on:input.change="handleRegionFilter(region)"
                                        class="region-checkbox form-check-input fw-normal fr-ml-2v fr-px-2v fr-py-2v fr-mr-2v"
                                        type="checkbox"
-                                       :value="region.active"
+                                       :value="region.code"
                                        :checked="region.active"
+                                       {% if input_region_name %}:name="`{{ input_region_name }}-region`"{% endif %}
                                        :id="`region-${region.code}`" />
                                 <label class="w-100 fr-pr-2v fr-pt-2v d-flex align-items-center"
                                        :for="`region-${region.code}`">
@@ -95,8 +90,9 @@
                                         <input x-on:input.change="handleDepartmentFilter(department)"
                                                class="form-check-input fw-normal fr-ml-2v fr-px-2v fr-py-2v fr-mr-2v"
                                                type="checkbox"
-                                               :value="department.active"
+                                               :value="department.code"
                                                :checked="department.active"
+                                               {% if input_department_name %}:name="`{{ input_department_name }}`"{% endif %}
                                                :id="department.code" />
                                         <label class=" w-100 fr-pr-2v fr-py-1v d-flex align-items-center"
                                                :for="department.code">
@@ -119,8 +115,9 @@
                             <input x-on:input.change="handleTerritoryFilter(department)"
                                    class="form-check-input fw-normal fr-ml-2v fr-px-2v fr-py-2v fr-mr-2v"
                                    type="checkbox"
-                                   :value="department.active"
+                                   :value="department.code"
                                    :checked="department.active"
+                                   {% if input_department_name %}:name="`{{ input_department_name }}"{% endif %}
                                    :id="department.code" />
                             <label class=" w-100 fr-pr-2v fr-py-1v d-flex align-items-center"
                                    :for="department.code">
