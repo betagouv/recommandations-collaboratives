@@ -1,8 +1,10 @@
 from rest_framework.filters import BaseFilterBackend
 from rest_framework.viewsets import ModelViewSet
-from waffle import switch_is_active
 
-from recoco.rest_api.filters import VectorSearchFilter, WatsonSearchFilter
+from recoco.rest_api.filters import (
+    VectorSearchFilter,
+    WordTrigramSimilaritySearchFilter,
+)
 from recoco.rest_api.pagination import StandardResultsSetPagination
 from recoco.rest_api.permissions import (
     IsStaffForSiteOrISAuthenticatedReadOnly,
@@ -56,43 +58,22 @@ class OrgaStartswithFilterBackend(BaseFilterBackend):
 class ContactViewSet(ModelViewSet):
     permission_classes = [IsStaffForSiteOrISAuthenticatedReadOnly]
     pagination_class = StandardResultsSetPagination
-    filter_backends = [OrgaStartswithFilterBackend]
+    filter_backends = [OrgaStartswithFilterBackend, WordTrigramSimilaritySearchFilter]
 
-    search_fields = [
-        ("last_name", {"weight": "A"}),
-        ("first_name", {"weight": "A"}),
-        ("email", {"weight": "A"}),
-        ("division", {"weight": "B"}),
-        ("organization__name", {"weight": "B"}),
-        ("organization__group__name", {"weight": "B"}),
-        ("organization__departments__name", {"weight": "C"}),
-        (
-            "organization__departments__code",
-            {"config": "simple", "weight": "C"},
-        ),
-        ("organization__departments__region__name", {"weight": "C"}),
-        (
-            "organization__departments__region__code",
-            {"config": "simple", "weight": "C"},
-        ),
+    trgm_search_fields = [
+        "last_name",
+        "first_name",
+        "division",
+        "organization__name",
+        "organization__group__name",
     ]
-    search_min_rank = 0.05
+    trgm_search_min_rank = 0.3
 
     def get_queryset(self):
         return Contact.on_site.all()
 
     def filter_queryset(self, queryset):
-        backends = list(self.filter_backends)
-
-        if switch_is_active("addressbook_contact_use_watson_search"):
-            backends.append(WatsonSearchFilter)
-        else:
-            backends.append(VectorSearchFilter)
-
-        for backend in backends:
-            queryset = backend().filter_queryset(self.request, queryset, self)
-
-        return queryset.distinct()
+        return super().filter_queryset(queryset).distinct()
 
     def get_serializer_class(self):
         match self.action:
