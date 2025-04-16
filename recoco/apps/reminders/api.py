@@ -155,7 +155,9 @@ def make_or_update_new_recommendations_reminder(
     )
 
 
-def get_due_new_recommendations_reminder_for_project(site, project):
+def get_due_new_recommendations_reminder_for_project(
+    site: Site, project: Project
+) -> models.Reminder | None:
     return get_due_reminder_for_project(site, project, kind=models.Reminder.NEW_RECO)
 
 
@@ -210,7 +212,9 @@ def make_or_update_whatsup_reminder(
     )
 
 
-def get_due_whatsup_reminder_for_project(site, project):
+def get_due_whatsup_reminder_for_project(
+    site: Site, project: Project
+) -> models.Reminder | None:
     return get_due_reminder_for_project(site, project, kind=models.Reminder.WHATS_UP)
 
 

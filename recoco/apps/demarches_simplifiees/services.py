@@ -1,3 +1,4 @@
+import logging
 from typing import Any
 
 from django.contrib.sites.models import Site
@@ -8,6 +9,9 @@ from recoco.apps.resources.models import Resource
 from recoco.apps.survey.models import Answer, Session
 
 from .models import DSMapping, DSResource
+from .utils import MappingField
+
+logger = logging.getLogger(__name__)
 
 
 def find_ds_resource_for_project(
@@ -41,39 +45,80 @@ def make_ds_data_from_project(
     session = _get_session(site=site, project=project)
 
     for ds_field_id, mapping_items in ds_mapping.mapping.items():
+        # retrieve the DS field from the DS schema
+        ds_field = ds_mapping.indexed_ds_fields.get(ds_field_id)
+        if ds_field is None:
+            logger.error(
+                f"DS field {ds_field_id} not found in DS schema for resource {ds_resource.name}"
+            )
+            continue
+
         ds_value = None
 
+        # iterate over the mapping items
         for mapping_item in mapping_items:
-            value = mapping_item.get("value")
+            conditions_ok: bool = True
 
-            if value.startswith("raw["):
-                ds_value = value[4:-1]
-                continue
-
-            recoco_field = ds_mapping.indexed_recoco_fields.get(value)
-            if recoco_field is None:
-                continue
-
-            if value.startswith("project."):
-                if res := resolve_project_lookup(
-                    project=project, lookup=recoco_field.lookup
-                ):
-                    ds_value = res
-                continue
-
-            if value.startswith("edl.") and session:
-                if res := resolve_edl_lookup(
+            # check conditions are met for the current mapping item
+            for condition in mapping_item.get("conditions", []):
+                if not resolve_mapping_value(
+                    value=condition.get("value"),
+                    recoco_field=ds_mapping.indexed_recoco_fields.get(
+                        condition.get("value")
+                    ),
                     session=session,
-                    lookup=recoco_field.lookup,
-                    condition=mapping_item.get("condition", []),
+                    conditions=condition.get("tags"),
                 ):
-                    ds_value = res
-                continue
+                    conditions_ok = False
+                    break
 
-        if ds_value is not None:
+            # if conditions are met, resolve the mapping value
+            if conditions_ok:
+                ds_value = resolve_mapping_value(
+                    value=mapping_item.get("value"),
+                    ds_field=ds_field,
+                    recoco_field=ds_mapping.indexed_recoco_fields.get(
+                        mapping_item.get("value")
+                    ),
+                    project=project,
+                    session=session,
+                )
+
+        if ds_value:
             data[ds_field_id] = ds_value
 
     return data
+
+
+def resolve_mapping_value(
+    value: str,
+    ds_field: MappingField | None = None,
+    recoco_field: MappingField | None = None,
+    project: Project | None = None,
+    session: Session | None = None,
+    conditions: list[str] | None = None,
+) -> Any | None:
+    # raw value expected
+    if value.startswith("raw["):
+        return value[4:-1]
+
+    # DS field option value expected
+    if value.startswith("option[") and ds_field:
+        try:
+            option = int(value[7:-1])
+            return ds_field.options[option]
+        except (ValueError, IndexError):
+            return None
+
+    # resolve from Recoco project fields
+    if value.startswith("project.") and project and recoco_field:
+        return resolve_project_lookup(project=project, lookup=recoco_field.lookup)
+
+    # resolve from Recoco EDL fields
+    if value.startswith("edl.") and session and recoco_field:
+        return resolve_edl_lookup(
+            session=session, lookup=recoco_field.lookup, conditions=conditions
+        )
 
 
 def _recursive_get_attr(obj: Any, lookup: str) -> Any | None:
@@ -97,7 +142,7 @@ def resolve_project_lookup(project: Project, lookup: str) -> Any | None:
 
 
 def resolve_edl_lookup(
-    session: Session, lookup: str, condition: list[str] = None
+    session: Session, lookup: str, conditions: list[str] | None = None
 ) -> Any | None:
     _take_comment = False
     if lookup.endswith(".comment"):
@@ -108,9 +153,9 @@ def resolve_edl_lookup(
     if answer is None:
         return None
 
-    if condition:
+    if conditions:
         answer_tags = [tag.strip() for tag in answer.signals.split(",") if tag]
-        if not all(tag in answer_tags for tag in condition):
+        if not all(tag in answer_tags for tag in conditions):
             return None
 
     return answer.comment if _take_comment else answer.formatted_value
