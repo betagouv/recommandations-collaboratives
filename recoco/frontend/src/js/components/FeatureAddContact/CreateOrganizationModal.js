@@ -21,11 +21,12 @@ Alpine.data('CreateOrganizationModal', () => {
       this.Modal = Modal(this, 'create-organization-modal');
       await this.showDepartments();
     },
-    closeCreateOrganizationModal() {
-      this.modalCreateOrganization = document.querySelector('#create-organization-modal');
-      this.modalCreateOrganization.classList.toggle('d-none');
-      this.reOpenModalCreateContact();
-    },
+    // closeCreateOrganizationModal() {
+    //   // this.modalCreateOrganization = document.querySelector('#create-organization-modal');
+    //   // this.modalCreateOrganization.classList.toggle('d-none');
+    //   // this.reOpenModalCreateContact();
+    //   this.Modal.closeModal();
+    // },
     reOpenModalCreateContact() {
       this.modalSearchOrganization = document.querySelector('#create-contact-modal');
       this.modalSearchOrganization.classList.toggle('d-none');

@@ -49,7 +49,7 @@ Alpine.data('CreateContactModal', () => {
         };
 
         api.post(contactsUrl(), payload).then((response) => {
-          this.Modal.responseModal(response.data);
+          this.Modal.responseModal({... this.contact, id : response.data.id});
         });
       }
     },

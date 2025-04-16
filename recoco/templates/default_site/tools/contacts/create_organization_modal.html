@@ -12,7 +12,7 @@
             <p class="fw-bold color-666 correct-p">CREER UNE ORGANISATION</p>
             <span class="fr-icon-close-line color-666 cursor-pointer"
                 aria-hidden="true"
-                @click="closeCreateOrganizationModal"></span>
+                @click.prevent="Modal.closeModal()"></span>
         </div>
         <div class="fr-p-3v modal-create-organization__block">
             {% comment %} x-data="SearchNationalGroup" {% endcomment %}
@@ -112,7 +112,7 @@
         <div class="fr-p-3v modal-create-organization__block">{% include "tools/contacts/multi_select.html" %}</div>
         <div class="fr-p-3v modal-create-organization__block d-flex">
             <button class="fr-btn fr-btn--secondary fr-mr-3v w-100 justify-content-center"
-                    @click="closeCreateOrganizationModal()">Annuler</button>
+                    @click.prevent="Modal.closeModal()">Annuler</button>
             <button class="fr-btn w-100 justify-content-center"
                     @click="createOrganization">Créer l'organisation</button>
         </div>
