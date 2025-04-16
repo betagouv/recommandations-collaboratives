@@ -94,6 +94,7 @@ Alpine.data('CreateOrganizationModal', () => {
           }
     },
     createOrganization() {
+      // TODO suppress store use
         this.selectedDepartments = [...this.$store.contact.selectedDepartments];
 
         if(this.isGroupNat && this.organizationGroup === null){
@@ -130,31 +131,31 @@ Alpine.data('CreateOrganizationModal', () => {
                 departments: this.selectedDepartments,
               };
           }
-          try {
+
             api.post(organizationsUrl(), this.organizationToCreate).then((response) => {
-                this.organizationToCreate = response.data;
-                this.$store.contact.orgaSelected = this.organizationToCreate;
-                this.$store.contact.orgaCreated = this.organizationToCreate;
-                this.resetFormValue();
-                this.closeCreateOrganizationModal();
-            });
-          } catch (error) {
+                // this.organizationToCreate = response.data;
+                // this.$store.contact.orgaSelected = this.organizationToCreate;
+                // this.$store.contact.orgaCreated = this.organizationToCreate;
+                // this.resetFormValue();
+                // this.closeCreateOrganizationModal();
+                this.Modal.responseModal(response.data);
+            }).catch ((error) =>{
             console.log(error);
-          }
+          });
         }
     },
-    resetFormValue() {
-      this.organizationName = '';
-      this.organizationGroup = null;
-      this.verifNomOrga = false;
-      this.isGroupNat = false;
-      this.isAnOrgaGroupSelected = false;
-      this.userInput = '';
-      this.showOrgaGroupsresults = false;
-      this.selectedDepartments = [];
-      const radioButton = document.querySelector('input[name="natGroup"]');
-      radioButton.checked = false;
-      this.$dispatch('reset-form-create-orga');
-    },
+    // resetFormValue() {
+    //   this.organizationName = '';
+    //   this.organizationGroup = null;
+    //   this.verifNomOrga = false;
+    //   this.isGroupNat = false;
+    //   this.isAnOrgaGroupSelected = false;
+    //   this.userInput = '';
+    //   this.showOrgaGroupsresults = false;
+    //   this.selectedDepartments = [];
+    //   const radioButton = document.querySelector('input[name="natGroup"]');
+    //   radioButton.checked = false;
+    //   this.$dispatch('reset-form-create-orga');
+    // },
   };
 })

@@ -5,7 +5,7 @@ import { Modal } from '../../models/Modal.model';
 Alpine.data('SearchContactModal', () => ({
   Modal: null,
   contactsFound: [],
-  userInput: '',
+  userInputSearchContact: '',
   selectedContact: null,
   modalCreateContact: null,
   modalSearchContact: null,
@@ -16,18 +16,19 @@ Alpine.data('SearchContactModal', () => ({
   onSearch() {
     this.noSearch = false;
     this.selectedContact = null;
-    if (this.userInput.length > 0) {
-      api.get(searchContactsUrl(this.userInput)).then((response) => {
+    if (this.userInputSearchContact.length > 0) {
+      api.get(searchContactsUrl(this.userInputSearchContact)).then((response) => {
         const searchResults = response.data;
         this.contactsFound = searchResults.results;
       });
-    } else if (this.userInput.length === 0) {
+    } else if (this.userInputSearchContact.length === 0) {
       this.noSearch = true;
     }
   },
   onSelect(contact) {
     this.noSearch = false;
     this.selectedContact = contact;
+    console.log('Selected contact:', this.selectedContact);
   },
   addContact() {
     this.Modal.responseModal(this.selectedContact);
@@ -49,6 +50,7 @@ Alpine.data('SearchContactModal', () => ({
     }
     if (event.detail) {
       this.onSelect(event.detail);
+      console.log('event.detail', event.detail);
     }
     this.isCreateContactModalOpen = false;
     this.modalSearchContact.classList.toggle('d-none');
@@ -64,7 +66,7 @@ Alpine.data('SearchContactModal', () => ({
 //     searchResults: [],
 //     contactsFound: [],
 //     isOpenModal: false,
-//     userInput: '',
+//     userInputSearchContact: '',
 //     showContactsresults: false,
 //     isAContactSelected: false,
 //     selectedContact: null,
@@ -76,10 +78,10 @@ Alpine.data('SearchContactModal', () => ({
 //     onSearch() {
 //       this.delayDisplay = true;
 //       this.noSearch = false;
-//       if (this.userInput.length > 0 && !this.isAContactSelected) {
+//       if (this.userInputSearchContact.length > 0 && !this.isAContactSelected) {
 //         this.contactsFound = [];
 //         try {
-//           api.get(searchContactsUrl(this.userInput)).then((response) => {
+//           api.get(searchContactsUrl(this.userInputSearchContact)).then((response) => {
 //             this.searchResults = response.data;
 //             this.contactsFound = this.searchResults.results;
 //             if (this.contactsFound.length > 0) {
@@ -91,7 +93,7 @@ Alpine.data('SearchContactModal', () => ({
 //         } catch (error) {
 //           console.log(error);
 //         }
-//       } else if (this.userInput.length === 0) {
+//       } else if (this.userInputSearchContact.length === 0) {
 //         this.noSearch = true;
 //       }
 //     },
@@ -110,7 +112,7 @@ Alpine.data('SearchContactModal', () => ({
 //     closeModal() {
 //       this.isAContactSelected = false;
 //       this.showContactsresults = false;
-//       this.userInput = '';
+//       this.userInputSearchContact = '';
 //       this.modalSearchContact.classList.toggle('d-none');
 //     },
 //     onCancelSelectContact() {

@@ -20,7 +20,8 @@
     <div x-init="$watch('$store.contact.orgaCreated', value => setSearch())"
      @reset-orga-name.window="resetSearch()">
         <div class="position-relative">
-            <div class="fr-search-bar" id="header-search" role="search">
+            <div class="fr-search-bar" x-modelable="userInputSearchOrganization"
+                       x-model="contact.organization.name" id="header-search" role="search">
                 <input class="fr-input"
                        :class="{'fr-input--error': formState.isSubmitted && !formState.fields.isOrgaSelected}"
                        placeholder="ADEME 44"
@@ -28,14 +29,14 @@
                        id="search-organization-input"
                        name="search-organization-input"
                        @input.debounce="onSearch"
-                       x-model="userInput"
+                       x-model="userInputSearchOrganization"
                        required>
                 <button class="fr-btn" title="Rechercher" @click="onSearch">Rechercher</button>
             </div>
             <div class="fr-menu menu-modal-correct-fr-menu better-positionning-dropdown border-radius-4px">
                 <div class="fr-menu__list specific-width-26rem border-radius-4px">
-                    <div class="fr-menu__list specific-width-26rem overflow-auto specific-height border-radius-4px">
-                        <template x-if="userInput.length > 0 && showOrgAsResults && selectedOrga == null">
+                    <div class="fr-menu__list specific-width-26rem overflow-auto specific-height border-radius-4px fr-mb-0">
+                        <template x-if="userInputSearchOrganization.length > 0 && showOrgAsResults && selectedOrga == null">
                             <template class="fr-menu__item" x-for="(group) in orgaSorted">
                                 <div class="fr-menu__item__content" data-test-id="orga-to-select">
                                     <template x-for="(orga, index) in group" :key="index">
@@ -55,7 +56,7 @@
                             </template>
                         </template>
                         <template class="fr-menu__item"
-                                  x-if="userInput.length > 0 && selectedOrga == null && !showOrgAsResults">
+                                  x-if="userInputSearchOrganization.length > 0 && selectedOrga == null && !showOrgAsResults">
                             <div>
                                 <div class="fr-m-1w fr-p-3v specific-banner">
                                     <span class="text-style">Aucun résultat</span>
@@ -67,7 +68,7 @@
                             </div>
                         </template>
                     </div>
-                    <template x-if="userInput.length > 0 && showOrgAsResults && !isAnOrgaSelected">
+                    <template x-if="userInputSearchOrganization.length > 0 && showOrgAsResults && !isAnOrgaSelected">
                         <div class="btn-create-orga fr-p-1w cursor-pointer"
                             @click="openModalCreateOrganization">
                             <span class="fr-icon-add-line" aria-hidden="true"></span><span>Créer une nouvelle organisation</span>
@@ -77,5 +78,5 @@
             </div>
         </div>
     </div>
-    {% include "tools/contacts/create_organization_modal.html" %}
+    {% comment %} {% include "tools/contacts/create_organization_modal.html" %} {% endcomment %}
 </div>

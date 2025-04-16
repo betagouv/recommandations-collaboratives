@@ -5,7 +5,9 @@
           type="text/css" />
 {% endblock css %}
 <template x-if="isCreateContactModalOpen">
-    <div x-data="CreateContactModal" id="create-contact-modal">
+    <div x-data="CreateContactModal"
+         @modal-response="closeCreateOrganizationModal($event)"
+         id="create-contact-modal">
         <div x-ref="createContactModal"
              @set-organization="handleSetOrganization($event.detail)"
              class="modal-create-contact z-2">
@@ -80,6 +82,6 @@
             </form>
         </div>
         {% comment %} TODO gérer si comment useless {% endcomment %}
-        {% comment %} {% include "tools/contacts/create_organization_modal.html" %} {% endcomment %}
+        {% include "tools/contacts/create_organization_modal.html" %}
     </div>
 </template>

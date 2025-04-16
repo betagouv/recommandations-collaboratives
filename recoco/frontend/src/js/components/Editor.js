@@ -124,6 +124,7 @@ Alpine.data('editor', (content) => {
     isSearchContactModalOpen: false,
     handleSetContact(contact) {
       this.selectedContact = { ...contact }; // XXX Copy since it can be destroyed from an inner scope and values result to null
+      console.log('contact', contact);
     },
     handleResetContact() {
       this.selectedContact = null;

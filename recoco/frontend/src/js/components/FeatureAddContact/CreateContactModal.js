@@ -6,7 +6,7 @@ Alpine.data('CreateContactModal', () => {
   return {
     Modal: null,
     contact: {
-      organization: '',
+      organization: {name: ''},
       last_name: '',
       first_name: '',
       division: '',
@@ -55,6 +55,27 @@ Alpine.data('CreateContactModal', () => {
     },
     handleSetOrganization(organization) {
       this.contact.organization = organization;
+      console.log('contact.organization', this.contact.organization);
+    },
+    // TODO : voir si on peut mettre ce code dans un "meilleur endroit"
+    isCreateOrganizationModalOpen: false,
+    openModalCreateOrganization() {
+      // hide create contact modal
+      this.modalCreateContact = this.$refs.createContactModal;
+      this.modalCreateContact.classList.toggle('d-none');
+      // create organization modal
+      this.isCreateOrganizationModalOpen = true;
+    },
+    closeCreateOrganizationModal(event) {
+      if (event.target.id !== 'create-organization-modal') {
+        return;
+      }
+      if (event.detail) {
+        console.log('event.detail', event.detail);
+        this.handleSetOrganization(event.detail);
+      }
+      this.isCreateOrganizationModalOpen = false;
+      this.modalCreateContact.classList.toggle('d-none');
     },
   };
 });

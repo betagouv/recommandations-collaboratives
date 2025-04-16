@@ -5,7 +5,7 @@ import _ from 'lodash';
 Alpine.data('SearchOrganization', () => ({
   orgaFound: [],
   orgaSorted: [],
-  userInput: '',
+  userInputSearchOrganization: '',
   showOrgAsResults: false,
   selectedOrga: null,
   isAnOrgaSelected: false,
@@ -14,9 +14,9 @@ Alpine.data('SearchOrganization', () => ({
   onSearch() {
     this.selectedOrga = null;
     try {
-      if (this.userInput.length > 0) {
+      if (this.userInputSearchOrganization.length > 0) {
         this.orgaFound = [];
-        api.get(searchOrganizationsUrl(this.userInput)).then((response) => {
+        api.get(searchOrganizationsUrl(this.userInputSearchOrganization)).then((response) => {
           this.searchResults = response.data;
           this.orgaFound = this.searchResults.results;
           if (this.orgaFound.length > 0) {
@@ -79,18 +79,16 @@ Alpine.data('SearchOrganization', () => ({
     this.isAnOrgaSelected = false;
     this.$store.contact.orgaSelected = null;
   },
+  handleDisplayOrganizationCreated(organization) {
+
+    if (organization.name) {
+      this.userInput = organization.name;
+    }
+  }
   // openCreateOrganizationModal() {
   //   this.$dispatch('open-create-organization-modal', {
   //     userInput: this.userInput,
   //   });
   // },
-  isCreateOrganizationModalOpen: false,
-  openModalCreateOrganization() {
-    // hide create contact modal
-    this.modalCreateContact = this.$refs.createContactModal;
-    this.modalCreateContact.classList.toggle('d-none');
-    // create organization modal
-    this.isCreateOrganizationModalOpen = true;
-    console.log('open create organization modal', this.isCreateOrganizationModalOpen);
-  },
+
 }));
