@@ -1,4 +1,4 @@
-{% if request.user in project.members.all and request.user != project.owner or position.is_advisor or position.is_observer %}
+{% if request.user in project.members.all and request.user != project.owner or advising_position.is_advisor or advising_position.is_observer %}
     <div data-test-id="admin-banner-quit-project"
          class="flag fr-pl-2v medium-border-radius border-red fr-mb-3w d-flex align-items-start justify-content-between">
         <div class="d-flex align-items-start">
@@ -29,7 +29,7 @@
                   data-test-id="form__admin-quit-project"
                   method="post">
                 {% csrf_token %}
-                {% if position.is_advisor or position.is_observer %}
+                {% if advising_position.is_advisor or advising_position.is_observer %}
                     <button data-test-id="button-quit-project"
                             formaction="{% url 'projects-project-access-advisor-delete' project.pk request.user.username %}"
                             class="button red filled flex-grow-1 text-nowrap inherit">Quitter le projet</button>

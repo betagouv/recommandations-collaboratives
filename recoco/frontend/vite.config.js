@@ -87,6 +87,7 @@ const config = {
         DepartmentsSelector: resolve(
           './src/js/components/DepartmentsSelector.js'
         ),
+        User: resolve('./src/js/components/User.js'),
       },
       output: {
         chunkFileNames: undefined,
