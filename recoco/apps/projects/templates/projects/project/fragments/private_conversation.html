@@ -14,6 +14,7 @@
             <li class="list-group-item border-0 fr-m-0 fr-p-0">
                 <div class="small fr-my-2v text-center w-100">{{ date|naturalday|capfirst }}</div>
                 {% for note in notes %}
+                    <h1>Contact {{ note.contact }}</h1>
                     <div class="bg-orange-light rounded-3 fr-p-2w fr-my-2v {% if request.user == note.created_by %}specific-ml-2vw {% else %} specific-mr-2vw {% endif %}">
                         <div class="overflow-hidden">{{ note.content_rendered|safe }}</div>
                         {% if note.document.count %}

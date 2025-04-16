@@ -25,9 +25,12 @@ class NoteForm(forms.ModelForm):
 
     class Meta:
         model = models.Note
-        fields = ["content"]
+        fields = ["content", "contact"]
 
     content = MarkdownxFormField()
+
+    def set_contact_queryset(self, contact_queryset: QuerySet[Contact]):
+        self.fields["contact"].queryset = contact_queryset
 
 
 class StaffNoteForm(NoteForm):
@@ -41,7 +44,10 @@ class PrivateNoteForm(forms.ModelForm):
 
     class Meta:
         model = models.Note
-        fields = ["content"]
+        fields = ["content", "contact"]
+
+    def set_contact_queryset(self, contact_queryset: QuerySet[Contact]):
+        self.fields["contact"].queryset = contact_queryset
 
 
 class PublicNoteForm(forms.ModelForm):
