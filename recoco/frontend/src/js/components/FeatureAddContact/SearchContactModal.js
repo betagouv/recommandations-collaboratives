@@ -35,6 +35,9 @@ Alpine.data('SearchContactModal', () => ({
   },
   onCancelSelectContact() {
     this.selectedContact = null;
+    if (this.userInputSearchContact.length === 0) {
+      this.noSearch = true;
+    }
   },
   isCreateContactModalOpen: false,
   openModalCreateContact() {
