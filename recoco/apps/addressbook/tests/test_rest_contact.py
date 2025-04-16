@@ -4,7 +4,6 @@ import pytest
 from django.contrib.sites.models import Site
 from django.urls import reverse
 from model_bakery import baker
-from waffle.testutils import override_switch
 
 from ..models import Contact, Organization
 
@@ -104,22 +103,16 @@ def test_can_not_create_contact_with_wrong_organization(api_client, staff_user):
 
 
 @pytest.mark.parametrize(
-    "search_terms,expected_result,use_watson",
+    "search_terms,expected_result",
     [
-        # vector search
-        ("skywalker", [999], False),
-        ("jedi", [777, 888], False),
-        ("coté obscure", [999], False),
-        ("cote", [999], False),
-        ("Maître", [777, 888], False),
-        ("maitre", [777, 888], False),
-        # watson search
-        ("skywalker", [999], True),
-        ("jedi", [777, 888], True),
-        ("coté obscure", [999], True),
-        ("cote", [999], True),
-        ("Maître", [777, 888], True),
-        ("maitre", [777, 888], True),
+        ("skywalker", [999]),
+        ("sky", [999]),
+        ("jedi", [777, 888]),
+        ("jed", [777, 888]),
+        ("coté obscure", [999]),
+        ("obscure", [999]),
+        ("Maître", [777, 888]),
+        ("maitre", [777, 888]),
     ],
 )
 @pytest.mark.django_db
@@ -129,7 +122,6 @@ def test_contact_search_filter(
     current_site,
     search_terms,
     expected_result,
-    use_watson,
 ):
     jedi_organization = baker.make(
         Organization,
@@ -149,7 +141,7 @@ def test_contact_search_filter(
         last_name="Jinn",
         email="quiqui@coruscant.com",
         organization=jedi_organization,
-        division="Maître jedi",
+        division="Maître Jedi",
         site=current_site,
     )
     baker.make(
@@ -174,10 +166,9 @@ def test_contact_search_filter(
 
     api_client.force_authenticate(staff_user)
 
-    with override_switch("addressbook_contact_use_watson_search", active=use_watson):
-        response = api_client.get(
-            reverse("api-addressbook-contact-list"), {"search": search_terms}
-        )
+    response = api_client.get(
+        reverse("api-addressbook-contact-list"), {"search": search_terms}
+    )
 
     assert response.status_code == 200
     assert [contact["id"] for contact in response.data["results"]] == expected_result, (

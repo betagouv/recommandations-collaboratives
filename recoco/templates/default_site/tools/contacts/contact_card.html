@@ -1,4 +1,9 @@
 {% load sass_tags %}
+{% load static %}
+{% load django_vite %}
+{% block js %}
+    {% vite_asset 'js/components/User.js' %}
+{% endblock js %}
 {% block css %}
     <link href="{% sass_src 'css/tools/contact/contact-card.scss' %}"
           rel="stylesheet"
@@ -8,7 +13,9 @@
           type="text/css" />
 {% endblock css %}
 <template x-if="contact">
-    <div class="contact-card fr-p-3v bg-white" data-test-id="contact-card">
+    <div x-data="User()"
+         class="contact-card fr-p-3v bg-white"
+         data-test-id="contact-card">
         <div class="d-flex">
             <template x-if="contact.first_name">
                 <div>
@@ -41,6 +48,13 @@
                    class="contact-card__link same-for-all-text text-position">
                     <span class="fr-icon--sm fr-icon-link" x-text="contact.email"></span>
                 </a>
+                <button class="fr-ml-3w fr-px-2v fr-py-0 fr-btn fr-btn--secondary fr-btn--xs"
+                        @click="clipboardCopy(`L'email`, contact.email)"
+                        title="Copier l'email">
+                    <svg class="bi align-baseline" width="10" height="10" fill="currentColor">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#clipboard" />
+                    </svg>
+                </button>
             </div>
         </template>
         <template x-if="contact.phone_no">

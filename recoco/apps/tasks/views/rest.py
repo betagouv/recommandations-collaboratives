@@ -240,22 +240,28 @@ class TaskNotificationViewSet(
 ########################################################################
 
 
-class IsTaskUser(permissions.BasePermission):
+class TaskFollowupPermission(permissions.BasePermission):
     """
-    Custom permission to check if user can use task on given project
+    Custom permission to check if user can use task followup on given project
     """
 
     def has_permission(self, request, view):
-        project_id = view.kwargs.get("project_id")
-        user_projects = list(
-            projects_models.Project.on_site.for_user(request.user).values_list(
-                flat=True
-            )
-        )
-        if project_id in user_projects:
+        # conseiller regional
+        if request.method in permissions.SAFE_METHODS and has_perm(
+            request.user, "list_projects", request.site
+        ):
             return True
 
+        project_id = view.kwargs.get("project_id")
         project = projects_models.Project.on_site.get(pk=project_id)
+
+        # conseiller ponctuel
+        if request.method in permissions.SAFE_METHODS and has_perm(
+            request.user, "view_tasks", project
+        ):
+            return True
+
+        # conseiller projet
         return has_perm(request.user, "projects.use_tasks", project)
 
 
@@ -266,7 +272,7 @@ class TaskFollowupViewSet(viewsets.ModelViewSet):
 
     permission_classes = [
         permissions.IsAuthenticated,
-        IsTaskUser,
+        TaskFollowupPermission,
     ]
 
     @property
