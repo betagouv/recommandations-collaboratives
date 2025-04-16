@@ -101,6 +101,9 @@
                                                 <p x-html="currentTask && renderMarkdown(currentTask?.content)"
                                                    class="fr-mb-2v overflow-hidden text-break"></p>
                                             </template>
+                                            <template x-if="currentTask && currentTask.contact">
+                                                <div x-data="{contact: currentTask.contact}">{% include "tools/contacts/contact_card.html" %}</div>
+                                            </template>
                                             <template x-if="currentTask?.content === ''">
                                                 <p class="fst-italic">Aucun commentaire initial n'a été ajouté</p>
                                             </template>
