@@ -55,16 +55,21 @@
             type="button"
             @click="$refs.fileUploadInput.click()">
         <span class="file-upload-text">Ajouter un fichier</span>
-        <span class="fr-ml-1w" x-text="fileName"></span>
-        <input x-ref="fileUploadInput"
-               x-model="currentFile"
-               type="file"
-               id="file-upload"
-               name="the_file"
-               @change='handleFileUpload'
-               class="d-none file-upload-input">
     </button>
 </div>
+<template x-if="fileName">
+    <p>
+        Fichier selectionné :
+        <span class="fr-ml-1w" x-text="fileName"></span>
+    </p>
+</template>
+<input x-ref="fileUploadInput"
+       x-model="currentFile"
+       type="file"
+       id="file-upload"
+       name="the_file"
+       @change='handleFileUpload'
+       class="d-none file-upload-input">
 <div class="fr-mb-3w">
     {% comment %} {% include "projects/project/fragments/files_links/file_upload_input_standalone.html" %} {% endcomment %}
     {% for error in document_form.the_file.errors %}
