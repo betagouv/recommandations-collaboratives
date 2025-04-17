@@ -1,5 +1,6 @@
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
+from django.contrib.sites.shortcuts import get_current_site
 from django.utils.functional import cached_property
 from rest_framework.request import Request
 from rest_framework.serializers import Serializer
@@ -15,7 +16,11 @@ class BaseSerializerMixin(Serializer):
 
     @cached_property
     def current_site(self) -> Site:
-        return self.request.site
+        return (
+            self.request.site
+            if hasattr(self.request, "site")
+            else get_current_site(self.request)
+        )
 
     @cached_property
     def current_user(self) -> User | None:
@@ -23,7 +28,9 @@ class BaseSerializerMixin(Serializer):
 
     @cached_property
     def is_staff_for_site(self) -> bool:
-        return utils_is_staff_for_site(self.current_user, self.current_site)
+        if self.current_user is None:
+            return False
+        return utils_is_staff_for_site(user=self.current_user, site=self.current_site)
 
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):

@@ -66,6 +66,7 @@ def project(commune, organization, make_project, current_site):
             email="anakin@jedi.com",
             username="anakin",
         )[0]
+
         user.profile.organization_position = "Padawan"
         user.profile.organization = organization
         user.profile.save()
@@ -138,7 +139,7 @@ def serialized_project(project, organization):
         ],
         "is_diagnostic_done": False,
         "status": "READY",
-        "advisors_note": "Note interne",
+        "advisors_note": None,
     }
 
 
