@@ -148,6 +148,7 @@ def test_project_list_includes_only_projects_in_switchtender_departments(
         "description",
         "project_sites",
         "tags",
+        "advisors_note",
     ]
     assert set(data.keys()) == set(expected)
 
@@ -495,6 +496,7 @@ def check_project_content(project, data):
         "project_sites",
         "tags",
         "is_diagnostic_done",
+        "advisors_note",
     ]
     assert set(data.keys()) == set(expected)
 

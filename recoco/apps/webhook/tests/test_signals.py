@@ -37,6 +37,8 @@ def commune():
         longitude=-1.4753,
         department__code="64",
         department__name="Pyrénées-Atlantiques",
+        department__region__code="75",
+        department__region__name="Nouvelle-Aquitaine",
     )
 
 
@@ -56,6 +58,7 @@ def project(commune, organization, make_project, current_site):
             location_x=635731.78681425,
             location_y=3644425.1077159,
             description="My description",
+            advisors_note="Note interne",
         )
         project.tags.add("my_tag")  # taggit doesn't support initialization
 
@@ -63,6 +66,7 @@ def project(commune, organization, make_project, current_site):
             email="anakin@jedi.com",
             username="anakin",
         )[0]
+
         user.profile.organization_position = "Padawan"
         user.profile.organization = organization
         user.profile.save()
@@ -108,7 +112,14 @@ def serialized_project(project, organization):
             "name": "Bayonne",
             "insee": "64102",
             "postal": "64100",
-            "department": {"name": "Pyrénées-Atlantiques", "code": "64"},
+            "department": {
+                "name": "Pyrénées-Atlantiques",
+                "code": "64",
+                "region": {
+                    "name": "Nouvelle-Aquitaine",
+                    "code": "75",
+                },
+            },
             "latitude": 43.4933,
             "longitude": -1.4753,
         },
@@ -128,6 +139,7 @@ def serialized_project(project, organization):
         ],
         "is_diagnostic_done": False,
         "status": "READY",
+        "advisors_note": None,
     }
 
 
