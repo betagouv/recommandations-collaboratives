@@ -85,6 +85,10 @@ class PushTypeActionForm(forms.Form):
 
         self.fields["project"].queryset = project_qs
 
+        self.fields["contact"].queryset = Contact.objects.filter(
+            site=current_site,
+        ).distinct()
+
     PUSH_TYPES = (
         ("single", "single"),
         ("external_resource", "external_resource"),
@@ -97,6 +101,11 @@ class PushTypeActionForm(forms.Form):
         queryset=projects_models.Project.objects.none(),
         empty_label="(Veuillez sélectionner un projet)",
         required=True,
+    )
+    contact = forms.ModelChoiceField(
+        queryset=Contact.objects.none(),
+        empty_label="(Veuillez sélectionner un contact)",
+        required=False,
     )
 
 
