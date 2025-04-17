@@ -5,7 +5,7 @@
           rel="stylesheet"
           type="text/css" />
 {% endblock css %}
-<div x-data="SearchOrganization"
+<div x-data="SearchOrganization" x-ref="orgSearch"
      class="fr-p-3v modal-create-contact__block"
      :class="{'fr-input-group--error': formState.isSubmitted && !formState.fields.isOrgaSelected}">
     <label class="modal-create-contact__label"
@@ -20,8 +20,11 @@
     <div x-init="$watch('$store.contact.orgaCreated', value => setSearch())"
      @reset-orga-name.window="resetSearch()">
         <div class="position-relative">
-            <div class="fr-search-bar" x-modelable="userInputSearchOrganization"
-                       x-model="contact.organization.name" id="header-search" role="search">
+            <div class="fr-search-bar"
+                 x-modelable="userInputSearchOrganization"
+                 x-model="contact.organization.name"
+                 id="header-search"
+                 role="search">
                 <input class="fr-input"
                        :class="{'fr-input--error': formState.isSubmitted && !formState.fields.isOrgaSelected}"
                        placeholder="ADEME 44"

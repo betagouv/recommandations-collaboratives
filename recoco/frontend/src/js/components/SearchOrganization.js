@@ -84,7 +84,11 @@ Alpine.data('SearchOrganization', () => ({
     if (organization.name) {
       this.userInput = organization.name;
     }
-  }
+  },
+  resetSearchResultDisplayWhenOrgaCreated(result = false) {
+    this.isAnOrgaSelected = false;
+    console.log('resetSearchResultDisplayWhenOrgaCreated', this.isAnOrgaSelected);
+  },
   // openCreateOrganizationModal() {
   //   this.$dispatch('open-create-organization-modal', {
   //     userInput: this.userInput,
