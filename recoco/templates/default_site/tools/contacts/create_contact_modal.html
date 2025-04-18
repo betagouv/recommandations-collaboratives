@@ -18,9 +18,7 @@
                           aria-hidden="true"
                           @click.prevent="Modal.closeModal()"></span>
                 </div>
-                <div x-ref="orgSearch">
-                    {% include "tools/contacts/search_organization.html" %}
-                </div>
+                {% include "tools/contacts/search_organization.html" %}
                 <div class="fr-p-3v modal-create-contact__block">
                     <label class="modal-create-contact__label">Nom</label>
                     <input type="text" class="fr-input" x-model="contact.last_name">

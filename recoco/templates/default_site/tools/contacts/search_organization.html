@@ -5,7 +5,7 @@
           rel="stylesheet"
           type="text/css" />
 {% endblock css %}
-<div x-data="SearchOrganization" x-ref="orgSearch"
+<div x-data="SearchOrganization"
      class="fr-p-3v modal-create-contact__block"
      :class="{'fr-input-group--error': formState.isSubmitted && !formState.fields.isOrgaSelected}">
     <label class="modal-create-contact__label"
@@ -39,7 +39,7 @@
             <div class="fr-menu menu-modal-correct-fr-menu better-positionning-dropdown border-radius-4px">
                 <div class="fr-menu__list specific-width-26rem border-radius-4px">
                     <div class="fr-menu__list specific-width-26rem overflow-auto specific-height border-radius-4px fr-mb-0">
-                        <template x-if="userInputSearchOrganization.length > 0 && showOrgAsResults && selectedOrga == null">
+                        <template x-if="userInputSearchOrganization.length > 0 && showOrgAsResults && selectedOrga == null && !formState.fields.isOrgaSelected">
                             <template class="fr-menu__item" x-for="(group) in orgaSorted">
                                 <div class="fr-menu__item__content" data-test-id="orga-to-select">
                                     <template x-for="(orga, index) in group" :key="index">
@@ -59,7 +59,7 @@
                             </template>
                         </template>
                         <template class="fr-menu__item"
-                                  x-if="userInputSearchOrganization.length > 0 && selectedOrga == null && !showOrgAsResults">
+                                  x-if="userInputSearchOrganization.length > 0 && selectedOrga == null && !showOrgAsResults && !formState.fields.isOrgaSelected">
                             <div>
                                 <div class="fr-m-1w fr-p-3v specific-banner">
                                     <span class="text-style">Aucun résultat</span>

@@ -12,6 +12,7 @@ Alpine.data('SearchOrganization', () => ({
   init() {
   },
   onSearch() {
+    Alpine.$data(this.$el.parentElement).formState.fields.isOrgaSelected = false;
     this.selectedOrga = null;
     try {
       if (this.userInputSearchOrganization.length > 0) {
@@ -84,10 +85,6 @@ Alpine.data('SearchOrganization', () => ({
     if (organization.name) {
       this.userInput = organization.name;
     }
-  },
-  resetSearchResultDisplayWhenOrgaCreated(result = false) {
-    this.isAnOrgaSelected = false;
-    console.log('resetSearchResultDisplayWhenOrgaCreated', this.isAnOrgaSelected);
   },
   // openCreateOrganizationModal() {
   //   this.$dispatch('open-create-organization-modal', {

@@ -72,8 +72,7 @@ Alpine.data('CreateContactModal', () => {
       }
       if (event.detail) {
         this.handleSetOrganization(event.detail);
-        console.log("coucou");
-        this.$refs.orgSearch.resetSearchResultDisplayWhenOrgaCreated(false);
+        this.formState.fields.isOrgaSelected = true;
       }
       this.isCreateOrganizationModalOpen = false;
       this.modalCreateContact.classList.toggle('d-none');
