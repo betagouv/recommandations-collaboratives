@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load django_vite %}
+{% load vite %}
 {% load static %}
 {% load humanize %}
 {% load crm_tags %}
@@ -10,7 +10,7 @@
     Recommandations sans ressource - CRM
 {% endblock og_title %}
 {% block js %}
-    {% vite_asset 'js/apps/crm.js' %}
+    {% vite 'js/apps/crm.js' %}
 {% endblock js %}
 {% block content %}
     <div x-data="Crm" class="d-flex fr-px-0">

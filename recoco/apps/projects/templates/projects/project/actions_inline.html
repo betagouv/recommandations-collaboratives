@@ -3,7 +3,7 @@
 {% load humanize %}
 {% load gravatar %}
 {% load sass_tags %}
-{% load django_vite %}
+{% load vite %}
 {% load guardian_tags %}
 {% block title %}
     Recommandations - {{ block.super }}
@@ -12,7 +12,7 @@
     Recommandations - {{ block.super }}
 {% endblock og_title %}
 {% block js %}
-    {% vite_asset 'js/apps/project.js' %}
+    {% vite 'js/apps/project.js' %}
 {% endblock js %}
 {% block css %}
     <link href="{% sass_src 'projects/css/board.scss' %}"

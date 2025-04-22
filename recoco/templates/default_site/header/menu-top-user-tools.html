@@ -3,7 +3,7 @@
 {% load guardian_tags %}
 {% load projects_extra %}
 {% load sass_tags %}
-{% load django_vite %}
+{% load vite %}
 {% block css %}
     <link href="{% sass_src 'css/header/header.scss' %}"
           rel="stylesheet"
@@ -13,7 +13,7 @@
           type="text/css">
 {% endblock css %}
 {% block js %}
-    {% vite_asset 'js/components/ExpandableMenuHandler.js' %}
+    {% vite 'js/components/ExpandableMenuHandler.js' %}
 {% endblock js %}
 {% is_staff_for_current_site request.user as is_staff %}
 <!-- User -->
@@ -96,7 +96,8 @@
             </div>
         </div>
     {% else %}
-        <a class="responsive-header__element-not-mobile" href="{% url 'account_login' %}">
+        <a class="responsive-header__element-not-mobile"
+           href="{% url 'account_login' %}">
             <svg class="bi fr-mr-2v align-middle" width="16" height="16">
                 <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#person-circle" />
             </svg>

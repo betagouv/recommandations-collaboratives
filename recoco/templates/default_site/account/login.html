@@ -10,9 +10,9 @@
 {% block og_title %}
     Connexion
 {% endblock og_title %}
-{% load django_vite %}
+{% load vite %}
 {% block js %}
-    {% vite_asset 'js/apps/auth.js' %}
+    {% vite 'js/apps/auth.js' %}
 {% endblock js %}
 {% block css %}
     <link href="{% sass_src 'home/css/dsfr/custom-dsfr.scss' %}"

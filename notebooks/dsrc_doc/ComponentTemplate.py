@@ -60,7 +60,7 @@ template = Template(
 
 {% load static %}
 {% load sass_tags %}
-{% load django_vite %}
+{% load vite %}
 {% block css %}
     <style>
         {{csscore}}

@@ -8,9 +8,9 @@
 {% block og_title %}
     Page d'accueil
 {% endblock og_title %}
-{% load django_vite %}
+{% load vite %}
 {% block js %}
-    {% vite_asset 'js/apps/home.js' %}
+    {% vite 'js/apps/home.js' %}
 {% endblock js %}
 {% block css %}
     <link href="{% sass_src 'home/css/dsfr/custom-dsfr.scss' %}"

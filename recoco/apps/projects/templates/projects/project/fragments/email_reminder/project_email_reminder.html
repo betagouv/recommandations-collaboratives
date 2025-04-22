@@ -1,7 +1,7 @@
-{% load django_vite %}
+{% load vite %}
 {% load projects_extra %}
 {% block js %}
-    {% vite_asset 'js/apps/projectEmailReminder.js' %}
+    {% vite 'js/apps/projectEmailReminder.js' %}
 {% endblock js %}
 {% load static %}
 {% load guardian_tags %}

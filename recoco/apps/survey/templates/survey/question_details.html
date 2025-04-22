@@ -7,7 +7,7 @@
           type="text/css" />
 {% endblock css %}
 {% load humanize %}
-{% load django_vite %}
+{% load vite %}
 {% block title %}
     {{ question.text }} - {{ request.site.name }}
 {% endblock title %}
@@ -15,7 +15,7 @@
     {{ question.text }} - {{ request.site.name }}
 {% endblock og_title %}
 {% block js %}
-    {% vite_asset 'js/apps/tutorial.js' %}
+    {% vite 'js/apps/tutorial.js' %}
 {% endblock js %}
 {% block content %}
     <div x-data="Tutorial('survey')"

@@ -1,9 +1,9 @@
 {% load static %}
 {% load sass_tags %}
-{% load django_vite %}
+{% load vite %}
 {% load projects_extra %}
 {% block js %}
-    {% vite_asset 'js/apps/contactApp.js' %}
+    {% vite 'js/apps/contactApp.js' %}
 {% endblock js %}
 {% block css %}
     <link href="{% sass_src 'home/css/dsfr/custom-dsfr.scss' %}"

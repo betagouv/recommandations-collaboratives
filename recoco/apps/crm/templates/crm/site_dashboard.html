@@ -4,7 +4,7 @@
 {% load activity_tags %}
 {% load humanize %}
 {% load gravatar %}
-{% load django_vite %}
+{% load vite %}
 {% load guardian_tags %}
 {% load projects_extra %}
 {% load common_tags %}
@@ -14,7 +14,7 @@
           type="text/css">
 {% endblock css %}
 {% block js %}
-    {% vite_asset 'js/apps/crm.js' %}
+    {% vite 'js/apps/crm.js' %}
 {% endblock js %}
 {% block title %}
     CRM

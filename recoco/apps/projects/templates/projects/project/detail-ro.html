@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load humanize %}
 {% load static %}
-{% load django_vite %}
+{% load vite %}
 {% load sass_tags %}
 {% block title %}
     État des lieux du projet {{ project.name }} {{ block.super }}
@@ -19,7 +19,7 @@
     <link href="{% sass_src 'projects/css/project.scss' %}"
           rel="stylesheet"
           type="text/css">
-    {% vite_asset 'css/projectDetails.css' %}
+    {% vite 'css/projectDetails.css' %}
 {% endblock css %}
 {% block js %}
     <script type="text/javascript">

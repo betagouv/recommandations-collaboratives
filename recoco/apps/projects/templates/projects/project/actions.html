@@ -3,7 +3,7 @@
 {% load humanize %}
 {% load gravatar %}
 {% load sass_tags %}
-{% load django_vite %}
+{% load vite %}
 {% load guardian_tags %}
 {% load projects_extra %}
 {% block title %}
@@ -16,9 +16,9 @@
     {% comment %} TODO import in node_modules {% endcomment %}
     <script src="https://cdn.jsdelivr.net/npm/js-md5@0.7.3/src/md5.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    {% vite_asset 'js/store/showRole.js' %}
-    {% vite_asset 'js/apps/featureAddContact.js' %}
-    {% vite_asset 'js/store/contact.js' %}
+    {% vite 'js/store/showRole.js' %}
+    {% vite 'js/apps/featureAddContact.js' %}
+    {% vite 'js/store/contact.js' %}
 {% endblock js %}
 {% block css %}
     <link href="{% sass_src 'projects/css/board.scss' %}"

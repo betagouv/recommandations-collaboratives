@@ -1,10 +1,10 @@
 {% load static %}
 {% load guardian_tags %}
 {% load gravatar %}
-{% load django_vite %}
+{% load vite %}
 {% load projects_extra %}
 {% block js %}
-    {% vite_asset 'js/apps/menuTop.js' %}
+    {% vite 'js/apps/menuTop.js' %}
 {% endblock js %}
 {% with request.resolver_match.url_name as url_name %}
     {% if user.is_authenticated %}

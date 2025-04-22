@@ -1,7 +1,7 @@
 {% load static %}
-{% load django_vite %}
+{% load vite %}
 {% block js %}
-    {% vite_asset 'js/apps/mapViewerInteractive.js' %}
+    {% vite 'js/apps/mapViewerInteractive.js' %}
 {% endblock js %}
 <div class="modal fade modal-xl map-modal"
      id="project-map-modal"

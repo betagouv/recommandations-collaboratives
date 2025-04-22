@@ -1,9 +1,9 @@
 {% extends "base.html" %}
 {% load cookie_consent_tags %}
-{% load django_vite %}
+{% load vite %}
 {% load static %}
 {% block js %}
-    {% vite_asset 'js/apps/consent.js' %}
+    {% vite 'js/apps/consent.js' %}
 {% endblock js %}
 {% load sass_tags %}
 {% block css %}

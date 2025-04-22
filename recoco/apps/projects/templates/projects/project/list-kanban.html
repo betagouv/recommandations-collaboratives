@@ -4,7 +4,7 @@
 {% load notifications_tags %}
 {% load gravatar %}
 {% load sass_tags %}
-{% load django_vite %}
+{% load vite %}
 {% block css %}
     <link href="{% sass_src 'home/css/dsfr/custom-dsfr.scss' %}"
           rel="stylesheet"
@@ -17,7 +17,7 @@
           type="text/css">
 {% endblock css %}
 {% block js %}
-    {% vite_asset 'js/apps/boardProjects.js' %}
+    {% vite 'js/apps/boardProjects.js' %}
 {% endblock js %}
 {% block title %}
     Tableau de bord administrateur {{ block.super }}

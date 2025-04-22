@@ -1,8 +1,8 @@
 {% load static %}
-{% load django_vite %}
+{% load vite %}
 {% load phone_filters %}
 {% block js %}
-    {% vite_asset 'js/apps/user.js' %}
+    {% vite 'js/apps/user.js' %}
 {% endblock js %}
 {% load guardian_tags %}
 {% load projects_extra %}

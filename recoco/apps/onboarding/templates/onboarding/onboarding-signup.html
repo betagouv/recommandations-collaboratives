@@ -1,10 +1,10 @@
 {% extends "base.html" %}
-{% load django_vite %}
+{% load vite %}
 {% load static %}
 {% load sass_tags %}
 {% load crispy_forms_tags %}
 {% block js %}
-    {% vite_asset 'js/apps/onboarding.js' %}
+    {% vite 'js/apps/onboarding.js' %}
 {% endblock js %}
 {% block css %}
     <link href="{% sass_src 'home/css/dsfr/custom-dsfr.scss' %}"

@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 {% load sass_tags %}
 {% load static %}
-{% load django_vite %}
+{% load vite %}
 {% load humanize %}
 {% load training %}
 {% block js %}
-    {% vite_asset 'js/apps/crm.js' %}
+    {% vite 'js/apps/crm.js' %}
 {% endblock js %}
 {% block css %}
     <link href="{% sass_src 'home/css/dsfr/marianne.css' %}"

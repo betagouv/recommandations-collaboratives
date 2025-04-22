@@ -1,9 +1,9 @@
 {% load gravatar %}
 {% load static %}
 {% load sass_tags %}
-{% load django_vite %}
+{% load vite %}
 {% block js %}
-    {% vite_asset 'js/components/User.js' %}
+    {% vite 'js/components/User.js' %}
 {% endblock js %}
 {% block css %}
     <link href="{% sass_src 'projects/css/fragments/user_invited.scss' %}"

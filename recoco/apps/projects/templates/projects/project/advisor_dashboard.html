@@ -1,7 +1,7 @@
 {% extends "base.html" %}
-{% load django_vite %}
+{% load vite %}
 {% block js %}
-    {% vite_asset 'js/apps/advisorDashboard.js' %}
+    {% vite 'js/apps/advisorDashboard.js' %}
 {% endblock js %}
 {% block content %}
     <div class="col-12 fr-p-3w fr-mx-auto font-marianne">
