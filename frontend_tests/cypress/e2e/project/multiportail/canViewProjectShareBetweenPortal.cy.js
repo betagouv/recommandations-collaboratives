@@ -13,7 +13,7 @@ describe('Project share between portal', () => {
   it('display share by portal on moderation', () => {
     cy.login('staff'); // TODO replace by staffOnSite and check behaviour
     cy.visit('/projects/moderation');
-    cy.get('[data-cy="moderation-dossier-shared-by"]')
+    cy.get('[data-cy="moderation-folder-shared-by"]')
       .should('be.visible')
       .should('include.text', 'example2');
   });
