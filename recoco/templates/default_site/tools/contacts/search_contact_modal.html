@@ -9,7 +9,7 @@
     <div x-data="SearchContactModal"
          @modal-response="closeCreateContactModal($event)"
          id="search-contact-modal">
-        <div class="modal-contact z-1"
+        <div class="modal-contact"
              x-ref="searchContactModal"
              x-transition:enter="ease-out duration-300"
              x-transition:enter-start="opacity-0 scale-90"
@@ -44,8 +44,8 @@
                         <div class="fr-menu__list specific-width-26rem overflow-auto specific-height border-radius-4px fr-mb-0 rwd-resize">
                             <template x-if="userInput.length > 0 && contactsFound.length > 0 && selectedContact === null">
                                 <template class="fr-menu__item"
-                                          x-for="(contact, index) in contactsFound"
-                                          :key="index">
+                                          x-for="contact in contactsFound"
+                                          :key="contact.id">
                                     <div class="fr-menu__item__content cursor-pointer fr-pt-1w fr-px-1w add-borders"
                                          data-test-id="contact-to-select"
                                          @click="onSelect(contact)">
