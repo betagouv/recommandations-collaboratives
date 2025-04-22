@@ -1,7 +1,14 @@
 from typing import Any
 
-from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector
-from django.db.models import F, FloatField, Value
+from django.contrib.postgres.search import (
+    SearchQuery,
+    SearchRank,
+    SearchVector,
+    TrigramBase,
+    TrigramSimilarity,
+    TrigramWordSimilarity,
+)
+from django.db.models import Case, F, FloatField, Q, Value, When
 from django.db.models.functions import Coalesce, Round
 from django.utils.translation import gettext_lazy as _
 from django_filters.rest_framework import DjangoFilterBackend
@@ -33,6 +40,9 @@ class BaseSearchFilter(SearchFilter):
     search_title = _("Search")
     search_description = _("A search term.")
 
+    view_search_fields = "search_fields"
+    view_search_min_rank = "search_min_rank"
+
     def get_search_terms(self, request):
         """
         Search terms are set by a ?search=... query parameter,
@@ -53,10 +63,10 @@ class BaseSearchFilter(SearchFilter):
         dynamically change the search fields based on request content.
         """
 
-        return getattr(view, "search_fields", None)
+        return getattr(view, self.view_search_fields, None)
 
     def get_search_min_rank(self, view, request) -> float:
-        return getattr(view, "search_min_rank", 0.0)
+        return getattr(view, self.view_search_min_rank, 0.0)
 
 
 class VectorSearchFilter(BaseSearchFilter):
@@ -97,6 +107,78 @@ class VectorSearchFilter(BaseSearchFilter):
             .annotate(search_rank=Round(Coalesce(F("rank"), 0.0), precision=2))
             .order_by("-search_rank")
         )
+
+
+class TrigramSimilaritySearchFilter(BaseSearchFilter):
+    """Search filter that uses the Postgres trigram similarity to rank results."""
+
+    view_search_fields = "trgm_search_fields"
+    view_search_min_rank = "trgm_search_min_rank"
+
+    def get_similarity_trgm_obj(
+        self, search_field: str, search_terms: str
+    ) -> TrigramBase:
+        return TrigramSimilarity(search_field, search_terms)
+
+    def filter_queryset(self, request, queryset, view):
+        search_terms = self.get_search_terms(request)
+        search_fields = self.get_search_fields(view, request)
+
+        if not search_terms or not len(search_terms):
+            return queryset.annotate(
+                search_rank=Value(0.0, output_field=FloatField()),
+            )
+
+        search_terms = strip_accents(" ".join(search_terms))
+
+        trgm_similarity_threshold = self.get_search_min_rank(view, request)
+
+        search_filters = Q()
+        search_rank_fields = None
+
+        for search_field in search_fields:
+            similarity_field = f"{search_field}_trgm_similarity"
+
+            queryset = queryset.annotate(
+                **{
+                    similarity_field: self.get_similarity_trgm_obj(
+                        search_field=f"{search_field}__unaccent",
+                        search_terms=search_terms,
+                    )
+                }
+            ).annotate(
+                **{
+                    f"{similarity_field}_rank": Case(
+                        When(
+                            **{f"{similarity_field}__gt": trgm_similarity_threshold},
+                            then=Round(Coalesce(F(similarity_field), 0.0), precision=2),
+                        ),
+                        default=Value(0.0),
+                    )
+                }
+            )
+
+            search_filters |= Q(
+                **{f"{similarity_field}__gt": trgm_similarity_threshold}
+            )
+
+            if search_rank_fields is None:
+                search_rank_fields = F(f"{similarity_field}_rank")
+            else:
+                search_rank_fields += F(f"{similarity_field}_rank")
+
+        return (
+            queryset.filter(search_filters)
+            .annotate(search_rank=search_rank_fields)
+            .order_by("-search_rank")
+        )
+
+
+class WordTrigramSimilaritySearchFilter(TrigramSimilaritySearchFilter):
+    def get_similarity_trgm_obj(
+        self, search_field: str, search_terms: str
+    ) -> TrigramBase:
+        return TrigramWordSimilarity(search_terms, search_field)
 
 
 class WatsonSearchFilter(BaseSearchFilter):

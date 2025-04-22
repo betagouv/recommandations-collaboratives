@@ -6,7 +6,6 @@
 {% load static %}
 {% load guardian_tags %}
 {% get_obj_perms request.user for project as "user_project_perms" %}
-{% get_advising_position user project request.site as position %}
 {% is_staff_for_current_site request.user as is_staff %}
 {% if project.inactive_since == None %}
     {% with project.next_reminder as reminder %}
@@ -17,11 +16,11 @@
                     <span class="fr-icon-notification-3-line fr-icon--sm fr-mr-1w"
                           aria-hidden="true"></span>Prochain rappel au demandeur prévu le <span data-test-id="email-date">{{ reminder.deadline }}</span>
                 </p>
-                {% if request.user in project.members.all or position.is_advisor or position.is_observer %}
+                {% if request.user in project.members.all or advising_position.is_advisor or advising_position.is_observer %}
                     {% include "projects/project/fragments/email_reminder/learn_more_reminder.html" %}
                 {% endif %}
             </div>
-        {% elif request.user in project.members.all or position.is_advisor or position.is_observer or is_staff %}
+        {% elif request.user in project.members.all or advising_position.is_advisor or advising_position.is_observer or is_staff %}
             <div x-data="ProjectEmailReminder()"
                  class="highlighted highlighted--blue d-flex justify-content-between align-items-center fr-mt-5v fr-mb-3w fr-mr-3w">
                 <span data-test-id="no-reminders" class="tiny fw-medium text-blue">Aucun email de rappel programmé actuellement</span>

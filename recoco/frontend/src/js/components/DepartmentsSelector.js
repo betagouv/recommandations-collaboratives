@@ -1,21 +1,68 @@
 import Alpine from 'alpinejs';
+import api, { regionsUrl, departmentsUrl } from '../utils/api';
 
 Alpine.data(
   'DepartmentsSelector',
   (
-    regions,
-    { selectAll } = {
-      selectedDepartments: [],
+    { listZone, selectAll, filterByRegions, selectedDepartments } = {
       selectAll: true,
     }
   ) => {
     return {
       open: false,
       territorySelectAll: true,
-      regions: regions,
-      init() {
+      regions: listZone,
+      async init() {
+        try {
+          if (!listZone && filterByRegions) {
+            this.regions = (await api.get(regionsUrl())).data.map((region) => {
+              return { ...region, active: false };
+            });
+          } else if (!listZone && !filterByRegions) {
+            this.departments = (await api.get(departmentsUrl())).data.map(
+              (department) => {
+                return { ...department, active: false };
+              }
+            );
+          }
+          if (selectedDepartments) {
+            this.initSelectedDepartments();
+          }
+        } catch (error) {
+          throw new Error('Error fetching regions or departments', error);
+        }
+
         if (selectAll) {
           this.handleTerritorySelectAll(selectAll);
+        }
+      },
+      initSelectedDepartments() {
+        if (this.regions) {
+          this.regions = this.regions.map((region) => {
+            return {
+              ...region,
+              departments: region.departments.map((department) => ({
+                ...department,
+                active: selectedDepartments.includes(department.code),
+              })),
+            };
+          });
+          this.regions.forEach((region) => {
+            region.active =
+              region.departments.length ===
+              region.departments.filter((department) => department.active)
+                .length;
+          });
+          this.territorySelectAll =
+            this.regions.filter((region) => region.active).length ===
+            this.regions.length;
+        } else {
+          this.departments = this.departments.map((department) => {
+            return {
+              ...department,
+              active: selectedDepartments.includes(department.code),
+            };
+          });
         }
       },
       handleTerritorySelectAll(selectAll = !this.territorySelectAll) {

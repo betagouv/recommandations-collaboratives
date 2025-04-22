@@ -6,12 +6,16 @@
 {% load gravatar %}
 {% load guardian_tags %}
 {% load sass_tags %}
+{% load django_vite %}
 {% block title %}
     Espace conseillers - {{ block.super }}
 {% endblock title %}
 {% block og_title %}
     Espace conseillers - {{ block.super }}
 {% endblock og_title %}
+{% block js %}
+    {% vite_asset 'js/apps/featureAddContact.js' %}
+{% endblock js %}
 {% block project_detail %}
     {% get_obj_perms request.user for request.site as "user_site_perms" %}
     {% get_obj_perms request.user for project as "user_project_perms" %}
@@ -45,9 +49,10 @@
                                     <hr />
                                     <form class="form d-flex align-items-end flex-column"
                                           method="post"
+                                          x-data="{message: {text: '', contact: ''}}"
                                           action="{% url 'projects-create-note' project.pk %}">
                                         {% csrf_token %}
-                                        {% include "tools/editor.html" with input_name=private_note_form.content.name input_value=private_note_form.content.value|default:'' input_required=True %}
+                                        {% include "tools/editor.html" with model="message" can_attach_contact=True input_name=private_note_form.content.name input_value=private_note_form.content.value|default:'' input_required=True %}
                                         <label class="visually-hidden" for="input-project-content">{{ private_note_form.content.label }}</label>
                                         {% for error in private_note_form.content.errors %}<div class="text-danger text-end">{{ error }}</div>{% endfor %}
                                         <div class="d-flex justify-content-end fr-mt-2v">
@@ -56,6 +61,9 @@
                                                     class="fr-btn"
                                                     type="submit">Envoyer</button>
                                         </div>
+                                        <input type="hidden"
+                                               name="{{ private_note_form.contact.name }}"
+                                               :value="message.contact.id">
                                     </form>
                                 {% endif %}
                                 {% include "projects/project/fragments/private_conversation.html" with reversed=True %}

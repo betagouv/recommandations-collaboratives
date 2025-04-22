@@ -20,7 +20,6 @@
 {% get_obj_perms request.user for request.site as "user_site_perms" %}
 {% get_obj_perms request.user for project as "user_project_perms" %}
 {% is_staff_for_current_site request.user as is_staff %}
-{% get_advising_position user project request.site as position %}
 <div x-data
      class="project-navigation d-flex justify-content-between"
      x-init="$nextTick(() => $store.showRole.init())">
@@ -29,7 +28,7 @@
                   x-init="$nextTick(() => $store.projectQueue.addCurrentProjectId({{ project.id }}, `{{ project.name }}`, `{{ project.commune.name }}`,`{{ project.commune.insee }}`))">
             <legend class="fr-segmented__legend visually-hidden">Onglets du dossier</legend>
             {% if overview %}
-                {% if position.is_advisor or position.is_observer or is_regional_actor %}
+                {% if advising_position.is_advisor or advising_position.is_observer or is_regional_actor %}
                     {% include "tutorial/tutorial_hint.html" with type="navTuto" %}
                 {% endif %}
             {% endif %}
@@ -230,14 +229,14 @@
              class="project-navigation__container-btn-role-selection"
              data-test-id="header-banner-advising-position"
              id="overview-step-5">
-            <button class="fr-btn fr-btn--tertiary-no-outline fr-icon-team-line {% if position.is_advisor or position.is_observer %}fr-pr-18v{% else %}fr-pr-28v{% endif %}"
+            <button class="fr-btn fr-btn--tertiary-no-outline fr-icon-team-line {% if advising_position.is_advisor or advising_position.is_observer %}fr-pr-18v{% else %}fr-pr-28v{% endif %}"
                     role="button"
                     x-ref="expandMenuButton"
                     id="select-observer-or-advisor-button"
                     aria-expanded="false"
                     aria-controls="select-observer-or-advisor"
                     data-test-id="show-banner">
-                {% if position.is_advisor or position.is_observer %}
+                {% if advising_position.is_advisor or advising_position.is_observer %}
                     Rôle
                 {% else %}
                     Rejoindre
@@ -246,9 +245,9 @@
             <div class="fr-collapse fr-menu menu-modal-correct-fr-menu"
                  id="select-observer-or-advisor">
                 <div class="fr-menu__list specific-width-25rem" x-data="{role:
-                    {% if position.is_advisor %}
+                    {% if advising_position.is_advisor %}
                         '{% url 'projects-project-switchtender-join' project.id %}'
-                    {% elif position.is_observer %}
+                    {% elif advising_position.is_observer %}
                         '{% url 'projects-project-observer-join' project.id %}'
                     {% else %}
                         ''
@@ -310,8 +309,8 @@
                             </div>
                             <hr class="divider-specific">
                             <div class="d-flex justify-content-between">
-                                <div class="fr-p-3v {% if not position.is_advisor and not position.is_observer %}w-100{% endif %}">
-                                    {% if position.is_advisor or position.is_observer %}
+                                <div class="fr-p-3v {% if not advising_position.is_advisor and not advising_position.is_observer %}w-100{% endif %}">
+                                    {% if advising_position.is_advisor or advising_position.is_observer %}
                                         <button class="fr-btn background-dsfr-primary-button w-100 justify-content-center"
                                                 data-test-id="button-validate-role"
                                                 :disabled="!is_clickable">Changer de rôle</button>
@@ -322,7 +321,7 @@
                                     {% endif %}
                                 </div>
                             </form>
-                            {% if position.is_advisor or position.is_observer %}
+                            {% if advising_position.is_advisor or advising_position.is_observer %}
                                 <div class="fr-p-3v">
                                     <form method="post"
                                           action="{% url 'projects-project-access-advisor-delete' project.pk request.user.username %}">

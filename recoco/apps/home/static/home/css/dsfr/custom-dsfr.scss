@@ -141,6 +141,13 @@ button.fr-text-inverted--grey {
   }
 }
 
+.fr-btn--xs {
+  font-size: 0.5rem;
+  line-height: 1rem;
+  min-height: 1.5rem;
+  padding: 0.125rem 0.5rem;
+}
+
 .mt-n150px {
   margin-top: 0;
 }
@@ -656,6 +663,13 @@ form > p {
 .start-96 {
   left: 96% !important;
 }
+
+.repositionning {
+  bottom: 1px;
+  position: absolute;
+  right: 1rem;
+}
+
 
 /* ¯¯¯¯ *\
   COLORS
