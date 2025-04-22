@@ -22,7 +22,7 @@ Alpine.data('SearchContactModal', () => ({
     if (this.userInput.length > 0) {
       api.get(searchContactsUrl(this.userInput)).then((response) => {
         const searchResults = response.data;
-        this.contactsFound = searchResults.results;
+        this.contactsFound = [...searchResults.results];
       });
     } else if (this.userInput.length === 0) {
       this.noSearch = true;
