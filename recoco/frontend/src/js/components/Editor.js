@@ -5,6 +5,7 @@ import Link from '@tiptap/extension-link';
 import HardBreak from '@tiptap/extension-hard-break';
 import { createMarkdownEditor } from 'tiptap-markdown';
 import '../../css/tiptap.css';
+import { formatDate } from '../utils/date';
 
 const MarkdownEditor = createMarkdownEditor(Editor);
 
@@ -14,6 +15,7 @@ Alpine.data('editor', (content) => {
   return {
     updatedAt: Date.now(), // force Alpine to rerender on selection change
     markdownContent: null,
+    formatDate,
     init() {
       const _this = this;
 
