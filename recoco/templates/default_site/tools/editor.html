@@ -88,7 +88,7 @@ Parameters:
                         </button>
                     </template>
                     <template x-if="selectedContact">
-                        <div class="d-flex flex-column">
+                        <div class="d-flex flex-column contact-card__container">
                             <div class="border position-relative" x-data="{contact:selectedContact}">
                                 {% include "tools/contacts/contact_card.html" %}
                                 <button @click.prevent="handleResetContact"
