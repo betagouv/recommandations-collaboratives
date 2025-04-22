@@ -5,7 +5,6 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("projects", "0107_alter_project_inactive_reason_and_more"),
         ("invites", "0005_alter_invite_role"),

@@ -5,7 +5,6 @@ import taggit.managers
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         (
             "taggit",
