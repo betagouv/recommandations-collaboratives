@@ -114,13 +114,16 @@ class CreateActionBaseForm(forms.ModelForm):
 
     topic_name = forms.CharField(required=False)
 
+    def set_contact_queryset(self, contact_queryset: QuerySet[Contact]):
+        self.fields["contact"].queryset = contact_queryset
+
 
 class CreateActionWithoutResourceForm(CreateActionBaseForm):
     """Create an action for a project, without attached resource"""
 
     class Meta:
         model = models.Task
-        fields = ["intent", "content", "public"]
+        fields = ["intent", "content", "public", "contact"]
 
 
 class CreateActionWithResourceForm(CreateActionBaseForm):
@@ -154,9 +157,6 @@ class CreateActionWithResourceForm(CreateActionBaseForm):
     class Meta:
         model = models.Task
         fields = ["intent", "content", "public", "resource", "contact"]
-
-    def set_contact_queryset(self, contact_queryset: QuerySet[Contact]):
-        self.fields["contact"].queryset = contact_queryset
 
 
 class CreateTaskForm(forms.ModelForm):
