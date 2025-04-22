@@ -14,7 +14,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta property="og:title"
               content="{% block og_title %}{% endblock og_title %} - {{ request.site.name }}">
-        {% vite_hmr_client %}
+        {% vite %}
         {% vite 'js/main.js' %}
         {% if not debug and request|cookie_group_accepted:"analytics" %}
             <script>
