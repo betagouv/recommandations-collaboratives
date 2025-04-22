@@ -86,7 +86,7 @@ document.addEventListener("alpine:init", () => {
                    }
                })
            }
-           this.$store.contact.selectedDepartments = this.selected;
+           this.$dispatch('set-departments', this.selected);
        },
        // remove from selected option
        remove(index, option) {
@@ -101,7 +101,7 @@ document.addEventListener("alpine:init", () => {
                    this.options[key].selected = false;
                }
            });
-           this.$store.contact.selectedDepartments = this.selected;
+            this.$dispatch('set-departments', this.selected);
        },
        // filter out selected elements
        selectedElements() {

@@ -106,11 +106,6 @@ Alpine.data('CreateOrganizationModal', () => {
       };
       this.formState.isSubmitted = true;
 
-      // TODO suppress store use
-        this.organization.departments = [...this.$store.contact.selectedDepartments];
-      // TODO suppress store use
-
-
       if(this.formState.fields.isGroupNatName && this.formState.fields.isOrgaName || !this.formState.fields.isGroupNat && this.formState.fields.isOrgaName) {
         api.post(organizationsUrl(), this.organization).then((response) => {
             this.Modal.responseModal(response.data);
@@ -119,5 +114,8 @@ Alpine.data('CreateOrganizationModal', () => {
         });
       }
     },
+    handleDepartmentsSelection(departments) {
+      this.organization.departments = departments;
+    }
   };
 })

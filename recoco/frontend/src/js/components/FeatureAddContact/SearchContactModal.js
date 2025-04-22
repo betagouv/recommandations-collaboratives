@@ -28,7 +28,6 @@ Alpine.data('SearchContactModal', () => ({
   onSelect(contact) {
     this.noSearch = false;
     this.selectedContact = contact;
-    console.log('Selected contact:', this.selectedContact);
   },
   addContact() {
     this.Modal.responseModal(this.selectedContact);

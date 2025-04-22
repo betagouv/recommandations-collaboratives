@@ -55,9 +55,7 @@ Alpine.data('CreateContactModal', () => {
     },
     handleSetOrganization(organization) {
       this.contact.organization = organization;
-      console.log('contact.organization', this.contact.organization);
     },
-    // TODO : voir si on peut mettre ce code dans un "meilleur endroit"
     isCreateOrganizationModalOpen: false,
     openModalCreateOrganization() {
       // hide create contact modal

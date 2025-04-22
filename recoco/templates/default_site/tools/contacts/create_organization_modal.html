@@ -7,6 +7,7 @@
 <template x-if="isCreateOrganizationModalOpen">
     <div x-data="CreateOrganizationModal()"
         id="create-organization-modal"
+        @set-departments="handleDepartmentsSelection($event.detail)"
         class="modal-create-organization z-2">
         <form @submit.prevent>
             <div class="d-flex justify-content-between border-bottom-666 fr-p-3v modal-create-contact__block">
