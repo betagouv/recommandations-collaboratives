@@ -220,6 +220,16 @@ class ProjectQuerySet(models.QuerySet):
             ),
         )
 
+    def with_site_status(self):
+        return self.annotate(
+            site_status=Subquery(
+                ProjectSite.objects.filter(
+                    site=Site.objects.get_current(),
+                    project=OuterRef("pk"),
+                ).values("status")[:1]
+            )
+        )
+
 
 class ProjectOnSiteManager(CurrentSiteManager, ProjectManager):
     pass
@@ -750,6 +760,10 @@ class Note(models.Model):
         default=timezone.now, verbose_name="Dernière mise à jour"
     )
     tags = models.CharField(max_length=256, blank=True, default="")
+
+    topic = models.ForeignKey(
+        Topic, related_name="notes", on_delete=models.SET_NULL, blank=True, null=True
+    )
 
     notifications_as_action = CastedGenericRelation(
         notifications_models.Notification,

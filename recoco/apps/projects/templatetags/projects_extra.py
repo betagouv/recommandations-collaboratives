@@ -7,8 +7,11 @@ authors: raphael.marvie@beta.gouv.fr, guillaume.libersat@beta.gouv.fr
 created: 2021-06-29 11:30:42 CEST
 """
 
+import json
+
 from django import template
 from django.contrib.sites.models import Site
+from django.forms import model_to_dict
 
 from recoco import utils as recoco_utils
 
@@ -40,25 +43,6 @@ def is_admin_for_current_site(user):
 
 
 @register.simple_tag
-def get_advising_position(user, project, site):
-    """Return position of user for project on current site as dict
-
-    {"is_observer": bool, "is_advisor": bool}
-    """
-    if user is None or user.is_anonymous:
-        return {"is_observer": False, "is_advisor": False}
-
-    try:
-        ps = models.ProjectSwitchtender.objects.get(
-            switchtender=user, project=project, site=site
-        )
-        # obsevrer and advisor and in mutual exclusion
-        return {"is_observer": ps.is_observer, "is_advisor": not ps.is_observer}
-    except models.ProjectSwitchtender.DoesNotExist:
-        return {"is_observer": False, "is_advisor": False}
-
-
-@register.simple_tag
 def get_projectsite_for_site(project, site):
     """Return the ProjectSite for the given site"""
     try:
@@ -75,6 +59,29 @@ def get_project_moderation_count():
         project_sites__site=Site.objects.get_current(),
         deleted=None,
     ).count()
+
+
+@register.filter(name="to_json")
+def to_json(value, fields=None):
+    """Transforme un objet Python en JSON avec des champs spécifiques."""
+    if fields:
+        field_list = [field.strip() for field in fields.split(",")]
+        data = model_to_dict(value, fields=field_list)
+    else:
+        data = model_to_dict(value)
+    return json.dumps(data)
+
+
+@register.simple_tag
+def count_has_notifications(feed_items):
+    """Count elements with notifications (new message)"""
+    return len([item for item in feed_items if item.get("notifications")])
+
+
+@register.simple_tag
+def count_message_by_type(feed_items, *args):
+    """Count message by type in feed"""
+    return len([item for item in feed_items if item.get("type") in args])
 
 
 # eof

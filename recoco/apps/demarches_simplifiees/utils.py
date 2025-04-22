@@ -14,6 +14,7 @@ class MappingField:
     id: str
     label: str
     lookup: str | None = None
+    options: list[str] | None = None
 
 
 project_mapping_fields: list[MappingField] = [
@@ -21,6 +22,11 @@ project_mapping_fields: list[MappingField] = [
         id="project.name",
         label="Nom du projet",
         lookup="name",
+    ),
+    MappingField(
+        id="project.description",
+        label="Description du projet",
+        lookup="description",
     ),
     MappingField(
         id="project.owner_first_name",
@@ -76,5 +82,15 @@ project_mapping_fields: list[MappingField] = [
         id="project.region_code",
         label="Code de la région",
         lookup="commune.department.region.code",
+    ),
+    MappingField(
+        id="project.postal_and_insee_codes",
+        label="Code INSEE de la commune",
+        lookup="commune.postal_and_insee_codes",
+    ),
+    MappingField(
+        id="project.location",
+        label="Localisation",
+        lookup="location",
     ),
 ]

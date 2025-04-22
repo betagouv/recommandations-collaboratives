@@ -93,6 +93,9 @@ export function searchOrganizationsUrl(search) {
 export function searchContactsUrl(search) {
   return `/api/addressbook/contacts/?search=${search}`;
 }
+export function contactsUrl() {
+  return `/api/addressbook/contacts/`;
+}
 
 // Topic
 export function searchTopicsUrl(search, restrict_to) {
@@ -107,7 +110,14 @@ export function taskUrl(projectId, taskId) {
 export function tasksUrl(projectId) {
   return `/api/projects/${projectId}/tasks/`;
 }
-
+/**
+ * Params:
+ * - projectId
+ * - taskId
+ * Payload:
+ * - "above"/"below" with the id of the task to move above/below
+ * - "top"/"bottom" set to true to move the task to the top/bottom of the list
+ */
 export function moveTaskUrl(projectId, taskId) {
   return `/api/projects/${projectId}/tasks/${taskId}/move/`;
 }
@@ -153,9 +163,13 @@ export function postExternalRessourceUrl() {
 }
 
 // Regions :
-// export function regionsUrl() {
-//   return `/api/regions/`;
-// }
+export function regionsUrl() {
+  return `/api/regions/`;
+}
+
+export function departmentsUrl() {
+  return `/api/departments/`;
+}
 
 // Challenges
 export function challengeUrl(code) {

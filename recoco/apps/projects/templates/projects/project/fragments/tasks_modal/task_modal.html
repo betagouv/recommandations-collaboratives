@@ -55,11 +55,11 @@
                         <div class="d-flex flex-grow-1 align-items-stretch w-65 task-modal-content"
                              :class="!contentIsLoading && 'visible'"
                              x-effect="taskId && loadContent()">
-                            <template x-if="currentTask && taskId && currentTask?.resource_id">
+                            <template x-if="taskId && currentTask.resource_id">
                                 <iframe class="w-100 d-flex flex-column rounded"
-                                        :src="resourcePreviewUrl(currentTask?.resource_id, taskId)"></iframe>
+                                        :src="resourcePreviewUrl(currentTask.resource_id, taskId)"></iframe>
                             </template>
-                            <template x-if="currentTask && taskId && !currentTask?.resource_id">
+                            <template x-if="taskId && !currentTask.resource_id">
                                 <div class="w-100 text-break fr-p-2w specific-maxheight-90vh scroll-gestion">
                                     <div class="resource-details">
                                         <h1 x-text="currentTask?.intent" class="fr-mb-2w"></h1>
@@ -84,7 +84,7 @@
                             <div class="task-modal-followups position-relative"
                                  :class="getTypeOfModalClass(currentTask?.document && currentTask?.document.length > 0)"
                                  id="followups-scroll-container">
-                                <div class="fr-py-2v fr-px-2w position-sticky top-0 d-flex justify-content-between bg-white z-index-100 border-bottom-grey">
+                                <div class="fr-py-2v fr-px-2w position-sticky top-0 d-flex justify-content-between bg-white z-1 border-bottom-grey">
                                     <span class="fw-medium title-info text-dark">Échanges & notes</span>
                                 </div>
                                 <div class="position-absolute d-flex justify-content-center align-items-center w-100 h-100">
@@ -111,7 +111,7 @@
                                                           x-text="`le ${formatDate(currentTask?.created_on)}`"></span>
                                                 </div>
                                                 <template x-if="$store.djangoData.canManageTasks">
-                                                    <a class="text-muted cursor-pointer tiny" @click="onEditContent()">Editer</a>
+                                                    <button class="text-muted cursor-pointer tiny" @click="onEditContent()">Editer</button>
                                                 </template>
                                             </div>
                                         </div>
@@ -126,7 +126,7 @@
                                             </div>
                                         </div>
                                     </template>
-                                    <template x-if="followups">
+                                    <template x-if="!followupsIsLoading && followups">
                                         <template x-for="f in followups"
                                                   x-key="f.timestamp"
                                                   x-effect="followups"
@@ -146,9 +146,9 @@
                                                                       x-text="`le ${formatDate(f.timestamp)}`"></span>
                                                             </div>
                                                             <template x-if="$store.djangoData.canUseTasks && f.who.email === $store.djangoData.userEmail">
-                                                                <a data-test-id="task-edit-followup-button"
-                                                                   class="text-muted cursor-pointer tiny"
-                                                                   @click="onEditComment(f)">Editer</a>
+                                                                <button data-test-id="task-edit-followup-button"
+                                                                        class="text-muted cursor-pointer tiny"
+                                                                        @click="onEditComment(f)">Editer</button>
                                                             </template>
                                                         </div>
                                                     </div>
@@ -186,14 +186,25 @@
                                 </div>
                             </div>
                             <template x-if="currentTask.public || showEdition">
-                                <div class="w-100 fr-p-2w specific-border-top-solid1pxEEE">
-                                    {% include "tools/editor.html" with is_task_modal_comment=True %}
-                                </div>
+                                <form @submit.prevent="onSubmitComment()" novalidate>
+                                    <div class="w-100 fr-p-2w specific-border-top-solid1pxEEE">
+                                        {% include "tools/editor.html" with model="comment" can_attach_contact=True tools_disabled="title" %}
+                                        <template x-if="currentlyEditing">
+                                            <button type="button"
+                                                    class="fr-btn fr-btn--sm fr-btn--tertiary button-cancel-edit"
+                                                    @click="onCancelEdit()">Annuler</button>
+                                        </template>
+                                        <button type="submit"
+                                                class="fr-btn fr-btn--sm repositionning-in-modal"
+                                                data-test-id="button-submit-new"
+                                                x-text="currentlyEditing ? 'Modifier' : 'Envoyer'"></button>
+                                    </div>
+                                </form>
                             </template>
                             <template x-if="!currentTask.public">
                                 <div class="w-100 fr-p-2w specific-border-top-solid1pxEEE">
                                     <div class="text-center">
-                                        <span class="text-muted">Vous devez publier votre recommandation pour ajouter un commentaire</span>
+                                        <span class="text-muted">Cette recommandation est en brouillon. Vous devez la publier pour ajouter un commentaire</span>
                                     </div>
                                 </div>
                             </template>

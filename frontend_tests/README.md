@@ -159,7 +159,7 @@ Merci de mettre à jour la colonne `Utilisé` en fonction de l'utilisation du co
 | Projet - État des lieux    | `/project/{id}/connaissance`   | Page                                               | `// @page-projet-edl`                               |      ❌ |
 | Projet - État des lieux    | `/project/{id}/connaissance`   | CTA complétion                                     | `// @page-projet-edl-completer`                     |      ❌ |
 | Projet - État des lieux    | `/project/{id}/connaissance`   | Partage                                            | `// @page-projet-edl-partager`                      |      ❌ |
-| Projet - Recommandations   | `/project/{id}/actions`        | Page                                               | `// @page-projet-recommandations`                   |      ❌ |
+| Projet - Recommandations   | `/project/{id}/actions`        | Page                                               | `// @page-projet-recommandations`                   |      🚧 |
 | Projet - Recommandations   | `/project/{id}/actions`        | Création                                           | `// @page-projet-recommandations-creation`          |      🚧 |
 | Projet - Recommandations   | `/project/{id}/actions`        | Modification                                       | `// @page-projet-recommandations-modification`      |      ❌ |
 | Projet - Recommandations   | `/project/{id}/actions`        | Passer en brouillon                                | `// @page-projet-recommandations-brouillon`         |      ❌ |

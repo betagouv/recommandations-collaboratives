@@ -1,21 +1,37 @@
 import Alpine from 'alpinejs';
+import _ from 'lodash';
 
 document.addEventListener('alpine:init', () => {
   Alpine.store('tasksView', {
     displayedTasks: [],
     currentView: 'inline',
     async updateViewWithTask(taskId) {
-      const updatedTasks = await Alpine.store('tasksData').loadTasks();
-      const updatedTask = updatedTasks.find((task) => task.id === taskId);
-      this.displayedTasks = this.displayedTasks.map((task) =>
-        task.id === taskId ? updatedTask : task
-      );
+      try {
+        const updatedTasks = await Alpine.store('tasksData').loadTasks();
+        const updatedTask = updatedTasks.find((task) => task.id === taskId);
+        this.displayedTasks = this.displayedTasks.map((task) =>
+          task.id === taskId ? updatedTask : task
+        );
+      } catch (error) {
+        throw new Error('Error loading tasks while view update : ' + error);
+      }
     },
     async updateView() {
-      this.displayedTasks = await Alpine.store('tasksData').loadTasks();
+      try {
+        const tasksLoaded = await Alpine.store('tasksData').loadTasks();
+        this.displayedTasks = _.orderBy(tasksLoaded, ['order'], ['asc']);
+      } catch (error) {
+        throw new Error('Error loading tasks while view update : ' + error);
+      }
     },
     findById(taskId) {
       return this.displayedTasks.find((task) => task.id === taskId);
+    },
+    findLast() {
+      return this.displayedTasks.slice(-1)[0];
+    },
+    findFirst() {
+      return this.displayedTasks[0];
     },
     switchView() {
       this.currentView === 'inline'

@@ -11,11 +11,16 @@ import { truncate } from '../utils/taskStatus';
  */
 export default function PreviewModal() {
   return {
-    pendingComment: '',
     currentlyEditing: null,
     followupsIsLoading: false,
     contentIsLoading: false,
     showEdition: false,
+
+    comment: {
+      text: '',
+      contact: '',
+    },
+
     get index() {
       return this.$store.previewModal.index;
     },
@@ -48,46 +53,60 @@ export default function PreviewModal() {
       return `${this.index + 1} sur ${this.newTasks.length} nouvelle${this.newTasks.length > 0 ? 's' : ''} recommandation${this.newTasks.length > 0 ? 's' : ''}`;
     },
     hasNotification(followupId) {
+      if (this.notifications) return false;
+
       return (
         this.notifications.filter(
           (n) => n.action_object.who && n.action_object.id === followupId
         ).length > 0
       );
     },
-    async onSubmitComment(content) {
-      const contactAdded = this.$store.previewModal.contact;
-      this.$store.previewModal.contact = null;
+    async onSubmitComment() {
       this.$store.editor.setIsSubmitted(true);
+
+      // We are not editing a comment atm
       if (!this.currentlyEditing) {
-        await this.$store.tasksData.issueFollowup(
-          this.currentTask,
-          undefined,
-          content,
-          contactAdded??null
-        );
-        await this.$store.previewModal.loadFollowups();
-        await this.$store.tasksView.updateView();
+        await this.$store.tasksData
+          .issueFollowup(
+            this.currentTask,
+            undefined,
+            this.comment.text,
+            this.comment.contact ?? null
+          )
+          .then(async () => {
+            // Refresh messages
+            await this.$store.previewModal.loadFollowups();
+            await this.$store.tasksView.updateView();
+            // reset every contact info after submitting
+            this.comment.contact = '';
+            this.comment.text = '';
+          })
+          .catch((error) => {
+            console.error('Error while creating followup', error);
+          });
       } else {
+        // We are editing a comment
         const [type, id] = this.currentlyEditing;
         if (type === 'followup') {
-          await this.$store.tasksData.editComment(
-            this.currentTask.id,
-            id,
-            content
-          );
+          this.followupsIsLoading = true;
+          await this.$store.tasksData.editComment(this.currentTask.id, id, {
+            comment: this.comment.text,
+            contact: this.comment.contact,
+          });
           await this.$store.previewModal.loadFollowups();
           await this.$store.tasksView.updateView();
+          this.followupsIsLoading = false;
         } else if (type === 'content') {
+          // We are editing the initial comment (contained in Task model)
           await this.$store.tasksData.patchTask(this.currentTask.id, {
-            content: content,
+            content: this.comment.text,
+            contact: this.comment.contact,
           });
           await this.$store.tasksView.updateViewWithTask(this.currentTask.id);
         }
       }
-
-      this.pendingComment = '';
       this.currentlyEditing = null;
-      this.$dispatch('set-comment', this.pendingComment);
+      this.$dispatch('set-comment', { text: '', contact: null });
       this.followupScrollToLastMessage();
       if (!this.currentTask.public) {
         this.showEdition = false;
@@ -95,17 +114,26 @@ export default function PreviewModal() {
     },
     onEditComment(followup) {
       this.showEdition = true;
-      this.pendingComment = followup.comment;
       this.currentlyEditing = ['followup', followup.id];
       document.querySelector('#comment-text-ref .ProseMirror').focus();
-      this.$dispatch('set-comment', followup.comment);
+      this.$dispatch('set-comment', {
+        text: followup.comment,
+        contact: followup.contact,
+      });
     },
     onEditContent() {
       this.showEdition = true;
-      this.pendingComment = this.currentTask.content;
       this.currentlyEditing = ['content', this.currentTask.id];
       document.querySelector('#comment-text-ref .ProseMirror').focus();
-      this.$dispatch('set-comment', this.currentTask.content);
+      this.$dispatch('set-comment', {
+        text: this.currentTask.content,
+        contact: this.currentTask.contact,
+      });
+    },
+    onCancelEdit() {
+      this.showEdition = false;
+      this.currentlyEditing = null;
+      this.$dispatch('set-comment', { text: '', contact: null });
     },
     loadContent() {
       this.contentIsLoading = true;

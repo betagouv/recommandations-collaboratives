@@ -12,7 +12,6 @@
           rel="stylesheet"
           type="text/css">
 {% endblock css %}
-{% get_advising_position user project request.site as position %}
 {% get_obj_perms request.user for request.site as "user_site_perms" %}
 {% get_obj_perms request.user for project as "user_project_perms" %}
 <div x-data="User()"
@@ -24,11 +23,11 @@
                 class="d-flex align-items-center flex-wrap user-info border-0 fr-p-0 bg-transparent {% if user_popup_deactivate %}no-underline{% endif %}"
                 data-test-id="button-open-tooltip-user-card">
             <span class="fr-mr-1v d-flex align-items-center font-very-small">
-                <img class="rounded-circle fr-mr-1v {% if not user.is_active %}border-0{% elif position.is_advisor %}advisor-border border-2{% elif position.is_observer %}observer-border border-2{% else %}neutral-role-border border-2{% endif %}"
+                <img class="user-card__gravatar rounded-circle fr-mr-1v {% if not user.is_active %}border-0{% elif advising_position.is_advisor %}advisor-border border-2{% elif advising_position.is_observer %}observer-border border-2{% else %}neutral-role-border border-2{% endif %}"
                      :src='gravatar_url("{{ user.email }}", 18, "{{ user.first_name }}" + " " + "{{ user.last_name }}")'
                      alt="{{ action.actor }}">
                 {% if user %}
-                    <strong class="text-nowrap text-capitalize {% if not user.is_active %}inactive-status{% endif %}"
+                    <strong class="user-card__name text-nowrap text-capitalize {% if not user.is_active %}inactive-status{% endif %}"
                             data-test-id="user-card-intro">
                         {% if user.get_full_name %}
                             {{ user.get_full_name }}
@@ -42,9 +41,9 @@
                 {% endif %}
             </span>
             {% if user.profile.organization.name %}
-                <span class="text-dark fw-normal font-italic font-very-small">{{ user.profile.organization.name }}</span>
+                <span class="user-card__org-name fw-normal font-italic font-very-small">{{ user.profile.organization.name }}</span>
             {% elif project_owner and project.org_name %}
-                <span class="text-dark fw-normal font-italic font-very-small">{{ project.org_name }}</span>
+                <span class="user-card__org-name fw-normal font-italic font-very-small">{{ project.org_name }}</span>
             {% endif %}
         </button>
         {% if 'use_crm' in user_site_perms and user_activity %}
@@ -68,19 +67,19 @@
          id="user-tooltip"
          @click.outside="onOutsideUserClick"
          data-test-id="tooltip-user-card"
-         class="user-card-popup flex-column {% if not user.is_active %}...{% elif position.is_advisor %}advisor-border{% elif position.is_observer %}observer-border{% else %}neutral-role-border{% endif %}">
-        {% if user.is_active and position.is_advisor %}
+         class="user-card-popup flex-column {% if not user.is_active %}...{% elif advising_position.is_advisor %}advisor-border{% elif advising_position.is_observer %}observer-border{% else %}neutral-role-border{% endif %}">
+        {% if user.is_active and advising_position.is_advisor %}
             <div class="user-role position-absolute">
                 <span class="fr-py-1v fr-px-2v fw-bold text-uppercase tiny advisor-background text-white specific-borderradius-2px">Conseiller</span>
             </div>
-        {% elif user.is_active and position.is_observer %}
+        {% elif user.is_active and advising_position.is_observer %}
             <div class="user-role position-absolute">
                 <span class="fr-py-1v fr-px-2v fw-bold text-uppercase tiny observer-background text-white specific-borderradius-2px">Observateur</span>
             </div>
         {% endif %}
         <div class="d-flex align-items-center flex-wrap">
             <span class="fr-mr-2v d-flex align-items-center font-very-small">
-                <img class="rounded-circle fr-mr-2v {% if not user.is_active %}border-0{% elif position.is_advisor %}advisor-border border-2{% elif position.is_observer %}observer-border border-2{% else %}neutral-role-border border-2{% endif %}"
+                <img class="rounded-circle fr-mr-2v {% if not user.is_active %}border-0{% elif advising_position.is_advisor %}advisor-border border-2{% elif advising_position.is_observer %}observer-border border-2{% else %}neutral-role-border border-2{% endif %}"
                      :src='gravatar_url("{{ user.email }}", 25, "{{ user.first_name }}" + " " + "{{ user.last_name }}")'
                      alt="{{ action.actor }}">
                 <strong class="text-nowrap text-capitalize {% if not user.is_active %}inactive-status{% endif %}">
@@ -136,7 +135,7 @@
                 </button>
             </span>
         {% endif %}
-        {% if user.is_active and user.profile.phone_no and not position.is_observer %}
+        {% if user.is_active and user.profile.phone_no and not advising_position.is_observer %}
             <span class="d-flex align-items-center justify-content-between text-blue font-very-small fr-mt-1v">
                 <div class="d-flex align-items-center">
                     <svg class="bi align-middle fr-mr-2v"

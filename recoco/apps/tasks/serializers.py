@@ -21,7 +21,9 @@ from recoco.rest_api.serializers import BaseSerializerMixin
 from .models import Task, TaskFollowup
 
 
-class TaskFollowupCreateSerializer(BaseSerializerMixin, serializers.ModelSerializer):
+class TaskFollowupCreateUpdateSerializer(
+    BaseSerializerMixin, serializers.ModelSerializer
+):
     class Meta:
         model = TaskFollowup
         fields = [
@@ -45,18 +47,21 @@ class TaskFollowupCreateSerializer(BaseSerializerMixin, serializers.ModelSeriali
                 "task_id": self.context.get("task_id"),
             }
         )
+        self._update_activity_flags_and_states(followup)
+        return followup
 
-        task = followup.task
-        project = task.project
+    def update(self, instance, validated_data):
+        followup = super().update(instance, validated_data)
+        self._update_activity_flags_and_states(followup)
+        return followup
 
-        # update activity flags and states
+    def _update_activity_flags_and_states(self, followup):
+        project = followup.task.project
         if followup.who in get_collaborators_for_project(project):
             project.last_members_activity_at = timezone.now()
             if project.inactive_since:
                 project.reactivate()
             project.save()
-
-        return followup
 
 
 class TaskFollowupSerializer(serializers.ModelSerializer):
@@ -113,7 +118,7 @@ class TaskSerializer(BaseSerializerMixin, OrderedModelSerializer):
     contact_id = serializers.IntegerField(write_only=True, required=False)
 
     resource = ResourceSerializer(read_only=True)
-    resource_id = serializers.IntegerField(write_only=True, required=False)
+    resource_id = serializers.IntegerField(required=False)
 
     created_by = UserSerializer(read_only=True)
     document = DocumentSerializer(read_only=True, many=True)

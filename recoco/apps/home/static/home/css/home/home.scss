@@ -90,7 +90,6 @@ span.step {
   line-height: 1.7em;
 }
 
-
 // .custom-banner::after {
 //   content: '';
 
@@ -105,7 +104,6 @@ span.step {
 //   border-right: 10px solid transparent;
 //   border-top: 10px solid #3558a2;
 // }
-
 
 .imiteH6 {
   font-size: 1rem;
@@ -129,12 +127,11 @@ span.step {
   text-decoration: underline;
 }
 
-
 // design hero des portails
 
 .hero-div {
-  margin: .5rem;
-  padding: .5rem;
+  margin: 0.5rem;
+  padding: 0.5rem;
   margin-top: 2rem;
 
   &__sub-container {
@@ -149,7 +146,7 @@ span.step {
   }
 
   &__dark-section {
-    background: var(--light-background-alt-blue-france, #F5F5FE);
+    background: var(--light-background-alt-blue-france, #f5f5fe);
     padding-left: 120px;
     padding-right: 120px;
     padding-top: 80px;
@@ -175,13 +172,12 @@ span.step {
     margin-left: 6rem;
   }
 
-    &__custom-banner a {
+  &__custom-banner a {
     text-decoration: underline;
   }
 }
 
 @media (max-width: 48em) {
-
   .hero-div {
     &__custom-banner {
       display: flex;
@@ -191,7 +187,6 @@ span.step {
 }
 
 @media (min-width: 1100px) and (max-width: 1200px) {
-
   .hero-div {
     &__img-div img {
       height: 450px;
@@ -201,7 +196,6 @@ span.step {
 }
 
 @media (max-width: 1100px) {
-
   .hero-div {
     text-align: center;
     padding: 40px 40px 60px 40px;
@@ -242,7 +236,6 @@ span.step {
 }
 
 @media (max-width: 900px) {
-
   .hero-div {
     &__dark-section {
       padding-left: 40px;
@@ -251,6 +244,10 @@ span.step {
     &__dark-section h2 {
       text-align: center;
     }
+    &__buttons {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
   }
-
 }
