@@ -1,7 +1,7 @@
 {% load cookie_consent_tags %}
-{% load django_vite %}
+{% load vite %}
 {% block js %}
-    {% vite_asset 'js/apps/consent.js' %}
+    {% vite 'js/apps/consent.js' %}
 {% endblock js %}
 {% load sass_tags %}
 {% block css %}

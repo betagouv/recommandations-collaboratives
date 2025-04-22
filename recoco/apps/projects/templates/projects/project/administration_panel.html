@@ -2,7 +2,7 @@
 {% load static %}
 {% load guardian_tags %}
 {% load sass_tags %}
-{% load django_vite %}
+{% load vite %}
 {% load projects_extra %}
 {% block title %}
     Paramètres - {{ block.super }}
@@ -11,7 +11,7 @@
     Paramètres - {{ block.super }}
 {% endblock og_title %}
 {% block js %}
-    {% vite_asset 'js/apps/projectAdministration.js' %}
+    {% vite 'js/apps/projectAdministration.js' %}
 {% endblock js %}
 {% block css %}
     <link href="{% sass_src 'projects/css/administration.scss' %}"
@@ -82,8 +82,7 @@
                                                    for="input-project-description">
                                                 {{ project_form.description.label }}
                                             </label>
-                                            <textarea
-                                                      class="placeholder-grey form-control {% if project_form.description.errors %}is-invalid{% endif %} textarea-size"
+                                            <textarea class="placeholder-grey form-control {% if project_form.description.errors %}is-invalid{% endif %} textarea-size"
                                                       id="input-project-description"
                                                       name="{{ project_form.description.name }}"
                                                       placeholder="">{{ project_form.description.value|default:'' }}</textarea>
@@ -391,7 +390,5 @@
         {% elif project.site_status == 'DRAFT' %}
         </div>
     {% endif %}
-    <div class="fr-mt-2w fr-px-2w">
-        {% include "projects/project/fragments/administration/activate_project.html" %}
-    </div>
+    <div class="fr-mt-2w fr-px-2w">{% include "projects/project/fragments/administration/activate_project.html" %}</div>
 {% endblock project_detail %}

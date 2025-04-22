@@ -1,7 +1,7 @@
 {% extends "projects/project/detail.html" %}
 {% load guardian_tags %}
 {% load sass_tags %}
-{% load django_vite %}
+{% load vite %}
 {% load projects_extra %}
 {% block title %}
     Nouvelle conversation - {{ block.super }}
@@ -10,7 +10,7 @@
     Nouvelle conversation - {{ block.super }}
 {% endblock og_title %}
 {% block js %}
-    {% vite_asset 'js/apps/conversationsNew.js' %}
+    {% vite 'js/apps/conversationsNew.js' %}
 {% endblock js %}
 {% block css %}
     <link href="{% sass_src 'projects/css/conversations_new.scss' %}"

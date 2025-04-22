@@ -47,6 +47,7 @@ dependencies = [
     "django-tagging",
     "django-taggit==5.0.1",
     "django-vite==3.0.3",
+    "django-vite-plugin>=4.1.0",
     "django-waffle==4.1.0",
     "django-watson==1.6.3",
     "django-webhook",

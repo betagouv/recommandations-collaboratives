@@ -1,8 +1,8 @@
 {% load static %}
-{% load django_vite %}
+{% load vite %}
 {% load sass_tags %}
 {% block js %}
-    {% vite_asset 'js/apps/searchableList.js' %}
+    {% vite 'js/apps/searchableList.js' %}
 {% endblock js %}
 <div x-data="SearchableList('{{ search_list_id }}', {{ list.field.choices|length }}, {{ search_options }})"
      id="{{ search_list_id }}">

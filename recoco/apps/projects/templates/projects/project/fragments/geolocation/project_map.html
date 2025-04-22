@@ -1,6 +1,6 @@
 {% load static %}
 {% load sass_tags %}
-{% load django_vite %}
+{% load vite %}
 {{ project.name|json_script:"nameProject" }}
 {{ project.status|json_script:"status" }}
 {{ project.location|json_script:"location" }}
@@ -28,7 +28,7 @@
             }
         }
     </script>
-    {% vite_asset 'js/apps/mapViewerStatic.js' %}
+    {% vite 'js/apps/mapViewerStatic.js' %}
 {% endblock js %}
 <div x-data='MapViewerStatic(projectOptions)'
      data-test-id="project-knogwledge-map">

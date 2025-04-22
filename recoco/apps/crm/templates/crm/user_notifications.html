@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load sass_tags %}
 {% load static %}
-{% load django_vite %}
+{% load vite %}
 {% block title %}
     Emails de notification à {{ crm_user.get_full_name }}
 {% endblock title %}
@@ -9,7 +9,7 @@
     Emails de notification à {{ crm_user.get_full_name }}
 {% endblock og_title %}
 {% block js %}
-    {% vite_asset 'js/apps/crm.js' %}
+    {% vite 'js/apps/crm.js' %}
 {% endblock js %}
 {% block css %}
     <link href="{% sass_src 'home/css/dsfr/marianne.css' %}"

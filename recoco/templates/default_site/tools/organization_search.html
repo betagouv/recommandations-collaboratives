@@ -1,6 +1,6 @@
-{% load django_vite %}
+{% load vite %}
 {% block js %}
-    {% vite_asset 'js/apps/organizationSearch.js' %}
+    {% vite 'js/apps/organizationSearch.js' %}
 {% endblock js %}
 <div x-data='OrganizationSearch("{{ value|default:"" }}", {% if isRequired %}true{% else %}false{% endif %}, {% if dsfr %}true{% else %}false{% endif %}, "{{ request.method }}")'
      x-effect='validateData({% if request.method is "POST" %}true{% else %}false{% endif %})'

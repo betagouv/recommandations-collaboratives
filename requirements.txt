@@ -413,6 +413,9 @@ django-treebeard==4.7.1 \
 django-vite==3.0.3 \
     --hash=sha256:0738e6fe49ed097ab8e9e22ac78776584735948e118d3875817f78a87acaac82 \
     --hash=sha256:3efe96d93cd77dfca4d8274c49db9dd43c545c95daab3c6b1e3dabf2236df943
+django-vite-plugin==4.1.0 \
+    --hash=sha256:834f979960d5d05b53c0c5a8f6143108c9c4ce56fda16a140f638ccd6607ed7c \
+    --hash=sha256:85f749c41be4191ab031d36e3ee47e4a2bf8d25222becb8f25515f3e688db61b
 django-waffle==4.1.0 \
     --hash=sha256:5979a2f3dd674ef7086480525b39651fc2045427f6d8e6a614192656d3402c5b \
     --hash=sha256:e49d7d461d89f3bd8e53f20efe39310acca8f275c9888495e68e195345bf18b1

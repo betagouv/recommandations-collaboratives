@@ -1,19 +1,14 @@
 {% extends "base.html" %}
-
-{% load django_vite %}
-
+{% load vite %}
 {% block title %}
     Configuration des tags du Site- CRM
 {% endblock title %}
-
 {% block og_title %}
     Configuration des tags du Site - CRM
 {% endblock og_title %}
-
 {% block js %}
-    {% vite_asset 'js/apps/crm.js' %}
+    {% vite 'js/apps/crm.js' %}
 {% endblock js %}
-
 {% block content %}
     <div class="d-flex fr-px-0">
         {% include "crm/fragments/sidebar.html" with search=True back_button=True user_advised_projects=False user_projects=False %}

@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load django_vite %}
+{% load vite %}
 {% load static %}
 {% block title %}
     Tableau de bord conseillers {{ block.super }}
@@ -8,7 +8,7 @@
     Tableau de bord conseillers {{ block.super }}
 {% endblock og_title %}
 {% block js %}
-    {% vite_asset 'js/apps/advisorDashboard.js' %}
+    {% vite 'js/apps/advisorDashboard.js' %}
 {% endblock js %}
 {% block content %}
     <div class="col-12 fr-p-3w fr-mx-auto font-marianne">

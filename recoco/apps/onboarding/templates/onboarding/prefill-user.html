@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load django_vite %}
+{% load vite %}
 {% load static %}
 {% load sass_tags %}
 {% load crispy_forms_tags %}
@@ -10,7 +10,7 @@
     Déposer un projet pour le compte du porteur de projet {{ block.super }}
 {% endblock og_title %}
 {% block js %}
-    {% vite_asset 'js/apps/advisorCreateProject.js' %}
+    {% vite 'js/apps/advisorCreateProject.js' %}
 {% endblock js %}
 {% block css %}
     <link href="{% sass_src 'home/css/dsfr/custom-dsfr.scss' %}"
@@ -49,27 +49,24 @@
         <div class="container__form justify-content-center"
              x-data="AjvValidationSchema('schemaOnboardingPrefillSetuserFormValidator')">
             <div class="onboarding__form">
-                <h3 class="fr-stepper__title text-align-center fr-mb-4w">
-                    Vous êtes référent sur le projet
-                </h3>
+                <h3 class="fr-stepper__title text-align-center fr-mb-4w">Vous êtes référent sur le projet</h3>
                 <div class="blue-text-block fr-mb-4w fr-p-1w">
                     <p class="fr-m-0">
                         Vous pourrez inviter le porteur de projet  ultérieurement. Vous recevrez les emails relatifs au projet.
                     </p>
                 </div>
-                <a href="{% url 'onboarding-project' %}" class="fr-btn justify-content-center fr-mb-4w w-100">Créer un projet</a>
+                <a href="{% url 'onboarding-project' %}"
+                   class="fr-btn justify-content-center fr-mb-4w w-100">Créer un projet</a>
             </div>
             <div class="fr-mb-4w d-flex flex-it-well">
                 <div class="separator"></div>
-                <p class="place-it-well"> OU </p>
+                <p class="place-it-well">OU</p>
                 <div class="separator"></div>
             </div>
             <div class="onboarding__form"
                  x-data="DsrcFormValidator('{{ form.helper.form_id }}', schemaValidator, '{{ request.method }}')"
                  x-init="init">
-                <h3 class="fr-stepper__title text-align-center fr-mb-4w">
-                    Une autre personne est référente sur le projet
-                </h3>
+                <h3 class="fr-stepper__title text-align-center fr-mb-4w">Une autre personne est référente sur le projet</h3>
                 <div class="blue-text-block fr-mb-4w fr-p-1w">
                     <p class="fr-m-0">
                         Entrez ici les coordonnées de l'interlocuteur ou l'interlocutrice chez le porteur de projet.

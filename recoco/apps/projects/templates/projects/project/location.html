@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 {% load projects_extra %}
-{% load django_vite %}
+{% load vite %}
 {% load guardian_tags %}
 {% block title %}
     Modifier la localisation du projet - {{ request.site.name }}
@@ -43,7 +43,7 @@
             }
         }
         </script>
-        {% vite_asset 'js/apps/mapEditor.js' %}
+        {% vite 'js/apps/mapEditor.js' %}
     {% endblock js %}
     {% block content %}
         <div x-data='MapEditor(projectOptions)'

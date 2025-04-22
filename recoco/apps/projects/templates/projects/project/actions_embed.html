@@ -3,7 +3,7 @@
 {% load humanize %}
 {% load gravatar %}
 {% load sass_tags %}
-{% load django_vite %}
+{% load vite %}
 {% load guardian_tags %}
 {% block title %}
     Recommandations - {{ block.super }}
@@ -14,7 +14,7 @@
 {% block js %}
     <script src="https://cdn.jsdelivr.net/npm/js-md5@0.7.3/src/md5.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    {% vite_asset 'js/apps/actionsEmbed.js' %}
+    {% vite 'js/apps/actionsEmbed.js' %}
 {% endblock js %}
 {% block css %}
     <link href="{% sass_src 'projects/css/board.scss' %}"

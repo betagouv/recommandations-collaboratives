@@ -1,10 +1,10 @@
 {% load static %}
-{% load django_vite %}
+{% load vite %}
 {% load sass_tags %}
 {% load projects_extra %}
 {% block js %}
-    {% vite_asset 'js/components/ClickToSeeUser.js' %}
-    {% vite_asset 'js/components/User.js' %}
+    {% vite 'js/components/ClickToSeeUser.js' %}
+    {% vite 'js/components/User.js' %}
 {% endblock js %}
 {% block css %}
     <link href="{% sass_src 'projects/css/fragments/owner/owner-details.scss' %}"

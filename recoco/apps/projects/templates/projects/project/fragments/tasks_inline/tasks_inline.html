@@ -1,4 +1,4 @@
-{% load django_vite %}
+{% load vite %}
 <!-- Index of tasks inline app -->
 <div x-data="TasksInline({{ project.pk }})" class="fr-mt-2v">
     {% include "projects/project/fragments/tasks_inline/status_list.html" %}

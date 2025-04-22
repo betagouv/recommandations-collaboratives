@@ -1,9 +1,9 @@
-{% load django_vite %}
+{% load vite %}
 {% block js %}
     {% if embed_view is not True %}
-        {% vite_asset 'js/apps/tasks.js' %}
+        {% vite 'js/apps/tasks.js' %}
     {% else %}
-        {% vite_asset 'js/apps/tasksEmbed.js' %}
+        {% vite 'js/apps/tasksEmbed.js' %}
     {% endif %}
 {% endblock js %}
 {{ project.pk|json_script:"djangoProjectId" }}

@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 {% load sass_tags %}
-{% load django_vite %}
+{% load vite %}
 {% block css %}
     <link href="{% sass_src 'resources/resources.scss' %}"
           rel="stylesheet"
@@ -11,9 +11,9 @@
           type="text/css">
 {% endblock css %}
 {% block js %}
-    {% vite_asset 'js/components/ActionPusher.js' %}
-    {% vite_asset 'js/store/actionPusher.js' %}
-    {% vite_asset 'js/apps/tutorial.js' %}
+    {% vite 'js/components/ActionPusher.js' %}
+    {% vite 'js/store/actionPusher.js' %}
+    {% vite 'js/apps/tutorial.js' %}
 {% endblock js %}
 {% block content %}
     <div class="col-12 fr-p-3w fr-mx-auto push-reco">

@@ -12,9 +12,9 @@
 {% block og_title %}
     Fichiers et liens - {{ block.super }}
 {% endblock og_title %}
-{% load django_vite %}
+{% load vite %}
 {% block js %}
-    {% vite_asset 'js/apps/documents.js' %}
+    {% vite 'js/apps/documents.js' %}
 {% endblock js %}
 {% block project_detail %}
     {% get_obj_perms request.user for request.site as "user_site_perms" %}

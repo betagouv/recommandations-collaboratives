@@ -1,7 +1,7 @@
 {% load survey %}
 {% load static %}
 {% load sass_tags %}
-{% load django_vite %}
+{% load vite %}
 {% load projects_extra %}
 {% block css %}
     <link href="{% sass_src 'projects/css/fragments/survey_grid.scss' %}"
@@ -9,7 +9,7 @@
           type="text/css">
 {% endblock css %}
 {% block js %}
-    {% vite_asset 'js/apps/projectKnowledge.js' %}
+    {% vite 'js/apps/projectKnowledge.js' %}
     <script src="https://cdn.jsdelivr.net/npm/masonry-layout@4.2.2/dist/masonry.pkgd.min.js" integrity="sha384-GNFwBvfVxBkLMJpYMOABq3c+d3KnQxudP/mGPkzpZSTYykLBNsZEnG2D9G/X/+7D" crossorigin="anonymous">
     </script>
 {% endblock js %}

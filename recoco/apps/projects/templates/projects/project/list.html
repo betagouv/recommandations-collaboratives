@@ -4,7 +4,7 @@
 {% load notifications_tags %}
 {% load gravatar %}
 {% load sass_tags %}
-{% load django_vite %}
+{% load vite %}
 {% load leaflet_tags %}
 {% load guardian_tags %}
 {% block js %}
@@ -24,8 +24,8 @@
      return `https://www.gravatar.com/avatar/${hash}?s=${size}&d=${encoded_fallback_uri}`
  }
     </script>
-    {% vite_asset 'js/apps/map.js' %}
-    {% vite_asset 'js/apps/boardProjects.js' %}
+    {% vite 'js/apps/map.js' %}
+    {% vite 'js/apps/boardProjects.js' %}
     {% leaflet_js %}
 {% endblock js %}
 {% block css %}

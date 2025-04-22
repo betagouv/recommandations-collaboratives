@@ -2,7 +2,7 @@
 {% load static %}
 {% load humanize %}
 {% load sass_tags %}
-{% load django_vite %}
+{% load vite %}
 {% block title %}
     Thématiques du projet {{ project.name }}
 {% endblock title %}
@@ -10,7 +10,7 @@
     Thématiques du projet {{ project.name }}
 {% endblock og_title %}
 {% block js %}
-    {% vite_asset 'js/apps/topicSearch.js' %}
+    {% vite 'js/apps/topicSearch.js' %}
 {% endblock js %}
 {% block css %}
     <link href="{% sass_src 'projects/css/project.scss' %}"

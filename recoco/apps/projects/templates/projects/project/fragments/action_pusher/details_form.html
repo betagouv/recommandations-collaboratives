@@ -1,7 +1,7 @@
 {% load static %}
-{% load django_vite %}
+{% load vite %}
 {% block js %}
-    {% vite_asset 'js/apps/topicSearch.js' %}
+    {% vite 'js/apps/topicSearch.js' %}
 {% endblock js %}
 <!-- Action title -->
 <div class="fr-mt-2v" x-show="push_type == 'noresource'">

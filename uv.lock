@@ -1199,6 +1199,15 @@ wheels = [
 ]
 
 [[package]]
+name = "django-vite-plugin"
+version = "4.1.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/19/e7/f6a461351095af67209d1b9653ee3382cc8b1d34cce810b4c4a53460a143/django_vite_plugin-4.1.0.tar.gz", hash = "sha256:85f749c41be4191ab031d36e3ee47e4a2bf8d25222becb8f25515f3e688db61b", size = 7089 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/ce/43/f5ee21f7a21f37fc66682549f47614ddcabf84be4a61661f61001a239a87/django_vite_plugin-4.1.0-py3-none-any.whl", hash = "sha256:834f979960d5d05b53c0c5a8f6143108c9c4ce56fda16a140f638ccd6607ed7c", size = 12574 },
+]
+
+[[package]]
 name = "django-waffle"
 version = "4.1.0"
 source = { registry = "https://pypi.org/simple" }
@@ -3109,6 +3118,7 @@ dependencies = [
     { name = "django-tagging" },
     { name = "django-taggit" },
     { name = "django-vite" },
+    { name = "django-vite-plugin" },
     { name = "django-waffle" },
     { name = "django-watson" },
     { name = "django-webhook" },
@@ -3211,6 +3221,7 @@ requires-dist = [
     { name = "django-tagging", git = "https://github.com/nextories/django-tagging.git?rev=bug%2Fusage_for_model_with_filters_none" },
     { name = "django-taggit", specifier = "==5.0.1" },
     { name = "django-vite", specifier = "==3.0.3" },
+    { name = "django-vite-plugin", specifier = ">=4.1.0" },
     { name = "django-waffle", specifier = "==4.1.0" },
     { name = "django-watson", specifier = "==1.6.3" },
     { name = "django-webhook", git = "https://github.com/etchegom/django-webhook.git?rev=recoco" },

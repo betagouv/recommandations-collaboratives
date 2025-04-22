@@ -1,4 +1,4 @@
-{% load django_vite %}
+{% load vite %}
 {% load static %}
 {% load sass_tags %}
 <link href="{% sass_src 'css/base.scss' %}"
@@ -11,8 +11,8 @@
       rel="stylesheet"
       type="text/css">
 {% block js %}
-    {% vite_asset 'js/main.js' %}
-    {% vite_asset 'js/apps/embedResource.js' %}
+    {% vite 'js/main.js' %}
+    {% vite 'js/apps/embedResource.js' %}
 {% endblock js %}
 <style type="text/css">
 	@media print

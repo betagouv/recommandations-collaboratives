@@ -1,9 +1,9 @@
 {% load static %}
 {% load humanize %}
-{% load django_vite %}
+{% load vite %}
 {% load guardian_tags %}
 {% block js %}
-    {% vite_asset 'js/apps/topicSearch.js' %}
+    {% vite 'js/apps/topicSearch.js' %}
 {% endblock js %}
 {% get_obj_perms request.user for request.site as "user_site_perms" %}
 {% get_obj_perms request.user for project as "user_project_perms" %}

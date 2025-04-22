@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load django_vite %}
+{% load vite %}
 {% load static %}
 {% block title %}
     Usage des tags dans le CRM - CRM
@@ -8,8 +8,8 @@
     Usage des tags dans le CRM - CRM
 {% endblock og_title %}
 {% block js %}
-    {% vite_asset 'js/apps/crm.js' %}
-    {% vite_asset 'js/apps/tagCloud.js' %}
+    {% vite 'js/apps/crm.js' %}
+    {% vite 'js/apps/tagCloud.js' %}
 {% endblock js %}
 {% block content %}
     {{ tags|json_script:"tagsArray" }}
