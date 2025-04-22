@@ -183,10 +183,6 @@ export function regionsUrl() {
   return `/api/regions/`;
 }
 
-export function departmentsUrl() {
-  return `/api/departments/`;
-}
-
 // Challenges
 export function challengeUrl(code) {
   return `/api/challenges/${code}/`;
