@@ -12,6 +12,7 @@ Alpine.data('SearchContactModal', () => ({
   modalCreateContact: null,
   modalSearchContact: null,
   noSearch: true,
+  formatDate,
   init() {
     this.Modal = Modal(this, 'search-contact-modal');
   },
