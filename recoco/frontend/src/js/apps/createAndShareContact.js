@@ -1,6 +1,0 @@
-import '../components/SearchContact.js'
-import '../components/CreateContact.js'
-import '../components/FeatureAddContact/CreateOrganizationModal.js'
-import '../components/SearchOrganization.js'
-import '../components/MultiSelect.js'
-import '../store/previewModal.js'
