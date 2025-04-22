@@ -107,6 +107,7 @@ INSTALLED_APPS = [
     "django_json_widget",
     "waffle",
     "django_htmx",
+    "django_vite_plugin",
 ]
 
 SITE_ID = SiteID(default=1)
@@ -382,6 +383,21 @@ SOCIALACCOUNT_PROVIDERS = {
 # Django vite
 DJANGO_VITE_ASSETS_PATH = BASE_DIR / "frontend/dist"
 STATICFILES_DIRS += [DJANGO_VITE_ASSETS_PATH]
+
+# Django vite plugin
+DJANGO_VITE_PLUGIN = {
+    "WS_CLIENT": "@vite/client",
+    # 'DEV_MODE': getattr(settings, 'DEBUG', True),
+    "DEV_MODE": True,
+    # 'BUILD_DIR': getattr(settings, 'STATIC_ROOT') or 'static',
+    "BUILD_DIR": "static",
+    "MANIFEST": "<BUILD_DIR>/.vite/manifest.json",
+    # 'BUILD_URL_PREFIX': getattr(settings, 'STATIC_URL'),
+    "BUILD_URL_PREFIX": "STATIC_URL",
+    "JS_ATTRS": {"type": "module"},
+    "CSS_ATTRS": {"rel": "stylesheet", "type": "text/css"},
+    "STATIC_LOOKUP": True,
+}
 
 
 # Phonenumbers
