@@ -83,7 +83,6 @@ const config = {
         NotificationEater: resolve('./src/js/components/NotificationEater.js'),
         actionPusher: resolve('./src/js/store/actionPusher.js'),
         conversationsNew: resolve('./src/js/apps/conversationsNew.js'),
-        contact: resolve('./src/js/store/contact.js'),
         featureAddContact: resolve('./src/js/apps/featureAddContact.js'),
         DepartmentsSelector: resolve(
           './src/js/components/DepartmentsSelector.js'

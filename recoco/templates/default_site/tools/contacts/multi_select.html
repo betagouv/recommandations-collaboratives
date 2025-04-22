@@ -6,9 +6,7 @@
                 <!-- Define component with preselected options -->
                 <div class="w-100"
                      x-data="alpineMultiSelect({selected:[], elementId:'multiSelect'})"
-                     @on-department-fetch.window="initSelect($event)"
-                     @reset-orga-name.window="resetSelectedDepartments()"
-                     @reset-form-create-orga.window="resetSelectedDepartments()">
+                     @on-department-fetch.window="initSelect($event)">
                     <!-- Select Options -->
                     <select class="d-none" id="multiSelect" x-on:change="init">
                         <template x-for="department in departments" :key="department.code">

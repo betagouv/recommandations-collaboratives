@@ -10,9 +10,7 @@ Alpine.data('CreateOrganizationModal', () => {
     showOrgaGroupsresults: false,
     isAnOrgaGroupSelected: false,
     departments: [],
-    // selectedDepartments: [],
     radiobuttonForGroup: 'no',
-    organizationToCreate: null,
     organization: {
       name: '',
       group: null,

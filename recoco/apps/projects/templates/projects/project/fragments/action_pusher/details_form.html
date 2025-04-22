@@ -2,12 +2,6 @@
 {% load django_vite %}
 {% block js %}
     {% vite_asset 'js/apps/topicSearch.js' %}
-    {% comment %} {% vite_asset 'js/components/SearchContact.js' %}
-    {% vite_asset 'js/components/CreateContact.js' %}
-    {% vite_asset 'js/components/CreateOrganisation.js' %}
-    {% vite_asset 'js/components/SearchOrganisation.js' %}
-    {% vite_asset 'js/components/MultiSelect.js' %}
-    {% vite_asset 'js/store/contact.js' %} {% endcomment %}
 {% endblock js %}
 <!-- Action title -->
 <div class="fr-mt-2v" x-show="push_type == 'noresource'">

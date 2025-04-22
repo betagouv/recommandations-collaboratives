@@ -17,8 +17,7 @@
             Merci de sélectionner une organisation existante ou d'en créer une nouvelle si besoin.*
         </p>
     </template>
-    <div x-init="$watch('$store.contact.orgaCreated', value => setSearch())"
-     @reset-orga-name.window="resetSearch()">
+    <div>
         <div class="position-relative">
             <div class="fr-search-bar"
                  x-modelable="userInputSearchOrganization"

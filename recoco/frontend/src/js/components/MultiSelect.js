@@ -117,7 +117,6 @@ document.addEventListener("alpine:init", () => {
               Object.keys(this.options).forEach((key) => {
                 this.options[key].selected = false;
               });
-              this.$store.contact.selectedDepartments = this.selected;
          }
    }));
 });
