@@ -4,7 +4,7 @@
   "description": "Frontend Recoco",
   "author": "guillaume.libersat@beta.gouv.fr, quentin.danneville@beta.gouv.fr",
   "private": true,
-  "type": "commonjs",
+  "type": "module",
   "scripts": {
     "test": "jest",
     "dev": "vite --force",
@@ -30,6 +30,7 @@
     "bootstrap": "^5.3.3",
     "d3": "^7.8.4",
     "d3-cloud": "^1.2.5",
+    "django-vite-plugin": "^4.1.0",
     "fuse.js": "^7.0.0",
     "htmx.org": "^2.0.4",
     "intro.js": "^7.0.1",
