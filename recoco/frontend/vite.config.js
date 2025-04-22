@@ -71,8 +71,8 @@ const config = {
         CreateContactModal: resolve(
           './src/js/components/FeatureAddContact/CreateContactModal.js'
         ),
-        SearchOrganizationModal: resolve(
-          './src/js/components/SearchOrganizationModal.js'
+        SearchOrganization: resolve(
+          './src/js/components/SearchOrganization.js'
         ),
         projectQueue: resolve('./src/js/store/projectQueue.js'),
         showRole: resolve('./src/js/store/showRole.js'),
