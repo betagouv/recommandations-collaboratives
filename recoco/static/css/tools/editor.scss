@@ -47,9 +47,11 @@
 }
 
 // Override contact card style
-.contact-card {
-  padding-right: 49px !important;
-  &__container {
-    max-width: 25rem;
+.editor-container {
+  .contact-card {
+    padding-right: 49px !important;
+    &__container {
+      max-width: 25rem;
+    }
   }
 }

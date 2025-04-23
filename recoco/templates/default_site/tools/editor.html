@@ -19,7 +19,7 @@ Parameters:
           type="text/css">
 {% endblock css %}
 {% comment %} TODO @set-comment.window to fix{% endcomment %}
-<div class="w-100 position-relative"
+<div class="w-100 position-relative editor-container"
      {% if initial_content_escapejs %} x-data='editor("{{ initial_content|escapejs }}")' {% else %} x-data='editor("{{ initial_content }}")' {% endif %}
      @reset-contact="handleResetContact()"
      @set-comment.window="setMarkdownContent(event)"

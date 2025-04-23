@@ -74,6 +74,9 @@ body.modal-open {
   height: 62vh;
   overflow-y: auto;
 }
+.task-modal-followups .contact-card {
+  padding: 0.75rem !important;
+}
 
 .task-modal-followups.is-documented {
   height: 49vh;
