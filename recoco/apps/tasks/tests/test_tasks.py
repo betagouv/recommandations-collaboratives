@@ -24,6 +24,7 @@ from notifications import notify
 from pytest_django.asserts import assertContains, assertRedirects
 
 from recoco import verbs
+from recoco.apps.addressbook.models import Contact
 from recoco.apps.geomatics import models as geomatics
 from recoco.apps.home import models as home_models
 from recoco.apps.projects import models as project_models
@@ -1018,6 +1019,8 @@ def test_create_new_action_with_single_resource(request, client, project_ready):
     intent = "My Intent"
     content = "My Content"
 
+    contact = baker.make(Contact, site=current_site)
+
     with login(client) as user:
         utils.assign_advisor(user, project_ready)
 
@@ -1030,6 +1033,7 @@ def test_create_new_action_with_single_resource(request, client, project_ready):
                 "resource": resource.pk,
                 "intent": intent,
                 "content": content,
+                "contact": contact.pk,
             },
         )
     task = models.Task.on_site.first()
@@ -1037,6 +1041,7 @@ def test_create_new_action_with_single_resource(request, client, project_ready):
     assert task.project == project_ready
     assert task.public is True
     assert task.resource == resource
+    assert task.contact == contact
     assert response.status_code == 302
 
 
