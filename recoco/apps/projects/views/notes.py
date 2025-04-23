@@ -109,6 +109,10 @@ def create_private_note(request, project_id=None):
     if request.method == "POST":
         form = NoteForm(request.POST)
 
+        form.set_contact_queryset(
+            Contact.objects.filter(site_id=request.site.id),
+        )
+
         if form.is_valid():
             instance = form.save(commit=False)
             instance.project = project
