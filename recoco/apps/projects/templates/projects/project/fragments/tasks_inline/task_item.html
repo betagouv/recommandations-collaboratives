@@ -75,9 +75,9 @@
         <template x-if="task.resource">
             <article>{% include "projects/project/fragments/task/task_comment.html" %}</article>
         </template>
-        <hr class="fr-mt-3w">
         <!-- DS integration -->
         <template x-if="task.ds_folder && task.ds_folder.prefilled_count > 0">
+            <hr class="fr-mt-3w">
             <div>
                 <h4 class="fw-bolder">
                     <img height="31px"

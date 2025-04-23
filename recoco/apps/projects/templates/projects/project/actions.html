@@ -24,9 +24,6 @@
     <link href="{% sass_src 'projects/css/board.scss' %}"
           rel="stylesheet"
           type="text/css" />
-    <link href="{% sass_src 'projects/css/fragments/task_inline/task.scss' %}"
-          rel="stylesheet"
-          type="text/css" />
 {% endblock css %}
 {% block project_detail %}
     {% get_obj_perms request.user for request.site as "user_site_perms" %}
