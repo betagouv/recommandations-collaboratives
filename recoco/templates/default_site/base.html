@@ -13,7 +13,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta property="og:title"
-              content="{% block og_title %}{% endblock og_title %} - {{ request.site.name }}">
+              content="{% spaceless %}{% block og_title %}{% endblock og_title %}{% endspaceless %} - {{ request.site.name }}">
         {% vite_hmr_client %}
         {% vite_asset 'js/main.js' %}
         {% if not debug and request|cookie_group_accepted:"analytics" %}
