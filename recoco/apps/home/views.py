@@ -27,7 +27,7 @@ from recoco.apps.projects import models as projects
 from recoco.apps.projects.utils import can_administrate_project
 from recoco.apps.resources import models as resources_models
 from recoco.apps.tasks import models as tasks
-from recoco.utils import check_if_advisor
+from recoco.utils import check_if_advisor, require_htmx
 
 from . import models
 from .forms import AdvisorAccessRequestForm, ContactForm, UserPasswordFirstTimeSetupForm
