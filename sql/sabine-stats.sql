@@ -11,7 +11,7 @@ SELECT
 	n.public AS public,
 	n.created_on AS creation,
 	n.updated_on AS modification,
-	p.name AS projet,
+	p.name AS dossier,
 	u.email AS auteurice,
 	g.group_id AS categorie
 FROM
@@ -60,7 +60,7 @@ SELECT
 	n.public AS public,
 	n.created_on AS creation,
 	n.updated_on AS modification,
-	p.name AS projet,
+	p.name AS dossier,
 	u.email AS auteurice,
 	g.group_id AS categorie
 FROM
@@ -108,7 +108,7 @@ SELECT
 	NULL AS public,
 	tf.timestamp AS creation,
 	NULL AS modification,
-	p.name AS projet,
+	p.name AS dossier,
 	u.email AS auteurice,
 	g.group_id AS categorie
 FROM

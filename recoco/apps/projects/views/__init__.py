@@ -98,7 +98,7 @@ def project_moderation_refuse(request, project_pk):
         project.save()
 
         messages.add_message(
-            request, messages.INFO, f"Le projet '{project.name}' a été refusé."
+            request, messages.INFO, f"Le dossier '{project.name}' a été refusé."
         )
 
     return redirect(reverse("projects-moderation-list"))
@@ -122,7 +122,7 @@ def project_moderation_accept(request, project_pk):
         project.save()
 
         messages.add_message(
-            request, messages.SUCCESS, f"Le projet '{project.name}' a été accepté."
+            request, messages.SUCCESS, f"Le dossier '{project.name}' a été accepté."
         )
 
         signals.project_validated.send(
@@ -198,7 +198,7 @@ def project_moderation_accept(request, project_pk):
                 messages.add_message(
                     request,
                     messages.INFO,
-                    f"Vous êtes maintenant conseiller·ère du projet '{project.name}'.",
+                    f"Vous êtes maintenant conseiller·ère du dossier '{project.name}'.",
                 )
 
         return redirect(reverse("projects-project-detail-overview", args=(project.pk,)))

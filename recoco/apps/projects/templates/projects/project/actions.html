@@ -51,9 +51,9 @@
                         {{ advising_position.is_advisor|json_script:"isAdvisorOnProject" }}
                         {% if is_switchtender and project.tasks.all.count == 0 %}
                             <div data-test-id="no-tasks-banner" class="bg-light fr-p-3w rounded-2">
-                                <h3 class="fw-light">Pas encore de recommandations au porteur de projet ?</h3>
+                                <h3 class="fw-light">Pas encore de recommandations au demandeur ?</h3>
                                 <p class="fst-italic fw-light fr-mb-2w">
-                                    Soyez la première personne à proposer des recommandations ou des ressources au porteur de projet !
+                                    Soyez la première personne à proposer des recommandations ou des ressources au demandeur !
                                 </p>
                                 {% if advising or is_staff %}
                                     <a data-test-id="submit-task-button"
@@ -68,7 +68,7 @@
                                             data-bs-auto-close="outside"
                                             aria-expanded="false"
                                             aria-controls="select-observer-or-advisor">
-                                        Rejoindre ce projet pour l'aiguiller
+                                        Rejoindre ce dossier pour l'aiguiller
                                     </button>
                                 {% endif %}
                             </div>
