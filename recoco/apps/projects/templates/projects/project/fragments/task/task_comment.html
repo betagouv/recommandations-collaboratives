@@ -31,7 +31,7 @@
             <button class="fr-btn fr-btn--sm fr-btn--tertiary fr-icon-close-line position-absolute top-0 end-0 fr-m-2w"
                     @click.stop="isEditing = false">Annuler la modification</button>
             <form @submit.prevent="handleEditComment(task)" novalidate>
-                {% include "tools/editor.html" with model="comment" initial_content="task.content" %}
+                {% include "tools/editor.html" with model="comment" initial_content="task.content" initial_content_js=True %}
                 <button @click.stop
                         type="submit"
                         class="fr-btn fr-btn--sm repositionning"
