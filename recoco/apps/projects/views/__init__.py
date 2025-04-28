@@ -26,6 +26,7 @@ from recoco.apps.communication.api import send_email
 from recoco.apps.communication.digests import normalize_user_name
 from recoco.apps.geomatics import models as geomatics_models
 from recoco.apps.geomatics.serializers import DepartmentSerializer, RegionSerializer
+from recoco.apps.home.models import AdvisorAccessRequest
 from recoco.utils import (
     check_if_advisor,
     get_site_config_or_503,
@@ -77,7 +78,20 @@ def project_moderation_list(request):
         project_sites__status="DRAFT", project_sites__site=request.site, deleted=None
     ).order_by("-created_on")
 
-    return render(request, "projects/projects_moderation.html", locals())
+    advisor_access_requests = AdvisorAccessRequest.objects.filter(
+        site=request.site,
+        status="PENDING",
+    )
+
+    return render(
+        request,
+        "projects/projects_moderation.html",
+        context={
+            "site_config": site_config,
+            "draft_projects": draft_projects,
+            "advisor_access_requests": advisor_access_requests,
+        },
+    )
 
 
 @login_required

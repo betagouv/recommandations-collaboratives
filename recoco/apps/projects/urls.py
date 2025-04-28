@@ -28,12 +28,12 @@ urlpatterns = [
         name="projects-moderation-list",
     ),
     path(
-        r"projects/moderation/<int:project_pk>/refuse",
+        r"projects/moderation/project/<int:project_pk>/refuse",
         views.project_moderation_refuse,
         name="projects-moderation-refuse",
     ),
     path(
-        r"projects/moderation/<int:project_pk>/accept",
+        r"projects/moderation/project/<int:project_pk>/accept",
         views.project_moderation_accept,
         name="projects-moderation-accept",
     ),
