@@ -1029,8 +1029,6 @@ def test_switchtender_joins_project(request, client, make_project):
     url = reverse("projects-project-switchtender-join", args=[project.id])
     with login(client, groups=["example_com_advisor"]) as user:
         user.profile.sites.add(current_site)
-
-        # Then POST to join projet
         response = client.post(url)
 
     project = models.Project.on_site.get(pk=project.pk)
@@ -1156,7 +1154,7 @@ def test_switchtender_exports_csv(request, client, make_project):
     # Expected project
     p1 = make_project(
         site=get_current_site(request),
-        name="Projet 1",
+        name="Dossier 1",
         status="READY",
     )
 
@@ -1164,7 +1162,7 @@ def test_switchtender_exports_csv(request, client, make_project):
     p1.save()
 
     # Project that should not appear
-    make_project(site=other_site, name="Projet 2")
+    make_project(site=other_site, name="Dossier 2")
 
     # Make a task
     Recipe(task_models.Task, public=True, project=p1).make()

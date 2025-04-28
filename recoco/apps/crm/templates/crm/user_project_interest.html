@@ -14,7 +14,7 @@
                 {% include "crm/search.html" %}
                 <div class="fr-pt-2w crm-border-bottom fr-pb-2v fr-px-3w">
                     <h5 class="crm-project-decoration d-inline-block relative">
-                        Projets conseillés <strong>({{ crm_user.projects_switchtended_per_site.all|length }})</strong>
+                        Dossiers conseillés <strong>({{ crm_user.projects_switchtended_per_site.all|length }})</strong>
                     </h5>
                     <ul class="list-unstyled">
                         {% for switchtending in crm_user.projects_switchtended_per_site.all %}
@@ -26,7 +26,7 @@
                 </div>
                 <div class="fr-pt-2w crm-border-bottom fr-pb-2v fr-px-3w">
                     <h5 class="crm-project-decoration d-inline-block relative">
-                        Participe aux projets <strong>({{ crm_user.projectmember_set.all|length }})</strong>
+                        Participe aux dossiers <strong>({{ crm_user.projectmember_set.all|length }})</strong>
                     </h5>
                     <ul class="list-unstyled">
                         {% for membership in crm_user.projectmember_set.all %}
@@ -52,7 +52,7 @@
                 </div>
                 <table class="table">
                     <tr>
-                        <th>Projet</th>
+                        <th>Dossier</th>
                         <th>Intéret?</th>
                     </tr>
                     {% for status in statuses %}
@@ -66,7 +66,7 @@
                         </tr>
                     {% empty %}
                         <tr>
-                            <td>-- Pas encore de positionnement sur les projets --</td>
+                            <td>-- Pas encore de positionnement sur les dossiers --</td>
                         </tr>
                     {% endfor %}
                 </table>
