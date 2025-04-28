@@ -48,8 +48,7 @@ source .venv/bin/activate
 ```
 
 ```sh
-uv pip install -r requirements.txt
-uv pip install -r requirements-dev.txt
+uv sync
 ```
 
 #### Configuration de l'applicatif
