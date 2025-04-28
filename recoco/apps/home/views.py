@@ -14,8 +14,10 @@ from django.contrib.auth import models as auth
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models import Count, F, Q
-from django.shortcuts import redirect, render
+from django.http import HttpRequest
+from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.decorators import method_decorator
+from django.views.decorators.http import require_http_methods
 from django.views.generic import View
 from django.views.generic.base import TemplateView
 
@@ -24,10 +26,11 @@ from recoco.apps.projects import models as projects
 from recoco.apps.projects.utils import can_administrate_project
 from recoco.apps.resources import models as resources_models
 from recoco.apps.tasks import models as tasks
-from recoco.utils import check_if_advisor
+from recoco.utils import check_if_advisor, require_htmx
 
 from . import models
-from .forms import ContactForm, UserPasswordFirstTimeSetupForm
+from .forms import AdvisorAccessRequestForm, ContactForm, UserPasswordFirstTimeSetupForm
+from .models import AdvisorAccessRequest
 from .utils import get_current_site_sender_email
 
 
@@ -254,6 +257,74 @@ def setup_password(request):
         form = UserPasswordFirstTimeSetupForm(initial={"next": next_url})
 
     return render(request, "home/user_setup_password.html", locals())
+
+
+@login_required
+def advisor_access_request_view(request: HttpRequest):
+    redirect_url = request.GET.get("next", "/")
+
+    if check_if_advisor(request.user):
+        return redirect(redirect_url)
+
+    if request.method == "GET":
+        form = AdvisorAccessRequestForm()
+
+        advisor_access_request = AdvisorAccessRequest.objects.filter(
+            user=request.user, site=request.site
+        ).first()
+
+        if advisor_access_request:
+            if not advisor_access_request.is_pending:
+                return redirect(redirect_url)
+
+            form.fields["departments"].initial = [
+                department.id for department in advisor_access_request.departments.all()
+            ]
+
+    if request.method == "POST":
+        form = AdvisorAccessRequestForm(request.POST)
+
+        if form.is_valid():
+            advisor_access_request = AdvisorAccessRequest(
+                site=request.site, user=request.user
+            )
+            advisor_access_request.save()
+            advisor_access_request.departments.set(form.cleaned_data["departments"])
+        else:
+            advisor_access_request = None
+
+    return render(
+        request,
+        "home/advisor_access_request.html",
+        context={
+            "form": form,
+            "advisor_access_request": advisor_access_request,
+        },
+    )
+
+
+@login_required
+@require_http_methods(["POST"])
+@require_htmx
+def advisor_access_request_accept_view(
+    request: HttpRequest, advisor_access_request_id: int
+):
+    advisor_access_request = get_object_or_404(
+        AdvisorAccessRequest, pk=advisor_access_request_id
+    )
+    advisor_access_request.accept(handled_by=request.user)
+
+
+@login_required
+@require_http_methods(["POST"])
+@require_htmx
+def advisor_access_request_reject_view(
+    request: HttpRequest, advisor_access_request_id: int
+):
+    advisor_access_request = get_object_or_404(
+        AdvisorAccessRequest, pk=advisor_access_request_id
+    )
+    advisor_access_request.reject(handled_by=request.user)
 
 
 # eof
