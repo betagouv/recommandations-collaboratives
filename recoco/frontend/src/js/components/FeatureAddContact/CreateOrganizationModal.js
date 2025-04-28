@@ -10,7 +10,6 @@ Alpine.data('CreateOrganizationModal', () => {
     showOrgaGroupsresults: false,
     isAnOrgaGroupSelected: false,
     departments: [],
-    radiobuttonForGroup: 'no',
     organization: {
       name: '',
       group: null,
@@ -27,13 +26,6 @@ Alpine.data('CreateOrganizationModal', () => {
     async init() {
       this.Modal = Modal(this, 'create-organization-modal');
       await this.showDepartments();
-    },
-    reOpenModalCreateContact() {
-      this.modalSearchOrganization = document.querySelector('#create-contact-modal');
-      this.modalSearchOrganization.classList.toggle('d-none');
-    },
-    setGroupNatToTrue() {
-      this.formState.fields.isGroupNat = true;
     },
     setGroupNatToFalse() {
       this.formState.fields.isGroupNat = false;
@@ -99,7 +91,7 @@ Alpine.data('CreateOrganizationModal', () => {
     createOrganization() {
       this.formState.fields = {
         isOrgaName: this.organization.name !== '',
-        isGroupNat: this.radiobuttonForGroup === 'yes',
+        isGroupNat: this.formState.fields.isGroupNat == 'true',
         isGroupNatName: this.organization.group !== null && this.formState.fields.isGroupNat,
       };
       this.formState.isSubmitted = true;

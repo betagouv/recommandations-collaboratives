@@ -69,27 +69,10 @@ Alpine.data('SearchOrganization', () => ({
       }
     }
   },
-  setSearch() {
-    this.userInput = this.$store.contact.orgaSelected.name;
-    this.showOrgAsResults = false;
-    this.isAnOrgaSelected = true;
-  },
-  resetSearch() {
-    this.userInput = '';
-    this.showOrgAsResults = false;
-    this.isAnOrgaSelected = false;
-    this.$store.contact.orgaSelected = null;
-  },
   handleDisplayOrganizationCreated(organization) {
 
     if (organization.name) {
       this.userInput = organization.name;
     }
   },
-  // openCreateOrganizationModal() {
-  //   this.$dispatch('open-create-organization-modal', {
-  //     userInput: this.userInput,
-  //   });
-  // },
-
 }));
