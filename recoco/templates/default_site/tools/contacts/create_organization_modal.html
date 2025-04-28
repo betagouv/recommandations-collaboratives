@@ -11,7 +11,7 @@
         class="modal-create-organization z-2">
         <form @submit.prevent>
             <div class="d-flex justify-content-between border-bottom-666 fr-p-3v modal-create-contact__block">
-                <p class="fw-bold color-666 correct-p">CREER UNE ORGANISATION</p>
+                <p class="fw-bold color-666 correct-p text-uppercase">Créer un organisation</p>
                 <span class="fr-icon-close-line color-666 cursor-pointer"
                     aria-hidden="true"
                     @click.prevent="Modal.closeModal()"></span>
@@ -38,8 +38,8 @@
                     </legend>
                     <div class="fr-fieldset__element modal-create-organization__yes fr-mb-0 fr-pb-2v">
                         <div class="fr-radio-group">
-                            <input type="radio" id="natGroup-yes" name="natGroup" value="yes" x-model="radiobuttonForGroup" @click="setGroupNatToTrue">
-                            <label class="fr-label" for="natGroup-yes" @click="setGroupNatToTrue">Oui</label>
+                            <input type="radio" id="natGroup-yes" name="natGroup" value="true" x-model="formState.fields.isGroupNat">
+                            <label class="fr-label" for="natGroup-yes">Oui</label>
                         </div>
                         <template x-if="formState.fields.isGroupNat">
                             {% comment %} a remplacer par un composant search group nat {% endcomment %}
@@ -56,7 +56,7 @@
                                             x-model="userInput"
                                             required
                                             @input.debounce="onSearchOrgaGroup">
-                                        <button class="fr-btn" title="Rechercher" @click="onSearch">Rechercher</button>
+                                        <button role="button" class="fr-btn" title="Rechercher" @click.prevent="onSearchOrgaGroup">Rechercher</button>
                                     </div>
                                 </div>
                                 <div class="fr-menu menu-modal-correct-fr-menu position-relative border-radius-4px">
@@ -89,11 +89,6 @@
                                                 </div>
                                             </template>
                                         </div>
-                                        {% comment %} <template x-if="userInput.length > 0 && showOrgAsResults && !isAnOrgaSelected">
-                                            <div class="btn-create-orga fr-p-1w cursor-pointer" @click="openCreateOrganizationModal">
-                                                <span class="fr-icon-add-line" aria-hidden="true"></span><span>Créer une nouvelle organisation</span>
-                                            </div>
-                                        </template> {% endcomment %}
                                     </div>
                                 </div>
                             </div>
@@ -101,7 +96,7 @@
                     </div>
                     <div class="fr-fieldset__element fr-pt-2v fr-mb-0">
                         <div class="fr-radio-group">
-                            <input type="radio" id="natGroup-no" name="natGroup" value="no" x-model="radiobuttonForGroup" checked>
+                            <input type="radio" id="natGroup-no" name="natGroup" value="false" x-model="formState.fields.isGroupNat">
                             <label class="fr-label" for="natGroup-no" @click="setGroupNatToFalse">Non</label>
                         </div>
                     </div>
@@ -110,14 +105,6 @@
                         aria-live="assertive"></div>
                 </fieldset>
             </div>
-            {% comment %} <div class="fr-p-3v modal-create-organization__block">
-                <span class="modal-create-organization__label">Départements</span>
-                <select class="fr-select" multiple required>
-                    <template x-for="department in departments" :key="department.code">
-                        <option :value="department.code" x-text="'(' + department.code + ')' + ' ' + department.name" :selected="department.selected" @click="selectThisDepartment" />
-                    </template>
-                </select>
-            </div> {% endcomment %}
             <div class="fr-p-3v modal-create-organization__block">{% include "tools/contacts/multi_select.html" %}</div>
             <div class="fr-p-3v modal-create-organization__block d-flex">
                 <button class="fr-btn fr-btn--secondary fr-mr-3v w-100 justify-content-center"

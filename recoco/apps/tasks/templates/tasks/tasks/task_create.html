@@ -22,7 +22,7 @@
     {% vite_asset 'js/apps/tutorial.js' %}
 {% endblock js %}
 {% block content %}
-    <div x-data='SearchContact()' class="col-10 fr-py-6w fr-mx-auto push-reco">
+    <div class="col-10 fr-py-6w fr-mx-auto push-reco">
         <h2 class="push-reco__main-title">Créer une recommandation</h2>
         <div x-data="ActionPusher()" x-init="create_recommendation()" x-cloak>
             <form class="form" method="post" action="." enctype="multipart/form-data">
@@ -33,11 +33,7 @@
                 {% include "projects/project/fragments/action_pusher/details_form.html" %}
                 <input type="hidden" name="next" value="{{ type_form.next.value }}">
                 <input type="hidden" name="public" x-model="public">
-                <input type="hidden" name="contact_id" x-model="selectedContact.id">
             </form>
-            {% include "tools/contacts/search_contact_modal.html" %}
-            {% include "tools/contacts/create_contact_modal.html" %}
-            {% include "tools/contacts/create_organization_modal.html" %}
         </div>
     </div>
 {% endblock content %}
