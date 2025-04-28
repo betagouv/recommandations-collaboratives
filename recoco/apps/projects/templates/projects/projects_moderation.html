@@ -96,7 +96,7 @@
                                 <div class="d-flex flex-grow-1 align-items-end fr-mt-3w">
                                     <div class="d-flex justify-content-between align-items-stretch w-100 specific-maxheight-70">
                                         <form method="post"
-                                              action="{% url "projects-moderation-refuse" project.id %}"
+                                              action="{% url "projects-moderation-project-refuse" project.id %}"
                                               class="flex-grow-1">
                                             {% csrf_token %}
                                             <button class="fr-btn fr-btn--secondary black fr-btn--sm fr-mr-1v h-100"
@@ -105,7 +105,7 @@
                                                     data-test-id="refuse-project">Refuser</button>
                                         </form>
                                         <form method="post"
-                                              action="{% url "projects-moderation-accept" project.id %}">
+                                              action="{% url "projects-moderation-project-accept" project.id %}">
                                             {% csrf_token %}
                                             <button class="fr-btn fr-btn--secondary fr-btn--sm fr-mr-1v float-end h-100"
                                                     type="submit"
@@ -114,7 +114,7 @@
                                                     data-test-id="accept-project">Accepter</button>
                                         </form>
                                         <form method="post"
-                                              action="{% url "projects-moderation-accept" project.id %}">
+                                              action="{% url "projects-moderation-project-accept" project.id %}">
                                             {% csrf_token %}
                                             <input type="hidden" name="join" value="1">
                                             <button class="fr-btn fr-btn--secondary fr-btn--sm fr-mr-1v float-end h-100"
