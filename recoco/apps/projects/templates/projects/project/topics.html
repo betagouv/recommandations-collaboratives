@@ -150,7 +150,7 @@
                         <span class="title-info text-red">PRIVÉ&nbsp;</span>
                         Cette note ne sera que visible par les conseillers du projet.
                     </p>
-                    {% include "tools/editor.html" with input_name=form.advisors_note.name initial_content=form.advisors_note.value|default:'' escapejs=True wide=True %}
+                    {% include "tools/editor.html" with input_name=form.advisors_note.name initial_content=form.advisors_note.value|default:'' initial_content_escapejs=True wide=True %}
                     <footer class="d-flex justify-content-end align-items-center">
                         <button type="advisor-note" class="button small filled w-auto">Enregistrer</button>
                     </footer>
