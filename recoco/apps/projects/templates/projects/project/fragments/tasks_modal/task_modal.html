@@ -110,7 +110,7 @@
                                                     <span class="text-muted tiny specific-lineheight-20"
                                                           x-text="`le ${formatDate(currentTask?.created_on)}`"></span>
                                                 </div>
-                                                <template x-if="$store.djangoData.canManageTasks">
+                                                <template x-if="$store.djangoData.canManageTasks && currentTask.public">
                                                     <button class="text-muted cursor-pointer tiny" @click="onEditContent()">Editer</button>
                                                 </template>
                                             </div>
@@ -192,10 +192,12 @@
                                         <template x-if="currentlyEditing">
                                             <button type="button"
                                                     class="fr-btn fr-btn--sm fr-btn--tertiary button-cancel-edit"
+                                                    :class="!currentTask.public ? 'button-cancel-edit-non-public' : 'button-cancel-edit'"
                                                     @click="onCancelEdit()">Annuler</button>
                                         </template>
                                         <button type="submit"
-                                                class="fr-btn fr-btn--sm repositionning-in-modal"
+                                                class="fr-btn fr-btn--sm "
+                                                :class="!currentTask.public ? 'repositionning-in-modal-non-public' : 'repositionning-in-modal'"
                                                 data-test-id="button-submit-new"
                                                 x-text="currentlyEditing ? 'Modifier' : 'Envoyer'"></button>
                                     </div>

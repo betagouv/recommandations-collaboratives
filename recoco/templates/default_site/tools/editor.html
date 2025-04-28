@@ -20,7 +20,7 @@ Parameters:
 {% endblock css %}
 {% comment %} TODO @set-comment.window to fix{% endcomment %}
 <div class="w-100"
-     {% if initial_content_escapejs %} x-data='editor("{{ initial_content|escapejs }}")' {% else %} x-data='editor("{{ initial_content }}")' {% endif %}
+     {% if initial_content_escapejs %} x-data='editor("{{ initial_content|escapejs }}")' {% elif initial_content_js %} x-data='editor({{ initial_content }})' {% else %} x-data='editor("{{ initial_content }}")' {% endif %}
      @reset-contact="handleResetContact()"
      @set-comment.window="setMarkdownContent(event)"
      @modal-response="closeSearchContactModal($event)"
@@ -88,7 +88,7 @@ Parameters:
                         </button>
                     </template>
                     <template x-if="selectedContact">
-                        <div class="d-flex flex-column">
+                        <div class="d-flex flex-column contact-card__container">
                             <div class="border position-relative" x-data="{contact:selectedContact}">
                                 {% include "tools/contacts/contact_card.html" %}
                                 <button @click.prevent="handleResetContact"
