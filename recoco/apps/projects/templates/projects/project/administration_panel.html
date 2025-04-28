@@ -82,8 +82,7 @@
                                                    for="input-project-description">
                                                 {{ project_form.description.label }}
                                             </label>
-                                            <textarea
-                                                      class="placeholder-grey form-control {% if project_form.description.errors %}is-invalid{% endif %} textarea-size"
+                                            <textarea class="placeholder-grey form-control {% if project_form.description.errors %}is-invalid{% endif %} textarea-size"
                                                       id="input-project-description"
                                                       name="{{ project_form.description.name }}"
                                                       placeholder="">{{ project_form.description.value|default:'' }}</textarea>
@@ -391,7 +390,5 @@
         {% elif project.site_status == 'DRAFT' %}
         </div>
     {% endif %}
-    <div class="fr-mt-2w fr-px-2w">
-        {% include "projects/project/fragments/administration/activate_project.html" %}
-    </div>
+    <div class="fr-mt-2w fr-px-2w">{% include "projects/project/fragments/administration/activate_project.html" %}</div>
 {% endblock project_detail %}

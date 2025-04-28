@@ -17,9 +17,9 @@ describe('I can attach miscellanious ressource to task @page-projet-recommandati
     cy.get('[data-cy="button-submit-task"]').should('be.enabled');
 
     // Test with comment
-    cy.get('.ProseMirror p')
-      .invoke('text', 'reco test from action description')
-      .should('have.text', 'reco test from action description');
+    cy.get('.ProseMirror p').click();
+    cy.focused().type('text', 'reco test from action description');
+
     cy.get('[data-cy="button-submit-task"]').should('be.enabled').click();
 
     cy.url().should('include', '/actions');
@@ -40,9 +40,9 @@ describe('I can attach miscellanious ressource to task @page-projet-recommandati
     cy.get('[data-cy="button-external-resource-load"]').click();
     cy.get('[data-cy="radio-resource-list-task"]').check({ force: true });
 
-    cy.get('.ProseMirror p')
-      .invoke('text', 'reco test from action description')
-      .should('have.text', 'reco test from action description');
+    cy.get('.ProseMirror p').click();
+    cy.focused().type('text', 'reco test from action description');
+
     cy.get('[data-cy="button-submit-task"]').should('be.enabled').click();
 
     cy.url().should('include', '/actions');
@@ -56,9 +56,9 @@ describe('I can attach miscellanious ressource to task @page-projet-recommandati
       .check({ force: true })
       .should('be.checked');
 
-    cy.get('.ProseMirror p')
-      .invoke('text', 'reco test with no resource')
-      .should('have.text', 'reco test with no resource');
+    cy.get('.ProseMirror p').click();
+    cy.focused().type('text', 'reco test with no resource');
+
     cy.get('[data-cy="input-title-task"]').type('reco test with no resource', {
       delay: 0,
     });
