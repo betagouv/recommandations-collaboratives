@@ -27,6 +27,7 @@ from guardian.models import (
     UserObjectPermissionAbstract,
     UserObjectPermissionBase,
 )
+from model_utils.models import TimeStampedModel
 from phonenumber_field.modelfields import PhoneNumberField
 from taggit.managers import TaggableManager
 
@@ -417,6 +418,68 @@ ObjectPermissionChecker.original_get_local_cache_key = (
     ObjectPermissionChecker.get_local_cache_key
 )
 ObjectPermissionChecker.get_local_cache_key = get_local_cache_key_with_site
+
+
+class AdvisorAccessRequest(TimeStampedModel):
+    user = models.ForeignKey(
+        auth_models.User,
+        on_delete=models.CASCADE,
+        related_name="advisor_access_requests",
+    )
+
+    site = models.ForeignKey(Site, on_delete=models.CASCADE)
+
+    departments = models.ManyToManyField(
+        geomatics.Department,
+        blank=True,
+        help_text="Départements pour lesquels le conseiller demande un accès",
+    )
+
+    status = models.CharField(
+        max_length=20,
+        choices=[
+            ("PENDING", "En attente"),
+            ("ACCEPTED", "Accepté"),
+            ("REJECTED", "Rejeté"),
+        ],
+        default="PENDING",
+    )
+
+    handled_by = models.ForeignKey(
+        auth_models.User,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="accepted_advisor_access_requests",
+    )
+
+    class Meta:
+        verbose_name = "Demande d'accès conseiller"
+        verbose_name_plural = "Demandes d'accès conseiller"
+        ordering = ["-created"]
+        unique_together = ["user", "site"]
+
+    def accept(self, handled_by: auth_models.User = None):
+        self.status = "ACCEPTED"
+        self.handled_by = handled_by
+        self.save()
+
+    def reject(self, handled_by: auth_models.User = None):
+        self.status = "REJECTED"
+        self.handled_by = handled_by
+        self.save()
+
+    @property
+    def is_pending(self) -> bool:
+        return self.status == "PENDING"
+
+    @property
+    def is_accepted(self) -> bool:
+        return self.status == "ACCEPTED"
+
+    @property
+    def is_rejected(self) -> bool:
+        return self.status == "REJECTED"
 
 
 # eof

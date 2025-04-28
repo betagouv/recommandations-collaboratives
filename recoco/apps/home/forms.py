@@ -11,6 +11,10 @@ from captcha.widgets import ReCaptchaV2Checkbox
 from django import forms
 from django.core.exceptions import ValidationError
 
+from recoco.apps.geomatics.models import Department
+
+from .models import AdvisorAccessRequest
+
 
 class UVSignupForm(SignupForm):
     field_order = [
@@ -115,3 +119,13 @@ class UserPasswordFirstTimeSetupForm(forms.Form):
         if password1 and password2:
             if password1 != password2:
                 raise ValidationError("Les mots de passe ne correspondent pas.")
+
+
+class AdvisorAccessRequestForm(forms.ModelForm):
+    class Meta:
+        model = AdvisorAccessRequest
+        fields = ["departments"]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["departments"].queryset = Department.objects.all()
