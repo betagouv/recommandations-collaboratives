@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<br>
+<br>
+
+{% if not advisor_access_request %}
+
+    <form class="form" action="{% url 'advisor-access-request' %}" method="post">
+        {% csrf_token %}
+        {{ form }}
+
+        <br>
+        <br>
+        <input type="submit" value="Submit"  class="btn btn-primary">
+    </form>
+
+{% else %}
+
+    {% if advisor_access_request.is_pending  %}
+
+        Nous avons addressé un courrier de confirmation ...
+
+    {% endif %}
+
+
+{% endif %}
+
+{% endblock content %}

@@ -85,3 +85,25 @@ class CustomUserAdmin(UserAdmin):
 
 admin.site.unregister(auth_models.User)
 admin.site.register(auth_models.User, CustomUserAdmin)
+
+
+@admin.register(models.AdvisorAccessRequest)
+class AdvisorAccessRequestAdmin(admin.ModelAdmin):
+    list_display = (
+        "user",
+        "status",
+    )
+    list_filter = (
+        "site",
+        "status",
+    )
+    ordering = ("-created",)
+    readonly_fields = ("handled_by",)
+
+    def get_queryset(self, request):
+        return (
+            super()
+            .get_queryset(request)
+            .select_related("user", "handled_by")
+            .prefetch_related("departments")
+        )

@@ -14,20 +14,29 @@ from django.contrib.auth import models as auth
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models import Count, F, Q
-from django.shortcuts import redirect, render
+from django.http import (
+    HttpRequest,
+    HttpResponse,
+    HttpResponseForbidden,
+)
+from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from django.utils.decorators import method_decorator
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.generic import View
 from django.views.generic.base import TemplateView
 
+from recoco.apps.geomatics.models import Department
 from recoco.apps.onboarding.forms import OnboardingEmailForm
 from recoco.apps.projects import models as projects
-from recoco.apps.projects.utils import can_administrate_project
+from recoco.apps.projects.utils import can_administrate_project, is_project_moderator
 from recoco.apps.resources import models as resources_models
 from recoco.apps.tasks import models as tasks
 from recoco.utils import check_if_advisor
 
 from . import models
-from .forms import ContactForm, UserPasswordFirstTimeSetupForm
+from .forms import AdvisorAccessRequestForm, ContactForm, UserPasswordFirstTimeSetupForm
+from .models import AdvisorAccessRequest
 from .utils import get_current_site_sender_email
 
 
@@ -254,6 +263,110 @@ def setup_password(request):
         form = UserPasswordFirstTimeSetupForm(initial={"next": next_url})
 
     return render(request, "home/user_setup_password.html", locals())
+
+
+@login_required
+def advisor_access_request_view(request: HttpRequest) -> HttpResponse:
+    redirect_url = request.GET.get("next")
+    if not url_has_allowed_host_and_scheme(redirect_url, allowed_hosts=None):
+        redirect_url = reverse("home")
+
+    if check_if_advisor(request.user):
+        return redirect(redirect_url)
+
+    advisor_access_request = (
+        AdvisorAccessRequest.objects.filter(user=request.user, site=request.site)
+        .prefetch_related("departments")
+        .select_related("user")
+        .first()
+    )
+
+    departments = departments = [
+        {"name": d.name, "code": d.code} for d in Department.objects.all()
+    ]
+
+    selected_departments = (
+        [department.code for department in advisor_access_request.departments.all()]
+        if advisor_access_request
+        else []
+    )
+
+    if request.method == "GET":
+        if advisor_access_request and not advisor_access_request.is_pending:
+            return redirect(redirect_url)
+
+        form = AdvisorAccessRequestForm()
+        form.fields["departments"].initial = selected_departments
+
+    if request.method == "POST":
+        form = AdvisorAccessRequestForm(request.POST)
+        if form.is_valid():
+            if not advisor_access_request:
+                advisor_access_request = AdvisorAccessRequest(
+                    site=request.site, user=request.user
+                )
+                advisor_access_request.save()
+            advisor_access_request.departments.set(form.cleaned_data["departments"])
+
+    return render(
+        request,
+        "home/advisor_access_request.html",
+        context={
+            "form": form,
+            "advisor_access_request": advisor_access_request,
+            "departments": departments,
+            "selected_departments": selected_departments,
+        },
+    )
+
+
+@login_required
+def advisor_access_request_moderator_view(
+    request: HttpRequest, advisor_access_request_id: int
+) -> HttpResponse:
+    if not is_project_moderator(request.user, request.site):
+        return HttpResponseForbidden(
+            "You are not allowed to modify this advisor access request."
+        )
+
+    advisor_access_request = get_object_or_404(
+        AdvisorAccessRequest.on_site.prefetch_related("departments").select_related(
+            "user"
+        ),
+        pk=advisor_access_request_id,
+    )
+
+    departments = [{"name": d.name, "code": d.code} for d in Department.objects.all()]
+
+    selected_departments = [
+        department.code for department in advisor_access_request.departments.all()
+    ]
+
+    redirect_url = reverse("projects-moderation-list")
+
+    if request.method == "GET":
+        if not advisor_access_request.is_pending:
+            return redirect(redirect_url)
+
+        form = AdvisorAccessRequestForm()
+        form.fields["departments"].initial = selected_departments
+
+    if request.method == "POST":
+        form = AdvisorAccessRequestForm(request.POST)
+        if form.is_valid():
+            advisor_access_request.departments.set(form.cleaned_data["departments"])
+            return redirect(redirect_url)
+
+    return render(
+        request,
+        "home/advisor_access_request_moderator.html",
+        context={
+            "form": form,
+            "advisor_access_request": advisor_access_request,
+            "departments": departments,
+            "selected_departments": selected_departments,
+        },
+    )
 
 
 # eof
