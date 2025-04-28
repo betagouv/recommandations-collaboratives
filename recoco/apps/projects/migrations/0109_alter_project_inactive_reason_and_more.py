@@ -4,7 +4,7 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("projects", "0106_alter_userprojectstatus_managers"),
+        ("projects", "0108_note_topic"),
     ]
 
     operations = [
