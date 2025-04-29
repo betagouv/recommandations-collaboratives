@@ -19,19 +19,19 @@ describe('I can invite people', () => {
     cy.get('#invite-member-modal')
       .get('#invite-message')
       .type(
-        "Bonjour membre, je t'invite à conseiller mon projet friche numéro 2",
+        "Bonjour membre, je t'invite à conseiller mon dossier friche numéro 2",
         { force: true }
       )
       .should(
         'have.value',
-        "Bonjour membre, je t'invite à conseiller mon projet friche numéro 2"
+        "Bonjour membre, je t'invite à conseiller mon dossier friche numéro 2"
       );
 
     cy.get('#invite-member-modal')
       .contains("Envoyer l'invitation")
       .click({ force: true });
     cy.contains(
-      "Un courriel d'invitation à rejoindre le projet a été envoyé à member@test.fr"
+      "Un courriel d'invitation à rejoindre le dossier a été envoyé à member@test.fr"
     );
   });
 });

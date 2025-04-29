@@ -24,7 +24,7 @@ describe('I can go to administration area of a project and change general inform
       .type(`${currentProject.fields.description} updated`, { force: true })
       .should('have.value', `${currentProject.fields.description} updated`);
 
-    cy.contains('Modifier les informations du projet').click({ force: true });
+    cy.contains('Modifier les informations du dossier').click({ force: true });
 
     cy.url().should('include', '/presentation');
 
