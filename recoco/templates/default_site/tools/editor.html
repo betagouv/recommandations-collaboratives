@@ -8,6 +8,8 @@ Parameters:
 - can_attach_contact (boolean)
 - input_name (string)
 - input_required (boolean)
+- input_file_name (string)
+- input_file_required (boolean)
 - tools_disabled (list of tool names: <title>)
 
 {% endcomment %}
@@ -106,7 +108,6 @@ Parameters:
                 </div>
             {% endif %}
         {% endif %}
-        {% comment %} </div> {% endcomment %}
         {% if errors %}
             {% for error in errors %}<div class="text-danger text-start fr-mb-2v">{{ error }}</div>{% endfor %}
         {% endif %}
@@ -133,11 +134,12 @@ Parameters:
             </p>
         </template>
         <input x-ref="fileUploadInput"
-               x-model="currentFile"
+               {% if model %} x-model="{{ model }}.the_file" x-modelable="currentFile" {% else %} x-model="currentFile" {% endif %}
                type="file"
                id="file-upload"
-               name="the_file"
+               name="{{ input_file_name|default:"the_file" }}"
                @change='handleFileUpload'
+               {% if input_file_required %}required{% endif %}
                class="d-none file-upload-input">
     {% endif %}
 </div>
