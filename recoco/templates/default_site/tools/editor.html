@@ -19,7 +19,7 @@ Parameters:
           type="text/css">
 {% endblock css %}
 {% comment %} TODO @set-comment.window to fix{% endcomment %}
-<div class="w-100"
+<div class="w-100 position-relative editor-container"
      {% if initial_content_escapejs %} x-data='editor("{{ initial_content|escapejs }}")' {% elif initial_content_js %} x-data='editor({{ initial_content }})' {% else %} x-data='editor("{{ initial_content }}")' {% endif %}
      @reset-contact="handleResetContact()"
      @set-comment.window="setMarkdownContent(event)"
@@ -27,44 +27,43 @@ Parameters:
      x-ref="editor"
      data-test-id="tiptap-editor">
     <template x-if="isLoaded()">
-        <div class="tiptap-menu">
+        <div class="tiptap-menu-custom">
             {% if not "title" in tools_disabled %}
                 <button @click.stop.prevent="toggleHeading({ level: 3 })"
-                        :class="{ 'is-active': isActive('heading', { level: 3 }, updatedAt) }">
-                    <span class="specific-fontweight-500">Titre</span>
+                        title="Titre"
+                        class="fr-btn fr-btn--sm fr-icon-h-1"
+                        :class="{ 'fr-btn--secondary': isActive('heading', { level: 3 }, updatedAt), 'fr-btn--tertiary': !isActive('heading', { level: 3 }, updatedAt), }">
+                    Titre
                 </button>
             {% endif %}
             <button @click.stop.prevent="toggleBold()"
-                    :class="{ 'is-active' : isActive('bold', updatedAt) }">
-                <svg class="bi align-middle" width="18" height="18" fill="currentColor">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#type-bold" />
-                </svg>
+                    title="Gras"
+                    class="fr-btn fr-btn--sm fr-icon-bold"
+                    :class="{ 'fr-btn--secondary': isActive('bold', updatedAt), 'fr-btn--tertiary': !isActive('bold', updatedAt), }">
+                Gras
             </button>
             <button @click.stop.prevent="toggleItalic()"
-                    :class="{ 'is-active' : isActive('italic', updatedAt) }">
-                <svg class="bi align-middle" width="18" height="18" fill="currentColor">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#type-italic" />
-                </svg>
+                    title="Italique"
+                    class="fr-btn fr-btn--sm fr-icon-italic"
+                    :class="{ 'fr-btn--secondary': isActive('italic', updatedAt), 'fr-btn--tertiary': !isActive('italic', updatedAt), }">
+                Italique
             </button>
             <button @click.stop.prevent="toggleBulletList()"
-                    :class="{ 'is-active' : isActive('bulletList', updatedAt) }">
-                <svg class="bi align-middle" width="18" height="18" fill="currentColor">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#list-ul" />
-                </svg>
+                    title="Liste"
+                    class="fr-btn fr-btn--sm fr-icon-list-unordered"
+                    :class="{ 'fr-btn--secondary': isActive('bulletList', updatedAt), 'fr-btn--tertiary': !isActive('bulletList', updatedAt), }">
+                Liste
             </button>
             <button @click.stop.prevent="setLink()"
-                    :class="{ 'is-active' : isActive('link', updatedAt) }">
-                <svg class="bi align-middle" width="18" height="18" fill="currentColor">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#link" />
-                </svg>
+                    title="Attacher un lien"
+                    class="fr-btn fr-btn--sm fr-icon-link"
+                    :class="{ 'fr-btn--secondary': isActive('link', updatedAt), 'fr-btn--tertiary': !isActive('link', updatedAt), }">
+                Attacher un lien
             </button>
-            <button class="unset-link"
-                    @click.stop.prevent="unsetLink()"
-                    x-bind:disabled="!isActive('link', updatedAt)">
-                <svg class="bi align-middle" width="18" height="18" fill="currentColor">
-                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#link" />
-                </svg>
-            </button>
+            <button @click.stop.prevent="unsetLink()"
+                    title="Détacher un lien"
+                    class="fr-btn fr-btn--sm fr-icon-link-unlink text-white"
+                    x-bind:disabled="!isActive('link', updatedAt)">Détacher un lien</button>
         </div>
     </template>
     <div class="position-relative">
@@ -77,36 +76,68 @@ Parameters:
                   {% if model %} x-model="{{ model }}.text" x-modelable="markdownContent" {% else %} x-model="markdownContent" {% endif  %}
                   name="{{input_name|default:"content"}}"
                   {% if input_required %} required {% endif %}></textarea>
-        <div x-cloak class="d-flex flex-column">
-            {% if can_attach_contact %}
-                <div x-cloak>
-                    <template x-if="!selectedContact">
-                        <button @click.prevent="openModalSearchContact"
-                                data-test-id="button-add-contact"
-                                class="fr-btn fr-btn--tertiary fr-btn--sm justify-content-center fr-text--sm">
-                            Ajouter un contact
-                        </button>
-                    </template>
-                    <template x-if="selectedContact">
-                        <div class="d-flex flex-column contact-card__container">
-                            <div class="border position-relative" x-data="{contact:selectedContact}">
-                                {% include "tools/contacts/contact_card.html" %}
-                                <button @click.prevent="handleResetContact"
-                                        data-test-id="button-remove-contact"
-                                        class="fr-btn fr-btn--tertiary fr-btn--sm justify-content-center fr-text--sm close-contact-button-style position-absolute top-0 end-0">
-                                    <span class="fr-icon-close-line" aria-hidden="true"></span>
-                                </button>
-                            </div>
-                        </div>
-                    </template>
-                    {% include "tools/contacts/search_contact_modal.html" %}
-                    <input type="hidden"
-                           {% if model %} x-model="{{ model }}.contact" x-modelable="selectedContact" {% else %} x-model="selectedContact" {% endif %}>
+        {% comment %} <div x-cloak class="d-flex flex-column"> {% endcomment %}
+        {% if can_attach_contact %}
+            <div x-cloak>
+                <template x-if="!selectedContact">
+                    <button @click.prevent="openModalSearchContact"
+                            data-test-id="button-add-contact"
+                            class="fr-btn fr-btn--tertiary fr-btn--sm justify-content-center fr-text--sm button-add-contact">
+                        Ajouter un contact
+                    </button>
+                </template>
+                {% include "tools/contacts/search_contact_modal.html" %}
+                <input type="hidden"
+                       {% if model %} x-model="{{ model }}.contact" x-modelable="selectedContact" {% else %} x-model="selectedContact" {% endif %}>
+            </div>
+        {% endif %}
+        {% if can_attach_files %}
+            <!-- Action file -->
+            <button class="fr-btn fr-btn--sm fr-btn--tertiary fr-icon-file-add-line fr-btn--icon-left file-upload-wrapper"
+                    type="button"
+                    @click="$refs.fileUploadInput.click()">
+                <span class="file-upload-text">Ajouter un fichier</span>
+            </button>
+            {% if document_form.the_file.errors %}
+                <div class="fr-mb-3w">
+                    {% for error in document_form.the_file.errors %}
+                        <div class="text-danger text-start fr-mb-2v">{{ error }}</div>
+                    {% endfor %}
                 </div>
             {% endif %}
-        </div>
+        {% endif %}
+        {% comment %} </div> {% endcomment %}
         {% if errors %}
             {% for error in errors %}<div class="text-danger text-start fr-mb-2v">{{ error }}</div>{% endfor %}
         {% endif %}
     </div>
+    {% if can_attach_contact %}
+        <template x-if="selectedContact">
+            <div class="d-flex flex-column contact-card__container">
+                <div class="border position-relative" x-data="{contact:selectedContact}">
+                    {% include "tools/contacts/contact_card.html" %}
+                    <button @click.prevent="handleResetContact"
+                            data-test-id="button-remove-contact"
+                            class="fr-btn fr-btn--tertiary fr-btn--sm justify-content-center fr-text--sm close-contact-button-style position-absolute top-0 end-0">
+                        <span class="fr-icon-close-line" aria-hidden="true"></span>
+                    </button>
+                </div>
+            </div>
+        </template>
+    {% endif %}
+    {% if can_attach_files %}
+        <template x-if="fileName">
+            <p>
+                Fichier selectionné :
+                <span class="fr-ml-1w" x-text="fileName"></span>
+            </p>
+        </template>
+        <input x-ref="fileUploadInput"
+               x-model="currentFile"
+               type="file"
+               id="file-upload"
+               name="the_file"
+               @change='handleFileUpload'
+               class="d-none file-upload-input">
+    {% endif %}
 </div>

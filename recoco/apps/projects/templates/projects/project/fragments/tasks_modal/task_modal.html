@@ -66,6 +66,12 @@
                                     </div>
                                     <p class="text-justified overflow-hidden text-break"
                                        x-html="renderMarkdown(currentTask?.content || '' )"></p>
+                                    <template x-if="currentTask?.contact">
+                                        <div x-data="{contact: currentTask.contact}"
+                                             class="container__card-contact--no-ressource">
+                                            {% include "tools/contacts/contact_card.html" %}
+                                        </div>
+                                    </template>
                                 </div>
                             </template>
                         </div>
@@ -100,6 +106,9 @@
                                             <template x-if="currentTask && taskId && currentTask?.content !== ''">
                                                 <p x-html="currentTask && renderMarkdown(currentTask?.content)"
                                                    class="fr-mb-2v overflow-hidden text-break"></p>
+                                            </template>
+                                            <template x-if="currentTask && currentTask.contact">
+                                                <div x-data="{contact: currentTask.contact}">{% include "tools/contacts/contact_card.html" %}</div>
                                             </template>
                                             <template x-if="currentTask?.content === ''">
                                                 <p class="fst-italic">Aucun commentaire initial n'a été ajouté</p>

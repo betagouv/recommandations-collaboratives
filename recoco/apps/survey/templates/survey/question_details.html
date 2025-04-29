@@ -136,7 +136,7 @@
                                    id="attachment"
                                    type="file"
                                    name="attachment"
-                                   value="kdl" />
+                                   value="{{ form.attachment.value }}" />
                             {% if form.attachment.value %}
                                 Actuellement : <a href="{{ MEDIA_URL }}/{{ form.attachment.value }}">{{ form.attachment.value }}</a>
                             {% endif %}

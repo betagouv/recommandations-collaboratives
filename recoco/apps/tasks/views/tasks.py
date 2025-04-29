@@ -75,12 +75,17 @@ def create_task(request):
         form = push_form_type(request.POST)
         if form.is_valid():
             project = type_form.cleaned_data.get("project")
+            contact = type_form.cleaned_data.get("contact")
+
             has_perm_or_403(request.user, "projects.manage_tasks", project)
 
             action = form.save(commit=False)
             action.project = project
             action.site = request.site
             action.created_by = request.user
+            if contact:
+                action.contact = contact
+
             # get or create topic
             name = form.cleaned_data["topic_name"]
             if name:
@@ -274,6 +279,7 @@ def update_task(request, task_id=None):
                     defaults={"name": name.capitalize(), "site": request.site},
                 )
                 instance.topic = topic
+            instance.contact = form.cleaned_data["contact"]
             instance.save()
             instance.project.updated_on = instance.updated_on
             instance.project.save()

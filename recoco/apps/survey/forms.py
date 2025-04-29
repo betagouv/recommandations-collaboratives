@@ -40,6 +40,8 @@ class AnswerForm(forms.Form):
 
         if question.upload_title:
             self.fields["attachment"] = forms.FileField(required=False)
+            if "attachment" in self.files:
+                self.fields["attachment"].initial = self.files["attachment"]
 
         # If we already have an answer, prefill
         if answer:
