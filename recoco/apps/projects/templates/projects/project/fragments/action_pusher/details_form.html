@@ -47,9 +47,11 @@
 <div class="fr-input-group">
     <label class="push-reco__title-section" for="content">Commentaire personnalisé</label>
     {% include "tools/editor.html" with can_attach_files=True model="message" can_attach_contact=True input_name="content" initial_content=form.content.value|default:'' errors=form.content.errors is_task=True %}
-    <input type="hidden"
-           name="{{ form.contact.name }}"
-           :value="message.contact.id">
+    <template x-if="message.contact">
+        <input type="hidden"
+               name="{{ form.contact.name }}"
+               :value="message.contact.id">
+    </template>
 </div>
 <!-- Action submit -->
 <div class="d-flex justify-content-center">

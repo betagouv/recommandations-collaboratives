@@ -25,7 +25,7 @@
             </svg>
             Mettre à jour une recommandation
         </h1>
-        <section {% if task.contact %}x-data="GetContactObject({{ task.contact.id }})"{% endif %}>
+        <section>
             <div x-data="ActionPusher()"
                  x-init="update_recommendation({{ task.pk }}, '{{ task.intent|escapejs }}', '{{ task.content|escapejs }}', {{ task.resource_id|default:'null' }})"
                  x-cloak>
@@ -34,8 +34,8 @@
                       enctype="multipart/form-data"
                       action="."
                       class="form"
-                      x-data="{message: {text: '', contact: contact || ''}}"
-                      x-init="$watch('contact', value => {message.contact = value})">
+                      x-data="{message: {text: '', contact: ''}}"
+                      {% if task.contact %}x-init="message.contact = await getContact({{ task.contact.id }})"{% endif %}>
                     {% csrf_token %}
                     {% include "projects/project/fragments/action_pusher/type.html" with disable_multi=True %}
                     {% include "projects/project/fragments/action_pusher/resource_search.html" %}

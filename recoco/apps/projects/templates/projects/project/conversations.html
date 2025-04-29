@@ -50,7 +50,10 @@
                                                 <div class="rounded-3 fr-p-2w fr-my-2v fr-mr-6w {% if request.user == note.created_by %}bg-blue-light{% else %}bg-grey-light {% endif %}">
                                                     {{ note.content_rendered|safe }}
                                                     {% if note.contact %}
-                                                        <div x-data="GetContactObject({{ note.contact.id }})">{% include "tools/contacts/contact_card.html" %}</div>
+                                                        <div x-data="{contact : null }"
+                                                             x-init="contact = await getContact({{ note.contact.id }})">
+                                                            {% include "tools/contacts/contact_card.html" %}
+                                                        </div>
                                                     {% endif %}
                                                     {% if note.document.count %}
                                                         {% for document in note.document.all %}
