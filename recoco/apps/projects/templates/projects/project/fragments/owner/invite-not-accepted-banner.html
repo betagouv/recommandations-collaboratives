@@ -5,7 +5,7 @@
           type="text/css">
 {% endblock css %}
 {% if project.owner != project.submitted_by %}
-    {% for invite in invites.pending %}
+    {% for invite in invites %}
         {% if invite.role == "COLLABORATOR" and invite.email == project.owner.email %}
             <div class="invite-not-accepted-banner fr-p-2v"
                  data-test-id="invite-not-accepted-banner">
