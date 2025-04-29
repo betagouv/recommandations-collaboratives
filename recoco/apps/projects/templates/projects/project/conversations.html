@@ -87,7 +87,7 @@
                                           id="conversation-form"
                                           novalidate>
                                         {% csrf_token %}
-                                        {% include "tools/editor.html" with model="message" can_attach_contact=True input_name=public_note_form.content.name input_value=public_note_form.content.value|default:'' input_required=True %}
+                                        {% include "tools/editor.html" with model="message" can_attach_contact=True input_name=public_note_form.content.name initial_content=public_note_form.content.value|default:'' input_required=True %}
                                         <label class="visually-hidden" for="input-project-content">{{ public_note_form.content.label }}</label>
                                         <!-- TODO: add contact for input (public_note_form.contact) -->
                                         {% comment %} {{ public_note_form.contact }} {% endcomment %}

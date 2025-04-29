@@ -72,7 +72,7 @@
                       id="conversation-form">
                     {% csrf_token %}
                     <div class="message-form fr-mt-3w bg-light border-form editor-form__container fr-input-group">
-                        {% include "tools/editor_dsfr.html" with input_name=posting_form.content.name input_value=posting_form.content.value|default:'' errors=posting_form.content.errors input_required=True %}
+                        {% include "tools/editor_dsfr.html" with input_name=posting_form.content.name initial_content=posting_form.content.value|default:'' errors=posting_form.content.errors input_required=True %}
                         {% comment %} {% include "projects/project/fragments/files_links/file_upload_input_standalone.html" %} {% endcomment %}
                         <!-- Action file -->
                         <button x-data="{fileName: ''}"

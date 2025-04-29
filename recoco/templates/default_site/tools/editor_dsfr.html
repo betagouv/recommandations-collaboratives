@@ -6,7 +6,7 @@
           type="text/css">
 {% endblock css %}
 <div class="w-100"
-     {% if escapejs %} x-data='editor("{{ input_value|escapejs }}")' {% elif is_task_comment %}x-data='editor(task.content)' {% else %} x-data='editor({{ input_value }})'{% endif %}
+     {% if escapejs %} x-data='editor("{{ initial_content|escapejs }}")' {% elif is_task_comment %}x-data='editor(task.content)' {% else %} x-data='editor({{ initial_content }})'{% endif %}
      @set-comment.window="setMarkdownContentFromTaskModal($event)"
      data-test-id="tiptap-editor">
     <template x-if="isLoaded()">
