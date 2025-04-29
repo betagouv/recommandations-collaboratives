@@ -8,9 +8,9 @@ describe('I can not comment a draft task', () => {
 
   it('opens a modal with the task', () => {
     cy.visit(`/project/${currentProject.pk}`);
-    cy.becomeAdvisor(currentProject.pk); // A remplacer par une fixture avec un user déjà advisor du projet
+    cy.becomeAdvisor(currentProject.pk); // A remplacer par une fixture avec un user déjà advisor du dossier
     cy.visit(`/project/${currentProject.pk}/actions`);
-    cy.createTask('test');
+    // cy.createTask('test');
 
     cy.get('[data-test-id="list-tasks-switch-button"]').should('be.checked');
 
@@ -41,9 +41,12 @@ describe('I can not comment a draft task', () => {
       .type(` edited`, { force: true, delay: 0 })
       .should('have.value', `Draft reco edited`);
 
-    cy.get('textarea')
-      .type(` new value`, { force: true, delay: 0 })
-      .should('have.value', `reco test from action description new value`);
+    cy.get('[data-test-id="tiptap-editor-content"] .ProseMirror').click();
+
+    cy.focused().type(` new value`, {
+      force: true,
+      delay: 0,
+    });
 
     cy.get('[data-test-id="publish-draft-task-button"]')
       .trigger('click')

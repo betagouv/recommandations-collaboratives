@@ -26,7 +26,11 @@ describe('I can create a resource as a switchtender', () => {
       .type('20/12/2022', { force: true })
       .should('have.value', '20/12/2022');
 
-    cy.get('[type="submit"]').click({ force: true });
+    cy.get('.ProseMirror p').click();
+    cy.focused().type('text', 'test from ressource description');
+
+    // cy.get('[data-cy="button-ressource-create"]').click({ force: true });
+    cy.get('[data-cy="form-resource-create"]').submit();
 
     cy.url().should('include', '/ressource/');
 

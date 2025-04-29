@@ -11,9 +11,9 @@
         <template x-if="data.length == 0 && !isBusy">
             <div class="rounded bg-white fr-mb-3w fr-px-2w d-flex flex-column fr-py-2w justify-content-between align-items-start task-item position-relative">
                 <div class="d-flex flex-column align-items-center justify-content-center w-100 fr-py-3w">
-                    <span class="text-info-custom text-grey-dark name fw-normal fr-mb-2v">Pas encore de projet</span>
+                    <span class="text-info-custom text-grey-dark name fw-normal fr-mb-2v">Pas encore de dossier</span>
                     <a class="button filled blue small inherit"
-                       href="{% url 'onboarding-prefill-set-user' %}">Créer un projet</a>
+                       href="{% url 'onboarding-prefill-set-user' %}">Créer un dossier</a>
                 </div>
             </div>
         </template>
@@ -21,7 +21,7 @@
             <div class="rounded bg-white fr-mb-3w fr-px-2w d-flex flex-column fr-py-2w justify-content-between align-items-start task-item position-relative">
                 <header>
                     <div class="d-flex align-items-center">
-                        <span class="text-info-custom text-grey-dark name">Aucun projet trouvé, essayez peut-être de réduire vos critères de recherche ?</span>
+                        <span class="text-info-custom text-grey-dark name">Aucun dossier trouvé, essayez peut-être de réduire vos critères de recherche ?</span>
                     </div>
                 </header>
             </div>
@@ -112,7 +112,7 @@
                             <span x-show="!item.project.origin.siteInfo.configuration.logo_small"
                                   class="fr-icon--sm fr-icon-window-line"
                                   aria-hidden="true"></span>
-                            <span class="align-middle text-grey-dark tiny">projet envoyé par</span>
+                            <span class="align-middle text-grey-dark tiny">dossier envoyé par</span>
                             <span x-text="item.project.origin.siteInfo.name"
                                   class="align-middle text-grey-dark tiny"></span>
                         </div>

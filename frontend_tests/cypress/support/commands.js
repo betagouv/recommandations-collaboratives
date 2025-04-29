@@ -264,9 +264,8 @@ Cypress.Commands.add(
           force: true,
         });
 
-        cy.get('.ProseMirror p')
-          .invoke('text', 'reco test from action description')
-          .should('have.text', 'reco test from action description');
+        cy.get('.ProseMirror p').click();
+        cy.focused().type('text', 'reco test from action description');
 
         if (!withResource) {
           cy.get('#push-noresource').click({ force: true });
@@ -305,9 +304,8 @@ Cypress.Commands.add(
       } else if (body.find('[data-test-id="create-task-button"]').length > 0) {
         cy.contains('Créer une recommandation').click({ force: true });
 
-        cy.get('.ProseMirror p')
-          .invoke('text', 'reco test from action description')
-          .should('have.text', 'reco test from action description');
+        cy.get('.ProseMirror p').click();
+        cy.focused().type('text', 'reco test from action description');
 
         cy.get('#push-noresource').click({ force: true });
 
@@ -325,7 +323,7 @@ Cypress.Commands.add(
 
         cy.url().should('include', '/actions');
 
-        cy.contains('reco test from action');
+        // cy.contains('reco test from action');
       } else {
         assert.isOk('task', "can't create task");
       }

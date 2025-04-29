@@ -6,10 +6,10 @@
 {% load projects_extra %}
 {% load survey %}
 {% block title %}
-    Projets à examiner
+    Dossiers à examiner
 {% endblock title %}
 {% block og_title %}
-    Projets à examiner
+    Dossiers à examiner
 {% endblock og_title %}
 {% block css %}
     <link href="{% sass_src 'home/css/dsfr/marianne.css' %}"
@@ -27,11 +27,11 @@
             <div class="row">
                 <div class="col-12">
                     {% if draft_projects.count > 1 %}
-                        <h2>{{ draft_projects.count }} projets entrants à examiner</h2>
+                        <h2>{{ draft_projects.count }} dossiers entrants à examiner</h2>
                     {% elif draft_projects.count > 0 %}
-                        <h2>{{ draft_projects.count }} projet entrant à examiner</h2>
+                        <h2>{{ draft_projects.count }} dossier entrant à examiner</h2>
                     {% else %}
-                        <h2>Aucun projet à examiner</h2>
+                        <h2>Aucun dossier à examiner</h2>
                     {% endif %}
                     {% for project in draft_projects %}
                         <div class="card fr-mb-2w d-flex flex-row project-card"
@@ -47,7 +47,7 @@
                                 </h3>
                                 <p class="project-card__keyinfo fr-mb-2v">
                                     {% if project.project_sites.origin.site != request.site %}
-                                        <span data-cy="moderation-projet-shared-by">
+                                        <span data-cy="moderation-folder-shared-by">
                                             {% if project.project_sites.origin.site.configuration.logo_small %}
                                                 <img src="{{ project.project_sites.origin.site.configuration.logo_small.url }}"
                                                      width="16px"
@@ -56,7 +56,7 @@
                                             {% else %}
                                                 <span class="fr-icon--sm fr-icon-window-line" aria-hidden="true"></span>
                                             {% endif %}
-                                            projet envoyé par {{ project.project_sites.origin.site.name }}
+                                            dossier envoyé par {{ project.project_sites.origin.site.name }}
                                         </span>
                                     {% endif %}
                                     {% if project.commune %}
@@ -88,7 +88,7 @@
                                         </p>
                                     {% endif %}
                                 </div>
-                                <h4 class="text-uppercase project-card__team fr-mb-0">Porteur de projet</h4>
+                                <h4 class="text-uppercase project-card__team fr-mb-0">Demandeur</h4>
                                 <div>
                                     {% include "projects/project/fragments/project_owner.html" with project=project %}
                                     {% include "projects/project/fragments/owner/owner-details.html" with project=project %}
@@ -128,7 +128,7 @@
                             </div>
                             <div class="project-card__col--right fr-p-0">
                                 <!-- Contexte -->
-                                {% include "projects/project/fragments/information_card.html" with full_width=True padding_end=False padding_top=False project=project title="Résumé du projet" description=project.description updated_on=project.created_on data_test="context" display_user=False %}
+                                {% include "projects/project/fragments/information_card.html" with full_width=True padding_end=False padding_top=False project=project title="Résumé du dossier" description=project.description updated_on=project.created_on data_test="context" display_user=False %}
                                 <!-- Complément -->
                                 {% for question in site_config.onboarding_questions.all %}
                                     {% project_session_for_survey project site_config.project_survey as session %}

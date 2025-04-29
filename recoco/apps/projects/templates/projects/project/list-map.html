@@ -1,10 +1,10 @@
 {% extends "projects/project/list.html" %}
 {% load static %}
 {% block title %}
-    Carte des projets {{ block.super }}
+    Carte des dossiers {{ block.super }}
 {% endblock title %}
 {% block og_title %}
-    Carte des projets {{ block.super }}
+    Carte des dossiers {{ block.super }}
 {% endblock og_title %}
 {% block project_list_content %}
     <div x-data="Map">
@@ -21,7 +21,7 @@
                     <span class="align-middle">
                         {% with draft_projects.count as draft_projects_count %}
                             {% if draft_projects_count > 0 %}
-                                <a href="#draft-projects">{{ draft_projects_count }} projet{{ draft_projects_count|pluralize }}</a> en attente d'acceptation
+                                <a href="#draft-projects">{{ draft_projects_count }} dossier{{ draft_projects_count|pluralize }}</a> en attente d'acceptation
                             {% endif %}
                         {% endwith %}
                     </span>

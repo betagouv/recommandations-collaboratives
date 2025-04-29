@@ -33,7 +33,10 @@
             </div>
         </nav>
         <section>
-            <form id="form-resource-create" method="post" action=".">
+            <form id="form-resource-create"
+                  data-cy="form-resource-create"
+                  method="post"
+                  action=".">
                 {% csrf_token %}
                 <h2>
                     <svg class="bi " width="32" height="32" fill="currentColor">
@@ -102,7 +105,9 @@
                     {{ form.expires_on.errors }}
                     {{ form.expires_on }}
                 </p>
-                <button type="submit" class="btn btn-primary">Créer</button>
+                <button type="submit"
+                        class="btn btn-primary"
+                        data-cy="button-ressource-create">Créer</button>
             </form>
             {{ form.media }}
         </section>
