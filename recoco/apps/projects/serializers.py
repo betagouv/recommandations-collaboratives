@@ -106,8 +106,11 @@ class ProjectSerializer(
 
     advisors_note = serializers.SerializerMethodField()
 
-    def get_advisors_note(self, obj):
-        return obj.advisors_note if self.is_staff_for_site else None
+    def get_advisors_note(self, obj) -> str | None:
+        if self.current_user and self.current_user.has_perm(
+            "projects.use_private_notes", obj
+        ):
+            return obj.advisors_note
 
 
 class UserProjectSerializer(ProjectSerializer):
@@ -205,7 +208,12 @@ class ProjectForListSerializer(BaseSerializerMixin):
             "notifications": data.notifications,
             "project_sites": format_sites(data),
             "tags": [tag.name for tag in data.tags.all()],
-            "advisors_note": data.advisors_note if self.is_staff_for_site else None,
+            "advisors_note": (
+                data.advisors_note
+                if self.current_user
+                and self.current_user.has_perm("projects.use_private_notes", data)
+                else None
+            ),
         }
 
 

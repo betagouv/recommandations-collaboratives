@@ -6,8 +6,6 @@ from rest_framework.request import Request
 from rest_framework.serializers import Serializer
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
-from recoco.utils import is_staff_for_site as utils_is_staff_for_site
-
 
 class BaseSerializerMixin(Serializer):
     @property
@@ -25,12 +23,6 @@ class BaseSerializerMixin(Serializer):
     @cached_property
     def current_user(self) -> User | None:
         return self.request.user if hasattr(self.request, "user") else None
-
-    @cached_property
-    def is_staff_for_site(self) -> bool:
-        if self.current_user is None:
-            return False
-        return utils_is_staff_for_site(user=self.current_user, site=self.current_site)
 
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
