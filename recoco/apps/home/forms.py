@@ -13,8 +13,6 @@ from django.core.exceptions import ValidationError
 
 from recoco.apps.geomatics.models import Department
 
-from .models import AdvisorAccessRequest
-
 
 class UVSignupForm(SignupForm):
     field_order = [
