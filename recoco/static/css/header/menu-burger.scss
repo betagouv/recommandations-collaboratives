@@ -20,23 +20,18 @@
 @media (max-width: 991px) {
   .fr-modal--opened {
     display: block;
-    top: -92px;
-  }
-}
-@media (max-width: 768px) {
-  .fr-modal--opened {
-    top: -32px;
   }
 }
 
- .responsive-header .responsive-header__element-not-mobile {
+.responsive-header .responsive-header__element-not-mobile {
   display: block !important;
- }
+}
 
- .responsive-header span {
+.responsive-header span {
   margin-left: 0px !important;
- }
+}
 
- .fr-modal--opened {
-  height: 150%;
- }
+.fr-modal:after,
+.fr-modal:before {
+  height: 0 !important;
+}
