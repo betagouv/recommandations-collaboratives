@@ -127,10 +127,6 @@ body.modal-open {
   }
 }
 
-.followups-wrapper {
-  padding-top: 40px;
-}
-
 .is-new-followup {
   position: relative;
   border: solid 1px var(--background-action-high-blue-france);

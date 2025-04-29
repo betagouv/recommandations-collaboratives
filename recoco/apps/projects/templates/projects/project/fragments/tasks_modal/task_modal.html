@@ -9,7 +9,7 @@
 {% get_obj_perms request.user for request.site as "user_site_perms" %}
 {% get_obj_perms request.user for project as "user_project_perms" %}
 <div x-data="PreviewModal()"
-     class="modal fade"
+     class="modal fade modal-preview"
      id="task-modal"
      tabindex="-1"
      aria-hidden="true">
@@ -81,16 +81,20 @@
                                     </template>
                                 </div>
                             </div>
-                            <div class="task-modal-followups position-relative"
+                            <div class="task-modal-followups position-relative d-flex flex-column"
                                  :class="getTypeOfModalClass(currentTask?.document && currentTask?.document.length > 0)"
                                  id="followups-scroll-container">
                                 <div class="fr-py-2v fr-px-2w position-sticky top-0 d-flex justify-content-between bg-white z-1 border-bottom-grey">
                                     <span class="fw-medium title-info text-dark">Échanges & notes</span>
                                 </div>
+                                <template x-if="currentTask.public">
+                                    <div class="task-status-switcher__container" x-data="{task: currentTask}">
+                                        {% include "projects/project/fragments/tasks_inline_kanban/tasks_status_buttons.html" %}
+                                    </div>
+                                </template>
                                 <div class="position-absolute d-flex justify-content-center align-items-center w-100 h-100">
                                     <div x-show="followupsIsLoading" class="fr-ml-2v specific-size">
-                                        <div class="spinner-border spinner-border spinner-border-sm text-primary"
-                                             role="status"></div>
+                                        <output class="spinner-border spinner-border-sm text-primary"></output>
                                     </div>
                                 </div>
                                 <div :class="!followupsIsLoading && 'visible'" class="followups-wrapper">

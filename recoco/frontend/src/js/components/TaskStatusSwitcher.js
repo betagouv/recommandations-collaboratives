@@ -1,7 +1,7 @@
 import Alpine from 'alpinejs';
 import { STATUSES, isStatus, statusText } from '../utils/taskStatus';
 
-function TaskStatusSwitcher(commentTextRef, commentTextFormRef) {
+function TaskStatusSwitcher(task) {
   return {
     STATUSES,
     statusText,
@@ -13,18 +13,11 @@ function TaskStatusSwitcher(commentTextRef, commentTextFormRef) {
     },
     async handleStatusClick(task, status) {
       task.isLoading = true;
-
       await this.$store.tasksData.issueFollowup(task, status);
-
       await this.$store.tasksView.updateViewWithTask(task.id);
       task.isLoading = false;
+      task.status = status;
     },
-    // async handleStatusWithCommentClick(task, status) {
-    //     location.href = "#modal-textarea";
-    //     commentTextRef.classList.add('textarea-highlight');
-    //     commentTextFormRef.classList.add('tooltip-highlight');
-    //     this.$dispatch('issue-followup', { task, status })
-    // }
   };
 }
 
