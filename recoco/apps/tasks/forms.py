@@ -99,7 +99,7 @@ class PushTypeActionForm(forms.Form):
     next = forms.CharField(required=False)
     project = forms.ModelChoiceField(
         queryset=projects_models.Project.objects.none(),
-        empty_label="(Veuillez sélectionner un projet)",
+        empty_label="(Veuillez sélectionner un dossier)",
         required=True,
     )
     contact = forms.ModelChoiceField(

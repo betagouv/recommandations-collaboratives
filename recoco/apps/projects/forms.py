@@ -84,7 +84,7 @@ class ProjectForm(forms.ModelForm):
 
         labels = {
             "location": "Adresse",
-            "description": "Contexte du projet",
+            "description": "Contexte du dossier",
         }
 
 

@@ -2,7 +2,7 @@
 # coding: utf-8
 # %%
 
-# # Assigner des utilisateurs à des projets
+# # Assigner des utilisateurs à des dossiers
 
 # %%
 
@@ -48,7 +48,7 @@ print(assign_advisor.__doc__)
 
 get_ipython().run_line_magic("pinfo", "assign_collaborator")
 
-# Assigner un utilisateur sur un projet
+# Assigner un utilisateur sur un dossier
 assign_collaborator(user, project, is_owner=False)
 
 
