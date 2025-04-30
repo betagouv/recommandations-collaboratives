@@ -6,7 +6,7 @@ Alpine.data('CreateContactModal', () => {
   return {
     Modal: null,
     contact: {
-      organization: {name: ''},
+      organization: { name: '' },
       last_name: '',
       first_name: '',
       division: '',
@@ -32,7 +32,8 @@ Alpine.data('CreateContactModal', () => {
           isOrgaSelected: this.contact.organization !== '',
           isJobSelected: Boolean(this.contact.division),
           isMailOrPhone:
-            this.contact.email.length !== 0 || this.contact.phone_no.length !== 0,
+            this.contact.email.length !== 0 ||
+            this.contact.phone_no.length !== 0,
           isFormatEmailValid: this.contact.email.match(
             /^[\w.\-]+@([\w\-]+\.)+[\w\-]{2,4}$/
           ),
@@ -50,7 +51,7 @@ Alpine.data('CreateContactModal', () => {
           };
 
           api.post(contactsUrl(), payload).then((response) => {
-            this.Modal.responseModal({... this.contact, id : response.data.id});
+            this.Modal.responseModal({ ...this.contact, id: response.data.id });
           });
         }
       } catch (error) {

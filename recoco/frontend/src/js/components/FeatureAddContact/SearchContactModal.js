@@ -20,18 +20,21 @@ Alpine.data('SearchContactModal', () => ({
     this.selectedContact = null;
     if (this.userInputSearchContact.length > 0) {
       try {
-        api.get(searchContactsUrl(this.userInputSearchContact)).then((response) => {
-          const searchResults = response.data;
-          this.contactsFound = searchResults.results;
-        });
+        api
+          .get(searchContactsUrl(this.userInputSearchContact))
+          .then((response) => {
+            const searchResults = response.data;
+            this.contactsFound = searchResults.results;
+          });
       } catch (error) {
-          console.log(error);
-        }
+        console.log(error);
+      }
     } else if (this.userInputSearchContact.length === 0) {
       this.noSearch = true;
     }
   },
   onSelect(contact) {
+    this.userInputSearchContact = '';
     this.noSearch = false;
     this.selectedContact = contact;
   },
@@ -58,7 +61,6 @@ Alpine.data('SearchContactModal', () => ({
     }
     if (event.detail) {
       this.onSelect(event.detail);
-      console.log('event.detail', event.detail);
     }
     this.isCreateContactModalOpen = false;
     this.modalSearchContact.classList.toggle('d-none');
