@@ -1,0 +1,48 @@
+{% load static %}
+{% load sass_tags %}
+{% load django_vite %}
+{% block css %}
+    <link href="{% sass_src 'css/account/layout-form.scss' %}"
+          rel="stylesheet"
+          type="text/css">
+    <link href="{% sass_src 'home/css/dsfr/custom-dsfr.scss' %}"
+          rel="stylesheet"
+          type="text/css">
+{% endblock css %}
+<div class="layout-form container">
+    <div class="banner text-center">
+        {% comment %} TODO ADD site_config in context {% endcomment %}
+        {% if site_config.email_logo %}
+            <img src="{{ site_config.email_logo.url }}"
+                 width="10%"
+                 height="auto"
+                 alt="Logo {{ request.site.name }}" />
+        {% endif %}
+        {% if site_config.email_logo %}
+            <img src="{{ site_config.email_logo.url }}"
+                 width="10%"
+                 height="auto"
+                 alt="Logo {{ request.site.name }}" />
+        {% endif %}
+        <h1>
+            <strong>{{ mon_title }} sur <span class="layout-form__site-name">{{ request.site.name }}</span></strong>
+        </h1>
+    </div>
+    <div class="fr-stepper fr-mb-2w">
+        <h2 class="fr-stepper__title">
+            Décrivez votre demande
+            <span class="fr-stepper__state">Étape 2 sur 2</span>
+        </h2>
+        <div class="fr-stepper__steps" data-fr-current-step="2" data-fr-steps="2"></div>
+        <p class="fr-stepper__details">
+            <span class="fr-text--bold">Étape suivante :</span> Décrivez votre demande
+        </p>
+    </div>
+    <div class="container__form d-flex justify-content-center">
+        {% comment %} <div class="onboarding__form" x-data="DsrcFormValidator('{{ form.helper.form_id }}', schemaValidator, '{{ request.method }}')" x-init="init">{% include "onboarding/fragments/form-project.html" %}</div> {% endcomment %}
+        <div class="onboarding__form">
+            {% block layout_content %}
+            {% endblock layout_content %}
+        </div>
+    </div>
+</div>
