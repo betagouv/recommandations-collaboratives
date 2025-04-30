@@ -12,7 +12,7 @@ describe('I can go to the dashboard and see only my projects', () => {
         return Cypress.$(project).css('display') !== 'none';
       });
       projectsLength = visibleProjects.length;
-      cy.log(`Nombre initial de projets: ${projectsLength}`);
+      cy.log(`Nombre initial de dossiers: ${projectsLength}`);
     });
 
     cy.get('[data-test-id="my-projects-toggle"]').should('be.not.checked');

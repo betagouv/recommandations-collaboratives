@@ -167,7 +167,7 @@ Merci de mettre à jour la colonne `Utilisé` en fonction de l'utilisation du co
 | Projet - Recommandations   | `/project/{id}/actions`        | Changement ordre recommandation                    | `// @page-projet-recommandations-ordre`             |      ❌ |
 | Projet - Recommandations   | `/project/{id}/actions`        | Etiquette non lu                                   | `// @page-projet-recommandations-etiquette-non-lue` |      ❌ |
 | Projet - Recommandations   | `/project/{id}/actions`        | Modal - Echange                                    | `// @page-projet-recommandations-modal`             |      ❌ |
-| Projet - Recommandations   | `/project/{id}/actions`        | Status (En cours, faite, non applicable)           | `// @page-projet-recommandations-status`            |      ❌ |
+| Projet - Recommandations   | `/project/{id}/actions`        | Status (En cours, faite, non applicable)           | `// @page-projet-recommandations-status`            |      🚧 |
 | Projet - Recommandations   | `/project/{id}/actions`        | Bandeau recos non lues                             | `// @page-projet-recommandations-bandeau-non-lue`   |      ❌ |
 | Projet - Conversations     | `/project/{id}/conversations`  | Page                                               | `// @page-projet-conversations`                     |      ❌ |
 | Projet - Conversations     | `/project/{id}/conversations`  | Nouveau message                                    | `// @page-projet-conversations-nouveau-message`     |      ❌ |

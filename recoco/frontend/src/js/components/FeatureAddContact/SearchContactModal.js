@@ -5,6 +5,7 @@ import { formatDate } from '../../utils/date';
 
 Alpine.data('SearchContactModal', () => ({
   Modal: null,
+  formatDate,
   contactsFound: [],
   userInputSearchContact: '',
   selectedContact: null,
@@ -24,7 +25,7 @@ Alpine.data('SearchContactModal', () => ({
           .get(searchContactsUrl(this.userInputSearchContact))
           .then((response) => {
             const searchResults = response.data;
-            this.contactsFound = searchResults.results;
+            this.contactsFound = [...searchResults.results];
           });
       } catch (error) {
         console.log(error);

@@ -41,3 +41,14 @@
   background-color: var(--background-open-blue-france-hover);
   opacity: 0.5;
 }
+
+.contact-card {
+  max-width: 26rem;
+}
+
+.container__card-contact--no-ressource {
+  background-color: #f6f6f6;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  max-width: 26rem;
+}

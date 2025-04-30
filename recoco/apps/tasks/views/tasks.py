@@ -75,12 +75,17 @@ def create_task(request):
         form = push_form_type(request.POST)
         if form.is_valid():
             project = type_form.cleaned_data.get("project")
+            contact = type_form.cleaned_data.get("contact")
+
             has_perm_or_403(request.user, "projects.manage_tasks", project)
 
             action = form.save(commit=False)
             action.project = project
             action.site = request.site
             action.created_by = request.user
+            if contact:
+                action.contact = contact
+
             # get or create topic
             name = form.cleaned_data["topic_name"]
             if name:
@@ -396,7 +401,7 @@ def task_recommendation_delete(request, recommendation_id):
     return redirect(reverse("projects-task-recommendation-list"))
 
 
-# retourne pour le projet les suggestions du système
+# retourne pour le dossier les suggestions du système
 @login_required
 def presuggest_task(request, project_id):
     """Suggest tasks"""
