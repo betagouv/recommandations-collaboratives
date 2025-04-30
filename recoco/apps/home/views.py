@@ -266,11 +266,9 @@ def advisor_access_request_view(request: HttpRequest):
     if check_if_advisor(request.user):
         return redirect(redirect_url)
 
-    form = AdvisorAccessRequestForm(request.POST or None)
-
-    advisor_access_request: AdvisorAccessRequest = None
-
     if request.method == "GET":
+        form = AdvisorAccessRequestForm()
+
         advisor_access_request = AdvisorAccessRequest.objects.filter(
             user=request.user, site=request.site
         ).first()
@@ -284,10 +282,16 @@ def advisor_access_request_view(request: HttpRequest):
             ]
 
     if request.method == "POST":
-        advisor_access_request = form.save(commit=False)
-        advisor_access_request.site = request.site
-        advisor_access_request.user = request.user
-        advisor_access_request.save()
+        form = AdvisorAccessRequestForm(request.POST)
+
+        if form.is_valid():
+            advisor_access_request = AdvisorAccessRequest(
+                site=request.site, user=request.user
+            )
+            advisor_access_request.save()
+            advisor_access_request.departments.set(form.cleaned_data["departments"])
+        else:
+            advisor_access_request = None
 
     return render(
         request,
