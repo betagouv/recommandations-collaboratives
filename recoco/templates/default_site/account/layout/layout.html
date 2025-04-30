@@ -1,3 +1,15 @@
+{% comment %}
+    This layout is used to display the form for the account signup.
+
+    Parameters:
+        - stepper (boolean): if true, display the stepper
+        - total_steps (int): total number of steps
+        - step_number (int): current step number
+        - current_step_title (str): current step title
+        - next_step_title (str): next step title
+        - title (str): title of the page
+
+{% endcomment %}
 {% load static %}
 {% load sass_tags %}
 {% load django_vite %}
@@ -25,19 +37,23 @@
                  alt="Logo {{ request.site.name }}" />
         {% endif %}
         <h1>
-            <strong>{{ mon_title }} sur <span class="layout-form__site-name">{{ request.site.name }}</span></strong>
+            <strong>{{ title }} sur <span class="layout-form__site-name">{{ request.site.name }}</span></strong>
         </h1>
     </div>
-    <div class="fr-stepper fr-mb-2w">
-        <h2 class="fr-stepper__title">
-            Décrivez votre demande
-            <span class="fr-stepper__state">Étape 2 sur 2</span>
-        </h2>
-        <div class="fr-stepper__steps" data-fr-current-step="2" data-fr-steps="2"></div>
-        <p class="fr-stepper__details">
-            <span class="fr-text--bold">Étape suivante :</span> Décrivez votre demande
-        </p>
-    </div>
+    {% if stepper %}
+        <div class="fr-stepper fr-mb-2w">
+            <h2 class="fr-stepper__title">
+                {{ current_step_title }}
+                <span class="fr-stepper__state">Étape {{ step_number }} sur {{ total_steps }}</span>
+            </h2>
+            <div class="fr-stepper__steps"
+                 data-fr-current-step="{{ step_number }}"
+                 data-fr-steps="{{ total_steps }}"></div>
+            <p class="fr-stepper__details">
+                <span class="fr-text--bold">Étape suivante :</span> {{ next_step_title }}
+            </p>
+        </div>
+    {% endif %}
     <div class="container__form d-flex justify-content-center">
         {% comment %} <div class="onboarding__form" x-data="DsrcFormValidator('{{ form.helper.form_id }}', schemaValidator, '{{ request.method }}')" x-init="init">{% include "onboarding/fragments/form-project.html" %}</div> {% endcomment %}
         <div class="onboarding__form">
