@@ -31,7 +31,7 @@ Example usage in parent:
          class="contact-card fr-p-3v bg-white"
          data-test-id="contact-card">
         <div class="contact-card__firstline-container">
-            <span x-show="contact.first_name"
+            <span x-show="contact.first_name || contact.last_name"
                   x-text="`${contact.first_name} ${contact.last_name}`"
                   :title="`${contact.first_name} ${contact.last_name}`"
                   class="contact-info__name contact-names fr-pr-1v"></span>
@@ -43,7 +43,7 @@ Example usage in parent:
         <div :title="contact.division"
              x-show="contact.division"
              class="contact-info__division">
-            <span x-text="contact.division" class="color-3a3a3a text-organisation"></span>
+            <span x-text="contact.division" class="color-3a3a3a text-organization"></span>
         </div>
         <div x-show="!contact.division" class="contact-info-empty__division"></div>
         <div x-show="contact.email" class="contact-info__email">

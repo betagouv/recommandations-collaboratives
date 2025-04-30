@@ -59,7 +59,7 @@ def project_list_export_csv(request):
         "departement",
         "commune_insee",
         "commune_nom",
-        "nom_projet",
+        "nom_dossier",
         "detail_adresse",
         "date_contact",
         "contact_dossier",
@@ -80,7 +80,7 @@ def project_list_export_csv(request):
         "nb_messages_suivis_int_nonstaff",
         "nb_conseillers_nonstaff",
         "tags",
-        "lien_projet",
+        "lien_dossier",
         "exclude_stats",
         "origin_site",
     ]

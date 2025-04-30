@@ -5,7 +5,9 @@
           type="text/css" />
 {% endblock css %}
 <template x-if="isCreateContactModalOpen">
-    <div x-data="CreateContactModal" id="create-contact-modal">
+    <div x-data="CreateContactModal"
+         @modal-response="closeCreateOrganizationModal($event)"
+         id="create-contact-modal">
         <div x-ref="createContactModal"
              @set-organization="handleSetOrganization($event.detail)"
              class="modal-create-contact z-2">
@@ -16,7 +18,7 @@
                           aria-hidden="true"
                           @click.prevent="Modal.closeModal()"></span>
                 </div>
-                {% include "tools/contacts/search_organisation.html" %}
+                {% include "tools/contacts/search_organization.html" %}
                 <div class="fr-p-3v modal-create-contact__block">
                     <label class="modal-create-contact__label">Nom</label>
                     <input type="text" class="fr-input" x-model="contact.last_name">
@@ -79,5 +81,6 @@
                 </div>
             </form>
         </div>
+        {% include "tools/contacts/create_organization_modal.html" %}
     </div>
 </template>

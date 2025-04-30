@@ -129,7 +129,7 @@ class ProjectFilter(django_filters.FilterSet):
     )
 
     inactive = django_filters.BooleanFilter(
-        label="Projet inactifs",
+        label="Dossier inactifs",
         method="inactive_filter",
         widget=forms.widgets.CheckboxInput,
     )
@@ -143,7 +143,7 @@ class ProjectFilter(django_filters.FilterSet):
         ),
         # labels do not need to retain order
         field_labels={
-            "name": "Nom du projet",
+            "name": "Nom du dossier",
             "commune": "Commune",
             "created_on": "Date de dépôt",
         },

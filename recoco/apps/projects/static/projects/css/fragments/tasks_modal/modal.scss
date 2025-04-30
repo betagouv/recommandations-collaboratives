@@ -79,3 +79,21 @@
   bottom: 6rem;
   right: 6.5rem;
 }
+
+.modal-preview {
+  .task-status-switcher {
+    &__container {
+      position: sticky;
+      top: 38px;
+      background-color: white;
+      z-index: 2;
+      padding: 0.5rem 0;
+    }
+    margin-left: 1rem;
+    .button {
+      font-size: 0.75rem;
+      padding: 3px 10px;
+      border-radius: 2px;
+    }
+  }
+}

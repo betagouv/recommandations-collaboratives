@@ -13,6 +13,7 @@
     "preview": "vite preview --port 3000"
   },
   "dependencies": {
+    "@alpinejs/focus": "^3.14.9",
     "@alpinejs/resize": "^3.14.9",
     "@gouvfr/dsfr": "^1.11.2",
     "@iframe-resizer/child": "^5.3.1",
