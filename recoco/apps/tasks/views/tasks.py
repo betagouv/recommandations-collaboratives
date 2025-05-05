@@ -18,6 +18,7 @@ from django.utils import timezone
 from django.utils.text import slugify
 from django.views.decorators.http import require_http_methods
 
+from recoco.apps.addressbook.models import Contact
 from recoco.apps.projects import models as project_models
 from recoco.apps.projects.forms import DocumentUploadForm
 from recoco.apps.projects.utils import (
@@ -268,11 +269,15 @@ def update_task(request, task_id=None):
 
     if request.method == "POST":
         form = UpdateTaskForm(request.POST, instance=task)
+        form.set_contact_queryset(
+            Contact.objects.filter(site_id=request.site.id),
+        )
         if form.is_valid():
             instance = form.save(commit=False)
             instance.updated_on = timezone.now()
             # manage topic
             name = form.cleaned_data["topic_name"]
+
             if name:
                 topic, _ = project_models.Topic.objects.get_or_create(
                     name__iexact=name.lower(),

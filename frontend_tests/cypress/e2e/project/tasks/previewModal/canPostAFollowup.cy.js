@@ -22,9 +22,8 @@ describe('I can go tasks tab', () => {
 
     const now = new Date();
 
-    cy.get('.ProseMirror p')
-      .invoke('text', `test ${now}`)
-      .should('have.text', `test ${now}`);
+    cy.get('.ProseMirror p').click();
+    cy.focused().type('text', `test ${now}`);
 
     cy.get('[data-test-id="button-submit-new"]').click();
     cy.get('[data-cy="column-list-comment"]')
