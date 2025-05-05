@@ -14,7 +14,7 @@ from django.contrib.auth import models as auth
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models import Count, F, Q
-from django.http import HttpRequest
+from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.decorators import method_decorator
 from django.utils.http import url_has_allowed_host_and_scheme
@@ -261,7 +261,7 @@ def setup_password(request):
 
 
 @login_required
-def advisor_access_request_view(request: HttpRequest):
+def advisor_access_request_view(request: HttpRequest) -> HttpResponse:
     redirect_url = request.GET.get("next", "/")
     if not url_has_allowed_host_and_scheme(redirect_url):
         redirect_url = "/"
@@ -311,11 +311,12 @@ def advisor_access_request_view(request: HttpRequest):
 @require_htmx
 def advisor_access_request_accept_view(
     request: HttpRequest, advisor_access_request_id: int
-):
+) -> HttpResponse:
     advisor_access_request = get_object_or_404(
         AdvisorAccessRequest, pk=advisor_access_request_id
     )
     advisor_access_request.accept(handled_by=request.user)
+    return HttpResponse("Advisor access request accepted successfully.")
 
 
 @login_required
@@ -323,11 +324,12 @@ def advisor_access_request_accept_view(
 @require_htmx
 def advisor_access_request_reject_view(
     request: HttpRequest, advisor_access_request_id: int
-):
+) -> HttpResponse:
     advisor_access_request = get_object_or_404(
         AdvisorAccessRequest, pk=advisor_access_request_id
     )
     advisor_access_request.reject(handled_by=request.user)
+    return HttpResponse("Advisor access request rejected successfully.")
 
 
 # eof
