@@ -48,14 +48,12 @@ def create_public_note(request, project_id=None):
             instance.public = True
 
             topic_name = form.cleaned_data.get("topic_name", None)
-            print("TTTT>>", topic_name)
             if topic_name:
                 try:
                     instance.topic = models.Topic.objects.get(
                         site__in=project.sites.all(), name__iexact=topic_name
                     )
                 except models.Topic.DoesNotExist:
-                    print("NOOOO")
                     return HttpResponseBadRequest("Topic unknown")
 
             instance.save()

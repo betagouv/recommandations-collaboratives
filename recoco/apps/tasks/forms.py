@@ -9,9 +9,10 @@ created : 2021-12-14 10:36:20 CEST
 
 from django import forms
 from django.contrib.sites.models import Site
-from django.db.models import Q
+from django.db.models import Q, QuerySet
 from markdownx.fields import MarkdownxFormField
 
+from recoco.apps.addressbook.models import Contact
 from recoco.apps.projects import models as projects_models
 from recoco.apps.resources import models as resources_models
 from recoco.utils import is_staff_for_site
@@ -84,6 +85,10 @@ class PushTypeActionForm(forms.Form):
 
         self.fields["project"].queryset = project_qs
 
+        self.fields["contact"].queryset = Contact.objects.filter(
+            site=current_site,
+        ).distinct()
+
     PUSH_TYPES = (
         ("single", "single"),
         ("external_resource", "external_resource"),
@@ -97,6 +102,11 @@ class PushTypeActionForm(forms.Form):
         empty_label="(Veuillez sélectionner un dossier)",
         required=True,
     )
+    contact = forms.ModelChoiceField(
+        queryset=Contact.objects.none(),
+        empty_label="(Veuillez sélectionner un contact)",
+        required=False,
+    )
 
 
 class CreateActionBaseForm(forms.ModelForm):
@@ -104,13 +114,16 @@ class CreateActionBaseForm(forms.ModelForm):
 
     topic_name = forms.CharField(required=False)
 
+    def set_contact_queryset(self, contact_queryset: QuerySet[Contact]):
+        self.fields["contact"].queryset = contact_queryset
+
 
 class CreateActionWithoutResourceForm(CreateActionBaseForm):
     """Create an action for a project, without attached resource"""
 
     class Meta:
         model = models.Task
-        fields = ["intent", "content", "public"]
+        fields = ["intent", "content", "public", "contact"]
 
 
 class CreateActionWithResourceForm(CreateActionBaseForm):
@@ -143,7 +156,7 @@ class CreateActionWithResourceForm(CreateActionBaseForm):
 
     class Meta:
         model = models.Task
-        fields = ["intent", "content", "public", "resource"]
+        fields = ["intent", "content", "public", "resource", "contact"]
 
 
 class CreateTaskForm(forms.ModelForm):
@@ -178,7 +191,11 @@ class UpdateTaskForm(forms.ModelForm):
             "content",
             "resource",
             "public",
+            "contact",
         ]
+
+    def set_contact_queryset(self, contact_queryset: QuerySet[Contact]):
+        self.fields["contact"].queryset = contact_queryset
 
 
 class RemindTaskForm(forms.Form):

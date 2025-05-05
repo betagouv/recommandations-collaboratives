@@ -52,14 +52,14 @@
                                           x-data="{message: {text: '', contact: ''}}"
                                           action="{% url 'projects-create-note' project.pk %}">
                                         {% csrf_token %}
-                                        {% include "tools/editor.html" with model="message" can_attach_contact=True input_name=private_note_form.content.name input_value=private_note_form.content.value|default:'' input_required=True %}
+                                        {% include "tools/editor.html" with model="message" can_attach_contact=True input_name=private_note_form.content.name initial_content=private_note_form.content.value|default:'' input_required=True %}
                                         <label class="visually-hidden" for="input-project-content">{{ private_note_form.content.label }}</label>
                                         {% for error in private_note_form.content.errors %}<div class="text-danger text-end">{{ error }}</div>{% endfor %}
                                         <div class="d-flex justify-content-end fr-mt-2v">
                                             <button x-data
                                                     :disabled="$store.editor.currentMessage === ''"
                                                     class="fr-btn"
-                                                    type="submit">Envoyer</button>
+                                                    type="submit">Enregistrer</button>
                                         </div>
                                         <input type="hidden"
                                                name="{{ private_note_form.contact.name }}"

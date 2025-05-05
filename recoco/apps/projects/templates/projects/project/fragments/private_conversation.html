@@ -22,7 +22,10 @@
                             {% endfor %}
                         {% endif %}
                         {% if note.contact %}
-                            <div x-data="GetContactObject({{ note.contact.id }})">{% include "tools/contacts/contact_card.html" %}</div>
+                            <div x-data="{contact : null }"
+                                 x-init="contact = await getContact({{ note.contact.id }})">
+                                {% include "tools/contacts/contact_card.html" %}
+                            </div>
                         {% endif %}
                         {% if note.created_by %}
                             <div class="d-flex align-items-center">

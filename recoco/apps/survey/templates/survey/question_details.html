@@ -119,7 +119,7 @@
                     </ul>
                     <!-- Comment -->
                     <div class="fr-mt-2w fr-mb-2w">
-                        <label class="fr-mb-1v" for="input-project-comment">{{ question_comment_title|default:'Commentaire' }}</label>
+                        <label class="fr-mb-1v" for="input-project-comment">{{ question_comment_title|default:'Commentaire' }} {{ form.fields.comment.required|yesno:" (obligatoire)*," }}</label>
                         <textarea class="form-control {% if form.comment.errors %}is-invalid{% endif %} specific-height-100px"
                                   id="input-project-comment"
                                   name="{{ form.comment.name }}"
@@ -136,7 +136,7 @@
                                    id="attachment"
                                    type="file"
                                    name="attachment"
-                                   value="kdl" />
+                                   value="{{ form.attachment.value }}" />
                             {% if form.attachment.value %}
                                 Actuellement : <a href="{{ MEDIA_URL }}/{{ form.attachment.value }}">{{ form.attachment.value }}</a>
                             {% endif %}
