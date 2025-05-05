@@ -16,6 +16,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.db.models import Count, F, Q
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_http_methods
@@ -262,9 +263,9 @@ def setup_password(request):
 
 @login_required
 def advisor_access_request_view(request: HttpRequest) -> HttpResponse:
-    redirect_url = request.GET.get("next", "/")
-    if not url_has_allowed_host_and_scheme(redirect_url):
-        redirect_url = "/"
+    redirect_url = request.GET.get("next")
+    if not redirect_url or not url_has_allowed_host_and_scheme(redirect_url):
+        redirect_url = reverse("home")
 
     if check_if_advisor(request.user):
         return redirect(redirect_url)
