@@ -20,17 +20,14 @@ document.addEventListener('alpine:init', () => {
     },
 
     // Initializing component
-    initSelect(event) {
+    init(departments) {
       debugger;
-      const options = document.getElementById(this.elementId).options;
-      for (let i = 0; i < event.detail.length; i++) {
+      for (let i = 0; i < departments.length; i++) {
         this.options.push({
-          value: event.detail[i].code,
-          text: '(' + event.detail[i].code + ')' + ' ' + event.detail[i].name,
-          search: '(' + event.detail[i].code + ')' + ' ' + event.detail[i].name,
-          selected: Object.values(this.selected).includes(
-            event.detail[i].value
-          ),
+          value: departments[i].code,
+          text: `(${departments[i].code}) ${departments[i].name}`,
+          search: `(${departments[i].code}) ${departments[i].name}`,
+          selected: Object.values(this.selected).includes(departments[i].code),
         });
         if (this.options[i].selected) {
           this.selectedElms.push(this.options[i]);
@@ -42,7 +39,7 @@ document.addEventListener('alpine:init', () => {
         const options = document.getElementById(this.elementId).options;
         Object.values(options)
           .filter((el) => {
-            var reg = new RegExp(this.search, 'gi');
+            let reg = new RegExp(this.search, 'gi');
             return el.dataset.search.match(reg);
           })
           .forEach((el) => {
