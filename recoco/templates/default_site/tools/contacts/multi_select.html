@@ -1,3 +1,9 @@
+{% load sass_tags %}
+{% block css %}
+    <link href="{% sass_src 'css/tools/contact/multi-select.scss' %}"
+          rel="stylesheet"
+          type="text/css">
+{% endblock css %}
 <div>
     <div class="bg-white">
         <div>
@@ -5,10 +11,10 @@
             <div class="d-flex justify-center mt-8">
                 <!-- Define component with preselected options -->
                 <div class="w-100"
-                     x-data="alpineMultiSelect({selected:[], elementId:'multiSelect'})"
-                     @on-department-fetch.window="initSelect($event)">
+                     x-data="alpineMultiSelect({selected:[]})"
+                     x-init="init(objectsToSelect)">
                     <!-- Select Options -->
-                    <select class="d-none" id="multiSelect" x-on:change="init">
+                    <select class="d-none" x-on:change="init">
                         <template x-for="department in departments" :key="department.code">
                             <option :value="department.code"
                                     :data-search="'(' + department.code + ')' + ' ' + department.name"
