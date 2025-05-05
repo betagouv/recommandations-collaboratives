@@ -71,8 +71,8 @@ const config = {
         CreateContactModal: resolve(
           './src/js/components/FeatureAddContact/CreateContactModal.js'
         ),
-        SearchOrganisation: resolve(
-          './src/js/components/SearchOrganisation.js'
+        SearchOrganization: resolve(
+          './src/js/components/SearchOrganization.js'
         ),
         projectQueue: resolve('./src/js/store/projectQueue.js'),
         showRole: resolve('./src/js/store/showRole.js'),
@@ -82,7 +82,6 @@ const config = {
         NotificationEater: resolve('./src/js/components/NotificationEater.js'),
         actionPusher: resolve('./src/js/store/actionPusher.js'),
         conversationsNew: resolve('./src/js/apps/conversationsNew.js'),
-        contact: resolve('./src/js/store/contact.js'),
         featureAddContact: resolve('./src/js/apps/featureAddContact.js'),
         DepartmentsSelector: resolve(
           './src/js/components/DepartmentsSelector.js'
