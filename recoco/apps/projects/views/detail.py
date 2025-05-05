@@ -642,7 +642,7 @@ def project_update_tags(request, project_id=None):
         request.user, project
     )
 
-    has_perm_or_403(request.user, "sites.use_project_tags", request.site)
+    has_perm_or_403(request.user, "projects.use_project_tags", project)
 
     if request.method == "POST":
         form = ProjectTagsForm(request.POST, instance=project)

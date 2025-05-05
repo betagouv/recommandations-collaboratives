@@ -8,13 +8,11 @@ created: 2023-02-21 18:57:48 CET
 """
 
 from django.conf import settings
-from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.core.management.base import BaseCommand
 from guardian.shortcuts import assign_perm
 
 from recoco.apps.home.models import SITE_GROUP_PERMISSIONS
-from recoco.apps.invites.models import Invite
 from recoco.apps.projects.models import Project, ProjectSwitchtender
 from recoco.apps.projects.utils import (
     assign_advisor,
@@ -72,26 +70,6 @@ def assign_group_permissions_by_sites():
                 for perm_name in permissions:
                     print("group:", group, "perm:", perm_name, "site:", site.name)
                     assign_perm(perm_name, group, obj=site)
-
-            # assign site perms to advisor invites, as they don't belong to the advisor group
-            for invite in Invite.objects.filter(
-                site=site,
-                role="SWITCHTENDER",
-                accepted_on__isnull=False,
-            ):
-                invited_user = User.objects.filter(email=invite.email).first()
-                if not invited_user:
-                    continue
-                for perm_name in SITE_GROUP_PERMISSIONS.get("advisor"):
-                    print(
-                        "invited user:",
-                        invited_user.email,
-                        "perm:",
-                        perm_name,
-                        "site:",
-                        site.name,
-                    )
-                    assign_perm(perm_name, invited_user, obj=site)
 
 
 class Command(BaseCommand):

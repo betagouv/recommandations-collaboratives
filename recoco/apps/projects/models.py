@@ -78,6 +78,7 @@ ADVISOR_PERMISSIONS = [
     "projects.view_surveys",
     "projects.change_project",
     "projects.change_location",
+    "projects.use_project_tags",
 ]
 
 OBSERVER_PERMISSIONS = ADVISOR_PERMISSIONS
@@ -109,11 +110,12 @@ def create_site_permissions(sender, **kwargs):
         content_type=site_ct,
     )
 
-    auth_models.Permission.objects.get_or_create(
+    queryset = auth_models.Permission.objects.filter(
         codename="use_project_tags",
-        name="Can use tags on projects",
         content_type=site_ct,
     )
+    if queryset.exists():
+        queryset.delete()
 
 
 class ProjectManager(models.Manager):
