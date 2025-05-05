@@ -7,7 +7,7 @@ Alpine.data('SearchContactModal', () => ({
   Modal: null,
   formatDate,
   contactsFound: [],
-  userInput: '',
+  userInputSearchContact: '',
   selectedContact: null,
   modalCreateContact: null,
   modalSearchContact: null,
@@ -19,16 +19,22 @@ Alpine.data('SearchContactModal', () => ({
   onSearch() {
     this.noSearch = false;
     this.selectedContact = null;
-    if (this.userInput.length > 0) {
-      api.get(searchContactsUrl(this.userInput)).then((response) => {
-        const searchResults = response.data;
-        this.contactsFound = [...searchResults.results];
-      });
-    } else if (this.userInput.length === 0) {
+    if (this.userInputSearchContact.length > 0) {
+      api
+        .get(searchContactsUrl(this.userInputSearchContact))
+        .then((response) => {
+          const searchResults = response.data;
+          this.contactsFound = [...searchResults.results];
+        })
+        .catch((error) => {
+          throw new Error('Error searching contacts: ', error);
+        });
+    } else if (this.userInputSearchContact.length === 0) {
       this.noSearch = true;
     }
   },
   onSelect(contact) {
+    this.userInputSearchContact = '';
     this.noSearch = false;
     this.selectedContact = contact;
   },
@@ -37,6 +43,9 @@ Alpine.data('SearchContactModal', () => ({
   },
   onCancelSelectContact() {
     this.selectedContact = null;
+    if (this.userInputSearchContact.length === 0) {
+      this.noSearch = true;
+    }
   },
   isCreateContactModalOpen: false,
   openModalCreateContact() {

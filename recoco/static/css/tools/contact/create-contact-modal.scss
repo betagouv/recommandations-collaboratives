@@ -15,6 +15,7 @@
     color: #3a3a3a;
     font-size: 12px;
     font-weight: 700;
+    display: inline-block !important;
   }
   &__label-info {
     font-size: 10px;
@@ -36,7 +37,7 @@
 }
 
 .fr-input-group--error:before {
-      background-image: none !important;
+  background-image: none !important;
 }
 
 @media (max-height: 850px) {
