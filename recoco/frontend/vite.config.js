@@ -87,6 +87,7 @@ const config = {
           './src/js/components/DepartmentsSelector.js'
         ),
         User: resolve('./src/js/components/User.js'),
+        MutliSelect: resolve('./src/js/components/MultiSelect.js'),
       },
       output: {
         chunkFileNames: undefined,

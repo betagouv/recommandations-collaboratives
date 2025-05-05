@@ -1,10 +1,18 @@
 {% extends "base.html" %}
+{% load django_vite %}
+{% block js %}
+    {% vite_asset 'js/components/MultiSelect.js' %}
+{% endblock js %}
 {% block content %}
+    {{ departments|json_script:"departmentsArray" }}
     <br>
     <br>
-    {% if advisor_access_request %}
-        Nous avons addressé un courrier de confirmation ...
-    {% else %}
-        {% include "account/fragments/departements_select_form.html" with stepper=True total_steps=2 step_number=2 current_step_title="Sélection des départements" title="Devenir conseiller" %}
-    {% endif %}
+    <div x-data="{departments: JSON.parse(document.getElementById('departmentsArray').textContent)}"
+         x-init="console.log(departments)">
+        {% if advisor_access_request %}
+            Nous avons addressé un courrier de confirmation ...
+        {% else %}
+            {% include "account/fragments/departements_select_form.html" with stepper=True total_steps=2 step_number=2 current_step_title="Sélection des départements" title="Devenir conseiller" %}
+        {% endif %}
+    </div>
 {% endblock content %}

@@ -21,6 +21,7 @@ from django.views.decorators.http import require_http_methods
 from django.views.generic import View
 from django.views.generic.base import TemplateView
 
+from recoco.apps.geomatics.models import Department
 from recoco.apps.onboarding.forms import OnboardingEmailForm
 from recoco.apps.projects import models as projects
 from recoco.apps.projects.utils import can_administrate_project
@@ -273,6 +274,10 @@ def advisor_access_request_view(request: HttpRequest):
             user=request.user, site=request.site
         ).first()
 
+        departments = [
+            {"name": d.name, "code": d.code} for d in Department.objects.all()
+        ]
+
         if advisor_access_request:
             if not advisor_access_request.is_pending:
                 return redirect(redirect_url)
@@ -298,6 +303,7 @@ def advisor_access_request_view(request: HttpRequest):
         "home/advisor_access_request.html",
         context={
             "form": form,
+            "departments": departments,
             "advisor_access_request": advisor_access_request,
         },
     )
