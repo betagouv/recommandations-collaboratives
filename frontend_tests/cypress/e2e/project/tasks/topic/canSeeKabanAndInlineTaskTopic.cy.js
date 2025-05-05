@@ -10,7 +10,7 @@ describe('I can go to tasks tab', () => {
 
   it('sees a task kanban topic', () => {
     cy.visit(`/project/${currentProjectId}`);
-    cy.becomeAdvisor(currentProjectId); // A remplacer par une fixture avec un user déjà advisor du projet
+    cy.becomeAdvisor(currentProjectId); // A remplacer par une fixture avec un user déjà advisor du dossier
     cy.visit(`/project/${currentProjectId}/actions`);
 
     cy.createTask('inline task', 'kanban topic');

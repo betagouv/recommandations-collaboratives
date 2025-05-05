@@ -1,12 +1,6 @@
 {% load static %}
 {% load gravatar %}
 {% load guardian_tags %}
-{% load sass_tags %}
-{% block css %}
-    <link href="{% sass_src 'projects/css/fragments/task_inline/task.scss' %}"
-          rel="stylesheet"
-          type="text/css" />
-{% endblock css %}
 {% get_obj_perms request.user for request.site as "user_site_perms" %}
 {% get_obj_perms request.user for project as "user_project_perms" %}
 <div x-data="Task(task)"
@@ -28,7 +22,7 @@
                 <template x-if="!task.visited && task.public">
                     <div class="left-0">
                         <span class="bg-blue text-white"
-                              x-text="!$store.djangoData.isAdvisor ? 'Nouveau' : 'Non lu par le porteur de projet' "></span>
+                              x-text="!$store.djangoData.isAdvisor ? 'Nouveau' : 'Non lu par le demandeur' "></span>
                     </div>
                 </template>
             {% endif %}
@@ -70,14 +64,20 @@
                     <div x-html="truncate(renderMarkdown(task.content),100)"
                          class="text-info-custom fw-light font-small text-dark fr-mb-2v fr-p-0"></div>
                 </template>
+                <template x-if="!task.resource_id && task.contact">
+                    <div x-data="{contact: task.contact}"
+                         class="container__card-contact--no-ressource">
+                        {% include "tools/contacts/contact_card.html" %}
+                    </div>
+                </template>
             </article>
         {% endif %}
         <template x-if="task.resource">
             <article>{% include "projects/project/fragments/task/task_comment.html" %}</article>
         </template>
-        <hr class="fr-mt-3w">
         <!-- DS integration -->
         <template x-if="task.ds_folder && task.ds_folder.prefilled_count > 0">
+            <hr class="fr-mt-3w">
             <div>
                 <h4 class="fw-bolder">
                     <img height="31px"
@@ -97,9 +97,7 @@
                    target="_blank">Aller sur Demarches-simplifiees.fr</a>
             </div>
         </template>
-
         <hr class="fr-mt-3w">
-
         <footer class="d-flex justify-content-between align-items-center">
             <div class="d-flex align-items-center">
                 {% if embed_view is not True %}

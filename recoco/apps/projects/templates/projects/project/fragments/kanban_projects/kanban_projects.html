@@ -13,7 +13,7 @@
                 <div class="d-flex align-items-center">
                     <h2 class="fr-mb-1v d-flex align-items-center">Mon tableau de bord</h2>
                     <span class="text-muted fw-normal fr-mt-0 fr-ml-2v"
-                          x-text="`${data.length} projets`"></span>
+                          x-text="`${data.length} dossiers`"></span>
                     <div x-show="isBusy" class="fr-ml-2v specific-size">
                         <div class="spinner-border spinner-border spinner-border-sm text-primary"
                              role="status"></div>
@@ -36,7 +36,7 @@
                              fill="currentColor">
                             <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#folder" />
                         </svg>
-                        <span x-text="nbNewProjects > 0 ? `${nbNewProjects} Nouveaux projets` : `${nbNewProjects} Nouveau projet`"></span>
+                        <span x-text="nbNewProjects > 1 ? `${nbNewProjects} Nouveaux dossiers` : `${nbNewProjects} Nouveau dossier`"></span>
                     </div>
                     <template x-if="errors">
                         <div class="d-flex align-items-center fr-mr-2v">

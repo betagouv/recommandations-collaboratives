@@ -149,6 +149,27 @@ def test_answered_question_with_upload_has_attachment_saved(request, client):
 
 
 @pytest.mark.django_db
+def test_answer_question_with_upload_only_keeps_attachment(request, client):
+    current_site = get_current_site(request)
+    survey = Recipe(models.Survey, site=current_site).make()
+    session = Recipe(
+        models.Session, survey=survey, project__sites=[current_site]
+    ).make()
+
+    the_file = SimpleUploadedFile("test.pdf", b"Some content.")
+    qs = Recipe(models.QuestionSet, survey=survey).make()
+    q1 = Recipe(models.Question, question_set=qs, upload_title="The upload").make()
+    Recipe(models.Question, question_set=qs).make()
+
+    url = reverse("survey-question-details", args=(session.id, q1.id))
+    with login(client, is_staff=False):
+        response = client.post(url, data={"attachment": the_file})
+
+    assert response.status_code == 200
+    assert "test.pdf" in str(response.content)
+
+
+@pytest.mark.django_db
 def test_answered_question_with_single_choice_is_saved_to_session(request, client):
     survey = Recipe(models.Survey, site=get_current_site(request)).make()
     session = Recipe(models.Session, survey=survey).make()

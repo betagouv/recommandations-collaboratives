@@ -24,12 +24,12 @@ describe('I can go to administration area of a project and send back an invite f
 
     cy.get('.invite-switchtender-modal-textarea')
       .type(
-        `Bonjour ${userToInvite.fields.first_name}, je t'invite à conseiller mon projet friche numéro 2`,
+        `Bonjour ${userToInvite.fields.first_name}, je t'invite à conseiller mon dossier friche numéro 2`,
         { force: true }
       )
       .should(
         'have.value',
-        `Bonjour ${userToInvite.fields.first_name}, je t'invite à conseiller mon projet friche numéro 2`
+        `Bonjour ${userToInvite.fields.first_name}, je t'invite à conseiller mon dossier friche numéro 2`
       );
 
     cy.get('.invite-switchtender-modal-button').click({ force: true });

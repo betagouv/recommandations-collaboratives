@@ -14,6 +14,8 @@
     {% vite_asset 'js/components/ActionPusher.js' %}
     {% vite_asset 'js/store/actionPusher.js' %}
     {% vite_asset 'js/apps/tutorial.js' %}
+    {% vite_asset 'js/apps/featureAddContact.js' %}
+    {% vite_asset 'js/components/User.js' %}
 {% endblock js %}
 {% block content %}
     <div class="col-12 fr-p-3w fr-mx-auto push-reco">
@@ -31,11 +33,13 @@
                       method="post"
                       enctype="multipart/form-data"
                       action="."
-                      class="form">
+                      class="form"
+                      x-data="{message: {text: '', contact: ''}}"
+                      {% if task.contact %}x-init="message.contact = await getContact({{ task.contact.id }})"{% endif %}>
                     {% csrf_token %}
                     {% include "projects/project/fragments/action_pusher/type.html" with disable_multi=True %}
                     {% include "projects/project/fragments/action_pusher/resource_search.html" %}
-                    {% include "projects/project/fragments/action_pusher/details_form.html" with disable_draft=task.public %}
+                    {% include "projects/project/fragments/action_pusher/details_form.html" with disable_draft=task.public form=form %}
                     <input type="hidden" name="next" value="{{ form.next.value }}">
                     <input type="hidden" name="public" x-model="public">
                     {{ form.media }}

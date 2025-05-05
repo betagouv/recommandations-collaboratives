@@ -14,11 +14,14 @@ describe('As advisor, I can make a comment on a task', () => {
     cy.get('[data-test-id="edit-comment-button"]')
       .first()
       .click({ force: true });
-    cy.get('[data-test-id="tiptap-editor-content"] .ProseMirror').type(
-      message,
-      { force: true, delay: 0 }
-    );
-    cy.get('[data-test-id="button-submit-edit"]').click({ force: true });
+
+    cy.get('[data-test-id="tiptap-editor-content"] .ProseMirror').click();
+    cy.focused().type(message, {
+      force: true,
+      delay: 0,
+    });
+
+    cy.get('[data-test-id="button-submit-new"]').click({ force: true });
     cy.get('[data-test-id="task-initial-comment"]').should('contain', message);
   });
 });

@@ -6,16 +6,16 @@
 {% endblock css %}
 {% if is_staff %}
     <div class="d-flex justify-content-center banner-container">
-        <span class="fr-pb-2v fr-px-3v fr-pt-1v banner banner--non-publish"> Ce projet est en attente de validation.
+        <span class="fr-pb-2v fr-px-3v fr-pt-1v banner banner--non-publish"> Ce dossier est en attente de validation.
             <a class="text-underline" href="{% url 'projects-moderation-list' %}">Vous pouvez le valider ici</a>.</span>
     </div>
 {% elif request.user in project.members.all %}
     <div class="d-flex justify-content-center banner-container">
-        <span class="fr-pb-2v fr-px-3v fr-pt-1v banner banner--non-publish"> Ce projet est en attente de validation, n’hésitez pas à  <a href="{% url 'survey-project-session' project.id %}"
+        <span class="fr-pb-2v fr-px-3v fr-pt-1v banner banner--non-publish"> Ce dossier est en attente de validation, n’hésitez pas à  <a href="{% url 'survey-project-session' project.id %}"
      class="fw-bold text-underline">compléter l’état des lieux</a> pour accélérer le traitement de votre dossier</span>
     </div>
 {% else %}
     <div class="d-flex justify-content-center banner-container">
-        <span class="fr-pb-2v fr-px-3v fr-pt-1v banner banner--non-publish">Ce projet est en attente de validation</span>
+        <span class="fr-pb-2v fr-px-3v fr-pt-1v banner banner--non-publish">Ce dossier est en attente de validation</span>
     </div>
 {% endif %}
