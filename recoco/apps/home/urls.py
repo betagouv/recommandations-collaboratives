@@ -12,7 +12,11 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path(r"", views.HomePageView.as_view(), name="home"),
+    path(
+        r"",
+        views.HomePageView.as_view(),
+        name="home",
+    ),
     path(
         r"login-redirect",
         views.LoginRedirectView.as_view(),

@@ -17,6 +17,7 @@ from django.db.models import Count, F, Q
 from django.http import HttpRequest
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.decorators import method_decorator
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_http_methods
 from django.views.generic import View
 from django.views.generic.base import TemplateView
@@ -262,6 +263,8 @@ def setup_password(request):
 @login_required
 def advisor_access_request_view(request: HttpRequest):
     redirect_url = request.GET.get("next", "/")
+    if not url_has_allowed_host_and_scheme(redirect_url):
+        redirect_url = "/"
 
     if check_if_advisor(request.user):
         return redirect(redirect_url)
