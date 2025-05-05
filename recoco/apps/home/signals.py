@@ -7,7 +7,6 @@ created: 2023-06-27 08:06:10 CEST
 
 from actstream import action
 from allauth.account.signals import user_logged_in as allauth_user_logged_in
-from allauth.account.signals import user_signed_up as allauth_user_signed_up
 from django.contrib.auth.models import update_last_login
 from django.contrib.auth.signals import user_logged_in
 from django.contrib.sites.shortcuts import get_current_site
@@ -41,11 +40,6 @@ allauth_user_logged_in.connect(log_connection_on_user_login)
 magicauth_user_logged_in.connect(log_connection_on_user_login)
 
 user_logged_in.disconnect(update_last_login, dispatch_uid="update_last_login")
-
-
-@receiver(allauth_user_signed_up)
-def post_signup_workflow(sender, request, user, **kwargs):
-    pass
 
 
 # eof
