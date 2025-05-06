@@ -271,16 +271,14 @@ def advisor_access_request_view(request: HttpRequest) -> HttpResponse:
     if check_if_advisor(request.user):
         return redirect(redirect_url)
 
+    departments = [{"name": d.name, "code": d.code} for d in Department.objects.all()]
+
     if request.method == "GET":
         form = AdvisorAccessRequestForm()
 
         advisor_access_request = AdvisorAccessRequest.objects.filter(
             user=request.user, site=request.site
         ).first()
-
-        departments = [
-            {"name": d.name, "code": d.code} for d in Department.objects.all()
-        ]
 
         if advisor_access_request:
             if not advisor_access_request.is_pending:

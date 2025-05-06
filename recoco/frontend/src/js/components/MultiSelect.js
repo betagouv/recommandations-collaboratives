@@ -3,6 +3,7 @@ document.addEventListener('alpine:init', () => {
     elementId: obj.elementId,
     options: [],
     selected: obj.selected,
+    objectsToSelect: obj.objectsToSelect,
     selectedElms: [],
     show: false,
     search: '',
@@ -20,14 +21,15 @@ document.addEventListener('alpine:init', () => {
     },
 
     // Initializing component
-    init(departments) {
-      debugger;
-      for (let i = 0; i < departments.length; i++) {
+    init() {
+      for (let i = 0; i < this.objectsToSelect.length; i++) {
         this.options.push({
-          value: departments[i].code,
-          text: `(${departments[i].code}) ${departments[i].name}`,
-          search: `(${departments[i].code}) ${departments[i].name}`,
-          selected: Object.values(this.selected).includes(departments[i].code),
+          value: this.objectsToSelect[i].code,
+          text: `(${this.objectsToSelect[i].code}) ${this.objectsToSelect[i].name}`,
+          search: `(${this.objectsToSelect[i].code}) ${this.objectsToSelect[i].name}`,
+          selected: Object.values(this.selected).includes(
+            this.objectsToSelect[i].code
+          ),
         });
         if (this.options[i].selected) {
           this.selectedElms.push(this.options[i]);

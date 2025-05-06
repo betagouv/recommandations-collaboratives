@@ -1,18 +1,26 @@
+{% comment %}
+    This template is used to create a multi-select component.
+
+    Parameters django template:
+    - placeholder: The placeholder text for the input.
+
+    Parameters alpine:
+    - objectsToSelect: The objects to select from.
+{% endcomment %}
 {% load sass_tags %}
 {% block css %}
     <link href="{% sass_src 'css/tools/contact/multi-select.scss' %}"
           rel="stylesheet"
           type="text/css">
 {% endblock css %}
-<div>
+<template x-if="objectsToSelect">
     <div class="bg-white">
         <div>
             <span class="modal-create-organization__label">Départements</span>
             <div class="d-flex justify-center mt-8">
                 <!-- Define component with preselected options -->
                 <div class="w-100"
-                     x-data="alpineMultiSelect({selected:[]})"
-                     x-init="init(objectsToSelect)">
+                     x-data="alpineMultiSelect({selected:[], objectsToSelect})">
                     <!-- Select Options -->
                     <select class="d-none" x-on:change="init">
                         <template x-for="department in departments" :key="department.code">
@@ -54,7 +62,7 @@
                                             </template>
                                             <!-- None items selected -->
                                             <div x-show="selectedElms.length == 0" class="flex-grow-1">
-                                                <input placeholder="Sélectionnez un ou plusieurs départements"
+                                                <input placeholder="{{ placeholder|default:'Sélectionnez un ou plusieurs départements' }}"
                                                        class="bg-transparent p-1 px-2 appearance-none outline-none h-full w-100 text-gray-800"
                                                        x-bind:value="selectedElements()">
                                             </div>
@@ -150,4 +158,4 @@
             </div>
         </div>
     </div>
-</div>
+</template>

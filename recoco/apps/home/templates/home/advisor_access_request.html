@@ -7,8 +7,7 @@
     {{ departments|json_script:"departmentsArray" }}
     <br>
     <br>
-    <div x-data="{departments: JSON.parse(document.getElementById('departmentsArray').textContent)}"
-         x-init="console.log(departments)">
+    <div>
         {% if advisor_access_request %}
             Nous avons addressé un courrier de confirmation ...
         {% else %}
