@@ -315,12 +315,12 @@ def project_moderation_advisor_modify(
                 user=advisor_access_request.user, projects=project, site=request.site
             )
 
-    url = reverse(
-        "advisor-access-request",
-        kwargs={"advisor_access_request_id": advisor_access_request.pk},
+    return redirect(
+        reverse(
+            "advisor-access-request-moderator",
+            kwargs={"advisor_access_request_id": advisor_access_request.pk},
+        )
     )
-    next_url = reverse("projects-moderation-list")
-    return redirect(f"{url}?next={next_url}")
 
 
 # ----

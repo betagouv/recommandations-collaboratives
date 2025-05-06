@@ -18,20 +18,9 @@
 
 {% else %}
 
-    {% if not advisor_access_request.is_pending %}
+    {% if advisor_access_request.is_pending  %}
 
         Nous avons addressé un courrier de confirmation ...
-
-    {% else %}
-
-        <form class="form" action="{% url 'advisor-access-request' advisor_access_request.pk %}" method="post">
-            {% csrf_token %}
-            {{ form }}
-
-            <br>
-            <br>
-            <input type="submit" value="Submit"  class="btn btn-primary">
-        </form>
 
     {% endif %}
 
