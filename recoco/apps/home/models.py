@@ -478,6 +478,10 @@ class AdvisorAccessRequest(TimeStampedModel):
         self.status = "REJECTED"
         self.handled_by = handled_by
 
+    def modify(self, handled_by: auth_models.User = None):
+        self.status = "PENDING"
+        self.handled_by = handled_by
+
     @property
     def is_pending(self) -> bool:
         return self.status == "PENDING"
