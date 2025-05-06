@@ -234,13 +234,13 @@
                                                     type="submit"
                                                     role="submit">Refuser</button>
                                         </form>
-                                        {% comment %} <form method="post"
+                                        <form method="post"
                                             action="{% url "projects-moderation-advisor-modify" advisor.id %}">
                                             {% csrf_token %}
                                             <button class="fr-btn fr-btn--secondary fr-btn--sm fr-mr-1v float-end h-100 moderation-advisor__overright-button"
                                                     type="submit"
                                                     role="submit">Modifier</button>
-                                        </form> {% endcomment %}
+                                        </form>
                                         <form method="post"
                                             action="{% url "projects-moderation-advisor-accept" advisor.id %}">
                                             {% csrf_token %}
