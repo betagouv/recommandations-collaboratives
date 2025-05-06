@@ -290,7 +290,7 @@ def advisor_access_request_view(
         user_to_grant = advisor_access_request.user
         if user_to_grant == request.user:
             raise HttpResponseServerError(
-                "You can't grant your own. Please ask another staff member to do it."
+                "You are not allowed to modify your own advisor access request."
             )
 
     else:
