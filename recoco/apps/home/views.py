@@ -271,7 +271,7 @@ def advisor_access_request_view(
     request: HttpRequest, advisor_access_request_id: int | None = None
 ) -> HttpResponse:
     redirect_url = request.GET.get("next")
-    if not url_has_allowed_host_and_scheme(redirect_url):
+    if not url_has_allowed_host_and_scheme(redirect_url, allowed_hosts=None):
         redirect_url = reverse("home")
 
     if advisor_access_request_id:
