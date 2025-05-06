@@ -131,19 +131,9 @@
                                                              x-bind:class="option.selected ? 'selected-item' : ''"
                                                              @click="select(index,$event)">
                                                             <div x-bind:class="option.selected ? 'selected-item' : ''"
-                                                                 class="d-flex w-100 align-items-center p-2 pl-2 border-transparent border-l-2 position-relative">
+                                                                 class="d-flex w-100 align-items-center p-2 pl-2 border-transparent border-radius-03 border-l-2 position-relative">
                                                                 <div class="w-100 align-items-center d-flex">
                                                                     <div class="mx-2 leading-6" x-model="option" x-text="option.text"></div>
-                                                                    <span class="position-absolute inset-y-0 right-0 d-flex align-items-center pr-4 selected-item"
-                                                                          x-show="option.selected">
-                                                                        <svg class="h-5 w-5"
-                                                                             xmlns="http://www.w3.org/2000/svg"
-                                                                             viewBox="0 0 20 20"
-                                                                             fill="currentColor"
-                                                                             aria-hidden="true">
-                                                                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                                                                        </svg>
-                                                                    </span>
                                                                 </div>
                                                             </div>
                                                         </div>
