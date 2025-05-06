@@ -241,7 +241,7 @@ def project_moderation_advisor_refuse(
     messages.add_message(
         request,
         messages.INFO,
-        f"La demande d'accès conseiller pour '{advisor_access_request.user.emaail}' a été refusée.",
+        f"La demande d'accès conseiller pour '{advisor_access_request.user.email}' a été refusée.",
     )
 
     return redirect(reverse("projects-moderation-list"))
@@ -275,7 +275,7 @@ def project_moderation_advisor_accept(
     messages.add_message(
         request,
         messages.INFO,
-        f"La demande d'accès conseiller pour '{advisor_access_request.user.emaail}' a été acceptée.",
+        f"La demande d'accès conseiller pour '{advisor_access_request.user.email}' a été acceptée.",
     )
 
     return redirect(reverse("projects-moderation-list"))
