@@ -235,13 +235,22 @@ def project_moderation_advisor_refuse(
         AdvisorAccessRequest.on_site.select_related("user"),
         pk=advisor_access_request_id,
     )
-    advisor_access_request.reject(handled_by=request.user)
-    advisor_access_request.save()
+
+    with transaction.atomic():
+        advisor_access_request.reject(handled_by=request.user)
+        advisor_access_request.save()
+
+        for project in models.Project.on_site.filter(
+            commune__department__in=[
+                d.code for d in advisor_access_request.departments.all()
+            ]
+        ):
+            unassign_advisor(advisor_access_request.user, project)
 
     messages.add_message(
         request,
         messages.INFO,
-        f"La demande d'accès conseiller pour '{advisor_access_request.user.emaail}' a été refusée.",
+        f"La demande d'accès conseiller pour '{advisor_access_request.user.email}' a été refusée.",
     )
 
     return redirect(reverse("projects-moderation-list"))
@@ -275,10 +284,43 @@ def project_moderation_advisor_accept(
     messages.add_message(
         request,
         messages.INFO,
-        f"La demande d'accès conseiller pour '{advisor_access_request.user.emaail}' a été acceptée.",
+        f"La demande d'accès conseiller pour '{advisor_access_request.user.email}' a été acceptée.",
     )
 
     return redirect(reverse("projects-moderation-list"))
+
+
+@login_required
+@require_http_methods(["POST"])
+def project_moderation_advisor_modify(
+    request: HttpRequest, advisor_access_request_id: int
+) -> HttpResponse:
+    advisor_access_request = get_object_or_404(
+        AdvisorAccessRequest.on_site.prefetch_related("departments").select_related(
+            "user"
+        ),
+        pk=advisor_access_request_id,
+    )
+
+    with transaction.atomic():
+        advisor_access_request.modify(handled_by=request.user)
+        advisor_access_request.save()
+
+        for project in models.Project.on_site.filter(
+            commune__department__in=[
+                d.code for d in advisor_access_request.departments.all()
+            ]
+        ):
+            unassign_advisor(
+                user=advisor_access_request.user, projects=project, site=request.site
+            )
+
+    return redirect(
+        reverse(
+            "advisor-access-request-moderator",
+            kwargs={"advisor_access_request_id": advisor_access_request.pk},
+        )
+    )
 
 
 # ----

@@ -5,11 +5,7 @@
 <br>
 <br>
 
-{% if advisor_access_request %}
-
-    Nous avons addressé un courrier de confirmation ...
-
-{% else %}
+{% if not advisor_access_request %}
 
     <form class="form" action="{% url 'advisor-access-request' %}" method="post">
         {% csrf_token %}
@@ -19,6 +15,15 @@
         <br>
         <input type="submit" value="Submit"  class="btn btn-primary">
     </form>
+
+{% else %}
+
+    {% if advisor_access_request.is_pending  %}
+
+        Nous avons addressé un courrier de confirmation ...
+
+    {% endif %}
+
 
 {% endif %}
 

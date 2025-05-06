@@ -52,6 +52,11 @@ urlpatterns = [
         views.project_moderation_advisor_accept,
         name="projects-moderation-advisor-accept",
     ),
+    path(
+        r"projects/moderation/advisor/<int:advisor_access_request_id>/modify/",
+        views.project_moderation_advisor_modify,
+        name="projects-moderation-advisor-modify",
+    ),
     # projects for switchtenders
     path(
         r"projects/advisor/",

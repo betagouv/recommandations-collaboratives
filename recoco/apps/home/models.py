@@ -420,6 +420,10 @@ ObjectPermissionChecker.original_get_local_cache_key = (
 ObjectPermissionChecker.get_local_cache_key = get_local_cache_key_with_site
 
 
+class AdvisorAccessRequestManager(models.Manager):
+    use_in_migrations = False
+
+
 class AdvisorAccessRequestSiteManager(CurrentSiteManager):
     use_in_migrations = False
 
@@ -457,6 +461,7 @@ class AdvisorAccessRequest(TimeStampedModel):
         related_name="accepted_advisor_access_requests",
     )
 
+    objects = AdvisorAccessRequestManager()
     on_site = AdvisorAccessRequestSiteManager()
 
     class Meta:
@@ -471,6 +476,10 @@ class AdvisorAccessRequest(TimeStampedModel):
 
     def reject(self, handled_by: auth_models.User = None):
         self.status = "REJECTED"
+        self.handled_by = handled_by
+
+    def modify(self, handled_by: auth_models.User = None):
+        self.status = "PENDING"
         self.handled_by = handled_by
 
     @property

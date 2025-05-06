@@ -661,8 +661,8 @@ def test_project_moderation_not_available_for_non_moderators(
     with login(client):
         for url in [
             reverse("projects-moderation-list"),
-            reverse("projects-moderation-refuse", args=[project.id]),
-            reverse("projects-moderation-accept", args=[project.id]),
+            reverse("projects-moderation-project-refuse", args=[project.id]),
+            reverse("projects-moderation-project-accept", args=[project.id]),
         ]:
             response = client.get(url)
             assert response.status_code == 403
@@ -677,7 +677,7 @@ def test_project_moderation_accept_and_redirect(request, client, project_draft):
     baker.make(models.ProjectMember, project=project_draft, member=owner, is_owner=True)
 
     updated_on_before = project_draft.updated_on
-    url = reverse("projects-moderation-accept", args=[project_draft.id])
+    url = reverse("projects-moderation-project-accept", args=[project_draft.id])
 
     with login(client, groups=["example_com_staff"]) as moderator:
         moderator.profile.sites.add(current_site)
@@ -701,7 +701,7 @@ def test_project_moderation_accept_without_owner_and_redirect(
     baker.make(home_models.SiteConfiguration, site=current_site)
 
     updated_on_before = project_draft.updated_on
-    url = reverse("projects-moderation-accept", args=[project_draft.id])
+    url = reverse("projects-moderation-project-accept", args=[project_draft.id])
 
     with login(client, groups=["example_com_staff"]) as moderator:
         moderator.profile.sites.add(current_site)
@@ -744,7 +744,9 @@ def test_project_moderation_notifies_regional_actors_when_accepted(
 
     with login(client, groups=["example_com_advisor", "example_com_staff"]) as user:
         user.profile.sites.add(current_site)
-        response = client.post(reverse("projects-moderation-accept", args=[project.id]))
+        response = client.post(
+            reverse("projects-moderation-project-accept", args=[project.id])
+        )
         assert response.status_code == 302
 
     assert regional_actor.notifications.count() == 1
@@ -782,7 +784,7 @@ def test_project_moderation_does_not_notify_non_regional_actors_on_accept(
     ).make()
 
     with login(client, user=nr_membership.member, groups=["example_com_advisor"]):
-        client.post(reverse("projects-moderation-accept", args=[project.id]))
+        client.post(reverse("projects-moderation-project-accept", args=[project.id]))
 
     assert non_regional_actor.notifications.count() == 0
 
@@ -796,7 +798,7 @@ def test_project_moderation_refuse_and_redirect(request, client):
     baker.make(models.ProjectMember, project=project, member=owner, is_owner=True)
 
     updated_on_before = project.updated_on
-    url = reverse("projects-moderation-refuse", args=[project.id])
+    url = reverse("projects-moderation-project-refuse", args=[project.id])
 
     with login(client, groups=["example_com_staff"]) as moderator:
         moderator.profile.sites.add(current_site)
@@ -819,7 +821,7 @@ def test_project_moderation_accept_on_secondary_site(request, client, project_dr
     baker.make(models.ProjectMember, project=project_draft, member=owner, is_owner=True)
 
     updated_on_before = project_draft.updated_on
-    url = reverse("projects-moderation-accept", args=[project_draft.id])
+    url = reverse("projects-moderation-project-accept", args=[project_draft.id])
 
     with login(client, groups=["example_com_staff"]) as moderator:
         moderator.profile.sites.add(current_site)
