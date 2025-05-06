@@ -420,6 +420,10 @@ ObjectPermissionChecker.original_get_local_cache_key = (
 ObjectPermissionChecker.get_local_cache_key = get_local_cache_key_with_site
 
 
+class AdvisorAccessRequestSiteManager(CurrentSiteManager):
+    use_in_migrations = False
+
+
 class AdvisorAccessRequest(TimeStampedModel):
     user = models.ForeignKey(
         auth_models.User,
@@ -453,6 +457,8 @@ class AdvisorAccessRequest(TimeStampedModel):
         related_name="accepted_advisor_access_requests",
     )
 
+    on_site = AdvisorAccessRequestSiteManager()
+
     class Meta:
         verbose_name = "Demande d'accès conseiller"
         verbose_name_plural = "Demandes d'accès conseiller"
@@ -462,13 +468,10 @@ class AdvisorAccessRequest(TimeStampedModel):
     def accept(self, handled_by: auth_models.User = None):
         self.status = "ACCEPTED"
         self.handled_by = handled_by
-        self.save()
-        # TODO: add permission to user
 
     def reject(self, handled_by: auth_models.User = None):
         self.status = "REJECTED"
         self.handled_by = handled_by
-        self.save()
 
     @property
     def is_pending(self) -> bool:

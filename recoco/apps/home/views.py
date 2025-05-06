@@ -15,11 +15,10 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models import Count, F, Q
 from django.http import HttpRequest, HttpResponse
-from django.shortcuts import get_object_or_404, redirect, render
+from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.http import url_has_allowed_host_and_scheme
-from django.views.decorators.http import require_http_methods
 from django.views.generic import View
 from django.views.generic.base import TemplateView
 
@@ -28,7 +27,7 @@ from recoco.apps.projects import models as projects
 from recoco.apps.projects.utils import can_administrate_project
 from recoco.apps.resources import models as resources_models
 from recoco.apps.tasks import models as tasks
-from recoco.utils import check_if_advisor, require_htmx
+from recoco.utils import check_if_advisor
 
 from . import models
 from .forms import AdvisorAccessRequestForm, ContactForm, UserPasswordFirstTimeSetupForm
@@ -305,32 +304,6 @@ def advisor_access_request_view(request: HttpRequest) -> HttpResponse:
             "advisor_access_request": advisor_access_request,
         },
     )
-
-
-@login_required
-@require_http_methods(["POST"])
-@require_htmx
-def advisor_access_request_accept_view(
-    request: HttpRequest, advisor_access_request_id: int
-) -> HttpResponse:
-    advisor_access_request = get_object_or_404(
-        AdvisorAccessRequest, pk=advisor_access_request_id
-    )
-    advisor_access_request.accept(handled_by=request.user)
-    return HttpResponse("Advisor access request accepted successfully.")
-
-
-@login_required
-@require_http_methods(["POST"])
-@require_htmx
-def advisor_access_request_reject_view(
-    request: HttpRequest, advisor_access_request_id: int
-) -> HttpResponse:
-    advisor_access_request = get_object_or_404(
-        AdvisorAccessRequest, pk=advisor_access_request_id
-    )
-    advisor_access_request.reject(handled_by=request.user)
-    return HttpResponse("Advisor access request rejected successfully.")
 
 
 # eof
