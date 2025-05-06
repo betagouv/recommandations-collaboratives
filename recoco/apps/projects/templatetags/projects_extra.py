@@ -14,6 +14,7 @@ from django.contrib.sites.models import Site
 from django.forms import model_to_dict
 
 from recoco import utils as recoco_utils
+from recoco.apps.home.models import AdvisorAccessRequest
 
 from .. import models
 
@@ -59,6 +60,16 @@ def get_project_moderation_count():
         project_sites__site=Site.objects.get_current(),
         deleted=None,
     ).count()
+
+
+@register.simple_tag
+def get_advisor_access_requests_count():
+    """Return the number of advisor access requests to moderate for the current site"""
+    return (
+        AdvisorAccessRequest.objects.filter(site=Site.objects.get_current())
+        .pending()
+        .count()
+    )
 
 
 @register.filter(name="to_json")

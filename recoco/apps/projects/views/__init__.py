@@ -84,7 +84,7 @@ def project_moderation_list(request):
     ).order_by("-created_on")
 
     advisor_access_requests = (
-        AdvisorAccessRequest.on_site.filter(status="PENDING")
+        AdvisorAccessRequest.on_site.pending()
         .prefetch_related("departments")
         .select_related("user")
     ).order_by("-created")
