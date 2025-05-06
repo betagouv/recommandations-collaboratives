@@ -14,7 +14,12 @@ from django.contrib.auth import models as auth
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models import Count, F, Q
-from django.http import HttpRequest, HttpResponse, HttpResponseForbidden
+from django.http import (
+    HttpRequest,
+    HttpResponse,
+    HttpResponseForbidden,
+    HttpResponseServerError,
+)
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils.decorators import method_decorator
@@ -271,7 +276,9 @@ def advisor_access_request_view(
 
     if advisor_access_request_id:
         if not is_staff_for_site(request.user, request.site):
-            return HttpResponseForbidden()
+            return HttpResponseForbidden(
+                "You are not allowed to modify this advisor access request."
+            )
 
         advisor_access_request = get_object_or_404(
             AdvisorAccessRequest.on_site.prefetch_related("departments").select_related(
@@ -281,6 +288,11 @@ def advisor_access_request_view(
         )
 
         user_to_grant = advisor_access_request.user
+        if user_to_grant == request.user:
+            raise HttpResponseServerError(
+                "You can't grant your own. Please ask another staff member to do it."
+            )
+
     else:
         advisor_access_request = (
             AdvisorAccessRequest.objects.filter(user=request.user, site=request.site)
@@ -320,6 +332,7 @@ def advisor_access_request_view(
                 )
                 advisor_access_request.save()
             advisor_access_request.departments.set(form.cleaned_data["departments"])
+            return redirect(redirect_url)
 
     return render(
         request,
