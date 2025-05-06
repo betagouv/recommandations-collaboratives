@@ -245,7 +245,9 @@ def project_moderation_advisor_refuse(
                 d.code for d in advisor_access_request.departments.all()
             ]
         ):
-            unassign_advisor(advisor_access_request.user, project)
+            unassign_advisor(
+                user=advisor_access_request.user, project=project, site=request.site
+            )
 
     messages.add_message(
         request,
@@ -278,7 +280,7 @@ def project_moderation_advisor_accept(
             ]
         ):
             assign_advisor(
-                user=advisor_access_request.user, projects=project, site=request.site
+                user=advisor_access_request.user, project=project, site=request.site
             )
 
     messages.add_message(
@@ -312,7 +314,7 @@ def project_moderation_advisor_modify(
             ]
         ):
             unassign_advisor(
-                user=advisor_access_request.user, projects=project, site=request.site
+                user=advisor_access_request.user, project=project, site=request.site
             )
 
     return redirect(
