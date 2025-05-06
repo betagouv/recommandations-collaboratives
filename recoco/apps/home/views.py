@@ -332,7 +332,6 @@ def advisor_access_request_view(
                 )
                 advisor_access_request.save()
             advisor_access_request.departments.set(form.cleaned_data["departments"])
-            return redirect(redirect_url)
 
     return render(
         request,
