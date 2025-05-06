@@ -281,7 +281,8 @@ def advisor_access_request_view(request: HttpRequest) -> HttpResponse:
                 return redirect(redirect_url)
 
             form.fields["departments"].initial = [
-                department.id for department in advisor_access_request.departments.all()
+                department.code
+                for department in advisor_access_request.departments.all()
             ]
 
     if request.method == "POST":
