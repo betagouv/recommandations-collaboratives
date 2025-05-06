@@ -7,7 +7,10 @@ def delete_perm_site_use_project_tags(apps, schema_editor):
     Permission = apps.get_model("auth", "Permission")
     ContentType = apps.get_model("contenttypes", "ContentType")
 
-    site_ct = ContentType.objects.get(app_label="sites", model="site")
+    try:
+        site_ct = ContentType.objects.get(app_label="sites", model="site")
+    except ContentType.DoesNotExist:
+        return
 
     queryset = Permission.objects.filter(
         codename="use_project_tags",
@@ -21,7 +24,10 @@ def undo_delete_perm_site_use_project_tags(apps, schema_editor):
     Permission = apps.get_model("auth", "Permission")
     ContentType = apps.get_model("contenttypes", "ContentType")
 
-    site_ct = ContentType.objects.get(app_label="sites", model="site")
+    try:
+        site_ct = ContentType.objects.get(app_label="sites", model="site")
+    except ContentType.DoesNotExist:
+        return
 
     Permission.objects.get_or_create(
         codename="use_project_tags",
