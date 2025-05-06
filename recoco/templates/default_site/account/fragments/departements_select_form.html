@@ -11,8 +11,9 @@
                      x-data="{objectsToSelect: JSON.parse(document.getElementById('departmentsArray').textContent), selectedDepartments: []}"
                      @set-departments="selectedDepartments = $event.detail">
                     {% include "tools/contacts/multi_select.html" with placeholder="Sélectionnez un ou plusieurs départements, laisser vide pour toute la France" %}
-                    {{ form }}
-                    <input name="departments" :value="selectedDepartments">
+                    <template x-for="dept in selectedDepartments" :key="dept">
+                        <input type="hidden" name="departments" :value="dept">
+                    </template>
                     <button class="fr-btn custom-login-button w-100" type="submit">S'inscrire</button>
                 </div>
             </div>
