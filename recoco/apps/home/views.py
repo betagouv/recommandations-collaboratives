@@ -291,8 +291,8 @@ def advisor_access_request_view(
 
         user_to_grant = request.user
 
-        # if check_if_advisor(user_to_grant):
-        #     return redirect(redirect_url)
+        if check_if_advisor(user_to_grant):
+            return redirect(redirect_url)
 
     departments = departments = [
         {"name": d.name, "code": d.code} for d in Department.objects.all()

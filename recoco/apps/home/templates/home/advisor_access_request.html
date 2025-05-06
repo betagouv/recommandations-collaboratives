@@ -5,7 +5,7 @@
 <br>
 <br>
 
-{% if advisor_access_request %}
+{% if advisor_access_request and not advisor_access_request.is_pending %}
 
     Nous avons addressé un courrier de confirmation ...
 
