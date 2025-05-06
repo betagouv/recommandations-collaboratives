@@ -95,9 +95,9 @@
             <!-- Projects moderation -->
             <li class="navigation__item-moderation d-flex">
                 <a href="{% url "projects-moderation-list" %}"
-                   class="{% if url_name == 'projects-moderation-list' %}active{% endif %}"><span class="fr-link underline no-wrap">Dossiers à examiner</span></a>
+                   class="{% if url_name == 'projects-moderation-list' %}active{% endif %}"><span class="fr-link underline no-wrap">Modération</span></a>
                 {% if projects_to_moderate_count %}
-                    <span class="badge text-bg-danger no-underline">{{ projects_to_moderate_count }}</span>
+                    <span class="badge text-bg-danger no-underline">{{ projects_to_moderate_count | add:advisor_access_requests.count }}</span>
                 {% endif %}
             </li>
         {% endif %}
