@@ -1,0 +1,16 @@
+{% extends "account/layout/layout.html" %}
+{% load static %}
+{% block layout_content %}
+    <fieldset class="fr-fieldset">
+        <div class="fr-fieldset__content">
+            <p class="text-red-light fw-semibold fr-mb-1w">
+                Nous vous avons adressé un email de confirmation. Il est indispensable de cliquer sur le lien qu’il contient afin que votre demande puisse être traitée.
+            </p>
+            <p class="fr-mb-4w">
+                Votre demande de compte conseiller sera ainsi transférée aux administrateurs du site, qui devront la <span class="fw-semibold">valider manuellement</span>. Vous serez informé·e par email lorsque cela sera fait.
+            </p>
+            <p class="fr-mb-4w">En attendant, vous pouvez consulter le guide du conseiller ci-dessous.</p>
+            {% include "account/fragments/button_pending_advisor_request.html" %}
+        </div>
+    </fieldset>
+{% endblock layout_content %}

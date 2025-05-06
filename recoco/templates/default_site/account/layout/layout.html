@@ -30,13 +30,7 @@
                  height="auto"
                  alt="Logo {{ request.site.name }}" />
         {% endif %}
-        {% if site_config.email_logo %}
-            <img src="{{ site_config.email_logo.url }}"
-                 width="10%"
-                 height="auto"
-                 alt="Logo {{ request.site.name }}" />
-        {% endif %}
-        <h1>
+        <h1 class="fr-mb-8w">
             <strong>{{ title }} sur <span class="layout-form__site-name">{{ request.site.name }}</span></strong>
         </h1>
     </div>

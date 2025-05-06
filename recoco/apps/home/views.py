@@ -265,6 +265,8 @@ def setup_password(request):
 @login_required
 def advisor_access_request_view(request: HttpRequest) -> HttpResponse:
     redirect_url = request.GET.get("next")
+    site_config = request.site.configuration
+
     if not redirect_url or not url_has_allowed_host_and_scheme(redirect_url):
         redirect_url = reverse("home")
 
@@ -283,9 +285,8 @@ def advisor_access_request_view(request: HttpRequest) -> HttpResponse:
         if advisor_access_request:
             if not advisor_access_request.is_pending:
                 return redirect(redirect_url)
-
             form.fields["departments"].initial = [
-                department.id for department in advisor_access_request.departments.all()
+                department.pk for department in advisor_access_request.departments.all()
             ]
 
     if request.method == "POST":
@@ -304,6 +305,7 @@ def advisor_access_request_view(request: HttpRequest) -> HttpResponse:
         request,
         "home/advisor_access_request.html",
         context={
+            "site_config": site_config,
             "form": form,
             "departments": departments,
             "advisor_access_request": advisor_access_request,
