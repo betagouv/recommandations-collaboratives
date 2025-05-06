@@ -3,6 +3,12 @@
 {% block js %}
     {% vite_asset 'js/components/MultiSelect.js' %}
 {% endblock js %}
+{% block title %}
+    Devenir conseiller
+{% endblock title %}
+{% block og_title %}
+    Devenir conseiller
+{% endblock og_title %}
 {% block content %}
     {{ departments|json_script:"departmentsArray" }}
     <br>
