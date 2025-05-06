@@ -359,7 +359,7 @@ def advisor_access_request_moderator_view(
 
     return render(
         request,
-        "home/advisor_access_request.html",
+        "home/advisor_access_request_moderator.html",
         context={
             "form": form,
             "advisor_access_request": advisor_access_request,
