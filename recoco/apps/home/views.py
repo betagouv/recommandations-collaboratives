@@ -30,10 +30,10 @@ from django.views.generic.base import TemplateView
 from recoco.apps.geomatics.models import Department
 from recoco.apps.onboarding.forms import OnboardingEmailForm
 from recoco.apps.projects import models as projects
-from recoco.apps.projects.utils import can_administrate_project
+from recoco.apps.projects.utils import can_administrate_project, is_project_moderator
 from recoco.apps.resources import models as resources_models
 from recoco.apps.tasks import models as tasks
-from recoco.utils import check_if_advisor, is_staff_for_site
+from recoco.utils import check_if_advisor
 
 from . import models
 from .forms import AdvisorAccessRequestForm, ContactForm, UserPasswordFirstTimeSetupForm
@@ -271,11 +271,11 @@ def advisor_access_request_view(
     request: HttpRequest, advisor_access_request_id: int | None = None
 ) -> HttpResponse:
     redirect_url = request.GET.get("next")
-    if not redirect_url or not url_has_allowed_host_and_scheme(redirect_url):
+    if not url_has_allowed_host_and_scheme(redirect_url):
         redirect_url = reverse("home")
 
     if advisor_access_request_id:
-        if not is_staff_for_site(request.user, request.site):
+        if not is_project_moderator(request.user, request.site):
             return HttpResponseForbidden(
                 "You are not allowed to modify this advisor access request."
             )
