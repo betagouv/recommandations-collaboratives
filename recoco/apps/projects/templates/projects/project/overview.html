@@ -22,7 +22,6 @@
           type="text/css">
 {% endblock css %}
 {% block project_detail %}
-    {% get_obj_perms request.user for request.site as "user_site_perms" %}
     {% get_obj_perms request.user for project as "user_project_perms" %}
     <div x-data="ProjectShare" class="col-12">
         <div x-data="Tutorial('project-advisor-overview')">
@@ -160,14 +159,14 @@
                                                         <span class="fr-icon-pantone-line fr-icon--sm" aria-hidden="true"></span>
                                                         {% for tag in project.tags.all %}<span class="project-info__tag fr-mr-1v">#{{ tag }}</span>{% endfor %}
                                                     </div>
-                                                    {% if "use_project_tags" in user_site_perms %}
+                                                    {% if "use_project_tags" in user_project_perms %}
                                                         <a class="fr-btn fr-btn--sm fr-btn--tertiary-no-outline fr-icon-pencil-line btn-tag-specific-size"
                                                            href="{% url "projects-project-tags" project.id %}"
                                                            data-cy="overview-edit-project-tag">Modifier les étiquettes</a>
                                                     {% endif %}
                                                 </div>
                                             {% else %}
-                                                {% if "use_project_tags" in user_site_perms %}
+                                                {% if "use_project_tags" in user_project_perms %}
                                                     <a class="fr-btn fr-btn--sm fr-btn--tertiary fr-btn--icon-left fr-icon-pencil-line"
                                                        href="{% url "projects-project-tags" project.id %}"
                                                        data-cy="overview-add-project-tag">Ajouter des tags au dossier</a>

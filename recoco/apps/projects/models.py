@@ -78,6 +78,7 @@ ADVISOR_PERMISSIONS = [
     "projects.view_surveys",
     "projects.change_project",
     "projects.change_location",
+    "projects.use_project_tags",
 ]
 
 OBSERVER_PERMISSIONS = ADVISOR_PERMISSIONS
@@ -106,12 +107,6 @@ def create_site_permissions(sender, **kwargs):
     auth_models.Permission.objects.get_or_create(
         codename="delete_projects",
         name="Can delete projects for site",
-        content_type=site_ct,
-    )
-
-    auth_models.Permission.objects.get_or_create(
-        codename="use_project_tags",
-        name="Can use tags on projects",
         content_type=site_ct,
     )
 
