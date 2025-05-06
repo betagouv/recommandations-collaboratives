@@ -110,13 +110,6 @@ def create_site_permissions(sender, **kwargs):
         content_type=site_ct,
     )
 
-    queryset = auth_models.Permission.objects.filter(
-        codename="use_project_tags",
-        content_type=site_ct,
-    )
-    if queryset.exists():
-        queryset.delete()
-
 
 class ProjectManager(models.Manager):
     """Manager for all projects"""
