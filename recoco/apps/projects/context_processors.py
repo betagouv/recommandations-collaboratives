@@ -1,12 +1,13 @@
 from collections import defaultdict
 from functools import wraps
 
+from django.conf import settings
 from django.core.serializers import serialize
 from django.utils.timezone import localtime
 from notifications import models as notifications_models
 
 from recoco import verbs
-from recoco.utils import check_if_advisor
+from recoco.utils import check_if_advisor, is_admin_for_site, is_staff_for_site
 
 from .utils import can_administrate_project
 
@@ -74,6 +75,37 @@ def unread_notifications_processor(request):
         "unread_notifications_count": unread_notifications.count(),
         "grouped_notifications": dict(grouped_notifications),
         "show_project_verb_list": show_project_verb_list,
+    }
+
+
+@exclude_path("/nimda")
+@exclude_path("/api")
+def matomo_context_processor(request):
+    """
+    Context processor that provides a list of sites accessible to the user.
+    """
+    context = {
+        "matomo_url": settings.MATOMO_URL,
+        "matomo_site_id": settings.MATOMO_SITE_ID,
+    }
+
+    if not request.user.is_authenticated:
+        return context
+
+    # Check if the user is authenticated and has a site
+    roles = ",".join(
+        role
+        for role, has_role in {
+            "admin": is_admin_for_site(request.user),
+            "staff": is_staff_for_site(request.user, request.site),
+            "advisor": check_if_advisor(request.user, request.site),
+        }.items()
+        if has_role
+    )
+
+    return {
+        **context,
+        "matomo_user_roles": roles,
     }
 
 
