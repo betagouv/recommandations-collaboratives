@@ -92,16 +92,6 @@ urlpatterns = [
         views.advisor_access_request_moderator_view,
         name="advisor-access-request-moderator",
     ),
-    path(
-        r"advisor_access_accept_view/<int:advisor_access_request_id>/accept",
-        views.advisor_access_request_accept_view,
-        name="advisor-access-request-accept",
-    ),
-    path(
-        r"advisor_access_accept_view/<int:advisor_access_request_id>/reject",
-        views.advisor_access_request_reject_view,
-        name="advisor-access-request-reject",
-    ),
 ]
 
 # eof
