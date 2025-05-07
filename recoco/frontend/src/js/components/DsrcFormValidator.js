@@ -19,6 +19,8 @@ function DsrcFormValidator(formId, validationSchema, requestMethod = 'GET') {
     form: {},
     errors: [],
     schema: validationSchema,
+    isFormEdited: false,
+    canSubmit: true,
     submittedForm: requestMethod === 'POST',
     async init() {
       if (!this.schema) {
@@ -54,6 +56,8 @@ function DsrcFormValidator(formId, validationSchema, requestMethod = 'GET') {
       this.$nextTick(() => {
         // enable form validation for all submission types (click, keyboard, ...)
         document.getElementById(formId).addEventListener('submit', (event) => {
+          this.isFormEdited = false;
+          this.canSubmit = false;
           this.submittedForm = true;
           this.validate();
           if (Array.isArray(this.errors) && this.errors.length > 0) {

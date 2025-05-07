@@ -1,5 +1,7 @@
 {% load crispy_forms_tags %}
-<form id="{{ form.helper.form_id }}" method="post">
+<form id="{{ form.helper.form_id }}"
+      method="post"
+      x-on:input="isFormEdited = true">
     <input type="hidden"
            name="js_enabled"
            id="{{ form.helper.form_id }}_js_enabled"

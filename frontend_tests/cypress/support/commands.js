@@ -192,7 +192,7 @@ Cypress.Commands.add('createProject', (label, objProject = project) => {
     .should('have.value', objProject.description || project.description)
     .should('have.class', 'fr-input--valid');
 
-  cy.get('button[type="submit"]').click();
+  cy.get('button[type="submit"]').click().should('be.disabled');
 
   cy.url().should('include', '/onboarding/summary');
 
