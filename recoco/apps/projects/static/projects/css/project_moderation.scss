@@ -123,6 +123,11 @@
     font-weight: 700;
     line-height: 150%;
   }
+  &__departments {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
   &__department {
     border-radius: 2px;
     background: var(--light-background-contrast-info, #e8edff);
@@ -132,6 +137,7 @@
     font-size: 12px;
     font-style: normal;
     font-weight: 700;
+    line-height: 100%;
   }
   &__overright-button {
     border-radius: 1px;
