@@ -16,14 +16,14 @@
 <template x-if="objectsToSelect">
     <div class="bg-white">
         <div>
-            <span class="modal-create-organization__label">Départements</span>
+            <label class="modal-create-organization__label" for="select-list-input">Départements</label>
             <div class="d-flex justify-center mt-8">
                 <!-- Define component with preselected options -->
                 <div class="w-100"
-                     x-data="alpineMultiSelect({selected:[], objectsToSelect})">
+                     x-data="alpineMultiSelect({selected:selectedDepartments, objectsToSelect})">
                     <!-- Select Options -->
                     <select class="d-none" x-on:change="init">
-                        <template x-for="department in departments" :key="department.code">
+                        <template x-for="department in objectsToSelect" :key="department.code">
                             <option :value="department.code"
                                     :data-search="'(' + department.code + ')' + ' ' + department.name"
                                     x-text="'(' + department.code + ')' + ' ' + department.name" />
@@ -64,7 +64,8 @@
                                             <div x-show="selectedElms.length == 0" class="flex-grow-1">
                                                 <input placeholder="{{ placeholder|default:'Sélectionnez un ou plusieurs départements' }}"
                                                        class="bg-transparent p-1 px-2 appearance-none outline-none h-full w-100 text-gray-800"
-                                                       x-bind:value="selectedElements()">
+                                                       x-bind:value="selectedElements()"
+                                                       id="select-list-input">
                                             </div>
                                         </div>
                                         <!-- Drop down toogle with icons-->
