@@ -17,7 +17,7 @@ main {
   display: flex;
   flex-wrap: nowrap;
 
-  min-height: 100vh;
+  min-height: calc(100vh - 65px);
   height: -webkit-fill-available;
 }
 

@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% load django_vite %}
+{% block js %}
+    {% vite_asset 'js/components/MultiSelect.js' %}
+{% endblock js %}
+{% block title %}
+    Modification de la demande de conseiller
+{% endblock title %}
+{% block og_title %}
+    Modification de la demande de conseiller
+{% endblock og_title %}
+{% block content %}
+    {{ departments|json_script:"departmentsArray" }}
+    <div>
+        {% include "account/fragments/departements_select_form_moderator.html" with stepper=False current_step_title="Sélection des départements" title="Modification de la demande de conseiller" %}
+    </div>
+{% endblock content %}

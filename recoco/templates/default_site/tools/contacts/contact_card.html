@@ -1,5 +1,7 @@
 {% comment %}
 
+----- If contact data comes from js -----
+
 Contact Card Component.
 Be sure to include the following data transfer in your parent template.
 
@@ -10,6 +12,16 @@ Example usage in parent:
 <div x-data="{contact:myContactInParent}">
     {% include "tools/contacts/contact_card.html" %}
 </div>
+
+----- If contact data comes from django -----
+
+Parameters:
+- contact (object)
+- is_django_data (boolean)
+- is_type_user (boolean)
+
+Example usage in parent:
+{% include "tools/contacts/contact_card.html" is_django_data=True contact=myContactInParent %}
 
 {% endcomment %}
 {% load sass_tags %}
@@ -90,3 +102,150 @@ Example usage in parent:
         </template>
     </div>
 </template>
+{% if is_django_data %}
+    {% if is_type_user %}
+        <div class="contact-card fr-p-3v bg-white" data-test-id="contact-card">
+            <div class="contact-card__firstline-container">
+                {% if contact.first_name or contact.last_name %}
+                    <span title="{{ contact.first_name }} {{ contact.last_name }}"
+                          class="contact-info__name contact-names fr-pr-1v">{{ contact.first_name }} {{ contact.last_name }}</span>
+                {% endif %}
+                {% if contact.profile.organization.name %}
+                    <span title="{{ contact.profile.organization.name }}"
+                          class="contact-info__organization color-3a3a3a text-position">{{ contact.profile.organization.name }}</span>
+                {% endif %}
+            </div>
+            {% if contact.profile.organization_position %}
+                <div title="{{ contact.profile.organization_position }}"
+                     class="contact-info__division">
+                    <span class="color-3a3a3a text-organization">{{ contact.profile.organization_position }}</span>
+                </div>
+            {% else %}
+                <div class="contact-info-empty__division"></div>
+            {% endif %}
+            {% if contact.email %}
+                <div class="contact-info__email">
+                    <a href="mailto:{{ contact.email }}"
+                       class="contact-card__link text-position">
+                        <span class="fr-icon--sm fr-icon-link">{{ contact.email }}</span>
+                    </a>
+                    <button class="fr-ml-3w fr-px-2v fr-py-0 fr-btn fr-btn--secondary fr-btn--xs"
+                            @click.prevent="clipboardCopy(`L'email`, '{{ contact.email }}')"
+                            title="Copier l'email">
+                        <svg class="bi align-baseline" width="10" height="10" fill="currentColor">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#clipboard" />
+                        </svg>
+                    </button>
+                </div>
+            {% else %}
+                <div class="contact-info-empty__email"></div>
+            {% endif %}
+            {% if contact.profile.phone_no %}
+                <div class="contact-info__phone">
+                    <a href="tel:{{ contact.profile.phone_no }}"
+                       class="contact-card__link text-position">
+                        <span class="fr-icon--sm fr-icon-phone-line">{{ contact.profile.phone_no }}</span>
+                    </a>
+                </div>
+            {% else %}
+                <div class="contact-info-empty__phone"></div>
+            {% endif %}
+            {% if contact.profile.mobile_no %}
+                <div class="contact-info__phone">
+                    <a href="tel:{{ contact.profile.mobile_no }}"
+                       class="contact-card__link text-position">
+                        <span class="fr-icon--sm fr-icon-phone-line">{{ contact.profile.mobile_no }}</span>
+                    </a>
+                </div>
+            {% else %}
+                <div class="contact-info-empty__phone"></div>
+            {% endif %}
+            {% if contact.modified %}
+                <div class="contact-card__updated-at contact-info__updated-at">
+                    <span class="text-date">mis
+                    à jour le</span>
+                    <span class="text-date">{{ contact.modified|date:"d/m/Y" }}</span>
+                {% endif %}
+                {% if contact.created and not contact.modified %}
+                    <div class="contact-card__updated-at contact-info__updated-at">
+                        <span class="text-date">mis
+                        à jour le</span>
+                        <span class="text-date">{{ contact.created|date:"d/m/Y" }}</span>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    {% else %}
+        <div class="contact-card fr-p-3v bg-white" data-test-id="contact-card">
+            <div class="contact-card__firstline-container">
+                {% if contact.first_name or contact.last_name %}
+                    <span title="{{ contact.first_name }} {{ contact.last_name }}"
+                          class="contact-info__name contact-names fr-pr-1v">{{ contact.first_name }} {{ contact.last_name }}</span>
+                {% endif %}
+                {{ contact.organization }}
+                {% if contact.organization.name %}
+                    <span title="{{ contact.organization.name }}"
+                          class="contact-info__organization color-3a3a3a text-position">{{ contact.organization.name }}</span>
+                {% endif %}
+            </div>
+            {% if contact.division %}
+                <div title="{{ contact.division }}" class="contact-info__division">
+                    <span class="color-3a3a3a text-organization">{{ contact.division }}</span>
+                </div>
+            {% else %}
+                <div class="contact-info-empty__division"></div>
+            {% endif %}
+            {% if contact.email %}
+                <div class="contact-info__email">
+                    <a href="mailto:{{ contact.email }}"
+                       class="contact-card__link text-position">
+                        <span class="fr-icon--sm fr-icon-link">{{ contact.email }}</span>
+                    </a>
+                    <button class="fr-ml-3w fr-px-2v fr-py-0 fr-btn fr-btn--secondary fr-btn--xs"
+                            @click.prevent="clipboardCopy(`L'email`, '{{ contact.email }}')"
+                            title="Copier l'email">
+                        <svg class="bi align-baseline" width="10" height="10" fill="currentColor">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#clipboard" />
+                        </svg>
+                    </button>
+                </div>
+            {% else %}
+                <div class="contact-info-empty__email"></div>
+            {% endif %}
+            {% if contact.phone_no %}
+                <div class="contact-info__phone">
+                    <a href="tel:{{ contact.phone_no }}"
+                       class="contact-card__link text-position">
+                        <span class="fr-icon--sm fr-icon-phone-line">{{ contact.phone_no }}</span>
+                    </a>
+                </div>
+            {% else %}
+                <div class="contact-info-empty__phone"></div>
+            {% endif %}
+            {% if contact.mobile_no %}
+                <div class="contact-info__phone">
+                    <a href="tel:{{ contact.mobile_no }}"
+                       class="contact-card__link text-position">
+                        <span class="fr-icon--sm fr-icon-phone-line">{{ contact.mobile_no }}</span>
+                    </a>
+                </div>
+            {% else %}
+                <div class="contact-info-empty__phone"></div>
+            {% endif %}
+            {% if contact.modified %}
+                <div class="contact-card__updated-at contact-info__updated-at">
+                    <span class="text-date">mis
+                    à jour le</span>
+                    <span class="text-date">{{ contact.modified|date:"d/m/Y" }}</span>
+                {% endif %}
+                {% if contact.created and not contact.modified %}
+                    <div class="contact-card__updated-at contact-info__updated-at">
+                        <span class="text-date">mis
+                        à jour le</span>
+                        <span class="text-date">{{ contact.created|date:"d/m/Y" }}</span>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    {% endif %}
+{% endif %}
