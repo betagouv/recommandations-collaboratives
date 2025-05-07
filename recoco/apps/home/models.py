@@ -14,6 +14,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.managers import CurrentSiteManager
 from django.contrib.sites.models import Site
 from django.db import models
+from django.db.models.query import QuerySet
 from django.db.models.signals import post_migrate, post_save
 from django.dispatch import receiver
 from django.utils.encoding import force_str
@@ -420,11 +421,20 @@ ObjectPermissionChecker.original_get_local_cache_key = (
 ObjectPermissionChecker.get_local_cache_key = get_local_cache_key_with_site
 
 
-class AdvisorAccessRequestManager(models.Manager):
+class AdvisorAccessRequestQuerySet(QuerySet):
+    def pending(self):
+        return self.filter(status="PENDING")
+
+
+class AdvisorAccessRequestManager(
+    models.Manager.from_queryset(AdvisorAccessRequestQuerySet)
+):
     use_in_migrations = False
 
 
-class AdvisorAccessRequestSiteManager(CurrentSiteManager):
+class AdvisorAccessRequestSiteManager(
+    CurrentSiteManager.from_queryset(AdvisorAccessRequestQuerySet)
+):
     use_in_migrations = False
 
 

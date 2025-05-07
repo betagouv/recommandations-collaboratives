@@ -5,7 +5,7 @@
 <br>
 <br>
 
-<form class="form" action="{% url 'advisor-access-request' advisor_access_request.pk %}" method="post">
+<form class="form" action="{% url 'advisor-access-request-moderator' advisor_access_request.pk %}" method="post">
     {% csrf_token %}
     {{ form }}
 
