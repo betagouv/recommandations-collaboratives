@@ -1,4 +1,4 @@
-describe('I can create a new project from the main header project list dropdown', () => {
+describe('I can create a new project from the main header project list dropdown @deposer-projet', () => {
   it('display button as a collectivity', () => {
     cy.login('collectivité1');
     cy.visit(`/`);
