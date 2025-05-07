@@ -11,8 +11,6 @@
 {% endblock og_title %}
 {% block content %}
     {{ departments|json_script:"departmentsArray" }}
-    <br>
-    <br>
     <div>
         {% if advisor_access_request %}
             {% include "account/fragments/pending_advisor_request_redirect.html" with title="Devenir conseiller" %}
