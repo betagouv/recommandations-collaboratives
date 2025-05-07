@@ -40,6 +40,7 @@ from recoco.utils import (
 
 from .. import forms, models
 from ..utils import (
+    get_advising_context_for_project,
     is_regional_actor_for_project,
     notify_advisors_of_project,
     refresh_user_projects_in_session,
@@ -79,6 +80,10 @@ def project_administration(request, project_id):
 
     is_regional_actor = is_regional_actor_for_project(
         request.site, project, request.user, allow_national=True
+    )
+
+    advising, advising_position = get_advising_context_for_project(
+        request.user, project
     )
 
     if not (is_regional_actor or has_any_required_perm):
@@ -167,6 +172,7 @@ def project_administration(request, project_id):
             "pending_invites": pending_invites,
             "is_regional_actor": is_regional_actor,
             "has_any_required_perm": has_any_required_perm,
+            "advising_position": advising_position,
         },
     )
 

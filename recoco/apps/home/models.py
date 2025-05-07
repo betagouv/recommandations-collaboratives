@@ -14,6 +14,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.managers import CurrentSiteManager
 from django.contrib.sites.models import Site
 from django.db import models
+from django.db.models.query import QuerySet
 from django.db.models.signals import post_migrate, post_save
 from django.dispatch import receiver
 from django.utils.encoding import force_str
@@ -420,6 +421,23 @@ ObjectPermissionChecker.original_get_local_cache_key = (
 ObjectPermissionChecker.get_local_cache_key = get_local_cache_key_with_site
 
 
+class AdvisorAccessRequestQuerySet(QuerySet):
+    def pending(self):
+        return self.filter(status="PENDING")
+
+
+class AdvisorAccessRequestManager(
+    models.Manager.from_queryset(AdvisorAccessRequestQuerySet)
+):
+    use_in_migrations = False
+
+
+class AdvisorAccessRequestSiteManager(
+    CurrentSiteManager.from_queryset(AdvisorAccessRequestQuerySet)
+):
+    use_in_migrations = False
+
+
 class AdvisorAccessRequest(TimeStampedModel):
     user = models.ForeignKey(
         auth_models.User,
@@ -453,6 +471,9 @@ class AdvisorAccessRequest(TimeStampedModel):
         related_name="accepted_advisor_access_requests",
     )
 
+    objects = AdvisorAccessRequestManager()
+    on_site = AdvisorAccessRequestSiteManager()
+
     class Meta:
         verbose_name = "Demande d'accès conseiller"
         verbose_name_plural = "Demandes d'accès conseiller"
@@ -462,12 +483,14 @@ class AdvisorAccessRequest(TimeStampedModel):
     def accept(self, handled_by: auth_models.User = None):
         self.status = "ACCEPTED"
         self.handled_by = handled_by
-        self.save()
 
     def reject(self, handled_by: auth_models.User = None):
         self.status = "REJECTED"
         self.handled_by = handled_by
-        self.save()
+
+    def modify(self, handled_by: auth_models.User = None):
+        self.status = "PENDING"
+        self.handled_by = handled_by
 
     @property
     def is_pending(self) -> bool:

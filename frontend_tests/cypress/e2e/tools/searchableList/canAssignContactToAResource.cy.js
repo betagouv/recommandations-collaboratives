@@ -47,6 +47,9 @@ describe('I can assign some contacts when I create a resource', () => {
       .type('20/12/2022', { force: true })
       .should('have.value', '20/12/2022');
 
+    cy.get('.ProseMirror p').click();
+    cy.focused().type('text', 'contenu de la ressource de test');
+
     cy.get('[type="submit"]').click({ force: true });
 
     cy.url().should('include', '/ressource/');

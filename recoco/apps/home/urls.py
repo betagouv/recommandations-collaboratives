@@ -88,6 +88,11 @@ urlpatterns = [
         name="advisor-access-request",
     ),
     path(
+        r"advisor-access-request/<int:advisor_access_request_id>/",
+        views.advisor_access_request_moderator_view,
+        name="advisor-access-request-moderator",
+    ),
+    path(
         r"advisor_access_accept_view/<int:advisor_access_request_id>/accept",
         views.advisor_access_request_accept_view,
         name="advisor-access-request-accept",

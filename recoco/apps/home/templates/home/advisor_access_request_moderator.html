@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<br>
+<br>
+
+<form class="form" action="{% url 'advisor-access-request-moderator' advisor_access_request.pk %}" method="post">
+    {% csrf_token %}
+    {{ form }}
+
+    <br>
+    <br>
+    <input type="submit" value="Submit"  class="btn btn-primary">
+</form>
+
+
+{% endblock content %}
