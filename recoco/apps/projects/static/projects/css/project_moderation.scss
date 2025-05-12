@@ -143,3 +143,9 @@
     border-radius: 1px;
   }
 }
+
+.fr-col-4-min {
+  flex: 0 0 32%;
+  max-width: 32%;
+  width: 32%;
+}
