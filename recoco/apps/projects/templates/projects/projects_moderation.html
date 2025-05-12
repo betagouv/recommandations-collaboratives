@@ -27,7 +27,8 @@
     {% if 'moderate_projects' in user_site_perms %}
         {% get_project_moderation_count as projects_to_moderate_count %}
     {% endif %}
-    <div x-data="{ show: sessionStorage.getItem('vue') }" x-init="if (sessionStorage.getItem('vue') === null) { sessionStorage.setItem('vue', 'projects'); show = 'projects' }">
+    <div x-data="{ show: sessionStorage.getItem('vue') }"
+         x-init="if (sessionStorage.getItem('vue') === null) { sessionStorage.setItem('vue', 'projects'); show = 'projects' }">
         <div class="d-flex col-11 fr-py-5v fr-mx-auto">
             <div class="row">
                 <div class="col-12">
@@ -37,7 +38,7 @@
                             <div class="fr-segmented__element">
                                 <input value="1"
                                        type="radio"
-                                       :checked="show === 'projects' ? 'checked' : ''"
+                                       :checked="show === 'projects'"
                                        id="segmented-moderation-projects"
                                        name="segmented-moderation"
                                        @click="sessionStorage.setItem('vue', 'projects'); show = 'projects'">
@@ -51,7 +52,7 @@
                             <div class="fr-segmented__element">
                                 <input value="2"
                                        type="radio"
-                                       :checked="show === 'advisor' ? 'checked' : ''"
+                                       :checked="show === 'advisor'"
                                        id="segmented-moderation-advisors"
                                        name="segmented-moderation"
                                        @click="sessionStorage.setItem('vue', 'advisor'); show = 'advisor'">
