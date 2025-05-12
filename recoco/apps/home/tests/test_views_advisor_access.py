@@ -27,6 +27,32 @@ class TestAdvisorAccessRequestView:
         assert response.status_code == 302
         assert response.url == "/"
 
+    @pytest.mark.django_db
+    def test_get_request(self, client, current_site):
+        user = baker.make(User)
+        baker.make(Department, code="64", name="Pyrénées-Atlantiques")
+        baker.make(Department, code="33", name="Gironde")
+
+        advisor_access_request = baker.make(
+            AdvisorAccessRequest, site=current_site, user=user
+        )
+        advisor_access_request.departments.add(
+            baker.make(Department, code="40", name="Landes")
+        )
+
+        client.force_login(user)
+
+        response = client.get(reverse("advisor-access-request"))
+        assert response.status_code == 200
+        assert response.context["advisor_access_request"] == advisor_access_request
+        assert response.context["form"] is not None
+        assert response.context["departments"] == [
+            {"name": "Gironde", "code": "33"},
+            {"name": "Landes", "code": "40"},
+            {"name": "Pyrénées-Atlantiques", "code": "64"},
+        ]
+        assert response.context["selected_departments"] == ["40"]
+
     @pytest.mark.django_db(transaction=True)
     def test_post_request(self, client, current_site):
         user = baker.make(User)
@@ -99,7 +125,7 @@ class TestAdvisorAccessRequestModeratorView:
 
     @pytest.mark.django_db
     @patch("recoco.apps.home.views.is_project_moderator", Mock(return_value=True))
-    def test_get_context(self, client, current_site):
+    def test_get_request(self, client, current_site):
         user = baker.make(User)
         client.force_login(user)
 
