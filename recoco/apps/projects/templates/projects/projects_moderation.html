@@ -27,7 +27,7 @@
     {% if 'moderate_projects' in user_site_perms %}
         {% get_project_moderation_count as projects_to_moderate_count %}
     {% endif %}
-    <div x-data="{show: false}">
+    <div x-data="{ show: sessionStorage.getItem('vue') }">
         <div class="d-flex col-11 fr-py-5v fr-mx-auto">
             <div class="row">
                 <div class="col-12">
@@ -36,11 +36,11 @@
                         <div class="fr-segmented__elements">
                             <div class="fr-segmented__element">
                                 <input value="1"
-                                       checked
                                        type="radio"
+                                       :checked="show === 'projects' ? 'checked' : ''"
                                        id="segmented-moderation-projects"
                                        name="segmented-moderation"
-                                       @click="show = false">
+                                       @click="sessionStorage.setItem('vue', 'projects'); show = 'projects'">
                                 <label class="fr-label" for="segmented-moderation-projects">
                                     Nouveaux dossiers
                                     {% if projects_to_moderate_count %}
@@ -51,9 +51,10 @@
                             <div class="fr-segmented__element">
                                 <input value="2"
                                        type="radio"
+                                       :checked="show === 'advisor' ? 'checked' : ''"
                                        id="segmented-moderation-advisors"
                                        name="segmented-moderation"
-                                       @click="show = true">
+                                       @click="sessionStorage.setItem('vue', 'advisor'); show = 'advisor'">
                                 <label class="fr-label" for="segmented-moderation-advisors">
                                     Comptes conseiller
                                     {% if advisor_access_requests.count %}
@@ -69,7 +70,7 @@
         {% is_staff_for_current_site request.user as is_staff %}
         <div class="col-11 fr-pb-6w fr-mx-auto"
              data-test-id="moderation-page"
-             x-show="!show">
+             x-show="show === 'projects'">
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-12">
@@ -203,7 +204,7 @@
         </div>
         <div class="col-11 fr-pt-2w fr-pb-6w fr-mx-auto"
              data-test-id="advisor-account-moderation-page"
-             x-show="show">
+             x-show="show === 'advisor'">
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-12">

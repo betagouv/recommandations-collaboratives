@@ -1,7 +1,7 @@
 {% extends "account/layout/layout.html" %}
 {% block layout_content %}
     <form class="form"
-          action="{% url 'advisor-access-request-moderator' advisor_access_request.pk %}"
+          action="{% url 'advisor-access-request-moderator' advisor_access_request.pk %}?vue=advisor"
           method="post">
         {% csrf_token %}
         <fieldset class="fr-fieldset">
@@ -14,7 +14,7 @@
                     <template x-for="dept in selectedDepartments" :key="dept">
                         <input type="hidden" name="departments" :value="dept">
                     </template>
-                    <button class="fr-btn custom-login-button w-100" type="submit">Enregistrer</button>
+                    <button class="fr-btn custom-login-button w-100" type="submit" @click="sessionStorage.setItem( 'vue', 'advisor')">Enregistrer</button>
                 </div>
             </div>
         </fieldset>
