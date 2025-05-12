@@ -146,7 +146,7 @@ Merci de mettre à jour la colonne `Utilisé` en fonction de l'utilisation du co
 | Projet                     | `/project/{id}`                | Raccourci CRM projet                               | `// @bouton-raccourci-crm-staff`                    |      ❌ |
 | Projet                     | `/project/{id}`                | Inviter                                            | `// @bouton-inviter-projet`                         |      ❌ |
 | Projet                     | `/project/{id}`                | Changement role                                    | `// @changement-role-projet`                        |      ❌ |
-| Projet - Présentation      | `/project/{id}/overview`       | Page                                               | `// @page-projet-presentation`                      |      ❌ |
+| Projet - Présentation      | `/project/{id}/overview`       | Page                                               | `// @page-projet-presentation`                      |      🚧 |
 | Projet - Présentation      | `/project/{id}/overview`       | Rappel Email                                       | `// @page-projet-presentation-rappel-email`         |      ❌ |
 | Projet - Présentation      | `/project/{id}/overview`       | Thématique projet                                  | `// @page-projet-presentation-thematique`           |      ❌ |
 | Projet - Présentation      | `/project/{id}/overview`       | Note interne                                       | `// @page-projet-presentation-note-interne`         |      ❌ |
@@ -156,6 +156,7 @@ Merci de mettre à jour la colonne `Utilisé` en fonction de l'utilisation du co
 | Projet - Présentation      | `/project/{id}/overview`       | Modal localisation projet                          | `// @page-projet-presentation-localisation`         |      ❌ |
 | Projet - Présentation      | `/project/{id}/overview`       | Inviter partenaire (ancien collectivité)           | `// @page-projet-presentation-inviter-partenaire`   |      ❌ |
 | Projet - Présentation      | `/project/{id}/overview`       | Inviter dans l'équipe de suivi (ancien conseiller) | `// @page-projet-presentation-inviter-suivie`       |      ❌ |
+| Projet - Diagnostic        | `/project/{id}/overview`       | Marquer le diagnostic comme fait                   | `// @page-projet-presentation-mark-diagnostic-done` |      ✅ |
 | Projet - État des lieux    | `/project/{id}/connaissance`   | Page                                               | `// @page-projet-edl`                               |      ❌ |
 | Projet - État des lieux    | `/project/{id}/connaissance`   | CTA complétion                                     | `// @page-projet-edl-completer`                     |      ❌ |
 | Projet - État des lieux    | `/project/{id}/connaissance`   | Partage                                            | `// @page-projet-edl-partager`                      |      ❌ |
