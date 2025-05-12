@@ -13,6 +13,7 @@ from django.contrib.sites.shortcuts import get_current_site
 from model_bakery import baker
 
 from recoco import utils
+from recoco.apps.home.models import AdvisorAccessRequest
 
 from .. import models
 from ..templatetags import projects_extra
@@ -43,6 +44,14 @@ def test_is_staff_for_current_site_success(request):
 def test_is_staff_for_current_site_failure(request):
     user = baker.make(auth.User)
     assert projects_extra.is_staff_for_current_site(user) is False
+
+
+@pytest.mark.django_db
+def test_get_advisor_access_requests_count(current_site):
+    baker.make(AdvisorAccessRequest, site=current_site)
+    baker.make(AdvisorAccessRequest, site=current_site)
+    baker.make(AdvisorAccessRequest, site=current_site, status="ACCEPTED")
+    assert projects_extra.get_advisor_access_requests_count() == 2
 
 
 # eof

@@ -17,7 +17,6 @@ from django.db.models import Count, F, Q
 from django.http import (
     HttpRequest,
     HttpResponse,
-    HttpResponseForbidden,
 )
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -29,7 +28,10 @@ from django.views.generic.base import TemplateView
 from recoco.apps.geomatics.models import Department
 from recoco.apps.onboarding.forms import OnboardingEmailForm
 from recoco.apps.projects import models as projects
-from recoco.apps.projects.utils import can_administrate_project, is_project_moderator
+from recoco.apps.projects.utils import (
+    can_administrate_project,
+    is_project_moderator_or_403,
+)
 from recoco.apps.resources import models as resources_models
 from recoco.apps.tasks import models as tasks
 from recoco.utils import check_if_advisor
@@ -324,10 +326,7 @@ def advisor_access_request_view(request: HttpRequest) -> HttpResponse:
 def advisor_access_request_moderator_view(
     request: HttpRequest, advisor_access_request_id: int
 ) -> HttpResponse:
-    if not is_project_moderator(request.user, request.site):
-        return HttpResponseForbidden(
-            "You are not allowed to modify this advisor access request."
-        )
+    is_project_moderator_or_403(request.user, request.site)
 
     advisor_access_request = get_object_or_404(
         AdvisorAccessRequest.on_site.prefetch_related("departments").select_related(
