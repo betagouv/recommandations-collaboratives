@@ -41,10 +41,17 @@ function Tutorial(challengeCode) {
         tooltipClass: 'introjs-uv',
         prevLabel: 'Précédent',
         nextLabel: 'Suivant',
-        doneLabel: "C'est parti !",
+        doneLabel: 'Ne plus afficher',
         skipLabel: '✕',
         steps: this.steps,
       });
+
+      if (
+        this.showTuto &&
+        this.challengeCode == 'time-filter-tutorial-on-kanban'
+      ) {
+        this.handleStartTour();
+      }
 
       this.tour.oncomplete(async () => {
         this.acquireChallenge(this.challengeCode);
