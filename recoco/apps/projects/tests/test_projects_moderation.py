@@ -8,7 +8,8 @@ from model_bakery import baker
 from model_bakery.recipe import Recipe
 
 from recoco.apps.geomatics import models as geomatics
-from recoco.apps.home.models import SiteConfiguration
+from recoco.apps.geomatics.models import Commune, Department
+from recoco.apps.home.models import AdvisorAccessRequest, SiteConfiguration
 from recoco.apps.projects.models import Project, ProjectMember
 from recoco.utils import login
 
@@ -233,7 +234,43 @@ class TestProjectModerationAdvisorRefuse:
         response = client.get(reverse("projects-moderation-advisor-refuse", args=[999]))
         assert response.status_code == 405
 
-    # TODO: add test for post request
+    @pytest.mark.django_db
+    @patch("recoco.apps.projects.utils.is_project_moderator", Mock(return_value=True))
+    def test_post_request(self, client, current_site):
+        moderator = baker.make(auth.User)
+        client.force_login(moderator)
+
+        user = baker.make(auth.User)
+        dpt = baker.make(Department, code="64", name="Pyrénées-Atlantiques")
+        project = baker.make(
+            Project,
+            sites=[current_site],
+            commune=baker.make(Commune, name="Bayonne", postal="64100", department=dpt),
+        )
+
+        advisor_access_request = baker.make(
+            AdvisorAccessRequest, site=current_site, user=user, status="PENDING"
+        )
+        advisor_access_request.departments.add(dpt)
+
+        with patch(
+            "recoco.apps.projects.views.unassign_advisor"
+        ) as mock_unassign_advisor:
+            response = client.post(
+                reverse(
+                    "projects-moderation-advisor-refuse",
+                    args=[advisor_access_request.pk],
+                )
+            )
+
+        assert response.status_code == 302
+        assert response.url == "/projects/moderation/"
+        mock_unassign_advisor.assert_called_once_with(
+            user=user, project=project, site=current_site
+        )
+
+        advisor_access_request.refresh_from_db()
+        assert advisor_access_request.status == "REJECTED"
 
 
 class TestProjectModerationAdvisorAccept:
@@ -274,7 +311,43 @@ class TestProjectModerationAdvisorAccept:
         response = client.get(reverse("projects-moderation-advisor-accept", args=[999]))
         assert response.status_code == 405
 
-    # TODO: add test for post request
+    @pytest.mark.django_db
+    @patch("recoco.apps.projects.utils.is_project_moderator", Mock(return_value=True))
+    def test_post_request(self, client, current_site):
+        moderator = baker.make(auth.User)
+        client.force_login(moderator)
+
+        user = baker.make(auth.User)
+        dpt = baker.make(Department, code="64", name="Pyrénées-Atlantiques")
+        project = baker.make(
+            Project,
+            sites=[current_site],
+            commune=baker.make(Commune, name="Bayonne", postal="64100", department=dpt),
+        )
+
+        advisor_access_request = baker.make(
+            AdvisorAccessRequest, site=current_site, user=user, status="PENDING"
+        )
+        advisor_access_request.departments.add(dpt)
+
+        with patch(
+            "recoco.apps.projects.views.assign_advisor"
+        ) as mock_unassign_advisor:
+            response = client.post(
+                reverse(
+                    "projects-moderation-advisor-accept",
+                    args=[advisor_access_request.pk],
+                )
+            )
+
+        assert response.status_code == 302
+        assert response.url == "/projects/moderation/"
+        mock_unassign_advisor.assert_called_once_with(
+            user=user, project=project, site=current_site
+        )
+
+        advisor_access_request.refresh_from_db()
+        assert advisor_access_request.status == "ACCEPTED"
 
 
 class TestProjectModerationAdvisorModify:
@@ -315,4 +388,40 @@ class TestProjectModerationAdvisorModify:
         response = client.get(reverse("projects-moderation-advisor-modify", args=[999]))
         assert response.status_code == 405
 
-    # TODO: add test for post request
+    @pytest.mark.django_db
+    @patch("recoco.apps.projects.utils.is_project_moderator", Mock(return_value=True))
+    def test_post_request(self, client, current_site):
+        moderator = baker.make(auth.User)
+        client.force_login(moderator)
+
+        user = baker.make(auth.User)
+        dpt = baker.make(Department, code="64", name="Pyrénées-Atlantiques")
+        project = baker.make(
+            Project,
+            sites=[current_site],
+            commune=baker.make(Commune, name="Bayonne", postal="64100", department=dpt),
+        )
+
+        advisor_access_request = baker.make(
+            AdvisorAccessRequest, site=current_site, user=user, status="ACCEPTED"
+        )
+        advisor_access_request.departments.add(dpt)
+
+        with patch(
+            "recoco.apps.projects.views.unassign_advisor"
+        ) as mock_unassign_advisor:
+            response = client.post(
+                reverse(
+                    "projects-moderation-advisor-modify",
+                    args=[advisor_access_request.pk],
+                )
+            )
+
+        assert response.status_code == 302
+        assert response.url == f"/advisor-access-request/{advisor_access_request.pk}/"
+        mock_unassign_advisor.assert_called_once_with(
+            user=user, project=project, site=current_site
+        )
+
+        advisor_access_request.refresh_from_db()
+        assert advisor_access_request.status == "PENDING"
