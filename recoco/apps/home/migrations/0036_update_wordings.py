@@ -27,5 +27,8 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(update_verbs),
+        migrations.RunPython(
+            code=update_verbs,
+            reverse_code=migrations.RunPython.noop,
+        ),
     ]
