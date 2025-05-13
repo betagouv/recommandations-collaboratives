@@ -9,7 +9,8 @@ function OrganizationSearch(
   currentOrganization,
   required = false,
   dsfr = false,
-  requestMethod = 'GET'
+  requestMethod = 'GET',
+  validation = false
 ) {
   return {
     organization: '',
@@ -17,8 +18,10 @@ function OrganizationSearch(
     required: required,
     requestMethod: requestMethod,
     dsfr: dsfr,
+    validation: validation,
     init() {
       this.organization = currentOrganization;
+      if (!this.validation) return;
       if (this.organization) this.validateData(true);
 
       [('focusout', 'input')].forEach((event) => {
@@ -57,7 +60,9 @@ function OrganizationSearch(
 
       try {
         if (e.target.value.length > 2) {
-          const response = await api.get(searchOrganizationsUrl(e.target.value));
+          const response = await api.get(
+            searchOrganizationsUrl(e.target.value)
+          );
           if (response && response.data) {
             return (this.results = response.data.results);
           }

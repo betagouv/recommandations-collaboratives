@@ -25,7 +25,7 @@
                         {{ form.last_name }}
                     </p>
                     <p>
-                        {% include "tools/organization_search.html" with name=form.organization.name label=form.organization.label value=form.organization.value id_for_label=form.organization.id_for_label placeholder="" errors=form.organization.errors dsfr=True %}
+                        {% include "tools/organization_search.html" with name=form.organization.name label=form.organization.label value=form.organization.value id_for_label=form.organization.id_for_label placeholder="" errors=form.organization.errors dsfr=True validation=False %}
                     </p>
                     <p>
                         {{ form.organization_position.label }}
