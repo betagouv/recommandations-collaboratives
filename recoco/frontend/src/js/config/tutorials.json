@@ -58,5 +58,13 @@
         "element": "#external-resources-step"
       }
     ]
+  },
+  "time-filter-tutorial-on-kanban": {
+    "steps": [
+      {
+        "intro": "coucou",
+        "element": "#kanban-time-filter"
+      }
+    ]
   }
 }
