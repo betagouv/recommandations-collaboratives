@@ -231,6 +231,8 @@ def project_moderation_project_accept(request: HttpRequest, project_id: int):
 def project_moderation_advisor_refuse(
     request: HttpRequest, advisor_access_request_id: int
 ) -> HttpResponse:
+    is_project_moderator_or_403(request.user, request.site)
+
     advisor_access_request = get_object_or_404(
         AdvisorAccessRequest.on_site.select_related("user"),
         pk=advisor_access_request_id,
@@ -263,6 +265,8 @@ def project_moderation_advisor_refuse(
 def project_moderation_advisor_accept(
     request: HttpRequest, advisor_access_request_id: int
 ) -> HttpResponse:
+    is_project_moderator_or_403(request.user, request.site)
+
     advisor_access_request = get_object_or_404(
         AdvisorAccessRequest.on_site.prefetch_related("departments").select_related(
             "user"
@@ -297,6 +301,8 @@ def project_moderation_advisor_accept(
 def project_moderation_advisor_modify(
     request: HttpRequest, advisor_access_request_id: int
 ) -> HttpResponse:
+    is_project_moderator_or_403(request.user, request.site)
+
     advisor_access_request = get_object_or_404(
         AdvisorAccessRequest.on_site.prefetch_related("departments").select_related(
             "user"

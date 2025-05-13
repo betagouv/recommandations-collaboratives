@@ -102,7 +102,7 @@ class TestAdvisorAccessRequestModeratorView:
         assert response.url == "/accounts/login/?next=/advisor-access-request/1/"
 
     @pytest.mark.django_db
-    @patch("recoco.apps.home.views.is_project_moderator", Mock(return_value=False))
+    @patch("recoco.apps.projects.utils.is_project_moderator", Mock(return_value=False))
     def test_not_project_moderator(self, client):
         user = baker.make(User)
         client.force_login(user)
@@ -114,7 +114,7 @@ class TestAdvisorAccessRequestModeratorView:
         # assert response.status_code == 403
 
     @pytest.mark.django_db
-    @patch("recoco.apps.home.views.is_project_moderator", Mock(return_value=True))
+    @patch("recoco.apps.projects.utils.is_project_moderator", Mock(return_value=True))
     def test_object_not_found(self, client):
         user = baker.make(User)
         client.force_login(user)
@@ -124,7 +124,7 @@ class TestAdvisorAccessRequestModeratorView:
         assert response.status_code == 404
 
     @pytest.mark.django_db
-    @patch("recoco.apps.home.views.is_project_moderator", Mock(return_value=True))
+    @patch("recoco.apps.projects.utils.is_project_moderator", Mock(return_value=True))
     def test_get_request(self, client, current_site):
         user = baker.make(User)
         client.force_login(user)
@@ -157,7 +157,7 @@ class TestAdvisorAccessRequestModeratorView:
         assert response.url == reverse("projects-moderation-list")
 
     @pytest.mark.django_db
-    @patch("recoco.apps.home.views.is_project_moderator", Mock(return_value=True))
+    @patch("recoco.apps.projects.utils.is_project_moderator", Mock(return_value=True))
     def test_post_request(self, client, current_site):
         user = baker.make(User)
         client.force_login(user)
