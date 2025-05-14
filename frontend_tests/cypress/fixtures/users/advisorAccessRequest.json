@@ -1,0 +1,29 @@
+[
+  {
+    "model": "home.advisoraccessrequest",
+    "pk": 1,
+    "status": "pending",
+    "site": 1,
+    "user": 15
+  },
+  {
+    "model": "home.advisoraccessrequest",
+    "pk": 2,
+    "status": "pending",
+    "site": 1,
+    "user": 16
+  },
+  {
+    "model": "home.advisoraccessrequest",
+    "pk": 3,
+    "status": "pending",
+    "site": 1,
+    "user": 17
+  },
+  {
+    "model": "home.advisoraccessrequest.departments",
+    "pk": 1,
+    "advisoraccessrequest": 2,
+    "department": [1, 2, 3]
+  }
+]

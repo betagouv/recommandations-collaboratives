@@ -27,8 +27,8 @@
     {% if 'moderate_projects' in user_site_perms %}
         {% get_project_moderation_count as projects_to_moderate_count %}
     {% endif %}
-    <div x-data="{ show: sessionStorage.getItem('vue') }"
-         x-init="if (sessionStorage.getItem('vue') === null) { sessionStorage.setItem('vue', 'projects'); show = 'projects' }">
+    <div x-data="{ show: sessionStorage.getItem('view') }"
+         x-init="if (sessionStorage.getItem('view') === null) { sessionStorage.setItem('view', 'projects'); show = 'projects' }">
         <div class="d-flex col-11 fr-py-5v fr-mx-auto">
             <div class="row">
                 <div class="col-12">
@@ -41,7 +41,7 @@
                                        :checked="show === 'projects'"
                                        id="segmented-moderation-projects"
                                        name="segmented-moderation"
-                                       @click="sessionStorage.setItem('vue', 'projects'); show = 'projects'">
+                                       @click="sessionStorage.setItem('view', 'projects'); show = 'projects'">
                                 <label class="fr-label" for="segmented-moderation-projects">
                                     Nouveaux dossiers
                                     {% if projects_to_moderate_count %}
@@ -55,7 +55,8 @@
                                        :checked="show === 'advisor'"
                                        id="segmented-moderation-advisors"
                                        name="segmented-moderation"
-                                       @click="sessionStorage.setItem('vue', 'advisor'); show = 'advisor'">
+                                       @click="sessionStorage.setItem('view', 'advisor'); show = 'advisor'"
+                                       data-test-id="advisor-view">
                                 <label class="fr-label" for="segmented-moderation-advisors">
                                     Comptes conseiller
                                     {% if advisor_access_requests.count %}
@@ -218,7 +219,7 @@
                         {% endif %}
                         <div class="moderation-advisor">
                             {% for advisor in advisor_access_requests %}
-                                <div class="moderation-advisor__card fr-col-4-min fr-mx-1v fr-my-1w">
+                                <div class="moderation-advisor__card fr-col-4-min fr-mx-1v fr-my-1w" data-test-id="moderation-advisor-card">
                                     <div class="moderation-advisor__contact-card fr-m-3v">
                                         {% include "tools/contacts/contact_card.html" with is_django_data=True contact=advisor.user is_type_user=True %}
                                     </div>
@@ -241,6 +242,7 @@
                                                   class="flex-grow-1">
                                                 {% csrf_token %}
                                                 <button class="fr-btn fr-btn--secondary fr-btn--sm fr-mr-1v h-100 moderation-advisor__overright-button"
+                                                        data-test-id="refuse-advisor-access"
                                                         type="submit"
                                                         role="submit">Refuser</button>
                                             </form>
@@ -248,6 +250,7 @@
                                                   action="{% url "projects-moderation-advisor-modify" advisor.id %}">
                                                 {% csrf_token %}
                                                 <button class="fr-btn fr-btn--secondary fr-btn--sm fr-mr-1v float-end h-100 moderation-advisor__overright-button"
+                                                        data-test-id="modify-advisor-access"
                                                         type="submit"
                                                         role="submit">Modifier</button>
                                             </form>
@@ -255,6 +258,7 @@
                                                   action="{% url "projects-moderation-advisor-accept" advisor.id %}">
                                                 {% csrf_token %}
                                                 <button class="fr-btn fr-btn--sm fr-mr-1v float-end h-100 moderation-advisor__overright-button"
+                                                        data-test-id="accept-advisor-access"
                                                         type="submit"
                                                         role="submit">Accepter</button>
                                             </form>

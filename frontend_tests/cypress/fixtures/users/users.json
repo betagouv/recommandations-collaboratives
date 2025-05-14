@@ -250,5 +250,59 @@
       "groups": [2],
       "user_permissions": []
     }
+  },
+  {
+    "model": "auth.user",
+    "pk": 15,
+    "fields": {
+      "password": "pbkdf2_sha256$600000$3pfC3P2LqKvugUezbdZA31$pXZ8qGnsZiaJywauV2Nhxy+ZEGPoOxHznxSVah+7Rog=",
+      "last_login": "2023-09-01T08:58:56.513Z",
+      "is_superuser": false,
+      "username": "nationalAdvisorRequest@test.fr",
+      "first_name": "NationalAdvisor",
+      "last_name": "Request",
+      "email": "nationalAdvisorRequest@test.fr",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2021-07-09T09:29:47.252Z",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 16,
+    "fields": {
+      "password": "pbkdf2_sha256$260000$V3dIecdsWK5a81GDWnqaxz$y1wlBcPfmo4n71IUVXFIB93ZHBX4bpBSp2i/X9mylx4=",
+      "last_login": "2023-09-01T08:58:56.513Z",
+      "is_superuser": false,
+      "username": "regionalAdvisorRequest@test.fr",
+      "first_name": "regionalAdvisor",
+      "last_name": "Request",
+      "email": "regionalAdvisorRequest@test.fr",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2021-07-09T09:29:47.252Z",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 17,
+    "fields": {
+      "password": "pbkdf2_sha256$260000$GI0RNpSmeqRhsgfzhp6vyy$9Fgr1MxA0pSga4BHt1lqdU1sFb/5+8HOpcUAkEoQYrg=",
+      "last_login": "2023-09-01T08:58:56.513Z",
+      "is_superuser": false,
+      "username": "refuseAdvisorRequest@test.fr",
+      "first_name": "refuseAdvisor",
+      "last_name": "Request",
+      "email": "refuseAdvisorRequest@test.fr",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2021-07-09T09:29:47.252Z",
+      "groups": [],
+      "user_permissions": []
+    }
   }
 ]
