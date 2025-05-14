@@ -228,7 +228,7 @@
                                             <span class="fr-m-3v moderation-advisor__texte">Demande d’accès sur les départements :</span>
                                             <div class="moderation-advisor__departments fr-m-3v">
                                                 {% for department in advisor.departments.all %}
-                                                    <span class="moderation-advisor__department">{{ department.name }} ({{ department.code }})</span>
+                                                    <span class="moderation-advisor__department" data-test-id="department-ask-for-access-advisor">{{ department.name }} ({{ department.code }})</span>
                                                 {% endfor %}
                                             </div>
                                         {% else %}
