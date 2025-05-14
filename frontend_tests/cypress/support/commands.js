@@ -432,3 +432,25 @@ Cypress.Commands.add(
     });
   }
 );
+
+/**
+ * Search and attach a contact.
+ *
+ * @function shareContact
+ * @memberof Cypress.Commands
+ * @param {string} name - The name of the contact you wish to share.
+ */
+Cypress.Commands.add('shareContact', (name) => {
+  //click on add contact button
+  cy.get('[data-test-id="button-add-contact-in-editor"]').click({
+    force: true,
+  });
+  //search for a contact
+  cy.get('#search-contact-input').type(name, { force: true });
+  //select a contact
+  cy.get('[data-test-id="contact-card"]').first().click({ force: true });
+  //send contact to tiptap editor
+  cy.get('[data-test-id="button-add-contact-to-tiptap-editor"]').click({
+    force: true,
+  });
+});

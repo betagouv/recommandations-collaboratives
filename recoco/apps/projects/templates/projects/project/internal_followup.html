@@ -57,6 +57,7 @@
                                         {% for error in private_note_form.content.errors %}<div class="text-danger text-end">{{ error }}</div>{% endfor %}
                                         <div class="d-flex justify-content-end fr-mt-2v">
                                             <button x-data
+                                                    data-test-id="submit-message-button-on-advisor-space"
                                                     :disabled="$store.editor.currentMessage === ''"
                                                     class="fr-btn"
                                                     type="submit">Enregistrer</button>
