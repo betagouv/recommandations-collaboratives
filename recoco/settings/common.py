@@ -152,6 +152,7 @@ TEMPLATES = [
                 "django.contrib.messages.context_processors.messages",
                 "recoco.apps.projects.context_processors.is_switchtender_processor",
                 "recoco.apps.projects.context_processors.unread_notifications_processor",
+                "recoco.apps.projects.context_processors.matomo_context_processor",
             ],
             "loaders": [
                 "dbtemplates.loader.Loader",
@@ -565,5 +566,9 @@ WAFFLE_SAMPLE_MODEL = "feature_flag.Sample"
 
 # https://github.com/etianen/django-watson/wiki/language-support
 WATSON_POSTGRES_SEARCH_CONFIG = "pg_catalog.french"
+
+# Matomo
+MATOMO_URL = os.environ.get("MATOMO_URL", "")
+MATOMO_SITE_ID = os.environ.get("MATOMO_SITE_ID", "")
 
 # eof
