@@ -58,5 +58,13 @@
         "element": "#external-resources-step"
       }
     ]
+  },
+  "time-filter-tutorial-on-kanban": {
+    "steps": [
+      {
+        "intro": "Seuls les dossiers avec activité récente sont affichés (moins de 1 mois, 3 mois etc.). Modifiez le filtre pour tout voir.",
+        "element": "#kanban-time-filter"
+      }
+    ]
   }
 }

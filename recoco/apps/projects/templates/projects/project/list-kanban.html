@@ -18,6 +18,7 @@
 {% endblock css %}
 {% block js %}
     {% vite_asset 'js/apps/boardProjects.js' %}
+    {% vite_asset 'js/apps/tutorial.js' %}
 {% endblock js %}
 {% block title %}
     Tableau de bord administrateur {{ block.super }}
@@ -42,11 +43,11 @@
             <div class="kanban-header__view-selector fs-5 fr-mr-6v">
                 {% include "projects/project/fragments/navigation/display_select.html" %}
             </div>
-            <div class="kanban-header__middle-part">
+            <div x-data="Tutorial('time-filter-tutorial-on-kanban')" class="kanban-header__middle-part">
                 <div class="kanban-header__searchbar">
                     {% include "projects/project/fragments/search_bar.html" with action_search="onSearch" x_model="searchText" %}
                 </div>
-                <div class="kanban-header__lastactivity-filter fr-select-group d-flex fr-m-0 fr-mr-6v align-items-center">
+                <div class="kanban-header__lastactivity-filter fr-select-group d-flex fr-m-0 fr-mr-6v align-items-center" id="kanban-time-filter">
                     <label class="fr-label no-wrap fr-mr-1v"
                            for="select-filter-project-duration">Dossiers actifs depuis :</label>
                     <select class="fr-select fr-m-0"

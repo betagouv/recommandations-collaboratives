@@ -219,6 +219,31 @@
   background-color: var(--background-action-high-blue-france);
 }
 
+.hint-button-kanban {
+  position: absolute;
+  top: 50px;
+  border-radius: 2px;
+  transition: all 0.25s ease;
+  font-size: 14px;
+  font-weight: 500;
+  color: white;
+  background-color: var(--background-action-high-blue-france);
+  z-index: 100;
+  box-shadow:
+    0px 3px 8px -16px rgba(0, 0, 0, 0.32),
+    0px 8px 16px rgba(0, 0, 0, 0.1);
+}
+.hint-button-kanban::after {
+  content: '';
+  position: absolute;
+  bottom: 149px;
+  right: 10px;
+  width: 15px;
+  height: 15px;
+  transform: rotate(45deg);
+  background-color: var(--background-action-high-blue-france);
+}
+
 /* .hint-button:hover {
     background-color: #FBD335;
 } */
