@@ -269,6 +269,10 @@ def format_commune(commune):
         "department": {
             "code": commune.department.code,
             "name": commune.department.name,
+            "region": {
+                "code": commune.department.region.code,
+                "name": commune.department.region.name,
+            },
         },
         "latitude": commune.latitude,
         "longitude": commune.longitude,
