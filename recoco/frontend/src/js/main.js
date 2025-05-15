@@ -8,7 +8,6 @@ import '@gouvfr/dsfr/dist/dsfr.module.min';
 import 'vite/modulepreload-polyfill';
 import './utils/globals';
 import './utils/tooltipInitialization.js';
-import './utils/htmx.js';
 
 //Global Store
 import './store/utils';
