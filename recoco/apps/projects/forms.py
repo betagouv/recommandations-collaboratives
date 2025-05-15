@@ -100,6 +100,9 @@ class ProjectTagsForm(forms.ModelForm):
     class Meta:
         model = models.Project
         fields = ["tags"]
+        help_texts = {
+            "tags": 'Séparez vos tags par des virgules. Mettez les entre-guillemets quand c\'est une expression ou un mot composé. Par exemple : convention, "programme NAP", "plan d\'action"'
+        }
 
 
 class TopicForm(forms.Form):
