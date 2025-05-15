@@ -26,12 +26,7 @@ from recoco.apps.communication.api import send_email
 from recoco.apps.communication.digests import normalize_user_name
 from recoco.apps.geomatics import models as geomatics_models
 from recoco.apps.geomatics.serializers import DepartmentSerializer, RegionSerializer
-from recoco.utils import (
-    check_if_advisor,
-    get_site_config_or_503,
-    has_perm_or_403,
-    is_staff_for_site,
-)
+from recoco.utils import check_if_advisor, has_perm_or_403, is_staff_for_site
 
 from .. import forms, models, signals
 from ..utils import (
@@ -71,7 +66,7 @@ def mark_general_notifications_as_seen(user):
 def project_moderation_list(request):
     is_project_moderator_or_403(request.user, request.site)
 
-    site_config = get_site_config_or_503(request.site)
+    site_config = request.site_config
 
     draft_projects = models.Project.on_site.filter(
         project_sites__status="DRAFT", project_sites__site=request.site, deleted=None
@@ -274,7 +269,7 @@ def project_list_for_staff(request):
     ):
         raise PermissionDenied("Vous n'avez pas le droit d'accéder à ceci.")
 
-    site_config = get_site_config_or_503(request.site)
+    site_config = request.site_config
 
     mark_general_notifications_as_seen(request.user)
 

@@ -22,7 +22,8 @@ from django.core.mail import mail_admins
 from django.core.mail import send_mail as django_send_mail
 from django.utils import timezone
 
-from recoco.utils import build_absolute_url, get_site_config_or_503
+from recoco.apps.home.models import SiteConfiguration
+from recoco.utils import build_absolute_url
 
 from .brevo import Brevo
 from .models import EmailTemplate, TransactionRecord
@@ -57,7 +58,7 @@ def get_site_params():
     params["site_name"] = current_site.name
     params["site_domain"] = current_site.domain
 
-    site_config = get_site_config_or_503(current_site)
+    site_config = SiteConfiguration.objects.get(site=current_site)
     params["legal_address"] = site_config.legal_address or ""
     params["legal_owner"] = site_config.legal_owner or ""
     params["description"] = site_config.description or ""
