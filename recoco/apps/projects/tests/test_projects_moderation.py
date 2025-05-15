@@ -8,10 +8,10 @@ from model_bakery import baker
 from model_bakery.recipe import Recipe
 
 from recoco.apps.geomatics import models as geomatics
-from recoco.apps.geomatics.models import Commune, Department
+from recoco.apps.geomatics.models import Department
 from recoco.apps.home.models import AdvisorAccessRequest, SiteConfiguration
 from recoco.apps.projects.models import Project, ProjectMember
-from recoco.utils import login
+from recoco.utils import get_group_for_site, login
 
 
 @pytest.mark.django_db
@@ -240,37 +240,35 @@ class TestProjectModerationAdvisorRefuse:
         moderator = baker.make(auth.User)
         client.force_login(moderator)
 
+        dept_64 = baker.make(Department, code="64", name="Pyrénées-Atlantiques")
+        dept_33 = baker.make(Department, code="33", name="Gironde")
+
         user = baker.make(auth.User)
-        dpt = baker.make(Department, code="64", name="Pyrénées-Atlantiques")
-        project = baker.make(
-            Project,
-            sites=[current_site],
-            commune=baker.make(Commune, name="Bayonne", postal="64100", department=dpt),
-        )
+        user.profile.departments.add(dept_33)
 
         advisor_access_request = baker.make(
             AdvisorAccessRequest, site=current_site, user=user, status="PENDING"
         )
-        advisor_access_request.departments.add(dpt)
+        advisor_access_request.departments.add(dept_64)
 
-        with patch(
-            "recoco.apps.projects.views.unassign_advisor"
-        ) as mock_unassign_advisor:
-            response = client.post(
-                reverse(
-                    "projects-moderation-advisor-refuse",
-                    args=[advisor_access_request.pk],
-                )
+        response = client.post(
+            reverse(
+                "projects-moderation-advisor-refuse",
+                args=[advisor_access_request.pk],
             )
+        )
 
         assert response.status_code == 302
         assert response.url == "/projects/moderation/"
-        mock_unassign_advisor.assert_called_once_with(
-            user=user, project=project, site=current_site
-        )
 
         advisor_access_request.refresh_from_db()
         assert advisor_access_request.status == "REJECTED"
+
+        user.refresh_from_db()
+        assert list(user.profile.departments.values_list("code", flat=True)) == ["33"]
+
+        advisor_group = get_group_for_site("advisor", current_site)
+        assert not user.groups.filter(name=advisor_group.name).exists()
 
 
 class TestProjectModerationAdvisorAccept:
@@ -317,37 +315,35 @@ class TestProjectModerationAdvisorAccept:
         moderator = baker.make(auth.User)
         client.force_login(moderator)
 
+        dept_64 = baker.make(Department, code="64", name="Pyrénées-Atlantiques")
+        dept_33 = baker.make(Department, code="33", name="Gironde")
+
         user = baker.make(auth.User)
-        dpt = baker.make(Department, code="64", name="Pyrénées-Atlantiques")
-        project = baker.make(
-            Project,
-            sites=[current_site],
-            commune=baker.make(Commune, name="Bayonne", postal="64100", department=dpt),
-        )
+        user.profile.departments.add(dept_33)
 
         advisor_access_request = baker.make(
             AdvisorAccessRequest, site=current_site, user=user, status="PENDING"
         )
-        advisor_access_request.departments.add(dpt)
+        advisor_access_request.departments.add(dept_64)
 
-        with patch(
-            "recoco.apps.projects.views.assign_advisor"
-        ) as mock_unassign_advisor:
-            response = client.post(
-                reverse(
-                    "projects-moderation-advisor-accept",
-                    args=[advisor_access_request.pk],
-                )
+        response = client.post(
+            reverse(
+                "projects-moderation-advisor-accept",
+                args=[advisor_access_request.pk],
             )
+        )
 
         assert response.status_code == 302
         assert response.url == "/projects/moderation/"
-        mock_unassign_advisor.assert_called_once_with(
-            user=user, project=project, site=current_site
-        )
 
-        advisor_access_request.refresh_from_db()
-        assert advisor_access_request.status == "ACCEPTED"
+        user.refresh_from_db()
+        assert list(user.profile.departments.values_list("code", flat=True)) == [
+            "33",
+            "64",
+        ]
+
+        advisor_group = get_group_for_site("advisor", current_site)
+        assert user.groups.filter(name=advisor_group.name).exists()
 
 
 class TestProjectModerationAdvisorModify:
@@ -394,34 +390,35 @@ class TestProjectModerationAdvisorModify:
         moderator = baker.make(auth.User)
         client.force_login(moderator)
 
+        dept_64 = baker.make(Department, code="64", name="Pyrénées-Atlantiques")
+        dept_33 = baker.make(Department, code="33", name="Gironde")
+
         user = baker.make(auth.User)
-        dpt = baker.make(Department, code="64", name="Pyrénées-Atlantiques")
-        project = baker.make(
-            Project,
-            sites=[current_site],
-            commune=baker.make(Commune, name="Bayonne", postal="64100", department=dpt),
-        )
+        user.profile.departments.add(dept_33, dept_64)
 
         advisor_access_request = baker.make(
             AdvisorAccessRequest, site=current_site, user=user, status="ACCEPTED"
         )
-        advisor_access_request.departments.add(dpt)
+        advisor_access_request.departments.add(dept_64)
 
-        with patch(
-            "recoco.apps.projects.views.unassign_advisor"
-        ) as mock_unassign_advisor:
-            response = client.post(
-                reverse(
-                    "projects-moderation-advisor-modify",
-                    args=[advisor_access_request.pk],
-                )
+        response = client.post(
+            reverse(
+                "projects-moderation-advisor-modify",
+                args=[advisor_access_request.pk],
             )
+        )
 
         assert response.status_code == 302
         assert response.url == f"/advisor-access-request/{advisor_access_request.pk}/"
-        mock_unassign_advisor.assert_called_once_with(
-            user=user, project=project, site=current_site
-        )
 
         advisor_access_request.refresh_from_db()
         assert advisor_access_request.status == "PENDING"
+
+        user.refresh_from_db()
+        assert list(user.profile.departments.values_list("code", flat=True)) == [
+            "33",
+            "64",
+        ]
+
+        advisor_group = get_group_for_site("advisor", current_site)
+        assert not user.groups.filter(name=advisor_group.name).exists()
