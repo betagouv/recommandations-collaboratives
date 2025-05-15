@@ -17,15 +17,6 @@
           rel="stylesheet"
           type="text/css">
 {% endblock css %}
-{% block js %}
-    <script type="text/javascript">
- $(document).ready(function() {
-     $(".filters-categories .form-check-input").click(function() { $(".quick-search form").submit(); });
-     $(".filters-internal .form-check-input").click(function() { $(".quick-search form").submit(); });
-     $("#limit_area").change(function() { $(".quick-search form").submit(); });
- });
-    </script>
-{% endblock js %}
 {% block content %}
     {% if user.is_authenticated %}
         {% get_obj_perms request.user for request.site as "user_site_perms" %}
