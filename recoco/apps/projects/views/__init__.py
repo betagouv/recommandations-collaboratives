@@ -32,6 +32,7 @@ from recoco.apps.geomatics.serializers import DepartmentSerializer, RegionSerial
 from recoco.apps.home.models import AdvisorAccessRequest
 from recoco.utils import (
     check_if_advisor,
+    get_group_for_site,
     get_site_config_or_503,
     has_perm_or_403,
     is_staff_for_site,
@@ -242,14 +243,8 @@ def project_moderation_advisor_refuse(
         advisor_access_request.reject(handled_by=request.user)
         advisor_access_request.save()
 
-        for project in models.Project.on_site.filter(
-            commune__department__in=[
-                d.code for d in advisor_access_request.departments.all()
-            ]
-        ):
-            unassign_advisor(
-                user=advisor_access_request.user, project=project, site=request.site
-            )
+        advisor_group = get_group_for_site("advisor", request.site)
+        advisor_access_request.user.groups.remove(advisor_group)
 
     messages.add_message(
         request,
@@ -278,14 +273,12 @@ def project_moderation_advisor_accept(
         advisor_access_request.accept(handled_by=request.user)
         advisor_access_request.save()
 
-        for project in models.Project.on_site.filter(
-            commune__department__in=[
-                d.code for d in advisor_access_request.departments.all()
-            ]
-        ):
-            assign_advisor(
-                user=advisor_access_request.user, project=project, site=request.site
-            )
+        advisor_group = get_group_for_site("advisor", request.site)
+        advisor_access_request.user.groups.add(advisor_group)
+
+        advisor_access_request.user.profile.departments.add(
+            *advisor_access_request.departments.all()
+        )
 
     messages.add_message(
         request,
@@ -314,14 +307,8 @@ def project_moderation_advisor_modify(
         advisor_access_request.modify(handled_by=request.user)
         advisor_access_request.save()
 
-        for project in models.Project.on_site.filter(
-            commune__department__in=[
-                d.code for d in advisor_access_request.departments.all()
-            ]
-        ):
-            unassign_advisor(
-                user=advisor_access_request.user, project=project, site=request.site
-            )
+        advisor_group = get_group_for_site("advisor", request.site)
+        advisor_access_request.user.groups.remove(advisor_group)
 
     return redirect(
         reverse(
