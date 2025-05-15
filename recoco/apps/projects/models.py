@@ -353,6 +353,8 @@ class Project(models.Model):
     @property
     def status(self):
         """Shortcut for the current site's status"""
+        if hasattr(self, "site_status"):
+            return self.site_status
         return self.project_sites.current().status
 
     @property
