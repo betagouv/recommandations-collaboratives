@@ -14,7 +14,6 @@ import pytest
 import test  # noqa
 from django.contrib.auth import models as auth
 from django.contrib.sites.shortcuts import get_current_site
-from django.core.exceptions import ImproperlyConfigured
 from freezegun import freeze_time
 from model_bakery import baker
 from model_bakery.recipe import Recipe
@@ -148,14 +147,6 @@ def test_send_digests_for_new_reco_empty(client, request, make_project):
     )
 
     assert membership.member.notifications.unsent().count() == 0
-
-
-@pytest.mark.django_db
-def test_make_site_digest_without_siteconfiguration(client, request):
-    site = get_current_site(request)
-
-    with pytest.raises(ImproperlyConfigured):
-        digests.make_site_digest(site)
 
 
 @pytest.mark.django_db

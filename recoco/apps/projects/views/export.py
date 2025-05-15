@@ -17,12 +17,7 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 
 from recoco.apps.crm import models as crm_models
 from recoco.apps.tasks import models as task_models
-from recoco.utils import (
-    build_absolute_url,
-    get_group_for_site,
-    get_site_config_or_503,
-    is_switchtender_or_403,
-)
+from recoco.utils import build_absolute_url, get_group_for_site, is_switchtender_or_403
 
 from .. import models
 from ..utils import (
@@ -84,8 +79,10 @@ def project_list_export_csv(request):
         "exclude_stats",
         "origin_site",
     ]
-    site_config = get_site_config_or_503(request.site)
-    tags_for_site = site_config.crm_available_tags.values_list("name", flat=True)
+
+    site_config = request.site_config
+
+    tags_for_site = [tag.name for tag in site_config.crm_available_tags.all()]
     for tag in tags_for_site:
         columns.append(tag)
 

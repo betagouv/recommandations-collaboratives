@@ -24,8 +24,6 @@ from django.db.models.functions import Cast
 from django.http import HttpResponseBadRequest
 from sesame.utils import get_query_string
 
-from recoco.apps.home.models import SiteConfiguration
-
 
 def make_site_slug(site: Site):
     return site.domain.translate(str.maketrans("-.", "__")).lower()
@@ -166,22 +164,6 @@ def login(
         group.user_set.add(user)
     client.force_login(user)
     yield user
-
-
-################################################################
-# Site configuration
-################################################################
-
-
-# TODO move me to home/utils.py
-def get_site_config_or_503(site):
-    try:
-        return SiteConfiguration.objects.get(site=site)
-    except SiteConfiguration.DoesNotExist as exc:
-        raise ImproperlyConfigured(
-            f"Please create a SiteConfiguration for '{site}'"
-            " before using this feature.",
-        ) from exc
 
 
 #######################################################################

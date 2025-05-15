@@ -28,13 +28,7 @@ from recoco.apps.invites.forms import InviteForm
 from recoco.apps.projects.views.notes import create_public_note
 from recoco.apps.survey import models as survey_models
 from recoco.apps.tasks import models as tasks_models
-from recoco.utils import (
-    get_site_config_or_503,
-    has_perm,
-    has_perm_or_403,
-    is_staff_for_site,
-    require_htmx,
-)
+from recoco.utils import has_perm, has_perm_or_403, is_staff_for_site, require_htmx
 
 from .. import models, signals
 from ..forms import (
@@ -73,7 +67,7 @@ def project_overview(request, project_id=None):
         pk=project_id,
     )
 
-    site_config = get_site_config_or_503(request.site)
+    site_config = request.site_config
 
     is_regional_actor = is_regional_actor_for_project(
         request.site, project, request.user, allow_national=True
@@ -163,6 +157,7 @@ def project_knowledge(request, project_id=None):
         models.Project.objects.filter(sites=request.site)
         .with_unread_notifications(user_id=request.user.id)
         .select_related("commune__department"),
+        # .prefetch_related("survey_session"),
         pk=project_id,
     )
 
@@ -184,13 +179,14 @@ def project_knowledge(request, project_id=None):
         request.user, "view_surveys", project
     )
 
-    site_config = get_site_config_or_503(request.site)
+    site_config = request.site_config
+
     session, created = survey_models.Session.objects.get_or_create(
         project=project, survey=site_config.project_survey
     )
 
     sorted_sessions = sorted(
-        project.survey_session.all(),
+        project.survey_session.select_related("survey__site"),
         key=lambda session: session.survey.site != request.site,
     )
 
