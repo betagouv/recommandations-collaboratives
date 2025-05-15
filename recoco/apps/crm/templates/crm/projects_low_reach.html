@@ -9,6 +9,9 @@
 {% block og_title %}
     Dossiers à faible répondant - CRM
 {% endblock og_title %}
+{% block js %}
+    {% vite_asset 'js/apps/crm.js' %}
+{% endblock js %}
 {% block content %}
     <div x-data="Crm" class="d-flex fr-px-0">
         {% include "crm/fragments/sidebar.html" with back_button=True map=True tools=True search=True %}
