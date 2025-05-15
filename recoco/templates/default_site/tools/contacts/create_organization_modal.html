@@ -55,7 +55,8 @@
                                             :class="{'fr-input--error': formState.isSubmitted && !formState.fields.isGroupNatName}"
                                             x-model="userInput"
                                             required
-                                            @input.debounce="onSearchOrgaGroup">
+                                            @input.debounce="onSearchOrgaGroup"
+                                            data-test-id="search-group-input">
                                         <button role="button" class="fr-btn" title="Rechercher" @click.prevent="onSearchOrgaGroup">Rechercher</button>
                                     </div>
                                 </div>
@@ -71,7 +72,8 @@
                                                         </div>
                                                     </template>
                                                     <div class="btn-create-orga fr-p-1w cursor-pointer"
-                                                        @click="createOrganizationGroup">
+                                                         data-test-id="button-create-organization-group"
+                                                         @click="createOrganizationGroup">
                                                         <span class="fr-icon-add-line" aria-hidden="true"></span><span>Créer une nouvelle structure nationale : "</span> <span x-text="userInput"></span><span>"</span>
                                                     </div>
                                                 </div>
@@ -83,7 +85,8 @@
                                                         <span class="text-style">Aucun résultat</span>
                                                     </div>
                                                     <div class="btn-create-orga fr-p-1w cursor-pointer"
-                                                        @click="createOrganizationGroup">
+                                                         data-test-id="button-create-organization-group"
+                                                         @click="createOrganizationGroup">
                                                         <span class="fr-icon-add-line" aria-hidden="true"></span><span>Créer une nouvelle structure nationale : "</span> <span x-text="userInput"></span><span>"</span>
                                                     </div>
                                                 </div>
@@ -110,6 +113,7 @@
                 <button class="fr-btn fr-btn--secondary fr-mr-3v w-100 justify-content-center"
                         @click.prevent="Modal.closeModal()">Annuler</button>
                 <button class="fr-btn w-100 justify-content-center"
+                        data-test-id="button-create-new-organization"
                         @click="createOrganization">Créer l'organisation</button>
             </div>
         </form>

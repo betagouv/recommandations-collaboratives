@@ -21,11 +21,11 @@
                 {% include "tools/contacts/search_organization.html" %}
                 <div class="fr-p-3v modal-create-contact__block">
                     <label class="modal-create-contact__label">Nom</label>
-                    <input type="text" class="fr-input" x-model="contact.last_name">
+                    <input type="text" class="fr-input" x-model="contact.last_name" data-test-id="last-name">
                 </div>
                 <div class="fr-p-3v modal-create-contact__block">
                     <label class="modal-create-contact__label">Prénom</label>
-                    <input type="text" class="fr-input" x-model="contact.first_name">
+                    <input type="text" class="fr-input" x-model="contact.first_name" data-test-id="first-name">
                 </div>
                 <div class="fr-p-3v modal-create-contact__block"
                      :class="{'fr-input-group--error': formState.isSubmitted && !formState.fields.isJobSelected}">
@@ -38,6 +38,7 @@
                            class="fr-input"
                            :class="{'fr-input--error': formState.isSubmitted && !formState.fields.isJobSelected}"
                            x-model="contact.division"
+                           data-test-id="job"
                            required>
                 </div>
                 <div class="fr-p-3v modal-create-contact__block"
@@ -56,7 +57,8 @@
                            pattern="^[\w.\-]+@([\w\-]+\.)+[\w\-]{2,4}$"
                            class="fr-input"
                            :class="{'fr-input--error': formState.isSubmitted && (!formState.fields.isMailOrPhone || !formState.fields.isFormatEmailValid)}"
-                           x-model="contact.email">
+                           x-model="contact.email"
+                           data-test-id="email">
                 </div>
                 <div class="fr-p-3v modal-create-contact__block"
                      :class="{'fr-input-group--error': formState.isSubmitted && !formState.fields.isMailOrPhone}">
@@ -68,7 +70,8 @@
                     <input type="text"
                            class="fr-input"
                            :class="{'fr-input--error': formState.isSubmitted && !formState.fields.isMailOrPhone}"
-                           x-model="contact.phone_no">
+                           x-model="contact.phone_no"
+                           data-test-id="phone">
                 </div>
                 <div class="fr-p-3v modal-create-contact__block">
                     <label class="modal-create-contact__label">Téléphone Secondaire</label>
@@ -77,7 +80,7 @@
                 <div class="fr-p-3v modal-create-contact__block d-flex">
                     <button class="fr-btn fr-btn--secondary fr-mr-3v w-100 justify-content-center"
                             @click.prevent="Modal.closeModal()">Annuler</button>
-                    <button class="fr-btn w-100 justify-content-center" @click="createContact">Créer le contact</button>
+                    <button class="fr-btn w-100 justify-content-center" @click="createContact" data-test-id="create-contact-button">Créer le contact</button>
                 </div>
             </form>
         </div>

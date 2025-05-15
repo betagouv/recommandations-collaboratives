@@ -64,7 +64,8 @@
                                     <span class="text-style">Aucun résultat</span>
                                 </div>
                                 <div class="btn-create-orga fr-p-1w cursor-pointer"
-                                    @click="openModalCreateOrganization">
+                                     data-test-id="button-create-organization"
+                                     @click="openModalCreateOrganization">
                                     <span class="fr-icon-add-line" aria-hidden="true"></span><span>Créer une nouvelle organisation</span>
                                 </div>
                             </div>
@@ -72,7 +73,8 @@
                     </div>
                     <template x-if="userInputSearchOrganization.length > 0 && showOrgAsResults && !isAnOrgaSelected">
                         <div class="btn-create-orga fr-p-1w cursor-pointer"
-                            @click="openModalCreateOrganization">
+                             data-test-id="button-create-organization"
+                             @click="openModalCreateOrganization">
                             <span class="fr-icon-add-line" aria-hidden="true"></span><span>Créer une nouvelle organisation</span>
                         </div>
                     </template>
