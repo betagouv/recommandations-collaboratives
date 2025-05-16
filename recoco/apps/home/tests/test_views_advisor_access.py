@@ -6,7 +6,7 @@ from django.urls import reverse
 from model_bakery import baker
 
 from recoco.apps.geomatics.models import Department
-from recoco.apps.home.models import AdvisorAccessRequest
+from recoco.apps.home.models import AdvisorAccessRequest, SiteConfiguration
 from recoco.utils import get_group_for_site
 
 
@@ -19,6 +19,7 @@ class TestAdvisorAccessRequestView:
 
     @pytest.mark.django_db
     def test_redirect_advisor(self, client, current_site):
+        baker.make(SiteConfiguration, site=current_site)
         advisor = baker.make(User)
         advisor.groups.add(get_group_for_site("advisor", current_site))
 
@@ -30,6 +31,7 @@ class TestAdvisorAccessRequestView:
     @pytest.mark.django_db
     def test_get_request(self, client, current_site):
         user = baker.make(User)
+        baker.make(SiteConfiguration, site=current_site)
         baker.make(Department, code="64", name="Pyrénées-Atlantiques")
         baker.make(Department, code="33", name="Gironde")
 
@@ -55,6 +57,7 @@ class TestAdvisorAccessRequestView:
 
     @pytest.mark.django_db(transaction=True)
     def test_post_request(self, client, current_site):
+        baker.make(SiteConfiguration, site=current_site)
         user = baker.make(User)
         baker.make(Department, code="64", name="Pyrénées-Atlantiques")
         baker.make(Department, code="33", name="Gironde")
