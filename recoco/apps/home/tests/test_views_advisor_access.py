@@ -15,7 +15,7 @@ class TestAdvisorAccessRequestView:
     def test_redirect_anonymous(self, client, current_site):
         response = client.get(reverse("advisor-access-request"))
         assert response.status_code == 302
-        assert response.url == "/accounts/login/?next=/advisor-access-request"
+        assert response.url == "/accounts/signup?next=/advisor-access-request"
 
     @pytest.mark.django_db
     def test_redirect_advisor(self, client, current_site):
