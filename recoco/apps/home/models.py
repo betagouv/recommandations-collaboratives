@@ -14,6 +14,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.managers import CurrentSiteManager
 from django.contrib.sites.models import Site
 from django.db import models
+from django.db.models.query import QuerySet
 from django.db.models.signals import post_migrate, post_save
 from django.dispatch import receiver
 from django.utils.encoding import force_str
@@ -27,6 +28,7 @@ from guardian.models import (
     UserObjectPermissionAbstract,
     UserObjectPermissionBase,
 )
+from model_utils.models import TimeStampedModel
 from phonenumber_field.modelfields import PhoneNumberField
 from taggit.managers import TaggableManager
 
@@ -413,6 +415,90 @@ ObjectPermissionChecker.original_get_local_cache_key = (
     ObjectPermissionChecker.get_local_cache_key
 )
 ObjectPermissionChecker.get_local_cache_key = get_local_cache_key_with_site
+
+
+class AdvisorAccessRequestQuerySet(QuerySet):
+    def pending(self):
+        return self.filter(status="PENDING")
+
+
+class AdvisorAccessRequestManager(
+    models.Manager.from_queryset(AdvisorAccessRequestQuerySet)
+):
+    use_in_migrations = False
+
+
+class AdvisorAccessRequestSiteManager(
+    CurrentSiteManager.from_queryset(AdvisorAccessRequestQuerySet)
+):
+    use_in_migrations = False
+
+
+class AdvisorAccessRequest(TimeStampedModel):
+    user = models.ForeignKey(
+        auth_models.User,
+        on_delete=models.CASCADE,
+        related_name="advisor_access_requests",
+    )
+
+    site = models.ForeignKey(Site, on_delete=models.CASCADE)
+
+    departments = models.ManyToManyField(
+        geomatics.Department,
+        blank=True,
+        help_text="Départements pour lesquels le conseiller demande un accès",
+    )
+
+    status = models.CharField(
+        max_length=20,
+        choices=[
+            ("PENDING", "En attente"),
+            ("ACCEPTED", "Accepté"),
+            ("REJECTED", "Rejeté"),
+        ],
+        default="PENDING",
+    )
+
+    handled_by = models.ForeignKey(
+        auth_models.User,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="accepted_advisor_access_requests",
+    )
+
+    objects = AdvisorAccessRequestManager()
+    on_site = AdvisorAccessRequestSiteManager()
+
+    class Meta:
+        verbose_name = "Demande d'accès conseiller"
+        verbose_name_plural = "Demandes d'accès conseiller"
+        ordering = ["-created"]
+        unique_together = ["user", "site"]
+
+    def accept(self, handled_by: auth_models.User = None):
+        self.status = "ACCEPTED"
+        self.handled_by = handled_by
+
+    def reject(self, handled_by: auth_models.User = None):
+        self.status = "REJECTED"
+        self.handled_by = handled_by
+
+    def modify(self, handled_by: auth_models.User = None):
+        self.status = "PENDING"
+        self.handled_by = handled_by
+
+    @property
+    def is_pending(self) -> bool:
+        return self.status == "PENDING"
+
+    @property
+    def is_accepted(self) -> bool:
+        return self.status == "ACCEPTED"
+
+    @property
+    def is_rejected(self) -> bool:
+        return self.status == "REJECTED"
 
 
 # eof

@@ -12,6 +12,7 @@
     {% endif %}
     {% if 'moderate_projects' in user_site_perms %}
         {% get_project_moderation_count as projects_to_moderate_count %}
+        {% get_advisor_access_requests_count as advisor_access_requests_count %}
     {% endif %}
     <ul x-data="MenuProjects({% if is_switchtender or is_administrating_project %}false{% else %}true{% endif %}),{ width: window.innerWidth}"
         x-on:resize.window="width = window.innerWidth"
@@ -91,13 +92,13 @@
                 </div>
             </li>
         {% endif %}
-        {% if projects_to_moderate_count > 0 %}
+        {% if projects_to_moderate_count > 0 or advisor_access_requests_count > 0 %}
             <!-- Projects moderation -->
             <li class="navigation__item-moderation d-flex">
                 <a href="{% url "projects-moderation-list" %}"
-                   class="{% if url_name == 'projects-moderation-list' %}active{% endif %}"><span class="fr-link underline no-wrap">Dossiers à examiner</span></a>
-                {% if projects_to_moderate_count %}
-                    <span class="badge text-bg-danger no-underline">{{ projects_to_moderate_count }}</span>
+                   class="{% if url_name == 'projects-moderation-list' %}active{% endif %}"><span class="fr-link underline no-wrap">Modération</span></a>
+                {% if projects_to_moderate_count or advisor_access_requests_count %}
+                    <span class="badge text-bg-danger no-underline">{{ projects_to_moderate_count | add:advisor_access_requests_count }}</span>
                 {% endif %}
             </li>
         {% endif %}

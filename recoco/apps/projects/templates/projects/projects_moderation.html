@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
+{% load guardian_tags %}
 {% load gravatar %}
 {% load django_vite %}
 {% load sass_tags %}
@@ -20,136 +21,253 @@
           type="text/css">
 {% endblock css %}
 {% block content %}
-    {% is_staff_for_current_site request.user as is_staff %}
-    <div class="col-11 fr-pt-2w fr-pb-6w fr-mx-auto"
-         data-test-id="moderation-page">
-        <div class="container-fluid">
+    {% if user.is_authenticated %}
+        {% get_obj_perms request.user for request.site as "user_site_perms" %}
+    {% endif %}
+    {% if 'moderate_projects' in user_site_perms %}
+        {% get_project_moderation_count as projects_to_moderate_count %}
+    {% endif %}
+    <div x-data="{ show: sessionStorage.getItem('view') }"
+         x-init="if (sessionStorage.getItem('view') === null) { sessionStorage.setItem('view', 'projects'); show = 'projects' }">
+        <div class="d-flex col-11 fr-py-5v fr-mx-auto">
             <div class="row">
                 <div class="col-12">
-                    {% if draft_projects.count > 1 %}
-                        <h2>{{ draft_projects.count }} dossiers entrants à examiner</h2>
-                    {% elif draft_projects.count > 0 %}
-                        <h2>{{ draft_projects.count }} dossier entrant à examiner</h2>
-                    {% else %}
-                        <h2>Aucun dossier à examiner</h2>
-                    {% endif %}
-                    {% for project in draft_projects %}
-                        <div class="card fr-mb-2w d-flex flex-row project-card"
-                             data-test-id="project-card">
-                            <div class="project-card__col--left project-card__col__padding d-flex flex-column">
-                                <h3 class="project-card__title">
-                                    <a href="{% url 'projects-project-detail' project.id %}">
-                                        {% if project.commune %}
-                                            <span class="project-card__city">{{ project.commune.name }}({{ project.commune.postal|slice:2 }})</span>
-                                        {% endif %}
-                                        <span class="project-card__name">{{ project.name }}</span>
-                                    </a>
-                                </h3>
-                                <p class="project-card__keyinfo fr-mb-2v">
-                                    {% if project.project_sites.origin.site != request.site %}
-                                        <span data-cy="moderation-folder-shared-by">
-                                            {% if project.project_sites.origin.site.configuration.logo_small %}
-                                                <img src="{{ project.project_sites.origin.site.configuration.logo_small.url }}"
-                                                     width="16px"
-                                                     height="auto"
-                                                     alt="Logo {{ project.project_sites.origin.site.name }}" />
-                                            {% else %}
-                                                <span class="fr-icon--sm fr-icon-window-line" aria-hidden="true"></span>
-                                            {% endif %}
-                                            dossier envoyé par {{ project.project_sites.origin.site.name }}
-                                        </span>
+                    <fieldset class="fr-segmented fr-ml-3v">
+                        <legend class="fr-segmented__legend fr-segmented__legend--inline">Vue :</legend>
+                        <div class="fr-segmented__elements">
+                            <div class="fr-segmented__element">
+                                <input value="1"
+                                       type="radio"
+                                       :checked="show === 'projects'"
+                                       id="segmented-moderation-projects"
+                                       name="segmented-moderation"
+                                       @click="sessionStorage.setItem('view', 'projects'); show = 'projects'">
+                                <label class="fr-label" for="segmented-moderation-projects">
+                                    Nouveaux dossiers
+                                    {% if projects_to_moderate_count %}
+                                        <span class="badge text-bg-danger no-underline fr-ml-1w">{{ projects_to_moderate_count }}</span>
                                     {% endif %}
-                                    {% if project.commune %}
-                                        <span class="fr-icon--sm fr-icon-map-pin-2-line">INSEE: {{ project.commune.insee }}</span>
-                                    {% endif %}
-                                    <span class="fr-icon--sm fr-icon-calendar-event-line">déposé depuis {{ project.created_on|timesince }}</span>
-                                </p>
-                                <div class="project-card__location">
-                                    <h4 class="text-uppercase project-card__address fr-mb-0">Localisation</h4>
-                                    {% if project.location and project.commune %}
-                                        <p>
-                                            <span class="fr-icon--sm fr-icon-map-pin-2-line project-card__location"
-                                                  id="no-margin">{{ project.location }}</span>
-                                        </p>
-                                        <p class="fr-mb-2v">
-                                            <span class="project-card__communename">{{ project.commune.postal }} {{ project.commune.name }}</span>
-                                        </p>
-                                    {% elif project.location %}
-                                        <p class="fr-mb-2v">
-                                            <span class="fr-icon--sm fr-icon-map-pin-2-line project-card__location">{{ project.location }}</span>
-                                        </p>
-                                    {% elif project.commune %}
-                                        <p class="fr-mb-2v">
-                                            <span class="fr-icon--sm fr-icon-map-pin-2-line project-card__location">{{ project.commune.postal }} {{ project.commune.name }}</span>
-                                        </p>
-                                    {% else %}
-                                        <p class="fr-mb-2v">
-                                            <span class="fr-icon--sm fr-icon-map-pin-2-line project-card__location">Non renseigné</span>
-                                        </p>
-                                    {% endif %}
-                                </div>
-                                <h4 class="text-uppercase project-card__team fr-mb-0">Demandeur</h4>
-                                <div>
-                                    {% include "projects/project/fragments/project_owner.html" with project=project %}
-                                    {% include "projects/project/fragments/owner/owner-details.html" with project=project %}
-                                </div>
-                                <div class="d-flex flex-grow-1 align-items-end fr-mt-3w">
-                                    <div class="d-flex justify-content-between align-items-stretch w-100 specific-maxheight-70">
-                                        <form method="post"
-                                              action="{% url "projects-moderation-refuse" project.id %}"
-                                              class="flex-grow-1">
-                                            {% csrf_token %}
-                                            <button class="fr-btn fr-btn--secondary black fr-btn--sm fr-mr-1v h-100"
-                                                    type="submit"
-                                                    role="submit"
-                                                    data-test-id="refuse-project">Refuser</button>
-                                        </form>
-                                        <form method="post"
-                                              action="{% url "projects-moderation-accept" project.id %}">
-                                            {% csrf_token %}
-                                            <button class="fr-btn fr-btn--secondary fr-btn--sm fr-mr-1v float-end h-100"
-                                                    type="submit"
-                                                    role="submit"
-                                                    @click="$store.projects.resetProjectsLocalStorage()"
-                                                    data-test-id="accept-project">Accepter</button>
-                                        </form>
-                                        <form method="post"
-                                              action="{% url "projects-moderation-accept" project.id %}">
-                                            {% csrf_token %}
-                                            <input type="hidden" name="join" value="1">
-                                            <button class="fr-btn fr-btn--secondary fr-btn--sm fr-mr-1v float-end h-100"
-                                                    type="submit"
-                                                    role="submit"
-                                                    @click="$store.projects.resetProjectsLocalStorage()"
-                                                    data-test-id="accept-project">Accepter et rejoindre</button>
-                                        </form>
-                                    </div>
-                                </div>
+                                </label>
                             </div>
-                            <div class="project-card__col--right fr-p-0">
-                                <!-- Contexte -->
-                                {% include "projects/project/fragments/information_card.html" with full_width=True padding_end=False padding_top=False project=project title="Résumé du dossier" description=project.description updated_on=project.created_on data_test="context" display_user=False %}
-                                <!-- Complément -->
-                                {% for question in site_config.onboarding_questions.all %}
-                                    {% project_session_for_survey project site_config.project_survey as session %}
-                                    {% question_answer session question as answer %}
-                                    {% if answer and answer.values %}
-                                        {% lookup_choices_from_answer answer as choices %}
-                                        {% if answer.comment %}
-                                            <!--Texte libre-->
-                                            {% include "projects/project/fragments/information_card.html" with full_width=True padding_end=False padding_top=False project=project title=answer.question.text description=answer.comment updated_on=project.created_on card_user=project.submitted_by org_name=project.submitted_by.profile.organization.name display_user=False %}
-                                        {% else %}
-                                            <div class="fr-pt-2v">
-                                                {% for choice in choices %}
-                                                    {% include "projects/project/fragments/information_card.html" with full_width=True project=project title=answer.question.text_short description=choice.conclusion updated_on=project.created_on card_user=project.submitted_by org_name=project.submitted_by.profile.organization.name display_user=False %}
-                                                {% endfor %}
-                                            </div>
-                                        {% endif %}
+                            <div class="fr-segmented__element">
+                                <input value="2"
+                                       type="radio"
+                                       :checked="show === 'advisor'"
+                                       id="segmented-moderation-advisors"
+                                       name="segmented-moderation"
+                                       @click="sessionStorage.setItem('view', 'advisor'); show = 'advisor'"
+                                       data-test-id="advisor-view">
+                                <label class="fr-label" for="segmented-moderation-advisors">
+                                    Comptes conseiller
+                                    {% if advisor_access_requests.count %}
+                                        <span class="badge text-bg-danger no-underline fr-ml-1w">{{ advisor_access_requests.count }}</span>
                                     {% endif %}
-                                {% endfor %}
+                                </label>
                             </div>
                         </div>
-                    {% endfor %}
+                    </fieldset>
+                </div>
+            </div>
+        </div>
+        {% is_staff_for_current_site request.user as is_staff %}
+        <div class="col-11 fr-pb-6w fr-mx-auto"
+             data-test-id="moderation-page"
+             x-show="show === 'projects'">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-12">
+                        {% if draft_projects.count > 1 %}
+                            <h2>{{ draft_projects.count }} dossiers entrants à examiner</h2>
+                        {% elif draft_projects.count > 0 %}
+                            <h2>{{ draft_projects.count }} dossier entrant à examiner</h2>
+                        {% else %}
+                            <h2>Aucun dossier à examiner</h2>
+                        {% endif %}
+                        {% for project in draft_projects %}
+                            <div class="card fr-mb-2w d-flex flex-row project-card"
+                                 data-test-id="project-card">
+                                <div class="project-card__col--left project-card__col__padding d-flex flex-column">
+                                    <h3 class="project-card__title">
+                                        <a href="{% url 'projects-project-detail' project.id %}">
+                                            {% if project.commune %}
+                                                <span class="project-card__city">{{ project.commune.name }}({{ project.commune.postal|slice:2 }})</span>
+                                            {% endif %}
+                                            <span class="project-card__name">{{ project.name }}</span>
+                                        </a>
+                                    </h3>
+                                    <p class="project-card__keyinfo fr-mb-2v">
+                                        {% if project.project_sites.origin.site != request.site %}
+                                            <span data-cy="moderation-folder-shared-by">
+                                                {% if project.project_sites.origin.site.configuration.logo_small %}
+                                                    <img src="{{ project.project_sites.origin.site.configuration.logo_small.url }}"
+                                                         width="16px"
+                                                         height="auto"
+                                                         alt="Logo {{ project.project_sites.origin.site.name }}" />
+                                                {% else %}
+                                                    <span class="fr-icon--sm fr-icon-window-line" aria-hidden="true"></span>
+                                                {% endif %}
+                                                dossier envoyé par {{ project.project_sites.origin.site.name }}
+                                            </span>
+                                        {% endif %}
+                                        {% if project.commune %}
+                                            <span class="fr-icon--sm fr-icon-map-pin-2-line">INSEE: {{ project.commune.insee }}</span>
+                                        {% endif %}
+                                        <span class="fr-icon--sm fr-icon-calendar-event-line">déposé depuis {{ project.created_on|timesince }}</span>
+                                    </p>
+                                    <div class="project-card__location">
+                                        <h4 class="text-uppercase project-card__address fr-mb-0">Localisation</h4>
+                                        {% if project.location and project.commune %}
+                                            <p>
+                                                <span class="fr-icon--sm fr-icon-map-pin-2-line project-card__location"
+                                                      id="no-margin">{{ project.location }}</span>
+                                            </p>
+                                            <p class="fr-mb-2v">
+                                                <span class="project-card__communename">{{ project.commune.postal }} {{ project.commune.name }}</span>
+                                            </p>
+                                        {% elif project.location %}
+                                            <p class="fr-mb-2v">
+                                                <span class="fr-icon--sm fr-icon-map-pin-2-line project-card__location">{{ project.location }}</span>
+                                            </p>
+                                        {% elif project.commune %}
+                                            <p class="fr-mb-2v">
+                                                <span class="fr-icon--sm fr-icon-map-pin-2-line project-card__location">{{ project.commune.postal }} {{ project.commune.name }}</span>
+                                            </p>
+                                        {% else %}
+                                            <p class="fr-mb-2v">
+                                                <span class="fr-icon--sm fr-icon-map-pin-2-line project-card__location">Non renseigné</span>
+                                            </p>
+                                        {% endif %}
+                                    </div>
+                                    <h4 class="text-uppercase project-card__team fr-mb-0">Demandeur</h4>
+                                    <div>
+                                        {% include "projects/project/fragments/project_owner.html" with project=project %}
+                                        {% include "projects/project/fragments/owner/owner-details.html" with project=project %}
+                                    </div>
+                                    <div class="d-flex flex-grow-1 align-items-end fr-mt-3w">
+                                        <div class="d-flex justify-content-between align-items-stretch w-100 specific-maxheight-70">
+                                            <form method="post"
+                                                  action="{% url "projects-moderation-project-refuse" project.id %}"
+                                                  class="flex-grow-1">
+                                                {% csrf_token %}
+                                                <button class="fr-btn fr-btn--secondary black fr-btn--sm fr-mr-1v h-100"
+                                                        type="submit"
+                                                        role="submit"
+                                                        data-test-id="refuse-project">Refuser</button>
+                                            </form>
+                                            <form method="post"
+                                                  action="{% url "projects-moderation-project-accept" project.id %}">
+                                                {% csrf_token %}
+                                                <button class="fr-btn fr-btn--secondary fr-btn--sm fr-mr-1v float-end h-100"
+                                                        type="submit"
+                                                        role="submit"
+                                                        @click="$store.projects.resetProjectsLocalStorage()"
+                                                        data-test-id="accept-project">Accepter</button>
+                                            </form>
+                                            <form method="post"
+                                                  action="{% url "projects-moderation-project-accept" project.id %}">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="join" value="1">
+                                                <button class="fr-btn fr-btn--secondary fr-btn--sm fr-mr-1v float-end h-100"
+                                                        type="submit"
+                                                        role="submit"
+                                                        @click="$store.projects.resetProjectsLocalStorage()"
+                                                        data-test-id="accept-project">Accepter et rejoindre</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="project-card__col--right fr-p-0">
+                                    <!-- Contexte -->
+                                    {% include "projects/project/fragments/information_card.html" with full_width=True padding_end=False padding_top=False project=project title="Résumé du dossier" description=project.description updated_on=project.created_on data_test="context" display_user=False %}
+                                    <!-- Complément -->
+                                    {% for question in site_config.onboarding_questions.all %}
+                                        {% project_session_for_survey project site_config.project_survey as session %}
+                                        {% question_answer session question as answer %}
+                                        {% if answer and answer.values %}
+                                            {% lookup_choices_from_answer answer as choices %}
+                                            {% if answer.comment %}
+                                                <!--Texte libre-->
+                                                {% include "projects/project/fragments/information_card.html" with full_width=True padding_end=False padding_top=False project=project title=answer.question.text description=answer.comment updated_on=project.created_on card_user=project.submitted_by org_name=project.submitted_by.profile.organization.name display_user=False %}
+                                            {% else %}
+                                                <div class="fr-pt-2v">
+                                                    {% for choice in choices %}
+                                                        {% include "projects/project/fragments/information_card.html" with full_width=True project=project title=answer.question.text_short description=choice.conclusion updated_on=project.created_on card_user=project.submitted_by org_name=project.submitted_by.profile.organization.name display_user=False %}
+                                                    {% endfor %}
+                                                </div>
+                                            {% endif %}
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-11 fr-pt-2w fr-pb-6w fr-mx-auto"
+             data-test-id="advisor-account-moderation-page"
+             x-show="show === 'advisor'">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-12">
+                        {% if advisor_access_requests.count > 1 %}
+                            <h2>{{ advisor_access_requests.count }} accès conseiller à examiner</h2>
+                        {% elif advisor_access_requests.count > 0 %}
+                            <h2>{{ advisor_access_requests.count }} accès conseiller à examiner</h2>
+                        {% else %}
+                            <h2>Aucun accès conseiller à examiner</h2>
+                        {% endif %}
+                        <div class="moderation-advisor">
+                            {% for advisor in advisor_access_requests %}
+                                <div class="moderation-advisor__card fr-col-4-min fr-mx-1v fr-my-1w" data-test-id="moderation-advisor-card">
+                                    <div class="moderation-advisor__contact-card fr-m-3v">
+                                        {% include "tools/contacts/contact_card.html" with is_django_data=True contact=advisor.user is_type_user=True %}
+                                    </div>
+                                    <div>
+                                        {% if advisor.departments.count %}
+                                            <span class="fr-m-3v moderation-advisor__texte">Demande d’accès sur les départements :</span>
+                                            <div class="moderation-advisor__departments fr-m-3v">
+                                                {% for department in advisor.departments.all %}
+                                                    <span class="moderation-advisor__department" data-test-id="department-ask-for-access-advisor">{{ department.name }} ({{ department.code }})</span>
+                                                {% endfor %}
+                                            </div>
+                                        {% else %}
+                                            <span class="fr-m-3v moderation-advisor__texte">Demande d’accès national</span>
+                                        {% endif %}
+                                    </div>
+                                    <div class="fr-m-3v">
+                                        <div class="d-flex justify-content-between align-items-stretch w-100">
+                                            <form method="post"
+                                                  action="{% url "projects-moderation-advisor-refuse" advisor.id %}"
+                                                  class="flex-grow-1">
+                                                {% csrf_token %}
+                                                <button class="fr-btn fr-btn--secondary fr-btn--sm fr-mr-1v h-100 moderation-advisor__overright-button"
+                                                        data-test-id="refuse-advisor-access"
+                                                        type="submit"
+                                                        role="submit">Refuser</button>
+                                            </form>
+                                            <form method="post"
+                                                  action="{% url "projects-moderation-advisor-modify" advisor.id %}">
+                                                {% csrf_token %}
+                                                <button class="fr-btn fr-btn--secondary fr-btn--sm fr-mr-1v float-end h-100 moderation-advisor__overright-button"
+                                                        data-test-id="modify-advisor-access"
+                                                        type="submit"
+                                                        role="submit">Modifier</button>
+                                            </form>
+                                            <form method="post"
+                                                  action="{% url "projects-moderation-advisor-accept" advisor.id %}">
+                                                {% csrf_token %}
+                                                <button class="fr-btn fr-btn--sm fr-mr-1v float-end h-100 moderation-advisor__overright-button"
+                                                        data-test-id="accept-advisor-access"
+                                                        type="submit"
+                                                        role="submit">Accepter</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

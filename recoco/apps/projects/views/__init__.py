@@ -12,11 +12,14 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import PermissionDenied
+from django.db import transaction
+from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import ensure_csrf_cookie
+from django.views.decorators.http import require_http_methods
 from notifications import models as notifications_models
 
 from recoco import verbs
@@ -26,8 +29,10 @@ from recoco.apps.communication.api import send_email
 from recoco.apps.communication.digests import normalize_user_name
 from recoco.apps.geomatics import models as geomatics_models
 from recoco.apps.geomatics.serializers import DepartmentSerializer, RegionSerializer
+from recoco.apps.home.models import AdvisorAccessRequest
 from recoco.utils import (
     check_if_advisor,
+    get_group_for_site,
     get_site_config_or_503,
     has_perm_or_403,
     is_staff_for_site,
@@ -67,6 +72,8 @@ def mark_general_notifications_as_seen(user):
 # -----
 # Project Moderation
 # -----
+
+
 @login_required
 def project_moderation_list(request):
     is_project_moderator_or_403(request.user, request.site)
@@ -77,11 +84,25 @@ def project_moderation_list(request):
         project_sites__status="DRAFT", project_sites__site=request.site, deleted=None
     ).order_by("-created_on")
 
-    return render(request, "projects/projects_moderation.html", locals())
+    advisor_access_requests = (
+        AdvisorAccessRequest.on_site.pending()
+        .prefetch_related("departments")
+        .select_related("user")
+    ).order_by("-created")
+
+    return render(
+        request,
+        "projects/projects_moderation.html",
+        context={
+            "site_config": site_config,
+            "draft_projects": draft_projects,
+            "advisor_access_requests": advisor_access_requests,
+        },
+    )
 
 
 @login_required
-def project_moderation_refuse(request, project_pk):
+def project_moderation_project_refuse(request: HttpRequest, project_id: int):
     is_project_moderator_or_403(request.user, request.site)
 
     project = get_object_or_404(
@@ -89,7 +110,7 @@ def project_moderation_refuse(request, project_pk):
         project_sites__status="DRAFT",
         project_sites__site=request.site,
         deleted=None,
-        pk=project_pk,
+        pk=project_id,
     )
 
     if request.method == "POST":
@@ -105,7 +126,7 @@ def project_moderation_refuse(request, project_pk):
 
 
 @login_required
-def project_moderation_accept(request, project_pk):
+def project_moderation_project_accept(request: HttpRequest, project_id: int):
     is_project_moderator_or_403(request.user, request.site)
 
     project = get_object_or_404(
@@ -113,7 +134,7 @@ def project_moderation_accept(request, project_pk):
         project_sites__status="DRAFT",
         project_sites__site=request.site,
         deleted=None,
-        pk=project_pk,
+        pk=project_id,
     )
 
     if request.method == "POST":
@@ -204,6 +225,97 @@ def project_moderation_accept(request, project_pk):
         return redirect(reverse("projects-project-detail-overview", args=(project.pk,)))
 
     return redirect(reverse("projects-moderation-list"))
+
+
+@login_required
+@require_http_methods(["POST"])
+def project_moderation_advisor_refuse(
+    request: HttpRequest, advisor_access_request_id: int
+) -> HttpResponse:
+    is_project_moderator_or_403(request.user, request.site)
+
+    advisor_access_request = get_object_or_404(
+        AdvisorAccessRequest.on_site.select_related("user"),
+        pk=advisor_access_request_id,
+    )
+
+    with transaction.atomic():
+        advisor_access_request.reject(handled_by=request.user)
+        advisor_access_request.save()
+
+        advisor_group = get_group_for_site("advisor", request.site)
+        advisor_access_request.user.groups.remove(advisor_group)
+
+    messages.add_message(
+        request,
+        messages.INFO,
+        f"La demande d'accès conseiller pour '{advisor_access_request.user.email}' a été refusée.",
+    )
+
+    return redirect(reverse("projects-moderation-list"))
+
+
+@login_required
+@require_http_methods(["POST"])
+def project_moderation_advisor_accept(
+    request: HttpRequest, advisor_access_request_id: int
+) -> HttpResponse:
+    is_project_moderator_or_403(request.user, request.site)
+
+    advisor_access_request = get_object_or_404(
+        AdvisorAccessRequest.on_site.prefetch_related("departments").select_related(
+            "user"
+        ),
+        pk=advisor_access_request_id,
+    )
+
+    with transaction.atomic():
+        advisor_access_request.accept(handled_by=request.user)
+        advisor_access_request.save()
+
+        advisor_group = get_group_for_site("advisor", request.site)
+        advisor_access_request.user.groups.add(advisor_group)
+
+        advisor_access_request.user.profile.departments.add(
+            *advisor_access_request.departments.all()
+        )
+
+    messages.add_message(
+        request,
+        messages.INFO,
+        f"La demande d'accès conseiller pour '{advisor_access_request.user.email}' a été acceptée.",
+    )
+
+    return redirect(reverse("projects-moderation-list"))
+
+
+@login_required
+@require_http_methods(["POST"])
+def project_moderation_advisor_modify(
+    request: HttpRequest, advisor_access_request_id: int
+) -> HttpResponse:
+    is_project_moderator_or_403(request.user, request.site)
+
+    advisor_access_request = get_object_or_404(
+        AdvisorAccessRequest.on_site.prefetch_related("departments").select_related(
+            "user"
+        ),
+        pk=advisor_access_request_id,
+    )
+
+    with transaction.atomic():
+        advisor_access_request.modify(handled_by=request.user)
+        advisor_access_request.save()
+
+        advisor_group = get_group_for_site("advisor", request.site)
+        advisor_access_request.user.groups.remove(advisor_group)
+
+    return redirect(
+        reverse(
+            "advisor-access-request-moderator",
+            kwargs={"advisor_access_request_id": advisor_access_request.pk},
+        )
+    )
 
 
 # ----
