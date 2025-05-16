@@ -285,7 +285,7 @@ def advisor_access_request_view(request: HttpRequest) -> HttpResponse:
     )
 
     departments = departments = [
-        {"name": d.name, "code": d.code} for d in Department.objects.all()
+        {"name": d.name, "code": d.code} for d in Department.objects.exclude(code="")
     ]
 
     selected_departments = (
