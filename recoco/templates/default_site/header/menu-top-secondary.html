@@ -3,6 +3,8 @@
 {% load gravatar %}
 {% load django_vite %}
 {% load projects_extra %}
+{% load invites_tags %}
+
 {% block js %}
     {% vite_asset 'js/apps/menuTop.js' %}
 {% endblock js %}
@@ -103,7 +105,6 @@
             </li>
         {% endif %}
         <!-- Projects invitations -->
-        {% load invites_tags %}
         {% pending_invitations_for request.user as invitations %}
         {% if invitations.count %}
             <li class="navigation__item-invitation d-flex">
