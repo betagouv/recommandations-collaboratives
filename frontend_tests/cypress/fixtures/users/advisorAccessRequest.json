@@ -1,0 +1,36 @@
+[
+  {
+    "model": "home.advisoraccessrequest",
+    "pk": 1,
+    "fields": {
+      "created": "2023-10-01T12:00:00Z",
+      "status": "PENDING",
+      "handled_by": 1,
+      "site": 1,
+      "user": 15
+    }
+  },
+  {
+    "model": "home.advisoraccessrequest",
+    "pk": 2,
+    "fields": {
+      "created": "2023-10-01T12:00:00Z",
+      "status": "PENDING",
+      "handled_by": 1,
+      "site": 1,
+      "user": 16,
+      "departments": ["1", "42"]
+    }
+  },
+  {
+    "model": "home.advisoraccessrequest",
+    "pk": 3,
+    "fields": {
+      "created": "2023-10-01T12:00:00Z",
+      "status": "PENDING",
+      "handled_by": 1,
+      "site": 1,
+      "user": 17
+    }
+  }
+]

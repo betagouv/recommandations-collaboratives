@@ -4,7 +4,6 @@ import pytest
 from django.contrib.sites.models import Site
 from django.urls import reverse
 from model_bakery import baker
-from waffle.testutils import override_switch
 
 from ..models import Contact, Organization
 
@@ -107,16 +106,22 @@ def test_can_not_create_contact_with_wrong_organization(api_client, staff_user):
     "search_terms,expected_result",
     [
         ("skywalker", [999]),
+        ("sky", [999]),
         ("jedi", [777, 888]),
+        ("jed", [777, 888]),
         ("coté obscure", [999]),
-        # On pourrait aller plus loin dans le tests ici,
-        # mais à voir avant si on passe par une recherche basée sur watson
+        ("obscure", [999]),
+        ("Maître", [777, 888]),
+        ("maitre", [777, 888]),
     ],
 )
 @pytest.mark.django_db
-@override_switch("addressbook_contact_use_watson_search", active=False)
 def test_contact_search_filter(
-    api_client, staff_user, current_site, search_terms, expected_result
+    api_client,
+    staff_user,
+    current_site,
+    search_terms,
+    expected_result,
 ):
     jedi_organization = baker.make(
         Organization,
@@ -136,7 +141,7 @@ def test_contact_search_filter(
         last_name="Jinn",
         email="quiqui@coruscant.com",
         organization=jedi_organization,
-        division="Maître jedi",
+        division="Maître Jedi",
         site=current_site,
     )
     baker.make(
@@ -160,13 +165,15 @@ def test_contact_search_filter(
     )
 
     api_client.force_authenticate(staff_user)
+
     response = api_client.get(
         reverse("api-addressbook-contact-list"), {"search": search_terms}
     )
+
     assert response.status_code == 200
-    assert [
-        contact["id"] for contact in response.data["results"]
-    ] == expected_result, f"failure for search terms: {search_terms}"
+    assert [contact["id"] for contact in response.data["results"]] == expected_result, (
+        f"failure for search terms: {search_terms}"
+    )
 
 
 @pytest.mark.parametrize(

@@ -103,3 +103,49 @@
 .specific-maxheight-70 {
   max-height: 70px;
 }
+
+.moderation-advisor {
+  display: flex;
+  flex-wrap: wrap;
+  &__card {
+    border-radius: 4px;
+    border: 1px solid var(--light-border-default-grey, #e5e5e5);
+    background: var(--light-background-default-grey, #fff);
+    box-shadow: 2px 2px 4px 0px rgba(0, 0, 0, 0.1);
+    height: fit-content;
+  }
+  &__contact-card {
+    border: 1px solid var(--light-border-default-grey, #e5e5e5);
+  }
+  &__texte {
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 150%;
+  }
+  &__departments {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  &__department {
+    border-radius: 2px;
+    background: var(--light-background-contrast-info, #e8edff);
+    color: var(--light-text-default-info, #0063cb);
+    padding: 6px 4px;
+    align-items: center;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 100%;
+  }
+  &__overright-button {
+    border-radius: 1px;
+  }
+}
+
+.fr-col-4-min {
+  flex: 0 0 32%;
+  max-width: 32%;
+  width: 32%;
+}

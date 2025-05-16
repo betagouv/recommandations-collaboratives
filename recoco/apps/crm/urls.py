@@ -7,7 +7,6 @@ author  : raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created : 2022-07-19 17:27:25 CEST
 """
 
-
 from django.urls import path
 
 from . import views
@@ -58,6 +57,11 @@ urlpatterns = [
         "crm/site_config",
         views.SiteConfigurationUpdateView.as_view(),
         name="crm-site-configuration",
+    ),
+    path(
+        "crm/site_config/tags",
+        views.siteconfiguration_tags,
+        name="crm-site-configuration-tags",
     ),
     #
     # users

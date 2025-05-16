@@ -24,6 +24,7 @@ from notifications import notify
 from pytest_django.asserts import assertContains, assertRedirects
 
 from recoco import verbs
+from recoco.apps.addressbook.models import Contact
 from recoco.apps.geomatics import models as geomatics
 from recoco.apps.home import models as home_models
 from recoco.apps.projects import models as project_models
@@ -1018,6 +1019,8 @@ def test_create_new_action_with_single_resource(request, client, project_ready):
     intent = "My Intent"
     content = "My Content"
 
+    contact = baker.make(Contact, site=current_site)
+
     with login(client) as user:
         utils.assign_advisor(user, project_ready)
 
@@ -1030,6 +1033,7 @@ def test_create_new_action_with_single_resource(request, client, project_ready):
                 "resource": resource.pk,
                 "intent": intent,
                 "content": content,
+                "contact": contact.pk,
             },
         )
     task = models.Task.on_site.first()
@@ -1037,6 +1041,7 @@ def test_create_new_action_with_single_resource(request, client, project_ready):
     assert task.project == project_ready
     assert task.public is True
     assert task.resource == resource
+    assert task.contact == contact
     assert response.status_code == 302
 
 
@@ -1063,6 +1068,66 @@ def test_create_new_action_on_unauthorized_project(request, client, project_read
 
 
 # Action sorting
+@pytest.mark.django_db
+def test_create_action_orders_chrono_the_same_day(request, client, project_ready):
+    current_site = get_current_site(request)
+
+    task1 = baker.make(
+        models.Task, site=current_site, project=project_ready, created_on=timezone.now()
+    )
+
+    with login(client) as user:
+        utils.assign_advisor(user, project_ready)
+
+        response = client.post(
+            reverse("projects-create-task"),
+            data={
+                "project": project_ready.pk,
+                "push_type": "noresource",
+                "public": True,
+                "intent": "Two",
+                "content": "Hello",
+            },
+        )
+        assert response.status_code == 302
+
+    task1.refresh_from_db()
+    task2 = models.Task.on_site.get(intent="Two")
+
+    assert task1.next() == task2
+
+
+# Action sorting
+@pytest.mark.django_db
+def test_create_action_orders_chrono_next_day(request, client, project_ready):
+    current_site = get_current_site(request)
+
+    task1 = baker.make(
+        models.Task,
+        site=current_site,
+        project=project_ready,
+        created_on=timezone.now() - datetime.timedelta(days=1),
+    )
+
+    with login(client) as user:
+        utils.assign_advisor(user, project_ready)
+
+        response = client.post(
+            reverse("projects-create-task"),
+            data={
+                "project": project_ready.pk,
+                "push_type": "noresource",
+                "public": True,
+                "intent": "Two",
+                "content": "Hello",
+            },
+        )
+        assert response.status_code == 302
+
+    task1.refresh_from_db()
+    task2 = models.Task.on_site.get(intent="Two")
+
+    assert task1.previous() == task2
 
 
 @pytest.mark.django_db

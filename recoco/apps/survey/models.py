@@ -137,7 +137,7 @@ class Question(CloneMixin, models.Model):
     """A question with mutliple choices"""
 
     objects = QuestionManager()
-    objects_deleted = models.Manager()
+    objects_all = models.Manager()
 
     precondition = TagField(
         verbose_name="Pré-condition",
@@ -162,7 +162,11 @@ class Question(CloneMixin, models.Model):
     def _populate_slug(self) -> str:
         return self.text_short if len(self.text_short) else self.text
 
-    slug = AutoSlugField(unique=True, populate_from=_populate_slug)
+    slug = AutoSlugField(
+        unique=True,
+        populate_from=_populate_slug,
+        manager=objects_all,
+    )
 
     how = models.TextField(default="", blank=True, verbose_name="Comment ?")
 

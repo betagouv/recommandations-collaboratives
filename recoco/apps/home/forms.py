@@ -11,6 +11,8 @@ from captcha.widgets import ReCaptchaV2Checkbox
 from django import forms
 from django.core.exceptions import ValidationError
 
+from recoco.apps.geomatics.models import Department
+
 
 class UVSignupForm(SignupForm):
     field_order = [
@@ -28,9 +30,9 @@ class UVSignupForm(SignupForm):
     def __init__(self, *args, **kwargs):
         super(UVSignupForm, self).__init__(*args, **kwargs)
 
-        self.fields["password1"].label = (
-            "Définissez votre mot de passe (8 caractères minimum)"
-        )
+        self.fields[
+            "password1"
+        ].label = "Définissez votre mot de passe (8 caractères minimum)"
         self.fields["password1"].widget = forms.PasswordInput(
             attrs={"class": "fr-input fr-mt-2v fr-mb-4v"}
         )
@@ -115,3 +117,12 @@ class UserPasswordFirstTimeSetupForm(forms.Form):
         if password1 and password2:
             if password1 != password2:
                 raise ValidationError("Les mots de passe ne correspondent pas.")
+
+
+class AdvisorAccessRequestForm(forms.Form):
+    departments = forms.ModelMultipleChoiceField(
+        queryset=Department.objects.all(),
+        label="Départements",
+        widget=forms.CheckboxSelectMultiple,
+        required=False,
+    )

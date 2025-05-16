@@ -7,6 +7,7 @@ from recoco import verbs
 from recoco.apps.geomatics.serializers import CommuneSerializer
 from recoco.apps.home.serializers import UserSerializer
 from recoco.apps.tasks import models as task_models
+from recoco.rest_api.serializers import BaseSerializerMixin
 from recoco.utils import get_group_for_site
 
 from .models import Document, Note, Project, ProjectSite, Topic, UserProjectStatus
@@ -43,7 +44,9 @@ class ProjectSiteSerializer(serializers.ModelSerializer):
         read_only_fields = ["id", "project", "site", "is_origin"]
 
 
-class ProjectSerializer(TaggitSerializer, serializers.HyperlinkedModelSerializer):
+class ProjectSerializer(
+    TaggitSerializer, BaseSerializerMixin, serializers.HyperlinkedModelSerializer
+):
     class Meta:
         model = Project
         fields = [
@@ -51,18 +54,22 @@ class ProjectSerializer(TaggitSerializer, serializers.HyperlinkedModelSerializer
             "name",
             "description",
             "inactive_since",
+            "status",
             "created_on",
             "updated_on",
             "org_name",
             "switchtenders",
             "commune",
             "location",
+            "latitude",
+            "longitude",
             "recommendation_count",
             "public_message_count",
             "private_message_count",
             "project_sites",
             "tags",
             "is_diagnostic_done",
+            "advisors_note",
         ]
 
     switchtenders = UserSerializer(read_only=True, many=True)
@@ -86,6 +93,24 @@ class ProjectSerializer(TaggitSerializer, serializers.HyperlinkedModelSerializer
         return Note.on_site.private().filter(project=obj).count()
 
     commune = CommuneSerializer(read_only=True)
+
+    latitude = serializers.SerializerMethodField()
+
+    def get_latitude(self, obj):
+        return obj.location_y
+
+    longitude = serializers.SerializerMethodField()
+
+    def get_longitude(self, obj):
+        return obj.location_x
+
+    advisors_note = serializers.SerializerMethodField()
+
+    def get_advisors_note(self, obj) -> str | None:
+        if self.current_user and self.current_user.has_perm(
+            "projects.use_private_notes", obj
+        ):
+            return obj.advisors_note
 
 
 class UserProjectSerializer(ProjectSerializer):
@@ -153,7 +178,7 @@ class UserProjectSerializer(ProjectSerializer):
         }
 
 
-class ProjectForListSerializer(serializers.BaseSerializer):
+class ProjectForListSerializer(BaseSerializerMixin):
     class Meta:
         model = Project
         fields = []
@@ -163,6 +188,7 @@ class ProjectForListSerializer(serializers.BaseSerializer):
         # uses our optimized queryset and not project serializer
         commune = data.commune
         commune_data = format_commune(commune)
+
         return {
             "id": data.id,
             "name": data.name,
@@ -177,9 +203,17 @@ class ProjectForListSerializer(serializers.BaseSerializer):
             "is_observer": data.is_observer,
             "commune": commune_data,
             "location": data.location,
+            "latitude": data.location_y,
+            "longitude": data.location_x,
             "notifications": data.notifications,
             "project_sites": format_sites(data),
             "tags": [tag.name for tag in data.tags.all()],
+            "advisors_note": (
+                data.advisors_note
+                if self.current_user
+                and self.current_user.has_perm("projects.use_private_notes", data)
+                else None
+            ),
         }
 
 
@@ -235,6 +269,10 @@ def format_commune(commune):
         "department": {
             "code": commune.department.code,
             "name": commune.department.name,
+            "region": {
+                "code": commune.department.region.code,
+                "name": commune.department.region.name,
+            },
         },
         "latitude": commune.latitude,
         "longitude": commune.longitude,

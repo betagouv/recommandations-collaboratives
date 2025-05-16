@@ -5,6 +5,7 @@ import Link from '@tiptap/extension-link';
 import HardBreak from '@tiptap/extension-hard-break';
 import { createMarkdownEditor } from 'tiptap-markdown';
 import '../../css/tiptap.css';
+import { formatDate } from '../utils/date';
 
 const MarkdownEditor = createMarkdownEditor(Editor);
 
@@ -13,7 +14,8 @@ Alpine.data('editor', (content) => {
 
   return {
     updatedAt: Date.now(), // force Alpine to rerender on selection change
-    markdownContent: content ? content : '',
+    markdownContent: null,
+    formatDate,
     init() {
       const _this = this;
 
@@ -43,6 +45,7 @@ Alpine.data('editor', (content) => {
         content: content,
         onCreate({ editor }) {
           _this.updatedAt = Date.now();
+          _this.renderMarkdown();
         },
         onUpdate({ editor }) {
           _this.updatedAt = Date.now();
@@ -54,8 +57,11 @@ Alpine.data('editor', (content) => {
         },
         onSelectionUpdate({ editor }) {
           _this.updatedAt = Date.now();
+          _this.renderMarkdown();
         },
       });
+
+      this.renderMarkdown();
     },
     isLoaded() {
       return editor;
@@ -102,11 +108,40 @@ Alpine.data('editor', (content) => {
     unsetLink() {
       editor.chain().focus().unsetLink().run();
     },
-    setMarkdownContentFromTaskModal(event) {
-      editor.commands.setContent(event.detail);
+    setMarkdownContent(event) {
+      editor.commands.setContent(event.detail.text);
+      if (event.detail.contact) {
+        this.selectedContact = event.detail.contact;
+      } else {
+        this.selectedContact = null;
+      }
     },
     renderMarkdown() {
       this.markdownContent = editor.getMarkdown().replaceAll('\\', '');
+    },
+    /****************
+     * Plugin contact
+     */
+    selectedContact: null,
+    isSearchContactModalOpen: false,
+    handleSetContact(contact) {
+      this.selectedContact = { ...contact }; // XXX Copy since it can be destroyed from an inner scope and values result to null
+    },
+    handleResetContact() {
+      this.selectedContact = null;
+    },
+    openModalSearchContact() {
+      this.isSearchContactModalOpen = true;
+    },
+    closeSearchContactModal(event) {
+      if (event.target.id !== 'search-contact-modal') {
+        return;
+      }
+      const contact = event.detail;
+      if (contact) {
+        this.handleSetContact(contact);
+      }
+      this.isSearchContactModalOpen = false;
     },
   };
 });

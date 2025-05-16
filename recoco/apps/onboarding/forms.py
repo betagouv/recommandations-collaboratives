@@ -13,7 +13,7 @@ from captcha.fields import ReCaptchaField
 from captcha.widgets import ReCaptchaV2Checkbox
 from crispy_forms.layout import Fieldset, Layout
 from django import forms
-from django.shortcuts import reverse
+from django.urls import reverse
 
 from recoco.apps.dsrc.forms import DsrcBaseForm
 
@@ -53,7 +53,7 @@ class OnboardingResponseForm(forms.ModelForm):
         label="Nom de votre structure", initial="", required=True
     )
 
-    name = forms.CharField(label="Nom du projet", max_length=128, required=True)
+    name = forms.CharField(label="Nom du dossier", max_length=128, required=True)
     location = forms.CharField(label="Adresse", required=False)
     postcode = forms.CharField(max_length=5, required=False, label="Code Postal")
     insee = forms.CharField(max_length=5, required=False, label="Code Insee")
@@ -232,7 +232,7 @@ class OnboardingProject(DsrcBaseForm):
         label="Titre de la demande *",
         initial="",
         required=True,
-        help_text="Indiquez un nom court qui décrit la demande ou le projet. Inutile d'ajouter le nom de la commune, l'adresse ou le programme.",
+        help_text="Indiquez un nom court qui décrit la demande ou le dossier. Inutile d'ajouter le nom de la commune, l'adresse ou le programme.",
     )
     location = forms.CharField(
         label="Adresse",
@@ -252,7 +252,7 @@ class OnboardingProject(DsrcBaseForm):
         label="Résumé de la demande *",
         initial="",
         required=True,
-        help_text="Décrivez votre demande ou projet et son contexte en quelques mots.",
+        help_text="Décrivez votre demande ou dossier et son contexte en quelques mots.",
         widget=forms.Textarea(attrs={"rows": 3}),
     )
 
@@ -268,7 +268,7 @@ class PrefillSetuserForm(DsrcBaseForm):
 
         self.helper.layout = Layout(
             Fieldset(
-                "Pour qui remplissez-vous ce projet",  # The first argument is the legend of the fieldset
+                "Pour qui remplissez-vous ce dossier",  # The first argument is the legend of the fieldset
                 "first_name",
                 "last_name",
                 "org_name",
@@ -341,10 +341,10 @@ class PrefillProjectForm(DsrcBaseForm):
         )
 
     name = forms.CharField(
-        label="Nom du projet *",
+        label="Nom du dossier *",
         initial="",
         required=True,
-        help_text="Indiquez un nom court qui décrit le projet. Inutile d'ajouter le nom de la commune, l'adresse ou le programme.",
+        help_text="Indiquez un nom court qui décrit le dossier. Inutile d'ajouter le nom de la commune, l'adresse ou le programme.",
     )
     location = forms.CharField(
         label="Adresse",
@@ -361,10 +361,10 @@ class PrefillProjectForm(DsrcBaseForm):
     )
 
     description = forms.CharField(
-        label="Résumé du projet *",
+        label="Résumé du dossier *",
         initial="",
         required=True,
-        help_text="Décrivez votre projet et son contexte en quelques mots.",
+        help_text="Décrivez votre dossier et son contexte en quelques mots.",
         widget=forms.Textarea(attrs={"rows": 3}),
     )
 

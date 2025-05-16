@@ -63,6 +63,7 @@ class DSResource(TimeStampedModel):
                 MappingField(
                     id="champ_" + field.get("id").replace("==", ""),
                     label=field.get("label"),
+                    options=field.get("options"),
                 )
                 for field in self.schema["revision"]["champDescriptors"]
             ]
@@ -156,6 +157,10 @@ class DSMapping(TimeStampedModel):
     def ds_fields(self) -> list[MappingField]:
         return self.ds_resource.fields
 
+    @property
+    def indexed_ds_fields(self) -> dict[str, MappingField]:
+        return {field.id: field for field in self.ds_fields}
+
     @cached_property
     def recoco_fields(self) -> list[MappingField]:
         fields = copy(project_mapping_fields)
@@ -169,14 +174,18 @@ class DSMapping(TimeStampedModel):
                         survey_id=survey.id
                     ).values("id")
                 ):
-                    fields.append(
+                    fields += [
                         MappingField(
                             id=f"edl.{question.slug}",
                             label=question.text_short,
                             lookup=question.slug,
                         ),
-                    )
-
+                        MappingField(
+                            id=f"edl.{question.slug}.comment",
+                            label=question.text_short,
+                            lookup=f"{question.slug}.comment",
+                        ),
+                    ]
         return fields
 
     @cached_property

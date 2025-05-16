@@ -1,4 +1,5 @@
-<div x-data="TaskStatusSwitcher" class="d-flex align-items-center">
+<div x-data="TaskStatusSwitcher(task)"
+     class="d-flex align-items-center task-status-switcher">
     <button data-test-id="in-progress-status-task-button"
             class="button tiny black inherit fw-medium fr-mr-2v"
             :class="(activeStatus(task, STATUSES.INPROGRESS) || task.status === STATUSES.BLOCKED) && 'bg-blue text-white border-blue pointer-events-none'"

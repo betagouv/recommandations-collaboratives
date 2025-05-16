@@ -27,7 +27,7 @@ def invite_accept(request, invite_id):
     # Check if this email already exists as an account
     existing_account = None
     try:
-        existing_account = auth_models.User.objects.get(email=invite.email)
+        existing_account = auth_models.User.objects.get(username=invite.email)
     except auth_models.User.DoesNotExist:
         pass
 
@@ -105,7 +105,7 @@ def invite_details(request, invite_id):
     # Check if this email already exists as an account
     existing_account = None
     try:
-        existing_account = auth_models.User.objects.get(email=invite.email)
+        existing_account = auth_models.User.objects.get(username=invite.email)
     except auth_models.User.DoesNotExist:
         pass
 

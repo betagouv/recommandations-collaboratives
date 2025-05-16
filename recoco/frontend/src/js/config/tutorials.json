@@ -3,7 +3,7 @@
     "steps": [
       {
         "title": "<div class='tutorial-first-step' data-test-id='survey-tutorial'><h3>Bienvenue sur l'état des lieux</h3></div>",
-        "intro": "<strong>Obtenez des recommandations plus efficaces</strong> en répondant à quelques questions ! <br/>Ce parcours vous guide pour structurer votre <strong>connaissance sur le projet</strong>.<br/>Vous pouvez quitter et reprendre le questionnaire à tout moment, et inviter des participants pour le remplir"
+        "intro": "<strong>Obtenez des recommandations plus efficaces</strong> en répondant à quelques questions ! <br/>Ce parcours vous guide pour structurer votre <strong>connaissance sur le dossier</strong>.<br/>Vous pouvez quitter et reprendre le questionnaire à tout moment, et inviter des participants pour le remplir"
       },
       {
         "element": "#qs-heading",
@@ -23,18 +23,18 @@
       },
       {
         "element": "#project-link",
-        "intro": "Ici, vous retrouverez le récapitulatif de vos réponses, et les questions que vous avez laissées vides : vous pouvez y revenir une fois l’information trouvée. <br/>Bonne exploration de votre projet 👋"
+        "intro": "Ici, vous retrouverez le récapitulatif de vos réponses, et les questions que vous avez laissées vides : vous pouvez y revenir une fois l’information trouvée. <br/>Bonne exploration de votre dossier 👋"
       }
     ]
   },
   "project-advisor-overview": {
     "steps": [
       {
-        "intro": "<div data-test-id='project-overview-tutorial'>Ici, familiarisez-vous avec le projet</div>",
+        "intro": "<div data-test-id='project-overview-tutorial'>Ici, familiarisez-vous avec le dossier</div>",
         "element": "#overview-step-1"
       },
       {
-        "intro": "Le service et les acteurs locaux comme vous, conseillent le porteur de projet ici.",
+        "intro": "Le service et les acteurs locaux comme vous, conseillent le demandeur ici.",
         "element": "#overview-step-2"
       },
       {
@@ -42,12 +42,28 @@
         "element": "#overview-step-3"
       },
       {
-        "intro": "Le porteur de projet et ses partenaires n’ont pas accès à cet onglet d’échanges.",
+        "intro": "Le demandeur et ses partenaires n’ont pas accès à cet onglet d’échanges.",
         "element": "#overview-step-4"
       },
       {
-        "intro": "Pour vous déclarer conseiller ou observateur sur ce projet, c’est ici.",
+        "intro": "Pour vous déclarer conseiller ou observateur sur ce dossier, c’est ici.",
         "element": "#overview-step-5"
+      }
+    ]
+  },
+  "external-resources-proper-functioning": {
+    "steps": [
+      {
+        "intro": "<h2>Comment ça marche ?</h2> <p>1. Allez sur l'autre site web (ex : Aides-territoires), <br>2. Allez sur la page de la ressource que vous souhaitez recommander, <br>3. Copiez l'URL de cette page spécifique, <br>4. Collez-la dans le champ ci-dessous, <br>5. Cliquez sur Charger. <br> Note : actuellement seuls Aides-territoires et certains wiki sont supportés ici. <a class='' href='mailto:recommandations-collaboratives@beta.gouv.fr?subject=Ressource externe'>Vous pouvez demander l'ajout d'autres sites ici.</a></p>",
+        "element": "#external-resources-step"
+      }
+    ]
+  },
+  "time-filter-tutorial-on-kanban": {
+    "steps": [
+      {
+        "intro": "Seuls les dossiers avec activité récente sont affichés (moins de 1 mois, 3 mois etc.). Modifiez le filtre pour tout voir.",
+        "element": "#kanban-time-filter"
       }
     ]
   }

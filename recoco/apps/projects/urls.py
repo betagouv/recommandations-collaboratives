@@ -21,21 +21,41 @@ from .views import (
 )
 
 urlpatterns = [
-    path(r"projects/", views.project_list, name="projects-project-list"),
+    path(
+        r"projects/",
+        views.project_list,
+        name="projects-project-list",
+    ),
+    # moderation
     path(
         r"projects/moderation/",
         views.project_moderation_list,
         name="projects-moderation-list",
     ),
     path(
-        r"projects/moderation/<int:project_pk>/refuse",
-        views.project_moderation_refuse,
-        name="projects-moderation-refuse",
+        r"projects/moderation/project/<int:project_id>/refuse/",
+        views.project_moderation_project_refuse,
+        name="projects-moderation-project-refuse",
     ),
     path(
-        r"projects/moderation/<int:project_pk>/accept",
-        views.project_moderation_accept,
-        name="projects-moderation-accept",
+        r"projects/moderation/project/<int:project_id>/accept/",
+        views.project_moderation_project_accept,
+        name="projects-moderation-project-accept",
+    ),
+    path(
+        r"projects/moderation/advisor/<int:advisor_access_request_id>/refuse/",
+        views.project_moderation_advisor_refuse,
+        name="projects-moderation-advisor-refuse",
+    ),
+    path(
+        r"projects/moderation/advisor/<int:advisor_access_request_id>/accept/",
+        views.project_moderation_advisor_accept,
+        name="projects-moderation-advisor-accept",
+    ),
+    path(
+        r"projects/moderation/advisor/<int:advisor_access_request_id>/modify/",
+        views.project_moderation_advisor_modify,
+        name="projects-moderation-advisor-modify",
     ),
     # projects for switchtenders
     path(
@@ -119,6 +139,16 @@ urlpatterns = [
         r"project/<int:project_id>/conversations",
         detail.project_conversations,
         name="projects-project-detail-conversations",
+    ),
+    path(
+        r"project/<int:project_id>/conversations-new",
+        detail.project_conversations_new,
+        name="projects-project-detail-conversations-new",
+    ),
+    path(
+        r"project/<int:project_id>/conversations-new-partial",
+        detail.project_conversations_new_partial,
+        name="projects-project-detail-conversations-new-partial",
     ),
     path(
         r"project/<int:project_id>/switchtender/join",

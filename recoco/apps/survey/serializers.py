@@ -12,6 +12,7 @@ class ChoiceSerializer(serializers.ModelSerializer):
             "id",
             "value",
             "text",
+            "conclusion",
         ]
 
 

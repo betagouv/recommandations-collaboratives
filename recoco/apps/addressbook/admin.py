@@ -13,7 +13,7 @@ class OrganizationGroupAdmin(admin.ModelAdmin):
 
 @admin.register(models.Organization)
 class OrganizationAdmin(admin.ModelAdmin):
-    search_fields = ["name" "group__name"]
+    search_fields = ["name", "group__name"]
     list_display = ["name"]
     ordering = ["name"]
     list_filter = ["sites", "group"]

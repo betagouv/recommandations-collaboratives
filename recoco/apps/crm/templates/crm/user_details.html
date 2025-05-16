@@ -7,13 +7,24 @@
 {% load hijack %}
 {% load phone_filters %}
 {% block title %}
-    {{ crm_user.get_full_name }} - CRM
+    {% if crm_user.get_full_name %}
+        {{ crm_user.get_full_name }}
+    {% else %}
+        Utilisateur
+    {% endif %}
+    - CRM
 {% endblock title %}
 {% block og_title %}
-    {{ crm_user.get_full_name }} - CRM
+    {% if crm_user.get_full_name %}
+        {{ crm_user.get_full_name }}
+    {% else %}
+        Utilisateur
+    {% endif %}
+    - CRM
 {% endblock og_title %}
 {% block js %}
     {% vite_asset 'js/apps/crm.js' %}
+    {% vite_asset 'js/components/User.js' %}
 {% endblock js %}
 {% block css %}
     <link href="{% sass_src 'home/css/dsfr/marianne.css' %}"
@@ -41,7 +52,7 @@
                 <div class="d-flex justify-content-between align-items-center fr-mb-2v">
                     <div class="d-flex align-items-start justify-content-between w-100">
                         <div class="flex-row">
-                            <div class="d-flex align-items-center">
+                            <div x-data="User()" class="d-flex align-items-center">
                                 <h5 class="d-flex align-items-center fr-mb-0">
                                     <svg class="bi fr-mr-2v" width="16" height="16" fill="currentColor">
                                         <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#person-fill" />
@@ -61,6 +72,20 @@
                                         <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#envelope-fill" />
                                     </svg>  
                                     <span>{{ crm_user.email }}</span>
+                                    <button class="fr-ml-3w fr-px-2v fr-py-0 fr-btn fr-btn--secondary fr-btn--xs"
+                                            @click="clipboardCopy(`L'email`, '{{ crm_user.email }}')"
+                                            title="Copier l'email">
+                                        <svg class="bi align-baseline" width="10" height="10" fill="currentColor">
+                                            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#clipboard" />
+                                        </svg>
+                                    </button>
+                                {% endif %}
+                                {% if crm_user.profile.organization %}
+                                    <span class="fr-ml-2v fr-mr-2v">|</span>
+                                    <svg class="bi" width="16" height="16" fill="currentColor">
+                                        <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#building" />
+                                    </svg>  
+                                    {{ crm_user.profile.organization.name }}
                                 {% endif %}
                                 {% if crm_user.profile.organization.position %}
                                     <span class="fr-ml-2v fr-mr-2v">|</span>
@@ -176,10 +201,10 @@
                 <a class="btn btn-primary fr-mb-3w"
                    href="{% url 'crm-user-note-create' crm_user.pk %}">créer une note</a>
                 {% for note in sticky_notes.all %}
-                    {% include "crm/note.html" with pinned=True update_url_name="crm-user-note-update" %}
+                    {% include "crm/note.html" with pinned=True %}
                 {% endfor %}
                 {% for note in notes.all %}
-                    {% include "crm/note.html" with update_url_name="crm-user-note-update" %}
+                    {% include "crm/note.html" %}
                 {% endfor %}
             </div>
             <div class="fr-px-3w fr-pt-3w bg-light crm-timeline-min-height">

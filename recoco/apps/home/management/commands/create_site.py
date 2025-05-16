@@ -71,7 +71,6 @@ class Command(BaseCommand):
         email_logo = options["email_logo"]
 
         try:
-
             admin_user = None
             if options["admin_user"]:
                 admin_user = User.objects.get(username=options["admin_user"])

@@ -3,10 +3,18 @@ from rest_framework import serializers
 from .models import Commune, Department, Region
 
 
+class RegionNestedSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Region
+        fields = ["name", "code"]
+
+
 class DepartmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Department
-        fields = ["name", "code"]
+        fields = ["name", "code", "region"]
+
+    region = RegionNestedSerializer(read_only=True)
 
 
 class CommuneSerializer(serializers.ModelSerializer):

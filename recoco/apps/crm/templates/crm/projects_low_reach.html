@@ -4,17 +4,20 @@
 {% load humanize %}
 {% load crm_tags %}
 {% block title %}
-    Projets à faible répondant - CRM
+    Dossiers à faible répondant - CRM
 {% endblock title %}
 {% block og_title %}
-    Projets à faible répondant - CRM
+    Dossiers à faible répondant - CRM
 {% endblock og_title %}
+{% block js %}
+    {% vite_asset 'js/apps/crm.js' %}
+{% endblock js %}
 {% block content %}
     <div x-data="Crm" class="d-flex fr-px-0">
         {% include "crm/fragments/sidebar.html" with back_button=True map=True tools=True search=True %}
         <div class="w-75 d-flex flex-column justify-content-start">
             <div class="d-flex justify-content-between align-items-center fr-px-3w fr-pt-3w">
-                <h2>Projets à faible répondant</h2>
+                <h2>Dossiers à faible répondant</h2>
                 <a href="{% url 'crm-projects-low-reach-csv' %}" class="btn btn-primary">Export CSV</a>
             </div>
             <table class="table table-striped">
@@ -23,7 +26,7 @@
                         <th>Nom</th>
                         <th>Conseillers</th>
                         <th>% d'accès aux recos</th>
-                        <th>Dernière activité porteur de projet</th>
+                        <th>Dernière activité demandeur</th>
                         <th>Dernière reco publiée</th>
                         <th>Dernier msg conversation</th>
                     </tr>
@@ -60,8 +63,8 @@
                             </td>
                             <td>
                                 {% for advisor in project.switchtenders.all %}
-                                <span><a href="{% url 'crm-user-details' advisor.pk %}">{{ advisor.get_full_name }} ({{ advisor.profile.organization }})</a></span>
-                                {% if not forloop.last %} - {% endif %}
+                                    <span><a href="{% url 'crm-user-details' advisor.pk %}">{{ advisor.get_full_name }} ({{ advisor.profile.organization }})</a></span>
+                                    {% if not forloop.last %}-{% endif %}
                                 {% endfor %}
                             </td>
                             <td>{{ project.reco_read_ratio|floatformat:0 }}% ({{ project.reco_read }}/{{ project.reco_total }})</td>

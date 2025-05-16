@@ -9,7 +9,7 @@
 {% get_obj_perms request.user for request.site as "user_site_perms" %}
 {% get_obj_perms request.user for project as "user_project_perms" %}
 <div x-data="PreviewModal()"
-     class="modal fade"
+     class="modal fade modal-preview"
      id="task-modal"
      tabindex="-1"
      aria-hidden="true">
@@ -42,7 +42,7 @@
                         </div>
                     </template>
                     <!-- Modal body -->
-                    <div x-effect="taskId && $store.previewModal.loadFollowups() && $store.previewModal.loadNotifications() && followupScrollToLastMessage(true)"
+                    <div x-init="taskId && $store.previewModal.loadFollowups() && $store.previewModal.loadNotifications() && followupScrollToLastMessage(true)"
                          class="d-flex w-100 align-items-stretch position-relative">
                         <!-- Modal resource / content preview -->
                         <div class="position-absolute top-0 end-0 fr-p-1v close-btn-modal">
@@ -55,17 +55,23 @@
                         <div class="d-flex flex-grow-1 align-items-stretch w-65 task-modal-content"
                              :class="!contentIsLoading && 'visible'"
                              x-effect="taskId && loadContent()">
-                            <template x-if="currentTask && taskId && currentTask?.resource_id">
+                            <template x-if="taskId && currentTask.resource_id">
                                 <iframe class="w-100 d-flex flex-column rounded"
-                                        :src="resourcePreviewUrl(currentTask?.resource_id, taskId)"></iframe>
+                                        :src="resourcePreviewUrl(currentTask.resource_id, taskId)"></iframe>
                             </template>
-                            <template x-if="currentTask && taskId && !currentTask?.resource_id">
+                            <template x-if="taskId && !currentTask.resource_id">
                                 <div class="w-100 text-break fr-p-2w specific-maxheight-90vh scroll-gestion">
                                     <div class="resource-details">
                                         <h1 x-text="currentTask?.intent" class="fr-mb-2w"></h1>
                                     </div>
                                     <p class="text-justified overflow-hidden text-break"
                                        x-html="renderMarkdown(currentTask?.content || '' )"></p>
+                                    <template x-if="currentTask?.contact">
+                                        <div x-data="{contact: currentTask.contact}"
+                                             class="container__card-contact--no-ressource">
+                                            {% include "tools/contacts/contact_card.html" %}
+                                        </div>
+                                    </template>
                                 </div>
                             </template>
                         </div>
@@ -81,16 +87,20 @@
                                     </template>
                                 </div>
                             </div>
-                            <div class="task-modal-followups position-relative"
+                            <div class="task-modal-followups position-relative d-flex flex-column"
                                  :class="getTypeOfModalClass(currentTask?.document && currentTask?.document.length > 0)"
                                  id="followups-scroll-container">
                                 <div class="fr-py-2v fr-px-2w position-sticky top-0 d-flex justify-content-between bg-white z-1 border-bottom-grey">
                                     <span class="fw-medium title-info text-dark">Échanges & notes</span>
                                 </div>
+                                <template x-if="currentTask.public">
+                                    <div class="task-status-switcher__container" x-data="{task: currentTask}">
+                                        {% include "projects/project/fragments/tasks_inline_kanban/tasks_status_buttons.html" %}
+                                    </div>
+                                </template>
                                 <div class="position-absolute d-flex justify-content-center align-items-center w-100 h-100">
                                     <div x-show="followupsIsLoading" class="fr-ml-2v specific-size">
-                                        <div class="spinner-border spinner-border spinner-border-sm text-primary"
-                                             role="status"></div>
+                                        <output class="spinner-border spinner-border-sm text-primary"></output>
                                     </div>
                                 </div>
                                 <div :class="!followupsIsLoading && 'visible'" class="followups-wrapper">
@@ -101,6 +111,9 @@
                                                 <p x-html="currentTask && renderMarkdown(currentTask?.content)"
                                                    class="fr-mb-2v overflow-hidden text-break"></p>
                                             </template>
+                                            <template x-if="currentTask && currentTask.contact">
+                                                <div x-data="{contact: currentTask.contact}">{% include "tools/contacts/contact_card.html" %}</div>
+                                            </template>
                                             <template x-if="currentTask?.content === ''">
                                                 <p class="fst-italic">Aucun commentaire initial n'a été ajouté</p>
                                             </template>
@@ -110,8 +123,8 @@
                                                     <span class="text-muted tiny specific-lineheight-20"
                                                           x-text="`le ${formatDate(currentTask?.created_on)}`"></span>
                                                 </div>
-                                                <template x-if="$store.djangoData.canManageTasks">
-                                                    <a class="text-muted cursor-pointer tiny" @click="onEditContent()">Editer</a>
+                                                <template x-if="$store.djangoData.canManageTasks && currentTask.public">
+                                                    <button class="text-muted cursor-pointer tiny" @click="onEditContent()">Editer</button>
                                                 </template>
                                             </div>
                                         </div>
@@ -126,7 +139,7 @@
                                             </div>
                                         </div>
                                     </template>
-                                    <template x-if="followups">
+                                    <template x-if="!followupsIsLoading && followups">
                                         <template x-for="f in followups"
                                                   x-key="f.timestamp"
                                                   x-effect="followups"
@@ -146,9 +159,9 @@
                                                                       x-text="`le ${formatDate(f.timestamp)}`"></span>
                                                             </div>
                                                             <template x-if="$store.djangoData.canUseTasks && f.who.email === $store.djangoData.userEmail">
-                                                                <a data-test-id="task-edit-followup-button"
-                                                                   class="text-muted cursor-pointer tiny"
-                                                                   @click="onEditComment(f)">Editer</a>
+                                                                <button data-test-id="task-edit-followup-button"
+                                                                        class="text-muted cursor-pointer tiny"
+                                                                        @click="onEditComment(f)">Editer</button>
                                                             </template>
                                                         </div>
                                                     </div>
@@ -186,14 +199,27 @@
                                 </div>
                             </div>
                             <template x-if="currentTask.public || showEdition">
-                                <div class="w-100 fr-p-2w specific-border-top-solid1pxEEE">
-                                    {% include "tools/editor.html" with is_task_modal_comment=True %}
-                                </div>
+                                <form @submit.prevent="onSubmitComment()" novalidate>
+                                    <div class="w-100 fr-p-2w specific-border-top-solid1pxEEE">
+                                        {% include "tools/editor.html" with model="comment" can_attach_contact=True tools_disabled="title" %}
+                                        <template x-if="currentlyEditing">
+                                            <button type="button"
+                                                    class="fr-btn fr-btn--sm fr-btn--tertiary button-cancel-edit"
+                                                    :class="!currentTask.public ? 'button-cancel-edit-non-public' : 'button-cancel-edit'"
+                                                    @click="onCancelEdit()">Annuler</button>
+                                        </template>
+                                        <button type="submit"
+                                                class="fr-btn fr-btn--sm "
+                                                :class="!currentTask.public ? 'repositionning-in-modal-non-public' : 'repositionning-in-modal'"
+                                                data-test-id="button-submit-new"
+                                                x-text="currentlyEditing ? 'Modifier' : 'Envoyer'"></button>
+                                    </div>
+                                </form>
                             </template>
                             <template x-if="!currentTask.public">
                                 <div class="w-100 fr-p-2w specific-border-top-solid1pxEEE">
                                     <div class="text-center">
-                                        <span class="text-muted">Vous devez publier votre recommandation pour ajouter un commentaire</span>
+                                        <span class="text-muted">Cette recommandation est en brouillon. Vous devez la publier pour ajouter un commentaire</span>
                                     </div>
                                 </div>
                             </template>

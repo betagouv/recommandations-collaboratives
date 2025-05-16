@@ -15,6 +15,7 @@
     color: #3a3a3a;
     font-size: 12px;
     font-weight: 700;
+    display: inline-block !important;
   }
   &__label-info {
     font-size: 10px;
@@ -27,10 +28,24 @@
 .color-important {
   color: var(--color-important, #ff0000);
 }
-.red-text {
-  color: var(--color-important, #ff0000);
-}
+// .red-text {
+//   color: var(--color-important, #ff0000);
+// }
 
 .grey-text {
   color: var(--color-grey, #666666);
+}
+
+.fr-input-group--error:before {
+  background-image: none !important;
+}
+
+@media (max-height: 850px) {
+  .modal-create-contact {
+    height: 500px;
+    overflow-y: auto;
+  }
+  .specific-width-26rem {
+    width: 407px;
+  }
 }

@@ -1,17 +1,29 @@
-<div>
+{% comment %}
+    This template is used to create a multi-select component.
+
+    Parameters django template:
+    - placeholder: The placeholder text for the input.
+
+    Parameters alpine:
+    - objectsToSelect: The objects to select from.
+{% endcomment %}
+{% load sass_tags %}
+{% block css %}
+    <link href="{% sass_src 'css/tools/contact/multi-select.scss' %}"
+          rel="stylesheet"
+          type="text/css">
+{% endblock css %}
+<template x-if="objectsToSelect">
     <div class="bg-white">
         <div>
-            <span class="modal-create-organisation__label">Départements</span>
+            <label class="modal-create-organization__label" for="select-list-input">Départements</label>
             <div class="d-flex justify-center mt-8">
                 <!-- Define component with preselected options -->
                 <div class="w-100"
-                     x-data="alpineMultiSelect({selected:[], elementId:'multiSelect'})"
-                     @on-department-fetch.window="initSelect($event)"
-                     @reset-orga-name.window="resetSelectedDepartments()"
-                     @reset-form-create-orga.window="resetSelectedDepartments()">
+                     x-data="alpineMultiSelect({selected:selectedDepartments, objectsToSelect})">
                     <!-- Select Options -->
-                    <select class="d-none" id="multiSelect" x-on:change="init">
-                        <template x-for="department in departments" :key="department.code">
+                    <select class="d-none" x-on:change="init">
+                        <template x-for="department in objectsToSelect" :key="department.code">
                             <option :value="department.code"
                                     :data-search="'(' + department.code + ')' + ' ' + department.name"
                                     x-text="'(' + department.code + ')' + ' ' + department.name" />
@@ -20,13 +32,13 @@
                     <div class="w-100 d-flex flex-column align-items-center h-64 mx-auto"
                          @keyup.alt="toggle">
                         <!-- Selected department -->
-                        <input name="teams[]" type="hidden" x-bind:value="selectedValues()">
+                        <input type="hidden" x-bind:value="selectedValues()">
                         <div class="inline-block position-relative w-100">
                             <div class="d-flex flex-column align-items-center position-relative">
                                 <!-- Selected elements container -->
                                 <div class="w-100">
                                     <div class="my-2 p-1 d-flex border border-gray-200 bg-white rounded">
-                                        <div class="d-flex flex-auto flex-wrap" x-on:click="open">
+                                        <div class="d-flex flex-auto flex-wrap w-100" x-on:click="open">
                                             <!-- iterating over selected elements -->
                                             <template x-for="(option,index) in selectedElms" :key="option.value">
                                                 <div x-show="index < 2"
@@ -35,7 +47,7 @@
                                                          x-model="selectedElms[option]"
                                                          x-text="option.text"></div>
                                                     <div class="d-flex flex-auto flex-row-reverse">
-                                                        <div x-on:click.stop="remove(index,option)">
+                                                        <div x-on:click.stop="remove(index,option)" data-test-id="remove-selected-item">
                                                             <svg xmlns="http://www.w3.org/2000/svg"
                                                                  class="little-img fr-ml-1v"
                                                                  fill="none"
@@ -50,9 +62,10 @@
                                             </template>
                                             <!-- None items selected -->
                                             <div x-show="selectedElms.length == 0" class="flex-grow-1">
-                                                <input placeholder="Sélectionnez un ou plusieurs départements"
+                                                <input placeholder="{{ placeholder|default:'Sélectionnez un ou plusieurs départements' }}"
                                                        class="bg-transparent p-1 px-2 appearance-none outline-none h-full w-100 text-gray-800"
-                                                       x-bind:value="selectedElements()">
+                                                       x-bind:value="selectedElements()"
+                                                       id="select-list-input">
                                             </div>
                                         </div>
                                         <!-- Drop down toogle with icons-->
@@ -127,19 +140,9 @@
                                                              x-bind:class="option.selected ? 'selected-item' : ''"
                                                              @click="select(index,$event)">
                                                             <div x-bind:class="option.selected ? 'selected-item' : ''"
-                                                                 class="d-flex w-100 align-items-center p-2 pl-2 border-transparent border-l-2 position-relative">
+                                                                 class="d-flex w-100 align-items-center p-2 pl-2 border-transparent border-radius-03 border-l-2 position-relative">
                                                                 <div class="w-100 align-items-center d-flex">
                                                                     <div class="mx-2 leading-6" x-model="option" x-text="option.text"></div>
-                                                                    <span class="position-absolute inset-y-0 right-0 d-flex align-items-center pr-4 selected-item"
-                                                                          x-show="option.selected">
-                                                                        <svg class="h-5 w-5"
-                                                                             xmlns="http://www.w3.org/2000/svg"
-                                                                             viewBox="0 0 20 20"
-                                                                             fill="currentColor"
-                                                                             aria-hidden="true">
-                                                                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                                                                        </svg>
-                                                                    </span>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -156,4 +159,4 @@
             </div>
         </div>
     </div>
-</div>
+</template>

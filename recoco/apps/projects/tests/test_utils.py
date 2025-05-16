@@ -6,6 +6,7 @@ Tests for project application
 authors: raphael.marvie@beta.gouv.fr, guillaume.libersat@beta.gouv.fr
 created: 2022-01-18 10:11:56 CEST
 """
+
 import pytest
 from django.conf import settings
 from django.contrib.auth import models as auth
@@ -138,6 +139,51 @@ def test_assign_owner_collaborator_while_already_another_nonowner(
 
     assert owner_ms.is_owner is True
     assert member_ms.is_owner is False
+
+
+@pytest.mark.django_db
+def test_get_advising_context_for_project():
+    user = baker.make(auth.User)
+    project = baker.make(models.Project)
+
+    assert utils.get_advising_context_for_project(user, project) == (
+        None,
+        {
+            "is_advisor": False,
+            "is_observer": False,
+        },
+    )
+
+    assign_advisor(user, project)
+    advisor = models.ProjectSwitchtender.objects.get(switchtender=user, project=project)
+
+    assert utils.get_advising_context_for_project(user, project) == (
+        advisor,
+        {
+            "is_advisor": True,
+            "is_observer": False,
+        },
+    )
+
+    advisor.is_observer = True
+    advisor.save()
+
+    assert utils.get_advising_context_for_project(user, project) == (
+        advisor,
+        {
+            "is_advisor": False,
+            "is_observer": True,
+        },
+    )
+
+
+@pytest.mark.django_db
+def test_is_advisor_for_project():
+    user = baker.make(auth.User)
+    project = baker.make(models.Project)
+    assert not utils.is_advisor_for_project(user, project)
+    assign_advisor(user, project)
+    assert utils.is_advisor_for_project(user, project)
 
 
 ########################################################################

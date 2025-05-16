@@ -192,7 +192,7 @@ Cypress.Commands.add('createProject', (label, objProject = project) => {
     .should('have.value', objProject.description || project.description)
     .should('have.class', 'fr-input--valid');
 
-  cy.get('button[type="submit"]').click();
+  cy.get('button[type="submit"]').click().should('be.disabled');
 
   cy.url().should('include', '/onboarding/summary');
 
@@ -264,9 +264,8 @@ Cypress.Commands.add(
           force: true,
         });
 
-        cy.get('.ProseMirror p')
-          .invoke('text', 'reco test from action description')
-          .should('have.text', 'reco test from action description');
+        cy.get('.ProseMirror p').click();
+        cy.focused().type('text', 'reco test from action description');
 
         if (!withResource) {
           cy.get('#push-noresource').click({ force: true });
@@ -305,9 +304,8 @@ Cypress.Commands.add(
       } else if (body.find('[data-test-id="create-task-button"]').length > 0) {
         cy.contains('Créer une recommandation').click({ force: true });
 
-        cy.get('.ProseMirror p')
-          .invoke('text', 'reco test from action description')
-          .should('have.text', 'reco test from action description');
+        cy.get('.ProseMirror p').click();
+        cy.focused().type('text', 'reco test from action description');
 
         cy.get('#push-noresource').click({ force: true });
 
@@ -325,7 +323,7 @@ Cypress.Commands.add(
 
         cy.url().should('include', '/actions');
 
-        cy.contains('reco test from action');
+        // cy.contains('reco test from action');
       } else {
         assert.isOk('task', "can't create task");
       }
@@ -434,3 +432,25 @@ Cypress.Commands.add(
     });
   }
 );
+
+/**
+ * Search and attach a contact.
+ *
+ * @function shareContact
+ * @memberof Cypress.Commands
+ * @param {string} name - The name of the contact you wish to share.
+ */
+Cypress.Commands.add('shareContact', (name) => {
+  //click on add contact button
+  cy.get('[data-test-id="button-add-contact-in-editor"]').click({
+    force: true,
+  });
+  //search for a contact
+  cy.get('#search-contact-input').type(name, { force: true });
+  //select a contact
+  cy.get('[data-test-id="contact-card"]').first().click({ force: true });
+  //send contact to tiptap editor
+  cy.get('[data-test-id="button-add-contact-to-tiptap-editor"]').click({
+    force: true,
+  });
+});

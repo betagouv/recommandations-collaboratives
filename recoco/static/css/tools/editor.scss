@@ -18,22 +18,40 @@
   display: block;
   font-size: 1rem;
   line-height: 1.5rem;
-  padding: 3rem 0.5rem 0.5rem;
+  padding: 3rem 0.5rem;
   width: 100%;
   margin-top: 0;
+  margin-bottom: 0;
   min-height: 10rem;
-  padding-bottom: 1rem;
+  p {
+    margin-bottom: 0;
+  }
 }
 
 .tiptap-menu-custom {
   position: absolute;
   z-index: 1;
-  top: 2rem;
+  top: 0.5rem;
   left: 0.5rem;
   button {
     color: #3a3a3a;
     &.text-white:disabled {
       color: #3a3a3a !important;
+    }
+  }
+}
+
+.close-contact-button-style {
+  height: 40px;
+  box-shadow: none;
+}
+
+// Override contact card style
+.editor-container {
+  .contact-card {
+    padding-right: 49px !important;
+    &__container {
+      max-width: 25rem;
     }
   }
 }

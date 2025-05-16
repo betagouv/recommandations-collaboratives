@@ -24,7 +24,7 @@
                 <div class="fr-notice fr-notice--info">
                     <div class="fr-container">
                         <div class="fr-notice__body">
-                            <span class="fr-notice__title">Il s'agit d'un projet provenant d'un autre portail ({{ site_origin.site.name }}).</span>
+                            <span class="fr-notice__title">Il s'agit d'un dossier provenant d'un autre portail ({{ site_origin.site.name }}).</span>
                             <span class="fr-notice__description">Les notes de CRM ne sont pas partagées, vous ne verrez donc pas celles rédigées par les autres portails. Vous pouvez néanmoins en ajouter pour vous.</span>
                         </div>
                     </div>
@@ -33,11 +33,11 @@
             {% if project.deleted %}
                 <div class="d-block fr-mx-3w">
                     <div class="alert alert-danger fr-mt-3w" role="alert">
-                        <span>Ce projet a été supprimé. Ceci signifie qu'il n'est plus visible sur {{ request.site.name }}. Vous pouvez néanmoins le réactiver si vous le souhaitez.</span>
+                        <span>Ce dossier a été supprimé. Ceci signifie qu'il n'est plus visible sur {{ request.site.name }}. Vous pouvez néanmoins le réactiver si vous le souhaitez.</span>
                         <div class="d-flex justify-content-end fr-mt-2v">
                             <form method="post" action="{% url 'crm-project-undelete' project.pk %}">
                                 {% csrf_token %}
-                                <button type="submit" class="btn btn-danger">Réactiver ce projet</button>
+                                <button type="submit" class="btn btn-danger">Réactiver ce dossier</button>
                             </form>
                         </div>
                     </div>
@@ -91,11 +91,11 @@
                 </div>
                 <div>
                     <a class="btn btn-primary" href="{{ project.get_absolute_url }}">
-                        <span>Voir le projet</span>
+                        <span>Voir le dossier</span>
                     </a>
                     <a href="{% url 'crm-project-update' project.pk %}"
                        class="btn btn-outline-secondary"
-                       aria-current="page">Gérer le projet</a>
+                       aria-current="page">Gérer le dossier</a>
                 </div>
             </div>
             <div class="fr-px-3w fr-pt-3w crm-notes-wrapper">
@@ -104,10 +104,10 @@
                        href="{% url 'crm-project-note-create' project.pk %}">créer une note</a>
                 </div>
                 {% for note in sticky_notes.all %}
-                    {% include "crm/note.html" with pinned=True update_url_name="crm-project-note-update" get_user_profile=True %}
+                    {% include "crm/note.html" with pinned=True get_user_profile=True %}
                 {% endfor %}
                 {% for note in notes.all %}
-                    {% include "crm/note.html" with update_url_name="crm-project-note-update" get_user_profile=True %}
+                    {% include "crm/note.html" with get_user_profile=True %}
                 {% endfor %}
             </div>
             <div class="fr-px-3w fr-pt-3w bg-light crm-timeline-min-height">

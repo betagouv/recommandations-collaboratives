@@ -1,5 +1,7 @@
 {% load crispy_forms_tags %}
-<form id="{{ form.helper.form_id }}" method="post">
+<form id="{{ form.helper.form_id }}"
+      method="post"
+      x-on:input="isFormEdited = true">
     <input type="hidden"
            name="js_enabled"
            id="{{ form.helper.form_id }}_js_enabled"
@@ -17,7 +19,7 @@
         {{ form.first_name|as_crispy_field }}
         {{ form.last_name|as_crispy_field }}
         <div class="fr-fieldset__element">
-            {% include "tools/organization_search.html" with name=form.org_name.name label=form.org_name.label value=form.org_name.value id_for_label=form.org_name.id_for_label errors=form.org_name.errors dsfr=True isRequired=True %}
+            {% include "tools/organization_search.html" with name=form.org_name.name label=form.org_name.label value=form.org_name.value id_for_label=form.org_name.id_for_label errors=form.org_name.errors dsfr=True isRequired=True validation=True %}
         </div>
         {{ form.role|as_crispy_field }}
         {{ form.email|as_crispy_field }}

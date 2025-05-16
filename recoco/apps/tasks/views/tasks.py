@@ -7,6 +7,8 @@ author  : raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created : 2021-05-26 15:56:20 CEST
 """
 
+import datetime
+
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import Http404, HttpResponseForbidden
@@ -16,6 +18,7 @@ from django.utils import timezone
 from django.utils.text import slugify
 from django.views.decorators.http import require_http_methods
 
+from recoco.apps.addressbook.models import Contact
 from recoco.apps.projects import models as project_models
 from recoco.apps.projects.forms import DocumentUploadForm
 from recoco.apps.projects.utils import (
@@ -73,65 +76,61 @@ def create_task(request):
         form = push_form_type(request.POST)
         if form.is_valid():
             project = type_form.cleaned_data.get("project")
+            contact = type_form.cleaned_data.get("contact")
+
             has_perm_or_403(request.user, "projects.manage_tasks", project)
 
-            if push_type == "multiple":
-                for resource in form.cleaned_data.get("resources", []):
-                    public = form.cleaned_data.get("public", False)
+            action = form.save(commit=False)
+            action.project = project
+            action.site = request.site
+            action.created_by = request.user
+            if contact:
+                action.contact = contact
 
-                    action = models.Task.on_site.create(
-                        project=project,
-                        site=request.site,
-                        resource=resource,
-                        intent=resource.title,
-                        created_by=request.user,
-                        public=public,
-                    )
-                    action.top()
+            # get or create topic
+            name = form.cleaned_data["topic_name"]
+            if name:
+                topic, _ = project_models.Topic.objects.get_or_create(
+                    name__iexact=name.lower(),
+                    defaults={"name": name.capitalize(), "site": request.site},
+                )
+                action.topic = topic
+            action.save()
 
-                    # Notify other switchtenders
-                    signals.action_created.send(
-                        sender=create_task,
-                        task=action,
-                        project=project,
-                        user=request.user,
-                    )
-
+            # Depending on wether we already have a recommandation on the same day:
+            # - move the new action after the existing one on the same day
+            # - let it on top if the following one was at least yesterday
+            today = datetime.date.today()
+            previous_today_action = (
+                models.Task.objects.filter(project=action.project)
+                .exclude(id=action.id)
+                .filter(created_on__date=today)
+                .order_by("-created_on")
+                .first()
+            )
+            if previous_today_action:
+                action.below(previous_today_action)
             else:
-                action = form.save(commit=False)
-                action.project = project
-                action.site = request.site
-                action.created_by = request.user
-                # get or create topic
-                name = form.cleaned_data["topic_name"]
-                if name:
-                    topic, _ = project_models.Topic.objects.get_or_create(
-                        name__iexact=name.lower(),
-                        defaults={"name": name.capitalize(), "site": request.site},
-                    )
-                    action.topic = topic
-                action.save()
                 action.top()
 
-                # Check if we have a file or link
-                document_form = DocumentUploadForm(request.POST, request.FILES)
-                if document_form.is_valid():
-                    if document_form.cleaned_data["the_file"]:
-                        document = document_form.save(commit=False)
-                        document.attached_object = action
-                        document.site = request.site
-                        document.uploaded_by = request.user
-                        document.project = action.project
+            # Check if we have a file or link
+            document_form = DocumentUploadForm(request.POST, request.FILES)
+            if document_form.is_valid():
+                if document_form.cleaned_data["the_file"]:
+                    document = document_form.save(commit=False)
+                    document.attached_object = action
+                    document.site = request.site
+                    document.uploaded_by = request.user
+                    document.project = action.project
+                    document.save()
 
-                        document.save()
-
-                # Notify other switchtenders
-                signals.action_created.send(
-                    sender=create_task,
-                    task=action,
-                    project=project,
-                    user=request.user,
-                )
+            # Notify other switchtenders
+            signals.action_created.send(
+                sender=create_task,
+                task=action,
+                project=project,
+                user=request.user,
+            )
 
             # Redirect to `action-inline` if we're coming
             # from `action-inline` after create
@@ -270,11 +269,15 @@ def update_task(request, task_id=None):
 
     if request.method == "POST":
         form = UpdateTaskForm(request.POST, instance=task)
+        form.set_contact_queryset(
+            Contact.objects.filter(site_id=request.site.id),
+        )
         if form.is_valid():
             instance = form.save(commit=False)
             instance.updated_on = timezone.now()
             # manage topic
             name = form.cleaned_data["topic_name"]
+
             if name:
                 topic, _ = project_models.Topic.objects.get_or_create(
                     name__iexact=name.lower(),
@@ -403,7 +406,7 @@ def task_recommendation_delete(request, recommendation_id):
     return redirect(reverse("projects-task-recommendation-list"))
 
 
-# retourne pour le projet les suggestions du système
+# retourne pour le dossier les suggestions du système
 @login_required
 def presuggest_task(request, project_id):
     """Suggest tasks"""

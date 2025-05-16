@@ -17,15 +17,6 @@
           rel="stylesheet"
           type="text/css">
 {% endblock css %}
-{% block js %}
-    <script type="text/javascript">
- $(document).ready(function() {
-     $(".filters-categories .form-check-input").click(function() { $(".quick-search form").submit(); });
-     $(".filters-internal .form-check-input").click(function() { $(".quick-search form").submit(); });
-     $("#limit_area").change(function() { $(".quick-search form").submit(); });
- });
-    </script>
-{% endblock js %}
 {% block content %}
     {% if user.is_authenticated %}
         {% get_obj_perms request.user for request.site as "user_site_perms" %}
@@ -143,7 +134,7 @@
                                    name="{{ form.draft.name }}"
                                    id="check-draft"
                                    {% if form.draft.value %}checked{% endif %}>
-                            <label class="form-draft-label text-secondary" for="check-expired">Brouillons</label>
+                            <label class="form-draft-label text-secondary" for="check-draft">Brouillons</label>
                         </span>
                         <span class="form-check form-switch form-check-inline">
                             <input class="form-check-input"
@@ -175,7 +166,7 @@
                 {% else %}
                     <div class="col-12">
                         <span class="text-secondary">
-                            {{ resources_count }} résultat{{ resources|pluralize }} trouvé{{ resources|pluralize }} pour "<em>{{ query }}</em>".
+                            {{ resources_count }} résultat{{ resources_count|pluralize }} trouvé{{ resources_count|pluralize }} pour "<em>{{ query }}</em>".
                         </span>
                     </div>
                 {% endif %}

@@ -17,6 +17,8 @@ document.addEventListener('alpine:init', () => {
     index: null,
     scrollY: null,
 
+    notifications: [],
+
     contact: null,
 
     get projectId() {
@@ -123,7 +125,6 @@ document.addEventListener('alpine:init', () => {
     },
     async loadFollowups() {
       const { data } = await api.get(followupsUrl(this.projectId, this.taskId));
-
       Alpine.store('tasksData').markAllAsRead(this.taskId);
       this.followups = data;
     },

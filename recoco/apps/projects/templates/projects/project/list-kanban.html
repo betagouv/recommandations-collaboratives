@@ -18,6 +18,7 @@
 {% endblock css %}
 {% block js %}
     {% vite_asset 'js/apps/boardProjects.js' %}
+    {% vite_asset 'js/apps/tutorial.js' %}
 {% endblock js %}
 {% block title %}
     Tableau de bord administrateur {{ block.super }}
@@ -28,7 +29,8 @@
 {% block project_list_content %}
     {{ departments|json_script:"departmentsArray" }}
     {{ regions|json_script:"regionsArray" }}
-    <div x-data="KanbanProjects({{ request.site.id }}, departmentsArray, regionsArray )">
+    <div x-data="KanbanProjects({{ request.site.id }}, departmentsArray, regionsArray )"
+         @selected-departments="saveSelectedDepartment($event)">
         <div x-show="isBusy"
              x-transition
              class="position-absolute text-center w-100"
@@ -41,13 +43,13 @@
             <div class="kanban-header__view-selector fs-5 fr-mr-6v">
                 {% include "projects/project/fragments/navigation/display_select.html" %}
             </div>
-            <div class="kanban-header__middle-part">
+            <div x-data="Tutorial('time-filter-tutorial-on-kanban')" class="kanban-header__middle-part">
                 <div class="kanban-header__searchbar">
                     {% include "projects/project/fragments/search_bar.html" with action_search="onSearch" x_model="searchText" %}
                 </div>
-                <div class="kanban-header__lastactivity-filter fr-select-group d-flex fr-m-0 fr-mr-6v align-items-center">
+                <div class="kanban-header__lastactivity-filter fr-select-group d-flex fr-m-0 fr-mr-6v align-items-center" id="kanban-time-filter">
                     <label class="fr-label no-wrap fr-mr-1v"
-                           for="select-filter-project-duration">Projets actifs depuis :</label>
+                           for="select-filter-project-duration">Dossiers actifs depuis :</label>
                     <select class="fr-select fr-m-0"
                             name="select-filter-project-duration"
                             x-ref="selectFilterProjectDuration"
@@ -64,7 +66,7 @@
                     {% include "projects/project/fragments/only_my_projects_toggle.html" %}
                 </div>
                 <div class="kanban-header__region-filter">
-                    {% include "projects/project/fragments/region_filter.html" with filter_by_regions=True %}
+                    {% include "projects/project/fragments/departments_selector.html" with label="Projets de mon territoire" filter_by_regions=True zone_objects="regions" select_all=True %}
                 </div>
             </div>
             <div class="kanban-header__toolbar">{% include "projects/project/fragments/list-toolbars.html" %}</div>
@@ -74,7 +76,7 @@
                 <div class="fr-container">
                     <div class="fr-notice__body">
                         <p>
-                            <span class="fr-notice__title">Aucun projet correspondant aux critères de recherche selectionnés</span>
+                            <span class="fr-notice__title">Aucun dossier correspondant aux critères de recherche selectionnés</span>
                             <span class="fr-notice__desc">Essayez de modifier vos critères pour obtenir un résultat</span>
                         </p>
                         <button title="Masquer le message"
@@ -162,7 +164,7 @@
                                                                         <span x-show="!t.origin.siteInfo.configuration.logo_small"
                                                                               class="fr-icon--sm fr-icon-window-line"
                                                                               aria-hidden="true"></span>
-                                                                        <span class="not-a-link kanban">projet envoyé par</span>
+                                                                        <span class="not-a-link kanban">dossier envoyé par</span>
                                                                         <span x-text="t.origin.siteInfo.name"></span>
                                                                     </div>
                                                                 </template>
@@ -178,14 +180,16 @@
                                                                             <span x-show="!portal.siteInfo.configuration.logo_small"
                                                                                   class="fr-icon--sm fr-icon-window-line"
                                                                                   aria-hidden="true"></span>
-                                                                            <span class="not-a-link kanban">projet envoyé sur</span>
+                                                                            <span class="not-a-link kanban">dossier envoyé sur</span>
                                                                             <span x-text="portal.siteInfo.name"></span>
                                                                         </div>
                                                                     </template>
                                                                 </template>
-                                                                <div>
-                                                                    <span class="kanban-card__project-insee fr-icon--sm fr-icon-map-pin-2-line not-a-link">INSEE: <span x-text="truncate(t.commune.insee)"></span></span>
-                                                                </div>
+                                                                <template x-if="t.commune">
+                                                                    <div>
+                                                                        <span class="kanban-card__project-insee fr-icon--sm fr-icon-map-pin-2-line not-a-link">INSEE: <span x-text="truncate(t.commune.insee)"></span></span>
+                                                                    </div>
+                                                                </template>
                                                                 <div class="d-flex justify-content-between">
                                                                     <div class="kanban-card__project-date-container text-secondary">
                                                                         <span x-text="`Déposé le ${formatDateDisplay(t.created_on)}`"

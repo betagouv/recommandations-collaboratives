@@ -18,6 +18,19 @@ export const STATUS_TEXT = {
   5: 'faite', // ALREADY_DONE: Legacy status, kind of
 };
 
+export const STATUS_HUMAN_READ = {
+  nouveau: 'Nouvelle recommandation',
+  'en cours': 'En cours',
+  bloquée: 'Bloquée',
+  terminée: 'Terminée',
+  'pas intéressé': 'Non applicable',
+  'déjà faite': 'Déjà faite',
+};
+
+export function humanReadableTaskStatus(status) {
+  return STATUS_HUMAN_READ[status];
+}
+
 export function statusText(status) {
   return STATUS_TEXT[status];
 }
@@ -35,7 +48,7 @@ export function isArchivedStatus(status) {
 }
 
 export function isStatusUpdate(followup) {
-  return isArchivedStatus(followup.status) || followup.comment === '';
+  return isArchivedStatus(followup.status) || (followup.comment === '' && followup.contact == null);
 }
 
 export function truncate(input, size = 30) {

@@ -1,0 +1,107 @@
+{% extends "projects/project/detail.html" %}
+{% load guardian_tags %}
+{% load sass_tags %}
+{% load django_vite %}
+{% load projects_extra %}
+{% block title %}
+    Nouvelle conversation - {{ block.super }}
+{% endblock title %}
+{% block og_title %}
+    Nouvelle conversation - {{ block.super }}
+{% endblock og_title %}
+{% block js %}
+    {% vite_asset 'js/apps/conversationsNew.js' %}
+{% endblock js %}
+{% block css %}
+    <link href="{% sass_src 'projects/css/conversations_new.scss' %}"
+          rel="stylesheet"
+          type="text/css">
+{% endblock css %}
+{% block project_detail %}
+    {{ project.pk|json_script:"djangoProjectId" }}
+    {% include "projects/project/navigation.html" with conversations_new=True %}
+    {% comment %} TODO: build topic_list in django view {% endcomment %}
+    {% regroup feed by topic as topic_list %}
+    <div class="conversation-new d-flex"
+         x-data="ConversationTopicSwitch({{ project.pk }})"
+         hx-history="false">
+        <div class="conversation-new__topics">
+            <div class="justify-content-between">
+                <div class="conversation-new__topics-header">
+                    <h2 class="conversation-new__topics-header-title">Fils de discussion</h2>
+                </div>
+                {% for topic in topic_list %}
+                    {% include "projects/project/fragments/conversations_new/conversation_topic.html" with topic_name=topic.grouper message_number=topic.list %}
+                {% endfor %}
+            </div>
+            <div class="conversation-new__topics-list-member fr-p-2w">
+                <h2 class="conversation-new__topics-list-member-title">Participants</h2>
+                <h3 class="fr-mt-2w conversation-new__topics-list-member-subtitle">Porteur de projet et partenaires</h3>
+                <ul class="flex-column list-unstyled fr-mb-0">
+                    {% for projectmember in project.projectmember_set.all %}
+                        {% if projectmember.is_owner and projectmember.member.is_active %}
+                            <li>{% include "user/user_card.html" with user=project.owner project_owner=True user_activity=True %}</li>
+                        {% elif projectmember.member.is_active %}
+                            <li>{% include "user/user_card.html" with user=projectmember.member user_activity=True %}</li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+                <h3 class="fr-mt-2w conversation-new__topics-list-member-subtitle">Equipe de suivi</h3>
+                <ul class="d-flex flex-column list-unstyled fr-mb-0">
+                    {% for advisor in project.switchtender_sites.all %}
+                        {% if advisor.switchtender.is_active %}
+                            <li>{% include "user/user_card.html" with user=advisor.switchtender user_activity=True %}</li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        <div class="conversation-new__container"
+             x-data="NotificationEater({{ project.id }})"
+             @topic-switched.window="scrollToFirstNotification($event.detail)">
+            {% get_obj_perms request.user for project as "user_project_perms" %}
+            {% include "projects/project/partials/conversations_new_partial.html" %}
+            {% if "use_public_notes" in user_project_perms %}
+                <!-- Post message -->
+                <form class="form editor-form fr-px-5v"
+                      hx-post="{% url 'projects-project-detail-conversations-new-partial' project.pk %}"
+                      hx-trigger="submit"
+                      hx-swap="outerHTML"
+                      hx-target="#conversation-new-container"
+                      enctype="multipart/form-data"
+                      id="conversation-form">
+                    {% csrf_token %}
+                    <div class="message-form fr-mt-3w bg-light border-form editor-form__container fr-input-group">
+                        {% include "tools/editor.html" with input_name=posting_form.content.name initial_content=posting_form.content.value|default:'' errors=posting_form.content.errors input_required=True %}
+                        {% comment %} {% include "projects/project/fragments/files_links/file_upload_input_standalone.html" %} {% endcomment %}
+                        <!-- Action file -->
+                        <button x-data="{fileName: ''}"
+                                class="fr-btn fr-btn--sm fr-btn--tertiary fr-icon-file-add-line fr-btn--icon-left file-upload-wrapper"
+                                type="button"
+                                @click="$refs.fileUploadInput.click()">
+                            <span class="file-upload-text">Ajouter un fichier</span>
+                            <span class="fr-ml-1w" x-text="fileName"></span>
+                            <input x-ref="fileUploadInput"
+                                   type="file"
+                                   id="file-upload"
+                                   name="the_file"
+                                   @change="fileName = $refs.fileUploadInput.files.length > 0 ? $refs.fileUploadInput.files[0].name : ''"
+                                   class="d-none file-upload-input">
+                        </button>
+                        <button data-test-id="send-message-conversation"
+                                x-data
+                                :disabled="$store.editor.currentMessage === '' "
+                                form="conversation-form"
+                                class="fr-btn send-message"
+                                type="submit">Envoyer</button>
+                    </div>
+                    {% for error in posting_form.content.errors %}<div class="text-danger text-end">{{ error }}</div>{% endfor %}
+                    <label class="visually-hidden" for="input-project-content">{{ posting_form.content.label }}</label>
+                    <input type="hidden" name="new" value="1">
+                    <input type="hidden" name="topic_name" :value="valueTopicFormMessageSend">
+                    <div class="d-flex justify-content-end fr-mt-3w"></div>
+                </form>
+            {% endif %}
+        </div>
+    </div>
+{% endblock project_detail %}

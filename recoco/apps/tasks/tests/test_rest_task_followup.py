@@ -5,12 +5,13 @@ from model_bakery import baker
 
 from recoco.apps.addressbook.models import Contact
 from recoco.apps.projects import utils
+from recoco.utils import get_group_for_site
 
 from .. import models
 
 
 @pytest.mark.django_db
-def test_project_task_followup_list_closed_to_anonymous_user(
+def test_project_task_followup_list_not_allowed_to_anonymous_user(
     api_client, current_site, project
 ):
     task = baker.make(models.Task, project=project, site=current_site, public=True)
@@ -22,7 +23,7 @@ def test_project_task_followup_list_closed_to_anonymous_user(
 
 
 @pytest.mark.django_db
-def test_project_task_followup_list_closed_to_user_wo_permission(
+def test_project_task_followup_list_not_allowed_to_user_wo_permission(
     api_client, current_site, project
 ):
     user = baker.make(auth_models.User)
@@ -89,7 +90,7 @@ def test_project_task_followup_list_returns_followups_to_collaborator(
 
 
 @pytest.mark.django_db
-def test_project_task_followup_create_closed_to_anonymous_user(
+def test_project_task_followup_create_not_allowed_to_anonymous_user(
     api_client, current_site, project
 ):
     task = baker.make(models.Task, project=project, site=current_site, public=True)
@@ -101,10 +102,27 @@ def test_project_task_followup_create_closed_to_anonymous_user(
 
 
 @pytest.mark.django_db
-def test_project_task_followup_create_not_allowed_for_simple_auth_user(
+def test_project_task_followup_create_not_allowed_to_simple_auth_user(
     api_client, current_site, project
 ):
     user = baker.make(auth_models.User)
+    task = baker.make(models.Task, project=project, site=current_site, public=True)
+
+    api_client.force_authenticate(user=user)
+    url = reverse("project-tasks-followups-list", args=[project.id, task.id])
+    response = api_client.post(url, data={"comment": "a new followup for tasks"})
+
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_project_task_followup_create_not_allowed_to_external_advisor(
+    api_client, current_site, project
+):
+    user = baker.make(auth_models.User)
+    user.profile.sites.add(current_site)
+    user.groups.add(get_group_for_site("advisor", current_site))
+
     task = baker.make(models.Task, project=project, site=current_site, public=True)
 
     api_client.force_authenticate(user=user)
@@ -155,7 +173,7 @@ def test_project_task_followup_create_is_processed_for_auth_user(
 
 
 @pytest.mark.django_db
-def test_project_task_followup_update_closed_to_anonymous_user(
+def test_project_task_followup_update_not_allowed_to_anonymous_user(
     api_client, current_site, project
 ):
     task = baker.make(models.Task, project=project, site=current_site, public=True)
@@ -175,15 +193,27 @@ def test_project_task_followup_update_is_processed_for_auth_user(
 ):
     user = baker.make(auth_models.User)
     task = baker.make(models.Task, project=project, site=current_site, public=True)
-    followup = baker.make(models.TaskFollowup, task=task)
+    contact = baker.make(Contact)
+    followup = baker.make(
+        models.TaskFollowup, task=task, contact=contact, comment="my comment"
+    )
 
     api_client.force_authenticate(user=user)
     utils.assign_advisor(user, project)
+
+    new_comment = "my new comment"
+    new_contact = baker.make(Contact)
+
     url = reverse(
         "project-tasks-followups-detail", args=[project.id, task.id, followup.id]
     )
     response = api_client.patch(
-        url, data={"comment": "an updated comment for followup"}, format="json"
+        url,
+        data={
+            "comment": new_comment,
+            "contact": new_contact.id,
+        },
+        format="json",
     )
 
     assert response.status_code == 200
@@ -191,8 +221,10 @@ def test_project_task_followup_update_is_processed_for_auth_user(
     # followup updated
     followup.refresh_from_db()
     assert followup.status is None  # FIXME should we have a default status ?
-    assert followup.comment == "an updated comment for followup"
+    assert followup.comment == new_comment
+    assert followup.contact == new_contact
 
     # returned value
     assert response.data["id"] == followup.id
-    assert response.data["comment"] == "an updated comment for followup"
+    assert response.data["comment"] == new_comment
+    assert response.data["contact"] == new_contact.id

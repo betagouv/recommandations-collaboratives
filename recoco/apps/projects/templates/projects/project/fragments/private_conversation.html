@@ -21,6 +21,12 @@
                                 {% include "projects/project/fragments/files_links/file_list_item_embedded.html" with document=document %}
                             {% endfor %}
                         {% endif %}
+                        {% if note.contact %}
+                            <div x-data="{contact : null }"
+                                 x-init="contact = await getContact({{ note.contact.id }})">
+                                {% include "tools/contacts/contact_card.html" %}
+                            </div>
+                        {% endif %}
                         {% if note.created_by %}
                             <div class="d-flex align-items-center">
                                 {% include "user/user_card.html" with user=note.created_by %}

@@ -6,70 +6,28 @@
 {% load static %}
 {% load guardian_tags %}
 {% get_obj_perms request.user for project as "user_project_perms" %}
-{% get_advising_position user project request.site as position %}
 {% is_staff_for_current_site request.user as is_staff %}
 {% if project.inactive_since == None %}
-    <div x-data="ProjectEmailReminder()"
-         class="highlighted highlighted--blue d-flex justify-content-between align-items-center fr-mt-5v fr-mb-3w fr-mr-3w">
-        {% with project.next_reminder as reminder %}
-            {% if reminder %}
+    {% with project.next_reminder as reminder %}
+        {% if reminder %}
+            <div x-data="ProjectEmailReminder()"
+                 class="highlighted highlighted--blue d-flex justify-content-between align-items-center fr-mt-5v fr-mb-3w fr-mr-3w">
                 <p class="fr-mb-0">
                     <span class="fr-icon-notification-3-line fr-icon--sm fr-mr-1w"
-                          aria-hidden="true"></span>Prochain rappel au porteur de projet prévu le <span data-test-id="email-date">{{ reminder.deadline }}</span>
+                          aria-hidden="true"></span>Prochain rappel au demandeur prévu le <span data-test-id="email-date">{{ reminder.deadline }}</span>
                 </p>
-            {% else %}
-                {% if is_staff and "change_project" in user_project_perms %}
-                    <span data-test-id="no-reminders" class="tiny fw-medium text-blue">Aucun email de rappel programmé actuellement</span>
+                {% if request.user in project.members.all or advising_position.is_advisor or advising_position.is_observer %}
+                    {% include "projects/project/fragments/email_reminder/learn_more_reminder.html" %}
                 {% endif %}
-            {% endif %}
-        {% endwith %}
-        {% if request.user in project.members.all or position.is_advisor or position.is_observer %}
-            <button x-ref="emailReminderButton"
-                    @click="onEmailReminderButtonClick"
-                    data-bs-toggle="tooltip"
-                    data-test-id="button-open-reminder-settings"
-                    class="fr-btn fr-btn--tertiary-no-outline fr-btn--sm text-underline">En savoir plus</button>
-            <div x-cloak
-                 x-ref="emailReminderTooltip"
-                 @click.outside="onOutsideEmailReminderButtonClick"
-                 data-test-id="tooltip-reminder-settings"
-                 class="highlighted__tooltip bg-white email-reminder-popup border medium-border-radius border-blue box-shadow-popup">
-                <div class="d-flex align-items-center justify-content-between border-bottom-grey fr-p-2v">
-                    <span class="tiny fw-medium">Paramètres de notification</span>
-                    <button class="fr-btn--close fr-btn fr-text--xs"
-                            aria-label="Fermer la popup de rappel"
-                            @click="onOutsideEmailReminderButtonClick">Fermer</button>
-                </div>
-                {% if request.user == project.owner %}
-                    <div data-test-id="message-reminder-settings"
-                         class="border-bottom-grey fr-p-2v d-flex flex-column">
-                        <span class="tiny fw-medium">Rappels</span>
-                        <span class="tiny fw-normal fr-mb-2v">Vous recevez un rappel par email toutes les 6 à 12 semaines pour consulter et mettre à jour votre avancement sur les recommandations.</span>
-                        {% if project.next_reminder %}
-                            {% with project.next_reminder as reminder %}
-                                <span class="tiny fw-medium text-blue">Prochain rappel prévu le {{ reminder.deadline|default:"Aucun" }} ({{ reminder.get_kind_display }})</span>
-                            {% endwith %}
-                        {% endif %}
-                    </div>
+            </div>
+        {% elif request.user in project.members.all or advising_position.is_advisor or advising_position.is_observer or is_staff %}
+            <div x-data="ProjectEmailReminder()"
+                 class="highlighted highlighted--blue d-flex justify-content-between align-items-center fr-mt-5v fr-mb-3w fr-mr-3w">
+                <span data-test-id="no-reminders" class="tiny fw-medium text-blue">Aucun email de rappel programmé actuellement</span>
+                {% if not is_staff %}
+                    {% include "projects/project/fragments/email_reminder/learn_more_reminder.html" %}
                 {% endif %}
-                <div class="border-bottom-grey fr-p-2v d-flex flex-column">
-                    <span class="tiny fw-medium">Activité du projet</span>
-                    <span class="tiny fw-normal fr-mb-2v">Vous recevez une notification par email à chaque nouvelle activité sur le projet dans un récapitulatif journalier.</span>
-                </div>
-                <div class="fr-p-2v d-flex flex-column">
-                    {% if request.user == project.owner %}
-                        <span class="tiny fw-normal fr-mb-1v">Pour couper les notifications vous pouvez mettre le projet en pause depuis l’onglet
-                            <a class="fr-link"
-                               href="{% url 'projects-project-administration' project.pk %}#project-status-settings">Paramètres</a>
-                        </span>
-                    {% else %}
-                        <span class="tiny fw-normal fr-mb-1v">Si vous ne souhaitez plus recevoir de notifications vous pouvez quitter le projet depuis l’onglet
-                            <a class="fr-link text-underline"
-                               href="{% url 'projects-project-administration' project.pk %}#project-status-settings">Paramètres</a>
-                        </span>
-                    {% endif %}
-                </div>
             </div>
         {% endif %}
-    </div>
+    {% endwith %}
 {% endif %}

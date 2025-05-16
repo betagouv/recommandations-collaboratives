@@ -1,0 +1,136 @@
+{% load static %}
+{% load sass_tags %}
+{% load django_vite %}
+{% block css %}
+    <link href="{% sass_src 'projects/css/departments_selector.scss' %}"
+          rel="stylesheet"
+          type="text/css">
+{% endblock css %}
+{% block js %}
+    {% vite_asset 'js/components/DepartmentsSelector.js' %}
+{% endblock js %}
+{% comment %}
+
+    Region filter component
+
+    Parameters:
+        - label (string): label to display in the filter button (default="Projets de mon territoire")
+        - filter_by_regions (boolean): if true, filter by regions, else filter by departments
+        - zone_objects (list): list of regions or departments to display in filter
+        - select_all (boolean): to select all departments (default=true)
+        - input_region_name (string): name of the input for regions
+        - input_department_name (string): name of the input for departments
+        - selected_departments (list): list of selected departments (default=null)
+
+    Event to listen in parent component:
+        - selected-departments: when a department is selected, the event is triggered with the selected departments
+        - user-close-selector: when the user closes the selector, the event is triggered with the selected departments
+
+{% endcomment %}
+<div class="d-flex align-items-center fr-mr-6v">
+    <span class="fr-segmented__legend inline text-nowrap">Filtrer :</span>
+    <div class="input-item position-relative active specific-border-solid1pxE5E5E5"
+         x-data="DepartmentsSelector({ listZone: {{ zone_objects|default:'null' }}, selectAll : '{{ select_all | default:'False' }}' == 'True', filterByRegions : '{{ filter_by_regions }}' == 'True' , selectedDepartments: {{ selected_departments|default:'null' }} })"
+         x-on:click.outside="open && $dispatch('user-close-selector'); open = false; ">
+        <div class="d-flex align-items-center fr-pr-3w bg-white rounded-pill"
+             x-on:click.prevent="open = !open"
+             type="button"
+             :class="{'input-active':open}">
+            <button class="input-field bg-transparent fr-px-2w fw-normal text-dark appearance-none"
+                    data-cy="check-display-project">{{ label |default:"Dossiers de mon territoire" }}</button>
+            {% comment %} TODO Use DSFR icon {% endcomment %}
+            <svg class="input-icon right black bi align-baseline fr-mr-2v"
+                 width="15"
+                 height="15"
+                 fill="#000000">
+                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#chevron-down" />
+            </svg>
+        </div>
+        <ul x-show="open"
+            :class="{'show':open}"
+            class="region-filter list-unstyled flex-column">
+            <li class="bg-white appearance-none w-100 d-flex justify-content-start align-items-center border-bottom department-item">
+                <div class="form-check w-100 d-flex align-items-center fr-p-0">
+                    <input {% if filter_by_regions %} x-on:input.change="handleTerritorySelectAll()" {% else %} x-on:input.change="handleTerritorySelectAllDepartements()" {% endif %}
+                           class="form-check-input fw-normal fr-ml-2v fr-px-2v fr-py-2v fr-mr-2v"
+                           type="checkbox"
+                           data-cy="check-all-territory"
+                           :value="territorySelectAll"
+                           :checked="territorySelectAll"
+                           id="allTerritory" />
+                    <label class=" w-100 fr-pr-2v fr-py-2v d-flex align-items-center"
+                           for="allTerritory">
+                        <span class="fw-normal">Tout (dé)sélectionner</span>
+                    </label>
+                </div>
+            </li>
+            {% if filter_by_regions %}
+                <template x-for="region in regions">
+                    <div class="region-filter-item">
+                        <li :class="{'region-is-active':region.active}"
+                            class="bg-white appearance-none w-100 d-flex justify-content-start align-items-center department-item fr-pr-2w fr-pb-0">
+                            <div class="form-check w-100 d-flex align-items-center fr-px-0">
+                                <input x-on:input.change="handleRegionFilter(region)"
+                                       class="region-checkbox form-check-input fw-normal fr-ml-2v fr-px-2v fr-py-2v fr-mr-2v"
+                                       type="checkbox"
+                                       :value="region.code"
+                                       :checked="region.active"
+                                       {% if input_region_name %}:name="`{{ input_region_name }}-region`"{% endif %}
+                                       :id="`region-${region.code}`" />
+                                <label class="w-100 fr-pr-2v fr-pt-2v d-flex align-items-center"
+                                       :for="`region-${region.code}`">
+                                    <span class="fw-light text-grey-dark text-nowrap" x-text="region.name"></span>
+                                </label>
+                            </div>
+                        </li>
+                        <ul class="region-departments list-unstyled flex-column fr-mt-0">
+                            <template x-for="department in region.departments">
+                                <li class="bg-white appearance-none w-100 d-flex justify-content-start align-items-center department-item">
+                                    <div class="form-check w-100 d-flex align-items-center fr-p-0">
+                                        <input x-on:input.change="handleDepartmentFilter(department)"
+                                               class="form-check-input fw-normal fr-ml-2v fr-px-2v fr-py-2v fr-mr-2v"
+                                               type="checkbox"
+                                               :value="department.code"
+                                               :checked="department.active"
+                                               {% if input_department_name %}:name="`{{ input_department_name }}`"{% endif %}
+                                               :id="department.code" />
+                                        <label class=" w-100 fr-pr-2v fr-py-1v d-flex align-items-center"
+                                               :for="department.code">
+                                            <span class="fw-normal" x-text="department.code"></span>
+                                            <span class="fr-mx-1v fw-light">-</span>
+                                            <span class="fw-light text-grey-dark text-nowrap" x-text="department.name"></span>
+                                            {% comment %} <span class="fw-light text-dark fr-ml-1v"
+       x-text="`(${department.nbProjects})`"></span> {% endcomment %}
+                                        </label>
+                                    </div>
+                                </li>
+                            </template>
+                        </ul>
+                    </div>
+                </template>
+            {% else %}
+                <template x-for="department in departments">
+                    <li class="bg-white appearance-none w-100 d-flex justify-content-start align-items-center department-item fr-pr-3w">
+                        <div class="form-check w-100 d-flex align-items-center fr-p-0">
+                            <input x-on:input.change="handleTerritoryFilter(department)"
+                                   class="form-check-input fw-normal fr-ml-2v fr-px-2v fr-py-2v fr-mr-2v"
+                                   type="checkbox"
+                                   :value="department.code"
+                                   :checked="department.active"
+                                   {% if input_department_name %}:name="`{{ input_department_name }}"{% endif %}
+                                   :id="department.code" />
+                            <label class=" w-100 fr-pr-2v fr-py-1v d-flex align-items-center"
+                                   :for="department.code">
+                                <span class="fw-normal" x-text="department.code"></span>
+                                <span class="fr-mx-1v fw-light">-</span>
+                                <span class="fw-light text-grey-dark text-nowrap" x-text="department.name"></span>
+                                <span class="fw-light text-dark fr-ml-1v"
+                                      x-text="`(${department.nbProjects})`"></span>
+                            </label>
+                        </div>
+                    </li>
+                </template>
+            {% endif %}
+        </ul>
+    </div>
+</div>

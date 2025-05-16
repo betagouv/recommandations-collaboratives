@@ -1,13 +1,5 @@
 {% extends "base.html" %}
 {% load static %}
-{% block js %}
-    <script type="text/javascript">
- // Bootstrap needs collapse/show class to toggle correctly
- $(document).ready(function() {
-     $(".markdownx-preview").addClass("collapse show");
- });
-    </script>
-{% endblock js %}
 {% block content %}
     <div class="col-12 fr-p-3w fr-mx-auto">
         <!-- Breadcrumb -->
@@ -22,7 +14,7 @@
                             <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#building" />
                         </svg>
                         &nbsp;
-                        <a class="fr-breadcrumb__link" href="{% url 'projects-project-list' %}">Projets</a>
+                        <a class="fr-breadcrumb__link" href="{% url 'projects-project-list' %}">Dossiers</a>
                     </li>
                     <li>
                         <a class="fr-breadcrumb__link"

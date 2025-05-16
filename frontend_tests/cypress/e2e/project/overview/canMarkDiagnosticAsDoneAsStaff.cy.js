@@ -1,4 +1,4 @@
-describe('I can mark project diagnostic done ', () => {
+describe('I can mark project diagnostic done @page-projet-presentation @page-projet-presentation-mark-diagnostic-done', () => {
   it('display diagnostic button (as staff)', () => {
     cy.login('staff'); // TODO replace by staffOnSite and check behaviour
     cy.visit(`/project/2/presentation`);

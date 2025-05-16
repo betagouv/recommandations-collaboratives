@@ -173,6 +173,71 @@ def test_crm_user_list_filters_only_selected_role(request, client):
     assertNotContains(response, unexpected)
 
 
+@pytest.mark.django_db
+def test_crm_user_list_filters_on_other_role(request, client):
+    site = get_current_site(request)
+
+    staff = baker.make(auth_models.User)
+    staff.profile.sites.add(site)
+    gstaff = auth_models.Group.objects.get(name="example_com_staff")
+    staff.groups.add(gstaff)
+
+    advisor = baker.make(auth_models.User)
+    advisor.profile.sites.add(site)
+    gadvisor = auth_models.Group.objects.get(name="example_com_advisor")
+    advisor.groups.add(gadvisor)
+
+    a_user = baker.make(auth_models.User)
+    a_user.profile.sites.add(site)
+
+    url = reverse("crm-user-list") + "?role=4"  # role 4 is other
+
+    with login(client) as user:
+        assign_perm("use_crm", user, site)
+        response = client.get(url)
+
+    assert response.status_code == 200
+
+    expected = reverse("crm-user-details", args=[a_user.id])
+    assertContains(response, expected)
+
+    unexpected = reverse("crm-user-details", args=[advisor.id])
+    assertNotContains(response, unexpected)
+
+    unexpected = reverse("crm-user-details", args=[staff.id])
+    assertNotContains(response, unexpected)
+
+
+@pytest.mark.django_db
+def test_crm_user_list_filters_on_departments(request, client):
+    site = get_current_site(request)
+
+    dpt_nord = baker.make(geomatics.Department, code="59", name="Nord")
+    dpt_allier = baker.make(geomatics.Department, code="03", name="Allier")
+
+    user_a = baker.make(auth_models.User)
+    user_a.profile.sites.add(site)
+    user_a.profile.departments.add(dpt_allier)
+
+    user_b = baker.make(auth_models.User)
+    user_b.profile.sites.add(site)
+    user_b.profile.departments.add(dpt_nord)
+
+    url = reverse("crm-user-list") + "?departments=59"
+
+    with login(client) as user:
+        assign_perm("use_crm", user, site)
+        response = client.get(url)
+
+    assert response.status_code == 200
+
+    expected = reverse("crm-user-details", args=[user_b.id])
+    assertContains(response, expected)
+
+    unexpected = reverse("crm-user-details", args=[user_a.id])
+    assertNotContains(response, unexpected)
+
+
 ########################################################################
 # details
 ########################################################################

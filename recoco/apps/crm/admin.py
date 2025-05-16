@@ -1,3 +1,10 @@
-# from django.contrib import admin
+from csvexport.actions import csvexport
+from django.contrib import admin
 
-# Register your models here.
+from . import models
+
+
+@admin.register(models.Note)
+class NoteAdmin(admin.ModelAdmin):
+    actions = [csvexport]
+    list_filter = ["site", "kind"]

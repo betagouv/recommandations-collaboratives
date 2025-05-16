@@ -4,10 +4,10 @@
 {% load sass_tags %}
 {% load django_vite %}
 {% block title %}
-    Thématiques du projet {{ project.name }}
+    Thématiques du dossier {{ project.name }}
 {% endblock title %}
 {% block og_title %}
-    Thématiques du projet {{ project.name }}
+    Thématiques du dossier {{ project.name }}
 {% endblock og_title %}
 {% block js %}
     {% vite_asset 'js/apps/topicSearch.js' %}
@@ -50,10 +50,10 @@
             <input class="d-none" autocomplete="false" name="hidden" type="text">
             <section class="project-details-section l-stack col-6">
                 <header>
-                    <h2 class="font-small">Modifier les Thématiques du Projet</h2>
+                    <h2 class="font-small">Modifier les Thématiques du Dossier</h2>
                 </header>
                 <p class="project-card-details font-small">
-                    Les thématiques sont définies par les conseillers du projet, vous pouvez en ajouter ou les supprimer ici.
+                    Les thématiques sont définies par les conseillers du dossier, vous pouvez en ajouter ou les supprimer ici.
                 </p>
                 {{ topic_formset.management_form }}
                 <ul class="topic-list l-stack">
@@ -148,9 +148,9 @@
                     </header>
                     <p class="project-card-details font-small">
                         <span class="title-info text-red">PRIVÉ&nbsp;</span>
-                        Cette note ne sera que visible par les conseillers du projet.
+                        Cette note ne sera que visible par les conseillers du dossier.
                     </p>
-                    {% include "tools/editor.html" with input_name=form.advisors_note.name input_value=form.advisors_note.value|default:'' escapejs=True wide=True %}
+                    {% include "tools/editor.html" with input_name=form.advisors_note.name initial_content=form.advisors_note.value|default:'' initial_content_escapejs=True wide=True %}
                     <footer class="d-flex justify-content-end align-items-center">
                         <button type="advisor-note" class="button small filled w-auto">Enregistrer</button>
                     </footer>

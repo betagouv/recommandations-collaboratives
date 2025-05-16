@@ -12,7 +12,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.sites.models import Site
 from django.core.exceptions import BadRequest
-from django.shortcuts import get_object_or_404, redirect, render, reverse
+from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from django.utils import timezone
 from django.views.generic import DetailView, RedirectView
 
@@ -71,7 +72,7 @@ def survey_question_details(request, session_id, question_id):
         answer = None
 
     if request.method == "POST":
-        form = forms.AnswerForm(question, answer, request.POST, request.FILES)
+        form = forms.AnswerForm(question, answer, request.POST, files=request.FILES)
         if form.is_valid():
             form.update_session(session, request.user)
 

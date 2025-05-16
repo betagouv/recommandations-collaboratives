@@ -69,7 +69,7 @@ def invite_user_to_project(
         email=user.email,
         defaults={
             "message": (
-                "Je viens de déposer votre projet sur la"
+                "Je viens de déposer votre dossier sur la"
                 "plateforme de manière à faciliter nos échanges."
             )
         },
@@ -87,7 +87,7 @@ def invite_user_to_project(
             "message": invite.message,
             "invite_url": build_absolute_url(
                 invite.get_absolute_url(),
-                auto_login_user=user if not is_new_user else None,
+                auto_login_user=user,
             ),
             "project": digests.make_project_digest(project),
         },
@@ -97,7 +97,7 @@ def invite_user_to_project(
         request,
         (
             "Un courriel d'invitation à rejoindre"
-            f" le projet a été envoyé à {user.email}."
+            f" le dossier a été envoyé à {user.email}."
         ),
         extra_tags=["email"],
     )

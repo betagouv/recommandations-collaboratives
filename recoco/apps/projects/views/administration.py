@@ -40,6 +40,7 @@ from recoco.utils import (
 
 from .. import forms, models
 from ..utils import (
+    get_advising_context_for_project,
     is_regional_actor_for_project,
     notify_advisors_of_project,
     refresh_user_projects_in_session,
@@ -58,8 +59,10 @@ def project_administration(request, project_id):
 
     project = get_object_or_404(
         models.Project.objects.filter(sites=request.site)
+        .with_site_status()
         .with_unread_notifications(user_id=request.user.id)
-        .select_related("commune__department"),
+        .select_related("commune__department")
+        .prefetch_related("switchtender_sites"),
         pk=project_id,
     )
 
@@ -77,6 +80,10 @@ def project_administration(request, project_id):
 
     is_regional_actor = is_regional_actor_for_project(
         request.site, project, request.user, allow_national=True
+    )
+
+    advising, advising_position = get_advising_context_for_project(
+        request.user, project
     )
 
     if not (is_regional_actor or has_any_required_perm):
@@ -114,7 +121,7 @@ def project_administration(request, project_id):
                     original_value = form.initial[field_name]
                 if str(original_value) != str(submitted_value):
                     edited_fields.append(
-                        form.fields[field_name].label.lower().replace(" du projet", "")
+                        form.fields[field_name].label.lower().replace(" du dossier", "")
                     )
 
             if edited_fields:
@@ -133,7 +140,10 @@ def project_administration(request, project_id):
                     insee=form.cleaned_data["insee"]
                 )
                 instance.commune = commune
-            except geomatics_models.Commune.DoesNotExist:
+            except (
+                geomatics_models.Commune.DoesNotExist,
+                geomatics_models.Commune.MultipleObjectsReturned,
+            ):
                 pass
 
             instance.updated_on = timezone.now()
@@ -152,7 +162,19 @@ def project_administration(request, project_id):
             initial={"postcode": postcode, "insee": insee},
         )
 
-    return render(request, "projects/project/administration_panel.html", locals())
+    return render(
+        request,
+        "projects/project/administration_panel.html",
+        context={
+            "project": project,
+            "project_form": project_form,
+            "invite_form": invite_form,
+            "pending_invites": pending_invites,
+            "is_regional_actor": is_regional_actor,
+            "has_any_required_perm": has_any_required_perm,
+            "advising_position": advising_position,
+        },
+    )
 
 
 def access_invite(request, role, project):
@@ -181,7 +203,7 @@ def access_invite(request, role, project):
             messages.success(
                 request,
                 (
-                    "Un courriel d'invitation à rejoindre le projet"
+                    "Un courriel d'invitation à rejoindre le dossier"
                     f" a été envoyé à {email}."
                 ),
                 extra_tags=["email"],
@@ -191,7 +213,7 @@ def access_invite(request, role, project):
             messages.warning(
                 request,
                 (
-                    f"Cet usager ({email}) est déjà membre du projet, il n'a"
+                    f"Cet usager ({email}) est déjà membre du dossier, il n'a"
                     " donc pas été réinvité."
                 ),
             )
@@ -344,7 +366,7 @@ def access_collaborator_delete(request, project_id: int, username: str):
         if membership.is_owner:
             messages.error(
                 request,
-                "Vous ne pouvez pas retirer le propriétaire de son propre projet.",
+                "Vous ne pouvez pas retirer le propriétaire de son propre dossier.",
                 extra_tags=["auth"],
             )
 

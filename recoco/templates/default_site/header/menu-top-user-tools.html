@@ -104,12 +104,12 @@
             </div>
         </div>
     {% else %}
-        <a href="{% url 'account_login' %}">
+        <a class="responsive-header__element-not-mobile" href="{% url 'account_login' %}">
             <svg class="bi fr-mr-2v align-middle" width="16" height="16">
                 <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#person-circle" />
             </svg>
             <span class="align-middle">Se connecter</span>
         </a>
+        {% include "header/menu-burger.html" %}
     {% endif %}
 </div>
-{% include "header/menu-burger.html" %}

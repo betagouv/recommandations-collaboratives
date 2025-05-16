@@ -9,6 +9,7 @@ const config = {
     host: '0.0.0.0',
     port: 3000,
     open: false,
+    cors: true,
     watch: {
       usePolling: true,
       disableGlobbing: false,
@@ -50,7 +51,7 @@ const config = {
         topicSearch: resolve('./src/js/apps/topicSearch.js'),
         user: resolve('./src/js/apps/user.js'),
         tutorial: resolve('./src/js/apps/tutorial.js'),
-        contact: resolve('./src/js/apps/contact.js'),
+        contactApp: resolve('./src/js/apps/contactApp.js'),
         projectDetailsCss: resolve('./src/css/projectDetails.css'),
         mapViewerStatic: resolve('./src/js/apps/mapViewerStatic.js'),
         mapViewerInteractive: resolve('./src/js/apps/mapViewerInteractive.js'),
@@ -72,8 +73,15 @@ const config = {
         projects: resolve('./src/js/store/projects.js'),
         ClickToSeeUser: resolve('./src/js/components/ClickToSeeUser.js'),
         ActionPusher: resolve('./src/js/components/ActionPusher.js'),
+        NotificationEater: resolve('./src/js/components/NotificationEater.js'),
         actionPusher: resolve('./src/js/store/actionPusher.js'),
-        contact: resolve('./src/js/store/contact.js'),
+        conversationsNew: resolve('./src/js/apps/conversationsNew.js'),
+        featureAddContact: resolve('./src/js/apps/featureAddContact.js'),
+        DepartmentsSelector: resolve(
+          './src/js/components/DepartmentsSelector.js'
+        ),
+        User: resolve('./src/js/components/User.js'),
+        MutliSelect: resolve('./src/js/components/MultiSelect.js'),
         ContactBook: resolve('./src/js/store/ContactBook.js'),
       },
       output: {

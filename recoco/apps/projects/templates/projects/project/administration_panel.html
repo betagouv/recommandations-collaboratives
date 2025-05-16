@@ -21,14 +21,13 @@
 {% block project_detail %}
     {% get_obj_perms request.user for request.site as "user_site_perms" %}
     {% get_obj_perms request.user for project as "user_project_perms" %}
-    {% get_advising_position request.user project request.site as position %}
     {% is_staff_for_current_site request.user as is_staff %}
     {% include "projects/project/navigation.html" with administration_panel=True %}
     {% if project.inactive_since != None %}
         <div class="specific-border-4pxsolid1e1e1e">
             {% include "projects/project/fragments/project_banner/paused_project_banner.html" %}
             <div>
-            {% elif project.status == 'DRAFT' %}
+            {% elif project.site_status == 'DRAFT' %}
                 <div class="specific-border-4pxsolid000091">
                     {% include "projects/project/fragments/project_banner/non_published_project_banner.html" %}
                 {% endif %}
@@ -56,7 +55,7 @@
                                                    class="fr-py-2w placeholder-grey form-control {% if project_form.name.errors %}is-invalid{% endif %}"
                                                    id="{{ project_form.name.id_for_label }}"
                                                    name="{{ project_form.name.name }}"
-                                                   placeholder="Nom du projet"
+                                                   placeholder="Nom du dossier"
                                                    value="{{ project_form.name.value }}"
                                                    required />
                                             {% for error in project_form.name.errors %}<div class="invalid-feedback">{{ error }}</div>{% endfor %}
@@ -83,8 +82,7 @@
                                                    for="input-project-description">
                                                 {{ project_form.description.label }}
                                             </label>
-                                            <textarea maxlength="500"
-                                                      class="placeholder-grey form-control {% if project_form.description.errors %}is-invalid{% endif %} textarea-size"
+                                            <textarea class="placeholder-grey form-control {% if project_form.description.errors %}is-invalid{% endif %} textarea-size"
                                                       id="input-project-description"
                                                       name="{{ project_form.description.name }}"
                                                       placeholder="">{{ project_form.description.value|default:'' }}</textarea>
@@ -129,7 +127,7 @@
                                             </template>
                                         </div>
                                     </div>
-                                    <button id="bouton-modifier-les-info" type="submit" class="button filled">Modifier les informations du projet</button>
+                                    <button id="bouton-modifier-les-info" type="submit" class="button filled">Modifier les informations du dossier</button>
                                 </form>
                             </div>
                         {% endif %}
@@ -143,8 +141,8 @@
                                     <button @click="openInviteSwitchtenderModal"
                                             data-toggle="modal"
                                             data-target="#InviteSwitchtenderModal"
-                                            class="{% if project.status == 'DRAFT' %} disabled{% endif %} button d-inline-flex justify-content-center w-100 fr-mb-3w cursor-pointer">
-                                        {% if project.status == 'DRAFT' %}
+                                            class="{% if project.site_status == 'DRAFT' %} disabled{% endif %} button d-inline-flex justify-content-center w-100 fr-mb-3w cursor-pointer">
+                                        {% if project.site_status == 'DRAFT' %}
                                             <svg class="bi align-middle" width="18" height="18" fill="currentColor">
                                                 <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#lock-fill" />
                                             </svg>
@@ -155,7 +153,7 @@
                                 {% endif %}
                                 {% if project.switchtender_sites.all.count == 0 %}
                                     <div class="bg-light d-flex flex-column justify-content-center align-items-center fr-py-3w rounded">
-                                        <p class="fr-m-0 text-info-custom text-grey fw-normal fr-pb-2w">Le projet n'est pas encore suivi</p>
+                                        <p class="fr-m-0 text-info-custom text-grey fw-normal fr-pb-2w">Le dossier n'est pas encore suivi</p>
                                         <svg class="bi align-baseline fr-mr-2v fr-mt-1v"
                                              width="30"
                                              height="30"
@@ -199,19 +197,19 @@
                                 {% endif %}
                             </div>
                             <div class="col">
-                                <p class="text-info-custom fr-mb-2v">Equipe du porteur de projet et partenaires</p>
+                                <p class="text-info-custom fr-mb-2v">Equipe du demandeur et partenaires</p>
                                 {% if "invite_collaborators" in user_project_perms %}
                                     <button @click="openInviteMemberModal"
                                             data-toggle="modal"
                                             data-target="#InviteMemberModal"
                                             data-cy="button-invite-project-member"
-                                            class="{% if project.status == 'DRAFT' %} disabled{% endif %} button d-inline-flex justify-content-center w-100 fr-mb-3w cursor-pointer">
-                                        {% if project.status == 'DRAFT' %}
+                                            class="{% if project.site_status == 'DRAFT' %} disabled{% endif %} button d-inline-flex justify-content-center w-100 fr-mb-3w cursor-pointer">
+                                        {% if project.site_status == 'DRAFT' %}
                                             <svg class="bi align-middle" width="18" height="18" fill="currentColor">
                                                 <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#lock-fill" />
                                             </svg>
                                         {% endif %}
-                                        <span>Inviter un membre porteur de projet ou un partenaire</span>
+                                        <span>Inviter un membre demandeur ou un partenaire</span>
                                     </button>
                                 {% endif %}
                                 <ul class="flex-column list-unstyled fr-mb-0">
@@ -219,7 +217,7 @@
                                         {% if pm.is_owner %}
                                             <li class="d-flex align-items-start justify-content-between fr-mb-1v">
                                                 {% include "user/user_card.html" with user=pm.member project_owner=True user_activity=True %}
-                                                <span class="fr-ml-1v text-lowercase fst-italic font-weight-light specific-color-666">Référent du projet</span>
+                                                <span class="fr-ml-1v text-lowercase fst-italic font-weight-light specific-color-666">Référent du dossier</span>
                                             </li>
                                         {% else %}
                                             <li class="d-flex align-items-start justify-content-between fr-mb-1v">
@@ -328,7 +326,7 @@
                                 {% else %}
                                     <p data-test-id="administration-member-invitation-list"
                                        class="text-info-custom fr-mb-3w fr-mt-1v">
-                                        Invitations en attente porteur de projet et partenaires
+                                        Invitations en attente demandeur et partenaires
                                     </p>
                                     <ul class="list-group">
                                         {% for invite in pending_invites %}
@@ -382,17 +380,15 @@
                         <section id="project-status-settings" class="col">
                             <hr class="fr-my-3w" />
                             {% include "projects/project/fragments/administration/quit_project.html" %}
-                            {% include "projects/project/fragments/administration/stand_by_project.html" with position=position %}
+                            {% include "projects/project/fragments/administration/stand_by_project.html" %}
                         </section>
                     </div>
                 </div>
                 {% if project.inactive_since != None %}
                 </div>
             </div>
-        {% elif project.status == 'DRAFT' %}
+        {% elif project.site_status == 'DRAFT' %}
         </div>
     {% endif %}
-    <div class="fr-mt-2w fr-px-2w">
-        {% include "projects/project/fragments/administration/activate_project.html" with position=position %}
-    </div>
+    <div class="fr-mt-2w fr-px-2w">{% include "projects/project/fragments/administration/activate_project.html" %}</div>
 {% endblock project_detail %}

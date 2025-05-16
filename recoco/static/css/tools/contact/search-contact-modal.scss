@@ -8,6 +8,15 @@
   border: 1px solid var(--light-border-default-grey, #e5e5e5);
   background: #fff;
   box-shadow: 4px 8px 6px 0px rgba(0, 0, 0, 0.2);
+  z-index: 1020;
+
+  .contact-card {
+    max-width: 26rem;
+  }
+  .button-cancel-contact {
+    position: absolute;
+    right: 0;
+  }
 }
 
 .specific-height {
@@ -69,7 +78,7 @@
   font-weight: 400;
 }
 
-.text-organisation {
+.text-organization {
   font-size: 11px;
   font-weight: 700;
 }
@@ -97,7 +106,33 @@
   display: inline;
 }
 
+.long-text-adaptation {
+  display: inline-block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  height: 20px;
+  width: 150px;
+  white-space: nowrap;
+  padding-top: 2px;
+}
+
 .btn-create-contact {
   background: #f5f5fe;
   color: #000091;
+}
+
+.correct-position {
+  top: 0px;
+  left: 24px;
+  position: relative;
+}
+
+@media (max-height: 850px) {
+  .modal-contact {
+    top: 30%;
+  }
+
+  .rwd-resize {
+    width: 26.5rem !important;
+  }
 }

@@ -1,9 +1,9 @@
-describe('I can attach miscellanious ressource to task', () => {
+describe('I can attach miscellanious ressource to task @page-projet-recommandations-creation', () => {
   beforeEach(() => {
     cy.login('conseiller1');
   });
 
-  it('publishes a task with resource', () => {
+  it('publishes a task with resource comment / no comment', () => {
     cy.visit(`/projects/action/?project_id=25`);
 
     cy.get('[data-cy="radio-push-reco-single-resource"]').should('be.checked');
@@ -13,9 +13,13 @@ describe('I can attach miscellanious ressource to task', () => {
       .first()
       .check({ force: true });
 
-    cy.get('.ProseMirror p')
-      .invoke('text', 'reco test from action description')
-      .should('have.text', 'reco test from action description');
+    // Test with no comment
+    cy.get('[data-cy="button-submit-task"]').should('be.enabled');
+
+    // Test with comment
+    cy.get('.ProseMirror p').click();
+    cy.focused().type('text', 'reco test from action description');
+
     cy.get('[data-cy="button-submit-task"]').should('be.enabled').click();
 
     cy.url().should('include', '/actions');
@@ -36,9 +40,9 @@ describe('I can attach miscellanious ressource to task', () => {
     cy.get('[data-cy="button-external-resource-load"]').click();
     cy.get('[data-cy="radio-resource-list-task"]').check({ force: true });
 
-    cy.get('.ProseMirror p')
-      .invoke('text', 'reco test from action description')
-      .should('have.text', 'reco test from action description');
+    cy.get('.ProseMirror p').click();
+    cy.focused().type('text', 'reco test from action description');
+
     cy.get('[data-cy="button-submit-task"]').should('be.enabled').click();
 
     cy.url().should('include', '/actions');
@@ -52,9 +56,9 @@ describe('I can attach miscellanious ressource to task', () => {
       .check({ force: true })
       .should('be.checked');
 
-    cy.get('.ProseMirror p')
-      .invoke('text', 'reco test with no resource')
-      .should('have.text', 'reco test with no resource');
+    cy.get('.ProseMirror p').click();
+    cy.focused().type('text', 'reco test with no resource');
+
     cy.get('[data-cy="input-title-task"]').type('reco test with no resource', {
       delay: 0,
     });

@@ -19,7 +19,6 @@ from django.test import override_settings
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.http import urlencode
-from guardian.shortcuts import get_user_perms
 from model_bakery import baker
 from model_bakery.recipe import Recipe
 from notifications import notify
@@ -137,15 +136,31 @@ def test_project_list_not_available_for_non_staff_users(client):
 
 @pytest.mark.django_db
 def test_project_list_available_for_switchtender_user(request, client):
-    get_current_site(request)
+    current_site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=current_site)
+    url = reverse("projects-project-list")
+    with login(client, groups=["example_com_staff", "example_com_advisor"]):
+        response = client.get(url, follow=True)
+
+    advisor_url = reverse("projects-project-list-staff")
+    url, code = response.redirect_chain[-1]
+    assert code == 302
+    assert url == advisor_url
+
+
+@pytest.mark.django_db
+def test_project_list_available_for_advisor(request, client):
+    current_site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=current_site)
+
     url = reverse("projects-project-list")
     with login(client, groups=["example_com_advisor"]):
         response = client.get(url, follow=True)
 
-    advisor_url = reverse("projects-project-list-advisor")
+    staff_url = reverse("projects-project-list-staff")
     url, code = response.redirect_chain[-1]
     assert code == 302
-    assert url == advisor_url
+    assert url == staff_url
 
 
 @pytest.mark.django_db
@@ -154,7 +169,7 @@ def test_project_list_available_for_staff(request, client):
     baker.make(home_models.SiteConfiguration, site=current_site)
 
     url = reverse("projects-project-list")
-    with login(client, groups=["example_com_staff", "example_com_advisor"]):
+    with login(client, groups=["example_com_staff"]):
         response = client.get(url, follow=True)
 
     staff_url = reverse("projects-project-list-staff")
@@ -630,196 +645,6 @@ def test_project_detail_contains_actions_for_assigned_advisor(request, client, p
 
 
 ########################################################################
-# Project moderation
-########################################################################
-
-
-@pytest.mark.django_db
-def test_project_moderation_not_available_for_non_moderators(
-    request, client, project_draft
-):
-    current_site = get_current_site(request)
-    baker.make(home_models.SiteConfiguration, site=current_site)
-    project = Recipe(models.Project, sites=[current_site]).make()
-
-    with login(client):
-        for url in [
-            reverse("projects-moderation-list"),
-            reverse("projects-moderation-refuse", args=[project.id]),
-            reverse("projects-moderation-accept", args=[project.id]),
-        ]:
-            response = client.get(url)
-            assert response.status_code == 403
-
-
-@pytest.mark.django_db
-def test_project_moderation_accept_and_redirect(request, client, project_draft):
-    current_site = get_current_site(request)
-    baker.make(home_models.SiteConfiguration, site=current_site)
-    owner = Recipe(auth.User, username="owner@owner.co").make()
-
-    baker.make(models.ProjectMember, project=project_draft, member=owner, is_owner=True)
-
-    updated_on_before = project_draft.updated_on
-    url = reverse("projects-moderation-accept", args=[project_draft.id])
-
-    with login(client, groups=["example_com_staff"]) as moderator:
-        moderator.profile.sites.add(current_site)
-        response = client.post(url)
-
-    project = models.Project.on_site.get(id=project_draft.id)
-    assert project.project_sites.current().status == "TO_PROCESS"
-    assert project.updated_on > updated_on_before
-
-    # check updated permissions
-    assert "invite_collaborators" in get_user_perms(owner, project)
-
-    assert response.status_code == 302
-
-
-@pytest.mark.django_db
-def test_project_moderation_accept_without_owner_and_redirect(
-    request, client, project_draft
-):
-    current_site = get_current_site(request)
-    baker.make(home_models.SiteConfiguration, site=current_site)
-
-    updated_on_before = project_draft.updated_on
-    url = reverse("projects-moderation-accept", args=[project_draft.id])
-
-    with login(client, groups=["example_com_staff"]) as moderator:
-        moderator.profile.sites.add(current_site)
-        response = client.post(url)
-
-    project = models.Project.on_site.get(id=project_draft.id)
-    assert project.project_sites.current().status == "TO_PROCESS"
-    assert project.updated_on > updated_on_before
-
-    assert response.status_code == 302
-
-
-@pytest.mark.django_db
-def test_project_moderation_notifies_regional_actors_when_accepted(
-    request, client, make_project
-):
-    current_site = get_current_site(request)
-    baker.make(home_models.SiteConfiguration, site=current_site)
-
-    st_group = auth.Group.objects.get(name="example_com_advisor")
-
-    dpt_nord = Recipe(geomatics.Department, code=59, name="Nord").make()
-    commune = Recipe(
-        geomatics.Commune, name="Lille", postal="59000", department=dpt_nord
-    ).make()
-
-    regional_actor = Recipe(auth.User).make()
-    regional_actor.groups.add(st_group)
-    regional_actor.profile.departments.add(dpt_nord)
-    regional_actor.profile.sites.add(current_site)
-
-    membership = baker.make(models.ProjectMember, member=regional_actor, is_owner=True)
-
-    project = make_project(
-        site=current_site,
-        status="DRAFT",
-        commune=commune,
-        projectmember_set=[membership],
-    )
-
-    with login(client, groups=["example_com_advisor", "example_com_staff"]) as user:
-        user.profile.sites.add(current_site)
-        response = client.post(reverse("projects-moderation-accept", args=[project.id]))
-        assert response.status_code == 302
-
-    assert regional_actor.notifications.count() == 1
-
-
-@pytest.mark.django_db
-def test_project_moderation_does_not_notify_non_regional_actors_on_accept(
-    request, client
-):
-    current_site = get_current_site(request)
-    baker.make(home_models.SiteConfiguration, site=current_site)
-    group = auth.Group.objects.get(name="example_com_advisor")
-
-    dpt_nord = Recipe(geomatics.Department, code=59, name="Nord").make()
-    dpt_pdc = Recipe(geomatics.Department, code=62, name="Pas de Calais").make()
-    commune = Recipe(
-        geomatics.Commune, name="Lille", postal="59000", department=dpt_nord
-    ).make()
-
-    non_regional_actor = baker.make(auth.User, email="somewhere@else.info")
-    non_regional_actor.groups.add(group)
-    non_regional_actor.profile.departments.add(dpt_pdc)
-
-    nr_membership = baker.make(
-        models.ProjectMember,
-        member=non_regional_actor,
-    )
-
-    owner_membership = baker.make(models.ProjectMember, is_owner=True)
-    project = Recipe(
-        models.Project,
-        sites=[current_site],
-        commune=commune,
-        projectmember_set=[owner_membership],
-    ).make()
-
-    with login(client, user=nr_membership.member, groups=["example_com_advisor"]):
-        client.post(reverse("projects-moderation-accept", args=[project.id]))
-
-    assert non_regional_actor.notifications.count() == 0
-
-
-@pytest.mark.django_db
-def test_project_moderation_refuse_and_redirect(request, client):
-    current_site = get_current_site(request)
-    baker.make(home_models.SiteConfiguration, site=current_site)
-    owner = Recipe(auth.User, username="owner@owner.co").make()
-    project = Recipe(models.Project, sites=[current_site]).make()
-    baker.make(models.ProjectMember, project=project, member=owner, is_owner=True)
-
-    updated_on_before = project.updated_on
-    url = reverse("projects-moderation-refuse", args=[project.id])
-
-    with login(client, groups=["example_com_staff"]) as moderator:
-        moderator.profile.sites.add(current_site)
-        response = client.post(url)
-
-    project = models.Project.on_site.get(id=project.id)
-    assert project.status == "REJECTED"
-    assert project.updated_on > updated_on_before
-
-    assert response.status_code == 302
-
-
-@pytest.mark.multisite
-@pytest.mark.django_db
-def test_project_moderation_accept_on_secondary_site(request, client, project_draft):
-    current_site = get_current_site(request)
-    baker.make(home_models.SiteConfiguration, site=current_site)
-    owner = Recipe(auth.User, username="owner@owner.co").make()
-
-    baker.make(models.ProjectMember, project=project_draft, member=owner, is_owner=True)
-
-    updated_on_before = project_draft.updated_on
-    url = reverse("projects-moderation-accept", args=[project_draft.id])
-
-    with login(client, groups=["example_com_staff"]) as moderator:
-        moderator.profile.sites.add(current_site)
-        response = client.post(url)
-
-    project = models.Project.on_site.get(id=project_draft.id)
-    assert project.project_sites.current().status == "TO_PROCESS"
-    assert project.updated_on > updated_on_before
-
-    # check updated permissions
-    assert "invite_collaborators" in get_user_perms(owner, project)
-
-    assert response.status_code == 302
-
-
-########################################################################
 # delete project
 ########################################################################
 
@@ -1013,8 +838,6 @@ def test_switchtender_joins_project(request, client, make_project):
     url = reverse("projects-project-switchtender-join", args=[project.id])
     with login(client, groups=["example_com_advisor"]) as user:
         user.profile.sites.add(current_site)
-
-        # Then POST to join projet
         response = client.post(url)
 
     project = models.Project.on_site.get(pk=project.pk)
@@ -1140,7 +963,7 @@ def test_switchtender_exports_csv(request, client, make_project):
     # Expected project
     p1 = make_project(
         site=get_current_site(request),
-        name="Projet 1",
+        name="Dossier 1",
         status="READY",
     )
 
@@ -1148,7 +971,7 @@ def test_switchtender_exports_csv(request, client, make_project):
     p1.save()
 
     # Project that should not appear
-    make_project(site=other_site, name="Projet 2")
+    make_project(site=other_site, name="Dossier 2")
 
     # Make a task
     Recipe(task_models.Task, public=True, project=p1).make()
@@ -1173,7 +996,7 @@ def test_switchtender_exports_csv(request, client, make_project):
 # Tags
 #################################################################
 @pytest.mark.django_db
-def test_advisor_cannot_updates_tags(request, client, project):
+def test_advisor_updates_tags(request, client, project):
     current_site = get_current_site(request)
 
     data = {"tags": "blah"}
@@ -1185,9 +1008,9 @@ def test_advisor_cannot_updates_tags(request, client, project):
             reverse("projects-project-tags", args=[project.id]), data=data
         )
 
-    assert response.status_code == 403
+    assert response.status_code == 302
     project = models.Project.objects.all()[0]
-    assert list(project.tags.names()) == []
+    assert list(project.tags.names()) == [data["tags"]]
 
 
 @pytest.mark.django_db

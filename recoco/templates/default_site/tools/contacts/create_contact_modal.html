@@ -4,71 +4,86 @@
           rel="stylesheet"
           type="text/css" />
 {% endblock css %}
-{% comment %} <div> {% endcomment %}
-<div x-data="CreateContact()"
-     id="create-contact-modal"
-     class="modal-create-contact d-none z-2"
-     @click.away="isOpenCreateContactModal = false">
-    <div class="d-flex justify-content-between border-bottom-666 fr-p-3v modal-create-contact__block">
-        <p class="fw-bold color-666 correct-p">ATTACHER UN CONTACT</p>
-        <span class="fr-icon-close-line color-666 cursor-pointer"
-              aria-hidden="true"
-              @click="closeCreateContactModal"></span>
+<template x-if="isCreateContactModalOpen">
+    <div x-data="CreateContactModal"
+         @modal-response="closeCreateOrganizationModal($event)"
+         id="create-contact-modal">
+        <div x-ref="createContactModal"
+             @set-organization="handleSetOrganization($event.detail)"
+             class="modal-create-contact z-2">
+            <form @submit.prevent>
+                <div class="d-flex justify-content-between border-bottom-666 fr-p-3v modal-create-contact__block">
+                    <p class="fw-bold color-666 correct-p text-uppercase">Attacher un contact</p>
+                    <span class="fr-icon-close-line color-666 cursor-pointer"
+                          aria-hidden="true"
+                          @click.prevent="Modal.closeModal()"></span>
+                </div>
+                {% include "tools/contacts/search_organization.html" %}
+                <div class="fr-p-3v modal-create-contact__block">
+                    <label class="modal-create-contact__label">Nom</label>
+                    <input type="text" class="fr-input" x-model="contact.last_name" data-test-id="last-name">
+                </div>
+                <div class="fr-p-3v modal-create-contact__block">
+                    <label class="modal-create-contact__label">Prénom</label>
+                    <input type="text" class="fr-input" x-model="contact.first_name" data-test-id="first-name">
+                </div>
+                <div class="fr-p-3v modal-create-contact__block"
+                     :class="{'fr-input-group--error': formState.isSubmitted && !formState.fields.isJobSelected}">
+                    <label class="modal-create-contact__label">Poste</label>
+                    <span :class="{'color-important': formState.isSubmitted && !formState.fields.isJobSelected}">*</span>
+                    <template x-if="formState.isSubmitted && !formState.fields.isJobSelected">
+                        <p class="modal-create-contact__label-info color-important">Le champ de votre poste est obligatoire *</p>
+                    </template>
+                    <input type="text"
+                           class="fr-input"
+                           :class="{'fr-input--error': formState.isSubmitted && !formState.fields.isJobSelected}"
+                           x-model="contact.division"
+                           data-test-id="job"
+                           required>
+                </div>
+                <div class="fr-p-3v modal-create-contact__block"
+                     :class="{'fr-input-group--error': formState.isSubmitted && (!formState.fields.isMailOrPhone || !formState.fields.isFormatEmailValid)}">
+                    <label class="modal-create-contact__label">Email</label>
+                    <p class="modal-create-contact__label-info"
+                       :class="{'color-important': formState.isSubmitted && !formState.fields.isMailOrPhone}">
+                        Merci de renseigner A MINIMA l'email OU un numéro de téléphone
+                    </p>
+                    <template x-if="formState.isSubmitted && formState.fields.isMailOrPhone && !formState.fields.isFormatEmailValid">
+                        <p class="modal-create-contact__label-info color-important">
+                            Le format de l'email est incorrect : marie.curie@email.fr
+                        </p>
+                    </template>
+                    <input type="email"
+                           pattern="^[\w.\-]+@([\w\-]+\.)+[\w\-]{2,4}$"
+                           class="fr-input"
+                           :class="{'fr-input--error': formState.isSubmitted && (!formState.fields.isMailOrPhone || !formState.fields.isFormatEmailValid)}"
+                           x-model="contact.email"
+                           data-test-id="email">
+                </div>
+                <div class="fr-p-3v modal-create-contact__block"
+                     :class="{'fr-input-group--error': formState.isSubmitted && !formState.fields.isMailOrPhone}">
+                    <label class="modal-create-contact__label">Téléphone Principal</label>
+                    <p class="modal-create-contact__label-info"
+                       :class="{'color-important': formState.isSubmitted && !formState.fields.isMailOrPhone}">
+                        Merci de renseigner A MINIMA l'email OU un numéro de téléphone
+                    </p>
+                    <input type="text"
+                           class="fr-input"
+                           :class="{'fr-input--error': formState.isSubmitted && !formState.fields.isMailOrPhone}"
+                           x-model="contact.phone_no"
+                           data-test-id="phone">
+                </div>
+                <div class="fr-p-3v modal-create-contact__block">
+                    <label class="modal-create-contact__label">Téléphone Secondaire</label>
+                    <input type="text" class="fr-input" x-model="contact.mobile_no">
+                </div>
+                <div class="fr-p-3v modal-create-contact__block d-flex">
+                    <button class="fr-btn fr-btn--secondary fr-mr-3v w-100 justify-content-center"
+                            @click.prevent="Modal.closeModal()">Annuler</button>
+                    <button class="fr-btn w-100 justify-content-center" @click="createContact" data-test-id="create-contact-button">Créer le contact</button>
+                </div>
+            </form>
+        </div>
+        {% include "tools/contacts/create_organization_modal.html" %}
     </div>
-    <div x-data="SearchOrganisation"
-         class="fr-p-3v modal-create-contact__block">
-        <span class="modal-create-contact__label">Organisation</span><span class="color-important">*</span>
-        <template x-if="verifOrga">
-            <p class="modal-create-contact__label-info red-text">La sélection de votre organisation est obligatoire *</p>
-        </template>
-        <div>{% include "tools/contacts/search_organisation.html" %}</div>
-    </div>
-    <div class="fr-p-3v modal-create-contact__block">
-        <label class="modal-create-contact__label">Nom</label>
-        <input type="text" class="fr-input" x-model="contactLastName">
-    </div>
-    <div class="fr-p-3v modal-create-contact__block">
-        <label class="modal-create-contact__label">Prénom</label>
-        <input type="text" class="fr-input" x-model="contactFirstName">
-    </div>
-    <div class="fr-p-3v modal-create-contact__block">
-        <label class="modal-create-contact__label">Poste</label>
-        <span class="color-important">*</span>
-        <template x-if="verifPoste">
-            <p class="modal-create-contact__label-info red-text">Le champ de votre poste est obligatoire *</p>
-        </template>
-        <input type="text"
-               class="fr-input"
-               :class="{'fr-input--error': verifPoste}"
-               x-model="contactJob"
-               required>
-    </div>
-    <div class="fr-p-3v modal-create-contact__block">
-        <label class="modal-create-contact__label">Email</label>
-        <p class="modal-create-contact__label-info"
-           :class="{'red-text': verifMailOrPhone}">Renseigner au minimum l’email ou un numéro de téléphone</p>
-        <input type="text"
-               class="fr-input"
-               :class="{'fr-input--error': verifMailOrPhone}"
-               x-model="contactEmail">
-    </div>
-    <div class="fr-p-3v modal-create-contact__block">
-        <label class="modal-create-contact__label">Téléphone Principal</label>
-        <p class="modal-create-contact__label-info"
-           :class="{'red-text': verifMailOrPhone}">Renseigner au minimum l’email ou un numéro de téléphone</p>
-        <input type="text"
-               class="fr-input"
-               :class="{'fr-input--error': verifMailOrPhone}"
-               x-model="contactTel">
-    </div>
-    <div class="fr-p-3v modal-create-contact__block">
-        <label class="modal-create-contact__label">Téléphone Secondaire</label>
-        <input type="text" class="fr-input" x-model="contactPhone">
-    </div>
-    <div class="fr-p-3v modal-create-contact__block d-flex">
-        <button class="fr-btn fr-btn--secondary fr-mr-3v w-100 justify-content-center"
-                @click="closeCreateContactModal()">Annuler</button>
-        <button class="fr-btn w-100 justify-content-center" @click="createContact">Créer le contact</button>
-    </div>
-</div>
-{% comment %} </div> {% endcomment %}
+</template>
