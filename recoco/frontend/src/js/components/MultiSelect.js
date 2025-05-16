@@ -2,7 +2,7 @@ document.addEventListener('alpine:init', () => {
   Alpine.data('alpineMultiSelect', (obj) => ({
     elementId: obj.elementId,
     options: [],
-    selected: obj.selected,
+    selected: obj.selected || [],
     objectsToSelect: obj.objectsToSelect,
     selectedElms: [],
     show: false,

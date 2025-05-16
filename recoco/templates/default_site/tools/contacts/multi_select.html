@@ -38,7 +38,7 @@
                                 <!-- Selected elements container -->
                                 <div class="w-100">
                                     <div class="my-2 p-1 d-flex border border-gray-200 bg-white rounded">
-                                        <div class="d-flex flex-auto flex-wrap" x-on:click="open">
+                                        <div class="d-flex flex-auto flex-wrap w-100" x-on:click="open">
                                             <!-- iterating over selected elements -->
                                             <template x-for="(option,index) in selectedElms" :key="option.value">
                                                 <div x-show="index < 2"
