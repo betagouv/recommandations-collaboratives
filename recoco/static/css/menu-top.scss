@@ -37,13 +37,15 @@
     }
     .navigation__item-dashboard,
     .navigation__item-moderation,
+    .navigation__item-invitation,
     .navigation__item-resource,
     .navigation__item {
       padding: var(--padding-y-navigation);
     }
 
     .navigation__item-dashboard,
-    .navigation__item-moderation {
+    .navigation__item-moderation,
+    .navigation__item-invitation {
       .badge {
         margin-left: 0.5rem;
         line-height: 1rem;
