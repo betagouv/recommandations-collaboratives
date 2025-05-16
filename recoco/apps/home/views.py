@@ -267,7 +267,7 @@ def setup_password(request):
     return render(request, "home/user_setup_password.html", locals())
 
 
-@login_required
+@login_required(login_url="/accounts/signup")
 def advisor_access_request_view(request: HttpRequest) -> HttpResponse:
     redirect_url = request.GET.get("next")
     site_config = request.site.configuration
