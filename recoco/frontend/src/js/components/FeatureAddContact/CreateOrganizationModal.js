@@ -15,6 +15,7 @@ Alpine.data('CreateOrganizationModal', (organizationName) => {
     showOrgaGroupsresults: false,
     isAnOrgaGroupSelected: false,
     departments: null,
+    selectedDepartments: null,
     organization: {
       name: '',
       group: null,
@@ -67,8 +68,7 @@ Alpine.data('CreateOrganizationModal', (organizationName) => {
       try {
         const response = await api.get(departmentsUrl());
         this.departments = response.data;
-        debugger;
-        // this.$dispatch('on-department-fetch', this.departments);
+        console.log(this.departments);
       } catch (error) {
         console.log(error);
         throw new Error('Error while fetching departments ', error);
