@@ -102,6 +102,17 @@
                 {% endif %}
             </li>
         {% endif %}
+        <!-- Projects invitations -->
+        {% load invites_tags %}
+        {% pending_invitations_for request.user as invitations %}
+        {% if invitations.count %}
+            <li class="navigation__item-invitation d-flex">
+                <a href="{% url "invites-invite-details" invitations.first.pk %}">
+                    <span class="fr-link underline no-wrap">Invitations</span>
+                </a>
+                <span class="badge text-bg-danger no-underline">{{ invitations.count }}</span>
+            </li>
+        {% endif %}
         {% comment %} surcharge pour ajouter des éléments au menu top à gauche de ressources {% endcomment %}
         {% include "header/menu-top-secondary-left.html" %}
         <!-- Ressources -->
