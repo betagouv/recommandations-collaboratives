@@ -74,6 +74,15 @@ Alpine.data('ContactBook', () => {
       }
       return contactByOrganizationArray;
     },
+
+    deleteContact(contact) {
+      {
+        api.delete(`${contactsUrl()}${contact.id}/`).then((response) => {
+          location.reload();
+        });
+      }
+    },
+
     isCreateContactModalOpen: false,
     openModalCreateContact() {
       // create contact modal

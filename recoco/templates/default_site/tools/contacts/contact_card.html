@@ -102,8 +102,8 @@ Example usage in parent:
         </template>
         {% if button_actions %}
             <div class="button__actions">
-                <a class="fr-btn fr-btn--tertiary-no-outline fr-btn--sm fr-icon-pencil-line button__actions-edit"
-                   :href="`/addressbook/contact/${contact.id}/update/`">Éditer le contact</a>
+                <button class="fr-btn fr-btn--tertiary-no-outline fr-btn--sm fr-icon-pencil-line button__actions-edit"
+                        @click="openModalCreateContact">Éditer le contact</button>
                 <div x-data="{ openDeleteContact: false }"
                      @click.outside="openDeleteContact = false"
                      class="position-relative">
@@ -140,7 +140,7 @@ Example usage in parent:
                                           class="color-3a3a3a text-organisation"></span>
                                 </div>
                                 <div x-show="contact.division">
-                                    <span x-text="contact.division || 'Coucou la division'"
+                                    <span x-text="contact.division"
                                           class="color-3a3a3a text-position"></span>
                                 </div>
                             </div>
@@ -150,7 +150,7 @@ Example usage in parent:
                         </li>
                         <li class="modal__footer d-inline-flex gap-1">
                             <button class="modal__footer-cancel" @click="openDeleteContact = false">Annuler</button>
-                            <button class="modal__footer-confirm">Confirmer la suppression</button>
+                            <button class="modal__footer-confirm" @click="deleteContact(contact)">Confirmer la suppression</button>
                         </li>
                     </ul>
                 </div>
