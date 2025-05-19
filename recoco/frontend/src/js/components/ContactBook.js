@@ -84,9 +84,14 @@ Alpine.data('ContactBook', () => {
     },
 
     isCreateContactModalOpen: false,
-    openModalCreateContact() {
+    openModalCreateContact(contact = null) {
       // create contact modal
       this.isCreateContactModalOpen = true;
+      if (contact) {
+        this.$nextTick(() => {
+          this.$dispatch('init-create-contact-modal-data', contact);
+        });
+      }
     },
     closeCreateContactModal(event) {
       if (event.target.id !== 'create-contact-modal') {

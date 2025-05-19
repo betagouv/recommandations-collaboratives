@@ -23,7 +23,7 @@ Alpine.data('CreateContactModal', () => {
         isFormatEmailValid: false,
       },
     },
-    init() {
+    init(contact = null) {
       this.Modal = Modal(this, 'create-contact-modal');
     },
     createContact(isItReturningData = false) {
@@ -87,6 +87,16 @@ Alpine.data('CreateContactModal', () => {
       }
       this.isCreateOrganizationModalOpen = false;
       this.modalCreateContact.classList.toggle('d-none');
+    },
+    initCreateContactModalData($event) {
+      this.contact = $event.detail;
+      this.formState.fields.isOrgaSelected = true;
+      this.formState.fields.isJobSelected = Boolean(this.contact.division);
+      this.formState.fields.isMailOrPhone =
+        this.contact.email.length !== 0 || this.contact.phone_no.length !== 0;
+      this.formState.fields.isFormatEmailValid = this.contact.email.match(
+        /^[\w.\-]+@([\w\-]+\.)+[\w\-]{2,4}$/
+      );
     },
   };
 });

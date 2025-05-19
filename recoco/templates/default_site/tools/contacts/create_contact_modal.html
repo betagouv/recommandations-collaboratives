@@ -7,6 +7,7 @@
 <template x-if="isCreateContactModalOpen">
     <div x-data="CreateContactModal"
          @modal-response="closeCreateOrganizationModal($event)"
+         @init-create-contact-modal-data.window="initCreateContactModalData($event)"
          id="create-contact-modal">
         <div x-ref="createContactModal"
              @set-organization="handleSetOrganization($event.detail)"

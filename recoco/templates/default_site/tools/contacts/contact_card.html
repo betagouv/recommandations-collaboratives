@@ -103,7 +103,7 @@ Example usage in parent:
         {% if button_actions %}
             <div class="button__actions">
                 <button class="fr-btn fr-btn--tertiary-no-outline fr-btn--sm fr-icon-pencil-line button__actions-edit"
-                        @click="openModalCreateContact">Éditer le contact</button>
+                        @click="openModalCreateContact(contact)">Éditer le contact</button>
                 <div x-data="{ openDeleteContact: false }"
                      @click.outside="openDeleteContact = false"
                      class="position-relative">

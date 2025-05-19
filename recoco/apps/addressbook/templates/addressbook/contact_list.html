@@ -51,9 +51,6 @@
                 </div>
                 <button class="actions__add-contact no-wrap fr-btn fr-btn--icon-left fr-icon-add-line"
                         @click="openModalCreateContact">Créer un contact</button>
-                {% comment %} {% include "tools/contacts/search_contact_modal.html" %} {% endcomment %}
-                {% include "tools/contacts/create_contact_modal.html" with isItReturningData=False %}
-                {% comment %} {% include "tools/contacts/create_organization_modal.html" %} {% endcomment %}
             </div>
             <div class="header__filter">
                 <template x-for="letter of letters">
@@ -90,6 +87,6 @@
                 </div>
             </template>
         </div>
-        {% comment %} {% include "tools/contacts/search_contact_modal.html" %} {% endcomment %}
+        {% include "tools/contacts/create_contact_modal.html" with isItReturningData=False %}
     </div>
 {% endblock content %}
