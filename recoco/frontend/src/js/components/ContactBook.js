@@ -37,7 +37,6 @@ Alpine.data('ContactBook', () => {
           ).data.departments;
         }
       }
-      console.log(organizationList);
     },
     searchContacts(search) {
       this.searchParams.search = search;
@@ -83,9 +82,6 @@ Alpine.data('ContactBook', () => {
     closeCreateContactModal(event) {
       if (event.target.id !== 'create-contact-modal') {
         return;
-      }
-      if (event.detail) {
-        this.onSelect(event.detail);
       }
       this.isCreateContactModalOpen = false;
       this.modalSearchContact.classList.toggle('d-none');

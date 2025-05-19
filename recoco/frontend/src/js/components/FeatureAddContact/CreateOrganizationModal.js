@@ -68,7 +68,6 @@ Alpine.data('CreateOrganizationModal', (organizationName) => {
       try {
         const response = await api.get(departmentsUrl());
         this.departments = response.data;
-        console.log(this.departments);
       } catch (error) {
         console.log(error);
         throw new Error('Error while fetching departments ', error);

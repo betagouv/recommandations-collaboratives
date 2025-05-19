@@ -26,7 +26,7 @@ Alpine.data('CreateContactModal', () => {
     init() {
       this.Modal = Modal(this, 'create-contact-modal');
     },
-    createContact() {
+    createContact(isItReturningData = false) {
       try {
         this.formState.fields = {
           isOrgaSelected: this.contact.organization !== '',
@@ -51,7 +51,14 @@ Alpine.data('CreateContactModal', () => {
           };
 
           api.post(contactsUrl(), payload).then((response) => {
-            this.Modal.responseModal({ ...this.contact, id: response.data.id });
+            if (isItReturningData) {
+              this.Modal.responseModal({
+                ...this.contact,
+                id: response.data.id,
+              });
+            } else {
+              this.Modal.closeModal();
+            }
           });
         }
       } catch (error) {
