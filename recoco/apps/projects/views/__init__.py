@@ -31,6 +31,7 @@ from recoco.apps.communication.digests import normalize_user_name
 from recoco.apps.geomatics import models as geomatics_models
 from recoco.apps.geomatics.serializers import DepartmentSerializer, RegionSerializer
 from recoco.apps.home.models import AdvisorAccessRequest
+from recoco.apps.projects.models import ProjectCreationRequest
 from recoco.utils import (
     check_if_advisor,
     get_group_for_site,
@@ -96,6 +97,10 @@ def project_moderation_list(request):
         .select_related("user")
     ).order_by("-created")
 
+    project_creation_requests = ProjectCreationRequest.objects.on_site.order_by(
+        "-created"
+    )
+
     return render(
         request,
         "projects/projects_moderation.html",
@@ -103,6 +108,7 @@ def project_moderation_list(request):
             "site_config": site_config,
             "draft_projects": draft_projects,
             "advisor_access_requests": advisor_access_requests,
+            "project_creation_requests": project_creation_requests,
         },
     )
 
