@@ -23,7 +23,7 @@ Alpine.data('CreateContactModal', () => {
         isFormatEmailValid: false,
       },
     },
-    init(contact = null) {
+    init() {
       this.Modal = Modal(this, 'create-contact-modal');
     },
     createContact(isItReturningData = false) {
