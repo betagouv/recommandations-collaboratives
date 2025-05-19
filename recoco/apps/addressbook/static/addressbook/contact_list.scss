@@ -35,6 +35,12 @@
       text-decoration-thickness: auto;
       text-underline-offset: auto;
       text-underline-position: from-font;
+      &--active {
+        color: var(--light-background-action-high-blue-france, #000091);
+        font-weight: 700;
+        font-size: 18px;
+        text-decoration: none;
+      }
     }
   }
   &__list {

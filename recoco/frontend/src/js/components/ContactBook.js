@@ -23,6 +23,9 @@ Alpine.data('ContactBook', () => {
           response.data.results
         );
         this.getDepartmentsOrganization(this.contactListGroupByOrganization);
+        if (sessionStorage.getItem('letter')) {
+          this.loadOrganizationStartingWith(sessionStorage.getItem('letter'));
+        }
       } catch (error) {
         // TODO add a toast
         console.error(error);
@@ -47,6 +50,8 @@ Alpine.data('ContactBook', () => {
         return;
       }
       this.searchParams.letter = letter;
+      sessionStorage.setItem('letter', letter);
+
       this.getContactData();
     },
     async getContactData() {
@@ -73,6 +78,12 @@ Alpine.data('ContactBook', () => {
         });
       }
       return contactByOrganizationArray;
+    },
+
+    resetLetterFilter() {
+      this.searchParams.letter = null;
+      sessionStorage.removeItem('letter');
+      this.getContactData();
     },
 
     deleteContact(contact) {
