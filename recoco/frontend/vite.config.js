@@ -79,7 +79,7 @@ const config = {
         ),
         User: resolve('./src/js/components/User.js'),
         MutliSelect: resolve('./src/js/components/MultiSelect.js'),
-        ContactBook: resolve('./src/js/store/ContactBook.js'),
+        ContactBook: resolve('./src/js/components/ContactBook.js'),
       },
       output: {
         chunkFileNames: undefined,
