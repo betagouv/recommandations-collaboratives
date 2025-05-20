@@ -97,9 +97,7 @@ def project_moderation_list(request):
         .select_related("user")
     ).order_by("-created")
 
-    project_creation_requests = ProjectCreationRequest.objects.on_site.order_by(
-        "-created"
-    )
+    project_creation_requests = ProjectCreationRequest.on_site.order_by("-created")
 
     return render(
         request,
