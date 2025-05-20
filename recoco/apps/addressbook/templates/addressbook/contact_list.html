@@ -61,9 +61,8 @@
                 </template>
                 <template x-if="searchParams.letter">
                     <div>
-                        <span> - </span>
-                        <button class="header__filter-letter"
-                                @click="resetLetterFilter">supprimer le filtre</button>
+                        <span>-</span>
+                        <button class="header__filter-letter" @click="resetLetterFilter">supprimer le filtre</button>
                     </div>
                 </template>
             </div>
@@ -87,7 +86,8 @@
                     </div>
                     <div class="contact-list__list-container">
                         <template x-for="contact in organization.contacts" :key="contact.id">
-                            <div x-data="{contact:contact}" class="contact-list__list-item">
+                            <div x-data="{contact:contact, isOpenDeleteContact: false}"
+                                 class="contact-list__list-item">
                                 {% include "tools/contacts/contact_card.html" with button_actions=True %}
                             </div>
                         </template>

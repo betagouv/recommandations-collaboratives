@@ -89,7 +89,7 @@ Alpine.data('CreateContactModal', () => {
       this.modalCreateContact.classList.toggle('d-none');
     },
     initCreateContactModalData($event) {
-      this.contact = $event.detail;
+      this.contact = { ...$event.detail };
       this.formState.fields.isOrgaSelected = true;
       this.formState.fields.isJobSelected = Boolean(this.contact.division);
       this.formState.fields.isMailOrPhone =

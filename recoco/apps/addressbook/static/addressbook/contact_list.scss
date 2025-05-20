@@ -161,9 +161,8 @@
           }
         }
       }
-      &:hover.actions {
-        //TODO: Uncomment this line and delete the next line
-        // &.actions {
+      &:hover.actions,
+      &.actions.active {
         border: 1px solid var(--light-border-action-high-blue-france, #000091);
         .button__actions {
           position: absolute;
