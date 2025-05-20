@@ -107,7 +107,6 @@ Alpine.data('ContactBook', () => {
         return;
       }
       this.isCreateContactModalOpen = false;
-      this.modalSearchContact.classList.toggle('d-none');
     },
   };
 });
