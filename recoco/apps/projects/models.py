@@ -580,6 +580,8 @@ class Project(models.Model):
             ("manage_advisors", "Can manage advisors"),
             # Geolocation
             ("change_location", "Can change the geolocation"),
+            # Project tags
+            ("use_project_tags", "Can use tags on projects"),
         )
 
     def __str__(self):  # pragma: nocover
