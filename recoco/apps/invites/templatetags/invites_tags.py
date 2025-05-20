@@ -8,4 +8,4 @@ register = template.Library()
 @register.simple_tag
 def pending_invitations_for(user):
     """Return a list of projects tagged with the given tag"""
-    return Invite.objects.pending().filter(email=user.username)
+    return Invite.on_site.pending().filter(email=user.username)
