@@ -129,7 +129,7 @@ export function contactsUrl(limit) {
 }
 
 export function contactUrl(contactId) {
-  return `/api/addressbook/contacts/${contactId}`;
+  return `/api/addressbook/contacts/${contactId}/`;
 }
 
 // Topic

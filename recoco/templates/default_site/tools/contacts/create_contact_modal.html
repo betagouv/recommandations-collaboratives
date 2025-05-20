@@ -14,7 +14,8 @@
              class="modal-create-contact z-2">
             <form @submit.prevent>
                 <div class="d-flex justify-content-between border-bottom-666 fr-p-3v modal-create-contact__block">
-                    <p class="fw-bold color-666 correct-p text-uppercase">Attacher un contact</p>
+                    <p class="fw-bold color-666 correct-p text-uppercase"
+                       x-text="isFormInEditMode ? 'Modifier un contact' : 'Attacher un contact'"></p>
                     <span class="fr-icon-close-line color-666 cursor-pointer"
                           aria-hidden="true"
                           @click.prevent="Modal.closeModal()"></span>
@@ -22,11 +23,17 @@
                 {% include "tools/contacts/search_organization.html" %}
                 <div class="fr-p-3v modal-create-contact__block">
                     <label class="modal-create-contact__label">Nom</label>
-                    <input type="text" class="fr-input" x-model="contact.last_name" data-test-id="last-name">
+                    <input type="text"
+                           class="fr-input"
+                           x-model="contact.last_name"
+                           data-test-id="last-name">
                 </div>
                 <div class="fr-p-3v modal-create-contact__block">
                     <label class="modal-create-contact__label">Prénom</label>
-                    <input type="text" class="fr-input" x-model="contact.first_name" data-test-id="first-name">
+                    <input type="text"
+                           class="fr-input"
+                           x-model="contact.first_name"
+                           data-test-id="first-name">
                 </div>
                 <div class="fr-p-3v modal-create-contact__block"
                      :class="{'fr-input-group--error': formState.isSubmitted && !formState.fields.isJobSelected}">
@@ -82,10 +89,9 @@
                     <button class="fr-btn fr-btn--secondary fr-mr-3v w-100 justify-content-center"
                             @click.prevent="Modal.closeModal()">Annuler</button>
                     <button class="fr-btn w-100 justify-content-center"
-                            {% if isItReturningData == True %} @click="createContact(true)"
-                            {% else %} @click="createContact(false)"
-                            {% endif %}
-                            data-test-id="create-contact-button">Créer le contact</button>
+                            {% if isItReturningData == True %} @click="isFormInEditMode ? updateContact() : createContact(true)" {% else %} @click="isFormInEditMode ? updateContact() : createContact(false)" {% endif %}
+                            data-test-id="create-contact-button"
+                            x-text="isFormInEditMode ? 'Modifier le contact' : 'Créer le contact'"></button>
                 </div>
             </form>
         </div>

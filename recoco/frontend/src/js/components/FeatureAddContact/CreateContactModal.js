@@ -1,10 +1,11 @@
 import Alpine from 'alpinejs';
-import api, { contactsUrl } from '../../utils/api';
+import api, { contactsUrl, contactUrl } from '../../utils/api';
 import { Modal } from '../../models/Modal.model';
 
 Alpine.data('CreateContactModal', () => {
   return {
     Modal: null,
+    isFormInEditMode: false,
     contact: {
       organization: { name: '' },
       last_name: '',
@@ -66,6 +67,40 @@ Alpine.data('CreateContactModal', () => {
         throw new Error('Error while creating a contact ', error);
       }
     },
+    updateContact() {
+      try {
+        this.formState.fields = {
+          isOrgaSelected: this.contact.organization !== '',
+          isJobSelected: Boolean(this.contact.division),
+          isMailOrPhone:
+            this.contact.email.length !== 0 ||
+            this.contact.phone_no.length !== 0,
+          isFormatEmailValid: this.contact.email
+            ? this.contact.email.match(/^[\w.\-]+@([\w\-]+\.)+[\w\-]{2,4}$/)
+            : true,
+        };
+
+        this.formState.isSubmitted = true;
+        if (
+          this.contact.organization &&
+          this.contact.division.length > 0 &&
+          (this.contact.email.length > 0 || this.contact.phone_no.length > 0)
+        ) {
+          let payload = {
+            ...this.contact,
+            organization: this.contact.organization.id,
+          };
+
+          api.patch(contactUrl(this.contact.id), payload).then((response) => {
+            this.Modal.closeModal();
+            location.reload();
+          });
+        }
+      } catch (error) {
+        console.log(error);
+        throw new Error('Error while creating a contact ', error);
+      }
+    },
     handleSetOrganization(organization) {
       this.contact.organization = organization;
     },
@@ -90,6 +125,9 @@ Alpine.data('CreateContactModal', () => {
     },
     initCreateContactModalData($event) {
       this.contact = { ...$event.detail };
+      if (this.contact.id) {
+        this.isFormInEditMode = true;
+      }
       this.formState.fields.isOrgaSelected = true;
       this.formState.fields.isJobSelected = Boolean(this.contact.division);
       this.formState.fields.isMailOrPhone =
