@@ -22,7 +22,7 @@
                 <div class="w-100"
                      x-data="alpineMultiSelect({selected:selectedDepartments, objectsToSelect})">
                     <!-- Select Options -->
-                    <select class="d-none" x-on:change="init">
+                    <select class="d-none" x-on:change="init" id="select-list">
                         <template x-for="department in objectsToSelect" :key="department.code">
                             <option :value="department.code"
                                     :data-search="'(' + department.code + ')' + ' ' + department.name"
@@ -47,7 +47,8 @@
                                                          x-model="selectedElms[option]"
                                                          x-text="option.text"></div>
                                                     <div class="d-flex flex-auto flex-row-reverse">
-                                                        <div x-on:click.stop="remove(index,option)" data-test-id="remove-selected-item">
+                                                        <div x-on:click.stop="remove(index,option)"
+                                                             data-test-id="remove-selected-item">
                                                             <svg xmlns="http://www.w3.org/2000/svg"
                                                                  class="little-img fr-ml-1v"
                                                                  fill="none"
