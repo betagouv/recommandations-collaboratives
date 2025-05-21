@@ -3,7 +3,7 @@
 
     Parameters django template:
     - placeholder: The placeholder text for the input.
-
+    - label: The label text for the input.
     Parameters alpine:
     - objectsToSelect: The objects to select from.
 {% endcomment %}
@@ -16,7 +16,7 @@
 <template x-if="objectsToSelect">
     <div class="bg-white">
         <div>
-            <label class="modal-create-organization__label" for="select-list-input">Départements</label>
+            <label class="modal-create-organization__label" for="select-list-input">{{ label|default:'Départements' }}</label>
             <div class="d-flex justify-center mt-8">
                 <!-- Define component with preselected options -->
                 <div class="w-100"
