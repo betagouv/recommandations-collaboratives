@@ -10,7 +10,7 @@
     Carnet de contacts {{ block.super }}
 {% endblock og_title %}
 {% block css %}
-    <link href="{% sass_src 'addressbook/contact_list.scss' %}"
+    <link href="{% sass_src 'addressbook/css/contact_list.scss' %}"
           rel="stylesheet"
           type="text/css">
 {% endblock css %}
@@ -96,7 +96,8 @@
             </template>
             <template x-if="contactListGroupByOrganization.length === 0">
                 <div class="no-contacts fr-m-2w">
-                    <p class="no-contacts__text">Aucun contact trouvé.</p><br>
+                    <p class="no-contacts__text">Aucun contact trouvé.</p>
+                    <br>
                     <p class="no-contacts__text fr-m-0">Vous pouvez créer un contact en cliquant sur le bouton ci-dessus.</p>
                 </div>
             </template>
