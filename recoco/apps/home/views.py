@@ -356,7 +356,9 @@ def advisor_access_request_moderator_view(
         form = AdvisorAccessRequestForm(request.POST)
         if form.is_valid():
             advisor_access_request.departments.set(form.cleaned_data["departments"])
-            return redirect(redirect_url)
+            return redirect(
+                f"{redirect_url}?advisor_access_request_firstname={advisor_access_request.user.first_name}&advisor_access_request_lastname={advisor_access_request.user.last_name}"
+            )
 
     return render(
         request,
