@@ -374,7 +374,9 @@ django-modelcluster==6.4 \
 django-modeltree==0.6 \
     --hash=sha256:60305500255f2738bd254e80ab6939d6744679ba3bc1146cbddfbd27449bd257 \
     --hash=sha256:b99bd64715086b573473c9cc789c1ca73709424a9b16ca0840fc7ece1cec1be9
-django-multisite @ git+https://github.com/protoroto/django-multisite.git@08b6ca0c8011cd85afd7dcf0ef0c00998305f05c
+django-multisite2==2.0.1 \
+    --hash=sha256:633cc8d95e51205c998ada6eea6a84037800245c614f8a5c0a55d5b95c0ae6f5 \
+    --hash=sha256:bae603a76baf7035e776ae3c8289c79ea1336881694b96690f2745e94388c3ae
 django-notifications-hq @ git+https://github.com/glibersat/django-notifications.git@30e6c7901520d46877790e5c87767caa98925b2a
 django-ordered-model==3.7.4 \
     --hash=sha256:dfcd3183fe0749dad1c9971cba1d6240ce7328742a30ddc92feca41107bb241d \
@@ -1381,9 +1383,9 @@ terminado==0.18.1 \
 tinycss2==1.4.0 \
     --hash=sha256:10c0972f6fc0fbee87c3edb76549357415e94548c1ae10ebccdea16fb404a9b7 \
     --hash=sha256:3a49cf47b7675da0b15d0c6e1df8df4ebd96e9394bb905a5775adb0d884c5289
-tldextract==2.2.3 \
-    --hash=sha256:ab0e38977a129c72729476d5f8c85a8e1f8e49e9202e1db8dca76e95da7be9a8 \
-    --hash=sha256:c2a8a392edf3ea6fa8be80930f04c3ac29e91fa604cb2139bdf6a37fc1e1ac6d
+tldextract==5.3.0 \
+    --hash=sha256:b3d2b70a1594a0ecfa6967d57251527d58e00bb5a91a74387baa0d87a0678609 \
+    --hash=sha256:f70f31d10b55c83993f55e91ecb7c5d84532a8972f22ec578ecfbe5ea2292db2
 toml==0.10.2 \
     --hash=sha256:806143ae5bfb6a3c6e736a764057db0e6a0e05e338b5630894a5f779cabb4f9b \
     --hash=sha256:b3bda1d108d5dd99f4a20d24d9c348e91c4db7ab1b749200bded2f839ccbe68f
