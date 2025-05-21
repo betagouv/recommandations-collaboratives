@@ -11,6 +11,7 @@ recursive-include recoco/apps/resources/static *.*
 recursive-include recoco/apps/crm/static *.*
 recursive-include recoco/apps/onboarding/static *.*
 recursive-include recoco/apps/survey/static *.*
+recursive-include recoco/apps/addressbook/static *.*
 recursive-include recoco/apps/resources *.md
 recursive-include recoco/sql/ *.sql
 recursive-include recoco/apps/ *.html

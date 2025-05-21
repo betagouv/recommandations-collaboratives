@@ -38,6 +38,11 @@ urlpatterns = [
         name="addressbook-organization-contact-create",
     ),
     path(
+        r"addressbook/contacts/",
+        views.contact_list,
+        name="addressbook-contact-list",
+    ),
+    path(
         r"addressbook/contact/<int:contact_id>/update/",
         views.contact_update,
         name="addressbook-organization-contact-update",
