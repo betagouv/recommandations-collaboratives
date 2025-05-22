@@ -90,6 +90,15 @@ def project_moderation_list(request):
         .select_related("user")
     ).order_by("-created")
 
+    advisor_access_request_name = request.GET.get("advisor_access_request_firstname")
+    advisor_access_request_lastname = request.GET.get("advisor_access_request_lastname")
+    if advisor_access_request_name is not None:
+        messages.add_message(
+            request,
+            messages.SUCCESS,
+            f"'{advisor_access_request_name}' '{advisor_access_request_lastname}' modifié.",
+        )
+
     return render(
         request,
         "projects/projects_moderation.html",
@@ -119,7 +128,7 @@ def project_moderation_project_refuse(request: HttpRequest, project_id: int):
         project.save()
 
         messages.add_message(
-            request, messages.INFO, f"Le dossier '{project.name}' a été refusé."
+            request, messages.SUCCESS, f"Le dossier '{project.name}' a été refusé."
         )
 
     return redirect(reverse("projects-moderation-list"))
@@ -218,7 +227,7 @@ def project_moderation_project_accept(request: HttpRequest, project_id: int):
                 assign_advisor(request.user, project, request.site)
                 messages.add_message(
                     request,
-                    messages.INFO,
+                    messages.SUCCESS,
                     f"Vous êtes maintenant conseiller·ère du dossier '{project.name}'.",
                 )
 
@@ -248,7 +257,7 @@ def project_moderation_advisor_refuse(
 
     messages.add_message(
         request,
-        messages.INFO,
+        messages.SUCCESS,
         f"La demande d'accès conseiller pour '{advisor_access_request.user.email}' a été refusée.",
     )
 
@@ -282,7 +291,7 @@ def project_moderation_advisor_accept(
 
     messages.add_message(
         request,
-        messages.INFO,
+        messages.SUCCESS,
         f"La demande d'accès conseiller pour '{advisor_access_request.user.email}' a été acceptée.",
     )
 
