@@ -156,7 +156,7 @@ TEMPLATES = [
             ],
             "loaders": [
                 "dbtemplates.loader.Loader",
-                "multisite.template.loaders.filesystem.Loader",
+                "recoco.template_loaders.Loader",
                 "django.template.loaders.app_directories.Loader",
             ],
             "libraries": {
