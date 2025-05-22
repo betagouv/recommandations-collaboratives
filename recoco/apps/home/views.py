@@ -70,6 +70,11 @@ class LoginRedirectView(View):
 class RegionalActorsPageView(TemplateView):
     template_name = "home/regional_actors.html"
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["is_switchtender"] = check_if_advisor(self.request.user)
+        return context
+
 
 class MethodologyPageView(TemplateView):
     template_name = "home/methodology.html"

@@ -82,7 +82,7 @@
                              aria-live="assertive"
                              aria-atomic="true"
                              x-ref="toastContainer">
-                            <div class="toast-header {% if message.level == DEFAULT_MESSAGE_LEVELS.SUCCESS %}bg-success text-white{% endif %} {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}bg-error text-white{% endif %}">
+                            <div class="toast-header {% if message.level == DEFAULT_MESSAGE_LEVELS.SUCCESS %}bg-success text-white{% endif %} {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}bg-danger text-white{% endif %}">
                                 {% if "email" in message.tags %}
                                     <strong class="fr-mr-auto">
                                         <svg class="bi fr-mr-1v" width="16" height="16" fill="currentColor">

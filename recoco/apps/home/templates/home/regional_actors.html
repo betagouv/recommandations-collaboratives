@@ -31,8 +31,11 @@
                     </p>
                     <ul class="fr-btns-group fr-btns-group--inline fr-mb-2v">
                         <li>
-                            <a href="{% url 'home-contact' %}?subject=Demande d’accès à UrbanVitaliz en tant que conseiller·e"
-                               class="fr-btn fr-text--xl">Demander un accès</a>
+                            {% if is_switchtender %}
+                                <a href="{% url 'projects-project-list' %}" class="fr-btn fr-text--xl">Accéder à la liste des dossiers</a>
+                            {% else %}
+                                <a href="{% url 'advisor-access-request' %}" class="fr-btn fr-text--xl">Demander un accès</a>
+                            {% endif %}
                         </li>
                     </ul>
                     <div>
