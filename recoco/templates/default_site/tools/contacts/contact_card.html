@@ -40,7 +40,8 @@ Example usage in parent:
 {% endblock css %}
 <template x-if="contact">
     <div x-data="User()"
-         class="contact-card fr-p-3v bg-white"
+         class="contact-card fr-p-3v bg-white {% if button_actions %}actions{% endif %}"
+         :class="{'active': isOpenDeleteContact}"
          data-test-id="contact-card">
         <div class="contact-card__firstline-container">
             <span x-show="contact.first_name || contact.last_name"
@@ -100,6 +101,60 @@ Example usage in parent:
                       x-text="`${formatDate(contact.created, { year: 'numeric', month: 'long', day: 'numeric' })}`"></span>
             </div>
         </template>
+        {% if button_actions %}
+            <div class="button__actions">
+                <button class="fr-btn fr-btn--tertiary-no-outline fr-btn--sm fr-icon-pencil-line button__actions-edit"
+                        @click="openModalCreateContact(contact)">Éditer le contact</button>
+                <div @click.outside="isOpenDeleteContact = false"
+                     class="position-relative">
+                    <button class="fr-btn fr-btn--tertiary-no-outline fr-btn--sm fr-icon-delete-line button__actions-delete"
+                            @click="isOpenDeleteContact = !isOpenDeleteContact">Supprimer le contact</button>
+                    <ul x-show="isOpenDeleteContact"
+                        :class="{'isOpenDeleteContact':open}"
+                        class="modal__confirm-delete positioning-dropdown">
+                        <li class="modal__header">
+                            Supprimer un contact
+                            <button class="notification__icon"
+                                    title="Fermer le menu"
+                                    @click="isOpenDeleteContact = false">
+                                <svg class="bi fr-mr-1v" width="16" height="16" fill="currentColor">
+                                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#x-lg" />
+                                </svg>
+                            </button>
+                        </li>
+                        <li>
+                            <hr class="dropdown-divider fr-pb-0">
+                        </li>
+                        <li class="modal__body">
+                            <p class="modal__text">Êtes-vous sûr de vouloir supprimer le contact suivant :</p>
+                            <div class="contact__resume">
+                                <div>
+                                    <span x-show="contact.first_name"
+                                          x-text="contact.first_name"
+                                          class="contact-names fr-pr-1v no-wrap"></span>
+                                    <span x-show="contact.last_name"
+                                          x-text="contact.last_name"
+                                          class="contact-names fr-pr-1v no-wrap"></span>
+                                    <span x-show="contact.organization.name"
+                                          x-text="contact.organization.name"
+                                          class="color-3a3a3a text-organisation"></span>
+                                </div>
+                                <div x-show="contact.division">
+                                    <span x-text="contact.division" class="color-3a3a3a text-position"></span>
+                                </div>
+                            </div>
+                        </li>
+                        <li>
+                            <hr class="dropdown-divider fr-pb-0">
+                        </li>
+                        <li class="modal__footer d-inline-flex gap-1">
+                            <button class="modal__footer-cancel" @click="openDeleteContact = false">Annuler</button>
+                            <button class="modal__footer-confirm" @click="deleteContact(contact)">Confirmer la suppression</button>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        {% endif %}
     </div>
 </template>
 {% if is_django_data %}
