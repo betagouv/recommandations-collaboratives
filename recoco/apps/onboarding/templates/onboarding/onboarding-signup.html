@@ -59,7 +59,7 @@
             <div class="onboarding__form"
                  x-data="DsrcFormValidator('{{ form.helper.form_id }}', schemaValidator, '{{ request.method }}')"
                  x-init="init">
-                {% include "onboarding/fragments/form-user.html" with include_password_field=True %}
+                {% include "onboarding/fragments/form-user.html" with include_password_field=True include_message_field=False %}
             </div>
         </div>
     </div>

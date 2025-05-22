@@ -10,6 +10,7 @@ created: 2023-07-17 20:39:35 CEST
 from django.contrib import messages
 from django.contrib.auth import models as auth
 from django.contrib.sites import models as sites
+from django.http import HttpRequest
 
 from recoco.apps.communication import constants as communication_constants
 from recoco.apps.communication import digests
@@ -60,19 +61,22 @@ def email_owner_of_project(
 
 
 def invite_user_to_project(
-    request, user: auth.User, project: projects.Project, is_new_user: bool
+    request: HttpRequest,
+    user: auth.User,
+    project: projects.Project,
+    message: str | None = None,
 ):
+    message = message or (
+        "Je viens de déposer votre dossier sur la "
+        "plateforme de manière à faciliter nos échanges."
+    )
+
     invite, _ = invites.Invite.objects.get_or_create(
         project=project,
         inviter=request.user,
         site=request.site,
         email=user.email,
-        defaults={
-            "message": (
-                "Je viens de déposer votre dossier sur la"
-                "plateforme de manière à faciliter nos échanges."
-            )
-        },
+        defaults={"message": message},
     )
 
     send_email(
