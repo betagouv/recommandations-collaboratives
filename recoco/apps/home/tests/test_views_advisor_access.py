@@ -179,7 +179,10 @@ class TestAdvisorAccessRequestModeratorView:
 
         response = client.post(url, data={"departments": ["64", "33"]})
         assert response.status_code == 302
-        assert response.url == reverse("projects-moderation-list")
+        assert (
+            response.url
+            == f"{reverse('projects-moderation-list')}?advisor_access_request_firstname={user.first_name}&advisor_access_request_lastname={user.last_name}"
+        )
 
         advisor_access_request.refresh_from_db()
         assert list(
