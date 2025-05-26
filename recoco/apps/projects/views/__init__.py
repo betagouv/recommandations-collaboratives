@@ -13,6 +13,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
+from django.db.models import Prefetch
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -86,7 +87,12 @@ def project_moderation_list(request):
 
     advisor_access_requests = (
         AdvisorAccessRequest.on_site.pending()
-        .prefetch_related("departments")
+        .prefetch_related(
+            Prefetch(
+                "departments",
+                queryset=geomatics_models.Department.objects.order_by("code"),
+            )
+        )
         .select_related("user")
     ).order_by("-created")
 
@@ -263,9 +269,7 @@ def project_moderation_advisor_accept(
     is_project_moderator_or_403(request.user, request.site)
 
     advisor_access_request = get_object_or_404(
-        AdvisorAccessRequest.on_site.prefetch_related("departments").select_related(
-            "user"
-        ),
+        AdvisorAccessRequest.on_site.select_related("user"),
         pk=advisor_access_request_id,
     )
 
@@ -297,9 +301,7 @@ def project_moderation_advisor_modify(
     is_project_moderator_or_403(request.user, request.site)
 
     advisor_access_request = get_object_or_404(
-        AdvisorAccessRequest.on_site.prefetch_related("departments").select_related(
-            "user"
-        ),
+        AdvisorAccessRequest.on_site.select_related("user"),
         pk=advisor_access_request_id,
     )
 
