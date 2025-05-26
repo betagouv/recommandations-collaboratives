@@ -92,7 +92,10 @@ def project_moderation_list(request):
 
     advisor_access_request_name = request.GET.get("advisor_access_request_firstname")
     advisor_access_request_lastname = request.GET.get("advisor_access_request_lastname")
-    if advisor_access_request_name is not None:
+    if (
+        advisor_access_request_name is not None
+        and advisor_access_request_lastname is not None
+    ):
         messages.add_message(
             request,
             messages.SUCCESS,
