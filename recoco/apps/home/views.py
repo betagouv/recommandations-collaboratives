@@ -285,7 +285,8 @@ def advisor_access_request_view(request: HttpRequest) -> HttpResponse:
     )
 
     departments = departments = [
-        {"name": d.name, "code": d.code} for d in Department.objects.exclude(code="")
+        {"name": d.name, "code": d.code}
+        for d in Department.objects.exclude(code="").order_by("code")
     ]
 
     selected_departments = (
@@ -337,7 +338,10 @@ def advisor_access_request_moderator_view(
         pk=advisor_access_request_id,
     )
 
-    departments = [{"name": d.name, "code": d.code} for d in Department.objects.all()]
+    departments = [
+        {"name": d.name, "code": d.code}
+        for d in Department.objects.exclude(code="").order_by("code")
+    ]
 
     selected_departments = [
         department.code for department in advisor_access_request.departments.all()
