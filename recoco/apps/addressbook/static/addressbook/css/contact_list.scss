@@ -200,3 +200,23 @@
   align-self: stretch;
   width: 100%;
 }
+
+.specific-banner {
+  border-radius: 1px;
+  background: var(--light-background-alt-grey, #f6f6f6);
+  text-align: center;
+}
+
+.text-style {
+  color: var(--light-text-mention-grey, #666);
+  text-align: right;
+  font-family: Marianne;
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 150%;
+}
+
+.correct-p {
+  margin-bottom: 0px;
+}

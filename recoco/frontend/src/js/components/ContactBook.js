@@ -4,7 +4,7 @@ import api, {
   searchContactsUrl,
   getOrganizationById,
 } from '../utils/api';
-
+import _ from 'lodash';
 import { formatDate } from '../utils/date';
 
 Alpine.data('ContactBook', () => {
@@ -65,7 +65,7 @@ Alpine.data('ContactBook', () => {
     },
 
     groupContactByOrganization(contactList) {
-      const contactByOrganization = Object.groupBy(
+      const contactByOrganization = _.groupBy(
         contactList,
         ({ organization: { name } }) => name
       );
