@@ -30,7 +30,6 @@ Alpine.data('CreateContactModal', () => {
     createContact(isItReturningData = false) {
       try {
         this.formState.fields = {
-          isOrgaSelected: this.contact.organization.name !== '',
           isJobSelected: Boolean(this.contact.division),
           isMailOrPhone:
             this.contact.email.length !== 0 ||
@@ -69,7 +68,6 @@ Alpine.data('CreateContactModal', () => {
     updateContact() {
       try {
         this.formState.fields = {
-          isOrgaSelected: this.contact.organization !== '',
           isJobSelected: Boolean(this.contact.division),
           isMailOrPhone:
             this.contact.email.length !== 0 ||
@@ -102,6 +100,7 @@ Alpine.data('CreateContactModal', () => {
     },
     handleSetOrganization(organization) {
       this.contact.organization = organization;
+      this.formState.fields.isOrgaSelected = true;
     },
     isCreateOrganizationModalOpen: false,
     openModalCreateOrganization() {
@@ -117,7 +116,6 @@ Alpine.data('CreateContactModal', () => {
       }
       if (event.detail) {
         this.handleSetOrganization(event.detail);
-        this.formState.fields.isOrgaSelected = true;
       }
       this.isCreateOrganizationModalOpen = false;
       this.modalCreateContact.classList.toggle('d-none');
@@ -127,13 +125,17 @@ Alpine.data('CreateContactModal', () => {
       if (this.contact.id) {
         this.isFormInEditMode = true;
       }
-      this.formState.fields.isOrgaSelected = true;
-      this.formState.fields.isJobSelected = Boolean(this.contact.division);
-      this.formState.fields.isMailOrPhone =
-        this.contact.email.length !== 0 || this.contact.phone_no.length !== 0;
-      this.formState.fields.isFormatEmailValid = this.contact.email.match(
-        /^[\w.\-]+@([\w\-]+\.)+[\w\-]{2,4}$/
-      );
+      if (this.contact.organization) {
+        console.log('Organization is  to ', this.contact.organization);
+
+        this.formState.fields.isOrgaSelected = true;
+      }
+      // this.formState.fields.isJobSelected = Boolean(this.contact.division);
+      // this.formState.fields.isMailOrPhone =
+      //   this.contact.email.length !== 0 || this.contact.phone_no.length !== 0;
+      // this.formState.fields.isFormatEmailValid = this.contact.email.match(
+      //   /^[\w.\-]+@([\w\-]+\.)+[\w\-]{2,4}$/
+      // );
     },
   };
 });

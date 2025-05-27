@@ -9,24 +9,28 @@ Alpine.data('SearchOrganization', () => ({
   showOrgAsResults: false,
   selectedOrga: null,
   isAnOrgaSelected: false,
-  init() {
-  },
+  focusOnInput: false,
+  init() {},
   onSearch() {
-    Alpine.$data(this.$el.parentElement).formState.fields.isOrgaSelected = false;
+    this.focusOnInput = true;
+    Alpine.$data(this.$el.parentElement).formState.fields.isOrgaSelected =
+      false;
     this.selectedOrga = null;
     try {
       if (this.userInputSearchOrganization.length > 0) {
         this.orgaFound = [];
-        api.get(searchOrganizationsUrl(this.userInputSearchOrganization)).then((response) => {
-          this.searchResults = response.data;
-          this.orgaFound = this.searchResults.results;
-          if (this.orgaFound.length > 0) {
-            this.sortOrgasResults();
-            this.showOrgAsResults = true;
-          } else {
-            this.showOrgAsResults = false;
-          }
-        });
+        api
+          .get(searchOrganizationsUrl(this.userInputSearchOrganization))
+          .then((response) => {
+            this.searchResults = response.data;
+            this.orgaFound = this.searchResults.results;
+            if (this.orgaFound.length > 0) {
+              this.sortOrgasResults();
+              this.showOrgAsResults = true;
+            } else {
+              this.showOrgAsResults = false;
+            }
+          });
       }
     } catch (error) {
       console.log(error);
@@ -37,7 +41,6 @@ Alpine.data('SearchOrganization', () => ({
     this.selectedOrga = orga;
     this.userInput = orga.name;
     this.showOrgAsResults = false;
-
     this.$dispatch('set-organization', orga);
   },
   sortOrgasResults() {
@@ -70,7 +73,6 @@ Alpine.data('SearchOrganization', () => ({
     }
   },
   handleDisplayOrganizationCreated(organization) {
-
     if (organization.name) {
       this.userInput = organization.name;
     }
