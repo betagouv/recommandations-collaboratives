@@ -13,7 +13,7 @@ from django.contrib.auth import login as log_user
 from django.contrib.auth import models as auth
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ImproperlyConfigured
-from django.db.models import Count, F, Q
+from django.db.models import Count, F, Prefetch, Q
 from django.http import (
     HttpRequest,
     HttpResponse,
@@ -284,7 +284,12 @@ def advisor_access_request_view(request: HttpRequest) -> HttpResponse:
 
     advisor_access_request = (
         AdvisorAccessRequest.objects.filter(user=request.user, site=request.site)
-        .prefetch_related("departments")
+        .prefetch_related(
+            Prefetch(
+                "departments",
+                queryset=Department.objects.order_by("code"),
+            )
+        )
         .select_related("user")
         .first()
     )
@@ -295,7 +300,10 @@ def advisor_access_request_view(request: HttpRequest) -> HttpResponse:
     ]
 
     selected_departments = (
-        [department.code for department in advisor_access_request.departments.all()]
+        [
+            department.code
+            for department in advisor_access_request.departments.order_by("code")
+        ]
         if advisor_access_request
         else []
     )
