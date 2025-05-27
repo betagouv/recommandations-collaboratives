@@ -13,11 +13,6 @@ from . import views
 
 urlpatterns = [
     path(
-        r"onboarding/",
-        views.OnboardingView.as_view(),
-        name="onboarding",
-    ),
-    path(
         r"onboarding/signin",
         views.OnboardingLogin.as_view(),
         name="onboarding-signin",

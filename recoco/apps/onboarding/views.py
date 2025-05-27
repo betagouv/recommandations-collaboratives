@@ -17,7 +17,6 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils.http import urlencode
-from django.views.generic import FormView
 
 from recoco.apps.addressbook import models as addressbook
 from recoco.apps.geomatics import models as geomatics
@@ -65,35 +64,6 @@ class OnboardingLogin(LoginView):
 ########################################################################
 # User driven onboarding for a new project
 ########################################################################
-
-
-class OnboardingView(FormView):
-    """Dispatch user based on auth/provided credentials"""
-
-    form_class = forms.OnboardingEmailForm
-
-    def dispatch(self, request, *args, **kwargs):
-        if request.user.is_authenticated:
-            return redirect(reverse("onboarding-project"))
-
-        return super().dispatch(request, *args, **kwargs)
-
-    def get(self, request, *args, **kwargs):
-        return redirect(reverse("onboarding-signin"))
-
-    def form_valid(self, form):
-        self.request.session["onboarding_email"] = form.cleaned_data["email"]
-        try:
-            auth.User.objects.get(username=form.cleaned_data["email"])
-            next_args = urlencode({"next": reverse("onboarding-project")})
-            login_url = reverse("onboarding-signin")
-            return redirect(f"{login_url}?{next_args}")
-        except auth.User.DoesNotExist:
-            signup_url = reverse("onboarding-signup")
-            return redirect(signup_url)
-
-    def form_invalid(self, form):
-        return redirect(reverse("onboarding-signin"))
 
 
 def onboarding_signup(request):
@@ -150,7 +120,6 @@ def onboarding_signup(request):
     return render(request, "onboarding/onboarding-signup.html", context)
 
 
-@login_required
 def onboarding_project(request):
     """Return the onboarding page and process onboarding submission"""
     site_config = get_site_config_or_503(request.site)

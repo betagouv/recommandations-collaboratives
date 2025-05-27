@@ -98,36 +98,6 @@ class SelectCommuneForm(forms.Form):
 ##################################################
 # Onboarding multi-step forms
 ##################################################
-class OnboardingEmailForm(DsrcBaseForm):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.helper.form_id = "id-onboarding-email-form"  # The form id is used for validation, it must be set and unique in the page
-        self.helper.form_method = "post"
-        self.helper.action_button = {
-            "submit": {
-                "label": "Décrivez votre demande",
-            }
-        }
-        self.helper.layout = Layout(
-            Fieldset(
-                "",  # The first argument is the legend of the fieldset
-                "email",
-            ),
-        )
-
-    def clean_email(self):
-        """Make sure email is lowercased"""
-        email = self.cleaned_data["email"]
-        return email.lower()
-
-    email = forms.EmailField(
-        label="Adresse email",
-        help_text="Format attendu : prenom.nom@domaine.fr",
-        required=True,
-        initial="",
-    )
-
-
 class OnboardingSignupForm(DsrcBaseForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
