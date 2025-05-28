@@ -195,6 +195,7 @@ class OnboardingProject(DsrcBaseForm):
                 "postcode",
                 "insee",
                 "description",
+                "email",
             )
         )
 
@@ -225,6 +226,8 @@ class OnboardingProject(DsrcBaseForm):
         help_text="Décrivez votre demande ou dossier et son contexte en quelques mots.",
         widget=forms.Textarea(attrs={"rows": 3}),
     )
+
+    email = forms.CharField(label="Courriel", required=True)
 
 
 class PrefillSetuserForm(DsrcBaseForm):

@@ -120,6 +120,35 @@ def onboarding_signup(request):
     return render(request, "onboarding/onboarding-signup.html", context)
 
 
+# class OnboardingView(FormView):
+#     """Dispatch user based on auth/provided credentials"""
+
+#     form_class = forms.OnboardingEmailForm
+
+#     def dispatch(self, request, *args, **kwargs):
+#         if request.user.is_authenticated:
+#             return redirect(reverse("onboarding-project"))
+
+#         return super().dispatch(request, *args, **kwargs)
+
+#     def get(self, request, *args, **kwargs):
+#         return redirect(reverse("onboarding-signin"))
+
+#     def form_valid(self, form):
+#         self.request.session["onboarding_email"] = form.cleaned_data["email"]
+#         try:
+#             auth.User.objects.get(username=form.cleaned_data["email"])
+#             next_args = urlencode({"next": reverse("onboarding-project")})
+#             login_url = reverse("onboarding-signin")
+#             return redirect(f"{login_url}?{next_args}")
+#         except auth.User.DoesNotExist:
+#             signup_url = reverse("onboarding-signup")
+#             return redirect(signup_url)
+
+#     def form_invalid(self, form):
+#         return redirect(reverse("onboarding-signin"))
+
+
 def onboarding_project(request):
     """Return the onboarding page and process onboarding submission"""
     site_config = get_site_config_or_503(request.site)
@@ -145,9 +174,12 @@ def onboarding_project(request):
             all_forms_valid = all_forms_valid and question_form.is_valid()
 
         if all_forms_valid:
+            connected_user = request.user.is_authenticated
+            user = request.user if connected_user else None
+
             project = create_project_for_user(
                 site=request.site,
-                user=request.user,
+                user=user,
                 data=form.cleaned_data,
                 status="DRAFT",
             )
@@ -159,21 +191,26 @@ def onboarding_project(request):
                 )
 
                 for question_form in question_forms:
-                    question_form.update_session(session, request.user)
+                    question_form.update_session(session, user)
 
-            assign_collaborator(request.user, project, is_owner=True)
+            if connected_user:
+                assign_collaborator(user, project, is_owner=True)
 
-            utils.notify_new_project(request.site, project, request.user)
-            utils.email_owner_of_project(request.site, project, request.user)
+                utils.notify_new_project(request.site, project, user)
+                utils.email_owner_of_project(request.site, project, user)
 
-            refresh_user_projects_in_session(request, request.user)
+                refresh_user_projects_in_session(request, user)
 
-            # cleanup now useless onboarding existing data if present
-            if "onboarding_signup" in request.session:
-                del request.session["onboarding_signup"]
-
-            return redirect(f"{reverse('onboarding-summary', args=(project.pk,))}")
-
+                return redirect(f"{reverse('onboarding-summary', args=(project.pk,))}")
+            else:
+                try:
+                    auth.User.objects.get(username=form.cleaned_data["email"])
+                    next_args = urlencode({"next": reverse("onboarding-project")})
+                    login_url = reverse("onboarding-signin")
+                    return redirect(f"{login_url}?{next_args}")
+                except auth.User.DoesNotExist:
+                    signup_url = reverse("onboarding-signup")
+                    return redirect(signup_url)
     context = {
         "form": form,
         "question_forms": question_forms,
