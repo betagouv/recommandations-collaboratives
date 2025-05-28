@@ -123,7 +123,10 @@
                         <textarea class="form-control {% if form.comment.errors %}is-invalid{% endif %} specific-height-100px"
                                   id="input-project-comment"
                                   name="{{ form.comment.name }}"
-                                  placeholder="{{ question.comment_title }}">{{ form.comment.value|default:'' }}</textarea>
+                                  placeholder="{{ question.comment_title }}"
+                                  {% if form.fields.comment.required %} required {% endif %}>
+                                  {{ form.comment.value|default:'' }}
+                                </textarea>
                         {% for error in form.comment.errors %}
                             <div class="text-danger text-end">{{ error }}</div>
                         {% endfor %}
@@ -168,9 +171,9 @@
                                 type="submit"
                                 data-test-id="button-submit-survey-questionset">
                             <svg class="d-inline-block bi fr-mr-1v"
-                                 width="16"
-                                 height="16"
-                                 fill="currentColor">
+                                width="16"
+                                height="16"
+                                fill="currentColor">
                                 <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#check2-circle" />
                             </svg>
                             &nbsp;
