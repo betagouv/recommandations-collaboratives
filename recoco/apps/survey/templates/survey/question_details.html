@@ -124,7 +124,7 @@
                                   id="input-project-comment"
                                   name="{{ form.comment.name }}"
                                   placeholder="{{ question.comment_title }}"
-                                  {% if form.fields.comment.required %} required {% endif %}>
+                                  {% if form.fields.comment.required %}required{% endif %}>
                                   {{ form.comment.value|default:'' }}
                                 </textarea>
                         {% for error in form.comment.errors %}
