@@ -505,6 +505,17 @@ METRICS_MATERIALIZED_VIEWS_SPEC = [
             },
         ],
     },
+    {
+        "name": "hits",
+        "indexes": [
+            {
+                "name": "hash_idx",
+                "columns": "hash,site_domain",
+                "unique": True,
+                "for_site": False,
+            },
+        ],
+    },
 ]
 
 METRICS_MATERIALIZED_VIEWS_SQL_DIR = BASE_DIR / "apps/metrics/sql_queries"
