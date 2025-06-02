@@ -338,7 +338,12 @@ def prefill_project_submit(request):
             assign_collaborator(user, project, is_owner=True)
             assign_advisor(request.user, project, request.site)
 
-            utils.invite_user_to_project(request, user, project, is_new_user)
+            utils.invite_user_to_project(
+                request=request,
+                user=user,
+                project=project,
+                message=prefill_set_user_data.get("message"),
+            )
             utils.notify_new_project(request.site, project, user)
 
             # cleanup now useless prefill existing data if present
