@@ -156,7 +156,7 @@ TEMPLATES = [
             ],
             "loaders": [
                 "dbtemplates.loader.Loader",
-                "multisite.template.loaders.filesystem.Loader",
+                "recoco.template_loaders.Loader",
                 "django.template.loaders.app_directories.Loader",
             ],
             "libraries": {
@@ -176,6 +176,7 @@ CRISPY_ALLOWED_TEMPLATE_PACKS = ["dsrc_crispy_forms", "dsrc_crispy_forms_no_js"]
 CRISPY_TEMPLATE_PACK = "dsrc_crispy_forms"
 
 WSGI_APPLICATION = "recoco.wsgi.application"
+
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
@@ -502,6 +503,17 @@ METRICS_MATERIALIZED_VIEWS_SPEC = [
             {
                 "name": "user_hash_idx",
                 "columns": "user_hash",
+            },
+        ],
+    },
+    {
+        "name": "hits",
+        "indexes": [
+            {
+                "name": "hash_idx",
+                "columns": "hash,site_domain",
+                "unique": True,
+                "for_site": False,
             },
         ],
     },

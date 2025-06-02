@@ -353,6 +353,8 @@ class Project(models.Model):
     @property
     def status(self):
         """Shortcut for the current site's status"""
+        if hasattr(self, "site_status"):
+            return self.site_status
         return self.project_sites.current().status
 
     @property
@@ -580,6 +582,8 @@ class Project(models.Model):
             ("manage_advisors", "Can manage advisors"),
             # Geolocation
             ("change_location", "Can change the geolocation"),
+            # Project tags
+            ("use_project_tags", "Can use tags on projects"),
         )
 
     def __str__(self):  # pragma: nocover
@@ -881,7 +885,7 @@ class Document(models.Model):
     class Meta:
         constraints = [
             models.CheckConstraint(
-                check=~Q(Q(the_file__exact="") & Q(the_link__isnull=True)),
+                condition=~Q(Q(the_file__exact="") & Q(the_link__isnull=True)),
                 name="not_both_link_and_file_are_null",
             )
         ]

@@ -59,12 +59,13 @@
                                         <p class="modal-create-organization__label-info color-important">Sélectionnez ou créez un réseau national *</p>
                                     </template>
                                     <div class="fr-search-bar" id="header-search" role="search">
-                                        <input type="search" class="fr-input"
-                                        :class="{'fr-input--error': formState.isSubmitted && !formState.fields.isGroupNatName}"
-                                        x-model="userInput"
-                                        required
-                                        data-test-id="search-group-input">
-                                        @input.debounce="onSearchOrgaGroup">
+                                        <input type="search"
+                                               class="fr-input"
+                                               :class="{'fr-input--error': formState.isSubmitted && !formState.fields.isGroupNatName}"
+                                               x-model="userInput"
+                                               required
+                                               data-test-id="search-group-input"
+                                               @input.debounce="onSearchOrgaGroup">
                                         <button role="button"
                                                 class="fr-btn"
                                                 title="Rechercher"

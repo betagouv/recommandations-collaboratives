@@ -8,6 +8,7 @@ Alpine.data('KanbanProjects', function (currentSiteId, departments, regions) {
   return {
     makeProjectURL,
     projectList: null,
+    projectListFiltered: null,
     isViewInitialized: false,
     currentSiteId: currentSiteId,
     isDisplayingOnlyUserProjects:
@@ -61,9 +62,11 @@ Alpine.data('KanbanProjects', function (currentSiteId, departments, regions) {
           uuid: generateUUID(),
         })
       );
+      this.projectListFiltered = [...this.projectList];
+      this.filterMyProjects();
     },
     get view() {
-      return this.projectList.sort(this.sortFn.bind(this));
+      return this.projectListFiltered.sort(this.sortFn.bind(this));
     },
     column(status) {
       if (status instanceof Array) {
@@ -143,6 +146,16 @@ Alpine.data('KanbanProjects', function (currentSiteId, departments, regions) {
         'isDisplayingOnlyUserProjects',
         this.isDisplayingOnlyUserProjects
       );
+      this.filterMyProjects();
+    },
+    filterMyProjects() {
+      if (this.isDisplayingOnlyUserProjects) {
+        this.projectListFiltered = this.projectList.filter(
+          (d) => d.is_observer || d.is_switchtender
+        );
+      } else {
+        this.projectListFiltered = [...this.projectList];
+      }
     },
     constructRegionsFilter(departments, regions) {
       const currentRegions = [];

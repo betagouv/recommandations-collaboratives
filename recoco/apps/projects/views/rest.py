@@ -59,7 +59,7 @@ class ProjectDetail(APIView):
 
     def get_object(self, pk):
         try:
-            return models.Project.on_site.get(pk=pk)
+            return models.Project.on_site.with_site_status().get(pk=pk)
         except models.Project.DoesNotExist as exc:
             raise Http404 from exc
 

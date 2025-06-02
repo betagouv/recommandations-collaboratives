@@ -4,41 +4,18 @@
     {% vite_asset 'js/components/MultiSelect.js' %}
 {% endblock js %}
 {% block title %}
-    Devenir conseiller
+    Devenir conseiller·e
 {% endblock title %}
 {% block og_title %}
-    Devenir conseiller
+    Devenir conseiller·e
 {% endblock og_title %}
 {% block content %}
     {{ departments|json_script:"departmentsArray" }}
     <div>
         {% if advisor_access_request %}
-            {% include "account/fragments/pending_advisor_request_redirect.html" with title="Devenir conseiller" %}
+            {% include "account/fragments/pending_advisor_request_redirect.html" with title="Devenir conseiller·e" %}
         {% else %}
-            {% include "account/fragments/departements_select_form.html" with stepper=True total_steps=2 step_number=2 current_step_title="Sélection des départements" title="Devenir conseiller" %}
+            {% include "account/fragments/departements_select_form.html" with stepper=True total_steps=2 step_number=2 current_step_title="Sélection des départements" title="Devenir conseiller•e" %}
         {% endif %}
     </div>
 {% endblock content %}
-{% comment %} {% if not advisor_access_request %}
-
-    <form class="form" action="{% url 'advisor-access-request' %}" method="post">
-        {% csrf_token %}
-        {{ form }}
-
-        <br>
-        <br>
-        <input type="submit" value="Submit"  class="btn btn-primary">
-    </form>
-
-{% else %}
-
-    {% if advisor_access_request.is_pending  %}
-
-        Nous avons addressé un courrier de confirmation ...
-
-    {% endif %}
-
-
-{% endif %}
-
-{% endblock content %} {% endcomment %}

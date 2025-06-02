@@ -467,6 +467,12 @@ class AdvisorAccessRequest(TimeStampedModel):
         related_name="accepted_advisor_access_requests",
     )
 
+    comment = models.TextField(
+        null=True,
+        blank=True,
+        help_text="Commentaire laissé par le conseiller lors de la demande d'accès",
+    )
+
     objects = AdvisorAccessRequestManager()
     on_site = AdvisorAccessRequestSiteManager()
 
