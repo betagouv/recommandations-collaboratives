@@ -708,6 +708,7 @@ form > p {
   CRM - Custom styles
 \* ˍˍˍˍˍˍˍˍˍˍˍˍˍˍˍˍˍˍ */
 
-.left-25prct {
-  left: 25%;
+.sticky-header {
+  position: sticky;
+  top: 60px;
 }
