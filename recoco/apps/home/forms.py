@@ -126,3 +126,9 @@ class AdvisorAccessRequestForm(forms.Form):
         widget=forms.CheckboxSelectMultiple,
         required=False,
     )
+
+    comment = forms.CharField(
+        label="Commentaire",
+        widget=forms.Textarea(attrs={"rows": 3}),
+        required=False,
+    )
