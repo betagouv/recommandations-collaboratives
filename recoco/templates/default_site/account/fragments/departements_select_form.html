@@ -10,12 +10,17 @@
                 <div class="fr-input-group fr-mt-4v"
                      x-data="{objectsToSelect: JSON.parse(document.getElementById('departmentsArray').textContent), selectedDepartments: []}"
                      @set-departments="selectedDepartments = $event.detail">
-                    {% include "tools/contacts/multi_select.html" with placeholder="Cherchez et sélectionnez vos départements" label="Sélectionnez un ou plusieurs départements, laissez vide pour toute la France" %}
+                    {% include "tools/contacts/multi_select.html" with placeholder="Cherchez et sélectionnez vos départements pour avoir accès aux dossiers" label="Sélectionnez un ou plusieurs départements, laissez vide pour toute la France" %}
                     <template x-for="dept in selectedDepartments" :key="dept">
                         <input type="hidden" name="departments" :value="dept">
                     </template>
-                    <button class="fr-btn custom-login-button w-100 fr-mt-3w" type="submit">S'inscrire</button>
                 </div>
+                <div class="fr-input-group fr-mt-4v">
+                    <label for="comment" class="fr-label">{{ form.comment.label }} (facultatif)</label>
+                    <helptext>{{ form.comment.help_text }}</helptext>
+                    <textarea name="comment" class="fr-input" id="comment" rows="3"></textarea>
+                </div>
+                <button class="fr-btn custom-login-button w-100" type="submit">S'inscrire</button>
             </div>
         </fieldset>
     </form>
