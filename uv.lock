@@ -1,4 +1,5 @@
 version = 1
+revision = 1
 requires-python = ">=3.11"
 resolution-markers = [
     "python_full_version >= '3.13'",
@@ -709,16 +710,16 @@ wheels = [
 
 [[package]]
 name = "django"
-version = "4.2.19"
+version = "4.2.21"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "asgiref" },
     { name = "sqlparse" },
     { name = "tzdata", marker = "sys_platform == 'win32'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/cf/49/8e71f8a30aecc8e236bbb0ce056ff705a4782db4ab836e588c1a0e0a26aa/Django-4.2.19.tar.gz", hash = "sha256:6c833be4b0ca614f0a919472a1028a3bbdeb6f056fa04023aeb923346ba2c306", size = 10426865 }
+sdist = { url = "https://files.pythonhosted.org/packages/c1/bb/2fad5edc1af2945cb499a2e322ac28e4714fc310bd5201ed1f5a9f73a342/django-4.2.21.tar.gz", hash = "sha256:b54ac28d6aa964fc7c2f7335138a54d78980232011e0cd2231d04eed393dcb0d", size = 10424638 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/14/db/6fc8c55f3b482776ac245623cd713b00ba894ad8f32cf438a40d9f1ea29e/Django-4.2.19-py3-none-any.whl", hash = "sha256:a104e13f219fc55996a4e416ef7d18ab4eeb44e0aa95174c192f16cda9f94e75", size = 7993670 },
+    { url = "https://files.pythonhosted.org/packages/2c/4f/aeaa3098da18b625ed672f3da6d1cd94e188d1b2cc27c2c841b2f9666282/django-4.2.21-py3-none-any.whl", hash = "sha256:1d658c7bf5d31c7d0cac1cab58bc1f822df89255080fec81909256c30e6180b3", size = 7993839 },
 ]
 
 [[package]]
@@ -3178,7 +3179,7 @@ dev = [
 requires-dist = [
     { name = "beautifulsoup4", specifier = "==4.12.3" },
     { name = "celery", specifier = "==5.4.0" },
-    { name = "django", specifier = ">4,<5.0" },
+    { name = "django", specifier = "==4.2.21" },
     { name = "django-activity-stream", git = "https://github.com/glibersat/django-activity-stream.git?rev=django4" },
     { name = "django-admin-csvexport", specifier = "==2.2" },
     { name = "django-allauth", extras = ["openid", "socialaccount"], specifier = "==0.63.6" },
@@ -3232,7 +3233,7 @@ requires-dist = [
     { name = "requests-html", specifier = "==0.10.0" },
     { name = "rest-framework-generic-relations", specifier = ">=2.2.0" },
     { name = "sentry-sdk", specifier = ">=2.20.0" },
-    { name = "setuptools", specifier = "==70.2.0" },
+    { name = "setuptools", specifier = "==78.1.1" },
     { name = "sib-api-v3-sdk", specifier = ">=7.6.0" },
     { name = "wagtail", specifier = "==6.2.2" },
 ]
@@ -3638,11 +3639,11 @@ wheels = [
 
 [[package]]
 name = "setuptools"
-version = "70.2.0"
+version = "78.1.1"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/8d/e6/2fc95aec377988ff3ca882aa58d4f6ab35ff59a12b1611a9fe3075eb3019/setuptools-70.2.0.tar.gz", hash = "sha256:bd63e505105011b25c3c11f753f7e3b8465ea739efddaccef8f0efac2137bac1", size = 2332711 }
+sdist = { url = "https://files.pythonhosted.org/packages/81/9c/42314ee079a3e9c24b27515f9fbc7a3c1d29992c33451779011c74488375/setuptools-78.1.1.tar.gz", hash = "sha256:fcc17fd9cd898242f6b4adfaca46137a9edef687f43e6f78469692a5e70d851d", size = 1368163 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/42/54/2a8ecfcc9a714a6fbf86559a4b0f50b126a4ac4269ea8134f2c75c3e73de/setuptools-70.2.0-py3-none-any.whl", hash = "sha256:b8b8060bb426838fbe942479c90296ce976249451118ef566a5a0b7d8b78fb05", size = 930834 },
+    { url = "https://files.pythonhosted.org/packages/90/99/158ad0609729111163fc1f674a5a42f2605371a4cf036d0441070e2f7455/setuptools-78.1.1-py3-none-any.whl", hash = "sha256:c3a9c4211ff4c309edb8b8c4f1cbfa7ae324c4ba9f91ff254e3d305b9fd54561", size = 1256462 },
 ]
 
 [[package]]

@@ -14,7 +14,7 @@ requires-python = ">=3.11"
 dependencies = [
     "beautifulsoup4==4.12.3",
     "celery==5.4.0",
-    "django>4,<5.0",
+    "django==4.2.21",
     "django-activity-stream",
     "django-admin-csvexport==2.2",
     "django-allauth[openid,socialaccount]==0.63.6",
@@ -68,7 +68,7 @@ dependencies = [
     "requests-html==0.10.0",
     "rest-framework-generic-relations>=2.2.0",
     "sentry-sdk>=2.20.0",
-    "setuptools==70.2.0",
+    "setuptools==78.1.1",
     "sib-api-v3-sdk>=7.6.0",
     "wagtail==6.2.2",
 ]
