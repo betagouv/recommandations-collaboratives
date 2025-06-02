@@ -40,7 +40,7 @@ class Migration(migrations.Migration):
         migrations.AddConstraint(
             model_name="document",
             constraint=models.CheckConstraint(
-                check=models.Q(("the_file", ""), _negated=True),
+                condition=models.Q(("the_file", ""), _negated=True),
                 name="not_both_link_and_file_are_null",
             ),
         ),
