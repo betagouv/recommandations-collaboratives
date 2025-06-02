@@ -63,6 +63,7 @@ Alpine.data('KanbanProjects', function (currentSiteId, departments, regions) {
         })
       );
       this.projectListFiltered = [...this.projectList];
+      this.filterMyProjects();
     },
     get view() {
       return this.projectListFiltered.sort(this.sortFn.bind(this));
@@ -141,6 +142,13 @@ Alpine.data('KanbanProjects', function (currentSiteId, departments, regions) {
     },
     toggleMyProjectsFilter() {
       this.isDisplayingOnlyUserProjects = !this.isDisplayingOnlyUserProjects;
+      localStorage.setItem(
+        'isDisplayingOnlyUserProjects',
+        this.isDisplayingOnlyUserProjects
+      );
+      this.filterMyProjects();
+    },
+    filterMyProjects() {
       if (this.isDisplayingOnlyUserProjects) {
         this.projectListFiltered = this.projectList.filter(
           (d) => d.is_observer || d.is_switchtender
@@ -148,10 +156,6 @@ Alpine.data('KanbanProjects', function (currentSiteId, departments, regions) {
       } else {
         this.projectListFiltered = [...this.projectList];
       }
-      localStorage.setItem(
-        'isDisplayingOnlyUserProjects',
-        this.isDisplayingOnlyUserProjects
-      );
     },
     constructRegionsFilter(departments, regions) {
       const currentRegions = [];
