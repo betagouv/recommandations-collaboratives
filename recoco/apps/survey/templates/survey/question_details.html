@@ -8,6 +8,7 @@
 {% endblock css %}
 {% load humanize %}
 {% load django_vite %}
+{% load waffle_tags %}
 {% block title %}
     {{ question.text }} - {{ request.site.name }}
 {% endblock title %}
@@ -65,9 +66,11 @@
                         Administration
                     </div>
                     <div class="d-grid gap-2 fr-mt-2w">
+
+                        {% flag "FLAG_EDIT_EDL" %}
                         <span class="d-inline-block">
                             <a href="{% url 'survey-editor-question-set-details' question.question_set.id %}#q-{{ question.id }}"
-                               class="btn btn-light w-100 btn-sm">
+                            class="btn btn-light w-100 btn-sm">
                                 <svg class="bi" width="16" height="16" fill="currentColor">
                                     <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#pencil" />
                                 </svg>
@@ -75,6 +78,8 @@
                                 Éditer
                             </a>
                         </span>
+                        {% endflag %}
+
                         <span class="d-inline-block">
                             <a href="{% url 'survey-session-refresh-signals' session.pk %}"
                                class="btn btn-light w-100 btn-sm">

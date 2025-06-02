@@ -16,7 +16,7 @@ class Migration(migrations.Migration):
         migrations.AddConstraint(
             model_name="document",
             constraint=models.CheckConstraint(
-                check=models.Q(
+                condition=models.Q(
                     ("the_file__isnull", False),
                     ("the_link__isnull", False),
                     _connector="OR",

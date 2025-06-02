@@ -322,7 +322,10 @@ def advisor_access_request_view(request: HttpRequest) -> HttpResponse:
                 advisor_access_request = AdvisorAccessRequest(
                     site=request.site, user=request.user
                 )
-                advisor_access_request.save()
+
+            advisor_access_request.comment = form.cleaned_data.get("comment", "")
+            advisor_access_request.save()
+
             advisor_access_request.departments.set(form.cleaned_data["departments"])
 
     return render(
