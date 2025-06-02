@@ -120,35 +120,6 @@ def onboarding_signup(request):
     return render(request, "onboarding/onboarding-signup.html", context)
 
 
-# class OnboardingView(FormView):
-#     """Dispatch user based on auth/provided credentials"""
-
-#     form_class = forms.OnboardingEmailForm
-
-#     def dispatch(self, request, *args, **kwargs):
-#         if request.user.is_authenticated:
-#             return redirect(reverse("onboarding-project"))
-
-#         return super().dispatch(request, *args, **kwargs)
-
-#     def get(self, request, *args, **kwargs):
-#         return redirect(reverse("onboarding-signin"))
-
-#     def form_valid(self, form):
-#         self.request.session["onboarding_email"] = form.cleaned_data["email"]
-#         try:
-#             auth.User.objects.get(username=form.cleaned_data["email"])
-#             next_args = urlencode({"next": reverse("onboarding-project")})
-#             login_url = reverse("onboarding-signin")
-#             return redirect(f"{login_url}?{next_args}")
-#         except auth.User.DoesNotExist:
-#             signup_url = reverse("onboarding-signup")
-#             return redirect(signup_url)
-
-#     def form_invalid(self, form):
-#         return redirect(reverse("onboarding-signin"))
-
-
 def onboarding_project(request):
     """Return the onboarding page and process onboarding submission"""
     site_config = get_site_config_or_503(request.site)
@@ -176,12 +147,13 @@ def onboarding_project(request):
         if all_forms_valid:
             connected_user = request.user.is_authenticated
             user = request.user if connected_user else None
+            project_status = "DRAFT" if connected_user else "PRE_DRAFT"
 
             project = create_project_for_user(
                 site=request.site,
                 user=user,
                 data=form.cleaned_data,
-                status="DRAFT",
+                status=project_status,
             )
 
             # Save survey questions
@@ -203,6 +175,13 @@ def onboarding_project(request):
 
                 return redirect(f"{reverse('onboarding-summary', args=(project.pk,))}")
             else:
+                request.session["onboarding_email"] = form.cleaned_data["email"]
+                hash_project_uuid = form.cleaned_data["project_uuid"]
+                print("____________________________________________________")
+                print(hash_project_uuid)
+                print("____________________________________________________")
+                # TODO: save project in project_creation_request table if user is not connected
+
                 try:
                     auth.User.objects.get(username=form.cleaned_data["email"])
                     next_args = urlencode({"next": reverse("onboarding-project")})

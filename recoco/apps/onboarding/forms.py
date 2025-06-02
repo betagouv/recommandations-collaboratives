@@ -200,10 +200,10 @@ class OnboardingProject(DsrcBaseForm):
         )
 
     name = forms.CharField(
-        label="Titre de la demande *",
+        label="Nom du dossier *",
         initial="",
         required=True,
-        help_text="Indiquez un nom court qui décrit la demande ou le dossier. Inutile d'ajouter le nom de la commune, l'adresse ou le programme.",
+        help_text="Indiquez un nom court qui désigne le dossier ou le projet. Inutile d'ajouter le nom de la commune, l'adresse ou le programme.",
     )
     location = forms.CharField(
         label="Adresse",
@@ -227,7 +227,13 @@ class OnboardingProject(DsrcBaseForm):
         widget=forms.Textarea(attrs={"rows": 3}),
     )
 
-    email = forms.CharField(label="Courriel", required=True)
+    email = forms.EmailField(
+        label="Adresse email *",
+        help_text="Format attendu : prenom.nom@domaine.fr",
+        required=True,
+    )
+
+    project_uuid = forms.CharField(label="UUID du dossier", widget=forms.HiddenInput())
 
 
 class PrefillSetuserForm(DsrcBaseForm):
