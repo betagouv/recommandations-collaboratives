@@ -113,8 +113,10 @@ def onboarding_signup(request):
 
         if "onboarding_email" in request.session:
             del request.session["onboarding_email"]
-
-        return redirect(f"{reverse('onboarding-project')}")
+        if "project_id" in request.session:
+            project_id = request.session["project_id"]
+            del request.session["project_id"]
+            return redirect(f"{reverse('onboarding-summary', args=(project_id,))}")
 
     context = {"form": form, "site_config": site_config}
     return render(request, "onboarding/onboarding-signup.html", context)
@@ -156,6 +158,8 @@ def onboarding_project(request):
                 status=project_status,
             )
 
+            request.session["project_id"] = project.id
+
             # Save survey questions
             if site_config.project_survey:
                 session, _ = survey_models.Session.objects.get_or_create(
@@ -176,11 +180,13 @@ def onboarding_project(request):
                 return redirect(f"{reverse('onboarding-summary', args=(project.pk,))}")
             else:
                 request.session["onboarding_email"] = form.cleaned_data["email"]
-                hash_project_uuid = form.cleaned_data["project_uuid"]
-                print("____________________________________________________")
-                print(hash_project_uuid)
-                print("____________________________________________________")
-                # TODO: save project in project_creation_request table if user is not connected
+                project_creation_request = projects.ProjectCreationRequest.objects.create(
+                    site=request.site,
+                    # project_uuid=form.cleaned_data["project_uuid"], TODO: add project_uuid
+                    email=form.cleaned_data["email"],
+                    project=project,
+                )
+                project_creation_request.save()
 
                 try:
                     auth.User.objects.get(username=form.cleaned_data["email"])
