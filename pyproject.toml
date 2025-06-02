@@ -86,6 +86,9 @@ namespaces = false  # to disable scanning PEP 420 namespaces (true by default)
 [tool.setuptools.dynamic]
 version = { attr = "recoco.__version__" }
 
+[tool.uv]
+package = false
+
 [build-system]
 requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
