@@ -52,13 +52,15 @@ class OrgaStartswithFilterBackend(BaseFilterBackend):
         orga_sw = request.query_params.get("orga-startswith")
         if not orga_sw:
             return queryset
-        return queryset.filter(organization__name__istartswith=orga_sw)
+        return queryset.filter(organization__name__istartswith=orga_sw).order_by(
+            "organization__name", "last_name", "first_name"
+        )
 
 
 class ContactViewSet(ModelViewSet):
     permission_classes = [IsStaffForSiteOrISAuthenticatedReadOnly]
     pagination_class = StandardResultsSetPagination
-    filter_backends = [OrgaStartswithFilterBackend, WordTrigramSimilaritySearchFilter]
+    filter_backends = [WordTrigramSimilaritySearchFilter, OrgaStartswithFilterBackend]
 
     trgm_search_fields = [
         "last_name",
@@ -70,7 +72,7 @@ class ContactViewSet(ModelViewSet):
     trgm_search_min_rank = 0.3
 
     def get_queryset(self):
-        return Contact.on_site.all()
+        return Contact.on_site.select_related("organization__group")
 
     def filter_queryset(self, queryset):
         return super().filter_queryset(queryset).distinct()
