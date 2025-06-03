@@ -12,17 +12,15 @@ from django.contrib import messages
 from django.contrib.auth import login as log_user
 from django.contrib.auth import models as auth
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models import Count, F, Prefetch, Q
-from django.http import (
-    HttpRequest,
-    HttpResponse,
-)
+from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.http import url_has_allowed_host_and_scheme
-from django.views.generic import View
+from django.views.generic import FormView, View
 from django.views.generic.base import TemplateView
 
 from recoco.apps.geomatics.models import Department
@@ -37,9 +35,14 @@ from recoco.apps.tasks import models as tasks
 from recoco.utils import check_if_advisor
 
 from . import models
-from .forms import AdvisorAccessRequestForm, ContactForm, UserPasswordFirstTimeSetupForm
+from .forms import (
+    AdvisorAccessRequestForm,
+    ContactForm,
+    SiteCreateForm,
+    UserPasswordFirstTimeSetupForm,
+)
 from .models import AdvisorAccessRequest
-from .utils import get_current_site_sender_email
+from .utils import get_current_site_sender_email, make_new_site
 
 
 class HomePageView(TemplateView):
@@ -388,6 +391,33 @@ def advisor_access_request_moderator_view(
             "selected_departments": selected_departments,
         },
     )
+
+
+### Site Creation
+class SiteCreateView(LoginRequiredMixin, PermissionRequiredMixin, FormView):
+    form_class = SiteCreateForm
+    permission_required = "site.can_add_site"
+    template_name = "home/site_create.html"
+
+    def form_valid(self, form):
+        try:
+            make_new_site(
+                name=form.cleaned_data["name"],
+                domain=f"{form.cleaned_data['subdomain']}.recoconseil.fr",
+                sender_email=form.cleaned_data["sender_email"],
+                sender_name=form.cleaned_data["sender_name"],
+                contact_form_recipient=form.cleaned_data["contact_form_recipient"],
+                legal_address=form.cleaned_data["legal_address"],
+                admin_user=self.request.user,
+            )
+            messages.success(self.request, "Le portail a bien été créé !")
+        except Exception as e:
+            messages.error(self.request, f"Impossible de créer le portail : {e}")
+
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse("site-create")
 
 
 # eof
