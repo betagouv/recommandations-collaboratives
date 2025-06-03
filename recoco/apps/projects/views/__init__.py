@@ -281,7 +281,7 @@ def project_moderation_advisor_refuse(
             }
         ],
         params={
-            "message": advisor_access_request.message,
+            "message": advisor_access_request.comment,
         },
     )
 
@@ -326,7 +326,7 @@ def project_moderation_advisor_accept(
             }
         ],
         params={
-            "message": advisor_access_request.message,
+            "message": advisor_access_request.comment,
         },
     )
 
