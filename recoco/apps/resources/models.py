@@ -279,9 +279,10 @@ class Resource(CloneMixin, models.Model):
         return watson.filter(resources, query)
 
     def addons(self, project_id: int | None = None) -> models.QuerySet["ResourceAddon"]:
+        queryset = self.resource_addons.exclude(enabled=False)
         if project_id:
-            return self.resource_addons.filter(project_id=project_id)
-        return self.resource_addons.all()
+            queryset = queryset.filter(project_id=project_id)
+        return queryset
 
 
 class ResourceAddon(TimeStampedModel):
@@ -289,6 +290,11 @@ class ResourceAddon(TimeStampedModel):
         Resource,
         on_delete=models.CASCADE,
         related_name="resource_addons",
+    )
+
+    enabled = models.BooleanField(
+        default=False,
+        help_text="Indique si l'addon est activé pour cette ressource",
     )
 
     project = models.ForeignKey(
