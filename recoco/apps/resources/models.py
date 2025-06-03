@@ -24,6 +24,7 @@ from django.urls import reverse
 from django.utils import timezone
 from markdownx.utils import markdownify
 from model_clone.models import CloneMixin
+from model_utils.models import TimeStampedModel
 from taggit.managers import TaggableManager
 from watson import search as watson
 
@@ -276,6 +277,39 @@ class Resource(CloneMixin, models.Model):
             )
 
         return watson.filter(resources, query)
+
+    def addons(self, project_id: int | None = None) -> models.QuerySet["ResourceAddon"]:
+        if project_id:
+            return self.resource_addons.filter(project_id=project_id)
+        return self.resource_addons.all()
+
+
+class ResourceAddon(TimeStampedModel):
+    resource = models.ForeignKey(
+        Resource,
+        on_delete=models.CASCADE,
+        related_name="resource_addons",
+    )
+
+    project = models.ForeignKey(
+        "projects.Project",
+        on_delete=models.CASCADE,
+        related_name="resource_addons",
+        blank=True,
+        null=True,
+    )
+
+    iframe_url = models.URLField(
+        help_text="URL de l'iframe pour afficher la ressource externe",
+        blank=True,
+        null=True,
+    )
+
+    content = models.JSONField(
+        help_text="Contenu additionnel de la ressource, au format JSON",
+        default=dict,
+        blank=True,
+    )
 
 
 class BookmarkManager(models.Manager):
