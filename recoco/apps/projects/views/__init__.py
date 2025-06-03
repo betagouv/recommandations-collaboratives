@@ -128,6 +128,20 @@ def project_moderation_project_refuse(request: HttpRequest, project_id: int):
             request, messages.INFO, f"Le dossier '{project.name}' a été refusé."
         )
 
+        if owner := project.owner:
+            send_email(
+                template_name=communication_constants.TPL_PROJECT_REFUSED,
+                recipients=[
+                    {
+                        "name": normalize_user_name(owner),
+                        "email": project.owner.email,
+                    }
+                ],
+                params={
+                    "project": digests.make_project_digest(project, owner),
+                },
+            )
+
     return redirect(reverse("projects-moderation-list"))
 
 
@@ -258,6 +272,19 @@ def project_moderation_advisor_refuse(
         f"La demande d'accès conseiller pour '{advisor_access_request.user.email}' a été refusée.",
     )
 
+    send_email(
+        template_name=communication_constants.TPL_ADVISOR_ACCESS_REQUEST_REFUSED,
+        recipients=[
+            {
+                "name": normalize_user_name(advisor_access_request.user),
+                "email": advisor_access_request.user.email,
+            }
+        ],
+        params={
+            "message": advisor_access_request.message,
+        },
+    )
+
     return redirect(reverse("projects-moderation-list"))
 
 
@@ -288,6 +315,19 @@ def project_moderation_advisor_accept(
         request,
         messages.INFO,
         f"La demande d'accès conseiller pour '{advisor_access_request.user.email}' a été acceptée.",
+    )
+
+    send_email(
+        template_name=communication_constants.TPL_ADVISOR_ACCESS_REQUEST_ACCEPTED,
+        recipients=[
+            {
+                "name": normalize_user_name(advisor_access_request.user),
+                "email": advisor_access_request.user.email,
+            }
+        ],
+        params={
+            "message": advisor_access_request.message,
+        },
     )
 
     return redirect(reverse("projects-moderation-list"))
