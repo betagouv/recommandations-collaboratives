@@ -394,6 +394,8 @@ def advisor_access_request_moderator_view(
 
 
 ### Site Creation
+### 3 tests are at least required: permission enforcement, site creation and
+### site creation error (domain already used for eg)
 class SiteCreateView(LoginRequiredMixin, PermissionRequiredMixin, FormView):
     form_class = SiteCreateForm
     permission_required = "site.can_add_site"
