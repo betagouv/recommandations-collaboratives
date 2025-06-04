@@ -26,6 +26,7 @@
 {% endblock tagline %}
 {% block content %}
     <div class="container">
+        {% include "onboarding/fragments/email-modal.html" %}
         <div class="banner  text-center">
             {% if site_config.email_logo %}
                 <img src="{{ site_config.email_logo.url }}"

@@ -233,8 +233,6 @@ class OnboardingProject(DsrcBaseForm):
         required=True,
     )
 
-    project_uuid = forms.CharField(label="UUID du dossier", widget=forms.HiddenInput())
-
 
 class PrefillSetuserForm(DsrcBaseForm):
     def __init__(self, *args, **kwargs):

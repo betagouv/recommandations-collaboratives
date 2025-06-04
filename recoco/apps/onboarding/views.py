@@ -115,6 +115,10 @@ def onboarding_signup(request):
             del request.session["onboarding_email"]
         if "project_id" in request.session:
             project_id = request.session["project_id"]
+            project_creation_request = projects.ProjectCreationRequest.objects.get(
+                project_id=project_id, site=request.site, email=email
+            )
+            project_creation_request.delete()
             del request.session["project_id"]
             return redirect(f"{reverse('onboarding-summary', args=(project_id,))}")
 
