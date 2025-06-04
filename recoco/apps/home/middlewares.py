@@ -15,6 +15,8 @@ class CurrentSiteConfigurationMiddleware:
                 "Ensure that the site middleware is applied before this middleware."
             )
 
+        # TODO: use SiteConfiguration.objects.get() instead of filter().first()
+        # Because the site configuration should be unique per site and always exist.
         request.site_config = (
             SiteConfiguration.objects.filter(site=request.site)
             .prefetch_related("onboarding_questions", "crm_available_tags")
