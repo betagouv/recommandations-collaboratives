@@ -90,18 +90,6 @@ def project_moderation_list(request):
         .select_related("user")
     ).order_by("-created")
 
-    # advisor_access_request_name = request.GET.get("advisor_access_request_firstname")
-    # advisor_access_request_lastname = request.GET.get("advisor_access_request_lastname")
-    # if (
-    #     advisor_access_request_name is not None
-    #     and advisor_access_request_lastname is not None
-    # ):
-    #     messages.add_message(
-    #         request,
-    #         messages.SUCCESS,
-    #         f"'{advisor_access_request_name}' '{advisor_access_request_lastname}' a été modifié.",
-    #     )
-
     return render(
         request,
         "projects/projects_moderation.html",
