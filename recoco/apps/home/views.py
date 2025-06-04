@@ -13,7 +13,7 @@ from django.contrib.auth import login as log_user
 from django.contrib.auth import models as auth
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ImproperlyConfigured
-from django.db.models import Count, F, Q
+from django.db.models import Count, F, Prefetch, Q
 from django.http import (
     HttpRequest,
     HttpResponse,
@@ -67,6 +67,11 @@ class LoginRedirectView(View):
 
 class RegionalActorsPageView(TemplateView):
     template_name = "home/regional_actors.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["is_switchtender"] = check_if_advisor(self.request.user)
+        return context
 
 
 class MethodologyPageView(TemplateView):
@@ -277,17 +282,26 @@ def advisor_access_request_view(request: HttpRequest) -> HttpResponse:
 
     advisor_access_request = (
         AdvisorAccessRequest.objects.filter(user=request.user, site=request.site)
-        .prefetch_related("departments")
+        .prefetch_related(
+            Prefetch(
+                "departments",
+                queryset=Department.objects.order_by("code"),
+            )
+        )
         .select_related("user")
         .first()
     )
 
     departments = departments = [
-        {"name": d.name, "code": d.code} for d in Department.objects.exclude(code="")
+        {"name": d.name, "code": d.code}
+        for d in Department.objects.exclude(code="").order_by("code")
     ]
 
     selected_departments = (
-        [department.code for department in advisor_access_request.departments.all()]
+        [
+            department.code
+            for department in advisor_access_request.departments.order_by("code")
+        ]
         if advisor_access_request
         else []
     )
@@ -306,7 +320,10 @@ def advisor_access_request_view(request: HttpRequest) -> HttpResponse:
                 advisor_access_request = AdvisorAccessRequest(
                     site=request.site, user=request.user
                 )
-                advisor_access_request.save()
+
+            advisor_access_request.comment = form.cleaned_data.get("comment", "")
+            advisor_access_request.save()
+
             advisor_access_request.departments.set(form.cleaned_data["departments"])
 
     return render(
@@ -335,7 +352,10 @@ def advisor_access_request_moderator_view(
         pk=advisor_access_request_id,
     )
 
-    departments = [{"name": d.name, "code": d.code} for d in Department.objects.all()]
+    departments = [
+        {"name": d.name, "code": d.code}
+        for d in Department.objects.exclude(code="").order_by("code")
+    ]
 
     selected_departments = [
         department.code for department in advisor_access_request.departments.all()

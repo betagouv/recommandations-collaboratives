@@ -17,6 +17,15 @@ def setup_db(django_db_setup, django_db_blocker):
         call_command("update_permissions")
 
 
+@pytest.fixture(scope="session", autouse=True)
+def create_site_alias(django_db_setup, django_db_blocker):
+    from multisite.models import Alias
+
+    with django_db_blocker.unblock():
+        site = Site.objects.filter(domain="example.com").first()
+        Alias.objects.get_or_create(site=site, domain="example.com", is_canonical=True)
+
+
 @pytest.fixture(scope="function")
 def api_client():
     return APIClient()

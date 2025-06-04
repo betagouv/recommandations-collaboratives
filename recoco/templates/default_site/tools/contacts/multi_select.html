@@ -3,7 +3,7 @@
 
     Parameters django template:
     - placeholder: The placeholder text for the input.
-
+    - label: The label text for the input.
     Parameters alpine:
     - objectsToSelect: The objects to select from.
 {% endcomment %}
@@ -16,13 +16,13 @@
 <template x-if="objectsToSelect">
     <div class="bg-white">
         <div>
-            <label class="modal-create-organization__label" for="select-list-input">Départements</label>
+            <label class="modal-create-organization__label" for="select-list-input">{{ label|default:'Départements' }}</label>
             <div class="d-flex justify-center mt-8">
                 <!-- Define component with preselected options -->
                 <div class="w-100"
                      x-data="alpineMultiSelect({selected:selectedDepartments, objectsToSelect})">
                     <!-- Select Options -->
-                    <select class="d-none" x-on:change="init">
+                    <select class="d-none" x-on:change="init" id="select-list">
                         <template x-for="department in objectsToSelect" :key="department.code">
                             <option :value="department.code"
                                     :data-search="'(' + department.code + ')' + ' ' + department.name"
@@ -47,7 +47,8 @@
                                                          x-model="selectedElms[option]"
                                                          x-text="option.text"></div>
                                                     <div class="d-flex flex-auto flex-row-reverse">
-                                                        <div x-on:click.stop="remove(index,option)" data-test-id="remove-selected-item">
+                                                        <div x-on:click.stop="remove(index,option)"
+                                                             data-test-id="remove-selected-item">
                                                             <svg xmlns="http://www.w3.org/2000/svg"
                                                                  class="little-img fr-ml-1v"
                                                                  fill="none"
@@ -103,7 +104,7 @@
                                 <div class="w-100">
                                     <div x-show.transition.origin.top="isOpen()"
                                          x-trap="isOpen()"
-                                         class="position-absolute shadow-lg top-100 bg-white z-40 w-100 lef-0 rounded max-h-80"
+                                         class="position-absolute shadow-lg top-100 bg-white z-1 w-100 left-0 rounded max-h-80"
                                          x-on:click.away="close">
                                         <div class="d-flex flex-column w-100">
                                             <div class="fr-px-1w fr-py-1w">

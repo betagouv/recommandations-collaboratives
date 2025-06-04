@@ -355,6 +355,8 @@ class Project(models.Model):
     @property
     def status(self):
         """Shortcut for the current site's status"""
+        if hasattr(self, "site_status"):
+            return self.site_status
         return self.project_sites.current().status
 
     @property
@@ -930,7 +932,7 @@ class Document(models.Model):
     class Meta:
         constraints = [
             models.CheckConstraint(
-                check=~Q(Q(the_file__exact="") & Q(the_link__isnull=True)),
+                condition=~Q(Q(the_file__exact="") & Q(the_link__isnull=True)),
                 name="not_both_link_and_file_are_null",
             )
         ]

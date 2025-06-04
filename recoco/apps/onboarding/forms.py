@@ -290,6 +290,14 @@ class PrefillSetuserForm(DsrcBaseForm):
         required=True,
     )
 
+    message = forms.CharField(
+        label="Message personnalisé au référent, accompagnant l'invitation à rejoindre le dossier",
+        initial="",
+        required=False,
+        help_text="Ce message sera envoyé au référent par mail. Il est facultatif.",
+        widget=forms.Textarea(attrs={"rows": 3}),
+    )
+
 
 class PrefillProjectForm(DsrcBaseForm):
     def __init__(self, *args, **kwargs):
