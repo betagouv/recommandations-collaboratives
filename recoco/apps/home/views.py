@@ -398,7 +398,7 @@ def advisor_access_request_moderator_view(
 ### site creation error (domain already used for eg)
 class SiteCreateView(LoginRequiredMixin, PermissionRequiredMixin, FormView):
     form_class = SiteCreateForm
-    permission_required = "site.can_add_site"
+    permission_required = "sites.add_site"
     template_name = "home/site_create.html"
 
     def form_valid(self, form):
