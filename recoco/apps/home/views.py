@@ -26,7 +26,6 @@ from django.views.generic import View
 from django.views.generic.base import TemplateView
 
 from recoco.apps.geomatics.models import Department
-from recoco.apps.onboarding.forms import OnboardingEmailForm
 from recoco.apps.projects import models as projects
 from recoco.apps.projects.utils import (
     can_administrate_project,
@@ -47,7 +46,6 @@ class HomePageView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["onboarding_modal_form"] = OnboardingEmailForm()
         return context
 
 
