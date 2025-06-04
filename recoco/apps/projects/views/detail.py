@@ -157,7 +157,6 @@ def project_knowledge(request, project_id=None):
         models.Project.objects.filter(sites=request.site)
         .with_unread_notifications(user_id=request.user.id)
         .select_related("commune__department"),
-        # .prefetch_related("survey_session"),
         pk=project_id,
     )
 
