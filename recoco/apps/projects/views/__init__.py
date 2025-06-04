@@ -134,11 +134,11 @@ def project_moderation_project_refuse(request: HttpRequest, project_id: int):
                 recipients=[
                     {
                         "name": normalize_user_name(owner),
-                        "email": project.owner.email,
+                        "email": owner.email,
                     }
                 ],
                 params={
-                    "project": digests.make_project_digest(project, owner),
+                    "project": digests.make_project_digest(project=project, user=owner),
                 },
             )
 

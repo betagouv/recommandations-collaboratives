@@ -151,14 +151,29 @@ def test_project_moderation_does_not_notify_non_regional_actors_on_accept(
 @pytest.mark.django_db
 def test_project_moderation_refuse_and_redirect(current_site, client):
     baker.make(SiteConfiguration, site=current_site)
-    owner = Recipe(auth.User, username="owner@owner.co").make()
-    project = Recipe(Project, sites=[current_site]).make()
+
+    owner = Recipe(
+        auth.User,
+        username="owner@owner.co",
+        email="owner@owner.co",
+        first_name="Anakin",
+        last_name="Skywalker",
+    ).make()
+
+    project = Recipe(Project, sites=[current_site], name="My project").make()
     baker.make(ProjectMember, project=project, member=owner, is_owner=True)
 
     updated_on_before = project.updated_on
     url = reverse("projects-moderation-project-refuse", args=[project.id])
 
-    with login(client, groups=["example_com_staff"]) as moderator:
+    with (
+        login(client, groups=["example_com_staff"]) as moderator,
+        patch("recoco.apps.projects.views.send_email") as mock_send_email,
+        patch(
+            "recoco.apps.communication.digests.make_project_digest",
+            Mock(return_value="mocked_project_digest"),
+        ) as mock_make_project_digest,
+    ):
         moderator.profile.sites.add(current_site)
         response = client.post(url)
 
@@ -167,6 +182,24 @@ def test_project_moderation_refuse_and_redirect(current_site, client):
     assert project.updated_on > updated_on_before
 
     assert response.status_code == 302
+
+    mock_make_project_digest.assert_called_once_with(
+        project=project,
+        user=owner,
+    )
+
+    mock_send_email.assert_called_once_with(
+        template_name="project_refused",
+        recipients=[
+            {
+                "name": "Anakin Skywalker",
+                "email": "owner@owner.co",
+            }
+        ],
+        params={
+            "project": "mocked_project_digest",
+        },
+    )
 
 
 @pytest.mark.multisite
