@@ -190,7 +190,9 @@ def onboarding_project(request):
 
                 try:
                     auth.User.objects.get(username=form.cleaned_data["email"])
-                    next_args = urlencode({"next": reverse("onboarding-project")})
+                    next_args = urlencode(
+                        {"next": reverse("onboarding-summary", args=(project.pk,))}
+                    )
                     login_url = reverse("onboarding-signin")
                     return redirect(f"{login_url}?{next_args}")
                 except auth.User.DoesNotExist:

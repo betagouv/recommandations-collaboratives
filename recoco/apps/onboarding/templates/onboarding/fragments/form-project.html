@@ -2,6 +2,7 @@
 <form id="{{ form.helper.form_id }}"
       method="post"
       enctype="multipart/form-data"
+      @submit="localStorage.setItem('userEmailProjectCreationStep', $event.target.elements.email.value)"
       x-on:input="isFormEdited = true">
     <input type="hidden"
            name="js_enabled"
@@ -19,7 +20,6 @@
         </div>
         {{ form.email|as_crispy_field }}
         {{ form.description|as_crispy_field }}
-        <input type="hidden" name="project_uuid" :value="generateUUID()">
     </fieldset>
     {% for form in question_forms %}
         <fieldset class="fr-fieldset"
