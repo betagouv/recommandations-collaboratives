@@ -73,10 +73,10 @@ class DSResource(TimeStampedModel):
 
 
 class DSFolder(TimeStampedModel):
-    project = models.ForeignKey(
-        Project,
-        on_delete=models.CASCADE,
-    )
+    # project = models.ForeignKey(
+    #     Project,
+    #     on_delete=models.CASCADE,
+    # )
     ds_resource = models.ForeignKey(
         DSResource,
         on_delete=models.CASCADE,

@@ -278,44 +278,50 @@ class Resource(CloneMixin, models.Model):
 
         return watson.filter(resources, query)
 
-    def addons(self, project_id: int | None = None) -> models.QuerySet["ResourceAddon"]:
-        queryset = self.resource_addons.exclude(enabled=False)
-        if project_id:
-            queryset = queryset.filter(project_id=project_id)
+    def addons(self, task_id: int | None = None) -> models.QuerySet["ResourceAddon"]:
+        queryset = self.recommandations.resource_addons().exclude(enabled=False)
+        if task_id:
+            queryset = queryset.filter(recommandations__task_id=task_id)
         return queryset
 
 
+from recoco.apps.tasks.models import Task
+
+
 class ResourceAddon(TimeStampedModel):
-    resource = models.ForeignKey(
-        Resource,
-        on_delete=models.CASCADE,
-        related_name="resource_addons",
-    )
+    # resource = models.ForeignKey(
+    #     Resource,
+    #     on_delete=models.CASCADE,
+    #     related_name="resource_addons",
+    # )
 
     enabled = models.BooleanField(
         default=False,
         help_text="Indique si l'addon est activé pour cette ressource",
     )
 
-    project = models.ForeignKey(
-        "projects.Project",
+    recommendation = models.ForeignKey(
+        Task,
         on_delete=models.CASCADE,
         related_name="resource_addons",
-        blank=True,
-        null=True,
     )
 
-    iframe_url = models.URLField(
-        help_text="URL de l'iframe pour afficher la ressource externe",
-        blank=True,
-        null=True,
+    nature = models.CharField(
+        max_length=32,
+        help_text="Nature de l'addon",
     )
 
-    content = models.JSONField(
+    data = models.JSONField(
         help_text="Contenu additionnel de la ressource, au format JSON",
         default=dict,
         blank=True,
     )
+
+    class Meta:
+        verbose_name = "Addon de ressource"
+        verbose_name_plural = "Addons de ressources"
+        ordering = ["-created"]
+        unique_together = ["recommendation", "nature"]
 
 
 class BookmarkManager(models.Manager):
