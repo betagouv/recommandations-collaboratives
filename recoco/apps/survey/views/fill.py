@@ -19,7 +19,7 @@ from django.views.generic import DetailView, RedirectView
 
 from recoco.apps.projects import models as projects_models
 from recoco.apps.projects.utils import get_collaborators_for_project
-from recoco.utils import get_site_config_or_503, has_perm_or_403
+from recoco.utils import has_perm_or_403
 
 from .. import forms, models, signals
 
@@ -109,7 +109,8 @@ def survey_create_session_for_project(request, project_id, site_id=None):
     project = get_object_or_404(
         projects_models.Project, sites=request.site, pk=project_id
     )
-    site_config = get_site_config_or_503(request.site)
+
+    site_config = request.site_config
 
     if site_id:
         try:
