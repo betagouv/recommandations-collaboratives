@@ -74,7 +74,7 @@ def update_or_create_ds_folder(recommendation_id: int):
     content_hash = hash_data(content)
 
     if not DSFolder.objects.filter(
-        project=recommendation.project,
+        recommendation=recommendation,
         ds_resource=ds_resource,
         content_hash=content_hash,
     ).exists():
@@ -90,11 +90,10 @@ def update_or_create_ds_folder(recommendation_id: int):
             )
 
         DSFolder.objects.update_or_create(
-            project=recommendation.project,
+            recommendation=recommendation,
             ds_resource=ds_resource,
             defaults={
                 "content": content,
-                "recommendation": recommendation,
                 **resp.json(),
             },
         )

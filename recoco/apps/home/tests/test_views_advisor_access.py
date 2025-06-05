@@ -88,13 +88,17 @@ class TestAdvisorAccessRequestView:
 
         response = client.post(
             reverse("advisor-access-request"),
-            data={"departments": ["64", "33", "40"]},
+            data={
+                "departments": ["64", "33", "40"],
+                "comment": "Test comment",
+            },
         )
         assert response.status_code == 200
 
         advisor_access_request.refresh_from_db()
         assert AdvisorAccessRequest.objects.count() == 1
         assert advisor_access_request.departments.count() == 3
+        assert advisor_access_request.comment == "Test comment"
 
 
 class TestAdvisorAccessRequestModeratorView:

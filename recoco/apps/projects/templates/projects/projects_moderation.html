@@ -218,8 +218,9 @@
                         {% endif %}
                         <div class="moderation-advisor">
                             {% for advisor in advisor_access_requests %}
-                                <div class="moderation-advisor__card fr-col-4-min fr-mx-1v fr-mb-2w" data-test-id="moderation-advisor-card">
-                                    <div class="moderation-advisor__contact-card fr-m-3v">
+                                <div class="moderation-advisor__card fr-col-4-min fr-mx-1v fr-mb-2w"
+                                     data-test-id="moderation-advisor-card">
+                                    <div x-data="{contact:null}" class="moderation-advisor__contact-card fr-m-3v">
                                         {% include "tools/contacts/contact_card.html" with is_django_data=True contact=advisor.user is_type_user=True %}
                                     </div>
                                     <div>
@@ -227,13 +228,20 @@
                                             <span class="fr-m-3v moderation-advisor__texte">Demande d’accès sur les départements :</span>
                                             <div class="moderation-advisor__departments fr-m-3v">
                                                 {% for department in advisor.departments.all %}
-                                                    <span class="moderation-advisor__department" data-test-id="department-ask-for-access-advisor">{{ department.name }} ({{ department.code }})</span>
+                                                    <span class="moderation-advisor__department"
+                                                          data-test-id="department-ask-for-access-advisor">{{ department.name }} ({{ department.code }})</span>
                                                 {% endfor %}
                                             </div>
                                         {% else %}
                                             <span class="fr-m-3v moderation-advisor__texte">Demande d’accès national</span>
                                         {% endif %}
                                     </div>
+                                    {% if advisor.comment %}
+                                        <div class="fr-m-3v">
+                                            <span class="moderation-advisor__texte">Détails de la demande :</span>
+                                            <p class="moderation-advisor__comment">{{ advisor.comment }}</p>
+                                        </div>
+                                    {% endif %}
                                     <div class="fr-m-3v">
                                         <div class="d-flex justify-content-between align-items-stretch w-100">
                                             <form method="post"

@@ -43,11 +43,13 @@
             <div class="kanban-header__view-selector fs-5 fr-mr-6v">
                 {% include "projects/project/fragments/navigation/display_select.html" %}
             </div>
-            <div x-data="Tutorial('time-filter-tutorial-on-kanban')" class="kanban-header__middle-part">
+            <div x-data="Tutorial('time-filter-tutorial-on-kanban')"
+                 class="kanban-header__middle-part">
                 <div class="kanban-header__searchbar">
                     {% include "projects/project/fragments/search_bar.html" with action_search="onSearch" x_model="searchText" %}
                 </div>
-                <div class="kanban-header__lastactivity-filter fr-select-group d-flex fr-m-0 fr-mr-6v align-items-center" id="kanban-time-filter">
+                <div class="kanban-header__lastactivity-filter fr-select-group d-flex fr-m-0 fr-mr-6v align-items-center"
+                     id="kanban-time-filter">
                     <label class="fr-label no-wrap fr-mr-1v"
                            for="select-filter-project-duration">Dossiers actifs depuis :</label>
                     <select class="fr-select fr-m-0"
@@ -109,10 +111,7 @@
                                                          @dragleave="onDragLeave(event)"
                                                          @dragstart="onDragStart(event, t.uuid)"
                                                          @dragend="onDragEnd(event)"
-                                                         data-test-id="drag-target">
-                                                        <div class="drag-placeholder"></div>
-                                                        <span x-text=board.status></span>
-                                                    </div>
+                                                         data-test-id="drag-target"></div>
                                                 </template>
                                                 <!-- Task Template -->
                                                 <template x-for="(t, taskIndex) in column(board.code)" :key="t.id">

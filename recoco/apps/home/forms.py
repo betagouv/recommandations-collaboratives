@@ -45,10 +45,10 @@ class UVLoginForm(LoginForm):
     def __init__(self, *args, **kwargs):
         super(UVLoginForm, self).__init__(*args, **kwargs)
         self.fields["login"].widget = forms.TextInput(
-            attrs={"type": "email", "class": "fr-input fr-mt-2v fr-mb-4v"}
+            attrs={"type": "email", "class": "fr-input fr-mt-2v fr-mb-5v"}
         )
         self.fields["password"].widget = forms.PasswordInput(
-            attrs={"class": "fr-input fr-mt-2v fr-mb-4v"}
+            attrs={"class": "fr-input fr-mt-2v fr-mb-5v"}
         )
 
 
@@ -124,5 +124,12 @@ class AdvisorAccessRequestForm(forms.Form):
         queryset=Department.objects.all(),
         label="Départements",
         widget=forms.CheckboxSelectMultiple,
+        required=False,
+    )
+
+    comment = forms.CharField(
+        label="Commentaire",
+        help_text="Expliquez brièvement pourquoi vous demandez l’accès à ces dossiers et en quoi cela est pertinent pour votre rôle, afin de nous aider à examiner votre demande.",
+        widget=forms.Textarea(attrs={"rows": 3}),
         required=False,
     )

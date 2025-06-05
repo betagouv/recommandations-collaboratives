@@ -123,6 +123,12 @@
     font-weight: 700;
     line-height: 150%;
   }
+  &__comment {
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 150%;
+  }
   &__departments {
     display: flex;
     flex-wrap: wrap;
