@@ -133,6 +133,11 @@ def resource_search(request):
     if to_review:
         staff_redux |= Q(status=models.Resource.TO_REVIEW)
 
+    # keep 'published' "only" if requested
+    published = form.cleaned_data.get("published", False)
+    if published:
+        staff_redux |= Q(status=models.Resource.PUBLISHED)
+
     resources = resources.filter(staff_redux)
 
     return render(
@@ -165,6 +170,7 @@ class SearchForm(forms.Form):
     draft = forms.BooleanField(required=False, initial=False)
     expired = forms.BooleanField(required=False, initial=False)
     to_review = forms.BooleanField(required=False, initial=False)
+    published = forms.BooleanField(required=False, initial=True)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
