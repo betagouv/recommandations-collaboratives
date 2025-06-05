@@ -227,6 +227,7 @@ dev = [
     "requests-mock==1.12.1",
     "responses==0.25.3",
     "rich>=13.9.4",
+    "ruff>=0.11.12",
     "semgrep==1.61.1",
     "sphinx-autodoc-annotation>=1.0.post1",
     "sphinx-js>=4.0.0",

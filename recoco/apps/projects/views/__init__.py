@@ -124,9 +124,7 @@ def project_moderation_project_refuse(request: HttpRequest, project_id: int):
         project.updated_on = timezone.now()
         project.save()
 
-        messages.add_message(
-            request, messages.INFO, f"Le dossier '{project.name}' a été refusé."
-        )
+        messages.success(request, f"Le dossier '{project.name}' a été refusé.")
 
     return redirect(reverse("projects-moderation-list"))
 
@@ -148,9 +146,7 @@ def project_moderation_project_accept(request: HttpRequest, project_id: int):
         project.updated_on = timezone.now()
         project.save()
 
-        messages.add_message(
-            request, messages.SUCCESS, f"Le dossier '{project.name}' a été accepté."
-        )
+        messages.success(request, f"Le dossier '{project.name}' a été accepté.")
 
         signals.project_validated.send(
             sender=models.Project,
@@ -222,9 +218,9 @@ def project_moderation_project_accept(request: HttpRequest, project_id: int):
             if join:
                 # Assign current user as advisor if requested
                 assign_advisor(request.user, project, request.site)
-                messages.add_message(
+                messages.success(
                     request,
-                    messages.INFO,
+                    messages.SUCCESS,
                     f"Vous êtes maintenant conseiller·ère du dossier '{project.name}'.",
                 )
 
@@ -252,9 +248,8 @@ def project_moderation_advisor_refuse(
         advisor_group = get_group_for_site("advisor", request.site)
         advisor_access_request.user.groups.remove(advisor_group)
 
-    messages.add_message(
+    messages.success(
         request,
-        messages.INFO,
         f"La demande d'accès conseiller pour '{advisor_access_request.user.email}' a été refusée.",
     )
 
@@ -284,9 +279,8 @@ def project_moderation_advisor_accept(
             *advisor_access_request.departments.all()
         )
 
-    messages.add_message(
+    messages.success(
         request,
-        messages.INFO,
         f"La demande d'accès conseiller pour '{advisor_access_request.user.email}' a été acceptée.",
     )
 
