@@ -33,7 +33,6 @@
             <div class="row">
                 <div class="col-12">
                     <fieldset class="fr-segmented fr-ml-3v">
-                        <legend class="fr-segmented__legend fr-segmented__legend--inline">Vue :</legend>
                         <div class="fr-segmented__elements">
                             <div class="fr-segmented__element">
                                 <input value="1"
@@ -204,7 +203,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-11 fr-pt-2w fr-pb-6w fr-mx-auto"
+        <div class="col-11 fr-pb-6w fr-mx-auto"
              data-test-id="advisor-account-moderation-page"
              x-show="show === 'advisor'">
             <div class="container-fluid">
@@ -219,7 +218,7 @@
                         {% endif %}
                         <div class="moderation-advisor">
                             {% for advisor in advisor_access_requests %}
-                                <div class="moderation-advisor__card fr-col-4-min fr-mx-1v fr-my-1w"
+                                <div class="moderation-advisor__card fr-col-4-min fr-mx-1v fr-mb-2w"
                                      data-test-id="moderation-advisor-card">
                                     <div x-data="{contact:null}" class="moderation-advisor__contact-card fr-m-3v">
                                         {% include "tools/contacts/contact_card.html" with is_django_data=True contact=advisor.user is_type_user=True %}
