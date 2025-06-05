@@ -21,84 +21,127 @@
     <link href="{% sass_src 'home/css/auth/auth.css' %}"
           rel="stylesheet"
           type="text/css">
-    <link href="{% static 'css/account/login.css' %}"
+    <link href="{% sass_src 'css/account/login.scss' %}"
           rel="stylesheet"
           type="text/css">
 {% endblock css %}
 {% block content %}
-    <div class="container-fluid">
-        <div x-data="Auth"
-             x-init="initLogin"
-             class="fr-container fr-py-6w max-width-800">
-            <div class="d-flex justify-content-between align-items-start">
-                <h2 class="fr-mb-6w d-flex align-items-center">
-                    <svg class="bi fr-mr-2v" width="28" height="28">
-                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#person-circle" />
-                    </svg>
-                    Connexion à {{ site.name }}
-                </h2>
+<div class="container-fluid login-page">
+    <div x-data="Auth"
+         x-init="initLogin"
+         class="fr-container fr-py-6w max-width-800 login-page__subcontainer">
+        <!-- Breadcrumb -->
+        <nav role="navigation" class="fr-breadcrumb" aria-label="vous êtes ici :">
+            <button class="fr-breadcrumb__button"
+                    aria-expanded="false"
+                    aria-controls="breadcrumb-1">Voir le fil d’Ariane</button>
+            <div class="fr-collapse" id="breadcrumb-1">
+                <ol class="fr-breadcrumb__list">
+                    <li>
+                        <a class="fr-breadcrumb__link underline"
+                            href="{% url 'home' %}">Accueil</a>
+                    </li>
+                    <li>
+                        <a class="fr-breadcrumb__link" aria-current="page">Solliciter UrbanVitaliz</a>
+                    </li>
+                </ol>
+            </div>
+        </nav>
+        <div class="d-flex flex-column justify-content-between align-items-start">
+            <h2 class="fr-mb-3v d-flex align-items-center">
+                Connexion à {{ site.name }}
+            </h2>
+            <p class="fr-mb-4v">Connectez vous à votre espace UrbanVitaliz en utilisant vos identifiants ou votre compte ProConnect</p>
+        </div>
+        <div class="d-flex justify-content-center">
+            <div class="{% flag "proconnect_login" %}w-50 {% else %}w-100 {% endflag %}fr-p-4v">
+            {% comment %} <div class="w-50 fr-p-4v"> {% endcomment %}
+                <form class="login fr-form-group"
+                    method="post"
+                    action="{% url 'account_login' %}">
+                    {% csrf_token %}
+                    {% if redirect_field_value %}
+                        <input type="hidden"
+                            name="{{ redirect_field_name }}"
+                            value="{{ redirect_field_value }}" />
+                    {% endif %}
+                    <fieldset class="fr-fieldset fr-m-0">
+                        <h3 class="fr-mb-5v d-block login-page__title">Identifiants</h3>
+                        <div class="fr-fieldset__content fr-m-0">
+                            {{ form.non_field_errors }}
+                            <div>
+                                {{ form.login.errors }}
+                                <label for="{{ form.login.id_for_label }}">Email :</label>
+                                {{ form.login }}
+                            </div>
+                            <div>
+                                {{ form.password.errors }}
+                                <label for="{{ form.password.id_for_label }}">Mot de passe :</label>
+                                {{ form.password }}
+                            </div>
+                            <div>
+                                {{ form.remember.errors }}
+                                {{ form.remember }}
+                                <label for="{{ form.remember.id_for_label }}">Se souvenir de mes identifiants</label>
+                            </div>
+                            <div class="d-flex flex-column fr-mt-5v">
+                                <div class="d-flex w-100">
+                                    <div class="fr-input-group fr-m-auto">
+                                        <button class="fr-btn" type="submit">Connexion</button>
+                                    </div>
+                                </div>
+                                <div class="fr-input-group d-flex flex-column fr-mt-5v">
+                                    <p class="font-size-14px fr-mb-1w">
+                                        Mot de passe oublié ?
+                                        <a id="forgot-password"
+                                            class="font-size-14px"
+                                            href="{% url 'account_reset_password' %}">Réinitialisez votre mot de passe</a>
+                                    </p>
+                                    <p class="font-size-14px fr-mb-0">
+                                        Vous n’avez pas de mot de passe ? <a class="font-size-14px" href="/login/">Connectez-vous par email</a>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </fieldset>
+                </form>
             </div>
             <!-- Proconnect -->
             {% flag "proconnect_login" %}
-            <h3 class="fr-mb-2w d-block">Se connecter via ProConnect</h3>
-            <div class="fr-connect-group text-align-center">
-                <form action="{% provider_login_url 'proconnect' process='process' %}">
-                    <button class="fr-connect">
-                        <span class="fr-connect__login">S’identifier avec</span>
-                        <span class="fr-connect__brand">ProConnect</span>
-                    </button>
-                </form>
-                <p>
-                    <a href="https://proconnect.gouv.fr/"
-                       target="_blank"
-                       rel="noopener"
-                       title="Qu’est-ce que ProConnect ? - nouvelle fenêtre">Qu’est-ce que ProConnect ?</a>
-                </p>
-            </div>
-            <hr />
-        {% endflag %}
-        <form class="login fr-form-group"
-              method="post"
-              action="{% url 'account_login' %}">
-            {% csrf_token %}
-            {% if redirect_field_value %}
-                <input type="hidden"
-                       name="{{ redirect_field_name }}"
-                       value="{{ redirect_field_value }}" />
-            {% endif %}
-            <fieldset class="fr-fieldset">
-                <h3 class="fr-mb-3w d-block">Se connecter avec son mot de passe</h3>
-                <div class="fr-fieldset__content">
-                    {{ form.as_p }}
-                    <div class="d-flex flex-column justify-content-between align-items-start fr-mt-2w">
-                        <div class="d-flex w-100 justify-content-between">
-                            <a id="forgot-password"
-                               class="fr-btn fr-btn--secondary"
-                               href="{% url 'account_reset_password' %}">{% trans "Forgot Password?" %}</a>
-                            <div class="fr-input-group">
-                                <button class="fr-btn custom-login-button" type="submit">Se connecter</button>
-                            </div>
-                        </div>
-                        <div class="fr-input-group d-flex justify-content-end flex-column align-items-end fr-mt-3w">
-                            <p>
-                                Se connecter avec un simple email ? <a class="fr-btn fr-btn--sm fr-btn--secondary fr-ml-2w" href="/login/">Connexion avec email</a>
-                            </p>
-                        </div>
+                <div class="w-50 fr-ml-5v login-page__proconnect">
+                    <h3 class="fr-mb-2w d-block login-page__title">Pro Connect</h3>
+                    <div class="fr-connect-group text-align-center fr-m-auto">
+                        <form action="{% provider_login_url 'proconnect' process='process' %}">
+                            <button class="fr-connect">
+                                <span class="fr-connect__login">Se connecter avec</span>
+                                <span class="fr-connect__brand">ProConnect</span>
+                            </button>
+                        </form>
+                        <p>
+                            <a href="https://proconnect.gouv.fr/"
+                                target="_blank"
+                                rel="noopener"
+                                title="Qu’est-ce que ProConnect ? - nouvelle fenêtre"
+                                class="font-size-14px">Qu’est-ce que ProConnect ?</a>
+                        </p>
                     </div>
                 </div>
-            </fieldset>
-        </form>
-        <hr />
-        <div class="d-flex justify-content-center align-items-center fr-mt-1v">
-            <div class="fr-form-group text-center">
+            {% endflag %}
+        </div>
+        <hr class="fr-my-8w login-page__separator">
+        <div class="d-flex fr-mt-1v">
+            <div class="fr-form-group">
                 <fieldset>
-                    <h3 class="fr-mb-3w d-block ">Vous n'avez pas de compte ?</h3>
-                    <div class="fr-fieldset__content">
+                    <h3 class="d-block fr-mb-1w">Vous n'avez pas de compte {{ site.name }} ?</h3>
+                    <p class="font-size-14px fr-mb-1w">Si vous souhaitez vous inscrire pour obtenir de l’aide ou être en contact avec un·e conseiller·e, il vous faut créer un dossier : </p>
+                    <div class="fr-fieldset__content fr-m-0">
                         <div class="fr-input-group">
-                            <a class="fr-btn fr-btn--secondary custom-login-button"
-                               href="{{ signup_url }}">S'inscrire</a>
+                            <a class="fr-btn"
+                               href="{{ signup_url }}">Déposer un dossier</a>
                         </div>
                     </div>
+                    <p class="font-size-14px fr-mt-1w fr-mb-0">Si vous souhaitez demander un accès “conseiller” sur les dossiers de votre territoire, vous pouvez <a class="font-size-14px" href="{% url 'advisor-access-request' %}">faire une demande de compte conseiller.</a></p>
+                    <p class="font-size-14px fr-mt-1w fr-mb-0">Si vous souhaitez rejoindre un dossier qui a déjà été déposé sur UrbanVitaliz, il vous faut demander à un membre de ce dossier de vous y inviter.</p>
                 </fieldset>
             </div>
         </div>

@@ -221,7 +221,7 @@
                             {% for advisor in advisor_access_requests %}
                                 <div class="moderation-advisor__card fr-col-4-min fr-mx-1v fr-my-1w"
                                      data-test-id="moderation-advisor-card">
-                                    <div class="moderation-advisor__contact-card fr-m-3v">
+                                    <div x-data="{contact:null}" class="moderation-advisor__contact-card fr-m-3v">
                                         {% include "tools/contacts/contact_card.html" with is_django_data=True contact=advisor.user is_type_user=True %}
                                     </div>
                                     <div>
