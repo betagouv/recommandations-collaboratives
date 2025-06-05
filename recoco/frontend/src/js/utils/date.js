@@ -1,5 +1,8 @@
-export function formatDate(timestamp) {
-  return new Date(timestamp).toLocaleDateString('fr-FR');
+export function formatDate(
+  timestamp,
+  options = { year: 'numeric', month: 'numeric', day: 'numeric' }
+) {
+  return new Date(timestamp).toLocaleDateString('fr-FR', options);
 }
 
 export function formatReminderDate(date) {
