@@ -45,10 +45,10 @@ class UVLoginForm(LoginForm):
     def __init__(self, *args, **kwargs):
         super(UVLoginForm, self).__init__(*args, **kwargs)
         self.fields["login"].widget = forms.TextInput(
-            attrs={"type": "email", "class": "fr-input fr-mt-2v fr-mb-4v"}
+            attrs={"type": "email", "class": "fr-input fr-mt-2v fr-mb-5v"}
         )
         self.fields["password"].widget = forms.PasswordInput(
-            attrs={"class": "fr-input fr-mt-2v fr-mb-4v"}
+            attrs={"class": "fr-input fr-mt-2v fr-mb-5v"}
         )
 
 
