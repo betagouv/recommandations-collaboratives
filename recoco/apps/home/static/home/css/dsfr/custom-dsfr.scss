@@ -715,3 +715,18 @@ form > p {
   position: sticky;
   top: 60px;
 }
+
+/* ¯¯¯¯¯¯¯¯ *\
+  Multisites
+\* ˍˍˍˍˍˍˍˍ */
+
+.blue-hero-banner {
+  border-radius: 2px;
+  background: var(--light-background-alt-blue-france, #f5f5fe);
+}
+
+.h1-dsfr-rework {
+  font-size: 48px !important;
+  font-weight: 800 !important;
+  line-height: 125% !important;
+}
