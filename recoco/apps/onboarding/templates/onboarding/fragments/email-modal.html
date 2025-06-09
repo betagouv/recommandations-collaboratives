@@ -23,7 +23,8 @@
                             </h1>
                             <p>
                                 Nous avons détecté que vous avez déjà commencé à créer un dossier avec l'email suivant :
-                                <strong x-text="localStorage.getItem('userEmailProjectCreationStep')"></strong>.
+                                <strong data-cy="found-email-onboarding"
+                                        x-text="localStorage.getItem('userEmailProjectCreationStep')"></strong>.
                                 <br />
                                 Souhaitez-vous continuer ou l'abandonner ?
                             </p>
@@ -33,6 +34,7 @@
                                     Abandonner
                                 </button>
                                 <a class="fr-btn"
+                                   data-cy="continue-onboarding"
                                    :href="`{% url 'onboarding-signup' %}?email=${localStorage.getItem('userEmailProjectCreationStep')}`">Continuer</a>
                             </div>
                         </div>
