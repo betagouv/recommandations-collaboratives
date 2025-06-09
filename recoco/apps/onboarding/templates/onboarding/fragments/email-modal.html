@@ -28,8 +28,12 @@
                                 Souhaitez-vous continuer ou l'abandonner ?
                             </p>
                             <div class="fr-btns-group fr-btns-group--inline-sm">
-                                <button class="fr-btn fr-btn--secondary" @click="show = false">Abandonner</button>
-                                <a class="fr-btn" href="{% url 'onboarding-signup' %}">Continuer</a>
+                                <button class="fr-btn fr-btn--secondary"
+                                        @click="show = false; localStorage.removeItem('userEmailProjectCreationStep')">
+                                    Abandonner
+                                </button>
+                                <a class="fr-btn"
+                                   :href="`{% url 'onboarding-signup' %}?email=${localStorage.getItem('userEmailProjectCreationStep')}`">Continuer</a>
                             </div>
                         </div>
                     </div>

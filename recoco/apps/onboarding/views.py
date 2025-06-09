@@ -73,7 +73,19 @@ def onboarding_signup(request):
     if request.user.is_authenticated:
         return redirect(reverse("onboarding-project"))
 
-    existing_email_user = request.session.get("onboarding_email") or ""
+    existing_email_user = request.session.get("onboarding_email") or request.GET.get(
+        "email"
+    )
+
+    if existing_email_user:
+        try:
+            # Check if there is a project creation request for the email
+            project_creation_request = projects.ProjectCreationRequest.objects.get(
+                site=request.site, email=existing_email_user
+            )
+            project_id = project_creation_request.project.id
+        except projects.ProjectCreationRequest.DoesNotExist:
+            return redirect(reverse("onboarding-project"))  # TODO: Add error message
 
     form = forms.OnboardingSignupForm(
         request.POST or None, initial={"email": existing_email_user}
@@ -91,6 +103,7 @@ def onboarding_signup(request):
             },
         )
 
+        # TODO : if project is created with existing email we should log user and assign it to the project
         if not is_new_user:
             # user exists but is not currently logged in,
             request.session["onboarding_email"] = email
@@ -111,16 +124,22 @@ def onboarding_signup(request):
 
         log_user(request, user, backend="django.contrib.auth.backends.ModelBackend")
 
+        # Update project with new user
+        project = projects.Project.objects.get(id=project_id)
+        project.submitted_by = user
+        project.save()
+
+        # Delete project creation request
+        project_creation_request.delete()
+
+        # Cleanup session
         if "onboarding_email" in request.session:
             del request.session["onboarding_email"]
+
         if "project_id" in request.session:
-            project_id = request.session["project_id"]
-            project_creation_request = projects.ProjectCreationRequest.objects.get(
-                project_id=project_id, site=request.site, email=email
-            )
-            project_creation_request.delete()
             del request.session["project_id"]
-            return redirect(f"{reverse('onboarding-summary', args=(project_id,))}")
+
+        return redirect(f"{reverse('onboarding-summary', args=(project_id,))}")
 
     context = {"form": form, "site_config": site_config}
     return render(request, "onboarding/onboarding-signup.html", context)
