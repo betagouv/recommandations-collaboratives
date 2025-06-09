@@ -98,36 +98,6 @@ class SelectCommuneForm(forms.Form):
 ##################################################
 # Onboarding multi-step forms
 ##################################################
-class OnboardingEmailForm(DsrcBaseForm):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.helper.form_id = "id-onboarding-email-form"  # The form id is used for validation, it must be set and unique in the page
-        self.helper.form_method = "post"
-        self.helper.action_button = {
-            "submit": {
-                "label": "Décrivez votre demande",
-            }
-        }
-        self.helper.layout = Layout(
-            Fieldset(
-                "",  # The first argument is the legend of the fieldset
-                "email",
-            ),
-        )
-
-    def clean_email(self):
-        """Make sure email is lowercased"""
-        email = self.cleaned_data["email"]
-        return email.lower()
-
-    email = forms.EmailField(
-        label="Adresse email",
-        help_text="Format attendu : prenom.nom@domaine.fr",
-        required=True,
-        initial="",
-    )
-
-
 class OnboardingSignupForm(DsrcBaseForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -225,14 +195,15 @@ class OnboardingProject(DsrcBaseForm):
                 "postcode",
                 "insee",
                 "description",
+                "email",
             )
         )
 
     name = forms.CharField(
-        label="Titre de la demande *",
+        label="Nom du dossier *",
         initial="",
         required=True,
-        help_text="Indiquez un nom court qui décrit la demande ou le dossier. Inutile d'ajouter le nom de la commune, l'adresse ou le programme.",
+        help_text="Indiquez un nom court qui désigne le dossier ou le projet. Inutile d'ajouter le nom de la commune, l'adresse ou le programme.",
     )
     location = forms.CharField(
         label="Adresse",
@@ -254,6 +225,12 @@ class OnboardingProject(DsrcBaseForm):
         required=True,
         help_text="Décrivez votre demande ou dossier et son contexte en quelques mots.",
         widget=forms.Textarea(attrs={"rows": 3}),
+    )
+
+    email = forms.EmailField(
+        label="Adresse email *",
+        help_text="Format attendu : prenom.nom@domaine.fr",
+        required=True,
     )
 
 
