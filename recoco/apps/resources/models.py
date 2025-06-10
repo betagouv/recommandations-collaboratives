@@ -24,12 +24,14 @@ from django.urls import reverse
 from django.utils import timezone
 from markdownx.utils import markdownify
 from model_clone.models import CloneMixin
+from model_utils.models import TimeStampedModel
 from taggit.managers import TaggableManager
 from watson import search as watson
 
 from recoco.apps.addressbook import models as addressbook_models
 from recoco.apps.geomatics import models as geomatics_models
 
+# from recoco.apps.tasks.models import Task
 from . import apps
 
 
@@ -276,6 +278,47 @@ class Resource(CloneMixin, models.Model):
             )
 
         return watson.filter(resources, query)
+
+
+class ResourceAddonManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().select_related("recommendation__resource")
+
+
+class ResourceAddon(TimeStampedModel):
+    enabled = models.BooleanField(
+        default=False,
+        help_text="Indique si l'addon est activé pour cette ressource",
+    )
+
+    recommendation = models.ForeignKey(
+        "tasks.Task",
+        on_delete=models.CASCADE,
+        related_name="resource_addons",
+    )
+
+    nature = models.CharField(
+        max_length=32,
+        help_text="Nature de l'addon",
+    )
+
+    data = models.JSONField(
+        help_text="Contenu additionnel de la ressource, au format JSON",
+        default=dict,
+        blank=True,
+    )
+
+    objects = ResourceAddonManager()
+
+    @property
+    def resource(self):
+        return self.recommendation.resource
+
+    class Meta:
+        verbose_name = "Addon de ressource"
+        verbose_name_plural = "Addons de ressources"
+        ordering = ["-created"]
+        unique_together = ["recommendation", "nature"]
 
 
 class BookmarkManager(models.Manager):
