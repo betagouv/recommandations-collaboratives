@@ -56,6 +56,16 @@
                                 <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#eye-fill" />
                             </svg>
                         </span>
+                        {% if resource.status == 1 %}
+                            <span class="fr-ml-1v align-middle"
+                                  data-bs-toggle="tooltip"
+                                  data-bs-placement="top"
+                                  title="A relire">
+                                <svg class="bi" width="16" height="16" fill="currentColor">
+                                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#exclamation-circle-fill" />
+                                </svg>
+                            </span>
+                        {% endif %}
                     {% else %}
                         <span class="align-middle"
                               data-bs-toggle="tooltip"
