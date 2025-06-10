@@ -11,6 +11,7 @@ import pytest
 from django.contrib.auth import models as auth_models
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
+from guardian.shortcuts import assign_perm
 from model_bakery.recipe import Recipe, baker
 
 from .. import models
@@ -118,3 +119,28 @@ def test_staff_user_can_create_resource_with_api(request, api_client):
     assert response.data["title"] == data["title"]
     assert response.data["created_by"]["first_name"] == staff.first_name
     assert response.data["created_by"]["last_name"] == staff.last_name
+
+
+class TestRessourceAddonViewSet:
+    @pytest.mark.django_db
+    def test_not_authenticated(self, api_client):
+        response = api_client.get(reverse("resource-addons-list"))
+        assert response.status_code == 403
+
+    @pytest.mark.django_db
+    def test_not_authorized(self, api_client):
+        user = baker.make(auth_models.User)
+        api_client.force_authenticate(user)
+        response = api_client.get(reverse("resource-addons-list"))
+        assert response.status_code == 403
+
+    @pytest.mark.django_db
+    def test_list_resource_addons(self, api_client, current_site):
+        user = baker.make(auth_models.User)
+        assign_perm("sites.manage_resources", user, current_site)
+
+        api_client.force_authenticate(user)
+
+        response = api_client.get(reverse("resource-addons-list"))
+        assert response.status_code == 200
+        assert response.data["count"] == 0

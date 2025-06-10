@@ -90,10 +90,15 @@ class ResourceViewSet(viewsets.ModelViewSet):
         return Response(status=status.HTTP_501_NOT_IMPLEMENTED)
 
 
+class IsResourceManager(permissions.BasePermission):
+    def has_permission(self, request, view):
+        return has_perm(request.user, "sites.manage_resources", request.site)
+
+
 class ResourceAddonViewSet(viewsets.ModelViewSet):
     permission_classes = [
-        permissions.IsAuthenticatedOrReadOnly,
-        IsResourceManagerOrReadOnly,
+        permissions.IsAuthenticated,
+        IsResourceManager,
     ]
     serializer_class = ResourceAddonSerializer
     pagination_class = StandardResultsSetPagination
