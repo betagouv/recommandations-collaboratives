@@ -126,7 +126,7 @@
             </div>
             <template x-if="departments">
                 <div class="fr-p-3v modal-create-organization__block"
-                     x-data="{objectsToSelect: departments}">{% include "tools/contacts/multi_select.html" %}</div>
+                     x-data="{objectsToSelect: departments}">{% include "tools/contacts/multi_select.html" with placeholder="Cherchez et sélectionnez vos départements" label="Sélectionnez un ou plusieurs départements, laissez vide pour toute la France" %}</div>
             </template>
             <div class="fr-p-3v modal-create-organization__block d-flex">
                 <button class="fr-btn fr-btn--secondary fr-mr-3v w-100 justify-content-center"
