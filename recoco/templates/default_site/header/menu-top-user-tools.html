@@ -65,15 +65,6 @@
                             <a class="fr-nav__link" href="{% url 'admin:index' %}">Administration Reco-co</a>
                         </li>
                     {% endif %}
-                    <!-- Address Book -->
-                    {% if "use_addressbook" in user_site_perms %}
-                        <li>
-                            <a href="{% url 'addressbook-organization-list' %}"
-                               class="fr-nav__link"
-                               data-test-id="button-adress-book"
-                               {% if 'addressbook-organization' in url_name %}aria-current="page"{% endif %}>Carnet d'adresses</a>
-                        </li>
-                    {% endif %}
                     <!-- Contact Book -->
                     {% if "use_addressbook" in user_site_perms %}
                         <li>
