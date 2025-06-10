@@ -65,13 +65,12 @@
                             <a class="fr-nav__link" href="{% url 'admin:index' %}">Administration Reco-co</a>
                         </li>
                     {% endif %}
-                    <!-- Address Book -->
+                    <!-- Contact Book -->
                     {% if "use_addressbook" in user_site_perms %}
                         <li>
-                            <a href="{% url 'addressbook-organization-list' %}"
+                            <a href="{% url 'addressbook-contact-list' %}"
                                class="fr-nav__link"
-                               data-test-id="button-adress-book"
-                               {% if 'addressbook' in url_name %}aria-current="page"{% endif %}>Carnet d'adresses</a>
+                               {% if 'addressbook-contact' in url_name %}aria-current="page"{% endif %}>Carnet de contacts <span class="badge text-bg-primary">New</span></a>
                         </li>
                     {% endif %}
                     {% if is_staff %}
