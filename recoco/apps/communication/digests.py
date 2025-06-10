@@ -18,6 +18,7 @@ from django.db.models.query import QuerySet
 from django.urls import reverse
 
 from recoco import utils, verbs
+from recoco.apps.home.models import SiteConfiguration
 from recoco.apps.projects import models as projects_models
 from recoco.apps.reminders.api import (
     get_due_new_recommendations_reminder_for_project,
@@ -292,20 +293,21 @@ def make_site_digest(site):
         "name": site.name,
     }
 
-    siteconf = utils.get_site_config_or_503(site)
+    site_config = SiteConfiguration.objects.get(site=site)
+
     data.update(
         {
-            "description": siteconf.description or "",
-            "sender_name": siteconf.sender_name or "",
-            "sender_email": siteconf.sender_email or "",
-            "legal_address": siteconf.legal_address or "",
-            "main_topic": siteconf.main_topic or "",
-            "legal_owner": siteconf.legal_owner or "",
+            "description": site_config.description or "",
+            "sender_name": site_config.sender_name or "",
+            "sender_email": site_config.sender_email or "",
+            "legal_address": site_config.legal_address or "",
+            "main_topic": site_config.main_topic or "",
+            "legal_owner": site_config.legal_owner or "",
         }
     )
 
-    if siteconf.email_logo:
-        data["site_logo"] = utils.build_absolute_url(siteconf.email_logo.url)
+    if site_config.email_logo:
+        data["site_logo"] = utils.build_absolute_url(site_config.email_logo.url)
 
     return data
 
@@ -313,9 +315,9 @@ def make_site_digest(site):
 def make_project_survey_digest_for_site(user, project, site):
     """Return survey information as a dict for a given project on a given site"""
 
-    siteconf = utils.get_site_config_or_503(site)
+    site_config = SiteConfiguration.objects.get(site=site)
 
-    if not siteconf.project_survey:
+    if not site_config.project_survey:
         return {"name": None, "url": None}
 
     project_survey_url = utils.build_absolute_url(
@@ -324,7 +326,7 @@ def make_project_survey_digest_for_site(user, project, site):
         site=site,
     )
 
-    data = {"name": siteconf.project_survey.name, "url": project_survey_url}
+    data = {"name": site_config.project_survey.name, "url": project_survey_url}
 
     return data
 
