@@ -70,6 +70,10 @@ def resource_search(request):
         .prefetch_related("task_recommendations")
     )
 
+    no_category = form.cleaned_data.get("no_category", False)
+    resources = resources.filter(category__isnull=no_category)
+    # TODO join resource with check category and without category if no_category is check
+
     # If we are not allowed to manage resources, filter out DRAFT/TO_REVIEW items and
     # imported resources
     if not has_perm(request.user, "manage_resources", request.site):
@@ -171,6 +175,7 @@ class SearchForm(forms.Form):
     expired = forms.BooleanField(required=False, initial=False)
     to_review = forms.BooleanField(required=False, initial=False)
     published = forms.BooleanField(required=False, initial=True)
+    no_category = forms.BooleanField(required=False, initial=False)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
