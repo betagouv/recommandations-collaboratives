@@ -31,6 +31,7 @@ from watson import search as watson
 from recoco.apps.addressbook import models as addressbook_models
 from recoco.apps.geomatics import models as geomatics_models
 
+# from recoco.apps.tasks.models import Task
 from . import apps
 
 
@@ -278,30 +279,20 @@ class Resource(CloneMixin, models.Model):
 
         return watson.filter(resources, query)
 
-    def addons(self, task_id: int | None = None) -> models.QuerySet["ResourceAddon"]:
-        queryset = self.recommandations.resource_addons().exclude(enabled=False)
-        if task_id:
-            queryset = queryset.filter(recommandations__task_id=task_id)
-        return queryset
 
-
-from recoco.apps.tasks.models import Task
+class ResourceAddonManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().select_related("recommendation__resource")
 
 
 class ResourceAddon(TimeStampedModel):
-    # resource = models.ForeignKey(
-    #     Resource,
-    #     on_delete=models.CASCADE,
-    #     related_name="resource_addons",
-    # )
-
     enabled = models.BooleanField(
         default=False,
         help_text="Indique si l'addon est activé pour cette ressource",
     )
 
     recommendation = models.ForeignKey(
-        Task,
+        "tasks.Task",
         on_delete=models.CASCADE,
         related_name="resource_addons",
     )
@@ -316,6 +307,12 @@ class ResourceAddon(TimeStampedModel):
         default=dict,
         blank=True,
     )
+
+    objects = ResourceAddonManager()
+
+    @property
+    def resource(self):
+        return self.recommendation.resource
 
     class Meta:
         verbose_name = "Addon de ressource"
