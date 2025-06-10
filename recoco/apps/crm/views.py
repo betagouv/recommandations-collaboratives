@@ -66,7 +66,6 @@ from recoco.apps.reminders import models as reminders_models
 from recoco.apps.tasks.models import Task
 from recoco.utils import (
     get_group_for_site,
-    get_site_config_or_503,
     has_perm,
     has_perm_or_403,
     make_group_name_for_site,
@@ -783,7 +782,7 @@ def project_details(request, project_id):
 
     project = get_object_or_404(Project.all_on_site, pk=project_id)
 
-    site_config = get_site_config_or_503(request.site)
+    site_config = request.site_config
 
     site_origin = project.project_sites.get(is_origin=True)
 
@@ -871,7 +870,7 @@ def project_toggle_annotation(request, project_id=None):
 
     project = get_object_or_404(Project.on_site, pk=project_id)
 
-    site_config = get_site_config_or_503(request.site)
+    site_config = request.site_config
 
     form = forms.ProjectAnnotationForm(request.POST)
     if form.is_valid():
@@ -1078,7 +1077,7 @@ def crm_list_recommendation_without_resources(request):
 
 
 def make_low_reach_project_query(request):
-    site_config = get_site_config_or_503(request.site)
+    site_config = request.site_config
 
     return (
         Project.on_site.filter(
