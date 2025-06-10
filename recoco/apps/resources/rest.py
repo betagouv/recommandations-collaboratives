@@ -104,12 +104,7 @@ class ResourceAddonViewSet(viewsets.ModelViewSet):
     pagination_class = StandardResultsSetPagination
 
     def get_queryset(self):
-        return ResourceAddon.objects.filter(
-            recommendation__resource__site_origin=self.request.site
-        )
-
-    def perform_create(self, serializer):
-        serializer.save(site=self.request.site)
+        return ResourceAddon.objects.filter(recommendation__site=self.request.site)
 
 
 # eof

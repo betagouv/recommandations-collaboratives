@@ -139,8 +139,48 @@ class TestRessourceAddonViewSet:
         user = baker.make(auth_models.User)
         assign_perm("sites.manage_resources", user, current_site)
 
-        api_client.force_authenticate(user)
+        resource_addon = baker.make(
+            models.ResourceAddon,
+            nature="hub_with_iframe",
+            recommendation__site=current_site,
+            data={
+                "title": "Hub avec iframe",
+                "iframe_url": "https://www.example.com",
+            },
+        )
 
+        api_client.force_authenticate(user)
         response = api_client.get(reverse("resource-addons-list"))
         assert response.status_code == 200
-        assert response.data["count"] == 0
+        assert response.data["count"] == 1
+        assert response.data["results"][0] == {
+            "id": resource_addon.id,
+            "nature": "hub_with_iframe",
+            "recommendation": resource_addon.recommendation_id,
+            "data": {
+                "title": "Hub avec iframe",
+                "iframe_url": "https://www.example.com",
+            },
+        }
+
+    @pytest.mark.django_db
+    def test_create_resource_addon(self, api_client, current_site):
+        user = baker.make(auth_models.User)
+        assign_perm("sites.manage_resources", user, current_site)
+
+        resource = baker.make("resources.Resource", sites=[current_site])
+        recommendation = baker.make("tasks.Task", site=current_site, resource=resource)
+
+        api_client.force_authenticate(user)
+        response = api_client.post(
+            reverse("resource-addons-list"),
+            data={
+                "nature": "hub_with_iframe",
+                "recommendation": recommendation.id,
+                # "data": {
+                #     "title": "Hub avec iframe",
+                #     "iframe_url": "https://www.example.com",
+                # },
+            },
+        )
+        assert response.status_code == 201, response.content
