@@ -65,7 +65,7 @@
                          class="text-info-custom fw-light font-small text-dark fr-mb-2v fr-p-0"></div>
                 </template>
                 <template x-if="!task.resource_id && task.contact">
-                    <div x-data="{contact: task.contact}"
+                    <div x-data="{contact: task.contact,isOpenDeleteContact:null}"
                          class="container__card-contact--no-ressource">
                         {% include "tools/contacts/contact_card.html" %}
                     </div>
