@@ -6,7 +6,8 @@
 {% endblock css %}
 <input type="search"
        data-cy="search-bar-project"
-       class="fr-icon-search-line"
+       class="fr-icon-search-line placeholder-position"
        placeholder="{{ placeholder|default:"Rechercher" }}"
        @input.debounce.500ms="{{ action_search }}"
        {% if x_model %}x-model="{{ x_model }}"{% endif %}>
+<span class="fr-icon-search-line correct-position" aria-hidden="true"></span>

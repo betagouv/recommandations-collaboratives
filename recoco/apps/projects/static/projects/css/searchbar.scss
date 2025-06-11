@@ -5,3 +5,19 @@ input {
   width: 100%;
   border-radius: 100px;
 }
+
+.correct-position {
+  position: absolute;
+  left: 10px;
+  top: 5px;
+  width: 50%;
+}
+
+.correct-position::before {
+  --icon-size: 1.2rem;
+  color: #929292;
+}
+
+.placeholder-position {
+  padding-left: 32px;
+}
