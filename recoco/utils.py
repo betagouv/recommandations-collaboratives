@@ -12,8 +12,9 @@ from contextlib import contextmanager
 from functools import wraps
 from pathlib import Path
 from typing import AnyStr
-from urllib.parse import urldefrag, urljoin
+from urllib.parse import parse_qs, urlencode, urljoin, urlparse, urlunparse
 
+from django.conf import settings
 from django.contrib.auth import models as auth
 from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.sites.models import Site
@@ -22,7 +23,7 @@ from django.db import migrations
 from django.db import models as db_models
 from django.db.models.functions import Cast
 from django.http import HttpResponseBadRequest
-from sesame.utils import get_query_string
+from sesame.tokens import create_token
 
 
 def make_site_slug(site: Site):
@@ -123,11 +124,22 @@ def build_absolute_url(path, auto_login_user=None, site=None):
     url = urljoin(base, path)
 
     if auto_login_user:
-        parsed_url = urldefrag(url)
-        sesame_qstring = get_query_string(auto_login_user)
-        url = f"{parsed_url.url}{sesame_qstring}"
-        if parsed_url.fragment:
-            url = f"{url}#{parsed_url.fragment}"
+        parsed_url = urlparse(url)
+        params = parse_qs(parsed_url.query)
+
+        url = urlunparse(
+            parsed_url._replace(
+                query=urlencode(
+                    params
+                    | {
+                        getattr(settings, "SESAME_TOKEN_NAME", "sesame"): [
+                            create_token(user=auto_login_user)
+                        ]
+                    },
+                    doseq=True,
+                )
+            )
+        )
 
     return url
 

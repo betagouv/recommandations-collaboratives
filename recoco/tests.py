@@ -1,3 +1,5 @@
+from urllib.parse import unquote
+
 import pytest
 from autoslug import AutoSlugField
 from django.conf import settings
@@ -35,6 +37,13 @@ def test_build_absolute_url_with_auto_login():
     assert url.startswith("https://")
     assert "/somewhere" in url
     assert "?sesame=" in url
+
+
+@pytest.mark.django_db
+def test_build_absolute_url_with_autologin_and_params():
+    user = Recipe(auth.User, username="owner", email="owner@example.com").make()
+    url = utils.build_absolute_url("somewhere?param=around-the-rainbow", user)
+    assert "somewhere?param=around-the-rainbow&sesame=" in unquote(url)
 
 
 @pytest.mark.django_db
