@@ -85,11 +85,14 @@ class OrganizationDetailSerializer(OrganizationListSerializer):
 
 
 class NestedOrganizationSerializer(OrganizationListSerializer):
+    group = OrganizationGroupSerializer()
+
     class Meta:
         model = Organization
         fields = [
             "id",
             "name",
+            "group",
             "_link",
         ]
 
