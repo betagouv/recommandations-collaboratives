@@ -95,6 +95,10 @@ class Organization(TimeStampedModel):
     def __str__(self):  # pragma: nocover
         return "{0}".format(self.name)
 
+    @property
+    def has_departments(self):
+        return self.departments.exists()
+
     @classmethod
     def get_or_create(cls, name):
         """Return existing organization with casefree name or new one"""
