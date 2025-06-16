@@ -19,6 +19,7 @@ Alpine.data('ContactBook', () => {
     async init() {
       try {
         const response = await api.get(contactsUrl(25));
+        console.log(response.data.results);
         this.contactListGroupByOrganization = this.groupContactByOrganization(
           response.data.results
         );
@@ -79,6 +80,22 @@ Alpine.data('ContactBook', () => {
       }
       return contactByOrganizationArray;
     },
+
+    // groupContactByNationalGroup(contactList) {
+    //   const contactByNationalGroup = _.groupBy(
+    //     contactList,
+    //     ({ national_group: { name } }) => name
+    //   );
+    //   const contactByNationalGroupArray = [];
+    //   for (const key in contactByNationalGroup) {
+    //     contactByNationalGroupArray.push({
+    //       name: key,
+    //       id: contactByNationalGroup[key][0].national_group.id,
+    //       contacts: contactByNationalGroup[key],
+    //     });
+    //   }
+    //   return contactByNationalGroupArray;
+    // },
 
     resetLetterFilter() {
       this.searchParams.letter = null;
