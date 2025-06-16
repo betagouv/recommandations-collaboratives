@@ -11,7 +11,7 @@
          class="modal-create-organization z-2">
         <form @submit.prevent>
             <div class="d-flex justify-content-between border-bottom-666 fr-p-3v modal-create-contact__block">
-                <p class="fw-bold color-666 correct-p text-uppercase">Créer un organisation</p>
+                <p class="fw-bold color-666 correct-p text-uppercase">Créer une organisation</p>
                 <span class="fr-icon-close-line color-666 cursor-pointer"
                       aria-hidden="true"
                       @click.prevent="Modal.closeModal()"></span>
@@ -32,11 +32,17 @@
                        x-model="organization.name"
                        required>
             </div>
+            <template x-if="departments">
+                <div class="fr-p-3v modal-create-organization__block"
+                     x-data="{objectsToSelect: departments}">
+                     {% include "tools/contacts/multi_select.html" with placeholder="Cherchez et sélectionnez vos départements" label="Départements" helptext="Sélectionnez un ou plusieurs départements, laissez vide pour toute la France" %}
+                </div>
+            </template>
             <div class="fr-p-3v modal-create-organization__block">
                 <fieldset class="fr-fieldset fr-mb-0"
                           id="radio-hint"
                           aria-labelledby="radio-hint-legend radio-hint-messages">
-                    <legend class="fr-fieldset__legend--regular fr-fieldset__legend fw-700 fr-pb-0"
+                    <legend class="fr-fieldset__legend--regular fr-fieldset__legend fw-700 fr-pb-0 modal-create-organization__label"
                             id="radio-hint-legend">
                         Rattachement national
                         <span class="fr-hint-text">Cette organisation est-elle rattachée à une structure-mère ou un réseau national ? Ex : le Cerema Occitanie se rattache à la structure Cerema.</span>
@@ -124,10 +130,6 @@
                          aria-live="assertive"></div>
                 </fieldset>
             </div>
-            <template x-if="departments">
-                <div class="fr-p-3v modal-create-organization__block"
-                     x-data="{objectsToSelect: departments}">{% include "tools/contacts/multi_select.html" with placeholder="Cherchez et sélectionnez vos départements" label="Sélectionnez un ou plusieurs départements, laissez vide pour toute la France" %}</div>
-            </template>
             <div class="fr-p-3v modal-create-organization__block d-flex">
                 <button class="fr-btn fr-btn--secondary fr-mr-3v w-100 justify-content-center"
                         @click.prevent="Modal.closeModal()">Annuler</button>
