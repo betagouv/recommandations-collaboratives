@@ -123,31 +123,32 @@ def build_absolute_url(path, auto_login_user=None, site=None):
     base = "https://" + current_site.domain
     url = urljoin(base, path)
 
-    # Check if the account is sensitive and should not all autologin
-    sensitive_account = (
-        auto_login_user.is_staff
-        | auto_login_user.is_superuser
-        | is_staff_for_site(auto_login_user)
-        | is_admin_for_site(auto_login_user)
-    )
+    if auto_login_user:
+        # Check if the account is sensitive and should not allow autologin
+        sensitive_account = (
+            auto_login_user.is_staff
+            | auto_login_user.is_superuser
+            | is_staff_for_site(auto_login_user)
+            | is_admin_for_site(auto_login_user)
+        )
 
-    if auto_login_user and not sensitive_account:
-        parsed_url = urlparse(url)
-        params = parse_qs(parsed_url.query)
+        if not sensitive_account:
+            parsed_url = urlparse(url)
+            params = parse_qs(parsed_url.query)
 
-        url = urlunparse(
-            parsed_url._replace(
-                query=urlencode(
-                    params
-                    | {
-                        getattr(settings, "SESAME_TOKEN_NAME", "sesame"): [
-                            create_token(user=auto_login_user)
-                        ]
-                    },
-                    doseq=True,
+            url = urlunparse(
+                parsed_url._replace(
+                    query=urlencode(
+                        params
+                        | {
+                            getattr(settings, "SESAME_TOKEN_NAME", "sesame"): [
+                                create_token(user=auto_login_user)
+                            ]
+                        },
+                        doseq=True,
+                    )
                 )
             )
-        )
 
     return url
 
