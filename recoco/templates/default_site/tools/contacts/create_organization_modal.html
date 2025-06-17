@@ -8,7 +8,7 @@
     <div x-data="CreateOrganizationModal(contact.organization.name)"
          id="create-organization-modal"
          @set-departments="handleDepartmentsSelection($event.detail)"
-         class="modal-create-organization z-2">
+         class="modal-create-organization z-1002">
         <form @submit.prevent>
             <div class="d-flex justify-content-between border-bottom-666 fr-p-3v modal-create-contact__block">
                 <p class="fw-bold color-666 correct-p text-uppercase">Créer une organisation</p>
@@ -18,7 +18,7 @@
             </div>
             <div class="fr-p-3v modal-create-organization__block"
                  :class="{'fr-input-group--error': formState.isSubmitted && !formState.fields.isOrgaName}">
-                <label class="modal-create-organization__label">Nom de l'organisation</label>
+                <label class="modal-create-organization__label d-inline">Nom de l'organisation</label>
                 <span class="color-important">*</span>
                 <p class="modal-create-organization__label-info grey-text">
                     Préciser sa zone géographique éventuelle (ex : Cerema Occitanie)
@@ -35,7 +35,7 @@
             <template x-if="departments">
                 <div class="fr-p-3v modal-create-organization__block"
                      x-data="{objectsToSelect: departments}">
-                     {% include "tools/contacts/multi_select.html" with placeholder="Cherchez et sélectionnez vos départements" label="Départements" helptext="Sélectionnez un ou plusieurs départements, laissez vide pour toute la France" %}
+                     {% include "tools/contacts/multi_select.html" with placeholder="Sélectionnez vos départements" label="Départements (facultatif)" helptext="Si l'organisation n'est active que sur certains territoires, sélectionnez-les ici." %}
                 </div>
             </template>
             <div class="fr-p-3v modal-create-organization__block">
