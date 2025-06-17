@@ -99,6 +99,7 @@ def serialized_project(project, organization):
                         "_link": f"/api/addressbook/organizations/{organization.id}/",
                         "id": organization.id,
                         "name": "Jedi corp",
+                        "group": None,
                     },
                     "organization_position": "Padawan",
                 },
