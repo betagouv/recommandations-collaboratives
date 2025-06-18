@@ -127,8 +127,6 @@
                         </ul>
                     </div>
                 {% endif %}
-
-
                 {% if is_staff %}
                     <div class="fr-pb-2w fr-px-3w">
                         <h5 class="d-flex align-items-center relative fr-pb-2v text-info-custom text-grey-dark">
@@ -142,11 +140,17 @@
                                 {% url 'mfa_activate_totp' as url %}
                                 {% include "crm/fragments/crm_icon_button.html" with link_url=url name="Authentification forte" icon="lock-fill" %}
                             </li>
+                            <li class="fr-mr-2v col-2">
+                                {% url 'account_email' as email_url_ %}
+                                {% include "crm/fragments/crm_icon_button.html" with link_url=email_url_ name="Vérifier l'adresse email" icon="envelope-fill" %}
+                            </li>
+                            <li class="fr-mr-2v col-2">
+                                {% url 'mfa_index' as mfa_url_ %}
+                                {% include "crm/fragments/crm_icon_button.html" with link_url=mfa_url_ name="Gestion de la double authentification" icon="lock-fill" %}
+                            </li>
                         </ul>
                     </div>
                 {% endif %}
-
-
             </div>
             <div class="fr-px-3w fr-pt-1v bg-light crm-timeline-min-height">
                 <h3 class="fr-mt-2w">
