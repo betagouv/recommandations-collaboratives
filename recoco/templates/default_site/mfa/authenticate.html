@@ -2,9 +2,12 @@
 {% load i18n %}
 {% load allauth %}
 {% load allauth static %}
-{% block head_title %}
+{% block title %}
     {% trans "Sign In" %}
-{% endblock head_title %}
+{% endblock title %}
+{% block og_title %}
+    {% trans "Sign In" %}
+{% endblock og_title %}
 {% block content %}
     <div class="fr-container fr-container--fluid fr-my-md-14v">
         <div class="fr-grid-row fr-grid-row-gutters fr-grid-row--center">
