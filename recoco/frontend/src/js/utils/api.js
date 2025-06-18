@@ -72,8 +72,6 @@ export function projectsUrl(search, departments, lastActivity) {
   if (departments.length) {
     departments = departments.map((code) => `departments=${code}`).join('&');
     url = url + '&' + departments;
-    // }
-    console.log(url);
   }
   return url;
 }

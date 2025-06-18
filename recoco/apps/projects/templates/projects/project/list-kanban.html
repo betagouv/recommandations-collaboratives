@@ -151,6 +151,21 @@
                                                                     <span class="kanban-card__project-name project-link"
                                                                           x-text="truncate(t.name)"></span>
                                                                 </div>
+                                                                <template x-if="t.tags.length > 0">
+                                                                        <div class="kanban-card__tags-container d-flex">
+                                                                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="11" viewBox="0 0 12 11" fill="none" class="fr-mt-0-5v min-width-12">
+                                                                                <path d="M5.4521 1.05011L10.4019 1.75721L11.109 6.70698L6.51275 11.3031C6.3175 11.4984 6.00095 11.4984 5.80565 11.3031L0.855921 6.35343C0.660656 6.15813 0.660656 5.84158 0.855921 5.64628L5.4521 1.05011ZM5.80565 2.11077L1.91658 5.99983L6.1592 10.2425L10.0483 6.35343L9.518 2.6411L5.80565 2.11077ZM6.86635 5.29273C6.4758 4.90222 6.4758 4.26906 6.86635 3.87853C7.25685 3.48801 7.89 3.48801 8.28055 3.87853C8.67105 4.26906 8.67105 4.90222 8.28055 5.29273C7.89 5.68328 7.25685 5.68328 6.86635 5.29273Z" fill="#666666"/>
+                                                                            </svg>
+                                                                            <div class="d-flex flex-wrap">
+                                                                                <template x-for="tag in t.tags">
+                                                                                    <div @click.prevent="$data.onTagClick(tag)" class="fr-mr-1v">
+                                                                                        <p class="fake-a-link fr-mb-0">#<span class="fake-a-link"x-text="tag"></span>
+                                                                                        </p>
+                                                                                    </div>
+                                                                                </template>
+                                                                            </div>
+                                                                        </div>
+                                                                </template>
                                                                 <template x-if="t.origin">
                                                                     <div class="kanban-card__project-push-by-container"
                                                                          data-cy="kanban-project-shared-by-origin"
