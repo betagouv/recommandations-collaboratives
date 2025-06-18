@@ -39,7 +39,9 @@
                                 </div>
                                 <button type="submit" class="fr-btn fr-btn--primary">{% trans "Sign In" %}</button>
                                 {% if "webauthn" not in MFA_SUPPORTED_TYPES %}
-                                    <button type="submit" class="fr-btn fr-btn--secondary">{% trans "Cancel" %}</button>
+                                    <button type="submit"
+                                            form="logout-from-stage"
+                                            class="fr-btn fr-btn--secondary">{% trans "Cancel" %}</button>
                                 {% endif %}
                             </form>
                             {% if "webauthn" in MFA_SUPPORTED_TYPES %}
