@@ -15,15 +15,14 @@ Alpine.data('ContactBook', () => {
       letter: null,
     },
     letters: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split(''),
-    contactListGroupByOrganization: {},
+    contactListGroupByNationalGroup: {},
     async init() {
       try {
         const response = await api.get(contactsUrl(25));
-        console.log(response.data.results);
-        this.contactListGroupByOrganization = this.groupContactByOrganization(
+        this.contactListGroupByNationalGroup = this.groupContactByNationalGroup(
           response.data.results
         );
-        this.getDepartmentsOrganization(this.contactListGroupByOrganization);
+        this.getDepartmentsOrganization(this.contactListGroupByNationalGroup);
         if (sessionStorage.getItem('letter')) {
           this.loadOrganizationStartingWith(sessionStorage.getItem('letter'));
         }
@@ -33,12 +32,14 @@ Alpine.data('ContactBook', () => {
         throw new Error('Erreur lors de la récupération des contacts');
       }
     },
-    async getDepartmentsOrganization(organizationList) {
-      for (const orga of organizationList) {
-        if (orga.id) {
-          orga.departments = (
-            await api.get(getOrganizationById(orga.id))
-          ).data.departments;
+    async getDepartmentsOrganization(nationalGroupList) {
+      for (const nationalGroup of nationalGroupList) {
+        for (const orga of nationalGroup.organizations) {
+          if (orga.id) {
+            orga.departments = (
+              await api.get(getOrganizationById(orga.id))
+            ).data.departments;
+          }
         }
       }
     },
@@ -59,13 +60,14 @@ Alpine.data('ContactBook', () => {
       const response = await api.get(
         searchContactsUrl(this.searchParams.search, this.searchParams.letter)
       );
-      this.contactListGroupByOrganization = this.groupContactByOrganization(
+      this.contactListGroupByNationalGroup = this.groupContactByNationalGroup(
         response.data.results
       );
-      this.getDepartmentsOrganization(this.contactListGroupByOrganization);
+      this.getDepartmentsOrganization(this.contactListGroupByNationalGroup);
     },
 
     groupContactByOrganization(contactList) {
+      contactList.sort((a,b)=>a.organization.name.localeCompare(b.organization.name, 'en', { sensitivity: 'base' }));
       const contactByOrganization = _.groupBy(
         contactList,
         ({ organization: { name } }) => name
@@ -81,21 +83,22 @@ Alpine.data('ContactBook', () => {
       return contactByOrganizationArray;
     },
 
-    // groupContactByNationalGroup(contactList) {
-    //   const contactByNationalGroup = _.groupBy(
-    //     contactList,
-    //     ({ national_group: { name } }) => name
-    //   );
-    //   const contactByNationalGroupArray = [];
-    //   for (const key in contactByNationalGroup) {
-    //     contactByNationalGroupArray.push({
-    //       name: key,
-    //       id: contactByNationalGroup[key][0].national_group.id,
-    //       contacts: contactByNationalGroup[key],
-    //     });
-    //   }
-    //   return contactByNationalGroupArray;
-    // },
+    groupContactByNationalGroup(contactList) {
+      const contactByNationalGroup = _.groupBy(
+        contactList,
+        contact => contact.organization?.group?.name || 'Autres'
+      );
+      const contactByNationalGroupArray = [];
+      for (const key in contactByNationalGroup) {
+        contactByNationalGroupArray.push({
+          name: key,
+          id: contactByNationalGroup[key][0].organization.group?.id,
+          organizations: this.groupContactByOrganization(contactByNationalGroup[key]),
+        });
+      }
+      contactByNationalGroupArray.sort((a,b)=>a.name.localeCompare(b.name, 'en', { sensitivity: 'base' }))
+      return contactByNationalGroupArray;
+    },
 
     resetLetterFilter() {
       this.searchParams.letter = null;
