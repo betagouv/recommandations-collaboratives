@@ -153,8 +153,9 @@
                                                                 </div>
                                                                 <template x-if="t.tags.length > 0">
                                                                     <div class="kanban-card__tags-container d-flex">
-                                                                        <span class="fr-icon-pantone-line fr-icon--sm" aria-hidden="true"></span>
-                                                                        <div class="d-flex flex-wrap">
+                                                                        <span class="fr-icon-pantone-line fr-icon--sm not-a-link"
+                                                                              aria-hidden="true"></span>
+                                                                        <div class="d-flex flex-wrap align-items-center">
                                                                             <template x-for="tag in t.tags">
                                                                                 <div @click.prevent="onTagClick(tag)" class="fr-mr-1v">
                                                                                     <p class="fake-a-link fr-mb-0">
