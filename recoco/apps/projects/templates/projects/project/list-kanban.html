@@ -152,17 +152,18 @@
                                                                           x-text="truncate(t.name)"></span>
                                                                 </div>
                                                                 <template x-if="t.tags.length > 0">
-                                                                        <div class="kanban-card__tags-container d-flex">
-                                                                            <span class="fr-icon-pantone-line fr-icon--sm min-width-12" aria-hidden="true"></span>
-                                                                            <div class="d-flex flex-wrap">
-                                                                                <template x-for="tag in t.tags">
-                                                                                    <div @click.prevent="onTagClick(tag)" class="fr-mr-1v">
-                                                                                        <p class="fake-a-link fr-mb-0">#<span class="fake-a-link"x-text="tag"></span>
-                                                                                        </p>
-                                                                                    </div>
-                                                                                </template>
-                                                                            </div>
+                                                                    <div class="kanban-card__tags-container d-flex">
+                                                                        <span class="fr-icon-pantone-line fr-icon--sm" aria-hidden="true"></span>
+                                                                        <div class="d-flex flex-wrap">
+                                                                            <template x-for="tag in t.tags">
+                                                                                <div @click.prevent="onTagClick(tag)" class="fr-mr-1v">
+                                                                                    <p class="fake-a-link fr-mb-0">
+                                                                                        #<span x-text="tag"></span>
+                                                                                    </p>
+                                                                                </div>
+                                                                            </template>
                                                                         </div>
+                                                                    </div>
                                                                 </template>
                                                                 <template x-if="t.origin">
                                                                     <div class="kanban-card__project-push-by-container"
