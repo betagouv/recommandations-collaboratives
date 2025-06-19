@@ -108,5 +108,22 @@ Alpine.data('ContactBook', () => {
       }
       this.isCreateContactModalOpen = false;
     },
+
+    isCreateOrganizationModalOpen: false,
+    openModalCreateOrganization(organization = null) {
+      console.log('openModalCreateOrganization', organization);
+      this.isCreateOrganizationModalOpen = true;
+      if (organization) {
+        this.$nextTick(() => {
+          this.$dispatch('init-create-organization-modal-data', organization);
+        });
+      }
+    },
+    closeCreateOrganizationModal(event) {
+      if (event.target.id !== 'create-organization-modal') {
+        return;
+      }
+      this.isCreateOrganizationModalOpen = false;
+    },
   };
 });

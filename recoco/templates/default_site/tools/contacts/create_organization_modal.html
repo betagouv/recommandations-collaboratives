@@ -8,10 +8,12 @@
     <div x-data="CreateOrganizationModal(contact.organization.name)"
          id="create-organization-modal"
          @set-departments="handleDepartmentsSelection($event.detail)"
+         @init-create-organization-modal-data.window="initCreateOrganizationModalData($event)"
          class="modal-create-organization z-1002">
         <form @submit.prevent>
             <div class="d-flex justify-content-between border-bottom-666 fr-p-3v modal-create-contact__block">
-                <p class="fw-bold color-666 correct-p text-uppercase">Créer une organisation</p>
+                <p class="fw-bold color-666 correct-p text-uppercase"
+                   x-text="isFormInEditMode ? 'Modifier une organisation' : 'Créer une organisation'"></p>
                 <span class="fr-icon-close-line color-666 cursor-pointer"
                       aria-hidden="true"
                       @click.prevent="Modal.closeModal()"></span>

@@ -95,7 +95,7 @@ Alpine.data('CreateOrganizationModal', (organizationName) => {
         console.log(error);
       }
     },
-    createOrganization() {
+    createOrganization(isItReturningData = false) {
       this.formState.fields = {
         isOrgaName: this.organization.name !== '',
         isGroupNat: this.formState.fields.isGroupNat == 'true',
@@ -112,7 +112,11 @@ Alpine.data('CreateOrganizationModal', (organizationName) => {
         api
           .post(organizationsUrl(), this.organization)
           .then((response) => {
-            this.Modal.responseModal(response.data);
+            if (isItReturningData) {
+              this.Modal.responseModal(response.data);
+            } else {
+              this.Modal.closeModal();
+            }
           })
           .catch((error) => {
             console.log(error);
@@ -121,6 +125,17 @@ Alpine.data('CreateOrganizationModal', (organizationName) => {
     },
     handleDepartmentsSelection(departments) {
       this.organization.departments = departments;
+    },
+    initCreateOrganizationModalData($event) {
+      console.log($event.detail);
+      this.organization = { ...$event.detail };
+      if (this.organization.id) {
+        this.isFormInEditMode = true;
+      }
+      if (this.organization.group) {
+
+        this.formState.fields.isOrgaSelected = true;
+      }
     },
   };
 });

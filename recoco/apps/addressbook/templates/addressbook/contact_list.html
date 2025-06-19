@@ -72,6 +72,8 @@
                 <div class="organization-container">
                     <div class="d-flex align-items-center">
                         <h3 class="organization__name fr-mb-0 no-wrap" x-text="organization.name"></h3>
+                        <button class="fr-btn fr-btn--tertiary-no-outline fr-btn--sm fr-icon-pencil-line button__actions-edit"
+                        @click="openModalCreateOrganization(organization)">Éditer l'organisation'</button>
                         <template x-if="organization.departments?.length > 0">
                             <div class="organization__departments"
                                  :title="organization.departments.map(department => `${department.name} (${department.code})`).join(', ')">
@@ -103,5 +105,6 @@
             </template>
         </div>
         {% include "tools/contacts/create_contact_modal.html" with isItReturningData=False %}
+        {% include "tools/contacts/create_organization_modal.html" with isItReturningData=False %}
     </div>
 {% endblock content %}
