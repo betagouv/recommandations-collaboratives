@@ -7,8 +7,9 @@ import { createMarkdownEditor } from 'tiptap-markdown';
 import '../../css/tiptap.css';
 import { formatDate } from '../utils/date';
 import Placeholder from '@tiptap/extension-placeholder';
+import { ContactCardExtension } from './ContactCardExtension';
 
-const MarkdownEditor = createMarkdownEditor(Editor);
+// const MarkdownEditor = createMarkdownEditor(Editor);
 
 Alpine.data('editor', (content) => {
   let editor;
@@ -20,7 +21,7 @@ Alpine.data('editor', (content) => {
     init() {
       const _this = this;
 
-      editor = new MarkdownEditor({
+      editor = new Editor({
         element: this.$refs.element,
         extensions: [
           StarterKit,
@@ -45,6 +46,7 @@ Alpine.data('editor', (content) => {
               };
             },
           }),
+          ContactCardExtension,
         ],
         content: content,
         onCreate({ editor }) {
@@ -56,8 +58,8 @@ Alpine.data('editor', (content) => {
           _this.renderMarkdown();
           _this.$store.editor.setIsSubmitted(false);
 
-          _this.$store.editor.isEditing = editor.getMarkdown() != '';
-          _this.$store.editor.currentMessage = editor.getMarkdown();
+          _this.$store.editor.isEditing = editor.getHTML() != '';
+          _this.$store.editor.currentMessage = editor.getHTML();
         },
         onSelectionUpdate({ editor }) {
           _this.updatedAt = Date.now();
@@ -121,7 +123,7 @@ Alpine.data('editor', (content) => {
       }
     },
     renderMarkdown() {
-      this.markdownContent = editor.getMarkdown().replaceAll('\\', '');
+      this.markdownContent = editor.getHTML();
     },
     /****************
      * Plugin contact
@@ -144,8 +146,43 @@ Alpine.data('editor', (content) => {
       const contact = event.detail;
       if (contact) {
         this.handleSetContact(contact);
+        // Insert contact card into editor
+        this.insertContactCard(contact);
       }
       this.isSearchContactModalOpen = false;
+    },
+    insertContactCard(contact) {
+      if (editor && contact) {
+        console.log('Inserting contact card:', contact);
+
+        const contactAttributes = {
+          id: contact.id,
+          firstName: contact.first_name,
+          lastName: contact.last_name,
+          email: contact.email,
+          phoneNo: contact.phone_no,
+          mobileNo: contact.mobile_no,
+          division: contact.division,
+          organization: contact.organization,
+          modified: contact.modified,
+          created: contact.created,
+        };
+
+        console.log('Contact attributes:', contactAttributes);
+
+        editor.chain().focus().insertContactCard(contactAttributes).run();
+      }
+    },
+    removeContactCard() {
+      if (editor) {
+        // Find the current selection and remove the contact card if it's selected
+        const { from, to } = editor.state.selection;
+        const node = editor.state.doc.nodeAt(from);
+
+        if (node && node.type.name === 'contactCard') {
+          editor.chain().focus().deleteSelection().run();
+        }
+      }
     },
   };
 });

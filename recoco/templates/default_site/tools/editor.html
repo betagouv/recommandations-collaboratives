@@ -101,26 +101,22 @@ Parameters:
             <!-- Recommendation module -->
             {% if can_add_reco %}
                 <!-- djlint:off -->
-                                                                                                                        <a data-test-id="create-task-button"
-                                                                                                                            href="{% url 'projects-create-task' %}?project_id={{ project.pk }}{% if next_url_add_reco %}&next={% url next_url_add_reco project.pk %}{% endif %}"
-                                                                                                                            class="fr-btn fr-btn--tertiary fr-btn--sm justify-content-center fr-text--sm button-add-reco">
-                                                                                                                                Créer une recommandation
-                                                                                        </a>
+                                                                                                                                                                        <a data-test-id="create-task-button"
+                                                                                                                                                                            href="{% url 'projects-create-task' %}?project_id={{ project.pk }}{% if next_url_add_reco %}&next={% url next_url_add_reco project.pk %}{% endif %}"
+                                                                                                                                                                            class="fr-btn fr-btn--tertiary fr-btn--sm justify-content-center fr-text--sm button-add-reco">
+                                                                                                                                                                                Créer une recommandation
+                                                                                                                            </a>
             <!-- djlint:on -->
         {% endif %}
         <!-- Contact module -->
         {% if can_attach_contact %}
-            <div x-cloak>
-                <template x-if="!selectedContact">
-                    <button @click.prevent="openModalSearchContact"
-                            data-test-id="button-add-contact-in-editor"
-                            class="fr-btn fr-btn--tertiary fr-btn--sm justify-content-center fr-text--sm button-add-contact">
-                        Ajouter un contact
-                    </button>
-                </template>
+            <div x-cloak @modal-response="insertContactCard($event.detail)">
+                <button @click.prevent="openModalSearchContact"
+                        data-test-id="button-add-contact-in-editor"
+                        class="fr-btn fr-btn--tertiary fr-btn--sm justify-content-center fr-text--sm button-add-contact">
+                    Ajouter un contact
+                </button>
                 {% include "tools/contacts/search_contact_modal.html" %}
-                <input type="hidden"
-                       {% if model %} x-model="{{ model }}.contact" x-modelable="selectedContact" {% else %} x-model="selectedContact" {% endif %}>
             </div>
         {% endif %}
     </div>
@@ -128,21 +124,6 @@ Parameters:
         {% for error in errors %}<div class="text-danger text-start fr-mb-2v">{{ error }}</div>{% endfor %}
     {% endif %}
 </div>
-{% if can_attach_contact %}
-    <template x-if="selectedContact">
-        <div class="d-flex flex-column contact-card__container">
-            <div class="border position-relative"
-                 x-data="{contact:selectedContact,isOpenDeleteContact:null}">
-                {% include "tools/contacts/contact_card.html" %}
-                <button @click.prevent="handleResetContact"
-                        data-test-id="button-remove-contact"
-                        class="fr-btn fr-btn--tertiary fr-btn--sm justify-content-center fr-text--sm close-contact-button-style position-absolute top-0 end-0">
-                    <span class="fr-icon-close-line" aria-hidden="true"></span>
-                </button>
-            </div>
-        </div>
-    </template>
-{% endif %}
 {% if can_attach_files %}
     <template x-if="fileName">
         <p>

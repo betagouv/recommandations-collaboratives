@@ -88,3 +88,90 @@
   //   left: 11.75rem;
   // }
 }
+
+// Contact card styles in editor
+.tiptap .contact-card {
+  border: 1px solid #e5e5e5;
+  border-radius: 0.25rem;
+  margin: 0.5rem 0;
+  background-color: #f8f9fa;
+  position: relative;
+
+  &__firstline-container {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .contact-info {
+    &__name {
+      font-weight: 600;
+      color: #333;
+    }
+
+    &__organization {
+      color: #666;
+      font-size: 0.875rem;
+    }
+
+    &__division {
+      color: #666;
+      font-size: 0.875rem;
+      margin-bottom: 0.25rem;
+    }
+
+    &__email,
+    &__phone {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.125rem;
+
+      a {
+        color: #0066cc;
+        text-decoration: none;
+
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+
+      button {
+        padding: 0.125rem 0.25rem;
+        font-size: 0.75rem;
+        border: 1px solid #ccc;
+        border-radius: 0.125rem;
+        background-color: #fff;
+        cursor: pointer;
+
+        &:hover {
+          background-color: #f0f0f0;
+        }
+      }
+    }
+  }
+
+  .contact-info-empty {
+    &__division,
+    &__email,
+    &__phone {
+      height: 1rem;
+    }
+  }
+
+  // Cancel button styles
+  .close-contact-button-style {
+    height: 40px;
+    box-shadow: none;
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    z-index: 10;
+
+    &:hover {
+      background-color: #f0f0f0;
+    }
+  }
+}
