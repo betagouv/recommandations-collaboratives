@@ -293,15 +293,52 @@
       .tiptap-menu-custom {
         top: 0.5rem;
       }
-      .file-upload-wrapper {
-        position: absolute;
-        bottom: 0.5rem;
-        left: 0.5rem;
-      }
+      // .file-upload-wrapper {
+      //   position: absolute;
+      //   bottom: 0.5rem;
+      //   left: 0.5rem;
+      // }
       .send-message {
         position: absolute;
         bottom: 0.5rem;
         right: 0.5rem;
+      }
+    }
+  }
+  // Override tiptap styles
+  .editor-container {
+    .tiptap-menu-custom {
+      display: none;
+    }
+    .button-module__container {
+      display: none;
+    }
+    .button-add-reco {
+      display: none;
+    }
+    .tiptap.ProseMirror {
+      min-height: 3.5rem;
+      max-height: 3.5rem;
+      height: 3.5rem;
+      padding: 0.75rem 0.5rem;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      overflow: hidden;
+    }
+    &:focus-within {
+      .tiptap-menu-custom {
+        display: block;
+      }
+      .button-module__container {
+        display: flex;
+      }
+      .button-add-reco {
+        display: block;
+      }
+      .tiptap.ProseMirror {
+        min-height: inherit;
+        max-height: inherit;
+        height: inherit;
+        padding: 3rem 0.5rem;
       }
     }
   }

@@ -41,6 +41,22 @@
   }
 }
 
+.button-module__container {
+  position: absolute;
+  bottom: 0.5rem;
+  left: 0.5rem;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.tiptap p.is-editor-empty:first-child::before {
+  color: #adb5bd;
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
 .close-contact-button-style {
   height: 40px;
   box-shadow: none;
@@ -55,20 +71,20 @@
     }
   }
 
-  .file-upload-wrapper {
-    position: absolute;
-    bottom: 0.5rem;
-    left: 0.5rem;
-  }
+  // .file-upload-wrapper {
+  //   position: absolute;
+  //   bottom: 0.5rem;
+  //   left: 0.5rem;
+  // }
 
   // .button-add-contact {
   //   position: absolute;
   //   bottom: 0.5rem;
   //   left: 11.75rem;
   // }
-  .button-add-reco {
-    position: absolute;
-    bottom: 0.5rem;
-    left: 11.75rem;
-  }
+  // .button-add-reco {
+  //   position: absolute;
+  //   bottom: 0.5rem;
+  //   left: 11.75rem;
+  // }
 }

@@ -348,7 +348,8 @@ def _build_feeds(project: models.Project, user: User) -> list[dict[str, Any]]:
             tasks_models.Task,
             project.tasks.filter(public=True),
             lambda item: item.updated_on,
-            lambda item: item.topic.name if item.topic else "",
+            # lambda item: item.topic.name if item.topic else "",
+            lambda item: "",
         ),
         (
             "followup",
@@ -357,7 +358,8 @@ def _build_feeds(project: models.Project, user: User) -> list[dict[str, Any]]:
                 task__in=project.tasks.filter(public=True)
             ),
             lambda item: item.timestamp,
-            lambda item: item.task.topic.name if item.task.topic else "",
+            # lambda item: item.task.topic.name if item.task.topic else "",
+            lambda item: "",
         ),
     ]
 

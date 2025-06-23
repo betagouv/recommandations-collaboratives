@@ -81,44 +81,49 @@ Parameters:
                   name="{{input_name|default:"content"}}"
                   {% if input_required %} required {% endif %}></textarea>
         {% comment %} <div x-cloak class="d-flex flex-column"> {% endcomment %}
-        {% if can_add_reco %}
-            <!-- djlint:off -->
-                                                                                                                                                <a data-test-id="create-task-button"
-                                                                                                                                                    href="{% url 'projects-create-task' %}?project_id={{ project.pk }}{% if next_url_add_reco %}&next={% url next_url_add_reco project.pk %}{% endif %}"
-                                                                                                                                                    class="fr-btn fr-btn--tertiary fr-btn--sm justify-content-center fr-text--sm button-add-reco">
-                                                                                                                                                        Créer une recommandation
-                                                                                                        </a>
-        <!-- djlint:on -->
-    {% endif %}
-    {% if can_attach_contact %}
-        <div x-cloak>
-            <template x-if="!selectedContact">
-                <button @click.prevent="openModalSearchContact"
-                        data-test-id="button-add-contact-in-editor"
-                        class="fr-btn fr-btn--tertiary fr-btn--sm justify-content-center fr-text--sm button-add-contact">
-                    Ajouter un contact
+        <div class="button-module__container">
+            <!-- File module -->
+            {% if can_attach_files %}
+                <!-- Action file -->
+                <button class="fr-btn fr-btn--sm fr-btn--tertiary fr-icon-file-add-line fr-btn--icon-left file-upload-wrapper"
+                        type="button"
+                        @click="$refs.fileUploadInput.click()">
+                    <span class="file-upload-text">Ajouter un fichier</span>
                 </button>
-            </template>
-            {% include "tools/contacts/search_contact_modal.html" %}
-            <input type="hidden"
-                   {% if model %} x-model="{{ model }}.contact" x-modelable="selectedContact" {% else %} x-model="selectedContact" {% endif %}>
-        </div>
-    {% endif %}
-    {% if can_attach_files %}
-        <!-- Action file -->
-        <button class="fr-btn fr-btn--sm fr-btn--tertiary fr-icon-file-add-line fr-btn--icon-left file-upload-wrapper"
-                type="button"
-                @click="$refs.fileUploadInput.click()">
-            <span class="file-upload-text">Ajouter un fichier</span>
-        </button>
-        {% if document_form.the_file.errors %}
-            <div class="fr-mb-3w">
-                {% for error in document_form.the_file.errors %}
-                    <div class="text-danger text-start fr-mb-2v">{{ error }}</div>
-                {% endfor %}
+                {% if document_form.the_file.errors %}
+                    <div class="fr-mb-3w">
+                        {% for error in document_form.the_file.errors %}
+                            <div class="text-danger text-start fr-mb-2v">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endif %}
+            <!-- Recommendation module -->
+            {% if can_add_reco %}
+                <!-- djlint:off -->
+                                                                                                                        <a data-test-id="create-task-button"
+                                                                                                                            href="{% url 'projects-create-task' %}?project_id={{ project.pk }}{% if next_url_add_reco %}&next={% url next_url_add_reco project.pk %}{% endif %}"
+                                                                                                                            class="fr-btn fr-btn--tertiary fr-btn--sm justify-content-center fr-text--sm button-add-reco">
+                                                                                                                                Créer une recommandation
+                                                                                        </a>
+            <!-- djlint:on -->
+        {% endif %}
+        <!-- Contact module -->
+        {% if can_attach_contact %}
+            <div x-cloak>
+                <template x-if="!selectedContact">
+                    <button @click.prevent="openModalSearchContact"
+                            data-test-id="button-add-contact-in-editor"
+                            class="fr-btn fr-btn--tertiary fr-btn--sm justify-content-center fr-text--sm button-add-contact">
+                        Ajouter un contact
+                    </button>
+                </template>
+                {% include "tools/contacts/search_contact_modal.html" %}
+                <input type="hidden"
+                       {% if model %} x-model="{{ model }}.contact" x-modelable="selectedContact" {% else %} x-model="selectedContact" {% endif %}>
             </div>
         {% endif %}
-    {% endif %}
+    </div>
     {% if errors %}
         {% for error in errors %}<div class="text-danger text-start fr-mb-2v">{{ error }}</div>{% endfor %}
     {% endif %}
@@ -126,7 +131,8 @@ Parameters:
 {% if can_attach_contact %}
     <template x-if="selectedContact">
         <div class="d-flex flex-column contact-card__container">
-            <div class="border position-relative" x-data="{contact:selectedContact,isOpenDeleteContact:null}">
+            <div class="border position-relative"
+                 x-data="{contact:selectedContact,isOpenDeleteContact:null}">
                 {% include "tools/contacts/contact_card.html" %}
                 <button @click.prevent="handleResetContact"
                         data-test-id="button-remove-contact"

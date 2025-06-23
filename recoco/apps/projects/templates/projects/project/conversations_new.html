@@ -71,23 +71,16 @@
                       enctype="multipart/form-data"
                       id="conversation-form">
                     {% csrf_token %}
-                    <div class="message-form fr-mt-3w bg-light border-form editor-form__container fr-input-group">
-                        {% include "tools/editor.html" with input_name=posting_form.content.name initial_content=posting_form.content.value|default:'' errors=posting_form.content.errors input_required=True can_add_reco=True next_url_add_reco="projects-project-detail-conversations-new" %}
+                    <div class="message-form fr-mt-3w bg-light border-form editor-form__container fr-input-group"
+                         x-data="{fileName: '', currentFile: ''}">
+                        {% include "tools/editor.html" with input_name=posting_form.content.name initial_content=posting_form.content.value|default:'' errors=posting_form.content.errors input_required=True can_add_reco=True next_url_add_reco="projects-project-detail-conversations-new" can_attach_files=True %}
                         {% comment %} {% include "projects/project/fragments/files_links/file_upload_input_standalone.html" %} {% endcomment %}
                         <!-- Action file -->
-                        <button x-data="{fileName: ''}"
-                                class="fr-btn fr-btn--sm fr-btn--tertiary fr-icon-file-add-line fr-btn--icon-left file-upload-wrapper"
-                                type="button"
-                                @click="$refs.fileUploadInput.click()">
+                        {% comment %} <button x-data="{fileName: ''}" class="fr-btn fr-btn--sm fr-btn--tertiary fr-icon-file-add-line fr-btn--icon-left file-upload-wrapper" type="button" @click="$refs.fileUploadInput.click()">
                             <span class="file-upload-text">Ajouter un fichier</span>
                             <span class="fr-ml-1w" x-text="fileName"></span>
-                            <input x-ref="fileUploadInput"
-                                   type="file"
-                                   id="file-upload"
-                                   name="the_file"
-                                   @change="fileName = $refs.fileUploadInput.files.length > 0 ? $refs.fileUploadInput.files[0].name : ''"
-                                   class="d-none file-upload-input">
-                        </button>
+                            <input x-ref="fileUploadInput" type="file" id="file-upload" name="the_file" @change="fileName = $refs.fileUploadInput.files.length > 0 ? $refs.fileUploadInput.files[0].name : ''" class="d-none file-upload-input">
+                        </button> {% endcomment %}
                         <button data-test-id="send-message-conversation"
                                 x-data
                                 :disabled="$store.editor.currentMessage === '' "

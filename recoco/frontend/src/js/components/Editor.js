@@ -6,6 +6,7 @@ import HardBreak from '@tiptap/extension-hard-break';
 import { createMarkdownEditor } from 'tiptap-markdown';
 import '../../css/tiptap.css';
 import { formatDate } from '../utils/date';
+import Placeholder from '@tiptap/extension-placeholder';
 
 const MarkdownEditor = createMarkdownEditor(Editor);
 
@@ -24,6 +25,9 @@ Alpine.data('editor', (content) => {
         extensions: [
           StarterKit,
           Link,
+          Placeholder.configure({
+            placeholder: 'Ecrivez votre message ici…',
+          }),
           HardBreak.extend({
             addKeyboardShortcuts() {
               const handleEnter = () =>
