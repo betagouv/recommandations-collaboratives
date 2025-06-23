@@ -200,4 +200,15 @@ class TaskNotificationSerializer(serializers.HyperlinkedModelSerializer):
     )
 
 
+class TaskWebhookSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Task
+        fields = [
+            "id",
+            "status",
+            "resource",
+            "project",
+        ]
+
+
 # eof
