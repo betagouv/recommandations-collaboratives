@@ -1,0 +1,36 @@
+{% extends "account/base_entrance.html" %}
+{% load allauth %}
+{% load i18n %}
+{% block title %}
+    {% trans "Confirm Access" %}
+{% endblock title %}
+{% block og_title %}
+    {% trans "Confirm Access" %}
+{% endblock og_title %}
+{% block content %}
+    <div class="fr-container fr-container--fluid fr-my-md-14v">
+        <div class="fr-grid-row fr-grid-row-gutters fr-grid-row--center">
+            <div class="fr-col-12 fr-col-md-8 fr-col-lg-6">
+                <div class="fr-container fr-background-alt--grey fr-px-md-0 fr-py-10v fr-py-md-14v">
+                    <div class="fr-grid-row fr-grid-row-gutters fr-grid-row--center">
+                        <div class="fr-col-12 fr-col-md-9 fr-col-lg-8">
+                            <h1>{% trans "Confirm Access" %}</h1>
+                            <p>{% blocktranslate %}Please reauthenticate to safeguard your account.{% endblocktranslate %}</p>
+                            {% block reauthenticate_content %}
+                            {% endblock reauthenticate_content %}
+                            {% if reauthentication_alternatives %}
+                                <hr />
+                                <h2>{% translate "Alternative options" %}</h2>
+                                <div class="fr-btns-group">
+                                    {% for alt in reauthentication_alternatives %}
+                                        <a href="{{ alt.url }}" class="fr-btn fr-btn--tertiary-no-outline">{{ alt.description }}</a>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}
