@@ -34,19 +34,10 @@
           padding: 20px;
         }
 
-        /* .content-block {
-          padding-bottom: 10px;
-          padding-top: 10px;
-        } */
-
         .footer {
           text-align: center;
         }
-        /* .footer td,
-        .footer p,
-        .footer span,
-        .footer a { */
-          /* text-align: center; } */
+
 
         /* -------------------------------------
             TYPOGRAPHY
@@ -107,21 +98,6 @@
         .mb0 {
           margin-bottom: 0;
         }
-
-        /* .preheader {
-          color: transparent;
-          display: none;
-          height: 0;
-          max-height: 0;
-          max-width: 0;
-          opacity: 0;
-          overflow: hidden;
-          mso-hide: all;
-          visibility: hidden;
-          width: 0; } */
-
-        /* .subtitle {
-          font-style: italic; }  */
 
         .text-strong {
           font-size: 140%;
@@ -229,7 +205,7 @@
     <body>
       <div class="banner">
         {% if site.configuration.logo_small %}
-          <img src="{{ site.configuration.logo_small.url }}"
+          <img src="https://{{ site.domain }}{{ site.configuration.logo_small.url }}"
               width="auto"
               height="40px"
               alt="" />
