@@ -76,7 +76,12 @@ class Organization(TimeStampedModel):
 
     sites = models.ManyToManyField(Site, related_name="organizations")
 
-    name = models.CharField(max_length=90, verbose_name="Nom")
+    name = models.CharField(
+        max_length=90,
+        verbose_name="Nom",
+        unique=True,
+    )
+
     departments = models.ManyToManyField(
         geomatics_models.Department,
         blank=True,
