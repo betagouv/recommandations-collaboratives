@@ -67,3 +67,19 @@ class ResourceSerializer(
 
 class ResourceURIImportSerializer(serializers.Serializer):
     uri = serializers.URLField()
+
+
+class ResourceWebhookSerializer(
+    BaseSerializerMixin, TaggitSerializer, serializers.HyperlinkedModelSerializer
+):
+    class Meta:
+        model = Resource
+        fields = (
+            "id",
+            "title",
+            "subtitle",
+            "tags",
+            "status",
+        )
+
+    tags = TagListSerializerField()
