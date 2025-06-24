@@ -45,8 +45,8 @@
             </div>
             <div x-data="Tutorial('time-filter-tutorial-on-kanban')"
                  class="kanban-header__middle-part">
-                <div class="kanban-header__searchbar">
-                    {% include "projects/project/fragments/search_bar.html" with action_search="onSearch" x_model="searchText" %}
+                <div class="kanban-header__searchbar position-relative">
+                    {% include "projects/project/fragments/search_bar.html" with action_search="onSearch" x_model="searchText" placeholder="Rechercher commune, #tag, nom du dossier..." %}
                 </div>
                 <div class="kanban-header__lastactivity-filter fr-select-group d-flex fr-m-0 fr-mr-6v align-items-center"
                      id="kanban-time-filter">

@@ -66,11 +66,10 @@
                         Administration
                     </div>
                     <div class="d-grid gap-2 fr-mt-2w">
-
                         {% flag "FLAG_EDIT_EDL" %}
                         <span class="d-inline-block">
                             <a href="{% url 'survey-editor-question-set-details' question.question_set.id %}#q-{{ question.id }}"
-                            class="btn btn-light w-100 btn-sm">
+                               class="btn btn-light w-100 btn-sm">
                                 <svg class="bi" width="16" height="16" fill="currentColor">
                                     <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#pencil" />
                                 </svg>
@@ -78,163 +77,160 @@
                                 Éditer
                             </a>
                         </span>
-                        {% endflag %}
-
-                        <span class="d-inline-block">
-                            <a href="{% url 'survey-session-refresh-signals' session.pk %}"
-                               class="btn btn-light w-100 btn-sm">
-                                <svg class="bi" width="16" height="16" fill="currentColor">
-                                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#braces" />
-                                </svg>
-                                &nbsp;
-                                Rafraîchir les signaux
-                            </a>
-                        </span>
-                    </div>
+                    {% endflag %}
+                    <span class="d-inline-block">
+                        <a href="{% url 'survey-session-refresh-signals' session.pk %}"
+                           class="btn btn-light w-100 btn-sm">
+                            <svg class="bi" width="16" height="16" fill="currentColor">
+                                <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#braces" />
+                            </svg>
+                            &nbsp;
+                            Rafraîchir les signaux
+                        </a>
+                    </span>
                 </div>
-            {% endif %}
-        </div>
-        <div class="row fr-mt-6w">
-            <div class="col col-lg-7 fr-pr-6w">
-                <h3>{{ question.text }}</h3>
-                <form method="post" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    <ul class="list-group list-unstyled fr-mt-2w fr-mb-2w">
-                        {% for choice in form.fields.answer.choices %}
-                            <li class="list-group-item fr-py-2w">
-                                {% if question.is_multiple %}
-                                    <input class="form-check-input"
-                                           type="checkbox"
-                                           name="answer"
-                                           value="{{ choice.0 }}"
-                                           id="form_answer-{{ forloop.counter }}"
-                                           {% if choice.0 in form.fields.answer.initial %}checked{% endif %} />
-                                {% else %}
-                                    <input class="form-check-input"
-                                           type="radio"
-                                           name="answer"
-                                           value="{{ choice.0 }}"
-                                           id="form_answer-{{ forloop.counter }}"
-                                           {% if form.fields.answer.initial == choice.0 %}checked{% endif %} />
-                                    {{ form.fields.answer.selected }}
-                                {% endif %}
-                                <label class="form-check-label w-75" for="form_answer-{{ forloop.counter }}">&nbsp;{{ choice.1|capfirst }}</label>
-                            </li>
-                        {% endfor %}
-                    </ul>
-                    <!-- Comment -->
-                    <div class="fr-mt-2w fr-mb-2w">
-                        <label class="fr-mb-1v" for="input-project-comment">{{ question_comment_title|default:'Commentaire' }} {{ form.fields.comment.required|yesno:" (obligatoire)*," }}</label>
-                        <textarea class="form-control {% if form.comment.errors %}is-invalid{% endif %} specific-height-100px"
-                                  id="input-project-comment"
-                                  name="{{ form.comment.name }}"
-                                  placeholder="{{ question.comment_title }}"
-                                  {% if form.fields.comment.required %}required{% endif %}>
-                                  {{ form.comment.value|default:'' }}
-                                </textarea>
-                        {% for error in form.comment.errors %}
-                            <div class="text-danger text-end">{{ error }}</div>
-                        {% endfor %}
-                    </div>
-                    <!-- File upload -->
-                    {% if form.attachment %}
-                        <div class="fr-mb-2w">
-                            <label for="attachment" class="form-label">{{ question.upload_title }}</label>
-                            <input class="form-control form-control-sm"
-                                   id="attachment"
-                                   type="file"
-                                   name="attachment"
-                                   value="{{ form.attachment.value }}" />
-                            {% if form.attachment.value %}
-                                Actuellement : <a href="{{ MEDIA_URL }}/{{ form.attachment.value }}">{{ form.attachment.value }}</a>
+            </div>
+        {% endif %}
+    </div>
+    <div class="row fr-mt-6w">
+        <div class="col col-lg-7 fr-pr-6w">
+            <h3>{{ question.text }}</h3>
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <ul class="list-group list-unstyled fr-mt-2w fr-mb-2w">
+                    {% for choice in form.fields.answer.choices %}
+                        <li class="list-group-item fr-py-2w">
+                            {% if question.is_multiple %}
+                                <input class="form-check-input"
+                                       type="checkbox"
+                                       name="answer"
+                                       value="{{ choice.0 }}"
+                                       id="form_answer-{{ forloop.counter }}"
+                                       {% if choice.0 in form.fields.answer.initial %}checked{% endif %} />
+                            {% else %}
+                                <input class="form-check-input"
+                                       type="radio"
+                                       name="answer"
+                                       value="{{ choice.0 }}"
+                                       id="form_answer-{{ forloop.counter }}"
+                                       {% if form.fields.answer.initial == choice.0 %}checked{% endif %} />
+                                {{ form.fields.answer.selected }}
                             {% endif %}
-                        </div>
-                    {% endif %}
-                    <div class="btn-toolbar justify-content-between"
-                         role="toolbar"
-                         aria-label="Toolbar">
-                        <div class="btn-group fr-mr-2v" role="group" aria-label="First group">
-                            <!--                         <a class="btn btn-outline-warning" href="{% url 'survey-session-details' question.question_set.survey.id %}">
+                            <label class="form-check-label w-75" for="form_answer-{{ forloop.counter }}">&nbsp;{{ choice.1|capfirst }}</label>
+                        </li>
+                    {% endfor %}
+                </ul>
+                <!-- Comment -->
+                <div class="fr-mt-2w fr-mb-2w">
+                    <label class="fr-mb-1v" for="input-project-comment">
+                        {{ question_comment_title|default:'Commentaire' }} {{ form.fields.comment.required|yesno:" (obligatoire)*," }}
+                    </label>
+                    <textarea class="form-control {% if form.comment.errors %}is-invalid{% endif %} specific-height-100px"
+                              id="input-project-comment"
+                              name="{{ form.comment.name }}"
+                              placeholder="{{ question.comment_title }}"
+                              {% if form.fields.comment.required %}required{% endif %}>{{ form.comment.value|default:'' }}</textarea>
+                    {% for error in form.comment.errors %}<div class="text-danger text-end">{{ error }}</div>{% endfor %}
+                </div>
+                <!-- File upload -->
+                {% if form.attachment %}
+                    <div class="fr-mb-2w">
+                        <label for="attachment" class="form-label">{{ question.upload_title }}</label>
+                        <input class="form-control form-control-sm"
+                               id="attachment"
+                               type="file"
+                               name="attachment"
+                               value="{{ form.attachment.value }}" />
+                        {% if form.attachment.value %}
+                            Actuellement : <a href="{{ MEDIA_URL }}/{{ form.attachment.value }}">{{ form.attachment.value }}</a>
+                        {% endif %}
+                    </div>
+                {% endif %}
+                <div class="btn-toolbar justify-content-between"
+                     role="toolbar"
+                     aria-label="Toolbar">
+                    <div class="btn-group fr-mr-2v" role="group" aria-label="First group">
+                        <!--                         <a class="btn btn-outline-warning" href="{% url 'survey-session-details' question.question_set.survey.id %}">
                              <svg class="d-inline-block bi" width="16" height="16" fill="currentColor">
                              <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#cup-fill" />
                              </svg>&nbsp;
                              Je Break !
                              </a>
                         -->
-                            <a id="button-skip"
-                               data-test-id="link-skip-survey-questionset"
-                               class="btn btn-outline-secondary"
-                               href="{% url 'survey-question-next' session.id question.id %}">
-                                <svg class="d-inline-block bi" width="16" height="16" fill="currentColor">
-                                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#patch-question" />
-                                </svg>
-                                &nbsp;
-                                Je ne sais pas, je passe
-                            </a>
-                        </div>
-                        <button class="btn btn-primary"
-                                type="submit"
-                                data-test-id="button-submit-survey-questionset">
-                            <svg class="d-inline-block bi fr-mr-1v"
-                                width="16"
-                                height="16"
-                                fill="currentColor">
-                                <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#check2-circle" />
+                        <a id="button-skip"
+                           data-test-id="link-skip-survey-questionset"
+                           class="btn btn-outline-secondary"
+                           href="{% url 'survey-question-next' session.id question.id %}">
+                            <svg class="d-inline-block bi" width="16" height="16" fill="currentColor">
+                                <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#patch-question" />
                             </svg>
                             &nbsp;
-                            Valider ma réponse
-                        </button>
+                            Je ne sais pas, je passe
+                        </a>
                     </div>
-                </form>
-            </div>
-            <div class="col col-lg-5" x-data="{ showMore: false }">
-                {% if question.why %}
-                    <div id="section-why" class="fr-mb-6w">
+                    <button class="btn btn-primary"
+                            type="submit"
+                            data-test-id="button-submit-survey-questionset">
                         <svg class="d-inline-block bi fr-mr-1v"
-                             width="18"
-                             height="18"
+                             width="16"
+                             height="16"
                              fill="currentColor">
-                            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#question-circle" />
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#check2-circle" />
                         </svg>
                         &nbsp;
-                        <h5 class="d-inline-block">Pourquoi c'est important</h5>
-                        <p class="text-secondary">
-                            <div x-show="!showMore">{{ question.why_rendered|safe|truncatechars_html:150 }}</div>
-                            {% if question.why_rendered|safe|truncatechars_html:151|length > 150 %}
-                                <span x-show="showMore">{{ question.why_rendered|safe }}</span>
-                                <button @click="showMore = true" x-show="!showMore">[Lire tout]</button>
-                            {% endif %}
-                        </p>
-                    </div>
-                {% endif %}
-                {% if question.how %}
-                    <div id="section-how" x-data="{ showMore: false }">
-                        <svg class="d-inline-block bi fr-mr-1v"
-                             width="18"
-                             height="18"
-                             fill="currentColor">
-                            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#compass" />
-                        </svg>
-                        &nbsp;
-                        <h5 class="d-inline-block">Où chercher l'information</h5>
-                        <p class="text-secondary">
-                            <div x-show="!showMore">{{ question.how_rendered|safe|truncatechars_html:500 }}</div>
-                            {% if question.how_rendered|safe|truncatechars_html:501|length > 500 %}
-                                <span x-show="showMore">{{ question.how_rendered|safe }}</span>
-                                <button @click="showMore = true" x-show="!showMore">[Lire tout]</button>
-                            {% endif %}
-                        </p>
-                    </div>
-                {% endif %}
-            </div>
+                        Valider ma réponse
+                    </button>
+                </div>
+            </form>
         </div>
-        <ul class="fr-mt-2w">
-            <li>
-                <a href="javascript:history.go(-1);">Revenir à la question précédente</a>
-            </li>
-            <li id="project-link">
-                <a href="{% url 'projects-project-detail' session.project.id %}#exploration">Revenir à la page de présentation</a>
-            </li>
-        </ul>
+        <div class="col col-lg-5" x-data="{ showMore: false }">
+            {% if question.why %}
+                <div id="section-why" class="fr-mb-6w">
+                    <svg class="d-inline-block bi fr-mr-1v"
+                         width="18"
+                         height="18"
+                         fill="currentColor">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#question-circle" />
+                    </svg>
+                    &nbsp;
+                    <h5 class="d-inline-block">Pourquoi c'est important</h5>
+                    <p class="text-secondary">
+                        <div x-show="!showMore">{{ question.why_rendered|safe|truncatechars_html:150 }}</div>
+                        {% if question.why_rendered|safe|truncatechars_html:151|length > 150 %}
+                            <span x-show="showMore">{{ question.why_rendered|safe }}</span>
+                            <button @click="showMore = true" x-show="!showMore">[Lire tout]</button>
+                        {% endif %}
+                    </p>
+                </div>
+            {% endif %}
+            {% if question.how %}
+                <div id="section-how" x-data="{ showMore: false }">
+                    <svg class="d-inline-block bi fr-mr-1v"
+                         width="18"
+                         height="18"
+                         fill="currentColor">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#compass" />
+                    </svg>
+                    &nbsp;
+                    <h5 class="d-inline-block">Où chercher l'information</h5>
+                    <p class="text-secondary">
+                        <div x-show="!showMore">{{ question.how_rendered|safe|truncatechars_html:500 }}</div>
+                        {% if question.how_rendered|safe|truncatechars_html:501|length > 500 %}
+                            <span x-show="showMore">{{ question.how_rendered|safe }}</span>
+                            <button @click="showMore = true" x-show="!showMore">[Lire tout]</button>
+                        {% endif %}
+                    </p>
+                </div>
+            {% endif %}
+        </div>
     </div>
+    <ul class="fr-mt-2w">
+        <li>
+            <a href="javascript:history.go(-1);">Revenir à la question précédente</a>
+        </li>
+        <li id="project-link">
+            <a href="{% url 'projects-project-detail' session.project.id %}#exploration">Revenir à la page de présentation</a>
+        </li>
+    </ul>
+</div>
 {% endblock content %}

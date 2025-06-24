@@ -9,7 +9,6 @@ function User(user) {
   return {
     popper: null,
     isOpening: false,
-    contact: null,
     gravatar_url,
     currentUser: user,
     init() {

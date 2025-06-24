@@ -30,7 +30,6 @@ from recoco.apps.projects.utils import (
 from recoco.apps.survey import models as survey_models
 from recoco.apps.survey.forms import AnswerForm
 from recoco.utils import (
-    get_site_config_or_503,
     is_switchtender_or_403,
 )
 
@@ -68,7 +67,7 @@ class OnboardingLogin(LoginView):
 
 def onboarding_signup(request):
     """Return the onboarding signup page and process onboarding signup submission"""
-    site_config = get_site_config_or_503(request.site)
+    site_config = request.site_config
 
     if request.user.is_authenticated:
         return redirect(reverse("onboarding-project"))
@@ -148,7 +147,7 @@ def onboarding_signup(request):
 
 def onboarding_project(request):
     """Return the onboarding page and process onboarding submission"""
-    site_config = get_site_config_or_503(request.site)
+    site_config = request.site_config
 
     form = forms.OnboardingProject(request.POST or None)
 
@@ -233,7 +232,7 @@ def onboarding_project(request):
 @login_required
 def onboarding_summary(request, project_id=None):
     """Resume project from onboarding"""
-    site_config = get_site_config_or_503(request.site)
+    site_config = request.site_config
 
     project = get_object_or_404(projects.Project, sites=request.site, pk=project_id)
 
@@ -266,7 +265,7 @@ def onboarding_summary(request, project_id=None):
 
 def prefill_project_set_user(request):
     """Create a new project for someone else - step 1 create user"""
-    site_config = get_site_config_or_503(request.site)
+    site_config = request.site_config
 
     is_switchtender_or_403(request.user)
 
@@ -284,7 +283,7 @@ def prefill_project_set_user(request):
 
 def prefill_project_submit(request):
     """Create a new project for someone else - step 2 create project"""
-    site_config = get_site_config_or_503(request.site)
+    site_config = request.site_config
 
     is_switchtender_or_403(request.user)
 

@@ -34,7 +34,6 @@ class DSResourceAdmin(admin.ModelAdmin):
 class DSFolderAdmin(admin.ModelAdmin):
     list_display = (
         "dossier_id",
-        "project",
         "ds_resource",
         "recommendation",
     )
@@ -42,7 +41,6 @@ class DSFolderAdmin(admin.ModelAdmin):
     list_filter = ("created",)
 
     search_fields = (
-        "project",
         "ds_resource",
         "dossier_id",
     )
@@ -53,7 +51,6 @@ class DSFolderAdmin(admin.ModelAdmin):
         "dossier_number",
         "dossier_prefill_token",
         "dossier_url",
-        "project",
         "recommendation",
         "state",
     )
@@ -66,9 +63,8 @@ class DSFolderAdmin(admin.ModelAdmin):
 
     ordering = ("-created",)
     list_select_related = (
-        "project",
         "ds_resource",
-        "recommendation",
+        "recommendation__project",
     )
 
     @admin.action(description="Mettre à jour le matching dossier / démarche simplifiée")

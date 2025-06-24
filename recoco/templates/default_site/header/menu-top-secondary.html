@@ -4,7 +4,6 @@
 {% load django_vite %}
 {% load projects_extra %}
 {% load invites_tags %}
-
 {% block js %}
     {% vite_asset 'js/apps/menuTop.js' %}
 {% endblock js %}
@@ -88,7 +87,7 @@
                         {% if not is_switchtender %}
                             <a class="fr-btn justify-content-center w-100"
                                data-test-id="create-project"
-                               href="{% url 'onboarding-project' %}">Créer un dossier</a>
+                               href="{% url 'onboarding-prefill' %}">Déposer un dossier</a>
                         {% endif %}
                     </ul>
                 </div>
