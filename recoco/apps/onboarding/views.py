@@ -163,6 +163,10 @@ def onboarding_project(request):
             )
         )
 
+    if request.user.is_authenticated:
+        form.fields["email"].initial = request.user.email
+        form.fields["email"].disabled = True
+
     if request.method == "POST":
         all_forms_valid = form.is_valid()
 
