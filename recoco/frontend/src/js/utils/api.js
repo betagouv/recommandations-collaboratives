@@ -91,7 +91,7 @@ export function searchOrganizationsUrl(search) {
 }
 
 export function getOrganizationById(id) {
-  return `/api/addressbook/organizations/${id}`;
+  return `/api/addressbook/organizations/${id}/`;
 }
 
 export function organizationsUrl() {

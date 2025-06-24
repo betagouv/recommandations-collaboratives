@@ -4,10 +4,11 @@ import api, {
   departmentsUrl,
   organizationsUrl,
   organizationGroupsUrl,
+  getOrganizationById,
 } from '../../utils/api';
 import { Modal } from '../../models/Modal.model';
 
-Alpine.data('CreateOrganizationModal', (organizationName) => {
+Alpine.data('CreateOrganizationModal', (data = null) => {
   return {
     Modal: null,
     orgaGroupsFound: [],
@@ -16,6 +17,7 @@ Alpine.data('CreateOrganizationModal', (organizationName) => {
     isAnOrgaGroupSelected: false,
     departments: null,
     selectedDepartments: null,
+    isFormInEditMode: false,
     organization: {
       name: '',
       group: null,
@@ -31,7 +33,42 @@ Alpine.data('CreateOrganizationModal', (organizationName) => {
     },
     async init() {
       this.Modal = Modal(this, 'create-organization-modal');
-      this.organization.name = organizationName;
+      if (data) {
+        // if (typeof data === 'object') {
+        //   this.organization = { ...data };
+        //   if (this.organization.id) {
+        //     this.isFormInEditMode = true;
+        //   }
+        //   if (this.organization.group) {
+        //     this.formState.fields.isOrgaSelected = true;
+        //     this.userInput = this.organization.group.name;
+        //     this.isAnOrgaGroupSelected = true;
+        //     this.organization.group = this.organization.group.id;
+        //   }
+        //   if (this.organization.departments) {
+        //     this.selectedDepartments = this.organization.departments.map(
+        //       (department) => department.id
+        //     );
+        //   }
+        // }
+        if (typeof data === 'string') {
+          // this.organization = {
+          //   name: data,
+          //   group: null,
+          //   departments: [],
+          // };
+          this.organization.name = data;
+          this.isFormInEditMode = false;
+        }
+      } else {
+        this.organization = {
+          name: '',
+          group: null,
+          departments: [],
+        };
+        this.isFormInEditMode = false;
+      }
+      // this.organization.name = organizationName;
       await this.showDepartments();
     },
     setGroupNatToFalse() {
@@ -109,7 +146,7 @@ Alpine.data('CreateOrganizationModal', (organizationName) => {
           this.formState.fields.isOrgaName) ||
         (!this.formState.fields.isGroupNat && this.formState.fields.isOrgaName)
       ) {
-        api
+          api
           .post(organizationsUrl(), this.organization)
           .then((response) => {
             if (isItReturningData) {
@@ -123,18 +160,49 @@ Alpine.data('CreateOrganizationModal', (organizationName) => {
           });
       }
     },
+    updateOrganization(isItReturningData = false) {
+      this.formState.fields = {
+        isOrgaName: this.organization.name !== '',
+        isGroupNat: this.formState.fields.isGroupNat == 'true',
+        isGroupNatName:
+          this.organization.group !== null && this.formState.fields.isGroupNat,
+      };
+      this.formState.isSubmitted = true;
+
+      if (
+        (this.formState.fields.isGroupNatName &&
+          this.formState.fields.isOrgaName) ||
+        (!this.formState.fields.isGroupNat && this.formState.fields.isOrgaName)
+      ) {
+          api.patch(getOrganizationById(this.organization.id), this.organization)
+          .then((response) => {
+            if (isItReturningData) {
+              this.Modal.responseModal(response.data);
+            } else {
+              this.Modal.closeModal();
+              location.reload();
+            }
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      }
+    },
     handleDepartmentsSelection(departments) {
       this.organization.departments = departments;
     },
     initCreateOrganizationModalData($event) {
-      console.log($event.detail);
       this.organization = { ...$event.detail };
       if (this.organization.id) {
         this.isFormInEditMode = true;
       }
       if (this.organization.group) {
-
         this.formState.fields.isOrgaSelected = true;
+      }
+      if (this.organization.departments) {
+        this.selectedDepartments = this.organization.departments.map(
+          (department) => department.code
+        );
       }
     },
   };

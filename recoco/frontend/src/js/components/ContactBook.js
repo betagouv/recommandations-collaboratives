@@ -102,16 +102,9 @@ Alpine.data('ContactBook', () => {
         });
       }
     },
-    closeCreateContactModal(event) {
-      if (event.target.id !== 'create-contact-modal') {
-        return;
-      }
-      this.isCreateContactModalOpen = false;
-    },
 
     isCreateOrganizationModalOpen: false,
     openModalCreateOrganization(organization = null) {
-      console.log('openModalCreateOrganization', organization);
       this.isCreateOrganizationModalOpen = true;
       if (organization) {
         this.$nextTick(() => {
@@ -119,11 +112,16 @@ Alpine.data('ContactBook', () => {
         });
       }
     },
-    closeCreateOrganizationModal(event) {
-      if (event.target.id !== 'create-organization-modal') {
+    closeCreatesModal(event) {
+      if (event.target.id == 'create-organization-modal') {
+        this.isCreateOrganizationModalOpen = false;
         return;
       }
-      this.isCreateOrganizationModalOpen = false;
+      if (event.target.id == 'create-contact-modal') {
+        this.isCreateContactModalOpen = false;
+        return;
+      }
+      return;
     },
   };
 });
