@@ -186,7 +186,7 @@ class TestUpdateOrCreateDSFolder:
         assert DSFolder.objects.count() == 1
         ds_folder = DSFolder.objects.first()
         assert ds_folder is not None
-        assert ds_folder.project == recommendation.project
+        assert ds_folder.recommendation == recommendation
         assert ds_folder.ds_resource == ds_resource
         assert ds_folder.dossier_id == "12345"
         assert ds_folder.dossier_url == "https://example.com/dossiers/12345"
@@ -198,4 +198,3 @@ class TestUpdateOrCreateDSFolder:
             ds_folder.content_hash
             == "9cd55d887a3e036cd6107553d52f804415b6b3d74ecb65b268188c1596eab748"
         )
-        assert ds_folder.recommendation == recommendation

@@ -76,7 +76,12 @@ class Organization(TimeStampedModel):
 
     sites = models.ManyToManyField(Site, related_name="organizations")
 
-    name = models.CharField(max_length=90, verbose_name="Nom")
+    name = models.CharField(
+        max_length=90,
+        verbose_name="Nom",
+        unique=True,
+    )
+
     departments = models.ManyToManyField(
         geomatics_models.Department,
         blank=True,
@@ -94,6 +99,10 @@ class Organization(TimeStampedModel):
 
     def __str__(self):  # pragma: nocover
         return "{0}".format(self.name)
+
+    @property
+    def has_departments(self):
+        return self.departments.exists()
 
     @classmethod
     def get_or_create(cls, name):

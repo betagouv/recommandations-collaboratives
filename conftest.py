@@ -37,10 +37,9 @@ def current_site():
 
 
 @pytest.fixture
-def staff_user():
-    site = Site.objects.filter(domain="example.com").first()
+def staff_user(current_site):
     staff = baker.make(User)
-    staff.profile.sites.add(site)
+    staff.profile.sites.add(current_site)
     gstaff = Group.objects.get(name="example_com_staff")
     staff.groups.add(gstaff)
     return staff

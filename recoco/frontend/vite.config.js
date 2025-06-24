@@ -65,15 +65,6 @@ const config = {
         ExpandableMenuHandler: resolve(
           './src/js/components/ExpandableMenuHandler.js'
         ),
-        SearchContactModal: resolve(
-          './src/js/components/FeatureAddContact/SearchContactModal.js'
-        ),
-        CreateContactModal: resolve(
-          './src/js/components/FeatureAddContact/CreateContactModal.js'
-        ),
-        SearchOrganization: resolve(
-          './src/js/components/SearchOrganization.js'
-        ),
         projectQueue: resolve('./src/js/store/projectQueue.js'),
         showRole: resolve('./src/js/store/showRole.js'),
         projects: resolve('./src/js/store/projects.js'),
@@ -88,6 +79,7 @@ const config = {
         ),
         User: resolve('./src/js/components/User.js'),
         MutliSelect: resolve('./src/js/components/MultiSelect.js'),
+        ContactBook: resolve('./src/js/components/ContactBook.js'),
       },
       output: {
         chunkFileNames: undefined,

@@ -22,7 +22,7 @@
                             {% endfor %}
                         {% endif %}
                         {% if note.contact %}
-                            <div x-data="{contact : null }"
+                            <div x-data="{contact : null,isOpenDeleteContact:null}"
                                  x-init="contact = await getContact({{ note.contact.id }})">
                                 {% include "tools/contacts/contact_card.html" %}
                             </div>

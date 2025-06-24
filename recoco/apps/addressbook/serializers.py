@@ -15,6 +15,7 @@ from rest_framework.serializers import (
     SerializerMethodField,
 )
 
+from recoco.apps.geomatics.serializers import DepartmentSerializer
 from recoco.rest_api.serializers import BaseSerializerMixin
 
 from .models import Contact, Organization, OrganizationGroup
@@ -71,6 +72,8 @@ class OrganizationListSerializer(OrganizationSerializer):
 
 
 class OrganizationDetailSerializer(OrganizationListSerializer):
+    departments = DepartmentSerializer(read_only=True, many=True)
+
     class Meta:
         model = Organization
         fields = [
@@ -82,11 +85,14 @@ class OrganizationDetailSerializer(OrganizationListSerializer):
 
 
 class NestedOrganizationSerializer(OrganizationListSerializer):
+    group = OrganizationGroupSerializer()
+
     class Meta:
         model = Organization
         fields = [
             "id",
             "name",
+            "group",
             "_link",
         ]
 
