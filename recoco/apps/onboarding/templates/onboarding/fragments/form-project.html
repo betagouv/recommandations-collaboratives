@@ -103,5 +103,8 @@
             {% endif %}
         </fieldset>
     {% endfor %}
+    <fieldset class="fr-fieldset">
+        {{ form.captcha }}
+    </fieldset>
     {% include "dsrc/core/blocks/buttons/button_group.html" %}
 </form>
