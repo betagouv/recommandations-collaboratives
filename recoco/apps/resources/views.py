@@ -52,9 +52,6 @@ from . import models
 def resource_search(request):
     """Search existing resources"""
 
-    print(">" * 100)
-    print(request.GET)
-
     form = SearchForm(request.GET)
     form.is_valid()
     query = form.cleaned_data.get("query", "")
