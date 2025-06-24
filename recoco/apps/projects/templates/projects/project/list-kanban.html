@@ -151,21 +151,6 @@
                                                                     <span class="kanban-card__project-name project-link"
                                                                           x-text="truncate(t.name)"></span>
                                                                 </div>
-                                                                <template x-if="t.tags.length > 0">
-                                                                    <div class="kanban-card__tags-container d-flex">
-                                                                        <span class="fr-icon-pantone-line fr-icon--sm not-a-link"
-                                                                              aria-hidden="true"></span>
-                                                                        <div class="d-flex flex-wrap align-items-center">
-                                                                            <template x-for="tag in t.tags">
-                                                                                <div @click.prevent="onTagClick(tag)" class="fr-mr-1v">
-                                                                                    <p class="fake-a-link fr-mb-0">
-                                                                                        #<span x-text="tag"></span>
-                                                                                    </p>
-                                                                                </div>
-                                                                            </template>
-                                                                        </div>
-                                                                    </div>
-                                                                </template>
                                                                 <template x-if="t.origin">
                                                                     <div class="kanban-card__project-push-by-container"
                                                                          data-cy="kanban-project-shared-by-origin"
@@ -202,6 +187,21 @@
                                                                 <template x-if="t.commune">
                                                                     <div>
                                                                         <span class="kanban-card__project-insee fr-icon--sm fr-icon-map-pin-2-line not-a-link">INSEE: <span x-text="truncate(t.commune.insee)"></span></span>
+                                                                    </div>
+                                                                </template>
+                                                                <template x-if="t.tags.length > 0">
+                                                                    <div class="kanban-card__tags-container d-flex">
+                                                                        <span class="fr-icon-pantone-line fr-icon--sm not-a-link"
+                                                                              aria-hidden="true"></span>
+                                                                        <div class="d-flex flex-wrap align-items-center limit-height">
+                                                                            <template x-for="tag in t.tags">
+                                                                                <div @click.prevent="onTagClick(tag)" class="fr-mr-1v">
+                                                                                    <p class="fake-a-link fr-mb-0">
+                                                                                        #<span x-text="tag"></span>
+                                                                                    </p>
+                                                                                </div>
+                                                                            </template>
+                                                                        </div>
                                                                     </div>
                                                                 </template>
                                                                 <div class="d-flex justify-content-between">

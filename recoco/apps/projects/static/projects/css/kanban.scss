@@ -194,3 +194,8 @@ h5 {
 .min-width-12 {
   min-width: 12px;
 }
+
+.limit-height {
+  max-height: 34px;
+  overflow: auto;
+}
