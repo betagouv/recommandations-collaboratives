@@ -20,6 +20,11 @@ describe('I can create a new project as a new user', () => {
     password2: 'testpassword123',
   };
 
+  const alreadyExistingUserInfo = {
+    email: projectInfo.email,
+    password: 'testpassword123',
+  };
+
   it('goes through the complete onboarding process', () => {
     // Visit home page and click on need help button
     cy.visit('/');
@@ -216,6 +221,77 @@ describe('I can create a new project as a new user', () => {
       innerDoc.querySelector('.recaptcha-checkbox').click();
       cy.wait(400);
     });
+
+    // Submit signup form
+    cy.get('[type=submit]').click();
+
+    // Land on onboarding/summary page
+    cy.url().should('include', '/onboarding/summary');
+  });
+
+  it('goes through the complete onboarding process with already existing user', () => {
+    // Visit home page and click on need help button
+    cy.visit('/');
+    cy.get('[data-test-id="button-need-help"]')
+      .contains('Solliciter')
+      .click({ force: true });
+
+    // Land on onboarding/project page
+    cy.url().should('include', '/onboarding/project');
+
+    // Fill project form
+    cy.get('#id_name')
+      .should('not.have.class', 'fr-input--error')
+      .type(projectInfo.name, { delay: 0 })
+      .should('have.value', projectInfo.name)
+      .should('have.class', 'fr-input--valid');
+
+    cy.get('#id_location')
+      .should('not.have.class', 'fr-input--error')
+      .type(projectInfo.location, { delay: 0 })
+      .should('have.value', projectInfo.location)
+      .should('have.class', 'fr-input--valid');
+
+    cy.get('[data-test-id="input-postcode"]')
+      .type(projectInfo.postcode, { delay: 0 })
+      .should('have.value', projectInfo.postcode)
+      .parent()
+      .should('have.class', 'fr-input-group--valid');
+
+    cy.get('[data-test-id="select-city"]')
+      .should('not.have.class', 'fr-select-group--error')
+      .focus();
+
+    cy.get('[data-test-id="select-city"]')
+      .should('contain.text', projectInfo.commune)
+      .should('have.value', projectInfo.insee)
+      .parent()
+      .should('have.class', 'fr-select-group--valid');
+
+    cy.get('#id_description')
+      .should('not.have.class', 'fr-input--error')
+      .type(projectInfo.description, { delay: 0 })
+      .should('have.value', projectInfo.description)
+      .should('have.class', 'fr-input--valid');
+
+    cy.get('#id_email')
+      .should('not.have.class', 'fr-input--error')
+      .type(projectInfo.email, { delay: 0 })
+      .should('have.value', projectInfo.email)
+      .should('have.class', 'fr-input--valid');
+
+    // Submit project form
+    cy.get('button[type="submit"]').click();
+
+    // Land on onboarding/signup page
+    cy.url().should('include', '/onboarding/signin');
+
+    // Fill signup form
+    cy.get('[name=login]').should('have.value', alreadyExistingUserInfo.email);
+
+    cy.get('[name=password]')
+      .type(alreadyExistingUserInfo.password, { delay: 0 })
+      .should('have.value', alreadyExistingUserInfo.password);
 
     // Submit signup form
     cy.get('[type=submit]').click();
