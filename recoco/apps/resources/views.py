@@ -52,6 +52,9 @@ from . import models
 def resource_search(request):
     """Search existing resources"""
 
+    print(">" * 100)
+    print(request.GET)
+
     form = SearchForm(request.GET)
     form.is_valid()
     query = form.cleaned_data.get("query", "")
@@ -70,9 +73,10 @@ def resource_search(request):
         .prefetch_related("task_recommendations")
     )
 
-    no_category = form.cleaned_data.get("no_category", False)
-    resources = resources.filter(category__isnull=no_category)
-    # TODO join resource with check category and without category if no_category is check
+    if form.cleaned_data.get("no_category", False):
+        resources = resources.filter(category__isnull=True)
+    else:
+        resources = resources.exclude(category__isnull=True)
 
     # If we are not allowed to manage resources, filter out DRAFT/TO_REVIEW items and
     # imported resources
@@ -138,8 +142,7 @@ def resource_search(request):
         staff_redux |= Q(status=models.Resource.TO_REVIEW)
 
     # keep 'published' "only" if requested
-    published = form.cleaned_data.get("published", False)
-    if published:
+    if form.cleaned_data.get("published", False):
         staff_redux |= Q(status=models.Resource.PUBLISHED)
 
     resources = resources.filter(staff_redux)
