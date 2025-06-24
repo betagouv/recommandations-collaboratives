@@ -83,7 +83,7 @@ def onboarding_signup(request):
             project_creation_request = projects.ProjectCreationRequest.objects.get(
                 site=request.site, email=existing_email_user
             )
-            project_id = project_creation_request.project.id
+            project_id = project_creation_request.project_id
         except projects.ProjectCreationRequest.DoesNotExist:
             return redirect(reverse("onboarding-project"))  # TODO: Add error message
 
@@ -103,12 +103,13 @@ def onboarding_signup(request):
             },
         )
 
-        # TODO : if project is created with existing email we should log user and assign it to the project
         if not is_new_user:
             # user exists but is not currently logged in,
             request.session["onboarding_email"] = email
             login_url = reverse("onboarding-signin")
-            next_args = urlencode({"next": reverse("onboarding-project")})
+            next_args = urlencode(
+                {"next": reverse("onboarding-summary", args=(project_id,))}
+            )
             return redirect(f"{login_url}?{next_args}")
 
         user.set_password(form.cleaned_data.get("password"))
