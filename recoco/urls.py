@@ -22,6 +22,7 @@ from recoco.apps.crm.urls import urlpatterns as crm_urls
 from recoco.apps.hitcount.urls import urlpatterns as hitcount_urls
 from recoco.apps.home.urls import urlpatterns as home_urls
 from recoco.apps.invites.urls import urlpatterns as invites_urls
+from recoco.apps.ml.urls import urlpatterns as ml_urls
 from recoco.apps.onboarding.urls import urlpatterns as onboarding_urls
 from recoco.apps.projects.urls import urlpatterns as projects_urls
 from recoco.apps.resources.urls import urlpatterns as resources_urls
@@ -39,6 +40,7 @@ urlpatterns = [
     path("cookies/", include("cookie_consent.urls")),
     path("cms/", include(wagtailadmin_urls)),
     path("documents/", include(wagtaildocs_urls)),
+    path("ml", include(ml_urls)),
     path("p/", include(wagtail_urls)),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
