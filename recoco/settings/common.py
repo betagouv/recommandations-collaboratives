@@ -92,6 +92,7 @@ INSTALLED_APPS = [
     "recoco.apps.metrics",
     "recoco.apps.demarches_simplifiees",
     "recoco.apps.social_account",
+    "recoco.apps.ml",
     "crispy_forms",
     "wagtail.contrib.forms",
     "wagtail.contrib.redirects",
