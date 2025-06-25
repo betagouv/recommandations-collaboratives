@@ -40,7 +40,7 @@ urlpatterns = [
     path("cookies/", include("cookie_consent.urls")),
     path("cms/", include(wagtailadmin_urls)),
     path("documents/", include(wagtaildocs_urls)),
-    path("ml", include(ml_urls)),
+    path("ml/", include(ml_urls)),
     path("p/", include(wagtail_urls)),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
