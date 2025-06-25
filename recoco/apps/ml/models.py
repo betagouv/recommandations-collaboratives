@@ -37,6 +37,7 @@ class Summary(TimeStampedModel):
         indexes = [
             models.Index(fields=["content_type", "object_id"]),
         ]
+        unique_together = [["content_type", "object_id", "config", "prompt"]]
 
 
 class Comparison(TimeStampedModel):
@@ -57,3 +58,4 @@ class Comparison(TimeStampedModel):
 
     class Meta:
         unique_together = [["summary1", "summary2", "user"]]
+        # constraints = [CheckConstraint(condition=Q(summary1__pk__lt="summary2__pk"), name="Summaries are ordered by ID")]

@@ -13,8 +13,8 @@ from . import views
 
 urlpatterns = [
     path(
-        r"",
+        r"compare/resource/<int:resource_id>",
         views.compare_resource,
-        name="ml-summary",
+        name="ml-compare-resource",
     ),
 ]
