@@ -35,7 +35,9 @@
                     {% include "projects/project/fragments/conversations_new/conversation_topic.html" with topic_name=topic.grouper message_number=topic.list %}
                 {% endfor %}
             </div>
-            <div class="conversation-new__topics-list-member fr-p-2w">
+            <div class="conversation-new__topics-list-member fr-p-2w"
+                 x-data="{isOpen: false}"
+                 :class="{'open': isOpen}">
                 <h2 class="conversation-new__topics-list-member-title">Participants</h2>
                 <h3 class="fr-mt-2w conversation-new__topics-list-member-subtitle">Porteur de projet et partenaires</h3>
                 <ul class="flex-column list-unstyled fr-mb-0">
@@ -55,6 +57,11 @@
                         {% endif %}
                     {% endfor %}
                 </ul>
+                <div class="list-member-toggle position-sticky bottom-0 start-0 text-center w-100 bg-white">
+                    <button class="fr-btn fr-btn--sm fr-btn--tertiary-no-outline"
+                            @click="isOpen = !isOpen"
+                            x-text="isOpen ? 'Voir moins' : 'Voir plus'"></button>
+                </div>
             </div>
         </div>
         <div class="conversation-new__container"

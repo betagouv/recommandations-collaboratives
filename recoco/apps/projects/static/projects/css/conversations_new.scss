@@ -1,6 +1,6 @@
 :root {
-  --width-right-col: 25%;
-  --width-left-col: 75%;
+  --width-left-col: 20%;
+  --width-right-col: 80%;
 }
 .conversation-new {
   line-height: 1.5em;
@@ -9,12 +9,14 @@
     flex-direction: column;
     justify-content: space-between;
     flex: 0 0 auto;
-    width: var(--width-right-col);
+    width: var(--width-left-col);
+    min-width: 18.75rem;
     border-right: 1px solid var(--light-border-default-grey, #e5e5e5);
     position: sticky;
     height: calc(100vh - 128px);
     top: 128px;
-    overflow-y: auto;
+    // overflow-y: auto;
+    overflow-y: hidden;
     &-header {
       padding: 1rem;
       border-bottom: 1px solid var(--light-border-default-grey, #e5e5e5);
@@ -31,9 +33,20 @@
       box-shadow: 0px -4px 4px 0px #0000001a;
       border-top: 1px solid var(--light-border-default-grey, #e5e5e5);
       position: sticky;
-      max-height: 30vh;
+      max-height: 48vh;
       bottom: 0;
       background-color: #fff;
+      transition: max-height 0.3s ease-in-out;
+      .list-member-toggle {
+        padding-bottom: 1rem;
+      }
+      &.open {
+        max-height: unset;
+        overflow-y: auto;
+        .list-member-toggle {
+          padding-bottom: 0;
+        }
+      }
       &-title {
         color: var(--light-text-default-grey, #3a3a3a);
         font-size: 0.875rem;
@@ -132,7 +145,7 @@
   &__container {
     display: flex;
     flex-direction: column;
-    width: var(--width-left-col);
+    width: var(--width-right-col);
     &-partial {
       display: flex;
       flex-direction: column-reverse;
