@@ -9,8 +9,7 @@ class LLMPrompt(models.Model):
 
 
 class LLMConfig(models.Model):
-    name = models.CharField(max_length=64)
-    uri = models.URLField("lmstdio://xxxxx")
+    model_name = models.CharField(max_length=64)  #     llama-3.2-1b-instruct
 
 
 class Summary(models.Model):
