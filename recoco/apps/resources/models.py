@@ -251,6 +251,9 @@ class Resource(CloneMixin, models.Model):
         """Return content as markdown"""
         return markdownify(self.content)
 
+    def to_markdown(self):
+        return "TODO"
+
     deleted = models.DateTimeField(null=True, blank=True)
 
     _clone_linked_m2m_fields = ["sites", "contacts", "departments"]

@@ -6,6 +6,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from recoco.apps.addressbook import rest as addressbook_rest
 from recoco.apps.geomatics import rest as geomatics_rest
 from recoco.apps.home import rest as home_rest
+from recoco.apps.ml import rest as ml_rest
 from recoco.apps.projects.views import rest as projects_rest
 from recoco.apps.resources import rest as resources_rest
 from recoco.apps.survey.views import rest as survey_rest
@@ -87,6 +88,12 @@ router.register(
     basename="api-addressbook-contact",
 )
 
+# machine learning
+router.register(
+    r"ml/summaries",
+    ml_rest.SummaryViewSet,
+    basename="api-ml-summary",
+)
 
 api_urls = [
     path(
