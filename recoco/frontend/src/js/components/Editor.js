@@ -52,6 +52,7 @@ Alpine.data('editor', (content) => {
         onCreate({ editor }) {
           _this.updatedAt = Date.now();
           _this.renderMarkdown();
+          _this.isEditorEmpty = editor.isEmpty;
         },
         onUpdate({ editor }) {
           _this.updatedAt = Date.now();
@@ -60,6 +61,14 @@ Alpine.data('editor', (content) => {
 
           _this.$store.editor.isEditing = editor.getHTML() != '';
           _this.$store.editor.currentMessage = editor.getHTML();
+
+          // Mettre à jour la propriété réactive
+          _this.isEditorEmpty = editor.isEmpty;
+
+          // S'assurer que Alpine.js traite les mises à jour
+          _this.$nextTick(() => {
+            _this.updatedAt = Date.now();
+          });
         },
         onSelectionUpdate({ editor }) {
           _this.updatedAt = Date.now();
@@ -68,6 +77,23 @@ Alpine.data('editor', (content) => {
       });
 
       this.renderMarkdown();
+
+      // Ajouter des watchers pour déclencher des mises à jour réactives
+      this.$watch('selectedContact', () => {
+        this.forceReactivity();
+      });
+
+      this.$watch('selectedFile', () => {
+        this.forceReactivity();
+      });
+
+      this.$watch('isEditorEmpty', () => {
+        this.forceReactivity();
+      });
+    },
+    forceReactivity() {
+      // Force Alpine.js à re-rendre le composant
+      this.updatedAt = Date.now();
     },
     isLoaded() {
       return editor;
@@ -132,9 +158,11 @@ Alpine.data('editor', (content) => {
     isSearchContactModalOpen: false,
     handleSetContact(contact) {
       this.selectedContact = { ...contact }; // XXX Copy since it can be destroyed from an inner scope and values result to null
+      this.forceReactivity();
     },
     handleResetContact() {
       this.selectedContact = null;
+      this.forceReactivity();
     },
     openModalSearchContact() {
       this.isSearchContactModalOpen = true;
@@ -171,6 +199,10 @@ Alpine.data('editor', (content) => {
         console.log('Contact attributes:', contactAttributes);
 
         editor.chain().focus().insertContactCard(contactAttributes).run();
+
+        // Mettre à jour le contact sélectionné
+        this.selectedContact = contact;
+        this.forceReactivity();
       }
     },
     removeContactCard() {
@@ -183,6 +215,39 @@ Alpine.data('editor', (content) => {
           editor.chain().focus().deleteSelection().run();
         }
       }
+    },
+    /****************
+     * Plugin file
+     */
+    selectedFile: null,
+    fileName: '',
+    isEditorEmpty: true, // Propriété réactive pour suivre si l'éditeur est vide
+    handleFileUpload(event) {
+      const file = event.target.files[0];
+      if (file) {
+        this.selectedFile = file;
+        // Mettre à jour le nom du fichier affiché
+        this.fileName = file.name;
+      } else {
+        this.selectedFile = null;
+        this.fileName = '';
+      }
+      // Force la réactivité
+      this.forceReactivity();
+    },
+    get isFormValid() {
+      // Le formulaire est valide si au moins un des éléments suivants est présent :
+      // - Un message non vide
+      // - Un contact sélectionné
+      // - Un fichier sélectionné
+      // Utiliser les propriétés du store pour la réactivité
+      // unused variable hasMessage but necessary to force reactivity
+      const hasMessage = this.$store.editor.currentMessage !== '';
+      const isEditorEmpty = !editor.state.doc.textContent.trim().length;
+      const hasContact = this.selectedContact !== null;
+      const hasFile = this.selectedFile !== null;
+
+      return !isEditorEmpty || hasContact || hasFile;
     },
   };
 });

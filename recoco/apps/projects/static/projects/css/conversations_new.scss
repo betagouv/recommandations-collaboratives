@@ -307,14 +307,12 @@
   }
   // Override tiptap styles
   .editor-container {
-    .tiptap-menu-custom {
+    .tiptap-menu-custom,
+    .button-add-reco,
+    .button-module__container,
+    .contact-card {
       display: none;
-    }
-    .button-module__container {
-      display: none;
-    }
-    .button-add-reco {
-      display: none;
+      transition: none;
     }
     .tiptap.ProseMirror {
       min-height: 3.5rem;
@@ -324,22 +322,27 @@
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       overflow: hidden;
     }
-    &:focus-within {
-      .tiptap-menu-custom {
-        display: block;
-      }
-      .button-module__container {
-        display: flex;
-      }
-      .button-add-reco {
-        display: block;
-      }
-      .tiptap.ProseMirror {
-        min-height: inherit;
-        max-height: inherit;
-        height: inherit;
-        padding: 3rem 0.5rem;
-      }
+  }
+  .contact-card {
+    max-width: 36rem;
+  }
+}
+
+.message-form {
+  &.focus {
+    .tiptap-menu-custom,
+    .button-add-reco,
+    .contact-card {
+      display: block;
+    }
+    .button-module__container {
+      display: flex;
+    }
+    .tiptap.ProseMirror {
+      min-height: inherit;
+      max-height: inherit;
+      height: inherit;
+      padding: 3rem 0.5rem;
     }
   }
 }
