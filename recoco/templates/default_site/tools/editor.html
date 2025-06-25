@@ -136,12 +136,6 @@ Parameters:
         {% endif %}
     </div>
     {% if can_attach_files %}
-        <template x-if="fileName">
-            <p>
-                Fichier selectionné :
-                <span class="fr-ml-1w" x-text="fileName"></span>
-            </p>
-        </template>
         <input x-ref="fileUploadInput"
                {% if model %} x-model="{{ model }}.the_file" x-modelable="currentFile" {% else %} x-model="currentFile" {% endif %}
                type="file"

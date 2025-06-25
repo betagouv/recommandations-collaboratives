@@ -8,6 +8,7 @@ import '../../css/tiptap.css';
 import { formatDate } from '../utils/date';
 import Placeholder from '@tiptap/extension-placeholder';
 import { ContactCardExtension } from './ContactCardExtension';
+import { FileCardExtension } from './FileCardExtension';
 
 // const MarkdownEditor = createMarkdownEditor(Editor);
 
@@ -47,6 +48,7 @@ Alpine.data('editor', (content) => {
             },
           }),
           ContactCardExtension,
+          FileCardExtension,
         ],
         content: content,
         onCreate({ editor }) {
@@ -216,11 +218,23 @@ Alpine.data('editor', (content) => {
         }
       }
     },
+    removeFileCard() {
+      if (editor) {
+        // Find the current selection and remove the file card if it's selected
+        const { from, to } = editor.state.selection;
+        const node = editor.state.doc.nodeAt(from);
+
+        if (node && node.type.name === 'fileCard') {
+          editor.chain().focus().deleteSelection().run();
+        }
+      }
+    },
     /****************
      * Plugin file
      */
     selectedFile: null,
     fileName: '',
+    currentFile: null,
     isEditorEmpty: true, // Propriété réactive pour suivre si l'éditeur est vide
     handleFileUpload(event) {
       const file = event.target.files[0];
@@ -228,6 +242,34 @@ Alpine.data('editor', (content) => {
         this.selectedFile = file;
         // Mettre à jour le nom du fichier affiché
         this.fileName = file.name;
+
+        // Insérer la carte de fichier dans l'éditeur
+        if (editor) {
+          console.log('Inserting file card for:', file.name);
+
+          const fileAttributes = {
+            fileName: file.name,
+            fileSize: file.size,
+            fileType: file.type,
+            uploadedAt: new Date().toISOString(),
+          };
+
+          console.log('File attributes:', fileAttributes);
+
+          try {
+            const result = editor
+              .chain()
+              .focus()
+              .insertFileCard(fileAttributes)
+              .run();
+            console.log('Insert result:', result);
+          } catch (error) {
+            console.error('Error inserting file card:', error);
+            console.error('Error stack:', error.stack);
+          }
+        } else {
+          console.error('Editor not initialized');
+        }
       } else {
         this.selectedFile = null;
         this.fileName = '';
@@ -240,14 +282,19 @@ Alpine.data('editor', (content) => {
       // - Un message non vide
       // - Un contact sélectionné
       // - Un fichier sélectionné
-      // Utiliser les propriétés du store pour la réactivité
+      // - Des cartes de fichiers dans l'éditeur
       // unused variable hasMessage but necessary to force reactivity
       const hasMessage = this.$store.editor.currentMessage !== '';
       const isEditorEmpty = !editor.state.doc.textContent.trim().length;
       const hasContact = this.selectedContact !== null;
       const hasFile = this.selectedFile !== null;
 
-      return !isEditorEmpty || hasContact || hasFile;
+      // Vérifier s'il y a des cartes de fichiers dans l'éditeur
+      const hasFileCards = editor.state.doc.descendants((node) => {
+        return node.type.name === 'fileCard';
+      });
+
+      return !isEditorEmpty || hasContact || hasFile || hasFileCards;
     },
   };
 });
