@@ -7,9 +7,15 @@ class LLMPrompt(models.Model):
     name = models.CharField(max_length=64)
     text = models.TextField()
 
+    def __str__(self):
+        return self.name
+
 
 class LLMConfig(models.Model):
     model_name = models.CharField(max_length=64)  #     llama-3.2-1b-instruct
+
+    def __str__(self):
+        return self.model_name
 
 
 class Summary(models.Model):
@@ -17,7 +23,7 @@ class Summary(models.Model):
     object_id = models.PositiveBigIntegerField()
     content_object = GenericForeignKey("content_type", "object_id")
 
-    text = models.TextField()
+    text = models.TextField(null=True, blank=True)
     config = models.ForeignKey(
         LLMConfig, null=True, blank=True, on_delete=models.SET_NULL
     )

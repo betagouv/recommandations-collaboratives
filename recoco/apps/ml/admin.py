@@ -15,4 +15,4 @@ class LLMPromptAdmin(admin.ModelAdmin):
 
 @admin.register(models.Summary)
 class SummaryAdmin(admin.ModelAdmin):
-    readonly_fields = ["prompt", "config"]
+    pass
