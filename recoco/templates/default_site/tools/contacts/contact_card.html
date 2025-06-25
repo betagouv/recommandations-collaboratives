@@ -39,7 +39,7 @@ Example usage in parent:
           type="text/css" />
 {% endblock css %}
 <div x-data="User()">
-    <template x-if="typeof contact !== 'undefined' && contact">
+    <template x-if="contact">
         <div class="contact-card fr-p-3v bg-white {% if button_actions %}actions{% endif %}"
              :class="{'active': isOpenDeleteContact}"
              data-test-id="contact-card">
@@ -291,13 +291,13 @@ Example usage in parent:
                         <span class="text-date">mis
                         à jour le</span>
                         <span class="text-date">{{ contact.modified|date:"d/m/Y" }}</span>
-                    {% endif %}
-                    {% if contact.created and not contact.modified %}
-                        <div class="contact-card__updated-at contact-info__updated-at">
-                            <span class="text-date">mis
-                            à jour le</span>
-                            <span class="text-date">{{ contact.created|date:"d/m/Y" }}</span>
-                        </div>
+                    </div>
+                {% endif %}
+                {% if contact.created and not contact.modified %}
+                    <div class="contact-card__updated-at contact-info__updated-at">
+                        <span class="text-date">mis
+                        à jour le</span>
+                        <span class="text-date">{{ contact.created|date:"d/m/Y" }}</span>
                     </div>
                 {% endif %}
             </div>
