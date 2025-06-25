@@ -64,7 +64,7 @@
             {% include "projects/project/partials/conversations_new_partial.html" %}
             {% if "use_public_notes" in user_project_perms %}
                 <!-- Post message -->
-                <form class="form editor-form fr-px-5v"
+                <form class="form editor-form fr-px-3v"
                       hx-post="{% url 'projects-project-detail-conversations-new-partial' project.pk %}"
                       hx-trigger="submit"
                       hx-swap="outerHTML"
@@ -72,7 +72,7 @@
                       enctype="multipart/form-data"
                       id="conversation-form">
                     {% csrf_token %}
-                    <div class="message-form fr-mt-3w bg-light border-form editor-form__container fr-input-group"
+                    <div class="message-form fr-my-3v bg-light border-form editor-form__container fr-input-group"
                          :class="{'focus': isFocus}"
                          @click.outside="isFocus = false"
                          x-data="{fileName: '', currentFile: '', isFocus: false, }">
@@ -92,7 +92,7 @@
                     <label class="visually-hidden" for="input-project-content">{{ posting_form.content.label }}</label>
                     <input type="hidden" name="new" value="1">
                     <input type="hidden" name="topic_name" :value="valueTopicFormMessageSend">
-                    <div class="d-flex justify-content-end fr-mt-3w"></div>
+                    <div class="d-flex justify-content-end fr-mt-3v"></div>
                 </form>
             {% endif %}
         </div>
