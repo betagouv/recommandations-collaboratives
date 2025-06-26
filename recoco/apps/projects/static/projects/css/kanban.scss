@@ -180,3 +180,22 @@ h5 {
   text-decoration: none;
   color: #666666;
 }
+
+.fake-a-link {
+  color: var(--light-background-flat-info, #0063CB);
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 16px; /* 160% */
+  text-decoration-line: underline;
+  text-decoration-style: solid;
+}
+
+.min-width-12 {
+  min-width: 12px;
+}
+
+.limit-height {
+  max-height: 34px;
+  overflow: auto;
+}
