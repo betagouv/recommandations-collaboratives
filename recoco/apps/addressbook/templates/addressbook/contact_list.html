@@ -69,10 +69,8 @@
         </div>
         <div class="contact-list__list">
             <template x-for="nationalGroup in contactListGroupByNationalGroup" :key="nationalGroup.id">
-                <div x-data="{ showOrgaName : true }" class="national-group-container w-100 fr-my-5v">
+                <div class="national-group-container w-100 fr-my-5v">
                     <h3 class="national-group__name fr-mb-0 no-wrap" x-text="nationalGroup.name"></h3>
-                    {% comment %} <template x-if="nationalGroup.organizations?.length > 1">
-                    </template> {% endcomment %}
                     <template x-for="organization in nationalGroup.organizations" :key="index">
                         <div class="organization-container">
                             <div class="d-flex align-items-center">

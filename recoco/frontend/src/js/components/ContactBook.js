@@ -96,7 +96,7 @@ Alpine.data('ContactBook', () => {
           organizations: this.groupContactByOrganization(contactByNationalGroup[key]),
         });
       }
-      contactByNationalGroupArray.sort((a,b)=>a.name.localeCompare(b.name, 'en', { sensitivity: 'base' }))
+      contactByNationalGroupArray.sort((a,b)=>a.name.localeCompare(b.name, 'fr', { sensitivity: 'base' }))
       return contactByNationalGroupArray;
     },
 
