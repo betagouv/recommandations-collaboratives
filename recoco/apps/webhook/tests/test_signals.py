@@ -184,7 +184,8 @@ def test_find_webhooks_no_project():
 
 @pytest.mark.django_db
 def test_model_dict_project(project, serialized_project):
-    assert build_listener().model_dict(project) == serialized_project
+    dict_project = build_listener().model_dict(project)
+    assert dict_project == serialized_project
 
 
 @pytest.mark.django_db
