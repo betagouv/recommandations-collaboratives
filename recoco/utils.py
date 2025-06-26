@@ -124,22 +124,31 @@ def build_absolute_url(path, auto_login_user=None, site=None):
     url = urljoin(base, path)
 
     if auto_login_user:
-        parsed_url = urlparse(url)
-        params = parse_qs(parsed_url.query)
+        # Check if the account is sensitive and should not allow autologin
+        sensitive_account = (
+            auto_login_user.is_staff
+            | auto_login_user.is_superuser
+            | is_staff_for_site(auto_login_user)
+            | is_admin_for_site(auto_login_user)
+        )
 
-        url = urlunparse(
-            parsed_url._replace(
-                query=urlencode(
-                    params
-                    | {
-                        getattr(settings, "SESAME_TOKEN_NAME", "sesame"): [
-                            create_token(user=auto_login_user)
-                        ]
-                    },
-                    doseq=True,
+        if not sensitive_account:
+            parsed_url = urlparse(url)
+            params = parse_qs(parsed_url.query)
+
+            url = urlunparse(
+                parsed_url._replace(
+                    query=urlencode(
+                        params
+                        | {
+                            getattr(settings, "SESAME_TOKEN_NAME", "sesame"): [
+                                create_token(user=auto_login_user)
+                            ]
+                        },
+                        doseq=True,
+                    )
                 )
             )
-        )
 
     return url
 
@@ -147,6 +156,13 @@ def build_absolute_url(path, auto_login_user=None, site=None):
 def assign_site_staff(site, user):
     """Make someone staff on this site"""
     staff_group = get_group_for_site("staff", site, create=True)
+    user.profile.sites.add(site)
+    staff_group.user_set.add(user)
+
+
+def assign_site_admin(site, user):
+    """Make someone admin on this site"""
+    staff_group = get_group_for_site("admin", site, create=True)
     user.profile.sites.add(site)
     staff_group.user_set.add(user)
 
