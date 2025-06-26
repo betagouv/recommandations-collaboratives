@@ -35,6 +35,11 @@ router.register(
     basename="resources",
 )
 router.register(
+    r"resource-addons",
+    resources_rest.ResourceAddonViewSet,
+    basename="resource-addons",
+)
+router.register(
     r"departments",
     geomatics_rest.DepartmentViewSet,
     basename="departments",
