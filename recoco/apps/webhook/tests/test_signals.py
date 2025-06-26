@@ -185,11 +185,6 @@ def test_find_webhooks_no_project():
 @pytest.mark.django_db
 def test_model_dict_project(project, serialized_project):
     dict_project = build_listener().model_dict(project)
-
-    for k, v in serialized_project.items():
-        if dict_project[k] != v:
-            print(f"Mismatch for key '{k}': {dict_project[k]} != {v}")
-
     assert dict_project == serialized_project
 
 
