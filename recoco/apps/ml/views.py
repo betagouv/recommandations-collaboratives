@@ -6,6 +6,7 @@ from django.shortcuts import get_object_or_404, render
 
 from recoco.apps.resources import models as resources_models
 
+from . import forms
 from .models import Comparison, Summary
 
 
@@ -25,13 +26,20 @@ def compare_resource(request, resource_id):
             user=request.user,
             summary1__content_type=resource_ct,
             summary1__object_id=resource.id,
-        ).values_list("summary1__pk", "summary2__pk")
+        )
+        .exclude(choice=None)
+        .values_list("summary1__pk", "summary2__pk")
     )
 
-    (sum1, sum2) = random.choice(tuple(candidates - existings))  # noqa: S311
+    options = tuple(candidates - existings)
 
-    comparison = Comparison.objects.create(
-        user=request.user, summary1_id=sum1, summary2_id=sum2
-    )
+    if options:
+        summary1, summary2 = random.choice(options)  # noqa: S311
+
+        comparison, _ = Comparison.objects.get_or_create(
+            user=request.user, summary1_id=summary1, summary2_id=summary2, choice=None
+        )
+
+        form = forms.ComparisonForm(instance=comparison)
 
     return render(request, "ml/compare_resource.html", locals())
