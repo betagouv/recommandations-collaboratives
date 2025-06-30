@@ -34,29 +34,7 @@ Alpine.data('CreateOrganizationModal', (data = null) => {
     async init() {
       this.Modal = Modal(this, 'create-organization-modal');
       if (data) {
-        // if (typeof data === 'object') {
-        //   this.organization = { ...data };
-        //   if (this.organization.id) {
-        //     this.isFormInEditMode = true;
-        //   }
-        //   if (this.organization.group) {
-        //     this.formState.fields.isOrgaSelected = true;
-        //     this.userInput = this.organization.group.name;
-        //     this.isAnOrgaGroupSelected = true;
-        //     this.organization.group = this.organization.group.id;
-        //   }
-        //   if (this.organization.departments) {
-        //     this.selectedDepartments = this.organization.departments.map(
-        //       (department) => department.id
-        //     );
-        //   }
-        // }
         if (typeof data === 'string') {
-          // this.organization = {
-          //   name: data,
-          //   group: null,
-          //   departments: [],
-          // };
           this.organization.name = data;
           this.isFormInEditMode = false;
         }
@@ -68,7 +46,6 @@ Alpine.data('CreateOrganizationModal', (data = null) => {
         };
         this.isFormInEditMode = false;
       }
-      // this.organization.name = organizationName;
       await this.showDepartments();
     },
     setGroupNatToFalse() {
@@ -200,9 +177,14 @@ Alpine.data('CreateOrganizationModal', (data = null) => {
         this.formState.fields.isOrgaSelected = true;
       }
       if (this.organization.departments) {
+        // If departments are already selected, we map them to their codes
+        // selectedDepartments init them in the multiselect component
+        // organization.departments is updated with the selected departments
+        // so that it can be sent to the backend in the good format
         this.selectedDepartments = this.organization.departments.map(
           (department) => department.code
         );
+        this.organization.departments = this.selectedDepartments
       }
     },
   };
