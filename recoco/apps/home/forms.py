@@ -122,6 +122,15 @@ class UserPasswordFirstTimeSetupForm(forms.Form):
 
 
 class AdvisorAccessRequestForm(forms.Form):
+    is_select_departments = forms.ChoiceField(
+        widget=forms.RadioSelect,
+        choices=[
+            forms.ChoiceField(label="Oui", value=True),
+            forms.ChoiceField(label="Non", value=False),
+        ],
+        required=True,
+    )
+
     departments = forms.ModelMultipleChoiceField(
         queryset=Department.objects.all(),
         label="Départements",
@@ -135,6 +144,13 @@ class AdvisorAccessRequestForm(forms.Form):
         widget=forms.Textarea(attrs={"rows": 3}),
         required=False,
     )
+
+    def clean(self):
+        cleaned_data = super().clean()
+        departments = cleaned_data.get("departments")
+
+        if not departments:
+            raise ValidationError("Veuillez sélectionner au moins un département.")
 
 
 class SiteCreateForm(forms.ModelForm):
