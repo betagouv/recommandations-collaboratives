@@ -7,6 +7,7 @@ author  : raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created : 2021-05-26 11:29:25 CEST
 """
 
+from allauth.account.decorators import secure_admin_login
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
@@ -28,6 +29,10 @@ from recoco.apps.resources.urls import urlpatterns as resources_urls
 from recoco.apps.survey.urls import urlpatterns as survey_urls
 from recoco.apps.tasks.urls import urlpatterns as tasks_urls
 from recoco.rest_api.urls import urlpatterns as rest_api_urls
+
+# Alter admin login with secure (2fa) version from allauth
+admin.autodiscover()
+admin.site.login = secure_admin_login(admin.site.login)
 
 urlpatterns = [
     path("api/", include(rest_api_urls)),
