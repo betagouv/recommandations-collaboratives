@@ -80,7 +80,6 @@ const config = {
         User: resolve('./src/js/components/User.js'),
         MutliSelect: resolve('./src/js/components/MultiSelect.js'),
         ContactBook: resolve('./src/js/components/ContactBook.js'),
-        AdvisorDemandValidation: resolve('./src/js/components/AdvisorDemandValidation.js'),
       },
       output: {
         chunkFileNames: undefined,
