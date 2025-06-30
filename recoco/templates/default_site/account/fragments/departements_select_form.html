@@ -16,20 +16,24 @@
                 <div class="fr-radio-group">
                     <input type="radio"
                            id="selectDepartments-no"
-                           name="selectDepartments"
+                           name="is_select_departments"
                            value="false"
-                           x-model="isSelectDepartments">
+                           {% if form.is_select_departments.value == 'false' %}checked{% endif %}>
                     <label class="fr-label fr-label-rework" for="selectDepartments-no">Toute la France</label>
                 </div>
-
+                {% if form.is_select_departments.errors %}
+                    <div class="fr-error-text form-mandatory-element">
+                        {{ form.is_select_departments.errors.0 }}
+                    </div>
+                {% endif %}
             </div>
             <div class="fr-fieldset__element fr-p-2w fr-mb-0 w-100">
                 <div class="fr-radio-group">
                     <input type="radio"
                            id="selectDepartments-yes"
-                           name="selectDepartments"
+                           name="is_select_departments"
                            value="true"
-                           x-model="isSelectDepartments">
+                           {% if form.is_select_departments.value == 'true' %}checked{% endif %}>
                     <label class="fr-label fr-label-rework" for="selectDepartments-yes">Un ou plusieurs départements spécifiques</label>
                 </div>
                 <div class="fr-input-group fr-ml-4w"
@@ -39,6 +43,11 @@
                     <template x-for="dept in selectedDepartments" :key="dept">
                         <input type="hidden" name="departments" :value="dept">
                     </template>
+                    {% if form.departments.errors %}
+                        <div class="fr-error-text form-mandatory-element">
+                            {{ form.departments.errors.0 }}
+                        </div>
+                    {% endif %}
                 </div>
             </div>
             <div class="fr-fieldset__content">

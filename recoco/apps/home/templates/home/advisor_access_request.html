@@ -12,7 +12,7 @@
 {% endblock og_title %}
 {% block content %}
     {{ departments|json_script:"departmentsArray" }}
-    <div x-data="AdvisorDemandValidation()" @set-departments="handleDepartmentsSelection($event.detail)">
+    <div x-data @set-departments="handleDepartmentsSelection($event.detail)">
         {% if advisor_access_request %}
             {% include "account/fragments/pending_advisor_request_redirect.html" with title="Devenir conseiller·e" %}
         {% else %}

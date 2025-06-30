@@ -125,10 +125,11 @@ class AdvisorAccessRequestForm(forms.Form):
     is_select_departments = forms.ChoiceField(
         widget=forms.RadioSelect,
         choices=[
-            forms.ChoiceField(label="Oui", value=True),
-            forms.ChoiceField(label="Non", value=False),
+            ("false", "Toute la France"),
+            ("true", "Un ou plusieurs départements spécifiques"),
         ],
         required=True,
+        label="Sélection du territoire",
     )
 
     departments = forms.ModelMultipleChoiceField(
@@ -140,17 +141,22 @@ class AdvisorAccessRequestForm(forms.Form):
 
     comment = forms.CharField(
         label="Commentaire",
-        help_text="Expliquez brièvement pourquoi vous demandez l’accès à ces dossiers et en quoi cela est pertinent pour votre rôle, afin de nous aider à examiner votre demande.",
+        help_text="Expliquez brièvement pourquoi vous demandez l'accès à ces dossiers et en quoi cela est pertinent pour votre rôle, afin de nous aider à examiner votre demande.",
         widget=forms.Textarea(attrs={"rows": 3}),
         required=False,
     )
 
     def clean(self):
         cleaned_data = super().clean()
+        is_select_departments = cleaned_data.get("is_select_departments")
         departments = cleaned_data.get("departments")
-
-        if not departments:
-            raise ValidationError("Veuillez sélectionner au moins un département.")
+        if is_select_departments == "true" and (
+            not departments or len(departments) == 0
+        ):
+            self.add_error(
+                "departments", "Merci de sélectionner au moins un département."
+            )
+        return cleaned_data
 
 
 class SiteCreateForm(forms.ModelForm):
