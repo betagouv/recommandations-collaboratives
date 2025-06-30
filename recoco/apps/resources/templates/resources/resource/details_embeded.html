@@ -1,6 +1,7 @@
 {% load django_vite %}
 {% load static %}
 {% load sass_tags %}
+{% load common_tags %}
 <link href="{% sass_src 'css/base.scss' %}"
       rel="stylesheet"
       type="text/css">
@@ -37,6 +38,16 @@
 <div class="row">
     <div class="col-11 fr-px-2v fr-mx-auto" x-data="PrintTaskResource">
         <div class="d-flex justify-content-end fr-pb-2v fr-mb-2v task-preview-cta fr-mt-2v">
+
+            <!-- List all available addons and display them if a template exists -->
+            {% for addon in task.resource_addons.all %}
+                {% with "resources/resource/addons/"|add:addon.nature|lower|add:".html" as addon_template %}
+                    {% if addon_template|template_exists %}
+                        {% include addon_template with data=addon.data %}
+                    {% endif %}
+                {% endwith %}
+            {% endfor %}
+
             {% if task and task.ds_folder %}
                 <a class="fr-btn fr-btn--secondary fr-btn--sm fr-mr-1w"
                    href="{{ task.ds_folder.dossier_url }}"
@@ -49,6 +60,7 @@
                     Voir mon dossier
                 </a>
             {% endif %}
+
             {% if contacts.count > 0 %}
                 <a href="#task-contacts"
                    class="fr-mr-2v fr-px-2v fr-py-1v bg-white text-decoration-none d-flex align-items-center text-black fw-medium specific-border-solid2px222">
