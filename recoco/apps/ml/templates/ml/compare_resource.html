@@ -13,16 +13,16 @@
             <div class="fr-grid-row">
                 <!-- Choice -->
 
-                {{ form }}
-                {{ summary1 }}
                   <div class="col-4" style="border: 1px solid red">
                       <input type="radio" id="choice1" name="{{ form.choice.html_name }}" value="1">
-                      <label for="choice1">{{ summary1.text }}</label>
+                      <label for="choice1">{{ comparison.summary1.text }}</label>
                   </div>
+
+                  <!-- no one is satisfying todo --->
 
                   <div class="col-4 fr-col-offset-4" style="border: 1px solid red">
                       <input type="radio" id="choice2" name="{{ form.choice.html_name }}" value="2">
-                      <label for="choice2">{{ summary2.text }}</label>
+                      <label for="choice2">{{ comparison.summary2.text }}</label>
                   </div>
                 </input>
             </div>

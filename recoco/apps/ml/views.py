@@ -34,10 +34,10 @@ def compare_resource(request, resource_id):
     options = tuple(candidates - existings)
 
     if options:
-        summary1, summary2 = random.choice(options)  # noqa: S311
+        sum1, sum2 = random.choice(options)  # noqa: S311
 
         comparison, _ = Comparison.objects.get_or_create(
-            user=request.user, summary1_id=summary1, summary2_id=summary2, choice=None
+            user=request.user, summary1_id=sum1, summary2_id=sum2, choice=None
         )
 
         form = forms.ComparisonForm(instance=comparison)
