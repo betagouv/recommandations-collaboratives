@@ -80,6 +80,7 @@ Alpine.data('ContactBook', () => {
           contacts: contactByOrganization[key],
         });
       }
+      console.log('contactByOrganizationArray', contactByOrganizationArray);
       return contactByOrganizationArray;
     },
 
@@ -124,9 +125,12 @@ Alpine.data('ContactBook', () => {
     },
 
     isCreateOrganizationModalOpen: false,
-    openModalCreateOrganization(organization = null) {
+    openModalCreateOrganization(organization = null, nationalGroup = null) {
       this.isCreateOrganizationModalOpen = true;
       if (organization) {
+        if(nationalGroup && nationalGroup.name !== 'Autres') {
+          organization.group = nationalGroup;
+        }
         this.$nextTick(() => {
           this.$dispatch('init-create-organization-modal-data', organization);
         });

@@ -174,7 +174,9 @@ Alpine.data('CreateOrganizationModal', (data = null) => {
         this.isFormInEditMode = true;
       }
       if (this.organization.group) {
-        this.formState.fields.isOrgaSelected = true;
+        this.formState.fields.isGroupNat = true;
+        this.isAnOrgaGroupSelected = true;
+        this.userInput = this.organization.group.name;
       }
       if (this.organization.departments) {
         // If departments are already selected, we map them to their codes
