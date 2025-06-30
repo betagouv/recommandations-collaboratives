@@ -127,6 +127,15 @@ def onboarding_signup(request):
         # Update project with new user
         project = projects.Project.objects.get(id=project_id)
         project.submitted_by = user
+        project.first_name = user.first_name
+        project.last_name = user.last_name
+        project.org_name = user.profile.organization.name
+        project.phone = user.profile.phone_no
+        project_site = projects.ProjectSite.objects.get(
+            project=project, site=request.site
+        )
+        project_site.status = "DRAFT"
+        project_site.save()
         project.save()
 
         # Delete project creation request
