@@ -254,7 +254,9 @@ class Resource(CloneMixin, models.Model):
         return markdownify(self.content)
 
     def to_markdown(self):
-        return "TODO"
+        return "\n\n".join(
+            [f"# {self.title}", f"## {self.subtitle}", f"{self.content_rendered()}"]
+        )
 
     deleted = models.DateTimeField(null=True, blank=True)
 
