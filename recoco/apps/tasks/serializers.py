@@ -15,7 +15,10 @@ from recoco.apps.home.serializers import UserSerializer
 from recoco.apps.projects.serializers import DocumentSerializer, TopicSerializer
 from recoco.apps.projects.utils import get_collaborators_for_project
 from recoco.apps.resources.models import Resource
-from recoco.apps.resources.serializers import ResourceSerializer
+from recoco.apps.resources.serializers import (
+    ResourceSerializer,
+    ResourceWebhookSerializer,
+)
 from recoco.rest_api.serializers import BaseSerializerMixin
 
 from .models import Task, TaskFollowup
@@ -201,14 +204,16 @@ class TaskNotificationSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class TaskWebhookSerializer(serializers.ModelSerializer):
+    resource = ResourceWebhookSerializer(read_only=True)
+
     class Meta:
         model = Task
-        fields = [
+        fields = (
             "id",
             "status",
             "resource",
             "project",
-        ]
+        )
 
 
 # eof
