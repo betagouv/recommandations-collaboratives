@@ -13,6 +13,7 @@ from django.contrib.auth import models as auth
 from django.contrib.auth.decorators import login_required
 from django.contrib.sites import models as sites
 from django.db import transaction
+from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.template.loader import render_to_string
 from django.urls import reverse
@@ -59,6 +60,56 @@ class OnboardingLogin(LoginView):
 
         return context
 
+    def form_valid(self, form):
+        """Process the valid form submission"""
+        redirect_url = self.get_success_url()
+
+        try:
+            # Get project creation request for this email if it exists
+            project_creation_request = (
+                projects.ProjectCreationRequest.objects.filter(
+                    site=self.request.site, email=form.cleaned_data.get("login")
+                )
+                .order_by("-created")
+                .first()
+            )
+        except projects.ProjectCreationRequest.DoesNotExist as e:
+            raise Http404 from e
+
+        project = project_creation_request.project
+
+        super().form_valid(form)
+
+        # Update project with new user
+        project.submitted_by = self.request.user
+        project.first_name = self.request.user.first_name
+        project.last_name = self.request.user.last_name
+        project.org_name = self.request.user.profile.organization.name
+        project.phone = self.request.user.profile.phone_no
+        project_site = projects.ProjectSite.objects.get(
+            project=project, site=self.request.site
+        )
+        project_site.status = "DRAFT"
+        project_site.save()
+        project.save()
+
+        # Delete project creation request
+        project_creation_request.delete()
+
+        # Assign user as project owner
+        assign_collaborator(self.request.user, project, is_owner=True)
+
+        # Send notifications
+        utils.notify_new_project(self.request.site, project, self.request.user)
+        utils.email_owner_of_project(self.request.site, project, self.request.user)
+
+        refresh_user_projects_in_session(self.request, self.request.user)
+
+        # Override redirect to go to project summary
+        redirect_url = reverse("onboarding-summary", args=(project.pk,))
+
+        return redirect(redirect_url)
+
 
 ########################################################################
 # User driven onboarding for a new project
@@ -79,7 +130,7 @@ def onboarding_signup(request):
     if existing_email_user:
         try:
             # Check if there is a project creation request for the email
-            project_creation_request = projects.ProjectCreationRequest.objects.get(
+            project_creation_request = projects.ProjectCreationRequest.objects.last(
                 site=request.site, email=existing_email_user
             )
             project_id = project_creation_request.project_id
@@ -140,6 +191,13 @@ def onboarding_signup(request):
 
         # Delete project creation request
         project_creation_request.delete()
+
+        assign_collaborator(user, project, is_owner=True)
+
+        utils.notify_new_project(request.site, project, user)
+        utils.email_owner_of_project(request.site, project, user)
+
+        refresh_user_projects_in_session(request, user)
 
         # Cleanup session
         if "onboarding_email" in request.session:
