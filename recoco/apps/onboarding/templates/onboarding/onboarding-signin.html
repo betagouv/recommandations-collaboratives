@@ -62,7 +62,7 @@
                         <form class="login fr-form-group"
                               id="onboarding-login-form"
                               method="post"
-                              action="{% url 'account_login' %}">
+                              action="{% url 'onboarding-signin' %}">
                             {% csrf_token %}
                             {% if redirect_field_value %}
                                 <input type="hidden"

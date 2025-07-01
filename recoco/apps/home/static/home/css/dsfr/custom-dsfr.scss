@@ -654,6 +654,9 @@ form > p {
 .specific-flex-basis-48 {
   flex-basis: 48.8%;
 }
+.font-size-14px {
+  font-size: 14px;
+}
 
 .centered-item {
   margin: auto;
@@ -711,4 +714,27 @@ form > p {
 .sticky-header {
   position: sticky;
   top: 60px;
+}
+
+/* ¯¯¯¯¯¯¯¯ *\
+  Multisites
+\* ˍˍˍˍˍˍˍˍ */
+
+.blue-hero-banner {
+  border-radius: 2px;
+  background: var(--light-background-alt-blue-france, #f5f5fe);
+}
+
+.h1-dsfr-rework {
+  font-size: 2rem !important;
+  font-weight: 700 !important;
+  line-height: 2.5rem !important;
+}
+
+/* ¯¯¯¯¯¯¯¯¯¯¯¯¯ *\
+  Gestion z-index
+\* ˍˍˍˍˍˍˍˍˍˍˍˍˍ */
+
+.z-1002 {
+  z-index: 1002 !important;
 }
