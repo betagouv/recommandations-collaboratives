@@ -1,3 +1,4 @@
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -102,6 +103,8 @@ class ResourceAddonViewSet(viewsets.ModelViewSet):
     ]
     serializer_class = ResourceAddonSerializer
     pagination_class = StandardResultsSetPagination
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ["recommendation", "nature"]
 
     def get_queryset(self):
         return ResourceAddon.objects.filter(recommendation__site=self.request.site)
