@@ -1,5 +1,5 @@
 <div x-data="{ show: false }"
-     x-init="setTimeout(() => { show = !!localStorage.getItem('userEmailProjectCreationStep') }, 500)">
+     x-init="setTimeout(() => { show = !!localStorage.getItem('userEmailProjectCreationStep') && JSON.parse(localStorage.getItem('userReachSignup')) }, 500)">
     <dialog aria-labelledby="email-modal-title"
             id="email-modal"
             class="fr-modal"

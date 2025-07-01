@@ -130,8 +130,12 @@ def onboarding_signup(request):
     if existing_email_user:
         try:
             # Check if there is a project creation request for the email
-            project_creation_request = projects.ProjectCreationRequest.objects.last(
-                site=request.site, email=existing_email_user
+            project_creation_request = (
+                projects.ProjectCreationRequest.objects.filter(
+                    site=request.site, email=existing_email_user
+                )
+                .order_by("-created")
+                .first()
             )
             project_id = project_creation_request.project_id
         except projects.ProjectCreationRequest.DoesNotExist:
