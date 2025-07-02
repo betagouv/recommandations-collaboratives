@@ -74,7 +74,6 @@ Alpine.data('CreateOrganizationModal', (data = null) => {
             });
         }
       } catch (error) {
-        console.log(error);
         throw new Error('Error while fetching organizations ', error);
       }
     },
@@ -83,7 +82,6 @@ Alpine.data('CreateOrganizationModal', (data = null) => {
         const response = await api.get(departmentsUrl());
         this.departments = response.data;
       } catch (error) {
-        console.log(error);
         throw new Error('Error while fetching departments ', error);
       }
     },
@@ -106,7 +104,7 @@ Alpine.data('CreateOrganizationModal', (data = null) => {
             this.organization.group = response.data.id;
           });
       } catch (error) {
-        console.log(error);
+        throw new Error('Error while creating organization group ', error);
       }
     },
     createOrganization(isItReturningData = false) {
