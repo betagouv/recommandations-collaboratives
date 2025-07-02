@@ -2,7 +2,6 @@
 {% load django_vite %}
 {% block js %}
     {% vite_asset 'js/components/MultiSelect.js' %}
-    {% vite_asset 'js/components/AdvisorDemandValidation.js' %}
 {% endblock js %}
 {% block title %}
     Devenir conseiller·e
@@ -12,7 +11,7 @@
 {% endblock og_title %}
 {% block content %}
     {{ departments|json_script:"departmentsArray" }}
-    <div x-data @set-departments="handleDepartmentsSelection($event.detail)">
+    <div>
         {% if advisor_access_request %}
             {% include "account/fragments/pending_advisor_request_redirect.html" with title="Devenir conseiller·e" %}
         {% else %}

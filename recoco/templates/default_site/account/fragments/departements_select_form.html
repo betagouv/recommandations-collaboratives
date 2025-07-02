@@ -37,8 +37,7 @@
                     <label class="fr-label fr-label-rework" for="selectDepartments-yes">Un ou plusieurs départements spécifiques</label>
                 </div>
                 <div class="fr-input-group fr-ml-4w"
-                    x-data="{objectsToSelect: JSON.parse(document.getElementById('departmentsArray').textContent), selectedDepartments: []}"
-                    @set-departments="selectedDepartments = $event.detail">
+                    x-data="{objectsToSelect: JSON.parse(document.getElementById('departmentsArray').textContent), selectedDepartments: []}">
                     {% include "tools/contacts/multi_select.html" with placeholder="Cherchez et sélectionnez vos départements pour avoir accès aux dossiers" label="Sélectionnez-le(s) ci-dessous : " %}
                     <template x-for="dept in selectedDepartments" :key="dept">
                         <input type="hidden" name="departments" :value="dept">
