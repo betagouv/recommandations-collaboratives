@@ -2,29 +2,39 @@
 
 {% block content %}
     <div class="col-9 fr-py-6w fr-mx-auto">
-        <div class="fr-grid-row">
-            <div class="col-12">
-                <iframe width="100%" height="500vh" src="{% url "resources-resource-detail-embeded" resource.pk %}"></iframe>
+      <h2>Résumé automatique des ressources</h2>
+        <div class="fr-grid-row fr-py-4w" >
+            <div class="col-12" style="border: 1px solid #eee">
+                <iframe width="100%" height="500vh" src="{% url "resources-resource-detail-embeded" comparison.summary1.object_id %}"></iframe>
             </div>
         </div>
 
+        <h3>Quelle proposition résume au mieux les enjeux de cette fiche-ressource ?</h3>
         <form method="POST">
             {% csrf_token %}
-            <div class="fr-grid-row">
+            <div class="fr-grid-row fr-py-4w fr-radio-group">
                 <!-- Choice -->
 
-                  <div class="col-4" style="border: 1px solid red">
+                  <div class="col-5" style="border: 1px solid red">
+                    <div class="fr-card">
                       <input type="radio" id="choice1" name="{{ form.choice.html_name }}" value="1">
-                      <label for="choice1">{{ comparison.summary1.text }}</label>
+                      <label class="fr-label" for="choice1">{{ comparison.summary1.text }}</label>
+                    </div>
                   </div>
 
-                  <!-- no one is satisfying todo --->
-
-                  <div class="col-4 fr-col-offset-4" style="border: 1px solid red">
+                  <div class="col-5 fr-col-offset-2" style="border: 1px solid red">
+                    <div class="fr-card">
                       <input type="radio" id="choice2" name="{{ form.choice.html_name }}" value="2">
-                      <label for="choice2">{{ comparison.summary2.text }}</label>
+                      <label class="fr-label" for="choice2">{{ comparison.summary2.text }}</label>
+                    </div>
                   </div>
-                </input>
+            </div>
+            <div class="fr-grid-row fr-radio-group">
+                  <div class="col-5 fr-col-offset-4" style="border: 1px solid red">
+                      <input type="radio" id="choice0" name="{{ form.choice.html_name }}" value="0">
+                      <label for="choice0">Aucune proposition n'est acceptable</label>
+                      <input class="fr-btn fr-btn--primary" type="submit" value="Valider">
+                  </div>
             </div>
         </form>
     </div>
