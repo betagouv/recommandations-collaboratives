@@ -5,7 +5,7 @@ import { formatDate } from '../utils/date';
 import { gravatar_url } from '../utils/gravatar';
 import { isStatusUpdate, statusText } from '../utils/taskStatus';
 import { truncate } from '../utils/taskStatus';
-
+import { tiptapParserJSONToHTML } from '../utils/tiptapParser';
 /**
  * A Preview Modal component
  */
@@ -44,6 +44,7 @@ export default function PreviewModal() {
     },
     resourcePreviewUrl,
     renderMarkdown,
+    tiptapParserJSONToHTML,
     formatDate,
     gravatar_url,
     isStatusUpdate,
