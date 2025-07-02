@@ -34,7 +34,7 @@ from recoco.apps.resources import models as resources_models
 from recoco.apps.tasks import models as tasks
 from recoco.utils import check_if_advisor
 
-from . import models
+from . import forms, models
 from .forms import (
     AdvisorAccessRequestForm,
     ContactForm,
@@ -425,6 +425,32 @@ class SiteCreateView(LoginRequiredMixin, PermissionRequiredMixin, FormView):
 
     def get_success_url(self):
         return reverse("site-create")
+
+
+def update_profile_if_incomplete(request):
+    """
+    If a user has missing infos, ask for completion.
+    This is triggered by the 'needs_profile_update'.
+    """
+    form_user = forms.UserUpdateForm(request.POST or None, instance=request.user)
+    form_profile = forms.UserProfileForm(
+        request.POST or None, instance=request.user.profile
+    )
+
+    if request.method == "POST":
+        if form_user.is_valid() and form_profile.is_valid():
+            form_user.save()
+            profile = form_profile.save()
+            profile.needs_profile_update = False
+            profile.save()
+
+            next_page = request.GET.get("next", None)
+            if not next_page:
+                next_page = reverse("home")
+
+            return redirect(next_page)
+
+    return render("home/update_incomplete_profile.html", locals())
 
 
 # eof
