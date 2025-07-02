@@ -167,4 +167,63 @@ def test_command_create_site(request):
         assert advisor.has_perm("sites.list_projects", new_site)
 
 
+@pytest.mark.django_db
+def test_command_set_needs_profile_update_with_full_profile(request):
+    organization = baker.make(addressbook_models.Organization)
+    user = baker.make(auth_models.User, first_name="First", last_name="Last")
+    user.profile.organization = organization
+    user.profile.phone_no = "0666666666"
+    user.profile.organization_position = "Position"
+    user.profile.save()
+
+    call_command("set_needs_profile_update")
+
+    user.refresh_from_db()
+    assert user.profile.needs_profile_update is False
+
+
+@pytest.mark.django_db
+def test_command_set_needs_profile_update_with_incomplete_user(request):
+    organization = baker.make(addressbook_models.Organization)
+    user = baker.make(auth_models.User, first_name="", last_name="Last")
+    user.profile.organization = organization
+    user.profile.phone_no = "0666666666"
+    user.profile.organization_position = "Position"
+    user.profile.save()
+
+    call_command("set_needs_profile_update")
+
+    user.refresh_from_db()
+    assert user.profile.needs_profile_update is True
+
+
+@pytest.mark.django_db
+def test_command_set_needs_profile_update_with_incomplete_userprofile(request):
+    organization = baker.make(addressbook_models.Organization)
+    user = baker.make(auth_models.User, first_name="First", last_name="Last")
+    user.profile.organization = organization
+    user.profile.phone_no = ""
+    user.profile.organization_position = "Position"
+    user.profile.save()
+
+    call_command("set_needs_profile_update")
+
+    user.refresh_from_db()
+    assert user.profile.needs_profile_update is True
+
+
+@pytest.mark.django_db
+def test_command_set_needs_profile_update_with_incomplete_userprofile_fk(request):
+    user = baker.make(auth_models.User, first_name="First", last_name="Last")
+    user.profile.organization = None
+    user.profile.phone_no = "0788888888"
+    user.profile.organization_position = "Position"
+    user.profile.save()
+
+    call_command("set_needs_profile_update")
+
+    user.refresh_from_db()
+    assert user.profile.needs_profile_update is True
+
+
 # # eof

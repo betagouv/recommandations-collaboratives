@@ -125,6 +125,8 @@ class UserProfile(models.Model):
 
     deleted = models.DateTimeField(null=True, blank=True)
 
+    needs_profile_update = models.BooleanField(default=False)
+
     class Meta:
         verbose_name = "profil utilisateur"
         verbose_name_plural = "profils utilisateurs"
