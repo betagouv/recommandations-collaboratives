@@ -62,7 +62,7 @@ Alpine.data('editor', (content) => {
           _this.$store.editor.setIsSubmitted(false);
 
           _this.$store.editor.isEditing = editor.getHTML() != '';
-          _this.$store.editor.currentMessage = editor.getHTML();
+          _this.$store.editor.currentMessage = JSON.stringify(editor.getJSON());
 
           // Mettre à jour la propriété réactive
           _this.isEditorEmpty = editor.isEmpty;
@@ -151,7 +151,7 @@ Alpine.data('editor', (content) => {
       }
     },
     renderMarkdown() {
-      this.markdownContent = editor.getHTML();
+      this.markdownContent = JSON.stringify(editor.getJSON());
     },
     /****************
      * Plugin contact
