@@ -9,12 +9,7 @@ import '../components/TaskStatus.js';
 import '../components/TaskStatusSwitcherConversations.js';
 import '../components/NotificationEater.js';
 import '../components/ConversationTopicSwitch.js';
-import { generateHTML } from '@tiptap/core';
-import StarterKit from '@tiptap/starter-kit';
-import { ContactCardExtension } from '../components/ContactCardExtension';
-import { FileCardExtension } from '../components/FileCardExtension';
 
-window.generateHTML = generateHTML;
-window.StarterKit = StarterKit;
-window.ContactCardExtension = ContactCardExtension;
-window.FileCardExtension = FileCardExtension;
+import { tiptapParserJSONToHTML } from '../utils/tiptapParser.js';
+
+window.tiptapParserJSONToHTML = tiptapParserJSONToHTML;

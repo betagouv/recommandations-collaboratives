@@ -2,7 +2,7 @@
      data-notifications="{{ element.notifications }}">
     <div class="posting-item rounded-3 fr-p-3v fr-my-2v {% if request.user == element.object.created_by %}bg-blue-light fr-ml-5w{% else %}bg-grey-light fr-mr-5w{% endif %}">
         {% if element.object.content|first == '{' %}
-            <span x-html="generateHTML({{ element.object.content }}, [StarterKit, ContactCardExtension, FileCardExtension])"></span>
+            <span x-html="tiptapParserJSONToHTML({{ element.object.content }})"></span>
         {% else %}
             {{ element.object.content_rendered|safe }}
         {% endif %}
