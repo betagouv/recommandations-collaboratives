@@ -7,7 +7,7 @@
     </div>
 </div>
 <header class="d-flex justify-content-between fr-p-2v ">
-    <span class="fs-5">{% include "projects/project/fragments/navigation/display_select.html" %}</span>
+    {% comment %} <span class="fs-5">{% include "projects/project/fragments/navigation/display_select.html" %}</span> {% endcomment %}
     <div class="fr-ml-3w flex-grow-1 fr-mr-6v position-relative">
         {% include "projects/project/fragments/search_bar.html" with action_search="handleProjectsSearch" x_model="search" %}
     </div>
