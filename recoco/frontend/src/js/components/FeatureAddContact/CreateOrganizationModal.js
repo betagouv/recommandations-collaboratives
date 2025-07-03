@@ -74,7 +74,6 @@ Alpine.data('CreateOrganizationModal', (data = null) => {
             });
         }
       } catch (error) {
-        console.log(error);
         throw new Error('Error while fetching organizations ', error);
       }
     },
@@ -83,7 +82,6 @@ Alpine.data('CreateOrganizationModal', (data = null) => {
         const response = await api.get(departmentsUrl());
         this.departments = response.data;
       } catch (error) {
-        console.log(error);
         throw new Error('Error while fetching departments ', error);
       }
     },
@@ -106,7 +104,7 @@ Alpine.data('CreateOrganizationModal', (data = null) => {
             this.organization.group = response.data.id;
           });
       } catch (error) {
-        console.log(error);
+        throw new Error('Error while creating organization group ', error);
       }
     },
     createOrganization(isItReturningData = false) {
@@ -123,7 +121,7 @@ Alpine.data('CreateOrganizationModal', (data = null) => {
           this.formState.fields.isOrgaName) ||
         (!this.formState.fields.isGroupNat && this.formState.fields.isOrgaName)
       ) {
-          api
+        api
           .post(organizationsUrl(), this.organization)
           .then((response) => {
             if (isItReturningData) {
@@ -133,8 +131,7 @@ Alpine.data('CreateOrganizationModal', (data = null) => {
             }
           })
           .catch((error) => {
-            console.log(error);
-            throw new Error('Erreur lors de la création de l\'organisation', error);
+            throw new Error('Error while creating organization ', error);
           });
       }
     },
@@ -152,7 +149,8 @@ Alpine.data('CreateOrganizationModal', (data = null) => {
           this.formState.fields.isOrgaName) ||
         (!this.formState.fields.isGroupNat && this.formState.fields.isOrgaName)
       ) {
-          api.patch(getOrganizationById(this.organization.id), this.organization)
+        api
+          .patch(getOrganizationById(this.organization.id), this.organization)
           .then((response) => {
             if (isItReturningData) {
               this.Modal.responseModal(response.data);
@@ -162,8 +160,7 @@ Alpine.data('CreateOrganizationModal', (data = null) => {
             }
           })
           .catch((error) => {
-            console.log(error);
-            throw new Error('Erreur lors de l\'édition de l\'organisation', error);
+            throw new Error('Error while updating organization ', error);
           });
       }
     },
@@ -188,7 +185,7 @@ Alpine.data('CreateOrganizationModal', (data = null) => {
         this.selectedDepartments = this.organization.departments.map(
           (department) => department.code
         );
-        this.organization.departments = this.selectedDepartments
+        this.organization.departments = this.selectedDepartments;
       }
     },
   };
