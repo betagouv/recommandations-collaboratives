@@ -9,11 +9,12 @@ from allauth.account.forms import (
 from captcha.fields import ReCaptchaField
 from captcha.widgets import ReCaptchaV2Checkbox
 from django import forms
+from django.contrib.auth import models as auth_models
 from django.core.exceptions import ValidationError
 
 from recoco.apps.geomatics.models import Department
 
-from .models import SiteConfiguration
+from .models import SiteConfiguration, UserProfile
 
 
 class UVSignupForm(SignupForm):
@@ -41,6 +42,23 @@ class UVSignupForm(SignupForm):
         self.fields["password2"].widget = forms.PasswordInput(
             attrs={"class": "fr-input fr-mt-2v fr-mb-4v"}
         )
+
+
+class UserUpdateForm(forms.ModelForm):
+    class Meta:
+        model = auth_models.User
+        fields = [
+            "first_name",
+            "last_name",
+        ]
+
+
+class UserProfileUpdateForm(forms.ModelForm):
+    class Meta:
+        model = UserProfile
+        fields = ["organization", "organization_position", "phone_no"]
+
+    # FIXME Make sure empty strings are invalid
 
 
 class UVLoginForm(LoginForm):

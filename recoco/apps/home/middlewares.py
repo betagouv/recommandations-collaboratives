@@ -1,7 +1,21 @@
 from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpRequest
+from django.shortcuts import redirect, reverse
 
 from recoco.apps.home.models import SiteConfiguration
+
+
+class RedirectIncompleteProfileUserMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request: HttpRequest):
+        if request.user.profile.needs_profile_update and request.path != reverse(
+            "home-update-incomplete-profile"
+        ):
+            return redirect(reverse("home-update-incomplete-profile"))
+
+        return self.get_response(request)
 
 
 class CurrentSiteConfigurationMiddleware:
