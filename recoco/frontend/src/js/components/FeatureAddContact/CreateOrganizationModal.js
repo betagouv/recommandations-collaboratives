@@ -134,6 +134,7 @@ Alpine.data('CreateOrganizationModal', (data = null) => {
           })
           .catch((error) => {
             console.log(error);
+            throw new Error('Erreur lors de la création de l\'organisation', error);
           });
       }
     },
@@ -162,6 +163,7 @@ Alpine.data('CreateOrganizationModal', (data = null) => {
           })
           .catch((error) => {
             console.log(error);
+            throw new Error('Erreur lors de l\'édition de l\'organisation', error);
           });
       }
     },
