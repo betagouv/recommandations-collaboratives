@@ -67,7 +67,11 @@ Alpine.data('ContactBook', () => {
     },
 
     groupContactByOrganization(contactList) {
-      contactList.sort((a,b)=>a.organization.name.localeCompare(b.organization.name, 'en', { sensitivity: 'base' }));
+      contactList.sort((a, b) =>
+        a.organization.name.localeCompare(b.organization.name, 'en', {
+          sensitivity: 'base',
+        })
+      );
       const contactByOrganization = _.groupBy(
         contactList,
         ({ organization: { name } }) => name
@@ -86,17 +90,21 @@ Alpine.data('ContactBook', () => {
     groupContactByNationalGroup(contactList) {
       const contactByNationalGroup = _.groupBy(
         contactList,
-        contact => contact.organization?.group?.name || 'Autres'
+        (contact) => contact.organization?.group?.name || 'Autres'
       );
       const contactByNationalGroupArray = [];
       for (const key in contactByNationalGroup) {
         contactByNationalGroupArray.push({
           name: key,
           id: contactByNationalGroup[key][0].organization.group?.id,
-          organizations: this.groupContactByOrganization(contactByNationalGroup[key]),
+          organizations: this.groupContactByOrganization(
+            contactByNationalGroup[key]
+          ),
         });
       }
-      contactByNationalGroupArray.sort((a,b)=>a.name.localeCompare(b.name, 'fr', { sensitivity: 'base' }))
+      contactByNationalGroupArray.sort((a, b) =>
+        a.name.localeCompare(b.name, 'fr', { sensitivity: 'base' })
+      );
       return contactByNationalGroupArray;
     },
 
@@ -122,11 +130,29 @@ Alpine.data('ContactBook', () => {
         });
       }
     },
-    closeCreateContactModal(event) {
-      if (event.target.id !== 'create-contact-modal') {
+
+    isCreateOrganizationModalOpen: false,
+    openModalCreateOrganization(organization = null, nationalGroup = null) {
+      this.isCreateOrganizationModalOpen = true;
+      if (organization) {
+        if (nationalGroup && nationalGroup.name !== 'Autres') {
+          organization.group = nationalGroup;
+        }
+        this.$nextTick(() => {
+          this.$dispatch('init-create-organization-modal-data', organization);
+        });
+      }
+    },
+    closeCreatesModal(event) {
+      if (event.target.id == 'create-organization-modal') {
+        this.isCreateOrganizationModalOpen = false;
         return;
       }
-      this.isCreateContactModalOpen = false;
+      if (event.target.id == 'create-contact-modal') {
+        this.isCreateContactModalOpen = false;
+        return;
+      }
+      return;
     },
   };
 });

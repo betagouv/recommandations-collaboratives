@@ -20,13 +20,13 @@
 {% endblock js %}
 {% block content %}
     <div x-data="ContactBook"
-         @modal-response="closeCreateContactModal($event)"
+         @modal-response="closeCreatesModal($event)"
          class="contact-list col-12 fr-px-15w fr-mx-auto">
         <!-- Breadcrumb -->
         <nav role="navigation" class="fr-breadcrumb" aria-label="vous êtes ici :">
             <button class="fr-breadcrumb__button"
                     aria-expanded="false"
-                    aria-controls="breadcrumb-1">Voir le fil d’Ariane</button>
+                    aria-controls="breadcrumb-1">Voir le fil d'Ariane</button>
             <div class="fr-collapse" id="breadcrumb-1">
                 <ol class="fr-breadcrumb__list">
                     <li>
@@ -75,7 +75,9 @@
                         <div class="organization-container">
                             <div class="d-flex align-items-center">
                                 <h3 class="organization__name fr-mb-0 no-wrap" x-text="organization.name"></h3>
-                                <template x-if="organization.departments?.length > 0">
+                                <button class="fr-btn fr-btn--tertiary-no-outline fr-btn--sm fr-icon-pencil-line button__actions-edit"
+                        @click="openModalCreateOrganization(organization, nationalGroup)">Éditer l'organisation'</button>
+                        <template x-if="organization.departments?.length > 0">
                                     <div class="organization__departments"
                                          :title="organization.departments.map(department => `${department.name} (${department.code})`).join(', ')">
                                         <template x-for="department in organization.departments">
@@ -110,5 +112,6 @@
             </template>
         </div>
         {% include "tools/contacts/create_contact_modal.html" with isItReturningData=False %}
+        {% include "tools/contacts/create_organization_modal.html" with isItReturningData=False %}
     </div>
 {% endblock content %}
