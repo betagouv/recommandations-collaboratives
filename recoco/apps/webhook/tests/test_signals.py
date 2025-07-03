@@ -99,6 +99,7 @@ def serialized_project(project, organization):
                         "_link": f"/api/addressbook/organizations/{organization.id}/",
                         "id": organization.id,
                         "name": "Jedi corp",
+                        "group": {"id": organization.group.id, "name": "Jedi corp"},
                     },
                     "organization_position": "Padawan",
                 },
@@ -183,7 +184,8 @@ def test_find_webhooks_no_project():
 
 @pytest.mark.django_db
 def test_model_dict_project(project, serialized_project):
-    assert build_listener().model_dict(project) == serialized_project
+    dict_project = build_listener().model_dict(project)
+    assert dict_project == serialized_project
 
 
 @pytest.mark.django_db

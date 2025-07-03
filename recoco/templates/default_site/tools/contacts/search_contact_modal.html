@@ -35,7 +35,7 @@
                            name="search-contact-input"
                            @input.debounce="onSearch"
                            x-model="userInputSearchContact">
-                    <button class="fr-btn" title="Rechercher" @click="onSearch">Rechercher</button>
+                    <button class="fr-btn" title="Rechercher" @click.prevent="onSearch()">Rechercher</button>
                 </div>
             </div>
             <div>

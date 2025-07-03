@@ -37,4 +37,14 @@ class BookmarkAdmin(admin.ModelAdmin):
     list_display = ["resource", "created_by"]
 
 
+@admin.register(models.ResourceAddon)
+class ResourceAddonAdmin(admin.ModelAdmin):
+    list_display = (
+        "recommendation",
+        "nature",
+        "enabled",
+    )
+    list_filter = ("nature",)
+
+
 # eof
