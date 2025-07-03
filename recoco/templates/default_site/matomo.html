@@ -12,6 +12,8 @@
     _paq.push(['setSiteId', '{{ matomo_site_id }}']);
     var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
     g.async=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);
+    var h = d.createElement('script');
+    h.async=true; h.src=u+'plugins/HeatmapSessionRecording/tracker.min.js'; s.parentNode.insertBefore(h,s);
   })();
 </script>
 {% else %}
