@@ -433,7 +433,7 @@ def update_profile_if_incomplete(request):
     This is triggered by the 'needs_profile_update'.
     """
     form_user = forms.UserUpdateForm(request.POST or None, instance=request.user)
-    form_profile = forms.UserProfileForm(
+    form_profile = forms.UserProfileUpdateForm(
         request.POST or None, instance=request.user.profile
     )
 
@@ -441,6 +441,7 @@ def update_profile_if_incomplete(request):
         if form_user.is_valid() and form_profile.is_valid():
             form_user.save()
             profile = form_profile.save()
+            # FIXME: add validation to check if profile is complete
             profile.needs_profile_update = False
             profile.save()
 
@@ -450,7 +451,7 @@ def update_profile_if_incomplete(request):
 
             return redirect(next_page)
 
-    return render("home/update_incomplete_profile.html", locals())
+    return render(request, "home/update_incomplete_profile.html", locals())
 
 
 # eof

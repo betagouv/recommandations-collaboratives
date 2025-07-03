@@ -10,7 +10,9 @@ class RedirectIncompleteProfileUserMiddleware:
         self.get_response = get_response
 
     def __call__(self, request: HttpRequest):
-        if request.user.profile.needs_profile_update:
+        if request.user.profile.needs_profile_update and request.path != reverse(
+            "home-update-incomplete-profile"
+        ):
             return redirect(reverse("home-update-incomplete-profile"))
 
         return self.get_response(request)
