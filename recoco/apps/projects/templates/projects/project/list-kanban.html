@@ -141,16 +141,16 @@
                                                                     <span class="kanban-card__notification-container position-absolute top-25 start-100 badge bg-info"
                                                                           :class="{'bg-danger': t.notifications.has_collaborator_activity == true}"><span x-text="t.notifications.count"></span> <span class="visually-hidden">nouvelle activité</span></span>
                                                                 </template>
-                                                                <template x-if="t.commune">
-                                                                    <div class="kanban-card__commune-container fw-bold">
-                                                                        <span class="kanban-card__commune-name" x-text="t.commune.name"></span>
-                                                                        <span class="kanban-card__commune-postal" x-text="`(${t.commune.postal})`"></span>
-                                                                    </div>
-                                                                </template>
                                                                 <div class="kanban-card__project-container fw-semibold fr-mb-2v">
                                                                     <span class="kanban-card__project-name project-link"
                                                                           x-text="truncate(t.name)"></span>
                                                                 </div>
+                                                                <template x-if="t.organization">
+                                                                    <div class="kanban-card__project-organization-container">
+                                                                        <span class="kanban-card__project-organization"
+                                                                              x-text="t.organization.name"></span>
+                                                                    </div>
+                                                                </template>
                                                                 <template x-if="t.origin">
                                                                     <div class="kanban-card__project-push-by-container"
                                                                          data-cy="kanban-project-shared-by-origin"
@@ -167,6 +167,7 @@
                                                                         <span x-text="t.origin.siteInfo.name"></span>
                                                                     </div>
                                                                 </template>
+
                                                                 <template x-for="portal in t.publishTo">
                                                                     <template x-if="portal.site !== {{ site_config.site_id }}">
                                                                         <div class="kanban-card__project-push-by-container"
@@ -183,6 +184,12 @@
                                                                             <span x-text="portal.siteInfo.name"></span>
                                                                         </div>
                                                                     </template>
+                                                                </template>
+                                                                <template x-if="t.commune">
+                                                                    <div class="kanban-card__commune-container fw-bold">
+                                                                        <span class="kanban-card__commune-name" x-text="t.commune.name"></span>
+                                                                        <span class="kanban-card__commune-postal" x-text="`(${t.commune.postal})`"></span>
+                                                                    </div>
                                                                 </template>
                                                                 <template x-if="t.commune">
                                                                     <div>
