@@ -119,9 +119,6 @@ class OnboardingSignupForm(DsrcBaseForm):
                 "password",
             ),
         )
-        # Skip captcha during tests
-        if "PYTEST_CURRENT_TEST" in os.environ:
-            self.fields.pop("captcha")
 
     # Example clean method
     def clean_email(self):
