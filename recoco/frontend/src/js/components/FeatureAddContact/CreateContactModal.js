@@ -126,8 +126,6 @@ Alpine.data('CreateContactModal', () => {
         this.isFormInEditMode = true;
       }
       if (this.contact.organization) {
-        console.log('Organization is  to ', this.contact.organization);
-
         this.formState.fields.isOrgaSelected = true;
       }
       // this.formState.fields.isJobSelected = Boolean(this.contact.division);
