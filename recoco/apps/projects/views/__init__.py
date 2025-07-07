@@ -34,7 +34,6 @@ from recoco.apps.home.models import AdvisorAccessRequest
 from recoco.utils import (
     check_if_advisor,
     get_group_for_site,
-    get_site_config_or_503,
     has_perm_or_403,
     is_staff_for_site,
 )
@@ -79,7 +78,7 @@ def mark_general_notifications_as_seen(user):
 def project_moderation_list(request):
     is_project_moderator_or_403(request.user, request.site)
 
-    site_config = get_site_config_or_503(request.site)
+    site_config = request.site_config
 
     draft_projects = models.Project.on_site.filter(
         project_sites__status="DRAFT", project_sites__site=request.site, deleted=None
@@ -124,9 +123,21 @@ def project_moderation_project_refuse(request: HttpRequest, project_id: int):
         project.updated_on = timezone.now()
         project.save()
 
-        messages.add_message(
-            request, messages.INFO, f"Le dossier '{project.name}' a été refusé."
-        )
+        messages.success(request, f"Le dossier '{project.name}' a été refusé.")
+
+        if owner := project.owner:
+            send_email(
+                template_name=communication_constants.TPL_PROJECT_REFUSED,
+                recipients=[
+                    {
+                        "name": normalize_user_name(owner),
+                        "email": owner.email,
+                    }
+                ],
+                params={
+                    "project": digests.make_project_digest(project=project, user=owner),
+                },
+            )
 
     return redirect(reverse("projects-moderation-list"))
 
@@ -148,9 +159,7 @@ def project_moderation_project_accept(request: HttpRequest, project_id: int):
         project.updated_on = timezone.now()
         project.save()
 
-        messages.add_message(
-            request, messages.SUCCESS, f"Le dossier '{project.name}' a été accepté."
-        )
+        messages.success(request, f"Le dossier '{project.name}' a été accepté.")
 
         signals.project_validated.send(
             sender=models.Project,
@@ -222,9 +231,9 @@ def project_moderation_project_accept(request: HttpRequest, project_id: int):
             if join:
                 # Assign current user as advisor if requested
                 assign_advisor(request.user, project, request.site)
-                messages.add_message(
+                messages.success(
                     request,
-                    messages.INFO,
+                    messages.SUCCESS,
                     f"Vous êtes maintenant conseiller·ère du dossier '{project.name}'.",
                 )
 
@@ -252,10 +261,22 @@ def project_moderation_advisor_refuse(
         advisor_group = get_group_for_site("advisor", request.site)
         advisor_access_request.user.groups.remove(advisor_group)
 
-    messages.add_message(
+    messages.success(
         request,
-        messages.INFO,
         f"La demande d'accès conseiller pour '{advisor_access_request.user.email}' a été refusée.",
+    )
+
+    send_email(
+        template_name=communication_constants.TPL_ADVISOR_ACCESS_REQUEST_REFUSED,
+        recipients=[
+            {
+                "name": normalize_user_name(advisor_access_request.user),
+                "email": advisor_access_request.user.email,
+            }
+        ],
+        params={
+            "message": advisor_access_request.comment,
+        },
     )
 
     return redirect(reverse("projects-moderation-list"))
@@ -284,10 +305,22 @@ def project_moderation_advisor_accept(
             *advisor_access_request.departments.all()
         )
 
-    messages.add_message(
+    messages.success(
         request,
-        messages.INFO,
         f"La demande d'accès conseiller pour '{advisor_access_request.user.email}' a été acceptée.",
+    )
+
+    send_email(
+        template_name=communication_constants.TPL_ADVISOR_ACCESS_REQUEST_ACCEPTED,
+        recipients=[
+            {
+                "name": normalize_user_name(advisor_access_request.user),
+                "email": advisor_access_request.user.email,
+            }
+        ],
+        params={
+            "message": advisor_access_request.comment,
+        },
     )
 
     return redirect(reverse("projects-moderation-list"))
@@ -388,7 +421,7 @@ def project_list_for_staff(request):
     ):
         raise PermissionDenied("Vous n'avez pas le droit d'accéder à ceci.")
 
-    site_config = get_site_config_or_503(request.site)
+    site_config = request.site_config
 
     mark_general_notifications_as_seen(request.user)
 

@@ -1,7 +1,7 @@
 {% extends "account/layout/layout.html" %}
 {% block layout_content %}
     <form class="form"
-          action="{% url 'advisor-access-request-moderator' advisor_access_request.pk %}?vue=advisor"
+          action="{% url 'advisor-access-request-moderator' advisor_access_request.pk %}"
           method="post">
         {% csrf_token %}
         <fieldset class="fr-fieldset">

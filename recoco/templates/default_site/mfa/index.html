@@ -1,0 +1,93 @@
+{% extends "mfa/base_manage.html" %}
+{% load allauth %}
+{% load i18n %}
+{% block title %}
+    {% trans "Two-Factor Authentication" %}
+{% endblock title %}
+{% block content %}
+    <div class="fr-container fr-container--fluid fr-my-md-14v">
+        <div class="fr-grid-row fr-grid-row-gutters fr-grid-row--center">
+            <div class="fr-col-12 fr-col-md-8 fr-col-lg-6">
+                <div class="fr-container fr-background-alt--grey fr-px-md-0 fr-py-10v fr-py-md-14v">
+                    <div class="fr-grid-row fr-grid-row-gutters fr-grid-row--center">
+                        <div class="fr-col-12 fr-col-md-9 fr-col-lg-8">
+                            <h1>{% trans "Two-Factor Authentication" %}</h1>
+                            {% if "totp" in MFA_SUPPORTED_TYPES %}
+                                <section>
+                                    <h2>{% translate "Authenticator App" %}</h2>
+                                    {% if authenticators.totp %}
+                                        <p>{% translate "Authentication using an authenticator app is active." %}</p>
+                                    {% else %}
+                                        <p>{% translate "An authenticator app is not active." %}</p>
+                                    {% endif %}
+                                    {% url 'mfa_deactivate_totp' as deactivate_url %}
+                                    {% url 'mfa_activate_totp' as activate_url %}
+                                    {% if authenticators.totp %}
+                                        <a href="{{ deactivate_url }}" class="fr-btn">{% translate "Deactivate" %}</a>
+                                    {% else %}
+                                        <a href="{{ activate_url }}" class="fr-btn">{% translate "Activate" %}</a>
+                                    {% endif %}
+                                </section>
+                            {% endif %}
+                            {% if "webauthn" in MFA_SUPPORTED_TYPES %}
+                                {% element panel %}
+                                    {% slot title %}
+                                        {% translate "Security Keys" %}
+                                    {% endslot %}
+                                    {% slot body %}
+                                        {% if authenticators.webauthn|length %}
+                                            <p>
+                                                {% blocktranslate count count=authenticators.webauthn|length %}You have added {{ count }} security key.{% plural %}You have added {{ count }} security keys.{% endblocktranslate %}
+                                            </p>
+                                        {% else %}
+                                            <p>{% translate "No security keys have been added." %}</p>
+                                        {% endif %}
+                                    {% endslot %}
+                                    {% slot actions %}
+                                        {% if authenticators.webauthn|length %}
+                                            {% url 'mfa_list_webauthn' as webauthn_list_url %}
+                                            {% element button href=webauthn_list_url %}
+                                                {% translate "Manage" %}
+                                            {% endelement %}
+                                        {% else %}
+                                            {% url 'mfa_add_webauthn' as webauthn_add_url %}
+                                            {% element button href=webauthn_add_url %}
+                                                {% translate "Add" %}
+                                            {% endelement %}
+                                        {% endif %}
+                                    {% endslot %}
+                                {% endelement %}
+                            {% endif %}
+                            {% if "recovery_codes" in MFA_SUPPORTED_TYPES %}
+                                {% with total_count=authenticators.recovery_codes.generate_codes|length unused_count=authenticators.recovery_codes.get_unused_codes|length %}
+                                    <section class="fr-mt-4w">
+                                        <h2>{% translate "Recovery Codes" %}</h2>
+                                        {% if authenticators.recovery_codes %}
+                                            <p>
+                                                {% blocktranslate count unused_count=unused_count %}There is {{ unused_count }} out of {{ total_count }} recovery codes available.{% plural %}There are {{ unused_count }} out of {{ total_count }} recovery codes available.{% endblocktranslate %}
+                                            </p>
+                                        {% else %}
+                                            <p>{% translate "No recovery codes set up." %}</p>
+                                        {% endif %}
+                                        {% if is_mfa_enabled %}
+                                            {% if authenticators.recovery_codes %}
+                                                {% if unused_count > 0 %}
+                                                    {% url 'mfa_view_recovery_codes' as view_url %}
+                                                    <a class="fr-btn fr-btn--secondary" href="{{ view_url }}">{% translate "View" %}</a>
+                                                {% endif %}
+                                                {% url 'mfa_download_recovery_codes' as download_url %}
+                                                <button class="fr-btn fr-btn--secondary" href="{{ download_url }}">{% translate "Download" %}</button>
+                                            {% endif %}
+                                        {% endif %}
+                                        {% url 'mfa_generate_recovery_codes' as generate_url %}
+                                        <a class="fr-btn fr-btn--secondary" href="{{ generate_url }}">{% translate "Generate" %}</a>
+                                    </section>
+                                {% endwith %}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% load guardian_tags %}
+{% load static %}
+{% load sass_tags %}
+{% load django_vite %}
+{% block title %}
+    Carnet de contacts {{ block.super }}
+{% endblock title %}
+{% block og_title %}
+    Carnet de contacts {{ block.super }}
+{% endblock og_title %}
+{% block css %}
+    <link href="{% sass_src 'addressbook/css/contact_list.scss' %}"
+          rel="stylesheet"
+          type="text/css">
+{% endblock css %}
+{% block js %}
+    {% vite_asset 'js/components/ContactBook.js' %}
+    {% vite_asset 'js/apps/featureAddContact.js' %}
+{% endblock js %}
+{% block content %}
+    <div x-data="ContactBook"
+         @modal-response="closeCreateContactModal($event)"
+         class="contact-list col-12 fr-px-15w fr-mx-auto">
+        <!-- Breadcrumb -->
+        <nav role="navigation" class="fr-breadcrumb" aria-label="vous êtes ici :">
+            <button class="fr-breadcrumb__button"
+                    aria-expanded="false"
+                    aria-controls="breadcrumb-1">Voir le fil d’Ariane</button>
+            <div class="fr-collapse" id="breadcrumb-1">
+                <ol class="fr-breadcrumb__list">
+                    <li>
+                        <a class="fr-breadcrumb__link" href="{% url 'home' %}">Accueil</a>
+                    </li>
+                    <li>
+                        <a class="fr-breadcrumb__link" aria-current="page">Contacts</a>
+                    </li>
+                </ol>
+            </div>
+        </nav>
+        <div class="header">
+            <h2>Contact</h2>
+            <div class="header__actions">
+                <div class="actions__search-bar">
+                    <span class="fr-icon-search-line fr-icon--sm" aria-hidden="true"></span>
+                    <input class="fr-input w-100"
+                           type="search"
+                           @input.debounce.500ms="searchContacts($event.target.value)"
+                           x-model="searchParams.search"
+                           placeholder="Rechercher">
+                </div>
+                <button class="actions__add-contact no-wrap fr-btn fr-btn--icon-left fr-icon-add-line"
+                        @click="openModalCreateContact()">Créer un contact</button>
+            </div>
+            <div class="header__filter d-flex">
+                <template x-for="letter of letters">
+                    <button class="header__filter-letter"
+                            :class="letter === searchParams.letter ? 'header__filter-letter--active': ''"
+                            x-text="letter"
+                            @click="loadOrganizationStartingWith(letter)"></button>
+                </template>
+                <template x-if="searchParams.letter">
+                    <div>
+                        <span>-</span>
+                        <button class="header__filter-letter" @click="resetLetterFilter">supprimer le filtre</button>
+                    </div>
+                </template>
+            </div>
+        </div>
+        <div class="contact-list__list">
+            <template x-for="nationalGroup in contactListGroupByNationalGroup" :key="nationalGroup.id">
+                <div class="national-group-container w-100 fr-my-5v">
+                    <h3 class="national-group__name fr-mb-0 no-wrap" x-text="nationalGroup.name"></h3>
+                    <template x-for="organization in nationalGroup.organizations" :key="index">
+                        <div class="organization-container">
+                            <div class="d-flex align-items-center">
+                                <h3 class="organization__name fr-mb-0 no-wrap" x-text="organization.name"></h3>
+                                <template x-if="organization.departments?.length > 0">
+                                    <div class="organization__departments"
+                                         :title="organization.departments.map(department => `${department.name} (${department.code})`).join(', ')">
+                                        <template x-for="department in organization.departments">
+                                            <template x-if="department.name">
+                                                <span class="organization__departments-item"
+                                                      x-text="`${department.name} (${department.code})`"></span>
+                                            </template>
+                                        </template>
+                                    </div>
+                                </template>
+                            </div>
+                            <div class="contact-list__list-container">
+                                <template x-for="contact in organization.contacts" :key="contact.id">
+                                    <div x-data="{contact:contact, isOpenDeleteContact: false}"
+                                         class="contact-list__list-item">
+                                        {% include "tools/contacts/contact_card.html" with button_actions=True %}
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </template>
+
+
+                </div>
+            </template>
+            <template x-if="contactListGroupByNationalGroup.length === 0">
+                <div class="no-contacts fr-m-2w">
+                    <p class="no-contacts__text">Aucun contact trouvé.</p>
+                    <br>
+                    <p class="no-contacts__text fr-m-0">Vous pouvez créer un contact en cliquant sur le bouton ci-dessus.</p>
+                </div>
+            </template>
+        </div>
+        {% include "tools/contacts/create_contact_modal.html" with isItReturningData=False %}
+    </div>
+{% endblock content %}

@@ -126,7 +126,7 @@ Parameters:
 {% if can_attach_contact %}
     <template x-if="selectedContact">
         <div class="d-flex flex-column contact-card__container">
-            <div class="border position-relative" x-data="{contact:selectedContact}">
+            <div class="border position-relative" x-data="{contact:selectedContact,isOpenDeleteContact:null}">
                 {% include "tools/contacts/contact_card.html" %}
                 <button @click.prevent="handleResetContact"
                         data-test-id="button-remove-contact"

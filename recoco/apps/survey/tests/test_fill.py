@@ -10,7 +10,6 @@ created: 2021-06-27 12:06:10 CEST
 import pytest
 from django.contrib.auth import models as auth_models
 from django.contrib.sites.shortcuts import get_current_site
-from django.core.exceptions import ImproperlyConfigured
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 from django.utils import timezone
@@ -52,18 +51,6 @@ def test_new_survey_session_is_created(request, client, project):
 
     assert response.status_code == 302
     assert response.url == reverse("survey-session-start", args=(new_session.id,))
-
-
-@pytest.mark.django_db
-def test_new_survey_session_makes_500_if_no_siteconfiguration(request, client, project):
-    current_site = get_current_site(request)
-
-    Recipe(models.Survey, site=current_site).make()
-
-    url = reverse("survey-project-session", args=(project.id,))
-    with login(client, is_staff=False):
-        with pytest.raises(ImproperlyConfigured):
-            client.get(url)
 
 
 @pytest.mark.django_db

@@ -47,14 +47,6 @@ def test_create_new_organization_and_redirect(request, client, current_site):
 
 
 @pytest.mark.django_db
-def test_organization_list_not_available_for_non_staff(client):
-    url = reverse("addressbook-organization-list")
-    with login(client):
-        response = client.get(url)
-    assert response.status_code == 403
-
-
-@pytest.mark.django_db
 def test_create_existing_organization_and_redirect(current_site, client):
     organization = Recipe(
         Organization, sites=[current_site], name="my organization"
@@ -120,8 +112,6 @@ def test_organization_create_error(client):
 
 
 # Listing
-
-
 @pytest.mark.django_db
 def test_organization_list_not_available_for_non_switchtender(client):
     url = reverse("addressbook-organization-list")

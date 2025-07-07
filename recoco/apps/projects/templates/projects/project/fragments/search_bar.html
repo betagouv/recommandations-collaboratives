@@ -1,12 +1,24 @@
+{% comment %}
+
+Pour que l'icone de loupe s'affiche correctement, il faut que la div englobante de ce composant soit en position relative.
+
+variables to pass :
+- action_search : la fonction à appeler lors de la recherche
+- placeholder : le texte à afficher dans la barre de recherche
+- x_model : le nom du modèle x-data à lier à la barre de recherche (optionnel)
+
+{% endcomment %}
 {% load sass_tags %}
 {% block css %}
 <link href="{% sass_src 'projects/css/searchbar.scss' %}"
       rel="stylesheet"
       type="text/css">
 {% endblock css %}
-<input type="search"
+<input x-ref="search_bar"
+       type="search"
        data-cy="search-bar-project"
-       class="fr-icon-search-line"
+       class="fr-icon-search-line placeholder-position"
        placeholder="{{ placeholder|default:"Rechercher" }}"
        @input.debounce.500ms="{{ action_search }}"
        {% if x_model %}x-model="{{ x_model }}"{% endif %}>
+<span class="fr-icon-search-line correct-position" aria-hidden="true"></span>

@@ -1,12 +1,33 @@
 import pytest
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
+from guardian.shortcuts import assign_perm
 from model_bakery.recipe import Recipe
 from pytest_django.asserts import assertContains, assertRedirects
 
 from recoco.utils import login
 
 from ..models import Contact, Organization
+
+
+# Contact list
+@pytest.mark.django_db
+def test_contact_list_not_available_for_non_staff(client):
+    url = reverse("addressbook-contact-list")
+    with login(client):
+        response = client.get(url)
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_contact_list_available(client, current_site):
+    url = reverse("addressbook-contact-list")
+    with login(client) as user:
+        assign_perm("site.use_addressbook", user, current_site)
+        response = client.get(url)
+
+    assert response.status_code == 200
+
 
 # Creation
 

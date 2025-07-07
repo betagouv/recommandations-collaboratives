@@ -53,18 +53,26 @@ export default instance;
 // }
 
 export function projectsUrl(search, departments, lastActivity) {
+  // if search with tags, make a different url
+  let url;
+  if (search.includes('#')) {
+    search = search.substring(1);
+  }
+  //   search.paragraph.replace(' ', '_');
+  //   url = '/api/projects/?tags=' + search.substring(1);
+  //   console.log(url);
+  // } else {
   const params = new URLSearchParams({
     search: search,
     last_activity: lastActivity,
   });
 
-  let url = '/api/projects/?' + params.toString();
+  url = '/api/projects/?' + params.toString();
 
   if (departments.length) {
     departments = departments.map((code) => `departments=${code}`).join('&');
     url = url + '&' + departments;
   }
-
   return url;
 }
 
@@ -90,6 +98,10 @@ export function searchOrganizationsUrl(search) {
   return `/api/addressbook/organizations/?search=${search}`;
 }
 
+export function getOrganizationById(id) {
+  return `/api/addressbook/organizations/${id}`;
+}
+
 export function organizationsUrl() {
   return `/api/addressbook/organizations/`;
 }
@@ -106,15 +118,26 @@ export function departmentsUrl() {
   return `/api/departments/`;
 }
 // Contacts
-export function searchContactsUrl(search) {
-  return `/api/addressbook/contacts/?search=${search}`;
+export function searchContactsUrl(search, orgaFirstLetter) {
+  const params = new URLSearchParams({ search });
+  if (orgaFirstLetter) {
+    params.append('orga-startswith', orgaFirstLetter);
+  }
+  return `/api/addressbook/contacts/?${params}`;
 }
-export function contactsUrl() {
+
+export function contactsUrl(limit) {
+  if (limit) {
+    const params = new URLSearchParams({
+      limit: limit,
+    });
+    return `/api/addressbook/contacts/?${params}`;
+  }
   return `/api/addressbook/contacts/`;
 }
 
 export function contactUrl(contactId) {
-  return `/api/addressbook/contacts/${contactId}`;
+  return `/api/addressbook/contacts/${contactId}/`;
 }
 
 // Topic

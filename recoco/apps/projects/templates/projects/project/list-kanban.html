@@ -45,8 +45,8 @@
             </div>
             <div x-data="Tutorial('time-filter-tutorial-on-kanban')"
                  class="kanban-header__middle-part">
-                <div class="kanban-header__searchbar">
-                    {% include "projects/project/fragments/search_bar.html" with action_search="onSearch" x_model="searchText" %}
+                <div class="kanban-header__searchbar position-relative">
+                    {% include "projects/project/fragments/search_bar.html" with action_search="onSearch" x_model="searchText" placeholder="Rechercher commune, #tag, nom du dossier..." %}
                 </div>
                 <div class="kanban-header__lastactivity-filter fr-select-group d-flex fr-m-0 fr-mr-6v align-items-center"
                      id="kanban-time-filter">
@@ -102,7 +102,7 @@
                                             <h5 x-text="board.title" class="font-medium text-gray-800 fr-mb-0"></h5>
                                         </div>
                                         <div class="kanban-column__content">
-                                            <div class="fr-px-2v fr-py-1v fr-pb-1v h-100">
+                                            <div class="fr-px-2v fr-py-1v fr-pb-1v h-100 d-flex flex-column">
                                                 <template x-if="column(board.code).length === 0">
                                                     <div class="drag-targetable fr-py-2v h-100"
                                                          @dragover="onDragOver(event, null)"
@@ -189,6 +189,21 @@
                                                                         <span class="kanban-card__project-insee fr-icon--sm fr-icon-map-pin-2-line not-a-link">INSEE: <span x-text="truncate(t.commune.insee)"></span></span>
                                                                     </div>
                                                                 </template>
+                                                                <template x-if="t.tags.length > 0">
+                                                                    <div class="kanban-card__tags-container d-flex">
+                                                                        <span class="fr-icon-pantone-line fr-icon--sm not-a-link"
+                                                                              aria-hidden="true"></span>
+                                                                        <div class="d-flex flex-wrap align-items-center limit-height">
+                                                                            <template x-for="tag in t.tags">
+                                                                                <div @click.prevent="onTagClick(tag)" class="fr-mr-1v">
+                                                                                    <p class="fake-a-link fr-mb-0">
+                                                                                        #<span x-text="tag"></span>
+                                                                                    </p>
+                                                                                </div>
+                                                                            </template>
+                                                                        </div>
+                                                                    </div>
+                                                                </template>
                                                                 <div class="d-flex justify-content-between">
                                                                     <div class="kanban-card__project-date-container text-secondary">
                                                                         <span x-text="`Déposé le ${formatDateDisplay(t.created_on)}`"
@@ -205,6 +220,16 @@
                                                             </div>
                                                         </a>
                                                     </div>
+                                                </template>
+                                                <template x-if="column(board.code).length > 0">
+                                                    <div class="drag-targetable fr-py-2v flex-grow-1"
+                                                         @dragover="onDragOver(event, null)"
+                                                         @drop="onDrop(event, board.code, null)"
+                                                         @dragenter="onDragEnter(event)"
+                                                         @dragleave="onDragLeave(event)"
+                                                         @dragstart="onDragStart(event, t.uuid)"
+                                                         @dragend="onDragEnd(event)"
+                                                         data-test-id="drag-target"></div>
                                                 </template>
                                             </div>
                                         </div>

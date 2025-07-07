@@ -13,6 +13,8 @@ from django.core.exceptions import ValidationError
 
 from recoco.apps.geomatics.models import Department
 
+from .models import SiteConfiguration
+
 
 class UVSignupForm(SignupForm):
     field_order = [
@@ -45,10 +47,10 @@ class UVLoginForm(LoginForm):
     def __init__(self, *args, **kwargs):
         super(UVLoginForm, self).__init__(*args, **kwargs)
         self.fields["login"].widget = forms.TextInput(
-            attrs={"type": "email", "class": "fr-input fr-mt-2v fr-mb-4v"}
+            attrs={"type": "email", "class": "fr-input fr-mt-2v fr-mb-5v"}
         )
         self.fields["password"].widget = forms.PasswordInput(
-            attrs={"class": "fr-input fr-mt-2v fr-mb-4v"}
+            attrs={"class": "fr-input fr-mt-2v fr-mb-5v"}
         )
 
 
@@ -132,4 +134,22 @@ class AdvisorAccessRequestForm(forms.Form):
         help_text="Expliquez brièvement pourquoi vous demandez l’accès à ces dossiers et en quoi cela est pertinent pour votre rôle, afin de nous aider à examiner votre demande.",
         widget=forms.Textarea(attrs={"rows": 3}),
         required=False,
+    )
+
+
+class SiteCreateForm(forms.ModelForm):
+    class Meta:
+        model = SiteConfiguration
+        fields = [
+            "name",
+            "subdomain",
+            "sender_email",
+            "sender_name",
+            "contact_form_recipient",
+            "legal_address",
+        ]
+
+    name = forms.CharField(label="Nom du portail")
+    subdomain = forms.CharField(
+        label="Sous-domaine recoconseil. Ex: bidule si bidule.recoconseil.fr"
     )

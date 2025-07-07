@@ -10,7 +10,6 @@ created : 2022-12-19 11:56:20 CEST
 from django.http import Http404
 from django.shortcuts import render
 
-from recoco import utils
 from recoco.apps.survey import models as survey_models
 
 from .. import models
@@ -24,10 +23,12 @@ def project_detail_from_sharing_link(request, project_ro_key):
         raise Http404 from exc
 
     try:
-        site_config = utils.get_site_config_or_503(request.site)
+        site_config = request.site_config
+
         session, created = survey_models.Session.objects.get_or_create(
             project=project, survey=site_config.project_survey
         )
+
         sorted_sessions = sorted(
             project.survey_session.all(),
             key=lambda session: session.survey.site != request.site,

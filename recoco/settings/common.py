@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     "allauth.account",
     "allauth.socialaccount",
     "allauth.socialaccount.providers.openid_connect",
+    "allauth.mfa",
     "guardian",
     "magicauth",
     "sass_processor",
@@ -122,6 +123,7 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "multisite.middleware.DynamicSiteMiddleware",
     "django.contrib.sites.middleware.CurrentSiteMiddleware",
+    "recoco.apps.home.middlewares.CurrentSiteConfigurationMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "sesame.middleware.AuthenticationMiddleware",
@@ -381,6 +383,10 @@ SOCIALACCOUNT_PROVIDERS = {
     },
 }
 
+# allow one step back for TOTP
+MFA_TOTP_TOLERANCE = 1
+
+
 # Django vite
 DJANGO_VITE_ASSETS_PATH = BASE_DIR / "frontend/dist"
 STATICFILES_DIRS += [DJANGO_VITE_ASSETS_PATH]
@@ -551,6 +557,7 @@ DJANGO_WEBHOOK = {
         "projects.Project",
         "survey.Answer",
         "taggit.TaggedItem",
+        "tasks.Task",
     ],
     "SIGNAL_LISTENER": "recoco.apps.webhook.signals.WebhookSignalListener",
     "USE_CACHE": False,
