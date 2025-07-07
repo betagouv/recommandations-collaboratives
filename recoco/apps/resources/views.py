@@ -72,8 +72,6 @@ def resource_search(request):
 
     if form.cleaned_data.get("no_category", False):
         resources = resources.filter(category__isnull=True)
-    else:
-        resources = resources.exclude(category__isnull=True)
 
     # If we are not allowed to manage resources, filter out DRAFT/TO_REVIEW items and
     # imported resources

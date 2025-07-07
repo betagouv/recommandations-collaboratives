@@ -279,7 +279,7 @@ def test_resource_list_contains_only_uncategorized(current_site, client):
         f"{reverse('resources-resource-search')}?no_category=false&query=resource"
     )
     assertContains(response, resource2_url)
-    assertNotContains(response, resource1_url)
+    assertContains(response, resource1_url)
 
 
 @pytest.mark.django_db
