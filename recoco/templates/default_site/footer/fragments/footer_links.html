@@ -1,0 +1,15 @@
+{% load wagtailcore_tags %}
+{% wagtail_site as current_site %}
+<div class="fr-col-12 fr-col-sm-3 fr-col-md-2">
+    <h3 class="fr-footer__top-cat">{{ request.site.name }}</h3>
+    <ul class="fr-footer__top-list">
+        {% for menuitem in current_site.root_page.get_children.live.in_menu %}
+            <li>
+                <a href="{% pageurl menuitem %}" class="fr-footer__top-link">{{ menuitem.title }}</a>
+            </li>
+        {% endfor %}
+        <li>
+            <a href="{% url 'home-contact' %}" class="fr-footer__top-link">Nous contacter</a>
+        </li>
+    </ul>
+</div>
