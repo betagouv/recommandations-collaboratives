@@ -117,7 +117,6 @@ class OnboardingSignupForm(DsrcBaseForm):
                 "email",
                 "phone",
                 "password",
-                "captcha",
             ),
         )
         # Skip captcha during tests
@@ -171,8 +170,6 @@ class OnboardingSignupForm(DsrcBaseForm):
         help_text="Votre numéro de téléphone ne sera jamais diffusé en dehors du site. Il permet aux administrateurs ou aux partenaires de votre dossier de vous joindre plus facilement. Format attendu: 0102030405.",
         required=True,
     )
-
-    captcha = ReCaptchaField(widget=ReCaptchaV2Checkbox(api_params={"hl": "fr"}))
 
 
 class OnboardingProject(DsrcBaseForm):
