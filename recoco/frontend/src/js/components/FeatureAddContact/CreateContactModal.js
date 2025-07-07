@@ -61,7 +61,6 @@ Alpine.data('CreateContactModal', () => {
           });
         }
       } catch (error) {
-        console.log(error);
         throw new Error('Error while creating a contact ', error);
       }
     },
@@ -94,8 +93,7 @@ Alpine.data('CreateContactModal', () => {
           });
         }
       } catch (error) {
-        console.log(error);
-        throw new Error('Error while creating a contact ', error);
+        throw new Error('Error while updating a contact ', error);
       }
     },
     handleSetOrganization(organization) {
