@@ -102,7 +102,7 @@
                                             <h5 x-text="board.title" class="font-medium text-gray-800 fr-mb-0"></h5>
                                         </div>
                                         <div class="kanban-column__content">
-                                            <div class="fr-px-2v fr-py-1v fr-pb-1v h-100">
+                                            <div class="fr-px-2v fr-py-1v fr-pb-1v h-100 d-flex flex-column">
                                                 <template x-if="column(board.code).length === 0">
                                                     <div class="drag-targetable fr-py-2v h-100"
                                                          @dragover="onDragOver(event, null)"
@@ -220,6 +220,16 @@
                                                             </div>
                                                         </a>
                                                     </div>
+                                                </template>
+                                                <template x-if="column(board.code).length > 0">
+                                                    <div class="drag-targetable fr-py-2v flex-grow-1"
+                                                         @dragover="onDragOver(event, null)"
+                                                         @drop="onDrop(event, board.code, null)"
+                                                         @dragenter="onDragEnter(event)"
+                                                         @dragleave="onDragLeave(event)"
+                                                         @dragstart="onDragStart(event, t.uuid)"
+                                                         @dragend="onDragEnd(event)"
+                                                         data-test-id="drag-target"></div>
                                                 </template>
                                             </div>
                                         </div>
