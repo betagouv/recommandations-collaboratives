@@ -446,7 +446,7 @@ def update_profile_if_incomplete(request):
             profile.save()
 
             next_page = request.GET.get("next", None)
-            if not next_page:
+            if not url_has_allowed_host_and_scheme(next_page, allowed_hosts=None):
                 next_page = reverse("home")
 
             return redirect(next_page)
