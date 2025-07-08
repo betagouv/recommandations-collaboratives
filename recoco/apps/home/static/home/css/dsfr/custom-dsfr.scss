@@ -88,21 +88,23 @@ p {
   }
 }
 
-a.fr-btn {
-  &:hover {
-    &:not(.fr-btn--secondary),
-    &:not(.fr-btn--tertiary),
-    &:not(.fr-btn--tertiary-no-outline) {
-      color: white !important;
-    }
+// a.fr-btn {
+//   &:hover {
+//     &:not(.fr-btn--primary),
+//     &:not(.fr-btn--secondary),
+//     &:not(.fr-btn--tertiary),
+//     &:not(.fr-btn--tertiary-no-outline) {
+//       color: white !important;
+//     }
 
-    &.fr-btn--secondary,
-    &.fr-btn--tertiary,
-    &.fr-btn--tertiary-no-outline {
-      color: var(--text-active-blue-france) !important;
-    }
-  }
-}
+//     &.fr-btn--primary,
+//     &.fr-btn--secondary,
+//     &.fr-btn--tertiary,
+//     &.fr-btn--tertiary-no-outline {
+//       color: var(--text-active-blue-france) !important;
+//     }
+//   }
+// }
 
 .fr-btn--secondary {
   &:is(.black) {
@@ -135,7 +137,8 @@ a.fr-btn {
   box-shadow: 0 0 0 1px #8585f6 !important;
 }
 
-button.fr-text-inverted--grey {
+button.fr-text-inverted--grey,
+a.fr-text-inverted--grey {
   &:hover {
     color: var(--text-active-blue-france) !important;
   }
@@ -681,14 +684,14 @@ form > p {
   border-radius: 0.3rem;
 }
 
-.form-mandatory-element{
-  color: #E1000F;
+.form-mandatory-element {
+  color: #e1000f;
   font-size: 16px;
   font-weight: 500;
 }
 
 .border-bottom {
- border-bottom: 1px solid var(--light-border-default-grey, #e5e5e5) !important;
+  border-bottom: 1px solid var(--light-border-default-grey, #e5e5e5) !important;
 }
 
 /* ¯¯¯¯ *\
@@ -762,7 +765,7 @@ form > p {
 }
 
 .size-20px {
-  font-size: 20px ;
+  font-size: 20px;
 }
 
 .h5-rework {
@@ -780,7 +783,7 @@ form > p {
 }
 
 .fr-label-rework {
-  color: var(--light-text-default-grey, #3A3A3A);
+  color: var(--light-text-default-grey, #3a3a3a);
   font-size: 12px;
   font-weight: 700;
   line-height: 170%; /* 20.4px */
@@ -788,8 +791,17 @@ form > p {
 }
 
 .label-helptext-rework {
-  color: var(--light-text-default-grey, #3A3A3A);
+  color: var(--light-text-default-grey, #3a3a3a);
   font-size: 12px;
   font-weight: 400;
   line-height: 150%; /* 18px */
+}
+
+/* ¯¯ *\
+  Link
+\* ˍˍ */
+
+.non-stylish-link {
+  color: white !important;
+  text-decoration: none !important;
 }

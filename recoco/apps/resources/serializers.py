@@ -93,6 +93,7 @@ class ResourceAddonSerializer(BaseSerializerMixin, serializers.ModelSerializer):
             "nature",
             "recommendation",
             "data",
+            "enabled",
         ]
 
     def save(self, **kwargs):
