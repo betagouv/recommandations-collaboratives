@@ -35,7 +35,7 @@
                     @click.stop="isEditing = false">Annuler la modification</button>
             <form @submit.prevent="handleEditComment(task)" novalidate>
                 {% include "tools/editor.html" with model="comment" initial_content="task.content" initial_content_js=True %}
-                <button @click.stop
+                <button @click.stop="window.location.reload();"
                         type="submit"
                         class="fr-btn fr-btn--sm repositionning"
                         data-test-id="button-submit-new">Enregistrer</button>
