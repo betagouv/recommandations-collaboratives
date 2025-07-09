@@ -89,12 +89,12 @@
                     <button class="fr-btn fr-btn--secondary fr-mr-3v w-100 justify-content-center"
                             @click.prevent="Modal.closeModal()">Annuler</button>
                     <button class="fr-btn w-100 justify-content-center"
-                            {% if isItReturningData == True %} @click="isFormInEditMode ? updateContact() : createContact(true)" {% else %} @click="isFormInEditMode ? updateContact() : createContact(false)" {% endif %}
+                            {% if is_it_returning_data == True %} @click="isFormInEditMode ? updateContact() : createContact(true)" {% else %} @click="isFormInEditMode ? updateContact() : createContact(false)" {% endif %}
                             data-test-id="create-contact-button"
                             x-text="isFormInEditMode ? 'Modifier le contact' : 'Créer le contact'"></button>
                 </div>
             </form>
         </div>
-        {% include "tools/contacts/create_organization_modal.html" %}
+        {% include "tools/contacts/create_organization_modal.html" with is_it_returning_data=True %}
     </div>
 </template>

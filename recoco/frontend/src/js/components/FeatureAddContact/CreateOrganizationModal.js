@@ -149,6 +149,7 @@ Alpine.data('CreateOrganizationModal', (data = null) => {
           this.formState.fields.isOrgaName) ||
         (!this.formState.fields.isGroupNat && this.formState.fields.isOrgaName)
       ) {
+        this.organization.group = this.organization.group.id;
         api
           .patch(getOrganizationById(this.organization.id), this.organization)
           .then((response) => {

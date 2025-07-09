@@ -68,16 +68,20 @@
             </div>
         </div>
         <div class="contact-list__list">
-            <template x-for="nationalGroup in contactListGroupByNationalGroup" :key="nationalGroup.id">
+            <template x-for="nationalGroup in contactListGroupByNationalGroup"
+                      :key="nationalGroup.id">
                 <div class="national-group-container w-100 fr-my-5v">
-                    <h3 class="national-group__name fr-mb-0 no-wrap" x-text="nationalGroup.name"></h3>
+                    <h3 class="national-group__name fr-mb-0 no-wrap"
+                        x-text="nationalGroup.name"></h3>
                     <template x-for="organization in nationalGroup.organizations" :key="index">
                         <div class="organization-container">
                             <div class="d-flex align-items-center">
                                 <h3 class="organization__name fr-mb-0 no-wrap" x-text="organization.name"></h3>
                                 <button class="fr-btn fr-btn--tertiary-no-outline fr-btn--sm fr-icon-pencil-line button__actions-edit"
-                        @click="openModalCreateOrganization(organization, nationalGroup)">Éditer l'organisation'</button>
-                        <template x-if="organization.departments?.length > 0">
+                                        @click="openModalCreateOrganization(organization, nationalGroup)">
+                                    Éditer l'organisation'
+                                </button>
+                                <template x-if="organization.departments?.length > 0">
                                     <div class="organization__departments"
                                          :title="organization.departments.map(department => `${department.name} (${department.code})`).join(', ')">
                                         <template x-for="department in organization.departments">
@@ -99,8 +103,6 @@
                             </div>
                         </div>
                     </template>
-
-
                 </div>
             </template>
             <template x-if="contactListGroupByNationalGroup.length === 0">
@@ -111,7 +113,7 @@
                 </div>
             </template>
         </div>
-        {% include "tools/contacts/create_contact_modal.html" with isItReturningData=False %}
-        {% include "tools/contacts/create_organization_modal.html" with isItReturningData=False %}
+        {% include "tools/contacts/create_contact_modal.html" with is_it_returning_data=False %}
+        {% include "tools/contacts/create_organization_modal.html" with is_it_returning_data=False %}
     </div>
 {% endblock content %}
