@@ -35,13 +35,13 @@
                            name="search-contact-input"
                            @input.debounce="onSearch"
                            x-model="userInputSearchContact">
-                    <button class="fr-btn" title="Rechercher" @click="onSearch">Rechercher</button>
+                    <button class="fr-btn" title="Rechercher" @click.prevent="onSearch()">Rechercher</button>
                 </div>
             </div>
             <div>
                 <div class="fr-menu menu-modal-correct-fr-menu better-positionning border-radius-4px correct-position">
-                    <div class="fr-menu__list specific-width-26rem border-radius-4px position-absolute rwd-resize">
-                        <div class="fr-menu__list specific-width-26rem overflow-auto specific-height border-radius-4px fr-mb-0 rwd-resize">
+                    <div class="fr-menu__list w-100 border-radius-4px position-absolute rwd-resize">
+                        <div class="fr-menu__list w-100 overflow-auto specific-height border-radius-4px fr-mb-0 rwd-resize">
                             <template x-if="userInputSearchContact.length > 0 && contactsFound.length > 0 && selectedContact === null">
                                 <template class="fr-menu__item"
                                           x-for="contact in contactsFound"
@@ -49,14 +49,14 @@
                                     <div class="fr-menu__item__content cursor-pointer fr-pt-1w fr-px-1w add-borders"
                                          data-test-id="contact-to-select"
                                          @click="onSelect(contact)">
-                                        <div x-data="{contact:contact}">{% include "tools/contacts/contact_card.html" %}</div>
+                                        <div x-data="{contact:contact,isOpenDeleteContact:null}">{% include "tools/contacts/contact_card.html" %}</div>
                                     </div>
                                 </template>
                             </template>
                             <template class="fr-menu__item" x-if="selectedContact != null">
                                 <div class="design-dropdown">
                                     <div class="d-flex justify-content-between add-borders">
-                                        <div x-data="{contact:selectedContact}">{% include "tools/contacts/contact_card.html" %}</div>
+                                        <div x-data="{contact:selectedContact,isOpenDeleteContact:null}">{% include "tools/contacts/contact_card.html" %}</div>
                                         <span class="fr-icon-close-line color-666 cursor-pointer fr-pt-3v fr-pr-3v button-cancel-contact"
                                               aria-hidden="true"
                                               @click="onCancelSelectContact"></span>
@@ -104,6 +104,6 @@
                 </div>
             </div>
         </div>
-        {% include "tools/contacts/create_contact_modal.html" %}
+        {% include "tools/contacts/create_contact_modal.html" with isItReturningData=True %}
     </div>
 </template>

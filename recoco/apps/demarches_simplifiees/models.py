@@ -8,7 +8,6 @@ from model_utils.models import TimeStampedModel
 
 from recoco.apps.geomatics.models import Department
 from recoco.apps.home.models import SiteConfiguration
-from recoco.apps.projects.models import Project
 from recoco.apps.resources.models import Resource
 from recoco.apps.survey.models import Question, QuestionSet
 from recoco.apps.tasks.models import Task
@@ -73,10 +72,6 @@ class DSResource(TimeStampedModel):
 
 
 class DSFolder(TimeStampedModel):
-    project = models.ForeignKey(
-        Project,
-        on_delete=models.CASCADE,
-    )
     ds_resource = models.ForeignKey(
         DSResource,
         on_delete=models.CASCADE,
@@ -103,7 +98,7 @@ class DSFolder(TimeStampedModel):
         verbose_name = "Dossier pré-rempli"
         verbose_name_plural = "Dossiers pré-remplis"
         ordering = ["-created"]
-        unique_together = ["project", "ds_resource"]
+        unique_together = ["recommendation", "ds_resource"]
 
     def __str__(self) -> str:
         return self.dossier_id

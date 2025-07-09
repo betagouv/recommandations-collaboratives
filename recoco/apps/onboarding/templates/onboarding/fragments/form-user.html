@@ -1,6 +1,8 @@
 {% load crispy_forms_tags %}
 <form id="{{ form.helper.form_id }}"
       method="post"
+      x-data
+      x-init="localStorage.setItem('userReachSignup', true)"
       x-on:input="isFormEdited = true">
     <input type="hidden"
            name="js_enabled"
@@ -26,7 +28,6 @@
         {{ form.phone|as_crispy_field }}
         {% if include_message_field %}{{ form.message|as_crispy_field }}{% endif %}
         {% if include_password_field %}{{ form.password|as_crispy_field }}{% endif %}
-        {{ form.captcha }}
     </fieldset>
     {% include "dsrc/core/blocks/buttons/button_group.html" %}
 </form>

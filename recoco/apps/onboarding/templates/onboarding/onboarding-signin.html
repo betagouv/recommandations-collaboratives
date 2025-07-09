@@ -45,12 +45,9 @@
         <div class="fr-stepper fr-mb-2w">
             <h2 class="fr-stepper__title">
                 Identifiez-vous
-                <span class="fr-stepper__state">Étape 1 sur 2</span>
+                <span class="fr-stepper__state">Étape 2 sur 2</span>
             </h2>
-            <div class="fr-stepper__steps" data-fr-current-step="1" data-fr-steps="2"></div>
-            <p class="fr-stepper__details">
-                <span class="fr-text--bold">Étape suivante :</span> Décrivez votre demande
-            </p>
+            <div class="fr-stepper__steps" data-fr-current-step="2" data-fr-steps="2"></div>
         </div>
         <div class="container__form d-flex justify-content-center"
              x-data="AjvValidationSchema('schemaOnboardingStep1SigninFormValidator')">
@@ -62,7 +59,7 @@
                         <form class="login fr-form-group"
                               id="onboarding-login-form"
                               method="post"
-                              action="{% url 'account_login' %}">
+                              action="{% url 'onboarding-signin' %}">
                             {% csrf_token %}
                             {% if redirect_field_value %}
                                 <input type="hidden"

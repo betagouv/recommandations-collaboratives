@@ -92,6 +92,7 @@ urlpatterns = [
         views.advisor_access_request_moderator_view,
         name="advisor-access-request-moderator",
     ),
+    path(r"site/create", views.SiteCreateView.as_view(), name="site-create"),
 ]
 
 # eof

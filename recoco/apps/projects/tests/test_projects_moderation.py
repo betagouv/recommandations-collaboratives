@@ -151,14 +151,29 @@ def test_project_moderation_does_not_notify_non_regional_actors_on_accept(
 @pytest.mark.django_db
 def test_project_moderation_refuse_and_redirect(current_site, client):
     baker.make(SiteConfiguration, site=current_site)
-    owner = Recipe(auth.User, username="owner@owner.co").make()
-    project = Recipe(Project, sites=[current_site]).make()
+
+    owner = Recipe(
+        auth.User,
+        username="owner@owner.co",
+        email="owner@owner.co",
+        first_name="Anakin",
+        last_name="Skywalker",
+    ).make()
+
+    project = Recipe(Project, sites=[current_site], name="My project").make()
     baker.make(ProjectMember, project=project, member=owner, is_owner=True)
 
     updated_on_before = project.updated_on
     url = reverse("projects-moderation-project-refuse", args=[project.id])
 
-    with login(client, groups=["example_com_staff"]) as moderator:
+    with (
+        login(client, groups=["example_com_staff"]) as moderator,
+        patch("recoco.apps.projects.views.send_email") as mock_send_email,
+        patch(
+            "recoco.apps.communication.digests.make_project_digest",
+            Mock(return_value="mocked_project_digest"),
+        ) as mock_make_project_digest,
+    ):
         moderator.profile.sites.add(current_site)
         response = client.post(url)
 
@@ -167,6 +182,24 @@ def test_project_moderation_refuse_and_redirect(current_site, client):
     assert project.updated_on > updated_on_before
 
     assert response.status_code == 302
+
+    mock_make_project_digest.assert_called_once_with(
+        project=project,
+        user=owner,
+    )
+
+    mock_send_email.assert_called_once_with(
+        template_name="project_refused",
+        recipients=[
+            {
+                "name": "Anakin Skywalker",
+                "email": "owner@owner.co",
+            }
+        ],
+        params={
+            "project": "mocked_project_digest",
+        },
+    )
 
 
 @pytest.mark.multisite
@@ -237,26 +270,33 @@ class TestProjectModerationAdvisorRefuse:
     @pytest.mark.django_db
     @patch("recoco.apps.projects.utils.is_project_moderator", Mock(return_value=True))
     def test_post_request(self, client, current_site):
+        baker.make(SiteConfiguration, site=current_site)
+
         moderator = baker.make(auth.User)
         client.force_login(moderator)
 
         dept_64 = baker.make(Department, code="64", name="Pyrénées-Atlantiques")
         dept_33 = baker.make(Department, code="33", name="Gironde")
 
-        user = baker.make(auth.User)
+        user = baker.make(auth.User, first_name="Anakin", last_name="Skywalker")
         user.profile.departments.add(dept_33)
 
         advisor_access_request = baker.make(
-            AdvisorAccessRequest, site=current_site, user=user, status="PENDING"
+            AdvisorAccessRequest,
+            site=current_site,
+            user=user,
+            status="PENDING",
+            comment="My comment",
         )
         advisor_access_request.departments.add(dept_64)
 
-        response = client.post(
-            reverse(
-                "projects-moderation-advisor-refuse",
-                args=[advisor_access_request.pk],
+        with patch("recoco.apps.projects.views.send_email") as mock_send_email:
+            response = client.post(
+                reverse(
+                    "projects-moderation-advisor-refuse",
+                    args=[advisor_access_request.pk],
+                )
             )
-        )
 
         assert response.status_code == 302
         assert response.url == "/projects/moderation/"
@@ -269,6 +309,19 @@ class TestProjectModerationAdvisorRefuse:
 
         advisor_group = get_group_for_site("advisor", current_site)
         assert not user.groups.filter(name=advisor_group.name).exists()
+
+        mock_send_email.assert_called_once_with(
+            template_name="advisor_access_request_refused",
+            recipients=[
+                {
+                    "name": "Anakin Skywalker",
+                    "email": user.email,
+                }
+            ],
+            params={
+                "message": "My comment",
+            },
+        )
 
 
 class TestProjectModerationAdvisorAccept:
@@ -318,20 +371,25 @@ class TestProjectModerationAdvisorAccept:
         dept_64 = baker.make(Department, code="64", name="Pyrénées-Atlantiques")
         dept_33 = baker.make(Department, code="33", name="Gironde")
 
-        user = baker.make(auth.User)
+        user = baker.make(auth.User, first_name="Anakin", last_name="Skywalker")
         user.profile.departments.add(dept_33)
 
         advisor_access_request = baker.make(
-            AdvisorAccessRequest, site=current_site, user=user, status="PENDING"
+            AdvisorAccessRequest,
+            site=current_site,
+            user=user,
+            status="PENDING",
+            comment="My comment",
         )
         advisor_access_request.departments.add(dept_64)
 
-        response = client.post(
-            reverse(
-                "projects-moderation-advisor-accept",
-                args=[advisor_access_request.pk],
+        with patch("recoco.apps.projects.views.send_email") as mock_send_email:
+            response = client.post(
+                reverse(
+                    "projects-moderation-advisor-accept",
+                    args=[advisor_access_request.pk],
+                )
             )
-        )
 
         assert response.status_code == 302
         assert response.url == "/projects/moderation/"
@@ -344,6 +402,19 @@ class TestProjectModerationAdvisorAccept:
 
         advisor_group = get_group_for_site("advisor", current_site)
         assert user.groups.filter(name=advisor_group.name).exists()
+
+        mock_send_email.assert_called_once_with(
+            template_name="advisor_access_request_accepted",
+            recipients=[
+                {
+                    "name": "Anakin Skywalker",
+                    "email": user.email,
+                }
+            ],
+            params={
+                "message": "My comment",
+            },
+        )
 
 
 class TestProjectModerationAdvisorModify:

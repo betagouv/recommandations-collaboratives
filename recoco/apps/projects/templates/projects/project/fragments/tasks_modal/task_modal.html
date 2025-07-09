@@ -67,7 +67,7 @@
                                     <p class="text-justified overflow-hidden text-break"
                                        x-html="renderMarkdown(currentTask?.content || '' )"></p>
                                     <template x-if="currentTask?.contact">
-                                        <div x-data="{contact: currentTask.contact}"
+                                        <div x-data="{contact: currentTask.contact,isOpenDeleteContact:null}"
                                              class="container__card-contact--no-ressource">
                                             {% include "tools/contacts/contact_card.html" %}
                                         </div>
@@ -112,7 +112,7 @@
                                                    class="fr-mb-2v overflow-hidden text-break"></p>
                                             </template>
                                             <template x-if="currentTask && currentTask.contact">
-                                                <div x-data="{contact: currentTask.contact}">{% include "tools/contacts/contact_card.html" %}</div>
+                                                <div x-data="{contact: currentTask.contact,isOpenDeleteContact:null}">{% include "tools/contacts/contact_card.html" %}</div>
                                             </template>
                                             <template x-if="currentTask?.content === ''">
                                                 <p class="fst-italic">Aucun commentaire initial n'a été ajouté</p>
@@ -150,7 +150,7 @@
                                                          :class="hasNotification(f.id) && 'is-new-followup'">
                                                         <p x-html="renderMarkdown(f.comment)" class="fr-mb-2v text-break"></p>
                                                         <template x-if="f.contact">
-                                                            <div x-data="{contact:f.contact}">{% include "tools/contacts/contact_card.html" %}</div>
+                                                            <div x-data="{contact:f.contact,isOpenDeleteContact:null}">{% include "tools/contacts/contact_card.html" %}</div>
                                                         </template>
                                                         <div class="d-flex justify-content-between align-items-center specific-fontsize-09">
                                                             <div class="d-flex flex-column">

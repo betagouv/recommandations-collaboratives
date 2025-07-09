@@ -1,27 +1,33 @@
 repos:
-- repo: https://github.com/pre-commit/pre-commit-hooks
-  rev: v5.0.0
-  hooks:
-    - id: end-of-file-fixer
-    - id: check-yaml
-    - id: trailing-whitespace
-      exclude_types: [sql]
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: trailing-whitespace
+        exclude_types: [sql]
 
-- repo: https://github.com/astral-sh/ruff-pre-commit
-  rev: v0.11.12
-  hooks:
-    - id: ruff
-      args: [--fix, --exit-non-zero-on-fix]
-    - id: ruff-format
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.11.13
+    hooks:
+      - id: ruff-check
+        args: [--fix, --exit-non-zero-on-fix]
+      - id: ruff-format
 
-- repo: https://github.com/adamchainz/django-upgrade
-  rev: "1.25.0"
-  hooks:
-    - id: django-upgrade
-      args: [--target-version, "5.2"]
+  - repo: https://github.com/adamchainz/django-upgrade
+    rev: "1.25.0"
+    hooks:
+      - id: django-upgrade
+        args: [--target-version, "5.2"]
 
-- repo: https://github.com/astral-sh/uv-pre-commit
-  rev: 0.7.9
-  hooks:
-    - id: uv-lock
-    - id: uv-export
+  - repo: https://github.com/astral-sh/uv-pre-commit
+    rev: 0.7.13
+    hooks:
+      - id: uv-lock
+      - id: uv-export
+
+  - repo: https://github.com/owenlamont/uv-secure
+    rev: 0.9.2
+    hooks:
+      - id: uv-secure
+        files: uv.lock

@@ -26,7 +26,14 @@ def organization_create(request):
     has_perm_or_403(request.user, "use_addressbook", request.site)
 
     if request.method == "POST":
-        form = OrganizationForm(request.POST)
+        try:
+            organization = models.Organization.objects.get(
+                name=request.POST.get("name", "").strip()
+            )
+        except models.Organization.DoesNotExist:
+            organization = None
+
+        form = OrganizationForm(request.POST, instance=organization)
         if form.is_valid():
             name = form.cleaned_data.get("name")
             departments = form.cleaned_data.get("departments")
@@ -39,6 +46,7 @@ def organization_create(request):
             )
     else:
         form = OrganizationForm()
+
     return render(request, "addressbook/organization_create.html", locals())
 
 
@@ -113,6 +121,14 @@ class ContactForm(forms.ModelForm):
             "phone_no",
             "mobile_no",
         ]
+
+
+@login_required
+def contact_list(request):
+    """Return the Contact list"""
+    has_perm_or_403(request.user, "use_addressbook", request.site)
+
+    return render(request, "addressbook/contact_list.html", locals())
 
 
 @login_required
