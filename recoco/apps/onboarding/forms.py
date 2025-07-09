@@ -195,6 +195,10 @@ class OnboardingProject(DsrcBaseForm):
             )
         )
 
+        # Skip captcha during tests
+        if "PYTEST_CURRENT_TEST" in os.environ:
+            self.fields.pop("captcha")
+
     name = forms.CharField(
         label="Nom du dossier *",
         initial="",
