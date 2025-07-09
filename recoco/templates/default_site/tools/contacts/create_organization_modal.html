@@ -37,7 +37,7 @@
             <template x-if="departments">
                 <div class="fr-p-3v modal-create-organization__block"
                      x-data="{objectsToSelect: departments}">
-                     {% include "tools/contacts/multi_select.html" with placeholder="Sélectionnez vos départements" label="Départements (facultatif)" helptext="Si l'organisation n'est active que sur certains territoires, sélectionnez-les ici." %}
+                    {% include "tools/contacts/multi_select.html" with placeholder="Sélectionnez vos départements" label="Départements (facultatif)" helptext="Si l'organisation n'est active que sur certains territoires, sélectionnez-les ici." %}
                 </div>
             </template>
             <div class="fr-p-3v modal-create-organization__block">
@@ -137,8 +137,7 @@
                         @click.prevent="Modal.closeModal()">Annuler</button>
                 <button class="fr-btn w-100 justify-content-center"
                         data-test-id="button-create-new-organization"
-                        {% if isItReturningData == True %} @click="isFormInEditMode ? updateOrganization(true) : createOrganization(true)" {% else %} @click="isFormInEditMode ? updateOrganization(false) : createOrganization(false)" {% endif %}
-                        @click="createOrganization"
+                        {% if is_it_returning_data %} @click="isFormInEditMode ? updateOrganization(true) : createOrganization(true)" {% else %} @click="isFormInEditMode ? updateOrganization(false) : createOrganization(false)" {% endif %}
                         x-text="isFormInEditMode ? 'Modifier l\'organisation' : 'Créer une organisation'"></button>
             </div>
         </form>
