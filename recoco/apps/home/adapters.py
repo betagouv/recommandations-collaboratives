@@ -1,8 +1,11 @@
+import re
+
 from allauth.account import adapter as allauth_adapter
 from allauth.account import app_settings
 from allauth.account.utils import user_email, user_username
 from django.contrib.auth import models as auth_models
 from django.contrib.sites.shortcuts import get_current_site
+from django.core.exceptions import ValidationError
 from magicauth import adapters as magicauth_adapters
 
 from . import utils
@@ -34,6 +37,14 @@ class UVAccountAdapter(allauth_adapter.DefaultAccountAdapter):
         saved_user.profile.sites.add(get_current_site(request))
 
         return saved_user
+
+    def clean_password(self, password, user=None):
+        if re.match(r"^(?=.*?\d)(?=.*?[A-Z])(?=.*?[a-z])[A-Za-z\d]{8,}$", password):
+            return password
+        else:
+            raise ValidationError(
+                "Votre mot de passe doit comporter au moins 8 caractères, une majuscule et un chiffre."
+            )
 
 
 class UVMagicauthAdapter(magicauth_adapters.DefaultAccountAdapter):
