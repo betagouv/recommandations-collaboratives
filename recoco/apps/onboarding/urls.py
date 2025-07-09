@@ -42,11 +42,6 @@ urlpatterns = [
         views.prefill_project_submit,
         name="onboarding-prefill",
     ),
-    path(
-        r"onboarding/<int:project_id>/commune/",
-        views.select_commune,
-        name="onboarding-select-commune",
-    ),
 ]
 
 # eof

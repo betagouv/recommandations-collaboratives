@@ -448,26 +448,6 @@ def prefill_project_submit(request):
     return render(request, "onboarding/prefill-project.html", locals())
 
 
-@login_required
-def select_commune(request, project_id=None):
-    """Intermediate screen to select proper insee number of commune"""
-    project = get_object_or_404(projects.Project, sites=request.site, pk=project_id)
-    response = redirect("survey-project-session", project_id=project.id)
-    response["Location"] += "?first_time=1"
-    if not project.commune:
-        return response
-    communes = geomatics.Commune.objects.filter(postal=project.commune.postal)
-    if request.method == "POST":
-        form = forms.SelectCommuneForm(communes, request.POST)
-        if form.is_valid():
-            project.commune = form.cleaned_data["commune"]
-            project.save()
-            return response
-    else:
-        form = forms.SelectCommuneForm(communes)
-    return render(request, "onboarding/select-commune.html", locals())
-
-
 @transaction.atomic
 def create_project_for_user(
     site, user: auth.User, data: dict, status: str, submitted_by: auth.User = None
