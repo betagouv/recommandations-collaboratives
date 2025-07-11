@@ -42,10 +42,10 @@ class Recommendation:
 class Project:
     INVITATION = "a invité un·e collaborateur·rice à rejoindre le dossier"
 
-    JOINED = "a rejoint le dossier"
+    JOINED = "a accepté l'invitation sur le dossier"
 
     SUBMITTED = "a été déposé"  # FIXME to be removed and keep _BY
-    SUBMITTED_BY = "a déposé un nouveau dossier, qui est en attente de validation"
+    SUBMITTED_BY = "a déposé une nouvelle demande"
 
     VALIDATED = "a été validé"
     VALIDATED_BY = "a validé le dossier"
@@ -68,6 +68,17 @@ class Project:
     SET_ACTIVE = "a réactivé le dossier"
 
     EDITED = "a modifé les informations du dossier"
+
+    IS_NEW_OWNER = "est dorénavant référent sur le dossier"
+
+    ADVISOR_NOTE_MODIFIED = "a modifié la note interne du dossier"
+
+
+class Moderation:
+    ACCEPTED = "a été accepté"
+    REJECTED = "a été refusé"
+    REQUEST_ACCCEPTED = "a été acceptée"
+    REQUEST_REJECTED = "a été refusée"
 
 
 class Survey:
