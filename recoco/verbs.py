@@ -69,6 +69,17 @@ class Project:
 
     EDITED = "a modifé les informations du dossier"
 
+    IS_OWNER = "est dorénavant référent sur le dossier"
+
+    ADVISOR_NOTE_MODIFIED = "a modifié la note interne du dossier"
+
+
+class Moderation:
+    ACCEPTED = "a été accepté"
+    REJECTED = "a été refusé"
+    REQUEST_ACCCEPTED = "a été acceptée"
+    REQUEST_REJECTED = "a été refusée"
+
 
 class Survey:
     STARTED = "a démarré l'état des lieux"

@@ -8,6 +8,7 @@ created: 2021-08-16 15:40:08 CEST
 """
 
 import django.core.mail
+from actstream import action
 from django.contrib import messages
 from django.contrib.auth import login as log_user
 from django.contrib.auth import models as auth
@@ -23,6 +24,7 @@ from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.generic import FormView, View
 from django.views.generic.base import TemplateView
 
+from recoco import verbs
 from recoco.apps.geomatics.models import Department
 from recoco.apps.onboarding.forms import OnboardingEmailForm
 from recoco.apps.projects import models as projects
@@ -394,6 +396,12 @@ def advisor_access_request_moderator_view(
             # La demande de compte conseiller de [Prénom Nom (orga)] a été acceptée.
             # - fil d'activités général du CRM,
             # - fil d'activité de l'utilisateur,
+            action.send(
+                request.user,
+                verb=verbs.Moderation.REQUEST_ACCCEPTED,
+                action_object=advisor_access_request,
+                target=advisor_access_request,
+            )
 
             return redirect(redirect_url)
 

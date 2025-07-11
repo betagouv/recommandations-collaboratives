@@ -7,6 +7,7 @@ author  : raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created : 2021-05-26 15:56:20 CEST
 """
 
+from actstream import action
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.contenttypes.models import ContentType
@@ -129,6 +130,12 @@ def project_moderation_project_refuse(request: HttpRequest, project_id: int):
         # Le dossier [Nom du dossier - Commune] a été accepté.
         # - fil d'activités général du CRM,
         # - fil d'activité du dossier,
+        action.send(
+            request.user,
+            verb=verbs.Moderation.REJECTED,
+            action_object=project,
+            # target=...,
+        )
 
         if owner := project.owner:
             send_email(
@@ -168,8 +175,14 @@ def project_moderation_project_accept(request: HttpRequest, project_id: int):
 
         # TODO: traces
         # Le dossier [Nom du dossier - Commune] a été accepté.
-        # - fil d'activités général du CRM,
-        # - fil d'activité du dossier,
+        # - fil d'activités général du CRM
+        # - fil d'activité du dossier
+        action.send(
+            request.user,
+            verb=verbs.Moderation.ACCEPTED,
+            action_object=project,
+            # target=...,
+        )
 
         signals.project_validated.send(
             sender=models.Project,
@@ -280,6 +293,12 @@ def project_moderation_advisor_refuse(
     # La demande de compte conseiller de [Prénom Nom (orga)] a été refusée.
     # - fil d'activités général du CRM
     # - fil d'activité de l'utilisateur
+    action.send(
+        request.user,
+        verb=verbs.Moderation.REQUEST_REJECTED,
+        action_object=advisor_access_request,
+        target=advisor_access_request,
+    )
 
     send_email(
         template_name=communication_constants.TPL_ADVISOR_ACCESS_REQUEST_REFUSED,
@@ -329,6 +348,12 @@ def project_moderation_advisor_accept(
     # La demande de compte conseiller de [Prénom Nom (orga)] a été acceptée.
     # - fil d'activités général du CRM
     # - fil d'activité de l'utilisateur
+    action.send(
+        request.user,
+        verb=verbs.Moderation.REQUEST_ACCCEPTED,
+        action_object=advisor_access_request,
+        target=advisor_access_request,
+    )
 
     send_email(
         template_name=communication_constants.TPL_ADVISOR_ACCESS_REQUEST_ACCEPTED,

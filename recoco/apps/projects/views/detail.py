@@ -10,6 +10,7 @@ created : 2022-03-07 15:56:20 CEST -- HB David!
 from datetime import timedelta
 from typing import Any
 
+from actstream import action
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
@@ -624,6 +625,12 @@ def project_create_or_update_topics(request, project_id=None):
             # - fil d'activités général du CRM
             # - fil d'activité du dossier
             # - fil d'activité de l'utilisateur
+            action.send(
+                request.user,
+                verb=verbs.Project.ADVISOR_NOTE_MODIFIED,
+                action_object=project,
+                target=project,
+            )
 
             return redirect(
                 reverse("projects-project-detail-overview", args=[project.pk])
