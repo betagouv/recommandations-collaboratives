@@ -125,6 +125,11 @@ def project_moderation_project_refuse(request: HttpRequest, project_id: int):
 
         messages.success(request, f"Le dossier '{project.name}' a été refusé.")
 
+        # TODO: traces
+        # Le dossier [Nom du dossier - Commune] a été accepté.
+        # - fil d'activités général du CRM,
+        # - fil d'activité du dossier,
+
         if owner := project.owner:
             send_email(
                 template_name=communication_constants.TPL_PROJECT_REFUSED,
@@ -160,6 +165,11 @@ def project_moderation_project_accept(request: HttpRequest, project_id: int):
         project.save()
 
         messages.success(request, f"Le dossier '{project.name}' a été accepté.")
+
+        # TODO: traces
+        # Le dossier [Nom du dossier - Commune] a été accepté.
+        # - fil d'activités général du CRM,
+        # - fil d'activité du dossier,
 
         signals.project_validated.send(
             sender=models.Project,
@@ -266,6 +276,11 @@ def project_moderation_advisor_refuse(
         f"La demande d'accès conseiller pour '{advisor_access_request.user.email}' a été refusée.",
     )
 
+    # TODO: traces
+    # La demande de compte conseiller de [Prénom Nom (orga)] a été refusée.
+    # - fil d'activités général du CRM
+    # - fil d'activité de l'utilisateur
+
     send_email(
         template_name=communication_constants.TPL_ADVISOR_ACCESS_REQUEST_REFUSED,
         recipients=[
@@ -309,6 +324,11 @@ def project_moderation_advisor_accept(
         request,
         f"La demande d'accès conseiller pour '{advisor_access_request.user.email}' a été acceptée.",
     )
+
+    # TODO: traces
+    # La demande de compte conseiller de [Prénom Nom (orga)] a été acceptée.
+    # - fil d'activités général du CRM
+    # - fil d'activité de l'utilisateur
 
     send_email(
         template_name=communication_constants.TPL_ADVISOR_ACCESS_REQUEST_ACCEPTED,

@@ -383,11 +383,18 @@ def advisor_access_request_moderator_view(
         form = AdvisorAccessRequestForm(request.POST)
         if form.is_valid():
             advisor_access_request.departments.set(form.cleaned_data["departments"])
+
             messages.add_message(
                 request,
                 messages.SUCCESS,
                 f"{advisor_access_request.user.first_name} {advisor_access_request.user.last_name} a été modifié.",
             )
+
+            # TODO: traces
+            # La demande de compte conseiller de [Prénom Nom (orga)] a été acceptée.
+            # - fil d'activités général du CRM,
+            # - fil d'activité de l'utilisateur,
+
             return redirect(redirect_url)
 
     return render(
