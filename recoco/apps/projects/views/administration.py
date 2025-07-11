@@ -298,10 +298,9 @@ def promote_collaborator_as_referent(request, project_id, user_id=None):
     # - fil d'activité de l'utilisateur
     # - email de récap d'activité aux conseillers et aux autres membres du dossier
     action.send(
-        user,
-        verb=verbs.Project.IS_OWNER,
+        sender=user,
+        verb=verbs.Project.IS_NEW_OWNER,
         action_object=project,
-        target=project,
     )
 
     return redirect(reverse("projects-project-administration", args=[project_id]))

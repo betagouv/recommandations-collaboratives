@@ -127,14 +127,14 @@ def project_moderation_project_refuse(request: HttpRequest, project_id: int):
         messages.success(request, f"Le dossier '{project.name}' a été refusé.")
 
         # TODO: traces
-        # Le dossier [Nom du dossier - Commune] a été accepté.
+        # Le dossier [Nom du dossier - Commune] a été refusé.
         # - fil d'activités général du CRM,
         # - fil d'activité du dossier,
         action.send(
-            request.user,
+            sender=request.user,
             verb=verbs.Moderation.REJECTED,
-            action_object=project,
-            # target=...,
+            # action_object=project,
+            target=project,
         )
 
         if owner := project.owner:
@@ -178,10 +178,10 @@ def project_moderation_project_accept(request: HttpRequest, project_id: int):
         # - fil d'activités général du CRM
         # - fil d'activité du dossier
         action.send(
-            request.user,
+            sender=request.user,
             verb=verbs.Moderation.ACCEPTED,
-            action_object=project,
-            # target=...,
+            # action_object=project,
+            target=project,
         )
 
         signals.project_validated.send(
@@ -294,9 +294,9 @@ def project_moderation_advisor_refuse(
     # - fil d'activités général du CRM
     # - fil d'activité de l'utilisateur
     action.send(
-        request.user,
+        sender=request.user,
         verb=verbs.Moderation.REQUEST_REJECTED,
-        action_object=advisor_access_request,
+        # action_object=advisor_access_request,
         target=advisor_access_request,
     )
 
@@ -349,9 +349,9 @@ def project_moderation_advisor_accept(
     # - fil d'activités général du CRM
     # - fil d'activité de l'utilisateur
     action.send(
-        request.user,
+        sender=request.user,
         verb=verbs.Moderation.REQUEST_ACCCEPTED,
-        action_object=advisor_access_request,
+        # action_object=advisor_access_request,
         target=advisor_access_request,
     )
 

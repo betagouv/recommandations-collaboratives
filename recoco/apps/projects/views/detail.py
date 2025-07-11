@@ -626,10 +626,9 @@ def project_create_or_update_topics(request, project_id=None):
             # - fil d'activité du dossier
             # - fil d'activité de l'utilisateur
             action.send(
-                request.user,
+                sender=request.user,
                 verb=verbs.Project.ADVISOR_NOTE_MODIFIED,
                 action_object=project,
-                target=project,
             )
 
             return redirect(
