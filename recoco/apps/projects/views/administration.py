@@ -291,6 +291,13 @@ def promote_collaborator_as_referent(request, project_id, user_id=None):
         project.phone = user.profile.phone_no
         project.save()
 
+    # TODO: traces
+    # [Prénom Nom du nouveau référent (orga)] est dorénavant référent·e sur le dossier [Nom du dossier - Commune].
+    # - fil d'activités général du CRM
+    # - fil d'activité du dossier
+    # - fil d'activité de l'utilisateur
+    # - email de récap d'activité aux conseillers et aux autres membres du dossier
+
     return redirect(reverse("projects-project-administration", args=[project_id]))
 
 
