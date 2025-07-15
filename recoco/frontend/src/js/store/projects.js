@@ -30,7 +30,6 @@ Alpine.store('projects', {
   },
   async getUserProjetsStatus() {
     const json = await api.get(userProjectStatusUrl());
-
     return (this.userProjetsStatus = json.data);
   },
   async getSitesConfig() {
@@ -45,7 +44,6 @@ Alpine.store('projects', {
         (await this.getSitesConfig());
     }
     projects.forEach((project) => {
-      console.log('Project:', project);
       if (project.project) {
         project.project.project_sites.forEach((projectSite) => {
           projectSite.siteInfo = this.sitesConfig.find(

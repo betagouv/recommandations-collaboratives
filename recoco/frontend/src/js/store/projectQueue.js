@@ -39,11 +39,12 @@ Alpine.store('projectQueue', {
     }
   },
 
-  addCurrentProjectId(projectId, projectName, communeName, communeInsee) {
+  addCurrentProjectId(projectId, projectName, communeName, communeInsee, orgName) {
     this.queue = this.queue.filter((project) => project.id !== projectId);
     this.queue.unshift({
       id: projectId,
       name: projectName,
+      org_name: orgName,
       commune: {
         name: communeName,
         insee: communeInsee,

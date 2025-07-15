@@ -25,7 +25,7 @@
      x-init="$nextTick(() => $store.showRole.init())">
     {% with active_project_action_notifications_count=project.action_notifications_count active_project_conversation_notifications_count=project.conversation_notifications_count active_project_document_notifications_count=project.document_notifications_count active_project_private_conversation_notifications_count=project.private_conversation_notifications_count %}
         <fieldset class="fr-segmented fr-segmented--md fr-px-3w"
-                  x-init="$nextTick(() => $store.projectQueue.addCurrentProjectId({{ project.id }}, `{{ project.name }}`, `{{ project.commune.name }}`,`{{ project.commune.insee }}`))">
+                  x-init="$nextTick(() => $store.projectQueue.addCurrentProjectId({{ project.id }}, `{{ project.name }}`, `{{ project.commune.name }}`,`{{ project.commune.insee }}`, `{{ project.org_name }}`))">
             <legend class="fr-segmented__legend visually-hidden">Onglets du dossier</legend>
             {% if overview %}
                 {% if advising_position.is_advisor or advising_position.is_observer or is_regional_actor %}
