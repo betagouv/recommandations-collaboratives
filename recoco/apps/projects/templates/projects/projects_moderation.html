@@ -98,10 +98,10 @@
                                 <div class="project-card__col--left project-card__col__padding d-flex flex-column">
                                     <h3 class="project-card__title">
                                         <a href="{% url 'projects-project-detail' project.id %}">
-                                            {% if project.commune %}
-                                                <span class="project-card__city">{{ project.commune.name }}({{ project.commune.postal|slice:2 }})</span>
+                                            <span class="project-card__city">{{ project.name }}</span>
+                                            {% if project.org_name %}
+                                            <span class="project-card__name">{{ project.org_name }}</span>
                                             {% endif %}
-                                            <span class="project-card__name">{{ project.name }}</span>
                                         </a>
                                     </h3>
                                     <p class="project-card__keyinfo fr-mb-2v">
@@ -119,7 +119,7 @@
                                             </span>
                                         {% endif %}
                                         {% if project.commune %}
-                                            <span class="fr-icon--sm fr-icon-map-pin-2-line">INSEE: {{ project.commune.insee }}</span>
+                                            <span class="fr-icon--sm fr-icon-map-pin-2-line">{{ project.commune.name }} {{ project.commune.insee }}</span>
                                         {% endif %}
                                         <span class="fr-icon--sm fr-icon-calendar-event-line">déposé depuis {{ project.created_on|timesince }}</span>
                                     </p>
