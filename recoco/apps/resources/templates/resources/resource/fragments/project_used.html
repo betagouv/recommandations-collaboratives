@@ -7,7 +7,7 @@
             <li class="text-dark">
                 <div class="d-flex">
                     <a class="text-info-custom text-grey-dark text-decoration-none hover-underline white-space-pre text-overflow-ellipsis overflow-hidden"
-                       href="{% url 'projects-project-detail' project.pk %}"><strong class="text-dark fw-normal">({{ project.commune.postal }}) {{ project.commune.name }}</strong> {{ project.name }}</a>
+                       href="{% url 'projects-project-detail' project.pk %}"><strong class="text-dark fw-normal">{{ project.name }} </strong>{{ project.org_name }}</a>
                 </div>
             </li>
         {% endfor %}

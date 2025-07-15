@@ -87,7 +87,7 @@ main {
   border-bottom: 1px solid transparent;
 }
 
-.personal-dashboard-container-inner .project-link::after {
+/* .personal-dashboard-container-inner .project-link::after {
   content: '';
   position: absolute;
 
@@ -98,7 +98,7 @@ main {
   height: 1px;
 
   background-color: var(--background-action-high-blue-france);
-}
+} */
 
 .project-item {
   transition: opacity 0.25s ease;
@@ -266,7 +266,7 @@ main {
 
 .project-card .project-link,
 .project-card .title-info {
-  color: var(--background-action-high-blue-france);
+  /* color: var(--background-action-high-blue-france); */
 }
 
 .project-card.inactive .project-link,
