@@ -15,6 +15,9 @@
     <link href="{% sass_src 'projects/css/board.scss' %}"
           rel="stylesheet"
           type="text/css">
+    <link href="{% sass_src 'projects/css/segmented_ctrl.scss' %}"
+          rel="stylesheet"
+          type="text/css">
 {% endblock css %}
 {% block js %}
     {% vite_asset 'js/apps/boardProjects.js' %}
@@ -39,10 +42,10 @@
                 <span class="visually-hidden">Loading...</span>
             </div>
         </div>
-        <div class="kanban-header topbar d-flex justify-content-between align-items-center fr-p-2v">
-            <div class="kanban-header__view-selector fs-5 fr-mr-6v">
+        <div class="kanban-header topbar d-flex justify-content-end align-items-center fr-p-2v">
+            {% comment %} <div class="kanban-header__view-selector fs-5 fr-mr-6v">
                 {% include "projects/project/fragments/navigation/display_select.html" %}
-            </div>
+            </div> {% endcomment %}
             <div x-data="Tutorial('time-filter-tutorial-on-kanban')"
                  class="kanban-header__middle-part">
                 <div class="kanban-header__searchbar position-relative">
