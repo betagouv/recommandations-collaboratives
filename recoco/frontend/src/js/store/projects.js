@@ -45,6 +45,7 @@ Alpine.store('projects', {
         (await this.getSitesConfig());
     }
     projects.forEach((project) => {
+      console.log('Project:', project);
       if (project.project) {
         project.project.project_sites.forEach((projectSite) => {
           projectSite.siteInfo = this.sitesConfig.find(

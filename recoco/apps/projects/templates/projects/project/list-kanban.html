@@ -129,7 +129,7 @@
                                                          @dragstart="onDragStart(event, t.uuid)"
                                                          @dragend="onDragEnd(event)">
                                                         <a :href="makeProjectURL('{% url 'projects-project-detail' 0 %}', t.id)">
-                                                            <div class="kanban-card rounded fr-p-2v w-100 position-relative"
+                                                            <div class="kanban-card rounded fr-p-4v w-100 position-relative"
                                                                  :class="{'kanban-card__border--is-switchtender': t.is_switchtender, 'kanban-card__border--is-observer': t.is_observer}"
                                                                  draggable="true"
                                                                  :data-test-id="`item-draggable-${taskIndex}`">
@@ -144,16 +144,14 @@
                                                                     <span class="kanban-card__notification-container position-absolute top-25 start-100 badge bg-info"
                                                                           :class="{'bg-danger': t.notifications.has_collaborator_activity == true}"><span x-text="t.notifications.count"></span> <span class="visually-hidden">nouvelle activité</span></span>
                                                                 </template>
-                                                                <div class="kanban-card__project-container fw-semibold fr-mb-2v">
+                                                                <div class="kanban-card__project-container fr-mb-2v">
                                                                     <span class="kanban-card__project-name project-link"
                                                                           x-text="truncate(t.name)"></span>
-                                                                </div>
-                                                                <template x-if="t.organization">
-                                                                    <div class="kanban-card__project-organization-container">
+                                                                    <template x-if="t.org_name">
                                                                         <span class="kanban-card__project-organization"
-                                                                              x-text="t.organization.name"></span>
-                                                                    </div>
-                                                                </template>
+                                                                                x-text="t.org_name"></span>
+                                                                    </template>
+                                                                </div>
                                                                 <template x-if="t.origin">
                                                                     <div class="kanban-card__project-push-by-container"
                                                                          data-cy="kanban-project-shared-by-origin"
@@ -170,7 +168,6 @@
                                                                         <span x-text="t.origin.siteInfo.name"></span>
                                                                     </div>
                                                                 </template>
-
                                                                 <template x-for="portal in t.publishTo">
                                                                     <template x-if="portal.site !== {{ site_config.site_id }}">
                                                                         <div class="kanban-card__project-push-by-container"
@@ -189,16 +186,19 @@
                                                                     </template>
                                                                 </template>
                                                                 <template x-if="t.commune">
-                                                                    <div class="kanban-card__commune-container fw-bold">
+                                                                    <div class="kanban-card__commune-container">
+                                                                        <span class="kanban-card__commune fr-icon--sm fr-icon-map-pin-2-line not-a-link"></span>
                                                                         <span class="kanban-card__commune-name" x-text="t.commune.name"></span>
                                                                         <span class="kanban-card__commune-postal" x-text="`(${t.commune.postal})`"></span>
                                                                     </div>
                                                                 </template>
-                                                                <template x-if="t.commune">
-                                                                    <div>
-                                                                        <span class="kanban-card__project-insee fr-icon--sm fr-icon-map-pin-2-line not-a-link">INSEE: <span x-text="truncate(t.commune.insee)"></span></span>
+                                                                <div class="d-flex justify-content-between">
+                                                                    <div class="kanban-card__project-date-container text-secondary">
+                                                                        <span class="fr-icon--sm fr-icon-calendar-event-line"></span>
+                                                                        <span x-text="`Déposé le ${formatDateDisplay(t.created_on)}`"
+                                                                              class="kanban-card__project-date align-middle not-a-link"></span>
                                                                     </div>
-                                                                </template>
+                                                                </div>
                                                                 <template x-if="t.tags.length > 0">
                                                                     <div class="kanban-card__tags-container d-flex">
                                                                         <span class="fr-icon-pantone-line fr-icon--sm not-a-link"
@@ -214,18 +214,12 @@
                                                                         </div>
                                                                     </div>
                                                                 </template>
-                                                                <div class="d-flex justify-content-between">
-                                                                    <div class="kanban-card__project-date-container text-secondary">
-                                                                        <span x-text="`Déposé le ${formatDateDisplay(t.created_on)}`"
-                                                                              class="kanban-card__project-date fr-icon--sm fr-icon-calendar-event-line align-middle not-a-link"></span>
-                                                                    </div>
-                                                                    <div class="d-flex justify-content-end fr-mr-1v">
-                                                                        <template x-for="switchtender in t.switchtenders">
-                                                                            <div class="got-my-style">
-                                                                                {% include "projects/project/fragments/advisor_gravatar_list_item.html" with wide_margin=True transparent_background=True %}
-                                                                            </div>
-                                                                        </template>
-                                                                    </div>
+                                                                <div class="d-flex justify-content-end fr-mr-1v">
+                                                                    <template x-for="switchtender in t.switchtenders">
+                                                                        <div class="got-my-style">
+                                                                            {% include "projects/project/fragments/advisor_gravatar_list_item.html" with wide_margin=True transparent_background=True %}
+                                                                        </div>
+                                                                    </template>
                                                                 </div>
                                                             </div>
                                                         </a>
