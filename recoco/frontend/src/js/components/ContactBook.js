@@ -108,10 +108,13 @@ Alpine.data('ContactBook', () => {
       return contactByNationalGroupArray;
     },
 
-    resetLetterFilter() {
+    resetLetterFilter(withReloadContact = true) {
       this.searchParams.letter = null;
       sessionStorage.removeItem('letter');
-      this.getContactData();
+      if (withReloadContact)
+      {
+        this.getContactData();
+      }
     },
 
     deleteContact(contact) {

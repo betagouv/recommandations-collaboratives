@@ -20,6 +20,7 @@
 {% endblock js %}
 {% block content %}
     <div x-data="ContactBook"
+         x-on:beforeunload.window="resetLetterFilter(false)"
          @modal-response="closeCreatesModal($event)"
          class="contact-list col-12 fr-px-15w fr-mx-auto">
         <!-- Breadcrumb -->
