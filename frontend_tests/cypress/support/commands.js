@@ -300,7 +300,7 @@ Cypress.Commands.add(
 
         cy.url().should('include', '/actions');
 
-        cy.contains('reco test from action');
+        cy.contains(`${label}`);
       } else if (body.find('[data-test-id="create-task-button"]').length > 0) {
         cy.contains('Créer une recommandation').click({ force: true });
 
