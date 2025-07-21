@@ -26,15 +26,8 @@ describe('I can add a file in a task', () => {
       .type('fake recommandation with no resource', { force: true })
       .should('have.value', 'fake recommandation with no resource');
 
-    cy.get('textarea')
-      .type(`fake recommandation content with no resource : ${now}`, {
-        force: true,
-        delay: 0,
-      })
-      .should(
-        'have.value',
-        `fake recommandation content with no resource : ${now}`
-      );
+      cy.get('.ProseMirror p').click();
+      cy.focused().type(`fake recommandation content with no resource : ${now}`);
 
     cy.get('[name="the_file"]').selectFile(file.path, { force: true });
 
