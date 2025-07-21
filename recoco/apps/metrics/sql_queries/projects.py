@@ -93,6 +93,8 @@ def get_queryset() -> QuerySet:
                 distinct=True,
             ),
             commune_insee=F("commune__insee"),
+            commune_latitude=F("commune__latitude"),
+            commune_longitude=F("commune__longitude"),
         )
         .annotate(
             status=F("project_sites__status"),
@@ -113,6 +115,8 @@ def get_queryset() -> QuerySet:
             "created_on",
             "inactive_since",
             "commune_insee",
+            "commune_latitude",
+            "commune_longitude",
             "recommandation_count",
             "advisor_count",
             "advised_by",

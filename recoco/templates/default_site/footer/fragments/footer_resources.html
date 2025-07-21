@@ -1,0 +1,9 @@
+{% load wagtailcore_tags %}
+<div class="fr-col-12 fr-col-sm-3 fr-col-md-2">
+    <h3 class="fr-footer__top-cat">{{ request.site.name }}</h3>
+    <ul class="fr-footer__top-list">
+        <li>
+            <a href="{% url 'statistics' %}" class="fr-footer__top-link">Statistiques d'impact</a>
+        </li>
+    </ul>
+</div>

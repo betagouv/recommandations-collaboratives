@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     "allauth.account",
     "allauth.socialaccount",
     "allauth.socialaccount.providers.openid_connect",
+    "allauth.mfa",
     "guardian",
     "magicauth",
     "sass_processor",
@@ -314,9 +315,9 @@ DYNAMIC_FORMS_CUSTOM_JS = ""
 
 # ALLAUTH
 ACCOUNT_ADAPTER = "recoco.apps.home.adapters.UVAccountAdapter"
-ACCOUNT_AUTHENTICATION_METHOD = "email"
+ACCOUNT_LOGIN_METHODS = {"email"}
 ACCOUNT_PRESERVE_USERNAME_CASING = False
-ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_SIGNUP_FIELDS = ["email*", "password1*", "password2*"]
 ACCOUNT_CONFIRM_EMAIL_ON_GET = True
 ACCOUNT_EMAIL_VERIFICATION = "optional"
 ACCOUNT_RATE_LIMITS = {
@@ -325,7 +326,6 @@ ACCOUNT_RATE_LIMITS = {
 ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
 ACCOUNT_LOGOUT_ON_GET = True
 ACCOUNT_UNIQUE_EMAIL = True
-ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_LOGIN_ON_PASSWORD_RESET = True
 ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = "/login-redirect"
 
@@ -381,6 +381,10 @@ SOCIALACCOUNT_PROVIDERS = {
         },
     },
 }
+
+# allow one step back for TOTP
+MFA_TOTP_TOLERANCE = 1
+
 
 # Django vite
 DJANGO_VITE_ASSETS_PATH = BASE_DIR / "frontend/dist"
@@ -552,6 +556,7 @@ DJANGO_WEBHOOK = {
         "projects.Project",
         "survey.Answer",
         "taggit.TaggedItem",
+        "tasks.Task",
     ],
     "SIGNAL_LISTENER": "recoco.apps.webhook.signals.WebhookSignalListener",
     "USE_CACHE": False,

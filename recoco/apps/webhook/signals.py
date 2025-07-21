@@ -8,6 +8,8 @@ from recoco.apps.projects.models import Project
 from recoco.apps.projects.serializers import ProjectSerializer
 from recoco.apps.survey.models import Answer
 from recoco.apps.survey.serializers import AnswerSerializer
+from recoco.apps.tasks.models import Task
+from recoco.apps.tasks.serializers import TaskWebhookSerializer
 
 
 class WebhookSignalListener(SignalListener):
@@ -20,6 +22,8 @@ class WebhookSignalListener(SignalListener):
             if isinstance(project := instance.content_object, Project):
                 return list(project.sites.values_list("id", flat=True))
             return []
+        if isinstance(instance, Task):
+            return [instance.site.id]
 
         return []
 
@@ -45,4 +49,7 @@ class WebhookSignalListener(SignalListener):
         if isinstance(instance, TaggedItem):
             if isinstance(project := instance.content_object, Project):
                 return ProjectSerializer(project, **kwargs).data
+        if isinstance(instance, Task):
+            return TaskWebhookSerializer(instance, **kwargs).data
+
         return {}

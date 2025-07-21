@@ -17,7 +17,7 @@ dependencies = [
     "django>=5.1.10,<5.2",
     "django-activity-stream",
     "django-admin-csvexport==2.2",
-    "django-allauth[openid,socialaccount]==0.63.6",
+    "django-allauth[mfa,openid,socialaccount]==65.9.0",
     "django-autoslug==1.9.9",
     "django-celery-results==2.5.1",
     "django-clone==5.3.3",
@@ -63,6 +63,7 @@ dependencies = [
     "multimethod==1.7",
     "mwclient==0.11.0",
     "pandoc==2.4",
+    "pillow==11.3.0",
     "psycopg[binary]>3",
     "redis==5.0.4",
     "requests-html==0.10.0",
@@ -70,7 +71,8 @@ dependencies = [
     "sentry-sdk>=2.20.0",
     "setuptools==78.1.1",
     "sib-api-v3-sdk>=7.6.0",
-    "wagtail==6.2.2",
+    "urllib3>=2.5.0",
+    "wagtail==6.3.5",
 ]
 
 [project.urls]

@@ -4,7 +4,7 @@ from taggit.serializers import TagListSerializerField, TaggitSerializer
 
 from recoco.rest_api.serializers import BaseSerializerMixin
 
-from .models import Category, Resource
+from .models import Category, Resource, ResourceAddon
 
 
 class ResourceCreatorSerializer(serializers.HyperlinkedModelSerializer):
@@ -67,3 +67,44 @@ class ResourceSerializer(
 
 class ResourceURIImportSerializer(serializers.Serializer):
     uri = serializers.URLField()
+
+
+class ResourceWebhookSerializer(
+    BaseSerializerMixin, TaggitSerializer, serializers.HyperlinkedModelSerializer
+):
+    class Meta:
+        model = Resource
+        fields = (
+            "id",
+            "title",
+            "subtitle",
+            "tags",
+            "status",
+        )
+
+    tags = TagListSerializerField()
+
+
+class ResourceAddonSerializer(BaseSerializerMixin, serializers.ModelSerializer):
+    class Meta:
+        model = ResourceAddon
+        fields = [
+            "id",
+            "nature",
+            "recommendation",
+            "data",
+            "enabled",
+        ]
+
+    def save(self, **kwargs):
+        if recommendation := self.validated_data.get("recommendation"):
+            if not recommendation.resource:
+                raise serializers.ValidationError(
+                    "Recommendation must be linked to a resource."
+                )
+            if recommendation.site != self.current_site:
+                raise serializers.ValidationError(
+                    "Recommendation must be linked to the current site."
+                )
+
+        return super().save(**kwargs)

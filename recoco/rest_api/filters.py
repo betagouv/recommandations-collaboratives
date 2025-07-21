@@ -137,12 +137,19 @@ class TrigramSimilaritySearchFilter(BaseSearchFilter):
         search_rank_fields = None
 
         for search_field in search_fields:
-            similarity_field = f"{search_field}_trgm_similarity"
+            if isinstance(search_field, tuple):
+                search_field_name = search_field[0]
+                similarity_field = f"{search_field[0]}_trgm_similarity"
+                boost = float(search_field[1])
+            else:
+                search_field_name = search_field
+                similarity_field = f"{search_field}_trgm_similarity"
+                boost = 1.0
 
             queryset = queryset.annotate(
                 **{
                     similarity_field: self.get_similarity_trgm_obj(
-                        search_field=f"{search_field}__unaccent",
+                        search_field=f"{search_field_name}__unaccent",
                         search_terms=search_terms,
                     )
                 }
@@ -151,7 +158,10 @@ class TrigramSimilaritySearchFilter(BaseSearchFilter):
                     f"{similarity_field}_rank": Case(
                         When(
                             **{f"{similarity_field}__gt": trgm_similarity_threshold},
-                            then=Round(Coalesce(F(similarity_field), 0.0), precision=2),
+                            then=Round(
+                                Coalesce(F(similarity_field) * Value(boost), 0.0),
+                                precision=2,
+                            ),
                         ),
                         default=Value(0.0),
                     )

@@ -18,5 +18,7 @@ class AddressbookConfig(AppConfig):
         registry.register(self.get_model("Organization"))
 
     def ready(self):
+        from . import signals  # noqa: F401
+
         self._watson_registrations()
         self._actstream_registrations()

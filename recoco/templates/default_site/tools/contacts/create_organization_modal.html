@@ -5,20 +5,22 @@
           type="text/css" />
 {% endblock css %}
 <template x-if="isCreateOrganizationModalOpen">
-    <div x-data="CreateOrganizationModal(contact.organization.name)"
+    <div x-data="CreateOrganizationModal(typeof contact !== 'undefined' && contact.organization ? contact.organization.name : '')"
          id="create-organization-modal"
          @set-departments="handleDepartmentsSelection($event.detail)"
-         class="modal-create-organization z-2">
+         @init-create-organization-modal-data.window="initCreateOrganizationModalData($event)"
+         class="modal-create-organization z-1002">
         <form @submit.prevent>
             <div class="d-flex justify-content-between border-bottom-666 fr-p-3v modal-create-contact__block">
-                <p class="fw-bold color-666 correct-p text-uppercase">Créer un organisation</p>
+                <p class="fw-bold color-666 correct-p text-uppercase"
+                   x-text="isFormInEditMode ? 'Modifier une organisation' : 'Créer une organisation'"></p>
                 <span class="fr-icon-close-line color-666 cursor-pointer"
                       aria-hidden="true"
                       @click.prevent="Modal.closeModal()"></span>
             </div>
             <div class="fr-p-3v modal-create-organization__block"
                  :class="{'fr-input-group--error': formState.isSubmitted && !formState.fields.isOrgaName}">
-                <label class="modal-create-organization__label">Nom de l'organisation</label>
+                <label class="modal-create-organization__label d-inline">Nom de l'organisation</label>
                 <span class="color-important">*</span>
                 <p class="modal-create-organization__label-info grey-text">
                     Préciser sa zone géographique éventuelle (ex : Cerema Occitanie)
@@ -32,11 +34,17 @@
                        x-model="organization.name"
                        required>
             </div>
+            <template x-if="departments">
+                <div class="fr-p-3v modal-create-organization__block"
+                     x-data="{objectsToSelect: departments}">
+                     {% include "tools/contacts/multi_select.html" with placeholder="Sélectionnez vos départements" label="Départements (facultatif)" helptext="Si l'organisation n'est active que sur certains territoires, sélectionnez-les ici." %}
+                </div>
+            </template>
             <div class="fr-p-3v modal-create-organization__block">
                 <fieldset class="fr-fieldset fr-mb-0"
                           id="radio-hint"
                           aria-labelledby="radio-hint-legend radio-hint-messages">
-                    <legend class="fr-fieldset__legend--regular fr-fieldset__legend fw-700 fr-pb-0"
+                    <legend class="fr-fieldset__legend--regular fr-fieldset__legend fw-700 fr-pb-0 modal-create-organization__label"
                             id="radio-hint-legend">
                         Rattachement national
                         <span class="fr-hint-text">Cette organisation est-elle rattachée à une structure-mère ou un réseau national ? Ex : le Cerema Occitanie se rattache à la structure Cerema.</span>
@@ -124,16 +132,14 @@
                          aria-live="assertive"></div>
                 </fieldset>
             </div>
-            <template x-if="departments">
-                <div class="fr-p-3v modal-create-organization__block"
-                     x-data="{objectsToSelect: departments}">{% include "tools/contacts/multi_select.html" with placeholder="Cherchez et sélectionnez vos départements" label="Sélectionnez un ou plusieurs départements, laissez vide pour toute la France" %}</div>
-            </template>
             <div class="fr-p-3v modal-create-organization__block d-flex">
                 <button class="fr-btn fr-btn--secondary fr-mr-3v w-100 justify-content-center"
                         @click.prevent="Modal.closeModal()">Annuler</button>
                 <button class="fr-btn w-100 justify-content-center"
                         data-test-id="button-create-new-organization"
-                        @click="createOrganization">Créer l'organisation</button>
+                        {% if isItReturningData == True %} @click="isFormInEditMode ? updateOrganization(true) : createOrganization(true)" {% else %} @click="isFormInEditMode ? updateOrganization(false) : createOrganization(false)" {% endif %}
+                        @click="createOrganization"
+                        x-text="isFormInEditMode ? 'Modifier l\'organisation' : 'Créer une organisation'"></button>
             </div>
         </form>
     </div>

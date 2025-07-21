@@ -4,7 +4,6 @@
 {% load django_vite %}
 {% load projects_extra %}
 {% load invites_tags %}
-
 {% block js %}
     {% vite_asset 'js/apps/menuTop.js' %}
 {% endblock js %}
@@ -93,26 +92,26 @@
                     </ul>
                 </div>
             </li>
-        {% endif %}
-        {% if projects_to_moderate_count > 0 or advisor_access_requests_count > 0 %}
-            <!-- Projects moderation -->
-            <li class="navigation__item-moderation d-flex">
-                <a href="{% url "projects-moderation-list" %}"
-                   class="{% if url_name == 'projects-moderation-list' %}active{% endif %}"><span class="fr-link underline no-wrap">Modération</span></a>
-                {% if projects_to_moderate_count or advisor_access_requests_count %}
-                    <span class="badge text-bg-danger no-underline">{{ projects_to_moderate_count | add:advisor_access_requests_count }}</span>
-                {% endif %}
-            </li>
-        {% endif %}
-        <!-- Projects invitations -->
-        {% pending_invitations_for request.user as invitations %}
-        {% if invitations.count %}
-            <li class="navigation__item-invitation d-flex">
-                <a href="{% url "invites-invite-details" invitations.first.pk %}">
-                    <span class="fr-link underline no-wrap">Invitations</span>
-                </a>
-                <span class="badge text-bg-danger no-underline">{{ invitations.count }}</span>
-            </li>
+            {% if projects_to_moderate_count > 0 or advisor_access_requests_count > 0 %}
+                <!-- Projects moderation -->
+                <li class="navigation__item-moderation d-flex">
+                    <a href="{% url "projects-moderation-list" %}"
+                       class="{% if url_name == 'projects-moderation-list' %}active{% endif %}"><span class="fr-link underline no-wrap">Modération</span></a>
+                    {% if projects_to_moderate_count or advisor_access_requests_count %}
+                        <span class="badge text-bg-danger no-underline">{{ projects_to_moderate_count | add:advisor_access_requests_count }}</span>
+                    {% endif %}
+                </li>
+            {% endif %}
+            <!-- Projects invitations -->
+            {% pending_invitations_for request.user as invitations %}
+            {% if invitations.count %}
+                <li class="navigation__item-invitation d-flex">
+                    <a href="{% url "invites-invite-details" invitations.first.pk %}">
+                        <span class="fr-link underline no-wrap">Invitations</span>
+                    </a>
+                    <span class="badge text-bg-danger no-underline">{{ invitations.count }}</span>
+                </li>
+            {% endif %}
         {% endif %}
         {% comment %} surcharge pour ajouter des éléments au menu top à gauche de ressources {% endcomment %}
         {% include "header/menu-top-secondary-left.html" %}

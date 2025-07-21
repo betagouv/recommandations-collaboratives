@@ -1,0 +1,103 @@
+{% load static %}
+{% load wagtailcore_tags %}
+{% wagtail_site as current_site %}
+<footer class="fr-footer" role="contentinfo" id="footer">
+    <div class="fr-footer__top">
+        <div class="fr-container">
+            <div class="fr-grid-row fr-grid-row--start fr-grid-row--gutters justify-content-end">
+                {% include "footer/fragments/footer_links.html" %}
+                {% include "footer/fragments/footer_resources.html" %}
+                <div class="fr-col-12 fr-col-sm-3 fr-col-md-2">
+                    <h3 class="fr-footer__top-cat">Logiciel libre</h3>
+                    <ul class="fr-footer__top-list">
+                        <li>
+                            <a href="https://github.com/betagouv/recommandations-collaboratives"
+                               class="fr-footer__top-link">Code Source</a>
+                        </li>
+                        <li>
+                            <a href="https://recommandations-collaboratives.beta.gouv.fr/"
+                               class="fr-footer__top-link">Ce site est propulsé par recommandations-collaboratives</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="fr-container">
+        <div class="fr-footer__body">
+            <div class="fr-footer__brand fr-enlarge-link">{% include "footer/fragments/footer_logo.html" %}</div>
+            <div class="fr-footer__content">
+                <p class="fr-footer__content-desc">{{ request.site.configuration.description }}</p>
+                <ul class="fr-footer__content-list">
+                    <li class="fr-footer__content-item">
+                        <a title="info.gouv.fr - nouvelle fenêtre"
+                           id="footer__content-link-0"
+                           href="https://info.gouv.fr"
+                           target="_blank"
+                           rel="noopener external"
+                           class="fr-footer__content-link">info.gouv.fr</a>
+                    </li>
+                    <li class="fr-footer__content-item">
+                        <a title="service-public.fr - nouvelle fenêtre"
+                           id="footer__content-link-1"
+                           href="https://service-public.fr"
+                           target="_blank"
+                           rel="noopener external"
+                           class="fr-footer__content-link">service-public.fr</a>
+                    </li>
+                    <li class="fr-footer__content-item">
+                        <a title="legifrance.gouv.fr - nouvelle fenêtre"
+                           id="footer__content-link-2"
+                           href="https://legifrance.gouv.fr"
+                           target="_blank"
+                           rel="noopener external"
+                           class="fr-footer__content-link">legifrance.gouv.fr</a>
+                    </li>
+                    <li class="fr-footer__content-item">
+                        <a title="data.gouv.fr - nouvelle fenêtre"
+                           id="footer__content-link-3"
+                           href="https://data.gouv.fr"
+                           target="_blank"
+                           rel="noopener external"
+                           class="fr-footer__content-link">data.gouv.fr</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="fr-footer__bottom">
+            <ul class="fr-footer__bottom-list">
+                <li class="fr-footer__bottom-item">
+                    <a id="footer__bottom-link-10"
+                       href="{% url 'accessibility' %}"
+                       class="fr-footer__bottom-link">Accessibilité : non conforme</a>
+                </li>
+                <li class="fr-footer__bottom-item">
+                    <a id="footer__bottom-link-11"
+                       href="{% url 'legals' %}"
+                       class="fr-footer__bottom-link">Mentions légales</a>
+                </li>
+                <li class="fr-footer__bottom-item">
+                    <a id="footer__bottom-link-12"
+                       href="{% url 'privacy' %}"
+                       class="fr-footer__bottom-link">Données personnelles</a>
+                </li>
+                <li class="fr-footer__bottom-item">
+                    <a id="footer__bottom-link-13"
+                       href="{% url 'termsofuse' %}"
+                       class="fr-footer__bottom-link">Conditions d'utilisation</a>
+                </li>
+                <li>
+                    <a class="link-secondary" href="{% url 'security' %}">Sécurité</a>
+                </li>
+            </ul>
+            <div class="fr-footer__bottom-copy">
+                <p>
+                    Sauf mention explicite de propriété intellectuelle détenue par des tiers, les contenus de ce site sont proposés sous <a href="https://github.com/etalab/licence-ouverte/blob/master/LO.md"
+    target="_blank"
+    rel="noopener external"
+    title="Licence etalab - nouvelle fenêtre">licence etalab-2.0</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>

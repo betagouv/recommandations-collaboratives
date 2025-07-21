@@ -6,6 +6,7 @@
     - label: The label text for the input.
     Parameters alpine:
     - objectsToSelect: The objects to select from.
+    - helptext: The help text for the input.
 {% endcomment %}
 {% load sass_tags %}
 {% block css %}
@@ -17,6 +18,9 @@
     <div class="bg-white">
         <div>
             <label class="modal-create-organization__label" for="select-list-input">{{ label|default:'Départements' }}</label>
+            {% if helptext %}
+                <p class="fr-hint-text fr-mb-0">{{ helptext }}</p>
+            {% endif %}
             <div class="d-flex justify-center mt-8">
                 <!-- Define component with preselected options -->
                 <div class="w-100"
@@ -126,7 +130,7 @@
                                                            id="search"
                                                            x-model.debounce.750ms="search"
                                                            class="focus:ring-indigo-500 focus:border-indigo-500 block w-100 fr-pl-4w sm:text-sm border border-indigo-300 rounded specific-height-2p5rem"
-                                                           placeholder="">
+                                                           placeholder="Recherchez">
                                                 </div>
                                             </div>
                                             <!-- Options container -->

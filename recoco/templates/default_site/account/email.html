@@ -1,0 +1,74 @@
+{% extends "account/base_manage_email.html" %}
+{% load static allauth i18n %}
+{% block title %}
+    {% trans "Email Addresses" %}
+{% endblock title %}
+{% block og_title %}
+    {% trans "Email Addresses" %}
+{% endblock og_title %}
+{% block content %}
+    <div class="fr-container fr-container--fluid fr-my-md-14v">
+        <div class="fr-grid-row fr-grid-row-gutters fr-grid-row--center">
+            <div class="fr-col-12 fr-col-md-8 fr-col-lg-6">
+                <div class="fr-container fr-background-alt--grey fr-px-md-0 fr-py-10v fr-py-md-14v">
+                    <div class="fr-grid-row fr-grid-row-gutters fr-grid-row--center">
+                        <div class="fr-col-12 fr-col-md-9 fr-col-lg-8">
+                            <h1>{% trans "Email Addresses" %}</h1>
+                            {% if emailaddresses %}
+                                <p>{% trans "The following email addresses are associated with your account:" %}</p>
+                                {% url 'account_email' as email_url %}
+                                {% element form form=form action=email_url method="post" tags="email,list" %}
+                                    {% slot body %}
+                                        {% csrf_token %}
+                                        {% for radio in emailaddress_radios %}
+                                            {% with emailaddress=radio.emailaddress %}
+                                                <input type="hidden"
+                                                       checked="{{ radio.checked }}"
+                                                       name="email"
+                                                       value="{{ emailaddress.email }}"
+                                                       id="{{ radio.id }}">
+                                                <label for="{{ radio.id }}">{{ emailaddress.email }}</label>
+                                                {% slot label %}
+                                                    {{ emailaddress.email }}
+                                                    {% if emailaddress.verified %}
+                                                        {% element badge tags="success,email,verified" %}
+                                                            {% translate "Verified" %}
+                                                        {% endelement %}
+                                                    {% else %}
+                                                        {% element badge tags="warning,email,unverified" %}
+                                                            {% translate "Unverified" %}
+                                                        {% endelement %}
+                                                    {% endif %}
+                                                    {% if emailaddress.primary %}
+                                                        {% element badge tags="email,primary" %}
+                                                            {% translate "Primary" %}
+                                                        {% endelement %}
+                                                    {% endif %}
+                                                {% endslot %}
+                                            {% endwith %}
+                                        {% endfor %}
+                                    {% endslot %}
+                                    {% slot actions %}
+                                        <div class="fr-mt-4w">
+                                            <button class="fr-btn" type="submit" name="action_send">{% trans "Re-send Verification" %}</button>
+                                        </div>
+                                    {% endslot %}
+                                {% endelement %}
+                            {% else %}
+                                {% include "account/snippets/warn_no_email.html" %}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}
+{% block extra_body %}
+    <script src="{% static 'account/js/account.js' %}"></script>
+    <script src="{% static 'account/js/onload.js' %}"></script>
+    <script data-allauth-onload="allauth.account.forms.manageEmailForm" type="application/json">{
+    "i18n": {"confirmDelete": "{% trans 'Do you really want to remove the selected email address?' %}"}
+}
+    </script>
+{% endblock extra_body %}
