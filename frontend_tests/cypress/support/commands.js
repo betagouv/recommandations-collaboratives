@@ -300,7 +300,11 @@ Cypress.Commands.add(
 
         cy.url().should('include', '/actions');
 
-        cy.contains(`${label}`);
+        if(!withResource) {
+          cy.contains(`${label}`);
+        } else {
+          cy.contains(currentResource.fields.title);
+        }
       } else if (body.find('[data-test-id="create-task-button"]').length > 0) {
         cy.contains('Créer une recommandation').click({ force: true });
 
