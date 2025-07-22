@@ -82,7 +82,7 @@
                     <div class="message-form fr-my-3v bg-light border-form editor-form__container fr-input-group"
                          :class="{'focus': isFocus}"
                          @click.outside="isFocus = false"
-                         x-data="{fileName: '', currentFile: '', isFocus: false, }">
+                         x-data="{fileName: '', currentFile: '', isFocus: false, message: {text: '', contact: ''}}">
                         {% include "tools/editor.html" with input_name=posting_form.content.name initial_content=posting_form.content.value|default:'' errors=posting_form.content.errors input_required=True can_add_reco=True next_url_add_reco="projects-project-detail-conversations-new" can_attach_files=True can_attach_contact=True show_send_button=True form_id="conversation-form" %}
                         {% comment %} {% include "projects/project/fragments/files_links/file_upload_input_standalone.html" %} {% endcomment %}
                         <!-- Action file -->

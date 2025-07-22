@@ -111,13 +111,16 @@ Parameters:
             {% endif %}
             <!-- Contact module -->
             {% if can_attach_contact %}
-                <div x-cloak @modal-response="insertContactCard($event.detail)">
+                {% comment %} <div x-cloak @modal-response="insertContactCard($event.detail)"> {% endcomment %}
+                <div x-cloak>
                     <button @click.prevent="openModalSearchContact"
                             data-test-id="button-add-contact-in-editor"
                             class="fr-btn fr-btn--tertiary fr-btn--sm justify-content-center fr-text--sm button-add-contact">
                         Ajouter un contact
                     </button>
                     {% include "tools/contacts/search_contact_modal.html" %}
+                    <input type="hidden"
+                           {% if model %} x-model="{{ model }}.contact" x-modelable="selectedContact" {% else %} x-model="selectedContact" {% endif %}>
                 </div>
             {% endif %}
         </div>
@@ -135,6 +138,21 @@ Parameters:
             </div>
         {% endif %}
     </div>
+    {% if can_attach_contact %}
+        <template x-if="selectedContact">
+            <div class="d-flex flex-column contact-card__container">
+                <div class="border position-relative"
+                     x-data="{contact:selectedContact,isOpenDeleteContact:null}">
+                    {% include "tools/contacts/contact_card.html" %}
+                    <button @click.prevent="handleResetContact"
+                            data-test-id="button-remove-contact"
+                            class="fr-btn fr-btn--tertiary fr-btn--sm justify-content-center fr-text--sm close-contact-button-style position-absolute top-0 end-0">
+                        <span class="fr-icon-close-line" aria-hidden="true"></span>
+                    </button>
+                </div>
+            </div>
+        </template>
+    {% endif %}
     {% if can_attach_files %}
         <input x-ref="fileUploadInput"
                {% if model %} x-model="{{ model }}.the_file" x-modelable="currentFile" {% else %} x-model="currentFile" {% endif %}

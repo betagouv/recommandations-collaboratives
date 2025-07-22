@@ -7,10 +7,8 @@ import { createMarkdownEditor } from 'tiptap-markdown';
 import '../../css/tiptap.css';
 import { formatDate } from '../utils/date';
 import Placeholder from '@tiptap/extension-placeholder';
-import { ContactCardExtension } from './ContactCardExtension';
-import { FileCardExtension } from './FileCardExtension';
 
-// const MarkdownEditor = createMarkdownEditor(Editor);
+const MarkdownEditor = createMarkdownEditor(Editor);
 
 Alpine.data('editor', (content) => {
   let editor;
@@ -22,7 +20,7 @@ Alpine.data('editor', (content) => {
     init() {
       const _this = this;
 
-      editor = new Editor({
+      editor = new MarkdownEditor({
         element: this.$refs.element,
         extensions: [
           StarterKit,
@@ -47,8 +45,8 @@ Alpine.data('editor', (content) => {
               };
             },
           }),
-          ContactCardExtension,
-          FileCardExtension,
+          // ContactCardExtension, // TODO: Uncomment this when the contact card is ready
+          // FileCardExtension, // TODO: Uncomment this when the file card is ready
         ],
         content: content,
         onCreate({ editor }) {
@@ -61,8 +59,8 @@ Alpine.data('editor', (content) => {
           _this.renderMarkdown();
           _this.$store.editor.setIsSubmitted(false);
 
-          _this.$store.editor.isEditing = editor.getHTML() != '';
-          _this.$store.editor.currentMessage = JSON.stringify(editor.getJSON());
+          _this.$store.editor.isEditing = editor.getMarkdown() != '';
+          _this.$store.editor.currentMessage = editor.getMarkdown();
 
           // Mettre à jour la propriété réactive
           _this.isEditorEmpty = editor.isEmpty;
@@ -151,7 +149,7 @@ Alpine.data('editor', (content) => {
       }
     },
     renderMarkdown() {
-      this.markdownContent = JSON.stringify(editor.getJSON());
+      this.markdownContent = editor.getMarkdown().replaceAll('\\', '');
     },
     /****************
      * Plugin contact
@@ -177,7 +175,7 @@ Alpine.data('editor', (content) => {
       if (contact) {
         this.handleSetContact(contact);
         // Insert contact card into editor
-        this.insertContactCard(contact);
+        // this.insertContactCard(contact); // TODO: Uncomment this when the contact card is ready
       }
       this.isSearchContactModalOpen = false;
     },

@@ -11,6 +11,9 @@
                 {% include "projects/project/fragments/files_links/file_list_item_embedded.html" with document=document %}
             {% endfor %}
         {% endif %}
+        {% if element.object.contact %}
+            {% include "tools/contacts/contact_card.html" with contact=element.object.contact is_django_data=True %}
+        {% endif %}
         {% if element.object.created_by %}
             <div class="d-flex align-items-center">{% include "user/user_card.html" with user=element.object.created_by %}</div>
         {% endif %}
