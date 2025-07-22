@@ -83,7 +83,6 @@ Parameters:
                   {% if model %} x-model="{{ model }}.text" x-modelable="markdownContent" {% else %} x-model="markdownContent" {% endif  %}
                   name="{{input_name|default:"content"}}"
                   {% if input_required %} required {% endif %}></textarea>
-        {% comment %} <div x-cloak class="d-flex flex-column"> {% endcomment %}
         <div class="button-module__container">
             <!-- File module -->
             {% if can_attach_files %}
@@ -111,7 +110,6 @@ Parameters:
             {% endif %}
             <!-- Contact module -->
             {% if can_attach_contact %}
-                {% comment %} <div x-cloak @modal-response="insertContactCard($event.detail)"> {% endcomment %}
                 <div x-cloak>
                     <button @click.prevent="openModalSearchContact"
                             data-test-id="button-add-contact-in-editor"

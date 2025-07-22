@@ -83,17 +83,24 @@
                          :class="{'focus': isFocus}"
                          @click.outside="isFocus = false"
                          x-data="{fileName: '', currentFile: '', isFocus: false, message: {text: '', contact: ''}}">
-                        {% include "tools/editor.html" with input_name=posting_form.content.name initial_content=posting_form.content.value|default:'' errors=posting_form.content.errors input_required=True can_add_reco=True next_url_add_reco="projects-project-detail-conversations-new" can_attach_files=True can_attach_contact=True show_send_button=True form_id="conversation-form" %}
+                        {% include "tools/editor.html" with model="message" input_name=posting_form.content.name initial_content=posting_form.content.value|default:'' errors=posting_form.content.errors input_required=True can_add_reco=True next_url_add_reco="projects-project-detail-conversations-new" can_attach_files=True can_attach_contact=True show_send_button=True form_id="conversation-form" %}
                         {% comment %} {% include "projects/project/fragments/files_links/file_upload_input_standalone.html" %} {% endcomment %}
                         <!-- Action file -->
                         {% comment %} <button x-data="{fileName: ''}" class="fr-btn fr-btn--sm fr-btn--tertiary fr-icon-file-add-line fr-btn--icon-left file-upload-wrapper" type="button" @click="$refs.fileUploadInput.click()">
                             <span class="file-upload-text">Ajouter un fichier</span>
                             <span class="fr-ml-1w" x-text="fileName"></span>
-                            <input x-ref="fileUploadInput" type="file" id="file-upload" name="the_file" @change="fileName = $refs.fileUploadInput.files.length > 0 ? $refs.fileUploadInput.files[0].name : ''" class="d-none file-upload-input">
+
                         </button> {% endcomment %}
                         {% comment %}
                         <button data-test-id="send-message-conversation" x-data :disabled="!$refs.editor.isFormValid()" form="conversation-form" class="fr-btn send-message" type="submit">Envoyer</button>
                         {% endcomment %}
+                        <input x-ref="fileUploadInput"
+                               type="file"
+                               id="file-upload"
+                               name="the_file"
+                               @change="fileName = $refs.fileUploadInput.files.length > 0 ? $refs.fileUploadInput.files[0].name : ''"
+                               class="d-none file-upload-input">
+                        <input type="hidden" name="contact" :value="message.contact.id">
                     </div>
                     {% for error in posting_form.content.errors %}<div class="text-danger text-end">{{ error }}</div>{% endfor %}
                     <label class="visually-hidden" for="input-project-content">{{ posting_form.content.label }}</label>
