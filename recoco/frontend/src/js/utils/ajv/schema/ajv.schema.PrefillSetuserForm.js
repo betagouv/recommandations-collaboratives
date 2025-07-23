@@ -40,6 +40,7 @@ export const schemaOnboardingPrefillSetuserFormValidator = {
       ],
     },
     role: { $ref: '#/definitions/text' },
+    message: { $ref: '#/definitions/text' },
     email: { $ref: '#/definitions/email' },
     phone: { $ref: '#/definitions/phone' },
   },
