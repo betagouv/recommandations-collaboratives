@@ -142,7 +142,7 @@ def test_project_list_includes_only_projects_in_switchtender_departments(
         "name",
         "notifications",
         "org_name",
-        "ownerstatus",
+        "owner",
         "switchtenders",
         "updated_on",
         "description",
