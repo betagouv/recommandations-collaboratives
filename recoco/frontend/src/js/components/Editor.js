@@ -90,6 +90,13 @@ Alpine.data('editor', (content) => {
       this.$watch('isEditorEmpty', () => {
         this.forceReactivity();
       });
+
+      document.addEventListener('htmx:afterSwap', () => {
+        this.markdownContent = '';
+        this.selectedContact = null;
+        this.selectedFile = null;
+        this.forceReactivity();
+      });
     },
     forceReactivity() {
       // Force Alpine.js à re-rendre le composant
@@ -141,6 +148,7 @@ Alpine.data('editor', (content) => {
       editor.chain().focus().unsetLink().run();
     },
     setMarkdownContent(event) {
+      console.log('setMarkdownContent', event);
       editor.commands.setContent(event.detail.text);
       if (event.detail.contact) {
         this.selectedContact = event.detail.contact;
