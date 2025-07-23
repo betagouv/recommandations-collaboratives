@@ -373,9 +373,15 @@
       height: inherit;
       padding: 3rem 0.5rem;
     }
-    .selected-contact {
+    .selected-contact,
+    .selected-file {
       .tiptap.ProseMirror {
         padding-bottom: 6rem;
+      }
+    }
+    .selected-contact.selected-file {
+      .tiptap.ProseMirror {
+        padding-bottom: 10rem;
       }
     }
   }

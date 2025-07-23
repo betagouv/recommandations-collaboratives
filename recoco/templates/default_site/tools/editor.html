@@ -33,7 +33,7 @@ Parameters:
      @modal-response="closeSearchContactModal($event)"
      x-ref="editor"
      data-test-id="tiptap-editor"
-     x-bind:class="{ 'selected-contact': selectedContact }">
+     x-bind:class="{ 'selected-contact': selectedContact, 'selected-file': selectedFile }">
     <template x-if="isLoaded()">
         <div class="tiptap-menu-custom">
             {% if not "title" in tools_disabled %}
@@ -86,6 +86,27 @@ Parameters:
                   {% if input_required %} required {% endif %}></textarea>
         <div class="module__container">
             <div class="info-module__container fr-mb-2v">
+                {% if can_attach_files %}
+                    <input x-ref="fileUploadInput"
+                           {% if model %} x-model="{{ model }}.the_file" x-modelable="currentFile" {% else %} x-model="currentFile" {% endif %}
+                           type="file"
+                           id="file-upload"
+                           name="{{ input_file_name|default:"the_file" }}"
+                           @change='handleFileUpload'
+                           {% if input_file_required %}required{% endif %}
+                           class="d-none file-upload-input">
+                    {% comment %} <template x-if="{% if model %}{{ model }}.the_file{% else %} currentFile{% endif %}"> {% endcomment %}
+                    <template x-if="selectedFile">
+                        <div class="d-flex align-items-center file__card fr-p-3v bg-white position-relative">
+                            <span class="fr-icon-file-add-line fr-btn--icon-left fr-icon-sm"></span>
+                            <span x-text="selectedFile.name" class="file-upload-text"></span>
+                            <button @click.prevent="handleResetFile"
+                                    class="fr-btn fr-btn--tertiary fr-btn--sm justify-content-center fr-text--sm close-contact-button-style position-absolute top-0 end-0">
+                                <span class="fr-icon-close-line" aria-hidden="true"></span>
+                            </button>
+                        </div>
+                    </template>
+                {% endif %}
                 {% if can_attach_contact %}
                     <template x-if="selectedContact">
                         <div class="contact-card__container">
@@ -156,14 +177,4 @@ Parameters:
             </div>
         {% endif %}
     </div>
-    {% if can_attach_files %}
-        <input x-ref="fileUploadInput"
-               {% if model %} x-model="{{ model }}.the_file" x-modelable="currentFile" {% else %} x-model="currentFile" {% endif %}
-               type="file"
-               id="file-upload"
-               name="{{ input_file_name|default:"the_file" }}"
-               @change='handleFileUpload'
-               {% if input_file_required %}required{% endif %}
-               class="d-none file-upload-input">
-    {% endif %}
 </div>

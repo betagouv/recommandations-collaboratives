@@ -184,3 +184,12 @@
     }
   }
 }
+
+// File card styles
+.file__card {
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  transition: all 0.2s ease-in-out;
+  font-size: 13px;
+  line-height: 1rem;
+}
