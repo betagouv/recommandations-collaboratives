@@ -208,4 +208,17 @@ class DocumentAdmin(admin.ModelAdmin):
     list_select_related = ("project",)
 
 
+@admin.register(models.ProjectCreationRequest)
+class ProjectCreationRequestAdmin(admin.ModelAdmin):
+    search_fields = ("email",)
+    list_filter = (
+        "created",
+        "site",
+    )
+    list_display = (
+        "email",
+        "project",
+    )
+
+
 # eof

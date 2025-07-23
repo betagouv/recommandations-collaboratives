@@ -2,6 +2,7 @@
 <form id="{{ form.helper.form_id }}"
       method="post"
       enctype="multipart/form-data"
+      @submit="localStorage.setItem('userEmailProjectCreationStep', $event.target.elements.email.value)"
       x-on:input="isFormEdited = true">
     <input type="hidden"
            name="js_enabled"
@@ -17,6 +18,7 @@
         <div class="fr-fieldset__element">
             {% include "projects/project/fragments/city_select_dsfr.html" with isRequired=True %}
         </div>
+        {{ form.email|as_crispy_field }}
         {{ form.description|as_crispy_field }}
     </fieldset>
     {% for form in question_forms %}
@@ -101,5 +103,8 @@
             {% endif %}
         </fieldset>
     {% endfor %}
+    <fieldset class="fr-fieldset">
+        {{ form.captcha }}
+    </fieldset>
     {% include "dsrc/core/blocks/buttons/button_group.html" %}
 </form>

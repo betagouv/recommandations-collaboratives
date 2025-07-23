@@ -13,11 +13,6 @@ from . import views
 
 urlpatterns = [
     path(
-        r"onboarding/",
-        views.OnboardingView.as_view(),
-        name="onboarding",
-    ),
-    path(
         r"onboarding/signin",
         views.OnboardingLogin.as_view(),
         name="onboarding-signin",
@@ -46,11 +41,6 @@ urlpatterns = [
         r"onboarding/prefill/project",
         views.prefill_project_submit,
         name="onboarding-prefill",
-    ),
-    path(
-        r"onboarding/<int:project_id>/commune/",
-        views.select_commune,
-        name="onboarding-select-commune",
     ),
 ]
 
