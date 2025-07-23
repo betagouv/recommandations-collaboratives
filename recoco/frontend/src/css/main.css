@@ -7,3 +7,8 @@
 .fr-icon-list-check-line::before {
   mask-image: url(../assets/list-check.svg);
 }
+
+.fr-icon-contact-book-line::after,
+.fr-icon-contact-book-line::before {
+  mask-image: url(../assets/contacts-book-line.svg);
+}

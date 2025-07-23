@@ -323,6 +323,7 @@
     .tiptap-menu-custom,
     .button-add-reco,
     .button-module__container,
+    .module__container,
     .contact-card {
       display: none;
       transition: none;
@@ -338,6 +339,9 @@
   }
   .contact-card {
     max-width: 28.125rem;
+    &__container {
+      display: none;
+    }
   }
 }
 
@@ -347,15 +351,32 @@
     .button-add-reco,
     .contact-card {
       display: block;
+      &__container {
+        display: flex;
+        flex-direction: column;
+      }
     }
-    .button-module__container {
+    .module__container {
       display: flex;
+      flex-direction: column;
+      .info-module__container {
+        display: flex;
+        flex-direction: column;
+      }
+      .button-module__container {
+        display: flex;
+      }
     }
     .tiptap.ProseMirror {
       min-height: inherit;
       max-height: inherit;
       height: inherit;
       padding: 3rem 0.5rem;
+    }
+    .selected-contact {
+      .tiptap.ProseMirror {
+        padding-bottom: 6rem;
+      }
     }
   }
 }

@@ -32,7 +32,8 @@ Parameters:
      @set-comment.window="setMarkdownContent(event)"
      @modal-response="closeSearchContactModal($event)"
      x-ref="editor"
-     data-test-id="tiptap-editor">
+     data-test-id="tiptap-editor"
+     x-bind:class="{ 'selected-contact': selectedContact }">
     <template x-if="isLoaded()">
         <div class="tiptap-menu-custom">
             {% if not "title" in tools_disabled %}
@@ -83,44 +84,63 @@ Parameters:
                   {% if model %} x-model="{{ model }}.text" x-modelable="markdownContent" {% else %} x-model="markdownContent" {% endif  %}
                   name="{{input_name|default:"content"}}"
                   {% if input_required %} required {% endif %}></textarea>
-        <div class="button-module__container">
-            <!-- File module -->
-            {% if can_attach_files %}
-                <!-- Action file -->
-                <button class="fr-btn fr-btn--sm fr-btn--tertiary fr-icon-file-add-line fr-btn--icon-left file-upload-wrapper"
-                        type="button"
-                        @click="$refs.fileUploadInput.click()">
-                    <span class="file-upload-text">Ajouter un fichier</span>
-                </button>
-                {% if document_form.the_file.errors %}
-                    <div class="fr-mb-3w">
-                        {% for error in document_form.the_file.errors %}
-                            <div class="text-danger text-start fr-mb-2v">{{ error }}</div>
-                        {% endfor %}
+        <div class="module__container">
+            <div class="info-module__container fr-mb-2v">
+                {% if can_attach_contact %}
+                    <template x-if="selectedContact">
+                        <div class="contact-card__container">
+                            <div class="border position-relative"
+                                 x-data="{contact:selectedContact,isOpenDeleteContact:null}">
+                                {% include "tools/contacts/contact_card_light.html" %}
+                                <button @click.prevent="handleResetContact"
+                                        data-test-id="button-remove-contact"
+                                        class="fr-btn fr-btn--tertiary fr-btn--sm justify-content-center fr-text--sm close-contact-button-style position-absolute top-0 end-0">
+                                    <span class="fr-icon-close-line" aria-hidden="true"></span>
+                                </button>
+                            </div>
+                        </div>
+                    </template>
+                {% endif %}
+            </div>
+            <div class="button-module__container">
+                <!-- File module -->
+                {% if can_attach_files %}
+                    <!-- Action file -->
+                    <button class="fr-btn fr-btn--sm fr-btn--tertiary fr-icon-file-add-line fr-btn--icon-left file-upload-wrapper"
+                            type="button"
+                            @click="$refs.fileUploadInput.click()">
+                        <span class="file-upload-text">Ajouter un fichier</span>
+                    </button>
+                    {% if document_form.the_file.errors %}
+                        <div class="fr-mb-3w">
+                            {% for error in document_form.the_file.errors %}
+                                <div class="text-danger text-start fr-mb-2v">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                {% endif %}
+                <!-- Recommendation module -->
+                {% if can_add_reco %}
+                    <a data-test-id="create-task-button"
+                       href="{% url 'projects-create-task' %}?project_id={{ project.pk }}{% if next_url_add_reco %}&next={% url next_url_add_reco project.pk %}{% endif %}"
+                       class="fr-btn fr-btn--tertiary fr-btn--sm justify-content-center fr-text--sm button-add-reco">
+                        Créer une recommandation
+                    </a>
+                {% endif %}
+                <!-- Contact module -->
+                {% if can_attach_contact %}
+                    <div x-cloak>
+                        <button @click.prevent="openModalSearchContact"
+                                data-test-id="button-add-contact-in-editor"
+                                class="fr-btn fr-btn--tertiary fr-btn--sm fr-icon-contact-book-line fr-btn--icon-left justify-content-center fr-text--sm button-add-contact">
+                            Ajouter un contact
+                        </button>
+                        {% include "tools/contacts/search_contact_modal.html" %}
+                        <input type="hidden"
+                               {% if model %} x-model="{{ model }}.contact" x-modelable="selectedContact" {% else %} x-model="selectedContact" {% endif %}>
                     </div>
                 {% endif %}
-            {% endif %}
-            <!-- Recommendation module -->
-            {% if can_add_reco %}
-                <a data-test-id="create-task-button"
-                   href="{% url 'projects-create-task' %}?project_id={{ project.pk }}{% if next_url_add_reco %}&next={% url next_url_add_reco project.pk %}{% endif %}"
-                   class="fr-btn fr-btn--tertiary fr-btn--sm justify-content-center fr-text--sm button-add-reco">
-                    Créer une recommandation
-                </a>
-            {% endif %}
-            <!-- Contact module -->
-            {% if can_attach_contact %}
-                <div x-cloak>
-                    <button @click.prevent="openModalSearchContact"
-                            data-test-id="button-add-contact-in-editor"
-                            class="fr-btn fr-btn--tertiary fr-btn--sm justify-content-center fr-text--sm button-add-contact">
-                        Ajouter un contact
-                    </button>
-                    {% include "tools/contacts/search_contact_modal.html" %}
-                    <input type="hidden"
-                           {% if model %} x-model="{{ model }}.contact" x-modelable="selectedContact" {% else %} x-model="selectedContact" {% endif %}>
-                </div>
-            {% endif %}
+            </div>
         </div>
         {% if errors %}
             {% for error in errors %}<div class="text-danger text-start fr-mb-2v">{{ error }}</div>{% endfor %}
@@ -131,26 +151,11 @@ Parameters:
                 <button data-test-id="send-message-conversation"
                         :disabled="!isFormValid"
                         form="{{ form_id|default:'conversation-form' }}"
-                        class="fr-btn send-message"
+                        class="fr-btn fr-btn--sm send-message"
                         type="submit">Envoyer</button>
             </div>
         {% endif %}
     </div>
-    {% if can_attach_contact %}
-        <template x-if="selectedContact">
-            <div class="d-flex flex-column contact-card__container">
-                <div class="border position-relative"
-                     x-data="{contact:selectedContact,isOpenDeleteContact:null}">
-                    {% include "tools/contacts/contact_card.html" %}
-                    <button @click.prevent="handleResetContact"
-                            data-test-id="button-remove-contact"
-                            class="fr-btn fr-btn--tertiary fr-btn--sm justify-content-center fr-text--sm close-contact-button-style position-absolute top-0 end-0">
-                        <span class="fr-icon-close-line" aria-hidden="true"></span>
-                    </button>
-                </div>
-            </div>
-        </template>
-    {% endif %}
     {% if can_attach_files %}
         <input x-ref="fileUploadInput"
                {% if model %} x-model="{{ model }}.the_file" x-modelable="currentFile" {% else %} x-model="currentFile" {% endif %}
