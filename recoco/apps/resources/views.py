@@ -70,6 +70,9 @@ def resource_search(request):
         .prefetch_related("task_recommendations")
     )
 
+    if form.cleaned_data.get("no_category", False):
+        resources = resources.filter(category__isnull=True)
+
     # If we are not allowed to manage resources, filter out DRAFT/TO_REVIEW items and
     # imported resources
     if not has_perm(request.user, "manage_resources", request.site):
@@ -133,6 +136,10 @@ def resource_search(request):
     if to_review:
         staff_redux |= Q(status=models.Resource.TO_REVIEW)
 
+    # keep 'published' "only" if requested
+    if form.cleaned_data.get("published", False):
+        staff_redux |= Q(status=models.Resource.PUBLISHED)
+
     resources = resources.filter(staff_redux)
 
     return render(
@@ -165,6 +172,8 @@ class SearchForm(forms.Form):
     draft = forms.BooleanField(required=False, initial=False)
     expired = forms.BooleanField(required=False, initial=False)
     to_review = forms.BooleanField(required=False, initial=False)
+    published = forms.BooleanField(required=False, initial=True)
+    no_category = forms.BooleanField(required=False, initial=False)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
