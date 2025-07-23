@@ -19,7 +19,7 @@ describe('I can access and use private notes', () => {
 
     editor.writeMessage(`test : ${now}`);
 
-    cy.contains('Envoyer').click({ force: true });
+    cy.contains('Enregistrer').click({ force: true });
 
     cy.contains(`test : ${now}`);
   });

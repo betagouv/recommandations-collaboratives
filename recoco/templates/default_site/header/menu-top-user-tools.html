@@ -70,6 +70,7 @@
                         <li>
                             <a href="{% url 'addressbook-contact-list' %}"
                                class="fr-nav__link"
+                               data-test-id="button-address-book">
                                {% if 'addressbook-contact' in url_name %}aria-current="page"{% endif %}>Carnet de contacts <span class="badge text-bg-primary">New</span></a>
                         </li>
                     {% endif %}
