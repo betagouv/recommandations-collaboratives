@@ -133,7 +133,7 @@ class AdvisorAccessRequestForm(forms.Form):
         label="Commentaire",
         help_text="Expliquez brièvement pourquoi vous demandez l’accès à ces dossiers et en quoi cela est pertinent pour votre rôle, afin de nous aider à examiner votre demande.",
         widget=forms.Textarea(attrs={"rows": 3}),
-        required=False,
+        required=True,
     )
 
 
