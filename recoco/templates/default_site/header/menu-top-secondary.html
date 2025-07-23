@@ -41,7 +41,7 @@
                         aria-controls="project_list"
                         :disabled="displayedProjectList.length == 0">
                     {% if project %}
-                        <span class="no-underline">{{ project.commune.name }} <span class="list-project__project-name">{{ project.name }}</span></span>
+                        <span class="list-project__project-name no-underline">{{ project.name }} <span class="list-project__project-org-name_title no-underline">{{ project.org_name }}</span></span>
                     {% else %}
                         <template x-if="currentProject">
                             <div>
@@ -77,12 +77,17 @@
                             </li>
                         {% endif %}
                         <template x-for="project in displayedProjectList">
-                            <li class="list-project__item">
-                                <a class="fr-nav__link" :href="`/project/${project.id}`">
-                                    <span class="no-underline strong" x-text="project.commune.name"></span>
-                                    <span class="list-project__project-name" x-text="project.name"></span>
+                            <div>
+                                <a class="fr-nav__link d-flex flex-column" :href="`/project/${project.id}`">
+                                    <span class="list-project__project-name no-underline" x-text="project.name"></span>
+                                    <span class="list-project__item no-underline">
+                                        <span class="fr-icon-parent-line fr-icon--sm align-middle" aria-hidden="true"></span>
+                                        <span class="list-project__project-org-name no-underline" x-text="project.org_name"></span>
+                                        <span class="fr-icon-map-pin-2-line fr-icon--sm align-middle" aria-hidden="true"></span>
+                                        <span class="list-project__project-commune no-underline" x-text="project.commune.name"></span>
+                                    </span>
                                 </a>
-                            </li>
+                            </div>
                         </template>
                         {% if not is_switchtender %}
                             <a class="fr-btn justify-content-center w-100"
