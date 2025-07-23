@@ -58,6 +58,11 @@ urlpatterns = [
         name="legals",
     ),
     path(
+        r"securite",
+        views.SecurityPageView.as_view(),
+        name="security",
+    ),
+    path(
         r"accessibilite",
         views.AccessibiltyPageView.as_view(),
         name="accessibility",
