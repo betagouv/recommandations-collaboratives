@@ -12,3 +12,9 @@
 .fr-icon-contact-book-line::before {
   mask-image: url(../assets/contacts-book-line.svg);
 }
+
+.text-ellipsis {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}

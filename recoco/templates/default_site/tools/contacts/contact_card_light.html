@@ -27,15 +27,16 @@ Example usage in parent:
                 <span x-show="contact.first_name || contact.last_name"
                       x-text="`${contact.first_name} ${contact.last_name}`"
                       :title="`${contact.first_name} ${contact.last_name}`"
-                      class="contact-card-light__name contact-names fr-pr-1v"></span>
+                      class="contact-card-light__name contact-names fr-pr-1v text-ellipsis"></span>
                 <span x-show="contact.organization.name"
                       x-text="contact.organization.name"
                       :title="contact.organization.name"
-                      class="contact-card-light__organization color-3a3a3a text-position"></span>
+                      class="contact-card-light__organization color-3a3a3a text-position text-ellipsis"></span>
                 <span :title="contact.division"
                       x-show="contact.division"
                       class="contact-card-light__division">
-                    <span x-text="contact.division" class="color-3a3a3a text-organization"></span>
+                    <span x-text="contact.division"
+                          class="color-3a3a3a text-organization text-ellipsis"></span>
                 </span>
             </div>
         </div>

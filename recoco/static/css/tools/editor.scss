@@ -193,3 +193,24 @@
   font-size: 13px;
   line-height: 1rem;
 }
+
+.module__container {
+  display: flex;
+  flex-direction: column;
+  .info-module__container {
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+.selected-contact,
+.selected-file {
+  .tiptap.ProseMirror {
+    padding-bottom: 6rem;
+  }
+}
+.selected-contact.selected-file {
+  .tiptap.ProseMirror {
+    padding-bottom: 10rem;
+  }
+}
