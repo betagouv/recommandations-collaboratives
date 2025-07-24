@@ -122,11 +122,11 @@ class UserPasswordFirstTimeSetupForm(forms.Form):
 
 
 class AdvisorAccessRequestForm(forms.Form):
-    is_select_departments = forms.ChoiceField(
+    advisor_access_type = forms.ChoiceField(
         widget=forms.RadioSelect,
         choices=[
-            ("false", "Toute la France"),
-            ("true", "Un ou plusieurs départements spécifiques"),
+            ("National", "Toute la France"),
+            ("Regional", "Un ou plusieurs départements spécifiques"),
         ],
         required=True,
         label="Sélection du territoire",
@@ -148,11 +148,9 @@ class AdvisorAccessRequestForm(forms.Form):
 
     def clean(self):
         cleaned_data = super().clean()
-        is_select_departments = cleaned_data.get("is_select_departments")
+        advisor_access_type = cleaned_data.get("advisor_access_type")
         departments = cleaned_data.get("departments")
-        if is_select_departments == "true" and (
-            not departments or len(departments) == 0
-        ):
+        if advisor_access_type == "Regional" and len(departments) == 0:
             self.add_error(
                 "departments", "Merci de sélectionner au moins un département."
             )

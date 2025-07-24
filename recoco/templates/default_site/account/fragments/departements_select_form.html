@@ -16,36 +16,32 @@
                 <div class="fr-radio-group">
                     <input type="radio"
                            id="selectDepartments-no"
-                           name="is_select_departments"
-                           value="false"
-                           {% if form.is_select_departments.value == 'false' %}checked{% endif %}>
-                    <label class="fr-label fr-label-rework" for="selectDepartments-no">Toute la France</label>
+                           name="{{ form.advisor_access_type.name }}"
+                           value="{{ form.fields.advisor_access_type.choices.0.0 }}"
+                           {% if form.advisor_access_type.value == 'National' %}checked{% endif %}>
+                    <label class="fr-label" for="selectDepartments-no">{{ form.fields.advisor_access_type.choices.0.1 }}</label>
                 </div>
-                {% if form.is_select_departments.errors %}
-                    <div class="fr-error-text form-mandatory-element">
-                        {{ form.is_select_departments.errors.0 }}
-                    </div>
+                {% if form.advisor_access_type.errors %}
+                    <div class="fr-error-text form-mandatory-element">{{ form.advisor_access_type.errors.0 }}</div>
                 {% endif %}
             </div>
             <div class="fr-fieldset__element fr-p-2w fr-mb-0 w-100">
                 <div class="fr-radio-group">
                     <input type="radio"
                            id="selectDepartments-yes"
-                           name="is_select_departments"
-                           value="true"
-                           {% if form.is_select_departments.value == 'true' %}checked{% endif %}>
-                    <label class="fr-label fr-label-rework" for="selectDepartments-yes">Un ou plusieurs départements spécifiques</label>
+                           name="{{ form.advisor_access_type.name }}"
+                           value="{{ form.fields.advisor_access_type.choices.1.0 }}"
+                           {% if form.advisor_access_type.value == 'Regional' %}checked{% endif %}>
+                    <label class="fr-label" for="selectDepartments-yes">{{ form.fields.advisor_access_type.choices.1.1 }}</label>
                 </div>
                 <div class="fr-input-group fr-ml-4w"
-                    x-data="{objectsToSelect: JSON.parse(document.getElementById('departmentsArray').textContent), selectedDepartments: []}">
+                     x-data="{objectsToSelect: JSON.parse(document.getElementById('departmentsArray').textContent), selectedDepartments: []}">
                     {% include "tools/contacts/multi_select.html" with placeholder="Cherchez et sélectionnez vos départements pour avoir accès aux dossiers" label="Sélectionnez-le(s) ci-dessous : " %}
                     <template x-for="dept in selectedDepartments" :key="dept">
                         <input type="hidden" name="departments" :value="dept">
                     </template>
                     {% if form.departments.errors %}
-                        <div class="fr-error-text form-mandatory-element">
-                            {{ form.departments.errors.0 }}
-                        </div>
+                        <div class="fr-error-text form-mandatory-element">{{ form.departments.errors.0 }}</div>
                     {% endif %}
                 </div>
             </div>
