@@ -8,11 +8,18 @@
             <h4 class="fr-mb-3w d-block">Sélectionnez vos départements d'action</h4>
             <div class="fr-fieldset__content">
                 <div class="fr-input-group fr-mt-4v"
-                     x-data="{objectsToSelect: JSON.parse(document.getElementById('departmentsArray').textContent), selectedDepartments: []}"
-                     @set-departments="selectedDepartments = $event.detail">
-                    {% include "tools/contacts/multi_select.html" with placeholder="Cherchez et sélectionnez vos départements pour avoir accès aux dossiers" label="Sélectionnez un ou plusieurs départements, laissez vide pour toute la France" %}
-                    <template x-for="dept in selectedDepartments" :key="dept">
-                        <input type="hidden" name="departments" :value="dept">
+                     x-data="RegionDepartmentPreparer({ selectedDepartments: [] })"
+                     x-init="init()">
+                    <template x-if="objectsToSelect && objectsToSelect.length">
+                        <div x-data="alpineMultiSelect({ selected: selectedDepartments, objectsToSelect: objectsToSelect, isRegion: true })">
+                            {% include "tools/contacts/multi_select.html" with placeholder="Cherchez et sélectionnez vos départements pour avoir accès aux dossiers" label="Sélectionnez un ou plusieurs départements, laissez vide pour toute la France" isRegion=True %}
+                            <template x-for="dept in selectedDepartments" :key="dept">
+                                <input type="hidden" name="departments" :value="dept">
+                            </template>
+                        </div>
+                    </template>
+                    <template x-if="!objectsToSelect || !objectsToSelect.length">
+                        <div>Chargement des départements...</div>
                     </template>
                 </div>
                 <div class="fr-input-group fr-mt-4v">
