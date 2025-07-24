@@ -34,7 +34,9 @@
                             {% if is_switchtender %}
                                 <a href="{% url 'projects-project-list' %}" class="fr-btn fr-text--xl">Accéder à la liste des dossiers</a>
                             {% else %}
-                                <a href="{% url 'advisor-access-request' %}" class="fr-btn fr-text--xl">Demander un accès</a>
+                                <a href="{% url 'advisor-access-request' %}"
+                                   class="fr-btn fr-text--xl"
+                                   data-test-id="button-advisor-access-request">Demander un accès</a>
                             {% endif %}
                         </li>
                     </ul>

@@ -27,6 +27,7 @@ Example usage in parent:
 {% load sass_tags %}
 {% load static %}
 {% load django_vite %}
+{% load guardian_tags %}
 {% block js %}
     {% vite_asset 'js/components/User.js' %}
 {% endblock js %}
@@ -38,6 +39,10 @@ Example usage in parent:
           rel="stylesheet"
           type="text/css" />
 {% endblock css %}
+{% block content %}
+    {% if user.is_authenticated %}
+        {% get_obj_perms request.user for request.site as "user_site_perms" %}
+    {% endif %}
 <div x-data="User()">
     <template x-if="typeof contact !== 'undefined' && contact">
         <div class="contact-card fr-p-3v bg-white {% if button_actions %}actions{% endif %}"
@@ -169,6 +174,14 @@ Example usage in parent:
                         <span title="{{ contact.profile.organization.name }}"
                               class="contact-info__organization color-3a3a3a text-position">{{ contact.profile.organization.name }}</span>
                     {% endif %}
+                    {% if 'use_crm' in user_site_perms %}
+                        <a class="small fr-ml-2v"
+                        href="{% url 'crm-user-details' contact.id %}">
+                            <svg class="bi fr-mr-1v" width="16" height="16" fill="currentColor">
+                                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#activity" />
+                            </svg>
+                        </a>
+                    {% endif %}
                 </div>
                 {% if contact.profile.organization_position %}
                     <div title="{{ contact.profile.organization_position }}"
@@ -241,6 +254,14 @@ Example usage in parent:
                         <span title="{{ contact.organization.name }}"
                               class="contact-info__organization color-3a3a3a text-position">{{ contact.organization.name }}</span>
                     {% endif %}
+                    {% if 'use_crm' in user_site_perms %}
+                        <a class="small fr-ml-2v"
+                        href="{% url 'crm-user-details' contact.id %}">
+                            <svg class="bi fr-mr-1v" width="16" height="16" fill="currentColor">
+                                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#activity" />
+                            </svg>
+                        </a>
+                    {% endif %}
                 </div>
                 {% if contact.division %}
                     <div title="{{ contact.division }}" class="contact-info__division">
@@ -304,3 +325,4 @@ Example usage in parent:
         {% endif %}
     {% endif %}
 </div>
+{% endblock content %}

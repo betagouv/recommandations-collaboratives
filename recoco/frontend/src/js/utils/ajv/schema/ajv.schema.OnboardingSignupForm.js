@@ -41,7 +41,7 @@ export const schemaOnboardingStep1SignupFormValidator = {
     },
     role: { $ref: '#/definitions/text' },
     email: { $ref: '#/definitions/email' },
-    password: { $ref: '#/definitions/passwordSoft' },
+    password: { $ref: '#/definitions/passwordNormal' },
     phone: { $ref: '#/definitions/phone' },
   },
   required: ['first_name', 'last_name', 'role', 'email', 'password', 'phone'],

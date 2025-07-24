@@ -190,6 +190,7 @@ Merci de mettre à jour la colonne `Utilisé` en fonction de l'utilisation du co
 | Projet - Paramètres        | `/project/{id}/administration` | Mettre projet en pause                             | `// @page-projet-parametres-pause-projet`           |      ❌ |
 | Projet - Paramètres        | `/project/{id}/administration` | Quitter le projet                                  | `// @page-projet-parametres-quitter-projet`         |      ❌ |
 | Déposer un projet          | `/onboarding/project`          | Page                                               | `// @deposer-projet`                                |      🚧 |
+| Demande compte conseiller  | `/advisor-access-request`      | Demande de compte conseiller                       | `// @demande-compte-conseiller`                     |      🚧 |
 
 Le code est a positionner dans les fichiers de tests Cypress dans le nom du test pour permettre de retrouver facilement les tests concernés et de les executer selectivement à l'aide du package @cypress/grep.
 
