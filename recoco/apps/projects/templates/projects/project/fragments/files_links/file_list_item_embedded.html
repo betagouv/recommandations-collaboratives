@@ -8,17 +8,15 @@
 {% endblock css %}
 {% if document %}
     <div class="fr-mb-2w">
-        <div class="rounded border fr-py-2v fr-px-2w fr-mb-2v d-flex align-items-center justify-content-between bg-white ">
+        <div class="border fr-py-2v fr-px-2w fr-mb-2v d-flex align-items-center justify-content-between bg-white ">
             <div class="d-flex align-items-center">
                 <a href="{{ document.the_file.url }}"
                    class="d-flex align-items-center text-decoration-none"
                    target="_new"
                    download>
-                    <svg class="bi align-baseline fr-mr-2v" width="17" height="17" fill="#222">
-                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#file-earmark" />
-                    </svg>
+                    <span class="fr-icon-file-add-line fr-btn--icon-left fr-icon-sm"></span>
                     <span class="text-info-custom text-black fw-medium description">{{ document.description|truncatechars:33 }}</span>
-                    <span class="text-info-custom text-black fr-ml-2v name">{{ document.filename|truncatechars:15 }}</span>
+                    <span class="text-info-custom text-black fr-ml-2v name">{{ document.filename|truncatechars:50 }}</span>
                     {% if document and document.the_file.size %}
                         <span class="text-info-custom text-black fr-ml-2v">({{ document.the_file.size|filesizeformat }})</span>
                     {% endif %}

@@ -22,3 +22,22 @@ Exemple dans le template du composant parent :
   <!-- Modal component --->
 </div>
 ```
+
+## Icônes
+
+### Comment ajouter une icône personnalisée ?
+
+Placer le svg dans le dossier `recoco/frontend/src/assets/`.
+
+Pour ajouter une icône personnalisée, il faut ajouter le nom de l'icône dans le fichier `recoco/frontend/src/css/main.css`.
+
+Exemple :
+
+```css
+.fr-icon-contact-book-line::after,
+.fr-icon-contact-book-line::before {
+  mask-image: url(../assets/contacts-book-line.svg);
+}
+```
+
+Et enfin utiliser l'icône dans le code html.

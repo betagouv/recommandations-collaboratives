@@ -1,4 +1,6 @@
-.contact-card {
+.contact-card,
+.contact-card-light {
+  max-width: 26rem;
   div {
     line-height: 1rem;
   }
@@ -40,4 +42,8 @@
       height: 1rem;
     }
   }
+}
+
+.contact-card-light {
+  max-width: 100%;
 }

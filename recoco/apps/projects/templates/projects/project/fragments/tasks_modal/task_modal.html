@@ -112,7 +112,9 @@
                                                    class="fr-mb-2v overflow-hidden text-break"></p>
                                             </template>
                                             <template x-if="currentTask && currentTask.contact">
-                                                <div x-data="{contact: currentTask.contact,isOpenDeleteContact:null}">{% include "tools/contacts/contact_card.html" %}</div>
+                                                <div x-data="{contact: currentTask.contact,isOpenDeleteContact:null}">
+                                                    {% include "tools/contacts/contact_card.html" %}
+                                                </div>
                                             </template>
                                             <template x-if="currentTask?.content === ''">
                                                 <p class="fst-italic">Aucun commentaire initial n'a été ajouté</p>
@@ -148,7 +150,13 @@
                                                 <template x-if="!isStatusUpdate(f)">
                                                     <div class="rounded bg-light fr-p-2v fr-m-2w message"
                                                          :class="hasNotification(f.id) && 'is-new-followup'">
-                                                        <p x-html="renderMarkdown(f.comment)" class="fr-mb-2v text-break"></p>
+                                                        <template x-if="f.comment.startsWith('{')">
+                                                            <p x-html="tiptapParserJSONToHTML(JSON.parse(f.comment))"
+                                                               class="fr-mb-2v text-break"></p>
+                                                        </template>
+                                                        <template x-if="!f.comment.startsWith('{')">
+                                                            <p x-html="renderMarkdown(f.comment)" class="fr-mb-2v text-break"></p>
+                                                        </template>
                                                         <template x-if="f.contact">
                                                             <div x-data="{contact:f.contact,isOpenDeleteContact:null}">{% include "tools/contacts/contact_card.html" %}</div>
                                                         </template>
