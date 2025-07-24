@@ -341,7 +341,8 @@ def _build_feeds(project: models.Project, user: User) -> list[dict[str, Any]]:
             models.Note,  # model
             project.notes.filter(public=True),  # initial queryset
             lambda item: item.updated_on,  # timestamp
-            lambda item: item.topic.name if item.topic else "",  # topic
+            # lambda item: item.topic.name if item.topic else "",  # topic
+            lambda item: "",
         ),
         (
             "reco",
