@@ -78,13 +78,18 @@
                         {% endif %}
                         <template x-for="project in displayedProjectList">
                             <div>
-                                <a class="fr-nav__link d-flex flex-column" :href="`/project/${project.id}`">
+                                <a class="fr-nav__link d-flex flex-column align-items-start"
+                                   :href="`/project/${project.id}`">
                                     <span class="list-project__project-name no-underline" x-text="project.name"></span>
                                     <span class="list-project__item no-underline">
-                                        <span class="fr-icon-parent-line fr-icon--sm align-middle" aria-hidden="true"></span>
-                                        <span class="list-project__project-org-name no-underline" x-text="project.org_name"></span>
-                                        <span class="fr-icon-map-pin-2-line fr-icon--sm align-middle" aria-hidden="true"></span>
-                                        <span class="list-project__project-commune no-underline" x-text="project.commune.name"></span>
+                                        <span class="fr-icon-parent-line fr-icon--sm align-middle"
+                                              aria-hidden="true"></span>
+                                        <span class="list-project__project-org-name no-underline"
+                                              x-text="project.org_name"></span>
+                                        <span class="fr-icon-map-pin-2-line fr-icon--sm align-middle"
+                                              aria-hidden="true"></span>
+                                        <span class="list-project__project-commune no-underline"
+                                              x-text="project.commune.name"></span>
                                     </span>
                                 </a>
                             </div>

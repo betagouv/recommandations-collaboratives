@@ -341,14 +341,16 @@ def _build_feeds(project: models.Project, user: User) -> list[dict[str, Any]]:
             models.Note,  # model
             project.notes.filter(public=True),  # initial queryset
             lambda item: item.updated_on,  # timestamp
-            lambda item: item.topic.name if item.topic else "",  # topic
+            # lambda item: item.topic.name if item.topic else "",  # topic
+            lambda item: "",
         ),
         (
             "reco",
             tasks_models.Task,
             project.tasks.filter(public=True),
             lambda item: item.updated_on,
-            lambda item: item.topic.name if item.topic else "",
+            # lambda item: item.topic.name if item.topic else "",
+            lambda item: "",
         ),
         (
             "followup",
@@ -357,7 +359,8 @@ def _build_feeds(project: models.Project, user: User) -> list[dict[str, Any]]:
                 task__in=project.tasks.filter(public=True)
             ),
             lambda item: item.timestamp,
-            lambda item: item.task.topic.name if item.task.topic else "",
+            # lambda item: item.task.topic.name if item.task.topic else "",
+            lambda item: "",
         ),
     ]
 
