@@ -68,8 +68,8 @@
   &-card-container {
     padding-top: 0.5rem;
     padding-bottom: 0.5rem;
-    margin-top: 0.5rem;
-    margin-bottom: 0.5rem;
+    // margin-top: 0.5rem;
+    // margin-bottom: 0.5rem;
   }
 
   &-card {
@@ -86,7 +86,7 @@
       }
 
       &--pause {
-        padding: 0.25rem 0.5rem;
+        padding: 0.2rem 0.5rem;
         font-size: 12px;
         text-transform: uppercase;
         font-weight: 700;
@@ -116,16 +116,14 @@
 
     &__commune {
       &-container {
-        margin-top: 2px;
-        color: #3a3a3a;
+        height: 24px;
       }
 
       &-name,
       &-postal {
-        font-size: 14px;
-        font-weight: 700;
-        font-family: 'Marianne';
-        color: #3a3a3a;
+        font-size: 10px;
+        font-weight: 400;
+        color: #666;
       }
     }
 
@@ -134,6 +132,8 @@
         margin-top: -5px;
         overflow: hidden;
         text-overflow: ellipsis;
+        display: flex;
+        flex-direction: column;
       }
 
       &-push-by-container,
@@ -145,11 +145,19 @@
       }
 
       &-name {
-        color: #666666;
+        color: #161616;
         font-size: 14px;
-        font-weight: 400;
-        font-family: 'Marianne';
+        font-weight: 700;
         white-space: nowrap;
+        height: 22px;
+      }
+
+      &-organization {
+        color: var(--light-text-mention-grey, #666);
+        font-size: 14px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 18px; /* 128.571% */
       }
 
       &-date-container {
@@ -179,4 +187,23 @@ h5 {
 .not-a-link {
   text-decoration: none;
   color: #666666;
+}
+
+.fake-a-link {
+  color: var(--light-background-flat-info, #0063CB);
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 16px; /* 160% */
+  text-decoration-line: underline;
+  text-decoration-style: solid;
+}
+
+.min-width-12 {
+  min-width: 12px;
+}
+
+.limit-height {
+  max-height: 34px;
+  overflow: auto;
 }

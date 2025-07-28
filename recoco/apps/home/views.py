@@ -93,6 +93,10 @@ class TermsOfUsePageView(TemplateView):
     template_name = "home/terms_of_use.html"
 
 
+class SecurityPageView(TemplateView):
+    template_name = "home/security.html"
+
+
 class AccessibiltyPageView(TemplateView):
     template_name = "home/accessibility.html"
 

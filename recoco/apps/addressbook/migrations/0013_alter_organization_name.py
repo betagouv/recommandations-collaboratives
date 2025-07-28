@@ -2,6 +2,7 @@
 
 from django.db import migrations
 from django.db.models import Count, CharField
+from uuid import uuid4
 
 
 def dedup_organisation_names(apps, schema_editor):
@@ -20,7 +21,7 @@ def dedup_organisation_names(apps, schema_editor):
     for name in duplicate_names:
         first_org = Organisation.objects.filter(name=name).order_by().first()
         for org in Organisation.objects.filter(name=name).exclude(id=first_org.id):
-            org.name = f"{org.name} (duplicate of {first_org.id})"
+            org.name = f"{org.name} - {str(uuid4())[:8]}"
             org.save()
 
 

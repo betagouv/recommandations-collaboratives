@@ -209,12 +209,16 @@ Alpine.data('KanbanProjects', function (currentSiteId, departments, regions) {
     },
     async backendSearchProjects(options = { resetLastActivity: false }) {
       if (this.backendSearch.searchText !== '') {
-        this.$refs.selectFilterProjectDuration.disabled = true;
-        this.$refs.selectFilterProjectDuration.value = 1460;
+        if (this.$refs.selectFilterProjectDuration) {
+          this.$refs.selectFilterProjectDuration.disabled = true;
+          this.$refs.selectFilterProjectDuration.value = 1460;
+        }
         this.backendSearch.lastActivity = '';
       } else if (options.resetLastActivity) {
-        this.$refs.selectFilterProjectDuration.disabled = false;
-        this.$refs.selectFilterProjectDuration.value = 30;
+        if (this.$refs.selectFilterProjectDuration) {
+          this.$refs.selectFilterProjectDuration.disabled = false;
+          this.$refs.selectFilterProjectDuration.value = 30;
+        }
         this.backendSearch.lastActivity = '30';
       }
 
@@ -239,6 +243,11 @@ Alpine.data('KanbanProjects', function (currentSiteId, departments, regions) {
     },
     formatDateDisplay(date) {
       return new Date(date).toLocaleDateString('fr-FR');
+    },
+    async onTagClick(tag) {
+      this.backendSearch.searchText = tag;
+      this.searchText = "#" + tag;
+      await this.backendSearchProjects({ resetLastActivity: true });
     },
   };
 });

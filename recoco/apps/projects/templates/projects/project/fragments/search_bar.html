@@ -14,7 +14,8 @@ variables to pass :
       rel="stylesheet"
       type="text/css">
 {% endblock css %}
-<input type="search"
+<input x-ref="search_bar"
+       type="search"
        data-cy="search-bar-project"
        class="fr-icon-search-line placeholder-position"
        placeholder="{{ placeholder|default:"Rechercher" }}"

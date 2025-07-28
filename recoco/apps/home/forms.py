@@ -34,7 +34,7 @@ class UVSignupForm(SignupForm):
 
         self.fields[
             "password1"
-        ].label = "Définissez votre mot de passe (8 caractères minimum)"
+        ].label = "Définissez votre mot de passe (8 caractères minimum et au moins 1 majuscule et 1 chiffre)"
         self.fields["password1"].widget = forms.PasswordInput(
             attrs={"class": "fr-input fr-mt-2v fr-mb-4v"}
         )
@@ -65,7 +65,9 @@ class UVResetPasswordForm(ResetPasswordForm):
 class UVResetPasswordKeyForm(ResetPasswordKeyForm):
     def __init__(self, *args, **kwargs):
         super(UVResetPasswordKeyForm, self).__init__(*args, **kwargs)
-        self.fields["password1"].label = "Nouveau mot de passe (8 caractères minimum)"
+        self.fields[
+            "password1"
+        ].label = "Nouveau mot de passe (8 caractères minimum et au moins 1 majuscule et 1 chiffre)"
         self.fields["password1"].widget = forms.PasswordInput(
             attrs={"class": "fr-input fr-mt-2v fr-mb-4v"}
         )
@@ -133,7 +135,7 @@ class AdvisorAccessRequestForm(forms.Form):
         label="Commentaire",
         help_text="Expliquez brièvement pourquoi vous demandez l’accès à ces dossiers et en quoi cela est pertinent pour votre rôle, afin de nous aider à examiner votre demande.",
         widget=forms.Textarea(attrs={"rows": 3}),
-        required=False,
+        required=True,
     )
 
 

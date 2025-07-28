@@ -57,27 +57,27 @@
 }
 
 .repositionning-in-modal {
-  bottom: 1rem;
   position: absolute;
-  right: 1rem;
+  bottom: 1.5rem;
+  right: 1.5rem;
 }
 
 .repositionning-in-modal-non-public {
-  bottom: 6rem;
   position: absolute;
-  right: 1rem;
+  bottom: 6rem;
+  right: 1.5rem;
 }
 
 .button-cancel-edit {
   position: absolute;
-  bottom: 1rem;
-  right: 6.5rem;
+  bottom: 1.5rem;
+  right: 7rem;
 }
 
 .button-cancel-edit-non-public {
   position: absolute;
-  bottom: 6rem;
-  right: 6.5rem;
+  bottom: 6.5rem;
+  right: 7rem;
 }
 
 .modal-preview {

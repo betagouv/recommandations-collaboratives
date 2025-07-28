@@ -41,15 +41,15 @@
                 <div class="project-card__content">
                     <div class="project__title">
                         {% if project.commune %}
-                            <p class="project__title-city">{{ project.commune.name }}</p>
+                            <p class="project__title-city">{{ project.name }}</p>
                         {% else %}
                             <p class="project__title-city">Pas encore de commune associée</p>
                         {% endif %}
-                        <p class="project__title-name">{{ project.name }}</p>
+                        <p class="project__title-name">{{ project.org_name }}</p>
                     </div>
                     <div class="project__info">
                         {% if project.commune %}
-                            <p class="project__info-insee fr-icon-map-pin-2-line">INSEE: {{ project.commune.insee }}</p>
+                            <p class="project__info-insee fr-icon-map-pin-2-line">{{ project.commune.name }}</p>
                         {% endif %}
                         <p class="project__info-date fr-icon-calendar-event-line">déposé aujourd'hui</p>
                     </div>

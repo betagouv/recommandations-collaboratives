@@ -1,12 +1,18 @@
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
+from recoco.rest_api.pagination import StandardResultsSetPagination
 from recoco.utils import has_perm
 
-from . import models
 from .importers import ResourceImporter
-from .serializers import ResourceSerializer, ResourceURIImportSerializer
+from .models import Resource, ResourceAddon
+from .serializers import (
+    ResourceAddonSerializer,
+    ResourceSerializer,
+    ResourceURIImportSerializer,
+)
 
 ########################################################################
 # REST API
@@ -31,9 +37,9 @@ class ResourceViewSet(viewsets.ModelViewSet):
     """
 
     def get_queryset(self):
-        qs = models.Resource.on_site
+        qs = Resource.on_site
         if not has_perm(self.request.user, "sites.manage_resources", self.request.site):
-            qs = qs.filter(status__gt=models.Resource.TO_REVIEW)
+            qs = qs.filter(status__gt=Resource.TO_REVIEW)
         return (
             qs.with_ds_annotations()
             .select_related("created_by", "category")
@@ -65,9 +71,7 @@ class ResourceViewSet(viewsets.ModelViewSet):
             resource_uri = serializer.validated_data["uri"]
 
             # Check if we already have this resource
-            resource = models.Resource.on_site.filter(
-                imported_from=resource_uri
-            ).first()
+            resource = Resource.on_site.filter(imported_from=resource_uri).first()
             if resource:
                 return Response(
                     ResourceSerializer(resource).data, status=status.HTTP_200_OK
@@ -85,6 +89,25 @@ class ResourceViewSet(viewsets.ModelViewSet):
             )
 
         return Response(status=status.HTTP_501_NOT_IMPLEMENTED)
+
+
+class IsResourceManager(permissions.BasePermission):
+    def has_permission(self, request, view):
+        return has_perm(request.user, "sites.manage_resources", request.site)
+
+
+class ResourceAddonViewSet(viewsets.ModelViewSet):
+    permission_classes = [
+        permissions.IsAuthenticated,
+        IsResourceManager,
+    ]
+    serializer_class = ResourceAddonSerializer
+    pagination_class = StandardResultsSetPagination
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ["recommendation", "nature"]
+
+    def get_queryset(self):
+        return ResourceAddon.objects.filter(recommendation__site=self.request.site)
 
 
 # eof

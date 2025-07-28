@@ -53,18 +53,26 @@ export default instance;
 // }
 
 export function projectsUrl(search, departments, lastActivity) {
+  // if search with tags, make a different url
+  let url;
+  if (search.includes('#')) {
+    search = search.substring(1);
+  }
+  //   search.paragraph.replace(' ', '_');
+  //   url = '/api/projects/?tags=' + search.substring(1);
+  //   console.log(url);
+  // } else {
   const params = new URLSearchParams({
     search: search,
     last_activity: lastActivity,
   });
 
-  let url = '/api/projects/?' + params.toString();
+  url = '/api/projects/?' + params.toString();
 
   if (departments.length) {
     departments = departments.map((code) => `departments=${code}`).join('&');
     url = url + '&' + departments;
   }
-
   return url;
 }
 
@@ -91,7 +99,7 @@ export function searchOrganizationsUrl(search) {
 }
 
 export function getOrganizationById(id) {
-  return `/api/addressbook/organizations/${id}`;
+  return `/api/addressbook/organizations/${id}/`;
 }
 
 export function organizationsUrl() {

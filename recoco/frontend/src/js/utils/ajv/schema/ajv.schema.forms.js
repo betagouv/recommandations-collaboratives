@@ -84,6 +84,26 @@ export const schemaFormInputs = {
       },
     ],
   },
+  passwordNormal: {
+    allOf: [
+      {
+        type: 'string',
+        format: 'password',
+        minLength: 8,
+        errorMessage: minLengthErrorMessage(8),
+      },
+      {
+        type: 'string',
+        pattern: '[0-9]{1}',
+        errorMessage: '1 chiffre minimum',
+      },
+      {
+        type: 'string',
+        pattern: '[A-Z]{1}',
+        errorMessage: '1 majuscule minimum',
+      },
+    ],
+  },
   postcode: {
     // TODO : adapt for French postcode validation
     allOf: [
