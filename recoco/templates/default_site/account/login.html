@@ -26,88 +26,87 @@
           type="text/css">
 {% endblock css %}
 {% block content %}
-<div class="container-fluid login-page">
-    <div x-data="Auth"
-         x-init="initLogin"
-         class="fr-container fr-py-6w login-page__subcontainer">
-        <!-- Breadcrumb -->
-        <nav role="navigation" class="fr-breadcrumb" aria-label="vous êtes ici :">
-            <button class="fr-breadcrumb__button"
-                    aria-expanded="false"
-                    aria-controls="breadcrumb-1">Voir le fil d’Ariane</button>
-            <div class="fr-collapse" id="breadcrumb-1">
-                <ol class="fr-breadcrumb__list">
-                    <li>
-                        <a class="fr-breadcrumb__link underline"
-                            href="{% url 'home' %}">Accueil</a>
-                    </li>
-                    <li>
-                        <a class="fr-breadcrumb__link" aria-current="page">Solliciter UrbanVitaliz</a>
-                    </li>
-                </ol>
+    <div class="container-fluid login-page">
+        <div x-data="Auth"
+             x-init="initLogin"
+             class="fr-container fr-py-6w login-page__subcontainer">
+            <!-- Breadcrumb -->
+            <nav role="navigation" class="fr-breadcrumb" aria-label="vous êtes ici :">
+                <button class="fr-breadcrumb__button"
+                        aria-expanded="false"
+                        aria-controls="breadcrumb-1">Voir le fil d’Ariane</button>
+                <div class="fr-collapse" id="breadcrumb-1">
+                    <ol class="fr-breadcrumb__list">
+                        <li>
+                            <a class="fr-breadcrumb__link underline" href="{% url 'home' %}">Accueil</a>
+                        </li>
+                        <li>
+                            <a class="fr-breadcrumb__link" aria-current="page">Solliciter {{ site.name }}</a>
+                        </li>
+                    </ol>
+                </div>
+            </nav>
+            <div class="d-flex flex-column justify-content-between align-items-start">
+                <h2 class="fr-mb-3v d-flex align-items-center">Connexion à {{ site.name }}</h2>
+                <p class="fr-mb-4v">
+                    Connectez vous à votre espace {{ site.name }} en utilisant vos identifiants ou votre compte ProConnect
+                </p>
             </div>
-        </nav>
-        <div class="d-flex flex-column justify-content-between align-items-start">
-            <h2 class="fr-mb-3v d-flex align-items-center">
-                Connexion à {{ site.name }}
-            </h2>
-            <p class="fr-mb-4v">Connectez vous à votre espace UrbanVitaliz en utilisant vos identifiants ou votre compte ProConnect</p>
-        </div>
-        <div class="d-flex justify-content-center">
-            <div class="{% flag "proconnect_login" %}w-50 {% else %}w-100 {% endflag %}fr-p-4v">
-            {% comment %} <div class="w-50 fr-p-4v"> {% endcomment %}
-                <form class="login fr-form-group"
-                    method="post"
-                    action="{% url 'account_login' %}">
-                    {% csrf_token %}
-                    {% if redirect_field_value %}
-                        <input type="hidden"
-                            name="{{ redirect_field_name }}"
-                            value="{{ redirect_field_value }}" />
-                    {% endif %}
-                    <fieldset class="fr-fieldset fr-m-0">
-                        <h3 class="fr-mb-5v d-block login-page__title">Identifiants</h3>
-                        <div class="fr-fieldset__content fr-m-0">
-                            {{ form.non_field_errors }}
-                            <div>
-                                {{ form.login.errors }}
-                                <label for="{{ form.login.id_for_label }}">Email :</label>
-                                {{ form.login }}
-                            </div>
-                            <div>
-                                {{ form.password.errors }}
-                                <label for="{{ form.password.id_for_label }}">Mot de passe :</label>
-                                {{ form.password }}
-                            </div>
-                            <div>
-                                {{ form.remember.errors }}
-                                {{ form.remember }}
-                                <label for="{{ form.remember.id_for_label }}">Se souvenir de mes identifiants</label>
-                            </div>
-                            <div class="d-flex flex-column fr-mt-5v">
-                                <div class="d-flex w-100">
-                                    <div class="fr-input-group fr-m-auto">
-                                        <button class="fr-btn" type="submit">Connexion</button>
+            <div class="d-flex justify-content-center">
+                <div class="{% flag "proconnect_login" %}w-50 {% else %}w-100 {% endflag %}fr-p-4v">
+                    {% comment %} <div class="w-50 fr-p-4v"> {% endcomment %}
+                    <form class="login fr-form-group"
+                          method="post"
+                          action="{% url 'account_login' %}">
+                        {% csrf_token %}
+                        {% if redirect_field_value %}
+                            <input type="hidden"
+                                   name="{{ redirect_field_name }}"
+                                   value="{{ redirect_field_value }}" />
+                        {% endif %}
+                        <fieldset class="fr-fieldset fr-m-0">
+                            <h3 class="fr-mb-5v d-block login-page__title">Identifiants</h3>
+                            <div class="fr-fieldset__content fr-m-0">
+                                {{ form.non_field_errors }}
+                                <div>
+                                    {{ form.login.errors }}
+                                    <label for="{{ form.login.id_for_label }}">Email :</label>
+                                    {{ form.login }}
+                                </div>
+                                <div>
+                                    {{ form.password.errors }}
+                                    <label for="{{ form.password.id_for_label }}">Mot de passe :</label>
+                                    {{ form.password }}
+                                </div>
+                                <div>
+                                    {{ form.remember.errors }}
+                                    {{ form.remember }}
+                                    <label for="{{ form.remember.id_for_label }}">Se souvenir de mes identifiants</label>
+                                </div>
+                                <div class="d-flex flex-column fr-mt-5v">
+                                    <div class="d-flex w-100">
+                                        <div class="fr-input-group fr-m-auto">
+                                            <button class="fr-btn" type="submit">Connexion</button>
+                                        </div>
+                                    </div>
+                                    <div class="fr-input-group d-flex flex-column fr-mt-5v">
+                                        <p class="font-size-14px fr-mb-1w">
+                                            Mot de passe oublié ?
+                                            <a id="forgot-password"
+                                               class="font-size-14px"
+                                               href="{% url 'account_reset_password' %}">Réinitialisez votre mot de passe</a>
+                                        </p>
+                                        <p class="font-size-14px fr-mb-0">
+                                            Vous n’avez pas de mot de passe ? <a class="font-size-14px" href="/login/">Connectez-vous par email</a>
+                                        </p>
                                     </div>
                                 </div>
-                                <div class="fr-input-group d-flex flex-column fr-mt-5v">
-                                    <p class="font-size-14px fr-mb-1w">
-                                        Mot de passe oublié ?
-                                        <a id="forgot-password"
-                                            class="font-size-14px"
-                                            href="{% url 'account_reset_password' %}">Réinitialisez votre mot de passe</a>
-                                    </p>
-                                    <p class="font-size-14px fr-mb-0">
-                                        Vous n’avez pas de mot de passe ? <a class="font-size-14px" href="/login/">Connectez-vous par email</a>
-                                    </p>
-                                </div>
                             </div>
-                        </div>
-                    </fieldset>
-                </form>
-            </div>
-            <!-- Proconnect -->
-            {% flag "proconnect_login" %}
+                        </fieldset>
+                    </form>
+                </div>
+                <!-- Proconnect -->
+                {% flag "proconnect_login" %}
                 <div class="w-50 fr-ml-5v login-page__proconnect">
                     <h3 class="fr-mb-2w d-block login-page__title">Pro Connect</h3>
                     <div class="fr-connect-group text-align-center fr-m-auto">
@@ -119,10 +118,10 @@
                         </form>
                         <p>
                             <a href="https://proconnect.gouv.fr/"
-                                target="_blank"
-                                rel="noopener"
-                                title="Qu’est-ce que ProConnect ? - nouvelle fenêtre"
-                                class="font-size-14px">Qu’est-ce que ProConnect ?</a>
+                               target="_blank"
+                               rel="noopener"
+                               title="Qu’est-ce que ProConnect ? - nouvelle fenêtre"
+                               class="font-size-14px">Qu’est-ce que ProConnect ?</a>
                         </p>
                     </div>
                 </div>
@@ -133,15 +132,20 @@
             <div class="fr-form-group">
                 <fieldset>
                     <h3 class="d-block fr-mb-1w">Vous n'avez pas de compte {{ site.name }} ?</h3>
-                    <p class="font-size-14px fr-mb-1w">Si vous souhaitez vous inscrire pour obtenir de l’aide ou être en contact avec un·e conseiller·e, il vous faut créer un compte : </p>
+                    <p class="font-size-14px fr-mb-1w">
+                        Si vous souhaitez vous inscrire pour obtenir de l’aide ou être en contact avec un·e conseiller·e, il vous faut déposer une demande :
+                    </p>
                     <div class="fr-fieldset__content fr-m-0">
                         <div class="fr-input-group">
-                            <a class="fr-btn"
-                               href="{{ signup_url }}">Créer un compte</a>
+                            <a class="fr-btn" href="{% url 'onboarding-project' %}">Déposer une demande</a>
                         </div>
                     </div>
-                    <p class="font-size-14px fr-mt-1w fr-mb-0">Si vous souhaitez demander un accès “conseiller” sur les dossiers de votre territoire, vous pouvez <a class="font-size-14px" href="{% url 'advisor-access-request' %}">faire une demande de compte conseiller.</a></p>
-                    <p class="font-size-14px fr-mt-1w fr-mb-0">Si vous souhaitez rejoindre un dossier qui a déjà été déposé sur UrbanVitaliz, il vous faut demander à un membre de ce dossier de vous y inviter.</p>
+                    <p class="font-size-14px fr-mt-1w fr-mb-0">
+                        Si vous souhaitez demander un accès “conseiller” sur les dossiers de votre territoire, vous pouvez <a class="font-size-14px" href="{% url 'advisor-access-request' %}">faire une demande de compte conseiller.</a>
+                    </p>
+                    <p class="font-size-14px fr-mt-1w fr-mb-0">
+                        Si vous souhaitez rejoindre un dossier qui a déjà été déposé sur {{ site.name }}, il vous faut demander à un membre de ce dossier de vous y inviter.
+                    </p>
                 </fieldset>
             </div>
         </div>
