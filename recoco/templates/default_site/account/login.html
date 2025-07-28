@@ -41,7 +41,7 @@
                             <a class="fr-breadcrumb__link underline" href="{% url 'home' %}">Accueil</a>
                         </li>
                         <li>
-                            <a class="fr-breadcrumb__link" aria-current="page">Solliciter UrbanVitaliz</a>
+                            <a class="fr-breadcrumb__link" aria-current="page">Solliciter {{ site.name }}</a>
                         </li>
                     </ol>
                 </div>
@@ -49,7 +49,7 @@
             <div class="d-flex flex-column justify-content-between align-items-start">
                 <h2 class="fr-mb-3v d-flex align-items-center">Connexion à {{ site.name }}</h2>
                 <p class="fr-mb-4v">
-                    Connectez vous à votre espace UrbanVitaliz en utilisant vos identifiants ou votre compte ProConnect
+                    Connectez vous à votre espace {{ site.name }} en utilisant vos identifiants ou votre compte ProConnect
                 </p>
             </div>
             <div class="d-flex justify-content-center">
@@ -144,7 +144,7 @@
                         Si vous souhaitez demander un accès “conseiller” sur les dossiers de votre territoire, vous pouvez <a class="font-size-14px" href="{% url 'advisor-access-request' %}">faire une demande de compte conseiller.</a>
                     </p>
                     <p class="font-size-14px fr-mt-1w fr-mb-0">
-                        Si vous souhaitez rejoindre un dossier qui a déjà été déposé sur UrbanVitaliz, il vous faut demander à un membre de ce dossier de vous y inviter.
+                        Si vous souhaitez rejoindre un dossier qui a déjà été déposé sur {{ site.name }}, il vous faut demander à un membre de ce dossier de vous y inviter.
                     </p>
                 </fieldset>
             </div>
