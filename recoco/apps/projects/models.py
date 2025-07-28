@@ -402,10 +402,10 @@ class Project(models.Model):
 
     last_name = models.CharField(
         max_length=128, default="", verbose_name="Nom du contact"
-    )
+    )  # DEPRECATED, DNU
     first_name = models.CharField(
         max_length=128, default="", verbose_name="Prénom du contact"
-    )
+    )  # DEPRECATED, DNU
 
     publish_to_cartofriches = models.BooleanField(
         verbose_name="Publier sur cartofriches", default=False
@@ -463,7 +463,7 @@ class Project(models.Model):
 
     org_name = models.CharField(
         max_length=256, blank=True, default="", verbose_name="Nom de votre structure"
-    )
+    )  # DEPRECATED, DNU
 
     created_on = models.DateTimeField(
         default=timezone.now, verbose_name="Date de création"
@@ -477,7 +477,7 @@ class Project(models.Model):
     name = models.CharField(max_length=128, verbose_name="Nom du dossier")
     phone = models.CharField(
         max_length=16, default="", blank=True, verbose_name="Téléphone"
-    )
+    )  # DEPRECATED, DNU
     description = models.TextField(verbose_name="Description", default="", blank=True)
 
     # Internal advisors note

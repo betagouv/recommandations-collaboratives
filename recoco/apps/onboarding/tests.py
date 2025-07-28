@@ -15,20 +15,115 @@ from recoco.apps.survey import models as survey_models
 from recoco.utils import login
 
 
-########################################################################
-# Onboarding page for user
-########################################################################
+#########################################
+# Onboarding: Step1, project info
+#########################################
 @pytest.mark.django_db
-def test_onboarding_page_with_logged_in_user_is_reachable(request, client):
+def test_onboarding_page_is_reachable(request, client):
     baker.make(
         home_models.SiteConfiguration,
         site=get_current_site(request),
     )
 
+    url = reverse("onboarding-project")
+    response = client.get(url)
+    assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_performing_onboarding_creates_a_new_project(request, client):
+    site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=site)
+
+    data = {
+        "name": "a project",
+        "location": "some place",
+        "postcode": "62170",
+        "insee": "62044",
+        "description": "a description",
+    }
+
     with login(client):
-        url = reverse("onboarding-project")
-        response = client.get(url)
-        assert response.status_code == 200
+        response = client.post(reverse("onboarding-project"), data=data)
+        assert response.status_code == 302
+
+    project = projects_models.Project.on_site.first()
+    assert project
+    assert project.name == data["name"]
+    assert project.project_sites.current().status == "DRAFT"
+    assert project.project_sites.current().is_origin is True
+    assert len(project.ro_key) == 32
+
+
+@pytest.mark.django_db
+def test_performing_onboarding_creates_a_project_creation_request(request, client):
+    site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=site)
+
+    data = {
+        "name": "a project",
+        "email": "hello@recoco.fr",
+        "location": "some place",
+        "postcode": "62170",
+        "insee": "62044",
+        "description": "a description",
+    }
+
+    response = client.post(reverse("onboarding-project"), data=data, follow=True)
+    last_url, status_code = response.redirect_chain[-1]
+    assert status_code == 302
+    assert last_url.startswith(reverse("onboarding-signup"))
+
+    assert (
+        projects_models.ProjectCreationRequest.on_site.filter(
+            email=data["email"]
+        ).count()
+        == 1
+    )
+
+
+@pytest.mark.django_db
+def test_performing_onboarding_with_survey_fills_it(request, client):
+    site = get_current_site(request)
+
+    survey = baker.make(survey_models.Survey)
+
+    survey_simple_question = baker.make(
+        survey_models.Question, question_set__survey=survey
+    )
+    survey_qcm_question = baker.make(
+        survey_models.Question, question_set__survey=survey
+    )
+    baker.make(
+        survey_models.Choice, question=survey_qcm_question, text="no", value="no"
+    )
+
+    baker.make(
+        home_models.SiteConfiguration,
+        site=site,
+        onboarding_questions=[survey_simple_question, survey_qcm_question],
+        project_survey=survey,
+    )
+
+    data = {
+        "name": "a project",
+        "location": "some place",
+        "postcode": "62170",
+        "insee": "62044",
+        "description": "a description",
+        f"q{survey_simple_question.id}-comment": "blah",
+        f"q{survey_qcm_question.id}-answer": "no",
+    }
+
+    with login(client):
+        response = client.post(reverse("onboarding-project"), data=data)
+        assert response.status_code == 302
+
+    project = projects_models.Project.on_site.first()
+    assert project
+
+    session = project.survey_session
+    assert session
 
 
 @pytest.mark.django_db
@@ -82,6 +177,9 @@ def test_onboarding_with_account_on_other_site_redirects_to_signin(request, clie
     user = baker.make(auth.User, email=data["email"].lower(), username=data["email"])
     user.profile.sites.add(other_site)
 
+    # We need a ProjectCreationRequest matching the user for this view
+    baker.make(projects_models.ProjectCreationRequest, email=user.email)
+
     response = client.post(reverse("onboarding-project"), data=data, follow=True)
     last_url, status_code = response.redirect_chain[-1]
     assert status_code == 302
@@ -89,7 +187,7 @@ def test_onboarding_with_account_on_other_site_redirects_to_signin(request, clie
 
 
 @pytest.mark.django_db
-def test_onboarding_with_nonexisting_account_redirects_to_signup(request, client):
+def test_onboarding_with_nonexisting_account_requests_info_from_user(request, client):
     onboarding = onboarding_models.Onboarding.objects.first()
 
     baker.make(
@@ -106,10 +204,13 @@ def test_onboarding_with_nonexisting_account_redirects_to_signup(request, client
         "insee": "62044",
         "description": "a description",
     }
-    response = client.post(reverse("onboarding-project"), data=data, follow=True)
-    last_url, status_code = response.redirect_chain[-1]
-    assert status_code == 302
-    assert last_url == reverse("onboarding-signup")
+
+    # We need a ProjectCreationRequest matching the user for this view
+    baker.make(projects_models.ProjectCreationRequest, email=data["email"])
+
+    response = client.post(reverse("onboarding-signup"), data=data)
+
+    assert response.status_code == 200
 
 
 @pytest.mark.django_db
@@ -121,11 +222,14 @@ def test_onboarding_signup_redirects_to_project_form_when_logged(request, client
         site=current_site,
     )
 
-    with login(client):
+    with login(client) as user:
+        # We need a ProjectCreationRequest matching the user for this view
+        baker.make(projects_models.ProjectCreationRequest, email=user.email)
+
         response = client.post(reverse("onboarding-signup"), follow=True)
         last_url, status_code = response.redirect_chain[-1]
         assert status_code == 302
-        assert last_url == reverse("onboarding-project")
+        assert last_url == reverse("onboarding-summary")
 
 
 @pytest.mark.django_db
@@ -147,9 +251,13 @@ def test_performing_onboarding_signup_create_a_new_user_and_logs_in(request, cli
         "org_name": "MyOrg",
     }
 
-    response = client.post(reverse("onboarding-signup"), data=data)
+    # We need a ProjectCreationRequest matching the user for this view
+    baker.make(projects_models.ProjectCreationRequest, email=data["email"])
 
-    assert response.status_code == 302
+    response = client.post(reverse("onboarding-signup"), data=data, follow=True)
+    last_url, status_code = response.redirect_chain[-1]
+    assert status_code == 302
+    assert last_url == reverse("onboarding-summary")
 
     # the user and profile are filled according to provided information
     user = auth.User.objects.get(username=data["email"])
@@ -208,80 +316,6 @@ def test_performing_onboarding_signup_with_existing_user_redirects_to_signin(
 
     # present if logged_in
     assert not client.session.get("_auth_user_id", None)
-
-
-#########################################
-# Onboarding: Step2, project info
-#########################################
-
-
-@pytest.mark.django_db
-def test_performing_onboarding_creates_a_new_project(request, client):
-    site = get_current_site(request)
-    baker.make(home_models.SiteConfiguration, site=site)
-
-    data = {
-        "name": "a project",
-        "location": "some place",
-        "postcode": "62170",
-        "insee": "62044",
-        "description": "a description",
-    }
-
-    with login(client):
-        response = client.post(reverse("onboarding-project"), data=data)
-        assert response.status_code == 302
-
-    project = projects_models.Project.on_site.first()
-    assert project
-    assert project.name == data["name"]
-    assert project.project_sites.current().status == "DRAFT"
-    assert project.project_sites.current().is_origin is True
-    assert len(project.ro_key) == 32
-
-
-@pytest.mark.django_db
-def test_performing_onboarding_with_survey_fills_it(request, client):
-    site = get_current_site(request)
-
-    survey = baker.make(survey_models.Survey)
-
-    survey_simple_question = baker.make(
-        survey_models.Question, question_set__survey=survey
-    )
-    survey_qcm_question = baker.make(
-        survey_models.Question, question_set__survey=survey
-    )
-    baker.make(
-        survey_models.Choice, question=survey_qcm_question, text="no", value="no"
-    )
-
-    baker.make(
-        home_models.SiteConfiguration,
-        site=site,
-        onboarding_questions=[survey_simple_question, survey_qcm_question],
-        project_survey=survey,
-    )
-
-    data = {
-        "name": "a project",
-        "location": "some place",
-        "postcode": "62170",
-        "insee": "62044",
-        "description": "a description",
-        f"q{survey_simple_question.id}-comment": "blah",
-        f"q{survey_qcm_question.id}-answer": "no",
-    }
-
-    with login(client):
-        response = client.post(reverse("onboarding-project"), data=data)
-        assert response.status_code == 302
-
-    project = projects_models.Project.on_site.first()
-    assert project
-
-    session = project.survey_session
-    assert session
 
 
 @pytest.mark.django_db
@@ -606,66 +640,6 @@ def test_prefill_project_with_survey_fills_it(request, client):
 
     session = project.survey_session
     assert session
-
-
-########################################################################
-# Selecting proper commune insee code for multiple commune postal code
-########################################################################
-
-
-@pytest.mark.django_db
-def test_selecting_proper_commune_completes_project_creation(
-    request, client, make_project
-):
-    commune = Recipe(geomatics.Commune, postal="12345").make()
-    selected = Recipe(geomatics.Commune, postal="12345").make()
-    membership = baker.make(
-        projects_models.ProjectMember, member__is_staff=False, is_owner=True
-    )
-    project = make_project(
-        site=get_current_site(request),
-        projectmember_set=[membership],
-        commune=commune,
-    )
-
-    with login(client, user=membership.member):
-        response = client.post(
-            reverse("onboarding-select-commune", args=[project.id]),
-            data={"commune": selected.id},
-        )
-    project = projects_models.Project.on_site.get(id=project.id)
-    assert project.commune == selected
-    assert response.status_code == 302
-    expected = reverse("survey-project-session", args=[project.id]) + "?first_time=1"
-    assert response.url == expected
-
-
-@pytest.mark.django_db
-def test_proper_commune_selection_contains_all_possible_commmunes(request, client):
-    expected = [
-        Recipe(geomatics.Commune, postal="12345").make(),
-        Recipe(geomatics.Commune, postal="12345").make(),
-    ]
-    unexpected = Recipe(geomatics.Commune, postal="67890").make()
-
-    membership = baker.make(
-        projects_models.ProjectMember, member__is_staff=False, is_owner=True
-    )
-    project = Recipe(
-        projects_models.Project,
-        sites=[get_current_site(request)],
-        projectmember_set=[membership],
-        commune=expected[1],
-    ).make()
-
-    with login(client, user=membership.member):
-        response = client.get(
-            reverse("onboarding-select-commune", args=[project.id]),
-        )
-    page = str(response.content)
-    for commune in expected:
-        assert commune.name in page
-    assert unexpected.name not in page
 
 
 # eof
