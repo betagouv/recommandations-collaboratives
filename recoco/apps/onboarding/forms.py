@@ -7,6 +7,8 @@ author  : guillaume.libersat@beta.gouv.fr, raphael.marvie@beta.gouv.fr
 created : 2022-06-06 14:16:20 CEST
 """
 
+import os
+
 from captcha.fields import ReCaptchaField
 from captcha.widgets import ReCaptchaV2Checkbox
 from crispy_forms.layout import Fieldset, Layout
