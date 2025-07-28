@@ -6,6 +6,7 @@ import HardBreak from '@tiptap/extension-hard-break';
 import { createMarkdownEditor } from 'tiptap-markdown';
 import '../../css/tiptap.css';
 import { formatDate } from '../utils/date';
+import Placeholder from '@tiptap/extension-placeholder';
 
 const MarkdownEditor = createMarkdownEditor(Editor);
 
@@ -24,6 +25,9 @@ Alpine.data('editor', (content) => {
         extensions: [
           StarterKit,
           Link,
+          Placeholder.configure({
+            placeholder: 'Ecrivez votre message ici…',
+          }),
           HardBreak.extend({
             addKeyboardShortcuts() {
               const handleEnter = () =>
@@ -41,11 +45,14 @@ Alpine.data('editor', (content) => {
               };
             },
           }),
+          // ContactCardExtension, // TODO: Uncomment this when the contact card is ready
+          // FileCardExtension, // TODO: Uncomment this when the file card is ready
         ],
         content: content,
         onCreate({ editor }) {
           _this.updatedAt = Date.now();
           _this.renderMarkdown();
+          _this.isEditorEmpty = editor.isEmpty;
         },
         onUpdate({ editor }) {
           _this.updatedAt = Date.now();
@@ -54,6 +61,14 @@ Alpine.data('editor', (content) => {
 
           _this.$store.editor.isEditing = editor.getMarkdown() != '';
           _this.$store.editor.currentMessage = editor.getMarkdown();
+
+          // Mettre à jour la propriété réactive
+          _this.isEditorEmpty = editor.isEmpty;
+
+          // S'assurer que Alpine.js traite les mises à jour
+          _this.$nextTick(() => {
+            _this.updatedAt = Date.now();
+          });
         },
         onSelectionUpdate({ editor }) {
           _this.updatedAt = Date.now();
@@ -62,6 +77,30 @@ Alpine.data('editor', (content) => {
       });
 
       this.renderMarkdown();
+
+      // Ajouter des watchers pour déclencher des mises à jour réactives
+      this.$watch('selectedContact', () => {
+        this.forceReactivity();
+      });
+
+      this.$watch('selectedFile', () => {
+        this.forceReactivity();
+      });
+
+      this.$watch('isEditorEmpty', () => {
+        this.forceReactivity();
+      });
+
+      document.addEventListener('htmx:afterSwap', () => {
+        this.markdownContent = '';
+        this.selectedContact = null;
+        this.selectedFile = null;
+        this.forceReactivity();
+      });
+    },
+    forceReactivity() {
+      // Force Alpine.js à re-rendre le composant
+      this.updatedAt = Date.now();
     },
     isLoaded() {
       return editor;
@@ -109,6 +148,7 @@ Alpine.data('editor', (content) => {
       editor.chain().focus().unsetLink().run();
     },
     setMarkdownContent(event) {
+      console.log('setMarkdownContent', event);
       editor.commands.setContent(event.detail.text);
       if (event.detail.contact) {
         this.selectedContact = event.detail.contact;
@@ -126,9 +166,11 @@ Alpine.data('editor', (content) => {
     isSearchContactModalOpen: false,
     handleSetContact(contact) {
       this.selectedContact = { ...contact }; // XXX Copy since it can be destroyed from an inner scope and values result to null
+      this.forceReactivity();
     },
     handleResetContact() {
       this.selectedContact = null;
+      this.forceReactivity();
     },
     openModalSearchContact() {
       this.isSearchContactModalOpen = true;
@@ -140,8 +182,131 @@ Alpine.data('editor', (content) => {
       const contact = event.detail;
       if (contact) {
         this.handleSetContact(contact);
+        // Insert contact card into editor
+        // this.insertContactCard(contact); // TODO: Uncomment this when the contact card is ready
       }
       this.isSearchContactModalOpen = false;
+    },
+    insertContactCard(contact) {
+      if (editor && contact) {
+        console.log('Inserting contact card:', contact);
+
+        const contactAttributes = {
+          id: contact.id,
+          firstName: contact.first_name,
+          lastName: contact.last_name,
+          email: contact.email,
+          phoneNo: contact.phone_no,
+          mobileNo: contact.mobile_no,
+          division: contact.division,
+          organization: contact.organization,
+          modified: contact.modified,
+          created: contact.created,
+        };
+
+        console.log('Contact attributes:', contactAttributes);
+
+        editor.chain().focus().insertContactCard(contactAttributes).run();
+
+        // Mettre à jour le contact sélectionné
+        this.selectedContact = contact;
+        this.forceReactivity();
+      }
+    },
+    removeContactCard() {
+      if (editor) {
+        // Find the current selection and remove the contact card if it's selected
+        const { from, to } = editor.state.selection;
+        const node = editor.state.doc.nodeAt(from);
+
+        if (node && node.type.name === 'contactCard') {
+          editor.chain().focus().deleteSelection().run();
+        }
+      }
+    },
+    removeFileCard() {
+      if (editor) {
+        // Find the current selection and remove the file card if it's selected
+        const { from, to } = editor.state.selection;
+        const node = editor.state.doc.nodeAt(from);
+
+        if (node && node.type.name === 'fileCard') {
+          editor.chain().focus().deleteSelection().run();
+        }
+      }
+    },
+    /****************
+     * Plugin file
+     */
+    selectedFile: null,
+    fileName: '',
+    currentFile: null,
+    isEditorEmpty: true, // Propriété réactive pour suivre si l'éditeur est vide
+    handleFileUpload(event) {
+      const file = event.target.files[0];
+      if (file) {
+        this.selectedFile = file;
+        // Mettre à jour le nom du fichier affiché
+        this.fileName = file.name;
+
+        // Insérer la carte de fichier dans l'éditeur
+        // if (editor) {
+        //   console.log('Inserting file card for:', file.name);
+
+        //   const fileAttributes = {
+        //     fileName: file.name,
+        //     fileSize: file.size,
+        //     fileType: file.type,
+        //     uploadedAt: new Date().toISOString(),
+        //   };
+
+        //   console.log('File attributes:', fileAttributes);
+
+        //   try {
+        //     const result = editor
+        //       .chain()
+        //       .focus()
+        //       .insertFileCard(fileAttributes)
+        //       .run();
+        //     console.log('Insert result:', result);
+        //   } catch (error) {
+        //     console.error('Error inserting file card:', error);
+        //     console.error('Error stack:', error.stack);
+        //   }
+        // } else {
+        //   console.error('Editor not initialized');
+        // }
+      } else {
+        this.selectedFile = null;
+        this.fileName = '';
+      }
+      // Force la réactivité
+      this.forceReactivity();
+    },
+    handleResetFile() {
+      this.selectedFile = null;
+      this.fileName = '';
+      this.currentFile = null;
+      this.forceReactivity();
+    },
+    get isFormValid() {
+      // Le formulaire est valide si au moins un des éléments suivants est présent :
+      // - Un message non vide
+      // - Un contact sélectionné
+      // - Un fichier sélectionné
+      // - Des cartes de fichiers dans l'éditeur
+      // unused variable hasMessage but necessary to force reactivity
+      const hasMessage = this.$store.editor.currentMessage !== '';
+      const isEditorEmpty = !editor.state.doc.textContent.trim().length;
+      const hasContact = this.selectedContact !== null;
+      const hasFile = this.selectedFile !== null;
+
+      // Vérifier s'il y a des cartes de fichiers dans l'éditeur
+      const hasFileCards = editor.state.doc.descendants((node) => {
+        return node.type.name === 'fileCard';
+      });
+
+      return !isEditorEmpty || hasContact || hasFile || hasFileCards;
     },
   };
 });
