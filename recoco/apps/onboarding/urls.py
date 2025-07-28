@@ -8,10 +8,16 @@ created : 2022-06-06 11:54:25 CEST
 """
 
 from django.urls import path
+from django.views.generic import RedirectView
 
 from . import views
 
 urlpatterns = [
+    path(
+        r"onboarding",
+        RedirectView.as_view(pattern_name="onboarding-project", query_string=True),
+        name="onboarding",
+    ),
     path(
         r"onboarding/signin",
         views.OnboardingLogin.as_view(),
