@@ -61,7 +61,6 @@ Alpine.data('CreateContactModal', () => {
           });
         }
       } catch (error) {
-        console.log(error);
         throw new Error('Error while creating a contact ', error);
       }
     },
@@ -94,8 +93,7 @@ Alpine.data('CreateContactModal', () => {
           });
         }
       } catch (error) {
-        console.log(error);
-        throw new Error('Error while creating a contact ', error);
+        throw new Error('Error while updating a contact ', error);
       }
     },
     handleSetOrganization(organization) {
@@ -126,8 +124,6 @@ Alpine.data('CreateContactModal', () => {
         this.isFormInEditMode = true;
       }
       if (this.contact.organization) {
-        console.log('Organization is  to ', this.contact.organization);
-
         this.formState.fields.isOrgaSelected = true;
       }
       // this.formState.fields.isJobSelected = Boolean(this.contact.division);

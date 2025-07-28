@@ -40,6 +40,28 @@ def test_build_absolute_url_with_auto_login():
 
 
 @pytest.mark.django_db
+def test_build_absolute_url_with_sensitive_account(current_site):
+    site_staff = Recipe(auth.User, username="site_staff").make()
+    utils.assign_site_staff(current_site, site_staff)
+
+    site_admin = Recipe(auth.User, username="site_admin").make()
+    utils.assign_site_admin(current_site, site_admin)
+
+    users = [
+        Recipe(auth.User, username="superadmin", is_superuser=True).make(),
+        Recipe(auth.User, username="superstaff", is_staff=True).make(),
+        site_staff,
+        site_admin,
+    ]
+
+    for user in users:
+        url = utils.build_absolute_url("somewhere", user)
+        assert url.startswith("https://")
+        assert "/somewhere" in url
+        assert "?sesame=" not in url
+
+
+@pytest.mark.django_db
 def test_build_absolute_url_with_autologin_and_params():
     user = Recipe(auth.User, username="owner", email="owner@example.com").make()
     url = utils.build_absolute_url("somewhere?param=around-the-rainbow", user)

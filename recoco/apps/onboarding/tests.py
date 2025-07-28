@@ -19,32 +19,16 @@ from recoco.utils import login
 # Onboarding page for user
 ########################################################################
 @pytest.mark.django_db
-def test_onboarding_page_without_login_redirects_to_signin(request, client):
-    baker.make(
-        home_models.SiteConfiguration,
-        site=get_current_site(request),
-    )
-
-    url = reverse("onboarding")
-    response = client.get(url, follow=True)
-    last_url, status_code = response.redirect_chain[-1]
-    assert status_code == 302
-    assert last_url == reverse("onboarding-signin")
-
-
-@pytest.mark.django_db
-def test_onboarding_page_with_logged_in_user_redirects_to_step2(request, client):
+def test_onboarding_page_with_logged_in_user_is_reachable(request, client):
     baker.make(
         home_models.SiteConfiguration,
         site=get_current_site(request),
     )
 
     with login(client):
-        url = reverse("onboarding")
-        response = client.get(url, follow=True)
-        last_url, status_code = response.redirect_chain[-1]
-        assert status_code == 302
-        assert last_url == reverse("onboarding-project")
+        url = reverse("onboarding-project")
+        response = client.get(url)
+        assert response.status_code == 200
 
 
 @pytest.mark.django_db
@@ -58,12 +42,17 @@ def test_onboarding_with_existing_account_redirects_to_signin(request, client):
     )
 
     data = {
-        "username": "a@exAmpLe.Com",
+        "email": "a@exAmpLe.Com",
+        "name": "a project",
+        "location": "some place",
+        "postcode": "62170",
+        "insee": "62044",
+        "description": "a description",
     }
 
-    baker.make(auth.User, email=data["username"].lower(), username=data["username"])
+    baker.make(auth.User, email=data["email"].lower(), username=data["email"])
 
-    response = client.post(reverse("onboarding"), data=data, follow=True)
+    response = client.post(reverse("onboarding-project"), data=data, follow=True)
     last_url, status_code = response.redirect_chain[-1]
     assert status_code == 302
     assert last_url.startswith(reverse("onboarding-signin"))
@@ -82,15 +71,18 @@ def test_onboarding_with_account_on_other_site_redirects_to_signin(request, clie
     )
 
     data = {
-        "username": "a@exAmpLe.Com",
+        "email": "a@exAmpLe.Com",
+        "name": "a project",
+        "location": "some place",
+        "postcode": "62170",
+        "insee": "62044",
+        "description": "a description",
     }
 
-    user = baker.make(
-        auth.User, email=data["username"].lower(), username=data["username"]
-    )
+    user = baker.make(auth.User, email=data["email"].lower(), username=data["email"])
     user.profile.sites.add(other_site)
 
-    response = client.post(reverse("onboarding"), data=data, follow=True)
+    response = client.post(reverse("onboarding-project"), data=data, follow=True)
     last_url, status_code = response.redirect_chain[-1]
     assert status_code == 302
     assert last_url.startswith(reverse("onboarding-signin"))
@@ -108,16 +100,16 @@ def test_onboarding_with_nonexisting_account_redirects_to_signup(request, client
 
     data = {
         "email": "a@eXampLe.com",
+        "name": "a project",
+        "location": "some place",
+        "postcode": "62170",
+        "insee": "62044",
+        "description": "a description",
     }
-    response = client.post(reverse("onboarding"), data=data, follow=True)
+    response = client.post(reverse("onboarding-project"), data=data, follow=True)
     last_url, status_code = response.redirect_chain[-1]
     assert status_code == 302
     assert last_url == reverse("onboarding-signup")
-
-
-#########################################
-# Onboarding: Step1, user signnup
-#########################################
 
 
 @pytest.mark.django_db

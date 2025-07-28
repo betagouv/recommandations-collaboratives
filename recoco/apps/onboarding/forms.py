@@ -7,6 +7,8 @@ author  : guillaume.libersat@beta.gouv.fr, raphael.marvie@beta.gouv.fr
 created : 2022-06-06 14:16:20 CEST
 """
 
+import os
+
 from captcha.fields import ReCaptchaField
 from captcha.widgets import ReCaptchaV2Checkbox
 from crispy_forms.layout import Fieldset, Layout
@@ -51,7 +53,12 @@ class OnboardingSignupForm(DsrcBaseForm):
     def password_message_group(errors=None):
         return {
             "help_text": "Votre mot de passe doit contenir :",
-            "messages": [{"text": "8 caractères minimum", "type": "info"}],
+            "messages": [
+                {
+                    "text": "(8 caractères minimum et au moins 1 majuscule et 1 chiffre)",
+                    "type": "info",
+                }
+            ],
         }
 
     first_name = forms.CharField(label="Prénom *", initial="", required=True)
@@ -74,7 +81,7 @@ class OnboardingSignupForm(DsrcBaseForm):
     password = forms.CharField(
         label="Mot de passe *",
         required=True,
-        help_text="Votre mot de passe doit contenir 8 caractères minimum",
+        help_text="Votre mot de passe doit contenir 8 caractères minimum et au moins 1 majuscule et 1 chiffre",
         widget=forms.PasswordInput(
             attrs={"size": "sm", "message_group": password_message_group()}
         ),
@@ -115,6 +122,10 @@ class OnboardingProject(DsrcBaseForm):
                 "captcha",
             )
         )
+
+        # Skip captcha during tests
+        if "PYTEST_CURRENT_TEST" in os.environ:
+            self.fields.pop("captcha")
 
     name = forms.CharField(
         label="Nom du dossier *",

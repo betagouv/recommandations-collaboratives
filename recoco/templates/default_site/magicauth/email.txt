@@ -1,9 +1,16 @@
 Bonjour,
 
-Pour accéder à {{ request.site.name }}, vous avez juste à cliquer sur ce lien de connexion:  https://{{ site.domain }}{% url 'magicauth-wait' token.key %}?next={{ next_url|urlencode }}
+Vous avez demandé à vous connecter à votre compte {{ site.name }}.
 
-Ce lien n'est valable que 3 jours. Il est à usage unique.
+Cliquez simplement sur le bouton ci-dessous pour accéder directement à votre espace personnel :
+https://{{ site.domain }}{% url 'magicauth-wait' token.key %}?next={{ next_url|urlencode }}
+
+Ce lien est valable pendant 3 jours et ne peut être utilisé qu'une seule fois.
+
+Pour votre sécurité, ne transférez pas cet email à d'autres personnes.
+
+Si vous n’êtes pas à l’origine de cette demande, vous pouvez ignorer ce message.
 
 Bonne journée,
 
-L'équipe {{ request.site.name }}
+L'équipe {{ site.name }}

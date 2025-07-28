@@ -13,9 +13,9 @@
           type="text/css">
 {% endblock css %}
 {% load projects_extra %}
-<nav class="navbar navbar-expand-lg sticky-top navbar-light bg-white flex-column navigation fr-p-0"
-     aria-label="Main navigation">
-    {% if user.is_authenticated %}
+{% if user.is_authenticated %}
+    <nav class="navbar navbar-expand-lg sticky-top navbar-light bg-white flex-column navigation fr-p-0"
+         aria-label="Main navigation">
         {% comment %} <div class="navbar-border-top navbar-shadow w-100 fr-py-2v"> {% endcomment %}
         <div class="w-100">
             <div class="d-flex align-items-center justify-content-between w-100">
@@ -26,13 +26,57 @@
                 <div class="bg-white">{% include "header/menu-top-user-tools.html" %}</div>
             </div>
         </div>
-    {% else %}
-        <div class="container-fluid fr-mr-2v">
-            {% include "header/menu-top-logo.html" %}
-            <div>{% include "header/menu-top-secondary.html" %}</div>
-            <div class="fr-ml-auto fr-mr-0">
-                <div class="bg-white">{% include "header/menu-top-user-tools.html" %}</div>
+    </nav>
+{% else %}
+    <header role="banner" class="fr-header">
+        <div class="fr-header__body">
+            <div class="fr-container">
+                <div class="fr-header__body-row">
+                    <div class="fr-header__brand fr-enlarge-link">
+                        <div class="fr-header__brand-top">
+                            {% include "header/fragments/offline_menu_marianne.html" %}
+                            <div class="fr-header__service order-2">
+                                <a href="{% url 'home' %}">{% include "header/menu-top-logo.html" %}</a>
+                            </div>
+                            <div class="fr-header__navbar">
+                                <button data-fr-opened="false"
+                                        aria-controls="modal-header"
+                                        title="Menu"
+                                        type="button"
+                                        id="button-header"
+                                        class="fr-btn--menu fr-btn">Menu</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="fr-header__tools">
+                        <div class="fr-header__tools-links">
+                            <ul class="fr-btns-group">
+                                <li>
+                                    <a href="{% url 'account_login' %}"
+                                       class="fr-btn--account fr-btn fr-btn--primary">Se connecter</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-    {% endif %}
-</nav>
+        <div class="fr-header__menu fr-modal"
+             id="modal-header"
+             aria-labelledby="button-header">
+            <div class="fr-container">
+                <button aria-controls="modal-header"
+                        title="Fermer"
+                        type="button"
+                        id="button-2168"
+                        class="fr-btn--close fr-btn">Fermer</button>
+                <div class="fr-header__menu-links"></div>
+                <nav class="fr-nav" role="navigation" aria-label="Menu principal">
+                    <ul class="fr-nav__list">
+                        {% include "header/fragments/offline_menu.html" %}
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+{% endif %}

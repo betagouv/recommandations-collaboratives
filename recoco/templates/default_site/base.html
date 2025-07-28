@@ -91,14 +91,14 @@
                     {% endfor %}
                 </div>
             {% endif %}
-            <div class="container-fluid bg-white h-100" id="content">
-                <div class="row background--grey-light h-100">
+            <div class="container-fluid bg-white" id="content">
+                <div class="row background--grey-light">
                     {% block content %}
                     {% endblock content %}
                 </div>
                 {% block footer %}
                     {% if not request.user.is_authenticated %}
-                        <div class="row justify-content-center" id="footer">{% include "footer.html" %}</div>
+                        <div class="row justify-content-center" id="footer">{% include "footer/footer.html" %}</div>
                     {% endif %}
                 {% endblock footer %}
             </div>

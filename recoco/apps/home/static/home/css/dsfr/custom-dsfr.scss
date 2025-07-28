@@ -88,21 +88,23 @@ p {
   }
 }
 
-a.fr-btn {
-  &:hover {
-    &:not(.fr-btn--secondary),
-    &:not(.fr-btn--tertiary),
-    &:not(.fr-btn--tertiary-no-outline) {
-      color: white !important;
-    }
+// a.fr-btn {
+//   &:hover {
+//     &:not(.fr-btn--primary),
+//     &:not(.fr-btn--secondary),
+//     &:not(.fr-btn--tertiary),
+//     &:not(.fr-btn--tertiary-no-outline) {
+//       color: white !important;
+//     }
 
-    &.fr-btn--secondary,
-    &.fr-btn--tertiary,
-    &.fr-btn--tertiary-no-outline {
-      color: var(--text-active-blue-france) !important;
-    }
-  }
-}
+//     &.fr-btn--primary,
+//     &.fr-btn--secondary,
+//     &.fr-btn--tertiary,
+//     &.fr-btn--tertiary-no-outline {
+//       color: var(--text-active-blue-france) !important;
+//     }
+//   }
+// }
 
 .fr-btn--secondary {
   &:is(.black) {
@@ -135,7 +137,8 @@ a.fr-btn {
   box-shadow: 0 0 0 1px #8585f6 !important;
 }
 
-button.fr-text-inverted--grey {
+button.fr-text-inverted--grey,
+a.fr-text-inverted--grey {
   &:hover {
     color: var(--text-active-blue-france) !important;
   }
@@ -668,9 +671,9 @@ form > p {
 }
 
 .repositionning {
-  bottom: 1px;
   position: absolute;
-  right: 1rem;
+  bottom: 1.5rem;
+  right: 1.5rem;
 }
 
 .flex-auto {
@@ -737,4 +740,13 @@ form > p {
 
 .z-1002 {
   z-index: 1002 !important;
+}
+
+/* ¯¯ *\
+  Link
+\* ˍˍ */
+
+.non-stylish-link {
+  color: white !important;
+  text-decoration: none !important;
 }
