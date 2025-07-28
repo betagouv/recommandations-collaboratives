@@ -75,6 +75,7 @@ class OnboardingSignupForm(DsrcBaseForm):
         label="Adresse email *",
         help_text="Format attendu : prenom.nom@domaine.fr",
         required=True,
+        disabled=True,
     )
 
     # Password input, with a password widget, show/hide control, and a help text
