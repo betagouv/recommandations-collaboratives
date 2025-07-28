@@ -47,10 +47,6 @@ from .utils import get_current_site_sender_email, make_new_site
 class HomePageView(TemplateView):
     template_name = "home/home.html"
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        return context
-
 
 @method_decorator([login_required], name="dispatch")
 class LoginRedirectView(View):
