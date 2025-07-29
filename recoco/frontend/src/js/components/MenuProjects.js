@@ -9,12 +9,12 @@ Alpine.data('MenuProjects', (isCollectivity = false) => {
     currentProject: null,
     async getProjetctsData() {
       let projectList = this.$store.projectQueue.get();
+
       if (isCollectivity) {
         projectList = (await this.$store.projects.getUserProjetsStatus()).map(
           (x) => x.project
         );
       }
-
       this.rawProjectList = [...projectList];
 
       const params = new URLSearchParams(document.location.search);

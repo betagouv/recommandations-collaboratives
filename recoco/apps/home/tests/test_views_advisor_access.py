@@ -72,7 +72,11 @@ class TestAdvisorAccessRequestView:
 
         response = client.post(
             reverse("advisor-access-request"),
-            data={"is_select_departments": "true", "departments": ["64", "33"]},
+            data={
+                "advisor_access_type": "Regional",
+                "departments": ["64", "33"],
+                "comment": "Merci pour votre aide !",
+            },
         )
         assert response.status_code == 200
 
@@ -85,11 +89,12 @@ class TestAdvisorAccessRequestView:
         assert advisor_access_request.user == user
         assert advisor_access_request.status == "PENDING"
         assert advisor_access_request.departments.count() == 2
+        assert advisor_access_request.comment == "Merci pour votre aide !"
 
         response = client.post(
             reverse("advisor-access-request"),
             data={
-                "is_select_departments": "true",
+                "advisor_access_type": "Regional",
                 "departments": ["64", "33", "40"],
                 "comment": "Test comment",
             },
@@ -179,13 +184,18 @@ class TestAdvisorAccessRequestModeratorView:
         )
 
         response = client.post(
-            url, data={"is_select_departments": "true", "departments": ["dummy_code"]}
+            url, data={"advisor_access_type": "Regional", "departments": ["dummy_code"]}
         )
         assert response.status_code == 200
         assert response.context["form"].errors is not None
 
         response = client.post(
-            url, data={"is_select_departments": "true", "departments": ["64", "33"]}
+            url,
+            data={
+                "advisor_access_type": "Regional",
+                "departments": ["64", "33"],
+                "comment": "Merci pour votre aide !",
+            },
         )
         assert response.status_code == 302
         assert response.url == reverse("projects-moderation-list")

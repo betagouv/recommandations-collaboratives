@@ -47,9 +47,20 @@
             </div>
             <div class="fr-fieldset__content">
                 <div class="fr-input-group fr-mt-4v">
-                    <label for="comment" class="fr-label h5-rework">{{ form.comment.label }} (facultatif)</label>
-                    <helptext class="description-help-text">{{ form.comment.help_text }}</helptext>
-                    <textarea name="comment" class="fr-input" id="comment" rows="3"></textarea>
+                    <label for="comment" class="fr-label">
+                        {{ form.fields.comment.label }}
+                        {% if form.fields.comment.required %}
+                            <span class="fr-text--bold">(obligatoire)</span>
+                        {% else %}
+                            <span>(facultatif)</span>
+                        {% endif %}
+                    </label>
+                    <helptext class="description-help-text">{{ form.fields.comment.help_text }}</helptext>
+                    <textarea name="comment"
+                              class="fr-input"
+                              id="comment"
+                              rows="3"
+                              {% if form.fields.comment.required %}required{% endif %}></textarea>
                 </div>
                 <button class="fr-btn custom-login-button w-100" type="submit">Envoyer la demande</button>
             </div>
