@@ -53,24 +53,6 @@ document.addEventListener('alpine:init', () => {
               region.classList.add('d-none');
             } else region.classList.remove('d-none');
           });
-          // .forEach((dep) => {
-          //   let reg = new RegExp(this.search, 'gi');
-          //   if (`(${dep.code}) ${dep.name}`.match(reg)) {
-
-          // this.regions.forEach((region) => {
-          //   region.departments.forEach((dep) => {
-          //     let reg = new RegExp(this.search, 'gi');
-          //     if (`(${dep.code}) ${dep.name}`.match(reg)) {
-          //       this.options.push({
-          //         value: dep.code,
-          //         text: `(${dep.code}) ${dep.name}`,
-          //         search: `(${dep.code}) ${dep.name}`,
-          //         selected: this.selected.includes(dep.code),
-          //         region: region.name,
-          //       });
-          //     }
-          //   });
-          // });
         } else {
           const options =
             document.getElementById(this.elementId)?.options || [];
@@ -218,7 +200,6 @@ document.addEventListener('alpine:init', () => {
       );
     },
     handleDepartmentSelect(dep) {
-      debugger;
       const idx = this.selected.indexOf(dep.code);
       if (idx === -1) {
         this.selected.push(dep.code);

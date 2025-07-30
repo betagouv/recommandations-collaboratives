@@ -378,6 +378,7 @@ def advisor_access_request_moderator_view(
 
         form = AdvisorAccessRequestForm()
         form.fields["departments"].initial = selected_departments
+        form.fields["comment"].initial = advisor_access_request.comment
 
     if request.method == "POST":
         form = AdvisorAccessRequestForm(request.POST)
