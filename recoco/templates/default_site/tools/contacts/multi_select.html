@@ -132,27 +132,31 @@
                                                 <template x-if="isRegion">
                                                     <template x-for="region in regions" :key="region.code">
                                                         <li>
-                                                            <div class="d-flex align-items-center region-header px-2 py-1 rounded cursor-pointer"
+                                                            <div class="d-flex align-items-center region-header px-2 py-1 rounded cursor-pointer position-relative"
                                                                  :class="isRegionSelected(region) ? 'selected-item' : ''">
                                                                 <input type="checkbox"
                                                                        :checked="isRegionSelected(region)"
                                                                        @change="handleRegionSelect(region)"
                                                                        class="mr-2 d-none"
                                                                        :id="`region-${region.code}`">
-                                                                <label class="fw-bold" x-text="region.name" :for="`region-${region.code}`"></label>
+                                                                <label class="fw-bold stretched-link"
+                                                                       x-text="region.name"
+                                                                       :for="`region-${region.code}`"></label>
                                                             </div>
                                                             <div class="departments-list"
                                                                  style="margin-left: 1.5em"
                                                                  x-ref="departmentsList">
                                                                 <template x-for="dep in region.departments" :key="dep.code">
-                                                                    <div class="d-flex align-items-center department-item px-2 py-1 rounded cursor-pointer"
+                                                                    <div class="d-flex align-items-center department-item px-2 py-1 rounded cursor-pointer position-relative"
                                                                          :class="isDepartmentSelected(dep) ? 'selected-item' : ''">
                                                                         <input type="checkbox"
                                                                                :checked="isDepartmentSelected(dep)"
                                                                                @change="handleDepartmentSelect(dep)"
-                                                                               class="mr-2 d-none"
+                                                                               class="mr-2 d-none "
                                                                                :id="`department-${dep.code}`">
-                                                                        <label x-text="`(${dep.code}) ${dep.name}`" :for="`department-${dep.code}`"></label>
+                                                                        <label class="stretched-link"
+                                                                               x-text="`(${dep.code}) ${dep.name}`"
+                                                                               :for="`department-${dep.code}`"></label>
                                                                     </div>
                                                                 </template>
                                                             </div>
