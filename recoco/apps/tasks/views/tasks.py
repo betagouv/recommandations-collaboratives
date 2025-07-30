@@ -55,6 +55,9 @@ def create_task(request):
     ):
         return HttpResponseForbidden()
 
+    # Initialize preserved_content for template compatibility
+    preserved_content = request.GET.get("content", "")
+
     if request.method == "POST":
         # Pick a different form for better data handling based
         # on the 'push_type' attribute
@@ -144,8 +147,6 @@ def create_task(request):
             return redirect(next_url)
     else:
         type_form = PushTypeActionForm(request.user, request.GET)
-        # Get preserved content from URL parameter
-        preserved_content = request.GET.get("content", "")
 
     return render(request, "tasks/tasks/task_create.html", locals())
 
@@ -324,6 +325,8 @@ def update_task(request, task_id=None):
         }
         form = UpdateTaskForm(instance=task, initial=initial)
         document_form = DocumentUploadForm()
+        # Initialize preserved_content for template compatibility
+        preserved_content = ""
     return render(request, "tasks/tasks/task_update.html", locals())
 
 
