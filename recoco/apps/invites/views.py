@@ -6,6 +6,7 @@ from django.urls import reverse
 from django.utils import timezone
 
 from recoco.apps.addressbook import models as addressbook_models
+from recoco.apps.home.models import SiteConfiguration
 from recoco.apps.projects import signals as projects_signals
 from recoco.apps.projects.utils import (
     assign_advisor,
@@ -98,6 +99,8 @@ def invite_accept(request, invite_id):
 
 def invite_details(request, invite_id):
     invite = get_object_or_404(models.Invite, site=request.site, pk=invite_id)
+
+    site_config = SiteConfiguration.objects.get(site=request.site)
 
     if invite.accepted_on:
         return redirect(reverse("account_login"))
