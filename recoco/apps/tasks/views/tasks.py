@@ -144,6 +144,8 @@ def create_task(request):
             return redirect(next_url)
     else:
         type_form = PushTypeActionForm(request.user, request.GET)
+        # Get preserved content from URL parameter
+        preserved_content = request.GET.get("content", "")
 
     return render(request, "tasks/tasks/task_create.html", locals())
 
