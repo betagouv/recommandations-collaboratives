@@ -23,6 +23,16 @@
                 <div class="w-100"
                      x-data="alpineMultiSelect({selected:selectedDepartments, objectsToSelect, isRegion: '{{ is_region }}' == 'True'})">
                     <input type="hidden" x-bind:value="selectedValues()">
+                    <template x-if="!isRegion">
+                        <!-- Select Options -->
+                        <select class="d-none" x-on:change="init" id="select-list">
+                            <template x-for="department in objectsToSelect" :key="department.code">
+                                <option :value="department.code"
+                                        :data-search="'(' + department.code + ')' + ' ' + department.name"
+                                        x-text="'(' + department.code + ')' + ' ' + department.name" />
+                            </template>
+                        </select>
+                    </template>
                     <div class="w-100 d-flex flex-column align-items-center h-64 mx-auto"
                          @keyup.alt="toggle">
                         <div class="inline-block position-relative w-100">
@@ -131,7 +141,9 @@
                                                                        :id="`region-${region.code}`">
                                                                 <label class="fw-bold" x-text="region.name" :for="`region-${region.code}`"></label>
                                                             </div>
-                                                            <div class="departments-list" style="margin-left: 1.5em;">
+                                                            <div class="departments-list"
+                                                                 style="margin-left: 1.5em"
+                                                                 x-ref="departmentsList">
                                                                 <template x-for="dep in region.departments" :key="dep.code">
                                                                     <div class="d-flex align-items-center department-item px-2 py-1 rounded cursor-pointer"
                                                                          :class="isDepartmentSelected(dep) ? 'selected-item' : ''">

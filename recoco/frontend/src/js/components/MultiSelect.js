@@ -1,6 +1,7 @@
 document.addEventListener('alpine:init', () => {
   Alpine.data('alpineMultiSelect', (obj) => ({
     isRegion: obj.isRegion || false,
+    elementId: obj.elementId || 'select-list',
     objectsToSelect: obj.objectsToSelect || [],
     regions: [],
     options: [],
@@ -28,22 +29,48 @@ document.addEventListener('alpine:init', () => {
       });
       // searching for the given value
       this.$watch('search', (e) => {
-        this.options = [];
         if (this.isRegion) {
-          this.regions.forEach((region) => {
-            region.departments.forEach((dep) => {
-              let reg = new RegExp(this.search, 'gi');
-              if (`(${dep.code}) ${dep.name}`.match(reg)) {
-                this.options.push({
-                  value: dep.code,
-                  text: `(${dep.code}) ${dep.name}`,
-                  search: `(${dep.code}) ${dep.name}`,
-                  selected: this.selected.includes(dep.code),
-                  region: region.name,
-                });
-              }
-            });
+          console.log(this.$refs.departmentsList);
+          console.log(document.querySelectorAll('.department-item'));
+          document.querySelectorAll('.department-item').forEach((dep) => {
+            let reg = new RegExp(this.search, 'gi');
+            if (dep.innerText.match(reg)) {
+              dep.classList.remove('d-none');
+            } else {
+              dep.classList.add('d-none');
+            }
           });
+          const regionHeaders = document.querySelectorAll('.region-header');
+          regionHeaders.forEach((region) => {
+            console.log(region);
+            const departmentItem =
+              region.parentElement.querySelectorAll('.department-item');
+            const departmentItemHide = region.parentElement.querySelectorAll(
+              '.department-item.d-none'
+            );
+            console.log(departmentItem, departmentItemHide);
+            if (departmentItem.length == departmentItemHide.length) {
+              region.classList.add('d-none');
+            } else region.classList.remove('d-none');
+          });
+          // .forEach((dep) => {
+          //   let reg = new RegExp(this.search, 'gi');
+          //   if (`(${dep.code}) ${dep.name}`.match(reg)) {
+
+          // this.regions.forEach((region) => {
+          //   region.departments.forEach((dep) => {
+          //     let reg = new RegExp(this.search, 'gi');
+          //     if (`(${dep.code}) ${dep.name}`.match(reg)) {
+          //       this.options.push({
+          //         value: dep.code,
+          //         text: `(${dep.code}) ${dep.name}`,
+          //         search: `(${dep.code}) ${dep.name}`,
+          //         selected: this.selected.includes(dep.code),
+          //         region: region.name,
+          //       });
+          //     }
+          //   });
+          // });
         } else {
           const options =
             document.getElementById(this.elementId)?.options || [];
@@ -146,6 +173,7 @@ document.addEventListener('alpine:init', () => {
       this.$dispatch('set-departments', this.selected);
     },
     selectedElements() {
+      console.log('this.options', this.options);
       return this.options.filter((op) => op.selected === true);
     },
     selectedValues() {
@@ -190,6 +218,7 @@ document.addEventListener('alpine:init', () => {
       );
     },
     handleDepartmentSelect(dep) {
+      debugger;
       const idx = this.selected.indexOf(dep.code);
       if (idx === -1) {
         this.selected.push(dep.code);
