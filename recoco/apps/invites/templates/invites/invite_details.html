@@ -2,6 +2,11 @@
 {% load humanize %}
 {% load static %}
 {% load sass_tags %}
+{% block css %}
+    <link href="{% sass_src 'projects/css/kanban.scss' %}"
+          rel="stylesheet"
+          type="text/css">
+{% endblock css %}
 {% block title %}
     {{ request.site.name }} - Invitation à rejoindre le dossier {{ invite.project.name }}
 {% endblock title %}
