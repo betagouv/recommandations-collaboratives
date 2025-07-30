@@ -18,12 +18,10 @@
     <div class="bg-white">
         <div>
             <label class="modal-create-organization__label" for="select-list-input">{{ label|default:'Départements' }}</label>
-            {% if helptext %}
-                <p class="fr-hint-text fr-mb-0">{{ helptext }}</p>
-            {% endif %}
+            {% if helptext %}<p class="fr-hint-text fr-mb-0">{{ helptext }}</p>{% endif %}
             <div class="d-flex justify-center mt-8">
                 <div class="w-100"
-                     x-data="alpineMultiSelect({selected:selectedDepartments, objectsToSelect, isRegion: isRegion})">
+                     x-data="alpineMultiSelect({selected:selectedDepartments, objectsToSelect, isRegion: '{{ is_region }}' == 'True'})">
                     <input type="hidden" x-bind:value="selectedValues()">
                     <div class="w-100 d-flex flex-column align-items-center h-64 mx-auto"
                          @keyup.alt="toggle">
@@ -124,21 +122,25 @@
                                                 <template x-if="isRegion">
                                                     <template x-for="region in regions" :key="region.code">
                                                         <li>
-                                                            <div class="d-flex align-items-center region-header px-2 py-1">
+                                                            <div class="d-flex align-items-center region-header px-2 py-1 rounded cursor-pointer"
+                                                                 :class="isRegionSelected(region) ? 'selected-item' : ''">
                                                                 <input type="checkbox"
                                                                        :checked="isRegionSelected(region)"
                                                                        @change="handleRegionSelect(region)"
-                                                                       class="mr-2">
-                                                                <span class="fw-bold" x-text="region.name"></span>
+                                                                       class="mr-2 d-none"
+                                                                       :id="`region-${region.code}`">
+                                                                <label class="fw-bold" x-text="region.name" :for="`region-${region.code}`"></label>
                                                             </div>
                                                             <div class="departments-list" style="margin-left: 1.5em;">
                                                                 <template x-for="dep in region.departments" :key="dep.code">
-                                                                    <div class="d-flex align-items-center department-item px-2 py-1">
+                                                                    <div class="d-flex align-items-center department-item px-2 py-1 rounded cursor-pointer"
+                                                                         :class="isDepartmentSelected(dep) ? 'selected-item' : ''">
                                                                         <input type="checkbox"
                                                                                :checked="isDepartmentSelected(dep)"
                                                                                @change="handleDepartmentSelect(dep)"
-                                                                               class="mr-2">
-                                                                        <span x-text="dep.name"></span>
+                                                                               class="mr-2 d-none"
+                                                                               :id="`department-${dep.code}`">
+                                                                        <label x-text="`(${dep.code}) ${dep.name}`" :for="`department-${dep.code}`"></label>
                                                                     </div>
                                                                 </template>
                                                             </div>
@@ -178,9 +180,7 @@
     <div class="bg-white">
         <div>
             <label class="modal-create-organization__label" for="select-list-input">{{ label|default:'Départements' }}</label>
-            {% if helptext %}
-                <p class="fr-hint-text fr-mb-0">{{ helptext }}</p>
-            {% endif %}
+            {% if helptext %}<p class="fr-hint-text fr-mb-0">{{ helptext }}</p>{% endif %}
             <input type="text"
                    id="select-list-input"
                    placeholder="{{ placeholder|default:'Sélectionnez un ou plusieurs départements' }}"

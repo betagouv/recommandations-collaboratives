@@ -12,7 +12,7 @@
                      x-init="init()">
                     <template x-if="objectsToSelect && objectsToSelect.length">
                         <div x-data="alpineMultiSelect({ selected: selectedDepartments, objectsToSelect: objectsToSelect, isRegion: true })">
-                            {% include "tools/contacts/multi_select.html" with placeholder="Cherchez et sélectionnez vos départements pour avoir accès aux dossiers" label="Sélectionnez un ou plusieurs départements, laissez vide pour toute la France" isRegion=True %}
+                            {% include "tools/contacts/multi_select.html" with placeholder="Cherchez et sélectionnez vos départements pour avoir accès aux dossiers" label="Sélectionnez un ou plusieurs départements, laissez vide pour toute la France" is_region=True %}
                             <template x-for="dept in selectedDepartments" :key="dept">
                                 <input type="hidden" name="departments" :value="dept">
                             </template>
