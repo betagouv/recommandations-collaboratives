@@ -1,4 +1,5 @@
 export function stringToColor(str, palette) {
+  str = str.slice(0, 10);
   const defaultPalette = [
     '#fbaff5', // Rose
     '#79e7d5', // Turquoise
@@ -16,7 +17,9 @@ export function stringToColor(str, palette) {
   for (let i = 0; i < str.length; i++) {
     hash = str.charCodeAt(i) + (hash * 32 - hash); // Hash simple
   }
+  console.log(str, hash);
 
   const colorIndex = Math.abs(hash) % colors.length; // Assurer un index positif
+  console.log(colors[colorIndex]);
   return colors[colorIndex];
 }

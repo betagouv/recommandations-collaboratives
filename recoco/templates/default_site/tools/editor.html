@@ -143,7 +143,7 @@ Parameters:
                 <!-- Recommendation module -->
                 {% if can_add_reco %}
                     <a data-test-id="create-task-button"
-                       href="{% url 'projects-create-task' %}?project_id={{ project.pk }}{% if next_url_add_reco %}&next={% url next_url_add_reco project.pk %}{% endif %}"
+                       :href="`{% url 'projects-create-task' %}?project_id={{ project.pk }}{% if next_url_add_reco %}&next={% url next_url_add_reco project.pk %}{% endif %}&content=${encodeURIComponent(markdownContent || '')}`"
                        class="fr-btn fr-btn--tertiary fr-btn--sm justify-content-center fr-text--sm button-add-reco">
                         Créer une recommandation
                     </a>

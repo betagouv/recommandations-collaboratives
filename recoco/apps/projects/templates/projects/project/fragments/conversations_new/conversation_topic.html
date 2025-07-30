@@ -1,7 +1,7 @@
 {% load projects_extra %}
 {% count_has_notifications topic.list as new_message_count %}
 {% count_message_by_type topic.list "reco" as reco_count %}
-{% count_message_by_type topic.list "posting" "followup" as message_count %}
+{% count_message_by_type topic.list "reco" "posting" "followup" as message_count %}
 {% with topic_slug=topic_name|default:"general"|slugify %}
     <div class="topic-item__container position-relative {% if is_open %}topic-item__container--open{% endif %}">
         <label class="topic-item__title stretched-link"

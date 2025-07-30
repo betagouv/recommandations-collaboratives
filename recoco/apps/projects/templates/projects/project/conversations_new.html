@@ -71,7 +71,7 @@
             {% include "projects/project/partials/conversations_new_partial.html" %}
             {% if "use_public_notes" in user_project_perms %}
                 <!-- Post message -->
-                <form class="form editor-form fr-px-3v"
+                <form class="form editor-form fr-px-3v fr-pr-12w"
                       hx-post="{% url 'projects-project-detail-conversations-new-partial' project.pk %}"
                       hx-trigger="submit"
                       hx-swap="outerHTML"
