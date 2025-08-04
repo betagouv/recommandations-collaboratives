@@ -69,10 +69,7 @@ def test_performing_onboarding_creates_a_project_creation_request(request, clien
         "description": "a description",
     }
 
-    response = client.post(reverse("onboarding-project"), data=data, follow=True)
-    last_url, status_code = response.redirect_chain[-1]
-    assert status_code == 302
-    assert last_url.startswith(reverse("onboarding-signup"))
+    client.post(reverse("onboarding-project"), data=data, follow=True)
 
     assert (
         projects_models.ProjectCreationRequest.on_site.filter(
@@ -127,7 +124,7 @@ def test_performing_onboarding_with_survey_fills_it(request, client):
 
 
 @pytest.mark.django_db
-def test_onboarding_with_existing_account_redirects_to_signin(request, client):
+def test_onboarding_continues_to_user_step_when_valid(request, client):
     onboarding = onboarding_models.Onboarding.objects.first()
 
     baker.make(
@@ -147,132 +144,13 @@ def test_onboarding_with_existing_account_redirects_to_signin(request, client):
 
     baker.make(auth.User, email=data["email"].lower(), username=data["email"])
 
-    response = client.post(reverse("onboarding-project"), data=data, follow=True)
-    last_url, status_code = response.redirect_chain[-1]
-    assert status_code == 302
-    assert last_url.startswith(reverse("onboarding-signin"))
+    response = client.post(reverse("onboarding-project"), data=data)
+    assert response.status_code == 302
 
 
-@pytest.mark.django_db
-def test_onboarding_with_account_on_other_site_redirects_to_signin(request, client):
-    onboarding = onboarding_models.Onboarding.objects.first()
-
-    other_site = baker.make(Site)
-
-    baker.make(
-        home_models.SiteConfiguration,
-        site=get_current_site(request),
-        onboarding=onboarding,
-    )
-
-    data = {
-        "email": "a@exAmpLe.Com",
-        "name": "a project",
-        "location": "some place",
-        "postcode": "62170",
-        "insee": "62044",
-        "description": "a description",
-    }
-
-    user = baker.make(auth.User, email=data["email"].lower(), username=data["email"])
-    user.profile.sites.add(other_site)
-
-    # We need a ProjectCreationRequest matching the user for this view
-    baker.make(projects_models.ProjectCreationRequest, email=user.email)
-
-    response = client.post(reverse("onboarding-project"), data=data, follow=True)
-    last_url, status_code = response.redirect_chain[-1]
-    assert status_code == 302
-    assert last_url.startswith(reverse("onboarding-signin"))
-
-
-@pytest.mark.django_db
-def test_onboarding_with_nonexisting_account_requests_info_from_user(request, client):
-    onboarding = onboarding_models.Onboarding.objects.first()
-
-    baker.make(
-        home_models.SiteConfiguration,
-        site=get_current_site(request),
-        onboarding=onboarding,
-    )
-
-    data = {
-        "email": "a@eXampLe.com",
-        "name": "a project",
-        "location": "some place",
-        "postcode": "62170",
-        "insee": "62044",
-        "description": "a description",
-    }
-
-    # We need a ProjectCreationRequest matching the user for this view
-    baker.make(projects_models.ProjectCreationRequest, email=data["email"])
-
-    response = client.post(reverse("onboarding-signup"), data=data)
-
-    assert response.status_code == 200
-
-
-@pytest.mark.django_db
-def test_onboarding_signup_redirects_to_project_form_when_logged(request, client):
-    current_site = get_current_site(request)
-
-    baker.make(
-        home_models.SiteConfiguration,
-        site=current_site,
-    )
-
-    with login(client) as user:
-        # We need a ProjectCreationRequest matching the user for this view
-        baker.make(projects_models.ProjectCreationRequest, email=user.email)
-
-        response = client.post(reverse("onboarding-signup"), follow=True)
-        last_url, status_code = response.redirect_chain[-1]
-        assert status_code == 302
-        assert last_url == reverse("onboarding-summary")
-
-
-@pytest.mark.django_db
-def test_performing_onboarding_signup_create_a_new_user_and_logs_in(request, client):
-    current_site = get_current_site(request)
-
-    baker.make(
-        home_models.SiteConfiguration,
-        site=current_site,
-    )
-
-    data = {
-        "email": "a@example.com",
-        "phone": "0610101010",
-        "role": "Ouistiti",
-        "password": "blah",
-        "first_name": "john",
-        "last_name": "doe",
-        "org_name": "MyOrg",
-    }
-
-    # We need a ProjectCreationRequest matching the user for this view
-    baker.make(projects_models.ProjectCreationRequest, email=data["email"])
-
-    response = client.post(reverse("onboarding-signup"), data=data, follow=True)
-    last_url, status_code = response.redirect_chain[-1]
-    assert status_code == 302
-    assert last_url == reverse("onboarding-summary")
-
-    # the user and profile are filled according to provided information
-    user = auth.User.objects.get(username=data["email"])
-    assert user.email == data["email"]
-    assert user.first_name == data["first_name"]
-    assert user.last_name == data["last_name"]
-    assert current_site in user.profile.sites.all()
-    assert user.profile.organization.name == data["org_name"]
-    assert user.profile.organization_position == data["role"]
-    assert user.profile.phone_no == data["phone"]
-
-    # present if logged_in
-    assert int(client.session["_auth_user_id"]) == user.pk
-
-
+#########################################
+# Onboarding: Step2, user info
+#########################################
 @pytest.mark.django_db
 def test_performing_onboarding_signup_with_existing_user_redirects_to_signin(
     request, client
@@ -298,15 +176,25 @@ def test_performing_onboarding_signup_with_existing_user_redirects_to_signin(
         "org_name": "MyOrg",
     }
 
+    baker.make(
+        projects_models.ProjectCreationRequest, email=user.username, site=current_site
+    )
+
+    session = client.session
+    session["onboarding_email"] = user.username
+    session.save()
+
     response = client.post(reverse("onboarding-signup"), data=data, follow=True)
     last_url, status_code = response.redirect_chain[-1]
     assert status_code == 302
     assert last_url.startswith(reverse("onboarding-signin"))
 
+    # make sure we didn't create another user
     assert auth.User.objects.count() == user_count
 
     user.refresh_from_db()
 
+    # Make sure the original user wasn't altered
     assert user.profile.organization_position != data["role"]
     assert user.first_name != data["first_name"]
     assert user.last_name != data["last_name"]
@@ -316,6 +204,187 @@ def test_performing_onboarding_signup_with_existing_user_redirects_to_signin(
 
     # present if logged_in
     assert not client.session.get("_auth_user_id", None)
+
+
+@pytest.mark.django_db
+def test_onboarding_with_account_on_other_site_redirects_to_signin(request, client):
+    onboarding = onboarding_models.Onboarding.objects.first()
+
+    current_site = get_current_site(request)
+    other_site = baker.make(Site)
+
+    baker.make(
+        home_models.SiteConfiguration,
+        site=get_current_site(request),
+        onboarding=onboarding,
+    )
+
+    data = {
+        "email": "a@exAmpLe.Com",
+        "name": "a project",
+        "location": "some place",
+        "postcode": "62170",
+        "insee": "62044",
+        "description": "a description",
+    }
+
+    user = baker.make(auth.User, email=data["email"].lower(), username=data["email"])
+    user.profile.sites.add(other_site)
+
+    # We need a ProjectCreationRequest matching the user for this view
+    baker.make(
+        projects_models.ProjectCreationRequest, email=user.email, site=current_site
+    )
+
+    session = client.session
+    session["onboarding_email"] = user.username
+    session.save()
+
+    response = client.post(reverse("onboarding-project"), data=data, follow=True)
+    last_url, status_code = response.redirect_chain[-1]
+    assert status_code == 302
+    assert last_url.startswith(reverse("onboarding-signin"))
+
+
+@pytest.mark.django_db
+def test_onboarding_with_nonexisting_account_requests_info_from_user(request, client):
+    current_site = get_current_site(request)
+
+    onboarding = onboarding_models.Onboarding.objects.first()
+
+    baker.make(
+        home_models.SiteConfiguration,
+        site=get_current_site(request),
+        onboarding=onboarding,
+    )
+
+    data = {
+        "email": "a@eXampLe.com",
+        "name": "a project",
+        "location": "some place",
+        "postcode": "62170",
+        "insee": "62044",
+        "description": "a description",
+    }
+
+    # We need a ProjectCreationRequest matching the user for this view
+    baker.make(
+        projects_models.ProjectCreationRequest, email=data["email"], site=current_site
+    )
+
+    session = client.session
+    session["onboarding_email"] = data["email"]
+    session.save()
+
+    response = client.get(reverse("onboarding-signup"), data=data)
+    assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_onboarding_signup_redirects_to_project_form_when_logged_in_if_no_project(
+    request, client
+):
+    current_site = get_current_site(request)
+
+    baker.make(
+        home_models.SiteConfiguration,
+        site=current_site,
+    )
+
+    with login(client):
+        response = client.post(reverse("onboarding-signup"), follow=True)
+        last_url, status_code = response.redirect_chain[-1]
+        assert status_code == 302
+
+        assert last_url == reverse("onboarding-project")
+
+
+@pytest.mark.django_db
+def test_performing_onboarding_signup_create_a_new_user_and_logs_in(request, client):
+    current_site = get_current_site(request)
+
+    baker.make(
+        home_models.SiteConfiguration,
+        site=current_site,
+    )
+
+    data = {
+        "email": "a@example.com",
+        "phone": "0610101010",
+        "role": "Ouistiti",
+        "password": "blah",
+        "first_name": "john",
+        "last_name": "doe",
+        "org_name": "MyOrg",
+    }
+
+    # We need a ProjectCreationRequest matching the user for this view
+    baker.make(
+        projects_models.ProjectCreationRequest,
+        project__sites=[current_site],
+        email=data["email"],
+        site=current_site,
+    )
+
+    session = client.session
+    session["onboarding_email"] = data["email"]
+    session.save()
+
+    response = client.post(reverse("onboarding-signup"), data=data, follow=True)
+    last_url, status_code = response.redirect_chain[-1]
+    assert status_code == 302
+
+    project = projects_models.Project.objects.last()
+    assert last_url == reverse("onboarding-summary", args=(project.pk,))
+
+    # the user and profile are filled according to provided information
+    user = auth.User.objects.get(username=data["email"])
+    assert user.email == data["email"]
+    assert user.first_name == data["first_name"]
+    assert user.last_name == data["last_name"]
+    assert current_site in user.profile.sites.all()
+    assert user.profile.organization.name == data["org_name"]
+    assert user.profile.organization_position == data["role"]
+    assert user.profile.phone_no == data["phone"]
+
+    # present if logged_in
+    assert int(client.session["_auth_user_id"]) == user.pk
+
+
+@pytest.mark.django_db
+def test_performing_onboarding_without_session_key_redirects_to_project_onboarding(
+    request, client
+):
+    current_site = get_current_site(request)
+
+    baker.make(
+        home_models.SiteConfiguration,
+        site=current_site,
+    )
+
+    user = baker.make(auth.User, username="bob@bob.fr")
+
+    data = {
+        "email": user.username,
+        "phone": "0610101010",
+        "role": "Ouistiti",
+        "password": "blah",
+        "first_name": "john",
+        "last_name": "doe",
+        "org_name": "MyOrg",
+    }
+
+    baker.make(
+        projects_models.ProjectCreationRequest, email=user.username, site=current_site
+    )
+
+    response = client.post(reverse("onboarding-signup"), data=data, follow=True)
+    last_url, status_code = response.redirect_chain[-1]
+    assert status_code == 302
+    assert last_url.startswith(reverse("onboarding-project"))
+
+
+## Notifications ##
 
 
 @pytest.mark.django_db
