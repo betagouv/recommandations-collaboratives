@@ -38,7 +38,17 @@ Deux choix :
 
 ### Virtualenv
 
-Commencez par installer `uv` sur votre machine avec pip ou votre gestionnaire de paquets. Si vous n'avez pas de moyen connu, référez vous à la page de `uv` ( https://github.com/astral-sh/uv ).
+#### Prérequis
+
+Installez `pandoc` et `gdal`
+
+Pour les sytèmes debian:
+  
+```sh
+sudo apt install python3-gdal pandoc
+```
+
+Installez `uv` sur votre machine avec pip ou votre gestionnaire de paquets. Si vous n'avez pas de moyen connu, référez vous à la page de `uv` ( https://github.com/astral-sh/uv ).
 
 Créez et sourcez l'environnement:
 
