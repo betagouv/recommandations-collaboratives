@@ -115,14 +115,6 @@ _Les commandes suivantes ne sont pas nécessaire si vous êtes avec Docker._
 
 Pour lancer l'applicatif en mode `développement`:
 
-- compilez le module `dsrc_ui`:
-
-```sh
-cd recoco/frontend/modules/dsrc_ui
-yarn install
-yarn build
-```
-
 - installez les dépendances:
 
 ```sh
