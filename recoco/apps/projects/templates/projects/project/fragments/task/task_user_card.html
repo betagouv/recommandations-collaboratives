@@ -10,7 +10,7 @@
     {% vite_asset 'js/apps/user.js' %}
 {% endblock js %}
 <div x-data="User(currentTask.created_by)"
-     class="user-card position-relative d-flex fr-my-1v flex-column justify-content-between align-items-start">
+     class="user-card position-relative d-flex fr-my-1v justify-content-between align-items-start">
     <div class="position-relative d-flex align-items-center justify-content-between">
         <div x-ref="user"
              {% if embed_view is not True %}@click.stop="onUserClick"{% endif %}
