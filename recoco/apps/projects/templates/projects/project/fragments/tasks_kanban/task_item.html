@@ -24,37 +24,31 @@
             <span class="position-absolute translate-middle top-0 start-100 badge rounded-circle bg-danger fw-bold specific-fontsize-07"
                   x-text="currentTask.notifications.count"></span>
         </template>
-        <div class="fr-p-2v">
+        <div class="fr-p-3v">
             <div class="d-flex flex-row">
-                <div class="flex-fill fr-mt-1v fr-ml-2v specific-fontsize-09 cursor-pointer"
+                <div class="flex-fill cursor-pointer"
                      @click="handleOpenPreviewModal()"
                      data-test-id="task-kanban-topic">
                     <template x-if="task.topic && task.topic.name">
-                        <div class="d-flex align-items-center fr-mb-1v fr-mt-1v">
-                            <span class="topic-indicator bg-green fr-mr-2v"></span>
+                        <div class="d-flex align-items-center fr-mb-1v">
+                            <span class="topic-indicator bg-green fr-mr-1v"></span>
                             <h5 data-test-id="task-kanban-topic"
                                 x-text="task.topic.name"
-                                class="fw-medium tiny text-gray-800 fr-mb-0"></h5>
+                                class="fw-medium font-very-small text-gray-800 fr-mb-0"></h5>
                         </div>
                     </template>
                     <h6 class="fr-mb-0 fw-bold title-info text-transform-none text-blue text-decoration-underline"
                         x-text="currentTask.intent"></h6>
-                    <div class="fr-pt-2v fr-my-2v"
+                    <div class="fr-pt-2v"
                          :class="canAdministrate && currentTask.content === '' && 'border border-warning'">
                         <div class="d-flex flex-column">
-                            <span class="align-middle text-grey-dark tiny specific-lineheight-20"
-                                  x-text="`Émis le ${formatDate(currentTask.created_on)}`"></span>
+                            <span class="align-middle text-grey-dark font-very-small specific-lineheight-20"
+                                  x-text="(diffDays = Math.floor((new Date() - new Date(currentTask.created_on)) / (1000 * 60 * 60 * 24))) < 0 
+                                            ? 'Aujourd\'hui' 
+                                            : diffDays === 1 
+                                                ? 'Il y a 1 jour' 
+                                                : `Il y a ${diffDays} jours`"></span>
                             {% include "projects/project/fragments/task/task_user_card.html" %}
-                            <div class="text-grey-dark d-flex align-items-center tiny fr-mr-2w responsive-flex-column fr-mt-1v">
-                                <svg class="align-middle bi fr-mr-1v"
-                                     width="18px"
-                                     height="15px"
-                                     fill="currentColor">
-                                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#chat-square" />
-                                </svg>
-                                <span class="tiny"
-                                      x-text="currentTask.resource_id ? currentTask.comments_count + 1  + ' messages' : currentTask.comments_count + ' messages'"></span>
-                            </div>
                         </div>
                     </div>
                 </div>

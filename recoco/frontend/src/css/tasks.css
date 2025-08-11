@@ -11,10 +11,9 @@ body.modal-open {
 }
 
 .topic-indicator {
-  width: 12px;
-  height: 12px;
-
-  border-radius: 50%;
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
 }
 
 .status-color-indicator.big {
