@@ -4,7 +4,7 @@
         <div data-test-id="task-initial-comment"
              class="position-relative fr-p-2w bg-grey-light rounded-3 fr-p-2w">
             <div x-html="truncate(renderMarkdown(task.content),100)"
-                 class="text-info-custom font-small text-dark fr-mb-2w"></div>
+                 class="text-info-custom font-small text-dark fr-mb-2w {% if content == 'tiny' %}font-size-12px{% endif %}"></div>
             <template x-if="task.contact">
                 <div x-data="{contact: task.contact,isOpenDeleteContact:null}">{% include "tools/contacts/contact_card.html" %}</div>
             </template>

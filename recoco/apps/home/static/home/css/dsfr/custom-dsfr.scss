@@ -654,11 +654,33 @@ form > p {
 .specific-background-grey {
   background-color: #fafafa;
 }
+
 .specific-flex-basis-48 {
   flex-basis: 48.8%;
 }
+
 .font-size-14px {
   font-size: 14px;
+}
+
+.font-size-14px p {
+  font-size: 14px;
+}
+
+.font-size-12px {
+  font-size: 12px;
+}
+
+.font-size-12px p {
+  font-size: 12px;
+}
+
+.fw-400 {
+  font-weight: 400;
+}
+
+.fw-400 p {
+  font-weight: 400;
 }
 
 .centered-item {

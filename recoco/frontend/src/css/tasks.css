@@ -194,3 +194,7 @@ body.modal-open {
   width: 65px;
   height: 65px;
 }
+
+.add-gap {
+  gap: 10px;
+}
