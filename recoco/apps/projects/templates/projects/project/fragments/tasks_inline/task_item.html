@@ -5,8 +5,9 @@
 {% get_obj_perms request.user for project as "user_project_perms" %}
 <div x-data="Task(task)"
      data-test-id="task-item"
+     style="width: 49%; border-radius:4px;"
      :class="`border${getTaskColor(task)}`"
-     class="rounded fr-mb-2w fr-px-2w d-flex fr-pt-2w fr-pb-2w justify-content-between align-items-start task-item {% if embed_view is not True %}cursor-pointer{% endif %} hover-shadow hover-border-blue transition-all"
+     class="position-relative fr-mb-2w fr-px-2w d-flex fr-pt-2w fr-pb-2w justify-content-between align-items-start task-item {% if embed_view is not True %}cursor-pointer{% endif %} hover-shadow hover-border-blue transition-all"
      {% if embed_view is not True %}@click="handleOpenPreviewModal()"{% endif %}
      :id="task.id">
     <div x-show="task.isLoading"
@@ -33,36 +34,36 @@
                           class="text-dark">Brouillon</span>
                 </div>
             </template>
-            <template x-if="task.topic && task.topic.name">
-                <div class="left-0 fr-ml-2v">
-                    <span data-test-id="task-inline-topic"
-                          class="bg-purple text-white"
-                          x-text="task.topic.name"></span>
-                </div>
-            </template>
+            
         </div>
         <div class="d-flex align-items-center justify-content-between">
-            <div class="d-flex w-100 justify-content-between align-items-center">
-                <div class="d-flex w-100 align-items-center">
-                    <h4 class="fr-mt-0 fr-pt-0 fr-mb-0 fw-bold {% if embed_view %}fr-mb-3v{% endif %}"
-                        x-text="task.intent"></h4>
+            <template x-if="task.topic && task.topic.name">
+                <div class="d-flex align-items-center fr-mb-1v">
+                    <span class="topic-indicator bg-green fr-mr-1v"></span>
+                    <h5 data-test-id="task-kanban-topic"
+                        x-text="task.topic.name"
+                        class="fw-bold tiny text-gray-800 fr-mb-0"></h5>
                 </div>
-            </div>
+            </template>
             {% if embed_view is not True %}
                 {% if "manage_tasks" in user_project_perms and not disable_edit %}
                     {% include "projects/project/fragments/task/task_actions.html" %}
                 {% endif %}
             {% endif %}
         </div>
+        <div class="d-flex align-items-center justify-content-between">
+            <h6 class="fr-mb-0 fw-bold title-info text-transform-none text-blue text-decoration-underline"
+                        x-text="currentTask.intent"></h6>
+        </div>
         {% if embed_view is not True %}
             <article class="fr-mt-1v fr-mb-2v">
                 <template x-if="task.resource_id && task.resource && task.resource.subtitle">
                     <div x-html="truncate(renderMarkdown(task.resource.subtitle),100)"
-                         class="text-info-custom fw-light font-small text-dark fr-m-0 fr-p-0"></div>
+                         class="text-info-custom fw-light font-small text-dark fr-m-0 fr-p-0 font-size-14px fw-400"></div>
                 </template>
                 <template x-if="!task.resource_id && task.content">
                     <div x-html="truncate(renderMarkdown(task.content),100)"
-                         class="text-info-custom fw-light font-small text-dark fr-mb-2v fr-p-0"></div>
+                         class="text-info-custom fw-light font-small text-dark fr-mb-2v fr-p-0 font-size-14px fw-400"></div>
                 </template>
                 <template x-if="!task.resource_id && task.contact">
                     <div x-data="{contact: task.contact,isOpenDeleteContact:null}"
@@ -73,7 +74,7 @@
             </article>
         {% endif %}
         <template x-if="task.resource">
-            <article>{% include "projects/project/fragments/task/task_comment.html" %}</article>
+            <article>{% include "projects/project/fragments/task/task_comment.html" with content="tiny" %}</article>
         </template>
         <!-- DS integration -->
         <template x-if="task.ds_folder && task.ds_folder.prefilled_count > 0">

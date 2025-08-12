@@ -1,25 +1,35 @@
+<!-- 
+This component must be used instead of the component of the same name in the tasks_inline folder
+
+It has a variable kanban_or_list to adapt to those two use cases.
+-->
+
 {% load static %}
 {% load guardian_tags %}
 {% get_obj_perms request.user for request.site as "user_site_perms" %}
 {% get_obj_perms request.user for project as "user_project_perms" %}
 <div x-data="Task(task)"
+    {% if kanban_or_list == "kanban" %}
      :id="task.uuid"
      class="drag-targetable fr-py-1v position-relative"
      @dragover="onDragOver(event)"
      @drop="onDrop(event, board.status, task.uuid)"
      @dragenter="onDragEnter(event)"
      @dragleave="onDragLeave(event)"
-     data-test-id="draggable">
+     data-test-id="draggable"
+     {% endif %}>
     <div x-show="task.isLoading"
          class="fr-ml-2v item-loader z-1 specific-size">
         <div class="spinner-border spinner-border spinner-border-sm text-primary"
              role="status"></div>
     </div>
-    <div class="medium-border-radius bg-white border-grey-dark position-relative hover-border-blue hover-shadow transition-all tmp-usevar"
+    <div {% if kanban_or_list == "kanban" %}
+         class="medium-border-radius bg-white border-grey-dark position-relative hover-border-blue hover-shadow transition-all tmp-usevar"
          :style="task.isLoading && 'opacity:0.3';"
          :draggable="true"
          @dragstart="onDragStart(event, task.uuid)"
-         @dragend="onDragEnd(event)">
+         @dragend="onDragEnd(event)"
+         {% endif %}>
         <template x-if="currentTask.notifications.count > 0">
             <span class="position-absolute translate-middle top-0 start-100 badge rounded-circle bg-danger fw-bold specific-fontsize-07"
                   x-text="currentTask.notifications.count"></span>
@@ -34,11 +44,12 @@
                             <span class="topic-indicator bg-green fr-mr-1v"></span>
                             <h5 data-test-id="task-kanban-topic"
                                 x-text="task.topic.name"
-                                class="fw-medium font-very-small text-gray-800 fr-mb-0"></h5>
+                                class="fw-bold tiny text-gray-800 fr-mb-0"></h5>
                         </div>
                     </template>
                     <h6 class="fr-mb-0 fw-bold title-info text-transform-none text-blue text-decoration-underline"
                         x-text="currentTask.intent"></h6>
+                    <!-- <span x-text="task.project.owner.first_name"></span> -->
                     <div class="fr-pt-2v"
                          :class="canAdministrate && currentTask.content === '' && 'border border-warning'">
                         <div class="d-flex flex-column">
