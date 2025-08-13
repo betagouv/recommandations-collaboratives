@@ -160,6 +160,18 @@ site.aliases.create(domain="localhost", redirect_to_canonical=False)
 ## Récupérer les portails existants
 Plusieurs portails (ie sites) ont déjà été configurés et sont disponibles sur le dépôt [recoco-portails](https://github.com/betagouv/recoco-portails). Pour y avoir accès en local, il faut cloner ce dépôt dans un dossier `multisites` à la racine du projet global.
 
+## Environnement de développement
+
+### pre-commit
+
+Pour que des PRs soient acceptées, on requiert que pre-commit ait été passé. La configuration est en principe bonne avec les étapes précédentes, mais il faut exécuter la commande
+```bash
+pre-commit install
+```
+pour que cette configuration soit bien appliquée.
+
+
+
 ## Tests
 
 ### Tests Front End
