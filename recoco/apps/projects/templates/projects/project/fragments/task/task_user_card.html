@@ -17,8 +17,8 @@
              class="d-flex align-items-center flex-wrap {% if embed_view is not True %}user-info{% endif %}">
             <span class="fr-mr-1v d-flex align-items-center font-very-small">
                 <img class="rounded-circle d-inline-block"
-                     width="20px"
-                     height="20px"
+                     width="12px"
+                     height="12px"
                      :src="gravatar_url(currentUser.email, 25, currentUser.first_name + ' ' + currentUser.last_name)"
                      data-bs-toggle="tooltip"
                      data-bs-placement="bottom"
@@ -26,7 +26,7 @@
                      tabindex="0" />
                 <strong x-text="`${currentUser.first_name} ${currentUser.last_name}`"
                         :class="!currentUser.is_active && 'inactive-status'"
-                        class="text-nowrap text-capitalize fr-ml-2v"></strong>
+                        class="text-nowrap text-capitalize fr-ml-1v"></strong>
             </span>
             <template x-if="currentUser.is_active && currentUser.profile.organization && currentUser.profile.organization.name">
                 <span class="text-dark fw-normal font-italic font-very-small"

@@ -732,6 +732,18 @@ form > p {
   &--error {
     background-color: #dc3444;
   }
+
+  &--mention {
+    color: var(--light-text-mention-grey, #666);
+    
+    &_button {
+      color: var(--light-text-mention-grey, #666);
+      border: 1px solid var(--light-text-mention-grey, #666);
+      box-shadow: none;
+    }
+  }
+
+  
 }
 
 .specific-color-3a {
@@ -826,4 +838,17 @@ form > p {
 .non-stylish-link {
   color: white !important;
   text-decoration: none !important;
+}
+
+/* ¯¯¯¯¯ *\
+  Buttons
+\* ˍˍˍˍˍ */
+
+.fr-btn-secondary-rework {
+  border-radius: 1px;
+  padding: 6px 8px;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 700;
+  min-height: 0;
 }

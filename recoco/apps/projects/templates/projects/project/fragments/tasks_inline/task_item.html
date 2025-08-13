@@ -7,7 +7,7 @@
      data-test-id="task-item"
      style="width: 49%; border-radius:4px;"
      :class="`border${getTaskColor(task)}`"
-     class="position-relative fr-mb-2w fr-px-2w d-flex fr-pt-2w fr-pb-2w justify-content-between align-items-start task-item {% if embed_view is not True %}cursor-pointer{% endif %} hover-shadow hover-border-blue transition-all"
+     class="position-relative fr-mb-2w fr-px-2w d-flex flex-column fr-pt-2w fr-pb-2w justify-content-between align-items-start task-item {% if embed_view is not True %}cursor-pointer{% endif %} hover-shadow hover-border-blue transition-all"
      {% if embed_view is not True %}@click="handleOpenPreviewModal()"{% endif %}
      :id="task.id">
     <div x-show="task.isLoading"
@@ -15,7 +15,7 @@
         <div class="spinner-border spinner-border spinner-border-sm text-primary"
              role="status"></div>
     </div>
-    <div class="d-flex flex-column flex-grow-1 ease-transition tmp-usevar"
+    <div class="d-flex flex-column flex-grow-1 ease-transition tmp-usevar w-100"
          :style="task.isLoading && 'opacity:0.3';">
         <div data-test-id="badge-new-task"
              class="card-top-information d-flex align-items-center">
@@ -52,7 +52,7 @@
             {% endif %}
         </div>
         <div class="d-flex align-items-center justify-content-between">
-            <h6 class="fr-mb-0 fw-bold title-info text-transform-none text-blue text-decoration-underline"
+            <h6 class="fr-mb-0 fr-mt-2v fw-bold title-info text-transform-none text-blue text-decoration-underline"
                         x-text="currentTask.intent"></h6>
         </div>
         {% if embed_view is not True %}
@@ -74,7 +74,7 @@
             </article>
         {% endif %}
         <template x-if="task.resource">
-            <article>{% include "projects/project/fragments/task/task_comment.html" with content="tiny" %}</article>
+            <article class="w-100 h-100">{% include "projects/project/fragments/task/task_comment.html" with content="tiny" height="100" %}</article>
         </template>
         <!-- DS integration -->
         <template x-if="task.ds_folder && task.ds_folder.prefilled_count > 0">
@@ -98,33 +98,31 @@
                    target="_blank">Aller sur Demarches-simplifiees.fr</a>
             </div>
         </template>
-        <hr class="fr-mt-3w">
-        <footer class="d-flex justify-content-between align-items-center">
-            <div class="d-flex align-items-center">
+        <footer class="fr-mt-auto">
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="none">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M4.5 0.5V1.5H7.5V0.5H8.5V1.5H10.5C10.7761 1.5 11 1.72386 11 2V10C11 10.2761 10.7761 10.5 10.5 10.5H1.5C1.22386 10.5 1 10.2761 1 10V2C1 1.72386 1.22386 1.5 1.5 1.5H3.5V0.5H4.5ZM10 5.5H2V9.5H10V5.5ZM5.5 6.5V8.5H3V6.5H5.5ZM3.5 2.5H2V4.5H10V2.5H8.5V3.5H7.5V2.5H4.5V3.5H3.5V2.5Z" fill="#666666"/>
+                </svg>
+                <span class="align-middle text-grey-dark font-very-small specific-lineheight-20"
+                    x-text="(diffDays = Math.floor((new Date() - new Date(currentTask.created_on)) / (1000 * 60 * 60 * 24))) == 0 
+                            ? 'Aujourd\'hui' 
+                            : diffDays === 1 
+                                ? 'Il y a 1 jour' 
+                                : `Il y a ${diffDays} jours`"></span>
+            </div>
+            <div class="d-flex justify-content-between align-items-center">
+                {% if embed_view is not True %}
+                    <div class="tiny d-flex align-items-center">
+                        {% include "projects/project/fragments/task/task_user_card.html" %}
+                    </div>
+                {% endif %}
                 {% if embed_view is not True %}
                     <template x-if="task.public">
                         {% include "projects/project/fragments/tasks_inline_kanban/tasks_status_buttons.html" %}
                     </template>
                 {% endif %}
-                <div class="text-grey-dark d-flex align-items-center tiny fr-mr-2w responsive-flex-column">
-                    <span class="fr-icon-chat-2-line fr-icon--sm fr-mr-1v" aria-hidden="true"></span>
-                    <span class="tiny {% if embed_view is not True %}hover-underline cursor-pointer{% endif %}"
-                          {% if embed_view is not True %}@click="handleOpenPreviewModal()"{% endif %}
-                          x-text="task.resource_id ? getTaskMessageCountLabel(task.comments_count + 1) : getTaskMessageCountLabel(task.comments_count)"></span>
-                    <template x-if="task.notifications.count > 0">
-                        <span class="tiny {% if embed_view is not True %}hover-underline cursor-pointer{% endif %} text-blue fw-medium fr-ml-1v"
-                              {% if embed_view is not True %}@click="handleOpenPreviewModal()"{% endif %}
-                              x-text="task.resource_id ? getTaskNewMessageCountLabel(task.notifications.count) : getTaskNewMessageCountLabel(task.notifications.count)"></span>
-                    </template>
-                </div>
+                
             </div>
-            {% if embed_view is not True %}
-                <div class="tiny d-flex align-items-center">
-                    <span class="text-muted fr-mr-1v specific-lineheight-20"
-                          x-text="`Émis le ${formatDate(task.created_on)}`"></span>
-                    {% include "projects/project/fragments/task/task_user_card.html" %}
-                </div>
-            {% endif %}
         </footer>
     </div>
 </div>

@@ -1,14 +1,13 @@
 {% load static %}
-<div x-data="TaskComment()">
+<div x-data="TaskComment()" {% if height == "100" %}class="w-100 h-100" {% endif %}>
     <template x-if="!isEditing && currentTask.content !== ''">
         <div data-test-id="task-initial-comment"
-             class="position-relative fr-p-2w bg-grey-light rounded-3 fr-p-2w">
+             class="position-relative fr-p-2w bg-grey-light rounded-3 fr-p-2w {% if height == "100" %} w-100 h-100{% endif %}">
             <div x-html="truncate(renderMarkdown(task.content),100)"
                  class="text-info-custom font-small text-dark fr-mb-2w {% if content == 'tiny' %}font-size-12px{% endif %}"></div>
             <template x-if="task.contact">
                 <div x-data="{contact: task.contact,isOpenDeleteContact:null}">{% include "tools/contacts/contact_card.html" %}</div>
             </template>
-            {% include "projects/project/fragments/task/task_user_card.html" %}
             {% if embed_view is not True %}
                 {% if "manage_tasks" in user_project_perms and not disable_edit %}
                     <button class="fr-btn fr-btn--sm fr-btn--tertiary fr-icon-pencil-line position-absolute bottom-0 end-0 fr-m-2w"
