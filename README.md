@@ -43,7 +43,7 @@ Deux choix :
 Installez `pandoc` et `gdal`
 
 Pour les sytèmes debian:
-  
+
 ```sh
 sudo apt install python3-gdal pandoc
 ```
