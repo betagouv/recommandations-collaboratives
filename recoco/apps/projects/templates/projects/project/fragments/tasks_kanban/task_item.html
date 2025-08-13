@@ -54,7 +54,7 @@ It has a variable kanban_or_list to adapt to those two use cases.
                          :class="canAdministrate && currentTask.content === '' && 'border border-warning'">
                         <div class="d-flex flex-column">
                             <span class="align-middle text-grey-dark font-very-small specific-lineheight-20"
-                                  x-text="(diffDays = Math.floor((new Date() - new Date(currentTask.created_on)) / (1000 * 60 * 60 * 24))) < 0 
+                                  x-text="(diffDays = Math.floor((new Date() - new Date(currentTask.created_on)) / (1000 * 60 * 60 * 24))) == 0 
                                             ? 'Aujourd\'hui' 
                                             : diffDays === 1 
                                                 ? 'Il y a 1 jour' 
