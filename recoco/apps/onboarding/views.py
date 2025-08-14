@@ -364,7 +364,7 @@ def prefill_project_set_user(request):
     if request.method == "POST" and form.is_valid():
         request.session["prefill_set_user"] = form.cleaned_data
 
-        return redirect(f"{reverse('onboarding-prefill')}")
+        return redirect(reverse("onboarding-prefill"))
 
     return render(request, "onboarding/prefill-user.html", locals())
 
@@ -378,7 +378,7 @@ def prefill_project_submit(request):
     prefill_set_user_data = request.session.get("prefill_set_user")
 
     if not prefill_set_user_data:
-        return redirect(f"{reverse('onboarding-prefill-set-user')}")
+        return redirect(reverse("onboarding-prefill-set-user"))
 
     form = forms.PrefillProjectForm(request.POST or None)
 
@@ -455,7 +455,7 @@ def prefill_project_submit(request):
                 del request.session["prefill_set_user"]
 
             return redirect(
-                f"{reverse('projects-project-detail-overview', args=(project.pk,))}"
+                reverse("projects-project-detail-overview", args=(project.pk,))
             )
 
     return render(request, "onboarding/prefill-project.html", locals())

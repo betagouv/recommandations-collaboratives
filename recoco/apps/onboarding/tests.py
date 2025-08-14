@@ -565,9 +565,10 @@ def test_create_prefilled_project_reachable_by_switchtenders(request, client):
 
     with login(client, groups=["example_com_advisor"]):
         response = client.post(reverse("onboarding-prefill-set-user"), data)
-        response = client.get(reverse("onboarding-prefill"))
+        assert response.status_code == 302
 
-    assert response.status_code == 200
+        response = client.get(reverse("onboarding-prefill"))
+        assert response.status_code == 200
 
 
 @pytest.mark.django_db
