@@ -733,7 +733,18 @@ form > p {
     }
   }
 
+  &--disabled-grey {
+    color: var(--light-text-disabled-grey, #929292);
+  }
   
+}
+
+.color-purple {
+  color: #667DCF;
+}
+
+.color-purple p {
+  color: #667DCF;
 }
 
 /* ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯ *\

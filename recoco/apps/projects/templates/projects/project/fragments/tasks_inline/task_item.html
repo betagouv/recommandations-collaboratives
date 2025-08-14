@@ -39,10 +39,10 @@
         <div class="d-flex align-items-center justify-content-between">
             <template x-if="task.topic && task.topic.name">
                 <div class="d-flex align-items-center fr-mb-1v">
-                    <span class="topic-indicator bg-green fr-mr-1v"></span>
+                    <span class="topic-indicator bg-purple fr-mr-1v"></span>
                     <h5 data-test-id="task-kanban-topic"
                         x-text="task.topic.name"
-                        class="fw-bold tiny text-gray-800 fr-mb-0"></h5>
+                        class="fw-bold tiny fr-mb-0 color-purple"></h5>
                 </div>
             </template>
             {% if embed_view is not True %}
