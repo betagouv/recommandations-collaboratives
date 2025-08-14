@@ -248,6 +248,66 @@ def test_resource_list_contains_only_resource_with_expired_selected(request, cli
     assertNotContains(response, detail_url)
 
 
+@pytest.mark.django_db
+def test_resource_list_contains_only_uncategorized(current_site, client):
+    resource1 = Recipe(
+        models.Resource,
+        sites=[current_site],
+        title="uncategorized resource",
+        status=models.Resource.PUBLISHED,
+        category=None,
+    ).make()
+
+    resource2 = Recipe(
+        models.Resource,
+        sites=[current_site],
+        title="categorized resource",
+        status=models.Resource.PUBLISHED,
+        category__sites=[current_site],
+    ).make()
+
+    resource1_url = reverse("resources-resource-detail", args=[resource1.id])
+    resource2_url = reverse("resources-resource-detail", args=[resource2.id])
+
+    response = client.get(
+        f"{reverse('resources-resource-search')}?no_category=true&query=resource"
+    )
+    assertContains(response, resource1_url)
+    assertNotContains(response, resource2_url)
+
+    response = client.get(
+        f"{reverse('resources-resource-search')}?no_category=false&query=resource"
+    )
+    assertContains(response, resource2_url)
+    assertContains(response, resource1_url)
+
+
+@pytest.mark.django_db
+def test_resource_list_contains_only_published(current_site, client):
+    resource1 = Recipe(
+        models.Resource,
+        sites=[current_site],
+        title="published resource",
+        status=models.Resource.PUBLISHED,
+    ).make()
+
+    resource2 = Recipe(
+        models.Resource,
+        sites=[current_site],
+        title="draft resource",
+        status=models.Resource.DRAFT,
+    ).make()
+
+    response = client.get(
+        f"{reverse('resources-resource-search')}?published=true&query=resource"
+    )
+
+    detail_url = reverse("resources-resource-detail", args=[resource1.id])
+    assertContains(response, detail_url)
+    detail_url = reverse("resources-resource-detail", args=[resource2.id])
+    assertNotContains(response, detail_url)
+
+
 #
 # details
 

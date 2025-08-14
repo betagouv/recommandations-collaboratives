@@ -38,7 +38,17 @@ Deux choix :
 
 ### Virtualenv
 
-Commencez par installer `uv` sur votre machine avec pip ou votre gestionnaire de paquets. Si vous n'avez pas de moyen connu, référez vous à la page de `uv` ( https://github.com/astral-sh/uv ).
+#### Prérequis
+
+Installez `pandoc` et `gdal`
+
+Pour les sytèmes debian:
+
+```sh
+sudo apt install python3-gdal pandoc
+```
+
+Installez `uv` sur votre machine avec pip ou votre gestionnaire de paquets. Si vous n'avez pas de moyen connu, référez vous à la page de `uv` ( https://github.com/astral-sh/uv ).
 
 Créez et sourcez l'environnement:
 
@@ -72,6 +82,7 @@ DJANGO_VITE_TEST_SERVER_PORT=3001
 DJANGO_VITE_DEV_SERVER_PORT=3000
 GDAL_LIBRARY_PATH=
 GEOS_LIBRARY_PATH=
+SKIP_TEST_METRICS_CREATE_ROLES=
 ```
 
 Copiez le fichier de configuration d'exemple :
@@ -104,14 +115,6 @@ python manage.py migrate
 _Les commandes suivantes ne sont pas nécessaire si vous êtes avec Docker._
 
 Pour lancer l'applicatif en mode `développement`:
-
-- compilez le module `dsrc_ui`:
-
-```sh
-cd recoco/frontend/modules/dsrc_ui
-yarn install
-yarn build
-```
 
 - installez les dépendances:
 
@@ -150,9 +153,24 @@ Création du premier site
 
 ```python
 from recoco.apps.home import utils
-site = utils.make_new_site("Example", "example.com", "sender@example.com", "Sender")
+site = utils.make_new_site("Example", "example.com", "sender@example.com", "Sender", "noreply@example.com", "postal adress")
 site.aliases.create(domain="localhost", redirect_to_canonical=False)
 ```
+
+## Récupérer les portails existants
+Plusieurs portails (ie sites) ont déjà été configurés et sont disponibles sur le dépôt [recoco-portails](https://github.com/betagouv/recoco-portails). Pour y avoir accès en local, il faut cloner ce dépôt dans un dossier `multisites` à la racine du projet global.
+
+## Environnement de développement
+
+### pre-commit
+
+Pour que des PRs soient acceptées, on requiert que pre-commit ait été passé. La configuration est en principe bonne avec les étapes précédentes, mais il faut exécuter la commande
+```bash
+pre-commit install
+```
+pour que cette configuration soit bien appliquée.
+
+
 
 ## Tests
 
