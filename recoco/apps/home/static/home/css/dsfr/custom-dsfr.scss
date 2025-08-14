@@ -735,7 +735,7 @@ form > p {
 
   &--mention {
     color: var(--light-text-mention-grey, #666);
-    
+
     &_button {
       color: var(--light-text-mention-grey, #666);
       border: 1px solid var(--light-text-mention-grey, #666);
@@ -743,7 +743,18 @@ form > p {
     }
   }
 
-  
+  &--disabled-grey {
+    color: var(--light-text-disabled-grey, #929292);
+  }
+
+}
+
+.color-purple {
+  color: #667DCF;
+}
+
+.color-purple p {
+  color: #667DCF;
 }
 
 .specific-color-3a {

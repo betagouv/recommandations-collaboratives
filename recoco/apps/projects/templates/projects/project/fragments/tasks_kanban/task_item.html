@@ -1,4 +1,4 @@
-<!-- 
+<!--
 This component must be used instead of the component of the same name in the tasks_inline folder
 
 It has a variable kanban_or_list to adapt to those two use cases.
@@ -41,10 +41,10 @@ It has a variable kanban_or_list to adapt to those two use cases.
                      data-test-id="task-kanban-topic">
                     <template x-if="task.topic && task.topic.name">
                         <div class="d-flex align-items-center fr-mb-1v">
-                            <span class="topic-indicator bg-green fr-mr-1v"></span>
+                            <span class="topic-indicator bg-purple fr-mr-1v"></span>
                             <h5 data-test-id="task-kanban-topic"
                                 x-text="task.topic.name"
-                                class="fw-bold tiny text-gray-800 fr-mb-0"></h5>
+                                class="fw-bold tiny text-gray-800 fr-mb-0 color-purple"></h5>
                         </div>
                     </template>
                     <h6 class="fr-mb-0 fw-bold title-info text-transform-none text-blue text-decoration-underline"
@@ -54,10 +54,10 @@ It has a variable kanban_or_list to adapt to those two use cases.
                          :class="canAdministrate && currentTask.content === '' && 'border border-warning'">
                         <div class="d-flex flex-column">
                             <span class="align-middle text-grey-dark font-very-small specific-lineheight-20"
-                                  x-text="(diffDays = Math.floor((new Date() - new Date(currentTask.created_on)) / (1000 * 60 * 60 * 24))) == 0 
-                                            ? 'Aujourd\'hui' 
-                                            : diffDays === 1 
-                                                ? 'Il y a 1 jour' 
+                                  x-text="(diffDays = Math.floor((new Date() - new Date(currentTask.created_on)) / (1000 * 60 * 60 * 24))) == 0
+                                            ? 'Aujourd\'hui'
+                                            : diffDays === 1
+                                                ? 'Il y a 1 jour'
                                                 : `Il y a ${diffDays} jours`"></span>
                             {% include "projects/project/fragments/task/task_user_card.html" %}
                         </div>

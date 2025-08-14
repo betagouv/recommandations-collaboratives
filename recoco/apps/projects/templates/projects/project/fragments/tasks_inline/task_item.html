@@ -34,15 +34,15 @@
                           class="text-dark">Brouillon</span>
                 </div>
             </template>
-            
+
         </div>
         <div class="d-flex align-items-center justify-content-between">
             <template x-if="task.topic && task.topic.name">
                 <div class="d-flex align-items-center fr-mb-1v">
-                    <span class="topic-indicator bg-green fr-mr-1v"></span>
+                    <span class="topic-indicator bg-purple fr-mr-1v"></span>
                     <h5 data-test-id="task-kanban-topic"
                         x-text="task.topic.name"
-                        class="fw-bold tiny text-gray-800 fr-mb-0"></h5>
+                        class="fw-bold tiny fr-mb-0 color-purple"></h5>
                 </div>
             </template>
             {% if embed_view is not True %}
@@ -104,10 +104,10 @@
                     <path fill-rule="evenodd" clip-rule="evenodd" d="M4.5 0.5V1.5H7.5V0.5H8.5V1.5H10.5C10.7761 1.5 11 1.72386 11 2V10C11 10.2761 10.7761 10.5 10.5 10.5H1.5C1.22386 10.5 1 10.2761 1 10V2C1 1.72386 1.22386 1.5 1.5 1.5H3.5V0.5H4.5ZM10 5.5H2V9.5H10V5.5ZM5.5 6.5V8.5H3V6.5H5.5ZM3.5 2.5H2V4.5H10V2.5H8.5V3.5H7.5V2.5H4.5V3.5H3.5V2.5Z" fill="#666666"/>
                 </svg>
                 <span class="align-middle text-grey-dark font-very-small specific-lineheight-20"
-                    x-text="(diffDays = Math.floor((new Date() - new Date(currentTask.created_on)) / (1000 * 60 * 60 * 24))) == 0 
-                            ? 'Aujourd\'hui' 
-                            : diffDays === 1 
-                                ? 'Il y a 1 jour' 
+                    x-text="(diffDays = Math.floor((new Date() - new Date(currentTask.created_on)) / (1000 * 60 * 60 * 24))) == 0
+                            ? 'Aujourd\'hui'
+                            : diffDays === 1
+                                ? 'Il y a 1 jour'
                                 : `Il y a ${diffDays} jours`"></span>
             </div>
             <div class="d-flex justify-content-between align-items-center">
@@ -121,7 +121,7 @@
                         {% include "projects/project/fragments/tasks_inline_kanban/tasks_status_buttons.html" %}
                     </template>
                 {% endif %}
-                
+
             </div>
         </footer>
     </div>
