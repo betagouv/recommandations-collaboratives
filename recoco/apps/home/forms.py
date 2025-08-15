@@ -124,6 +124,16 @@ class UserPasswordFirstTimeSetupForm(forms.Form):
 
 
 class AdvisorAccessRequestForm(forms.Form):
+    advisor_access_type = forms.ChoiceField(
+        widget=forms.RadioSelect,
+        choices=[
+            ("National", "Toute la France"),
+            ("Regional", "Un ou plusieurs départements spécifiques"),
+        ],
+        required=True,
+        label="Sélection du territoire",
+    )
+
     departments = forms.ModelMultipleChoiceField(
         queryset=Department.objects.all(),
         label="Départements",
@@ -133,10 +143,20 @@ class AdvisorAccessRequestForm(forms.Form):
 
     comment = forms.CharField(
         label="Commentaire",
-        help_text="Expliquez brièvement pourquoi vous demandez l’accès à ces dossiers et en quoi cela est pertinent pour votre rôle, afin de nous aider à examiner votre demande.",
+        help_text="Expliquez brièvement pourquoi vous demandez l'accès à ces dossiers et en quoi cela est pertinent pour votre rôle, afin de nous aider à examiner votre demande.",
         widget=forms.Textarea(attrs={"rows": 3}),
         required=True,
     )
+
+    def clean(self):
+        cleaned_data = super().clean()
+        advisor_access_type = cleaned_data.get("advisor_access_type")
+        departments = cleaned_data.get("departments")
+        if advisor_access_type == "Regional" and departments and len(departments) == 0:
+            self.add_error(
+                "departments", "Merci de sélectionner au moins un département."
+            )
+        return cleaned_data
 
 
 class SiteCreateForm(forms.ModelForm):
