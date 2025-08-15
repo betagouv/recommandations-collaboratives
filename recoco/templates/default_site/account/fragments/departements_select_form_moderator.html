@@ -5,19 +5,31 @@
           method="post">
         {% csrf_token %}
         <fieldset class="fr-fieldset">
-            <h4 class="fr-mb-3w d-block">Sélectionnez vos départements d'action</h4>
-            <div class="fr-fieldset__content">
+            <h4 class="fr-mb-3w d-block">Sélectionnez les départements d'action</h4>
+            <div class="fr-fieldset__content"
+                 x-data="{objectsToSelect: JSON.parse(document.getElementById('departmentsArray').textContent), selectedDepartments: {{ selected_departments|default:'[]' }} }"
+                 @set-departments="selectedDepartments = $event.detail">
                 <div class="fr-input-group fr-mt-4v"
-                     x-data="{objectsToSelect: JSON.parse(document.getElementById('departmentsArray').textContent), selectedDepartments: {{ selected_departments|default:'[]' }} }"
-                     @set-departments="selectedDepartments = $event.detail">
-                    {% include "tools/contacts/multi_select.html" with placeholder="Cherchez et sélectionnez vos départements" label="Sélectionnez un ou plusieurs départements, laissez vide pour toute la France" %}
-                    <template x-for="dept in selectedDepartments" :key="dept">
-                        <input type="hidden" name="departments" :value="dept">
+                     x-data="RegionDepartmentPreparer({ selectedDepartments: selectedDepartments })"
+                     x-init="init()">
+                    <template x-if="objectsToSelect && objectsToSelect.length">
+                        <div x-data="alpineMultiSelect({ selected: selectedDepartments, objectsToSelect: objectsToSelect, isRegion: true })">
+                            {% include "tools/contacts/multi_select.html" with placeholder="Cherchez et sélectionnez les départements à affecter" label="Sélectionnez un ou plusieurs départements, laissez vide pour toute la France" is_region=True %}
+                            <template x-for="dept in selectedDepartments" :key="dept">
+                                <input type="hidden" name="departments" :value="dept">
+                            </template>
+                        </div>
                     </template>
+                    <template x-if="!objectsToSelect || !objectsToSelect.length">
+                        <div>Chargement des départements...</div>
+                    </template>
+                    <input type="hidden"
+                           name="{{ form.comment.name }}"
+                           value="{{ form.comment.value }}">
                     <button class="fr-btn custom-login-button w-100"
                             type="submit"
                             data-test-id="save-modif-departments"
-                            @click="sessionStorage.setItem( 'view', 'advisor')">Enregistrer</button>
+                            @click="sessionStorage.setItem('view', 'advisor')">Enregistrer</button>
                 </div>
             </div>
         </fieldset>
