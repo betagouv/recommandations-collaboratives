@@ -24,12 +24,10 @@
 {% block project_list_content %}
     {{ departments|json_script:"departmentsArray" }}
     {{ regions|json_script:"regionsArray" }}
-<div x-data="KanbanProjects({{ request.site.id }}, departmentsArray, regionsArray )"
-     @selected-departments="saveSelectedDepartment($event)"
-     class="col-12 fr-mx-auto font-marianne">
-    <div x-data="PersonalAdvisorDashboard({{ request.site.id }})"
+<div class="col-12 fr-mx-auto font-marianne">
+    <div x-data="PersonalAdvisorDashboard({{ request.site.id }}, departmentsArray, regionsArray)"
          x-init='getData("{{ request.user }}");'
-         @selected-departments="regionsFilterResponse($event)">
+         @selected-departments="saveSelectedDepartment($event)">
          <div class="kanban-header topbar d-flex justify-content-between align-items-center fr-p-2v">
             <div class="kanban-header__view-selector fs-5 fr-mr-6v">
                 {% include "projects/project/fragments/navigation/display_select.html" %}
