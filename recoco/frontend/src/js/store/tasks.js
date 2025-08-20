@@ -4,7 +4,7 @@ import _ from 'lodash';
 document.addEventListener('alpine:init', () => {
   Alpine.store('tasksView', {
     displayedTasks: [],
-    currentView: 'inline',
+    currentView: 'kanban',
     async updateViewWithTask(taskId) {
       try {
         const updatedTasks = await Alpine.store('tasksData').loadTasks();
