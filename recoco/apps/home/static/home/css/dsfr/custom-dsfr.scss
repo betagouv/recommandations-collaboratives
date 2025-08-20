@@ -866,7 +866,7 @@ form > p {
 }
 
 /* ¯¯¯ *\
-  Texte
+  Text
 \* ˍˍˍ */
 
 .text-light-centered {
@@ -877,4 +877,12 @@ form > p {
   font-weight: 400;
   line-height: 150%;
   margin: auto;
+}
+
+/* ¯¯¯ *\
+  Size
+\* ˍˍˍ */
+
+.w-49 {
+  width: 49%;
 }
