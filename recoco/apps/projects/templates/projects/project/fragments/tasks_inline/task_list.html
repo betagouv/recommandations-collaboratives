@@ -12,7 +12,7 @@
     </div>
 {% else %}
     {% for task in actions %}
-        <div class="task-animation-appear-in position-relative fr-my-3w tmp-usevar"> 
+        <div class="task-animation-appear-in position-relative fr-my-3w tmp-usevar">
             {% include "projects/project/fragments/tasks_inline/task_item_embed.html" with task=task task_id=task.id %}
         </div>
     {% endfor %}
