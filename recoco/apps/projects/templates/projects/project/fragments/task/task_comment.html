@@ -1,17 +1,16 @@
 {% load static %}
-<div x-data="TaskComment()">
+<div x-data="TaskComment()" {% if height == "100" %}class="w-100 h-100" {% endif %}>
     <template x-if="!isEditing && currentTask.content !== ''">
         <div data-test-id="task-initial-comment"
-             class="position-relative fr-p-2w bg-grey-light rounded-3 fr-p-2w">
-            <div x-html="truncate(renderMarkdown(task.content),100)"
-                 class="text-info-custom font-small text-dark fr-mb-2w"></div>
+             class="position-relative fr-p-2w bg-grey-light rounded-3 fr-p-2w {% if height == "100" %} w-100 h-100{% endif %}">
+            <div x-html="truncate(renderMarkdown(task.content),400)"
+                 class="text-info-custom font-small text-dark fr-mb-2w {% if content == 'tiny' %}font-size-12px{% endif %}"></div>
             <template x-if="task.contact">
                 <div x-data="{contact: task.contact,isOpenDeleteContact:null}">{% include "tools/contacts/contact_card.html" %}</div>
             </template>
-            {% include "projects/project/fragments/task/task_user_card.html" %}
             {% if embed_view is not True %}
                 {% if "manage_tasks" in user_project_perms and not disable_edit %}
-                    <button class="fr-btn fr-btn--sm fr-btn--tertiary fr-icon-pencil-line position-absolute bottom-0 end-0 fr-m-2w"
+                    <button class="fr-btn fr-btn--sm fr-btn--tertiary fr-icon-pencil-line position-absolute bottom-0 end-0 fr-color--mention_button fr-m-2w"
                             @click.stop="isEditing = true;"
                             data-test-id="edit-comment-button">
                         Modifier le commentaire initial de la recommandation
@@ -23,8 +22,8 @@
     <template x-if="!isEditing && currentTask.content === ''">
         <div class="rounded bg-grey-light fr-mb-3w fr-px-2w d-flex flex-column fr-py-2w justify-content-between align-items-start task-item position-relative">
             <div class="d-flex flex-column align-items-center justify-content-center w-100 fr-py-3w">
-                <span class="text-info-custom text-orange name fw-normal fr-mb-2v">Pas de commentaire initial</span>
-                <button class="button filled blue small inherit"
+                <span class="text-info-custom font-very-small name fw-normal fr-color--disabled-grey fr-mb-2v fw-bold">Pas de commentaire initial</span>
+                <button class="fr-btn fr-btn--secondary fr-btn-secondary-rework"
                         @click.stop="isEditing = true;">Ajouter un commentaire</button>
             </div>
         </div>

@@ -177,6 +177,11 @@
   border-color: #929292 !important;
 }
 
+.border-grey-light {
+  border: 1px solid #E5E5E5;
+  border-color: #E5E5E5 !important;
+}
+
 .border-blue {
   border: solid 1px var(--background-action-high-blue-france);
   border-color: var(--background-action-high-blue-france) !important;
