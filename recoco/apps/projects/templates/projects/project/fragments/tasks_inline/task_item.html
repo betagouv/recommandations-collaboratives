@@ -118,7 +118,7 @@
                 {% endif %}
                 {% if embed_view is not True %}
                     <template x-if="task.public">
-                        {% include "projects/project/fragments/tasks_inline_kanban/tasks_status_buttons.html" %}
+                        {% include "projects/project/fragments/tasks_inline_kanban/tasks_status_buttons.html" with full_width=False %}
                     </template>
                 {% endif %}
 

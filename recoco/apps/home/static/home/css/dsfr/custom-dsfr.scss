@@ -719,6 +719,7 @@ form > p {
 /* ¯¯¯¯ *\
   COLORS
 \* ˍˍˍˍ */
+
 .fr-color {
   color: white;
   &--success {
@@ -862,4 +863,18 @@ form > p {
   font-style: normal;
   font-weight: 700;
   min-height: 0;
+}
+
+/* ¯¯¯ *\
+  Texte
+\* ˍˍˍ */
+
+.text-light-centered {
+  color: #999;
+  text-align: center;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 150%;
+  margin: auto;
 }
