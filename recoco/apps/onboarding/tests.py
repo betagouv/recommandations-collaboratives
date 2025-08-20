@@ -176,12 +176,12 @@ def test_performing_onboarding_signup_with_existing_user_redirects_to_signin(
         "org_name": "MyOrg",
     }
 
-    baker.make(
+    project_creation_request = baker.make(
         projects_models.ProjectCreationRequest, email=user.username, site=current_site
     )
 
     session = client.session
-    session["onboarding_email"] = user.username
+    session["onboarding_uuid"] = str(project_creation_request.uuid)
     session.save()
 
     response = client.post(reverse("onboarding-signup"), data=data, follow=True)
@@ -232,12 +232,12 @@ def test_onboarding_with_account_on_other_site_redirects_to_signin(request, clie
     user.profile.sites.add(other_site)
 
     # We need a ProjectCreationRequest matching the user for this view
-    baker.make(
+    project_creation_request = baker.make(
         projects_models.ProjectCreationRequest, email=user.email, site=current_site
     )
 
     session = client.session
-    session["onboarding_email"] = user.username
+    session["onboarding_uuid"] = str(project_creation_request.uuid)
     session.save()
 
     response = client.post(reverse("onboarding-project"), data=data, follow=True)
@@ -268,12 +268,12 @@ def test_onboarding_with_nonexisting_account_requests_info_from_user(request, cl
     }
 
     # We need a ProjectCreationRequest matching the user for this view
-    baker.make(
+    project_creation_request = baker.make(
         projects_models.ProjectCreationRequest, email=data["email"], site=current_site
     )
 
     session = client.session
-    session["onboarding_email"] = data["email"]
+    session["onboarding_uuid"] = str(project_creation_request.uuid)
     session.save()
 
     response = client.get(reverse("onboarding-signup"), data=data)
@@ -319,7 +319,7 @@ def test_performing_onboarding_signup_create_a_new_user_and_logs_in(request, cli
     }
 
     # We need a ProjectCreationRequest matching the user for this view
-    baker.make(
+    project_creation_request = baker.make(
         projects_models.ProjectCreationRequest,
         project__sites=[current_site],
         email=data["email"],
@@ -327,7 +327,7 @@ def test_performing_onboarding_signup_create_a_new_user_and_logs_in(request, cli
     )
 
     session = client.session
-    session["onboarding_email"] = data["email"]
+    session["onboarding_uuid"] = str(project_creation_request.uuid)
     session.save()
 
     response = client.post(reverse("onboarding-signup"), data=data, follow=True)

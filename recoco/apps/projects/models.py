@@ -8,6 +8,7 @@ created : 2021-05-26 13:33:11 CEST
 """
 
 import os
+import uuid
 
 from django.apps import apps as django_apps
 from django.contrib.auth import models as auth_models
@@ -737,6 +738,7 @@ class ProjectCreationRequest(TimeStampedModel):
     project = models.ForeignKey(
         Project, on_delete=models.CASCADE, related_name="project_creation_requests"
     )
+    uuid = models.UUIDField(default=uuid.uuid4)
 
     objects = ProjectCreationRequestManager()
     on_site = ProjectCreationRequestSiteManager()

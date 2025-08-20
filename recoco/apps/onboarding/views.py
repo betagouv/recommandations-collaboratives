@@ -7,6 +7,8 @@ authors: guillaume.libersat@beta.gouv.fr, raphael.marvie@beta.gouv.fr
 created: 2023-07-17 20:39:35 CEST
 """
 
+import uuid
+
 from allauth.account.views import LoginView
 from django.contrib.auth import login as log_user
 from django.contrib.auth import models as auth
@@ -126,17 +128,17 @@ def onboarding_signup(request):
     if request.user.is_authenticated:
         return redirect(reverse("onboarding-project"))
 
-    existing_email_user = request.session.get("onboarding_email") or request.GET.get(
-        "email"
+    project_request_uuid = request.session.get("onboarding_uuid") or request.GET.get(
+        "onboarding_uuid"
     )
 
-    if not existing_email_user:
+    if not project_request_uuid:
         return redirect(reverse("onboarding-project"))
 
-    # Retrieve the project creation request for the email
+    # Retrieve the project creation request for the uuid
     project_creation_request = (
         projects.ProjectCreationRequest.objects.filter(
-            site=request.site, email=existing_email_user
+            site=request.site, uuid=uuid.UUID(project_request_uuid)
         )
         .order_by("-created")
         .first()
@@ -290,14 +292,15 @@ def onboarding_project(request):
 
                 return redirect(f"{reverse('onboarding-summary', args=(project.pk,))}")
             else:
-                request.session["onboarding_email"] = form.cleaned_data["email"]
-                project_creation_request = projects.ProjectCreationRequest.objects.create(
-                    site=request.site,
-                    # project_uuid=form.cleaned_data["project_uuid"], TODO: add project_uuid
-                    email=form.cleaned_data["email"],
-                    project=project,
+                project_creation_request = (
+                    projects.ProjectCreationRequest.objects.create(
+                        site=request.site,
+                        email=form.cleaned_data["email"],
+                        project=project,
+                    )
                 )
                 project_creation_request.save()
+                request.session["onboarding_uuid"] = str(project_creation_request.uuid)
 
                 try:
                     auth.User.objects.get(username=form.cleaned_data["email"])
