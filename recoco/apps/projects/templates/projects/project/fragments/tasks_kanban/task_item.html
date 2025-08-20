@@ -1,4 +1,4 @@
-<!-- 
+<!--
 This component must be used instead of the component of the same name in the tasks_inline folder
 
 It has a variable kanban_or_list to adapt to those two use cases.
@@ -54,10 +54,10 @@ It has a variable kanban_or_list to adapt to those two use cases.
                          :class="canAdministrate && currentTask.content === '' && 'border border-warning'">
                         <div class="d-flex flex-column">
                             <span class="align-middle text-grey-dark font-very-small specific-lineheight-20"
-                                  x-text="(diffDays = Math.floor((new Date() - new Date(currentTask.created_on)) / (1000 * 60 * 60 * 24))) == 0 
-                                            ? 'Aujourd\'hui' 
-                                            : diffDays === 1 
-                                                ? 'Il y a 1 jour' 
+                                  x-text="(diffDays = Math.floor((new Date() - new Date(currentTask.created_on)) / (1000 * 60 * 60 * 24))) == 0
+                                            ? 'Aujourd\'hui'
+                                            : diffDays === 1
+                                                ? 'Il y a 1 jour'
                                                 : `Il y a ${diffDays} jours`"></span>
                             {% include "projects/project/fragments/task/task_user_card.html" %}
                         </div>
