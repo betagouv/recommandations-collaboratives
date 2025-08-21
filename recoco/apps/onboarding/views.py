@@ -48,15 +48,25 @@ class OnboardingLogin(LoginView):
         context = super().get_context_data(**kwargs)
         current_site = self.request.site
 
-        onboarding_email = self.request.session.get("onboarding_email", None)
+        onboarding_uuid_str: str | None = self.request.session.get(
+            "onboarding_uuid", None
+        )
 
         context["user_other_sites"] = []
-        if onboarding_email:
+        if onboarding_uuid_str is not None:
             try:
-                onboarding_user = auth.User.objects.get(username=onboarding_email)
+                project_creation_request = projects.ProjectCreationRequest.objects.get(
+                    site=self.request.site, uuid=uuid.UUID(onboarding_uuid_str)
+                )
+                onboarding_user = auth.User.objects.get(
+                    username=project_creation_request.email
+                )
+                context["onboarding_email"] = onboarding_user.email
                 context["user_other_sites"] = onboarding_user.profile.sites.exclude(
                     id=current_site.id
                 )
+            except projects.ProjectCreationRequest.DoesNotExist:
+                pass
             except auth.User.DoesNotExist:
                 pass
 
@@ -163,7 +173,7 @@ def onboarding_signup(request):
 
         if not is_new_user:
             # user exists but is not currently logged in,
-            request.session["onboarding_email"] = project_creation_request.email
+            request.session["onboarding_uuid"] = str(project_creation_request.uuid)
 
             login_url = reverse("onboarding-signin")
             next_args = urlencode(
@@ -219,8 +229,8 @@ def onboarding_signup(request):
             refresh_user_projects_in_session(request, user)
 
             # Cleanup session
-            if "onboarding_email" in request.session:
-                del request.session["onboarding_email"]
+            if "onboarding_uuid" in request.session:
+                del request.session["onboarding_uuid"]
 
             if "project_id" in request.session:
                 del request.session["project_id"]
