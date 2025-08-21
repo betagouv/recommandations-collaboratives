@@ -74,8 +74,6 @@ class OnboardingLogin(LoginView):
 
     def form_valid(self, form):
         """Process the valid form submission"""
-        redirect_url = self.get_success_url()
-
         try:
             # Get project creation request for this email if it exists
             project_creation_request = (
