@@ -42,10 +42,10 @@
                 <span class="visually-hidden">Loading...</span>
             </div>
         </div>
-        <div class="kanban-header topbar d-flex justify-content-end align-items-center fr-p-2v">
-            {% comment %} <div class="kanban-header__view-selector fs-5 fr-mr-6v">
+        <div class="kanban-header topbar d-flex justify-content-between align-items-center fr-p-2v">
+            <div class="kanban-header__view-selector fs-5 fr-mr-6v">
                 {% include "projects/project/fragments/navigation/display_select.html" %}
-            </div> {% endcomment %}
+            </div>
             <div x-data="Tutorial('time-filter-tutorial-on-kanban')"
                  class="kanban-header__middle-part">
                 <div class="kanban-header__searchbar position-relative">
