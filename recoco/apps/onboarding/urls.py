@@ -8,13 +8,14 @@ created : 2022-06-06 11:54:25 CEST
 """
 
 from django.urls import path
+from django.views.generic import RedirectView
 
 from . import views
 
 urlpatterns = [
     path(
-        r"onboarding/",
-        views.OnboardingView.as_view(),
+        r"onboarding",
+        RedirectView.as_view(pattern_name="onboarding-project", query_string=True),
         name="onboarding",
     ),
     path(
@@ -46,11 +47,6 @@ urlpatterns = [
         r"onboarding/prefill/project",
         views.prefill_project_submit,
         name="onboarding-prefill",
-    ),
-    path(
-        r"onboarding/<int:project_id>/commune/",
-        views.select_commune,
-        name="onboarding-select-commune",
     ),
 ]
 

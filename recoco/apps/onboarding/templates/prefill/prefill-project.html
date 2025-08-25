@@ -47,7 +47,7 @@
              x-data="AjvValidationSchema('schemaPrefillProjectFormValidator')">
             <div class="onboarding__form"
                  x-data="DsrcFormValidator('{{ form.helper.form_id }}', schemaValidator, '{{ request.method }}')"
-                 x-init="init">{% include "onboarding/fragments/form-project.html" %}</div>
+                 x-init="init">{% include "prefill/fragments/form-project.html" %}</div>
         </div>
     </div>
 {% endblock content %}
