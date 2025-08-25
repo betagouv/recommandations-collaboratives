@@ -32,7 +32,7 @@
                         </div>
                     </template>
                     <template x-for="(task, i) in column(board.status)" :key="task.id">
-                        {% include "projects/project/fragments/tasks_kanban/task_item.html" %}
+                        {% include "projects/project/fragments/tasks_kanban/task_item.html" with kanban_or_list="kanban" %}
                     </template>
                 </div>
             </div>

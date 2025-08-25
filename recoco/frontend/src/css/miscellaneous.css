@@ -81,6 +81,14 @@
   border-bottom: 1px solid #eee;
 }
 
+.border-top-grey {
+  border-top: 1px solid #eee;
+}
+
+.border-grey {
+  border: 1px solid #eee;
+}
+
 .ease-transition {
   transition: all 0.25s ease;
 }
@@ -175,6 +183,11 @@
 .border-grey-dark {
   border: 1px solid #929292;
   border-color: #929292 !important;
+}
+
+.border-grey-light {
+  border: 1px solid #E5E5E5;
+  border-color: #E5E5E5 !important;
 }
 
 .border-blue {
