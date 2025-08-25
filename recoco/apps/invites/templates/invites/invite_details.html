@@ -2,111 +2,21 @@
 {% load humanize %}
 {% load static %}
 {% load sass_tags %}
+{% load django_vite %}
+{% block css %}
+    <link href="{% sass_src 'projects/css/kanban.scss' %}"
+          rel="stylesheet"
+          type="text/css">
+{% endblock css %}
+{% block js %}
+    {% vite_asset 'css/pageInvitation.scss' %}
+{% endblock js %}
 {% block title %}
-    {{ site.name }} | Invitation à rejoindre le dossier {{ invite.project.name }}
+    {{ request.site.name }} - Invitation à rejoindre le dossier {{ invite.project.name }}
 {% endblock title %}
 {% block og_title %}
-    {{ site.name }} | Invitation à rejoindre le dossier {{ invite.project.name }}
+    {{ request.site.name }} - Invitation à rejoindre le dossier {{ invite.project.name }}
 {% endblock og_title %}
 {% block content %}
-    <div class="col-10 fr-py-6w fr-mx-auto">
-        <span class="fs-4">Vous êtes invité·e sur le dossier</span>
-        <h4 class="fw-bolder">{{ invite.project.name }}</h4>
-        <div class="fr-mt-2w">
-            <strong>{{ invite.inviter.get_full_name }}</strong> vous invite à contribuer
-            sur le dossier <strong>{{ invite.project.name }}</strong> en tant
-            que <strong>{{ invite.get_role_display }}</strong>.
-        </div>
-        <div class="row">
-            <div class="col-7">
-                {% if not existing_account %}<h5>Créez votre compte {{ site.name }}</h5>{% endif %}
-                <form class="form fr-mt-3w"
-                      action="{% url 'invites-invite-accept' invite.pk %}"
-                      method="post">
-                    {% csrf_token %}
-                    {% if not existing_account %}
-                        <label class="form-label" for="email">Adresse courriel</label>
-                        <input type="text"
-                               class="form-control"
-                               id="email"
-                               value="{{ invite.email }}"
-                               disabled>
-                        <div class="row">
-                            <div class="col-6">
-                                <div class="fr-my-2w">
-                                    <label class="form-label" for="input-first-name">Prénom</label>
-                                    <input type="text"
-                                           class="form-control {% if form.first_name.errors %}is-invalid{% endif %}"
-                                           id="input-first-name"
-                                           name="{{ form.first_name.name }}"
-                                           placeholder="Camille"
-                                           value="{{ form.first_name.value|default:'' }}"
-                                           required>
-                                    {% for error in form.first_name.errors %}<div class="text-danger text-end">{{ error }}</div>{% endfor %}
-                                </div>
-                            </div>
-                            <div class="col-6">
-                                <div class="fr-my-2w">
-                                    <label class="form-label" for="input-last-name">Nom</label>
-                                    <input type="text"
-                                           class="form-control {% if form.last_name.errors %}is-invalid{% endif %}"
-                                           id="input-last-name"
-                                           name="{{ form.last_name.name }}"
-                                           placeholder="Dupont"
-                                           value="{{ form.last_name.value|default:'' }}"
-                                           required>
-                                    {% for error in form.last_name.errors %}<div class="text-danger text-end">{{ error }}</div>{% endfor %}
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-6">
-                                <div class="fr-my-2v">
-                                    <label class="form-label" for="input-organization">Organisation</label>
-                                    <input type="text"
-                                           class="form-control {% if form.organization.errors %}is-invalid{% endif %}"
-                                           id="input-organization"
-                                           name="{{ form.organization.name }}"
-                                           placeholder="DEFR59"
-                                           value="{{ form.organization.value|default:'' }}"
-                                           required>
-                                    {% for error in form.organization.errors %}<div class="text-danger text-end">{{ error }}</div>{% endfor %}
-                                </div>
-                            </div>
-                            <div class="col-6">
-                                <div class="fr-my-2v">
-                                    <label class="form-label" for="input-position">Fonction</label>
-                                    <input type="text"
-                                           class="form-control {% if form.position.errors %}is-invalid{% endif %}"
-                                           id="input-position"
-                                           name="{{ form.position.name }}"
-                                           placeholder="Chargée de mission"
-                                           value="{{ form.position.value|default:'' }}"
-                                           required>
-                                    {% for error in form.position.errors %}<div class="text-danger text-end">{{ error }}</div>{% endfor %}
-                                </div>
-                            </div>
-                        </div>
-                    {% endif %}
-                    <button class="fr-my-2v btn btn-primary" type="submit">Accepter l'invitation</button>
-                </form>
-            </div>
-            <div class="col-4">
-                {% if invite.message %}
-                    <div class="bg-light fr-p-2w">
-                        <h6 class="fw-bolder">Message de l'utilisateur</h6>
-                        <p>{{ invite.message }}</p>
-                        <p>-- {{ invite.inviter.get_full_name }}</p>
-                    </div>
-                {% endif %}
-                <div class="bg-light fr-p-2w fr-my-2v">
-                    <h6 class="fw-bolder">Qu'est ce que {{ request.site.name }} ?</h6>
-                    {% include "invites/invite_site_message.html" %}
-                    <p>
-                        <a href="{% url 'home' %}">En savoir plus</a>
-                    </p>
-                </div>
-            </div>
-        </div>
-    </div>
+    {% include "invites/fragments/invite_form.html" with title="Invitation à rejoindre un dossier" %}
 {% endblock content %}

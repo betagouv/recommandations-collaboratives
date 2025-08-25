@@ -6,6 +6,7 @@ from django.urls import reverse
 from django.utils import timezone
 
 from recoco.apps.addressbook import models as addressbook_models
+from recoco.apps.home.models import SiteConfiguration
 from recoco.apps.projects import signals as projects_signals
 from recoco.apps.projects.utils import (
     assign_advisor,
@@ -18,7 +19,11 @@ from . import forms, models
 
 def invite_accept(request, invite_id):
     invite = get_object_or_404(
-        models.Invite, pk=invite_id, site=request.site, accepted_on=None
+        models.Invite,
+        pk=invite_id,
+        site=request.site,
+        accepted_on=None,
+        refused_on=None,
     )
     project = invite.project
 
@@ -96,11 +101,44 @@ def invite_accept(request, invite_id):
     return redirect(reverse("invites-invite-details", args=(invite.pk,)))
 
 
-def invite_details(request, invite_id):
-    invite = get_object_or_404(models.Invite, site=request.site, pk=invite_id)
+def invite_refuse(request, invite_id):
+    invite = get_object_or_404(
+        models.Invite,
+        pk=invite_id,
+        site=request.site,
+        accepted_on=None,
+        refused_on=None,
+    )
 
-    if invite.accepted_on:
-        return redirect(reverse("account_login"))
+    if request.method == "POST":
+        # Check if this email already exists as an account
+        try:
+            existing_account = auth_models.User.objects.get(username=invite.email)
+            if existing_account != request.user:
+                return HttpResponseForbidden()
+        except auth_models.User.DoesNotExist:
+            # we shouldn't be logged in at this point
+            if request.user.is_authenticated:
+                return HttpResponseForbidden()
+
+        invite.refused_on = timezone.now()
+        invite.save()
+
+        return redirect(reverse("home"))
+
+    return redirect(reverse("invites-invite-details", args=(invite.pk,)))
+
+
+def invite_details(request, invite_id):
+    invite = get_object_or_404(
+        models.Invite,
+        site=request.site,
+        pk=invite_id,
+        refused_on=None,
+        accepted_on=None,
+    )
+
+    site_config = SiteConfiguration.objects.get(site=request.site)
 
     # Check if this email already exists as an account
     existing_account = None

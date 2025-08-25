@@ -4,6 +4,7 @@ from django.contrib.auth import models as auth_models
 from django.contrib.sites.managers import CurrentSiteManager
 from django.contrib.sites.models import Site
 from django.db import models
+from django.db.models import Q
 from django.urls import reverse
 from django.utils import timezone
 
@@ -12,7 +13,7 @@ from recoco.apps.projects import models as projects_models
 
 class InviteManager(models.Manager):
     def pending(self):
-        return self.filter(accepted_on=None)
+        return self.filter(accepted_on=None, refused_on=None)
 
 
 class InviteOnSiteManager(CurrentSiteManager, InviteManager):
@@ -21,6 +22,18 @@ class InviteOnSiteManager(CurrentSiteManager, InviteManager):
 
 class Invite(models.Model):
     """Invitation for a project"""
+
+    class Meta:
+        constraints = [
+            models.CheckConstraint(
+                name="%(app_label)s_%(class)s_accepted_or_refused",
+                condition=(
+                    Q(accepted_on=None, refused_on=None)
+                    | Q(Q(accepted_on=None) & ~Q(refused_on=None))
+                    | Q(~Q(accepted_on=None) & Q(refused_on=None))
+                ),
+            )
+        ]
 
     INVITE_ROLES = (
         ("COLLABORATOR", "Participant·e"),
@@ -46,6 +59,14 @@ class Invite(models.Model):
         editable=False,
         verbose_name="date d'acceptation",
     )
+    refused_on = models.DateTimeField(
+        default=None,
+        null=True,
+        blank=True,
+        editable=False,
+        verbose_name="date de refus",
+    )
+
     email = models.EmailField(max_length=254)
 
     inviter = models.ForeignKey(
