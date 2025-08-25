@@ -17,9 +17,7 @@ export function stringToColor(str, palette) {
   for (let i = 0; i < str.length; i++) {
     hash = str.charCodeAt(i) + (hash * 32 - hash); // Hash simple
   }
-  console.log(str, hash);
 
   const colorIndex = Math.abs(hash) % colors.length; // Assurer un index positif
-  console.log(colors[colorIndex]);
   return colors[colorIndex];
 }
