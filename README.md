@@ -61,6 +61,21 @@ source .venv/bin/activate
 uv sync
 ```
 
+Il faut aussi une base de données postgres. Configurez-là pour le projet:
+```sh
+sudo -u postgres psql < sql/init.sql
+```
+La base ainsi créée s'appelle `recoco` et appartient à un utilisateur nommé `recoco` avec le mot de passe `recoco`. À ne laisser tel quel ue pour un environement de développement pour des raisons de sécurité.
+
+Les modules suivants sont installés en production et peuvent être requis (à affiner, plusieurs ne sont plus vraiment utilisés) :
+* agestore
+* pgcrypto
+* trgm
+* postgis
+* postgis topology
+* unaccent
+* uuid-ossp
+
 #### Configuration de l'applicatif
 
 Copiez le fichier de variables d'environnement d'exemple :
@@ -139,7 +154,9 @@ Puis, exécutez le backend :
 
 Vous devriez pouvoir vous connecter sur http://localhost:8000 !
 
-## Chargement des données de démo
+## Chargement de données
+
+### données de démo
 
 ```bash
 ./manage.py loaddata data/geomatics.json
@@ -157,8 +174,24 @@ site = utils.make_new_site("Example", "example.com", "sender@example.com", "Send
 site.aliases.create(domain="localhost", redirect_to_canonical=False)
 ```
 
-## Récupérer les portails existants
+### données de la prod
+
+Avec un dump de db de prod, vous pouvez restaurer ces donnés:
+
+```bash
+sudo -u postgres psql < [path vers le dump]
+```
+
+
+### Récupérer les portails existants
 Plusieurs portails (ie sites) ont déjà été configurés et sont disponibles sur le dépôt [recoco-portails](https://github.com/betagouv/recoco-portails). Pour y avoir accès en local, il faut cloner ce dépôt dans un dossier `multisites` à la racine du projet global.
+
+Pour créer les bons alias dans l'interface d'administration, exécuter depuis le shell django
+
+```python
+run scripts/create_site_localhost_aliases.py
+```
+Pour vérifier que ç'a bien fonctionner, vérifiez que l'accès à http://sosponts.localhost:8000 fonctionne bien (par ex)
 
 ## Environnement de développement
 
@@ -169,8 +202,6 @@ Pour que des PRs soient acceptées, on requiert que pre-commit ait été passé.
 pre-commit install
 ```
 pour que cette configuration soit bien appliquée.
-
-
 
 ## Tests
 
