@@ -261,6 +261,8 @@ def onboarding_project(request):
         form.fields["email"].initial = request.user.email
         form.fields["email"].disabled = True
 
+    is_prefill_step = request.GET.get("prefill", False)
+
     if request.method == "POST":
         all_forms_valid = form.is_valid()
 
@@ -324,6 +326,7 @@ def onboarding_project(request):
         "form": form,
         "question_forms": question_forms,
         "site_config": site_config,
+        "is_prefill_step": is_prefill_step,
     }
     return render(request, "onboarding/onboarding-project.html", context)
 
