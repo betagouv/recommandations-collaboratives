@@ -377,7 +377,7 @@ def prefill_project_set_user(request):
 
         return redirect(reverse("onboarding-prefill"))
 
-    return render(request, "onboarding/prefill-user.html", locals())
+    return render(request, "prefill/prefill-user.html", locals())
 
 
 def prefill_project_submit(request):
@@ -469,7 +469,7 @@ def prefill_project_submit(request):
                 reverse("projects-project-detail-overview", args=(project.pk,))
             )
 
-    return render(request, "onboarding/prefill-project.html", locals())
+    return render(request, "prefill/prefill-project.html", locals())
 
 
 @transaction.atomic
