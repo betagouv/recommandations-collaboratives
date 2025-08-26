@@ -33,7 +33,7 @@
                     <ul class="fr-btns-group fr-btns-group--inline" data-test-id="intro-uv">
                         <li>
                             {% if user.is_authenticated %}
-                                <a href="{% url 'onboarding-prefill-set-user' %}"
+                                <a href="{% url 'onboarding' %}?prefill=true"
                                    class="fr-btn fr-text--xl"
                                    data-test-id="button-need-help">Solliciter {{ request.site.name }}</a>
                             {% else %}
