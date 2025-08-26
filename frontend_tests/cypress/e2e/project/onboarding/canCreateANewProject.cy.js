@@ -16,13 +16,13 @@ describe('I can create a new project as a new user', () => {
     organization: 'Test Organization',
     organization_position: 'Test Position',
     phone_no: '0102030405',
-    password1: 'testpassword123',
-    password2: 'testpassword123',
+    password1: 'Testpassword123',
+    password2: 'Testpassword123',
   };
 
   const alreadyExistingUserInfo = {
     email: projectInfo.email,
-    password: 'testpassword123',
+    password: 'Testpassword123',
   };
 
   it('goes through the complete onboarding process', () => {
@@ -76,6 +76,14 @@ describe('I can create a new project as a new user', () => {
       .should('have.value', projectInfo.email)
       .should('have.class', 'fr-input--valid');
 
+    // Handle captcha
+    cy.document().then((doc) => {
+      const iframe = doc.getElementById('id_captcha').querySelector('iframe');
+      const innerDoc = iframe.contentDocument || iframe.contentWindow.document;
+      innerDoc.querySelector('.recaptcha-checkbox').click();
+      cy.wait(400);
+    });
+
     // Submit project form
     cy.get('button[type="submit"]').click();
 
@@ -107,14 +115,6 @@ describe('I can create a new project as a new user', () => {
       .type(signupInfo.password1, { delay: 0 })
       .should('have.value', signupInfo.password1);
 
-    // Handle captcha
-    cy.document().then((doc) => {
-      const iframe = doc.getElementById('id_captcha').querySelector('iframe');
-      const innerDoc = iframe.contentDocument || iframe.contentWindow.document;
-      innerDoc.querySelector('.recaptcha-checkbox').click();
-      cy.wait(400);
-    });
-
     // Submit signup form
     cy.get('[type=submit]').click();
 
@@ -122,7 +122,7 @@ describe('I can create a new project as a new user', () => {
     cy.url().should('include', '/onboarding/summary');
   });
 
-  it.skip('goes through the onboarding process but stop at signup page', () => {
+  it('goes through the onboarding process but stop at signup page', () => {
     // Visit home page and click on need help button
     cy.visit('/');
     cy.get('[data-test-id="button-need-help"]')
@@ -173,6 +173,14 @@ describe('I can create a new project as a new user', () => {
       .should('have.value', projectInfo.fixedEmail)
       .should('have.class', 'fr-input--valid');
 
+    // Handle captcha
+    cy.document().then((doc) => {
+      const iframe = doc.getElementById('id_captcha').querySelector('iframe');
+      const innerDoc = iframe.contentDocument || iframe.contentWindow.document;
+      innerDoc.querySelector('.recaptcha-checkbox').click();
+      cy.wait(400);
+    });
+
     // Submit project form
     cy.get('button[type="submit"]').click();
 
@@ -213,14 +221,6 @@ describe('I can create a new project as a new user', () => {
     cy.get('[name=password]')
       .type(signupInfo.password1, { delay: 0 })
       .should('have.value', signupInfo.password1);
-
-    // Handle captcha
-    cy.document().then((doc) => {
-      const iframe = doc.getElementById('id_captcha').querySelector('iframe');
-      const innerDoc = iframe.contentDocument || iframe.contentWindow.document;
-      innerDoc.querySelector('.recaptcha-checkbox').click();
-      cy.wait(400);
-    });
 
     // Submit signup form
     cy.get('[type=submit]').click();
@@ -279,6 +279,14 @@ describe('I can create a new project as a new user', () => {
       .type(projectInfo.email, { delay: 0 })
       .should('have.value', projectInfo.email)
       .should('have.class', 'fr-input--valid');
+
+    // Handle captcha
+    cy.document().then((doc) => {
+      const iframe = doc.getElementById('id_captcha').querySelector('iframe');
+      const innerDoc = iframe.contentDocument || iframe.contentWindow.document;
+      innerDoc.querySelector('.recaptcha-checkbox').click();
+      cy.wait(400);
+    });
 
     // Submit project form
     cy.get('button[type="submit"]').click();
