@@ -9,7 +9,6 @@ import 'leaflet-control-geocoder';
 import 'leaflet-providers';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-control-geocoder/dist/Control.Geocoder.css';
-import Fuse from 'fuse.js';
 import _ from 'lodash';
 
 function PersonalAdvisorDashboard(currentSiteId, departments, regions) {
@@ -23,11 +22,6 @@ function PersonalAdvisorDashboard(currentSiteId, departments, regions) {
     formatDate,
     gravatar_url,
     makeProjectURL,
-    //*** filters old ?
-    currentSort: this.sortProjectDate,
-    search: '',
-    select: '',
-    fuse: null,
     //*** new filters for map
     backendSearch: {
       searchText: '',
@@ -68,9 +62,6 @@ function PersonalAdvisorDashboard(currentSiteId, departments, regions) {
       this.data = projects.map((project) => ({ ...project, isLoading: false }));
       this.data = this.createProjectListWithNewActivities(projects);
       this.rawData = [...this.data];
-      this.fuse = new Fuse(this.rawData, {
-        keys: ['project.name', 'project.commune.name', 'project.commune.insee'],
-      });
       this.data = _.unionBy(this.data, 'project.id');
       this.displayedData = this.data.sort(this.sortProjectDate);
       if (this.map) {
@@ -89,106 +80,9 @@ function PersonalAdvisorDashboard(currentSiteId, departments, regions) {
       } else {
         setTimeout(() => this.map.invalidateSize(), 251);
       }
-
-      const sameUser = this.isSameUser(currentUser);
-
-      if (sameUser) {
-        return this.checkCurrentState();
-      } else {
-        //Changing current user and re-init current state
-        this.removeStateFromStore('departments');
-        this.removeStateFromStore('sort');
-        this.removeStateFromStore('search');
-        this.addCurrentStateToStore('currentUser', currentUser);
-      }
-    },
-    checkCurrentState() {
-      const currentSort = this.readCurrentStateFromStore('sort');
-      const currentDepartments = this.readCurrentStateFromStore('departments');
-
-      if (currentSort) {
-        this.select = JSON.parse(currentSort);
-        this.currentSort = this.getCurrentSortFn(this.select);
-      }
-
-      if (currentDepartments) {
-        this.departments = JSON.parse(currentDepartments);
-      }
-
-      //If we can find an inactive department in state
-      // then uncheck select all departments in filter
-      if (
-        this.departments.findIndex((department) => department.active) === -1
-      ) {
-        this.territorySelectAll = false;
-      }
-
-      return (this.displayedData = this.filterProjectsByDepartments(
-        this.data
-      ).sort(this.currentSort));
-    },
-    isSameUser(currentUser) {
-      const previousUser = this.readCurrentStateFromStore('currentUser');
-
-      if (!previousUser) {
-        this.addCurrentStateToStore('currentUser', currentUser);
-      }
-
-      return JSON.parse(previousUser) == currentUser;
     },
     get isBusy() {
       return this.$store.app.isLoading;
-    },
-    getProjectStatusClass(item) {
-      if (item.project.inactive_since !== null) {
-        return 'inactive';
-      }
-    },
-    getProjectStatusColor(item) {
-      if (item.status === 'NEW') {
-        return 'text-new-project';
-      } else if (item.project.inactive_since) {
-        return 'text-inactive';
-      } else if (item.project.is_switchtender && !item.project.is_observer) {
-        return 'text-green';
-      } else if (item.project.is_observer && item.project.is_switchtender) {
-        return 'text-blue';
-      }
-    },
-    getNewRecommendations(item) {
-      const newRecommendations = item.project.notifications.new_recommendations;
-
-      if (newRecommendations > 1) {
-        return `(${newRecommendations} nouvelles)`;
-      } else if (newRecommendations === 1) {
-        return `(${newRecommendations} nouvelle)`;
-      }
-
-      return null;
-    },
-    getUnreadPublicMessages(item) {
-      const unreadPublicMessages =
-        item.project.notifications.unread_public_messages;
-
-      if (unreadPublicMessages > 1) {
-        return `(${unreadPublicMessages} nouveaux)`;
-      } else if (unreadPublicMessages === 1) {
-        return `(${unreadPublicMessages} nouveau)`;
-      }
-
-      return null;
-    },
-    getUnreadPrivateMessages(item) {
-      const unreadPrivateMessages =
-        item.project.notifications.unread_private_messages;
-
-      if (unreadPrivateMessages > 1) {
-        return `(${unreadPrivateMessages} nouveaux)`;
-      } else if (unreadPrivateMessages === 1) {
-        return `(${unreadPrivateMessages} nouveau)`;
-      }
-
-      return null;
     },
     createProjectListWithNewActivities(projects) {
       const projectsWithNewActivities = projects.map((item) => {
@@ -233,15 +127,15 @@ function PersonalAdvisorDashboard(currentSiteId, departments, regions) {
 
       return (this.departments = departments.sort(this.sortDepartments));
     },
-    regionsFilterResponse(event) {
-      if (!event.detail) return;
+    // regionsFilterResponse(event) {
+    //   if (!event.detail) return;
 
-      this.departments = event.detail;
+    //   this.departments = event.detail;
 
-      return (this.displayedData = this.filterProjectsByDepartments(
-        this.searchProjects(this.search)
-      ).sort(this.currentSort));
-    },
+    //   return (this.displayedData = this.filterProjectsByDepartments(
+    //     this.searchProjects(this.search)
+    //   ).sort(this.currentSort));
+    // },
     filterProjectsByDepartments(projects) {
       this.addCurrentStateToStore('departments', this.departments);
 
@@ -254,24 +148,24 @@ function PersonalAdvisorDashboard(currentSiteId, departments, regions) {
           )?.active
       );
     },
-    handleProjectsSearch(event) {
-      const searchValue = event.target.value;
+    // handleProjectsSearch(event) {
+    //   const searchValue = event.target.value;
 
-      if (searchValue === '') {
-        this.addCurrentStateToStore('search', searchValue);
-        return (this.displayedData = this.filterProjectsByDepartments(
-          this.data
-        ).sort(this.currentSort));
-      }
+    //   if (searchValue === '') {
+    //     this.addCurrentStateToStore('search', searchValue);
+    //     return (this.displayedData = this.filterProjectsByDepartments(
+    //       this.data
+    //     ).sort(this.currentSort));
+    //   }
 
-      const newProjectList = this.searchProjects(searchValue);
+    //   const newProjectList = this.searchProjects(searchValue);
 
-      this.addCurrentStateToStore('search', searchValue);
+    //   this.addCurrentStateToStore('search', searchValue);
 
-      return (this.displayedData = this.filterProjectsByDepartments(
-        newProjectList
-      ).sort(this.currentSort));
-    },
+    //   return (this.displayedData = this.filterProjectsByDepartments(
+    //     newProjectList
+    //   ).sort(this.currentSort));
+    // },
     searchProjects(searchValue) {
       return this.data.filter((item) => {
         if (
@@ -301,121 +195,6 @@ function PersonalAdvisorDashboard(currentSiteId, departments, regions) {
     removeStateFromStore(item) {
       return localStorage.removeItem(item);
     },
-    handleProjectsSelect(event) {
-      this.currentSort = this.getCurrentSortFn(event.target.value);
-
-      this.select = event.target.value;
-      this.addCurrentStateToStore('sort', this.select);
-
-      return (this.displayedData = this.displayedData.sort(this.currentSort));
-    },
-    getCurrentSortFn(select) {
-      let sortCriterion;
-
-      switch (select) {
-        case 'commune-name':
-          sortCriterion = this.sortProjectCommuneName;
-          break;
-        case 'date':
-          sortCriterion = this.sortProjectDate;
-          break;
-        case 'insee':
-          sortCriterion = this.sortProjectInsee;
-          break;
-        case 'recent-activities':
-          sortCriterion = this.sortProjectRecentActivities;
-          break;
-        case 'role':
-          sortCriterion = this.sortProjectRole;
-          break;
-        default:
-          sortCriterion = this.sortProjectDate;
-          break;
-      }
-
-      return sortCriterion;
-    },
-    sortProjectCommuneName(a, b) {
-      if (a.project?.commune?.name < b.project?.commune?.name) {
-        return -1;
-      } else if (a.project?.commune?.name > b.project?.commune?.name) {
-        return 1;
-      } else return 0;
-    },
-    sortProjectDate(a, b) {
-      if (new Date(a.project?.created_on) > new Date(b.project?.created_on)) {
-        return -1;
-      } else if (
-        new Date(a.project?.created_on) < new Date(b.project?.created_on)
-      ) {
-        return 1;
-      } else return 0;
-    },
-    sortProjectInsee(a, b) {
-      if (a.project?.commune?.insee < b.project?.commune?.insee) {
-        return -1;
-      } else if (a.project?.commune?.insee > b.project?.commune?.insee) {
-        return 1;
-      } else return 0;
-    },
-    sortProjectStatus(a, b) {
-      if (a.status === 'NEW') {
-        return -1;
-      } else if (b.status === 'NEW') {
-        return 1;
-      } else return 0;
-    },
-    sortProjectRecentActivities(a, b) {
-      if (
-        a.project.newActivities === a.project.newActivities &&
-        new Date(a.project.updated_on) === new Date(b.project.updated_on)
-      ) {
-        if (new Date(a.project?.created_on) > new Date(b.project?.created_on)) {
-          return -1;
-        } else if (
-          new Date(a.project.created_on) < new Date(b.project.created_on)
-        ) {
-          return 1;
-        } else return 0;
-      } else if (a.project.newActivities === b.project.newActivities) {
-        if (new Date(a.project?.updated_on) > new Date(b.project?.updated_on)) {
-          return -1;
-        } else if (
-          new Date(a.project.updated_on) < new Date(b.project.updated_on)
-        ) {
-          return 1;
-        } else return 0;
-      } else {
-        if (a.project.newActivities > b.project.newActivities) {
-          return -1;
-        } else if (a.project.newActivities < b.project.newActivities) {
-          return 1;
-        } else return 0;
-      }
-    },
-    sortProjectRole(a, b) {
-      if (a.project.is_switchtender && !a.project.is_observer) {
-        return -1;
-      }
-      if (b.project.is_switchtender && !b.project.is_observer) {
-        return 1;
-      }
-      if (a.project.is_switchtender && a.project.is_switchtender) {
-        return -1;
-      }
-      if (b.project.is_switchtender && b.project.is_observer) {
-        return 1;
-      }
-
-      return 0;
-    },
-    sortDepartments(a, b) {
-      if (a.code < b.code) {
-        return -1;
-      } else if (a.code > b.code) {
-        return 1;
-      } else return 0;
-    },
     handleMapOpen() {
       //251 -> 0.25s for the map height transition +1 ms
       setTimeout(() => this.map.invalidateSize(), 251);
@@ -429,33 +208,6 @@ function PersonalAdvisorDashboard(currentSiteId, departments, regions) {
       this.bodyScrollTopPadding = height;
       window.document.body.style.scrollPaddingTop = `${this.bodyScrollTopPadding}px`;
       window.document.documentElement.style.scrollPaddingTop = `${this.bodyScrollTopPadding}px`;
-    },
-    async handlePositioningAction(url, id) {
-      const projectUpdated = this.displayedData.find(
-        (item) => item.project.id === id
-      );
-      this.open = false;
-
-      try {
-        projectUpdated.isLoading = true;
-
-        await api.post(url.replace('0', id));
-        const updatedProjects =
-          await this.$store.projects.getUserProjetsStatus();
-
-        const updatedProject = updatedProjects.find(
-          ({ project }) => project.id === id
-        );
-        this.displayedData = this.displayedData.map((item) =>
-          item.project.id === id ? updatedProject : item
-        );
-
-        projectUpdated.isLoading = false;
-      } catch (err) {
-        console.error('Something went wrong : ', err);
-        this.errors = err;
-        projectUpdated.isLoading = false;
-      }
     },
 
     //*** filters functions
@@ -702,10 +454,6 @@ function markerPopupTemplate(item) {
             </a>
         </div>
     `;
-}
-
-export function makeProjectPositioningActionURL(url, id) {
-  return url.replace('0', id);
 }
 
 Alpine.data('PersonalAdvisorDashboard', PersonalAdvisorDashboard);
