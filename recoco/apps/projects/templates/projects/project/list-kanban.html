@@ -147,7 +147,7 @@
                                                                 <div class="kanban-card__project-container fr-mb-2v">
                                                                     <span class="kanban-card__project-name project-link"
                                                                           x-text="truncate(t.name)"></span>
-                                                                    <template x-if="t.owner.profile.organization">
+                                                                    <template x-if="t.owner?.profile?.organization">
                                                                         <span class="kanban-card__project-organization"
                                                                                 x-text="t.owner.profile.organization.name"></span>
                                                                     </template>
