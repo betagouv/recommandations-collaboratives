@@ -3,6 +3,7 @@
               id="radio-hint"
               aria-labelledby="radio-hint-legend radio-hint-messages">
         {% if form.fields.answer.choices != None %}
+            {% for error in form.answer.errors %}<p class="fr-error-text element-to-focus">{{ error }}</p>{% endfor %}
             <legend class="fr-fieldset__legend--regular fr-fieldset__legend"
                     id="radio-hint-legend">{{ form.question.text }} *</legend>
         {% endif %}
@@ -14,6 +15,7 @@
                                value="{{ choice.0 }}"
                                id="form_answer-{{ forloop.parentloop.counter }}-{{ forloop.counter }}"
                                name="{{ form.answer.html_name }}"
+                               required
                                {% if choice.0 in form.fields.answer.initial %}checked{% endif %}>
                         <label class="fr-label"
                                for="form_answer-{{ forloop.parentloop.counter }}-{{ forloop.counter }}">
@@ -53,6 +55,7 @@
                               class="fr-input"
                               rows="3"
                               id="{{ form.comment.name }}-{{ forloop.parentloop.counter }}-{{ forloop.counter }}"
+                              required
                               name="{{ form.comment.html_name }}">{{form.comment.value|default:''}}</textarea>
                     {% for error in form.comment.errors %}
                         <p id="text-input-error-desc-error" class="fr-error-text">{{ error }}</p>

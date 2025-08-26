@@ -2,7 +2,7 @@
 <form id="{{ form.helper.form_id }}"
       method="post"
       enctype="multipart/form-data"
-      @submit="localStorage.setItem('userEmailProjectCreationStep', $event.target.elements.email.value)"
+      @submit="localStorage.setItem('userEmailProjectCreationStep', $event.target.elements.email.value); localStorage.setItem('userReachSignup', false)"
       x-on:input="isFormEdited = true">
     <input type="hidden"
            name="js_enabled"
@@ -25,5 +25,6 @@
     <fieldset class="fr-fieldset">
         {{ form.captcha }}
     </fieldset>
+    {{ form.errors }}
     {% include "dsrc/core/blocks/buttons/button_group.html" %}
 </form>

@@ -318,6 +318,7 @@ def onboarding_project(request):
                         {"next": reverse("onboarding-summary", args=(project.pk,))}
                     )
                     login_url = reverse("onboarding-signin")
+                    request.session["onboarding_email"] = form.cleaned_data["email"]
                     return redirect(f"{login_url}?{next_args}")
                 except auth.User.DoesNotExist:
                     signup_url = reverse("onboarding-signup")
