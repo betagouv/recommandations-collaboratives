@@ -10,7 +10,8 @@
            @click="setIntent(resource)">
     <label class="fr-label" :for="'resource-' + resource.id">
         <template x-if="resource.status == 0">
-            <span class="fr-badge fr-badge--sm fr-badge--warning">Ressource à l'état de brouillon</span>
+            <span class="fr-badge fr-badge--sm fr-badge--warning"
+                  data-cy="resource-warning-status-draft">Ressource à l'état de brouillon</span>
         </template>
         <span class="ressources__result-item-title"
               x-text="truncate(resource.title, 100)"></span>
