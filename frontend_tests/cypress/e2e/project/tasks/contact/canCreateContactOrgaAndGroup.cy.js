@@ -102,19 +102,20 @@ describe('I can create and edit a contact and an organization on contactbook', (
     //select yes for national group
     cy.get('#natGroup-yes').click({ force: true });
     //search for a non existing group
-    cy.get('[data-test-id="search-group-input"]').type('imsad');
+    cy.get('[data-test-id="search-group-input"]').type('imsupersad');
     //create the group from the dropdown
-    cy.get('[data-test-id="button-create-organization-group"]').click();
+    cy.get('[data-test-id="button-create-organization-group"]').click()
+    cy.wait(1000);
     //create the organization
     cy.get('[data-test-id="button-create-new-organization"]').click({ force: true });
-    cy.wait(1000); //wait for the organization to be created before submitting the contact form
     //submit the contact form
     cy.get('[data-test-id="create-contact-button"]').click({ force: true });
     //reload page to see the contact
     cy.reload();
     //verify that the contact is created and organization is linked
     cy.get('[data-test-id="contact-card"]').should('contain', 'darth vader')
-      .and('contain', 'imsad');
+      .and('contain', 'imsupersad');
+
   });
 
   xit('can create a contact and create a new organization with an existing group and one department', () => {
