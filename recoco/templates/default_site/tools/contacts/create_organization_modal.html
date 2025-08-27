@@ -84,7 +84,7 @@
                                     <div class="fr-menu__list w-100 position-absolute border-radius-4px">
                                         <div class="fr-menu__list w-100 overflow-auto specific-height border-radius-4px fr-mb-0">
                                             <template x-if="userInput.length > 0 && showOrgaGroupsresults && !isAnOrgaGroupSelected">
-                                                <div>
+                                                <div data-test-id="orga-group-to-select">
                                                     <template class="fr-menu__item" x-for="group in orgaGroupsFound">
                                                         <div class="fr-pt-1w fr-px-1w add-borders cursor-pointer"
                                                              @click="onSelectGroup(group)">
