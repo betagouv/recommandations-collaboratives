@@ -110,7 +110,7 @@ def invite_refuse(request, invite_id):
         refused_on=None,
     )
 
-    if request.method == "POST":
+    if request.method == "GET":
         # Check if this email already exists as an account
         try:
             existing_account = auth_models.User.objects.get(username=invite.email)

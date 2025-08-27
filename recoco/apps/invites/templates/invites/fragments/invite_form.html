@@ -116,7 +116,8 @@
                     <li class="w-50">
                         {% comment %} TODO: add url/action from backend {% endcomment %}
                         <a class="fr-btn fr-btn--tertiary-no-outline w-100 align-self-center"
-                           href="">Refuser</a>
+                           role="button"
+                           href="{% url 'invites-invite-refuse' invite.pk %}">Refuser</a>
                     </li>
                     <li class="w-50">
                         <button class="fr-btn fr-btn--primary w-100 align-self-center" type="submit">Rejoindre le dossier</button>
