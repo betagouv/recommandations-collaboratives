@@ -14,10 +14,10 @@
               x-text="resource.subtitle"></span>
         <div>
             <ul class="fr-badge-group fr-p-0">
-                <template x-if="resource.category && resource.category.name">
+                <template x-if="resource.category">
                     <li>
                         <span class="fr-badge fr-badge--sm fr-badge--green-menthe"
-                              x-text="resource.category.name"></span>
+                              x-text="resource.category"></span>
                     </li>
                 </template>
                 <li x-show="resource.has_dsresource">
