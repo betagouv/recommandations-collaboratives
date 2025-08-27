@@ -87,17 +87,17 @@ document.addEventListener('alpine:init', () => {
         this.selectedElms = this.options.filter((opt) => opt.selected);
       } else {
         this.options = [];
-        for (let i = 0; i < data.length; i++) {
+        data.forEach((item) => {
           this.options.push({
-            value: data[i].code,
-            text: `(${data[i].code}) ${data[i].name}`,
-            search: `(${data[i].code}) ${data[i].name}`,
-            selected: this.selected.includes(data[i].code),
+            value: item.code,
+            text: `(${item.code}) ${item.name}`,
+            search: `(${item.code}) ${item.name}`,
+            selected: this.selected.includes(item.code),
           });
-          if (this.options[i].selected) {
-            this.selectedElms.push(this.options[i]);
+          if (this.options[item].selected) {
+            this.selectedElms.push(this.options[item]);
           }
-        }
+        });
       }
     },
     clear() {
