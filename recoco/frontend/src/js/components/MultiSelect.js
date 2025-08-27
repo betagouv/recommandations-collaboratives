@@ -24,14 +24,11 @@ document.addEventListener('alpine:init', () => {
     init() {
       this.buildOptions();
       this.$watch('objectsToSelect', () => {
-        console.log('objectsToSelect changed', this.objectsToSelect);
         this.buildOptions();
       });
       // searching for the given value
       this.$watch('search', (e) => {
         if (this.isRegion) {
-          console.log(this.$refs.departmentsList);
-          console.log(document.querySelectorAll('.department-item'));
           document.querySelectorAll('.department-item').forEach((dep) => {
             let reg = new RegExp(this.search, 'gi');
             if (dep.innerText.match(reg)) {
@@ -42,13 +39,11 @@ document.addEventListener('alpine:init', () => {
           });
           const regionHeaders = document.querySelectorAll('.region-header');
           regionHeaders.forEach((region) => {
-            console.log(region);
             const departmentItem =
               region.parentElement.querySelectorAll('.department-item');
             const departmentItemHide = region.parentElement.querySelectorAll(
               '.department-item.d-none'
             );
-            console.log(departmentItem, departmentItemHide);
             if (departmentItem.length == departmentItemHide.length) {
               region.classList.add('d-none');
             } else region.classList.remove('d-none');
@@ -75,7 +70,6 @@ document.addEventListener('alpine:init', () => {
     },
     buildOptions() {
       const data = this.objectsToSelect;
-      console.log('buildOptions', data);
       if (this.isRegion) {
         this.regions = data || [];
         this.options = [];
@@ -155,7 +149,6 @@ document.addEventListener('alpine:init', () => {
       this.$dispatch('set-departments', this.selected);
     },
     selectedElements() {
-      console.log('this.options', this.options);
       return this.options.filter((op) => op.selected === true);
     },
     selectedValues() {
