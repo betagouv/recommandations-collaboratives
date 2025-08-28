@@ -45,6 +45,11 @@ class UVSignupForm(SignupForm):
 
 
 class UserUpdateForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["first_name"].required = True
+        self.fields["last_name"].required = True
+
     class Meta:
         model = auth_models.User
         fields = [
@@ -54,11 +59,21 @@ class UserUpdateForm(forms.ModelForm):
 
 
 class UserProfileUpdateForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super(forms.ModelForm, self).__init__(*args, **kwargs)
+        organization = kwargs["instance"].organization
+        if hasattr(organization, "name"):
+            self.fields["org_name"].initial = organization.name
+
     class Meta:
         model = UserProfile
-        fields = ["organization", "organization_position", "phone_no"]
+        fields = ["organization_position", "phone_no"]
 
-    # FIXME Make sure empty strings are invalid
+    org_name = forms.CharField(
+        label="Nom de votre organisation *",
+        help_text="Si vous êtes un particulier, indiquez votre nom. Votre administration, entreprise, association. Si vous êtes un particulier, écrivez 'Particulier'.",
+        required=True,
+    )
 
 
 class UVLoginForm(LoginForm):

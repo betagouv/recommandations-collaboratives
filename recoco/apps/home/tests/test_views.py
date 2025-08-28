@@ -597,4 +597,118 @@ def test_user_signin_shouldnt_be_logged_if_hijacked(request, client):
     assert hijacked.actor_actions.count() == 0
 
 
+@pytest.mark.django_db
+def test_update_profile_if_incomplete_updates_flag(request, client, std_user):
+    incomplete_user = std_user
+    std_user.last_name = ""
+    std_user.save()
+    incomplete_user.profile.needs_profile_update = True
+    incomplete_user.profile.save()
+
+    with login(client, user=incomplete_user):
+        url = reverse("home-update-incomplete-profile")
+        client.post(
+            url,
+            data={
+                "last_name": "Des Merveilles",
+                "first_name": incomplete_user.first_name,
+                "org_name": incomplete_user.profile.organization.name,
+                "phone_no": incomplete_user.profile.phone_no,
+                "organization_position": incomplete_user.profile.organization_position,
+            },
+        )
+        incomplete_user.refresh_from_db()
+    assert not incomplete_user.profile.needs_profile_update
+
+
+@pytest.mark.django_db
+def test_update_profile_if_missing_last_name_does_not_updates_flag(
+    request, client, std_user
+):
+    incomplete_user = std_user
+    std_user.last_name = ""
+    std_user.save()
+    incomplete_user.profile.needs_profile_update = True
+    incomplete_user.profile.save()
+
+    with login(client, user=incomplete_user):
+        url = reverse("home-update-incomplete-profile")
+        client.post(
+            url,
+            data={
+                "first_name": incomplete_user.first_name,
+                "org_name": incomplete_user.profile.organization.name,
+                "phone_no": incomplete_user.profile.phone_no,
+                "organization_position": incomplete_user.profile.organization_position,
+            },
+        )
+        incomplete_user.refresh_from_db()
+    assert incomplete_user.profile.needs_profile_update
+
+
+@pytest.mark.django_db
+def test_update_profile_if_missing_org_name_does_not_updates_flag(
+    request, client, std_user
+):
+    incomplete_user = std_user
+    incomplete_user.profile.needs_profile_update = True
+    incomplete_user.organization = None
+    incomplete_user.profile.save()
+
+    with login(client, user=incomplete_user):
+        url = reverse("home-update-incomplete-profile")
+        client.post(
+            url,
+            data={
+                "first_name": incomplete_user.first_name,
+                "last_name": incomplete_user.last_name,
+                "org_name": "",
+                "phone_no": incomplete_user.profile.phone_no,
+                "organization_position": incomplete_user.profile.organization_position,
+            },
+        )
+        incomplete_user.refresh_from_db()
+    assert incomplete_user.profile.needs_profile_update
+
+
+@pytest.mark.django_db
+def test_update_profile_actually_updates_profile(request, client, std_user):
+    incomplete_user = baker.make(auth_models.User, first_name="nameToChange")
+    incomplete_user.profile.needs_profile_update = True
+    incomplete_user.profile.save()
+
+    with login(client, user=incomplete_user):
+        url = reverse("home-update-incomplete-profile")
+        client.post(
+            url,
+            data={
+                "first_name": std_user.first_name,
+                "last_name": std_user.last_name,
+                "org_name": std_user.profile.organization.name,
+                "phone_no": std_user.profile.phone_no,
+                "organization_position": std_user.profile.organization_position,
+            },
+        )
+        incomplete_user.refresh_from_db()
+    assert not incomplete_user.profile.needs_profile_update
+    assert incomplete_user.first_name == std_user.first_name
+    assert incomplete_user.last_name == std_user.last_name
+    assert (
+        incomplete_user.profile.organization.name == std_user.profile.organization.name
+    )
+    assert incomplete_user.profile.phone_no == std_user.profile.phone_no
+    assert (
+        incomplete_user.profile.organization_position
+        == std_user.profile.organization_position
+    )
+
+
+@pytest.mark.django_db
+def test_update_profile_if_unauthenticated_redirects_to_home(request, client, std_user):
+    url = reverse("home-update-incomplete-profile")
+    response = client.get(url)
+    assert response.status_code == 302
+    assertRedirects(response, reverse("home"))
+
+
 # eof
