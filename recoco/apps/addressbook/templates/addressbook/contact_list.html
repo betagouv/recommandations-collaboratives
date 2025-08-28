@@ -77,11 +77,12 @@
                         x-text="nationalGroup.name"></h3>
                     <template x-for="organization in nationalGroup.organizations" :key="index">
                         <div class="organization-container">
-                            <div class="d-flex align-items-center">
+                            <div class="d-flex align-items-center" data-test-id="organization-header">
                                 <h3 class="organization__name fr-mb-0 no-wrap" x-text="organization.name"></h3>
                                 <button class="fr-btn fr-btn--tertiary-no-outline fr-btn--sm fr-icon-pencil-line button__actions-edit"
-                                        @click="openModalCreateOrganization(organization, nationalGroup)">
-                                    Éditer l'organisation'
+                                        @click="openModalCreateOrganization(organization, nationalGroup)"
+                                        data-test-id="button-edit-organization">
+                                    Éditer l'organisation
                                 </button>
                                 <template x-if="organization.departments?.length > 0">
                                     <div class="organization__departments"

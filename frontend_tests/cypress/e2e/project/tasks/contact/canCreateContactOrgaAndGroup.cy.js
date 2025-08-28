@@ -227,43 +227,37 @@ describe('I can create and edit a contact and an organization on contactbook', (
       .should('contain', 'han solo');
   });
 
-  xit('can edit an existing contact on contactbook', () => {
+  it('can edit an existing organization on contactbook', () => {
     cy.visit(`/addressbook/contacts`);
-    //click on recommandation
-    cy.get('[data-test-id="task-item"]').first().click({ force: true });
-    //click on add contact button
-    cy.get('[data-test-id="button-add-contact"]').click({ force: true });
-    //search for a contact
-    cy.get('#search-contact-input').type('Test', { force: true });
-    //select a contact
-    cy.get('[data-test-id="contact-to-select"]').first().click({ force: true });
-    //send contact to tiptap editor
-    cy.get('[data-test-id="button-add-contact-to-tiptap-editor"]').click({
-      force: true,
-    });
-    //validate message followup
-    cy.get('[data-test-id="button-submit-new"]').click({ force: true });
-    //my contact should be visible on the followup
-    cy.get('[data-test-id="contact-card"]').should('be.visible');
+    //click on edit organization
+    cy.get('[data-test-id="organization-header"]')
+      .should('contain', 'Jedicorp')
+      .find('[data-test-id="button-edit-organization"]').click({ force: true });
+    //change the name of the organization
+    cy.get('[data-test-id="organization-name"]').clear().type('Jedicorp edited');
+    //submit the organization form
+    cy.get('[data-test-id="create-organization-button"]').click({ force: true });
+    //reload page to see the organization
+    cy.reload();
+    //verify that the organization is created
+    cy.get('[data-test-id="organization-header"]')
+      .should('contain', 'Jedicorp edited');
   });
 
-  xit('can edit an existing organization on contactbook', () => {
-    cy.visit(`/project/2/actions#`);
-    //click on recommandation
-    cy.get('[data-test-id="task-item"]').first().click({ force: true });
-    //click on add contact button
-    cy.get('[data-test-id="button-add-contact"]').click({ force: true });
-    //search for a contact
-    cy.get('#search-contact-input').type('Test', { force: true });
-    //select a contact
-    cy.get('[data-test-id="contact-to-select"]').first().click({ force: true });
-    //send contact to tiptap editor
-    cy.get('[data-test-id="button-add-contact-to-tiptap-editor"]').click({
-      force: true,
-    });
-    //validate message followup
-    cy.get('[data-test-id="button-submit-new"]').click({ force: true });
-    //my contact should be visible on the followup
-    cy.get('[data-test-id="contact-card"]').should('be.visible');
+  it('can edit an existing contact on contactbook', () => {
+    cy.visit(`/addressbook/contacts`);
+    //click on edit card contact
+    cy.get('[data-test-id="contact-card"]')
+      .should('contain', 'Anakin Skywalker')
+      .find('[data-test-id="button-edit-contact"]').click({ force: true });
+    cy.get('[data-test-id="job"]').clear().type('Sith Lord');
+      //submit the contact form
+    cy.get('[data-test-id="create-contact-button"]').click({ force: true });
+    //reload page to see the contact
+    cy.reload();
+    //verify that the contact is created
+    cy.get('[data-test-id="contact-card"]')
+      .should('contain', 'Anakin Skywalker')
+      .should('contain', 'Sith Lord');
   });
 });
