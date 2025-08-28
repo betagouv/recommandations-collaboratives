@@ -7,6 +7,7 @@ from django.core.management import call_command
 from model_bakery import baker
 from rest_framework.test import APIClient
 
+from recoco.apps.addressbook import models as addressbook_models
 from recoco.apps.projects.models import Project
 
 
@@ -37,8 +38,18 @@ def current_site():
 
 
 @pytest.fixture
+def std_user():
+    user = baker.make(User, first_name="Ali", last_name="Baba")
+    user.profile.organization = baker.make(addressbook_models.Organization)
+    user.profile.phone_no = "0666666666"
+    user.profile.organization_position = "Position"
+    user.profile.save()
+    return user
+
+
+@pytest.fixture
 def staff_user(current_site):
-    staff = baker.make(User)
+    staff = std_user
     staff.profile.sites.add(current_site)
     gstaff = Group.objects.get(name="example_com_staff")
     staff.groups.add(gstaff)
