@@ -19,7 +19,6 @@ from django.urls import reverse
 from django.utils.http import urlencode
 from django.views.generic import FormView
 
-from recoco.apps.addressbook import models as addressbook
 from recoco.apps.geomatics import models as geomatics
 from recoco.apps.projects import models as projects
 from recoco.apps.projects.utils import (
@@ -32,6 +31,7 @@ from recoco.apps.survey import models as survey_models
 from recoco.apps.survey.forms import AnswerForm
 from recoco.utils import (
     is_switchtender_or_403,
+    update_user,
 )
 
 from . import forms, models, utils
@@ -403,45 +403,6 @@ def create_project_for_user(
     project.project_sites.create(site=site, status=status, is_origin=True)
 
     return project
-
-
-def update_user(
-    site: sites.Site,
-    user: auth.User,
-    first_name: str,
-    last_name: str,
-    org_name: str,
-    org_position: str,
-    phone: str,
-) -> auth.User:
-    """Update and return given user and its profile w/ data from form"""
-
-    # FIXME existing value are kept instead of new ones, why?
-
-    user.first_name = user.first_name or first_name
-    user.last_name = user.last_name or last_name
-    user.save()
-
-    organization = get_organization(site, org_name)
-
-    profile = user.profile
-    profile.organization = profile.organization or organization
-    profile.organization_position = org_position or None
-    profile.phone_no = profile.phone_no or phone
-    profile.save()
-
-    profile.sites.add(site)
-
-    return user
-
-
-def get_organization(site: sites.Site, name: str) -> addressbook.Organization:
-    """Return (new) organization with the given name or None"""
-    if not name:
-        return None
-    organization = addressbook.Organization.get_or_create(name)
-    organization.sites.add(site)
-    return organization
 
 
 def create_initial_note(
