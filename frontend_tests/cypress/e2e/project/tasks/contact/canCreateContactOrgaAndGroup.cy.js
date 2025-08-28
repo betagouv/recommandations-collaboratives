@@ -27,8 +27,10 @@ describe('I can create and edit a contact and an organization on contactbook', (
     //reload page to see the contact
     cy.reload();
     //verify that the contact is created
-    cy.get('[data-test-id="contact-card"]')
-      .should('contain', 'Anakin Skywalker');
+    cy.get('[data-test-id="contact-card"]').should(
+      'contain',
+      'Anakin Skywalker'
+    );
   });
 
   it('can create a contact and search an existing organization', () => {
@@ -46,10 +48,6 @@ describe('I can create and edit a contact and an organization on contactbook', (
       .find('span')
       .contains('jedicorp')
       .click();
-    cy.get('[data-test-id="orga-to-select"]')
-      .find('span')
-      .contains('jedicorp')
-      .click();
     //add job title
     cy.get('[data-test-id="job"]').type('Jedi Knight');
     //submit the contact form
@@ -57,8 +55,7 @@ describe('I can create and edit a contact and an organization on contactbook', (
     //reload page to see the contact
     cy.reload();
     //verify that the contact is created
-    cy.get('[data-test-id="contact-card"]')
-      .should('contain', 'Luke Skywalker');
+    cy.get('[data-test-id="contact-card"]').should('contain', 'Luke Skywalker');
   });
 
   it('can create a contact and create a new organization with an existing group and no departments', () => {
@@ -75,18 +72,11 @@ describe('I can create and edit a contact and an organization on contactbook', (
     cy.get('[data-test-id="button-create-organization"]').click({
       force: true,
     });
-    cy.get('[data-test-id="button-create-organization"]').click({
-      force: true,
-    });
     //select yes for national group
     cy.get('#natGroup-yes').click({ force: true });
     //search for an existing group
     cy.get('[data-test-id="search-group-input"]').type('Jedicorp');
     //select the group from the dropdown
-    cy.get('[data-test-id="orga-group-to-select"]')
-      .find('span')
-      .contains('Jedicorp')
-      .click();
     cy.get('[data-test-id="orga-group-to-select"]')
       .find('span')
       .contains('Jedicorp')
@@ -100,8 +90,7 @@ describe('I can create and edit a contact and an organization on contactbook', (
     //reload page to see the contact
     cy.reload();
     //verify that the contact is created
-    cy.get('[data-test-id="contact-card"]')
-      .should('contain', 'baby yoda');
+    cy.get('[data-test-id="contact-card"]').should('contain', 'baby yoda');
   });
 
   it('can create a contact and create a new organization and create a group and select departments', () => {
@@ -119,15 +108,8 @@ describe('I can create and edit a contact and an organization on contactbook', (
     cy.get('[data-test-id="button-create-organization"]').click({
       force: true,
     });
-    cy.get('[data-test-id="button-create-organization"]').click({
-      force: true,
-    });
     //select a department
     cy.get('#select-list-input').click();
-    cy.get('[data-test-id="select-list-options"]')
-      .find('div')
-      .contains('(93) Département de test numéro 3')
-      .click();
     cy.get('[data-test-id="select-list-options"]')
       .find('div')
       .contains('(93) Département de test numéro 3')
@@ -153,8 +135,7 @@ describe('I can create and edit a contact and an organization on contactbook', (
     //reload page to see the contact
     cy.reload();
     //verify that the contact is created
-    cy.get('[data-test-id="contact-card"]')
-      .should('contain', 'darth vader');
+    cy.get('[data-test-id="contact-card"]').should('contain', 'darth vader');
   });
 
   it('can create a contact and create a new organization with an existing group and one department', () => {
@@ -169,22 +150,12 @@ describe('I can create and edit a contact and an organization on contactbook', (
     cy.get('#search-organization-input').type(
       'between master and knight jedi corp'
     );
-    cy.get('#search-organization-input').type(
-      'between master and knight jedi corp'
-    );
     //click on create organization button
-    cy.get('[data-test-id="button-create-organization"]').click({
-      force: true,
-    });
     cy.get('[data-test-id="button-create-organization"]').click({
       force: true,
     });
     //select a department
     cy.get('#select-list-input').click();
-    cy.get('[data-test-id="select-list-options"]')
-      .find('div')
-      .contains('(93) Département de test numéro 3')
-      .click();
     cy.get('[data-test-id="select-list-options"]')
       .find('div')
       .contains('(93) Département de test numéro 3')
@@ -198,10 +169,6 @@ describe('I can create and edit a contact and an organization on contactbook', (
       .find('span')
       .contains('Jedicorp')
       .click();
-    cy.get('[data-test-id="orga-group-to-select"]')
-      .find('span')
-      .contains('Jedicorp')
-      .click();
     //create the organization
     cy.get('[data-test-id="button-create-new-organization"]').click();
     //add job title
@@ -211,8 +178,7 @@ describe('I can create and edit a contact and an organization on contactbook', (
     //reload page to see the contact
     cy.reload();
     //verify that the contact is created
-    cy.get('[data-test-id="contact-card"]')
-      .should('contain', 'obiwan kenobi');
+    cy.get('[data-test-id="contact-card"]').should('contain', 'obiwan kenobi');
   });
 
   xit('can create a contact and create a new organization and create a group and no department', () => {
@@ -227,9 +193,6 @@ describe('I can create and edit a contact and an organization on contactbook', (
     //search for a non existing organization
     cy.get('#search-organization-input').type('thiefcorp');
     //click on create organization button
-    cy.get('[data-test-id="button-create-organization"]').click({
-      force: true,
-    });
     cy.get('[data-test-id="button-create-organization"]').click({
       force: true,
     });
@@ -255,8 +218,7 @@ describe('I can create and edit a contact and an organization on contactbook', (
     //reload page to see the contact
     cy.reload();
     //verify that the contact is created
-    cy.get('[data-test-id="contact-card"]')
-      .should('contain', 'han solo');
+    cy.get('[data-test-id="contact-card"]').should('contain', 'han solo');
   });
 
   it('can edit an existing organization on contactbook', () => {
@@ -264,16 +226,23 @@ describe('I can create and edit a contact and an organization on contactbook', (
     //click on edit organization
     cy.get('[data-test-id="organization-header"]')
       .should('contain', 'Jedicorp')
-      .find('[data-test-id="button-edit-organization"]').click({ force: true });
+      .find('[data-test-id="button-edit-organization"]')
+      .click({ force: true });
     //change the name of the organization
-    cy.get('[data-test-id="organization-name"]').clear().type('Jedicorp edited');
+    cy.get('[data-test-id="organization-name"]')
+      .clear()
+      .type('Jedicorp edited');
     //submit the organization form
-    cy.get('[data-test-id="create-organization-button"]').click({ force: true });
+    cy.get('[data-test-id="create-organization-button"]').click({
+      force: true,
+    });
     //reload page to see the organization
     cy.reload();
     //verify that the organization is created
-    cy.get('[data-test-id="organization-header"]')
-      .should('contain', 'Jedicorp edited');
+    cy.get('[data-test-id="organization-header"]').should(
+      'contain',
+      'Jedicorp edited'
+    );
   });
 
   it('can edit an existing contact on contactbook', () => {
@@ -281,9 +250,10 @@ describe('I can create and edit a contact and an organization on contactbook', (
     //click on edit card contact
     cy.get('[data-test-id="contact-card"]')
       .should('contain', 'Anakin Skywalker')
-      .find('[data-test-id="button-edit-contact"]').click({ force: true });
+      .find('[data-test-id="button-edit-contact"]')
+      .click({ force: true });
     cy.get('[data-test-id="job"]').clear().type('Sith Lord');
-      //submit the contact form
+    //submit the contact form
     cy.get('[data-test-id="create-contact-button"]').click({ force: true });
     //reload page to see the contact
     cy.reload();
