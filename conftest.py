@@ -48,7 +48,7 @@ def std_user():
 
 
 @pytest.fixture
-def staff_user(current_site):
+def staff_user(current_site, std_user):
     staff = std_user
     staff.profile.sites.add(current_site)
     gstaff = Group.objects.get(name="example_com_staff")
