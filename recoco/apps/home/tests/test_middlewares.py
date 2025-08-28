@@ -2,10 +2,13 @@ from unittest.mock import Mock
 
 import pytest
 from django.core.exceptions import ImproperlyConfigured
+from django.urls import reverse
 from model_bakery import baker
+from pytest_django.asserts import assertRedirects
 
 from recoco.apps.home.middlewares import CurrentSiteConfigurationMiddleware
 from recoco.apps.home.models import SiteConfiguration
+from recoco.utils import login
 
 
 @pytest.fixture
@@ -43,3 +46,50 @@ class TestCurrentSiteConfigurationMiddleware:
         middleware(request_mock)
 
         assert request_mock.site_config == site_config
+
+
+@pytest.mark.django_db
+class TestRedirectIncompleteProfileUserMiddleware:
+    def test_does_not_redirect_unauthenticated_users(self, client):
+        url = reverse("home")
+        response = client.get(url, headers={"accept": "text/html"})
+        assert response.status_code == 200
+
+    def test_does_not_loop_redirect(self, client, std_user):
+        incomplete_user = std_user
+        incomplete_user.profile.needs_profile_update = True
+        incomplete_user.profile.save()
+        with login(client, user=incomplete_user):
+            url = reverse("home-update-incomplete-profile")
+            response = client.get(url, headers={"accept": "text/html"})
+            assert response.status_code == 200
+
+    def test_does_not_redirect_full_user(self, client, std_user):
+        with login(client, user=std_user):
+            url = reverse("home")
+            response = client.get(url, headers={"accept": "text/html"})
+            assert response.status_code == 200
+
+    def test_does_not_redirect_xhr_requests(self, client, std_user):
+        incomplete_user = std_user
+        incomplete_user.profile.needs_profile_update = True
+        incomplete_user.profile.save()
+        with login(client, user=incomplete_user):
+            url = reverse("home")
+            response = client.get(url, headers={"accept": "*/*"})
+            assert response.status_code == 200
+
+    def test_redirects_incomplete_users(self, client, std_user):
+        incomplete_user = std_user
+        incomplete_user.profile.needs_profile_update = True
+        incomplete_user.profile.save()
+        with login(client, user=incomplete_user):
+            url = reverse("home")
+            response = client.get(url, headers={"accept": "text/html"})
+            assert response.status_code == 302
+            assertRedirects(response, reverse("home-update-incomplete-profile"))
+
+
+# - if XHR call to not redirect
+
+# eof

@@ -12,9 +12,11 @@ class RedirectIncompleteProfileUserMiddleware:
     def __call__(self, request: HttpRequest):
         if not request.user.is_authenticated:
             return self.get_response(request)
-        if request.user.profile.needs_profile_update and request.path != reverse(
-            "home-update-incomplete-profile"
-        ):
+        if (
+            request.user.profile.needs_profile_update
+            and request.path != reverse("home-update-incomplete-profile")
+            and request.headers.get("accept") == "text/html"
+        ):  # don't redirect xhr or debug requests
             return redirect(reverse("home-update-incomplete-profile"))
 
         return self.get_response(request)
