@@ -12,3 +12,5 @@ class MarkdownNodeInline(admin.TabularInline):
 class MessageAdmin(admin.ModelAdmin):
     inlines = [MarkdownNodeInline]
     readonly_fields = ("created", "modified")
+
+    list_display = ("project", "posted_by", "created")
