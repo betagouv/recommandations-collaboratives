@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block title %}
+    Mettre à jour le profil
+{% endblock title %}
+{% block content %}
+    <div class="fr-container fr-container--fluid fr-my-md-14v">
+        <div class="fr-grid-row fr-grid-row-gutters fr-grid-row--center">
+            <div class="fr-col-12 fr-col-md-8 fr-col-lg-6">
+                <div class="fr-container fr-background-alt--grey fr-px-md-0 fr-py-10v fr-py-md-14v">
+                    <div class="fr-grid-row fr-grid-row-gutters fr-grid-row--center">
+                        <div class="fr-col-12 fr-col-md-9 fr-col-lg-8">
+                            <form method="post">
+                                {% csrf_token %}
+                                <fieldset class="fr-fieldset">
+                                    <legend class="fr-fieldset__legend" id="text-legend">
+                                        Vos informations de profil sont incomplètes
+                                        <span class="fr-hint-text">Vous pouvez les compléter ci-dessous.</span>
+                                    </legend>
+                                    <div class="fr-fieldset__element">
+                                        <div class="fr-input-group">
+                                            <label class="fr-label" for="id_first_name">Prénom</label>
+                                            <input class="fr-input"
+                                                   type="text"
+                                                   name="{{ form_user.first_name.name }}"
+                                                   id="id_first_name"
+                                                   value="{{ form_user.first_name.value }}"
+                                                   required>
+                                        </div>
+                                    </div>
+                                    <div class="fr-fieldset__element">
+                                        <div class="fr-input-group">
+                                            <label class="fr-label" for="id_last_name">Nom</label>
+                                            <input class="fr-input"
+                                                   type="text"
+                                                   name="{{ form_user.last_name.name }}"
+                                                   id="id_last_name"
+                                                   value="{{ form_user.last_name.value }}"
+                                                   required>
+                                        </div>
+                                    </div>
+                                    <div class="fr-fieldset__element">
+                                        {% comment %} TODO: Transform into organization select {% endcomment %}
+                                        <div class="fr-input-group">
+                                            <label class="fr-label" for="id_org_name">Organisation</label>
+                                            <input class="fr-input"
+                                                   type="text"
+                                                   name="{{ form_profile.org_name.name }}"
+                                                   id="id_org_name"
+                                                   value="{{ form_profile.org_name.value|default:'' }}"
+                                                   required>
+                                        </div>
+                                    </div>
+                                    <div class="fr-fieldset__element">
+                                        <div class="fr-input-group">
+                                            <label class="fr-label" for="id_organization_position">Fonction</label>
+                                            <input class="fr-input"
+                                                   type="text"
+                                                   name="{{ form_profile.organization_position.name }}"
+                                                   id="id_organization_position"
+                                                   value="{{ form_profile.organization_position.value|default:'' }}"
+                                                   required>
+                                        </div>
+                                    </div>
+                                    <div class="fr-fieldset__element">
+                                        <div class="fr-input-group">
+                                            <label class="fr-label" for="id_phone">Téléphone</label>
+                                            <input class="fr-input"
+                                                   type="tel"
+                                                   name="{{ form_profile.phone_no.name }}"
+                                                   id="id_phone"
+                                                   value="{{ form_profile.phone_no.value }}"
+                                                   required>
+                                        </div>
+                                    </div>
+                                    <button class="fr-btn" type="submit">Mettre à jour</button>
+                                </fieldset>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

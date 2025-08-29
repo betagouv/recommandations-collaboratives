@@ -17,6 +17,7 @@ from urllib.parse import parse_qs, urlencode, urljoin, urlparse, urlunparse
 from django.conf import settings
 from django.contrib.auth import models as auth
 from django.contrib.contenttypes.fields import GenericRelation
+from django.contrib.sites import models as sites
 from django.contrib.sites.models import Site
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.db import migrations
@@ -24,6 +25,8 @@ from django.db import models as db_models
 from django.db.models.functions import Cast
 from django.http import HttpResponseBadRequest
 from sesame.tokens import create_token
+
+from recoco.apps.addressbook import models as addressbook
 
 
 def make_site_slug(site: Site):
@@ -165,6 +168,45 @@ def assign_site_admin(site, user):
     staff_group = get_group_for_site("admin", site, create=True)
     user.profile.sites.add(site)
     staff_group.user_set.add(user)
+
+
+def update_user(
+    site: sites.Site,
+    user: auth.User,
+    first_name: str,
+    last_name: str,
+    org_name: str,
+    org_position: str,
+    phone: str,
+) -> auth.User:
+    """Update and return given user and its profile w/ data from form"""
+
+    # FIXME existing value are kept instead of new ones, why?
+
+    user.first_name = user.first_name or first_name
+    user.last_name = user.last_name or last_name
+    user.save()
+
+    organization = get_organization(site, org_name)
+
+    profile = user.profile
+    profile.organization = profile.organization or organization
+    profile.organization_position = org_position or None
+    profile.phone_no = profile.phone_no or phone
+    profile.save()
+
+    profile.sites.add(site)
+
+    return user
+
+
+def get_organization(site: sites.Site, name: str) -> addressbook.Organization:
+    """Return (new) organization with the given name or None"""
+    if not name:
+        return None
+    organization = addressbook.Organization.get_or_create(name)
+    organization.sites.add(site)
+    return organization
 
 
 ########################################################################
