@@ -23,6 +23,7 @@ from django.views.decorators.http import require_http_methods
 
 from recoco import verbs
 from recoco.apps.addressbook.models import Contact
+from recoco.apps.conversations import api as conversations_api
 from recoco.apps.hitcount.models import HitCount
 from recoco.apps.invites.forms import InviteForm
 from recoco.apps.projects.views.notes import create_public_note
@@ -446,7 +447,7 @@ def project_conversations_new(request, project_id=None):
 
     recipients = get_notification_recipients_for_project(project)
 
-    feed = _build_feeds(project=project, user=request.user)
+    feed = {"messages": conversations_api.build_feed(project)}
 
     return render(
         request,
