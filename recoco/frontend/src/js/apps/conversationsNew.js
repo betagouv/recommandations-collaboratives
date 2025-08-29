@@ -2,6 +2,7 @@ import '../store/tasks.js';
 import '../store/tasksData.js';
 
 import '../utils/htmx.js';
+import { renderMarkdown } from '../utils/markdown.js';
 
 import '../components/Task.js';
 import '../components/TaskModal.js';
@@ -13,3 +14,4 @@ import '../components/ConversationTopicSwitch.js';
 import { tiptapParserJSONToHTML } from '../utils/tiptapParser.js';
 
 window.tiptapParserJSONToHTML = tiptapParserJSONToHTML;
+window.renderMarkdown = renderMarkdown;

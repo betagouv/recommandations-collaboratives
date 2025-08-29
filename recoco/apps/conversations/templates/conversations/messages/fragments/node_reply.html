@@ -1,0 +1,5 @@
+<p>🚧 Réponse 🚧</p>
+<!-- Display initial message as introduction -->
+<p class="text-muted"
+   x-html="renderMarkdown(`{{ node.reply_to|truncatechars:20 }}`)"></p>
+<p x-html="renderMarkdown(`{{ node.text }}`)"></p>
