@@ -21,9 +21,9 @@ Alpine.data('KanbanProjects', function (currentSiteId, departments, regions) {
       searchDepartment: [],
       lastActivity: localStorage.getItem('lastActivity') ?? '30',
     },
-    filterProjectLastActivity: localStorage.getItem('lastActivity') ?? '30',
     searchText: '',
-    selectedDepartment: null,
+    filterProjectLastActivity: localStorage.getItem('lastActivity') ?? '30',
+    selectedDepartment: null, // is it used ?
     departments: JSON.parse(departments.textContent),
     regions: JSON.parse(regions.textContent),
     territorySelectAll: true,
