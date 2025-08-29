@@ -4,6 +4,12 @@
         {% for node in message.nodes %}
             {% if node.type == "markdown" %}
                 {% include "conversations/messages/fragments/node_markdown.html" %}
+            {% elif node.type == "contact" %}
+                {% include "conversations/messages/fragments/node_contact.html" %}
+            {% elif node.type == "document" %}
+                {% include "conversations/messages/fragments/node_document.html" %}
+            {% elif node.type == "reply" %}
+                {% include "conversations/messages/fragments/node_reply.html" %}
             {% endif %}
         {% endfor %}
         {% if message.posted_by %}

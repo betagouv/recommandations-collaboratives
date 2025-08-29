@@ -1,0 +1,6 @@
+<p>🚧 Document 🚧</p>
+{% if node.document.count %}
+    {% for document in node.document.all %}
+        {% include "projects/project/fragments/files_links/file_list_item_embedded.html" with document=document %}
+    {% endfor %}
+{% endif %}
