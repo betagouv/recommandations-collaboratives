@@ -1,0 +1,85 @@
+{% for form in question_forms %}
+    <fieldset class="fr-fieldset"
+              id="radio-hint"
+              aria-labelledby="radio-hint-legend radio-hint-messages">
+        {% if form.fields.answer.choices != None %}
+            {% for error in form.answer.errors %}<p class="fr-error-text element-to-focus">{{ error }}</p>{% endfor %}
+            <legend class="fr-fieldset__legend--regular fr-fieldset__legend"
+                    id="radio-hint-legend">{{ form.question.text }} *</legend>
+        {% endif %}
+        {% for choice in form.fields.answer.choices %}
+            <div class="fr-fieldset__element">
+                {% if not form.question.is_multiple %}
+                    <div class="fr-radio-group">
+                        <input type="radio"
+                               value="{{ choice.0 }}"
+                               id="form_answer-{{ forloop.parentloop.counter }}-{{ forloop.counter }}"
+                               name="{{ form.answer.html_name }}"
+                               required
+                               {% if choice.0 in form.fields.answer.initial %}checked{% endif %}>
+                        <label class="fr-label"
+                               for="form_answer-{{ forloop.parentloop.counter }}-{{ forloop.counter }}">
+                            {{ choice.1|capfirst }}
+                        </label>
+                    </div>
+                {% else %}
+                    <div class="fr-checkbox-group">
+                        <input type="checkbox"
+                               value="{{ choice.0 }}"
+                               id="form_answer-{{ forloop.parentloop.counter }}-{{ forloop.counter }}"
+                               name="{{ form.answer.html_name }}"
+                               {% if choice.0 in form.fields.answer.initial %}checked{% endif %}>
+                        <label class="fr-label"
+                               for="form_answer-{{ forloop.parentloop.counter }}-{{ forloop.counter }}">
+                            {{ choice.1|capfirst }}
+                        </label>
+                    </div>
+                {% endif %}
+            </div>
+        {% endfor %}
+        <!-- Comment -->
+        {% if not form.fields.answer.choices and form.comment %}
+            <div class="fr-fieldset__element">
+                <div class="fr-input-group">
+                    <label class="fr-label"
+                           for="{{ form.comment.name }}-{{ forloop.parentloop.counter }}-{{ forloop.counter }}">
+                        {% if form.fields.answer.choices == None %}
+                            {{ form.question.text }}
+                        {% else %}
+                            {{ question_comment_title|default:'Commentaire' }}
+                        {% endif %}
+                        *
+                    </label>
+                    <textarea x-data="FieldValidator(true,'{{ form.comment.value|default:'' }}', 'input', ['focusout', 'input'], submittedForm)"
+                              x-effect="validateData(submittedForm)"
+                              class="fr-input"
+                              rows="3"
+                              id="{{ form.comment.name }}-{{ forloop.parentloop.counter }}-{{ forloop.counter }}"
+                              required
+                              name="{{ form.comment.html_name }}">{{form.comment.value|default:''}}</textarea>
+                    {% for error in form.comment.errors %}
+                        <p id="text-input-error-desc-error" class="fr-error-text">{{ error }}</p>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+        <!-- File upload -->
+        {% if form.attachment %}
+            <div class="fr-upload-group fr-mb-6w">
+                <label class="fr-label"
+                       for="{{ form.attachment.name }}-{{ forloop.parentloop.counter }}-{{ forloop.counter }}">
+                    {{ question.upload_title }}
+                    <span class="fr-hint-text">Taille maximale : 500 Mo. Formats supportés : jpg, png, pdf. Plusieurs fichiers possibles.</span>
+                </label>
+                <input class="fr-upload"
+                       type="file"
+                       id="{{ form.attachment.name }}-{{ forloop.parentloop.counter }}-{{ forloop.counter }}"
+                       name="{{ form.attachment.html_name }}"
+                       value="{{ form.attachment.value }}">
+                {% if form.attachment.value %}
+                    Actuellement : <a href="{{ MEDIA_URL }}/{{ form.attachment.value }}">{{ form.attachment.value }}</a>
+                {% endif %}
+            </div>
+        {% endif %}
+    </fieldset>
+{% endfor %}
