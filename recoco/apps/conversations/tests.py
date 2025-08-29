@@ -2,7 +2,7 @@ import pytest
 from model_bakery import baker
 
 from .api import build_message_feed
-from .models import ContactNode, DocumentNode, MarkdownNode, Message
+from .models import ContactNode, DocumentNode, MarkdownNode, Message, RecommendationNode
 
 
 ######--- Message ----#####
@@ -50,6 +50,17 @@ def test_serialize_node_document():
 
     assert payload["type"] is DocumentNode.NODE_TYPE
     assert payload["data"]["document_id"] is not None
+
+
+@pytest.mark.django_db
+def test_serialize_node_recommendation():
+    node = baker.make(RecommendationNode)
+
+    payload = node.serialize()
+
+    assert payload["type"] is RecommendationNode.NODE_TYPE
+    assert payload["data"]["text"] is not None
+    assert payload["data"]["recommendation_id"] is not None
 
 
 #####--- Feed ---#####

@@ -14,8 +14,17 @@ class Message(TimeStampedModel):
         on_delete=models.CASCADE,
         related_name="public_messages",
     )
+
     posted_by = models.ForeignKey(
         auth_models.User, on_delete=models.CASCADE, related_name="project_messages"
+    )
+
+    in_reply_to = models.ForeignKey(
+        "Message",
+        on_delete=models.SET_NULL,
+        related_name="replies",
+        null=True,
+        blank=True,
     )
 
     def serialize(self):
@@ -43,20 +52,29 @@ class Node(models.Model):
         return {"type": self.NODE_TYPE, "position": self.position, "data": {}}
 
 
-class MarkdownNode(Node):
-    NODE_TYPE = "markdown"
-
+class MarkdownTextMixin(models.Model):
     text = models.TextField()
+
+    def contribute_to_serialize(self, payload):
+        payload["data"].update({"text": self.text})
+        return payload
+
+    class Meta:
+        abstract = True
+
+
+class MarkdownNode(Node, MarkdownTextMixin):
+    NODE_TYPE = "markdown"
 
     def serialize(self):
         payload = super().serialize()
 
-        payload["data"].update({"text": self.text})
+        payload = super().contribute_to_serialize(payload)
 
         return payload
 
 
-class RecommendationNode(Node):
+class RecommendationNode(Node, MarkdownTextMixin):
     NODE_TYPE = "recommendation"
 
     recommendation = models.ForeignKey(tasks_models.Task, on_delete=models.CASCADE)
@@ -64,6 +82,7 @@ class RecommendationNode(Node):
     def serialize(self):
         payload = super().serialize()
 
+        payload = super().contribute_to_serialize(payload)
         payload["data"].update({"recommendation_id": self.recommendation.pk})
 
         return payload

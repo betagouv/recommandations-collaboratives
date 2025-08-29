@@ -3,6 +3,7 @@
 from django.contrib.contenttypes.models import ContentType
 from django.db import migrations, transaction
 from guardian.utils import get_anonymous_user
+from django.contrib.auth import models as auth_models
 
 
 def copy_public_notes_to_messages(apps, schema_editor):
@@ -14,7 +15,12 @@ def copy_public_notes_to_messages(apps, schema_editor):
     ContactNode = apps.get_model("conversations", "ContactNode")
     DocumentNode = apps.get_model("conversations", "DocumentNode")
 
-    anonymous_user = get_anonymous_user()
+    # in case of a fresh installation, AnonymousUser does not exist and we have no data,
+    # so skip this migration
+    try:
+        anonymous_user = get_anonymous_user()
+    except auth_models.User.DoesNotExist:
+        return
 
     for project in Project.objects.all():
         for note in Note.objects.filter(project=project, public=True):
@@ -46,9 +52,7 @@ def copy_public_notes_to_messages(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-    dependencies = [
-        ("conversations", "0002_node_position"),
-    ]
+    dependencies = [("conversations", "0002_node_position")]
 
     operations = [
         migrations.RunPython(copy_public_notes_to_messages, lambda x, y: None)
