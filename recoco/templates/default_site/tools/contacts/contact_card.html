@@ -109,11 +109,13 @@ Example usage in parent:
             {% if button_actions %}
                 <div class="button__actions">
                     <button class="fr-btn fr-btn--tertiary-no-outline fr-btn--sm fr-icon-pencil-line button__actions-edit"
-                            @click="openModalCreateContact(contact)">Éditer le contact</button>
+                            @click="openModalCreateContact(contact)"
+                            data-test-id="button-edit-contact">Éditer le contact</button>
                     <div @click.outside="isOpenDeleteContact = false"
                          class="position-relative">
                         <button class="fr-btn fr-btn--tertiary-no-outline fr-btn--sm fr-icon-delete-line button__actions-delete"
-                                @click="isOpenDeleteContact = !isOpenDeleteContact">Supprimer le contact</button>
+                                @click="isOpenDeleteContact = !isOpenDeleteContact"
+                                data-test-id="button-delete-contact">Supprimer le contact</button>
                         <ul x-show="isOpenDeleteContact"
                             :class="{'isOpenDeleteContact':open}"
                             class="modal__confirm-delete positioning-dropdown">

@@ -137,7 +137,8 @@
                                             <ul class="z-10 fr-mt-0 w-100 bg-white shadow-lg max-h-80 rounded fr-py-0 hide-ul-style overflow-y-auto sm:text-sm"
                                                 tabindex="-1"
                                                 role="listbox"
-                                                @keyup.delete="deselect">
+                                                @keyup.delete="deselect"
+                                                data-test-id="select-list-options">
                                                 <template x-for="(option,index) in options" :key="option.text">
                                                     <li class="text-gray-900 cursor-default select-none position-relative"
                                                         role="option">
