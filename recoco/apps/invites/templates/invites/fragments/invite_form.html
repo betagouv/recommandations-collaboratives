@@ -1,0 +1,141 @@
+{% extends "account/layout/layout.html" %}
+{% block layout_content %}
+    <div>
+        <p class="fr-mb-4w">
+            Vous avez été invité·e par {{ invite.inviter.get_full_name }} à rejoindre un dossier sur {{ request.site.name }} <strong>en tant que {{ invite.get_role_display }}</strong> :
+        </p>
+        <div class="project-card project-card__border--highlight fr-mb-4w">
+            <div class="project-card__content">
+                <div class="project__title">
+                    <span class="project-card__project-name">{{ invite.project.name }}</span>
+                    <span class="project-card__project-org-name">{{ invite.project.org_name }}</span>
+                </div>
+                <div class="project__info">
+                    {% if invite.project.project_sites.origin.site.configuration.logo_small %}
+                        <img src="{{ invite.project.project_sites.origin.site.configuration.logo_small.url }}"
+                             width="16px"
+                             height="auto"
+                             alt="Logo {{ invite.project.project_sites.origin.site.configuration.name }}" />
+                    {% else %}
+                        <span class="fr-icon--sm fr-icon-window-line" aria-hidden="true"></span>
+                    {% endif %}
+                    <span class="project-card__project-site fr-mr-1w">provient de {{ invite.project.project_sites.origin.site.name }}</span>
+                    <span class="project-card__project-insee fr-icon--sm fr-icon-map-pin-2-line fr-mr-1w">{{ invite.project.commune.name }} ({{ invite.project.commune.insee }})</span>
+                    {% if invite.project.owner %}
+                        <span class="project-card__project-org fr-icon--sm fr-icon-parent-line fr-mr-1w">{{ invite.project.owner.profile.organization.name }}</span>
+                    {% endif %}
+                    <span class="project-card__project-date fr-icon--sm fr-icon-calendar-event-line fr-mr-1w">déposé depuis {{ invite.project.created_on|timesince }}</span>
+                </div>
+                <div class="project__info">
+                    <div class="project-card__project-tags">
+                        <span class="icon fr-icon-tag-line fr-icon--sm" aria-hidden="true"></span>
+                        {% for tag in invite.project.tags.all %}<span class="project-card__project-tag">#{{ tag }}</span>{% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <p class="fr-mb-3v">Message d'invitation :</p>
+        {% if invite.message %}
+            <div class="bg-light fr-p-2w fr-mb-4w">
+                <p>{{ invite.message }}</p>
+                {% include "user/user_card.html" with user=invite.inviter %}
+            </div>
+        {% endif %}
+        <form class="form fr-mt-3w"
+              action="{% url 'invites-invite-accept' invite.pk %}"
+              method="post">
+            {% csrf_token %}
+            {% if not existing_account %}
+                <hr class="fr-hr">
+                <h3>Créez votre compte {{ request.site.name }}</h3>
+                <div class="fr-input-group fr-my-1w">
+                    <label class="fr-label" for="email">Adresse courriel</label>
+                    <input type="text"
+                           class="fr-input"
+                           id="email"
+                           value="{{ invite.email }}"
+                           disabled>
+                </div>
+                <div class="fr-grid-row fr-grid-row--gutters fr-mt-1w">
+                    <div class="fr-col-6">
+                        <div class="fr-input-group">
+                            <label class="fr-label" for="input-first-name">Prénom</label>
+                            <input type="text"
+                                   class="fr-input {% if form.first_name.errors %}is-invalid{% endif %}"
+                                   id="input-first-name"
+                                   name="{{ form.first_name.name }}"
+                                   placeholder="Camille"
+                                   value="{{ form.first_name.value|default:'' }}"
+                                   required>
+                            {% for error in form.first_name.errors %}<div class="text-danger text-end">{{ error }}</div>{% endfor %}
+                        </div>
+                    </div>
+                    <div class="fr-col-6">
+                        <div class="fr-input-group">
+                            <label class="fr-label" for="input-last-name">Nom</label>
+                            <input type="text"
+                                   class="fr-input {% if form.last_name.errors %}is-invalid{% endif %}"
+                                   id="input-last-name"
+                                   name="{{ form.last_name.name }}"
+                                   placeholder="Dupont"
+                                   value="{{ form.last_name.value|default:'' }}"
+                                   required>
+                            {% for error in form.last_name.errors %}<div class="text-danger text-end">{{ error }}</div>{% endfor %}
+                        </div>
+                    </div>
+                </div>
+                <div class="fr-grid-row fr-grid-row--gutters fr-mt-1w">
+                    <div class="fr-col-6">
+                        <div class="fr-input-group">
+                            <label class="fr-label" for="input-organization">Organisation</label>
+                            <input type="text"
+                                   class="fr-input {% if form.organization.errors %}is-invalid{% endif %}"
+                                   id="input-organization"
+                                   name="{{ form.organization.name }}"
+                                   placeholder="DEFR59"
+                                   value="{{ form.organization.value|default:'' }}"
+                                   required>
+                            {% for error in form.organization.errors %}<div class="text-danger text-end">{{ error }}</div>{% endfor %}
+                        </div>
+                    </div>
+                    <div class="fr-col-6">
+                        <div class="fr-input-group">
+                            <label class="fr-label" for="input-position">Fonction</label>
+                            <input type="text"
+                                   class="fr-input {% if form.position.errors %}is-invalid{% endif %}"
+                                   id="input-position"
+                                   name="{{ form.position.name }}"
+                                   placeholder="Chargée de mission"
+                                   value="{{ form.position.value|default:'' }}"
+                                   required>
+                            {% for error in form.position.errors %}<div class="text-danger text-end">{{ error }}</div>{% endfor %}
+                        </div>
+                    </div>
+                </div>
+                <ul class="fr-btns-group fr-btns-group--inline-sm fr-mt-4w">
+                    <li class="w-50">
+                        {% comment %} TODO: add url/action from backend {% endcomment %}
+                        <button class="fr-btn fr-btn--tertiary-no-outline w-100 align-self-center"
+                                type="submit"
+                                form="refuse-form">Refuser</button>
+                    </li>
+                    <li class="w-50">
+                        <button class="fr-btn fr-btn--primary w-100 align-self-center" type="submit">Rejoindre le dossier</button>
+                    </li>
+                </ul>
+            {% endif %}
+        </form>
+        <form action="{% url 'invites-invite-refuse' invite.pk %}"
+              method="post"
+              id="refuse-form">
+            {% csrf_token %}
+        </form>
+    </div>
+{% endblock layout_content %}
+{% block layout_secondary_content %}
+    <h3 class="fw-bolder">Qu'est ce que {{ request.site.name }} ?</h3>
+    {% include "invites/invite_site_message.html" %}
+    <p>
+        <a class="fr-link" href="{% url 'home' %}">En savoir plus</a>
+    </p>
+{% endblock layout_secondary_content %}

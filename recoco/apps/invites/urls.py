@@ -22,4 +22,9 @@ urlpatterns = [
         views.invite_accept,
         name="invites-invite-accept",
     ),
+    path(
+        r"invites/<uuid:invite_id>/refuse",
+        views.invite_refuse,
+        name="invites-invite-refuse",
+    ),
 ]
