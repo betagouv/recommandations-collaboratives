@@ -23,7 +23,8 @@
     Ces informations nous permettent de traiter votre demande dans les meilleures conditions.
 {% endblock tagline %}
 {% block content %}
-    <div class="container onboarding__summary">
+    <div class="container onboarding__summary"
+         x-data="{init: function() { localStorage.removeItem('userEmailProjectCreationStep') }}">
         <div class="banner  text-center">
             {% if site_config.email_logo %}
                 <img src="{{ site_config.email_logo.url }}"

@@ -8,11 +8,9 @@
     {% endif %}
     {% if form.helper.action_button.submit %}
         <li class="flex-grow-1">
-            <button type="submit"
-                    class="fr-btn dsrc-color--primary w-100"
-                    x-on:click="validate"
-                    :disabled="!isFormEdited && !canSubmit"
-                    {% if disabled %}disabled=""{% endif %}>{{ form.helper.action_button.submit.label }}</button>
+            <button type="submit" class="fr-btn dsrc-color--primary w-100" x-on:click="validate" :disabled="!isFormEdited || !canSubmit || errors.length > 0"
+                {% if disabled %}disabled=""{% endif %}
+                >{{ form.helper.action_button.submit.label }}</button>
         </li>
     {% endif %}
 </ul>
