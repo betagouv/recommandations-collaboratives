@@ -6,7 +6,7 @@
     {% endif %}
     <!-- Message stream -->
     {% for topic in topic_list %}
-        {% count_has_notifications topic.list as new_message_count %}
+        {% comment %} {% count_has_notifications topic.list as new_message_count %} {% endcomment %}
         <div class="conversation-new__container-topic"
              data-type-element="feed-element-item"
              data-topic='{{ topic.grouper|default:"general"|slugify }}'>
@@ -48,13 +48,31 @@
                 {% endif %}
             {% endfor %}
         </div>
-        {% count_message_by_type topic.list "posting" "followup" as message_count %}
+        {% comment %} {% count_message_by_type topic.list "posting" "followup" as message_count %} {% endcomment %}
         {% if message_count == 0 and topic.grouper == "" %}
             <div class="feed-element-item fr-px-3v fr-mb-3v">
                 {% include "projects/project/fragments/conversations_new/message_type/empty_message_list.html" %}
             </div>
         {% endif %}
     {% endfor %}
+    {% comment %}
+    ****************************************
+    ************** NEW STREAM **************
+    ****************************************
+    {% endcomment %}
+    <!-- Loop through all messages -->
+    {% for message in feed.messages %}
+        <!-- Loop through one message node  -->
+        {% ifchanged message.created|date %}
+            <p class="conversation-new__date">{{ message.created|date }}</p>
+        {% endifchanged %}
+        {% include "conversations/messages/message_item.html" %}
+    {% endfor %}
+    {% comment %}
+    ****************************************
+    ************** NEW STREAM **************
+    ****************************************
+    {% endcomment %}
 </div>
 {% if topic_list|length == 0 %}
     <div class="feed-element-item fr-px-3v fr-mb-3v">
