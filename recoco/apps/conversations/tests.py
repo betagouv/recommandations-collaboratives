@@ -1,10 +1,11 @@
 import pytest
 from model_bakery import baker
 
-from .api import build_feed
-from .models import MarkdownNode, Message
+from .api import build_message_feed
+from .models import ContactNode, DocumentNode, MarkdownNode, Message
 
 
+######--- Message ----#####
 @pytest.mark.django_db
 def test_serialize_message_without_node():
     m = baker.make(Message)
@@ -12,7 +13,7 @@ def test_serialize_message_without_node():
 
 
 @pytest.mark.django_db
-def test_serialize_message_without_markdown():
+def test_serialize_message_with_node():
     m = baker.make(Message)
     baker.make(MarkdownNode, message=m, text="hello ##title")
 
@@ -20,9 +21,41 @@ def test_serialize_message_without_markdown():
     assert len(payload["nodes"]) == 1
 
 
+######-- Nodes ---##########
 @pytest.mark.django_db
-def test_build_feed():
+def test_serialize_node_markdown():
+    node = baker.make(MarkdownNode, text="hello ##title")
+
+    payload = node.serialize()
+
+    assert payload["type"] is MarkdownNode.NODE_TYPE
+    assert payload["data"]["text"] == node.text
+
+
+@pytest.mark.django_db
+def test_serialize_node_contact():
+    node = baker.make(ContactNode)
+
+    payload = node.serialize()
+
+    assert payload["type"] is ContactNode.NODE_TYPE
+    assert payload["data"]["contact_id"] is not None
+
+
+@pytest.mark.django_db
+def test_serialize_node_document():
+    node = baker.make(DocumentNode, document__the_link="http://blah.com")
+
+    payload = node.serialize()
+
+    assert payload["type"] is DocumentNode.NODE_TYPE
+    assert payload["data"]["document_id"] is not None
+
+
+#####--- Feed ---#####
+@pytest.mark.django_db
+def test_build_message_feed():
     m = baker.make(Message)
     baker.make(MarkdownNode, message=m, text="hello ##title")
 
-    assert build_feed(m.project)
+    assert build_message_feed(m.project)

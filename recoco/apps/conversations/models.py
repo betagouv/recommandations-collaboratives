@@ -32,26 +32,64 @@ class Message(TimeStampedModel):
 
 
 class Node(models.Model):
+    NODE_TYPE = "empty"
+
     objects = InheritanceManager()
 
     position = models.PositiveIntegerField()
     message = models.ForeignKey(Message, on_delete=models.CASCADE, related_name="nodes")
 
+    def serialize(self):
+        return {"type": self.NODE_TYPE, "position": self.position, "data": {}}
+
 
 class MarkdownNode(Node):
+    NODE_TYPE = "markdown"
+
     text = models.TextField()
 
     def serialize(self):
-        return {"type": "markdown", "text": self.text}
+        payload = super().serialize()
+
+        payload["data"].update({"text": self.text})
+
+        return payload
 
 
 class RecommendationNode(Node):
+    NODE_TYPE = "recommendation"
+
     recommendation = models.ForeignKey(tasks_models.Task, on_delete=models.CASCADE)
+
+    def serialize(self):
+        payload = super().serialize()
+
+        payload["data"].update({"recommendation_id": self.recommendation.pk})
+
+        return payload
 
 
 class ContactNode(Node):
+    NODE_TYPE = "vcard"
+
     contact = models.ForeignKey(addressbook_models.Contact, on_delete=models.CASCADE)
+
+    def serialize(self):
+        payload = super().serialize()
+
+        payload["data"].update({"contact_id": self.contact.pk})
+
+        return payload
 
 
 class DocumentNode(Node):
+    NODE_TYPE = "document"
+
     document = models.ForeignKey(projects_models.Document, on_delete=models.CASCADE)
+
+    def serialize(self):
+        payload = super().serialize()
+
+        payload["data"].update({"document_id": self.document.pk})
+
+        return payload
