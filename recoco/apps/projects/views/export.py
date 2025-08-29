@@ -120,7 +120,7 @@ def project_list_export_csv(request):
             project.name,
             project.location,
             project.created_on.date(),
-            f"{project.first_name} {project.last_name}",
+            f"{project.submitted_by.first_name} {project.submitted_by.last_name}",
             [m.email for m in project.members.all()],
             project.phone,
             switchtenders_txt,
