@@ -448,10 +448,8 @@ def project_conversations_new(request, project_id=None):
     recipients = get_notification_recipients_for_project(project)
 
     feed = {
-        "feed": {
-            "events": [],
-            "messages": conversations_api.build_message_feed(project),
-        }
+        "events": [],
+        "messages": conversations_api.build_message_feed(project),
     }
 
     return render(
