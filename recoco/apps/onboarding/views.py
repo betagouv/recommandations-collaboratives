@@ -92,10 +92,6 @@ class OnboardingLogin(LoginView):
 
         # Update project with new user
         project.submitted_by = self.request.user
-        project.first_name = self.request.user.first_name
-        project.last_name = self.request.user.last_name
-        project.org_name = self.request.user.profile.organization.name
-        project.phone = self.request.user.profile.phone_no
         project_site = projects.ProjectSite.objects.get(
             project=project, site=self.request.site
         )
