@@ -30,6 +30,7 @@ class Message(TimeStampedModel):
 class Node(models.Model):
     objects = InheritanceManager()
 
+    position = models.PositiveIntegerField()
     message = models.ForeignKey(Message, on_delete=models.CASCADE, related_name="nodes")
 
 

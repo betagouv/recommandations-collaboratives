@@ -3,6 +3,12 @@ from django.contrib import admin
 from . import models
 
 
+class MarkdownNodeInline(admin.TabularInline):
+    model = models.MarkdownNode
+    extra = 1
+
+
 @admin.register(models.Message)
 class MessageAdmin(admin.ModelAdmin):
-    pass
+    inlines = [MarkdownNodeInline]
+    readonly_fields = ("created", "modified")
