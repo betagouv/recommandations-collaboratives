@@ -713,7 +713,7 @@ def test_reufse_invite_matches_existing_account(request, client, project):
             models.Invite, project=project, site=current_site, email=user.email
         ).make()
         url = reverse("invites-invite-refuse", args=[invite.pk])
-        response = client.get(url)
+        response = client.post(url)
 
     assert response.status_code == 302
     invite = models.Invite.on_site.get(pk=invite.pk)
