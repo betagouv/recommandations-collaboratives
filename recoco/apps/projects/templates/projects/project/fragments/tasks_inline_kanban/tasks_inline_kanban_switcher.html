@@ -1,16 +1,6 @@
 <fieldset class="fr-segmented">
-    <legend class="fr-segmented__legend fr-my-0 fr-mr-1w fr-text--sm">Affiché par :</legend>
+    <legend class="fr-segmented__legend fr-my-0 fr-mr-1w fr-text--sm">Vue :</legend>
     <div class="fr-segmented__elements">
-        <div class="fr-segmented__element">
-            <input data-test-id="list-tasks-switch-button"
-                   @click="$store.tasksView.switchView()"
-                   value="1"
-                   type="radio"
-                   :checked="$store.tasksView.currentView === 'inline'"
-                   id="segmented-task-inline"
-                   name="segmented-task-inline-kanban">
-            <label class="fr-label" for="segmented-task-inline">Liste</label>
-        </div>
         <div class="fr-segmented__element">
             <input data-test-id="kanban-tasks-switch-button"
                    @click="$store.tasksView.switchView()"
@@ -20,6 +10,16 @@
                    id="segmented-task-kanban"
                    name="segmented-task-inline-kanban">
             <label class="fr-label" for="segmented-task-kanban">Tableau</label>
+        </div>
+        <div class="fr-segmented__element">
+            <input data-test-id="list-tasks-switch-button"
+                   @click="$store.tasksView.switchView()"
+                   value="1"
+                   type="radio"
+                   :checked="$store.tasksView.currentView === 'inline'"
+                   id="segmented-task-inline"
+                   name="segmented-task-inline-kanban">
+            <label class="fr-label" for="segmented-task-inline">Liste</label>
         </div>
     </div>
 </fieldset>
