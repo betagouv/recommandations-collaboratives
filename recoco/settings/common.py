@@ -78,6 +78,7 @@ INSTALLED_APPS = [
     "recoco.apps.onboarding",
     "recoco.apps.home",
     "recoco.apps.projects",
+    "recoco.apps.conversations",
     "recoco.apps.tasks",
     "recoco.apps.resources",
     "recoco.apps.geomatics",
