@@ -9,6 +9,9 @@
     <link href="{% sass_src 'home/css/dsfr/custom-dsfr.scss' %}"
           rel="stylesheet"
           type="text/css">
+    <link href="{% sass_src 'projects/css/kanban.scss' %}"
+          rel="stylesheet"
+          type="text/css">
 {% endblock css %}
 {% block title %}
     | Solliciter l'équipe {{ request.site.name }}
@@ -37,7 +40,7 @@
             </h1>
         </div>
         <div class="container__form">
-            <div class="project-card">
+            <div class="project-card project-card__border--highlight">
                 <div class="project-card__content">
                     <div class="project__title">
                         {% if project.commune %}
