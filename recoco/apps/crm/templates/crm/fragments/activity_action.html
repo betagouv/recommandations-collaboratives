@@ -41,13 +41,13 @@
                                 {% else %}
                                     {% if action.verb == verbs.Document.ADDED %}
                                         a ajouté
-                                        {% if action.action_object.the_link %}un lien{% endif %}
-                                        {% if action.action_object.the_file %}un document{% endif %}
+                                        {% if action.action_object.the_link %}le lien{% endif %}
+                                        {% if action.action_object.the_file %}le document{% endif %}
                                         <a class="d-inline hover-underline"
                                            href="{{ action.action_object.get_absolute_url }}">
                                             {% if action.action_object %}"{{ action.action_object }}"{% endif %}
                                         </a>
-                                        sur le dossier
+                                        dans le dossier
                                         <a class="d-inline hover-underline"
                                            href="{{ action.action_object.get_absolute_url }}">
                                             {{ action.action_object.feed_label }}
