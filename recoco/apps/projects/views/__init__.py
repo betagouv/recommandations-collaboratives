@@ -477,7 +477,33 @@ def project_maplist(request):
         .order_by("-timestamp")[:100]
     )
 
-    return render(request, "projects/project/list-map.html", locals())
+    # Provide departments/regions for filters on the map list, similar to staff view
+    department_queryset = (
+        geomatics_models.Department.objects.filter(
+            code__in=(
+                models.Project.on_site.for_user(request.user)
+                .order_by("-created_on", "-updated_on")
+                .prefetch_related("commune__department")
+                .values_list("commune__department", flat=True)
+            )
+        )
+        | request.user.profile.departments.all()
+    ).distinct()
+
+    region_queryset = (
+        geomatics_models.Region.objects.filter(departments__in=department_queryset)
+        .prefetch_related("departments")
+        .distinct()
+        .order_by("name")
+    )
+
+    context = {
+        "departments": list(DepartmentSerializer(department_queryset, many=True).data),
+        "regions": list(RegionSerializer(region_queryset, many=True).data),
+        **locals(),
+    }
+
+    return render(request, "projects/project/list-map.html", context)
 
 
 # ----

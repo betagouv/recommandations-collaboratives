@@ -17,7 +17,9 @@ Alpine.data('ActionPusher', () => {
         'url',
         'embeded_url',
         'has_dsresource',
-      ], //
+        'status',
+        'category',
+      ],
     }),
 
     push_type: 'single',
@@ -128,7 +130,8 @@ Alpine.data('ActionPusher', () => {
           url: t.web_url,
           embeded_url: t.embeded_url,
           has_dsresource: t.has_dsresource,
-          category: t.category,
+          category: t.category ? t.category.name : null,
+          status: t.status,
         };
 
         this.resources.push(entry);

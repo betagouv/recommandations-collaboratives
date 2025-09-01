@@ -1,55 +1,48 @@
 {% extends "projects/project/list.html" %}
+{% load django_vite %}
 {% load static %}
+{% load sass_tags %}
 {% block title %}
     Carte des dossiers {{ block.super }}
 {% endblock title %}
 {% block og_title %}
     Carte des dossiers {{ block.super }}
 {% endblock og_title %}
+{% block js %}
+    {% vite_asset 'js/apps/advisorDashboard.js' %}
+    {% vite_asset 'js/apps/tutorial.js' %}
+    {% vite_asset 'js/apps/boardProjects.js' %}
+{% endblock js %}
+{% block css %}
+    <link href="{% sass_src 'projects/css/segmented_ctrl.scss' %}"
+          rel="stylesheet"
+          type="text/css">
+    <link href="{% sass_src 'projects/css/kanban.scss' %}"
+          rel="stylesheet"
+          type="text/css">
+{% endblock css %}
 {% block project_list_content %}
-    <div x-data="Map">
-        <div class="topbar d-flex justify-content-between fr-p-2v">
-            <span class="fs-5 flex-grow-1">
-                {% comment %} {% include "projects/project/fragments/navigation/display_select.html" %} {% endcomment %}
-                {% if project_moderator %}
-                    <svg class="fr-ml-2v align-middle bi"
-                         width="24px"
-                         height="24px"
-                         fill="currentColor">
-                        <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#binoculars" />
-                    </svg>
-                    <span class="align-middle">
-                        {% with draft_projects.count as draft_projects_count %}
-                            {% if draft_projects_count > 0 %}
-                                <a href="#draft-projects">{{ draft_projects_count }} dossier{{ draft_projects_count|pluralize }}</a> en attente d'acceptation
-                            {% endif %}
-                        {% endwith %}
-                    </span>
-                    -
-                {% endif %}
-                {% if unread_notifications.count %}
-                    <div class="d-inline">
-                        <svg class="align-middle text-danger bi"
-                             width="16px"
-                             height="16px"
-                             fill="currentColor">
-                            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#bell-fill" />
-                        </svg>
-                        <span class="badge live_notify_badge bg-secondary">{{ unread_notifications.count }}</span>
-                    </div>
-                {% endif %}
-            </span>
-            <div x-show="isBusy"
-                 x-transition
-                 class="position-absolute w-100 text-center">
-                <div class="spinner-border" role="status">
-                    <span class="visually-hidden">Loading...</span>
+    {{ departments|json_script:"departmentsArray" }}
+    {{ regions|json_script:"regionsArray" }}
+    <div class="col-12 fr-mx-auto font-marianne">
+        <div x-data="PersonalAdvisorDashboard({{ request.site.id }}, departmentsArray, regionsArray)"
+             x-init='getData("{{ request.user }}");'
+             @selected-departments="saveSelectedDepartment($event)">
+                {% include "projects/project/fragments/tasks_inline_kanban/tasks_inline_kanban_filters.html" %}
+                <div class="kanban-header__toolbar">{% include "projects/project/fragments/list-toolbars.html" %}</div>
+            </div>
+            <div>
+                <span class="fr-mb-2w">Légende :</span>
+                <ul class="fr-ml-2w">
+                    <li>jaune : dossiers non consultés</li>
+                    <li>noir : dossiers déjà consultés</li>
+                </ul>
+            </div>
+            <div class="d-flex align-items-start fr-pt-3w">
+                <div class="personal-dashboard-container-inner w-100">
+                    {% include "projects/project/fragments/personal_dashboard/personal_dashboard_map.html" %}
                 </div>
             </div>
-            {% include "projects/project/fragments/list-toolbars.html" %}
-        </div>
-        <div x-cloak class="fr-p-0 fr-pt-3w">
-            <div x-ref="map" id="map"></div>
         </div>
     </div>
 {% endblock project_list_content %}
