@@ -140,12 +140,12 @@
                                     <div class="fr-mb-2w">
                                         <div class="d-flex flex-column project-info">
                                             <div class="project-info__name">{{ project.name }}</div>
-                                            <div class="project-info__org-name">{{ project.org_name }}</div>
+                                            <div class="project-info__org-name">{{ project.owner.profile.organization.name|default:project.org_name }}</div>
                                             <div class="project-info__secondary">
                                                 <span class="fr-mr-1w">
                                                     <span class="fr-icon-map-pin-2-line fr-icon--sm fr-mr-1v"
                                                           aria-hidden="true"></span>
-                                                          {{ project.commune.name }}
+                                                    {{ project.commune.name }}
                                                 </span>
                                                 <span>
                                                     <span class="fr-icon-calendar-event-line fr-icon--sm fr-mr-1v"

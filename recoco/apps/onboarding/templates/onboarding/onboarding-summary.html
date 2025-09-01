@@ -44,7 +44,7 @@
                         {% else %}
                             <p class="project__title-city">Pas encore de commune associée</p>
                         {% endif %}
-                        <p class="project__title-name">{{ project.org_name }}</p>
+                        <p class="project__title-name">{{ project.owner.profile.organization.name|default:project.org_name }}</p>
                     </div>
                     <div class="project__info">
                         {% if project.commune %}

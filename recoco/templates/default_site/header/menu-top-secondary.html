@@ -41,7 +41,7 @@
                         aria-controls="project_list"
                         :disabled="displayedProjectList.length == 0">
                     {% if project %}
-                        <span class="list-project__project-name no-underline">{{ project.name }} <span class="list-project__project-org-name_title no-underline">{{ project.org_name }}</span></span>
+                        <span class="list-project__project-name no-underline">{{ project.name }} <span class="list-project__project-org-name_title no-underline">{{ project.owner.profile.organization.name|default:project.org_name }}</span></span>
                     {% else %}
                         <template x-if="currentProject">
                             <div>
