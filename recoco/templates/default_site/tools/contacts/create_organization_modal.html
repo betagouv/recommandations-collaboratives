@@ -32,6 +32,7 @@
                        class="fr-input"
                        :class="{'fr-input--error': formState.isSubmitted && !formState.fields.isOrgaName}"
                        x-model="organization.name"
+                       data-test-id="organization-name"
                        required>
             </div>
             <template x-if="departments">
