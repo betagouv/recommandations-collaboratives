@@ -1,5 +1,5 @@
 import Alpine from 'alpinejs';
-import api from '../utils/api';
+import api, { projectsUrl } from '../utils/api';
 import { formatDate } from '../utils/date';
 import { gravatar_url } from '../utils/gravatar';
 import { makeProjectURL } from '../utils/createProjectUrl';
@@ -12,7 +12,7 @@ import 'leaflet-control-geocoder/dist/Control.Geocoder.css';
 import Fuse from 'fuse.js';
 import _ from 'lodash';
 
-function PersonalAdvisorDashboard(currentSiteId) {
+function PersonalAdvisorDashboard(currentSiteId, departments, regions) {
   return {
     currentSiteId: currentSiteId,
     data: [],
@@ -23,13 +23,24 @@ function PersonalAdvisorDashboard(currentSiteId) {
     formatDate,
     gravatar_url,
     makeProjectURL,
-    //*** filters
+    //*** filters old ?
     currentSort: this.sortProjectDate,
     search: '',
     select: '',
     fuse: null,
+    //*** new filters for map
+    backendSearch: {
+      searchText: '',
+      searchDepartment: [],
+      lastActivity: localStorage.getItem('lastActivity') ?? '30',
+    },
+    searchText: '',
+    filterProjectLastActivity: localStorage.getItem('lastActivity') ?? '30',
+    isDisplayingOnlyUserProjects:
+      JSON.parse(localStorage.getItem('isDisplayingOnlyUserProjects')) ?? false,
     //*** departments
-    departments: [],
+    departments: JSON.parse(departments.textContent),
+    regions: JSON.parse(regions.textContent),
     territorySelectAll: true,
     //*** map
     map: null,
@@ -38,8 +49,12 @@ function PersonalAdvisorDashboard(currentSiteId) {
     //*** options
     //*** header's height + some px
     bodyScrollTopPadding: 80,
-    init() {
+    allProjects: [],
+    async init() {
       this.handleBodyTopPaddingScroll(this.bodyScrollTopPadding);
+      this.allProjects = await this.$store.projects.getUserProjetsStatus();
+      await this.getDataFiltered();
+      this.constructRegionsFilter(this.departments, this.regions);
     },
     async getData(currentUser) {
       const projects = await this.$store.projects.getUserProjetsStatus();
@@ -58,6 +73,12 @@ function PersonalAdvisorDashboard(currentSiteId) {
       });
       this.data = _.unionBy(this.data, 'project.id');
       this.displayedData = this.data.sort(this.sortProjectDate);
+      if (this.map) {
+        this.map.remove();
+      }
+      if (this.markersLayer) {
+        this.markersLayer.remove();
+      }
       const { map, markersLayer } = initMap(projects);
 
       this.map = map;
@@ -436,6 +457,147 @@ function PersonalAdvisorDashboard(currentSiteId) {
         projectUpdated.isLoading = false;
       }
     },
+
+    //*** filters functions
+
+    async onLastActivityChange(event) {
+      this.backendSearch.lastActivity = event.target.value;
+      localStorage.setItem('lastActivity', this.backendSearch.lastActivity);
+      await this.getDataFiltered();
+    },
+
+    async getDataFiltered() {
+      const { searchText, searchDepartment, lastActivity } = this.backendSearch;
+      const projects = await api.get(
+        projectsUrl(searchText, searchDepartment, lastActivity)
+      );
+      this.projectList = await this.$store.projects.mapperProjetsProjectSites(
+        projects.data,
+        this.currentSiteId
+      );
+      this.projectList = this.projectList
+        .filter((fp) => this.allProjects.some((p) => p.project.id === fp.id))
+        .map((fp) => {
+          return this.allProjects.find((p) => p.project.id === fp.id);
+        });
+      this.projectListFiltered = [...this.projectList];
+      this.filterMyProjects();
+    },
+
+    filterMyProjects() {
+      if (this.isDisplayingOnlyUserProjects) {
+        this.projectListFiltered = this.projectList.filter(
+          (d) => d.project.is_observer || d.project.is_switchtender
+        );
+      } else {
+        this.projectListFiltered = [...this.projectList];
+      }
+      if (this.map) {
+        this.map.remove();
+      }
+      if (this.markersLayer) {
+        this.markersLayer.remove();
+      }
+      const { map, markersLayer } = initMap(this.projectListFiltered);
+      this.map = map;
+      this.markersLayer = markersLayer;
+      if (this.projectListFiltered.length > 0) {
+        zoomToCentroid(this.map, this.markersLayer);
+      } else {
+        setTimeout(() => this.map.invalidateSize(), 251);
+      }
+    },
+
+    toggleMyProjectsFilter() {
+      this.isDisplayingOnlyUserProjects = !this.isDisplayingOnlyUserProjects;
+      localStorage.setItem(
+        'isDisplayingOnlyUserProjects',
+        this.isDisplayingOnlyUserProjects
+      );
+      this.filterMyProjects();
+    },
+
+    async onSearch(event) {
+      this.backendSearch.searchText = event.target.value;
+      await this.backendSearchProjects({ resetLastActivity: true });
+    },
+
+    async backendSearchProjects(options = { resetLastActivity: false }) {
+      if (this.backendSearch.searchText !== '') {
+        if (this.$refs.selectFilterProjectDuration) {
+          this.$refs.selectFilterProjectDuration.disabled = true;
+          this.$refs.selectFilterProjectDuration.value = 1460;
+        }
+        this.backendSearch.lastActivity = '';
+      } else if (options.resetLastActivity) {
+        if (this.$refs.selectFilterProjectDuration) {
+          this.$refs.selectFilterProjectDuration.disabled = false;
+          this.$refs.selectFilterProjectDuration.value = 30;
+        }
+        this.backendSearch.lastActivity = '30';
+      }
+
+      await this.getDataFiltered();
+    },
+
+    async saveSelectedDepartment(event) {
+      if (!event.detail) return;
+
+      this.backendSearch.searchDepartment = [...event.detail];
+      await this.backendSearchProjects();
+    },
+
+    constructRegionsFilter(departments, regions) {
+      const currentRegions = [];
+      if (!Array.isArray(departments) || !Array.isArray(regions)) {
+        this.regions = [];
+        return;
+      }
+      const displayedProjectsDepartments =
+        this.extractDepartmentFromDisplayedProjects(this.projectList || []);
+
+      regions.forEach((region) => {
+        if (!region || !Array.isArray(region.departments)) return;
+        //Iterate through regions.departments and look for advisors departments
+        const foundDepartments = departments
+          .filter((department) =>
+            region.departments.find(
+              (regionDepartment) => regionDepartment.code === department.code
+            )
+          )
+          .map((department) => {
+            const isIncludeInDisplayedProjects =
+              displayedProjectsDepartments.includes(department.code);
+            const departmentData = {
+              ...department,
+              active: isIncludeInDisplayedProjects,
+            };
+            if (isIncludeInDisplayedProjects)
+              this.departments.push(departmentData);
+            return departmentData;
+          });
+
+        if (foundDepartments.length > 0) {
+          const currentRegion = {
+            code: region.code,
+            departments: foundDepartments,
+            name: region.name,
+            active:
+              foundDepartments.length ===
+              foundDepartments.filter((department) => department.active).length,
+          };
+
+          return currentRegions.push(currentRegion);
+        }
+      });
+      this.regions = currentRegions;
+    },
+    extractDepartmentFromDisplayedProjects(projects) {
+      const departments = projects
+        .map((item) => item?.project?.commune?.department?.code)
+        .filter((code) => Boolean(code));
+      return [...new Set(departments)];
+    },
   };
 }
 
@@ -451,6 +613,12 @@ function initMap(projects) {
     }
   );
 
+  // Guard against double-initialization on the same container
+  const existing = L.DomUtil.get('map');
+  if (existing && existing._leaflet_id) {
+    // If a map is already bound to this element, remove it first
+    existing._leaflet_id = null;
+  }
   const map = L.map('map').setView([48.51, 10.2], 2);
 
   L.tileLayer.provider('CartoDB.Positron').addTo(map);
