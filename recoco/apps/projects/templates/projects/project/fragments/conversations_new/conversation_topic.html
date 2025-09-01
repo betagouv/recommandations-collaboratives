@@ -8,7 +8,9 @@
                for="selector-{{ topic_slug }}">
             <input type="radio"
                    name="topic-selector"
+                   {% comment %}
                    x-model="topicSelector"
+                   {% endcomment %}
                    class="d-none"
                    id="selector-{{ topic_slug }}"
                    value="{{ topic_slug }}"

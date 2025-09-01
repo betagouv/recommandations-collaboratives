@@ -29,9 +29,10 @@ class Message(TimeStampedModel):
 
     def serialize(self):
         payload = {
+            "id": self.pk,
             "posted_by": self.posted_by_id,
             "created": self.created,
-            "in_reply_to": self.in_reply_to,
+            "in_reply_to": self.in_reply_to_id,
             "nodes": [],
         }
 

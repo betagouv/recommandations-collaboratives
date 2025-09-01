@@ -54,6 +54,14 @@
   font-weight: 700;
 }
 
+.fr-italic {
+  font-style: italic;
+}
+
+.fr-small > * {
+  font-size: 0.875rem !important;
+}
+
 /* ¯¯¯¯ *\
   BUTTONS
 \* ˍˍˍˍ */

@@ -10,6 +10,7 @@ import '../components/TaskStatus.js';
 import '../components/TaskStatusSwitcherConversations.js';
 import '../components/NotificationEater.js';
 import '../components/ConversationTopicSwitch.js';
+import '../components/FeatureConversations/Conversations.js';
 
 import { tiptapParserJSONToHTML } from '../utils/tiptapParser.js';
 

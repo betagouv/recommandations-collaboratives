@@ -20,11 +20,12 @@
 {% endblock css %}
 {% block project_detail %}
     {{ project.pk|json_script:"djangoProjectId" }}
+    {{ feed|json_script:"djangoFeed" }}
     {% include "projects/project/navigation.html" with conversations_new=True %}
     {% comment %} TODO: build topic_list in django view {% endcomment %}
     {% regroup feed by topic as topic_list %}
     <div class="conversation-new d-flex"
-         x-data="ConversationTopicSwitch({{ project.pk }})"
+         x-data="Conversations(JSON.parse(document.getElementById('djangoFeed').textContent))"
          hx-history="false">
         <div class="conversation-new__topics">
             <div class="justify-content-between">
@@ -65,8 +66,12 @@
             </div>
         </div>
         <div class="conversation-new__container"
+             {% comment %}
              x-data="NotificationEater({{ project.id }})"
-             @topic-switched.window="scrollToFirstNotification($event.detail)">
+             {% endcomment %}
+             {% comment %}
+             @topic-switched.window="scrollToFirstNotification($event.detail)"
+             {% endcomment %}>
             {% get_obj_perms request.user for project as "user_project_perms" %}
             {% include "projects/project/partials/conversations_new_partial.html" %}
             {% if "use_public_notes" in user_project_perms %}
@@ -90,7 +95,7 @@
                     {% for error in posting_form.content.errors %}<div class="text-danger text-end">{{ error }}</div>{% endfor %}
                     <label class="visually-hidden" for="input-project-content">{{ posting_form.content.label }}</label>
                     <input type="hidden" name="new" value="1">
-                    <input type="hidden" name="topic_name" :value="valueTopicFormMessageSend">
+                    {% comment %} <input type="hidden" name="topic_name" :value="valueTopicFormMessageSend"> {% endcomment %}
                     <div class="d-flex justify-content-end fr-mt-3v"></div>
                 </form>
             {% endif %}
