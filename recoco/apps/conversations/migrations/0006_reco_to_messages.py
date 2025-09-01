@@ -14,6 +14,7 @@ def create_messages_from_recommendations(apps, schema_editor):
     RecommendationNode = apps.get_model("conversations", "RecommendationNode")
     ContactNode = apps.get_model("conversations", "ContactNode")
     DocumentNode = apps.get_model("conversations", "DocumentNode")
+    MarkdownNode = apps.get_model("conversations", "MarkdownNode")
 
     # in case of a fresh installation, AnonymousUser does not exist and we have no data,
     # so skip this migration
@@ -27,6 +28,7 @@ def create_messages_from_recommendations(apps, schema_editor):
     for project in Project.objects.all():
         for task in Task.objects.filter(project=project, public=True):
             with transaction.atomic():
+                # First, create the message mirroring the Recommendation itself
                 msg = Message.objects.create(
                     project=project,
                     posted_by_id=task.created_by_id or anonymous_user.pk,
@@ -51,6 +53,26 @@ def create_messages_from_recommendations(apps, schema_editor):
                     prev_node = DocumentNode.objects.create(
                         message=msg, position=prev_node.position + 1, document=document
                     )
+
+                # Then, add TaskFollowups as replies
+                for followup in task.followups.exclude(comment=""):
+                    foll_msg = Message.objects.create(
+                        project=project,
+                        posted_by_id=followup.who_id or anonymous_user.pk,
+                        created=followup.timestamp,
+                        in_reply_to=msg,
+                    )
+
+                    MarkdownNode.objects.create(
+                        message=msg, position=1, text=followup.comment
+                    )
+
+                    if followup.contact:
+                        ContactNode.objects.create(
+                            message=foll_msg,
+                            position=2,
+                            contact=followup.contact,
+                        )
 
 
 class Migration(migrations.Migration):

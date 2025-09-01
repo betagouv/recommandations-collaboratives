@@ -28,7 +28,12 @@ class Message(TimeStampedModel):
     )
 
     def serialize(self):
-        payload = {"posted_by": self.posted_by_id, "created": self.created, "nodes": []}
+        payload = {
+            "posted_by": self.posted_by_id,
+            "created": self.created,
+            "in_reply_to": self.in_reply_to,
+            "nodes": [],
+        }
 
         for node in (
             Node.objects.filter(message=self.pk)
