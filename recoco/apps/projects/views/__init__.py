@@ -376,39 +376,9 @@ def project_list(request):
 @login_required
 @ensure_csrf_cookie
 @never_cache
-def project_list_for_advisor(request):
+def project_list_for_advisor():
     """Return the projects for the advisor"""
-    if not (
-        check_if_advisor(request.user, request.site)
-        or can_administrate_project(project=None, user=request.user)
-    ):
-        raise PermissionDenied("Vous n'avez pas le droit d'accéder à ceci.")
-
-    # unread_notifications = notifications_models.Notification.on_site.unread().filter(
-    #    recipient=request.user, public=True
-    # )
-
-    mark_general_notifications_as_seen(request.user)
-
-    project_ct = ContentType.objects.get_for_model(models.Project)
-    user_project_pks = list(
-        request.user.project_states.filter(
-            project__switchtenders=request.user
-        ).values_list("project__pk", flat=True)
-    )
-
-    action_stream = (
-        request.user.notifications.filter(
-            target_content_type=project_ct,
-            target_object_id__in=user_project_pks,
-        )
-        .prefetch_related("actor__profile__organization")
-        .prefetch_related("action_object")
-        .prefetch_related("target")
-        .order_by("-timestamp")[:20]
-    )
-
-    return render(request, "projects/project/personal_advisor_dashboard.html", locals())
+    return redirect("projects-project-list-staff")
 
 
 @login_required
