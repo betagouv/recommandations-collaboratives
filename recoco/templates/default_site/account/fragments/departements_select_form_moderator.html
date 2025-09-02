@@ -5,21 +5,58 @@
           method="post">
         {% csrf_token %}
         <fieldset class="fr-fieldset">
-            <h4 class="fr-mb-3w d-block">Sélectionnez vos départements d'action</h4>
-            <div class="fr-fieldset__content">
-                <div class="fr-input-group fr-mt-4v"
-                     x-data="{objectsToSelect: JSON.parse(document.getElementById('departmentsArray').textContent), selectedDepartments: {{ selected_departments|default:'[]' }} }"
+            <h4 class="fr-mb-3w d-block">Sélectionnez les départements d'action</h4>
+            <div class="fr-fieldset__element modal-create-organization__yes fr-mb-0 fr-p-2w border-bottom w-100">
+                <div class="fr-radio-group">
+                    <input type="radio"
+                           id="selectDepartments-no"
+                           name="{{ form.advisor_access_type.name }}"
+                           value="{{ form.fields.advisor_access_type.choices.0.0 }}"
+                           {% if form.advisor_access_type.value == 'National' %}checked{% endif %}
+                           @change="resetSelectedDepartments()">
+                    <label class="fr-label" for="selectDepartments-no">{{ form.fields.advisor_access_type.choices.0.1 }}</label>
+                </div>
+                {% if form.advisor_access_type.errors %}
+                    <div class="fr-error-text form-mandatory-element">{{ form.advisor_access_type.errors.0 }}</div>
+                {% endif %}
+            </div>
+            <div class="fr-fieldset__element fr-p-2w fr-mb-0 w-100">
+                <div class="fr-radio-group">
+                    <input type="radio"
+                           id="selectDepartments-yes"
+                           name="{{ form.advisor_access_type.name }}"
+                           value="{{ form.fields.advisor_access_type.choices.1.0 }}"
+                           {% if form.advisor_access_type.value == 'Regional' %}checked{% endif %}>
+                    <label class="fr-label" for="selectDepartments-yes">{{ form.fields.advisor_access_type.choices.1.1 }}</label>
+                </div>
+                <div x-data="{objectsToSelect: JSON.parse(document.getElementById('departmentsArray').textContent), selectedDepartments: {{ selected_departments|default:'[]' }} }"
                      @set-departments="selectedDepartments = $event.detail">
-                    {% include "tools/contacts/multi_select.html" with placeholder="Cherchez et sélectionnez vos départements" label="Sélectionnez un ou plusieurs départements, laissez vide pour toute la France" %}
-                    <template x-for="dept in selectedDepartments" :key="dept">
-                        <input type="hidden" name="departments" :value="dept">
-                    </template>
-                    <button class="fr-btn custom-login-button w-100"
-                            type="submit"
-                            data-test-id="save-modif-departments"
-                            @click="sessionStorage.setItem( 'view', 'advisor')">Enregistrer</button>
+                    <div class="fr-input-group fr-ml-4w"
+                         x-data="RegionDepartmentPreparer({ selectedDepartments: selectedDepartments })">
+                        <template x-if="objectsToSelect && objectsToSelect.length">
+                            <div x-data="alpineMultiSelect({ selected: selectedDepartments, objectsToSelect: objectsToSelect, displayRegions: true })">
+                                {% include "tools/contacts/multi_select.html" with placeholder="Cherchez et sélectionnez les départements à affecter" label="Cherchez et sélectionnez les départements à affecter" display_regions=True %}
+                                <template x-for="dept in selectedDepartments" :key="dept">
+                                    <input type="hidden" name="departments" :value="dept">
+                                </template>
+                            </div>
+                        </template>
+                        <template x-if="!objectsToSelect || !objectsToSelect.length">
+                            <div>Chargement des départements...</div>
+                        </template>
+                        {% if form.departments.errors %}
+                            <div class="fr-error-text form-mandatory-element">{{ form.departments.errors.0 }}</div>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
+            <input type="hidden"
+                   name="{{ form.comment.name }}"
+                   value="{{ form.comment.value }}">
+            <button class="fr-btn custom-login-button w-100"
+                    type="submit"
+                    data-test-id="save-modif-departments"
+                    @click="sessionStorage.setItem('view', 'advisor')">Enregistrer</button>
         </fieldset>
     </form>
 {% endblock layout_content %}
