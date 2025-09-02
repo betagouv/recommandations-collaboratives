@@ -1,6 +1,6 @@
 document.addEventListener('alpine:init', () => {
   Alpine.data('alpineMultiSelect', (obj) => ({
-    isRegion: obj.isRegion || false,
+    displayRegions: obj.displayRegions || false,
     elementId: obj.elementId || 'select-list',
     objectsToSelect: obj.objectsToSelect || [],
     regions: [],
@@ -25,7 +25,7 @@ document.addEventListener('alpine:init', () => {
       this.buildOptions();
       // searching for the given value
       this.$watch('search', (e) => {
-        if (this.isRegion) {
+        if (this.displayRegions) {
           document.querySelectorAll('.department-item').forEach((dep) => {
             let reg = new RegExp(this.search, 'gi');
             if (dep.innerText.match(reg)) {
@@ -67,7 +67,7 @@ document.addEventListener('alpine:init', () => {
     },
     buildOptions() {
       const data = this.objectsToSelect;
-      if (this.isRegion) {
+      if (this.displayRegions) {
         this.regions = data || [];
         this.options = [];
         this.regions.forEach((region) => {
@@ -85,14 +85,15 @@ document.addEventListener('alpine:init', () => {
       } else {
         this.options = [];
         data.forEach((item) => {
-          this.options.push({
+          const newItem = {
             value: item.code,
             text: `(${item.code}) ${item.name}`,
             search: `(${item.code}) ${item.name}`,
             selected: this.selected.includes(item.code),
-          });
-          if (this.options[item].selected) {
-            this.selectedElms.push(this.options[item]);
+          };
+          this.options.push(newItem);
+          if (newItem.selected) {
+            this.selectedElms.push(newItem);
           }
         });
       }
@@ -162,7 +163,7 @@ document.addEventListener('alpine:init', () => {
     },
     // Region-specific methods
     handleRegionSelect(region) {
-      if (!this.isRegion) return;
+      if (!this.displayRegions) return;
       const allSelected = region.departments.every((dep) =>
         this.selected.includes(dep.code)
       );
@@ -184,7 +185,7 @@ document.addEventListener('alpine:init', () => {
       this.$dispatch('set-departments', this.selected);
     },
     isRegionSelected(region) {
-      if (!this.isRegion) return false;
+      if (!this.displayRegions) return false;
       return region.departments.every((dep) =>
         this.selected.includes(dep.code)
       );

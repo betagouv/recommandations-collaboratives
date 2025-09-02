@@ -3,10 +3,11 @@
     Parameters django template:
     - placeholder: The placeholder text for the input.
     - label: The label text for the input.
+    - display_regions: If true, display regions.
     Parameters alpine:
     - objectsToSelect: The objects to select from.
     - helptext: The help text for the input.
-    - isRegion: If true, use region-grouped mode.
+    - displayRegions: If true, use region-grouped mode.
 {% endcomment %}
 {% load sass_tags %}
 {% block css %}
@@ -21,9 +22,9 @@
             {% if helptext %}<p class="fr-hint-text fr-mb-0">{{ helptext }}</p>{% endif %}
             <div class="d-flex justify-center mt-8">
                 <div class="w-100"
-                     x-data="alpineMultiSelect({selected:selectedDepartments, objectsToSelect, isRegion: '{{ is_region }}' == 'True'})">
+                     x-data="alpineMultiSelect({selected:selectedDepartments, objectsToSelect, displayRegions: '{{ display_regions }}' == 'True'})">
                     <input type="hidden" x-bind:value="selectedValues()">
-                    <template x-if="!isRegion">
+                    <template x-if="!displayRegions">
                         <!-- Select Options -->
                         <select class="d-none" x-on:change="init" id="select-list">
                             <template x-for="department in objectsToSelect" :key="department.code">
@@ -129,7 +130,7 @@
                                                 tabindex="-1"
                                                 role="listbox"
                                                 @keyup.delete="deselect">
-                                                <template x-if="isRegion">
+                                                <template x-if="displayRegions">
                                                     <template x-for="region in regions" :key="region.code">
                                                         <li>
                                                             <div class="d-flex align-items-center region-header px-2 py-1 rounded cursor-pointer position-relative"
@@ -163,7 +164,7 @@
                                                         </li>
                                                     </template>
                                                 </template>
-                                                <template x-if="!isRegion">
+                                                <template x-if="!displayRegions">
                                                     <template x-for="(option,index) in options" :key="option.text">
                                                         <li class="text-gray-900 cursor-default select-none position-relative"
                                                             role="option">
