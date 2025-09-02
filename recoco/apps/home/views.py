@@ -373,6 +373,10 @@ def advisor_access_request_moderator_view(
         form = AdvisorAccessRequestForm()
         form.fields["departments"].initial = selected_departments
         form.fields["comment"].initial = advisor_access_request.comment
+        if advisor_access_request.departments.count() > 0:
+            form.fields["advisor_access_type"].initial = "Regional"
+        else:
+            form.fields["advisor_access_type"].initial = "National"
 
     if request.method == "POST":
         form = AdvisorAccessRequestForm(request.POST)
