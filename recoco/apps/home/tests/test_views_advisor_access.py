@@ -72,7 +72,11 @@ class TestAdvisorAccessRequestView:
 
         response = client.post(
             reverse("advisor-access-request"),
-            data={"departments": ["64", "33"], "comment": "Merci pour votre aide !"},
+            data={
+                "advisor_access_type": "Regional",
+                "departments": ["64", "33"],
+                "comment": "Merci pour votre aide !",
+            },
         )
         assert response.status_code == 200
 
@@ -90,6 +94,7 @@ class TestAdvisorAccessRequestView:
         response = client.post(
             reverse("advisor-access-request"),
             data={
+                "advisor_access_type": "Regional",
                 "departments": ["64", "33", "40"],
                 "comment": "Test comment",
             },
@@ -100,6 +105,67 @@ class TestAdvisorAccessRequestView:
         assert AdvisorAccessRequest.objects.count() == 1
         assert advisor_access_request.departments.count() == 3
         assert advisor_access_request.comment == "Test comment"
+
+        @pytest.mark.django_db(transaction=True)
+        def test_post_request_ensures_department(self, client, current_site):
+            baker.make(SiteConfiguration, site=current_site)
+            user = baker.make(User)
+            baker.make(Department, code="40", name="Landes")
+
+            client.force_login(user)
+            response = client.get(reverse("advisor-access-request"))
+            assert response.status_code == 200
+            assert response.context.get("advisor_access_request") is None
+
+            assert AdvisorAccessRequest.objects.count() == 0
+
+            response = client.post(
+                reverse("advisor-access-request"),
+                data={
+                    "advisor_access_type": "Regional",
+                    "departments": [],
+                    "comment": "Merci pour votre aide !",
+                },
+            )
+            assert response.status_code == 400
+
+            advisor_access_request = AdvisorAccessRequest.objects.filter(
+                site=current_site
+            ).first()
+            assert advisor_access_request is None
+
+    @pytest.mark.django_db(transaction=True)
+    def test_post_request_national_no_dep_ok(self, client, current_site):
+        baker.make(SiteConfiguration, site=current_site)
+        user = baker.make(User)
+        baker.make(Department, code="40", name="Landes")
+
+        client.force_login(user)
+        response = client.get(reverse("advisor-access-request"))
+        assert response.status_code == 200
+        assert response.context.get("advisor_access_request") is None
+
+        assert AdvisorAccessRequest.objects.count() == 0
+
+        response = client.post(
+            reverse("advisor-access-request"),
+            data={
+                "advisor_access_type": "National",
+                "comment": "Merci pour votre aide !",
+            },
+        )
+        assert response.status_code == 200
+
+        advisor_access_request = (
+            AdvisorAccessRequest.objects.filter(site=current_site)
+            .prefetch_related("departments")
+            .first()
+        )
+        assert advisor_access_request is not None
+        assert advisor_access_request.user == user
+        assert advisor_access_request.status == "PENDING"
+        assert advisor_access_request.departments.count() == 0
+        assert advisor_access_request.comment == "Merci pour votre aide !"
 
 
 class TestAdvisorAccessRequestModeratorView:
@@ -178,13 +244,19 @@ class TestAdvisorAccessRequestModeratorView:
             "advisor-access-request-moderator", args=[advisor_access_request.id]
         )
 
-        response = client.post(url, data={"departments": ["dummy_code"]})
+        response = client.post(
+            url, data={"advisor_access_type": "Regional", "departments": ["dummy_code"]}
+        )
         assert response.status_code == 200
         assert response.context["form"].errors is not None
 
         response = client.post(
             url,
-            data={"departments": ["64", "33"], "comment": "Merci pour votre aide !"},
+            data={
+                "advisor_access_type": "Regional",
+                "departments": ["64", "33"],
+                "comment": "Merci pour votre aide !",
+            },
         )
         assert response.status_code == 302
         assert response.url == reverse("projects-moderation-list")

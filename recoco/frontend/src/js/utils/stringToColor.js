@@ -1,4 +1,5 @@
 export function stringToColor(str, palette) {
+  str = str.slice(0, 10);
   const defaultPalette = [
     '#fbaff5', // Rose
     '#79e7d5', // Turquoise

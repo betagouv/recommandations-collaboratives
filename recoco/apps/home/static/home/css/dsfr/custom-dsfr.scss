@@ -671,9 +671,9 @@ form > p {
 }
 
 .repositionning {
-  bottom: 1px;
   position: absolute;
-  right: 1rem;
+  bottom: 1.5rem;
+  right: 1.5rem;
 }
 
 .flex-auto {
@@ -682,6 +682,16 @@ form > p {
 
 .border-radius-03 {
   border-radius: 0.3rem;
+}
+
+.form-mandatory-element {
+  color: #e1000f;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.border-bottom {
+  border-bottom: 1px solid var(--light-border-default-grey, #e5e5e5) !important;
 }
 
 /* ¯¯¯¯ *\
@@ -700,6 +710,10 @@ form > p {
   &--error {
     background-color: #dc3444;
   }
+}
+
+.specific-color-3a {
+  color: #3a3a3a;
 }
 
 /* ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯ *\
@@ -740,6 +754,47 @@ form > p {
 
 .z-1002 {
   z-index: 1002 !important;
+}
+
+/* ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯ *\
+  resize text elements
+\* ˍˍˍˍˍˍˍˍˍˍˍˍˍˍˍˍˍˍ */
+
+.dsfr-stepper__title-resize {
+  font-size: 18px !important;
+}
+
+.size-20px {
+  font-size: 20px;
+}
+
+.h5-rework {
+  font-size: 16px !important;
+  line-height: 150% !important;
+  color: #242424;
+  font-weight: 500 !important;
+}
+
+.description-help-text {
+  color: var(--light-text-mention-grey, #666);
+  font-size: 12px !important;
+  font-weight: 400;
+  line-height: 150% !important; /* 18px */
+}
+
+.fr-label-rework {
+  color: var(--light-text-default-grey, #3a3a3a);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 170%; /* 20.4px */
+  height: 25px;
+}
+
+.label-helptext-rework {
+  color: var(--light-text-default-grey, #3a3a3a);
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 150%; /* 18px */
 }
 
 /* ¯¯ *\

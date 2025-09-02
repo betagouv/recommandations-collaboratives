@@ -11,6 +11,7 @@
 {% endblock og_title %}
 {% block js %}
     {% vite_asset 'js/apps/conversationsNew.js' %}
+    {% vite_asset 'js/apps/featureAddContact.js' %}
 {% endblock js %}
 {% block css %}
     <link href="{% sass_src 'projects/css/conversations_new.scss' %}"
@@ -34,7 +35,9 @@
                     {% include "projects/project/fragments/conversations_new/conversation_topic.html" with topic_name=topic.grouper message_number=topic.list %}
                 {% endfor %}
             </div>
-            <div class="conversation-new__topics-list-member fr-p-2w">
+            <div class="conversation-new__topics-list-member fr-p-2w"
+                 x-data="{isOpen: false}"
+                 :class="{'open': isOpen}">
                 <h2 class="conversation-new__topics-list-member-title">Participants</h2>
                 <h3 class="fr-mt-2w conversation-new__topics-list-member-subtitle">Porteur de projet et partenaires</h3>
                 <ul class="flex-column list-unstyled fr-mb-0">
@@ -54,6 +57,11 @@
                         {% endif %}
                     {% endfor %}
                 </ul>
+                <div class="list-member-toggle position-sticky bottom-0 start-0 text-center w-100 bg-white">
+                    <button class="fr-btn fr-btn--sm fr-btn--tertiary-no-outline"
+                            @click="isOpen = !isOpen"
+                            x-text="isOpen ? 'Voir moins' : 'Voir plus'"></button>
+                </div>
             </div>
         </div>
         <div class="conversation-new__container"
@@ -63,7 +71,7 @@
             {% include "projects/project/partials/conversations_new_partial.html" %}
             {% if "use_public_notes" in user_project_perms %}
                 <!-- Post message -->
-                <form class="form editor-form fr-px-5v"
+                <form class="form editor-form fr-px-3v fr-pr-12w"
                       hx-post="{% url 'projects-project-detail-conversations-new-partial' project.pk %}"
                       hx-trigger="submit"
                       hx-swap="outerHTML"
@@ -71,35 +79,19 @@
                       enctype="multipart/form-data"
                       id="conversation-form">
                     {% csrf_token %}
-                    <div class="message-form fr-mt-3w bg-light border-form editor-form__container fr-input-group">
-                        {% include "tools/editor.html" with input_name=posting_form.content.name initial_content=posting_form.content.value|default:'' errors=posting_form.content.errors input_required=True can_add_reco=True next_url_add_reco="projects-project-detail-conversations-new" %}
-                        {% comment %} {% include "projects/project/fragments/files_links/file_upload_input_standalone.html" %} {% endcomment %}
-                        <!-- Action file -->
-                        <button x-data="{fileName: ''}"
-                                class="fr-btn fr-btn--sm fr-btn--tertiary fr-icon-file-add-line fr-btn--icon-left file-upload-wrapper"
-                                type="button"
-                                @click="$refs.fileUploadInput.click()">
-                            <span class="file-upload-text">Ajouter un fichier</span>
-                            <span class="fr-ml-1w" x-text="fileName"></span>
-                            <input x-ref="fileUploadInput"
-                                   type="file"
-                                   id="file-upload"
-                                   name="the_file"
-                                   @change="fileName = $refs.fileUploadInput.files.length > 0 ? $refs.fileUploadInput.files[0].name : ''"
-                                   class="d-none file-upload-input">
-                        </button>
-                        <button data-test-id="send-message-conversation"
-                                x-data
-                                :disabled="$store.editor.currentMessage === '' "
-                                form="conversation-form"
-                                class="fr-btn send-message"
-                                type="submit">Envoyer</button>
+                    <div class="message-form fr-my-3v bg-light border-form editor-form__container fr-input-group"
+                         :class="{'focus': isFocus}"
+                         @click.outside="isFocus = false"
+                         @submit.prevent="console.log('submit')"
+                         x-data="{isFocus: false, message: {the_file: '', text: '', contact: ''}}">
+                        {% include "tools/editor.html" with model="message" input_name=posting_form.content.name initial_content=posting_form.content.value|default:'' errors=posting_form.content.errors input_required=True can_add_reco=True next_url_add_reco="projects-project-detail-conversations-new" can_attach_files=True can_attach_contact=True show_send_button=True form_id="conversation-form" %}
+                        <input type="hidden" name="contact" :value="message?.contact?.id">
                     </div>
                     {% for error in posting_form.content.errors %}<div class="text-danger text-end">{{ error }}</div>{% endfor %}
                     <label class="visually-hidden" for="input-project-content">{{ posting_form.content.label }}</label>
                     <input type="hidden" name="new" value="1">
                     <input type="hidden" name="topic_name" :value="valueTopicFormMessageSend">
-                    <div class="d-flex justify-content-end fr-mt-3w"></div>
+                    <div class="d-flex justify-content-end fr-mt-3v"></div>
                 </form>
             {% endif %}
         </div>

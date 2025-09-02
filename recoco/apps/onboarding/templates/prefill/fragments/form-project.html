@@ -1,0 +1,27 @@
+{% load crispy_forms_tags %}
+<form id="{{ form.helper.form_id }}"
+      method="post"
+      enctype="multipart/form-data"
+      x-on:input="isFormEdited = true">
+    <input type="hidden"
+           name="js_enabled"
+           id="{{ form.helper.form_id }}_js_enabled"
+           value="false">
+    <fieldset class="fr-fieldset">
+        <legend class="fr-fieldset__legend--regular fr-fieldset__legend">
+            Les champs suivis d'un astérisque (*) sont obligatoires
+        </legend>
+        {% csrf_token %}
+        {{ form.name|as_crispy_field }}
+        {{ form.location|as_crispy_field }}
+        <div class="fr-fieldset__element">
+            {% include "projects/project/fragments/city_select_dsfr.html" with isRequired=True %}
+        </div>
+        {{ form.description|as_crispy_field }}
+    </fieldset>
+    {% include "onboarding/fragments/survey.html" %}
+    <fieldset class="fr-fieldset">
+        {{ form.captcha }}
+    </fieldset>
+    {% include "dsrc/core/blocks/buttons/button_group.html" %}
+</form>

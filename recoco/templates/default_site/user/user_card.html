@@ -24,7 +24,8 @@
                 data-test-id="button-open-tooltip-user-card">
             <span class="fr-mr-1v d-flex align-items-center font-very-small">
                 <img class="user-card__gravatar rounded-circle fr-mr-1v {% if not user.is_active %}border-0{% elif advising_position.is_advisor %}advisor-border border-2{% elif advising_position.is_observer %}observer-border border-2{% else %}neutral-role-border border-2{% endif %}"
-                     :src='gravatar_url("{{ user.email }}", 18, "{{ user.first_name }}" + " " + "{{ user.last_name }}")'
+                     :src='gravatar_url("{{ user.email }}", 18, "{{ user.first_name }}" + " " + "{{ user.last_name }}", stringToColor("{{ user.email }}") )'
+                     :style="{ '--current-bg-color': stringToColor('{{ user.email }}') }"
                      alt="{{ action.actor }}">
                 {% if user %}
                     <strong class="user-card__name text-nowrap text-capitalize {% if not user.is_active %}inactive-status{% endif %}"

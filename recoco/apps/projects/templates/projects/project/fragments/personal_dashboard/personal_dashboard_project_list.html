@@ -63,11 +63,13 @@
                             <a class="project-link d-flex align-items-center no-underline"
                                data-test-id="project-link"
                                :href="makeProjectURL('{% url 'projects-project-detail' 0 %}', item.project.id)">
-                               <span class="text-info-custom name no-underline project-card__name" x-text="item.project.name"></span><p>&nbsp;</p>
-                               <template x-if="item.project.org_name">
-                                   <span class="fw-bold title-info fr-mr-2v location no-underline project-card__org-name"
-                                         x-text="item.project.org_name"></span>
-                               </template>
+                                <span class="text-info-custom name no-underline project-card__name"
+                                      x-text="item.project.name"></span>
+                                <p>&nbsp;</p>
+                                <template x-if="item.project.org_name">
+                                    <span class="fw-bold title-info fr-mr-2v location no-underline project-card__org-name"
+                                          x-text="item.project.org_name"></span>
+                                </template>
                             </a>
                         </div>
                         <div class="d-flex align-items-center fr-mr-1v">

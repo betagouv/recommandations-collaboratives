@@ -1,5 +1,5 @@
 import Alpine from 'alpinejs';
-import { stringToColor } from '../utils/utils';
+import { stringToColor } from '../utils/stringToColor';
 
 Alpine.data('ConversationTopicSwitch', (projectId) => {
   return {

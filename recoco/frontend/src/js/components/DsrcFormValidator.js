@@ -66,11 +66,13 @@ function DsrcFormValidator(formId, validationSchema, requestMethod = 'GET') {
           }
         });
       });
+      this.customFocus();
       // Disable browser validation as we are using our own
       document.getElementById(formId).setAttribute('novalidate', '');
       // Let the server know that JS is enabled
       document.getElementById(`${formId}_js_enabled`).value = 'true';
     },
+
     validate() {
       const fields = Object.keys(this.form);
       const validateMap = {};
@@ -172,6 +174,11 @@ function DsrcFormValidator(formId, validationSchema, requestMethod = 'GET') {
       // validate the field when it changes: remove this if you want to validate the form only on `blur` or `submit` events
       // Use a debounce mechanism for slow/complex/async validations (e.g. API calls)
       this.validateInput(event);
+    },
+    customFocus() {
+      const elementToFocus = this.$el.querySelector('.element-to-focus');
+      if (!elementToFocus) return;
+      elementToFocus.parentElement.querySelector('input').focus();
     },
   };
 }

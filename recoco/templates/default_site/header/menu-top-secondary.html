@@ -41,7 +41,7 @@
                         aria-controls="project_list"
                         :disabled="displayedProjectList.length == 0">
                     {% if project %}
-                        <span class="list-project__project-name no-underline">{{ project.name }} <span class="list-project__project-org-name_title no-underline">{{ project.org_name }}</span></span>
+                        <span class="list-project__project-name no-underline">{{ project.name }} <span class="list-project__project-org-name_title no-underline">{{ project.owner.profile.organization.name|default:project.org_name }}</span></span>
                     {% else %}
                         <template x-if="currentProject">
                             <div>
@@ -78,13 +78,23 @@
                         {% endif %}
                         <template x-for="project in displayedProjectList">
                             <div>
-                                <a class="fr-nav__link d-flex flex-column" :href="`/project/${project.id}`">
+                                <a class="fr-nav__link d-flex flex-column align-items-start"
+                                   :href="`/project/${project.id}`">
                                     <span class="list-project__project-name no-underline" x-text="project.name"></span>
                                     <span class="list-project__item no-underline">
-                                        <span class="fr-icon-parent-line fr-icon--sm align-middle" aria-hidden="true"></span>
-                                        <span class="list-project__project-org-name no-underline" x-text="project.org_name"></span>
-                                        <span class="fr-icon-map-pin-2-line fr-icon--sm align-middle" aria-hidden="true"></span>
-                                        <span class="list-project__project-commune no-underline" x-text="project.commune.name"></span>
+                                        <template x-if="project.org_name">
+                                            <span class="no-underline">
+                                                <span class="fr-icon-parent-line fr-icon--sm align-middle"
+                                                      aria-hidden="true"></span>
+                                                {% comment %} Came from project.owner.profile.organization.name {% endcomment %}
+                                                <span class="list-project__project-org-name no-underline"
+                                                      x-text="project.org_name"></span>
+                                            </span>
+                                        </template>
+                                        <span class="fr-icon-map-pin-2-line fr-icon--sm align-middle"
+                                              aria-hidden="true"></span>
+                                        <span class="list-project__project-commune no-underline"
+                                              x-text="project.commune.name"></span>
                                     </span>
                                 </a>
                             </div>
@@ -92,7 +102,7 @@
                         {% if not is_switchtender %}
                             <a class="fr-btn justify-content-center w-100"
                                data-test-id="create-project"
-                               href="{% url 'onboarding' %}">Déposer un dossier</a>
+                               href="{% url 'onboarding' %}?prefill=true">Déposer un dossier</a>
                         {% endif %}
                     </ul>
                 </div>

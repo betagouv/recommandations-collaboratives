@@ -21,6 +21,7 @@
     "@tiptap/core": "^2.0.0-beta.218",
     "@tiptap/extension-hard-break": "^2.1.16",
     "@tiptap/extension-link": "^2.0.0-beta.199",
+    "@tiptap/extension-placeholder": "^2.22.3",
     "@tiptap/pm": "^2.0.0-beta.218",
     "@tiptap/starter-kit": "^2.0.0-beta.218",
     "ajv": "^8.13.0",
@@ -61,5 +62,8 @@
     "stylelint": "16.1.0",
     "stylelint-config-standard": "36.0.0",
     "stylelint-config-standard-scss": "13.0.0"
+  },
+  "resolutions": {
+    "prosemirror-model": "1.25.1"
   }
 }

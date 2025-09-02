@@ -24,11 +24,7 @@
             </div>
         </span>
         <span class="project-card__orgname fw-light specific-color-666">
-            {% if project.owner.profile.organization.name %}
-                {{ project.owner.profile.organization.name }}
-            {% else %}
-                {{ project.org_name }}
-            {% endif %}
+            {{ project.owner.profile.organization.name|default:project.org_name }}
         </span>
         {% if 'use_crm' in user_site_perms %}
             <a class="small fr-ml-2v"
@@ -50,6 +46,6 @@
                 {{ project.last_name }}
             </strong>
         </span>
-        <span class="project-card__orgname fw-light specific-color-666">{{ project.org_name }}</span>
+        <span class="project-card__orgname fw-light specific-color-666">{{ project.owner.profile.organization.name|default:project.org_name }}</span>
     </div>
 {% endif %}
