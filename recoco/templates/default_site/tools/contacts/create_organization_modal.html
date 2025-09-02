@@ -28,6 +28,9 @@
                 <template x-if="formState.isSubmitted && !formState.fields.isOrgaName">
                     <p class="modal-create-organization__label-info color-important">Le nom de votre organisation est obligatoire *</p>
                 </template>
+                <template x-if="isOrgaAlreadyExistingOnOtherPortal">
+                    <p class="modal-create-organization__label-info color-important">Cette organisation existe déjà dans la base de données d'un autre portail. Essayez de changer le nom de votre organisation ou de contacter les administrateurs.</p>
+                </template>
                 <input type="text"
                        class="fr-input"
                        :class="{'fr-input--error': formState.isSubmitted && !formState.fields.isOrgaName}"
