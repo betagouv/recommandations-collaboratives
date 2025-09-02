@@ -23,9 +23,6 @@ document.addEventListener('alpine:init', () => {
     },
     init() {
       this.buildOptions();
-      this.$watch('objectsToSelect', () => {
-        this.buildOptions();
-      });
       // searching for the given value
       this.$watch('search', (e) => {
         if (this.isRegion) {
