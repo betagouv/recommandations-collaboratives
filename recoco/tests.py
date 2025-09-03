@@ -1,3 +1,5 @@
+import random
+from string import digits
 from urllib.parse import unquote
 
 import pytest
@@ -235,3 +237,11 @@ class CustomBaker(baker.Baker):
             for field in super(CustomBaker, self).get_fields()
             if not isinstance(field, AutoSlugField)
         ]
+
+
+def gen_phone_number():
+    return "0" + "".join(random.choices(digits, k=9))  # noqa: S311
+
+
+# todo is this proper place?
+baker.generators.add("phonenumber_field.modelfields.PhoneNumberField", gen_phone_number)
