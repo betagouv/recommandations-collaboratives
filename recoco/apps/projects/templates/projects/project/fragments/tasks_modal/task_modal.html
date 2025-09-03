@@ -18,7 +18,7 @@
             <template x-if="currentTask">
                 <div class="d-flex flex-column">
                     <!-- Pagination -->
-                    <template x-if="$store.previewModal.isPaginated">
+                    {% comment %} <template x-if="$store.previewModal.isPaginated">
                         <div class="bg-blue d-flex align-items-center justify-content-between fr-p-2v rounded specific-border-radiusy-0">
                             <button class="fr-p-1v button filled white small"
                                     @click="$store.previewModal.previous()">
@@ -40,7 +40,7 @@
                                 </svg>
                             </button>
                         </div>
-                    </template>
+                    </template> {% endcomment %}
                     <!-- Modal body -->
                     <div x-init="taskId && $store.previewModal.loadFollowups() && $store.previewModal.loadNotifications() && followupScrollToLastMessage(true)"
                          class="d-flex w-100 align-items-stretch position-relative">

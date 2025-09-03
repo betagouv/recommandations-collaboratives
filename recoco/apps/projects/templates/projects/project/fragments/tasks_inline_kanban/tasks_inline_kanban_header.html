@@ -6,7 +6,6 @@
                     {% include "projects/project/fragments/tasks_inline_kanban/tasks_inline_kanban_switcher.html" %}
                 {% endif %}
                 <div class="d-flex flex-column">
-                    {% comment %} {% include "projects/project/fragments/tasks_inline_kanban/tasks_inline_kanban_tasks_count.html" %} {% endcomment %}
                     {% if embed_view is not True %}
                         <div>
                             <a data-test-id="create-task-button"
@@ -25,7 +24,6 @@
                 {% if embed_view is not True %}
                     {% include "projects/project/fragments/tasks_inline_kanban/tasks_inline_kanban_switcher.html" %}
                 {% endif %}
-                {% comment %} {% include "projects/project/fragments/tasks_inline_kanban/tasks_inline_kanban_tasks_count.html" %} {% endcomment %}
             </div>
         </template>
     </div>
