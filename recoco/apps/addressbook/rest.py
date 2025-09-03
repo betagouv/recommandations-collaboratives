@@ -7,7 +7,7 @@ from recoco.rest_api.filters import (
 )
 from recoco.rest_api.pagination import StandardResultsSetPagination
 from recoco.rest_api.permissions import (
-    IsStaffForSiteOrISAuthenticatedReadOnly,
+    IsStaffForSiteOrIsAuthenticatedReadOnly,
     IsStaffForSiteOrReadOnly,
 )
 
@@ -58,7 +58,7 @@ class OrgaStartswithFilterBackend(BaseFilterBackend):
 
 
 class ContactViewSet(ModelViewSet):
-    permission_classes = [IsStaffForSiteOrISAuthenticatedReadOnly]
+    permission_classes = [IsStaffForSiteOrIsAuthenticatedReadOnly]
     pagination_class = StandardResultsSetPagination
     filter_backends = [WordTrigramSimilaritySearchFilter, OrgaStartswithFilterBackend]
 
