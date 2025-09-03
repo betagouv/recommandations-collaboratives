@@ -140,12 +140,12 @@
                                     <div class="fr-mb-2w">
                                         <div class="d-flex flex-column project-info">
                                             <div class="project-info__name">{{ project.name }}</div>
-                                            <div class="project-info__org-name">{{ project.org_name }}</div>
+                                            <div class="project-info__org-name">{{ project.owner.profile.organization.name|default:project.org_name }}</div>
                                             <div class="project-info__secondary">
                                                 <span class="fr-mr-1w">
                                                     <span class="fr-icon-map-pin-2-line fr-icon--sm fr-mr-1v"
                                                           aria-hidden="true"></span>
-                                                          {{ project.commune.name }}
+                                                    {{ project.commune.name }}
                                                 </span>
                                                 <span>
                                                     <span class="fr-icon-calendar-event-line fr-icon--sm fr-mr-1v"
@@ -156,7 +156,7 @@
                                             {% if project.tags.count > 0 %}
                                                 <div class="d-flex">
                                                     <div class="project-info__container-tags" data-cy="container-tags">
-                                                        <span class="fr-icon-pantone-line fr-icon--sm" aria-hidden="true"></span>
+                                                        <span class="fr-icon-tag-line fr-icon--sm" aria-hidden="true"></span>
                                                         {% for tag in project.tags.all %}<span class="project-info__tag fr-mr-1v">#{{ tag }}</span>{% endfor %}
                                                     </div>
                                                     {% if "use_project_tags" in user_project_perms %}
