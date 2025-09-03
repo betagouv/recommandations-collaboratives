@@ -5,18 +5,6 @@
                 {% if embed_view is not True %}
                     {% include "projects/project/fragments/tasks_inline_kanban/tasks_inline_kanban_switcher.html" %}
                 {% endif %}
-                <div class="d-flex flex-column">
-                    {% if embed_view is not True %}
-                        <div>
-                            <a data-test-id="create-task-button"
-                               href="{% url 'projects-create-task' %}?project_id={{ project.pk }}"
-                               class="fr-btn fr-btn--sm">Créer une recommandation</a>
-                            <a href="{% url 'projects-project-tasks-suggest' project.pk %}"
-                               class="fr-btn fr-btn--secondary fr-btn--sm"
-                               data-test-id="see-suggest-task-button">Examiner les ressources suggérées</a>
-                        </div>
-                    {% endif %}
-                </div>
             </div>
         </template>
         <template x-if="!$store.djangoData.canManageTasks">
