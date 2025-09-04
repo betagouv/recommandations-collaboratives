@@ -89,7 +89,7 @@ export default function Task(currentTask) {
       } else if (!task.public) {
         return '-yellow';
       } else {
-        return '-grey-dark';
+        return '-grey-light';
       }
     },
     getTaskMessageCountLabel(count) {
