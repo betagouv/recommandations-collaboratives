@@ -2,8 +2,8 @@ from rest_framework.filters import BaseFilterBackend
 from rest_framework.viewsets import ModelViewSet
 
 from recoco.rest_api.filters import (
+    StrictWordTrigramSimilaritySearchFilter,
     VectorSearchFilter,
-    WordTrigramSimilaritySearchFilter,
 )
 from recoco.rest_api.pagination import StandardResultsSetPagination
 from recoco.rest_api.permissions import (
@@ -60,7 +60,7 @@ class OrgaStartswithFilterBackend(BaseFilterBackend):
 class ContactViewSet(ModelViewSet):
     permission_classes = [IsStaffForSiteOrIsAuthenticatedReadOnly]
     pagination_class = StandardResultsSetPagination
-    filter_backends = [WordTrigramSimilaritySearchFilter, OrgaStartswithFilterBackend]
+    filter_backends = [StrictWordTrigramSimilaritySearchFilter]
 
     trgm_search_fields = [
         ("last_name", 1.25),

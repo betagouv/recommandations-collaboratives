@@ -6,7 +6,7 @@ from django.contrib.postgres.search import (
     SearchVector,
     TrigramBase,
     TrigramSimilarity,
-    TrigramWordSimilarity,
+    TrigramStrictWordSimilarity,
 )
 from django.db.models import Case, F, FloatField, Q, Value, When
 from django.db.models.functions import Coalesce, Round
@@ -193,11 +193,11 @@ class TrigramSimilaritySearchFilter(BaseSearchFilter):
         )
 
 
-class WordTrigramSimilaritySearchFilter(TrigramSimilaritySearchFilter):
+class StrictWordTrigramSimilaritySearchFilter(TrigramSimilaritySearchFilter):
     def get_similarity_trgm_obj(
         self, search_field: str, search_terms: str
     ) -> TrigramBase:
-        return TrigramWordSimilarity(search_terms, search_field)
+        return TrigramStrictWordSimilarity(search_terms, search_field)
 
 
 class WatsonSearchFilter(BaseSearchFilter):
