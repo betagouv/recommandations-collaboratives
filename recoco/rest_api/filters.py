@@ -178,7 +178,7 @@ class TrigramSimilaritySearchFilter(BaseSearchFilter):
             )
 
             search_filters |= Q(
-                **{f"{similarity_field}__gt": trgm_similarity_threshold}
+                **{f"{similarity_field}_rank__gt": trgm_similarity_threshold}
             )
 
             if search_rank_fields is None:
