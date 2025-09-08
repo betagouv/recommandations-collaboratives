@@ -136,15 +136,24 @@ class TrigramSimilaritySearchFilter(BaseSearchFilter):
         search_filters = Q()
         search_rank_fields = None
 
+        max_boost: float = max(
+            1.0,
+            *(
+                search_field[1]
+                for search_field in search_fields
+                if isinstance(search_field, tuple)
+            ),
+        )
+
         for search_field in search_fields:
             if isinstance(search_field, tuple):
                 search_field_name = search_field[0]
                 similarity_field = f"{search_field[0]}_trgm_similarity"
-                boost = float(search_field[1])
+                boost = float(search_field[1]) / max_boost
             else:
                 search_field_name = search_field
                 similarity_field = f"{search_field}_trgm_similarity"
-                boost = 1.0
+                boost = 1.0 / max_boost
 
             queryset = queryset.annotate(
                 **{

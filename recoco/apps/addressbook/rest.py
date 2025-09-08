@@ -63,10 +63,10 @@ class ContactViewSet(ModelViewSet):
     filter_backends = [WordTrigramSimilaritySearchFilter, OrgaStartswithFilterBackend]
 
     trgm_search_fields = [
-        ("last_name", 1.5),
+        ("last_name", 1.25),
         "first_name",
-        ("division", 1.5),
-        ("organization__name", 2.0),
+        ("division", 1.25),
+        ("organization__name", 1.5),
         "organization__group__name",
     ]
     trgm_search_min_rank = 0.3
