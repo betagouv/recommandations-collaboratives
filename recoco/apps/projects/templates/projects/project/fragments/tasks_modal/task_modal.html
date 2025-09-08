@@ -22,22 +22,12 @@
                         <div class="bg-blue d-flex align-items-center justify-content-between fr-p-2v rounded specific-border-radiusy-0">
                             <button class="fr-p-1v button filled white small"
                                     @click="$store.previewModal.previous()">
-                                    <span class="fr-icon-arrow-left-line" aria-hidden="true"></span>
+                                <span class="fr-icon-arrow-left-line" aria-hidden="true"></span>
                             </button>
                             <span class="text-white fw-normal" x-text="newTasksNavigationText()"></span>
                             <button class="fr-p-1v button filled white small"
                                     @click="$store.previewModal.next()">
-                                    <span class="fr-icon-arrow-right-line" aria-hidden="true"></span>
-                            </button>
-                        </div>
-                    </template>
-                    <!-- Modal body -->
-                    <div x-init="taskId && $store.previewModal.loadFollowups() && $store.previewModal.loadNotifications() && followupScrollToLastMessage(true)"
-                                     width="25"
-                                     height="25"
-                                     fill="var(--background-action-high-blue-france)">
-                                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#arrow-right-short" />
-                                </svg>
+                                <span class="fr-icon-arrow-right-line" aria-hidden="true"></span>
                             </button>
                         </div>
                     </template>

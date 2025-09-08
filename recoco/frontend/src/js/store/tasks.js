@@ -9,7 +9,6 @@ document.addEventListener('alpine:init', () => {
       try {
         const tasksLoaded = await Alpine.store('tasksData').loadTasks();
         for (const task of tasksLoaded) {
-          console.log('tasksLoaded in tasksView init:', task);
           if (task.status != 0) {
            this.currentView = 'kanban';
           }
