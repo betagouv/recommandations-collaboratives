@@ -15,7 +15,8 @@
         <div class="spinner-border spinner-border spinner-border-sm text-primary"
              role="status"></div>
     </div>
-    <div class="medium-border-radius bg-white border-grey-dark position-relative hover-border-blue hover-shadow transition-all tmp-usevar"
+    <div class="medium-border-radius bg-white border-grey-dark position-relative hover-border-blue hover-shadow transition-all tmp-usevar fr-mb-1w"
+         :class="`border${getTaskColor(currentTask)}`"
          :style="task.isLoading && 'opacity:0.3';"
          :draggable="true"
          @dragstart="onDragStart(event, task.uuid)"
@@ -23,6 +24,15 @@
         <template x-if="currentTask.notifications.count > 0">
             <span class="position-absolute translate-middle top-0 start-100 badge rounded-circle bg-danger fw-bold specific-fontsize-07"
                   x-text="currentTask.notifications.count"></span>
+        </template>
+        <template x-if="!currentTask.public">
+            <div class="card-top-information d-flex align-items-center">
+                <div class="left-0">
+                    <span data-test-id="task-draft-status-in-kanban"
+                        :class="`bg${getTaskColor(currentTask)}`"
+                        class="text-dark fr-ml-2v">Brouillon</span>
+                </div>
+            </div>
         </template>
         <div class="fr-p-3v">
             <div class="d-flex flex-row">

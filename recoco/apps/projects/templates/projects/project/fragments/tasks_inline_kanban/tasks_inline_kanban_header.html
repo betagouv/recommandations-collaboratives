@@ -5,6 +5,7 @@
                 {% if embed_view is not True %}
                     {% include "projects/project/fragments/tasks_inline_kanban/tasks_inline_kanban_switcher.html" %}
                 {% endif %}
+                {% include "projects/project/fragments/tasks_inline_kanban/tasks_inline_kanban_tasks_count.html" %}
             </div>
         </template>
         <template x-if="!$store.djangoData.canManageTasks">
@@ -12,6 +13,7 @@
                 {% if embed_view is not True %}
                     {% include "projects/project/fragments/tasks_inline_kanban/tasks_inline_kanban_switcher.html" %}
                 {% endif %}
+                {% include "projects/project/fragments/tasks_inline_kanban/tasks_inline_kanban_tasks_count.html" %}
             </div>
         </template>
     </div>
