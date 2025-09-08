@@ -1,7 +1,7 @@
 from django.contrib.auth import models as auth_models
 from django.db import models
-from model_utils.managers import InheritanceManager
 from model_utils.models import TimeStampedModel
+from polymorphic.models import PolymorphicModel
 
 from recoco.apps.addressbook import models as addressbook_models
 from recoco.apps.projects import models as projects_models
@@ -46,10 +46,8 @@ class Message(TimeStampedModel):
         return payload
 
 
-class Node(models.Model):
+class Node(PolymorphicModel):
     NODE_TYPE = "empty"
-
-    objects = InheritanceManager()
 
     position = models.PositiveIntegerField()
     message = models.ForeignKey(Message, on_delete=models.CASCADE, related_name="nodes")

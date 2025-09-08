@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "django.contrib.postgres",
     "django.contrib.sites",
+    "polymorphic",
     "multisite",
     "reversion",
     "reversion_compare",
