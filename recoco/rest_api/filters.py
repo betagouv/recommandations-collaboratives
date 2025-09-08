@@ -139,9 +139,8 @@ class TrigramSimilaritySearchFilter(BaseSearchFilter):
         max_boost: float = max(
             1.0,
             *(
-                search_field[1]
+                search_field[1] if isinstance(search_field, tuple) else 1.0
                 for search_field in search_fields
-                if isinstance(search_field, tuple)
             ),
         )
 
