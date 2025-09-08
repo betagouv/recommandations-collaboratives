@@ -166,17 +166,6 @@ class TestOrganizationSearch:
         )
 
     @pytest.mark.django_db
-    def test_spelling_teritoire(self, api_client, request):
-        site = get_current_site(request)
-        territoire_contact = self.generate_result(
-            site=site,
-            first_name="Benoît",
-            division="Interlocuteur Territoires d'industrie",
-            org_name="Banque des Territoires",
-        )
-        self.expect_one_not_other(api_client, "teritoire", accept=[territoire_contact])
-
-    @pytest.mark.django_db
     def test_teritoire_not_too_large(self, api_client, request):
         site = get_current_site(request)
         water_loire_contact = self.generate_result(
@@ -189,6 +178,7 @@ class TestOrganizationSearch:
 
     @pytest.mark.django_db
     def test_jean_compound_names(self, api_client, request):
+        # find compound names
         site = get_current_site(request)
         jean_contact = self.generate_result(site=site, first_name="Jean", division="")
         jean_fr_contact = self.generate_result(
@@ -203,6 +193,7 @@ class TestOrganizationSearch:
 
     @pytest.mark.django_db
     def test_jean_phi_only_compound(self, api_client, request):
+        # prefix
         site = get_current_site(request)
         jean_contact = self.generate_result(site=site, first_name="Jean", division="")
         jean_fr_contact = self.generate_result(
@@ -214,12 +205,13 @@ class TestOrganizationSearch:
         self.expect_one_not_other(
             api_client,
             "jean-phi",
-            accept=[jean_contact, jean_ph_contact],
-            refuse=[jean_fr_contact],
+            accept=[jean_ph_contact],
+            refuse=[jean_contact, jean_fr_contact],
         )
 
     @pytest.mark.django_db
     def test_sylvain_not_sylvie(self, api_client, request):
+        # prefix
         site = get_current_site(request)
         sylvain_contact = self.generate_result(
             site=site, first_name="Sylvain", division=""
@@ -233,6 +225,7 @@ class TestOrganizationSearch:
 
     @pytest.mark.django_db
     def test_sylva_not_syndicats(self, api_client, request):
+        # not too close
         site = get_current_site(request)
         sylvain_contact = self.generate_result(
             site=site, first_name="Sylvain", division=""
@@ -248,7 +241,20 @@ class TestOrganizationSearch:
         )
 
     @pytest.mark.django_db
+    def test_spelling_teritoire(self, api_client, request):
+        # typo
+        site = get_current_site(request)
+        territoire_contact = self.generate_result(
+            site=site,
+            first_name="Benoît",
+            division="Interlocuteur Territoires d'industrie",
+            org_name="Banque des Territoires",
+        )
+        self.expect_one_not_other(api_client, "teritoire", accept=[territoire_contact])
+
+    @pytest.mark.django_db
     def test_ardeche_spelling(self, api_client, request):
+        # resilience to typo
         site = get_current_site(request)
         ardeche_contact = self.generate_result(
             site=site, first_name="CAUE de l'Ardèche", division="", org_name="CAUE 07"
