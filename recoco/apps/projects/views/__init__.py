@@ -31,6 +31,7 @@ from recoco.apps.communication.digests import normalize_user_name
 from recoco.apps.geomatics import models as geomatics_models
 from recoco.apps.geomatics.serializers import DepartmentSerializer, RegionSerializer
 from recoco.apps.home.models import AdvisorAccessRequest
+from recoco.apps.projects.models import ProjectCreationRequest
 from recoco.utils import (
     check_if_advisor,
     get_group_for_site,
@@ -95,6 +96,8 @@ def project_moderation_list(request):
         .select_related("user")
     ).order_by("-created")
 
+    project_creation_requests = ProjectCreationRequest.on_site.order_by("-created")
+
     return render(
         request,
         "projects/projects_moderation.html",
@@ -102,6 +105,7 @@ def project_moderation_list(request):
             "site_config": site_config,
             "draft_projects": draft_projects,
             "advisor_access_requests": advisor_access_requests,
+            "project_creation_requests": project_creation_requests,
         },
     )
 
@@ -473,7 +477,33 @@ def project_maplist(request):
         .order_by("-timestamp")[:100]
     )
 
-    return render(request, "projects/project/list-map.html", locals())
+    # Provide departments/regions for filters on the map list, similar to staff view
+    department_queryset = (
+        geomatics_models.Department.objects.filter(
+            code__in=(
+                models.Project.on_site.for_user(request.user)
+                .order_by("-created_on", "-updated_on")
+                .prefetch_related("commune__department")
+                .values_list("commune__department", flat=True)
+            )
+        )
+        | request.user.profile.departments.all()
+    ).distinct()
+
+    region_queryset = (
+        geomatics_models.Region.objects.filter(departments__in=department_queryset)
+        .prefetch_related("departments")
+        .distinct()
+        .order_by("name")
+    )
+
+    context = {
+        "departments": list(DepartmentSerializer(department_queryset, many=True).data),
+        "regions": list(RegionSerializer(region_queryset, many=True).data),
+        **locals(),
+    }
+
+    return render(request, "projects/project/list-map.html", context)
 
 
 # ----

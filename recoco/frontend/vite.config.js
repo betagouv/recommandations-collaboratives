@@ -77,9 +77,13 @@ const config = {
         DepartmentsSelector: resolve(
           './src/js/components/DepartmentsSelector.js'
         ),
+        RegionDepartmentPreparer: resolve(
+          './src/js/components/RegionDepartmentPreparer.js'
+        ),
         User: resolve('./src/js/components/User.js'),
         MutliSelect: resolve('./src/js/components/MultiSelect.js'),
         ContactBook: resolve('./src/js/components/ContactBook.js'),
+        pageInvitation: resolve('./src/js/apps/pageInvitation.js'),
       },
       output: {
         chunkFileNames: undefined,

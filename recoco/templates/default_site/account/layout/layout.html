@@ -2,12 +2,12 @@
     This layout is used to display the form for the account signup.
 
     Parameters:
+        - title (str): title of the page
         - stepper (boolean): if true, display the stepper
         - total_steps (int): total number of steps
         - step_number (int): current step number
         - current_step_title (str): current step title
         - next_step_title (str): next step title
-        - title (str): title of the page
 
 {% endcomment %}
 {% load static %}
@@ -24,15 +24,17 @@
 <div class="layout-form container">
     <div class="banner text-center">
         {% comment %} TODO ADD site_config in context {% endcomment %}
-        {% if site_config.email_logo %}
-            <img src="{{ site_config.email_logo.url }}"
+        {% if site_config.logo_small %}
+            <img src="{{ site_config.logo_small.url }}"
                  width="10%"
                  height="auto"
                  alt="Logo {{ request.site.name }}" />
         {% endif %}
-        <h1 class="fr-mb-8w">
-            <strong>{{ title }} sur <span class="layout-form__site-name">{{ request.site.name }}</span></strong>
-        </h1>
+        <h2 class="fr-mb-8w">
+            <strong>{{ title }}</strong>
+            <br>
+            sur <span class="layout-form__site-name">{{ request.site.name }}</span>
+        </h2>
     </div>
     {% if stepper %}
         <div class="fr-stepper fr-mb-2w">
@@ -54,4 +56,12 @@
             {% endblock layout_content %}
         </div>
     </div>
+    {% if layout_secondary_content %}
+        <div class="container__form d-flex justify-content-center">
+            <div class="layout__form">
+                {% block layout_secondary_content %}
+                {% endblock layout_secondary_content %}
+            </div>
+        </div>
+    {% endif %}
 </div>

@@ -23,8 +23,8 @@
                 class="d-flex align-items-center flex-wrap user-info border-0 fr-p-0 bg-transparent {% if user_popup_deactivate %}no-underline{% endif %}"
                 data-test-id="button-open-tooltip-user-card">
             <span class="fr-mr-1v d-flex align-items-center font-very-small">
-                <img class="user-card__gravatar rounded-circle fr-mr-1v {% if not user.is_active %}border-0{% elif advising_position.is_advisor %}advisor-border border-2{% elif advising_position.is_observer %}observer-border border-2{% else %}neutral-role-border border-2{% endif %}"
-                     :src='gravatar_url("{{ user.email }}", 40, "{{ user.first_name }}" + " " + "{{ user.last_name }}", stringToColor("{{ user.email }}") )'
+                <img class="user-card__gravatar rounded-circle fr-mr-1v {% if not user.is_active %}border-0{% else %}neutral-role-border border-2{% endif %}"
+                     :src='gravatar_url("{{ user.email }}", 18, "{{ user.first_name }}" + " " + "{{ user.last_name }}", stringToColor("{{ user.email }}") )'
                      :style="{ '--current-bg-color': stringToColor('{{ user.email }}') }"
                      alt="{{ action.actor }}">
                 {% if user %}
@@ -68,38 +68,7 @@
          id="user-tooltip"
          @click.outside="onOutsideUserClick"
          data-test-id="tooltip-user-card"
-         class="user-card-popup flex-column {% if not user.is_active %}...{% elif advising_position.is_advisor %}advisor-border{% elif advising_position.is_observer %}observer-border{% else %}neutral-role-border{% endif %}">
-        {% if user.is_active and advising_position.is_advisor %}
-            <div class="user-role position-absolute">
-                <span class="fr-py-1v fr-px-2v fw-bold text-uppercase tiny advisor-background text-white specific-borderradius-2px">Conseiller</span>
-            </div>
-        {% elif user.is_active and advising_position.is_observer %}
-            <div class="user-role position-absolute">
-                <span class="fr-py-1v fr-px-2v fw-bold text-uppercase tiny observer-background text-white specific-borderradius-2px">Observateur</span>
-            </div>
-        {% endif %}
-        <div class="d-flex align-items-center flex-wrap">
-            <span class="fr-mr-2v d-flex align-items-center font-very-small">
-                <img class="rounded-circle fr-mr-2v {% if not user.is_active %}border-0{% elif advising_position.is_advisor %}advisor-border border-2{% elif advising_position.is_observer %}observer-border border-2{% else %}neutral-role-border border-2{% endif %}"
-                     :src='gravatar_url("{{ user.email }}", 25, "{{ user.first_name }}" + " " + "{{ user.last_name }}")'
-                     alt="{{ action.actor }}">
-                <strong class="text-nowrap text-capitalize {% if not user.is_active %}inactive-status{% endif %}">
-                    {% if user.get_full_name %}
-                        {{ user.get_full_name }}
-                    {% elif user and project and project.first_name and project.last_name %}
-                        {{ project.first_name }}
-                        {{ project.last_name }}
-                    {% else %}
-                        {{ user.email }}
-                    {% endif %}
-                </strong>
-            </span>
-            {% if user.profile.organization.name %}
-                <span class="text-dark fw-normal font-italic font-very-small">{{ user.profile.organization.name }}</span>
-            {% elif project_owner and project.org_name %}
-                <span class="text-dark fw-normal font-italic font-very-small">{{ project.org_name }}</span>
-            {% endif %}
-        </div>
+         class="user-card-popup flex-column {% if user.is_active %}neutral-role-border{% endif %}">
         {% if user.profile.organization_position %}
             <div class="d-flex align-items-center justify-content-between text-blue font-very-small specific-my">
                 <div class="d-flex align-items-center">

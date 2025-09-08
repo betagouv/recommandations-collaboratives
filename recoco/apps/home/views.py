@@ -24,7 +24,6 @@ from django.views.generic import FormView, View
 from django.views.generic.base import TemplateView
 
 from recoco.apps.geomatics.models import Department
-from recoco.apps.onboarding.forms import OnboardingEmailForm
 from recoco.apps.projects import models as projects
 from recoco.apps.projects.utils import (
     can_administrate_project,
@@ -47,11 +46,6 @@ from .utils import get_current_site_sender_email, make_new_site
 
 class HomePageView(TemplateView):
     template_name = "home/home.html"
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["onboarding_modal_form"] = OnboardingEmailForm()
-        return context
 
 
 @method_decorator([login_required], name="dispatch")
@@ -378,6 +372,11 @@ def advisor_access_request_moderator_view(
 
         form = AdvisorAccessRequestForm()
         form.fields["departments"].initial = selected_departments
+        form.fields["comment"].initial = advisor_access_request.comment
+        if advisor_access_request.departments.count() > 0:
+            form.fields["advisor_access_type"].initial = "Regional"
+        else:
+            form.fields["advisor_access_type"].initial = "National"
 
     if request.method == "POST":
         form = AdvisorAccessRequestForm(request.POST)

@@ -1,9 +1,6 @@
 describe('I can attach miscellanious ressource to task @page-projet-recommandations-creation', () => {
-  beforeEach(() => {
-    cy.login('conseiller1');
-  });
-
   it('publishes a task with resource comment / no comment', () => {
+    cy.login('conseiller1');
     cy.visit(`/projects/action/?project_id=25`);
 
     cy.get('[data-cy="radio-push-reco-single-resource"]').should('be.checked');
@@ -25,7 +22,23 @@ describe('I can attach miscellanious ressource to task @page-projet-recommandati
     cy.url().should('include', '/actions');
   });
 
+  it('cannot select a draft resource and see warning', () => {
+    cy.login('staff');
+    cy.visit(`/projects/action/?project_id=25`);
+
+    cy.get('[data-cy="radio-push-reco-single-resource"]').should('be.checked');
+
+    cy.get('[data-test-id="search-resource-input"]').type('brouillon', {
+      delay: 0,
+    });
+    cy.get('[data-cy="resource-warning-status-draft"]').should('be.visible');
+    cy.get('[data-cy="radio-resource-list-task"]')
+      .first()
+      .should('be.disabled');
+  });
+
   it('publishes a task with external resource', () => {
+    cy.login('conseiller1');
     cy.visit(`/projects/action/?project_id=25`);
 
     cy.get('[data-cy="radio-push-reco-external-resource"]')
@@ -49,6 +62,7 @@ describe('I can attach miscellanious ressource to task @page-projet-recommandati
   });
 
   it('publishes a task with no resource', () => {
+    cy.login('conseiller1');
     cy.visit(`/projects/action/?project_id=25`);
 
     cy.get('[data-cy="radio-push-reco-no-resource"]')

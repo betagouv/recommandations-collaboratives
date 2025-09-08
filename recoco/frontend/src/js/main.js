@@ -31,6 +31,7 @@ import '../css/colors.css';
 import '../css/text-colors.css';
 import '../css/border.css';
 import '../css/role.css';
+import '../css/custom-icon.css';
 import '../css/main.css';
 
 //Layouts CSS
