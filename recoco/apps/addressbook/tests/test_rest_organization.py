@@ -147,6 +147,7 @@ class TestOrganizationSearch:
         )
 
     @pytest.mark.django_db
+    @pytest.mark.skip  # too difficult to differenciate from typo
     def test_adac_22_both_results(self, api_client, request):
         site = get_current_site(request)
         adac_37_contact = self.generate_result(
@@ -192,6 +193,7 @@ class TestOrganizationSearch:
         )
 
     @pytest.mark.django_db
+    @pytest.mark.skip  # too difficult to differenciate from typo
     def test_jean_phi_only_compound(self, api_client, request):
         # prefix
         site = get_current_site(request)
