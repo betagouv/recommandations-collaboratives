@@ -44,6 +44,7 @@
         </div>
         <div>
             {% include "projects/project/fragments/tasks_inline_kanban/tasks_inline_kanban_filters.html" %}
+            <div class="kanban-header__toolbar">{% include "projects/project/fragments/list-toolbars.html" %}</div>
         </div>
         <template x-if="isViewInitialized && projectList.length == 0">
             <div class="fr-notice fr-notice--info fr-my-8w">
