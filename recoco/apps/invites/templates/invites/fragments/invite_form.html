@@ -112,9 +112,9 @@
                         </div>
                     </div>
                 </div>
+                {% endif %}
                 <ul class="fr-btns-group fr-btns-group--inline-sm fr-mt-4w">
                     <li class="w-50">
-                        {% comment %} TODO: add url/action from backend {% endcomment %}
                         <button class="fr-btn fr-btn--tertiary-no-outline w-100 align-self-center"
                                 type="submit"
                                 form="refuse-form">Refuser</button>
@@ -123,7 +123,6 @@
                         <button class="fr-btn fr-btn--primary w-100 align-self-center" type="submit">Rejoindre le dossier</button>
                     </li>
                 </ul>
-            {% endif %}
         </form>
         <form action="{% url 'invites-invite-refuse' invite.pk %}"
               method="post"
