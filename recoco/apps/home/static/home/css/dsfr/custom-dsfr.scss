@@ -694,6 +694,10 @@ form > p {
   border-bottom: 1px solid var(--light-border-default-grey, #e5e5e5) !important;
 }
 
+.no-interaction-possible {
+  pointer-events: none;
+}
+
 /* ¯¯¯¯ *\
   COLORS
 \* ˍˍˍˍ */

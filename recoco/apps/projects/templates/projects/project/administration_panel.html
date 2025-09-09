@@ -27,368 +27,375 @@
         <div class="specific-border-4pxsolid1e1e1e">
             {% include "projects/project/fragments/project_banner/paused_project_banner.html" %}
             <div>
-            {% elif project.site_status == 'DRAFT' %}
-                <div class="specific-border-4pxsolid000091">
-                    {% include "projects/project/fragments/project_banner/non_published_project_banner.html" %}
-                {% endif %}
-                {{ project_form.postcode.value|json_script:"projectPostcode" }}
-                {{ project_form.insee.value|json_script:"projectInsee" }}
-                <div class="container-fluid">
-                    <div class="row fr-p-2w">
-                        {% if "change_project" in user_project_perms %}
-                            <div class="col-12">
-                                <h6 class="text-uppercase fw-bold d-block fr-mb-2w font-small">informations générales</h6>
-                                <form method="post"
-                                      action="{% url 'projects-project-administration' project.pk %}"
-                                      class="{% if project_form.errors %}was-validated{% endif %}">
-                                    {% csrf_token %}
-                                    {% if project_form.errors %}
-                                        <div class="border border-danger rounded fr-mb-2w fr-pt-2w text-danger">{{ project_form.errors }}</div>
-                                    {% endif %}
-                                    <div class="row fr-mb-2w">
-                                        <div class="col">
-                                            <label class="fr-mb-2v text-info-custom text-grey-dark"
-                                                   for="{{ project_form.name.id_for_label }}">
-                                                {{ project_form.name.label }}
-                                            </label>
-                                            <input type="text"
-                                                   class="fr-py-2w placeholder-grey form-control {% if project_form.name.errors %}is-invalid{% endif %}"
-                                                   id="{{ project_form.name.id_for_label }}"
-                                                   name="{{ project_form.name.name }}"
-                                                   placeholder="Nom du dossier"
-                                                   value="{{ project_form.name.value }}"
-                                                   required />
-                                            {% for error in project_form.name.errors %}<div class="invalid-feedback">{{ error }}</div>{% endfor %}
-                                        </div>
-                                    </div>
-                                    <div class="row fr-mb-2w">
-                                        <div class="col">
-                                            <label class="fr-mb-2v text-info-custom text-grey-dark"
-                                                   for="input-project-address">
-                                                {{ project_form.location.label }}
-                                            </label>
-                                            <input type="text"
-                                                   class="fr-py-2w placeholder-grey form-control {% if project_form.location.errors %}is-invalid{% endif %}"
-                                                   id="input-project-address"
-                                                   name="{{ project_form.location.name }}"
-                                                   placeholder="Adresse"
-                                                   value="{{ project_form.location.value|default:'' }}" />
-                                            {% for error in project_form.location.errors %}<div class="text-danger text-end">{{ error }}</div>{% endfor %}
-                                        </div>
-                                    </div>
-                                    <div class="row fr-mb-2w">
-                                        <div class="col">
-                                            <label class="text-info-custom text-grey-dark"
-                                                   for="input-project-description">
-                                                {{ project_form.description.label }}
-                                            </label>
-                                            <textarea class="placeholder-grey form-control {% if project_form.description.errors %}is-invalid{% endif %} textarea-size"
-                                                      id="input-project-description"
-                                                      name="{{ project_form.description.name }}"
-                                                      placeholder="">{{ project_form.description.value|default:'' }}</textarea>
-                                            {% for error in project_form.description.errors %}
-                                                <div class="text-danger text-end">{{ error }}</div>
-                                            {% endfor %}
-                                        </div>
-                                    </div>
-                                    <div class="row fr-mb-2w"
-                                         x-data="CitySearch()"
-                                         x-init="getPostcode(projectPostcode,projectInsee)">
-                                        <div class="col-auto">
-                                            <div class="fr-mb-2w">
-                                                <label class="text-info-custom text-grey-dark" for="input-project-address">{{ project_form.postcode.label }}</label>
-                                                <input :disabled="isLoading"
-                                                       @change.debounce="fetchCities()"
-                                                       x-model="postal"
-                                                       type="text"
-                                                       class="fr-py-3w placeholder-grey form-control {% if project_form.postcode.errors %}is-invalid{% endif %}"
-                                                       id="input-project-address"
-                                                       name="{{ project_form.postcode.name }}"
-                                                       placeholder="Code Postal"
-                                                       required />
-                                                {% for error in project_form.postcode.errors %}<div class="text-danger text-end">{{ error }}</div>{% endfor %}
-                                            </div>
-                                        </div>
-                                        <div class="fr-mb-2w col-auto">
-                                            <label class="text-info-custom text-grey-dark" for="input-project-address">{{ project_form.insee.label }}</label>
-                                            <select required
-                                                    :style="cities && cities.length == 0 && postal ? 'background-color:#e9ecef;pointer-events:none;padding: 12px 10px; border-radius: 0.25rem;min-width: 170px;padding-right: 30px;' : 'padding: 12px 10px; border-radius: 0.25rem;min-width: 170px;padding-right: 30px;' "
-                                                    x-ref="insee"
-                                                    name="insee"
-                                                    class="form-select tmp-usevar">
-                                                <template x-if="cities && cities.length > 0">
-                                                    <template x-for="city in cities" :key="city.insee">
-                                                        <option :value="city.insee" x-text="city.name"></option>
-                                                    </template>
-                                                </template>
-                                            </select>
-                                            <template x-if="cities && cities.length == 0 && postal">
-                                                <span class="text-danger text-end">Aucune commune trouvée, vérifiez le code postal ?</span>
-                                            </template>
-                                        </div>
-                                    </div>
-                                    <button id="bouton-modifier-les-info" type="submit" class="button filled">Modifier les informations du dossier</button>
-                                </form>
-                            </div>
+    {% elif project.status == 'REJECTED' %}
+        <div class="specific-border-4pxsolid1e1e1e">
+            {% include "projects/project/fragments/project_banner/deleted_project_banner.html" %}
+                <div class="no-interaction-possible">
+    {% elif project.site_status == 'DRAFT' %}
+        <div class="specific-border-4pxsolid000091">
+            {% include "projects/project/fragments/project_banner/non_published_project_banner.html" %}
+    {% endif %}
+    {{ project_form.postcode.value|json_script:"projectPostcode" }}
+    {{ project_form.insee.value|json_script:"projectInsee" }}
+    <div class="container-fluid">
+        <div class="row fr-p-2w">
+            {% if "change_project" in user_project_perms %}
+                <div class="col-12">
+                    <h6 class="text-uppercase fw-bold d-block fr-mb-2w font-small">informations générales</h6>
+                    <form method="post"
+                            action="{% url 'projects-project-administration' project.pk %}"
+                            class="{% if project_form.errors %}was-validated{% endif %}">
+                        {% csrf_token %}
+                        {% if project_form.errors %}
+                            <div class="border border-danger rounded fr-mb-2w fr-pt-2w text-danger">{{ project_form.errors }}</div>
                         {% endif %}
-                        <hr class="fr-mt-3w" />
-                        <div x-data="ProjectShare" class="row fr-mt-2v position-relative">
-                            <div id="user-management" class="invisible-anchor-high"></div>
-                            <h6 class="text-uppercase fw-bold d-block fr-mb-2w font-small">Gestion des utilisateurs</h6>
+                        <div class="row fr-mb-2w">
                             <div class="col">
-                                <p class="text-info-custom fr-mb-2v">Équipe de suivi</p>
-                                {% if "invite_advisors" in user_project_perms %}
-                                    <button @click="openInviteSwitchtenderModal"
-                                            data-toggle="modal"
-                                            data-target="#InviteSwitchtenderModal"
-                                            class="{% if project.site_status == 'DRAFT' %} disabled{% endif %} button d-inline-flex justify-content-center w-100 fr-mb-3w cursor-pointer">
-                                        {% if project.site_status == 'DRAFT' %}
-                                            <svg class="bi align-middle" width="18" height="18" fill="currentColor">
-                                                <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#lock-fill" />
-                                            </svg>
-                                            &nbsp;
-                                        {% endif %}
-                                        <span>Inviter un conseiller</span>
-                                    </button>
-                                {% endif %}
-                                {% if project.switchtender_sites.all.count == 0 %}
-                                    <div class="bg-light d-flex flex-column justify-content-center align-items-center fr-py-3w rounded">
-                                        <p class="fr-m-0 text-info-custom text-grey fw-normal fr-pb-2w">Le dossier n'est pas encore suivi</p>
-                                        <svg class="bi align-baseline fr-mr-2v fr-mt-1v"
-                                             width="30"
-                                             height="30"
-                                             fill="#999999">
-                                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#clipboard-x" />
-                                        </svg>
-                                    </div>
-                                {% else %}
-                                    <ul class="d-flex flex-column list-unstyled fr-mb-0">
-                                        {% for advisor in project.switchtender_sites.all %}
-                                            <li class="d-flex align-items-start justify-content-between fr-mb-1v">
-                                                {% include "user/user_card.html" with user=advisor.switchtender user_activity=True %}
-                                                {% if request.user == advisor.switchtender %}
-                                                    <form id="projects-project-switchtender-leave"
-                                                          action="{% url 'projects-project-switchtender-leave' project.pk %}"
-                                                          method="post">
-                                                        {% csrf_token %}
-                                                        <button data-bs-toggle="tooltip"
-                                                                data-bs-title="Retirer l'accès"
-                                                                class="fr-btn fr-btn--tertiary fr-icon-close-line">
-                                                            Retirer l'accès
-                                                        </button>
-                                                    </form>
-                                                {% else %}
-                                                    {% if "manage_advisors" in user_project_perms %}
-                                                        <form id="form-projects-access-remove-user"
-                                                              action="{% url 'projects-project-access-advisor-delete' project.pk advisor.switchtender.email %}"
-                                                              method="post">
-                                                            {% csrf_token %}
-                                                            <button data-bs-toggle="tooltip"
-                                                                    data-bs-title="Retirer l'accès"
-                                                                    class="fr-btn fr-btn--tertiary fr-icon-close-line">
-                                                                Retirer l'accès
-                                                            </button>
-                                                        </form>
-                                                    {% endif %}
-                                                {% endif %}
-                                            </li>
-                                        {% endfor %}
-                                    </ul>
-                                {% endif %}
-                            </div>
-                            <div class="col">
-                                <p class="text-info-custom fr-mb-2v">Equipe du demandeur et partenaires</p>
-                                {% if "invite_collaborators" in user_project_perms %}
-                                    <button @click="openInviteMemberModal"
-                                            data-toggle="modal"
-                                            data-target="#InviteMemberModal"
-                                            data-cy="button-invite-project-member"
-                                            class="{% if project.site_status == 'DRAFT' %} disabled{% endif %} button d-inline-flex justify-content-center w-100 fr-mb-3w cursor-pointer">
-                                        {% if project.site_status == 'DRAFT' %}
-                                            <svg class="bi align-middle" width="18" height="18" fill="currentColor">
-                                                <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#lock-fill" />
-                                            </svg>
-                                        {% endif %}
-                                        <span>Inviter un membre demandeur ou un partenaire</span>
-                                    </button>
-                                {% endif %}
-                                <ul class="flex-column list-unstyled fr-mb-0">
-                                    {% for pm in project.projectmember_set.all %}
-                                        {% if pm.is_owner %}
-                                            <li class="d-flex align-items-start justify-content-between fr-mb-1v">
-                                                {% include "user/user_card.html" with user=pm.member project_owner=True user_activity=True %}
-                                                <span class="fr-ml-1v text-lowercase fst-italic font-weight-light specific-color-666">Référent du dossier</span>
-                                            </li>
-                                        {% else %}
-                                            <li class="d-flex align-items-start justify-content-between fr-mb-1v">
-                                                {% include "user/user_card.html" with user=pm.member user_activity=True %}
-                                                <div class="d-flex align-items-center">
-                                                    {% if is_staff %}
-                                                        <form id="form-projects-access-promote-user"
-                                                              class="fr-mr-2v"
-                                                              action="{% url 'projects-project-promote-referent' project.pk pm.member.pk %}"
-                                                              method="post">
-                                                            {% csrf_token %}
-                                                            <button data-bs-toggle="tooltip"
-                                                                    data-bs-title="Promouvoir en tant que référent·e"
-                                                                    class="fr-btn fr-btn--secondary fr-icon-user-star-line">
-                                                                Promouvoir en tant que référent·e
-                                                            </button>
-                                                        </form>
-                                                        <form id="form-projects-access-remove-user"
-                                                              action="{% url 'projects-project-access-collectivity-delete' project.pk pm.member.email %}"
-                                                              method="post">
-                                                            {% csrf_token %}
-                                                            <button data-bs-toggle="tooltip"
-                                                                    data-bs-title="Retirer l'accès"
-                                                                    class="fr-btn fr-btn--tertiary fr-icon-close-line">
-                                                                Retirer l'accès
-                                                            </button>
-                                                        </form>
-                                                    {% endif %}
-                                                </div>
-                                            </li>
-                                        {% endif %}
-                                    {% endfor %}
-                                </ul>
-                            </div>
-                            {% include "projects/project/fragments/share/invite_member.html" with source="admin" %}
-                            {% include "projects/project/fragments/share/invite_switchtender.html" with source="admin" %}
-                        </div>
-                        <div class="row">
-                            <div class="col">
-                                <hr class="fr-my-3w" />
-                                {% if pending_invites|length == 0 %}
-                                    <div class="bg-light d-flex flex-column justify-content-center align-items-center fr-py-3w rounded">
-                                        <p class="fr-m-0 text-info-custom text-grey fw-normal fr-pb-2w">Aucune invitation conseiller·e en cours</p>
-                                        <svg class="bi align-baseline fr-mr-2v fr-mt-1v"
-                                             width="30"
-                                             height="30"
-                                             fill="#999999">
-                                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#person-x" />
-                                        </svg>
-                                    </div>
-                                {% else %}
-                                    <p data-test-id="administration-advisor-invitation-list"
-                                       class="text-info-custom fr-mb-3w fr-mt-1v">
-                                        Invitations en attente de conseiller·e·s
-                                    </p>
-                                    <ul class="list-group">
-                                        {% for invite in pending_invites %}
-                                            {% if invite.role == "SWITCHTENDER" or invite.role == "OBSERVER" %}
-                                                <li class="d-flex justify-content-between align-items-start fr-mb-1v">
-                                                    {% include "projects/project/fragments/user_invited.html" with user_invited=invite %}
-                                                    <div class="d-flex align-items-center">
-                                                        {% if "manage_advisors" in user_project_perms %}
-                                                            <form class="fr-mr-2v"
-                                                                  action="{% url 'projects-project-access-revoke-invite' project.pk invite.pk %}"
-                                                                  method="post">
-                                                                {% csrf_token %}
-                                                                <button id="revoke-invite-switchtender"
-                                                                        data-bs-toggle="tooltip"
-                                                                        data-bs-title="Supprimer l'invitation"
-                                                                        class="fr-btn fr-btn--tertiary fr-icon-delete-line">
-                                                                    Supprimer l'invitation
-                                                                </button>
-                                                            </form>
-                                                        {% endif %}
-                                                        {% if "invite_advisors" in user_project_perms %}
-                                                            <form action="{% url 'projects-project-access-advisor-resend-invite' project.pk invite.pk %}"
-                                                                  method="post">
-                                                                {% csrf_token %}
-                                                                <button id="resend-invite-switchtender"
-                                                                        data-bs-toggle="tooltip"
-                                                                        data-bs-title="Renvoyer un email d'invitation"
-                                                                        class="fr-btn fr-btn--secondary fr-icon-mail-line">
-                                                                    Renvoyer un email d'invitation
-                                                                </button>
-                                                            </form>
-                                                        {% endif %}
-                                                    </div>
-                                                </li>
-                                            {% endif %}
-                                        {% endfor %}
-                                    </ul>
-                                {% endif %}
-                            </div>
-                            <div class="col">
-                                <hr class="fr-my-3w" />
-                                {% if pending_invites|length == 0 %}
-                                    <div class="bg-light d-flex flex-column justify-content-center align-items-center fr-py-3w rounded">
-                                        <p class="fr-m-0 text-info-custom text-grey fw-normal fr-pb-2w">Aucune invitation membre en cours</p>
-                                        <svg class="bi align-baseline fr-mr-2v fr-mt-1v"
-                                             width="30"
-                                             height="30"
-                                             fill="#999999">
-                                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#person-x" />
-                                        </svg>
-                                    </div>
-                                {% else %}
-                                    <p data-test-id="administration-member-invitation-list"
-                                       class="text-info-custom fr-mb-3w fr-mt-1v">
-                                        Invitations en attente demandeur et partenaires
-                                    </p>
-                                    <ul class="list-group">
-                                        {% for invite in pending_invites %}
-                                            {% if invite.role == "COLLABORATOR" %}
-                                                <li class="d-flex justify-content-between align-items-start fr-mb-1v">
-                                                    {% include "projects/project/fragments/user_invited.html" with user_invited=invite %}
-                                                    <div class="d-flex align-items-center">
-                                                        {% if "manage_collaborators" in user_project_perms %}
-                                                            <form class="fr-mr-2v"
-                                                                  action="{% url 'projects-project-access-revoke-invite' project.pk invite.pk %}"
-                                                                  method="post">
-                                                                {% csrf_token %}
-                                                                {% comment %} <button class="btn btn-outline-danger btn-sm fr-p-1v" id="revoke-invite-member">
-                                                                    <svg class="bi align-middle" width="18" height="18" fill="currentColor">
-                                                                        <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#trash" />
-                                                                    </svg>
-                                                                </button> {% endcomment %}
-                                                                <button id="revoke-invite-member"
-                                                                        data-bs-toggle="tooltip"
-                                                                        data-bs-title="Supprimer l'invitation"
-                                                                        class="fr-btn fr-btn--tertiary fr-icon-delete-line">
-                                                                    Supprimer l'invitation
-                                                                </button>
-                                                            </form>
-                                                        {% endif %}
-                                                        {% if "invite_collaborators" in user_project_perms %}
-                                                            <form action="{% url 'projects-project-access-collectivity-resend-invite' project.pk invite.pk %}"
-                                                                  method="post">
-                                                                {% csrf_token %}
-                                                                {% comment %} <button class="btn btn-outline-primary btn-sm fr-p-1v" id="resend-invite-member">
-                                                                    <svg class="bi align-middle" width="18" height="18" fill="currentColor">
-                                                                        <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#envelope-plus" />
-                                                                    </svg>
-                                                                </button> {% endcomment %}
-                                                                <button id="resend-invite-member"
-                                                                        data-bs-toggle="tooltip"
-                                                                        data-bs-title="Renvoyer un email d'invitation"
-                                                                        class="fr-btn fr-btn--secondary fr-icon-mail-line">
-                                                                    Renvoyer un email d'invitation
-                                                                </button>
-                                                            </form>
-                                                        {% endif %}
-                                                    </div>
-                                                </li>
-                                            {% endif %}
-                                        {% endfor %}
-                                    </ul>
-                                {% endif %}
+                                <label class="fr-mb-2v text-info-custom text-grey-dark"
+                                        for="{{ project_form.name.id_for_label }}">
+                                    {{ project_form.name.label }}
+                                </label>
+                                <input type="text"
+                                        class="fr-py-2w placeholder-grey form-control {% if project_form.name.errors %}is-invalid{% endif %}"
+                                        id="{{ project_form.name.id_for_label }}"
+                                        name="{{ project_form.name.name }}"
+                                        placeholder="Nom du dossier"
+                                        value="{{ project_form.name.value }}"
+                                        required />
+                                {% for error in project_form.name.errors %}<div class="invalid-feedback">{{ error }}</div>{% endfor %}
                             </div>
                         </div>
-                        <section id="project-status-settings" class="col">
-                            <hr class="fr-my-3w" />
-                            {% include "projects/project/fragments/administration/quit_project.html" %}
-                            {% include "projects/project/fragments/administration/stand_by_project.html" %}
-                        </section>
-                    </div>
+                        <div class="row fr-mb-2w">
+                            <div class="col">
+                                <label class="fr-mb-2v text-info-custom text-grey-dark"
+                                        for="input-project-address">
+                                    {{ project_form.location.label }}
+                                </label>
+                                <input type="text"
+                                        class="fr-py-2w placeholder-grey form-control {% if project_form.location.errors %}is-invalid{% endif %}"
+                                        id="input-project-address"
+                                        name="{{ project_form.location.name }}"
+                                        placeholder="Adresse"
+                                        value="{{ project_form.location.value|default:'' }}" />
+                                {% for error in project_form.location.errors %}<div class="text-danger text-end">{{ error }}</div>{% endfor %}
+                            </div>
+                        </div>
+                        <div class="row fr-mb-2w">
+                            <div class="col">
+                                <label class="text-info-custom text-grey-dark"
+                                        for="input-project-description">
+                                    {{ project_form.description.label }}
+                                </label>
+                                <textarea class="placeholder-grey form-control {% if project_form.description.errors %}is-invalid{% endif %} textarea-size"
+                                            id="input-project-description"
+                                            name="{{ project_form.description.name }}"
+                                            placeholder="">{{ project_form.description.value|default:'' }}</textarea>
+                                {% for error in project_form.description.errors %}
+                                    <div class="text-danger text-end">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="row fr-mb-2w"
+                                x-data="CitySearch()"
+                                x-init="getPostcode(projectPostcode,projectInsee)">
+                            <div class="col-auto">
+                                <div class="fr-mb-2w">
+                                    <label class="text-info-custom text-grey-dark" for="input-project-address">{{ project_form.postcode.label }}</label>
+                                    <input :disabled="isLoading"
+                                            @change.debounce="fetchCities()"
+                                            x-model="postal"
+                                            type="text"
+                                            class="fr-py-3w placeholder-grey form-control {% if project_form.postcode.errors %}is-invalid{% endif %}"
+                                            id="input-project-address"
+                                            name="{{ project_form.postcode.name }}"
+                                            placeholder="Code Postal"
+                                            required />
+                                    {% for error in project_form.postcode.errors %}<div class="text-danger text-end">{{ error }}</div>{% endfor %}
+                                </div>
+                            </div>
+                            <div class="fr-mb-2w col-auto">
+                                <label class="text-info-custom text-grey-dark" for="input-project-address">{{ project_form.insee.label }}</label>
+                                <select required
+                                        :style="cities && cities.length == 0 && postal ? 'background-color:#e9ecef;pointer-events:none;padding: 12px 10px; border-radius: 0.25rem;min-width: 170px;padding-right: 30px;' : 'padding: 12px 10px; border-radius: 0.25rem;min-width: 170px;padding-right: 30px;' "
+                                        x-ref="insee"
+                                        name="insee"
+                                        class="form-select tmp-usevar">
+                                    <template x-if="cities && cities.length > 0">
+                                        <template x-for="city in cities" :key="city.insee">
+                                            <option :value="city.insee" x-text="city.name"></option>
+                                        </template>
+                                    </template>
+                                </select>
+                                <template x-if="cities && cities.length == 0 && postal">
+                                    <span class="text-danger text-end">Aucune commune trouvée, vérifiez le code postal ?</span>
+                                </template>
+                            </div>
+                        </div>
+                        <button id="bouton-modifier-les-info" type="submit" class="button filled">Modifier les informations du dossier</button>
+                    </form>
                 </div>
-                {% if project.inactive_since != None %}
+            {% endif %}
+            <hr class="fr-mt-3w" />
+            <div x-data="ProjectShare" class="row fr-mt-2v position-relative">
+                <div id="user-management" class="invisible-anchor-high"></div>
+                <h6 class="text-uppercase fw-bold d-block fr-mb-2w font-small">Gestion des utilisateurs</h6>
+                <div class="col">
+                    <p class="text-info-custom fr-mb-2v">Équipe de suivi</p>
+                    {% if "invite_advisors" in user_project_perms %}
+                        <button @click="openInviteSwitchtenderModal"
+                                data-toggle="modal"
+                                data-target="#InviteSwitchtenderModal"
+                                class="{% if project.site_status == 'DRAFT' %} disabled{% endif %} button d-inline-flex justify-content-center w-100 fr-mb-3w cursor-pointer">
+                            {% if project.site_status == 'DRAFT' %}
+                                <svg class="bi align-middle" width="18" height="18" fill="currentColor">
+                                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#lock-fill" />
+                                </svg>
+                                &nbsp;
+                            {% endif %}
+                            <span>Inviter un conseiller</span>
+                        </button>
+                    {% endif %}
+                    {% if project.switchtender_sites.all.count == 0 %}
+                        <div class="bg-light d-flex flex-column justify-content-center align-items-center fr-py-3w rounded">
+                            <p class="fr-m-0 text-info-custom text-grey fw-normal fr-pb-2w">Le dossier n'est pas encore suivi</p>
+                            <svg class="bi align-baseline fr-mr-2v fr-mt-1v"
+                                    width="30"
+                                    height="30"
+                                    fill="#999999">
+                                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#clipboard-x" />
+                            </svg>
+                        </div>
+                    {% else %}
+                        <ul class="d-flex flex-column list-unstyled fr-mb-0">
+                            {% for advisor in project.switchtender_sites.all %}
+                                <li class="d-flex align-items-start justify-content-between fr-mb-1v">
+                                    {% include "user/user_card.html" with user=advisor.switchtender user_activity=True %}
+                                    {% if request.user == advisor.switchtender %}
+                                        <form id="projects-project-switchtender-leave"
+                                                action="{% url 'projects-project-switchtender-leave' project.pk %}"
+                                                method="post">
+                                            {% csrf_token %}
+                                            <button data-bs-toggle="tooltip"
+                                                    data-bs-title="Retirer l'accès"
+                                                    class="fr-btn fr-btn--tertiary fr-icon-close-line">
+                                                Retirer l'accès
+                                            </button>
+                                        </form>
+                                    {% else %}
+                                        {% if "manage_advisors" in user_project_perms %}
+                                            <form id="form-projects-access-remove-user"
+                                                    action="{% url 'projects-project-access-advisor-delete' project.pk advisor.switchtender.email %}"
+                                                    method="post">
+                                                {% csrf_token %}
+                                                <button data-bs-toggle="tooltip"
+                                                        data-bs-title="Retirer l'accès"
+                                                        class="fr-btn fr-btn--tertiary fr-icon-close-line">
+                                                    Retirer l'accès
+                                                </button>
+                                            </form>
+                                        {% endif %}
+                                    {% endif %}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+                <div class="col">
+                    <p class="text-info-custom fr-mb-2v">Equipe du demandeur et partenaires</p>
+                    {% if "invite_collaborators" in user_project_perms %}
+                        <button @click="openInviteMemberModal"
+                                data-toggle="modal"
+                                data-target="#InviteMemberModal"
+                                data-cy="button-invite-project-member"
+                                class="{% if project.site_status == 'DRAFT' %} disabled{% endif %} button d-inline-flex justify-content-center w-100 fr-mb-3w cursor-pointer">
+                            {% if project.site_status == 'DRAFT' %}
+                                <svg class="bi align-middle" width="18" height="18" fill="currentColor">
+                                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#lock-fill" />
+                                </svg>
+                            {% endif %}
+                            <span>Inviter un membre demandeur ou un partenaire</span>
+                        </button>
+                    {% endif %}
+                    <ul class="flex-column list-unstyled fr-mb-0">
+                        {% for pm in project.projectmember_set.all %}
+                            {% if pm.is_owner %}
+                                <li class="d-flex align-items-start justify-content-between fr-mb-1v">
+                                    {% include "user/user_card.html" with user=pm.member project_owner=True user_activity=True %}
+                                    <span class="fr-ml-1v text-lowercase fst-italic font-weight-light specific-color-666">Référent du dossier</span>
+                                </li>
+                            {% else %}
+                                <li class="d-flex align-items-start justify-content-between fr-mb-1v">
+                                    {% include "user/user_card.html" with user=pm.member user_activity=True %}
+                                    <div class="d-flex align-items-center">
+                                        {% if is_staff %}
+                                            <form id="form-projects-access-promote-user"
+                                                    class="fr-mr-2v"
+                                                    action="{% url 'projects-project-promote-referent' project.pk pm.member.pk %}"
+                                                    method="post">
+                                                {% csrf_token %}
+                                                <button data-bs-toggle="tooltip"
+                                                        data-bs-title="Promouvoir en tant que référent·e"
+                                                        class="fr-btn fr-btn--secondary fr-icon-user-star-line">
+                                                    Promouvoir en tant que référent·e
+                                                </button>
+                                            </form>
+                                            <form id="form-projects-access-remove-user"
+                                                    action="{% url 'projects-project-access-collectivity-delete' project.pk pm.member.email %}"
+                                                    method="post">
+                                                {% csrf_token %}
+                                                <button data-bs-toggle="tooltip"
+                                                        data-bs-title="Retirer l'accès"
+                                                        class="fr-btn fr-btn--tertiary fr-icon-close-line">
+                                                    Retirer l'accès
+                                                </button>
+                                            </form>
+                                        {% endif %}
+                                    </div>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% include "projects/project/fragments/share/invite_member.html" with source="admin" %}
+                {% include "projects/project/fragments/share/invite_switchtender.html" with source="admin" %}
+            </div>
+            <div class="row">
+                <div class="col">
+                    <hr class="fr-my-3w" />
+                    {% if pending_invites|length == 0 %}
+                        <div class="bg-light d-flex flex-column justify-content-center align-items-center fr-py-3w rounded">
+                            <p class="fr-m-0 text-info-custom text-grey fw-normal fr-pb-2w">Aucune invitation conseiller·e en cours</p>
+                            <svg class="bi align-baseline fr-mr-2v fr-mt-1v"
+                                    width="30"
+                                    height="30"
+                                    fill="#999999">
+                                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#person-x" />
+                            </svg>
+                        </div>
+                    {% else %}
+                        <p data-test-id="administration-advisor-invitation-list"
+                            class="text-info-custom fr-mb-3w fr-mt-1v">
+                            Invitations en attente de conseiller·e·s
+                        </p>
+                        <ul class="list-group">
+                            {% for invite in pending_invites %}
+                                {% if invite.role == "SWITCHTENDER" or invite.role == "OBSERVER" %}
+                                    <li class="d-flex justify-content-between align-items-start fr-mb-1v">
+                                        {% include "projects/project/fragments/user_invited.html" with user_invited=invite %}
+                                        <div class="d-flex align-items-center">
+                                            {% if "manage_advisors" in user_project_perms %}
+                                                <form class="fr-mr-2v"
+                                                        action="{% url 'projects-project-access-revoke-invite' project.pk invite.pk %}"
+                                                        method="post">
+                                                    {% csrf_token %}
+                                                    <button id="revoke-invite-switchtender"
+                                                            data-bs-toggle="tooltip"
+                                                            data-bs-title="Supprimer l'invitation"
+                                                            class="fr-btn fr-btn--tertiary fr-icon-delete-line">
+                                                        Supprimer l'invitation
+                                                    </button>
+                                                </form>
+                                            {% endif %}
+                                            {% if "invite_advisors" in user_project_perms %}
+                                                <form action="{% url 'projects-project-access-advisor-resend-invite' project.pk invite.pk %}"
+                                                        method="post">
+                                                    {% csrf_token %}
+                                                    <button id="resend-invite-switchtender"
+                                                            data-bs-toggle="tooltip"
+                                                            data-bs-title="Renvoyer un email d'invitation"
+                                                            class="fr-btn fr-btn--secondary fr-icon-mail-line">
+                                                        Renvoyer un email d'invitation
+                                                    </button>
+                                                </form>
+                                            {% endif %}
+                                        </div>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+                <div class="col">
+                    <hr class="fr-my-3w" />
+                    {% if pending_invites|length == 0 %}
+                        <div class="bg-light d-flex flex-column justify-content-center align-items-center fr-py-3w rounded">
+                            <p class="fr-m-0 text-info-custom text-grey fw-normal fr-pb-2w">Aucune invitation membre en cours</p>
+                            <svg class="bi align-baseline fr-mr-2v fr-mt-1v"
+                                    width="30"
+                                    height="30"
+                                    fill="#999999">
+                                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#person-x" />
+                            </svg>
+                        </div>
+                    {% else %}
+                        <p data-test-id="administration-member-invitation-list"
+                            class="text-info-custom fr-mb-3w fr-mt-1v">
+                            Invitations en attente demandeur et partenaires
+                        </p>
+                        <ul class="list-group">
+                            {% for invite in pending_invites %}
+                                {% if invite.role == "COLLABORATOR" %}
+                                    <li class="d-flex justify-content-between align-items-start fr-mb-1v">
+                                        {% include "projects/project/fragments/user_invited.html" with user_invited=invite %}
+                                        <div class="d-flex align-items-center">
+                                            {% if "manage_collaborators" in user_project_perms %}
+                                                <form class="fr-mr-2v"
+                                                        action="{% url 'projects-project-access-revoke-invite' project.pk invite.pk %}"
+                                                        method="post">
+                                                    {% csrf_token %}
+                                                    {% comment %} <button class="btn btn-outline-danger btn-sm fr-p-1v" id="revoke-invite-member">
+                                                        <svg class="bi align-middle" width="18" height="18" fill="currentColor">
+                                                            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#trash" />
+                                                        </svg>
+                                                    </button> {% endcomment %}
+                                                    <button id="revoke-invite-member"
+                                                            data-bs-toggle="tooltip"
+                                                            data-bs-title="Supprimer l'invitation"
+                                                            class="fr-btn fr-btn--tertiary fr-icon-delete-line">
+                                                        Supprimer l'invitation
+                                                    </button>
+                                                </form>
+                                            {% endif %}
+                                            {% if "invite_collaborators" in user_project_perms %}
+                                                <form action="{% url 'projects-project-access-collectivity-resend-invite' project.pk invite.pk %}"
+                                                        method="post">
+                                                    {% csrf_token %}
+                                                    {% comment %} <button class="btn btn-outline-primary btn-sm fr-p-1v" id="resend-invite-member">
+                                                        <svg class="bi align-middle" width="18" height="18" fill="currentColor">
+                                                            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#envelope-plus" />
+                                                        </svg>
+                                                    </button> {% endcomment %}
+                                                    <button id="resend-invite-member"
+                                                            data-bs-toggle="tooltip"
+                                                            data-bs-title="Renvoyer un email d'invitation"
+                                                            class="fr-btn fr-btn--secondary fr-icon-mail-line">
+                                                        Renvoyer un email d'invitation
+                                                    </button>
+                                                </form>
+                                            {% endif %}
+                                        </div>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
                 </div>
             </div>
-        {% elif project.site_status == 'DRAFT' %}
+            <section id="project-status-settings" class="col">
+                <hr class="fr-my-3w" />
+                {% include "projects/project/fragments/administration/quit_project.html" %}
+                {% include "projects/project/fragments/administration/stand_by_project.html" %}
+            </section>
         </div>
+    </div>
+    {% if project.inactive_since != None %}
+            </div>
+        </div>
+    {% elif project.status == 'REJECTED' or project.deleted != null %}
+            </div>
+        </div>
+    {% elif project.site_status == 'DRAFT' %}
+    </div>
     {% endif %}
     <div class="fr-mt-2w fr-px-2w">{% include "projects/project/fragments/administration/activate_project.html" %}</div>
 {% endblock project_detail %}
