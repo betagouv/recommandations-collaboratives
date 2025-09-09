@@ -1,0 +1,24 @@
+{% load projects_extra %}
+<div x-data="TaskStatusSwitcherConversations(projectId, recommendation)"
+     class="d-flex align-items-center">
+    <div x-show="task.isLoading"
+         class="fr-ml-2v item-loader z-1 specific-size">
+        <div class="spinner-border spinner-border spinner-border-sm text-primary"
+             role="status"></div>
+    </div>
+    <button data-test-id="in-progress-status-task-button"
+            class="button tiny black inherit fw-medium fr-mr-2v"
+            :class="(activeStatus(STATUSES.INPROGRESS) || recommendation.status === STATUSES.BLOCKED) && 'bg-blue text-white border-blue pointer-events-none'"
+            x-text="statusText(STATUSES.INPROGRESS)"
+            @click.stop="handleStatusClick(STATUSES.INPROGRESS)">En cours</button>
+    <button data-test-id="done-status-task-button"
+            class="button tiny black inherit fw-medium fr-mr-2v"
+            :class="activeStatus(STATUSES.DONE) && 'bg-green-dark text-white border-green-dark pointer-events-none'"
+            x-text="statusText(STATUSES.DONE)"
+            @click.stop="handleStatusClick(STATUSES.DONE)">Fait</button>
+    <button data-test-id="not-interested-status-task-button"
+            class="button tiny black inherit fw-medium fr-mr-2v"
+            :class="activeStatus(STATUSES.NOT_INTERESTED) && 'bg-grey-dark text-white border-grey-dark pointer-events-none'"
+            x-text="statusText(STATUSES.NOT_INTERESTED)"
+            @click.stop="handleStatusClick(STATUSES.NOT_INTERESTED)">Non applicable</button>
+</div>
