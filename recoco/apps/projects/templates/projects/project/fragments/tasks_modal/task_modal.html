@@ -17,7 +17,7 @@
         <div class="modal-content font-marianne">
             <template x-if="currentTask">
                 <div class="d-flex flex-column">
-                    <!-- Pagination -->
+                    <!-- Pagination: used for collectivity -->
                     <template x-if="$store.previewModal.isPaginated">
                         <div class="bg-blue d-flex align-items-center justify-content-between fr-p-2v rounded specific-border-radiusy-0">
                             <button class="fr-p-1v button filled white small"
@@ -32,7 +32,7 @@
                         </div>
                     </template>
                     <!-- Modal body -->
-                    <div x-init="taskId && $store.previewModal.loadFollowups() && $store.previewModal.loadNotifications() && followupScrollToLastMessage(true)"
+                    <div x-init="taskId && $store.previewModal.loadNotifications()"
                          class="d-flex w-100 align-items-stretch position-relative">
                         <!-- Modal resource / content preview -->
                         <div class="position-absolute top-0 end-0 fr-p-1v close-btn-modal">
@@ -42,9 +42,7 @@
                                     aria-label="Close"
                                     @click="changeShowEdition()">Fermer</button>
                         </div>
-                        <div class="d-flex flex-grow-1 align-items-stretch w-65 task-modal-content"
-                             :class="!contentIsLoading && 'visible'"
-                             x-effect="taskId && loadContent()">
+                        <div class="d-flex flex-grow-1 align-items-stretch w-65 task-modal-content visible">
                             <template x-if="taskId && currentTask.resource_id">
                                 <iframe class="w-100 d-flex flex-column rounded"
                                         :src="resourcePreviewUrl(currentTask.resource_id, taskId)"></iframe>
@@ -84,12 +82,12 @@
                                     <span class="fw-medium title-info text-dark">Commentaire du conseiller</span>
                                 </div>
 
-                                <div class="position-absolute d-flex justify-content-center align-items-center w-100 h-100">
+                                {% comment %} <div class="position-absolute d-flex justify-content-center align-items-center w-100 h-100">
                                     <div x-show="followupsIsLoading" class="fr-ml-2v specific-size">
                                         <output class="spinner-border spinner-border-sm text-primary"></output>
                                     </div>
-                                </div>
-                                <div :class="!followupsIsLoading && 'visible'" class="followups-wrapper">
+                                </div> {% endcomment %}
+                                <div class="followups-wrapper visible">
                                     <template x-if="currentTask?.resource_id">
                                         <div class="rounded bg-light fr-p-2v fr-m-2w message"
                                              :class="$store.djangoData.canManageTasks && currentTask?.content === '' && 'border border-warning'">
