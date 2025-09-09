@@ -25,7 +25,7 @@
     {% comment %} TODO: build topic_list in django view {% endcomment %}
     {% regroup feed by topic as topic_list %}
     <div class="conversation-new d-flex"
-         x-data="Conversations(JSON.parse(document.getElementById('djangoFeed').textContent))"
+         x-data="Conversations(JSON.parse(document.getElementById('djangoFeed').textContent), {{ project.id }})"
          hx-history="false">
         <div class="conversation-new__topics">
             <div class="justify-content-between">

@@ -61,13 +61,15 @@
     ****************************************
     {% endcomment %}
     <!-- Loop through all messages -->
-    {% for message in feed.messages %}
-        <!-- Loop through one message node  -->
-        {% ifchanged message.created|date %}
-            <p class="conversation-new__date">{{ message.created|date }}</p>
-        {% endifchanged %}
-        {% include "conversations/messages/message_item.html" %}
-    {% endfor %}
+    <div class="conversation-new__container-topic">
+        {% for message in feed.messages %}
+            <!-- Loop through one message node  -->
+            {% ifchanged message.created|date %}
+                <p class="conversation-new__date">{{ message.created|date }}</p>
+            {% endifchanged %}
+            {% include "conversations/messages/message_item.html" %}
+        {% endfor %}
+    </div>
     {% comment %}
     ****************************************
     ************** NEW STREAM **************

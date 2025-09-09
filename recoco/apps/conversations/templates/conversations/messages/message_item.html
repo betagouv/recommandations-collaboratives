@@ -17,7 +17,9 @@
             {% elif node.type == "document" %}
                 {% include "conversations/messages/fragments/node_document.html" %}
             {% elif node.type == "recommendation" %}
-                {% include "conversations/messages/fragments/node_recommendation.html" %}
+                <template x-if="recommendations.length > 0">
+                    {% include "conversations/messages/fragments/node_recommendation.html" with node=node posted_by=message.posted_by %}
+                </template>
             {% endif %}
         {% endfor %}
         <!-- Reply button -->

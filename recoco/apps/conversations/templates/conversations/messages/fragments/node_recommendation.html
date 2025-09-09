@@ -1,1 +1,44 @@
-<p>🚧 Recommandation 🚧</p>
+{% comment %}
+Parameter Django:
+    - node :
+    {   'data':
+            {
+                'recommendation_id': 4242,
+                'text': 'task text'
+            },
+        'position': 1,
+        'type': 'recommendation'
+    }
+    - posted_by : user object
+Parameter Alpine:
+    - recommendation : recommendation object
+{% endcomment %}
+<div x-data='{recommendation: getRecommendationById({{ node.data.recommendation_id }})}'
+     class="task-item observed-element rounded-3 fr-p-3v fr-my-2v"
+     data-notifications="{{ element.notifications }}">
+    <template x-if="recommendation">
+        <div>
+            <p x-html="renderMarkdown(recommendation.content)"></p>
+            <div class="task-item__resource">
+                <h4 x-text="recommendation.intent"></h4>
+                <template x-if="recommendation.resource">
+                    <p class="fr-mt-1w fr-mb-0" x-text="recommendation.resource.subtitle"></p>
+                </template>
+                <template x-for="document in recommendation.document" :key="document.id">
+                    <div>
+                        <span class="fr-mb-2w">🚧 TODO: Liste des documents 🚧</span>
+                        <span class="fr-mb-2w">There is a document to display</span>
+                    </div>
+                    {% comment %} {% include "projects/project/fragments/files_links/file_list_item_embedded.html" with document=document %} {% endcomment %}
+                </template>
+                <template x-if="recommendation.resource">
+                    <div class="resource-link fr-mt-1w fr-mb-2w">
+                        <span class="fr-icon-newspaper-line fr-icon--sm fr-mr-1v"
+                              aria-hidden="true"></span><a :href="recommendation.resource.web_url" target="_blank">Lien vers la ressource</a>
+                    </div>
+                </template>
+                {% comment %} {% include "projects/project/fragments/conversations_new/tasks_status_buttons.html" with task=element.object %} {% endcomment %}
+            </div>
+        </div>
+    </template>
+</div>
