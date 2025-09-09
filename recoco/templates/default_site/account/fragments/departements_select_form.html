@@ -35,14 +35,18 @@
                     <label class="fr-label" for="selectDepartments-yes">{{ form.fields.advisor_access_type.choices.1.1 }}</label>
                 </div>
                 <div class="fr-input-group fr-ml-4w"
-                     x-data="{objectsToSelect: JSON.parse(document.getElementById('departmentsArray').textContent), selectedDepartments: []}">
-                    {% include "tools/contacts/multi_select.html" with placeholder="Cherchez et sélectionnez vos départements pour avoir accès aux dossiers" label="Sélectionnez-le(s) ci-dessous : " %}
-                    <template x-for="dept in selectedDepartments" :key="dept">
-                        <input type="hidden" name="departments" :value="dept">
+                     x-data="RegionDepartmentPreparer({ selectedDepartments: [] })">
+                    <template x-if="objectsToSelect && objectsToSelect.length">
+                        <div x-data="alpineMultiSelect({ selected: selectedDepartments, objectsToSelect: objectsToSelect, displayRegions: true })">
+                            {% include "tools/contacts/multi_select.html" with placeholder="Cherchez et sélectionnez vos départements pour avoir accès aux dossiers" label="Sélectionnez-le(s) ci-dessous : " display_regions=True %}
+                            <template x-for="dept in selectedDepartments" :key="dept">
+                                <input type="hidden" name="departments" :value="dept">
+                            </template>
+                            {% if form.departments.errors %}
+                                <div class="fr-error-text form-mandatory-element">{{ form.departments.errors.0 }}</div>
+                            {% endif %}
+                        </div>
                     </template>
-                    {% if form.departments.errors %}
-                        <div class="fr-error-text form-mandatory-element">{{ form.departments.errors.0 }}</div>
-                    {% endif %}
                 </div>
             </div>
             <div class="fr-fieldset__content">
