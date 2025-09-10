@@ -3,7 +3,6 @@ from rest_framework.viewsets import ModelViewSet
 
 from recoco.rest_api.filters import (
     StrictWordTrigramSimilaritySearchFilter,
-    VectorSearchFilter,
 )
 from recoco.rest_api.pagination import StandardResultsSetPagination
 from recoco.rest_api.permissions import (
@@ -20,15 +19,21 @@ class OrganizationGroupViewSet(ModelViewSet):
     queryset = OrganizationGroup.objects.all()
     permission_classes = [IsStaffForSiteOrReadOnly]
     pagination_class = StandardResultsSetPagination
-    filter_backends = [VectorSearchFilter]
-    search_fields = ["name"]
-    search_min_rank = 0.05
+
+    filter_backends = [StrictWordTrigramSimilaritySearchFilter]
+
+    trgm_search_fields = ["name"]
+    trgm_search_min_rank = 0.3
 
 
 class OrganizationViewSet(ModelViewSet):
     permission_classes = [IsStaffForSiteOrReadOnly]
     pagination_class = StandardResultsSetPagination
-    filter_backends = [VectorSearchFilter]
+    filter_backends = [StrictWordTrigramSimilaritySearchFilter]
+
+    trgm_search_fields = [("name", 1.5), "group__name"]
+    trgm_search_min_rank = 0.3
+
     search_fields = ["name"]
     search_min_rank = 0.05
 
