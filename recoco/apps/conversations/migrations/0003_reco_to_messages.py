@@ -76,7 +76,7 @@ def create_messages_from_recommendations(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-    dependencies = [("conversations", "0005_recommendationnode_text")]
+    dependencies = [("conversations", "0002_public_note_to_messages")]
 
     operations = [
         migrations.RunPython(create_messages_from_recommendations, lambda x, y: None)

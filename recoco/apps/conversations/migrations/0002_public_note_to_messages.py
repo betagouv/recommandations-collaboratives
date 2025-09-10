@@ -52,7 +52,7 @@ def copy_public_notes_to_messages(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-    dependencies = [("conversations", "0002_node_position")]
+    dependencies = [("conversations", "0001_initial")]
 
     operations = [
         migrations.RunPython(copy_public_notes_to_messages, lambda x, y: None)
