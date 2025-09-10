@@ -35,6 +35,7 @@
                        class="fr-input"
                        :class="{'fr-input--error': formState.isSubmitted && !formState.fields.isOrgaName}"
                        x-model="organization.name"
+                       data-test-id="organization-name"
                        required>
             </div>
             <template x-if="departments">
@@ -87,17 +88,18 @@
                                     <div class="fr-menu__list w-100 position-absolute border-radius-4px">
                                         <div class="fr-menu__list w-100 overflow-auto specific-height border-radius-4px fr-mb-0">
                                             <template x-if="userInput.length > 0 && showOrgaGroupsresults && !isAnOrgaGroupSelected">
-                                                <div>
+                                                <div data-test-id="orga-group-to-select">
                                                     <template class="fr-menu__item" x-for="group in orgaGroupsFound">
                                                         <div class="fr-pt-1w fr-px-1w add-borders cursor-pointer"
                                                              @click="onSelectGroup(group)">
                                                             <span x-text="group.name"></span>
                                                         </div>
                                                     </template>
-                                                    <div class="btn-create-orga fr-p-1w cursor-pointer"
-                                                         data-test-id="button-create-organization-group"
-                                                         @click="createOrganizationGroup">
-                                                        <span class="fr-icon-add-line" aria-hidden="true"></span><span>Créer une nouvelle structure nationale : "</span> <span x-text="userInput"></span><span>"</span>
+                                                    <div class="btn-create-orga fr-p-1w cursor-pointer">
+                                                        <button data-test-id="button-create-organization-group"
+                                                                @click="createOrganizationGroup">
+                                                            <span class="fr-icon-add-line" aria-hidden="true"></span><span>Créer une nouvelle structure nationale : "</span> <span x-text="userInput"></span><span>"</span>
+                                                        </button>
                                                     </div>
                                                 </div>
                                             </template>
@@ -107,10 +109,11 @@
                                                     <div class="fr-m-1w fr-p-3v specific-banner">
                                                         <span class="text-style">Aucun résultat</span>
                                                     </div>
-                                                    <div class="btn-create-orga fr-p-1w cursor-pointer"
-                                                         data-test-id="button-create-organization-group"
-                                                         @click="createOrganizationGroup">
-                                                        <span class="fr-icon-add-line" aria-hidden="true"></span><span>Créer une nouvelle structure nationale : "</span> <span x-text="userInput"></span><span>"</span>
+                                                    <div class="btn-create-orga fr-p-1w cursor-pointer">
+                                                        <button data-test-id="button-create-organization-group"
+                                                                @click="createOrganizationGroup">
+                                                            <span class="fr-icon-add-line" aria-hidden="true"></span><span>Créer une nouvelle structure nationale : "</span> <span x-text="userInput"></span><span>"</span>
+                                                        </button>
                                                     </div>
                                                 </div>
                                             </template>
