@@ -23,13 +23,6 @@
 {% endblock css %}
 <div class="layout-form container">
     <div class="banner text-center">
-        {% comment %} TODO ADD site_config in context {% endcomment %}
-        {% if site_config.logo_small %}
-            <img src="{{ site_config.logo_small.url }}"
-                 width="10%"
-                 height="auto"
-                 alt="Logo {{ request.site.name }}" />
-        {% endif %}
         <h2 class="fr-mb-8w">
             <strong>{{ title }}</strong>
             <br>
