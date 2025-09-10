@@ -188,6 +188,30 @@
         }
       }
       .message-item {
+        &.other-user-message {
+          background: #f6f6f6;
+        }
+        &.current-user-message {
+          background: var(--light-background-alt-blue-france, #f5f5fe);
+          .message-item__reply-to {
+            background: #e4e4fe;
+          }
+        }
+        &__reply-to {
+          display: flex;
+          margin: -0.75rem -0.75rem 0 -0.75rem;
+          background: #eaeaea;
+          border-top-left-radius: 0.5rem;
+          border-top-right-radius: 0.5rem;
+          padding-left: 0.75rem;
+          padding-right: 0.75rem;
+          padding-top: 0.25rem;
+          padding-bottom: 0.25rem;
+          p {
+            margin: 0;
+            font-size: 0.875rem;
+          }
+        }
         .document-item {
           padding: 8px 8px 8px 12px;
           align-items: center;
