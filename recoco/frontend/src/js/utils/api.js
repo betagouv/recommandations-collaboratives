@@ -244,3 +244,7 @@ export function deleteTaskReminderUrl(taskId) {
 export function editReminderUrl(taskId) {
   return `/task/${taskId}/remind/`;
 }
+
+export function userUrl(userId) {
+  return `/api/users/${userId}/`;
+}
