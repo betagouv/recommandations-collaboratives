@@ -5,6 +5,7 @@ Alpine.data('Conversations', (feed, projectId) => ({
   projectId,
   feed,
   users: [],
+  documents: [],
   init() {},
   get recommendations() {
     return this.$store.tasksData.tasks;
@@ -37,7 +38,7 @@ Alpine.data('Conversations', (feed, projectId) => ({
         last_login: {
           date: '2021-01-01',
         },
-        is_active: false,
+        is_active: true,
         profile: {
           organization_position: 'Developer',
           organization: {
@@ -49,5 +50,27 @@ Alpine.data('Conversations', (feed, projectId) => ({
       return user.data;
     }
     return foundUser;
+  },
+  async getDocumentById(id) {
+    const foundDocument = this.documents.find(
+      (document) => document.id === +id
+    );
+    if (!foundDocument) {
+      // const user = await api.get(userUrl(id));
+      /** MOCK DATA */
+      const document = {};
+      document.data = {
+        id: +id,
+        filename: 'Document.pdf',
+        description: 'Description du document',
+        title: 'Titre du document',
+        size: '100KB',
+        the_link: '/media/projects/198/wushu.png',
+        uploaded_by: 1,
+      };
+      this.documents.push(document.data);
+      return document.data;
+    }
+    return foundDocument;
   },
 }));

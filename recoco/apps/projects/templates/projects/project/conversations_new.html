@@ -21,6 +21,7 @@
 {% block project_detail %}
     {{ project.pk|json_script:"djangoProjectId" }}
     {{ feed|json_script:"djangoFeed" }}
+    {{ user_project_perms|json_script:"userProjectPerms" }}
     {% include "projects/project/navigation.html" with conversations_new=True %}
     {% comment %} TODO: build topic_list in django view {% endcomment %}
     {% regroup feed by topic as topic_list %}

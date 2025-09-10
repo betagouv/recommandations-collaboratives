@@ -9,6 +9,10 @@ document.addEventListener('alpine:init', () => {
       getDjangoData('isAdvisorOnProject'),
     userEmail: getDjangoData('userEmail'),
     canAdministrate: getDjangoData('canAdministrate'),
+    canManageDocuments: getDjangoPermsData(
+      'userProjectPerms',
+      'manage_documents'
+    ),
     canUseTasks: getDjangoPermsData('userProjectPerms', 'use_tasks'),
     canManageTasks: getDjangoPermsData('userProjectPerms', 'manage_tasks'),
   });
@@ -16,13 +20,15 @@ document.addEventListener('alpine:init', () => {
 
 function getDjangoData(id) {
   const value = document.getElementById(id)?.innerHTML;
-
   if (value) {
     return JSON.parse(value);
   }
 }
 
 function getDjangoPermsData(id, perm) {
+  if (id == 'manage_documents') {
+    console.log('manage_documents', perm);
+  }
   const userProjectPerms = document.getElementById(id)?.textContent;
 
   if (userProjectPerms) {

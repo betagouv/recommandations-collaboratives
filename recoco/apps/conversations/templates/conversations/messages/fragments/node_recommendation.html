@@ -14,7 +14,7 @@ Parameter Alpine:
     - recommendation : recommendation object
 {% endcomment %}
 <div x-data='{recommendation: getRecommendationById({{ node.data.recommendation_id }})}'
-     class="task-item observed-element rounded-3 fr-p-3v fr-my-2v"
+     class="task-item observed-element rounded-3 fr-my-2v"
      data-notifications="{{ element.notifications }}">
     <template x-if="recommendation">
         <div>

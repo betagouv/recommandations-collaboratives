@@ -96,6 +96,18 @@ p {
   }
 }
 
+.fr-btn--grey {
+  background-color: var(--light-background-alt-grey, #f6f6f6);
+  color: var(--light-text-default-grey, #3a3a3a);
+  font-size: 14px;
+  font-weight: 700;
+  &:not(:disabled):hover {
+    background-color: var(--light-background-alt-grey-hover, #e6e6e6);
+    background: var(--light-background-alt-grey-hover, #e6e6e6);
+    color: var(--light-text-default-grey-hover, #3a3a3a);
+  }
+}
+
 // a.fr-btn {
 //   &:hover {
 //     &:not(.fr-btn--primary),

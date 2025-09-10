@@ -1,6 +1,23 @@
-<p>🚧 Document 🚧</p>
-{% if node.data.document.count %}
-    {% for document in node.data.document.all %}
-        {% include "projects/project/fragments/files_links/file_list_item_embedded.html" with document=document %}
-    {% endfor %}
-{% endif %}
+<div x-data="{document: null}"
+     x-init="document = await getDocumentById({{ node.data.document_id }})"
+     class="document-item">
+    <template x-if="document">
+        <div class="document-item__content">
+            <div class="document-item__info-container">
+                <span class="fr-icon-file-line fr-btn--icon-left fr-icon-sm"></span>
+                <span class="document-item__title" x-text="document.title"></span>
+                <span class="document-item__filename" x-text="document.filename"></span>
+                <span class="document-item__size" x-text="`(${document.size})`"></span>
+            </div>
+            <div class="document-item__actions-container">
+                <template x-if="document.uploaded_by == {{ request.user.id }} || $store.djangoData.canManageDocuments">
+                    <button class="fr-btn fr-btn--sm fr-btn--grey fr-icon-delete-line"></button>
+                </template>
+                <a class="fr-btn fr-btn--sm fr-btn--grey"
+                   :href="document.the_link"
+                   target="_new"
+                   download>Télécharger</a>
+            </div>
+        </div>
+    </template>
+</div>

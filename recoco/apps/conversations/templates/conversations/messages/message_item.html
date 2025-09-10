@@ -1,6 +1,6 @@
 <div class="observed-element"
      data-notifications="{{ message.notifications }}">
-    <div class="posting-item rounded-3 fr-p-3v fr-my-2v {% if request.user.id == message.posted_by %}bg-blue-light fr-ml-5w{% else %}bg-grey-light fr-mr-5w{% endif %}">
+    <div class="message-item rounded-3 fr-p-3v fr-my-2v {% if request.user.id == message.posted_by %}bg-blue-light fr-ml-5w{% else %}bg-grey-light fr-mr-5w{% endif %}">
         {% if message.in_reply_to %}
             <div class="text-muted fr-italic fr-small">
                 En réponse à : <span x-html="renderMarkdown(getShortMessageInReplyTo(`{{ message.in_reply_to }}`))"></span>
