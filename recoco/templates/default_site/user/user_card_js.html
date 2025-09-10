@@ -136,7 +136,8 @@
             {% endif %}
             <template x-if="currentUser && !currentUser.is_active">
                 <span data-test-id="deactivated-user-details"
-                      class="fr-p-1v fr-px-2v font-very-small bg-grey-light w-100 d-flex fr-mt-1v text-nowrap specific-borderradius-2px">Compte desactivé depuis <span x-text="currentUser.last_login.date"></span></span>
+                      class="fr-p-1v fr-px-2v font-very-small bg-grey-light w-100 d-flex fr-mt-1v text-nowrap specific-borderradius-2px"
+                      x-text="`Compte desactivé depuis le ${new Date(currentUser.last_login.date).toLocaleDateString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' })}`"></span>
             </template>
             <template x-if="!currentUser">
                 <span data-test-id="deleted-user-details"
