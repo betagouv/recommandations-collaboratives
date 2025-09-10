@@ -14,12 +14,12 @@
         </legend>
         {% csrf_token %}
         {{ form.name|as_crispy_field }}
+        {{ form.description|as_crispy_field }}
+        {{ form.email|as_crispy_field }}
         {{ form.location|as_crispy_field }}
         <div class="fr-fieldset__element">
             {% include "projects/project/fragments/city_select_dsfr.html" with isRequired=True %}
         </div>
-        {{ form.email|as_crispy_field }}
-        {{ form.description|as_crispy_field }}
     </fieldset>
     {% include "onboarding/fragments/survey.html" %}
     <fieldset class="fr-fieldset">
