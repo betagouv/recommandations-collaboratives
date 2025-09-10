@@ -58,6 +58,10 @@ class OrgaStartswithFilterBackend(BaseFilterBackend):
 
 
 class ContactViewSet(ModelViewSet):
+    filter_backends = [
+        OrgaStartswithFilterBackend,
+        StrictWordTrigramSimilaritySearchFilter,
+    ]
     permission_classes = [IsStaffForSiteOrIsAuthenticatedReadOnly]
     pagination_class = StandardResultsSetPagination
     filter_backends = [StrictWordTrigramSimilaritySearchFilter]
