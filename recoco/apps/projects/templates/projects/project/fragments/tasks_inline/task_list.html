@@ -1,7 +1,6 @@
 {% if embed_view is not True %}
     <template x-for="(task, i) in column(board.status)" :key="task.id">
-        <div class="task-animation-appear-in position-relative fr-my-3w tmp-usevar"
-             :style="`z-index:${10000-i}`">{% include "projects/project/fragments/tasks_inline/task_item.html" %}</div>
+        {% include "projects/project/fragments/tasks_inline/task_item.html" %}
     </template>
     <div x-show="column(board.status).length == '0'">
         <div class="border rounded fr-mb-2w fr-px-2w d-flex fr-pt-2w fr-pb-2w justify-content-between align-items-start task-item">
