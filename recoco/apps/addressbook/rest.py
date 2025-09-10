@@ -69,7 +69,7 @@ class ContactViewSet(ModelViewSet):
         ("organization__name", 1.5),
         "organization__group__name",
     ]
-    trgm_search_min_rank = 0.3
+    trgm_search_min_rank = 0.37
 
     def get_queryset(self):
         return Contact.on_site.select_related("organization__group")
