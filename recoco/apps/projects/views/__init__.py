@@ -362,13 +362,14 @@ def project_moderation_advisor_modify(
 # ----
 @login_required
 def project_list(request):
-    if is_staff_for_site(request.user, request.site) or check_if_advisor(
-        request.user, request.site
+    if (
+        is_staff_for_site(request.user, request.site)
+        or check_if_advisor
+        or can_administrate_project(project=None, user=request.user)(
+            request.user, request.site
+        )
     ):
         return redirect("projects-project-list-staff")
-
-    if can_administrate_project(project=None, user=request.user):
-        return redirect("projects-project-list-advisor")
 
     raise PermissionDenied("Vous n'avez pas le droit d'accéder à ceci.")
 
@@ -376,7 +377,7 @@ def project_list(request):
 @login_required
 @ensure_csrf_cookie
 @never_cache
-def project_list_for_advisor():
+def project_list_for_advisor(request):
     """Return the projects for the advisor"""
     return redirect("projects-project-list-staff")
 
