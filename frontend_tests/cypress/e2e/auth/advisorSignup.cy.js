@@ -6,8 +6,8 @@ describe('Signup advisor @demande-compte-conseiller', () => {
     '[name=organization_position]': 'Tester',
     '[name=email]': 'signup4@success.test',
     '[name=phone_no]': '0102030405',
-    '[name=password1]': 'derpderp',
-    '[name=password2]': 'derpderp',
+    '[name=password1]': 'Coco2000',
+    '[name=password2]': 'Coco2000',
   };
 
   it('signup a new advisor', function () {
