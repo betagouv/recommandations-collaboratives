@@ -364,10 +364,8 @@ def project_moderation_advisor_modify(
 def project_list(request):
     if (
         is_staff_for_site(request.user, request.site)
-        or check_if_advisor
-        or can_administrate_project(project=None, user=request.user)(
-            request.user, request.site
-        )
+        or check_if_advisor(request.user, request.site)
+        or can_administrate_project(project=None, user=request.user)
     ):
         return redirect("projects-project-list-staff")
 
