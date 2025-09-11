@@ -39,7 +39,6 @@ def test_orga_group_search(self, api_client):
 
     with login(api_client):
         url = reverse("api-addressbook-organization-group-list")
-        url = f"{url}?search={search}"
-        response = api_client.get(url)
+        response = api_client.get(url, {"search": search})
         ids = [search_response["id"] for search_response in response.data["results"]]
         assert ids == [z_org.id]
