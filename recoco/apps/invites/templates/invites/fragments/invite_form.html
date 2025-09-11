@@ -137,9 +137,14 @@
     </div>
 {% endblock layout_content %}
 {% block layout_secondary_content %}
-    <h3 class="fw-bolder">Qu'est ce que {{ request.site.name }} ?</h3>
-    {% include "invites/invite_site_message.html" %}
-    <p>
-        <a class="fr-link" href="{% url 'home' %}">En savoir plus</a>
-    </p>
+    <div class="container__form d-flex justify-content-center">
+        <div class="layout__form">
+            <h3 class="fw-bolder">Qu'est ce que {{ request.site.name }} ?</h3>
+            {% include "invites/invite_site_message.html" %}
+            <p>{{ request.site.configuration.description }}</p>
+            <p>
+                <a class="fr-link" href="{% url 'home' %}">En savoir plus</a>
+            </p>
+        </div>
+    </div>
 {% endblock layout_secondary_content %}
