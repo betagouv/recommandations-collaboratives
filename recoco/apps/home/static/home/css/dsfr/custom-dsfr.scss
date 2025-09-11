@@ -69,6 +69,22 @@ a {
   }
 }
 
+/* ¯¯¯¯ *\
+  INPUTS
+\* ˍˍˍˍ */
+
+.fr-input::placeholder {
+  color: #acacac;
+}
+
+/* ¯¯¯¯ *\
+  ICONS
+\* ˍˍˍˍ */
+
+.fr-icon-margin-right-sm::before {
+  margin-right: 0.2rem;
+}
+
 p a {
   text-decoration: underline;
   color: #0000ee;
