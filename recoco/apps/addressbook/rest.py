@@ -67,7 +67,6 @@ class ContactViewSet(ModelViewSet):
     ]
     permission_classes = [IsStaffForSiteOrIsAuthenticatedReadOnly]
     pagination_class = StandardResultsSetPagination
-    filter_backends = [StrictWordTrigramSimilaritySearchFilter]
 
     trgm_search_fields = [
         ("last_name", 1.25),
