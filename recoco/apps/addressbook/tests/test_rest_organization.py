@@ -5,7 +5,7 @@ from model_bakery import baker
 
 from recoco.utils import login
 
-from ..models import Contact, Organization
+from ..models import Contact, Organization, OrganizationGroup
 
 
 @pytest.fixture
@@ -56,13 +56,19 @@ def test_anonymous_can_read_organization_but_not_update(api_client, acme_organiz
 
 class TestOrganizationSearch:
     @staticmethod
-    def expect_one_not_other(api_client, search, accept=None, refuse=None):
+    def expect_one_not_other(
+        api_client, search=None, letter=None, accept=None, refuse=None
+    ):
         if refuse is None:
             refuse = []
         if accept is None:
             accept = []
         with login(api_client):
-            url = reverse("api-addressbook-contact-list")
+            url = reverse("api-addressbook-contact-list") + "?"
+            if letter is not None:
+                url += f"orga-startswith={letter}&"
+            if search is not None:
+                url += f"search={search}"
             response = api_client.get(f"{url}?search={search}")
             ids = [
                 search_response["id"] for search_response in response.data["results"]
@@ -262,3 +268,77 @@ class TestOrganizationSearch:
             site=site, first_name="CAUE de l'Ardèche", division="", org_name="CAUE 07"
         )
         self.expect_one_not_other(api_client, "adèche", accept=[ardeche_contact])
+
+    @pytest.mark.django_db
+    def test_orga_starts_with(self, api_client, request):
+        site = get_current_site(request)
+        a_contact = self.generate_result(
+            site=site, first_name="", division="", org_name="Agence avec un A"
+        )
+        b_contact = self.generate_result(
+            site=site, first_name="", division="", org_name="Bibliothèque avec un B"
+        )
+        b_bis_contact = self.generate_result(
+            site=site, first_name="", division="", org_name="Bibliothèque bis avec un B"
+        )
+        h_contact = self.generate_result(
+            site=site, first_name="", division="", org_name="Hôpital avec un H"
+        )
+        self.expect_one_not_other(
+            api_client,
+            letter="b",
+            accept=[b_contact, b_bis_contact],
+            refuse=[h_contact, a_contact],
+        )
+
+    @pytest.mark.django_db
+    def test_sorting(self, api_client, request):
+        site = get_current_site(request)
+        a_contact = self.generate_result(
+            site=site, first_name="Alice", division="", org_name="Assemblée"
+        )
+        z_contact = self.generate_result(
+            site=site, first_name="Zoé", division="", org_name="Zassembler"
+        )
+        search = "zassembler"
+
+        with login(api_client):
+            url = reverse("api-addressbook-contact-list")
+            url = f"{url}?search={search}"
+            response = api_client.get(url)
+            ids = [
+                search_response["id"] for search_response in response.data["results"]
+            ]
+            assert ids[0] == z_contact.id
+            assert ids[1] == a_contact.id
+
+    @pytest.mark.django_db
+    def test_orga_search(self, api_client, request):
+        site = get_current_site(request)
+        baker.make(Organization, sites=[site], name="ademe")
+        z_org = baker.make(Organization, sites=[site], name="zoologie")
+        search = "zoo"
+
+        with login(api_client):
+            url = reverse("api-addressbook-organization-list")
+            url = f"{url}?search={search}"
+            response = api_client.get(url)
+            ids = [
+                search_response["id"] for search_response in response.data["results"]
+            ]
+            assert ids == [z_org.id]
+
+    @pytest.mark.django_db
+    def test_orga_group_search(self, api_client, request):
+        baker.make(OrganizationGroup, name="ademe")
+        z_org = baker.make(OrganizationGroup, name="zoologie")
+        search = "zoo"
+
+        with login(api_client):
+            url = reverse("api-addressbook-organization-group-list")
+            url = f"{url}?search={search}"
+            response = api_client.get(url)
+            ids = [
+                search_response["id"] for search_response in response.data["results"]
+            ]
+            assert ids == [z_org.id]
