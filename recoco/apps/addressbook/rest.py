@@ -1,4 +1,7 @@
+from django.contrib.sites.shortcuts import get_current_site
+from rest_framework.exceptions import ValidationError
 from rest_framework.filters import BaseFilterBackend
+from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
 from recoco.rest_api.filters import (
@@ -45,6 +48,20 @@ class OrganizationViewSet(ModelViewSet):
                 return serializers.OrganizationDetailSerializer
             case _:
                 return serializers.OrganizationSerializer
+
+    def create(self, request, *args, **kwargs):
+        try:
+            return super().create(request, *args, **kwargs)
+        except ValidationError as e:
+            # if someone create an organization that exists in another site we just enable this one to the new one
+            # todo handle potential new data from creation request. Now it is discarded
+            if any(error.code == "unique" for error in e.detail["name"]):
+                instance = Organization.objects.get(name=request.data["name"])
+                instance.sites.add(get_current_site(request))
+                serializer = self.get_serializer(instance)
+                return Response(serializer.data)
+            # there is some other error
+            raise e
 
 
 class OrgaStartswithFilterBackend(BaseFilterBackend):
