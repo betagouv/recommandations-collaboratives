@@ -69,5 +69,4 @@ def test_update_use_given_group(api_client, staff_user, current_site):
 
     api_client.force_authenticate(staff_user)
     response = api_client.patch(url, {"group": group.id, "name": "orga_name"})
-    print(response.data)
     assert response.data["group"] == group.id

@@ -18,7 +18,6 @@ from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
-from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods
 from notifications import models as notifications_models
@@ -233,7 +232,8 @@ def project_moderation_project_accept(request: HttpRequest, project_id: int):
             join = form.cleaned_data["join"]
 
             if join:
-                # Assign current user as advisor if requested
+                # Assign current user as advisor if requeste
+                # d
                 assign_advisor(request.user, project, request.site)
                 messages.success(
                     request,
@@ -361,28 +361,19 @@ def project_moderation_advisor_modify(
 # List, dashboards
 # ----
 @login_required
-def project_list(request):
-    if (
-        is_staff_for_site(request.user, request.site)
-        or check_if_advisor(request.user, request.site)
-        or can_administrate_project(project=None, user=request.user)
-    ):
-        return redirect("projects-project-list-staff")
-
-    raise PermissionDenied("Vous n'avez pas le droit d'accéder à ceci.")
+def project_list_for_staff(request):
+    return redirect("projects-project-list")
 
 
 @login_required
-@ensure_csrf_cookie
-@never_cache
 def project_list_for_advisor(request):
     """Return the projects for the advisor"""
-    return redirect("projects-project-list-staff")
+    return redirect("projects-project-list")
 
 
 @login_required
 @ensure_csrf_cookie
-def project_list_for_staff(request):
+def project_list(request):
     """
     Return the projects for the staff (and for other people as a fallback until the
     new dashboard is fully completed).
