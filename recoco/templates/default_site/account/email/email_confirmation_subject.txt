@@ -1,17 +1,1 @@
-{% autoescape off %}
-Bonjour,
-
-Merci de vous être inscrit·e sur {{ current_site.name }}
-
-Pour activer votre compte, vous pouvez copier-coller le lien ci-dessous dans votre navigateur internet :
-{{ activate_url }}
-
-Ce lien est valable pendant 24 heures. Si vous ne confirmez pas votre adresse dans ce délai,
-vous devrez recommencer la procédure d’inscription.
-
-Si vous n’êtes pas à l’origine de cette inscription, vous pouvez nous le signaler en nous écrivant à : {{ current_site.configuration.contact_form_recipient }}
-
-À bientôt,
-L'équipe {{ current_site.name }}
-
-{% endautoescape %}
+Confirmez votre adresse email
