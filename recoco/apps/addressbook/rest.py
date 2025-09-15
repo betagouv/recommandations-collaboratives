@@ -2,12 +2,11 @@ from rest_framework.filters import BaseFilterBackend
 from rest_framework.viewsets import ModelViewSet
 
 from recoco.rest_api.filters import (
-    VectorSearchFilter,
-    WordTrigramSimilaritySearchFilter,
+    StrictWordTrigramSimilaritySearchFilter,
 )
 from recoco.rest_api.pagination import StandardResultsSetPagination
 from recoco.rest_api.permissions import (
-    IsStaffForSiteOrISAuthenticatedReadOnly,
+    IsStaffForSiteOrIsAuthenticatedReadOnly,
     IsStaffForSiteOrReadOnly,
 )
 
@@ -20,22 +19,26 @@ class OrganizationGroupViewSet(ModelViewSet):
     queryset = OrganizationGroup.objects.all()
     permission_classes = [IsStaffForSiteOrReadOnly]
     pagination_class = StandardResultsSetPagination
-    filter_backends = [VectorSearchFilter]
-    search_fields = ["name"]
-    search_min_rank = 0.05
+
+    filter_backends = [StrictWordTrigramSimilaritySearchFilter]
+
+    trgm_search_fields = ["name"]
+    trgm_search_min_rank = 0.3
 
 
 class OrganizationViewSet(ModelViewSet):
     permission_classes = [IsStaffForSiteOrReadOnly]
     pagination_class = StandardResultsSetPagination
-    filter_backends = [VectorSearchFilter]
+    filter_backends = [StrictWordTrigramSimilaritySearchFilter]
+
+    trgm_search_fields = [("name", 1.5), "group__name"]
+    trgm_search_min_rank = 0.3
+
     search_fields = ["name"]
     search_min_rank = 0.05
 
     def get_queryset(self):
-        return Organization.on_site.with_contacts_only().prefetch_related(
-            "departments__region"
-        )
+        return Organization.on_site.all().prefetch_related("departments__region")
 
     def get_serializer_class(self):
         match self.action:
@@ -58,18 +61,21 @@ class OrgaStartswithFilterBackend(BaseFilterBackend):
 
 
 class ContactViewSet(ModelViewSet):
-    permission_classes = [IsStaffForSiteOrISAuthenticatedReadOnly]
+    filter_backends = [
+        OrgaStartswithFilterBackend,
+        StrictWordTrigramSimilaritySearchFilter,
+    ]
+    permission_classes = [IsStaffForSiteOrIsAuthenticatedReadOnly]
     pagination_class = StandardResultsSetPagination
-    filter_backends = [WordTrigramSimilaritySearchFilter, OrgaStartswithFilterBackend]
 
     trgm_search_fields = [
-        ("last_name", 1.5),
+        ("last_name", 1.25),
         "first_name",
-        ("division", 1.5),
-        ("organization__name", 2.0),
+        ("division", 1.25),
+        ("organization__name", 1.5),
         "organization__group__name",
     ]
-    trgm_search_min_rank = 0.3
+    trgm_search_min_rank = 0.37
 
     def get_queryset(self):
         return Contact.on_site.select_related("organization__group")

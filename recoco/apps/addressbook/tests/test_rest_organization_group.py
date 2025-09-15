@@ -2,6 +2,8 @@ import pytest
 from django.urls import reverse
 from model_bakery import baker
 
+from recoco.utils import login
+
 from ..models import OrganizationGroup
 
 
@@ -27,3 +29,16 @@ def test_anonymous_can_read_organizationgroup_but_not_update(api_client):
 
     response = api_client.put(url, data={})
     assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_orga_group_search(self, api_client):
+    baker.make(OrganizationGroup, name="ademe")
+    z_org = baker.make(OrganizationGroup, name="zoologie")
+    search = "zoo"
+
+    with login(api_client):
+        url = reverse("api-addressbook-organization-group-list")
+        response = api_client.get(url, {"search": search})
+        ids = [search_response["id"] for search_response in response.data["results"]]
+        assert ids == [z_org.id]
