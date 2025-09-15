@@ -152,7 +152,7 @@ class AdvisorAccessRequestForm(forms.Form):
         cleaned_data = super().clean()
         advisor_access_type = cleaned_data.get("advisor_access_type")
         departments = cleaned_data.get("departments")
-        if advisor_access_type == "Regional" and departments and len(departments) == 0:
+        if advisor_access_type == "Regional" and not departments:
             self.add_error(
                 "departments", "Merci de sélectionner au moins un département."
             )
