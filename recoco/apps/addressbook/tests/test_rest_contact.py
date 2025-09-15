@@ -2,7 +2,6 @@ from unittest.mock import ANY
 
 import pytest
 from django.contrib.sites.models import Site
-from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
 from model_bakery import baker
 
@@ -84,7 +83,9 @@ def test_staff_user_can_create_contact(api_client, current_site, staff_user):
 
 
 @pytest.mark.django_db
-def test_can_not_create_contact_with_wrong_organization(api_client, staff_user):
+def test_can_not_create_contact_with_wrong_organization(
+    api_client, staff_user, current_site
+):
     other_site = baker.make(Site)
     organization = baker.make(Organization, sites=[other_site])
 
@@ -149,7 +150,13 @@ def test_organization_start_with_filter(
     ] == expected_result, f"failure for filter value: {filter_value}"
 
 
+@pytest.mark.usefixtures("current_site")
 class TestInputContactSearch:
+    @pytest.fixture(autouse=True)
+    def before_after(self, current_site):
+        self.current_site = current_site
+        yield
+
     @staticmethod
     def expect_one_not_other(
         api_client, search=None, letter=None, accept=None, refuse=None
@@ -174,19 +181,20 @@ class TestInputContactSearch:
             for contact in refuse:
                 assert contact.id not in ids
 
-    @staticmethod
-    def generate_result(site, first_name, division, org_name=None):
+    def generate_result(self, first_name, division, org_name=None):
+        current_site = self.current_site
         org = (
-            baker.make(Organization, sites=[site])
+            baker.make(Organization)
             if org_name is None
-            else baker.make(Organization, name=org_name, sites=[site])
+            else baker.make(Organization, name=org_name)
         )
+        org.sites.add(current_site)
         contact = baker.make(
             Contact,
             first_name=first_name,
             organization=org,
             division=division,
-            site=site,
+            site=current_site,
         )
         return contact
 
@@ -266,27 +274,23 @@ class TestInputContactSearch:
 
     @pytest.mark.django_db
     def test_adac_results(self, api_client, request):
-        site = get_current_site(request)
         ademe_contact = self.generate_result(
-            site=site,
             first_name="Laurent",
             division="Référent Aides travaux et études opérationnelles",
             org_name="ADEME Auvergne-Rhone-Alpes",
         )
         epfl_contact = self.generate_result(
-            site=site,
             first_name="Adeline",
             division="Directrice adjointe, responsable pole foncier",
             org_name="EPFL Oise Aisne",
         )
         region_contact = self.generate_result(
-            site=site,
             first_name="Valère",
             division="Chargée de mission territoires",
             org_name="Région Grand Est",
         )
         adac_contact = self.generate_result(
-            site=site, first_name="Éric", division="Président", org_name="ADAC 37"
+            first_name="Éric", division="Président", org_name="ADAC 37"
         )
         self.expect_one_not_other(
             api_client,
@@ -298,12 +302,10 @@ class TestInputContactSearch:
     @pytest.mark.django_db
     @pytest.mark.skip  # too difficult to differenciate from typo
     def test_adac_22_both_results(self, api_client, request):
-        site = get_current_site(request)
         adac_37_contact = self.generate_result(
-            site=site, first_name="Éric", division="Président", org_name="ADAC 37"
+            first_name="Éric", division="Président", org_name="ADAC 37"
         )
         water_loire_contact = self.generate_result(
-            site=site,
             first_name="Délégation Armorique",
             division="(22-29-35-56)",
             org_name="Agence de l'eau Loire-Bretagne",
@@ -317,9 +319,7 @@ class TestInputContactSearch:
 
     @pytest.mark.django_db
     def test_teritoire_not_too_large(self, api_client, request):
-        site = get_current_site(request)
         water_loire_contact = self.generate_result(
-            site=site,
             first_name="Délégation Armorique",
             division="(22-29-35-56)",
             org_name="Agence de l'eau Loire-Bretagne",
@@ -329,14 +329,10 @@ class TestInputContactSearch:
     @pytest.mark.django_db
     def test_jean_compound_names(self, api_client, request):
         # find compound names
-        site = get_current_site(request)
-        jean_contact = self.generate_result(site=site, first_name="Jean", division="")
-        jean_fr_contact = self.generate_result(
-            site=site, first_name="Jean-François", division=""
-        )
-        jean_ph_contact = self.generate_result(
-            site=site, first_name="Jean-Philippe", division=""
-        )
+
+        jean_contact = self.generate_result(first_name="Jean", division="")
+        jean_fr_contact = self.generate_result(first_name="Jean-François", division="")
+        jean_ph_contact = self.generate_result(first_name="Jean-Philippe", division="")
         self.expect_one_not_other(
             api_client, "jean", accept=[jean_contact, jean_ph_contact, jean_fr_contact]
         )
@@ -345,14 +341,10 @@ class TestInputContactSearch:
     @pytest.mark.skip  # too difficult to differenciate from typo
     def test_jean_phi_only_compound(self, api_client, request):
         # prefix
-        site = get_current_site(request)
-        jean_contact = self.generate_result(site=site, first_name="Jean", division="")
-        jean_fr_contact = self.generate_result(
-            site=site, first_name="Jean-François", division=""
-        )
-        jean_ph_contact = self.generate_result(
-            site=site, first_name="Jean-Philippe", division=""
-        )
+
+        jean_contact = self.generate_result(first_name="Jean", division="")
+        jean_fr_contact = self.generate_result(first_name="Jean-François", division="")
+        jean_ph_contact = self.generate_result(first_name="Jean-Philippe", division="")
         self.expect_one_not_other(
             api_client,
             "jean-phi",
@@ -363,13 +355,9 @@ class TestInputContactSearch:
     @pytest.mark.django_db
     def test_sylvain_not_sylvie(self, api_client, request):
         # prefix
-        site = get_current_site(request)
-        sylvain_contact = self.generate_result(
-            site=site, first_name="Sylvain", division=""
-        )
-        sylvie_contact = self.generate_result(
-            site=site, first_name="Sylvie", division=""
-        )
+
+        sylvain_contact = self.generate_result(first_name="Sylvain", division="")
+        sylvie_contact = self.generate_result(first_name="Sylvie", division="")
         self.expect_one_not_other(
             api_client, "sylvain", accept=[sylvain_contact], refuse=[sylvie_contact]
         )
@@ -377,12 +365,9 @@ class TestInputContactSearch:
     @pytest.mark.django_db
     def test_sylva_not_syndicats(self, api_client, request):
         # not too close
-        site = get_current_site(request)
-        sylvain_contact = self.generate_result(
-            site=site, first_name="Sylvain", division=""
-        )
+
+        sylvain_contact = self.generate_result(first_name="Sylvain", division="")
         syndicat_contact = self.generate_result(
-            site=site,
             first_name="Syndicat d'équipement des communes des Landes",
             division="",
             org_name="SYDEC",
@@ -394,9 +379,8 @@ class TestInputContactSearch:
     @pytest.mark.django_db
     def test_spelling_teritoire(self, api_client, request):
         # typo
-        site = get_current_site(request)
+
         territoire_contact = self.generate_result(
-            site=site,
             first_name="Benoît",
             division="Interlocuteur Territoires d'industrie",
             org_name="Banque des Territoires",
@@ -406,29 +390,27 @@ class TestInputContactSearch:
     @pytest.mark.django_db
     def test_ardeche_spelling(self, api_client, request):
         # resilience to typo
-        site = get_current_site(request)
+
         ardeche_contact = self.generate_result(
-            site=site, first_name="CAUE de l'Ardèche", division="", org_name="CAUE 07"
+            first_name="CAUE de l'Ardèche", division="", org_name="CAUE 07"
         )
         self.expect_one_not_other(api_client, "adèche", accept=[ardeche_contact])
 
     @pytest.mark.django_db
     def test_orga_starts_with(self, api_client, request):
-        site = get_current_site(request)
         a_contact = self.generate_result(
-            site=site, first_name="A", division="", org_name="Agence avec un A"
+            first_name="A", division="", org_name="Agence avec un A"
         )
         b_contact = self.generate_result(
-            site=site, first_name="B", division="", org_name="Bibliothèque avec un B"
+            first_name="B", division="", org_name="Bibliothèque avec un B"
         )
         b_bis_contact = self.generate_result(
-            site=site,
             first_name="B",
             division="",
             org_name="Bibliothèque bis avec un B",
         )
         h_contact = self.generate_result(
-            site=site, first_name="H", division="", org_name="Hôpital avec un H"
+            first_name="H", division="", org_name="Hôpital avec un H"
         )
         self.expect_one_not_other(
             api_client,
@@ -439,12 +421,11 @@ class TestInputContactSearch:
 
     @pytest.mark.django_db
     def test_sorting(self, api_client, request):
-        site = get_current_site(request)
         a_contact = self.generate_result(
-            site=site, first_name="Alice", division="", org_name="Assemblée"
+            first_name="Alice", division="", org_name="Assemblée"
         )
         z_contact = self.generate_result(
-            site=site, first_name="Zoé", division="", org_name="Zassembler"
+            first_name="Zoé", division="", org_name="Zassembler"
         )
         search = "zassembler"
 
