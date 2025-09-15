@@ -39,6 +39,10 @@ class UVAccountAdapter(allauth_adapter.DefaultAccountAdapter):
         return saved_user
 
     def clean_password(self, password, user=None):
+        """
+        Validates a password. You can hook into this if you want to
+        restric the allowed password choices.
+        """
         if re.match(r"^(?=.*?\d)(?=.*?[A-Z])(?=.*?[a-z])[A-Za-z\d]{8,}$", password):
             return password
         else:
