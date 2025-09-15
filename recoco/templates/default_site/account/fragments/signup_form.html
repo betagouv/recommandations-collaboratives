@@ -1,4 +1,5 @@
 {% extends "account/layout/layout.html" %}
+{% load crispy_forms_tags %}
 {% block layout_content %}
     {% block signup_form %}
         <form class="signup fr-form-group"
@@ -43,14 +44,12 @@
                         {{ form.phone_no }}
                     </p>
                     <p>
-                        {{ form.password1.label }}
                         {{ form.password1.errors }}
-                        {{ form.password1 }}
+                        {{ form.password1|as_crispy_field }}
                     </p>
                     <p>
-                        {{ form.password2.label }}
                         {{ form.password2.errors }}
-                        {{ form.password2 }}
+                        {{ form.password2|as_crispy_field }}
                     </p>
                     <p>
                         {{ form.captcha }}
