@@ -7,15 +7,19 @@ import api, {
 import _ from 'lodash';
 import { formatDate } from '../utils/date';
 
-Alpine.data('ContactBook', () => {
+Alpine.data('ContactBook', (departments, regions) => {
   return {
     formatDate,
     searchParams: {
       search: '',
       letter: null,
+      searchDepartment: [],
     },
     letters: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split(''),
     contactListGroupByNationalGroup: {},
+    departments: JSON.parse(departments.textContent),
+    regions: JSON.parse(regions.textContent),
+    contactSearched: [],
     async init() {
       try {
         const response = await api.get(contactsUrl(25));
@@ -58,12 +62,17 @@ Alpine.data('ContactBook', () => {
     },
     async getContactData() {
       const response = await api.get(
-        searchContactsUrl(this.searchParams.search, this.searchParams.letter)
+        searchContactsUrl(this.searchParams.search, this.searchParams.letter, this.searchParams.searchDepartment)
       );
-      this.contactListGroupByNationalGroup = this.groupContactByNationalGroup(
-        response.data.results
-      );
-      this.getDepartmentsOrganization(this.contactListGroupByNationalGroup);
+      if( this.searchParams.search && this.searchParams.search !== '') {
+        this.contactSearched = response.data.results;
+      }
+      else {
+        this.contactListGroupByNationalGroup = this.groupContactByNationalGroup(
+          response.data.results
+        );
+        this.getDepartmentsOrganization(this.contactListGroupByNationalGroup);
+      }
     },
 
     groupContactByOrganization(contactList) {
@@ -156,6 +165,11 @@ Alpine.data('ContactBook', () => {
         return;
       }
       return;
+    },
+    saveSelectedDepartment(event) {
+      if (!event.detail) return;
+      this.searchParams.searchDepartment = [...event.detail];
+      this.getContactData();
     },
   };
 });
