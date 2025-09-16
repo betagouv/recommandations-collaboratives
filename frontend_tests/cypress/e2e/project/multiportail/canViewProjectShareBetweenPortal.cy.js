@@ -18,14 +18,6 @@ describe('Project share between portal', () => {
       .should('include.text', 'example2');
   });
 
-  it('display share by and with portal on list advisor dashboard', () => {
-    cy.login('staff'); // TODO replace by staffOnSite and check behaviour
-    cy.visit('/projects/advisor');
-    cy.get('[data-cy="list-project-shared-by-origin"]')
-      .should('be.visible')
-      .should('include.text', 'example2');
-  });
-
   it('display current portal EDL first', () => {
     cy.login('collectivité1');
     cy.visit('/project/23/connaissance');

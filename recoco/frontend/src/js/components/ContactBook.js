@@ -18,7 +18,7 @@ Alpine.data('ContactBook', () => {
     contactListGroupByNationalGroup: {},
     async init() {
       try {
-        const response = await api.get(contactsUrl(25));
+        const response = await api.get(contactsUrl());
         this.contactListGroupByNationalGroup = this.groupContactByNationalGroup(
           response.data.results
         );
