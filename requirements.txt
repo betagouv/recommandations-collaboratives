@@ -469,6 +469,7 @@ django==5.1.12 \
     #   django-otp
     #   django-permissionedforms
     #   django-phonenumber-field
+    #   django-polymorphic
     #   django-recaptcha
     #   django-reversion
     #   django-reversion-compare
@@ -608,6 +609,10 @@ django-permissionedforms==0.1 \
 django-phonenumber-field==6.3.0 \
     --hash=sha256:188ca55b27ef1ac4d9b279d90ee3f1377ece6cd9ed8c63f0a66efd565bf9ad6f \
     --hash=sha256:668db2e61559908ce8dcd660ac716262c7922cc29ec76ede3f9b88772992dc28
+    # via recoco
+django-polymorphic==4.1.0 \
+    --hash=sha256:0ce3984999e103a0d1a434a5c5617f2c7f990dc3d5fb3585ce0fadadf9ff90ea \
+    --hash=sha256:4438d95a0aef6c4307cd6c83ead387e1142ce80b65188a931ec2f0dbdd9bfc51
     # via recoco
 django-recaptcha==3.0.0 \
     --hash=sha256:1aed69fd6ac8fd9e99e52665392ae6748f8b6339ace656fad779fe0c6c915a52 \

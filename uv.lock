@@ -1135,6 +1135,18 @@ phonenumbers = [
 ]
 
 [[package]]
+name = "django-polymorphic"
+version = "4.1.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "django" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/7a/4c/b8dc06147602b4c990e1094a1f230771fd65b2f9c1107f28afe1461ee249/django_polymorphic-4.1.0.tar.gz", hash = "sha256:4438d95a0aef6c4307cd6c83ead387e1142ce80b65188a931ec2f0dbdd9bfc51", size = 49696, upload-time = "2025-05-20T16:32:24.424Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/30/66/00e6fc8ca9cf10ca41aa5d3d7746214fa7690138174c6716e9a08259bff2/django_polymorphic-4.1.0-py3-none-any.whl", hash = "sha256:0ce3984999e103a0d1a434a5c5617f2c7f990dc3d5fb3585ce0fadadf9ff90ea", size = 62845, upload-time = "2025-05-20T16:32:20.322Z" },
+]
+
+[[package]]
 name = "django-recaptcha"
 version = "3.0.0"
 source = { registry = "https://pypi.org/simple" }
@@ -3236,6 +3248,7 @@ dependencies = [
     { name = "django-ordered-model" },
     { name = "django-otp" },
     { name = "django-phonenumber-field", extra = ["phonenumbers"] },
+    { name = "django-polymorphic" },
     { name = "django-recaptcha" },
     { name = "django-reversion" },
     { name = "django-reversion-compare" },
@@ -3341,6 +3354,7 @@ requires-dist = [
     { name = "django-ordered-model", specifier = "==3.7.4" },
     { name = "django-otp", specifier = "==1.3.0" },
     { name = "django-phonenumber-field", extras = ["phonenumbers"], specifier = "==6.3.0" },
+    { name = "django-polymorphic", specifier = ">=4.1.0" },
     { name = "django-recaptcha", specifier = "==3.0.0" },
     { name = "django-reversion", specifier = "==5.0.2" },
     { name = "django-reversion-compare", specifier = "==0.17.0" },
