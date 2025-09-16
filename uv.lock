@@ -1159,6 +1159,21 @@ wheels = [
 ]
 
 [[package]]
+name = "django-rest-polymorphic"
+version = "0.1.10"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "django" },
+    { name = "django-polymorphic" },
+    { name = "djangorestframework" },
+    { name = "six" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/f4/86/285f7da71ecd82ce6f1765ffb74425faf8244d8554cb6d00542286157701/django-rest-polymorphic-0.1.10.tar.gz", hash = "sha256:2960f58ed9a8bb0d42bc72c8ffaadfbd7f37d2573d42a1cd9a6460f3d572b519", size = 6464, upload-time = "2022-07-17T04:33:14.89Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/d3/90/e20bde06ea67111718ad8d03e21cccdfe37e24ccdff30ea22100a3004070/django_rest_polymorphic-0.1.10-py2.py3-none-any.whl", hash = "sha256:f3980e3e2af73357e7913f9b1410ef856866bcfcc46903b70fe9621118bb538c", size = 6027, upload-time = "2022-07-17T04:33:12.736Z" },
+]
+
+[[package]]
 name = "django-reversion"
 version = "5.0.2"
 source = { registry = "https://pypi.org/simple" }
@@ -3250,6 +3265,7 @@ dependencies = [
     { name = "django-phonenumber-field", extra = ["phonenumbers"] },
     { name = "django-polymorphic" },
     { name = "django-recaptcha" },
+    { name = "django-rest-polymorphic" },
     { name = "django-reversion" },
     { name = "django-reversion-compare" },
     { name = "django-sass-processor" },
@@ -3356,6 +3372,7 @@ requires-dist = [
     { name = "django-phonenumber-field", extras = ["phonenumbers"], specifier = "==6.3.0" },
     { name = "django-polymorphic", specifier = ">=4.1.0" },
     { name = "django-recaptcha", specifier = "==3.0.0" },
+    { name = "django-rest-polymorphic", specifier = ">=0.1.10" },
     { name = "django-reversion", specifier = "==5.0.2" },
     { name = "django-reversion-compare", specifier = "==0.17.0" },
     { name = "django-sass-processor", specifier = "==1.4.1" },
