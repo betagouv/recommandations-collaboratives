@@ -32,7 +32,7 @@ def test_anonymous_can_read_organizationgroup_but_not_update(api_client):
 
 
 @pytest.mark.django_db
-def test_orga_group_search(self, api_client):
+def test_orga_group_search(api_client):
     baker.make(OrganizationGroup, name="ademe")
     z_org = baker.make(OrganizationGroup, name="zoologie")
     search = "zoo"
