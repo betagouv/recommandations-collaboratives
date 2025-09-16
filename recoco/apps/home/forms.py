@@ -9,11 +9,12 @@ from allauth.account.forms import (
 from captcha.fields import ReCaptchaField
 from captcha.widgets import ReCaptchaV2Checkbox
 from django import forms
+from django.contrib.auth import models as auth_models
 from django.core.exceptions import ValidationError
 
 from recoco.apps.geomatics.models import Department
 
-from .models import SiteConfiguration
+from .models import SiteConfiguration, UserProfile
 
 
 class UVSignupForm(SignupForm):
@@ -41,6 +42,38 @@ class UVSignupForm(SignupForm):
         self.fields["password2"].widget = forms.PasswordInput(
             attrs={"class": "fr-input fr-mt-2v fr-mb-4v"}
         )
+
+
+class UserUpdateForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["first_name"].required = True
+        self.fields["last_name"].required = True
+
+    class Meta:
+        model = auth_models.User
+        fields = [
+            "first_name",
+            "last_name",
+        ]
+
+
+class UserProfileUpdateForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super(forms.ModelForm, self).__init__(*args, **kwargs)
+        organization = kwargs["instance"].organization
+        if hasattr(organization, "name"):
+            self.fields["org_name"].initial = organization.name
+
+    class Meta:
+        model = UserProfile
+        fields = ["organization_position", "phone_no"]
+
+    org_name = forms.CharField(
+        label="Nom de votre organisation *",
+        help_text="Si vous êtes un particulier, indiquez votre nom. Votre administration, entreprise, association. Si vous êtes un particulier, écrivez 'Particulier'.",
+        required=True,
+    )
 
 
 class UVLoginForm(LoginForm):
