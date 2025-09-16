@@ -62,8 +62,7 @@ class OrgaStartswithFilterBackend(BaseFilterBackend):
 
 class ByDepartmentFilterBackend(BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
-        departments_str = request.query_params.getlist("departments")
-        departments = [int(dep_str) for dep_str in departments_str]
+        departments = request.query_params.getlist("departments")
         if not departments:
             return queryset
         return queryset.filter(organization__departments__in=departments)
