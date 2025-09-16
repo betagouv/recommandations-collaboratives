@@ -12,34 +12,43 @@ from .models import (
 )
 
 
-class MarkdownNodeSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = MarkdownNode
-        fields = ("text",)
-
-
 class NodeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Node
         fields = ("position",)
 
 
+class MarkdownNodeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MarkdownNode
+        fields = (
+            "position",
+            "text",
+        )
+
+
 class RecommendationNodeSerializer(serializers.ModelSerializer):
     class Meta:
         model = RecommendationNode
-        fields = ("text", "recommendation_id")
+        fields = ("position", "text", "recommendation_id")
 
 
 class ContactNodeSerializer(serializers.ModelSerializer):
     class Meta:
         model = ContactNode
-        fields = ("contact_id",)
+        fields = (
+            "position",
+            "contact_id",
+        )
 
 
 class DocumentNodeSerializer(serializers.ModelSerializer):
     class Meta:
         model = DocumentNode
-        fields = ("document_id",)
+        fields = (
+            "position",
+            "document_id",
+        )
 
 
 class NodePolymorphicSerializer(PolymorphicSerializer):
@@ -57,6 +66,6 @@ class NodePolymorphicSerializer(PolymorphicSerializer):
 class MessageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Message
-        fields = ("posted_by", "in_reply_to", "nodes")
+        fields = ("id", "created", "modified", "posted_by", "in_reply_to", "nodes")
 
     nodes = NodePolymorphicSerializer(many=True)
