@@ -36,11 +36,7 @@ class Message(TimeStampedModel):
             "nodes": [],
         }
 
-        for node in (
-            Node.objects.filter(message=self.pk)
-            .order_by("position")
-            .select_subclasses()
-        ):
+        for node in Node.objects.filter(message=self.pk).order_by("position"):
             payload["nodes"].append(node.serialize())
 
         return payload
