@@ -18,7 +18,7 @@ from django.db.models import Count, F, OuterRef, Q, QuerySet, Subquery
 from django.http import Http404
 from django.shortcuts import get_object_or_404
 from notifications import models as notifications_models
-from rest_framework import permissions, status, viewsets
+from rest_framework import mixins, permissions, status, viewsets
 from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -39,6 +39,7 @@ from recoco.utils import (
 from .. import models, signals
 from ..filters import DepartmentsFilter, ProjectActivityFilter
 from ..serializers import (
+    DocumentSerializer,
     ProjectForListSerializer,
     ProjectSiteSerializer,
     TopicSerializer,
@@ -539,6 +540,23 @@ class ProjectSiteViewSet(viewsets.GenericViewSet):
             return Response(status=status.HTTP_204_NO_CONTENT)
 
         return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+########################################################################
+# Document API
+########################################################################
+
+
+class DocumentViewSet(mixins.RetrieveModelMixin, viewsets.GenericViewSet):
+    """API endpoint that allows searching for topics"""
+
+    serializer_class = DocumentSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    queryset = models.Document.objects
+
+    def get_queryset(self):
+        project_id = int(self.kwargs["project_id"])
+        return self.queryset.filter(project_id=project_id)
 
 
 # eof
