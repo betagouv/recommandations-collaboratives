@@ -7,6 +7,7 @@ from model_bakery import baker
 
 from recoco.utils import login
 
+from ...geomatics.models import Department
 from ..models import Contact, Organization
 
 
@@ -148,6 +149,55 @@ def test_organization_start_with_filter(
     assert [
         contact["first_name"] for contact in response.data["results"]
     ] == expected_result, f"failure for filter value: {filter_value}"
+
+
+@pytest.mark.parametrize(
+    "query_params,expected_result",
+    [
+        ("departments=31", ["vador"]),
+        ("departments=31&departments=14", ["vador", "obiwan"]),
+        ("departments=33", ["obiwan"]),
+        ("departments=69", []),
+    ],
+)
+@pytest.mark.django_db
+def test_organization_department(
+    api_client, staff_user, current_site, query_params, expected_result
+):
+    baker.make(Department, code=33, name="Corusant")
+    baker.make(Department, code=14, name="Yavin")
+    baker.make(Department, code=31, name="Tatoine")
+
+    jedi_organization = baker.make(
+        Organization, name="Conseil des Jedi", sites=[current_site]
+    )
+    jedi_organization.departments.add(33, 14)
+    baker.make(
+        Contact,
+        first_name="obiwan",
+        organization=jedi_organization,
+        site=current_site,
+    )
+
+    sith_organization = baker.make(
+        Organization, name="Empire Sith", sites=[current_site]
+    )
+    sith_organization.departments.add(31)
+    baker.make(
+        Contact,
+        first_name="vador",
+        organization=sith_organization,
+        site=current_site,
+    )
+
+    api_client.force_authenticate(staff_user)
+    response = api_client.get(
+        f"{reverse('api-addressbook-contact-list')}?{query_params}"
+    )
+    assert response.status_code == 200
+    assert set(contact["first_name"] for contact in response.data["results"]) == set(
+        expected_result
+    ), f"failure for query: {query_params}"
 
 
 @pytest.mark.usefixtures("current_site")
