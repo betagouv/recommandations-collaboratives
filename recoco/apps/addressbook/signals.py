@@ -11,7 +11,7 @@ from .models import Organization, OrganizationGroup
 def create_organisation_national_group(
     sender: Any, instance: Organization, created: bool, **kwargs
 ):
-    if not created or instance.has_departments:
+    if not created or instance.has_departments or instance.group is not None:
         return
     with transaction.atomic():
         group, _ = OrganizationGroup.objects.get_or_create(name=instance.name)

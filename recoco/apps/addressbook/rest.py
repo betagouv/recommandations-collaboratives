@@ -33,9 +33,7 @@ class OrganizationViewSet(ModelViewSet):
     search_min_rank = 0.05
 
     def get_queryset(self):
-        return Organization.on_site.with_contacts_only().prefetch_related(
-            "departments__region"
-        )
+        return Organization.on_site.all().prefetch_related("departments__region")
 
     def get_serializer_class(self):
         match self.action:
