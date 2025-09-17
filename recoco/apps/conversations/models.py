@@ -27,88 +27,30 @@ class Message(TimeStampedModel):
         blank=True,
     )
 
-    def serialize(self):
-        payload = {
-            "id": self.pk,
-            "posted_by": self.posted_by_id,
-            "created": self.created,
-            "in_reply_to": self.in_reply_to_id,
-            "nodes": [],
-        }
-
-        for node in Node.objects.filter(message=self.pk).order_by("position"):
-            payload["nodes"].append(node.serialize())
-
-        return payload
-
 
 class Node(PolymorphicModel):
-    NODE_TYPE = "empty"
-
     position = models.PositiveIntegerField()
     message = models.ForeignKey(Message, on_delete=models.CASCADE, related_name="nodes")
-
-    def serialize(self):
-        return {"type": self.NODE_TYPE, "position": self.position, "data": {}}
 
 
 class MarkdownTextMixin(models.Model):
     text = models.TextField()
-
-    def contribute_to_serialize(self, payload):
-        payload["data"].update({"text": self.text})
-        return payload
 
     class Meta:
         abstract = True
 
 
 class MarkdownNode(Node, MarkdownTextMixin):
-    NODE_TYPE = "markdown"
-
-    def serialize(self):
-        payload = super().serialize()
-
-        payload = super().contribute_to_serialize(payload)
-
-        return payload
+    pass
 
 
 class RecommendationNode(Node, MarkdownTextMixin):
-    NODE_TYPE = "recommendation"
-
     recommendation = models.ForeignKey(tasks_models.Task, on_delete=models.CASCADE)
-
-    def serialize(self):
-        payload = super().serialize()
-
-        payload = super().contribute_to_serialize(payload)
-        payload["data"].update({"recommendation_id": self.recommendation.pk})
-
-        return payload
 
 
 class ContactNode(Node):
-    NODE_TYPE = "vcard"
-
     contact = models.ForeignKey(addressbook_models.Contact, on_delete=models.CASCADE)
-
-    def serialize(self):
-        payload = super().serialize()
-
-        payload["data"].update({"contact_id": self.contact.pk})
-
-        return payload
 
 
 class DocumentNode(Node):
-    NODE_TYPE = "document"
-
     document = models.ForeignKey(projects_models.Document, on_delete=models.CASCADE)
-
-    def serialize(self):
-        payload = super().serialize()
-
-        payload["data"].update({"document_id": self.document.pk})
-
-        return payload

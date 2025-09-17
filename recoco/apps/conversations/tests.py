@@ -6,75 +6,25 @@ from model_bakery import baker
 from recoco.apps.tasks import signals as tasks_signals
 from recoco.apps.tasks.models import Task
 
-from .api import build_message_feed
-from .models import ContactNode, DocumentNode, MarkdownNode, Message, RecommendationNode
+from .models import Message
+from .utils import post_public_message_with_recommendation
 
 
-######--- Message ----#####
+#####--- Utils ---#####
 @pytest.mark.django_db
-def test_serialize_message_without_node():
-    m = baker.make(Message)
-    assert m.serialize()
+def test_post_message_with_recommendation(project_ready, request):
+    current_site = get_current_site(request)
+    user = baker.make(auth_models.User)
 
+    task = baker.make(
+        Task, public=True, project=project_ready, site=current_site, created_by=user
+    )
 
-@pytest.mark.django_db
-def test_serialize_message_with_node():
-    m = baker.make(Message)
-    baker.make(MarkdownNode, message=m, text="hello ##title")
+    assert Message.objects.count() == 0
 
-    payload = m.serialize()
-    assert len(payload["nodes"]) == 1
+    post_public_message_with_recommendation(project_ready, task)
 
-
-######-- Nodes ---##########
-@pytest.mark.django_db
-def test_serialize_node_markdown():
-    node = baker.make(MarkdownNode, text="hello ##title")
-
-    payload = node.serialize()
-
-    assert payload["type"] is MarkdownNode.NODE_TYPE
-    assert payload["data"]["text"] == node.text
-
-
-@pytest.mark.django_db
-def test_serialize_node_contact():
-    node = baker.make(ContactNode)
-
-    payload = node.serialize()
-
-    assert payload["type"] is ContactNode.NODE_TYPE
-    assert payload["data"]["contact_id"] is not None
-
-
-@pytest.mark.django_db
-def test_serialize_node_document():
-    node = baker.make(DocumentNode, document__the_link="http://blah.com")
-
-    payload = node.serialize()
-
-    assert payload["type"] is DocumentNode.NODE_TYPE
-    assert payload["data"]["document_id"] is not None
-
-
-@pytest.mark.django_db
-def test_serialize_node_recommendation():
-    node = baker.make(RecommendationNode)
-
-    payload = node.serialize()
-
-    assert payload["type"] is RecommendationNode.NODE_TYPE
-    assert payload["data"]["text"] is not None
-    assert payload["data"]["recommendation_id"] is not None
-
-
-#####--- Feed ---#####
-@pytest.mark.django_db
-def test_build_message_feed():
-    m = baker.make(Message)
-    baker.make(MarkdownNode, message=m, text="hello ##title")
-
-    assert build_message_feed(m.project)
+    assert Message.objects.count() == 1
 
 
 #####--- Signals ---#####
