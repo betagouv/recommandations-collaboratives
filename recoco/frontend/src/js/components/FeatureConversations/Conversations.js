@@ -1,26 +1,47 @@
 import Alpine from '../../utils/globals';
-import api, { userUrl } from '../../utils/api';
+import api, { userUrl, conversationsMessagesUrl } from '../../utils/api';
 
-Alpine.data('Conversations', (feed, projectId) => ({
+Alpine.data('Conversations', (projectId) => ({
   projectId,
-  feed,
+  feed: {},
+  messages: [],
   users: [],
   documents: [],
-  init() {},
+  init() {
+    this.getMessages();
+  },
+  get tasksLoaded() {
+    return this.$store.tasksData.tasks.length > 0;
+  },
   get recommendations() {
     return this.$store.tasksData.tasks;
   },
   getRecommendationById(id) {
-    return this.recommendations.find((task) => task.id === id);
+    const foundRecommendation = this.recommendations.find(
+      (recommendation) => recommendation.id == id
+    );
+    return foundRecommendation;
   },
   getMessageById(id) {
     return this.feed.messages.find((message) => message.id === +id);
   },
+  async getMessages() {
+    try {
+      const messages = await api.get(conversationsMessagesUrl(this.projectId));
+      this.feed.messages = messages.data;
+    } catch (error) {
+      throw new Error('Failed to get messages');
+    }
+  },
   getShortMessageInReplyTo(id) {
-    const shortMessage = this.getMessageById(id)
-      .nodes.find((node) => node.type === 'markdown')
-      .data.text.slice(0, 40);
-    return shortMessage;
+    const shortMessage = this.getMessageById(id);
+    if (!shortMessage) {
+      return '';
+    }
+    const markdownNode = shortMessage.nodes.find(
+      (node) => node.type === 'MarkdownNode'
+    );
+    return markdownNode.text.slice(0, 40);
   },
   async getUserById(id) {
     const foundUser = this.users.find((user) => user.id === +id);
@@ -52,6 +73,7 @@ Alpine.data('Conversations', (feed, projectId) => ({
     return foundUser;
   },
   async getDocumentById(id) {
+    // TODO: get document from API projects/${projectId}/documents/${id}/
     const foundDocument = this.documents.find(
       (document) => document.id === +id
     );
