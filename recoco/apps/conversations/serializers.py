@@ -5,6 +5,7 @@ from rest_framework import serializers
 from rest_polymorphic.serializers import PolymorphicSerializer
 
 from recoco.apps.projects.models import Project
+from recoco.apps.tasks.models import Task
 
 from .models import (
     ContactNode,
@@ -94,6 +95,14 @@ class ActivityProjectSerializer(serializers.ModelSerializer):
     model = serializers.ReadOnlyField(default="Project")
 
 
+class ActivityTaskSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Task
+        fields = ("model", "id", "intent")
+
+    model = serializers.ReadOnlyField(default="Task")
+
+
 class GenericRelatedField(serializers.Field):
     def to_representation(self, value):
         if isinstance(value, User):
@@ -101,6 +110,9 @@ class GenericRelatedField(serializers.Field):
 
         if isinstance(value, Project):
             return ActivityProjectSerializer(value).data
+
+        if isinstance(value, Task):
+            return ActivityTaskSerializer(value).data
 
         # Not found - return string.
         return str(value)
