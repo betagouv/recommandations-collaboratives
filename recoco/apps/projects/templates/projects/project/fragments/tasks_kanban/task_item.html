@@ -15,7 +15,8 @@
         <div class="spinner-border spinner-border spinner-border-sm text-primary"
              role="status"></div>
     </div>
-    <div class="medium-border-radius bg-white border-grey-dark position-relative hover-border-blue hover-shadow transition-all tmp-usevar"
+    <div class="medium-border-radius bg-white border-grey-dark position-relative hover-border-blue hover-shadow transition-all tmp-usevar fr-mb-1w"
+         :class="`border${getTaskColor(currentTask)}`"
          :style="task.isLoading && 'opacity:0.3';"
          :draggable="true"
          @dragstart="onDragStart(event, task.uuid)"
@@ -24,37 +25,45 @@
             <span class="position-absolute translate-middle top-0 start-100 badge rounded-circle bg-danger fw-bold specific-fontsize-07"
                   x-text="currentTask.notifications.count"></span>
         </template>
-        <div class="fr-p-2v">
+        <template x-if="!currentTask.public">
+            <div class="card-top-information d-flex align-items-center">
+                <div class="left-0">
+                    <span data-test-id="task-draft-status-in-kanban"
+                        :class="`bg${getTaskColor(currentTask)}`"
+                        class="text-dark fr-ml-2v">Brouillon</span>
+                </div>
+            </div>
+        </template>
+        <div class="fr-p-3v">
             <div class="d-flex flex-row">
-                <div class="flex-fill fr-mt-1v fr-ml-2v specific-fontsize-09 cursor-pointer"
+                <div class="flex-fill cursor-pointer"
                      @click="handleOpenPreviewModal()"
                      data-test-id="task-kanban-topic">
                     <template x-if="task.topic && task.topic.name">
-                        <div class="d-flex align-items-center fr-mb-1v fr-mt-1v">
-                            <span class="topic-indicator bg-green fr-mr-2v"></span>
+                        <div class="d-flex align-items-center fr-mb-1v">
+                            <span class="topic-indicator bg-purple fr-mr-1v"></span>
                             <h5 data-test-id="task-kanban-topic"
                                 x-text="task.topic.name"
-                                class="fw-medium tiny text-gray-800 fr-mb-0"></h5>
+                                class="fw-bold tiny text-gray-800 fr-mb-0 color-purple"></h5>
                         </div>
                     </template>
                     <h6 class="fr-mb-0 fw-bold title-info text-transform-none text-blue text-decoration-underline"
                         x-text="currentTask.intent"></h6>
-                    <div class="fr-pt-2v fr-my-2v"
+                    <div class="fr-pt-2v"
                          :class="canAdministrate && currentTask.content === '' && 'border border-warning'">
                         <div class="d-flex flex-column">
-                            <span class="align-middle text-grey-dark tiny specific-lineheight-20"
-                                  x-text="`Émis le ${formatDate(currentTask.created_on)}`"></span>
+                            <span class="align-middle text-grey-dark font-very-small specific-lineheight-20"
+                                  x-text="(() => {
+                                            let diffDays = Math.floor((new Date() - new Date(currentTask.created_on)) / (1000 * 60 * 60 * 24));
+                                            if (diffDays === 0) {
+                                                return 'Aujourd\'hui';
+                                            } else if (diffDays === 1) {
+                                                return 'Il y a 1 jour';
+                                            } else {
+                                                return `Il y a ${diffDays} jours`;
+                                            }
+                                        })()"></span>
                             {% include "projects/project/fragments/task/task_user_card.html" %}
-                            <div class="text-grey-dark d-flex align-items-center tiny fr-mr-2w responsive-flex-column fr-mt-1v">
-                                <svg class="align-middle bi fr-mr-1v"
-                                     width="18px"
-                                     height="15px"
-                                     fill="currentColor">
-                                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#chat-square" />
-                                </svg>
-                                <span class="tiny"
-                                      x-text="currentTask.resource_id ? currentTask.comments_count + 1  + ' messages' : currentTask.comments_count + ' messages'"></span>
-                            </div>
                         </div>
                     </div>
                 </div>
