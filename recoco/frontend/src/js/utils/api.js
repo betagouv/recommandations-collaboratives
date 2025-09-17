@@ -248,3 +248,7 @@ export function editReminderUrl(taskId) {
 export function userUrl(userId) {
   return `/api/users/${userId}/`;
 }
+
+export function conversationsMessagesUrl(projectId) {
+  return `/api/projects/${projectId}/conversations/messages/`;
+}

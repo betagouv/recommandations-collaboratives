@@ -62,13 +62,21 @@
     {% endcomment %}
     <!-- Loop through all messages -->
     <div class="conversation-new__container-topic">
-        {% for message in feed.messages %}
+        <template x-for="message in feed.messages">
+            {% comment %} TODO: add message date {% endcomment %}
+            <!-- Loop through one message node  -->
+            {% comment %} {% ifchanged message.created|date %}
+                <p class="conversation-new__date">{{ message.created|date }}</p>
+            {% endifchanged %} {% endcomment %}
+            {% include "conversations/messages/message_item.html" %}
+        </template>
+        {% comment %} {% for message in feed.messages %}
             <!-- Loop through one message node  -->
             {% ifchanged message.created|date %}
                 <p class="conversation-new__date">{{ message.created|date }}</p>
             {% endifchanged %}
             {% include "conversations/messages/message_item.html" %}
-        {% endfor %}
+        {% endfor %} {% endcomment %}
     </div>
     {% comment %}
     ****************************************

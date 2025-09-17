@@ -1,28 +1,29 @@
 <div class="observed-element"
      data-notifications="{{ message.notifications }}">
-    <div class="message-item rounded-3 fr-p-3v fr-my-2v {% if request.user.id == message.posted_by %}current-user-message fr-ml-5w{% else %}other-user-message fr-mr-5w{% endif %}">
-        {% if message.in_reply_to %}
+    <div class="message-item rounded-3 fr-p-3v fr-my-2v"
+         :class="{'current-user-message fr-ml-5w': {{ request.user.id }} == message.posted_by, 'other-user-message fr-mr-5w': {{ request.user.id }} != message.posted_by}">
+        <template x-if="message.in_reply_to">
             <div class="message-item__reply-to text-muted fr-italic fr-small">
                 <p class="d-flex">
                     <span class="fr-icon-corner-down-right-line fr-icon--sm"></span>
                     en réponse à : <span class="fr-ml-1v"
-       x-html="renderMarkdown(getShortMessageInReplyTo(`{{ message.in_reply_to }}`))"></span>
+       x-html="renderMarkdown(getShortMessageInReplyTo(message.in_reply_to))"></span>
                 </p>
             </div>
-        {% endif %}
-        {% for node in message.nodes %}
-            {% if node.type == "markdown" %}
+        </template>
+        <template x-for="node in message.nodes">
+            <template x-if="node.type == 'MarkdownNode'">
                 {% include "conversations/messages/fragments/node_markdown.html" %}
-            {% elif node.type == "contact" %}
-                {% include "conversations/messages/fragments/node_contact.html" %}
-            {% elif node.type == "document" %}
+            </template>
+            <template x-if="node.type == 'ContactNode'">
+            </template>
+            <template x-if="node.type == 'DocumentNode'">
                 {% include "conversations/messages/fragments/node_document.html" %}
-            {% elif node.type == "recommendation" %}
-                <template x-if="recommendations.length > 0">
-                    {% include "conversations/messages/fragments/node_recommendation.html" with node=node posted_by=message.posted_by %}
-                </template>
-            {% endif %}
-        {% endfor %}
+            </template>
+            <template x-if="node.type == 'RecommendationNode'">
+                {% include "conversations/messages/fragments/node_recommendation.html" %}
+            </template>
+        </template>
         <!-- Reply button -->
         {% if not message.in_reply_to %}
             <div class="d-flex justify-content-end">
@@ -33,9 +34,7 @@
         {% if message.posted_by %}
             <div class="d-flex align-items-center"
                  x-data="{user: null}"
-                 x-init="user = await getUserById({{ message.posted_by }});">
-                {% include "user/user_card_js.html" %}
-            </div>
+                 x-init="user = await getUserById(message.posted_by);">{% include "user/user_card_js.html" %}</div>
         {% endif %}
     </div>
 </div>
