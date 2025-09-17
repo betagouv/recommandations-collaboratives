@@ -3,7 +3,7 @@ from django.contrib.sites.models import Site
 from django.urls import reverse
 from model_bakery import baker
 
-from ..models import Contact, Organization
+from ..models import Contact, Organization, OrganizationGroup
 
 
 @pytest.fixture
@@ -50,6 +50,27 @@ def test_anonymous_can_read_organization_but_not_update(api_client, acme_organiz
 
     response = api_client.delete(url, data={})
     assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_create_use_given_group(api_client, staff_user):
+    group = baker.make(OrganizationGroup)
+    url = reverse("api-addressbook-organization-list")
+
+    api_client.force_authenticate(staff_user)
+    response = api_client.post(url, {"group": group.id, "name": "orga_name"})
+    assert response.data["group"] == group.id
+
+
+@pytest.mark.django_db
+def test_update_use_given_group(api_client, staff_user, current_site):
+    group = baker.make(OrganizationGroup)
+    orga = baker.make(Organization, sites=[current_site])
+    url = reverse("api-addressbook-organization-detail", args=[orga.id])
+
+    api_client.force_authenticate(staff_user)
+    response = api_client.patch(url, {"group": group.id, "name": "orga_name"})
+    assert response.data["group"] == group.id
 
 
 @pytest.mark.django_db

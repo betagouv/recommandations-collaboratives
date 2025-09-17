@@ -111,8 +111,7 @@
                                                                     </div>
                                                                 </template>
                                                                 <template x-if="t.notifications.count > 0">
-                                                                    <span class="kanban-card__notification-container position-absolute top-25 start-100 badge bg-info"
-                                                                          :class="{'bg-danger': t.notifications.has_collaborator_activity == true}"><span x-text="t.notifications.count"></span> <span class="visually-hidden">nouvelle activité</span></span>
+                                                                    <span class="kanban-card__notification-container position-absolute top-25 start-100 badge bg-danger"><span x-text="t.notifications.count"></span> <span class="visually-hidden">nouvelle activité</span></span>
                                                                 </template>
                                                                 <div class="kanban-card__project-container fr-mb-2v">
                                                                     <span class="kanban-card__project-name project-link"
