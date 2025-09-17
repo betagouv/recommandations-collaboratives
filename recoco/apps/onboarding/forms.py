@@ -129,10 +129,10 @@ class OnboardingProject(DsrcBaseForm):
             self.fields.pop("captcha")
 
     name = forms.CharField(
-        label="Nom du dossier *",
+        label="Nom de votre dossier *",
         initial="",
         required=True,
-        help_text="Indiquez un nom court qui désigne le dossier ou le projet. Inutile d'ajouter le nom de la commune, l'adresse ou le programme.",
+        help_text="Donnez un nom court pour désigner le dossier ou le projet. Inutile d'ajouter le nom de la commune ou l'adresse.",
     )
     location = forms.CharField(
         label="Adresse",
@@ -149,7 +149,7 @@ class OnboardingProject(DsrcBaseForm):
     )
 
     description = forms.CharField(
-        label="Résumé de la demande *",
+        label="Résumé de votre demande *",
         initial="",
         required=True,
         help_text="Décrivez votre demande ou dossier et son contexte en quelques mots.",
@@ -257,10 +257,10 @@ class PrefillProjectForm(DsrcBaseForm):
         )
 
     name = forms.CharField(
-        label="Nom du dossier *",
+        label="Nom de votre dossier *",
         initial="",
         required=True,
-        help_text="Indiquez un nom court qui décrit le dossier. Inutile d'ajouter le nom de la commune, l'adresse ou le programme.",
+        help_text="Donnez un nom court pour désigner le dossier ou le projet. Inutile d'ajouter le nom de la commune ou l'adresse.",
     )
     location = forms.CharField(
         label="Adresse",
@@ -277,7 +277,7 @@ class PrefillProjectForm(DsrcBaseForm):
     )
 
     description = forms.CharField(
-        label="Résumé du dossier *",
+        label="Résumé de votre demande *",
         initial="",
         required=True,
         help_text="Décrivez votre dossier et son contexte en quelques mots.",

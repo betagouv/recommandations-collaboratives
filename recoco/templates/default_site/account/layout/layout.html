@@ -30,7 +30,7 @@
                  height="auto"
                  alt="Logo {{ request.site.name }}" />
         {% endif %}
-        <h2 class="fr-mb-8w">
+        <h2 class="fr-mb-8w h2-rework">
             <strong>{{ title }}</strong>
             <br>
             sur <span class="layout-form__site-name">{{ request.site.name }}</span>
@@ -38,10 +38,10 @@
     </div>
     {% if stepper %}
         <div class="fr-stepper fr-mb-2w">
-            <h2 class="fr-stepper__title dsfr-stepper__title-resize">
+            <h3 class="fr-stepper__title dsfr-stepper__title-resize">
                 {{ current_step_title }}
                 <span class="fr-stepper__state specific-color-3a">Étape {{ step_number }} sur {{ total_steps }}</span>
-            </h2>
+            </h3>
             <div class="fr-stepper__steps"
                  data-fr-current-step="{{ step_number }}"
                  data-fr-steps="{{ total_steps }}"></div>

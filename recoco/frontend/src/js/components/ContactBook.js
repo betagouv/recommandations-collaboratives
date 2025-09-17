@@ -22,7 +22,7 @@ Alpine.data('ContactBook', (departments, regions) => {
     contactSearched: [],
     async init() {
       try {
-        const response = await api.get(contactsUrl(25));
+        const response = await api.get(contactsUrl());
         this.contactListGroupByNationalGroup = this.groupContactByNationalGroup(
           response.data.results
         );

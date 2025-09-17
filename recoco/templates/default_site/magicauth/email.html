@@ -36,6 +36,20 @@
 
         .footer {
           text-align: center;
+          background-color: #f6f6f6;
+          padding: 15px;
+        }
+
+        .banner {
+          background-color: #f6f6f6;
+          display: flex;
+          justify-content: center !important;
+          padding: 15px;
+        }
+
+        .banner p{
+          vertical-align: middle;
+          margin-left: 10px;
         }
 
 
@@ -43,7 +57,10 @@
             TYPOGRAPHY
         ------------------------------------- */
 
-        a {
+        p a {
+          color: #3498db;
+        }
+        strong a {
           color: #3498db;
         }
 
@@ -62,7 +79,7 @@
           width: fit-content;
           margin: auto;
           margin-top: 10px;
-          color: white;
+          color: white !important;
           text-decoration: none;
           font-weight: 700;
         }
@@ -189,28 +206,17 @@
           width: 100%;
         }
 
-        .banner {
-          background-color: #f6f6f6;
-          display: flex;
-          justify-content: center;
-          padding: 15px;
-        }
-
-        .footer {
-          background-color: #f6f6f6;
-          padding: 15px;
-        }
         </style>
     </head>
     <body>
       <div class="banner">
-        {% if site.configuration.logo_small %}
-          <img src="https://{{ site.domain }}{{ site.configuration.logo_small.url }}"
+        {% if site.configuration.email_logo %}
+          <img src="https://{{ site.domain }}{{ site.configuration.email_logo.url }}"
               width="auto"
               height="40px"
               alt="" />
         {% endif %}
-        {{ site.name }}
+        <p>{{ site.name }}</p>
       </div>
         <table border="0" cellpadding="0" cellspacing="0" class="body">
             <tr>

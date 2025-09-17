@@ -13,26 +13,26 @@
                 Indiquez le territoire sur lequel vous souhaitez consulter les dossiers déposés sur UrbanVitaliz.
             </p>
             <div class="fr-fieldset__element modal-create-organization__yes fr-mb-0 fr-p-2w border-bottom w-100">
-                <div class="fr-radio-group">
+                <div class="fr-radio-group fr-radio-group--sm">
                     <input type="radio"
                            id="selectDepartments-no"
                            name="{{ form.advisor_access_type.name }}"
                            value="{{ form.fields.advisor_access_type.choices.0.0 }}"
                            {% if form.advisor_access_type.value == 'National' %}checked{% endif %}>
-                    <label class="fr-label" for="selectDepartments-no">{{ form.fields.advisor_access_type.choices.0.1 }}</label>
+                    <label class="fr-label-rework fr-pt-05v" for="selectDepartments-no">{{ form.fields.advisor_access_type.choices.0.1 }}</label>
                 </div>
                 {% if form.advisor_access_type.errors %}
                     <div class="fr-error-text form-mandatory-element">{{ form.advisor_access_type.errors.0 }}</div>
                 {% endif %}
             </div>
             <div class="fr-fieldset__element fr-p-2w fr-mb-0 w-100">
-                <div class="fr-radio-group">
+                <div class="fr-radio-group fr-radio-group--sm">
                     <input type="radio"
                            id="selectDepartments-yes"
                            name="{{ form.advisor_access_type.name }}"
                            value="{{ form.fields.advisor_access_type.choices.1.0 }}"
                            {% if form.advisor_access_type.value == 'Regional' %}checked{% endif %}>
-                    <label class="fr-label" for="selectDepartments-yes">{{ form.fields.advisor_access_type.choices.1.1 }}</label>
+                    <label class="fr-label-rework fr-pt-05v" for="selectDepartments-yes">{{ form.fields.advisor_access_type.choices.1.1 }}</label>
                 </div>
                 <div class="fr-input-group fr-ml-4w"
                      x-data="RegionDepartmentPreparer({ selectedDepartments: [] })">

@@ -1,4 +1,5 @@
 {% extends "account/layout/layout.html" %}
+{% load crispy_forms_tags %}
 {% block layout_content %}
     {% block signup_form %}
         <form class="signup fr-form-group"
@@ -42,16 +43,18 @@
                         {{ form.phone_no.errors }}
                         {{ form.phone_no }}
                     </p>
-                    <p>
-                        {{ form.password1.label }}
-                        {{ form.password1.errors }}
-                        {{ form.password1 }}
-                    </p>
-                    <p>
-                        {{ form.password2.label }}
-                        {{ form.password2.errors }}
-                        {{ form.password2 }}
-                    </p>
+                    <p>{{ form.password1|as_crispy_field }}</p>
+                    <p>{{ form.password2|as_crispy_field }}</p>
+                    {% for error in form.password1.errors %}
+                        <div class="fr-alert fr-alert--error">
+                            <p>{{ error }}</p>
+                        </div>
+                    {% endfor %}
+                    {% for error in form.password2.errors %}
+                        <div class="fr-alert fr-alert--error">
+                            <p>{{ error }}</p>
+                        </div>
+                    {% endfor %}
                     <p>
                         {{ form.captcha }}
                         {% for error in form.captcha.errors %}<div class="text-danger text-start fr-mb-2v">{{ error }}</div>{% endfor %}
