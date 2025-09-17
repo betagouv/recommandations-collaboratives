@@ -22,7 +22,11 @@ class ActivityViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     queryset = Message.objects
     serializer_class = ActivitySerializer
 
-    activity_verbs = [verbs.Project.BECAME_OBSERVER, verbs.Project.BECAME_ADVISOR]
+    activity_verbs = [
+        verbs.Recommendation.IN_PROGRESS,
+        verbs.Recommendation.NOT_APPLICABLE,
+        verbs.Recommendation.DONE,
+    ]
 
     def get_queryset(self):
         project_id = int(self.kwargs["project_id"])
