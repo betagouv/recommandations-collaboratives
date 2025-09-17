@@ -81,6 +81,11 @@ router.register(
     basename="projects-conversations-messages",
 )
 router.register(
+    r"projects/(?P<project_id>[^/.]+)/conversations/activities",
+    conversations_rest.ActivityViewSet,
+    basename="projects-conversations-activities",
+)
+router.register(
     r"sites",
     home_rest.SiteViewSet,
     basename="sites",
