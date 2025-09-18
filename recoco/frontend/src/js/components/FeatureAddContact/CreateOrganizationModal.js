@@ -157,19 +157,21 @@ Alpine.data('CreateOrganizationModal', (data = null) => {
           this.formState.fields.isOrgaName) ||
         (!this.formState.fields.isGroupNat && this.formState.fields.isOrgaName)
       ) {
-        api
-          .patch(getOrganizationById(this.organization.id), this.organization)
-          .then((response) => {
-            if (isItReturningData) {
-              this.Modal.responseModal(response.data);
-            } else {
-              this.Modal.closeModal();
-              location.reload();
-            }
-          })
-          .catch((error) => {
-            throw new Error('Error while updating organization ', error);
-          });
+        try {
+          delete this.organization.group.organizations;
+          api
+            .patch(getOrganizationById(this.organization.id), this.organization)
+            .then((response) => {
+              if (isItReturningData) {
+                this.Modal.responseModal(response.data);
+              } else {
+                this.Modal.closeModal();
+                location.reload();
+              }
+            });
+        } catch (error) {
+          throw new Error('Error while updating organization ', error);
+        }
       }
     },
     handleDepartmentsSelection(departments) {

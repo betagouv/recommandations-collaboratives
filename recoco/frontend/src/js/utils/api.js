@@ -118,9 +118,14 @@ export function departmentsUrl() {
   return `/api/departments/`;
 }
 // Contacts
-export function searchContactsUrl(search, orgaFirstLetter, departments) {
+export function searchContactsUrl(
+  search,
+  orgaFirstLetter,
+  departments,
+  limit = 500
+) {
   let url;
-  const params = new URLSearchParams({ search });
+  const params = new URLSearchParams({ search, limit });
   if (orgaFirstLetter) {
     params.append('orga-startswith', orgaFirstLetter);
   }
@@ -132,7 +137,7 @@ export function searchContactsUrl(search, orgaFirstLetter, departments) {
   return url;
 }
 
-export function contactsUrl(limit) {
+export function contactsUrl(limit = 500) {
   if (limit) {
     const params = new URLSearchParams({
       limit: limit,

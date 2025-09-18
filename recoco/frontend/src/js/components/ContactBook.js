@@ -15,11 +15,13 @@ Alpine.data('ContactBook', (departments, regions) => {
       letter: null,
       searchDepartment: [],
     },
+    isSelectAllDepartments: true,
     letters: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split(''),
     contactListGroupByNationalGroup: {},
     departments: JSON.parse(departments.textContent),
     regions: JSON.parse(regions.textContent),
     contactSearched: [],
+    isContactDataLoaded: false,
     async init() {
       try {
         const response = await api.get(contactsUrl());
@@ -30,6 +32,7 @@ Alpine.data('ContactBook', (departments, regions) => {
         if (sessionStorage.getItem('letter')) {
           this.loadOrganizationStartingWith(sessionStorage.getItem('letter'));
         }
+        this.isContactDataLoaded = true;
       } catch (error) {
         // TODO add a toast
         console.error(error);
@@ -61,13 +64,19 @@ Alpine.data('ContactBook', (departments, regions) => {
       this.getContactData();
     },
     async getContactData() {
-      const response = await api.get(
-        searchContactsUrl(this.searchParams.search, this.searchParams.letter, this.searchParams.searchDepartment)
-      );
-      if( this.searchParams.search && this.searchParams.search !== '') {
-        this.contactSearched = response.data.results;
+      if (this.isSelectAllDepartments) {
+        this.searchParams.searchDepartment = [];
       }
-      else {
+      const response = await api.get(
+        searchContactsUrl(
+          this.searchParams.search,
+          this.searchParams.letter,
+          this.searchParams.searchDepartment
+        )
+      );
+      if (this.searchParams.search && this.searchParams.search !== '') {
+        this.contactSearched = response.data.results;
+      } else {
         this.contactListGroupByNationalGroup = this.groupContactByNationalGroup(
           response.data.results
         );
@@ -77,7 +86,7 @@ Alpine.data('ContactBook', (departments, regions) => {
 
     groupContactByOrganization(contactList) {
       contactList.sort((a, b) =>
-        a.organization.name.localeCompare(b.organization.name, 'en', {
+        a.organization.name.localeCompare(b.organization.name, 'fr', {
           sensitivity: 'base',
         })
       );
@@ -111,17 +120,22 @@ Alpine.data('ContactBook', (departments, regions) => {
           ),
         });
       }
-      contactByNationalGroupArray.sort((a, b) =>
-        a.name.localeCompare(b.name, 'fr', { sensitivity: 'base' })
-      );
+      contactByNationalGroupArray.sort((a, b) => {
+        if (a.name === 'Autres') {
+          return 1;
+        }
+        if (b.name === 'Autres') {
+          return -1;
+        }
+        return a.name.localeCompare(b.name, 'fr', { sensitivity: 'base' });
+      });
       return contactByNationalGroupArray;
     },
 
     resetLetterFilter(withReloadContact = true) {
       this.searchParams.letter = null;
       sessionStorage.removeItem('letter');
-      if (withReloadContact)
-      {
+      if (withReloadContact) {
         this.getContactData();
       }
     },
@@ -167,7 +181,7 @@ Alpine.data('ContactBook', (departments, regions) => {
       return;
     },
     saveSelectedDepartment(event) {
-      if (!event.detail) return;
+      if (!event.detail || !this.isContactDataLoaded) return;
       this.searchParams.searchDepartment = [...event.detail];
       this.getContactData();
     },
