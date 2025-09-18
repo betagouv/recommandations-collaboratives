@@ -158,11 +158,12 @@ Alpine.data('CreateOrganizationModal', (data = null) => {
         (!this.formState.fields.isGroupNat && this.formState.fields.isOrgaName)
       ) {
         try {
-          delete this.organization.group;
+          delete this.organization.group.organizations;
           const payload = {
             ...this.organization,
-            group_id: this.organization.group.id,
+            group: this.organization.group.id, // TODO : replace group by group_id this when the backend is updated
           };
+          delete this.organization.group;
           api
             .patch(getOrganizationById(this.organization.id), payload)
             .then((response) => {
