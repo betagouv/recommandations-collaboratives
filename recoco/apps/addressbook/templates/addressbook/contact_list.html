@@ -58,7 +58,7 @@
                            placeholder="Rechercher">
                 </div>
                 <div class="header__region-filter">
-                    {% include "projects/project/fragments/departments_selector.html" with label="Projets de mon territoire" filter_by_regions=True zone_objects="regions" select_all=True %}
+                    {% include "projects/project/fragments/departments_selector.html" with label="Sélection par département" filter_by_regions=True zone_objects="regions" select_all=True %}
                 </div>
                 <button class="actions__add-contact no-wrap fr-btn fr-btn--icon-left fr-icon-add-line"
                         @click="openModalCreateContact()"
