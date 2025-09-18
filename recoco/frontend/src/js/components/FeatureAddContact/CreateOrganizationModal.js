@@ -123,7 +123,11 @@ Alpine.data('CreateOrganizationModal', (data = null) => {
         (!this.formState.fields.isGroupNat && this.formState.fields.isOrgaName)
       ) {
         api
-          .post(organizationsUrl(), this.organization)
+          .post(organizationsUrl(), {
+            ...this.organization,
+            group_id: this.organization.group,
+            // group_id: this.organization.group, // TODO : use this line when organization.group is an object not an id
+          })
           .then((response) => {
             if (isItReturningData) {
               this.Modal.responseModal(response.data);
@@ -158,10 +162,9 @@ Alpine.data('CreateOrganizationModal', (data = null) => {
         (!this.formState.fields.isGroupNat && this.formState.fields.isOrgaName)
       ) {
         try {
-          delete this.organization.group.organizations;
           const payload = {
             ...this.organization,
-            group: this.organization.group.id, // TODO : replace group by group_id this when the backend is updated
+            group_id: this.organization?.group?.id || null, // TODO : replace group by group_id this when the backend is updated
           };
           delete this.organization.group;
           api
