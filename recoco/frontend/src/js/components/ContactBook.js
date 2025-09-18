@@ -17,7 +17,7 @@ Alpine.data('ContactBook', (departments, regions) => {
     },
     isSelectAllDepartments: true,
     letters: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split(''),
-    contactListGroupByNationalGroup: {},
+    contactListGroupByNationalGroup: [],
     departments: JSON.parse(departments.textContent),
     regions: JSON.parse(regions.textContent),
     contactSearched: [],
@@ -175,10 +175,18 @@ Alpine.data('ContactBook', (departments, regions) => {
         return;
       }
       if (event.target.id == 'create-contact-modal') {
+        window.location.reload();
+        // TODO: insert new contact in the contact list
+        // this.insertNewContact(event.detail);
         this.isCreateContactModalOpen = false;
+
         return;
       }
       return;
+    },
+    insertNewContact(event) {
+      this.contactListGroupByNationalGroup.push(newContact);
+      // this.getDepartmentsOrganization(this.contactListGroupByNationalGroup);
     },
     saveSelectedDepartment(event) {
       if (!event.detail || !this.isContactDataLoaded) return;
