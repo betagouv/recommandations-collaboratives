@@ -46,6 +46,12 @@ class OrganizationViewSet(ModelViewSet):
                 return serializers.OrganizationListSerializer
             case "retrieve":
                 return serializers.OrganizationDetailSerializer
+            case "partial_update":
+                return serializers.OrganizationWritableSerializer
+            case "update":
+                return serializers.OrganizationWritableSerializer
+            case "create":
+                return serializers.OrganizationWritableSerializer
             case _:
                 return serializers.OrganizationSerializer
 
