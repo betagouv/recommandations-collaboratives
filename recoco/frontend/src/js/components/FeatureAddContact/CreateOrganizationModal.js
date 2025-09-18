@@ -158,9 +158,13 @@ Alpine.data('CreateOrganizationModal', (data = null) => {
         (!this.formState.fields.isGroupNat && this.formState.fields.isOrgaName)
       ) {
         try {
-          delete this.organization.group.organizations;
+          delete this.organization.group;
+          const payload = {
+            ...this.organization,
+            group_id: this.organization.group.id,
+          };
           api
-            .patch(getOrganizationById(this.organization.id), this.organization)
+            .patch(getOrganizationById(this.organization.id), payload)
             .then((response) => {
               if (isItReturningData) {
                 this.Modal.responseModal(response.data);
