@@ -121,7 +121,7 @@ export function departmentsUrl() {
 export function searchContactsUrl(
   search,
   orgaFirstLetter,
-  departments,
+  departments = [],
   limit = 500
 ) {
   let url;
