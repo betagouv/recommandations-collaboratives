@@ -129,12 +129,22 @@
                 </template>
             </template>
             <template x-if="contactListGroupByNationalGroup.length === 0">
-                <div class="no-contacts fr-m-2w">
-                    <p class="no-contacts__text">Aucun contact trouvé.</p>
-                    <br>
-                    <p class="no-contacts__text fr-m-0">Vous pouvez créer un contact en cliquant sur le bouton ci-dessus.</p>
-                </div>
+                <template x-if="isContactDataLoaded">
+                    <div class="no-contacts fr-m-2w">
+                        <p class="no-contacts__text">Aucun contact trouvé.</p>
+                        <br>
+                        <p class="no-contacts__text fr-m-0">Vous pouvez créer un contact en cliquant sur le bouton ci-dessus.</p>
+                    </div>
+                </template>
             </template>
+            <div x-show="!isContactDataLoaded"
+                 x-transition
+                 class="position-absolute text-center w-100"
+                 data-cy="loader">
+                <div class="spinner-border" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
         </div>
         {% include "tools/contacts/create_contact_modal.html" with is_it_returning_data=True %}
         {% include "tools/contacts/create_organization_modal.html" with is_it_returning_data=False %}
