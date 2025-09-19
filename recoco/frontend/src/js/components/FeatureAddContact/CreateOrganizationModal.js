@@ -166,7 +166,7 @@ Alpine.data('CreateOrganizationModal', (data = null) => {
             ...this.organization,
             group_id: this.organization?.group?.id || this.organization?.group || null,
           };
-          delete this.organization.group;
+          delete payload.group;
           api
             .patch(getOrganizationById(this.organization.id), payload)
             .then((response) => {
