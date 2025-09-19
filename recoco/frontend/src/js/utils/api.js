@@ -118,15 +118,26 @@ export function departmentsUrl() {
   return `/api/departments/`;
 }
 // Contacts
-export function searchContactsUrl(search, orgaFirstLetter) {
-  const params = new URLSearchParams({ search });
+export function searchContactsUrl(
+  search,
+  orgaFirstLetter,
+  departments = [],
+  limit = 500
+) {
+  let url;
+  const params = new URLSearchParams({ search, limit });
   if (orgaFirstLetter) {
     params.append('orga-startswith', orgaFirstLetter);
   }
-  return `/api/addressbook/contacts/?${params}`;
+  url = `/api/addressbook/contacts/?${params}`;
+  if (departments.length) {
+    departments = departments.map((code) => `departments=${code}`).join('&');
+    url = url + '&' + departments;
+  }
+  return url;
 }
 
-export function contactsUrl(limit) {
+export function contactsUrl(limit = 500) {
   if (limit) {
     const params = new URLSearchParams({
       limit: limit,

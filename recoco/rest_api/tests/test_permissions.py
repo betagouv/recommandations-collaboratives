@@ -8,7 +8,7 @@ from model_bakery import baker
 
 from ..permissions import (
     IsStaffForSite,
-    IsStaffForSiteOrISAuthenticatedReadOnly,
+    IsStaffForSiteOrIsAuthenticatedReadOnly,
     IsStaffForSiteOrReadOnly,
 )
 
@@ -114,5 +114,5 @@ def test_is_staff_for_site_or_is_authenticated_read_only(
         mock_is_authenticated.return_value = user_is_authenticated
         mock_is_staff_for_site.return_value = is_staff_return_value
 
-        permission = IsStaffForSiteOrISAuthenticatedReadOnly()
+        permission = IsStaffForSiteOrIsAuthenticatedReadOnly()
         assert permission.has_permission(std_request, None) is expected_result

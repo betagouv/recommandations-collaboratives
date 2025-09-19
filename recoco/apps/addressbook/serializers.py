@@ -7,6 +7,7 @@ authors: guillaume.libersat@beta.gouv.fr, raphael.marvie@beta.gouv.fr
 created: 2022-05-16 17:44:55 CET
 """
 
+from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from rest_framework.serializers import (
     FloatField,
@@ -18,6 +19,7 @@ from rest_framework.serializers import (
 from recoco.apps.geomatics.serializers import DepartmentSerializer
 from recoco.rest_api.serializers import BaseSerializerMixin
 
+from ..geomatics.models import Department
 from .models import Contact, Organization, OrganizationGroup
 
 # OrganizationGroup serializers
@@ -80,6 +82,24 @@ class OrganizationDetailSerializer(OrganizationListSerializer):
             "id",
             "name",
             "group",
+            "departments",
+        ]
+
+
+class OrganizationWritableSerializer(OrganizationListSerializer):
+    group_id = serializers.PrimaryKeyRelatedField(
+        source="group", queryset=OrganizationGroup.objects.all(), allow_null=True
+    )
+    departments = serializers.PrimaryKeyRelatedField(
+        queryset=Department.objects.all(), many=True
+    )
+
+    class Meta:
+        model = Organization
+        fields = [
+            "id",
+            "name",
+            "group_id",
             "departments",
         ]
 

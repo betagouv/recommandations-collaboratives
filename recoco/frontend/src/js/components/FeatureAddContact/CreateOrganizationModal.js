@@ -123,7 +123,11 @@ Alpine.data('CreateOrganizationModal', (data = null) => {
         (!this.formState.fields.isGroupNat && this.formState.fields.isOrgaName)
       ) {
         api
-          .post(organizationsUrl(), this.organization)
+          .post(organizationsUrl(), {
+            ...this.organization,
+            group_id: this.organization?.group?.id || this.organization?.group || null,
+            // group_id: this.organization.group.id, // TODO : use this line when organization.group is an object not an id
+          })
           .then((response) => {
             if (isItReturningData) {
               this.Modal.responseModal(response.data);
@@ -157,19 +161,25 @@ Alpine.data('CreateOrganizationModal', (data = null) => {
           this.formState.fields.isOrgaName) ||
         (!this.formState.fields.isGroupNat && this.formState.fields.isOrgaName)
       ) {
-        api
-          .patch(getOrganizationById(this.organization.id), this.organization)
-          .then((response) => {
-            if (isItReturningData) {
-              this.Modal.responseModal(response.data);
-            } else {
-              this.Modal.closeModal();
-              location.reload();
-            }
-          })
-          .catch((error) => {
-            throw new Error('Error while updating organization ', error);
-          });
+        try {
+          const payload = {
+            ...this.organization,
+            group_id: this.organization?.group?.id || this.organization?.group || null,
+          };
+          delete payload.group;
+          api
+            .patch(getOrganizationById(this.organization.id), payload)
+            .then((response) => {
+              if (isItReturningData) {
+                this.Modal.responseModal(response.data);
+              } else {
+                this.Modal.closeModal();
+                location.reload();
+              }
+            });
+        } catch (error) {
+          throw new Error('Error while updating organization ', error);
+        }
       }
     },
     handleDepartmentsSelection(departments) {
