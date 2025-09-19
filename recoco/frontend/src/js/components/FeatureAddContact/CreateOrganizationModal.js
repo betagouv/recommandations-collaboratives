@@ -125,7 +125,7 @@ Alpine.data('CreateOrganizationModal', (data = null) => {
         api
           .post(organizationsUrl(), {
             ...this.organization,
-            group_id: this.organization.group,
+            group_id: this.organization?.group?.id || this.organization?.group || null,
             // group_id: this.organization.group.id, // TODO : use this line when organization.group is an object not an id
           })
           .then((response) => {
@@ -164,7 +164,7 @@ Alpine.data('CreateOrganizationModal', (data = null) => {
         try {
           const payload = {
             ...this.organization,
-            group_id: this.organization?.group?.id || null,
+            group_id: this.organization?.group?.id || this.organization?.group || null,
           };
           delete this.organization.group;
           api
