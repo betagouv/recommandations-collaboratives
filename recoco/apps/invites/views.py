@@ -17,16 +17,33 @@ from recoco.apps.projects.utils import (
 from . import forms, models
 
 
-def invite_accept(request, invite_id):
+class InviteExpired(Exception):
+    def __init__(self, invite):
+        self.project_id = invite.project_id
+        super(Exception, self).__init__()
+
+    def redirect(self):
+        return redirect("projects-project-detail", self.project_id)
+
+
+def get_fresh_invite_or_throw(request, invite_id):
     invite = get_object_or_404(
         models.Invite,
         pk=invite_id,
         site=request.site,
-        accepted_on=None,
-        refused_on=None,
     )
-    project = invite.project
+    if invite.accepted_on is not None or invite.refused_on is not None:
+        raise InviteExpired(invite)
+    return invite
 
+
+def invite_accept(request, invite_id):
+    try:
+        invite = get_fresh_invite_or_throw(request, invite_id)
+    except InviteExpired as e:
+        return e.redirect()
+
+    project = invite.project
     current_site = request.site
 
     # Check if this email already exists as an account
@@ -102,13 +119,10 @@ def invite_accept(request, invite_id):
 
 
 def invite_refuse(request, invite_id):
-    invite = get_object_or_404(
-        models.Invite,
-        pk=invite_id,
-        site=request.site,
-        accepted_on=None,
-        refused_on=None,
-    )
+    try:
+        invite = get_fresh_invite_or_throw(request, invite_id)
+    except InviteExpired as e:
+        return e.redirect()
 
     if request.method == "POST":
         # Check if this email already exists as an account
@@ -130,13 +144,10 @@ def invite_refuse(request, invite_id):
 
 
 def invite_details(request, invite_id):
-    invite = get_object_or_404(
-        models.Invite,
-        site=request.site,
-        pk=invite_id,
-        refused_on=None,
-        accepted_on=None,
-    )
+    try:
+        invite = get_fresh_invite_or_throw(request, invite_id)
+    except InviteExpired as e:
+        return e.redirect()
 
     site_config = SiteConfiguration.objects.get(site=request.site)
 
