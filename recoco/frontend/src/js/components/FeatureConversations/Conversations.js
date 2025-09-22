@@ -14,6 +14,7 @@ Alpine.data('Conversations', (projectId) => ({
   users: [],
   messagesParticipants: [],
   documents: [],
+  contacts: [],
   init() {
     this.getMessages();
     this.getMessagesParticipants();
@@ -97,7 +98,12 @@ Alpine.data('Conversations', (projectId) => ({
     return foundDocument;
   },
   async getContactById(id) {
-    const contact = await api.get(contactUrl(id));
-    return contact.data;
+    const foundContact = this.contacts.find((contact) => contact.id === +id);
+    if (!foundContact) {
+      const contact = await api.get(contactUrl(id));
+      this.contacts.push(contact.data);
+      return contact.data;
+    }
+    return foundContact;
   },
 }));
