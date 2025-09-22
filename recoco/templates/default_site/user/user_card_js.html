@@ -37,7 +37,7 @@
                         </strong>
                     </template>
                 </span>
-                <template x-if="currentUser.profile.organization.name">
+                <template x-if="currentUser?.profile?.organization?.name">
                     <span class="user-card__org-name fw-normal font-italic font-very-small"
                           x-text="currentUser.profile.organization.name"></span>
                 </template>
@@ -68,7 +68,7 @@
              data-test-id="tooltip-user-card"
              class="user-card-popup flex-column"
              :class="user.is_active && 'neutral-role-border'">
-            <template x-if="currentUser.profile.organization_position">
+            <template x-if="currentUser?.profile?.organization_position">
                 <div class="d-flex align-items-center justify-content-between text-blue font-very-small specific-my">
                     <div class="d-flex align-items-center">
                         <svg class="bi align-middle fr-mr-2v specific-ml-012"

@@ -131,10 +131,10 @@
         {% endif %}
         {% if user and not user.is_active %}
             <span data-test-id="deactivated-user-details"
-                  class="fr-p-1v fr-px-2v font-very-small bg-grey-light w-100 d-flex fr-mt-1v text-nowrap specific-borderradius-2px">Compte desactivé depuis {{ user.last_login.date|date:"F" }}  {{ user.last_login.date|date:"Y" }}</span>
+                  class="fr-p-1v fr-px-2v font-very-small bg-grey-light w-100 d-flex fr-mt-1v text-nowrap specific-borderradius-2px">Compte désactivé depuis {{ user.last_login.date|date:"F" }}  {{ user.last_login.date|date:"Y" }}</span>
         {% elif not user %}
             <span data-test-id="deleted-user-details"
-                  class="fr-p-1v fr-px-2v font-very-small bg-grey-light w-100 d-flex fr-mt-1v text-nowrap specific-borderradius-2px">Compte desactivé</span>
+                  class="fr-p-1v fr-px-2v font-very-small bg-grey-light w-100 d-flex fr-mt-1v text-nowrap specific-borderradius-2px">Compte désactivé</span>
         {% endif %}
     </div>
 </div>

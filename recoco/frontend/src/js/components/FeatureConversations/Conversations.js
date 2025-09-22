@@ -3,6 +3,7 @@ import api, {
   userUrl,
   conversationsMessagesUrl,
   contactUrl,
+  conversationsParticipantsUrl,
 } from '../../utils/api';
 
 Alpine.data('Conversations', (projectId) => ({
@@ -11,9 +12,11 @@ Alpine.data('Conversations', (projectId) => ({
   messages: [],
   tasks: [],
   users: [],
+  messagesParticipants: [],
   documents: [],
   init() {
     this.getMessages();
+    this.getMessagesParticipants();
     this.$store.tasksData._subscribe(() => {
       this.tasks = this.$store.tasksData.tasks;
     });
@@ -35,6 +38,16 @@ Alpine.data('Conversations', (projectId) => ({
       throw new Error('Failed to get messages');
     }
   },
+  async getMessagesParticipants() {
+    try {
+      const messagesParticipants = await api.get(
+        conversationsParticipantsUrl(this.projectId)
+      );
+      this.messagesParticipants = messagesParticipants.data;
+    } catch (error) {
+      throw new Error('Failed to get messages participants');
+    }
+  },
   getShortMessageInReplyTo(id) {
     const shortMessage = this.getMessageById(id);
     if (!shortMessage) {
@@ -45,10 +58,10 @@ Alpine.data('Conversations', (projectId) => ({
     );
     return `${markdownNode.text.slice(0, 40)}${markdownNode.text.length > 40 ? '...' : ''}`;
   },
-  async getUserById(id) {
-    const foundUser = this.users.find((user) => user.id === +id);
+  getUserById(id) {
+    const foundUser = this.messagesParticipants.find((user) => user.id === +id);
     if (!foundUser) {
-      // const user = await api.get(userUrl(id));
+      debugger;
       /** MOCK DATA */
       const user = {};
       user.data = {
@@ -69,7 +82,6 @@ Alpine.data('Conversations', (projectId) => ({
           },
         },
       };
-      this.users.push(user.data);
       return user.data;
     }
     return foundUser;

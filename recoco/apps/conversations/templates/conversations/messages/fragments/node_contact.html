@@ -1,4 +1,4 @@
-<div x-data="{contact: {}}"
+<div x-data="{contact: {}, isOpenDeleteContact: false}"
      x-init="contact = await getContactById(node.contact_id )">
     <p>
         🚧 Contact 🚧 <span x-text="node.contact_id"></span>

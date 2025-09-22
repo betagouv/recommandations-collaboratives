@@ -28,16 +28,16 @@
             </div>
         </template>
         <!-- Reply button -->
-        {% if not message.in_reply_to %}
+        <template x-if="message.in_reply_to">
             <div class="d-flex justify-content-end">
                 <button class="fr-btn fr-btn--sm fr-btn--tertiary-no-outline"
                         @click="handleReply(node)">Répondre</button>
             </div>
-        {% endif %}
-        {% if message.posted_by %}
+        </template>
+        <template x-if="message.posted_by && messagesParticipants.length > 0">
             <div class="d-flex align-items-center"
                  x-data="{user: null}"
-                 x-init="user = await getUserById(message.posted_by);">{% include "user/user_card_js.html" %}</div>
-        {% endif %}
+                 x-init="user = getUserById(message.posted_by);">{% include "user/user_card_js.html" %}</div>
+        </template>
     </div>
 </div>

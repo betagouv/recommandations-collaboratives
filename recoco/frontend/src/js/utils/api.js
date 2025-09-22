@@ -249,10 +249,15 @@ export function userUrl(userId) {
   return `/api/users/${userId}/`;
 }
 
+// Conversations
 export function conversationsMessagesUrl(projectId) {
   return `/api/projects/${projectId}/conversations/messages/`;
 }
 
 export function conversationsActivitiesUrl(projectId) {
   return `/api/projects/${projectId}/conversations/activities/`;
+}
+
+export function conversationsParticipantsUrl(projectId) {
+  return `/api/projects/${projectId}/conversations/participants/`;
 }
