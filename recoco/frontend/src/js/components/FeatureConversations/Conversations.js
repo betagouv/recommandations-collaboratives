@@ -1,9 +1,9 @@
 import Alpine from '../../utils/globals';
 import api, {
-  userUrl,
   conversationsMessagesUrl,
   contactUrl,
   conversationsParticipantsUrl,
+  documentUrl,
 } from '../../utils/api';
 
 Alpine.data('Conversations', (projectId) => ({
@@ -86,23 +86,11 @@ Alpine.data('Conversations', (projectId) => ({
     return foundUser;
   },
   async getDocumentById(id) {
-    // TODO: get document from API projects/${projectId}/documents/${id}/
     const foundDocument = this.documents.find(
       (document) => document.id === +id
     );
     if (!foundDocument) {
-      // const user = await api.get(userUrl(id));
-      /** MOCK DATA */
-      const document = {};
-      document.data = {
-        id: +id,
-        filename: 'Document.pdf',
-        description: 'Description du document',
-        title: 'Titre du document',
-        size: '100KB',
-        the_link: '/media/projects/198/wushu.png',
-        uploaded_by: 1,
-      };
+      const document = await api.get(documentUrl(this.projectId, id));
       this.documents.push(document.data);
       return document.data;
     }

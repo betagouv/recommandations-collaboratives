@@ -261,3 +261,8 @@ export function conversationsActivitiesUrl(projectId) {
 export function conversationsParticipantsUrl(projectId) {
   return `/api/projects/${projectId}/conversations/participants/`;
 }
+
+// Documents
+export function documentUrl(projectId, documentId) {
+  return `/api/projects/${projectId}/documents/${documentId}/`;
+}
