@@ -1,2 +1,7 @@
-<p>🚧 Contact 🚧</p>
-{% include "tools/contacts/contact_card.html" with contact=node.data.contact is_django_data=True %}
+<div x-data="{contact: {}}"
+     x-init="contact = await getContactById(node.contact_id )">
+    <p>
+        🚧 Contact 🚧 <span x-text="node.contact_id"></span>
+    </p>
+    {% include "tools/contacts/contact_card.html" with contact=contact is_django_data=False %}
+</div>

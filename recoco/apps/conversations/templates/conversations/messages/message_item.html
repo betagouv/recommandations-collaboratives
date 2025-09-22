@@ -17,6 +17,7 @@
                     {% include "conversations/messages/fragments/node_markdown.html" %}
                 </template>
                 <template x-if="node.type == 'ContactNode'">
+                    {% include "conversations/messages/fragments/node_contact.html" %}
                 </template>
                 <template x-if="node.type == 'DocumentNode'">
                     {% include "conversations/messages/fragments/node_document.html" %}

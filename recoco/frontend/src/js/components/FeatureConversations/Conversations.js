@@ -1,5 +1,9 @@
 import Alpine from '../../utils/globals';
-import api, { userUrl, conversationsMessagesUrl } from '../../utils/api';
+import api, {
+  userUrl,
+  conversationsMessagesUrl,
+  contactUrl,
+} from '../../utils/api';
 
 Alpine.data('Conversations', (projectId) => ({
   projectId,
@@ -39,7 +43,7 @@ Alpine.data('Conversations', (projectId) => ({
     const markdownNode = shortMessage.nodes.find(
       (node) => node.type === 'MarkdownNode'
     );
-    return markdownNode.text.slice(0, 40);
+    return `${markdownNode.text.slice(0, 40)}${markdownNode.text.length > 40 ? '...' : ''}`;
   },
   async getUserById(id) {
     const foundUser = this.users.find((user) => user.id === +id);
@@ -92,5 +96,9 @@ Alpine.data('Conversations', (projectId) => ({
       return document.data;
     }
     return foundDocument;
+  },
+  async getContactById(id) {
+    const contact = await api.get(contactUrl(id));
+    return contact.data;
   },
 }));
