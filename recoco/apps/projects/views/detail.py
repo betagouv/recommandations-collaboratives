@@ -10,6 +10,7 @@ created : 2022-03-07 15:56:20 CEST -- HB David!
 from datetime import timedelta
 from typing import Any
 
+from actstream import action
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
@@ -595,6 +596,7 @@ def project_create_or_update_topics(request, project_id=None):
 
     if request.method == "POST":
         topic_formset = TopicFormset(request.POST)
+
         form = ProjectTopicsForm(request.POST, instance=project)
         if form.is_valid() and topic_formset.is_valid():
             project = form.save(commit=False)
@@ -620,6 +622,17 @@ def project_create_or_update_topics(request, project_id=None):
                     defaults={"name": name.capitalize(), "site": request.site},
                 )
                 project.topics.add(topic)
+
+            # TODO: traces
+            # [Prénom Nom (orga)] a modifié la note interne du dossier [Nom du dossier - Commune]
+            # - fil d'activités général du CRM
+            # - fil d'activité du dossier
+            # - fil d'activité de l'utilisateur
+            action.send(
+                sender=request.user,
+                verb=verbs.Project.ADVISOR_NOTE_MODIFIED,
+                action_object=project,
+            )
 
             return redirect(
                 reverse("projects-project-detail-overview", args=[project.pk])
