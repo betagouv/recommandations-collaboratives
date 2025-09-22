@@ -1,7 +1,13 @@
 describe('I can attach miscellanious ressource to task @page-projet-recommandations-creation', () => {
   it('publishes a task with resource comment / no comment', () => {
     cy.login('conseiller1');
-    cy.visit(`/projects/action/?project_id=25`);
+    cy.visit('/project/1');
+    cy.visit('/project/25');
+
+    cy.visit(`/projects/action/?resource_id=2`);
+    cy.get('[data-cy="reco-pusher-selected-project"]').contains(
+      'commune de test - Projet avec une reco qui a une resource qui a des contacts'
+    );
 
     cy.get('[data-cy="radio-push-reco-single-resource"]').should('be.checked');
 
