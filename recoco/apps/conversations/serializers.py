@@ -130,4 +130,4 @@ class ActivitySerializer(serializers.ModelSerializer):
 
 class ParticipantSerializer(UserSerializer):
     class Meta(UserSerializer.Meta):
-        fields = UserSerializer.Meta.fields + ["last_login"]
+        fields = UserSerializer.Meta.fields + ["last_login", "id"]
