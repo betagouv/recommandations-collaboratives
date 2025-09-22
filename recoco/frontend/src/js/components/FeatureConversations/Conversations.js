@@ -61,7 +61,6 @@ Alpine.data('Conversations', (projectId) => ({
   getUserById(id) {
     const foundUser = this.messagesParticipants.find((user) => user.id === +id);
     if (!foundUser) {
-      debugger;
       /** MOCK DATA */
       const user = {};
       user.data = {
