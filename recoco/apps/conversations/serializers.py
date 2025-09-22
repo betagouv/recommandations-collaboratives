@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from rest_framework import serializers
 from rest_polymorphic.serializers import PolymorphicSerializer
 
+from recoco.apps.home.serializers import UserSerializer
 from recoco.apps.projects.models import Project
 from recoco.apps.tasks.models import Task
 
@@ -127,12 +128,6 @@ class ActivitySerializer(serializers.ModelSerializer):
     action_object = GenericRelatedField(read_only=True)
 
 
-class ParticipantSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = (
-            "id",
-            "email",
-            "first_name",
-            "last_name",
-        )
+class ParticipantSerializer(UserSerializer):
+    class Meta(UserSerializer.Meta):
+        fields = UserSerializer.Meta.fields + ["last_login"]

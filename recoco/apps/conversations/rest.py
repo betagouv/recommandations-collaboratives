@@ -87,6 +87,7 @@ class ParticipantViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
 
         return (
             self.queryset.prefetch_related("project_messages")
+            .select_related("profile")
             .filter(project_messages__project=project)
             .distinct()
         )
