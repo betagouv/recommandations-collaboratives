@@ -5,19 +5,17 @@ Alpine.data('Conversations', (projectId) => ({
   projectId,
   feed: {},
   messages: [],
+  tasks: [],
   users: [],
   documents: [],
   init() {
     this.getMessages();
-  },
-  get tasksLoaded() {
-    return this.$store.tasksData.tasks.length > 0;
-  },
-  get recommendations() {
-    return this.$store.tasksData.tasks;
+    this.$store.tasksData._subscribe(() => {
+      this.tasks = this.$store.tasksData.tasks;
+    });
   },
   getRecommendationById(id) {
-    const foundRecommendation = this.recommendations.find(
+    const foundRecommendation = this.tasks.find(
       (recommendation) => recommendation.id == id
     );
     return foundRecommendation;

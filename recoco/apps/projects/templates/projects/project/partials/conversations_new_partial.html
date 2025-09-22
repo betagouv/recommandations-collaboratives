@@ -4,57 +4,6 @@
     {% if not topic_list %}
         {% regroup feed by topic as topic_list %}
     {% endif %}
-    <!-- Message stream -->
-    {% for topic in topic_list %}
-        {% comment %} {% count_has_notifications topic.list as new_message_count %} {% endcomment %}
-        <div class="conversation-new__container-topic"
-             data-type-element="feed-element-item"
-             data-topic='{{ topic.grouper|default:"general"|slugify }}'>
-            <div class="welcome-message">
-                <span class="fr-icon-chat-2-line fr-icon--sm"
-                      aria-hidden="true"
-                      title="chat-2-line"></span>
-                <p>Ceci est le début de votre conversation dans le canal {{ topic.grouper|default:"Général" }}</p>
-                <span class="fr-icon-chat-2-line fr-icon--sm"
-                      aria-hidden="true"
-                      title="chat-2-line"></span>
-            </div>
-            {% for element in topic.list %}
-                {% if element.notifications %}
-                    <div class="notification-limit d-none"
-                         x-ref="scrollLine_{{ topic.grouper|default:"general"|slugify }}">
-                        <div class="notification-limit__line"></div>
-                        <p class="notification-limit__message-number fr-mx-2w">
-                            {{ new_message_count }} message{{ new_message_count|pluralize }} non lu{{ new_message_count|pluralize }}
-                        </p>
-                        <div class="notification-limit__line"></div>
-                    </div>
-                {% endif %}
-                {% ifchanged element.timestamp|date %}
-                    <p class="conversation-new__date">{{ element.timestamp|date }}</p>
-                {% endifchanged %}
-                {% if element.type == "activity" %}
-                    <!-- Type Activity  -->
-                    {% include "projects/project/fragments/conversations_new/message_type/type_activity_item.html" %}
-                {% elif element.type == "reco" %}
-                    <!-- Type Reco + message -->
-                    {% include "projects/project/fragments/conversations_new/message_type/type_task_message_item.html" %}
-                {% elif element.type == "followup" %}
-                    <!-- Type followup -->
-                    {% include "projects/project/fragments/conversations_new/message_type/type_followup_item.html" %}
-                {% elif element.type == "posting" %}
-                    <!-- Type message -->
-                    {% include "projects/project/fragments/conversations_new/message_type/type_posting_item.html" %}
-                {% endif %}
-            {% endfor %}
-        </div>
-        {% comment %} {% count_message_by_type topic.list "posting" "followup" as message_count %} {% endcomment %}
-        {% if message_count == 0 and topic.grouper == "" %}
-            <div class="feed-element-item fr-px-3v fr-mb-3v">
-                {% include "projects/project/fragments/conversations_new/message_type/empty_message_list.html" %}
-            </div>
-        {% endif %}
-    {% endfor %}
     {% comment %}
     ****************************************
     ************** NEW STREAM **************

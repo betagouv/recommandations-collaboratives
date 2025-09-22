@@ -13,14 +13,10 @@ Parameter Django:
 Parameter Alpine:
     - recommendation : recommendation object
 {% endcomment %}
-<template x-if="tasksLoaded">
+<template x-if="tasks.length > 0">
     <div x-data='{recommendation: getRecommendationById(node.recommendation_id)}'
          class="task-item observed-element rounded-3 fr-my-2v"
          data-notifications="{{ element.notifications }}">
-        <span x-text="JSON.stringify(node)"></span>
-        <h1>
-            Reco <span x-text="recommendation.id"></span>
-        </h1>
         <template x-if="recommendation">
             <div>
                 <p x-html="renderMarkdown(recommendation.content)"></p>
