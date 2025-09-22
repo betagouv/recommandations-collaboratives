@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+
+from django.contrib.auth.models import User
 from rest_framework import mixins, viewsets
 from rest_framework.permissions import SAFE_METHODS, BasePermission, IsAuthenticated
 
@@ -8,7 +10,7 @@ from recoco.apps.projects import models as projects_models
 from recoco.utils import has_perm, has_perm_or_403
 
 from .models import Message
-from .serializers import ActivitySerializer, MessageSerializer
+from .serializers import ActivitySerializer, MessageSerializer, ParticipantSerializer
 
 
 class MessagePermissions(BasePermission):
@@ -32,7 +34,6 @@ class MessagePermissions(BasePermission):
             # Overwrite
             if obj.pk:
                 can_write &= obj.posted_by == request.user
-
             return can_write
 
         return False
@@ -54,7 +55,6 @@ class ActivityViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
      - list/read, one/read for anyone having "projects.view_public_notes"
     """
 
-    queryset = Message.objects
     serializer_class = ActivitySerializer
 
     activity_verbs = [
@@ -69,3 +69,24 @@ class ActivityViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
         has_perm_or_403(self.request.user, "projects.view_public_notes", project)
 
         return project.target_actions.filter(verb__in=self.activity_verbs, public=True)
+
+
+class ParticipantViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
+    """
+    Permissions:
+     - list/read, one/read for anyone having "projects.view_public_notes"
+    """
+
+    queryset = User.objects
+    serializer_class = ParticipantSerializer
+
+    def get_queryset(self):
+        project_id = int(self.kwargs["project_id"])
+        project = projects_models.Project.objects.get(id=project_id)
+        has_perm_or_403(self.request.user, "projects.view_public_notes", project)
+
+        return (
+            self.queryset.prefetch_related("project_messages")
+            .filter(project_messages__project=project)
+            .distinct()
+        )

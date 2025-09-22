@@ -125,3 +125,14 @@ class ActivitySerializer(serializers.ModelSerializer):
 
     actor = GenericRelatedField(read_only=True)
     action_object = GenericRelatedField(read_only=True)
+
+
+class ParticipantSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = (
+            "id",
+            "email",
+            "first_name",
+            "last_name",
+        )
