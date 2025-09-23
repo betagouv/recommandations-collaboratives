@@ -13,7 +13,7 @@ from .models import Message
 from .serializers import ActivitySerializer, MessageSerializer, ParticipantSerializer
 
 
-class MessagePermissions(BasePermission):
+class MessagePermission(BasePermission):
     """
     Should allow:
     - list/read, one/read for anyone having "projects.view_public_notes"
@@ -21,28 +21,22 @@ class MessagePermissions(BasePermission):
     - one/update for anyone having "projects.use_public_notes" and owning the object (posted_by)
     """
 
-    def has_object_permission(self, request, view, obj):
+    def has_object_permission(self, request, view, obj: Message):
         if request.method in SAFE_METHODS:
-            return has_perm(
-                self.request.user, "projects.view_public_notes", obj.project
-            )
+            return has_perm(request.user, "projects.view_public_notes", obj.project)
         else:
-            can_write = has_perm(
-                self.request.user, "projects.use_public_notes", obj.project
-            )
+            can_write = has_perm(request.user, "projects.use_public_notes", obj.project)
 
             # Overwrite
             if obj.pk:
                 can_write &= obj.posted_by == request.user
             return can_write
 
-        return False
-
 
 class MessageViewSet(viewsets.ModelViewSet):
     queryset = Message.objects
     serializer_class = MessageSerializer
-    permission_classes = [IsAuthenticated, MessagePermissions]
+    permission_classes = [IsAuthenticated, MessagePermission]
 
     def get_queryset(self):
         project_id = int(self.kwargs["project_id"])
