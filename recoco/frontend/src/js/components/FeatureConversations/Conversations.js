@@ -6,15 +6,19 @@ import api, {
   documentUrl,
 } from '../../utils/api';
 
-Alpine.data('Conversations', (projectId) => ({
+Alpine.data('Conversations', (projectId, currentUserId) => ({
   projectId,
+  currentUserId,
   feed: {},
   messages: [],
+  messagesLoaded: false,
+  showMessages: false,
   tasks: [],
   users: [],
   messagesParticipants: [],
   documents: [],
   contacts: [],
+  message: { the_file: '', text: '', contact: '' },
   init() {
     this.getMessages();
     this.getMessagesParticipants();
@@ -35,6 +39,10 @@ Alpine.data('Conversations', (projectId) => ({
     try {
       const messages = await api.get(conversationsMessagesUrl(this.projectId));
       this.feed.messages = messages.data;
+      this.messagesLoaded = true;
+      setTimeout(() => {
+        this.showMessages = true;
+      }, 500);
     } catch (error) {
       throw new Error('Failed to get messages');
     }
@@ -105,5 +113,30 @@ Alpine.data('Conversations', (projectId) => ({
       return contact.data;
     }
     return foundContact;
+  },
+
+  async sendMessage(rawMessage) {
+    console.log(rawMessage);
+    try {
+      const messageResponse = await api.post(
+        conversationsMessagesUrl(this.projectId),
+        this.buildMessageRope(rawMessage)
+      );
+      this.messages.push(messageResponse.data);
+    } catch (error) {
+      throw new Error('Failed to send message');
+    }
+  },
+  buildMessageRope(rawMessage) {
+    const messageRope = {
+      nodes: [],
+      posted_by: this.currentUserId,
+    };
+    messageRope.nodes.push({
+      position: messageRope.nodes.length + 1,
+      type: 'MarkdownNode',
+      text: rawMessage.text,
+    });
+    return messageRope;
   },
 }));

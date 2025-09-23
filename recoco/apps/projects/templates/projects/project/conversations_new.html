@@ -23,11 +23,9 @@
     {{ feed|json_script:"djangoFeed" }}
     {{ user_project_perms|json_script:"userProjectPerms" }}
     {% include "projects/project/navigation.html" with conversations_new=True %}
-    {% comment %} TODO: build topic_list in django view {% endcomment %}
     {% regroup feed by topic as topic_list %}
     <div class="conversation-new d-flex"
-         x-data="Conversations({{ project.id }})"
-         hx-history="false">
+         x-data="Conversations({{ project.id }}, {{ request.user.id }})">
         <div class="conversation-new__topics">
             <div class="justify-content-between">
                 <div class="conversation-new__topics-header">
@@ -66,40 +64,53 @@
                 </div>
             </div>
         </div>
-        <div class="conversation-new__container"
-             {% comment %}
-             x-data="NotificationEater({{ project.id }})"
-             {% endcomment %}
-             {% comment %}
-             @topic-switched.window="scrollToFirstNotification($event.detail)"
-             {% endcomment %}>
-            {% get_obj_perms request.user for project as "user_project_perms" %}
-            {% include "projects/project/partials/conversations_new_partial.html" %}
-            {% if "use_public_notes" in user_project_perms %}
-                <!-- Post message -->
-                <form class="form editor-form fr-px-3v fr-pr-12w"
-                      hx-post="{% url 'projects-project-detail-conversations-new-partial' project.pk %}"
-                      hx-trigger="submit"
-                      hx-swap="outerHTML"
-                      hx-target="#conversation-new-container"
-                      enctype="multipart/form-data"
-                      id="conversation-form">
-                    {% csrf_token %}
-                    <div class="message-form fr-my-3v bg-light border-form editor-form__container fr-input-group"
-                         :class="{'focus': isFocus}"
-                         @click.outside="isFocus = false"
-                         @submit.prevent="console.log('submit')"
-                         x-data="{isFocus: false, message: {the_file: '', text: '', contact: ''}}">
-                        {% include "tools/editor.html" with model="message" input_name=posting_form.content.name initial_content=posting_form.content.value|default:'' errors=posting_form.content.errors input_required=True can_add_reco=True next_url_add_reco="projects-project-detail-conversations-new" can_attach_files=True can_attach_contact=True show_send_button=True form_id="conversation-form" %}
-                        <input type="hidden" name="contact" :value="message?.contact?.id">
+        <template x-if="!messagesLoaded">
+            <div class="position-relative w-100">
+                <div x-transition
+                     class="position-absolute w-100 h-100 d-flex justify-content-center align-items-center"
+                     data-cy="loader">
+                    <div class="spinner-border" role="status">
+                        <span class="visually-hidden">Chargement des messages...</span>
                     </div>
-                    {% for error in posting_form.content.errors %}<div class="text-danger text-end">{{ error }}</div>{% endfor %}
-                    <label class="visually-hidden" for="input-project-content">{{ posting_form.content.label }}</label>
-                    <input type="hidden" name="new" value="1">
-                    {% comment %} <input type="hidden" name="topic_name" :value="valueTopicFormMessageSend"> {% endcomment %}
-                    <div class="d-flex justify-content-end fr-mt-3v"></div>
-                </form>
-            {% endif %}
-        </div>
+                </div>
+            </div>
+        </template>
+        <template x-if="messagesLoaded">
+            <div class="conversation-new__container"
+                 x-show="showMessages"
+                 x-transition.opacity.duration.500ms
+                 x-data="NotificationEater({{ project.id }})"
+                 {% comment %}
+                 @topic-switched.window="scrollToFirstNotification($event.detail)"
+                 {% endcomment %}>
+                {% get_obj_perms request.user for project as "user_project_perms" %}
+                {% include "projects/project/partials/conversations_new_partial.html" %}
+                {% if "use_public_notes" in user_project_perms %}
+                    <!-- Post message -->
+                    {% comment %} hx-post="{% url 'projects-project-detail-conversations-new-partial' project.pk %}"
+                hx-trigger="submit"
+                hx-swap="outerHTML"
+                    hx-target="#conversation-new-container" {% endcomment %}
+                    <form class="form editor-form fr-px-3v fr-pr-12w"
+                          @submit.prevent="sendMessage(message)"
+                          enctype="multipart/form-data"
+                          id="conversation-form">
+                        {% csrf_token %}
+                        <div class="message-form fr-my-3v bg-light border-form editor-form__container fr-input-group"
+                             :class="{'focus': isFocus}"
+                             @click.outside="isFocus = false"
+                             x-data="{isFocus: false}">
+                            {% include "tools/editor.html" with model="message" input_name=posting_form.content.name initial_content=posting_form.content.value|default:'' errors=posting_form.content.errors input_required=True can_add_reco=True next_url_add_reco="projects-project-detail-conversations-new" can_attach_files=True can_attach_contact=True show_send_button=True form_id="conversation-form" %}
+                            <input type="hidden" name="contact" :value="message?.contact?.id">
+                        </div>
+                        {% for error in posting_form.content.errors %}<div class="text-danger text-end">{{ error }}</div>{% endfor %}
+                        <label class="visually-hidden" for="input-project-content">{{ posting_form.content.label }}</label>
+                        <input type="hidden" name="new" value="1">
+                        {% comment %} <input type="hidden" name="topic_name" :value="valueTopicFormMessageSend"> {% endcomment %}
+                        <div class="d-flex justify-content-end fr-mt-3v"></div>
+                    </form>
+                {% endif %}
+            </div>
+        </template>
     </div>
 {% endblock project_detail %}

@@ -33,8 +33,8 @@
     ****************************************
     {% endcomment %}
 </div>
-{% if topic_list|length == 0 %}
+<template x-if="feed.messages.length == 0">
     <div class="feed-element-item fr-px-3v fr-mb-3v">
         {% include "projects/project/fragments/conversations_new/message_type/empty_message_list.html" %}
     </div>
-{% endif %}
+</template>
