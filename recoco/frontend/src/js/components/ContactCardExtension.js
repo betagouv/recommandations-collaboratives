@@ -170,30 +170,34 @@ export const ContactCardExtension = Node.create({
       dom.setAttribute('data-type', 'contact-card');
       dom.className = 'contact-card__container border position-relative';
 
-      let html = '<div class="contact-card-light fr-p-3v bg-white">';
-      // Build the contact card HTML
-      html += '<div class="contact-card-light__firstline-container">';
-
-      // Add contact book icon
-      html +=
-        '<span class="fr-icon-contact-book-line fr-btn--icon-left fr-icon-sm"></span>';
+      const contactCardContentPart = {
+        name: '',
+        organization: '',
+        division: '',
+      };
 
       if (contact.first_name || contact.last_name) {
-        html += `<span class="contact-card-light__name contact-names fr-pr-1v text-ellipsis" title="${contact.first_name} ${contact.last_name}">${contact.first_name} ${contact.last_name}</span>`;
+        contactCardContentPart.name = `<span class="contact-card-light__name contact-names fr-pr-1v text-ellipsis" title="${contact.first_name} ${contact.last_name}">${contact.first_name} ${contact.last_name}</span>`;
       }
 
       if (contact.organization && contact.organization.name) {
-        html += `<span class="contact-card-light__organization color-3a3a3a text-position text-ellipsis" title="${contact.organization.name}">${contact.organization.name}</span>`;
+        contactCardContentPart.organization = `<span class="contact-card-light__organization color-3a3a3a text-position text-ellipsis" title="${contact.organization.name}">${contact.organization.name}</span>`;
       }
 
       if (contact.division) {
-        html += `<span class="contact-card-light__division" title="${contact.division}"><span class="color-3a3a3a text-organization text-ellipsis">${contact.division}</span></span>`;
+        contactCardContentPart.division = `<span class="contact-card-light__division" title="${contact.division}"><span class="color-3a3a3a text-organization text-ellipsis">${contact.division}</span></span>`;
       }
 
-      html += '</div></div>';
-
-      // Add cancel button
-      html += `
+      // Build the contact card HTML
+      let html = `
+        <div class="contact-card-light fr-p-3v bg-white">
+          <div class="contact-card-light__firstline-container">
+            <span class="fr-icon-contact-book-line fr-btn--icon-left fr-icon-sm"></span>
+            ${contactCardContentPart.name}
+            ${contactCardContentPart.organization}
+            ${contactCardContentPart.division}
+          </div>
+        </div>
         <button class="fr-btn fr-btn--tertiary fr-btn--sm justify-content-center fr-text--sm close-contact-button-style position-absolute top-0 end-0"
                 data-test-id="button-remove-contact-card"
                 title="Supprimer le contact">
@@ -202,7 +206,6 @@ export const ContactCardExtension = Node.create({
       `;
 
       dom.innerHTML = html;
-      console.log('Contact card HTML:', html);
 
       // Add event listener for the cancel button
       const cancelButton = dom.querySelector(
@@ -213,16 +216,10 @@ export const ContactCardExtension = Node.create({
           event.preventDefault();
           event.stopPropagation();
 
-          console.log('Cancel button clicked');
-          console.log('getPos:', getPos);
-          console.log('node:', node);
-
           // Remove the contact card from the editor
           if (getPos !== undefined) {
             const pos = getPos();
             const nodeSize = node.nodeSize;
-
-            console.log('Position:', pos, 'Node size:', nodeSize);
 
             // Delete the entire node
             editor
@@ -231,8 +228,6 @@ export const ContactCardExtension = Node.create({
               .setTextSelection(pos)
               .deleteRange({ from: pos, to: pos + nodeSize })
               .run();
-
-            console.log('Delete command executed');
           }
         });
       }
