@@ -32,8 +32,7 @@ Parameters:
      @set-comment.window="setMarkdownContent(event)"
      @modal-response="closeSearchContactModal($event)"
      x-ref="editor"
-     data-test-id="tiptap-editor"
-     x-bind:class="{ 'selected-contact': selectedContact, 'selected-file': selectedFile }">
+     data-test-id="tiptap-editor">
     <template x-if="isLoaded()">
         <div class="tiptap-menu-custom">
             {% if not "title" in tools_disabled %}
@@ -96,16 +95,15 @@ Parameters:
                            {% if input_file_required %}required{% endif %}
                            class="d-none file-upload-input">
                     {% comment %} <template x-if="{% if model %}{{ model }}.the_file{% else %} currentFile{% endif %}"> {% endcomment %}
-                    <template x-if="selectedFile">
+                    {% comment %} <template x-if="selectedFile">
                         <div class="d-flex align-items-center file__card fr-p-3v bg-white position-relative">
                             <span class="fr-icon-file-add-line fr-btn--icon-left fr-icon-sm"></span>
                             <span x-text="selectedFile.name" class="file-upload-text"></span>
-                            <button @click.prevent="handleResetFile"
-                                    class="fr-btn fr-btn--tertiary fr-btn--sm justify-content-center fr-text--sm close-contact-button-style position-absolute top-0 end-0">
+                            <button @click.prevent="handleResetFile" class="fr-btn fr-btn--tertiary fr-btn--sm justify-content-center fr-text--sm close-contact-button-style position-absolute top-0 end-0">
                                 <span class="fr-icon-close-line" aria-hidden="true"></span>
                             </button>
                         </div>
-                    </template>
+                    </template> {% endcomment %}
                 {% endif %}
                 {% comment %} {% if can_attach_contact %}
                     <template x-if="selectedContact">

@@ -40,52 +40,39 @@ const FileCardExtension = Node.create({
     const { fileName, fileSize, fileType } = HTMLAttributes;
     const formattedSize = fileSize ? formatFileSize(fileSize) : '';
 
+    const fileCardContent = [
+      'div',
+      {
+        class:
+          'd-flex align-items-center file__card fr-p-3v bg-white position-relative',
+      },
+      ['span', { class: 'fr-icon-file-add-line fr-btn--icon-left fr-icon-sm' }],
+      [
+        'span',
+        { class: 'file-upload-text' },
+        `${fileName || 'Fichier sans nom'} (${formattedSize})`,
+      ],
+      [
+        'div',
+        { class: 'file-card__actions' },
+        [
+          'button',
+          {
+            type: 'button',
+            class:
+              'fr-btn fr-btn--tertiary fr-btn--sm justify-content-center fr-text--sm close-file-button-style position-absolute top-0 end-0',
+            title: 'Supprimer le fichier',
+            'data-test-id': 'file-card-delete',
+          },
+          ['span', { class: 'fr-icon-close-line', 'aria-hidden': 'true' }],
+        ],
+      ],
+    ];
+
     return [
       'div',
       mergeAttributes(HTMLAttributes, { 'data-type': 'file-card' }),
-      [
-        'div',
-        { class: 'file-card fr-p-1w fr-mb-1v', 'data-test-id': 'file-card' },
-        [
-          'div',
-          {
-            class:
-              'file-card__content d-flex align-items-center justify-content-between',
-          },
-          [
-            'div',
-            { class: 'file-card__info d-flex align-items-center' },
-            [
-              'div',
-              { class: 'file-card__icon fr-mr-2w' },
-              ['span', { class: 'fr-icon-file-add-line fr-icon--sm' }],
-            ],
-            [
-              'div',
-              { class: 'file-card__details' },
-              [
-                'div',
-                { class: 'file-card__name fr-text--xs' },
-                `${fileName || 'Fichier sans nom'} (${formattedSize})`,
-              ],
-            ],
-          ],
-          [
-            'div',
-            { class: 'file-card__actions' },
-            [
-              'button',
-              {
-                type: 'button',
-                class: 'fr-btn fr-btn--sm fr-btn--tertiary fr-icon-close-line',
-                title: 'Supprimer le fichier',
-                'data-test-id': 'file-card-delete',
-              },
-              ['span', { class: 'sr-only' }, 'Supprimer'],
-            ],
-          ],
-        ],
-      ],
+      fileCardContent,
     ];
   },
 
@@ -117,30 +104,39 @@ const FileCardExtension = Node.create({
 
       const dom = document.createElement('div');
       dom.setAttribute('data-type', 'file-card');
-      dom.className = 'file-card fr-p-1w fr-mb-1v';
       dom.setAttribute('data-test-id', 'file-card');
+      dom.className =
+        'd-flex align-items-center file__card fr-p-3v bg-white position-relative';
 
       // Build the file card HTML
       const html = `
-        <div class="file-card__content d-flex align-items-center justify-content-between">
-          <div class="file-card__info d-flex align-items-center">
-            <div class="file-card__icon fr-mr-2w">
-              <span class="fr-icon-file-add-line fr-icon--sm"></span>
-            </div>
-            <div class="file-card__details">
-              <div class="file-card__name fr-text--xs">
-                ${fileName || 'Fichier sans nom'} (${formattedSize})
-              </div>
-            </div>
-          </div>
+          <span class="fr-icon-file-add-line fr-btn--icon-left fr-icon-sm"></span>
+          <span x-text="selectedFile.name" class="file-upload-text"> ${fileName || 'Fichier sans nom'} (${formattedSize})</span>
           <div class="file-card__actions">
-            <button type="button" class="fr-btn fr-btn--sm fr-btn--tertiary fr-icon-close-line"
+            <button type="button" class="fr-btn fr-btn--tertiary fr-btn--sm justify-content-center fr-text--sm close-file-button-style position-absolute top-0 end-0"
                     title="Supprimer le fichier" data-test-id="file-card-delete">
-              <span class="sr-only">Supprimer</span>
+              <span class="fr-icon-close-line" aria-hidden="true"></span>
             </button>
           </div>
-        </div>
       `;
+      // <div class="file-card__content d-flex align-items-center justify-content-between">
+      //   <div class="file-card__info d-flex align-items-center">
+      //     <div class="file-card__icon fr-mr-2w">
+      //       <span class="fr-icon-file-add-line fr-icon--sm"></span>
+      //     </div>
+      //     <div class="file-card__details">
+      //       <div class="file-card__name fr-text--xs">
+      //         ${fileName || 'Fichier sans nom'} (${formattedSize})
+      //       </div>
+      //     </div>
+      //   </div>
+      //   <div class="file-card__actions">
+      //     <button type="button" class="fr-btn fr-btn--sm fr-btn--tertiary fr-icon-close-line"
+      //             title="Supprimer le fichier" data-test-id="file-card-delete">
+      //       <span class="sr-only">Supprimer</span>
+      //     </button>
+      //   </div>
+      // </div>
 
       dom.innerHTML = html;
       console.log('File card HTML:', html);

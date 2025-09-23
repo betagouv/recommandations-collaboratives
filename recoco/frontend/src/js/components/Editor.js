@@ -8,6 +8,7 @@ import '../../css/tiptap.css';
 import { formatDate } from '../utils/date';
 import Placeholder from '@tiptap/extension-placeholder';
 import { ContactCardExtension } from './ContactCardExtension';
+import { FileCardExtension } from './FileCardExtension';
 
 const MarkdownEditor = createMarkdownEditor(Editor);
 
@@ -47,7 +48,7 @@ Alpine.data('editor', (content) => {
             },
           }),
           ContactCardExtension,
-          // FileCardExtension, // TODO: Uncomment this when the file card is ready
+          FileCardExtension,
         ],
         content: content,
         onCreate({ editor }) {
@@ -247,36 +248,35 @@ Alpine.data('editor', (content) => {
       const file = event.target.files[0];
       if (file) {
         this.selectedFile = file;
-        // Mettre à jour le nom du fichier affiché
         this.fileName = file.name;
 
         // Insérer la carte de fichier dans l'éditeur
-        // if (editor) {
-        //   console.log('Inserting file card for:', file.name);
+        if (editor) {
+          console.log('Inserting file card for:', file.name);
 
-        //   const fileAttributes = {
-        //     fileName: file.name,
-        //     fileSize: file.size,
-        //     fileType: file.type,
-        //     uploadedAt: new Date().toISOString(),
-        //   };
+          const fileAttributes = {
+            fileName: file.name,
+            fileSize: file.size,
+            fileType: file.type,
+            uploadedAt: new Date().toISOString(),
+          };
 
-        //   console.log('File attributes:', fileAttributes);
+          console.log('File attributes:', fileAttributes);
 
-        //   try {
-        //     const result = editor
-        //       .chain()
-        //       .focus()
-        //       .insertFileCard(fileAttributes)
-        //       .run();
-        //     console.log('Insert result:', result);
-        //   } catch (error) {
-        //     console.error('Error inserting file card:', error);
-        //     console.error('Error stack:', error.stack);
-        //   }
-        // } else {
-        //   console.error('Editor not initialized');
-        // }
+          try {
+            const result = editor
+              .chain()
+              .focus()
+              .insertFileCard(fileAttributes)
+              .run();
+            console.log('Insert result:', result);
+          } catch (error) {
+            console.error('Error inserting file card:', error);
+            console.error('Error stack:', error.stack);
+          }
+        } else {
+          console.error('Editor not initialized');
+        }
       } else {
         this.selectedFile = null;
         this.fileName = '';
