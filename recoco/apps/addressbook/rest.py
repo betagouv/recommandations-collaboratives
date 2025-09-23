@@ -1,4 +1,6 @@
+from django.contrib.sites.shortcuts import get_current_site
 from rest_framework.filters import BaseFilterBackend
+from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
 from recoco.rest_api.filters import (
@@ -54,6 +56,16 @@ class OrganizationViewSet(ModelViewSet):
                 return serializers.OrganizationWritableSerializer
             case _:
                 return serializers.OrganizationSerializer
+
+    def create(self, request, *args, **kwargs):
+        instance = Organization.objects.filter(name=request.data["name"]).first()
+        if instance is not None:
+            # if someone create an organization that exists in another site we just enable this one to the new one
+            instance.sites.add(get_current_site(request))
+            serializer = self.get_serializer(instance)
+            # todo handle potential new data from creation request. Now it is discarded
+            return Response(serializer.data)
+        return super().create(request, *args, **kwargs)
 
 
 class OrgaStartswithFilterBackend(BaseFilterBackend):

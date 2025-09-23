@@ -1,4 +1,5 @@
 import pytest
+from django.contrib.sites.models import Site
 from django.urls import reverse
 from model_bakery import baker
 
@@ -83,3 +84,16 @@ def test_update(api_client, staff_user, current_site):
     assert response.data["group_id"] == group.id
     assert set(response.data["departments"]) == {"01", "32"}
     assert response.data["name"] == "orga_name"
+
+
+@pytest.mark.django_db
+def test_add_sites_to_orga_when_created_same_name(api_client, staff_user):
+    site = baker.make(Site)
+    organization = baker.make(Organization, name="Services Secrets 91", sites=[site])
+    url = reverse("api-addressbook-organization-list")
+    api_client.force_authenticate(staff_user)
+    response = api_client.post(url, {"name": organization.name})
+    assert response.data["id"] == organization.id
+    assert response.status_code == 200
+    organization.refresh_from_db()
+    assert site in organization.sites.all()
