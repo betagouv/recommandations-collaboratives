@@ -78,9 +78,13 @@ class MessageSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         nodes_data = validated_data.pop("nodes")
-        message = super().create(**validated_data)
+        message = Message.objects.create(
+            project_id=self.context["project_id"], **validated_data
+        )
+        message.save()
         for node_data in nodes_data:
-            message.nodes.add(NodePolymorphicSerializer.create(**node_data))
+            node_data["message_id"] = message.id
+            NodePolymorphicSerializer().create(node_data)
         return message
 
 

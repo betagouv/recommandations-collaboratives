@@ -42,6 +42,11 @@ class MessageViewSet(viewsets.ModelViewSet):
         project_id = int(self.kwargs["project_id"])
         return self.queryset.filter(project_id=project_id)
 
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context.update({"project_id": int(self.kwargs["project_id"])})
+        return context
+
 
 class ActivityViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     """
