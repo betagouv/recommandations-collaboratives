@@ -5,9 +5,10 @@ from rest_framework import serializers
 from rest_polymorphic.serializers import PolymorphicSerializer
 
 from recoco.apps.home.serializers import UserSerializer
-from recoco.apps.projects.models import Project
+from recoco.apps.projects.models import Document, Project
 from recoco.apps.tasks.models import Task
 
+from ..addressbook.models import Contact
 from .models import (
     ContactNode,
     DocumentNode,
@@ -38,6 +39,10 @@ class RecommendationNodeSerializer(serializers.ModelSerializer):
         model = RecommendationNode
         fields = ("position", "text", "recommendation_id")
 
+    recommendation_id = serializers.PrimaryKeyRelatedField(
+        source="recommendation", queryset=Task.on_site.all()
+    )
+
 
 class ContactNodeSerializer(serializers.ModelSerializer):
     class Meta:
@@ -47,6 +52,10 @@ class ContactNodeSerializer(serializers.ModelSerializer):
             "contact_id",
         )
 
+    contact_id = serializers.PrimaryKeyRelatedField(
+        source="contact", queryset=Contact.on_site.all()
+    )
+
 
 class DocumentNodeSerializer(serializers.ModelSerializer):
     class Meta:
@@ -54,6 +63,9 @@ class DocumentNodeSerializer(serializers.ModelSerializer):
         fields = (
             "position",
             "document_id",
+        )
+        document_id = serializers.PrimaryKeyRelatedField(
+            source="document", queryset=Document.on_site.all()
         )
 
 
