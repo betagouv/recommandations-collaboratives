@@ -2,9 +2,7 @@ import { Node, mergeAttributes } from '@tiptap/core';
 
 export const ContactCardExtension = Node.create({
   name: 'contactCard',
-
   group: 'block',
-
   atom: true,
 
   addAttributes() {
@@ -51,99 +49,78 @@ export const ContactCardExtension = Node.create({
   },
 
   renderHTML({ HTMLAttributes }) {
+    console.log('RENDERING CONTACT CARD:', HTMLAttributes);
     const contact = {
-      id: HTMLAttributes.id,
+      // id: HTMLAttributes.id,
       first_name: HTMLAttributes.firstName,
       last_name: HTMLAttributes.lastName,
-      email: HTMLAttributes.email,
-      phone_no: HTMLAttributes.phoneNo,
-      mobile_no: HTMLAttributes.mobileNo,
+      // email: HTMLAttributes.email,
+      // phone_no: HTMLAttributes.phoneNo,
+      // mobile_no: HTMLAttributes.mobileNo,
       division: HTMLAttributes.division,
       organization: HTMLAttributes.organization,
-      modified: HTMLAttributes.modified,
-      created: HTMLAttributes.created,
+      // modified: HTMLAttributes.modified,
+      // created: HTMLAttributes.created,
     };
 
     // Create a simple contact card structure
     const contactCardContent = [
       'div',
       {
-        class: 'contact-card fr-p-3v bg-white position-relative',
-        'data-test-id': 'contact-card',
+        class: 'contact-card__container border position-relative',
       },
       [
         'div',
-        { class: 'contact-card__firstline-container' },
-        contact.first_name || contact.last_name
-          ? [
-              'span',
-              { class: 'contact-info__name contact-names fr-pr-1v' },
-              `${contact.first_name} ${contact.last_name}`,
-            ]
-          : null,
-        contact.organization && contact.organization.name
-          ? [
-              'span',
-              {
-                class: 'contact-info__organization color-3a3a3a text-position',
-              },
-              contact.organization.name,
-            ]
-          : null,
-      ].filter(Boolean),
-      contact.division
-        ? [
-            'div',
-            { class: 'contact-info__division' },
-            [
-              'span',
-              { class: 'color-3a3a3a text-organization' },
-              contact.division,
-            ],
-          ]
-        : ['div', { class: 'contact-info-empty__division' }],
-      contact.email
-        ? [
-            'div',
-            { class: 'contact-info__email' },
-            [
-              'a',
-              {
-                href: `mailto:${contact.email}`,
-                class: 'contact-card__link text-position',
-              },
-              contact.email,
-            ],
-          ]
-        : ['div', { class: 'contact-info-empty__email' }],
-      contact.phone_no
-        ? [
-            'div',
-            { class: 'contact-info__phone' },
-            [
-              'a',
-              {
-                href: `tel:${contact.phone_no}`,
-                class: 'contact-card__link text-position',
-              },
-              contact.phone_no,
-            ],
-          ]
-        : ['div', { class: 'contact-info-empty__phone' }],
-      contact.mobile_no
-        ? [
-            'div',
-            { class: 'contact-info__phone' },
-            [
-              'a',
-              {
-                href: `tel:${contact.mobile_no}`,
-                class: 'contact-card__link text-position',
-              },
-              contact.mobile_no,
-            ],
-          ]
-        : ['div', { class: 'contact-info-empty__phone' }],
+        {
+          class: 'contact-card-light position-relativefr-p-3v bg-white',
+        },
+        [
+          'div',
+          { class: 'contact-card-light__firstline-container' },
+          [
+            'span',
+            { class: 'fr-icon-contact-book-line fr-btn--icon-left fr-icon-sm' },
+          ],
+          contact.first_name || contact.last_name
+            ? [
+                'span',
+                {
+                  class:
+                    'contact-card-light__name contact-names fr-pr-1v text-ellipsis',
+                  title: `${contact.first_name} ${contact.last_name}`,
+                },
+                `${contact.first_name} ${contact.last_name}`,
+              ]
+            : null,
+          contact.organization && contact.organization.name
+            ? [
+                'span',
+                {
+                  class:
+                    'contact-card-light__organization color-3a3a3a text-position text-ellipsis',
+                  title: contact.organization.name,
+                },
+                contact.organization.name,
+              ]
+            : null,
+          contact.division
+            ? [
+                'span',
+                {
+                  class: 'contact-card-light__division',
+                  title: contact.division,
+                },
+                [
+                  'span',
+                  {
+                    class: 'color-3a3a3a text-organization text-ellipsis',
+                  },
+                  contact.division,
+                ],
+              ]
+            : null,
+        ].filter(Boolean),
+      ],
     ];
 
     return [
@@ -177,59 +154,43 @@ export const ContactCardExtension = Node.create({
       console.log('Creating contact card node view:', node.attrs);
 
       const contact = {
-        id: node.attrs.id,
+        // id: node.attrs.id,
         first_name: node.attrs.firstName,
         last_name: node.attrs.lastName,
-        email: node.attrs.email,
-        phone_no: node.attrs.phoneNo,
-        mobile_no: node.attrs.mobileNo,
+        // email: node.attrs.email,
+        // phone_no: node.attrs.phoneNo,
+        // mobile_no: node.attrs.mobileNo,
         division: node.attrs.division,
         organization: node.attrs.organization,
-        modified: node.attrs.modified,
-        created: node.attrs.created,
+        // modified: node.attrs.modified,
+        // created: node.attrs.created,
       };
 
       const dom = document.createElement('div');
       dom.setAttribute('data-type', 'contact-card');
-      dom.className = 'contact-card fr-p-3v bg-white position-relative';
-      dom.setAttribute('data-test-id', 'contact-card');
+      dom.className = 'contact-card__container border position-relative';
 
+      let html = '<div class="contact-card-light fr-p-3v bg-white">';
       // Build the contact card HTML
-      let html = '<div class="contact-card__firstline-container">';
+      html += '<div class="contact-card-light__firstline-container">';
+
+      // Add contact book icon
+      html +=
+        '<span class="fr-icon-contact-book-line fr-btn--icon-left fr-icon-sm"></span>';
 
       if (contact.first_name || contact.last_name) {
-        html += `<span class="contact-info__name contact-names fr-pr-1v">${contact.first_name} ${contact.last_name}</span>`;
+        html += `<span class="contact-card-light__name contact-names fr-pr-1v text-ellipsis" title="${contact.first_name} ${contact.last_name}">${contact.first_name} ${contact.last_name}</span>`;
       }
 
       if (contact.organization && contact.organization.name) {
-        html += `<span class="contact-info__organization color-3a3a3a text-position">${contact.organization.name}</span>`;
+        html += `<span class="contact-card-light__organization color-3a3a3a text-position text-ellipsis" title="${contact.organization.name}">${contact.organization.name}</span>`;
       }
-
-      html += '</div>';
 
       if (contact.division) {
-        html += `<div class="contact-info__division"><span class="color-3a3a3a text-organization">${contact.division}</span></div>`;
-      } else {
-        html += '<div class="contact-info-empty__division"></div>';
+        html += `<span class="contact-card-light__division" title="${contact.division}"><span class="color-3a3a3a text-organization text-ellipsis">${contact.division}</span></span>`;
       }
 
-      if (contact.email) {
-        html += `<div class="contact-info__email"><a href="mailto:${contact.email}" class="contact-card__link text-position">${contact.email}</a></div>`;
-      } else {
-        html += '<div class="contact-info-empty__email"></div>';
-      }
-
-      if (contact.phone_no) {
-        html += `<div class="contact-info__phone"><a href="tel:${contact.phone_no}" class="contact-card__link text-position">${contact.phone_no}</a></div>`;
-      } else {
-        html += '<div class="contact-info-empty__phone"></div>';
-      }
-
-      if (contact.mobile_no) {
-        html += `<div class="contact-info__phone"><a href="tel:${contact.mobile_no}" class="contact-card__link text-position">${contact.mobile_no}</a></div>`;
-      } else {
-        html += '<div class="contact-info-empty__phone"></div>';
-      }
+      html += '</div></div>';
 
       // Add cancel button
       html += `

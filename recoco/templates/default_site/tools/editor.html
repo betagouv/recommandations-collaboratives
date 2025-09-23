@@ -107,21 +107,18 @@ Parameters:
                         </div>
                     </template>
                 {% endif %}
-                {% if can_attach_contact %}
+                {% comment %} {% if can_attach_contact %}
                     <template x-if="selectedContact">
                         <div class="contact-card__container">
-                            <div class="border position-relative"
-                                 x-data="{contact:selectedContact,isOpenDeleteContact:null}">
+                            <div class="border position-relative" x-data="{contact:selectedContact,isOpenDeleteContact:null}">
                                 {% include "tools/contacts/contact_card_light.html" %}
-                                <button @click.prevent="handleResetContact"
-                                        data-test-id="button-remove-contact"
-                                        class="fr-btn fr-btn--tertiary fr-btn--sm justify-content-center fr-text--sm close-contact-button-style position-absolute top-0 end-0">
+                                <button @click.prevent="handleResetContact" data-test-id="button-remove-contact" class="fr-btn fr-btn--tertiary fr-btn--sm justify-content-center fr-text--sm close-contact-button-style position-absolute top-0 end-0">
                                     <span class="fr-icon-close-line" aria-hidden="true"></span>
                                 </button>
                             </div>
                         </div>
                     </template>
-                {% endif %}
+                {% endif %} {% endcomment %}
             </div>
             <div class="button-module__container">
                 <!-- File module -->

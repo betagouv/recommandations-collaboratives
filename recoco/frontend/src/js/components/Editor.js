@@ -7,6 +7,7 @@ import { createMarkdownEditor } from 'tiptap-markdown';
 import '../../css/tiptap.css';
 import { formatDate } from '../utils/date';
 import Placeholder from '@tiptap/extension-placeholder';
+import { ContactCardExtension } from './ContactCardExtension';
 
 const MarkdownEditor = createMarkdownEditor(Editor);
 
@@ -45,7 +46,7 @@ Alpine.data('editor', (content) => {
               };
             },
           }),
-          // ContactCardExtension, // TODO: Uncomment this when the contact card is ready
+          ContactCardExtension,
           // FileCardExtension, // TODO: Uncomment this when the file card is ready
         ],
         content: content,
@@ -183,7 +184,7 @@ Alpine.data('editor', (content) => {
       if (contact) {
         this.handleSetContact(contact);
         // Insert contact card into editor
-        // this.insertContactCard(contact); // TODO: Uncomment this when the contact card is ready
+        this.insertContactCard(contact);
       }
       this.isSearchContactModalOpen = false;
     },
