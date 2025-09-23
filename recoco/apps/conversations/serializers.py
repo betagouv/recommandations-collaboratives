@@ -76,6 +76,13 @@ class MessageSerializer(serializers.ModelSerializer):
 
     nodes = NodePolymorphicSerializer(many=True)
 
+    def create(self, validated_data):
+        nodes_data = validated_data.pop("nodes")
+        message = super().create(**validated_data)
+        for node_data in nodes_data:
+            message.nodes.add(NodePolymorphicSerializer.create(**node_data))
+        return message
+
 
 class ActivityUserSerializer(serializers.ModelSerializer):
     class Meta:
