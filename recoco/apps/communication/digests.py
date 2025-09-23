@@ -39,7 +39,7 @@ logger = logging.getLogger("main")
 ########################################################################
 
 
-def send_reminder_digests_by_project(project, dry_run=False):
+def send_reminder_digests_by_project(project, dry_run=False, no_send=False):
     """
     Send a digest emails per project for each expired reminders
     """
@@ -65,12 +65,12 @@ def send_reminder_digests_by_project(project, dry_run=False):
 
     # New reco (mail type B)
     send_new_recommendations_reminders_digest_by_project(
-        site=current_site, project=project, dry_run=dry_run
+        site=current_site, project=project, dry_run=dry_run, no_send=no_send
     )
 
     # What's up (mail type C)
     send_whatsup_reminders_digest_by_project(
-        site=current_site, project=project, dry_run=dry_run
+        site=current_site, project=project, dry_run=dry_run, no_send=no_send
     )
 
     # Reschedule next reminders
@@ -79,7 +79,7 @@ def send_reminder_digests_by_project(project, dry_run=False):
 
 
 def send_new_recommendations_reminders_digest_by_project(
-    site: Site, project: projects_models.Project, dry_run: bool
+    site: Site, project: projects_models.Project, dry_run: bool, no_send: bool
 ) -> bool:
     """
     Send 'New Recommendation' reminder for the given project (mail type B)
@@ -123,13 +123,15 @@ def send_new_recommendations_reminders_digest_by_project(
     logger.info(f"Sent NEW_RECO reminder <{due_reminder}>")
 
     # Mark as dispatched
-    due_reminder.mark_as_sent(sent_to=recipient)
+    if no_send:
+        return True
 
+    due_reminder.mark_as_sent(sent_to=recipient)
     return True
 
 
 def send_whatsup_reminders_digest_by_project(
-    site: Site, project: projects_models.Project, dry_run: bool
+    site: Site, project: projects_models.Project, dry_run: bool, no_send: bool
 ) -> bool:
     """
     Send 'What's up? reminder for the given project
@@ -173,6 +175,9 @@ def send_whatsup_reminders_digest_by_project(
     logger.info(f"Sent WHATS_UP reminder <{due_reminder}>")
 
     # Mark as dispatched
+    if no_send:
+        return True
+
     due_reminder.mark_as_sent(sent_to=recipient)
 
     return True
@@ -183,7 +188,7 @@ def send_whatsup_reminders_digest_by_project(
 ########################################################################
 
 
-def send_digests_for_new_recommendations_by_user(user, dry_run):
+def send_digests_for_new_recommendations_by_user(user, dry_run, no_send):
     """
     Send a digest email per project with all its new recommendations for given user.
     """
@@ -200,17 +205,17 @@ def send_digests_for_new_recommendations_by_user(user, dry_run):
         return 0
 
     skipped_projects = send_recommendation_digest_by_project(
-        user, notifications, dry_run
+        user, notifications, dry_run, no_send
     )
 
-    if not dry_run:
+    if not dry_run and not no_send:
         # Mark them as dispatched
         notifications.exclude(target_object_id__in=skipped_projects).mark_as_sent()
 
     return notifications.exclude(target_object_id__in=skipped_projects).count()
 
 
-def send_recommendation_digest_by_project(user, notifications, dry_run):
+def send_recommendation_digest_by_project(user, notifications, dry_run, no_send):
     """Send an email per project containing its notifications."""
 
     skipped_projects = []
@@ -246,7 +251,7 @@ def send_recommendation_digest_by_project(user, notifications, dry_run):
             logger.info(
                 f"[DRY RUN] Would have sent {len(digest)} notifications for <{user}>."
             )
-
+    # where is mark as sent
     return skipped_projects
 
 
@@ -401,7 +406,7 @@ def make_action_digest(action, user):
 ########################################################################
 
 
-def send_digests_for_new_sites_by_user(user, dry_run=False):
+def send_digests_for_new_sites_by_user(user, dry_run=False, no_send=False):
     project_ct = ContentType.objects.get_for_model(projects_models.Project)
 
     notifications = (
@@ -416,7 +421,7 @@ def send_digests_for_new_sites_by_user(user, dry_run=False):
 
     send_new_site_digest_by_user(user, notifications, dry_run=dry_run)
 
-    if not dry_run:
+    if not dry_run and not no_send:
         # Mark them as dispatched
         notifications.mark_as_sent()
 
@@ -482,7 +487,7 @@ def make_digest_for_new_site(notification, user):
 ########################################################################
 
 
-def send_digest_for_non_switchtender_by_user(user, dry_run=False):
+def send_digest_for_non_switchtender_by_user(user, dry_run=False, no_send=False):
     """
     Digest containing generic notifications (=those which weren't collected)
     """
@@ -499,10 +504,12 @@ def send_digest_for_non_switchtender_by_user(user, dry_run=False):
         user,
         template_name=communication_constants.TPL_DIGEST_FOR_NON_SWITCHTENDER,
         queryset=queryset,
+        dry_run=dry_run,
+        no_send=no_send,
     )
 
 
-def send_digest_for_switchtender_by_user(user, dry_run=False):
+def send_digest_for_switchtender_by_user(user, dry_run=False, no_send=False):
     """
     Digest containing generic notifications (=those which weren't collected)
     """
@@ -527,11 +534,12 @@ def send_digest_for_switchtender_by_user(user, dry_run=False):
         queryset=queryset,
         extra_context=context,
         dry_run=dry_run,
+        no_send=no_send,
     )
 
 
 def send_digest_by_user(
-    user, template_name, queryset=None, extra_context=None, dry_run=False
+    user, template_name, queryset=None, extra_context=None, dry_run=False, no_send=False
 ):
     """
     Should be run at the end, to collect remaining notifications
@@ -576,7 +584,7 @@ def send_digest_by_user(
                 f"[DRY RUN] Would have sent {len(digest)} notifications to <{user}>."
             )
 
-    if not dry_run:
+    if not dry_run and not no_send:
         # Mark them as dispatched
         notifications.mark_as_sent()
 

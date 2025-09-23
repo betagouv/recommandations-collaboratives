@@ -40,7 +40,8 @@ class Command(BaseCommand):
                 logger.info(f"\n#### Sending digests for site <{site.domain}> ####\n")
                 self.send_email_digests_for_site(site, dry_run)
 
-    def send_email_digests_for_site(self, site, dry_run):
+    @staticmethod
+    def send_email_digests_for_site(site, dry_run):
         advisor_group = get_group_for_site("advisor", site, create=True)
 
         # only send emails to active users and those actually linked to the current site
@@ -76,6 +77,42 @@ class Command(BaseCommand):
                 logger.info(f"* Sent new site digest for {user}")
 
             if digests.send_digest_for_switchtender_by_user(user, dry_run):
+                logger.info(f"* Sent general digest for switchtender (to {user})")
+
+    @staticmethod
+    def send_test_email_digests_for_project(project, consumes_notifications=True):
+        advisor_group = get_group_for_site("advisor", project.site, create=True)
+
+        # only send emails to active users and those actually linked to the current site
+        active_users = auth_models.User.objects.filter(
+            is_active=True, project_set=project
+        )  # todo members and advisors?
+
+        # Send reminders (new recommendation + whatsup)
+        logger.info("** Sending Project Reminders **")
+        for project in project_models.Project.on_site.all():
+            digests.send_reminder_digests_by_project(project)
+
+        # Send project collaborators new recommendations digest
+        logger.info("** Sending new recommendations digests **")
+        for user in project.members.filter(is_active=True):
+            if digests.send_digests_for_new_recommendations_by_user(user):
+                logger.info(f"Sent new reco digest for {user} on {project.name}")
+
+        # Digests for non switchtenders
+        logger.info("** Sending general digests **")  # FIXME include inactive project?
+        for user in active_users.exclude(groups__in=[advisor_group]):
+            if digests.send_digest_for_non_switchtender_by_user(user):
+                logger.info(f"Sent general digest for {user}")
+
+        # Digests for switchtenders
+        logger.info("** Sending general switchtender digests **")
+        # XXX pourquoi groups__in=[] et non groups=advisor_group
+        for user in active_users.filter(groups__in=[advisor_group]):
+            if digests.send_digests_for_new_sites_by_user(user):
+                logger.info(f"* Sent new site digest for {user}")
+
+            if digests.send_digest_for_switchtender_by_user(user):
                 logger.info(f"* Sent general digest for switchtender (to {user})")
 
 
