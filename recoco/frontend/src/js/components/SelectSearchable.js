@@ -14,17 +14,19 @@ Alpine.data('SelectSearchable', SelectSearchable);
 function SelectSearchable(params) {
   return {
     selectElIsChild: params.selectElIsChild,
+    recentProjectList: [],
+    recentProjectListId: [],
     init() {
       const _selectList = document.getElementById('id_project');
-      const recentProjectList = this.$store.projectQueue.get();
-      const recentProjectListId = recentProjectList.map((x) => x.id);
+      this.recentProjectList = this.$store.projectQueue.get();
+      this.recentProjectListId = this.recentProjectList.map((x) => x.id);
       const _selectListOptions = Array.from(_selectList.children);
       const _selectListOptionsId = _selectListOptions.map((x) => +x.value);
       _selectList.innerHTML = '';
       _selectList.appendChild(_selectListOptions.shift());
 
       // Add recent projects to the select list
-      recentProjectList.forEach((project, index) => {
+      this.recentProjectList.forEach((project, index) => {
         if (!_selectListOptionsId.includes(project.id)) {
           return;
         }
@@ -39,7 +41,7 @@ function SelectSearchable(params) {
 
       // Add other projects to the select list
       _selectListOptions.forEach((option) => {
-        if (recentProjectListId.includes(+option.value)) {
+        if (this.recentProjectListId.includes(+option.value)) {
           return;
         }
         _selectList.appendChild(option);
@@ -53,7 +55,8 @@ function SelectSearchable(params) {
         : this.$refs.selectSearchable;
 
       const params = new URLSearchParams(document.location.search);
-      const selected_project = parseInt(params.get('project_id'));
+      const selected_project =
+        parseInt(params.get('project_id')) || this.recentProjectListId[0];
       if (selected_project) {
         this.setSelectedProject();
       }
