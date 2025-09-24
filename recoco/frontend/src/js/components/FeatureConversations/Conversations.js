@@ -19,12 +19,24 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
   documents: [],
   contacts: [],
   message: { the_file: '', text: '', contact: '' },
-  init() {
-    this.getMessages();
+  countOf: {
+    messages: 0,
+    new_messages: 0,
+    tasks: 0,
+    contacts: 0,
+    documents: 0,
+  },
+  async init() {
+    await this.getMessages();
     this.getMessagesParticipants();
     this.$store.tasksData._subscribe(() => {
       this.tasks = this.$store.tasksData.tasks;
     });
+    this.countOf.messages = this.countMessagesInDiscussion();
+    this.countOf.tasks = this.countTasksInDiscussion();
+    this.countOf.contacts = this.countContactsInDiscussion();
+    this.countOf.documents = this.countDocumentsInDiscussion();
+    this.countOf.new_messages = this.countNewMessagesInDiscussion();
   },
   getRecommendationById(id) {
     const foundRecommendation = this.tasks.find(
@@ -39,6 +51,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     try {
       const messages = await api.get(conversationsMessagesUrl(this.projectId));
       this.feed.messages = messages.data;
+      console.log(this.feed.messages);
       this.messagesLoaded = true;
       setTimeout(() => {
         this.showMessages = true;
@@ -136,5 +149,113 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
         throw new Error('Failed to send message');
       }
     }
+  },
+  countDocumentsInDiscussion() {
+    let count = 0;
+    for (const message of this.feed.messages) {
+      for (const node of message.nodes) {
+        if (node.type === 'DocumentNode') {
+          count += 1;
+        }
+      }
+    }
+    return count;
+  },
+  countTasksInDiscussion() {
+    let count = 0;
+    for (const message of this.feed.messages) {
+      for (const node of message.nodes) {
+        if (node.type === 'RecommendationNode') {
+          count += 1;
+        }
+      }
+    }
+    return count;
+  },
+  countContactsInDiscussion() {
+    let count = 0;
+    for (const message of this.feed.messages) {
+      for (const node of message.nodes) {
+        if (node.type === 'ContactNode') {
+          count += 1;
+        }
+      }
+    }
+    return count;
+  },
+  countMessagesInDiscussion(){
+    let count = 0;
+    console.log(this.feed.messages);
+    for (const message of this.feed.messages) {
+      for (const node of message.nodes) {
+        if (node.type === 'MarkdownNode') {
+          count += 1;
+        }
+      }
+    }
+    return count;
+  },
+  countNewMessagesInDiscussion(){
+    let count = 0;
+    for (const message of this.feed.messages) {
+      if (!message.read_by.includes(this.currentUserId)) {
+        count += 1;
+      }
+    }
+    return count;
+  },
+  countDocumentsInDiscussion() {
+    let count = 0;
+    for (const message of this.feed.messages) {
+      for (const node of message.nodes) {
+        if (node.type === 'DocumentNode') {
+          count += 1;
+        }
+      }
+    }
+    return count;
+  },
+  countTasksInDiscussion() {
+    let count = 0;
+    for (const message of this.feed.messages) {
+      for (const node of message.nodes) {
+        if (node.type === 'RecommendationNode') {
+          count += 1;
+        }
+      }
+    }
+    return count;
+  },
+  countContactsInDiscussion() {
+    let count = 0;
+    for (const message of this.feed.messages) {
+      for (const node of message.nodes) {
+        if (node.type === 'ContactNode') {
+          count += 1;
+        }
+      }
+    }
+    return count;
+  },
+  countMessagesInDiscussion(){
+    let count = 0;
+    console.log(this.feed.messages);
+    for (const message of this.feed.messages) {
+      for (const node of message.nodes) {
+        if (node.type === 'MarkdownNode') {
+          count += 1;
+        }
+      }
+    }
+    return count;
+  },
+  countNewMessagesInDiscussion(){
+    let count = 0;
+    for (const message of this.feed.messages) {
+      if (!message.read_by.includes(this.currentUserId)) {
+        count += 1;
+      }
+    }
+    return count;
   },
 }));
