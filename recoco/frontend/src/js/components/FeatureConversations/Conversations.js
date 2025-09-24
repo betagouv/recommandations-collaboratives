@@ -144,7 +144,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
           conversationsMessagesUrl(this.projectId),
           payload
         );
-        this.messages.push(messageResponse.data);
+        this.feed.messages.push(messageResponse.data);
       } catch (error) {
         throw new Error('Failed to send message');
       }
@@ -183,7 +183,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     }
     return count;
   },
-  countMessagesInDiscussion(){
+  countMessagesInDiscussion() {
     let count = 0;
     console.log(this.feed.messages);
     for (const message of this.feed.messages) {
@@ -195,7 +195,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     }
     return count;
   },
-  countNewMessagesInDiscussion(){
+  countNewMessagesInDiscussion() {
     let count = 0;
     for (const message of this.feed.messages) {
       if (!message.read_by.includes(this.currentUserId)) {
@@ -237,7 +237,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     }
     return count;
   },
-  countMessagesInDiscussion(){
+  countMessagesInDiscussion() {
     let count = 0;
     console.log(this.feed.messages);
     for (const message of this.feed.messages) {
@@ -249,7 +249,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     }
     return count;
   },
-  countNewMessagesInDiscussion(){
+  countNewMessagesInDiscussion() {
     let count = 0;
     for (const message of this.feed.messages) {
       if (!message.read_by.includes(this.currentUserId)) {
