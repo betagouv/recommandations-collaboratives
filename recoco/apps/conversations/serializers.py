@@ -1,6 +1,7 @@
 # serializers.py
 from actstream.models import Action
 from django.contrib.auth.models import User
+from django.db import transaction
 from rest_framework import serializers
 from rest_polymorphic.serializers import PolymorphicSerializer
 
@@ -93,25 +94,27 @@ class MessageSerializer(serializers.ModelSerializer):
         message = Message.objects.create(
             project_id=self.context["project_id"], **validated_data
         )
-        message.save()
-        for node_data in nodes_data:
-            node_data["message_id"] = message.id
-            NodePolymorphicSerializer().create(node_data)
+        with transaction.atomic():
+            message.save()
+            for node_data in nodes_data:
+                node_data["message_id"] = message.id
+                NodePolymorphicSerializer().create(node_data)
         return message
 
     def update(self, instance, validated_data):
         nodes_data = validated_data.pop("nodes")
 
-        super().update(instance, validated_data)
-        old_nodes = [*instance.nodes.all()]
+        with transaction.atomic():
+            super().update(instance, validated_data)
+            old_nodes = [*instance.nodes.all()]
 
-        for node_data in nodes_data:
-            node_data["message_id"] = instance.id
-            NodePolymorphicSerializer().create(node_data)
+            for node_data in nodes_data:
+                node_data["message_id"] = instance.id
+                NodePolymorphicSerializer().create(node_data)
 
-        for node in old_nodes:
-            node.delete()
-            # cannot do queryset.delete directly otherwise polymorphism delete.CASCADE is not applied and it fails
+            for node in old_nodes:
+                node.delete()
+                # cannot do queryset.delete directly otherwise polymorphism delete.CASCADE is not applied and it fails
         return instance
 
 
