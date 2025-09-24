@@ -48,20 +48,21 @@ export const ContactCardExtension = Node.create({
     ];
   },
 
+  // Produce the HTML to export from tiptap
   renderHTML({ HTMLAttributes }) {
     console.log('RENDERING CONTACT CARD:', HTMLAttributes);
-    const contact = {
-      // id: HTMLAttributes.id,
-      first_name: HTMLAttributes.firstName,
-      last_name: HTMLAttributes.lastName,
-      // email: HTMLAttributes.email,
-      // phone_no: HTMLAttributes.phoneNo,
-      // mobile_no: HTMLAttributes.mobileNo,
-      division: HTMLAttributes.division,
-      organization: HTMLAttributes.organization,
-      // modified: HTMLAttributes.modified,
-      // created: HTMLAttributes.created,
-    };
+    const contact = { HTMLAttributes };
+    //   id: HTMLAttributes.id,
+    //   first_name: HTMLAttributes.firstName,
+    //   last_name: HTMLAttributes.lastName,
+    //   // email: HTMLAttributes.email,
+    //   // phone_no: HTMLAttributes.phoneNo,
+    //   // mobile_no: HTMLAttributes.mobileNo,
+    //   division: HTMLAttributes.division,
+    //   organization: HTMLAttributes.organization,
+    //   // modified: HTMLAttributes.modified,
+    //   // created: HTMLAttributes.created,
+    // };
 
     // Create a simple contact card structure
     const contactCardContent = [
@@ -81,15 +82,15 @@ export const ContactCardExtension = Node.create({
             'span',
             { class: 'fr-icon-contact-book-line fr-btn--icon-left fr-icon-sm' },
           ],
-          contact.first_name || contact.last_name
+          contact.firstName || contact.lastName
             ? [
                 'span',
                 {
                   class:
                     'contact-card-light__name contact-names fr-pr-1v text-ellipsis',
-                  title: `${contact.first_name} ${contact.last_name}`,
+                  title: `${contact.firstName} ${contact.lastName}`,
                 },
-                `${contact.first_name} ${contact.last_name}`,
+                `${contact.firstName} ${contact.lastName}`,
               ]
             : null,
           contact.organization && contact.organization.name
@@ -125,7 +126,10 @@ export const ContactCardExtension = Node.create({
 
     return [
       'div',
-      mergeAttributes(HTMLAttributes, { 'data-type': 'contact-card' }),
+      mergeAttributes(HTMLAttributes, {
+        'data-type': 'contact-card',
+        'data-id': HTMLAttributes.id,
+      }),
       contactCardContent,
     ];
   },
@@ -148,22 +152,16 @@ export const ContactCardExtension = Node.create({
     };
   },
 
-  // Custom markdown serializer
+  // Custom node view in tiptap
   addNodeView() {
     return ({ node, getPos, editor }) => {
       console.log('Creating contact card node view:', node.attrs);
 
       const contact = {
-        // id: node.attrs.id,
         first_name: node.attrs.firstName,
         last_name: node.attrs.lastName,
-        // email: node.attrs.email,
-        // phone_no: node.attrs.phoneNo,
-        // mobile_no: node.attrs.mobileNo,
         division: node.attrs.division,
         organization: node.attrs.organization,
-        // modified: node.attrs.modified,
-        // created: node.attrs.created,
       };
 
       const dom = document.createElement('div');

@@ -63,7 +63,7 @@ Alpine.data('editor', (content) => {
 
           _this.$store.editor.isEditing = editor.getMarkdown() != '';
           _this.$store.editor.currentMessage = editor.getMarkdown();
-
+          _this.$store.editor.currentMessageJSON = editor.getJSON();
           // Mettre à jour la propriété réactive
           _this.isEditorEmpty = editor.isEmpty;
 

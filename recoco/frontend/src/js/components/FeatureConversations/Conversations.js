@@ -115,28 +115,26 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     return foundContact;
   },
 
-  async sendMessage(rawMessage) {
-    console.log(rawMessage);
-    try {
-      const messageResponse = await api.post(
-        conversationsMessagesUrl(this.projectId),
-        this.buildMessageRope(rawMessage)
+  async sendMessage() {
+    if (this.$store.editor.currentMessageJSON) {
+      const parsedNodesFromEditor = this.$store.editor.parseTipTapContent(
+        this.$store.editor.currentMessageJSON
       );
-      this.messages.push(messageResponse.data);
-    } catch (error) {
-      throw new Error('Failed to send message');
+      console.log('Raw message:', { parsedNodesFromEditor });
+      try {
+        const payload = {
+          nodes: parsedNodesFromEditor,
+          posted_by: this.currentUserId,
+          in_reply_to: null,
+        };
+        const messageResponse = await api.post(
+          conversationsMessagesUrl(this.projectId),
+          payload
+        );
+        this.messages.push(messageResponse.data);
+      } catch (error) {
+        throw new Error('Failed to send message');
+      }
     }
-  },
-  buildMessageRope(rawMessage) {
-    const messageRope = {
-      nodes: [],
-      posted_by: this.currentUserId,
-    };
-    messageRope.nodes.push({
-      position: messageRope.nodes.length + 1,
-      type: 'MarkdownNode',
-      text: rawMessage.text,
-    });
-    return messageRope;
   },
 }));

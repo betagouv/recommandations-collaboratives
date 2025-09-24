@@ -71,7 +71,10 @@ const FileCardExtension = Node.create({
 
     return [
       'div',
-      mergeAttributes(HTMLAttributes, { 'data-type': 'file-card' }),
+      mergeAttributes(HTMLAttributes, {
+        'data-type': 'file-card',
+        'data-id': HTMLAttributes.id,
+      }),
       fileCardContent,
     ];
   },
