@@ -1,7 +1,9 @@
 {% load projects_extra %}
-{% comment %} {% count_has_notifications topic.list as new_message_count %}
+{% count_has_notifications topic.list as new_message_count %}
 {% count_message_by_type topic.list "reco" as reco_count %}
-{% count_message_by_type topic.list "reco" "posting" "followup" as message_count %} {% endcomment %}
+{% count_message_by_type topic.list "contact" as contact_count %}
+{% count_message_by_type topic.list "document" as document_count %}
+{% count_message_by_type topic.list "reco" "posting" "followup" as message_count %}
 {% with topic_slug=topic_name|default:"general"|slugify %}
     <div class="topic-item__container position-relative topic-item__container--open {% if is_open %}topic-item__container--open{% endif %}">
         <label class="topic-item__title stretched-link"
@@ -15,14 +17,28 @@
                    @change="setActiveTopic($event.target.value, '{{ topic_name }}')">
             <span class="topic-item__label {% if topic_name %}color{% endif %}"
                   :style="{ '--current-bg-color': stringToColor('{{ topic_slug }}')}">{{ topic_name|default:"Général" }}</span>
-            <p class="topic-item__message-len">
-                <span class="fr-icon-chat-2-line fr-icon--sm" aria-hidden="true"></span> {{ message_count }} message{{ message_count|pluralize }}
-                {% if new_message_count > 0 %}
+            <div class="topic-item__message-len d-flex justify-content-between">
+                <p class="topic-item__message-len">
+                    <span class="fr-icon-chat-2-line fr-icon--sm" aria-hidden="true"></span> <span>{{ message_count }} message{{ message_count|pluralize }}</span>
+                {% comment %} {% if new_message_count > 0 %} {% endcomment %}
                     <span class="topic-item__message-len--new">({{ new_message_count }} {{ new_message_count|pluralize:"nouveau,nouveaux" }})</span>
-                {% endif %}
-                {% if reco_count > 0 %}
+                {% comment %} {% endif %} {% endcomment %}
+                </p>
+                <p class="topic-item__message-len">
+                {% comment %} {% if reco_count > 0 %} {% endcomment %}
                     <span class="fr-icon-list-check-line fr-icon--sm" aria-hidden="true"></span> <span>{{ reco_count }} recommandation{{ reco_count|pluralize }}</span>
-                {% endif %}
+                {% comment %} {% endif %} {% endcomment %}
+                <p>
+            </div>
+            <p class="topic-item__message-len d-flex justify-content-between">
+                {% comment %} {% if document_count > 0 %} {% endcomment %}
+                    <a class="stretched-link" href="{% if 'manage_documents' in user_project_perms %} {% url 'projects-project-detail-documents' project.pk %} {% else %}#{% endif %}">
+                        <span class="fr-icon-group-line fr-icon--sm" aria-hidden="true"></span> <span>{{ document_count }} document{{ document_count|pluralize }}</span>
+                    </a>
+                {% comment %} {% endif %} {% endcomment %}
+                {% comment %} {% if contact_count > 0 %} {% endcomment %}
+                    <span class="fr-icon-file-download-line fr-icon--sm" aria-hidden="true"></span> <span>{{ contact_count }} contact{{ contact_count|pluralize }}</span>
+                {% comment %} {% endif %} {% endcomment %}
             </p>
         </label>
     </div>
