@@ -36,6 +36,25 @@ def random_user():
     return user
 
 
+@pytest.fixture()
+def msg_and_sender(project_ready):
+    user = baker.make(auth_models.User)
+    assign_perm("projects.view_public_notes", project_reader, project_ready)
+    message = baker.make(Message, project=project_ready, posted_by=user)
+    message.save()
+    return message, user
+
+
+@pytest.fixture()
+def sender(msg_and_sender):
+    return msg_and_sender[1]
+
+
+@pytest.fixture()
+def message(msg_and_sender):
+    return msg_and_sender[0]
+
+
 @pytest.mark.django_db
 @pytest.mark.parametrize(
     "msg_reader,res_code",
@@ -45,10 +64,10 @@ def random_user():
         ("random_user", 403),
     ],
 )
-def test_who_can_read_messages(msg_reader, res_code, project_ready, request, client):
+def test_who_can_read_messages(
+    msg_reader, res_code, project_ready, msg_and_sender, request, client
+):
     user = request.getfixturevalue(msg_reader)
-    message = baker.make(Message, project=project_ready)
-    message.save()
     url = reverse("projects-conversations-messages-list", args=[project_ready.pk])
     client.force_login(user)
     response = client.get(url)
@@ -88,10 +107,10 @@ def test_who_can_send_messages(msg_reader, res_code, project_ready, request, cli
     ],
 )
 @pytest.mark.django_db
-def test_who_can_edit_messages(msg_reader, res_code, project_ready, request, client):
+def test_who_can_edit_messages(
+    msg_reader, res_code, project_ready, message, request, client
+):
     user = request.getfixturevalue(msg_reader)
-    message = baker.make(Message, project=project_ready)
-    message.save()
     url = reverse(
         "projects-conversations-messages-detail", args=[project_ready.pk, message.pk]
     )
