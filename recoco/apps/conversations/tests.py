@@ -101,6 +101,7 @@ def test_who_can_send_messages(msg_reader, res_code, project_ready, request, cli
 @pytest.mark.parametrize(
     "msg_reader,res_code",
     [
+        ("sender", 200),
         ("project_editor", 403),
         ("project_reader", 403),
         ("random_user", 403),
@@ -116,6 +117,48 @@ def test_who_can_edit_messages(
     )
     client.force_login(user)
     response = client.patch(url, data={"nodes": []})
+    assert response.status_code == res_code
+
+
+@pytest.mark.parametrize(
+    "msg_reader,res_code",
+    [
+        ("project_editor", 403),
+        ("project_reader", 403),
+        ("random_user", 403),
+    ],
+)
+def test_who_can_see_activity(msg_reader, res_code, project_ready, request, client):
+    user = request.getfixturevalue(msg_reader)
+    url = reverse("projects-conversations-activities-detail", args=[project_ready.pk])
+    client.force_login(user)
+    response = client.get(url)
+    assert response.status_code == res_code
+    pass
+
+
+@pytest.mark.parametrize(
+    "msg_reader,res_code",
+    [
+        ("project_editor", 200),
+        ("project_reader", 200),
+        ("random_user", 403),
+    ],
+)
+def test_who_can_see_participants(
+    msg_reader, project_editor, project_reader, res_code, project_ready, request, client
+):
+    user = request.getfixturevalue(msg_reader)
+    baker.make(auth_models.User)
+    project_ready.members.set(
+        project_editor,
+        project_reader,
+        baker.make(auth_models.User),
+        baker.make(auth_models.User),
+    )
+    url = reverse("projects-conversations-participants-detail", args=[project_ready.pk])
+    client.force_login(user)
+    response = client.get(url)
     assert response.status_code == res_code
 
 
