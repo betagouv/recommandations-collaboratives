@@ -1,5 +1,6 @@
 from django.contrib.auth import models as auth_models
 from django.db import models
+from django.urls import reverse
 from model_utils.models import TimeStampedModel
 from polymorphic.models import PolymorphicModel
 
@@ -26,6 +27,13 @@ class Message(TimeStampedModel):
         null=True,
         blank=True,
     )
+
+    def get_absolute_url(self):
+        return reverse(
+            "projects-project-detail-conversations",
+            kwargs={"project_id": self.project.pk},
+            query={"message_id": self.pk},
+        )
 
 
 class Node(PolymorphicModel):
