@@ -78,6 +78,7 @@ Alpine.data('editor', (content) => {
         },
       });
 
+      this.$store.editor.editorInstance = editor;
       this.renderMarkdown();
 
       // Ajouter des watchers pour déclencher des mises à jour réactives

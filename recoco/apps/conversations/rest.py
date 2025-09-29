@@ -21,16 +21,14 @@ class MessagePermission(BasePermission):
     - one/update for anyone having "projects.use_public_notes" and owning the object (posted_by)
     """
 
-    def has_object_permission(self, request, view, obj: Message):
+    def has_permission(self, request, view):
+        project = projects_models.Project.objects.get(pk=view.kwargs["project_id"])
         if request.method in SAFE_METHODS:
-            return has_perm(request.user, "projects.view_public_notes", obj.project)
-        else:
-            can_write = has_perm(request.user, "projects.use_public_notes", obj.project)
+            return has_perm(request.user, "projects.view_public_notes", project)
+        return has_perm(request.user, "projects.use_public_notes", project)
 
-            # Overwrite
-            if obj.pk:
-                can_write &= obj.posted_by == request.user
-            return can_write
+    def has_object_permission(self, request, view, obj: Message):
+        return request.method in SAFE_METHODS or obj.posted_by == request.user
 
 
 class MessageViewSet(viewsets.ModelViewSet):

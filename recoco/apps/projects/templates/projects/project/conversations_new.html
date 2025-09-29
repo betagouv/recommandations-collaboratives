@@ -35,7 +35,7 @@
                     {% include "projects/project/fragments/conversations_new/conversation_topic.html" with topic_name=topic.grouper message_number=topic.list %}
                 {% comment %} {% endfor %} {% endcomment %}
             </div>
-            <div class="conversation-new__topics-list-member fr-p-2w"
+            <div class="conversation-new__topics-list-member fr-px-2w fr-pt-2w"
                  x-data="{isOpen: false}"
                  :class="{'open': isOpen}">
                 <h2 class="conversation-new__topics-list-member-title">Participants</h2>
@@ -57,7 +57,7 @@
                         {% endif %}
                     {% endfor %}
                 </ul>
-                <div class="list-member-toggle position-sticky bottom-0 start-0 text-center w-100 bg-white">
+                <div class="list-member-toggle position-sticky bottom-0 start-0 text-center w-100 bg-white fr-pb-0">
                     <button class="fr-btn fr-btn--sm fr-btn--tertiary-no-outline"
                             @click="isOpen = !isOpen"
                             x-text="isOpen ? 'Voir moins' : 'Voir plus'"></button>

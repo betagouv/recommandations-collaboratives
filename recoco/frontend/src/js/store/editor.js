@@ -2,12 +2,13 @@ import Alpine from '../utils/globals';
 
 document.addEventListener('alpine:init', () => {
   Alpine.store('editor', {
+    editorInstance: null,
     currentMessage: '',
     currentMessageJSON: '',
     isEditing: false,
     isSubmitted: false,
-    clearCurrentMessage() {
-      this.currentMessage = '';
+    clearEditorContent() {
+      Alpine.raw(this.editorInstance).commands.clearContent();
     },
     setIsSubmitted(isSubmitted) {
       this.isSubmitted = isSubmitted;

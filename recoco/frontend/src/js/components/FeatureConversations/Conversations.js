@@ -32,11 +32,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     this.$store.tasksData._subscribe(() => {
       this.tasks = this.$store.tasksData.tasks;
     });
-    this.countOf.messages = this.countMessagesInDiscussion();
-    this.countOf.tasks = this.countTasksInDiscussion();
-    this.countOf.contacts = this.countContactsInDiscussion();
-    this.countOf.documents = this.countDocumentsInDiscussion();
-    this.countOf.new_messages = this.countNewMessagesInDiscussion();
+    this.countElementsInDiscussion();
   },
   getRecommendationById(id) {
     const foundRecommendation = this.tasks.find(
@@ -133,7 +129,6 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
       const parsedNodesFromEditor = this.$store.editor.parseTipTapContent(
         this.$store.editor.currentMessageJSON
       );
-      console.log('Raw message:', { parsedNodesFromEditor });
       try {
         const payload = {
           nodes: parsedNodesFromEditor,
@@ -144,118 +139,30 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
           conversationsMessagesUrl(this.projectId),
           payload
         );
-        this.messages.push(messageResponse.data);
+        this.feed.messages.push(messageResponse.data);
+        this.$store.editor.clearEditorContent();
       } catch (error) {
-        throw new Error('Failed to send message');
+        throw new Error('Failed to send message', error);
       }
     }
   },
-  countDocumentsInDiscussion() {
-    let count = 0;
+  countElementsInDiscussion() {
+    //TODO: add count of new messages since last visit
     for (const message of this.feed.messages) {
       for (const node of message.nodes) {
         if (node.type === 'DocumentNode') {
-          count += 1;
+          this.countOf.documents += 1;
         }
-      }
-    }
-    return count;
-  },
-  countTasksInDiscussion() {
-    let count = 0;
-    for (const message of this.feed.messages) {
-      for (const node of message.nodes) {
         if (node.type === 'RecommendationNode') {
-          count += 1;
+          this.countOf.tasks += 1;
         }
-      }
-    }
-    return count;
-  },
-  countContactsInDiscussion() {
-    let count = 0;
-    for (const message of this.feed.messages) {
-      for (const node of message.nodes) {
         if (node.type === 'ContactNode') {
-          count += 1;
+          this.countOf.contacts += 1;
         }
-      }
-    }
-    return count;
-  },
-  countMessagesInDiscussion(){
-    let count = 0;
-    console.log(this.feed.messages);
-    for (const message of this.feed.messages) {
-      for (const node of message.nodes) {
         if (node.type === 'MarkdownNode') {
-          count += 1;
+          this.countOf.messages += 1;
         }
       }
     }
-    return count;
-  },
-  countNewMessagesInDiscussion(){
-    let count = 0;
-    for (const message of this.feed.messages) {
-      if (!message.read_by.includes(this.currentUserId)) {
-        count += 1;
-      }
-    }
-    return count;
-  },
-  countDocumentsInDiscussion() {
-    let count = 0;
-    for (const message of this.feed.messages) {
-      for (const node of message.nodes) {
-        if (node.type === 'DocumentNode') {
-          count += 1;
-        }
-      }
-    }
-    return count;
-  },
-  countTasksInDiscussion() {
-    let count = 0;
-    for (const message of this.feed.messages) {
-      for (const node of message.nodes) {
-        if (node.type === 'RecommendationNode') {
-          count += 1;
-        }
-      }
-    }
-    return count;
-  },
-  countContactsInDiscussion() {
-    let count = 0;
-    for (const message of this.feed.messages) {
-      for (const node of message.nodes) {
-        if (node.type === 'ContactNode') {
-          count += 1;
-        }
-      }
-    }
-    return count;
-  },
-  countMessagesInDiscussion(){
-    let count = 0;
-    console.log(this.feed.messages);
-    for (const message of this.feed.messages) {
-      for (const node of message.nodes) {
-        if (node.type === 'MarkdownNode') {
-          count += 1;
-        }
-      }
-    }
-    return count;
-  },
-  countNewMessagesInDiscussion(){
-    let count = 0;
-    for (const message of this.feed.messages) {
-      if (!message.read_by.includes(this.currentUserId)) {
-        count += 1;
-      }
-    }
-    return count;
   },
 }));
