@@ -88,7 +88,7 @@ Alpine.data('CreateOrganizationModal', (data = null) => {
     },
     onSelectGroup(group) {
       this.isAnOrgaGroupSelected = true;
-      this.organization.group = group.id;
+      this.organization.group = group;
       this.userInput = group.name;
       this.showOrgaGroupsresults = false;
     },
@@ -102,7 +102,7 @@ Alpine.data('CreateOrganizationModal', (data = null) => {
         api
           .post(organizationGroupsUrl(), this.organization.group)
           .then((response) => {
-            this.organization.group = response.data.id;
+            this.organization.group = response.data;
           });
       } catch (error) {
         throw new Error('Error while creating organization group ', error);
@@ -125,8 +125,7 @@ Alpine.data('CreateOrganizationModal', (data = null) => {
         api
           .post(organizationsUrl(), {
             ...this.organization,
-            group_id: this.organization?.group?.id || this.organization?.group || null,
-            // group_id: this.organization.group.id, // TODO : use this line when organization.group is an object not an id
+            group_id: this.organization?.group?.id || null,
           })
           .then((response) => {
             if (isItReturningData) {
@@ -164,7 +163,8 @@ Alpine.data('CreateOrganizationModal', (data = null) => {
         try {
           const payload = {
             ...this.organization,
-            group_id: this.organization?.group?.id || this.organization?.group || null,
+            group_id:
+              this.organization?.group?.id || this.organization?.group || null,
           };
           delete payload.group;
           api
