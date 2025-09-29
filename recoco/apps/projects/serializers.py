@@ -3,6 +3,7 @@ from django.db.models import signals
 from notifications import models as notifications_models
 from rest_framework import serializers
 from rest_framework.fields import HiddenField
+from rest_framework.permissions import BasePermission
 from taggit.serializers import TagListSerializerField, TaggitSerializer
 
 from recoco import verbs
@@ -10,9 +11,16 @@ from recoco.apps.geomatics.serializers import CommuneSerializer
 from recoco.apps.home.serializers import UserSerializer
 from recoco.apps.tasks import models as task_models
 from recoco.rest_api.serializers import BaseSerializerMixin
-from recoco.utils import get_group_for_site
+from recoco.utils import get_group_for_site, has_perm
 
 from .models import Document, Note, Project, ProjectSite, Topic, UserProjectStatus
+
+
+class DocumentPermission(BasePermission):
+    def has_permission(self, request, view):
+        project = Project.objects.get(pk=view.kwargs["project_id"])
+        # perms from recoco.app.projects.views.documents
+        return has_perm(request.user, "manage_documents", project)
 
 
 class DocumentSerializer(serializers.HyperlinkedModelSerializer):
