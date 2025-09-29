@@ -129,7 +129,6 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
       const parsedNodesFromEditor = this.$store.editor.parseTipTapContent(
         this.$store.editor.currentMessageJSON
       );
-      console.log('Raw message:', { parsedNodesFromEditor });
       try {
         const payload = {
           nodes: parsedNodesFromEditor,
@@ -141,8 +140,9 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
           payload
         );
         this.feed.messages.push(messageResponse.data);
+        this.$store.editor.clearEditorContent();
       } catch (error) {
-        throw new Error('Failed to send message');
+        throw new Error('Failed to send message', error);
       }
     }
   },
