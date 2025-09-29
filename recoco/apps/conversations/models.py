@@ -1,6 +1,8 @@
 from django.contrib.auth import models as auth_models
+from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
 from model_utils.models import TimeStampedModel
+from notifications.models import Notification
 from polymorphic.models import PolymorphicModel
 
 from recoco.apps.addressbook import models as addressbook_models
@@ -13,6 +15,13 @@ class Message(TimeStampedModel):
         projects_models.Project,
         on_delete=models.CASCADE,
         related_name="public_messages",
+    )
+
+    notifications = GenericRelation(
+        Notification,
+        content_type_field="action_object_content_type_id",
+        object_id_field="action_object_object_id",
+        related_query_name="action_messages",
     )
 
     posted_by = models.ForeignKey(
