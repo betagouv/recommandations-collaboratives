@@ -17,6 +17,7 @@ from recoco.utils import is_staff_for_site
 
 from . import models
 from .utils import (
+    get_collaborators_for_project,
     get_project_moderators,
     get_regional_actors_for_project,
     notify_advisors_of_project,
@@ -325,6 +326,16 @@ def project_userproject_trace_status_changes(sender, old_one, new_one, **kwargs)
 @receiver(document_uploaded)
 def project_document_uploaded(sender, instance, **kwargs):
     project = instance.project
+
+    # Reactivate project if was set inactive
+    if instance.uploaded_by in get_collaborators_for_project(project):
+        project.last_members_activity_at = timezone.now()
+
+        if project.inactive_since:
+            project.reactivate()
+
+        project.save()
+
     if project.project_sites.current().status == "DRAFT" or project.muted:
         return
 

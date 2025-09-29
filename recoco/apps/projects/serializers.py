@@ -1,4 +1,5 @@
 from django.contrib.contenttypes.models import ContentType
+from django.db.models import signals
 from notifications import models as notifications_models
 from rest_framework import serializers
 from rest_framework.fields import HiddenField
@@ -47,6 +48,11 @@ class NewDocumentSerializer(serializers.ModelSerializer):
         data["uploaded_by"] = self.context.get("uploaded_by")
         data["project_id"] = self.context.get("project_id")
         return super().to_internal_value(data)
+
+    def create(self, validated_data):
+        res = super().create(validated_data)
+        signals.document_uploaded.send(sender=self.create, instance=res)
+        return res
 
 
 class InlineProjectSiteSerializer(serializers.ModelSerializer):
