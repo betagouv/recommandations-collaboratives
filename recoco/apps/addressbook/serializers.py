@@ -88,10 +88,10 @@ class OrganizationDetailSerializer(OrganizationListSerializer):
 
 class OrganizationWritableSerializer(OrganizationListSerializer):
     group_id = serializers.PrimaryKeyRelatedField(
-        source="group", queryset=OrganizationGroup.objects.all(), allow_null=True
+        source="group", queryset=OrganizationGroup.objects, allow_null=True
     )
     departments = serializers.PrimaryKeyRelatedField(
-        queryset=Department.objects.all(), many=True
+        queryset=Department.objects, many=True
     )
 
     class Meta:
