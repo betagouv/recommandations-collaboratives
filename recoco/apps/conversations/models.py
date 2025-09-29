@@ -32,7 +32,7 @@ class Message(TimeStampedModel):
         return reverse(
             "projects-project-detail-conversations",
             kwargs={"project_id": self.project.pk},
-            query={"message_id": self.pk},
+            query={"message-id": self.pk},
         )
 
 
