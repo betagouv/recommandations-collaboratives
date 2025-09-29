@@ -20,6 +20,7 @@ from django.shortcuts import get_object_or_404
 from notifications import models as notifications_models
 from rest_framework import mixins, permissions, status, viewsets
 from rest_framework.generics import ListAPIView
+from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -40,6 +41,7 @@ from .. import models, signals
 from ..filters import DepartmentsFilter, ProjectActivityFilter
 from ..serializers import (
     DocumentSerializer,
+    NewDocumentSerializer,
     ProjectForListSerializer,
     ProjectSiteSerializer,
     TopicSerializer,
@@ -547,16 +549,35 @@ class ProjectSiteViewSet(viewsets.GenericViewSet):
 ########################################################################
 
 
-class DocumentViewSet(mixins.RetrieveModelMixin, viewsets.GenericViewSet):
+class DocumentViewSet(
+    mixins.RetrieveModelMixin, mixins.CreateModelMixin, viewsets.GenericViewSet
+):
     """API endpoint that allows searching for topics"""
 
-    serializer_class = DocumentSerializer
     permission_classes = [permissions.IsAuthenticated]
     queryset = models.Document.objects
+    parsers = (
+        JSONParser,
+        MultiPartParser,
+        FormParser,
+    )
 
     def get_queryset(self):
         project_id = int(self.kwargs["project_id"])
         return self.queryset.filter(project_id=project_id)
+
+    def get_serializer_class(self):
+        if self.action == "create":
+            return NewDocumentSerializer
+        return DocumentSerializer
+
+    def get_serializer_context(self):
+        project_id = int(self.kwargs["project_id"])
+        return {
+            **super().get_serializer_context(),
+            "project_id": project_id,
+            "uploaded_by": self.request.user,
+        }
 
 
 # eof
