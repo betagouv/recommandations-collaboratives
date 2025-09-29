@@ -1,6 +1,7 @@
 from django.contrib.contenttypes.models import ContentType
 from notifications import models as notifications_models
 from rest_framework import serializers
+from rest_framework.fields import HiddenField
 from taggit.serializers import TagListSerializerField, TaggitSerializer
 
 from recoco import verbs
@@ -27,7 +28,25 @@ class DocumentSerializer(serializers.HyperlinkedModelSerializer):
             "pinned",
         ]
 
-    uploaded_by = UserSerializer(read_only=True, many=False)
+    uploaded_by = UserSerializer(read_only=True)
+
+
+class NewDocumentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Document
+        fields = [
+            "the_file",
+            "the_link",
+            "description",
+            "uploaded_by",
+        ]
+
+    project_id = HiddenField(default=0)  # will be re-written in to_internal_value
+
+    def to_internal_value(self, data):
+        data["uploaded_by"] = self.context.get("uploaded_by")
+        data["project_id"] = self.context.get("project_id")
+        return super().to_internal_value(data)
 
 
 class InlineProjectSiteSerializer(serializers.ModelSerializer):
