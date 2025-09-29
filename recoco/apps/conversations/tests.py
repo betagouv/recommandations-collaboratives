@@ -123,6 +123,28 @@ def test_who_can_edit_messages(
 @pytest.mark.parametrize(
     "msg_reader,res_code",
     [
+        ("sender", 204),
+        ("project_editor", 403),
+        ("project_reader", 403),
+        ("random_user", 403),
+    ],
+)
+@pytest.mark.django_db
+def test_who_can_delete_messages(
+    msg_reader, res_code, project_ready, message, request, client
+):
+    user = request.getfixturevalue(msg_reader)
+    url = reverse(
+        "projects-conversations-messages-detail", args=[project_ready.pk, message.pk]
+    )
+    client.force_login(user)
+    response = client.delete(url)
+    assert response.status_code == res_code
+
+
+@pytest.mark.parametrize(
+    "msg_reader,res_code",
+    [
         ("project_editor", 403),
         ("project_reader", 403),
         ("random_user", 403),
@@ -160,6 +182,20 @@ def test_who_can_see_participants(
     client.force_login(user)
     response = client.get(url)
     assert response.status_code == res_code
+
+
+@pytest.mark.django_db
+def test_delete_message(message, sender, project_ready, client):
+    url = reverse(
+        "projects-conversations-messages-detail", args=[project_ready.pk, message.pk]
+    )
+    client.force_login(sender)
+    client.delete(url)
+
+    msg = Message.objects.filter(pk=message.pk).first()
+    msg_not_deleted = Message.not_deleted.filter(pk=message.pk).first()
+    assert msg.deleted is not None
+    assert msg_not_deleted is None
 
 
 #####--- Utils ---#####

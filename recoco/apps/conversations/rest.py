@@ -32,18 +32,24 @@ class MessagePermission(BasePermission):
 
 
 class MessageViewSet(viewsets.ModelViewSet):
-    queryset = Message.objects
     serializer_class = MessageSerializer
     permission_classes = [IsAuthenticated, MessagePermission]
 
     def get_queryset(self):
         project_id = int(self.kwargs["project_id"])
-        return self.queryset.filter(project_id=project_id)
+        if self.action == "destroy":
+            queryset = Message.objects
+        else:
+            queryset = Message.not_deleted
+        return queryset.filter(project_id=project_id)
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
         context.update({"project_id": int(self.kwargs["project_id"])})
-        return context
+        return
+
+    def perform_destroy(self, instance):
+        instance.delete()
 
 
 class ActivityViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):

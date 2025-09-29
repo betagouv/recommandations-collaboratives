@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.contrib.auth import models as auth_models
 from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
@@ -11,7 +13,15 @@ from recoco.apps.projects import models as projects_models
 from recoco.apps.tasks import models as tasks_models
 
 
+class MessageNotDeleted(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(deleted=None)
+
+
 class Message(TimeStampedModel):
+    objects = models.Manager()  # todo ordering ?
+    not_deleted = MessageNotDeleted()
+
     project = models.ForeignKey(
         projects_models.Project,
         on_delete=models.CASCADE,
@@ -43,6 +53,12 @@ class Message(TimeStampedModel):
             kwargs={"project_id": self.project.pk},
             query={"message-id": self.pk},
         )
+
+    deleted = models.DateTimeField(null=True, blank=True)
+
+    def delete(self):
+        self.deleted = datetime.now()
+        self.save()
 
 
 class Node(PolymorphicModel):
