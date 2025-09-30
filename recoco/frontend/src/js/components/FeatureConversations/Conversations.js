@@ -56,7 +56,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     try {
       const messages = await api.get(conversationsMessagesUrl(this.projectId));
       this.feed.messages = messages.data;
-      console.log("messages", this.feed.messages);
+      console.log('messages', this.feed.messages);
       this.messagesLoaded = true;
       setTimeout(() => {
         this.showMessages = true;
@@ -67,21 +67,23 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
   },
   async getActivities() {
     try {
-      const activities = await api.get(conversationsActivitiesUrl(this.projectId));
+      const activities = await api.get(
+        conversationsActivitiesUrl(this.projectId)
+      );
       this.feed.activities = activities.data;
-      console.log("activities", this.feed.activities);
+      console.log('activities', this.feed.activities);
     } catch (error) {
       throw new Error('Failed to get activities');
     }
   },
   createFullFeed() {
-    const messages = (this.feed.messages || []).map(m => (
+    const messages = (this.feed.messages || []).map((m) =>
       m.type ? m : { ...m, type: 'message' }
-    ));
+    );
 
-    const activities = (this.feed.activities || []).map(a => (
+    const activities = (this.feed.activities || []).map((a) =>
       a.type ? a : { ...a, type: 'activity' }
-    ));
+    );
 
     this.feed.elements = [...messages, ...activities].sort((a, b) => {
       const ta = Date.parse(a.created ?? a.timestamp ?? 0);
@@ -89,7 +91,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
       if (ta !== tb) return ta - tb;
       return 0;
     });
-    console.log("full feed", this.feed);
+    console.log('full feed', this.feed);
   },
   async getMessagesParticipants() {
     try {
@@ -180,7 +182,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
           conversationsMessagesUrl(this.projectId),
           payload
         );
-        this.feed.messages.push(messageResponse.data);
+        this.feed.elements.push({ ...messageResponse.data, type: 'message' });
         this.$store.editor.clearEditorContent();
         this.messageIdToReply = null;
         this.isEditorInReplyMode = false;
@@ -266,9 +268,9 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     }
   },
   replaceMessage(message, messageIdToEdit) {
-    const messageIndex = this.feed.messages.findIndex(
+    const messageIndex = this.feed.elements.findIndex(
       (message) => message.id === messageIdToEdit
     );
-    this.feed.messages[messageIndex] = message;
+    this.feed.elements[messageIndex] = { ...message, type: 'message' };
   },
 }));
