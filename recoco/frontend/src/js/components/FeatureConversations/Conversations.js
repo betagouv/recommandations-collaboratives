@@ -1,6 +1,7 @@
 import Alpine from '../../utils/globals';
 import api, {
   conversationsMessagesUrl,
+  conversationsActivitiesUrl,
   contactUrl,
   conversationsParticipantsUrl,
   conversationsMessageUrl,
@@ -33,7 +34,9 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
   messageIdToEdit: null,
   messageIdToReply: null,
   async init() {
+    await this.getActivities();
     await this.getMessages();
+    this.createFullFeed();
     this.getMessagesParticipants();
     this.$store.tasksData._subscribe(() => {
       this.tasks = this.$store.tasksData.tasks;
@@ -53,7 +56,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     try {
       const messages = await api.get(conversationsMessagesUrl(this.projectId));
       this.feed.messages = messages.data;
-      console.log(this.feed.messages);
+      console.log("messages", this.feed.messages);
       this.messagesLoaded = true;
       setTimeout(() => {
         this.showMessages = true;
@@ -61,6 +64,32 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     } catch (error) {
       throw new Error('Failed to get messages');
     }
+  },
+  async getActivities() {
+    try {
+      const activities = await api.get(conversationsActivitiesUrl(this.projectId));
+      this.feed.activities = activities.data;
+      console.log("activities", this.feed.activities);
+    } catch (error) {
+      throw new Error('Failed to get activities');
+    }
+  },
+  createFullFeed() {
+    const messages = (this.feed.messages || []).map(m => (
+      m.type ? m : { ...m, type: 'message' }
+    ));
+
+    const activities = (this.feed.activities || []).map(a => (
+      a.type ? a : { ...a, type: 'activity' }
+    ));
+
+    this.feed.elements = [...messages, ...activities].sort((a, b) => {
+      const ta = Date.parse(a.created ?? a.timestamp ?? 0);
+      const tb = Date.parse(b.created ?? b.timestamp ?? 0);
+      if (ta !== tb) return ta - tb;
+      return 0;
+    });
+    console.log("full feed", this.feed);
   },
   async getMessagesParticipants() {
     try {

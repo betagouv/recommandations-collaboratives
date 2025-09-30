@@ -1,17 +1,17 @@
 <div class="observed-element"
-     data-notifications="{{ message.notifications }}">
+     data-notifications="{{ element.notifications }}">
     <div class="message-item rounded-3 fr-p-3v fr-my-2v"
-         :class="{'current-user-message fr-ml-5w': {{ request.user.id }} == message.posted_by, 'other-user-message fr-mr-5w': {{ request.user.id }} != message.posted_by}">
-        <template x-if="message.in_reply_to">
+         :class="{'current-user-message fr-ml-5w': {{ request.user.id }} == element.posted_by, 'other-user-message fr-mr-5w': {{ request.user.id }} != element.posted_by}">
+        <template x-if="element.in_reply_to">
             <div class="message-item__reply-to text-muted fr-italic fr-small">
                 <p class="d-flex">
                     <span class="fr-icon-corner-down-right-line fr-icon--sm"></span>
                     en réponse à : <span class="fr-ml-1v"
-       x-html="renderMarkdown(getShortMessageInReplyTo(message.in_reply_to))"></span>
+       x-html="renderMarkdown(getShortMessageInReplyTo(element.in_reply_to))"></span>
                 </p>
             </div>
         </template>
-        <template x-for="node in message.nodes">
+        <template x-for="node in element.nodes">
             <div>
                 <template x-if="node.type == 'MarkdownNode'">
                     {% include "conversations/messages/fragments/node_markdown.html" %}
@@ -28,22 +28,16 @@
             </div>
         </template>
         <!-- Reply button -->
-        <template x-if="message.posted_by != {{ request.user.id }} && !message.in_reply_to">
+        <template x-if="element.posted_by != {{ request.user.id }} && !element.in_reply_to">
             <div class="d-flex justify-content-end">
                 <button class="fr-btn fr-btn--sm fr-btn--tertiary-no-outline"
-                        @click="onClickHandleReply(message)">Répondre</button>
+                        @click="onClickHandleReply(element)">Répondre</button>
             </div>
         </template>
-        <template x-if="message.posted_by && messagesParticipants.length > 0">
-            <div class="d-flex justify-content-between">
-                <div class="d-flex align-items-center"
-                     x-data="{user: null}"
-                     x-init="user = getUserById(message.posted_by);">{% include "user/user_card_js.html" %}</div>
-                <template x-if="message.posted_by == {{ request.user.id }}">
-                    <button class="fr-btn fr-btn--sm fr-btn--tertiary-no-outline"
-                            @click="onClickHandleEdit(message)">Éditer</button>
-                </template>
-            </div>
+        <template x-if="element.posted_by && messagesParticipants.length > 0">
+            <div class="d-flex align-items-center"
+                 x-data="{user: null}"
+                 x-init="user = getUserById(element.posted_by);">{% include "user/user_card_js.html" %}</div>
         </template>
     </div>
 </div>

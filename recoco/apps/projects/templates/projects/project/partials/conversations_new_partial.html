@@ -11,13 +11,23 @@
     {% endcomment %}
     <!-- Loop through all messages -->
     <div class="conversation-new__container-topic">
-        <template x-for="message in feed.messages">
-            {% comment %} TODO: add message date {% endcomment %}
+        {% comment %} <template x-for="message in feed.messages">{% endcomment %}
+            {% comment %} TODO: add message date by block {% endcomment %}
             <!-- Loop through one message node  -->
             {% comment %} {% ifchanged message.created|date %}
                 <p class="conversation-new__date">{{ message.created|date }}</p>
             {% endifchanged %} {% endcomment %}
-            {% include "conversations/messages/message_item.html" %}
+            {% comment %} {% include "conversations/messages/message_item.html" %}
+        </template> {% endcomment %}
+        <template x-for="element in feed.elements">
+            <div>
+                <template x-if="element.type == 'message'">
+                    {% include "conversations/messages/message_item.html" %}
+                </template>
+                <template x-if="element.type == 'activity'">
+                    {% include "projects/project/fragments/conversations_new/message_type/type_followup_item.html" with element="node" %}
+                </template>
+            </div>
         </template>
         {% comment %} {% for message in feed.messages %}
             <!-- Loop through one message node  -->
