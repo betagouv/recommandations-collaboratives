@@ -214,6 +214,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
         );
         this.replaceMessage(messageResponse.data, messageIdToEdit);
         this.messageIdToEdit = null;
+        this.isEditorInEditMode = false;
         this.$store.editor.clearEditorContent();
       } catch (error) {
         throw new Error('Failed to update message', error);
