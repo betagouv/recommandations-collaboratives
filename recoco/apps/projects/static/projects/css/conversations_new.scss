@@ -197,6 +197,13 @@
             background: #e4e4fe;
           }
         }
+        &__date {
+          color: var(--light-neutral-grey-625, #929292);
+          font-size: 12px;
+          font-style: italic;
+          font-weight: 400;
+          line-height: 24px;
+        }
         &__reply-to {
           display: flex;
           margin: -0.75rem -0.75rem 0 -0.75rem;

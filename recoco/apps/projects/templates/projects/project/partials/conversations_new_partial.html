@@ -11,16 +11,22 @@
     {% endcomment %}
     <!-- Loop through all messages -->
     <div class="conversation-new__container-topic">
-        {% comment %} <template x-for="message in feed.messages">{% endcomment %}
-            {% comment %} TODO: add message date by block {% endcomment %}
-            <!-- Loop through one message node  -->
-            {% comment %} {% ifchanged message.created|date %}
-                <p class="conversation-new__date">{{ message.created|date }}</p>
-            {% endifchanged %} {% endcomment %}
-            {% comment %} {% include "conversations/messages/message_item.html" %}
-        </template> {% endcomment %}
-        <template x-for="element in feed.elements">
+        <template x-for="(element, index) in feed.elements">
             <div>
+                <!-- Date separator using simple Alpine.js approach -->
+                <template x-if="shouldShowDate(element)">
+                    <p class="conversation-new__date"
+                       x-text="formatDateFrench(element.type == 'message' ? element.created : element.timestamp)"></p>
+                </template>
+                <template x-if="element.firstUnread">
+                    <div class="notification-limit" x-ref="scrollLine_general">
+                        <div class="notification-limit__line"></div>
+                        <p class="notification-limit__message-number fr-mx-2w">
+                            <span x-text='feed.elements.length - index'></span> <span x-text='feed.elements.length - index > 1 ? "éléments non lus" : "élément non lu" '></span>
+                        </p>
+                        <div class="notification-limit__line"></div>
+                    </div>
+                </template>
                 <template x-if="element.type == 'message'">
                     {% include "conversations/messages/message_item.html" %}
                 </template>
@@ -29,13 +35,6 @@
                 </template>
             </div>
         </template>
-        {% comment %} {% for message in feed.messages %}
-            <!-- Loop through one message node  -->
-            {% ifchanged message.created|date %}
-                <p class="conversation-new__date">{{ message.created|date }}</p>
-            {% endifchanged %}
-            {% include "conversations/messages/message_item.html" %}
-        {% endfor %} {% endcomment %}
     </div>
     {% comment %}
     ****************************************

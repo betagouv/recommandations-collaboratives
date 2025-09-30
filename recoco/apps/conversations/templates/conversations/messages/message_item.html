@@ -1,5 +1,5 @@
 <div class="observed-element"
-     data-notifications="{{ element.notifications }}">
+     :data-notifications="JSON.stringify({id: element.id, read: element.read, type: element.type})">
     <div class="message-item rounded-3 fr-p-3v fr-my-2v"
          :class="{'current-user-message fr-ml-5w': {{ request.user.id }} == element.posted_by, 'other-user-message fr-mr-5w': {{ request.user.id }} != element.posted_by}">
         <template x-if="element.in_reply_to">
@@ -36,9 +36,14 @@
         </template>
         <template x-if="element.posted_by && messagesParticipants.length > 0">
             <div class="d-flex justify-content-between">
-                <div class="d-flex align-items-center"
-                     x-data="{user: null}"
-                     x-init="user = getUserById(element.posted_by);">{% include "user/user_card_js.html" %}</div>
+                <div class="d-flex">
+                    <div class="d-flex align-items-center"
+                         x-data="{user: null}"
+                         x-init="user = getUserById(element.posted_by);">{% include "user/user_card_js.html" %}</div>
+                    <p class="fr-m-0 fr-ml-1v message-item__date align-self-center">
+                        le <span x-text="formatDate(element.type == 'message' ? element.created : element.timestamp, { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })"></span>
+                    </p>
+                </div>
                 <template x-if="element.posted_by == {{ request.user.id }}">
                     <button class="fr-btn fr-btn--sm fr-btn--tertiary-no-outline"
                             @click="onClickHandleEdit(element)">Éditer</button>

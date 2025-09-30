@@ -7,6 +7,7 @@ import api, {
   conversationsMessageUrl,
   documentUrl,
 } from '../../utils/api';
+import { formatDateFrench } from '../../utils/date';
 
 Alpine.data('Conversations', (projectId, currentUserId) => ({
   projectId,
@@ -33,10 +34,18 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
   isEditorInReplyMode: false,
   messageIdToEdit: null,
   messageIdToReply: null,
+  lastMessageDate: null,
+  formatDateFrench,
   async init() {
     await this.getActivities();
     await this.getMessages();
     this.createFullFeed();
+    this.messagesLoaded = true;
+    console.log('messagesLoaded', this.messagesLoaded);
+    console.log('messagesLoaded', this.messagesLoaded);
+    setTimeout(() => {
+      this.showMessages = true;
+    }, 500);
     this.getMessagesParticipants();
     this.$store.tasksData._subscribe(() => {
       this.tasks = this.$store.tasksData.tasks;
@@ -57,10 +66,6 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
       const messages = await api.get(conversationsMessagesUrl(this.projectId));
       this.feed.messages = messages.data;
       console.log('messages', this.feed.messages);
-      this.messagesLoaded = true;
-      setTimeout(() => {
-        this.showMessages = true;
-      }, 500);
     } catch (error) {
       throw new Error('Failed to get messages');
     }
@@ -91,7 +96,24 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
       if (ta !== tb) return ta - tb;
       return 0;
     });
-    console.log('full feed', this.feed);
+    // !!! MOCKED DATA !!!
+    // !!! MOCKED DATA !!!
+    this.feed.elements = this.feed.elements.map((el, index) => {
+      if (index > this.feed.messages.length - 5) {
+        return { ...el, read: false };
+      } else {
+        return { ...el, read: true };
+      }
+    });
+    // !!! MOCKED DATA !!!
+    // !!! MOCKED DATA !!!
+    let countOfUnread = 0;
+    this.feed.elements.forEach((el) => {
+      if (!el.read && !countOfUnread) {
+        el.firstUnread = true;
+        countOfUnread++;
+      }
+    });
   },
   async getMessagesParticipants() {
     try {
@@ -271,5 +293,16 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
       (message) => message.id === messageIdToEdit
     );
     this.feed.elements[messageIndex] = { ...message, type: 'message' };
+  },
+  // Simple ifchanged implementation
+  shouldShowDate(element) {
+    const dateString =
+      element.type === 'message' ? element.created : element.timestamp;
+    const dateToCompare = this.formatDateFrench(dateString);
+    if (dateToCompare !== this.lastMessageDate) {
+      this.lastMessageDate = dateToCompare;
+      return true;
+    }
+    return false;
   },
 }));
