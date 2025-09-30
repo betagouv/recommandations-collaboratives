@@ -39,7 +39,7 @@ def random_user():
 @pytest.fixture()
 def msg_and_sender(project_ready):
     user = baker.make(auth_models.User)
-    assign_perm("projects.view_public_notes", project_reader, project_ready)
+    assign_perm("projects.use_public_notes", user, project_ready)
     message = baker.make(Message, project=project_ready, posted_by=user)
     message.save()
     return message, user
