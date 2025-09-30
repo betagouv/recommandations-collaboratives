@@ -28,10 +28,10 @@
             </div>
         </template>
         <!-- Reply button -->
-        <template x-if="message.in_reply_to">
+        <template x-if="message.posted_by != {{ request.user.id }} && !message.in_reply_to">
             <div class="d-flex justify-content-end">
                 <button class="fr-btn fr-btn--sm fr-btn--tertiary-no-outline"
-                        @click="handleReply(message)">Répondre</button>
+                        @click="onClickHandleReply(message)">Répondre</button>
             </div>
         </template>
         <template x-if="message.posted_by && messagesParticipants.length > 0">

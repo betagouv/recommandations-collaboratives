@@ -97,7 +97,7 @@
                           id="conversation-form">
                         {% csrf_token %}
                         <div class="message-form fr-my-3v bg-light border-form editor-form__container fr-input-group position-relative"
-                             :class="{'focus': isEditorFocused || isEditorInEditMode, 'edit-mode': isEditorInEditMode}"
+                             :class="{'focus': isEditorFocused || isEditorInEditMode || isEditorInReplyMode, 'edit-mode': isEditorInEditMode, 'reply-mode': isEditorInReplyMode}"
                              @click.outside="isEditorFocused = false">
                             <template x-if="isEditorInEditMode">
                                 <div class="edit-mode__message-container">
@@ -105,6 +105,15 @@
                                         Vous êtes en mode édition d'un message.
                                         <button class="fr-link edit-mode__button fr-text--sm"
                                                 @click="toggleEditMode({ activateEditMode: false })">Annuler</button>
+                                    </p>
+                                </div>
+                            </template>
+                            <template x-if="isEditorInReplyMode">
+                                <div class="reply-mode__message-container">
+                                    <p class="fr-text--sm fr-mb-0">
+                                        Vous êtes en mode réponse à un message.
+                                        <button class="fr-link reply-mode__button fr-text--sm"
+                                                @click="onClickCancelReply">Annuler</button>
                                     </p>
                                 </div>
                             </template>

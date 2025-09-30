@@ -29,7 +29,9 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
   },
   isEditorFocused: false,
   isEditorInEditMode: false,
+  isEditorInReplyMode: false,
   messageIdToEdit: null,
+  messageIdToReply: null,
   async init() {
     await this.getMessages();
     this.getMessagesParticipants();
@@ -143,7 +145,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
         const payload = {
           nodes: parsedNodesFromEditor,
           posted_by: this.currentUserId,
-          in_reply_to: null,
+          in_reply_to: this.messageIdToReply,
         };
         const messageResponse = await api.post(
           conversationsMessagesUrl(this.projectId),
@@ -151,6 +153,8 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
         );
         this.feed.messages.push(messageResponse.data);
         this.$store.editor.clearEditorContent();
+        this.messageIdToReply = null;
+        this.isEditorInReplyMode = false;
       } catch (error) {
         throw new Error('Failed to send message', error);
       }
@@ -175,7 +179,18 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
       }
     }
   },
+  onClickHandleReply(message) {
+    this.messageIdToReply = message.id;
+    this.isEditorInReplyMode = true;
+    Alpine.raw(this.$store.editor.editorInstance).commands.focus();
+  },
+  onClickCancelReply() {
+    this.messageIdToReply = null;
+    this.isEditorInReplyMode = false;
+  },
   onClickHandleEdit(message) {
+    debugger;
+    this.messageIdToReply = message.in_reply_to;
     this.messageIdToEdit = message.id;
     const tiptapJson = this.$store.editor.convertNodesToTipTapJson(
       message.nodes
@@ -206,7 +221,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
         const payload = {
           nodes: parsedNodesFromEditor,
           posted_by: this.currentUserId,
-          in_reply_to: null,
+          in_reply_to: this.messageIdToReply,
         };
         const messageResponse = await api.patch(
           conversationsMessageUrl(this.projectId, messageIdToEdit),

@@ -444,8 +444,10 @@
       padding: 3rem 0.5rem;
     }
   }
-  &.edit-mode {
-    .edit-mode__message-container {
+  &.edit-mode,
+  &.reply-mode {
+    .edit-mode__message-container,
+    .reply-mode__message-container {
       position: absolute;
       top: -33px;
       padding: 6px;
@@ -455,7 +457,8 @@
       font-weight: 700;
       line-height: 150%;
     }
-    button.edit-mode__button {
+    button.edit-mode__button,
+    button.reply-mode__button {
       color: #fff;
       font-weight: 700;
       text-decoration: underline;
