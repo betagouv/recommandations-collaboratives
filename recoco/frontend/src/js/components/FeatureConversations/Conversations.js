@@ -220,7 +220,6 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     this.isEditorInReplyMode = false;
   },
   onClickHandleEdit(message) {
-    debugger;
     this.messageIdToReply = message.in_reply_to;
     this.messageIdToEdit = message.id;
     const tiptapJson = this.$store.editor.convertNodesToTipTapJson(

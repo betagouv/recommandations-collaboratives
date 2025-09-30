@@ -35,9 +35,15 @@
             </div>
         </template>
         <template x-if="element.posted_by && messagesParticipants.length > 0">
-            <div class="d-flex align-items-center"
-                 x-data="{user: null}"
-                 x-init="user = getUserById(element.posted_by);">{% include "user/user_card_js.html" %}</div>
+            <div class="d-flex justify-content-between">
+                <div class="d-flex align-items-center"
+                     x-data="{user: null}"
+                     x-init="user = getUserById(element.posted_by);">{% include "user/user_card_js.html" %}</div>
+                <template x-if="element.posted_by == {{ request.user.id }}">
+                    <button class="fr-btn fr-btn--sm fr-btn--tertiary-no-outline"
+                            @click="onClickHandleEdit(element)">Éditer</button>
+                </template>
+            </div>
         </template>
     </div>
 </div>
