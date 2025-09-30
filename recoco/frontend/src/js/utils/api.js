@@ -254,6 +254,10 @@ export function conversationsMessagesUrl(projectId) {
   return `/api/projects/${projectId}/conversations/messages/`;
 }
 
+export function conversationsMessageUrl(projectId, messageId) {
+  return `/api/projects/${projectId}/conversations/messages/${messageId}/`;
+}
+
 export function conversationsActivitiesUrl(projectId) {
   return `/api/projects/${projectId}/conversations/activities/`;
 }

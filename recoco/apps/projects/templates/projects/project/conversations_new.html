@@ -92,7 +92,7 @@
                 hx-swap="outerHTML"
                     hx-target="#conversation-new-container" {% endcomment %}
                     <form class="form editor-form fr-px-3v fr-pr-12w"
-                          @submit.prevent="sendMessage(message)"
+                          @submit.prevent="sendFormMessage(message)"
                           enctype="multipart/form-data"
                           id="conversation-form">
                         {% csrf_token %}

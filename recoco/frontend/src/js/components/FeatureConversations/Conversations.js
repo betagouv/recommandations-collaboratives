@@ -3,6 +3,7 @@ import api, {
   conversationsMessagesUrl,
   contactUrl,
   conversationsParticipantsUrl,
+  conversationsMessageUrl,
   documentUrl,
 } from '../../utils/api';
 
@@ -28,6 +29,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
   },
   isEditorFocused: false,
   isEditorInEditMode: false,
+  messageIdToEdit: null,
   async init() {
     await this.getMessages();
     this.getMessagesParticipants();
@@ -125,7 +127,13 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     }
     return foundContact;
   },
-
+  async sendFormMessage(message) {
+    if (this.isEditorInEditMode) {
+      await this.onSubmitUpdateMessage(message, this.messageIdToEdit);
+    } else {
+      await this.sendMessage();
+    }
+  },
   async sendMessage() {
     if (this.$store.editor.currentMessageJSON) {
       const parsedNodesFromEditor = this.$store.editor.parseTipTapContent(
@@ -167,14 +175,55 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
       }
     }
   },
-  handleEdit(message) {
+  onClickHandleEdit(message) {
+    this.messageIdToEdit = message.id;
     const tiptapJson = this.$store.editor.convertNodesToTipTapJson(
       message.nodes
     );
     Alpine.raw(this.$store.editor.editorInstance).commands.setContent(
       tiptapJson
     );
+    this.$store.editor.currentMessageJSON = tiptapJson;
+
     Alpine.raw(this.$store.editor.editorInstance).commands.focus();
-    this.isEditorInEditMode = true;
+    this.toggleEditMode({ activateEditMode: true });
+  },
+  toggleEditMode({ activateEditMode = false }) {
+    this.isEditorInEditMode = activateEditMode;
+
+    if (!activateEditMode) {
+      Alpine.raw(this.$store.editor.editorInstance).commands.clearContent();
+    }
+  },
+  async onSubmitUpdateMessage(message, messageIdToEdit) {
+    console.log('onSubmitUpdateMessage', message);
+
+    if (this.$store.editor.currentMessageJSON) {
+      const parsedNodesFromEditor = this.$store.editor.parseTipTapContent(
+        this.$store.editor.currentMessageJSON
+      );
+      try {
+        const payload = {
+          nodes: parsedNodesFromEditor,
+          posted_by: this.currentUserId,
+          in_reply_to: null,
+        };
+        const messageResponse = await api.patch(
+          conversationsMessageUrl(this.projectId, messageIdToEdit),
+          payload
+        );
+        this.replaceMessage(messageResponse.data, messageIdToEdit);
+        this.messageIdToEdit = null;
+        this.$store.editor.clearEditorContent();
+      } catch (error) {
+        throw new Error('Failed to update message', error);
+      }
+    }
+  },
+  replaceMessage(message, messageIdToEdit) {
+    const messageIndex = this.feed.messages.findIndex(
+      (message) => message.id === messageIdToEdit
+    );
+    this.feed.messages[messageIndex] = message;
   },
 }));
