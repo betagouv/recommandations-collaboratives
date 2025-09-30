@@ -444,6 +444,30 @@
       padding: 3rem 0.5rem;
     }
   }
+  &.edit-mode {
+    .edit-mode__message-container {
+      position: absolute;
+      top: -33px;
+      padding: 6px;
+      background: var(--light-border-plain-info, #0063cb);
+      color: #fff;
+      font-size: 10px;
+      font-weight: 700;
+      line-height: 150%;
+    }
+    button.edit-mode__button {
+      color: #fff;
+      font-weight: 700;
+      text-decoration: underline;
+      &:hover {
+        opacity: 0.8;
+        background-color: transparent;
+      }
+    }
+    .tiptap.ProseMirror {
+      border: var(--light-border-plain-info, #0063cb) solid 1.5px;
+    }
+  }
 }
 
 .empty-message-list {

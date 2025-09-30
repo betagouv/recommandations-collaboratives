@@ -96,9 +96,18 @@
                           enctype="multipart/form-data"
                           id="conversation-form">
                         {% csrf_token %}
-                        <div class="message-form fr-my-3v bg-light border-form editor-form__container fr-input-group"
-                             :class="{'focus': isEditorFocused || isEditorInEditMode}"
+                        <div class="message-form fr-my-3v bg-light border-form editor-form__container fr-input-group position-relative"
+                             :class="{'focus': isEditorFocused || isEditorInEditMode, 'edit-mode': isEditorInEditMode}"
                              @click.outside="isEditorFocused = false">
+                            <template x-if="isEditorInEditMode">
+                                <div class="edit-mode__message-container">
+                                    <p class="fr-text--sm fr-mb-0">
+                                        Vous êtes en mode édition d'un message.
+                                        <button class="fr-link edit-mode__button fr-text--sm"
+                                                @click="toggleEditMode({ activateEditMode: false })">Annuler</button>
+                                    </p>
+                                </div>
+                            </template>
                             {% include "tools/editor.html" with model="message" input_name=posting_form.content.name initial_content=posting_form.content.value|default:'' errors=posting_form.content.errors input_required=True can_add_reco=True next_url_add_reco="projects-project-detail-conversations-new" can_attach_files=True can_attach_contact=True show_send_button=True form_id="conversation-form" %}
                             <input type="hidden" name="contact" :value="message?.contact?.id">
                         </div>

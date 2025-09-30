@@ -165,10 +165,6 @@ Parameters:
         {% if show_send_button %}
             <div class="d-flex justify-content-end">
                 <div class="d-flex gap-2 send-message">
-                    <template x-if="isEditorInEditMode">
-                        <button class="fr-btn fr-btn--tertiary fr-btn--sm"
-                                @click="toggleEditMode({ activateEditMode: false })">Annuler</button>
-                    </template>
                     <button data-test-id="send-message-conversation"
                             :disabled="!isFormValid"
                             form="{{ form_id|default:'conversation-form' }}"
