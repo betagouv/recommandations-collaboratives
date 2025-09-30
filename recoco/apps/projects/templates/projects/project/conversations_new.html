@@ -102,7 +102,7 @@
                             <template x-if="isEditorInEditMode">
                                 <div class="edit-mode__message-container">
                                     <p class="fr-text--sm fr-mb-0">
-                                        Vous êtes en mode édition d'un message.
+                                        Vous êtes en train de modifier un message.
                                         <button class="fr-link edit-mode__button fr-text--sm"
                                                 @click="toggleEditMode({ activateEditMode: false })">Annuler</button>
                                     </p>
@@ -111,7 +111,7 @@
                             <template x-if="isEditorInReplyMode">
                                 <div class="reply-mode__message-container">
                                     <p class="fr-text--sm fr-mb-0">
-                                        Vous êtes en mode réponse à un message.
+                                        Vous êtes en train de répondre à un message.
                                         <button class="fr-link reply-mode__button fr-text--sm"
                                                 @click="onClickCancelReply">Annuler</button>
                                     </p>
