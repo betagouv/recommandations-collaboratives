@@ -23,6 +23,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
   contacts: [],
   message: { the_file: '', text: '', contact: '' },
   countOf: {
+    isLoaded: false,
     messages: 0,
     new_messages: 0,
     tasks: 0,
@@ -41,8 +42,6 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     await this.getMessages();
     this.createFullFeed();
     this.messagesLoaded = true;
-    console.log('messagesLoaded', this.messagesLoaded);
-    console.log('messagesLoaded', this.messagesLoaded);
     setTimeout(() => {
       this.showMessages = true;
     }, 500);
@@ -65,7 +64,6 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     try {
       const messages = await api.get(conversationsMessagesUrl(this.projectId));
       this.feed.messages = messages.data;
-      console.log('messages', this.feed.messages);
     } catch (error) {
       throw new Error('Failed to get messages');
     }
@@ -76,7 +74,6 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
         conversationsActivitiesUrl(this.projectId)
       );
       this.feed.activities = activities.data;
-      console.log('activities', this.feed.activities);
     } catch (error) {
       throw new Error('Failed to get activities');
     }
@@ -214,23 +211,28 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     }
   },
   countElementsInDiscussion() {
-    //TODO: add count of new messages since last visit
-    for (const message of this.feed.messages) {
-      for (const node of message.nodes) {
-        if (node.type === 'DocumentNode') {
-          this.countOf.documents += 1;
-        }
-        if (node.type === 'RecommendationNode') {
-          this.countOf.tasks += 1;
-        }
-        if (node.type === 'ContactNode') {
-          this.countOf.contacts += 1;
-        }
-        if (node.type === 'MarkdownNode') {
-          this.countOf.messages += 1;
+    for (const message of this.feed.elements) {
+      if (!message.read) {
+        this.countOf.new_messages += 1;
+      }
+      if (message.nodes) {
+        for (const node of message.nodes) {
+          if (node.type === 'DocumentNode') {
+            this.countOf.documents += 1;
+          }
+          if (node.type === 'RecommendationNode') {
+            this.countOf.tasks += 1;
+          }
+          if (node.type === 'ContactNode') {
+            this.countOf.contacts += 1;
+          }
+          if (node.type === 'MarkdownNode') {
+            this.countOf.messages += 1;
+          }
         }
       }
     }
+    this.countOf.isLoaded = true;
   },
   onClickHandleReply(message) {
     this.messageIdToReply = message.id;

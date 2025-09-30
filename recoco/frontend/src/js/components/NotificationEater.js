@@ -13,7 +13,6 @@ Alpine.data('NotificationEater', (projectId) => {
                 const elementToConsume = JSON.parse(
                   entry.target.getAttribute('data-notifications')
                 );
-                console.log('elementToConsume', elementToConsume);
                 if (elementToConsume.read) return;
                 this.consumeNotifiction(elementToConsume.id);
               }
