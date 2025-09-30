@@ -50,7 +50,6 @@ export const ContactCardExtension = Node.create({
 
   // Produce the HTML to export from tiptap
   renderHTML({ HTMLAttributes }) {
-    console.log('RENDERING CONTACT CARD:', HTMLAttributes);
     const contact = { HTMLAttributes };
     //   id: HTMLAttributes.id,
     //   first_name: HTMLAttributes.firstName,
@@ -155,8 +154,6 @@ export const ContactCardExtension = Node.create({
   // Custom node view in tiptap
   addNodeView() {
     return ({ node, getPos, editor }) => {
-      console.log('Creating contact card node view:', node.attrs);
-
       const contact = {
         first_name: node.attrs.firstName,
         last_name: node.attrs.lastName,

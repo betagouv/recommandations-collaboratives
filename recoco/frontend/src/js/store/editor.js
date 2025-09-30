@@ -238,5 +238,362 @@ document.addEventListener('alpine:init', () => {
 
       return text;
     },
+    // !!! ************************
+    // !!! ************************
+    // !!! **  TODO REVIEW This  **
+    // !!! ************************
+    // !!! ************************
+
+    /**
+     * Convert parsed nodes back to TipTap JSON structure
+     * @param {Array} nodes - Array of nodes with position, type, and relevant data
+     * @returns {Object} TipTap JSON structure
+     */
+    convertNodesToTipTapJson(nodes) {
+      console.log('convertNodesToTipTapJson', nodes);
+      if (!nodes || nodes.length === 0) {
+        return {
+          type: 'doc',
+          content: [],
+        };
+      }
+
+      // Sort nodes by position to maintain order
+      const sortedNodes = [...nodes].sort((a, b) => a.position - b.position);
+
+      const content = sortedNodes.map((node) => {
+        switch (node.type) {
+          case 'MarkdownNode':
+            return this.parseMarkdownToTipTapNode(node.text);
+          case 'ContactNode':
+            return {
+              type: 'contactCard',
+              attrs: {
+                id: node.contact_id,
+              },
+            };
+          case 'DocumentNode':
+            return {
+              type: 'fileCard',
+              attrs: {
+                id: node.id,
+              },
+            };
+          default:
+            // Fallback to paragraph for unknown types
+            return {
+              type: 'paragraph',
+              content: [
+                {
+                  type: 'text',
+                  text: node.text || '',
+                },
+              ],
+            };
+        }
+      });
+
+      return {
+        type: 'doc',
+        content: content,
+      };
+    },
+
+    /**
+     * Parse markdown text and convert to TipTap node structure
+     * @param {string} markdownText - The markdown text to parse
+     * @returns {Object} TipTap node structure
+     */
+    parseMarkdownToTipTapNode(markdownText) {
+      if (!markdownText) {
+        return {
+          type: 'paragraph',
+          content: [],
+        };
+      }
+
+      // Handle headings
+      const headingMatch = markdownText.match(/^(#{1,6})\s+(.+)$/);
+      if (headingMatch) {
+        const level = headingMatch[1].length;
+        const text = headingMatch[2];
+        return {
+          type: 'heading',
+          attrs: { level },
+          content: this.parseInlineMarkdown(text),
+        };
+      }
+
+      // Handle blockquotes
+      if (markdownText.startsWith('> ')) {
+        const lines = markdownText.split('\n');
+        const quotedText = lines
+          .map((line) => line.replace(/^> /, ''))
+          .join('\n');
+        return {
+          type: 'blockquote',
+          content: [
+            {
+              type: 'paragraph',
+              content: this.parseInlineMarkdown(quotedText),
+            },
+          ],
+        };
+      }
+
+      // Handle code blocks
+      const codeBlockMatch = markdownText.match(/^```(\w+)?\n([\s\S]*?)\n```$/);
+      if (codeBlockMatch) {
+        const language = codeBlockMatch[1] || '';
+        const code = codeBlockMatch[2];
+        return {
+          type: 'codeBlock',
+          attrs: { language },
+          content: [
+            {
+              type: 'text',
+              text: code,
+            },
+          ],
+        };
+      }
+
+      // Handle bullet lists
+      if (markdownText.startsWith('- ')) {
+        const text = markdownText.replace(/^- /, '');
+        return {
+          type: 'listItem',
+          content: [
+            {
+              type: 'paragraph',
+              content: this.parseInlineMarkdown(text),
+            },
+          ],
+        };
+      }
+
+      // Handle ordered lists
+      const orderedListMatch = markdownText.match(/^(\d+)\.\s+(.+)$/);
+      if (orderedListMatch) {
+        const text = orderedListMatch[2];
+        return {
+          type: 'listItem',
+          content: [
+            {
+              type: 'paragraph',
+              content: this.parseInlineMarkdown(text),
+            },
+          ],
+        };
+      }
+
+      // Default to paragraph
+      return {
+        type: 'paragraph',
+        content: this.parseInlineMarkdown(markdownText),
+      };
+    },
+
+    /**
+     * Parse inline markdown formatting and convert to TipTap marks
+     * @param {string} text - The text with inline markdown
+     * @returns {Array} Array of TipTap text nodes with marks
+     */
+    parseInlineMarkdown(text) {
+      console.log('parseInlineMarkdown', text);
+      if (!text) return [];
+
+      // This is a simplified parser - in a real implementation, you'd want a more robust markdown parser
+      const nodes = [];
+      let remainingText = text;
+
+      // Handle bold text (**text**)
+      const boldRegex = /\*\*(.*?)\*\*/g;
+      let lastIndex = 0;
+      let match;
+
+      while ((match = boldRegex.exec(remainingText)) !== null) {
+        // Add text before the bold section
+        if (match.index > lastIndex) {
+          const beforeText = remainingText.slice(lastIndex, match.index);
+          if (beforeText) {
+            nodes.push({
+              type: 'text',
+              text: beforeText,
+            });
+          }
+        }
+
+        // Add the bold text
+        nodes.push({
+          type: 'text',
+          text: match[1],
+          marks: [{ type: 'bold' }],
+        });
+
+        lastIndex = match.index + match[0].length;
+      }
+
+      // Add remaining text
+      if (lastIndex < remainingText.length) {
+        const remaining = remainingText.slice(lastIndex);
+        if (remaining) {
+          nodes.push({
+            type: 'text',
+            text: remaining,
+          });
+        }
+      }
+
+      // If no formatting was found, return the text as is
+      if (nodes.length === 0) {
+        nodes.push({
+          type: 'text',
+          text: text,
+        });
+      }
+
+      return nodes;
+    },
+
+    /**
+     * Convert JSON structure to HTML for TipTap editor
+     * @param {Object} tiptapJson - The TipTap JSON structure
+     * @returns {string} HTML string ready for TipTap editor
+     */
+    convertJsonToHtml(tiptapJson) {
+      if (!tiptapJson || !tiptapJson.content) {
+        return '';
+      }
+
+      return this.convertNodeToHtml(tiptapJson);
+    },
+
+    /**
+     * Convert a TipTap node to HTML
+     * @param {Object} node - The TipTap node
+     * @returns {string} HTML string
+     */
+    convertNodeToHtml(node) {
+      console.log('convertNodeToHtml', node);
+      if (!node) return '';
+
+      switch (node.type) {
+        case 'doc':
+          if (node.content) {
+            return node.content
+              .map((child) => this.convertNodeToHtml(child))
+              .join('');
+          }
+          return '';
+
+        case 'paragraph':
+          const paragraphContent = node.content
+            ? node.content
+                .map((child) => this.convertNodeToHtml(child))
+                .join('')
+            : '';
+          return `<p>${paragraphContent}</p>`;
+
+        case 'heading':
+          const level = node.attrs?.level || 1;
+          const headingContent = node.content
+            ? node.content
+                .map((child) => this.convertNodeToHtml(child))
+                .join('')
+            : '';
+          return `<h${level}>${headingContent}</h${level}>`;
+
+        case 'bulletList':
+          const bulletContent = node.content
+            ? node.content
+                .map((child) => this.convertNodeToHtml(child))
+                .join('')
+            : '';
+          return `<ul>${bulletContent}</ul>`;
+
+        case 'orderedList':
+          const orderedContent = node.content
+            ? node.content
+                .map((child) => this.convertNodeToHtml(child))
+                .join('')
+            : '';
+          return `<ol>${orderedContent}</ol>`;
+
+        case 'listItem':
+          const listItemContent = node.content
+            ? node.content
+                .map((child) => this.convertNodeToHtml(child))
+                .join('')
+            : '';
+          return `<li>${listItemContent}</li>`;
+
+        case 'blockquote':
+          const blockquoteContent = node.content
+            ? node.content
+                .map((child) => this.convertNodeToHtml(child))
+                .join('')
+            : '';
+          return `<blockquote>${blockquoteContent}</blockquote>`;
+
+        case 'codeBlock':
+          const language = node.attrs?.language || '';
+          const codeContent = node.content
+            ? node.content
+                .map((child) => this.convertNodeToHtml(child))
+                .join('')
+            : '';
+          return `<pre><code class="language-${language}">${codeContent}</code></pre>`;
+
+        case 'contactCard':
+          const contactId = node.attrs?.id;
+          return `<div data-type="contactCard" data-id="${contactId}">Contact Card (ID: ${contactId})</div>`;
+
+        case 'fileCard':
+          const fileId = node.attrs?.id;
+          return `<div data-type="fileCard" data-id="${fileId}">File Card (ID: ${fileId})</div>`;
+
+        case 'text':
+          let text = node.text || '';
+
+          // Apply marks
+          if (node.marks) {
+            node.marks.forEach((mark) => {
+              switch (mark.type) {
+                case 'bold':
+                  text = `<strong>${text}</strong>`;
+                  break;
+                case 'italic':
+                  text = `<em>${text}</em>`;
+                  break;
+                case 'code':
+                  text = `<code>${text}</code>`;
+                  break;
+                case 'link':
+                  const href = mark.attrs?.href || '#';
+                  text = `<a href="${href}">${text}</a>`;
+                  break;
+                case 'strike':
+                  text = `<s>${text}</s>`;
+                  break;
+                case 'underline':
+                  text = `<u>${text}</u>`;
+                  break;
+              }
+            });
+          }
+
+          return text;
+
+        default:
+          // For unknown node types, process children if they exist
+          if (node.content) {
+            return node.content
+              .map((child) => this.convertNodeToHtml(child))
+              .join('');
+          }
+          return '';
+      }
+    },
   });
 });

@@ -26,6 +26,8 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     contacts: 0,
     documents: 0,
   },
+  isEditorFocused: false,
+  isEditorInEditMode: false,
   async init() {
     await this.getMessages();
     this.getMessagesParticipants();
@@ -164,5 +166,15 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
         }
       }
     }
+  },
+  handleEdit(message) {
+    const tiptapJson = this.$store.editor.convertNodesToTipTapJson(
+      message.nodes
+    );
+    Alpine.raw(this.$store.editor.editorInstance).commands.setContent(
+      tiptapJson
+    );
+    Alpine.raw(this.$store.editor.editorInstance).commands.focus();
+    this.isEditorInEditMode = true;
   },
 }));

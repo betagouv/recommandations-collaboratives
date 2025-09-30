@@ -77,7 +77,7 @@ Parameters:
         <div class="tiptap-editor {% if wide %}is-wide{% endif %}"
              data-test-id="tiptap-editor-content"
              x-ref="element"
-             @click.stop="isFocus = true"
+             @click.stop="isEditorFocused = true"
              id="comment-text-ref"></div>
         <textarea class="position-absolute top-0 opacity-0 specific-height-0"
                   {% if model %} x-model="{{ model }}.text" x-modelable="markdownContent" {% else %} x-model="markdownContent" {% endif  %}
