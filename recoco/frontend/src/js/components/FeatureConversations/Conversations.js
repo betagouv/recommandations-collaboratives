@@ -212,6 +212,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
   },
   countElementsInDiscussion() {
     for (const message of this.feed.elements) {
+      let sameNode = false;
       if (!message.read) {
         this.countOf.new_messages += 1;
       }
@@ -226,8 +227,9 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
           if (node.type === 'ContactNode') {
             this.countOf.contacts += 1;
           }
-          if (node.type === 'MarkdownNode') {
+          if (node.type === 'MarkdownNode' && !sameNode) {
             this.countOf.messages += 1;
+            sameNode = true;
           }
         }
       }
