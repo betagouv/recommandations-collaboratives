@@ -16,40 +16,39 @@
             <span class="topic-item__label {% if topic_name %}color{% endif %}"
                   :style="{ '--current-bg-color': stringToColor('{{ topic_slug }}')}">{{ topic_name|default:"Général" }}</span>
             <div x-show="countOf.isLoaded" x-transition.opacity.duration.500ms>
-                <div class="topic-item__message-len d-flex fr-mt-1v">
-                    <p class="topic-item__message-len fr-mt-0">
+                <div class="d-flex">
+                    <p class="topic-item__message-len fr-mt-0 fr-mr-1v">
                         <span class="fr-icon-chat-2-line fr-icon--sm" aria-hidden="true"></span>
                         <span x-text="`${countOf.messages} message${countOf.messages > 1 ? 's' : ''}`"></span>
-                        <template x-if="countOf.new_messages > 0">
-                            <span class="topic-item__message-len--new"
-                                  x-text="`(${countOf.new_messages} ${countOf.new_messages > 1 ? 'nouveaux' : 'nouveau'})`"></span>
-                        </template>
                     </p>
-                    <template x-if="countOf.tasks > 0">
-                        <a class="topic-item__message-len fr-mt-0"
-                           href="{% url 'projects-project-detail-actions' project.pk %}">
-                            <p class="topic-item__message-len fr-mt-0 fr-ml-2w">
-                                <span class="fr-icon-list-check-line fr-icon--sm" aria-hidden="true"></span>
-                                <span x-text="`${countOf.tasks} recommandation${countOf.tasks > 1 ? 's' : ''}`"></span>
-                            </p>
-                        </a>
-                    </template>
-                </div>
-                <div class="topic-item__message-len d-flex fr-mt-0">
-                    <template x-if="countOf.documents > 0">
-                        <a class="topic-item__message-len fr-mt-0"
-                           href="{% url 'projects-project-detail-documents' project.pk %}">
-                            <span class="fr-icon-group-line fr-icon--sm" aria-hidden="true"></span>
-                            <span x-text="`${countOf.documents} document${countOf.documents > 1 ? 's' : ''}`"></span>
-                        </a>
-                    </template>
-                    <template x-if="countOf.contacts > 0">
-                        <p class="topic-item__message-len fr-mt-0 fr-ml-2w">
-                            <span class="fr-icon-file-download-line fr-icon--sm" aria-hidden="true"></span>
-                            <span x-text="`${countOf.contacts} contact${countOf.contacts > 1 ? 's' : ''}`"></span>
+                    <template x-if="countOf.new_messages > 0">
+                        <p class="topic-item__message-len topic-item__message-len--new fr-mt-0">
+                            <span x-text="`(${countOf.new_messages} ${countOf.new_messages > 1 ? 'nouveaux' : 'nouveau'})`"></span>
                         </p>
                     </template>
                 </div>
+                <template x-if="countOf.tasks > 0">
+                    <a class="topic-item__message-len fr-mt-0"
+                       href="{% url 'projects-project-detail-actions' project.pk %}">
+                        <p class="topic-item__message-len fr-mt-0">
+                            <span class="fr-icon-list-check-line fr-icon--sm" aria-hidden="true"></span>
+                            <span x-text="`${countOf.tasks} recommandation${countOf.tasks > 1 ? 's' : ''}`"></span>
+                        </p>
+                    </a>
+                </template>
+                <template x-if="countOf.documents > 0">
+                    <a class="topic-item__message-len fr-mt-0"
+                        href="{% url 'projects-project-detail-documents' project.pk %}">
+                        <span class="fr-icon-group-line fr-icon--sm" aria-hidden="true"></span>
+                        <span x-text="`${countOf.documents} document${countOf.documents > 1 ? 's' : ''}`"></span>
+                    </a>
+                </template>
+                <template x-if="countOf.contacts > 0">
+                    <p class="topic-item__message-len fr-mt-0">
+                        <span class="fr-icon-file-download-line fr-icon--sm" aria-hidden="true"></span>
+                        <span x-text="`${countOf.contacts} contact${countOf.contacts > 1 ? 's' : ''}`"></span>
+                    </p>
+                </template>
             </div>
         </label>
     </div>
