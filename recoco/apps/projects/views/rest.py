@@ -14,6 +14,7 @@ from copy import copy
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
+from django.contrib.sites.shortcuts import get_current_site
 from django.db.models import Count, F, OuterRef, Q, QuerySet, Subquery
 from django.http import Http404
 from django.shortcuts import get_object_or_404
@@ -577,9 +578,8 @@ class DocumentViewSet(
             **super().get_serializer_context(),
             "project_id": project_id,
             "uploaded_by": self.request.user.id,
+            "site_id": get_current_site(self.request).id,
         }
-
-    # todo 201 et renvoyer au moins l'id
 
 
 # eof
