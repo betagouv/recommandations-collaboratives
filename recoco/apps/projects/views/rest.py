@@ -576,8 +576,10 @@ class DocumentViewSet(
         return {
             **super().get_serializer_context(),
             "project_id": project_id,
-            "uploaded_by": self.request.user,
+            "uploaded_by": self.request.user.id,
         }
+
+    # todo 201 et renvoyer au moins l'id
 
 
 # eof
