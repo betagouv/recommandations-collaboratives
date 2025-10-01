@@ -46,7 +46,7 @@ class MessageViewSet(viewsets.ModelViewSet):
     def get_serializer_context(self):
         context = super().get_serializer_context()
         context.update({"project_id": int(self.kwargs["project_id"])})
-        return
+        return context
 
     def perform_destroy(self, instance):
         instance.delete()
