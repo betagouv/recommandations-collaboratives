@@ -67,7 +67,7 @@ class DocumentNodeSerializer(serializers.ModelSerializer):
         )
 
     document_id = serializers.PrimaryKeyRelatedField(
-        source="document", queryset=Document.on_site
+        source="document", queryset=Document.on_site.all()
     )
 
     def create(self, validated_data):
