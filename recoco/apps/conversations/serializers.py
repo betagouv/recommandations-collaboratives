@@ -65,9 +65,18 @@ class DocumentNodeSerializer(serializers.ModelSerializer):
             "position",
             "document_id",
         )
-        document_id = serializers.PrimaryKeyRelatedField(
-            source="document", queryset=Document.on_site.all()
-        )
+
+    document_id = serializers.PrimaryKeyRelatedField(
+        source="document", queryset=Document.on_site.all()
+    )
+
+    def create(self, validated_data):
+        # todo update linked document to link message
+        with transaction.atomic():
+            node = super().create(validated_data)
+            node.document.attached_object = node.message
+            node.document.save()
+            return node
 
 
 class NodePolymorphicSerializer(PolymorphicSerializer):
