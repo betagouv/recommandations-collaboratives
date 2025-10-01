@@ -188,6 +188,10 @@
         }
       }
       .message-item {
+        p {
+          margin-bottom: 0.5rem;
+          font-size: 0.875rem;
+        }
         &.other-user-message {
           background: #f6f6f6;
         }
@@ -214,6 +218,7 @@
           padding-right: 0.75rem;
           padding-top: 0.25rem;
           padding-bottom: 0.25rem;
+          margin-bottom: 0.5rem;
           p {
             margin: 0;
             font-size: 0.875rem;
@@ -273,11 +278,11 @@
         }
         &__resource {
           border-radius: 2px;
-          border: 1px solid #eee;
+          border: 1px solid #c0c0c0;
           background: #fff;
           padding: 1em;
           h4 {
-            color: #161616;
+            color: var(--text-action-high-blue-france);
             font-family: Marianne;
             font-size: 0.875rem;
             font-style: normal;
@@ -410,6 +415,8 @@
   }
   .contact-card {
     max-width: 28.125rem;
+    border: 1px solid #c0c0c0;
+    margin-bottom: 0.5rem;
     &__container {
       display: none;
     }
@@ -448,7 +455,7 @@
       min-height: inherit;
       max-height: inherit;
       height: inherit;
-      padding: 3rem 0.5rem;
+      padding: 3.5rem 0.5rem;
     }
   }
   &.edit-mode,

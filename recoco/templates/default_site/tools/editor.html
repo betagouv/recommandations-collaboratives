@@ -140,6 +140,7 @@ Parameters:
                     <a data-test-id="create-task-button"
                        :href="`{% url 'projects-create-task' %}?project_id={{ project.pk }}{% if next_url_add_reco %}&next={% url next_url_add_reco project.pk %}{% endif %}&content=${encodeURIComponent(markdownContent || '')}`"
                        class="fr-btn fr-btn--tertiary fr-btn--sm justify-content-center fr-text--sm button-add-reco">
+                        <span class="fr-icon-list-check-line fr-icon--sm"></span>
                         Créer une recommandation
                     </a>
                 {% endif %}
