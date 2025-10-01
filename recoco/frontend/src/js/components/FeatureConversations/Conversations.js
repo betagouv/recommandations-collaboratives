@@ -292,15 +292,13 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     this.toggleEditMode({ activateEditMode: true });
   },
   onClickHandleDelete(message) {
-    if (confirm('Êtes-vous sûr de vouloir supprimer ce message ?')) {
-      try {
-        api.delete(conversationsMessageUrl(this.projectId, message.id));
-        this.feed.elements = this.feed.elements.map((el) =>
-          el.id === message.id ? { ...el, deleted: true } : el
-        );
-      } catch (error) {
-        throw new Error('Failed to delete message', error);
-      }
+    try {
+      api.delete(conversationsMessageUrl(this.projectId, message.id));
+      this.feed.elements = this.feed.elements.map((el) =>
+        el.id === message.id ? { ...el, deleted: true } : el
+      );
+    } catch (error) {
+      throw new Error('Failed to delete message', error);
     }
   },
   toggleEditMode({ activateEditMode = false }) {
