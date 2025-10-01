@@ -42,7 +42,7 @@
                          x-init="user = getUserById(element.posted_by);">{% include "user/user_card_js.html" %}</div>
                     <p class="fr-m-0 fr-ml-1v message-item__date align-self-center">
                         le <span x-text="formatDate(element.type == 'message' ? element.created : element.timestamp, { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })"></span>
-                        <template x-if="element.type ==='message' && element.created !== element.modified">
+                        <template x-if="element.type ==='message' && formatDate(element.created, { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' }) !== formatDate(element.modified, { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })">
                             <span class="fr-m-0 fr-ml-1v message-item__date align-self-center"
                                   :title="`modifié le ${formatDate(element.modified, { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })}`">
                                 (modifié)
