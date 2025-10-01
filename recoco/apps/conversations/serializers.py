@@ -41,7 +41,7 @@ class RecommendationNodeSerializer(serializers.ModelSerializer):
         fields = ("position", "text", "recommendation_id")
 
     recommendation_id = serializers.PrimaryKeyRelatedField(
-        source="recommendation", queryset=Task.on_site.all()
+        source="recommendation", queryset=Task.on_site
     )
 
 
@@ -54,7 +54,7 @@ class ContactNodeSerializer(serializers.ModelSerializer):
         )
 
     contact_id = serializers.PrimaryKeyRelatedField(
-        source="contact", queryset=Contact.on_site.all()
+        source="contact", queryset=Contact.on_site
     )
 
 
@@ -65,9 +65,18 @@ class DocumentNodeSerializer(serializers.ModelSerializer):
             "position",
             "document_id",
         )
-        document_id = serializers.PrimaryKeyRelatedField(
-            source="document", queryset=Document.on_site.all()
-        )
+
+    document_id = serializers.PrimaryKeyRelatedField(
+        source="document", queryset=Document.on_site
+    )
+
+    def create(self, validated_data):
+        # todo update linked document to link message
+        with transaction.atomic():
+            node = super().create(validated_data)
+            node.document.attached_object = node.message
+            node.document.save()
+            return node
 
 
 class NodePolymorphicSerializer(PolymorphicSerializer):
@@ -85,16 +94,7 @@ class NodePolymorphicSerializer(PolymorphicSerializer):
 class MessageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Message
-        fields = (
-            "id",
-            "created",
-            "modified",
-            "posted_by",
-            "in_reply_to",
-            "nodes",
-            "deleted",
-        )
-        read_only_fields = ("deleted",)
+        fields = ("id", "created", "modified", "posted_by", "in_reply_to", "nodes")
 
     nodes = NodePolymorphicSerializer(many=True)
 
