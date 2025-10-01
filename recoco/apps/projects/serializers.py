@@ -1,5 +1,4 @@
 from django.contrib.contenttypes.models import ContentType
-from django.db.models import signals
 from notifications import models as notifications_models
 from rest_framework import serializers
 from rest_framework.fields import HiddenField
@@ -13,6 +12,7 @@ from recoco.apps.tasks import models as task_models
 from recoco.rest_api.serializers import BaseSerializerMixin
 from recoco.utils import get_group_for_site, has_perm
 
+from . import signals
 from .models import Document, Note, Project, ProjectSite, Topic, UserProjectStatus
 
 
@@ -43,12 +43,7 @@ class DocumentSerializer(serializers.HyperlinkedModelSerializer):
 class NewDocumentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Document
-        fields = [
-            "the_file",
-            "the_link",
-            "description",
-            "uploaded_by",
-        ]
+        fields = ["the_file", "the_link", "description", "uploaded_by", "project_id"]
 
     project_id = HiddenField(default=0)  # will be re-written in to_internal_value
 
