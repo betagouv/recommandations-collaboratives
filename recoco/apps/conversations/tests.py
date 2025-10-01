@@ -9,6 +9,7 @@ from model_bakery import baker
 from notifications.models import Notification
 
 from recoco import verbs
+from recoco.apps.projects import models as projects_models
 from recoco.apps.tasks import models as tasks_models
 from recoco.apps.tasks import signals as tasks_signals
 
@@ -284,6 +285,34 @@ def test_post_message_with_recommendation(project_ready, request):
     post_public_message_with_recommendation(task, "message")
 
     assert Message.objects.count() == 1
+
+
+@pytest.mark.django_db
+def test_post_message_with_document(project_ready, request, client, project_editor):
+    current_site = get_current_site(request)
+
+    doc = baker.make(
+        projects_models.Document,
+        site=current_site,
+        project=project_ready,
+        uploaded_by=project_editor,
+        the_link="http://un.site.fr",
+    )
+
+    assert Message.objects.count() == 0
+
+    url = reverse("projects-conversations-messages-list", args=[project_ready.pk])
+    client.force_login(project_editor)
+    data = {
+        "nodes": [{"position": 1, "type": "DocumentNode", "document_id": doc.id}],
+        "posted_by": project_editor.id,
+    }
+    # when given directly, nested dict is not parsed correctly
+    client.post(url, json.dumps(data), content_type="application/json")
+    assert Message.objects.count() == 1
+    message = Message.objects.first()
+    doc.refresh_from_db()
+    assert doc.attached_object == message
 
 
 #####--- Signals ---#####
