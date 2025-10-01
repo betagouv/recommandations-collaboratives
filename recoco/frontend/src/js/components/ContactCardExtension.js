@@ -180,13 +180,13 @@ export const ContactCardExtension = Node.create({
       }
 
       if (contact.division) {
-        contactCardContentPart.division = `<span class="contact-card-light__division" title="${contact.division}"><span class="color-3a3a3a text-organization text-ellipsis">${contact.division}</span></span>`;
+        contactCardContentPart.division = `<span class="fr-ml-1v contact-card-light__division" title="${contact.division}"><span class="color-3a3a3a text-organization text-ellipsis">${contact.division}</span></span>`;
       }
 
       // Build the contact card HTML
       let html = `
         <div class="contact-card-light fr-p-3v bg-white">
-          <div class="contact-card-light__firstline-container">
+          <div class="contact-card-light__firstline-container align-items-end">
             <span class="fr-icon-contact-book-line fr-btn--icon-left fr-icon-sm"></span>
             ${contactCardContentPart.name}
             ${contactCardContentPart.organization}

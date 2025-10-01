@@ -248,9 +248,37 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
   onClickHandleEdit(message) {
     this.messageIdToReply = message.in_reply_to;
     this.messageIdToEdit = message.id;
+    message.nodes.forEach((node) => {
+      if (node.type === 'ContactNode') {
+        const contact = this.contacts.find(
+          (contact) => contact.id === node.contact_id
+        );
+        const {
+          id,
+          first_name,
+          last_name,
+          email,
+          phone_no,
+          mobile_no,
+          division,
+          organization,
+        } = contact;
+        node.attrs = {
+          id,
+          first_name,
+          last_name,
+          email,
+          phone_no,
+          mobile_no,
+          division,
+          organization,
+        };
+      }
+    });
     const tiptapJson = this.$store.editor.convertNodesToTipTapJson(
       message.nodes
     );
+
     Alpine.raw(this.$store.editor.editorInstance).commands.setContent(
       tiptapJson
     );

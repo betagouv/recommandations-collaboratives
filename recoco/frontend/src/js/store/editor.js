@@ -270,6 +270,13 @@ document.addEventListener('alpine:init', () => {
               type: 'contactCard',
               attrs: {
                 id: node.contact_id,
+                first_name: node.attrs.first_name,
+                last_name: node.attrs.last_name,
+                email: node.attrs.email,
+                phone_no: node.attrs.phone_no,
+                mobile_no: node.attrs.mobile_no,
+                division: node.attrs.division,
+                organization: node.attrs.organization,
               },
             };
           case 'DocumentNode':
