@@ -43,13 +43,22 @@ class DocumentSerializer(serializers.HyperlinkedModelSerializer):
 class NewDocumentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Document
-        fields = ["the_file", "the_link", "description", "uploaded_by", "project_id"]
+        fields = [
+            "the_file",
+            "the_link",
+            "description",
+            "uploaded_by",
+            "project_id",
+            "site_id",
+        ]
 
     project_id = HiddenField(default=0)  # will be re-written in to_internal_value
+    site_id = HiddenField(default=0)
 
     def to_internal_value(self, data):
         data["uploaded_by"] = self.context.get("uploaded_by")
         data["project_id"] = self.context.get("project_id")
+        data["site_id"] = self.context.get("site_id")
         return super().to_internal_value(data)
 
     def create(self, validated_data):
