@@ -37,11 +37,7 @@ class MessageViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         project_id = int(self.kwargs["project_id"])
-        if self.action == "destroy":
-            queryset = Message.objects
-        else:
-            queryset = Message.not_deleted
-        return queryset.filter(project_id=project_id)
+        return Message.objects.filter(project_id=project_id)
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
