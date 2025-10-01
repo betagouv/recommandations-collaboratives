@@ -219,7 +219,7 @@ def test_post_message_with_recommendation(project_ready, request):
 
     assert Message.objects.count() == 0
 
-    post_public_message_with_recommendation(project_ready, task)
+    post_public_message_with_recommendation(task, "message")
 
     assert Message.objects.count() == 1
 
