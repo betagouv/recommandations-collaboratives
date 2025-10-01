@@ -47,11 +47,14 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     }, 500);
     this.getMessagesParticipants();
     this.$store.tasksData._subscribe(() => {
+      console.log('tasksData', this.$store.tasksData.tasks);
       this.tasks = this.$store.tasksData.tasks;
     });
+    this.$store.tasksData._notify();
     this.countElementsInDiscussion();
   },
   getRecommendationById(id) {
+    console.log('getRecommendationById', id);
     const foundRecommendation = this.tasks.find(
       (recommendation) => recommendation.id == id
     );
@@ -96,7 +99,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     // !!! MOCKED DATA !!!
     // !!! MOCKED DATA !!!
     this.feed.elements = this.feed.elements.map((el, index) => {
-      if (index > this.feed.messages.length - 5) {
+      if (index > this.feed.messages.length - 2) {
         return { ...el, read: false };
       } else {
         return { ...el, read: true };

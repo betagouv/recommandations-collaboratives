@@ -14,7 +14,8 @@ Parameter Alpine:
     - recommendation : recommendation object
 {% endcomment %}
 <template x-if="tasks.length > 0">
-    <div x-data='{recommendation: getRecommendationById(node.recommendation_id)}'
+    <div x-data='{recommendation: null}'
+         x-init="recommendation = getRecommendationById(node.recommendation_id)"
          class="task-item observed-element rounded-3 fr-my-2v"
          data-notifications="{{ element.notifications }}">
         <template x-if="recommendation">
