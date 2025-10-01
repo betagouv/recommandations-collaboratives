@@ -56,8 +56,10 @@ class Message(TimeStampedModel):
 
     deleted = models.DateTimeField(null=True, blank=True)
 
-    def delete(self):
+    def delete(self, **kwargs):
         self.deleted = datetime.now()
+        for node in self.nodes.all():
+            node.delete()
         self.save()
 
 
