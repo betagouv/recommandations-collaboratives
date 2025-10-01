@@ -41,6 +41,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     await this.getActivities();
     await this.getMessages();
     this.createFullFeed();
+    console.log('this.feed', this.feed);
     this.messagesLoaded = true;
     setTimeout(() => {
       this.showMessages = true;
@@ -289,6 +290,18 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
 
     Alpine.raw(this.$store.editor.editorInstance).commands.focus();
     this.toggleEditMode({ activateEditMode: true });
+  },
+  onClickHandleDelete(message) {
+    if (confirm('Êtes-vous sûr de vouloir supprimer ce message ?')) {
+      try {
+        api.delete(conversationsMessageUrl(this.projectId, message.id));
+        this.feed.elements = this.feed.elements.map((el) =>
+          el.id === message.id ? { ...el, deleted: true } : el
+        );
+      } catch (error) {
+        throw new Error('Failed to delete message', error);
+      }
+    }
   },
   toggleEditMode({ activateEditMode = false }) {
     this.isEditorInEditMode = activateEditMode;

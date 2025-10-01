@@ -13,17 +13,26 @@
         </template>
         <template x-for="node in element.nodes">
             <div>
-                <template x-if="node.type == 'MarkdownNode'">
-                    {% include "conversations/messages/fragments/node_markdown.html" %}
+                <template x-if="node.deleted">
+                    <div class="text-muted fr-italic fr-small">
+                        (Ce contenu a été supprimé)
+                    </div>
                 </template>
-                <template x-if="node.type == 'ContactNode'">
-                    {% include "conversations/messages/fragments/node_contact.html" %}
-                </template>
-                <template x-if="node.type == 'DocumentNode'">
-                    {% include "conversations/messages/fragments/node_document.html" %}
-                </template>
-                <template x-if="node.type == 'RecommendationNode'">
-                    {% include "conversations/messages/fragments/node_recommendation.html" %}
+                <template x-if="!node.deleted">
+                    <div>
+                        <template x-if="node.type == 'MarkdownNode'">
+                            {% include "conversations/messages/fragments/node_markdown.html" %}
+                        </template>
+                        <template x-if="node.type == 'ContactNode'">
+                            {% include "conversations/messages/fragments/node_contact.html" %}
+                        </template>
+                        <template x-if="node.type == 'DocumentNode'">
+                            {% include "conversations/messages/fragments/node_document.html" %}
+                        </template>
+                        <template x-if="node.type == 'RecommendationNode'">
+                            {% include "conversations/messages/fragments/node_recommendation.html" %}
+                        </template>
+                    </div>
                 </template>
             </div>
         </template>
@@ -51,8 +60,12 @@
                     </p>
                 </div>
                 <template x-if="element.posted_by == {{ request.user.id }}">
-                    <button class="fr-btn fr-btn--sm fr-btn--tertiary-no-outline"
-                            @click="onClickHandleEdit(element)">Éditer</button>
+                    <div class="d-flex">
+                        <button class="fr-btn fr-btn--sm fr-btn--tertiary-no-outline"
+                                @click="onClickHandleEdit(element)">Éditer</button>
+                        <button class="fr-btn fr-btn--sm fr-btn--tertiary-no-outline"
+                                @click="onClickHandleDelete(element)">Supprimer</button>
+                    </div>
                 </template>
             </div>
         </template>
