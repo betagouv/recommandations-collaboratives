@@ -13,7 +13,7 @@ Parameters:
 - input_file_name (string)
 - input_file_required (boolean)
 - tools_disabled (list of tool names: <title>)
-
+- placeholder (string)
 {% endcomment %}
 {% load static %}
 {% load sass_tags %}
@@ -27,7 +27,7 @@ Parameters:
 {% endblock css %}
 {% comment %} TODO @set-comment.window to fix{% endcomment %}
 <div class="w-100 position-relative editor-container"
-     {% if initial_content_escapejs %} x-data='editor("{{ initial_content|escapejs }}")' {% elif initial_content_js %} x-data='editor({{ initial_content }})' {% else %} x-data='editor("{{ initial_content }}")' {% endif %}
+     {% if initial_content_escapejs %} x-data='editor("{{ initial_content|escapejs }}", "{{ placeholder }}")' {% elif initial_content_js %} x-data='editor({{ initial_content }}, "{{ placeholder }}")' {% else %} x-data='editor("{{ initial_content }}", "{{ placeholder }}")' {% endif %}
      @reset-contact="handleResetContact()"
      @set-comment.window="setMarkdownContent(event)"
      @modal-response="closeSearchContactModal($event)"
