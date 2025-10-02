@@ -7,6 +7,7 @@ import api, {
   conversationsMessageUrl,
   documentUrl,
   documentsUrl,
+  editTaskUrl,
 } from '../../utils/api';
 import { formatDateFrench } from '../../utils/date';
 
@@ -41,6 +42,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
   elementToDelete: null,
   theFiles: [],
   formatDateFrench,
+  editTaskUrl,
   async init() {
     await this.getActivities();
     await this.getMessages();
