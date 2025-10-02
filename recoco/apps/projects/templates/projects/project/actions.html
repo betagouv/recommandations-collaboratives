@@ -37,7 +37,7 @@
                     {% include "projects/project/fragments/project_banner/non_published_project_banner.html" %}
                 {% elif not advising and is_regional_actor and not is_staff %}
                     <div x-data
-                         x-init="$nextTick(() => $store.showRole.init())"
+                         x-init="$nextTick(() => $store.showRole.init()); $store.tasksView.init()"
                          class="specific-border-4pxsolid000091">
                         {% include "projects/project/fragments/project_banner/join_project_banner.html" %}
                         <div>
