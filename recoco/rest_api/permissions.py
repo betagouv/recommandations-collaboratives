@@ -13,7 +13,7 @@ class IsStaffForSiteOrReadOnly(IsStaffForSite):
         return request.method in SAFE_METHODS or super().has_permission(request, view)
 
 
-class IsStaffForSiteOrISAuthenticatedReadOnly(IsStaffForSite):
+class IsStaffForSiteOrIsAuthenticatedReadOnly(IsStaffForSite):
     def has_permission(self, request, view):
         return (
             request.method in SAFE_METHODS

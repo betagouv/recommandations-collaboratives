@@ -3,6 +3,7 @@ from django.contrib.sites.models import Site
 from django.urls import reverse
 from model_bakery import baker
 
+from ...geomatics.models import Department
 from ..models import Contact, Organization, OrganizationGroup
 
 
@@ -53,24 +54,36 @@ def test_anonymous_can_read_organization_but_not_update(api_client, acme_organiz
 
 
 @pytest.mark.django_db
-def test_create_use_given_group(api_client, staff_user):
+def test_create(api_client, staff_user):
     group = baker.make(OrganizationGroup)
+    baker.make(Department, code="01")
+    baker.make(Department, code="32")
     url = reverse("api-addressbook-organization-list")
 
     api_client.force_authenticate(staff_user)
-    response = api_client.post(url, {"group": group.id, "name": "orga_name"})
-    assert response.data["group"] == group.id
+    response = api_client.post(
+        url, {"group_id": group.id, "name": "orga_name", "departments": ["01", "32"]}
+    )
+    assert response.data["group_id"] == group.id
+    assert set(response.data["departments"]) == {"01", "32"}
+    assert response.data["name"] == "orga_name"
 
 
 @pytest.mark.django_db
-def test_update_use_given_group(api_client, staff_user, current_site):
+def test_update(api_client, staff_user, current_site):
     group = baker.make(OrganizationGroup)
+    baker.make(Department, code="01")
+    baker.make(Department, code="32")
     orga = baker.make(Organization, sites=[current_site])
     url = reverse("api-addressbook-organization-detail", args=[orga.id])
 
     api_client.force_authenticate(staff_user)
-    response = api_client.patch(url, {"group": group.id, "name": "orga_name"})
-    assert response.data["group"] == group.id
+    response = api_client.patch(
+        url, {"group_id": group.id, "name": "orga_name", "departments": ["01", "32"]}
+    )
+    assert response.data["group_id"] == group.id
+    assert set(response.data["departments"]) == {"01", "32"}
+    assert response.data["name"] == "orga_name"
 
 
 @pytest.mark.django_db
