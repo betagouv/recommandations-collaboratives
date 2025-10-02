@@ -1,7 +1,6 @@
 from django.contrib.contenttypes.models import ContentType
 from notifications import models as notifications_models
 from rest_framework import serializers
-from rest_framework.fields import HiddenField
 from rest_framework.permissions import BasePermission
 from taggit.serializers import TagListSerializerField, TaggitSerializer
 
@@ -43,23 +42,14 @@ class DocumentSerializer(serializers.HyperlinkedModelSerializer):
 class NewDocumentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Document
-        fields = [
-            "the_file",
-            "the_link",
-            "description",
-            "uploaded_by",
-            "project_id",
-            "site_id",
-        ]
-
-    project_id = HiddenField(default=0)  # will be re-written in to_internal_value
-    site_id = HiddenField(default=0)
+        fields = ["the_file", "the_link", "description", "uploaded_by", "id"]
 
     def to_internal_value(self, data):
-        data["uploaded_by"] = self.context.get("uploaded_by")
-        data["project_id"] = self.context.get("project_id")
-        data["site_id"] = self.context.get("site_id")
-        return super().to_internal_value(data)
+        instance = super().to_internal_value(data)
+        instance["uploaded_by"] = self.context.get("uploaded_by")
+        instance["project"] = Project.objects.get(pk=self.context.get("project_id"))
+        instance["site"] = self.context.get("site")
+        return instance
 
     def create(self, validated_data):
         res = super().create(validated_data)

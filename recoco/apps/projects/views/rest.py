@@ -577,8 +577,8 @@ class DocumentViewSet(
         return {
             **super().get_serializer_context(),
             "project_id": project_id,
-            "uploaded_by": self.request.user.id,
-            "site_id": get_current_site(self.request).id,
+            "uploaded_by": self.request.user,
+            "site": get_current_site(self.request),
         }
 
 
