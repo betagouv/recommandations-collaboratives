@@ -188,6 +188,14 @@
         }
       }
       .message-item {
+        .action-button {
+          display: none;
+        }
+        &:hover {
+          .action-button {
+            display: block;
+          }
+        }
         .contact-card {
           border: 1px solid #c0c0c0;
         }
