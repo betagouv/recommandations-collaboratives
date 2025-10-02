@@ -41,6 +41,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
   async init() {
     await this.getActivities();
     await this.getMessages();
+    console.log(this.feed.messages);
     this.createFullFeed();
     this.messagesLoaded = true;
     setTimeout(() => {
@@ -95,20 +96,9 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
       if (ta !== tb) return ta - tb;
       return 0;
     });
-    // !!! MOCKED DATA !!!
-    // !!! MOCKED DATA !!!
-    this.feed.elements = this.feed.elements.map((el, index) => {
-      if (index > this.feed.messages.length - 2) {
-        return { ...el, read: false };
-      } else {
-        return { ...el, read: true };
-      }
-    });
-    // !!! MOCKED DATA !!!
-    // !!! MOCKED DATA !!!
     let countOfUnread = 0;
     this.feed.elements.forEach((el) => {
-      if (!el.read && !countOfUnread) {
+      if (el.unread > 0 && !countOfUnread) {
         el.firstUnread = true;
         countOfUnread++;
       }
@@ -215,7 +205,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
   },
   countElementsInDiscussion() {
     for (const message of this.feed.elements) {
-      if (!message.read) {
+      if (message.unread > 0) {
         this.countOf.new_messages += 1;
       }
       this.updateCountOfElementsInDiscussion(message);
