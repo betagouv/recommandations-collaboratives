@@ -188,6 +188,9 @@
         }
       }
       .message-item {
+        .contact-card {
+          border: 1px solid #c0c0c0;
+        }
         p {
           margin-bottom: 0.5rem;
           font-size: 0.875rem;
@@ -233,6 +236,7 @@
           border-radius: 2px;
           border: 1px solid #c0c0c0;
           background: #fff;
+          margin-bottom: 0.5rem;
 
           &__content {
             gap: 0.5rem;
@@ -415,7 +419,6 @@
   }
   .contact-card {
     max-width: 28.125rem;
-    border: 1px solid #c0c0c0;
     margin-bottom: 0.5rem;
     &__container {
       display: none;

@@ -755,6 +755,12 @@ form > p {
   &-dark-background {
     background: var(--light-background-default-grey, #fff);
   }
+  &:not(:disabled):hover {
+    background-color: var(--light-background-alt-grey-hover, #e6e6e6);
+    background: var(--light-background-alt-grey-hover, #e6e6e6);
+    color: var(--light-text-default-grey-hover, #3a3a3a);
+    opacity: 0.9;
+  }
 }
 
 /* ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯ *\
