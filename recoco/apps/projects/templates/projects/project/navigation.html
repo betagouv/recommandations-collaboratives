@@ -83,7 +83,7 @@
                            name="segmented-control-project">
                     <label class="fr-label" for="segmented-control-tasks">
                     <a class="stretched-link"
-                       href="{% if "view_public_notes" in user_project_perms or "use_public_notes" in user_project_perms %} {% url 'projects-project-detail-conversations-new' project.pk %}{% else %}#{% endif %}">Conversations <span class="badge text-bg-primary">Nouv. 🎉</span>
+                       href="{% if "view_public_notes" in user_project_perms or "use_public_notes" in user_project_perms %} {% url 'projects-project-detail-conversations-new' project.pk %}{% else %}#{% endif %}">Conversation <span class="badge text-bg-primary">Nouv. 🎉</span>
                     {% if "view_public_notes" in user_project_perms or "use_public_notes" in user_project_perms %}
                         {% if active_project_conversation_notifications_count %}
                             <span class="badge text-bg-danger" data-test-id="badge-tab-new-message">{{ active_project_conversation_notifications_count }}</span>

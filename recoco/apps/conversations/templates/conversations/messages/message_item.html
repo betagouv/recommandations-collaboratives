@@ -62,11 +62,11 @@
                     <div class="d-flex">
                         <template x-if="element.nodes.some(x => x.type == 'RecommendationNode')">
                             <a class="fr-btn fr-btn--sm fr-btn--tertiary fr-mr-1v"
-                               :href="editTaskUrl(element.nodes.find(x => x.type == 'RecommendationNode').recommendation_id, '{{ request.path }}')">Éditer</a>
+                               :href="editTaskUrl(element.nodes.find(x => x.type == 'RecommendationNode').recommendation_id, '{{ request.path }}')">Modifier</a>
                         </template>
                         <template x-if="!element.nodes.some(x => x.type == 'RecommendationNode')">
                             <button class="fr-btn fr-btn--sm fr-btn--tertiary fr-mr-1v"
-                                    @click="onClickHandleEdit(element)">Éditer</button>
+                                    @click="onClickHandleEdit(element)">Modifier</button>
                         </template>
                         <button data-fr-opened="false"
                                 aria-controls="modal"
