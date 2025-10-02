@@ -39,13 +39,13 @@
                 <template x-if="countOf.documents > 0">
                     <a class="topic-item__message-len fr-mt-0"
                         href="{% url 'projects-project-detail-documents' project.pk %}">
-                        <span class="fr-icon-group-line fr-icon--sm" aria-hidden="true"></span>
+                        <span class="fr-icon-file-download-line fr-icon--sm" aria-hidden="true"></span>
                         <span x-text="`${countOf.documents} document${countOf.documents > 1 ? 's' : ''}`"></span>
                     </a>
                 </template>
                 <template x-if="countOf.contacts > 0">
                     <p class="topic-item__message-len fr-mt-0">
-                        <span class="fr-icon-file-download-line fr-icon--sm" aria-hidden="true"></span>
+                        <span class="fr-icon-contact-book-line fr-icon--sm" aria-hidden="true"></span>
                         <span x-text="`${countOf.contacts} contact${countOf.contacts > 1 ? 's' : ''}`"></span>
                     </p>
                 </template>

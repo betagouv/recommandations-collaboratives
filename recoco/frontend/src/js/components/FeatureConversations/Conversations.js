@@ -36,26 +36,24 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
   messageIdToEdit: null,
   messageIdToReply: null,
   lastMessageDate: null,
+  elementToDelete: null,
   formatDateFrench,
   async init() {
     await this.getActivities();
     await this.getMessages();
     this.createFullFeed();
-    console.log('this.feed', this.feed);
     this.messagesLoaded = true;
     setTimeout(() => {
       this.showMessages = true;
     }, 500);
     this.getMessagesParticipants();
     this.$store.tasksData._subscribe(() => {
-      console.log('tasksData', this.$store.tasksData.tasks);
       this.tasks = this.$store.tasksData.tasks;
     });
     this.$store.tasksData._notify();
     this.countElementsInDiscussion();
   },
   getRecommendationById(id) {
-    console.log('getRecommendationById', id);
     const foundRecommendation = this.tasks.find(
       (recommendation) => recommendation.id == id
     );
@@ -205,6 +203,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
           conversationsMessagesUrl(this.projectId),
           payload
         );
+        this.updateCountOfElementsInDiscussion(messageResponse.data);
         this.feed.elements.push({ ...messageResponse.data, type: 'message' });
         this.$store.editor.clearEditorContent();
         this.messageIdToReply = null;
@@ -216,29 +215,32 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
   },
   countElementsInDiscussion() {
     for (const message of this.feed.elements) {
-      let sameNode = false;
       if (!message.read) {
         this.countOf.new_messages += 1;
       }
-      if (message.nodes) {
-        for (const node of message.nodes) {
-          if (node.type === 'DocumentNode') {
-            this.countOf.documents += 1;
-          }
-          if (node.type === 'RecommendationNode') {
-            this.countOf.tasks += 1;
-          }
-          if (node.type === 'ContactNode') {
-            this.countOf.contacts += 1;
-          }
-          if (node.type === 'MarkdownNode' && !sameNode) {
-            this.countOf.messages += 1;
-            sameNode = true;
-          }
+     this.updateCountOfElementsInDiscussion(message);
+    }
+    this.countOf.isLoaded = true;
+  },
+  updateCountOfElementsInDiscussion(element) {
+    let sameNode = false;
+    if (element.nodes) {
+      for (const node of element.nodes) {
+        if (node.type === 'DocumentNode') {
+          this.countOf.documents += 1;
+        }
+        if (node.type === 'RecommendationNode') {
+          this.countOf.tasks += 1;
+        }
+        if (node.type === 'ContactNode') {
+          this.countOf.contacts += 1;
+        }
+        if (node.type === 'MarkdownNode' && !sameNode) {
+          this.countOf.messages += 1;
+          sameNode = true;
         }
       }
     }
-    this.countOf.isLoaded = true;
   },
   onClickHandleReply(message) {
     this.messageIdToReply = message.id;
@@ -291,11 +293,17 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     Alpine.raw(this.$store.editor.editorInstance).commands.focus();
     this.toggleEditMode({ activateEditMode: true });
   },
-  onClickHandleDelete(message) {
+  setElementToDelete(element) {
+    this.elementToDelete = element;
+  },
+  onClickHandleDelete() {
+    if (!this.elementToDelete) {
+      return;
+    }
     try {
-      api.delete(conversationsMessageUrl(this.projectId, message.id));
+      api.delete(conversationsMessageUrl(this.projectId, this.elementToDelete.id));
       this.feed.elements = this.feed.elements.map((el) =>
-        el.id === message.id ? { ...el, deleted: true } : el
+        el.id === this.elementToDelete.id ? { ...el, deleted: true } : el
       );
     } catch (error) {
       throw new Error('Failed to delete message', error);
@@ -309,8 +317,6 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     }
   },
   async onSubmitUpdateMessage(message, messageIdToEdit) {
-    console.log('onSubmitUpdateMessage', message);
-
     if (this.$store.editor.currentMessageJSON) {
       const parsedNodesFromEditor = this.$store.editor.parseTipTapContent(
         this.$store.editor.currentMessageJSON

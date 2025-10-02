@@ -102,6 +102,7 @@ class MessageSerializer(serializers.ModelSerializer):
             "in_reply_to",
             "nodes",
             "unread",
+            "deleted",
         )
 
     unread = serializers.IntegerField()

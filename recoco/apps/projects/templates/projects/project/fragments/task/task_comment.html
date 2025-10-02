@@ -11,7 +11,7 @@
             {% include "projects/project/fragments/task/task_user_card.html" %}
             {% if embed_view is not True %}
                 {% if "manage_tasks" in user_project_perms and not disable_edit %}
-                    <button class="fr-btn fr-btn--sm fr-btn--tertiary fr-icon-pencil-line position-absolute bottom-0 end-0 fr-m-2w"
+                    <button class="fr-btn fr-btn--sm fr-btn--tertiary fr-btn--tertiary-dark-background fr-icon-pencil-line position-absolute bottom-0 end-0 fr-m-2w"
                             @click.stop="isEditing = true;"
                             data-test-id="edit-comment-button">
                         Modifier le commentaire initial de la recommandation
