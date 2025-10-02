@@ -382,6 +382,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
         this.updateCountOfElementsInDiscussion(messageResponse.data);
         this.replaceMessage(messageResponse.data, messageIdToEdit);
         this.messageIdToEdit = null;
+        this.messageIdToReply = null;
         this.isEditorInEditMode = false;
         this.$store.editor.clearEditorContent();
       } catch (error) {
