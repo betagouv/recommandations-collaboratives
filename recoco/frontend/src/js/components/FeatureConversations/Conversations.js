@@ -101,17 +101,17 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
       if (ta !== tb) return ta - tb;
       return 0;
     });
-    // MOKED DATA
-    this.feed.elements.forEach((el, index) => {
-      if (el.type === 'message') {
-        if (index > this.feed.elements.length - 4) {
-          el.unread = 2;
-        } else {
-          el.unread = 0;
-        }
-      }
-    });
-    // MOKED DATA
+    // // MOKED DATA
+    // this.feed.elements.forEach((el, index) => {
+    //   if (el.type === 'message') {
+    //     if (index > this.feed.elements.length - 4) {
+    //       el.unread = 2;
+    //     } else {
+    //       el.unread = 0;
+    //     }
+    //   }
+    // });
+    // // MOKED DATA
     let countOfUnread = 0;
     this.feed.elements.forEach((el) => {
       if (el.unread > 0 && !countOfUnread) {
