@@ -6,7 +6,9 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
 from guardian.shortcuts import assign_perm
 from model_bakery import baker
+from notifications.models import Notification
 
+from recoco import verbs
 from recoco.apps.tasks import models as tasks_models
 from recoco.apps.tasks import signals as tasks_signals
 
@@ -201,6 +203,66 @@ def test_delete_message(message, sender, project_ready, client):
     msg_not_deleted = Message.not_deleted.filter(pk=message.pk).first()
     assert msg.deleted is not None
     assert msg_not_deleted is None
+
+
+#####--- "unread" attribute ---#####
+@pytest.mark.django_db
+def test_unread_is_zero_if_no_notifications(
+    message, project_ready, project_reader, api_client
+):
+    url = reverse("projects-conversations-messages-list", args=[project_ready.pk])
+
+    api_client.force_login(project_reader)
+    response = api_client.get(url)
+
+    assert response.status_code == 200
+
+    assert response.json()[0]["unread"] == 0
+
+
+@pytest.mark.django_db
+def test_unread_counts_unread_notifications(
+    message, project_ready, project_reader, api_client
+):
+    url = reverse("projects-conversations-messages-list", args=[project_ready.pk])
+
+    baker.make(
+        Notification,
+        actor=project_reader,
+        verb=verbs.Conversation.POST_MESSAGE,
+        action_object=message,
+        public=True,
+    )
+
+    api_client.force_login(project_reader)
+    response = api_client.get(url)
+
+    assert response.status_code == 200
+
+    assert response.json()[0]["unread"] == 1
+
+
+@pytest.mark.django_db
+def test_unread_does_not_count_read_notifications(
+    message, project_ready, project_reader, api_client
+):
+    url = reverse("projects-conversations-messages-list", args=[project_ready.pk])
+
+    baker.make(
+        Notification,
+        actor=project_reader,
+        verb=verbs.Conversation.POST_MESSAGE,
+        action_object=message,
+        public=True,
+        unread=False,
+    )
+
+    api_client.force_login(project_reader)
+    response = api_client.get(url)
+
+    assert response.status_code == 200
+
+    assert response.json()[0]["unread"] == 0
 
 
 #####--- Utils ---#####

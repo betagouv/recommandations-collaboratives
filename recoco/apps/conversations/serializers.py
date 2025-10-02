@@ -94,7 +94,17 @@ class NodePolymorphicSerializer(PolymorphicSerializer):
 class MessageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Message
-        fields = ("id", "created", "modified", "posted_by", "in_reply_to", "nodes")
+        fields = (
+            "id",
+            "created",
+            "modified",
+            "posted_by",
+            "in_reply_to",
+            "nodes",
+            "unread",
+        )
+
+    unread = serializers.IntegerField()
 
     nodes = NodePolymorphicSerializer(many=True)
 

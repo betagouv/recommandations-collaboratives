@@ -2,6 +2,7 @@
 
 
 from django.contrib.auth.models import User
+from django.db.models import Count, Q
 from rest_framework import mixins, viewsets
 from rest_framework.permissions import SAFE_METHODS, BasePermission, IsAuthenticated
 
@@ -37,7 +38,9 @@ class MessageViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         project_id = int(self.kwargs["project_id"])
-        return Message.objects.filter(project_id=project_id)
+        return Message.objects.filter(project_id=project_id).annotate(
+            unread=Count("notifications", filter=Q(notifications__unread=True))
+        )
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
