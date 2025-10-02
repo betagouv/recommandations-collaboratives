@@ -36,26 +36,24 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
   messageIdToEdit: null,
   messageIdToReply: null,
   lastMessageDate: null,
+  elementToDelete: null,
   formatDateFrench,
   async init() {
     await this.getActivities();
     await this.getMessages();
     this.createFullFeed();
-    console.log('this.feed', this.feed);
     this.messagesLoaded = true;
     setTimeout(() => {
       this.showMessages = true;
     }, 500);
     this.getMessagesParticipants();
     this.$store.tasksData._subscribe(() => {
-      console.log('tasksData', this.$store.tasksData.tasks);
       this.tasks = this.$store.tasksData.tasks;
     });
     this.$store.tasksData._notify();
     this.countElementsInDiscussion();
   },
   getRecommendationById(id) {
-    console.log('getRecommendationById', id);
     const foundRecommendation = this.tasks.find(
       (recommendation) => recommendation.id == id
     );
@@ -225,7 +223,6 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     this.countOf.isLoaded = true;
   },
   updateCountOfElementsInDiscussion(element) {
-    console.log('updateCountOfElementsInDiscussion', element);
     let sameNode = false;
     if (element.nodes) {
       for (const node of element.nodes) {
@@ -296,11 +293,17 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     Alpine.raw(this.$store.editor.editorInstance).commands.focus();
     this.toggleEditMode({ activateEditMode: true });
   },
-  onClickHandleDelete(message) {
+  setElementToDelete(element) {
+    this.elementToDelete = element;
+  },
+  onClickHandleDelete() {
+    if (!this.elementToDelete) {
+      return;
+    }
     try {
-      api.delete(conversationsMessageUrl(this.projectId, message.id));
+      api.delete(conversationsMessageUrl(this.projectId, this.elementToDelete.id));
       this.feed.elements = this.feed.elements.map((el) =>
-        el.id === message.id ? { ...el, deleted: true } : el
+        el.id === this.elementToDelete.id ? { ...el, deleted: true } : el
       );
     } catch (error) {
       throw new Error('Failed to delete message', error);
@@ -314,8 +317,6 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     }
   },
   async onSubmitUpdateMessage(message, messageIdToEdit) {
-    console.log('onSubmitUpdateMessage', message);
-
     if (this.$store.editor.currentMessageJSON) {
       const parsedNodesFromEditor = this.$store.editor.parseTipTapContent(
         this.$store.editor.currentMessageJSON

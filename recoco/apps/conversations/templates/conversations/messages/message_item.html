@@ -63,7 +63,7 @@
                     <div class="d-flex">
                         <button class="fr-btn fr-btn--sm fr-btn--tertiary fr-mr-1v"
                                 @click="onClickHandleEdit(element)">Éditer</button>
-                        <button data-fr-opened="false" aria-controls="modal" type="button" class="fr-btn fr-btn--sm fr-btn--tertiary">Supprimer</button>
+                        <button data-fr-opened="false" aria-controls="modal" type="button" class="fr-btn fr-btn--sm fr-btn--tertiary" @click="setElementToDelete(element)">Supprimer</button>
                         <dialog id="modal" class="fr-modal" aria-labelledby="supprimer-message" aria-modal="true">
                             <div class="fr-container fr-container--fluid fr-container-md">
                                 <div class="fr-grid-row fr-grid-row--center">
@@ -86,7 +86,7 @@
                                                         <button class="button filled red fr-mr-2w"
                                                                 aria-controls="modal"
                                                                 type="button"
-                                                                @click="onClickHandleDelete(element)">Supprimer</button>
+                                                                @click="onClickHandleDelete()">Supprimer</button>
                                                         <button class="button"
                                                                 aria-controls="modal"
                                                                 type="button">Annuler</button>
