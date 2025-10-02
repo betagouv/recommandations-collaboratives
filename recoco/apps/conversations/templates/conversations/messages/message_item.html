@@ -1,6 +1,7 @@
 <div class="observed-element"
      :data-notifications="JSON.stringify({id: element.id, read: element.read, type: element.type})">
     <div class="message-item rounded-3 fr-p-3v fr-my-2v"
+         :id="`message-${element.id}`"
          :class="{'current-user-message fr-ml-5w': {{ request.user.id }} == element.posted_by, 'other-user-message fr-mr-5w': {{ request.user.id }} != element.posted_by}">
         <template x-if="element.in_reply_to">
             <div class="message-item__reply-to text-muted fr-italic fr-small">
