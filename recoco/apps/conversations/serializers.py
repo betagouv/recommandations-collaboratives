@@ -105,7 +105,7 @@ class MessageSerializer(serializers.ModelSerializer):
             "deleted",
         )
 
-    unread = serializers.IntegerField()
+    unread = serializers.IntegerField(read_only=True)
 
     nodes = NodePolymorphicSerializer(many=True)
 
