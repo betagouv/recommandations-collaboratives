@@ -35,6 +35,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
   isEditorInEditMode: false,
   isEditorInReplyMode: false,
   messageIdToEdit: null,
+  oldMessageToEdit: null,
   messageIdToReply: null,
   lastMessageDate: null,
   elementToDelete: null,
@@ -99,7 +100,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
       return 0;
     });
     // MOKED DATA
-    this.feed.elements.forEach((el,index) => {
+    this.feed.elements.forEach((el, index) => {
       if (el.type === 'message') {
         if (index > this.feed.elements.length - 4) {
           el.unread = 2;
@@ -247,21 +248,21 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     }
     this.countOf.isLoaded = true;
   },
-  updateCountOfElementsInDiscussion(element) {
+  updateCountOfElementsInDiscussion(element, decrease = false) {
     let sameNode = false;
     if (element.nodes) {
       for (const node of element.nodes) {
         if (node.type === 'DocumentNode') {
-          this.countOf.documents += 1;
+          this.countOf.documents += decrease ? -1 : 1;
         }
         if (node.type === 'RecommendationNode') {
-          this.countOf.tasks += 1;
+          this.countOf.tasks += decrease ? -1 : 1;
         }
         if (node.type === 'ContactNode') {
-          this.countOf.contacts += 1;
+          this.countOf.contacts += decrease ? -1 : 1;
         }
         if (node.type === 'MarkdownNode' && !sameNode) {
-          this.countOf.messages += 1;
+          this.countOf.messages += decrease ? -1 : 1;
           sameNode = true;
         }
       }
@@ -277,6 +278,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     this.isEditorInReplyMode = false;
   },
   onClickHandleEdit(message) {
+    this.oldMessageToEdit = { ...message };
     this.messageIdToReply = message.in_reply_to;
     this.messageIdToEdit = message.id;
     message.nodes.forEach((node) => {
@@ -315,7 +317,14 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     );
     this.$store.editor.currentMessageJSON = tiptapJson;
 
-    Alpine.raw(this.$store.editor.editorInstance).commands.focus();
+    const { to } = Alpine.raw(this.$store.editor.editorInstance).state
+      .selection;
+    Alpine.raw(this.$store.editor.editorInstance)
+      .chain()
+      .focus()
+      .setTextSelection(to)
+      .insertContent('<br>')
+      .run();
     this.toggleEditMode({ activateEditMode: true });
   },
   setElementToDelete(element) {
@@ -366,6 +375,9 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
           conversationsMessageUrl(this.projectId, messageIdToEdit),
           payload
         );
+        this.updateCountOfElementsInDiscussion(this.oldMessageToEdit, true);
+        this.oldMessageToEdit = null;
+        this.updateCountOfElementsInDiscussion(messageResponse.data);
         this.replaceMessage(messageResponse.data, messageIdToEdit);
         this.messageIdToEdit = null;
         this.isEditorInEditMode = false;
