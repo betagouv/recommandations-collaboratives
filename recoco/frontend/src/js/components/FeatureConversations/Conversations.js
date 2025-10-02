@@ -218,7 +218,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
       if (!message.read) {
         this.countOf.new_messages += 1;
       }
-     this.updateCountOfElementsInDiscussion(message);
+      this.updateCountOfElementsInDiscussion(message);
     }
     this.countOf.isLoaded = true;
   },
@@ -301,10 +301,20 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
       return;
     }
     try {
-      api.delete(conversationsMessageUrl(this.projectId, this.elementToDelete.id));
-      this.feed.elements = this.feed.elements.map((el) =>
-        el.id === this.elementToDelete.id ? { ...el, deleted: true } : el
+      const messageEl = document.getElementById(
+        `message-${this.elementToDelete.id}`
       );
+      if (messageEl) {
+        messageEl.classList.add('message-item--deleting');
+      }
+      api.delete(
+        conversationsMessageUrl(this.projectId, this.elementToDelete.id)
+      );
+      setTimeout(() => {
+        this.feed.elements = this.feed.elements.map((el) =>
+          el.id === this.elementToDelete.id ? { ...el, deleted: true } : el
+        );
+      }, 200);
     } catch (error) {
       throw new Error('Failed to delete message', error);
     }

@@ -750,13 +750,12 @@ form > p {
 
 // rewrite dsfr btn style
 .fr-btn--tertiary {
-  color: #3A3A3A !important;
-  background: var(--light-background-alt-grey, #F6F6F6);
+  color: #3a3a3a !important;
+  background: var(--light-background-alt-grey, #f6f6f6);
   &-dark-background {
-    background: var(--light-background-default-grey, #FFF);
+    background: var(--light-background-default-grey, #fff);
   }
 }
-
 
 /* ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯ *\
   CRM - Custom styles
@@ -850,4 +849,22 @@ form > p {
 
 .fr-pt-05v {
   padding-top: 2px;
+}
+
+/* Conversations - delete highlight effect */
+.message-item--deleting {
+  position: relative;
+  animation: message-delete-pulse 600ms ease-in-out 0s 1 normal forwards;
+}
+
+@keyframes message-delete-pulse {
+  0% {
+    background-color: rgba(220, 53, 68, 0.12); /* error red, subtle */
+  }
+  40% {
+    background-color: rgba(220, 53, 68, 0.24);
+  }
+  100% {
+    background: var(--light-background-alt-blue-france, #f5f5fe);
+  }
 }
