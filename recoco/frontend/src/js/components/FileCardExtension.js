@@ -10,6 +10,9 @@ const FileCardExtension = Node.create({
 
   addAttributes() {
     return {
+      id: {
+        default: null,
+      },
       fileName: {
         default: null,
       },

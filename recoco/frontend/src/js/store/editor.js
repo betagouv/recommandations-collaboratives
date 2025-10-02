@@ -65,7 +65,7 @@ document.addEventListener('alpine:init', () => {
             nodes.push({
               position: position++,
               type: 'DocumentNode',
-              id: node.attrs?.id,
+              document_id: node.attrs?.id,
               fileName: node.attrs?.fileName,
               file: node.attrs?.file,
             });
