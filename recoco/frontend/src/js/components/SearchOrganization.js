@@ -8,7 +8,6 @@ Alpine.data('SearchOrganization', () => ({
   userInputSearchOrganization: '',
   showOrgAsResults: false,
   selectedOrga: null,
-  isAnOrgaSelected: false,
   focusOnInput: false,
   init() {},
   onSearch() {

@@ -76,7 +76,7 @@ Alpine.data(
             active: this.territorySelectAll,
           })),
         }));
-
+        this.$dispatch('is-select-all-departments', this.territorySelectAll);
         this.$dispatch(
           'selected-departments',
           this.extractDepartmentFromSelectedRegions(this.regions)
