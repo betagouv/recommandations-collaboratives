@@ -372,7 +372,6 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     }
   },
   async onSubmitUpdateMessage(message, messageIdToEdit) {
-    debugger;
     if (this.$store.editor.currentMessageJSON) {
       const parsedNodesFromEditor = this.$store.editor.parseTipTapContent(
         this.$store.editor.currentMessageJSON
