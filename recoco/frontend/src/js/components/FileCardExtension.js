@@ -25,6 +25,9 @@ const FileCardExtension = Node.create({
       uploadedAt: {
         default: null,
       },
+      file: {
+        default: null,
+      },
     };
   },
 
@@ -37,7 +40,7 @@ const FileCardExtension = Node.create({
   },
 
   renderHTML({ HTMLAttributes }) {
-    const { fileName, fileSize, fileType } = HTMLAttributes;
+    const { fileName, fileSize, fileType, file } = HTMLAttributes;
     const formattedSize = fileSize ? formatFileSize(fileSize) : '';
 
     const fileCardContent = [
@@ -102,7 +105,7 @@ const FileCardExtension = Node.create({
     return ({ node, getPos, editor }) => {
       console.log('Creating file card node view:', node.attrs);
 
-      const { fileName, fileSize, fileType } = node.attrs;
+      const { fileName, fileSize, fileType, file } = node.attrs;
       const formattedSize = fileSize ? formatFileSize(fileSize) : '';
 
       const dom = document.createElement('div');
@@ -114,7 +117,7 @@ const FileCardExtension = Node.create({
       // Build the file card HTML
       const html = `
           <span class="fr-icon-file-add-line fr-btn--icon-left fr-icon-sm"></span>
-          <span x-text="selectedFile.name" class="file-upload-text"> ${fileName || 'Fichier sans nom'} (${formattedSize})</span>
+          <span class="file-upload-text"> ${fileName || 'Fichier sans nom'} (${formattedSize})</span>
           <div class="file-card__actions">
             <button type="button" class="fr-btn fr-btn--tertiary fr-btn--sm justify-content-center fr-text--sm close-file-button-style position-absolute top-0 end-0"
                     title="Supprimer le fichier" data-test-id="file-card-delete">

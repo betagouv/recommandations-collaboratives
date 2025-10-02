@@ -65,7 +65,9 @@ document.addEventListener('alpine:init', () => {
             nodes.push({
               position: position++,
               type: 'DocumentNode',
-              id: node.attrs?.id || 42, // Fallback to fake ID as seen in FileCardExtension
+              id: node.attrs?.id,
+              fileName: node.attrs?.fileName,
+              file: node.attrs?.file,
             });
             break;
 

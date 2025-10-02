@@ -278,6 +278,9 @@ export function conversationsParticipantsUrl(projectId) {
 }
 
 // Documents
+export function documentsUrl(projectId) {
+  return `/api/projects/${projectId}/documents/`;
+}
 export function documentUrl(projectId, documentId) {
   return `/api/projects/${projectId}/documents/${documentId}/`;
 }

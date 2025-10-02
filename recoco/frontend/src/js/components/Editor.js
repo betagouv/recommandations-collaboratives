@@ -260,6 +260,7 @@ Alpine.data('editor', (content) => {
             fileSize: file.size,
             fileType: file.type,
             uploadedAt: new Date().toISOString(),
+            file: file,
           };
 
           console.log('File attributes:', fileAttributes);

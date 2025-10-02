@@ -6,6 +6,7 @@ import api, {
   conversationsParticipantsUrl,
   conversationsMessageUrl,
   documentUrl,
+  documentsUrl,
 } from '../../utils/api';
 import { formatDateFrench } from '../../utils/date';
 
@@ -37,6 +38,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
   messageIdToReply: null,
   lastMessageDate: null,
   elementToDelete: null,
+  theFiles: [],
   formatDateFrench,
   async init() {
     await this.getActivities();
@@ -189,12 +191,34 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
       await this.sendMessage();
     }
   },
+  uploadFile(file) {
+    const formData = new FormData();
+    formData.append('the_file', file);
+    return api.post(documentsUrl(this.projectId), formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+  },
   async sendMessage() {
     if (this.$store.editor.currentMessageJSON) {
+      let promises = [];
       const parsedNodesFromEditor = this.$store.editor.parseTipTapContent(
         this.$store.editor.currentMessageJSON
       );
+      if (parsedNodesFromEditor.some((node) => node.type === 'DocumentNode')) {
+        promises = parsedNodesFromEditor
+          .filter((node) => node.type === 'DocumentNode')
+          .map((node) => this.uploadFile(node.file));
+      }
+
       try {
+        const responseUploadFiles = await Promise.all(promises);
+        parsedNodesFromEditor.forEach((node) => {
+          if (node.type === 'DocumentNode') {
+            node.document_id = responseUploadFiles.shift().data.id;
+          }
+        });
         const payload = {
           nodes: parsedNodesFromEditor,
           posted_by: this.currentUserId,
