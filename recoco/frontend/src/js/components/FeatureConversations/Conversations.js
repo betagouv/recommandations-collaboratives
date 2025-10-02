@@ -309,6 +309,15 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
           organization,
         };
       }
+      if (node.type === 'DocumentNode') {
+        const document = this.documents.find(
+          (document) => document.id === node.document_id
+        );
+        node.attrs = {
+          id: document.id,
+          fileName: document.filename,
+        };
+      }
     });
     const tiptapJson = this.$store.editor.convertNodesToTipTapJson(
       message.nodes

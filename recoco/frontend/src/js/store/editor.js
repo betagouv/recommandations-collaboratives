@@ -272,11 +272,11 @@ document.addEventListener('alpine:init', () => {
               type: 'contactCard',
               attrs: {
                 id: node.contact_id,
-                first_name: node.attrs.first_name,
-                last_name: node.attrs.last_name,
+                firstName: node.attrs.first_name,
+                lastName: node.attrs.last_name,
                 email: node.attrs.email,
-                phone_no: node.attrs.phone_no,
-                mobile_no: node.attrs.mobile_no,
+                phoneNo: node.attrs.phone_no,
+                mobileNo: node.attrs.mobile_no,
                 division: node.attrs.division,
                 organization: node.attrs.organization,
               },
@@ -285,7 +285,10 @@ document.addEventListener('alpine:init', () => {
             return {
               type: 'fileCard',
               attrs: {
-                id: node.id,
+                id: node.attrs.id,
+                fileName: node.attrs.fileName,
+                fileSize: node.attrs.fileSize,
+                fileType: node.attrs.fileType,
               },
             };
           default:
@@ -409,7 +412,6 @@ document.addEventListener('alpine:init', () => {
      * @returns {Array} Array of TipTap text nodes with marks
      */
     parseInlineMarkdown(text) {
-      console.log('parseInlineMarkdown', text);
       if (!text) return [];
 
       // This is a simplified parser - in a real implementation, you'd want a more robust markdown parser
@@ -484,7 +486,6 @@ document.addEventListener('alpine:init', () => {
      * @returns {string} HTML string
      */
     convertNodeToHtml(node) {
-      console.log('convertNodeToHtml', node);
       if (!node) return '';
 
       switch (node.type) {
