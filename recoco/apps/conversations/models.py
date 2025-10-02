@@ -4,6 +4,7 @@ from django.contrib.auth import models as auth_models
 from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
 from django.urls import reverse
+from django.utils.http import urlencode
 from model_utils.models import TimeStampedModel
 from notifications.models import Notification
 from polymorphic.models import PolymorphicModel
@@ -48,11 +49,12 @@ class Message(TimeStampedModel):
     )
 
     def get_absolute_url(self):
-        return reverse(
+        url_no_query = reverse(
             "projects-project-detail-conversations",
             kwargs={"project_id": self.project.pk},
-            query={"message-id": self.pk},
         )
+        query_kwargs = {"message-id": self.pk}
+        return f"{url_no_query}?{urlencode(query_kwargs)}"
 
     deleted = models.DateTimeField(null=True, blank=True)
 
