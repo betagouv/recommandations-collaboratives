@@ -10,6 +10,7 @@ from recoco import verbs
 from recoco.apps.projects import models as projects_models
 from recoco.utils import has_perm, has_perm_or_403
 
+from . import signals
 from .models import Message
 from .serializers import ActivitySerializer, MessageSerializer, ParticipantSerializer
 
@@ -49,6 +50,10 @@ class MessageViewSet(viewsets.ModelViewSet):
 
     def perform_destroy(self, instance):
         instance.soft_delete()
+
+    def perform_create(self, serializer):
+        instance = serializer.save()
+        signals.message_sent.send(sender=self.perform_create, instance=instance)
 
 
 class ActivityViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
