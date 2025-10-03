@@ -574,14 +574,13 @@ class DocumentViewSet(
             return NewDocumentSerializer
         return DocumentSerializer
 
-    def get_serializer_context(self):
-        project_id = int(self.kwargs["project_id"])
-        return {
-            **super().get_serializer_context(),
-            "project_id": project_id,
-            "uploaded_by": self.request.user,
-            "site": get_current_site(self.request),
-        }
+    def perform_create(self, serializer):
+        instance = serializer.save(
+            project_id=int(self.kwargs["project_id"]),
+            uploaded_by=self.request.user,
+            site=get_current_site(self.request),
+        )
+        signals.document_uploaded.send(sender=self.create, instance=instance)
 
 
 # eof

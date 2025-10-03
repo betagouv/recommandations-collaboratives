@@ -10,7 +10,6 @@ from recoco.apps.tasks import models as task_models
 from recoco.rest_api.serializers import BaseSerializerMixin
 from recoco.utils import get_group_for_site
 
-from . import signals
 from .models import Document, Note, Project, ProjectSite, Topic, UserProjectStatus
 
 
@@ -34,7 +33,7 @@ class DocumentSerializer(serializers.HyperlinkedModelSerializer):
 class NewDocumentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Document
-        fields = ["the_file", "the_link", "description", "uploaded_by", "id"]
+        fields = ["the_file", "the_link", "description", "id"]
 
     def to_internal_value(self, data):
         instance = super().to_internal_value(data)
@@ -42,11 +41,6 @@ class NewDocumentSerializer(serializers.ModelSerializer):
         instance["project"] = Project.objects.get(pk=self.context.get("project_id"))
         instance["site"] = self.context.get("site")
         return instance
-
-    def create(self, validated_data):
-        res = super().create(validated_data)
-        signals.document_uploaded.send(sender=self.create, instance=res)
-        return res
 
 
 class InlineProjectSiteSerializer(serializers.ModelSerializer):
