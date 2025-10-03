@@ -70,14 +70,6 @@ class DocumentNodeSerializer(serializers.ModelSerializer):
         source="document", queryset=Document.on_site.all()
     )
 
-    def create(self, validated_data):
-        # todo update linked document to link message
-        with transaction.atomic():
-            node = super().create(validated_data)
-            node.document.attached_object = node.message
-            node.document.save()
-            return node
-
 
 class NodePolymorphicSerializer(PolymorphicSerializer):
     resource_type_field_name = "type"
@@ -128,13 +120,17 @@ class MessageSerializer(serializers.ModelSerializer):
             super().update(instance, validated_data)
             old_nodes = [*instance.nodes.all()]
 
+            for node in old_nodes:
+                node.delete()
+                # cannot do queryset.delete directly otherwise polymorphism delete.CASCADE is not applied
+                # and it fails
+
+            # order of loops is important for document nodes side effects
+
             for node_data in nodes_data:
                 node_data["message_id"] = instance.id
                 NodePolymorphicSerializer().create(node_data)
 
-            for node in old_nodes:
-                node.delete()
-                # cannot do queryset.delete directly otherwise polymorphism delete.CASCADE is not applied and it fails
         return instance
 
 
