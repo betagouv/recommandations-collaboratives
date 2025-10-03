@@ -48,7 +48,7 @@ class MessageViewSet(viewsets.ModelViewSet):
         return context
 
     def perform_destroy(self, instance):
-        instance.delete()
+        instance.soft_delete()
 
 
 class ActivityViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):

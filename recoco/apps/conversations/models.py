@@ -58,7 +58,7 @@ class Message(TimeStampedModel):
 
     deleted = models.DateTimeField(null=True, blank=True)
 
-    def delete(self, **kwargs):
+    def soft_delete(self):
         self.deleted = datetime.now()
         for node in self.nodes.all():
             node.delete()
