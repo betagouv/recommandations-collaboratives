@@ -1,4 +1,7 @@
 {% load static %}
+{% load guardian_tags %}
+{% get_obj_perms request.user for request.site as "user_site_perms" %}
+{% get_obj_perms request.user for project as "user_project_perms" %}
 <div x-data="TaskComment()" {% if height == "100" %}class="w-100 h-100" {% endif %}>
     <template x-if="!isEditing && currentTask.content !== ''">
         <div data-test-id="task-initial-comment"
@@ -19,15 +22,17 @@
             {% endif %}
         </div>
     </template>
-    <template x-if="!isEditing && currentTask.content === ''">
-        <div class="rounded bg-grey-light fr-mb-3w fr-px-2w d-flex flex-column fr-py-2w justify-content-between align-items-start task-item position-relative">
-            <div class="d-flex flex-column align-items-center justify-content-center w-100 fr-py-3w">
-                <span class="text-info-custom font-very-small name fw-normal fr-color--disabled-grey fr-mb-2v fw-bold">Pas de commentaire initial</span>
-                <button class="fr-btn fr-btn--secondary fr-btn-secondary-rework"
-                        @click.stop="isEditing = true;">Ajouter un commentaire</button>
+    {% if "list_projects" in user_site_perms or 'use_private_notes' in user_project_perms %}
+        <template x-if="!isEditing && currentTask.content === ''">
+            <div class="rounded bg-grey-light fr-mb-3w fr-px-2w d-flex flex-column fr-py-2w justify-content-between align-items-start task-item position-relative">
+                <div class="d-flex flex-column align-items-center justify-content-center w-100 fr-py-3w">
+                    <span class="text-info-custom font-very-small name fw-normal fr-color--disabled-grey fr-mb-2v fw-bold">Pas de commentaire initial</span>
+                    <button class="fr-btn fr-btn--secondary fr-btn-secondary-rework"
+                            @click.stop="isEditing = true;">Ajouter un commentaire</button>
+                </div>
             </div>
-        </div>
-    </template>
+        </template>
+    {% endif %}
     <template x-if="isEditing">
         <div class="fr-py-2w fr-px-2w fr-mb-2v border-blue task-comment medium-border-radius position-relative">
             <button class="fr-btn fr-btn--sm fr-btn--tertiary fr-icon-close-line position-absolute top-0 end-0 fr-m-2w"
