@@ -50,7 +50,7 @@ class Message(TimeStampedModel):
 
     def get_absolute_url(self):
         url_no_query = reverse(
-            "projects-project-detail-conversations",
+            "projects-project-detail-conversations-new",
             kwargs={"project_id": self.project.pk},
         )
         query_kwargs = {"message-id": self.pk}

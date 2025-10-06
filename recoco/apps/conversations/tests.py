@@ -231,7 +231,6 @@ def test_post_message_with_document(project_ready, request, client, project_edit
     client.force_login(project_editor)
     data = {
         "nodes": [{"position": 1, "type": "DocumentNode", "document_id": doc.id}],
-        "posted_by": project_editor.id,
     }
     # when given directly, nested dict is not parsed correctly
     client.post(url, json.dumps(data), content_type="application/json")
@@ -239,6 +238,10 @@ def test_post_message_with_document(project_ready, request, client, project_edit
     message = Message.objects.first()
     doc.refresh_from_db()
     assert doc.attached_object == message
+    assert (
+        doc.attached_object.get_absolute_url()
+        == f"/project/{project_ready.pk}/conversations-new?message-id={message.pk}"
+    )
 
 
 @pytest.mark.django_db
@@ -327,6 +330,15 @@ def test_edit_message_keeps_doc_restores_it(
     assert message.nodes.count() == 2
 
 
+# test envoi message
+# test serializer à l'édition du message
+# test édition du message
+#   - supprime les docs OK
+#   - garde le contact
+#   - garde la reco
+# réactive le projet
+
+
 #####--- "unread" attribute ---#####
 @pytest.mark.django_db
 def test_unread_is_zero_if_no_notifications(
@@ -406,7 +418,6 @@ def test_post_message_notify_others_and_creates_trace(
                     "text": "One two this is a test",
                 }
             ],
-            "posted_by": sender.id,
         }
 
         # when given directly, nested dict is not parsed correctly
@@ -435,7 +446,6 @@ def test_post_message_does_not_notify_poster(sender, project_ready, request, cli
                     "text": "One two this is a test",
                 }
             ],
-            "posted_by": sender.id,
         }
 
         # when given directly, nested dict is not parsed correctly
