@@ -236,6 +236,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
         this.$store.editor.clearEditorContent();
         this.messageIdToReply = null;
         this.isEditorInReplyMode = false;
+        this.scrollToNewMessage();
       } catch (error) {
         throw new Error('Failed to send message', error);
       }
@@ -415,5 +416,13 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
       return true;
     }
     return false;
+  },
+  scrollToNewMessage() {
+    requestAnimationFrame(() => {
+      window.scroll({
+        top: document.body.getBoundingClientRect().height,
+        behavior: 'auto',
+      });
+    });
   },
 }));
