@@ -1,6 +1,7 @@
 import json
 
 import pytest
+from actstream.models import action_object_stream
 from django.contrib.auth import models as auth_models
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
@@ -9,8 +10,10 @@ from model_bakery import baker
 from notifications.models import Notification
 
 from recoco import verbs
+from recoco.apps.projects import models as projects_models
 from recoco.apps.tasks import models as tasks_models
 from recoco.apps.tasks import signals as tasks_signals
+from recoco.utils import login
 
 from .models import Message
 from .utils import post_public_message_with_recommendation
@@ -263,6 +266,65 @@ def test_unread_does_not_count_read_notifications(
     assert response.status_code == 200
 
     assert response.json()[0]["unread"] == 0
+
+
+#####--- Notifications ---###
+@pytest.mark.django_db
+def test_post_message_notify_others_and_creates_trace(
+    sender, project_ready, request, client
+):
+    url = reverse("projects-conversations-messages-list", args=[project_ready.pk])
+
+    membership = baker.make(projects_models.ProjectMember, member__is_staff=False)
+    project_ready.projectmember_set.add(membership)
+
+    with login(client, user=sender):
+        data = {
+            "nodes": [
+                {
+                    "position": 1,
+                    "type": "MarkdownNode",
+                    "text": "One two this is a test",
+                }
+            ],
+            "posted_by": sender.id,
+        }
+
+        # when given directly, nested dict is not parsed correctly
+        response = client.post(url, json.dumps(data), content_type="application/json")
+        assert response.status_code == 201
+
+    # stream and notifications
+    message = Message.objects.last()
+    actions = action_object_stream(message)
+    assert actions.count() == 1
+    assert actions[0].verb == verbs.Conversation.POST_MESSAGE
+
+    assert membership.member.notifications.count() == 1
+
+
+@pytest.mark.django_db
+def test_post_message_does_not_notify_poster(sender, project_ready, request, client):
+    url = reverse("projects-conversations-messages-list", args=[project_ready.pk])
+
+    with login(client, user=sender):
+        data = {
+            "nodes": [
+                {
+                    "position": 1,
+                    "type": "MarkdownNode",
+                    "text": "One two this is a test",
+                }
+            ],
+            "posted_by": sender.id,
+        }
+
+        # when given directly, nested dict is not parsed correctly
+        response = client.post(url, json.dumps(data), content_type="application/json")
+        assert response.status_code == 201
+
+    # stream and notifications
+    assert sender.notifications.count() == 0
 
 
 #####--- Utils ---#####

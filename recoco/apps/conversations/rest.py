@@ -10,6 +10,7 @@ from recoco import verbs
 from recoco.apps.projects import models as projects_models
 from recoco.utils import has_perm, has_perm_or_403
 
+from . import signals
 from .models import Message
 from .serializers import ActivitySerializer, MessageSerializer, ParticipantSerializer
 
@@ -35,6 +36,15 @@ class MessagePermission(BasePermission):
 class MessageViewSet(viewsets.ModelViewSet):
     serializer_class = MessageSerializer
     permission_classes = [IsAuthenticated, MessagePermission]
+
+    def perform_create(self, serializer):
+        obj = serializer.save()
+
+        if obj:
+            # Dispatch a signal so notifications can be triggered
+            signals.message_posted.send(sender=MessageViewSet, message=obj)
+
+        return obj
 
     def get_queryset(self):
         project_id = int(self.kwargs["project_id"])
