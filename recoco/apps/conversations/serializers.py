@@ -109,6 +109,11 @@ class MessageSerializer(serializers.ModelSerializer):
 
     nodes = NodePolymorphicSerializer(many=True)
 
+    def validate_nodes(self, node_list):
+        if len(node_list) == 0:
+            raise serializers.ValidationError("A message must have at least one node.")
+        return node_list
+
     def create(self, validated_data):
         nodes_data = validated_data.pop("nodes")
         message = Message.objects.create(**validated_data)

@@ -41,6 +41,11 @@ def random_user():
 
 
 @pytest.fixture()
+def ex_node_dict():
+    return {"text": "toto", "type": "MarkdownNode", "position": 1}
+
+
+@pytest.fixture()
 def msg_and_sender(project_ready):
     user = baker.make(auth_models.User)
     assign_perm("projects.use_public_notes", user, project_ready)
@@ -91,15 +96,13 @@ def test_who_can_read_messages(
     ],
 )
 @pytest.mark.django_db
-def test_who_can_send_messages(msg_reader, res_code, project_ready, request, client):
+def test_who_can_send_messages(
+    msg_reader, res_code, ex_node_dict, project_ready, request, client
+):
     user = request.getfixturevalue(msg_reader)
     url = reverse("projects-conversations-messages-list", args=[project_ready.pk])
     client.force_login(user)
-    data = {
-        "nodes": [
-            {"position": 1, "type": "MarkdownNode", "text": "One two this is a test"}
-        ]
-    }
+    data = {"nodes": [ex_node_dict]}
     # when given directly, nested dict is not parsed correctly
     response = client.post(url, json.dumps(data), content_type="application/json")
     assert response.status_code == res_code
@@ -116,14 +119,14 @@ def test_who_can_send_messages(msg_reader, res_code, project_ready, request, cli
 )
 @pytest.mark.django_db
 def test_who_can_edit_messages(
-    msg_reader, res_code, project_ready, message, request, client
+    msg_reader, res_code, ex_node_dict, project_ready, message, request, client
 ):
     user = request.getfixturevalue(msg_reader)
     url = reverse(
         "projects-conversations-messages-detail", args=[project_ready.pk, message.pk]
     )
     client.force_login(user)
-    data = {"nodes": []}
+    data = {"nodes": [ex_node_dict]}
     response = client.patch(url, json.dumps(data), content_type="application/json")
     assert response.status_code == res_code
 
@@ -200,6 +203,31 @@ def test_who_can_see_participants(
 
 
 @pytest.mark.django_db
+def test_cannot_send_empty_message(sender, project_ready, request, client):
+    user = sender
+    url = reverse("projects-conversations-messages-list", args=[project_ready.pk])
+    client.force_login(user)
+    data = {"nodes": []}
+    # when given directly, nested dict is not parsed correctly
+    response = client.post(url, json.dumps(data), content_type="application/json")
+    assert response.status_code == 400
+    assert str(response.data["nodes"][0]) == "A message must have at least one node."
+
+
+@pytest.mark.django_db
+def test_cannot_edit_empty_message(sender, project_ready, message, request, client):
+    user = sender
+    url = reverse(
+        "projects-conversations-messages-detail", args=[project_ready.pk, message.pk]
+    )
+    client.force_login(user)
+    data = {"nodes": []}
+    response = client.patch(url, json.dumps(data), content_type="application/json")
+    assert response.status_code == 400
+    assert str(response.data["nodes"][0]) == "A message must have at least one node."
+
+
+@pytest.mark.django_db
 def test_delete_message(message, sender, project_ready, client):
     url = reverse(
         "projects-conversations-messages-detail", args=[project_ready.pk, message.pk]
@@ -272,7 +300,7 @@ def test_delete_message_with_doc_soft_deletes_doc(
 
 @pytest.mark.django_db
 def test_edit_message_removes_doc_soft_deletes_doc(
-    project_ready, message, sender, request, client
+    project_ready, message, sender, ex_node_dict, request, client
 ):
     current_site = get_current_site(request)
 
@@ -284,7 +312,7 @@ def test_edit_message_removes_doc_soft_deletes_doc(
         the_link="http://un.site.fr",
     )
     baker.make(DocumentNode, document=doc, position=1, message=message)
-    data = {"nodes": []}
+    data = {"nodes": [ex_node_dict]}
 
     url = reverse(
         "projects-conversations-messages-detail", args=[project_ready.pk, message.pk]
@@ -294,7 +322,7 @@ def test_edit_message_removes_doc_soft_deletes_doc(
 
     doc.refresh_from_db()
     assert doc.deleted is not None
-    assert not message.nodes.exists()
+    assert message.nodes.exists()
 
 
 @pytest.mark.django_db
