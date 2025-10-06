@@ -244,7 +244,6 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
         });
         const payload = {
           nodes: parsedNodesFromEditor,
-          posted_by: this.currentUserId,
           in_reply_to: this.messageIdToReply,
         };
         const messageResponse = await api.post(
@@ -400,7 +399,6 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
       try {
         const payload = {
           nodes: parsedNodesFromEditor,
-          posted_by: this.currentUserId,
           in_reply_to: this.messageIdToReply,
         };
         const messageResponse = await api.patch(
