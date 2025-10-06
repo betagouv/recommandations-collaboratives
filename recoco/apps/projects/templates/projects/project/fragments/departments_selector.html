@@ -36,7 +36,7 @@
              x-on:click.prevent="open = !open"
              type="button"
              :class="{'input-active':open}">
-            <button class="input-field bg-transparent fr-px-2w fw-normal text-dark appearance-none"
+            <button class="input-field bg-transparent fr-px-2w fw-normal text-dark appearance-none no-wrap"
                     data-cy="check-display-project">{{ label |default:"Dossiers de mon territoire" }}</button>
             {% comment %} TODO Use DSFR icon {% endcomment %}
             <svg class="input-icon right black bi align-baseline fr-mr-2v"

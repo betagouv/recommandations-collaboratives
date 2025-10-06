@@ -28,7 +28,7 @@
     "ajv-errors": "^3.0.0",
     "ajv-formats": "^3.0.1",
     "alpinejs": "^3.10.2",
-    "axios": "^1.8.2",
+    "axios": "^1.12.0",
     "bootstrap": "^5.3.3",
     "d3": "^7.8.4",
     "d3-cloud": "^1.2.5",
@@ -46,7 +46,7 @@
     "minisearch": "^7.1.0",
     "prosemirror-model": "^1.18.1",
     "tiptap-markdown": "^0.6.0",
-    "vite": "^4.5.14",
+    "vite": "^5.4.20",
     "yarn": "^1.22.22"
   },
   "devDependencies": {

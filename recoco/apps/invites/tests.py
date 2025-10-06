@@ -148,12 +148,19 @@ def test_invite_available_for_everyone(request, client):
 def test_invite_404_if_already_accepted(request, client):
     current_site = get_current_site(request)
     baker.make(home_models.SiteConfiguration, site=current_site)
-    invite = Recipe(models.Invite, site=current_site, accepted_on=timezone.now()).make()
 
-    url = reverse("invites-invite-details", args=[invite.pk])
-    response = client.get(url)
-
-    assert response.status_code == 404
+    with login(client) as user:
+        invite = baker.make(
+            models.Invite, site=current_site, accepted_on=timezone.now()
+        )
+        invite.project.members.add(user, through_defaults={"is_owner": False})
+        url = reverse("invites-invite-details", args=[invite.pk])
+        response = client.get(url, follow=True)
+        last_url, status_code = response.redirect_chain[-1]
+        assert status_code == 302
+        assert last_url == reverse(
+            "projects-project-detail-overview", args=(invite.project_id,)
+        )
 
 
 @pytest.mark.django_db
@@ -729,16 +736,19 @@ def test_user_cannot_access_already_refused_invitation(
     baker.make(home_models.SiteConfiguration, site=current_site)
 
     with login(client, email="invited@here.tld") as user:
-        invite = Recipe(
+        invite = baker.make(
             models.Invite,
             site=current_site,
             email=user.email,
             refused_on=timezone.now(),
-        ).make()
+        )
         url = reverse("invites-invite-accept", args=[invite.pk])
-        response = client.post(url)
-
-    assert response.status_code == 404
+        response = client.post(url, follow=True)
+        last_url, status_code = response.redirect_chain[-1]
+        assert status_code == 302
+        assert last_url == reverse(
+            "projects-project-detail-overview", args=(invite.project_id,)
+        )
 
 
 @pytest.mark.django_db

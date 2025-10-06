@@ -7,18 +7,24 @@ import api, {
 import _ from 'lodash';
 import { formatDate } from '../utils/date';
 
-Alpine.data('ContactBook', () => {
+Alpine.data('ContactBook', (departments, regions) => {
   return {
     formatDate,
     searchParams: {
       search: '',
       letter: null,
+      searchDepartment: [],
     },
+    isSelectAllDepartments: true,
     letters: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split(''),
-    contactListGroupByNationalGroup: {},
+    contactListGroupByNationalGroup: [],
+    departments: JSON.parse(departments.textContent),
+    regions: JSON.parse(regions.textContent),
+    contactSearched: [],
+    isContactDataLoaded: false,
     async init() {
       try {
-        const response = await api.get(contactsUrl(25));
+        const response = await api.get(contactsUrl());
         this.contactListGroupByNationalGroup = this.groupContactByNationalGroup(
           response.data.results
         );
@@ -26,6 +32,7 @@ Alpine.data('ContactBook', () => {
         if (sessionStorage.getItem('letter')) {
           this.loadOrganizationStartingWith(sessionStorage.getItem('letter'));
         }
+        this.isContactDataLoaded = true;
       } catch (error) {
         // TODO add a toast
         console.error(error);
@@ -57,18 +64,29 @@ Alpine.data('ContactBook', () => {
       this.getContactData();
     },
     async getContactData() {
+      if (this.isSelectAllDepartments) {
+        this.searchParams.searchDepartment = [];
+      }
       const response = await api.get(
-        searchContactsUrl(this.searchParams.search, this.searchParams.letter)
+        searchContactsUrl(
+          this.searchParams.search,
+          this.searchParams.letter,
+          this.searchParams.searchDepartment
+        )
       );
-      this.contactListGroupByNationalGroup = this.groupContactByNationalGroup(
-        response.data.results
-      );
-      this.getDepartmentsOrganization(this.contactListGroupByNationalGroup);
+      if (this.searchParams.search && this.searchParams.search !== '') {
+        this.contactSearched = response.data.results;
+      } else {
+        this.contactListGroupByNationalGroup = this.groupContactByNationalGroup(
+          response.data.results
+        );
+        this.getDepartmentsOrganization(this.contactListGroupByNationalGroup);
+      }
     },
 
     groupContactByOrganization(contactList) {
       contactList.sort((a, b) =>
-        a.organization.name.localeCompare(b.organization.name, 'en', {
+        a.organization.name.localeCompare(b.organization.name, 'fr', {
           sensitivity: 'base',
         })
       );
@@ -102,17 +120,22 @@ Alpine.data('ContactBook', () => {
           ),
         });
       }
-      contactByNationalGroupArray.sort((a, b) =>
-        a.name.localeCompare(b.name, 'fr', { sensitivity: 'base' })
-      );
+      contactByNationalGroupArray.sort((a, b) => {
+        if (a.name === 'Autres') {
+          return 1;
+        }
+        if (b.name === 'Autres') {
+          return -1;
+        }
+        return a.name.localeCompare(b.name, 'fr', { sensitivity: 'base' });
+      });
       return contactByNationalGroupArray;
     },
 
     resetLetterFilter(withReloadContact = true) {
       this.searchParams.letter = null;
       sessionStorage.removeItem('letter');
-      if (withReloadContact)
-      {
+      if (withReloadContact) {
         this.getContactData();
       }
     },
@@ -152,10 +175,23 @@ Alpine.data('ContactBook', () => {
         return;
       }
       if (event.target.id == 'create-contact-modal') {
+        window.location.reload();
+        // TODO: insert new contact in the contact list
+        // this.insertNewContact(event.detail);
         this.isCreateContactModalOpen = false;
+
         return;
       }
       return;
+    },
+    insertNewContact(event) {
+      this.contactListGroupByNationalGroup.push(newContact);
+      // this.getDepartmentsOrganization(this.contactListGroupByNationalGroup);
+    },
+    saveSelectedDepartment(event) {
+      if (!event.detail || !this.isContactDataLoaded) return;
+      this.searchParams.searchDepartment = [...event.detail];
+      this.getContactData();
     },
   };
 });

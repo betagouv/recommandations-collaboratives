@@ -24,7 +24,10 @@ describe('I can search and share a contact on a message editor', () => {
     cy.shareContact('Lala');
 
     //write a message
-    cy.get('[data-test-id="tiptap-editor-content"]').type('Here is my contact');
+    cy.get('[data-test-id="tiptap-editor-content"] .ProseMirror').type(
+      'Here is my contact',
+      { force: true }
+    );
 
     //validate message on conversation
     cy.get('[data-test-id="send-message-conversation"]').click({ force: true });
@@ -39,7 +42,10 @@ describe('I can search and share a contact on a message editor', () => {
     cy.shareContact('Lala');
 
     //write a message
-    cy.get('[data-test-id="tiptap-editor-content"]').type('Here is my contact');
+    cy.get('[data-test-id="tiptap-editor-content"] .ProseMirror').type(
+      'Here is my contact',
+      { force: true }
+    );
 
     //validate message on advisor space
     cy.get('[data-test-id="submit-message-button-on-advisor-space"]').click({
@@ -62,7 +68,10 @@ describe('I can search and share a contact on a message editor', () => {
     //write resource title
     cy.get('[data-cy="input-title-task"]').type('Test contact');
     //write a message
-    cy.get('[data-test-id="tiptap-editor-content"]').type('Here is my contact');
+    cy.get('[data-test-id="tiptap-editor-content"] .ProseMirror').type(
+      'Here is my contact',
+      { force: true }
+    );
     //click on add contact button
     cy.get('[data-test-id="button-add-contact-in-editor"]').click({
       force: true,
