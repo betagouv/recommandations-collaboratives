@@ -130,15 +130,35 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
       throw new Error('Failed to get messages participants');
     }
   },
-  getShortMessageInReplyTo(id) {
+  async getShortMessageInReplyTo(id) {
     const shortMessage = this.getMessageById(id);
     if (!shortMessage) {
       return '';
     }
-    const markdownNode = shortMessage.nodes.find(
-      (node) => node.type === 'MarkdownNode'
-    );
-    return `${markdownNode.text.slice(0, 40)}${markdownNode.text.length > 40 ? '...' : ''}`;
+    let contentToSummarize;
+    if (shortMessage.nodes[0].type === 'RecommendationNode') {
+      const recommendationIdToSummarize =
+        shortMessage.nodes[0].recommendation_id;
+      const recommendationToSummarize = await this.getRecommendationById(
+        recommendationIdToSummarize
+      );
+      contentToSummarize = `Recommandation - ${recommendationToSummarize.content}`;
+    } else if (shortMessage.nodes[0].type === 'ContactNode') {
+      const contactIdToSummarize = shortMessage.nodes[0].contact_id;
+      const contactToSummarize =
+        await this.getContactById(contactIdToSummarize);
+      contentToSummarize = `Contact - ${contactToSummarize.first_name} ${contactToSummarize.last_name}`;
+    } else if (shortMessage.nodes[0].type === 'DocumentNode') {
+      const documentIdToSummarize = shortMessage.nodes[0].document_id;
+      const documentToSummarize = await this.getDocumentById(
+        documentIdToSummarize
+      );
+      contentToSummarize = `Document - ${documentToSummarize.filename}`;
+    } else {
+      contentToSummarize = shortMessage.nodes[0].text;
+    }
+
+    return `${contentToSummarize.slice(0, 120)}${contentToSummarize.length > 120 ? '...' : ''}`;
   },
   getUserById(id) {
     const foundUser = this.messagesParticipants.find((user) => user.id === +id);
