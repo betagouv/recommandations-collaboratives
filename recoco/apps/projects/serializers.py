@@ -35,13 +35,6 @@ class NewDocumentSerializer(serializers.ModelSerializer):
         model = Document
         fields = ["the_file", "the_link", "description", "id"]
 
-    def to_internal_value(self, data):
-        instance = super().to_internal_value(data)
-        instance["uploaded_by"] = self.context.get("uploaded_by")
-        instance["project"] = Project.objects.get(pk=self.context.get("project_id"))
-        instance["site"] = self.context.get("site")
-        return instance
-
 
 class InlineProjectSiteSerializer(serializers.ModelSerializer):
     class Meta:
