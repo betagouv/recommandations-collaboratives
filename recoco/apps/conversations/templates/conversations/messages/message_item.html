@@ -106,14 +106,12 @@
                     </div>
                 </template>
                 <!-- Reply button -->
-                <template x-if="element.posted_by != {{ request.user.id }} && !element.in_reply_to">
-                    <div class="action-button">
-                        <div class="d-flex justify-content-end">
-                            <button class="fr-btn fr-btn--sm fr-btn--tertiary"
-                                    @click="onClickHandleReply(element)">Répondre</button>
-                        </div>
+                <div class="action-button">
+                    <div class="d-flex justify-content-end">
+                        <button class="fr-btn fr-btn--sm fr-btn--tertiary"
+                                @click="onClickHandleReply(element)">Répondre</button>
                     </div>
-                </template>
+                </div>
             </div>
         </template>
     </div>
