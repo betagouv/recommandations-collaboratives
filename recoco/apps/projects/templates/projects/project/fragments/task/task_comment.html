@@ -12,7 +12,7 @@
             </template>
             {% if embed_view is not True %}
                 {% if "manage_tasks" in user_project_perms and not disable_edit %}
-                    <button class="fr-btn fr-btn--sm fr-btn--tertiary fr-btn--tertiary-dark-background fr-icon-pencil-line position-absolute bottom-0 end-0 fr-color--mention_button fr-m-2w"
+                    <button class="fr-btn fr-btn--sm fr-btn--tertiary fr-btn--tertiary-light-background fr-icon-pencil-line position-absolute bottom-0 end-0 fr-color--mention_button fr-m-2w"
                             @click.stop="isEditing = true;"
                             data-test-id="edit-comment-button">
                         Modifier le commentaire initial de la recommandation

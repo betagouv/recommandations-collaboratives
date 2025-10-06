@@ -408,18 +408,18 @@
   }
   // Override tiptap styles
   .editor-container {
+    // .button-add-reco,
+    // .button-module__container,
+    // .module__container,
     .tiptap-menu-custom,
-    .button-add-reco,
-    .button-module__container,
-    .module__container,
     .contact-card {
       display: none;
       transition: none;
     }
     .tiptap.ProseMirror {
       min-height: 3.5rem;
-      max-height: 3.5rem;
-      height: 3.5rem;
+      // max-height: 3.5rem;
+      height: 5.3rem;
       padding: 0.75rem 0.5rem;
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       overflow: hidden;
