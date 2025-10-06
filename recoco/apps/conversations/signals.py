@@ -13,6 +13,7 @@ from recoco.apps.projects.utils import (
 )
 from recoco.apps.tasks.signals import action_created
 
+from ..projects.utils import reactivate_if_necessary
 from . import models
 from .utils import post_public_message_with_recommendation
 
@@ -72,3 +73,8 @@ def notify_message_created(sender, message, **kwargs):
     notify_advisors_of_project(project, notification, exclude=user)
     if not project.inactive_since:
         notify_members_of_project(project, notification, exclude=user)
+
+
+@receiver(message_posted)
+def update_project_status(sender, message, **kwargs):
+    reactivate_if_necessary(message.project, message.posted_by)

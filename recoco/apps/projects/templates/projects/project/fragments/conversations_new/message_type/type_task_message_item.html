@@ -18,7 +18,7 @@
                       aria-hidden="true"></span><a href="{{ element.object.resource.get_absolute_url }}" target="_blank">Lien vers la ressource</a>
             </div>
         {% endif %}
-        {% include "projects/project/fragments/conversations_new/tasks_status_buttons.html" with task=element.object %}
+        {% include "projects/project/fragments/conversations_new/tasks_status_buttons.html" with task=element.object full_width=False %}
     </div>
     {% if element.object.created_by %}
         <div class="fr-mt-1w d-flex align-items-center">

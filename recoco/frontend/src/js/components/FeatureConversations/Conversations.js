@@ -6,6 +6,8 @@ import api, {
   conversationsParticipantsUrl,
   conversationsMessageUrl,
   documentUrl,
+  documentsUrl,
+  editTaskUrl,
 } from '../../utils/api';
 import { formatDateFrench } from '../../utils/date';
 
@@ -34,13 +36,17 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
   isEditorInEditMode: false,
   isEditorInReplyMode: false,
   messageIdToEdit: null,
+  oldMessageToEdit: null,
   messageIdToReply: null,
   lastMessageDate: null,
   elementToDelete: null,
+  theFiles: [],
   formatDateFrench,
+  editTaskUrl,
   async init() {
     await this.getActivities();
     await this.getMessages();
+    console.log(this.feed.messages);
     this.createFullFeed();
     this.messagesLoaded = true;
     setTimeout(() => {
@@ -95,20 +101,20 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
       if (ta !== tb) return ta - tb;
       return 0;
     });
-    // !!! MOCKED DATA !!!
-    // !!! MOCKED DATA !!!
-    this.feed.elements = this.feed.elements.map((el, index) => {
-      if (index > this.feed.messages.length - 2) {
-        return { ...el, read: false };
-      } else {
-        return { ...el, read: true };
-      }
-    });
-    // !!! MOCKED DATA !!!
-    // !!! MOCKED DATA !!!
+    // // MOKED DATA
+    // this.feed.elements.forEach((el, index) => {
+    //   if (el.type === 'message') {
+    //     if (index > this.feed.elements.length - 4) {
+    //       el.unread = 2;
+    //     } else {
+    //       el.unread = 0;
+    //     }
+    //   }
+    // });
+    // // MOKED DATA
     let countOfUnread = 0;
     this.feed.elements.forEach((el) => {
-      if (!el.read && !countOfUnread) {
+      if (el.unread > 0 && !countOfUnread) {
         el.firstUnread = true;
         countOfUnread++;
       }
@@ -188,12 +194,34 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
       await this.sendMessage();
     }
   },
+  uploadFile(file) {
+    const formData = new FormData();
+    formData.append('the_file', file);
+    return api.post(documentsUrl(this.projectId), formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+  },
   async sendMessage() {
     if (this.$store.editor.currentMessageJSON) {
+      let promises = [];
       const parsedNodesFromEditor = this.$store.editor.parseTipTapContent(
         this.$store.editor.currentMessageJSON
       );
+      if (parsedNodesFromEditor.some((node) => node.type === 'DocumentNode')) {
+        promises = parsedNodesFromEditor
+          .filter((node) => node.type === 'DocumentNode')
+          .map((node) => this.uploadFile(node.file));
+      }
+
       try {
+        const responseUploadFiles = await Promise.all(promises);
+        parsedNodesFromEditor.forEach((node) => {
+          if (node.type === 'DocumentNode') {
+            node.document_id = responseUploadFiles.shift().data.id;
+          }
+        });
         const payload = {
           nodes: parsedNodesFromEditor,
           posted_by: this.currentUserId,
@@ -208,6 +236,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
         this.$store.editor.clearEditorContent();
         this.messageIdToReply = null;
         this.isEditorInReplyMode = false;
+        this.scrollToNewMessage();
       } catch (error) {
         throw new Error('Failed to send message', error);
       }
@@ -215,28 +244,28 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
   },
   countElementsInDiscussion() {
     for (const message of this.feed.elements) {
-      if (!message.read) {
+      if (message.unread > 0) {
         this.countOf.new_messages += 1;
       }
       this.updateCountOfElementsInDiscussion(message);
     }
     this.countOf.isLoaded = true;
   },
-  updateCountOfElementsInDiscussion(element) {
+  updateCountOfElementsInDiscussion(element, decrease = false) {
     let sameNode = false;
     if (element.nodes) {
       for (const node of element.nodes) {
         if (node.type === 'DocumentNode') {
-          this.countOf.documents += 1;
+          this.countOf.documents += decrease ? -1 : 1;
         }
         if (node.type === 'RecommendationNode') {
-          this.countOf.tasks += 1;
+          this.countOf.tasks += decrease ? -1 : 1;
         }
         if (node.type === 'ContactNode') {
-          this.countOf.contacts += 1;
+          this.countOf.contacts += decrease ? -1 : 1;
         }
         if (node.type === 'MarkdownNode' && !sameNode) {
-          this.countOf.messages += 1;
+          this.countOf.messages += decrease ? -1 : 1;
           sameNode = true;
         }
       }
@@ -252,6 +281,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     this.isEditorInReplyMode = false;
   },
   onClickHandleEdit(message) {
+    this.oldMessageToEdit = { ...message };
     this.messageIdToReply = message.in_reply_to;
     this.messageIdToEdit = message.id;
     message.nodes.forEach((node) => {
@@ -280,6 +310,15 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
           organization,
         };
       }
+      if (node.type === 'DocumentNode') {
+        const document = this.documents.find(
+          (document) => document.id === node.document_id
+        );
+        node.attrs = {
+          id: document.id,
+          fileName: document.filename,
+        };
+      }
     });
     const tiptapJson = this.$store.editor.convertNodesToTipTapJson(
       message.nodes
@@ -290,7 +329,14 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     );
     this.$store.editor.currentMessageJSON = tiptapJson;
 
-    Alpine.raw(this.$store.editor.editorInstance).commands.focus();
+    const { to } = Alpine.raw(this.$store.editor.editorInstance).state
+      .selection;
+    Alpine.raw(this.$store.editor.editorInstance)
+      .chain()
+      .focus()
+      .setTextSelection(to)
+      .insertContent('<br>')
+      .run();
     this.toggleEditMode({ activateEditMode: true });
   },
   setElementToDelete(element) {
@@ -341,8 +387,12 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
           conversationsMessageUrl(this.projectId, messageIdToEdit),
           payload
         );
+        this.updateCountOfElementsInDiscussion(this.oldMessageToEdit, true);
+        this.oldMessageToEdit = null;
+        this.updateCountOfElementsInDiscussion(messageResponse.data);
         this.replaceMessage(messageResponse.data, messageIdToEdit);
         this.messageIdToEdit = null;
+        this.messageIdToReply = null;
         this.isEditorInEditMode = false;
         this.$store.editor.clearEditorContent();
       } catch (error) {
@@ -366,5 +416,13 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
       return true;
     }
     return false;
+  },
+  scrollToNewMessage() {
+    requestAnimationFrame(() => {
+      window.scroll({
+        top: document.body.getBoundingClientRect().height,
+        behavior: 'auto',
+      });
+    });
   },
 }));

@@ -12,7 +12,7 @@ import { FileCardExtension } from './FileCardExtension';
 
 const MarkdownEditor = createMarkdownEditor(Editor);
 
-Alpine.data('editor', (content) => {
+Alpine.data('editor', (content, placeholder) => {
   let editor;
 
   return {
@@ -28,7 +28,7 @@ Alpine.data('editor', (content) => {
           StarterKit,
           Link,
           Placeholder.configure({
-            placeholder: 'Ecrivez votre message ici…',
+            placeholder: placeholder || 'Ecrivez votre message ici…',
           }),
           HardBreak.extend({
             addKeyboardShortcuts() {
@@ -260,6 +260,7 @@ Alpine.data('editor', (content) => {
             fileSize: file.size,
             fileType: file.type,
             uploadedAt: new Date().toISOString(),
+            file: file,
           };
 
           console.log('File attributes:', fileAttributes);

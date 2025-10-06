@@ -15,11 +15,10 @@ from recoco.apps.tasks import models as tasks_models
 from recoco.apps.tasks import signals as tasks_signals
 from recoco.utils import login
 
-from .models import Message
+from .models import DocumentNode, Message
 from .utils import post_public_message_with_recommendation
 
 
-#####--- Views ---#####
 @pytest.fixture()
 def project_reader(project_ready):
     project_reader = baker.make(auth_models.User)
@@ -58,6 +57,10 @@ def sender(msg_and_sender):
 @pytest.fixture()
 def message(msg_and_sender):
     return msg_and_sender[0]
+
+
+#####--- Views ---#####
+#####--- permissions ---#####
 
 
 @pytest.mark.django_db
@@ -194,6 +197,9 @@ def test_who_can_see_participants(
     assert response.status_code == res_code
 
 
+#####--- actions ---#####
+
+
 @pytest.mark.django_db
 def test_delete_message(message, sender, project_ready, client):
     url = reverse(
@@ -206,6 +212,120 @@ def test_delete_message(message, sender, project_ready, client):
     msg_not_deleted = Message.not_deleted.filter(pk=message.pk).first()
     assert msg.deleted is not None
     assert msg_not_deleted is None
+
+
+@pytest.mark.django_db
+def test_post_message_with_document(project_ready, request, client, project_editor):
+    current_site = get_current_site(request)
+
+    doc = baker.make(
+        projects_models.Document,
+        site=current_site,
+        project=project_ready,
+        uploaded_by=project_editor,
+        the_link="http://un.site.fr",
+    )
+
+    assert Message.objects.count() == 0
+
+    url = reverse("projects-conversations-messages-list", args=[project_ready.pk])
+    client.force_login(project_editor)
+    data = {
+        "nodes": [{"position": 1, "type": "DocumentNode", "document_id": doc.id}],
+        "posted_by": project_editor.id,
+    }
+    # when given directly, nested dict is not parsed correctly
+    client.post(url, json.dumps(data), content_type="application/json")
+    assert Message.objects.count() == 1
+    message = Message.objects.first()
+    doc.refresh_from_db()
+    assert doc.attached_object == message
+
+
+@pytest.mark.django_db
+def test_delete_message_with_doc_soft_deletes_doc(
+    project_ready, message, sender, request, client
+):
+    current_site = get_current_site(request)
+
+    doc = baker.make(
+        projects_models.Document,
+        site=current_site,
+        project=project_ready,
+        uploaded_by=sender,
+        the_link="http://un.site.fr",
+    )
+    baker.make(DocumentNode, document=doc, position=1, message=message)
+
+    url = reverse(
+        "projects-conversations-messages-detail", args=[project_ready.pk, message.pk]
+    )
+    client.force_login(sender)
+    client.delete(url)
+
+    doc.refresh_from_db()
+    assert doc.deleted is not None
+    assert not message.nodes.exists()
+
+
+@pytest.mark.django_db
+def test_edit_message_removes_doc_soft_deletes_doc(
+    project_ready, message, sender, request, client
+):
+    current_site = get_current_site(request)
+
+    doc = baker.make(
+        projects_models.Document,
+        site=current_site,
+        project=project_ready,
+        uploaded_by=sender,
+        the_link="http://un.site.fr",
+    )
+    baker.make(DocumentNode, document=doc, position=1, message=message)
+    data = {"nodes": []}
+
+    url = reverse(
+        "projects-conversations-messages-detail", args=[project_ready.pk, message.pk]
+    )
+    client.force_login(sender)
+    client.patch(url, json.dumps(data), content_type="application/json")
+
+    doc.refresh_from_db()
+    assert doc.deleted is not None
+    assert not message.nodes.exists()
+
+
+@pytest.mark.django_db
+def test_edit_message_keeps_doc_restores_it(
+    project_ready, message, sender, request, client
+):
+    current_site = get_current_site(request)
+
+    doc = baker.make(
+        projects_models.Document,
+        site=current_site,
+        project=project_ready,
+        uploaded_by=sender,
+        the_link="http://un.site.fr",
+    )
+    baker.make(DocumentNode, document=doc, position=1, message=message)
+    data = {
+        "nodes": [
+            {"position": 1, "type": "DocumentNode", "document_id": doc.id},
+            {"position": 2, "type": "MarkdownNode", "text": "I changed that msg"},
+        ]
+    }
+
+    url = reverse(
+        "projects-conversations-messages-detail", args=[project_ready.pk, message.pk]
+    )
+    client.force_login(sender)
+    client.patch(url, json.dumps(data), content_type="application/json")
+
+    doc.refresh_from_db()
+    assert doc.deleted is None
+    assert doc.attached_object == message
+    assert message.nodes.count() == 2
 
 
 #####--- "unread" attribute ---#####

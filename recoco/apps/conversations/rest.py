@@ -37,15 +37,6 @@ class MessageViewSet(viewsets.ModelViewSet):
     serializer_class = MessageSerializer
     permission_classes = [IsAuthenticated, MessagePermission]
 
-    def perform_create(self, serializer):
-        obj = serializer.save()
-
-        if obj:
-            # Dispatch a signal so notifications can be triggered
-            signals.message_posted.send(sender=MessageViewSet, message=obj)
-
-        return obj
-
     def get_queryset(self):
         project_id = int(self.kwargs["project_id"])
         return Message.objects.filter(project_id=project_id).annotate(
@@ -58,7 +49,11 @@ class MessageViewSet(viewsets.ModelViewSet):
         return context
 
     def perform_destroy(self, instance):
-        instance.delete()
+        instance.soft_delete()
+
+    def perform_create(self, serializer):
+        instance = serializer.save()
+        signals.message_posted.send(sender=self.perform_create, message=instance)
 
 
 class ActivityViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):

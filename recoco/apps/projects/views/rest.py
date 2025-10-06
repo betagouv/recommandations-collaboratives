@@ -14,12 +14,15 @@ from copy import copy
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
+from django.contrib.sites.shortcuts import get_current_site
 from django.db.models import Count, F, OuterRef, Q, QuerySet, Subquery
 from django.http import Http404
 from django.shortcuts import get_object_or_404
 from notifications import models as notifications_models
 from rest_framework import mixins, permissions, status, viewsets
 from rest_framework.generics import ListAPIView
+from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
+from rest_framework.permissions import BasePermission
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -38,8 +41,10 @@ from recoco.utils import (
 
 from .. import models, signals
 from ..filters import DepartmentsFilter, ProjectActivityFilter
+from ..models import Project
 from ..serializers import (
     DocumentSerializer,
+    NewDocumentSerializer,
     ProjectForListSerializer,
     ProjectSiteSerializer,
     TopicSerializer,
@@ -547,16 +552,40 @@ class ProjectSiteViewSet(viewsets.GenericViewSet):
 ########################################################################
 
 
-class DocumentViewSet(mixins.RetrieveModelMixin, viewsets.GenericViewSet):
+class DocumentViewSet(
+    mixins.RetrieveModelMixin, mixins.CreateModelMixin, viewsets.GenericViewSet
+):
     """API endpoint that allows searching for topics"""
 
-    serializer_class = DocumentSerializer
     permission_classes = [permissions.IsAuthenticated]
     queryset = models.Document.objects
+    parsers = (
+        JSONParser,
+        MultiPartParser,
+        FormParser,
+    )
 
     def get_queryset(self):
         project_id = int(self.kwargs["project_id"])
         return self.queryset.filter(project_id=project_id)
 
+    def get_serializer_class(self):
+        if self.action == "create":
+            return NewDocumentSerializer
+        return DocumentSerializer
+
+    def perform_create(self, serializer):
+        instance = serializer.save(
+            project_id=int(self.kwargs["project_id"]),
+            uploaded_by=self.request.user,
+            site=get_current_site(self.request),
+        )
+        signals.document_uploaded.send(sender=self.create, instance=instance)
+
 
 # eof
+class DocumentPermission(BasePermission):
+    def has_permission(self, request, view):
+        project = Project.objects.get(pk=view.kwargs["project_id"])
+        # perms from recoco.app.projects.views.documents
+        return has_perm(request.user, "manage_documents", project)

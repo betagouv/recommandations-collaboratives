@@ -188,6 +188,17 @@
         }
       }
       .message-item {
+        .action-button {
+          display: none;
+        }
+        &:hover {
+          .action-button {
+            display: block;
+          }
+        }
+        .contact-card {
+          border: 1px solid #c0c0c0;
+        }
         p {
           margin-bottom: 0.5rem;
           font-size: 0.875rem;
@@ -233,6 +244,7 @@
           border-radius: 2px;
           border: 1px solid #c0c0c0;
           background: #fff;
+          margin-bottom: 0.5rem;
 
           &__content {
             gap: 0.5rem;
@@ -396,18 +408,18 @@
   }
   // Override tiptap styles
   .editor-container {
+    // .button-add-reco,
+    // .button-module__container,
+    // .module__container,
     .tiptap-menu-custom,
-    .button-add-reco,
-    .button-module__container,
-    .module__container,
-    .contact-card {
+    .tiptap.ProseMirror .contact-card {
       display: none;
       transition: none;
     }
     .tiptap.ProseMirror {
       min-height: 3.5rem;
-      max-height: 3.5rem;
-      height: 3.5rem;
+      // max-height: 3.5rem;
+      height: 5.3rem;
       padding: 0.75rem 0.5rem;
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       overflow: hidden;
@@ -415,7 +427,6 @@
   }
   .contact-card {
     max-width: 28.125rem;
-    border: 1px solid #c0c0c0;
     margin-bottom: 0.5rem;
     &__container {
       display: none;
@@ -423,11 +434,11 @@
   }
 }
 
-.message-form {
-  .contact-card {
-    display: none;
-  }
-}
+// .message-form {
+//   .contact-card {
+//     display: none;
+//   }
+// }
 
 .message-form {
   &.focus {

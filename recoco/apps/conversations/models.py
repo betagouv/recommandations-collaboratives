@@ -2,8 +2,9 @@ from datetime import datetime
 
 from django.contrib.auth import models as auth_models
 from django.contrib.contenttypes.fields import GenericRelation
-from django.db import models
+from django.db import models, transaction
 from django.urls import reverse
+from django.utils.http import urlencode
 from model_utils.models import TimeStampedModel
 from notifications.models import Notification
 from polymorphic.models import PolymorphicModel
@@ -48,15 +49,16 @@ class Message(TimeStampedModel):
     )
 
     def get_absolute_url(self):
-        return reverse(
+        url_no_query = reverse(
             "projects-project-detail-conversations",
             kwargs={"project_id": self.project.pk},
-            query={"message-id": self.pk},
         )
+        query_kwargs = {"message-id": self.pk}
+        return f"{url_no_query}?{urlencode(query_kwargs)}"
 
     deleted = models.DateTimeField(null=True, blank=True)
 
-    def delete(self, **kwargs):
+    def soft_delete(self):
         self.deleted = datetime.now()
         for node in self.nodes.all():
             node.delete()
@@ -89,3 +91,15 @@ class ContactNode(Node):
 
 class DocumentNode(Node):
     document = models.ForeignKey(projects_models.Document, on_delete=models.CASCADE)
+
+    def save(self, **kwargs):
+        with transaction.atomic():
+            super().save(**kwargs)
+            self.document.deleted = None
+            self.document.attached_object = self.message
+            self.document.save()
+
+    def delete(self, **kwargs):
+        with transaction.atomic():
+            self.document.soft_delete()
+            super().delete(**kwargs)

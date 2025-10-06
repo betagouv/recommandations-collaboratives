@@ -4,10 +4,10 @@
 {% load django_vite %}
 {% load projects_extra %}
 {% block title %}
-    Nouvelle conversation - {{ block.super }}
+    Conversation - {{ block.super }}
 {% endblock title %}
 {% block og_title %}
-    Nouvelle conversation - {{ block.super }}
+    Conversation - {{ block.super }}
 {% endblock og_title %}
 {% block js %}
     {% vite_asset 'js/apps/conversationsNew.js' %}
@@ -28,9 +28,9 @@
          x-data="Conversations({{ project.id }}, {{ request.user.id }})">
         <div class="conversation-new__topics">
             <div class="justify-content-between">
-                <div class="conversation-new__topics-header">
+                {% comment %} <div class="conversation-new__topics-header">
                     <h2 class="conversation-new__topics-header-title">Fils de discussion</h2>
-                </div>
+                </div> {% endcomment %}
                 {% comment %} {% for topic in topic_list %} {% endcomment %}
                 {% include "projects/project/fragments/conversations_new/conversation_topic.html" with topic_name=topic.grouper message_number=topic.list %}
                 {% comment %} {% endfor %} {% endcomment %}
@@ -117,7 +117,7 @@
                                     </p>
                                 </div>
                             </template>
-                            {% include "tools/editor.html" with model="message" input_name=posting_form.content.name initial_content=posting_form.content.value|default:'' errors=posting_form.content.errors input_required=True can_add_reco=True next_url_add_reco="projects-project-detail-conversations-new" can_attach_files=True can_attach_contact=True show_send_button=True form_id="conversation-form" %}
+                            {% include "tools/editor.html" with model="message" input_name=posting_form.content.name initial_content=posting_form.content.value|default:'' errors=posting_form.content.errors input_required=True can_add_reco=True next_url_add_reco="projects-project-detail-conversations-new" can_attach_files=True can_attach_contact=True show_send_button=True form_id="conversation-form" placeholder="Écrivez votre message ici. Ajouter des fichiers, contacts ou une recommandation…" %}
                             <input type="hidden" name="contact" :value="message?.contact?.id">
                         </div>
                         {% for error in posting_form.content.errors %}<div class="text-danger text-end">{{ error }}</div>{% endfor %}

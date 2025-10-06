@@ -13,7 +13,7 @@ Parameters:
 - input_file_name (string)
 - input_file_required (boolean)
 - tools_disabled (list of tool names: <title>)
-
+- placeholder (string)
 {% endcomment %}
 {% load static %}
 {% load sass_tags %}
@@ -27,7 +27,7 @@ Parameters:
 {% endblock css %}
 {% comment %} TODO @set-comment.window to fix{% endcomment %}
 <div class="w-100 position-relative editor-container"
-     {% if initial_content_escapejs %} x-data='editor("{{ initial_content|escapejs }}")' {% elif initial_content_js %} x-data='editor({{ initial_content }})' {% else %} x-data='editor("{{ initial_content }}")' {% endif %}
+     {% if initial_content_escapejs %} x-data='editor("{{ initial_content|escapejs }}", "{{ placeholder }}")' {% elif initial_content_js %} x-data='editor({{ initial_content }}, "{{ placeholder }}")' {% else %} x-data='editor("{{ initial_content }}", "{{ placeholder }}")' {% endif %}
      @reset-contact="handleResetContact()"
      @set-comment.window="setMarkdownContent(event)"
      @modal-response="closeSearchContactModal($event)"
@@ -122,9 +122,9 @@ Parameters:
                 <!-- File module -->
                 {% if can_attach_files %}
                     <!-- Action file -->
-                    <button class="fr-btn fr-btn--sm fr-btn--tertiary fr-icon-file-add-line fr-btn--icon-left file-upload-wrapper"
+                    <button class="fr-btn fr-btn--sm fr-btn--tertiary fr-btn--tertiary-dark-background fr-icon-file-add-line fr-btn--icon-left file-upload-wrapper"
                             type="button"
-                            @click="$refs.fileUploadInput.click()">
+                            @click="$refs.fileUploadInput.click(); isEditorFocused = true;">
                         <span class="file-upload-text">Ajouter un fichier</span>
                     </button>
                     {% if document_form.the_file.errors %}
@@ -139,7 +139,7 @@ Parameters:
                 {% if can_add_reco %}
                     <a data-test-id="create-task-button"
                        :href="`{% url 'projects-create-task' %}?project_id={{ project.pk }}{% if next_url_add_reco %}&next={% url next_url_add_reco project.pk %}{% endif %}&content=${encodeURIComponent(markdownContent || '')}`"
-                       class="fr-btn fr-btn--tertiary fr-btn--sm justify-content-center fr-text--sm button-add-reco">
+                       class="fr-btn fr-btn--tertiary fr-btn--tertiary-dark-background fr-btn--sm justify-content-center fr-text--sm button-add-reco">
                         <span class="fr-icon-list-check-line fr-icon--sm"></span>
                         Créer une recommandation
                     </a>
@@ -147,9 +147,9 @@ Parameters:
                 <!-- Contact module -->
                 {% if can_attach_contact %}
                     <div x-cloak>
-                        <button @click.prevent="openModalSearchContact"
+                        <button @click.prevent="openModalSearchContact; isEditorFocused = true;"
                                 data-test-id="button-add-contact-in-editor"
-                                class="fr-btn fr-btn--tertiary fr-btn--sm fr-icon-contact-book-line fr-btn--icon-left justify-content-center fr-text--sm button-add-contact">
+                                class="fr-btn fr-btn--tertiary fr-btn--tertiary-dark-background fr-btn--sm fr-icon-contact-book-line fr-btn--icon-left justify-content-center fr-text--sm button-add-contact">
                             Ajouter un contact
                         </button>
                         {% include "tools/contacts/search_contact_modal.html" %}
