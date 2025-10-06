@@ -24,9 +24,29 @@ Alpine.data('NotificationEater', (projectId) => {
         observedElements.forEach((el) => observer.observe(el));
         setTimeout(() => {
           this.hideScrollLine();
-          this.scrollToFirstNotification();
+          const params = new URLSearchParams(document.location.search);
+          const messageId = parseInt(params.get('message-id'));
+          if (messageId) {
+            this.scrollToMessage(messageId);
+          } else {
+            this.scrollToFirstNotification();
+          }
         }, 500);
       });
+    },
+
+    scrollToMessage(messageId) {
+      const message = document.getElementById(`message-${messageId}`);
+      if (message) {
+        const elementPosition =
+          message.getBoundingClientRect().top + window.scrollY;
+        const offsetPosition = elementPosition - 150;
+
+        window.scrollTo({
+          top: offsetPosition,
+          behavior: 'smooth',
+        });
+      }
     },
     scrollToFirstNotification(topic) {
       if (topic?.detail) topic = topic.detail;
