@@ -62,11 +62,7 @@
                                 <button class="fr-btn fr-btn--sm fr-btn--tertiary fr-mr-1v"
                                         @click="onClickHandleEdit(element)">Modifier</button>
                             </template>
-                            <button data-fr-opened="false"
-                                    aria-controls="modal"
-                                    type="button"
-                                    class="fr-btn fr-btn--sm fr-btn--tertiary"
-                                    @click="setElementToDelete(element)">Supprimer</button>
+                            {% comment %} <button data-fr-opened="false" aria-controls="modal" type="button" class="fr-btn fr-btn--sm fr-btn--tertiary" @click="setElementToDelete(element)">Supprimer</button> {% endcomment %}
                             <dialog id="modal"
                                     class="fr-modal"
                                     aria-labelledby="supprimer-message"

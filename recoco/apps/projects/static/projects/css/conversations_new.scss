@@ -412,7 +412,7 @@
     // .button-module__container,
     // .module__container,
     .tiptap-menu-custom,
-    .contact-card {
+    .tiptap.ProseMirror .contact-card {
       display: none;
       transition: none;
     }
@@ -434,11 +434,11 @@
   }
 }
 
-.message-form {
-  .contact-card {
-    display: none;
-  }
-}
+// .message-form {
+//   .contact-card {
+//     display: none;
+//   }
+// }
 
 .message-form {
   &.focus {

@@ -124,7 +124,7 @@ Parameters:
                     <!-- Action file -->
                     <button class="fr-btn fr-btn--sm fr-btn--tertiary fr-btn--tertiary-dark-background fr-icon-file-add-line fr-btn--icon-left file-upload-wrapper"
                             type="button"
-                            @click="$refs.fileUploadInput.click()">
+                            @click="$refs.fileUploadInput.click(); isEditorFocused = true;">
                         <span class="file-upload-text">Ajouter un fichier</span>
                     </button>
                     {% if document_form.the_file.errors %}
@@ -147,7 +147,7 @@ Parameters:
                 <!-- Contact module -->
                 {% if can_attach_contact %}
                     <div x-cloak>
-                        <button @click.prevent="openModalSearchContact"
+                        <button @click.prevent="openModalSearchContact; isEditorFocused = true;"
                                 data-test-id="button-add-contact-in-editor"
                                 class="fr-btn fr-btn--tertiary fr-btn--tertiary-dark-background fr-btn--sm fr-icon-contact-book-line fr-btn--icon-left justify-content-center fr-text--sm button-add-contact">
                             Ajouter un contact
