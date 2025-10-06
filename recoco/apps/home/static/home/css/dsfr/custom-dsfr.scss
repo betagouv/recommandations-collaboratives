@@ -678,11 +678,33 @@ form > p {
 .specific-background-grey {
   background-color: #fafafa;
 }
+
 .specific-flex-basis-48 {
   flex-basis: 48.8%;
 }
+
 .font-size-14px {
   font-size: 14px;
+}
+
+.font-size-14px p {
+  font-size: 14px;
+}
+
+.font-size-12px {
+  font-size: 12px;
+}
+
+.font-size-12px p {
+  font-size: 12px;
+}
+
+.fw-400 {
+  font-weight: 400;
+}
+
+.fw-400 p {
+  font-weight: 400;
 }
 
 .centered-item {
@@ -721,6 +743,7 @@ form > p {
 /* ¯¯¯¯ *\
   COLORS
 \* ˍˍˍˍ */
+
 .fr-color {
   color: white;
   &--success {
@@ -734,6 +757,28 @@ form > p {
   &--error {
     background-color: #dc3444;
   }
+
+  &--mention {
+    color: var(--light-text-mention-grey, #666);
+
+    &_button {
+      color: var(--light-text-mention-grey, #666);
+      border: 1px solid var(--light-text-mention-grey, #666);
+      box-shadow: none;
+    }
+  }
+
+  &--disabled-grey {
+    color: var(--light-text-disabled-grey, #929292);
+  }
+}
+
+.color-purple {
+  color: #667dcf;
+}
+
+.color-purple p {
+  color: #667dcf;
 }
 
 .specific-color-3a {
@@ -847,6 +892,41 @@ form > p {
 .non-stylish-link {
   color: white !important;
   text-decoration: none !important;
+}
+
+/* ¯¯¯¯¯ *\
+  Buttons
+\* ˍˍˍˍˍ */
+
+.fr-btn-secondary-rework {
+  border-radius: 1px;
+  padding: 6px 8px;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 700;
+  min-height: 0;
+}
+
+/* ¯¯¯ *\
+  Text
+\* ˍˍˍ */
+
+.text-light-centered {
+  color: #999;
+  text-align: center;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 150%;
+  margin: auto;
+}
+
+/* ¯¯¯ *\
+  Size
+\* ˍˍˍ */
+
+.w-49 {
+  width: 49%;
 }
 
 /* ¯¯¯¯¯¯¯¯ *\
