@@ -98,8 +98,7 @@ def test_who_can_send_messages(msg_reader, res_code, project_ready, request, cli
     data = {
         "nodes": [
             {"position": 1, "type": "MarkdownNode", "text": "One two this is a test"}
-        ],
-        "posted_by": user.id,
+        ]
     }
     # when given directly, nested dict is not parsed correctly
     response = client.post(url, json.dumps(data), content_type="application/json")

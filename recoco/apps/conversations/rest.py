@@ -43,16 +43,13 @@ class MessageViewSet(viewsets.ModelViewSet):
             unread=Count("notifications", filter=Q(notifications__unread=True))
         )
 
-    def get_serializer_context(self):
-        context = super().get_serializer_context()
-        context.update({"project_id": int(self.kwargs["project_id"])})
-        return context
-
     def perform_destroy(self, instance):
         instance.soft_delete()
 
     def perform_create(self, serializer):
-        instance = serializer.save()
+        instance = serializer.save(
+            posted_by=self.request.user, project_id=self.kwargs["project_id"]
+        )
         signals.message_posted.send(sender=self.perform_create, message=instance)
 
 

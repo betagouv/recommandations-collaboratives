@@ -87,12 +87,20 @@ class MessageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Message
         fields = (
-            "id",
-            "created",
-            "modified",
-            "posted_by",
             "in_reply_to",
             "nodes",
+            "id",
+            "posted_by",
+            "created",
+            "modified",
+            "unread",
+            "deleted",
+        )
+        read_only_fields = (
+            "id",
+            "posted_by",
+            "created",
+            "modified",
             "unread",
             "deleted",
         )
@@ -103,9 +111,7 @@ class MessageSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         nodes_data = validated_data.pop("nodes")
-        message = Message.objects.create(
-            project_id=self.context["project_id"], **validated_data
-        )
+        message = Message.objects.create(**validated_data)
         with transaction.atomic():
             message.save()
             for node_data in nodes_data:
