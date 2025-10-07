@@ -20,18 +20,7 @@
     {% get_obj_perms request.user for request.site as "user_site_perms" %}
     {% get_obj_perms request.user for project as "user_project_perms" %}
     {% include "projects/project/navigation.html" with files_links=True %}
-    {% if project.inactive_since != None %}
-        <div class="specific-border-4pxsolid1e1e1e">
-            {% include "projects/project/fragments/project_banner/paused_project_banner.html" %}
-            <div>
-    {% elif project.status == 'REJECTED' %}
-        <div class="specific-border-4pxsolid1e1e1e">
-            {% include "projects/project/fragments/project_banner/deleted_project_banner.html" %}
-            <div class="no-interaction-possible">
-    {% elif project.status == 'DRAFT' %}
-        <div class="specific-border-4pxsolid000091">
-            {% include "projects/project/fragments/project_banner/non_published_project_banner.html" %}
-    {% endif %}
+    {% include "projects/project/fragments/project_banner/banner_wrapper.html" with part='open' %}
                 <div class="fr-p-3w">
                     <div class="row">
                         <div class="col-8">
@@ -105,13 +94,5 @@
                         </div>
                     </div>
                 </div>
-    {% if project.inactive_since != None %}
-            </div>
-        </div>
-    {% elif project.status == 'REJECTED' or project.deleted != null %}
-            </div>
-        </div>
-    {% elif project.status == 'DRAFT' %}
-        </div>
-    {% endif %}
+                {% include "projects/project/fragments/project_banner/banner_wrapper.html" with part='close' %}
 {% endblock project_detail %}

@@ -23,18 +23,7 @@
     {% get_obj_perms request.user for project as "user_project_perms" %}
     {% is_staff_for_current_site request.user as is_staff %}
     {% include "projects/project/navigation.html" with administration_panel=True %}
-    {% if project.inactive_since != None %}
-        <div class="specific-border-4pxsolid1e1e1e">
-            {% include "projects/project/fragments/project_banner/paused_project_banner.html" %}
-            <div>
-    {% elif project.status == 'REJECTED' %}
-        <div class="specific-border-4pxsolid1e1e1e">
-            {% include "projects/project/fragments/project_banner/deleted_project_banner.html" %}
-                <div class="no-interaction-possible">
-    {% elif project.site_status == 'DRAFT' %}
-        <div class="specific-border-4pxsolid000091">
-            {% include "projects/project/fragments/project_banner/non_published_project_banner.html" %}
-    {% endif %}
+    {% include "projects/project/fragments/project_banner/banner_wrapper.html" with part='open' %}
     {{ project_form.postcode.value|json_script:"projectPostcode" }}
     {{ project_form.insee.value|json_script:"projectInsee" }}
     <div class="container-fluid">
@@ -388,14 +377,6 @@
             </section>
         </div>
     </div>
-    {% if project.inactive_since != None %}
-            </div>
-        </div>
-    {% elif project.status == 'REJECTED' or project.deleted != null %}
-            </div>
-        </div>
-    {% elif project.site_status == 'DRAFT' %}
-    </div>
-    {% endif %}
+    {% include "projects/project/fragments/project_banner/banner_wrapper.html" with part='close' %}
     <div class="fr-mt-2w fr-px-2w">{% include "projects/project/fragments/administration/activate_project.html" %}</div>
 {% endblock project_detail %}
