@@ -388,16 +388,18 @@ def test_unread_is_zero_if_no_notifications(
 
 @pytest.mark.django_db
 def test_unread_counts_unread_notifications(
-    message, project_ready, project_reader, api_client
+    message, sender, project_ready, project_reader, api_client
 ):
     url = reverse("projects-conversations-messages-list", args=[project_ready.pk])
 
     baker.make(
         Notification,
-        actor=project_reader,
+        actor=sender,
         verb=verbs.Conversation.POST_MESSAGE,
         action_object=message,
+        recipient=project_reader,
         public=True,
+        unread=True,
     )
 
     api_client.force_login(project_reader)
@@ -410,15 +412,16 @@ def test_unread_counts_unread_notifications(
 
 @pytest.mark.django_db
 def test_unread_does_not_count_read_notifications(
-    message, project_ready, project_reader, api_client
+    message, project_ready, sender, project_reader, api_client
 ):
     url = reverse("projects-conversations-messages-list", args=[project_ready.pk])
 
     baker.make(
         Notification,
-        actor=project_reader,
+        actor=sender,
         verb=verbs.Conversation.POST_MESSAGE,
         action_object=message,
+        recipient=project_reader,
         public=True,
         unread=False,
     )
@@ -429,6 +432,111 @@ def test_unread_does_not_count_read_notifications(
     assert response.status_code == 200
 
     assert response.json()[0]["unread"] == 0
+
+
+@pytest.mark.django_db
+def test_unread_considers_only_requesting_user_notifications(
+    message, project_ready, sender, project_reader, api_client
+):
+    url = reverse("projects-conversations-messages-list", args=[project_ready.pk])
+
+    # For sender
+    baker.make(
+        Notification,
+        actor=sender,
+        verb=verbs.Conversation.POST_MESSAGE,
+        action_object=message,
+        recipient=sender,
+        public=True,
+        unread=True,
+    )
+
+    # For reader
+    baker.make(
+        Notification,
+        actor=sender,
+        verb=verbs.Conversation.POST_MESSAGE,
+        action_object=message,
+        recipient=project_reader,
+        public=True,
+        unread=True,
+    )
+
+    api_client.force_login(project_reader)
+    response = api_client.get(url)
+
+    assert response.status_code == 200
+
+    assert response.json()[0]["unread"] == 1
+
+
+@pytest.mark.django_db
+def test_mark_message_as_read(
+    sender, message, project_reader, project_ready, api_client
+):
+    url = reverse(
+        "projects-conversations-messages-mark-as-read",
+        args=[project_ready.pk, message.pk],
+    )
+
+    # For reader
+    baker.make(
+        Notification,
+        actor=sender,
+        verb=verbs.Conversation.POST_MESSAGE,
+        action_object=message,
+        recipient=project_reader,
+        public=True,
+        unread=True,
+    )
+
+    api_client.force_login(project_reader)
+
+    response = api_client.post(url)
+
+    assert response.status_code == 202
+
+    assert Notification.objects.unread().count() == 0
+
+
+@pytest.mark.django_db
+def test_mark_message_as_read_honors_current_user(
+    sender, message, project_reader, project_ready, api_client
+):
+    url = reverse(
+        "projects-conversations-messages-mark-as-read",
+        args=[project_ready.pk, message.pk],
+    )
+
+    # For sender
+    baker.make(
+        Notification,
+        actor=sender,
+        verb=verbs.Conversation.POST_MESSAGE,
+        action_object=message,
+        recipient=sender,
+        public=True,
+        unread=True,
+    )
+
+    # For reader
+    baker.make(
+        Notification,
+        actor=sender,
+        verb=verbs.Conversation.POST_MESSAGE,
+        action_object=message,
+        recipient=project_reader,
+        public=True,
+        unread=True,
+    )
+
+    api_client.force_login(project_reader)
+
+    response = api_client.post(url)
+
+    assert response.status_code == 202
+
+    assert Notification.objects.unread().count() == 1
 
 
 #####--- Notifications ---###

@@ -3,8 +3,10 @@
 
 from django.contrib.auth.models import User
 from django.db.models import Count, Q
-from rest_framework import mixins, viewsets
+from rest_framework import mixins, status, viewsets
+from rest_framework.decorators import action
 from rest_framework.permissions import SAFE_METHODS, BasePermission, IsAuthenticated
+from rest_framework.response import Response
 
 from recoco import verbs
 from recoco.apps.projects import models as projects_models
@@ -40,7 +42,13 @@ class MessageViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         project_id = int(self.kwargs["project_id"])
         return Message.objects.filter(project_id=project_id).annotate(
-            unread=Count("notifications", filter=Q(notifications__unread=True))
+            unread=Count(
+                "notifications",
+                filter=Q(
+                    notifications__unread=True,
+                    notifications__recipient=self.request.user,
+                ),
+            )
         )
 
     def perform_destroy(self, instance):
@@ -51,6 +59,21 @@ class MessageViewSet(viewsets.ModelViewSet):
             posted_by=self.request.user, project_id=self.kwargs["project_id"]
         )
         signals.message_posted.send(sender=self.perform_create, message=instance)
+
+    @action(detail=True, methods=["post"], permission_classes=[IsAuthenticated])
+    def mark_as_read(self, request, project_id, pk):
+        """
+        Mark user's notifications as read for a given message.
+        We do not need more than IsAuthenticated to ensure no side effects.
+        XXX This exposes potential Message IDs from an unhautorized account (not critical)
+        """
+        message = self.get_object()
+
+        message.notifications.unread().filter(
+            public=True,
+        ).mark_all_as_read(self.request.user)
+
+        return Response(status=status.HTTP_202_ACCEPTED)
 
 
 class ActivityViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
