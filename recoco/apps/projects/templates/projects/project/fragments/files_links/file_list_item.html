@@ -68,9 +68,10 @@
                 <span class="fr-icon--sm fr-icon-calendar-event-line fr-mr-1v"
                       aria-hidden="true"></span>
             {{ document.created_on|naturalday }}</span>
-            {% if document.attached_object %}
+            {% comment %} TODO: Add attached object {% endcomment %}
+            {% comment %} {% if document.attached_object %}
                 <span class="fr-ml-3w tiny d-flex">De :  <a href="{{ document.attached_object.get_absolute_url }}">{{ document.attached_object }}</a></span>
-            {% endif %}
+            {% endif %} {% endcomment %}
         </div>
     </div>
 {% endif %}

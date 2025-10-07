@@ -7,10 +7,12 @@ import { createMarkdownEditor } from 'tiptap-markdown';
 import '../../css/tiptap.css';
 import { formatDate } from '../utils/date';
 import Placeholder from '@tiptap/extension-placeholder';
+import { ContactCardExtension } from './ContactCardExtension';
+import { FileCardExtension } from './FileCardExtension';
 
 const MarkdownEditor = createMarkdownEditor(Editor);
 
-Alpine.data('editor', (content) => {
+Alpine.data('editor', (content, placeholder) => {
   let editor;
 
   return {
@@ -26,7 +28,7 @@ Alpine.data('editor', (content) => {
           StarterKit,
           Link,
           Placeholder.configure({
-            placeholder: 'Ecrivez votre message ici…',
+            placeholder: placeholder || 'Ecrivez votre message ici…',
           }),
           HardBreak.extend({
             addKeyboardShortcuts() {
@@ -45,8 +47,8 @@ Alpine.data('editor', (content) => {
               };
             },
           }),
-          // ContactCardExtension, // TODO: Uncomment this when the contact card is ready
-          // FileCardExtension, // TODO: Uncomment this when the file card is ready
+          ContactCardExtension,
+          FileCardExtension,
         ],
         content: content,
         onCreate({ editor }) {
@@ -61,7 +63,7 @@ Alpine.data('editor', (content) => {
 
           _this.$store.editor.isEditing = editor.getMarkdown() != '';
           _this.$store.editor.currentMessage = editor.getMarkdown();
-
+          _this.$store.editor.currentMessageJSON = editor.getJSON();
           // Mettre à jour la propriété réactive
           _this.isEditorEmpty = editor.isEmpty;
 
@@ -76,6 +78,7 @@ Alpine.data('editor', (content) => {
         },
       });
 
+      this.$store.editor.editorInstance = editor;
       this.renderMarkdown();
 
       // Ajouter des watchers pour déclencher des mises à jour réactives
@@ -183,7 +186,7 @@ Alpine.data('editor', (content) => {
       if (contact) {
         this.handleSetContact(contact);
         // Insert contact card into editor
-        // this.insertContactCard(contact); // TODO: Uncomment this when the contact card is ready
+        this.insertContactCard(contact);
       }
       this.isSearchContactModalOpen = false;
     },
@@ -246,36 +249,36 @@ Alpine.data('editor', (content) => {
       const file = event.target.files[0];
       if (file) {
         this.selectedFile = file;
-        // Mettre à jour le nom du fichier affiché
         this.fileName = file.name;
 
         // Insérer la carte de fichier dans l'éditeur
-        // if (editor) {
-        //   console.log('Inserting file card for:', file.name);
+        if (editor) {
+          console.log('Inserting file card for:', file.name);
 
-        //   const fileAttributes = {
-        //     fileName: file.name,
-        //     fileSize: file.size,
-        //     fileType: file.type,
-        //     uploadedAt: new Date().toISOString(),
-        //   };
+          const fileAttributes = {
+            fileName: file.name,
+            fileSize: file.size,
+            fileType: file.type,
+            uploadedAt: new Date().toISOString(),
+            file: file,
+          };
 
-        //   console.log('File attributes:', fileAttributes);
+          console.log('File attributes:', fileAttributes);
 
-        //   try {
-        //     const result = editor
-        //       .chain()
-        //       .focus()
-        //       .insertFileCard(fileAttributes)
-        //       .run();
-        //     console.log('Insert result:', result);
-        //   } catch (error) {
-        //     console.error('Error inserting file card:', error);
-        //     console.error('Error stack:', error.stack);
-        //   }
-        // } else {
-        //   console.error('Editor not initialized');
-        // }
+          try {
+            const result = editor
+              .chain()
+              .focus()
+              .insertFileCard(fileAttributes)
+              .run();
+            console.log('Insert result:', result);
+          } catch (error) {
+            console.error('Error inserting file card:', error);
+            console.error('Error stack:', error.stack);
+          }
+        } else {
+          console.error('Editor not initialized');
+        }
       } else {
         this.selectedFile = null;
         this.fileName = '';

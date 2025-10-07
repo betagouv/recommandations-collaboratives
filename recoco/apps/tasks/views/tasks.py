@@ -23,7 +23,7 @@ from recoco.apps.projects import models as project_models
 from recoco.apps.projects.forms import DocumentUploadForm
 from recoco.apps.projects.utils import (
     can_administrate_project,
-    get_collaborators_for_project,
+    reactivate_if_necessary,
 )
 from recoco.apps.survey import models as survey_models
 from recoco.utils import check_if_advisor, has_perm_or_403, is_staff_for_site_or_403
@@ -505,13 +505,7 @@ def followup_task(request, task_id=None):
             followup.save()
 
             # update activity flags and states
-            if request.user in get_collaborators_for_project(task.project):
-                task.project.last_members_activity_at = timezone.now()
-
-                if task.project.inactive_since:
-                    task.project.reactivate()
-
-                task.project.save()
+            reactivate_if_necessary(task.project, request.user)
 
     return redirect(reverse("projects-project-detail-actions", args=[task.project.id]))
 

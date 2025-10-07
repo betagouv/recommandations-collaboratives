@@ -13,6 +13,10 @@ import { NO_TOPICS } from '../config/tasks';
 
 document.addEventListener('alpine:init', () => {
   Alpine.store('tasksData', {
+    _subscribers: [],
+    _state: {
+      tasks: [],
+    },
     get projectId() {
       return Alpine.store('djangoData').projectId;
     },
@@ -29,6 +33,22 @@ document.addEventListener('alpine:init', () => {
     },
     get newTasks() {
       return this.tasks.filter((task) => task.visited === false && task.public);
+    },
+    _subscribe(callback) {
+      this._subscribers.push(callback);
+      return () => {
+        this._subscribers = this._subscribers.filter((cb) => cb !== callback);
+      };
+    },
+    setState(newState) {
+      this._state = { ...this._state, ...newState };
+      this._subscribers.forEach((callback) => callback(this._state));
+    },
+    _unsubscribe(callback) {
+      this._subscribers = this._subscribers.filter((cb) => cb !== callback);
+    },
+    _notify() {
+      this._subscribers.forEach((callback) => callback());
     },
     extractTopicFromTasks() {
       let topics = [];
@@ -58,7 +78,7 @@ document.addEventListener('alpine:init', () => {
       this.tasks = data.map((task) => ({ ...task, isLoading: false }));
       this.draftTasks = this.tasks.filter((task) => task.public === false);
       this.validatedTasks = this.tasks.filter((task) => task.public === true);
-
+      this.setState({ tasks: this.tasks });
       return this.tasks;
     },
     getTaskById(id) {

@@ -54,6 +54,18 @@
   font-weight: 700;
 }
 
+.fr-italic {
+  font-style: italic;
+}
+
+.fr-small > * {
+  font-size: 0.875rem !important;
+}
+
+.fr-font--capitalize::first-letter {
+  text-transform: uppercase;
+}
+
 /* ¯¯¯¯ *\
   BUTTONS
 \* ˍˍˍˍ */
@@ -85,6 +97,18 @@ p {
   &:has(textarea) {
     margin-top: 0;
     margin-bottom: 1rem;
+  }
+}
+
+.fr-btn--grey {
+  background-color: var(--light-background-alt-grey, #f6f6f6);
+  color: var(--light-text-default-grey, #3a3a3a);
+  font-size: 14px;
+  font-weight: 700;
+  &:not(:disabled):hover {
+    background-color: var(--light-background-alt-grey-hover, #e6e6e6);
+    background: var(--light-background-alt-grey-hover, #e6e6e6);
+    color: var(--light-text-default-grey-hover, #3a3a3a);
   }
 }
 
@@ -654,11 +678,33 @@ form > p {
 .specific-background-grey {
   background-color: #fafafa;
 }
+
 .specific-flex-basis-48 {
   flex-basis: 48.8%;
 }
+
 .font-size-14px {
   font-size: 14px;
+}
+
+.font-size-14px p {
+  font-size: 14px;
+}
+
+.font-size-12px {
+  font-size: 12px;
+}
+
+.font-size-12px p {
+  font-size: 12px;
+}
+
+.fw-400 {
+  font-weight: 400;
+}
+
+.fw-400 p {
+  font-weight: 400;
 }
 
 .centered-item {
@@ -697,6 +743,7 @@ form > p {
 /* ¯¯¯¯ *\
   COLORS
 \* ˍˍˍˍ */
+
 .fr-color {
   color: white;
   &--success {
@@ -710,6 +757,28 @@ form > p {
   &--error {
     background-color: #dc3444;
   }
+
+  &--mention {
+    color: var(--light-text-mention-grey, #666);
+
+    &_button {
+      color: var(--light-text-mention-grey, #666);
+      border: 1px solid var(--light-text-mention-grey, #666);
+      box-shadow: none;
+    }
+  }
+
+  &--disabled-grey {
+    color: var(--light-text-disabled-grey, #929292);
+  }
+}
+
+.color-purple {
+  color: #667dcf;
+}
+
+.color-purple p {
+  color: #667dcf;
 }
 
 .specific-color-3a {
@@ -717,11 +786,26 @@ form > p {
 }
 
 /* ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯ *\
-  Tutorials buttons
+   Buttons
 \* ˍˍˍˍˍˍˍˍˍˍˍˍˍˍˍ */
 
 .introjs-skipbutton {
   cursor: pointer !important;
+}
+
+// rewrite dsfr btn style
+.fr-btn--tertiary {
+  color: #3a3a3a !important;
+  background: var(--light-background-alt-grey, #f6f6f6);
+  &-dark-background {
+    background: var(--light-background-default-grey, #fff);
+  }
+  &:not(:disabled):hover {
+    background-color: var(--light-background-alt-grey-hover, #e6e6e6);
+    background: var(--light-background-alt-grey-hover, #e6e6e6);
+    color: var(--light-text-default-grey-hover, #3a3a3a);
+    opacity: 0.9;
+  }
 }
 
 /* ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯ *\
@@ -810,10 +894,63 @@ form > p {
   text-decoration: none !important;
 }
 
+/* ¯¯¯¯¯ *\
+  Buttons
+\* ˍˍˍˍˍ */
+
+.fr-btn-secondary-rework {
+  border-radius: 1px;
+  padding: 6px 8px;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 700;
+  min-height: 0;
+}
+
+/* ¯¯¯ *\
+  Text
+\* ˍˍˍ */
+
+.text-light-centered {
+  color: #999;
+  text-align: center;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 150%;
+  margin: auto;
+}
+
+/* ¯¯¯ *\
+  Size
+\* ˍˍˍ */
+
+.w-49 {
+  width: 49%;
+}
+
 /* ¯¯¯¯¯¯¯¯ *\
   Espacement
 \* ˍˍˍˍˍˍˍˍ */
 
 .fr-pt-05v {
   padding-top: 2px;
+}
+
+/* Conversations - delete highlight effect */
+.message-item--deleting {
+  position: relative;
+  animation: message-delete-pulse 600ms ease-in-out 0s 1 normal forwards;
+}
+
+@keyframes message-delete-pulse {
+  0% {
+    background-color: rgba(220, 53, 68, 0.12); /* error red, subtle */
+  }
+  40% {
+    background-color: rgba(220, 53, 68, 0.24);
+  }
+  100% {
+    background: var(--light-background-alt-blue-france, #f5f5fe);
+  }
 }

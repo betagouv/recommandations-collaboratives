@@ -649,6 +649,8 @@ class FormattedNotification:
 
 
 class NotificationFormatter:
+    """Format notifications for email dispatch"""
+
     def __init__(self):
         self.dispatch_table = {
             verbs.Conversation.PUBLIC_MESSAGE: self.format_public_note_created,

@@ -5,6 +5,18 @@ document.addEventListener('alpine:init', () => {
   Alpine.store('tasksView', {
     displayedTasks: [],
     currentView: 'inline',
+    async init() {
+      try {
+        const tasksLoaded = await Alpine.store('tasksData').loadTasks();
+        for (const task of tasksLoaded) {
+          if (task.status != 0) {
+           this.currentView = 'kanban';
+          }
+        }
+      } catch (error) {
+        throw new Error('Error loading tasks while view initialization : ' + error);
+      }
+    },
     async updateViewWithTask(taskId) {
       try {
         const updatedTasks = await Alpine.store('tasksData').loadTasks();

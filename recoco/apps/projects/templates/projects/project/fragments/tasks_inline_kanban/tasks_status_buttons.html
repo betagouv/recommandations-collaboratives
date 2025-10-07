@@ -1,18 +1,18 @@
 <div x-data="TaskStatusSwitcher(task)"
      class="d-flex align-items-center task-status-switcher">
     <button data-test-id="in-progress-status-task-button"
-            class="button tiny black inherit fw-medium fr-mr-2v"
-            :class="(activeStatus(task, STATUSES.INPROGRESS) || task.status === STATUSES.BLOCKED) && 'bg-blue text-white border-blue pointer-events-none'"
+            class="{% if full_width %}flex-fill {% else %}fr-btn {% endif %}fr-btn--secondary fr-btn-secondary-rework fr-mr-2v"
+            :class="(activeStatus(task, STATUSES.INPROGRESS) || task.status === STATUSES.BLOCKED) && 'bg-blue text-white border-blue shadow-none pointer-events-none'"
             x-text="statusText(STATUSES.INPROGRESS)"
             @click.stop="handleStatusClick(task, STATUSES.INPROGRESS)">En cours</button>
     <button data-test-id="done-status-task-button"
-            class="button tiny black inherit fw-medium fr-mr-2v"
-            :class="activeStatus(task, STATUSES.DONE) && 'bg-green-dark text-white border-green-dark pointer-events-none'"
+            class="{% if full_width %}flex-fill {% else %}fr-btn {% endif %}fr-btn--secondary fr-btn-secondary-rework fr-mr-2v"
+            :class="activeStatus(task, STATUSES.DONE) && 'bg-green-dark text-white border-green-dark shadow-none pointer-events-none'"
             x-text="statusText(STATUSES.DONE)"
             @click.stop="handleStatusClick(task, STATUSES.DONE)">Fait</button>
     <button data-test-id="not-interested-status-task-button"
-            class="button tiny black inherit fw-medium fr-mr-2v"
-            :class="activeStatus(task, STATUSES.NOT_INTERESTED) && 'bg-grey-dark text-white border-grey-dark pointer-events-none'"
+            class="{% if full_width %}flex-fill {% else %}fr-btn {% endif %}fr-btn--secondary fr-btn-secondary-rework"
+            :class="activeStatus(task, STATUSES.NOT_INTERESTED) && 'bg-grey-dark text-white border-grey-dark shadow-none pointer-events-none'"
             x-text="statusText(STATUSES.NOT_INTERESTED)"
             @click.stop="handleStatusClick(task, STATUSES.NOT_INTERESTED)">Non applicable</button>
 </div>

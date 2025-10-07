@@ -42,11 +42,11 @@ from ..forms import (
 )
 from ..utils import (
     get_advising_context_for_project,
-    get_collaborators_for_project,
     get_notification_recipients_for_project,
     is_advisor_for_project,
     is_member,
     is_regional_actor_for_project,
+    reactivate_if_necessary,
 )
 
 
@@ -446,8 +446,6 @@ def project_conversations_new(request, project_id=None):
 
     recipients = get_notification_recipients_for_project(project)
 
-    feed = _build_feeds(project=project, user=request.user)
-
     return render(
         request,
         "projects/project/conversations_new.html",
@@ -457,7 +455,6 @@ def project_conversations_new(request, project_id=None):
             "advising": advising,
             "posting_form": posting_form,
             "recipients": recipients,
-            "feed": feed,
         },
     )
 
@@ -505,14 +502,7 @@ def project_conversations_new_partial(request, project_id=None):
 
                 document.save()
 
-        # Reactivate project if was set inactive
-        if request.user in get_collaborators_for_project(project):
-            project.last_members_activity_at = timezone.now()
-
-            if project.inactive_since:
-                project.reactivate()
-
-            project.save()
+        reactivate_if_necessary(project, request.user)
 
         signals.note_created.send(
             sender=create_public_note,

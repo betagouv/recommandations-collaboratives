@@ -37,7 +37,7 @@
                 {% include "projects/project/fragments/action_pusher/type.html" %}
                 {% include "projects/project/fragments/action_pusher/resource_search.html" %}
                 {% include "projects/project/fragments/action_pusher/details_form.html" with form=type_form %}
-                <input type="hidden" name="next" value="{{ type_form.next.value }}">
+                <input type="hidden" name="next" :value="draft ? '' : '{{ type_form.next.value }}'">
                 <input type="hidden" name="public" x-model="public">
             </form>
         </div>

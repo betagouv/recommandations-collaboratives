@@ -18,6 +18,7 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.db.models import Q
+from django.utils import timezone
 from guardian.shortcuts import assign_perm, get_users_with_perms, remove_perm
 from notifications.signals import notify
 
@@ -389,6 +390,19 @@ def format_switchtender_identity(user):
         fmt += f" - {user.profile.organization.name}"
 
     return fmt
+
+
+def reactivate_if_necessary(project, user_doing_something=None):
+    if (
+        user_doing_something is None
+        or user_doing_something in get_collaborators_for_project(project)
+    ):
+        project.last_members_activity_at = timezone.now()
+
+        if project.inactive_since:
+            project.reactivate()
+
+        project.save()
 
 
 # eof

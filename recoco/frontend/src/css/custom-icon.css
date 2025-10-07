@@ -17,3 +17,8 @@
 .fr-icon-tag-line::before {
   mask-image: url(../assets/tag-line.svg);
 }
+
+.fr-icon-corner-down-right-line::after,
+.fr-icon-corner-down-right-line::before {
+  mask-image: url(../assets/corner-down-right-line.svg);
+}

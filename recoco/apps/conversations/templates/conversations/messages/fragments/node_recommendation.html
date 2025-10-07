@@ -1,0 +1,49 @@
+{% comment %}
+Parameter Django:
+    - node :
+    {   'data':
+            {
+                'recommendation_id': 4242,
+                'text': 'task text'
+            },
+        'position': 1,
+        'type': 'recommendation'
+    }
+    - posted_by : user object
+Parameter Alpine:
+    - recommendation : recommendation object
+{% endcomment %}
+<template x-if="tasks.length > 0">
+    <div x-data='{recommendation: null}'
+         x-init="recommendation = getRecommendationById(node.recommendation_id)"
+         class="task-item rounded-3 fr-my-2v">
+        <template x-if="recommendation">
+            <div>
+                <p x-html="renderMarkdown(recommendation.content)"></p>
+                <div class="task-item__resource">
+                    <template x-if="recommendation.resource">
+                        <h4 class="fr-link">
+                            <a :href="recommendation.resource.web_url"
+                               target="_blank"
+                               x-text="recommendation.intent"></a>
+                        </h4>
+                    </template>
+                    <template x-if="!recommendation.resource">
+                        <h4 x-text="recommendation.intent"></h4>
+                    </template>
+                    <template x-if="recommendation.resource">
+                        <p class="fr-mt-1w fr-mb-0" x-text="recommendation.resource.subtitle"></p>
+                    </template>
+                    <template x-for="document in recommendation.document" :key="document.id">
+                        <div>
+                            <span class="fr-mb-2w">🚧 TODO: Liste des documents 🚧</span>
+                            <span class="fr-mb-2w">There is a document to display</span>
+                        </div>
+                        {% comment %} {% include "projects/project/fragments/files_links/file_list_item_embedded.html" with document=document %} {% endcomment %}
+                    </template>
+                    {% include "projects/project/fragments/conversations_new/tasks_status_buttons_js.html" %}
+                </div>
+            </div>
+        </template>
+    </div>
+</template>

@@ -255,3 +255,32 @@ export function deleteTaskReminderUrl(taskId) {
 export function editReminderUrl(taskId) {
   return `/task/${taskId}/remind/`;
 }
+
+export function userUrl(userId) {
+  return `/api/users/${userId}/`;
+}
+
+// Conversations
+export function conversationsMessagesUrl(projectId) {
+  return `/api/projects/${projectId}/conversations/messages/`;
+}
+
+export function conversationsMessageUrl(projectId, messageId) {
+  return `/api/projects/${projectId}/conversations/messages/${messageId}/`;
+}
+
+export function conversationsActivitiesUrl(projectId) {
+  return `/api/projects/${projectId}/conversations/activities/`;
+}
+
+export function conversationsParticipantsUrl(projectId) {
+  return `/api/projects/${projectId}/conversations/participants/`;
+}
+
+// Documents
+export function documentsUrl(projectId) {
+  return `/api/projects/${projectId}/documents/`;
+}
+export function documentUrl(projectId, documentId) {
+  return `/api/projects/${projectId}/documents/${documentId}/`;
+}
