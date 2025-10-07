@@ -22,7 +22,6 @@ from notifications import models as notifications_models
 from rest_framework import mixins, permissions, status, viewsets
 from rest_framework.generics import ListAPIView
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
-from rest_framework.permissions import BasePermission
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -33,6 +32,7 @@ from recoco.rest_api.filters import (
     WatsonSearchFilter,
 )
 from recoco.rest_api.pagination import LargeResultsSetPagination
+from recoco.rest_api.permissions import BaseConversationPermission
 from recoco.utils import (
     get_group_for_site,
     has_perm,
@@ -41,7 +41,6 @@ from recoco.utils import (
 
 from .. import models, signals
 from ..filters import DepartmentsFilter, ProjectActivityFilter
-from ..models import Project
 from ..serializers import (
     DocumentSerializer,
     NewDocumentSerializer,
@@ -557,7 +556,7 @@ class DocumentViewSet(
 ):
     """API endpoint that allows searching for topics"""
 
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, BaseConversationPermission]
     queryset = models.Document.objects
     parsers = (
         JSONParser,
@@ -584,8 +583,3 @@ class DocumentViewSet(
 
 
 # eof
-class DocumentPermission(BasePermission):
-    def has_permission(self, request, view):
-        project = Project.objects.get(pk=view.kwargs["project_id"])
-        # perms from recoco.app.projects.views.documents
-        return has_perm(request.user, "manage_documents", project)

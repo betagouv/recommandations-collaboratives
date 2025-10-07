@@ -5,32 +5,20 @@ from django.contrib.auth.models import User
 from django.db.models import Count, Q
 from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action
-from rest_framework.permissions import SAFE_METHODS, BasePermission, IsAuthenticated
+from rest_framework.permissions import SAFE_METHODS, IsAuthenticated
 from rest_framework.response import Response
 
 from recoco import verbs
 from recoco.apps.projects import models as projects_models
-from recoco.utils import has_perm, has_perm_or_403
+from recoco.utils import has_perm_or_403
 
+from ...rest_api.permissions import BaseConversationPermission
 from . import signals
 from .models import Message
 from .serializers import ActivitySerializer, MessageSerializer, ParticipantSerializer
 
 
-class MessagePermission(BasePermission):
-    """
-    Should allow:
-    - list/read, one/read for anyone having "projects.view_public_notes"
-    - list/create for anyone having "projects.use_public_notes"
-    - one/update for anyone having "projects.use_public_notes" and owning the object (posted_by)
-    """
-
-    def has_permission(self, request, view):
-        project = projects_models.Project.objects.get(pk=view.kwargs["project_id"])
-        if request.method in SAFE_METHODS:
-            return has_perm(request.user, "projects.view_public_notes", project)
-        return has_perm(request.user, "projects.use_public_notes", project)
-
+class MessagePermission(BaseConversationPermission):
     def has_object_permission(self, request, view, obj: Message):
         return request.method in SAFE_METHODS or obj.posted_by == request.user
 
