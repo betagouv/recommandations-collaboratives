@@ -116,7 +116,7 @@ class MessageSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         nodes_data = validated_data.pop("nodes")
-        message = Message.objects.create(**validated_data)
+        message = Message(**validated_data)
         with transaction.atomic():
             message.save()
             for node_data in nodes_data:
