@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 
+from django.contrib.contenttypes.models import ContentType
 from django.db import transaction
 
 from . import models
-from .models import RecommendationNode
+from .models import ContactNode, DocumentNode, RecommendationNode
 
 
 def make_public_message(project, sender):
@@ -23,3 +24,21 @@ def post_public_message_with_recommendation(recommendation, text=None):
         )
 
     return msg
+
+
+def gather_annotations_for_message_notification(message):
+    document_node_ct = ContentType.objects.get_for_model(DocumentNode)
+    contact_node_ct = ContentType.objects.get_for_model(ContactNode)
+    reco_node_ct = ContentType.objects.get_for_model(RecommendationNode)
+
+    return {
+        "documents": {
+            "count": message.nodes.filter(polymorphic_ctype_id=document_node_ct).count()
+        },
+        "contacts": {
+            "count": message.nodes.filter(polymorphic_ctype_id=contact_node_ct).count()
+        },
+        "recommendations": {
+            "count": message.nodes.filter(polymorphic_ctype_id=reco_node_ct).count()
+        },
+    }

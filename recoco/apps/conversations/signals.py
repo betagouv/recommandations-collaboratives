@@ -15,7 +15,10 @@ from recoco.apps.tasks.signals import action_created
 
 from ..projects.utils import reactivate_if_necessary
 from . import models
-from .utils import post_public_message_with_recommendation
+from .utils import (
+    gather_annotations_for_message_notification,
+    post_public_message_with_recommendation,
+)
 
 message_posted = django.dispatch.Signal()
 
@@ -68,6 +71,7 @@ def notify_message_created(sender, message, **kwargs):
         "verb": verbs.Conversation.POST_MESSAGE,
         "action_object": message,
         "target": project,
+        "annotations": gather_annotations_for_message_notification(message),
     }
 
     notify_advisors_of_project(project, notification, exclude=user)

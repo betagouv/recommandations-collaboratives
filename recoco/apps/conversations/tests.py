@@ -15,8 +15,12 @@ from recoco.apps.tasks import models as tasks_models
 from recoco.apps.tasks import signals as tasks_signals
 from recoco.utils import login
 
+from . import signals
 from .models import DocumentNode, Message
-from .utils import post_public_message_with_recommendation
+from .utils import (
+    gather_annotations_for_message_notification,
+    post_public_message_with_recommendation,
+)
 
 
 @pytest.fixture()
@@ -505,6 +509,15 @@ def test_post_message_with_recommendation(project_ready, request):
     assert Message.objects.count() == 1
 
 
+@pytest.mark.django_db
+def test_gather_notifications_for_message(message):
+    annotations = gather_annotations_for_message_notification(message)
+
+    assert annotations["documents"]["count"] == 0
+    assert annotations["contacts"]["count"] == 0
+    assert annotations["recommendations"]["count"] == 0
+
+
 #####--- Signals ---#####
 @pytest.mark.django_db
 def test_message_is_posted_upon_reco_creation(project_ready, request):
@@ -526,3 +539,21 @@ def test_message_is_posted_upon_reco_creation(project_ready, request):
     )
 
     assert Message.objects.count() == 1
+
+
+@pytest.mark.django_db
+def test_message_notification_is_filled_with_metadata_upon_creation(
+    project_ready, sender, request, message
+):
+    membership = baker.make(projects_models.ProjectMember, member__is_staff=False)
+    project_ready.projectmember_set.add(membership)
+
+    signals.message_posted.send(
+        sender=test_message_notification_is_filled_with_metadata_upon_creation,
+        message=message,
+    )
+
+    notification = Notification.objects.last()
+    assert notification
+
+    assert "annotations" in notification.data.keys()
