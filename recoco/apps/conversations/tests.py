@@ -24,21 +24,6 @@ from .utils import (
 
 
 @pytest.fixture()
-def project_reader(project_ready):
-    project_reader = baker.make(auth_models.User)
-    assign_perm("projects.view_public_notes", project_reader, project_ready)
-    return project_reader
-
-
-@pytest.fixture()
-def project_editor(project_ready):
-    project_editor = baker.make(auth_models.User)
-    assign_perm("projects.view_public_notes", project_editor, project_ready)
-    assign_perm("projects.use_public_notes", project_editor, project_ready)
-    return project_editor
-
-
-@pytest.fixture()
 def random_user():
     user = baker.make(auth_models.User)
     return user
