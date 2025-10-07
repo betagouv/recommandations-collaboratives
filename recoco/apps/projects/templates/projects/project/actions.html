@@ -28,68 +28,47 @@
     {% get_obj_perms request.user for request.site as "user_site_perms" %}
     {% get_obj_perms request.user for project as "user_project_perms" %}
     {% include "projects/project/navigation.html" with recommandations=True %}
-    {% if project.inactive_since != None %}
-        <div class="specific-border-4pxsolid1e1e1e">
-            {% include "projects/project/fragments/project_banner/paused_project_banner.html" %}
-            <div>
-            {% elif project.status == 'DRAFT' %}
-                <div class="specific-border-4pxsolid000091">
-                    {% include "projects/project/fragments/project_banner/non_published_project_banner.html" %}
-                {% elif not advising and is_regional_actor and not is_staff %}
-                    <div x-data
-                         x-init="$nextTick(() => $store.showRole.init())"
-                         class="specific-border-4pxsolid000091">
-                        {% include "projects/project/fragments/project_banner/join_project_banner.html" %}
-                        <div>
-                        {% endif %}
-                        {{ can_administrate|json_script:"canAdministrate" }}
-                        {{ user_project_perms|json_script:"userProjectPerms" }}
-                        {{ is_switchtender|json_script:"isSwitchtender" }}
-                        {{ user.email|json_script:"userEmail" }}
-                        {{ advising_position.is_observer|json_script:"isObserverOnProject" }}
-                        {{ advising_position.is_advisor|json_script:"isAdvisorOnProject" }}
-                        {% if is_switchtender and project.tasks.all.count == 0 %}
-                            <div data-test-id="no-tasks-banner" class="bg-light fr-p-3w rounded-2">
-                                <h3 class="fw-light">Pas encore de recommandations au demandeur ?</h3>
-                                <p class="fst-italic fw-light fr-mb-2w">
-                                    Soyez la première personne à proposer des recommandations ou des ressources au demandeur !
-                                </p>
-                                {% if advising or is_staff %}
-                                    <a data-test-id="submit-task-button"
-                                       href="{% url 'projects-create-task' %}?project_id={{ project.id }}"
-                                       class="fr-btn">Émettre une recommandation</a>
-                                    <a href="{% url 'projects-project-tasks-suggest' project.pk %}"
-                                       class="fr-btn fr-btn--secondary"
-                                       data-test-id="see-suggest-task-button">Examiner les ressources suggérées</a>
-                                {% else %}
-                                    <button class="fr-btn"
-                                            data-bs-toggle="dropdown"
-                                            data-bs-auto-close="outside"
-                                            aria-expanded="false"
-                                            aria-controls="select-observer-or-advisor">
-                                        Rejoindre ce dossier pour l'aiguiller
-                                    </button>
-                                {% endif %}
-                            </div>
-                        {% elif not is_switchtender and project.tasks.public.count == 0 %}
-                            <div class="bg-light fr-p-3w rounded-2">
-                                <h3 class="fw-light">Vous n'avez pas de recommandations en cours</h3>
-                                <p class="fst-italic fw-light">Des recommandations vous seront proposées par notre équipe dès que possible.</p>
-                                <p class="fst-italic fw-light">
-                                    Vous pouvez accélerer les recommandations <span class="fw-bolder">en complétant le questionnaire d'exploration</span>.
-                                </p>
-                                <a href="{% url 'survey-project-session' project.id %}" class="fr-btn">Compléter le questionnaire d'exploration</a>
-                            </div>
-                        {% else %}
-                            {% include "projects/project/fragments/tasks_inline_kanban/tasks_inline_kanban.html" %}
-                        {% endif %}
-                        {% if project.inactive_since != None %}
-                        </div>
-                    </div>
-                {% elif project.status == 'DRAFT' %}
-                </div>
-            {% elif not advising and is_regional_actor and not is_staff %}
-            </div>
+    {% include "projects/project/fragments/project_banner/banner_wrapper.html" with part='open' %}
+    {{ can_administrate|json_script:"canAdministrate" }}
+    {{ user_project_perms|json_script:"userProjectPerms" }}
+    {{ is_switchtender|json_script:"isSwitchtender" }}
+    {{ user.email|json_script:"userEmail" }}
+    {{ advising_position.is_observer|json_script:"isObserverOnProject" }}
+    {{ advising_position.is_advisor|json_script:"isAdvisorOnProject" }}
+    {% if is_switchtender and project.tasks.all.count == 0 %}
+        <div data-test-id="no-tasks-banner" class="bg-light fr-p-3w rounded-2">
+            <h3 class="fw-light">Pas encore de recommandations au demandeur ?</h3>
+            <p class="fst-italic fw-light fr-mb-2w">
+                Soyez la première personne à proposer des recommandations ou des ressources au demandeur !
+            </p>
+            {% if advising or is_staff %}
+                <a data-test-id="submit-task-button"
+                    href="{% url 'projects-create-task' %}?project_id={{ project.id }}"
+                    class="fr-btn">Émettre une recommandation</a>
+                <a href="{% url 'projects-project-tasks-suggest' project.pk %}"
+                    class="fr-btn fr-btn--secondary"
+                    data-test-id="see-suggest-task-button">Examiner les ressources suggérées</a>
+            {% else %}
+                <button class="fr-btn"
+                        data-bs-toggle="dropdown"
+                        data-bs-auto-close="outside"
+                        aria-expanded="false"
+                        aria-controls="select-observer-or-advisor">
+                    Rejoindre ce dossier pour l'aiguiller
+                </button>
+            {% endif %}
         </div>
+    {% elif not is_switchtender and project.tasks.public.count == 0 %}
+        <div class="bg-light fr-p-3w rounded-2">
+            <h3 class="fw-light">Vous n'avez pas de recommandations en cours</h3>
+            <p class="fst-italic fw-light">Des recommandations vous seront proposées par notre équipe dès que possible.</p>
+            <p class="fst-italic fw-light">
+                Vous pouvez accélerer les recommandations <span class="fw-bolder">en complétant le questionnaire d'exploration</span>.
+            </p>
+            <a href="{% url 'survey-project-session' project.id %}" class="fr-btn">Compléter le questionnaire d'exploration</a>
+        </div>
+    {% else %}
+        {% include "projects/project/fragments/tasks_inline_kanban/tasks_inline_kanban.html" %}
     {% endif %}
+    {% include "projects/project/fragments/project_banner/banner_wrapper.html" with part='close' %}
 {% endblock project_detail %}
