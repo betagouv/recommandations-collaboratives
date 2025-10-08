@@ -515,6 +515,16 @@ form > p {
   }
 }
 
+/* ¯¯¯ *\
+  USER TOOLS
+\* ˍˍˍ */
+
+.fr-menu__list {
+  li:last-child {
+    padding-bottom: 0;
+  }
+}
+
 /* -------------------- *\
   Add from 1.5.2 of DSFR
 \* -------------------- */

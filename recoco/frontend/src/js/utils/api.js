@@ -188,12 +188,18 @@ export function markTaskNotificationAsVisited(projectId, taskId) {
   return `/api/projects/${projectId}/tasks/${taskId}/mark_visited/`;
 }
 
+// Notifications :
+
 export function notificationsMarkAsReadByIdUrl(notificationId) {
   return `/api/notifications/mark-one-as-read/${notificationId}/`;
 }
 
 export function markAllNotificationsAsReadUrl() {
   return '/api/notifications/mark-all-as-read';
+}
+
+export function unreadNotificationsListUrl() {
+  return '/api/notifications/unread_list';
 }
 
 export function followupsUrl(projectId, taskId) {
@@ -254,10 +260,6 @@ export function deleteTaskReminderUrl(taskId) {
 
 export function editReminderUrl(taskId) {
   return `/task/${taskId}/remind/`;
-}
-
-export function userUrl(userId) {
-  return `/api/users/${userId}/`;
 }
 
 // Conversations

@@ -1,6 +1,17 @@
 .user-tools {
   .dropdown-menu {
     transform: translate3d(-60px, 0, 0);
+    &.notifications {
+      transform: none;
+      right: 0;
+      left: auto;
+      text-wrap: wrap;
+
+      span {
+        text-wrap: wrap;
+        display: inline;
+      }
+    }
   }
 
   &__notification-menu {
@@ -36,18 +47,6 @@
     --ul-type: none;
     z-index: 1040;
   }
-}
-
-#display-corrected {
-  transform: none;
-  right: 0;
-  left: auto;
-  text-wrap: wrap;
-}
-
-#display-corrected span {
-  text-wrap: wrap;
-  display: inline-block;
 }
 
 @media (max-width: 1200px) {

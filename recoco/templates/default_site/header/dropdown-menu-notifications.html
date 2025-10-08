@@ -2,75 +2,82 @@
 {% load static %}
 {% load common_tags %}
 {% get_verbs as verbs %}
-<ul class="dropdown-menu notifications" id="display-corrected">
-    <li>
-        Notifications non lues
-        <button class="notification__icon"
-                title="Fermer le menu"
-                @click="closeNotificationsMenu"
-                data-test-id="notification-menu-close">
-            <svg class="bi fr-mr-1v" width="16" height="16" fill="currentColor">
-                <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#x-lg" />
-            </svg>
-        </button>
-    </li>
-    <li>
-        <hr class="dropdown-divider fr-pb-0">
-    </li>
-    <div class="notifications__container" x-show="notificationNumber > 0">
-        {% for date, notifications in grouped_notifications.items %}
-            <div class="notification__date">le {{ date|date }}</div>
-            {% for notification in notifications %}
-                <li class="dropdown-item"
-                    x-init='initNewNotification(`${ {{ forloop.counter }}{{ forloop.parentloop.counter0 }} }`)'
-                    x-show="isNotificationShown[`${ {{ forloop.counter }}{{ forloop.parentloop.counter0 }} }`]"
-                    x-transition.duration.400ms>
-                    <a :href="getNotificationLink({% if notification.verb == verbs.Recommendation.COMMENTED %}'{{ notification.action_object.task.get_absolute_url }}' {% elif notification.verb == verbs.Survey.STARTED or notification.verb == verbs.Survey.UPDATED %} `{{ notification.target.get_absolute_url }}connaissance` {% else %}'{{ notification.action_object.get_absolute_url }}' {% endif %})"
-                       @click="clickConsummeNotificationAndRedirect({{ notification.pk }}, {% if notification.verb == verbs.Recommendation.COMMENTED %}'{{ notification.action_object.task.get_absolute_url }}' {% elif notification.verb == verbs.Survey.STARTED or notification.verb == verbs.Survey.UPDATED %} `{{ notification.target.get_absolute_url }}connaissance` {% else %}'{{ notification.action_object.get_absolute_url }}' {% endif %})">
-                        {% include "user/user_card.html" with user=notification.actor project=notification.target user_popup_deactivate=True user_activity=False disable_links=True %}
-                        {% if notification.verb == verbs.Project.VALIDATED %}
-                            <div class="notification__project">{{ notification.target }}</div>
-                        {% endif %}
-                        <div class="notification__verb">{{ notification.verb }}</div>
-                        {% if notification.verb == verbs.Recommendation.CREATED %}
-                            <span class="notification__project">{{ notification.action_object.feed_label }}</span>
-                        {% endif %}
-                        {% if notification.action_object.comment %}
-                            <span class="notification__project">{{ notification.action_object.task.resource.title }}</span>
-                            <div class="notification__message">"{{ notification.action_object.comment }}"</div>
-                        {% elif "projet" in notification.verb %}
-                            <div class="notification__project">{{ notification.target }}</div>
-                        {% elif notification.action_object.content and "message" in notification.verb %}
-                            <div class="notification__message">"{{ notification.action_object.content|truncatewords:100 }}"</div>
-                        {% endif %}
-                        {% if notification.verb in show_project_verb_list %}
-                            <div class="notification__project">
-                                <span class="notification__verb--no-margin">sur le dossier</span> {{ notification.target }}
-                            </div>
-                        {% endif %}
-                    </a>
-                    <button class="notification__icon"
-                            title="Supprimer la notification"
-                            data-test-id="notification-mark-as-read-one"
-                            @click="markNotificationAsRead({{ notification.id }}, $el, `${ {{ forloop.counter }}{{ forloop.parentloop.counter0 }} }`)">
-                        <svg class="bi fr-mr-1v" width="16" height="16" fill="currentColor">
-                            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#x-lg" />
-                        </svg>
-                    </button>
-                </li>
-            {% endfor %}
-        {% endfor %}
-    </div>
-    <li x-show="notificationNumber == 0">
-        <span class="dropdown-item-text">Vous n'avez aucune notification ☀️</span>
-    </li>
-    <li>
-        <hr class="dropdown-divider fr-pb-0">
-    </li>
-    <li class="btn-container">
-        <button @click="markAllNotificationsAsRead"
-                class="dropdown-item"
-                :disabled="notificationNumber == 0"
-                data-test-id="notification-mark-all-as-read">Marquer toutes les notifications commes lues</button>
-    </li>
+<ul class="dropdown-menu notifications">
+    <template x-if="isLoading">
+        <div x-transition
+             class="position-absolute text-center w-100"
+             data-cy="loader">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    </template>
+    <template x-if="!isLoading">
+        <div>
+            <li>
+                <span x-text="getNotificationLabel()"></span>
+                <button class="notification__icon"
+                        title="Fermer le menu"
+                        @click="closeNotificationsMenu"
+                        data-test-id="notification-menu-close">
+                    <span class="fr-icon-close-line fr-icon--sm" aria-hidden="true"></span>
+                </button>
+            </li>
+            <li>
+                <hr class="dropdown-divider fr-pb-0">
+            </li>
+            <div class="notifications__container"
+                 x-show="notifications.unread_count > 0"
+                 x-transition.duration.400ms>
+                <template x-for="notification in notifications.unread_list">
+                    <div class="notification">
+                        <div x-show="shouldShowDate(notification.timestamp)">
+                            <p class="notification__date fr-mb-0"
+                               x-text="`le ${formatDateFrench(notification.timestamp)}`"></p>
+                        </div>
+                        <li class="dropdown-item"
+                            x-show="notification.unread"
+                            x-transition.duration.400ms>
+                            <a :href="notification.action_object_url">
+                                {% comment %} TODO Prénom Nom (Organisation) {% endcomment %}
+                                {% comment %} TODO Vous a envoyé 1 message dans le dossier {% endcomment %}
+                                <div>
+                                    <span class="notification__sender" x-text="notification.actor"></span>
+                                    <span class="notification__organization"
+                                          x-text="notification.actor_organization"></span>
+                                </div>
+                                <div class="notification__verb">
+                                    <span x-text="`${notification?.data?.annotations ? 'vous a' : 'vous'}`"></span>
+                                    <span class="notification__verb--highlight"
+                                          x-text="summarizeNotification(notification)"></span>
+                                    <span>dans le dossier</span>
+                                    <span class="notification__verb--highlight" x-text="notification.target"></span>
+                                </div>
+                            </a>
+                            <button class="notification__icon"
+                                    title="Marquer comme lu"
+                                    @click="markNotificationAsRead(notification.id)"
+                                    data-test-id="notification-mark-as-read">
+                                <span class="fr-icon-close-line fr-icon--sm" aria-hidden="true"></span>
+                            </button>
+                        </li>
+                    </div>
+                </template>
+            </div>
+            <li x-show="notifications.unread_count == 0" x-transition.duration.400ms>
+                <span class="dropdown-item-text">Vous n'avez aucune notification ☀️</span>
+            </li>
+            <li>
+                <hr class="dropdown-divider fr-pb-0">
+            </li>
+            <li class="btn-container">
+                <button @click="markAllNotificationsAsRead"
+                        class="dropdown-item"
+                        :disabled="notifications.unread_count == 0"
+                        data-test-id="notification-mark-all-as-read">
+                    Marquer toutes les notifications commes lues
+                </button>
+            </li>
+        </div>
+    </template>
 </ul>
