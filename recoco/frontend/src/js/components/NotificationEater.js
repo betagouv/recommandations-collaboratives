@@ -1,5 +1,5 @@
 import Alpine from 'alpinejs';
-import api, { notificationsMarkAsReadByIdUrl } from '../utils/api';
+import api, { conversationsMessageMarkAsReadUrl } from '../utils/api';
 
 Alpine.data('NotificationEater', (projectId) => {
   return {
@@ -10,11 +10,11 @@ Alpine.data('NotificationEater', (projectId) => {
           (entries) => {
             entries.forEach((entry) => {
               if (entry.isIntersecting) {
-                const elementToConsume = JSON.parse(
+                const messageData = JSON.parse(
                   entry.target.getAttribute('data-notifications')
                 );
-                if (elementToConsume.read) return;
-                this.consumeNotifiction(elementToConsume.id);
+                if (messageData.unread === 0) return;
+                this.consumeNotification(messageData, entry.target);
               }
             });
           },
@@ -91,12 +91,15 @@ Alpine.data('NotificationEater', (projectId) => {
       if (scrollLineNewNotification.length == 0) return;
       scrollLineNewNotification[0].classList.remove('d-none');
     },
-    consumeNotifiction(notificationId) {
-      // TODO **********************
-      // TODO udpate this endpoint to accept the type of the element to consume
-      // TODO wait for backend to be ready
-      // TODO **********************
-      // api.patch(notificationsMarkAsReadByIdUrl(notificationId));
+    consumeNotification(message, messageElement) {
+      api.post(conversationsMessageMarkAsReadUrl(this.projectId, message.id));
+      messageElement.setAttribute(
+        'data-notifications',
+        JSON.stringify({
+          ...message,
+          unread: 0,
+        })
+      );
     },
   };
 });

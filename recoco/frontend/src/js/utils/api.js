@@ -277,6 +277,10 @@ export function conversationsParticipantsUrl(projectId) {
   return `/api/projects/${projectId}/conversations/participants/`;
 }
 
+export function conversationsMessageMarkAsReadUrl(projectId, messageId) {
+  return `/api/projects/${projectId}/conversations/messages/${messageId}/mark_as_read/`;
+}
+
 // Documents
 export function documentsUrl(projectId) {
   return `/api/projects/${projectId}/documents/`;
