@@ -1,0 +1,27 @@
+.onboarding-tutorial {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    &__dialog {
+        background-color: hsla(0, 0%, 0%, 0);
+    }
+    &__modal {
+        position: fixed;
+        right: 20px;
+        bottom: 94px;
+    }
+    &__button {
+        border-radius: 99px;
+        border: 1px solid #DDD;
+        background: #FFF;
+        box-shadow: 0 4px 10px 0 rgba(0, 0, 0, 0.10);
+        display: flex;
+        width: 64px;
+        height: 64px;
+        justify-content: center;
+        align-items: center;
+        gap: 16px;
+        flex-shrink: 0;
+    }
+
+}
