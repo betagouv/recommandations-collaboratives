@@ -7,8 +7,9 @@
             <div class="message-item__reply-to text-muted fr-italic fr-small">
                 <p class="d-flex">
                     <span class="fr-icon-corner-down-right-line fr-icon--sm"></span>
-                    en réponse à : <span class="fr-ml-1v"
-       x-html="renderMarkdown(await getShortMessageInReplyTo(element.in_reply_to))"></span>
+                    en réponse à : <a class="fr-ml-1v"
+    :href="`#message-${element.in_reply_to}`"
+    x-html="renderMarkdown(await getShortMessageInReplyTo(element.in_reply_to))"></a>
                 </p>
             </div>
         </template>

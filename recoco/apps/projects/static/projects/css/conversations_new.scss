@@ -188,6 +188,10 @@
         }
       }
       .message-item {
+        scroll-margin-top: 133px;
+        // &:target {
+        //   background-color: #ffa !important;
+        // }
         .action-button {
           display: none;
         }
