@@ -17,3 +17,11 @@
 .p-in-dev-3 {
   height: 100px;
 }
+
+thead, tbody, tfoot, tr, td, th {
+  border: 1px solid #000000 !important;
+  padding: 5px !important;
+}
+thead {
+  background-color: #e9ecef !important;
+}
