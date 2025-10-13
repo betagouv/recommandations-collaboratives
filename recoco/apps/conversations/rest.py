@@ -55,11 +55,15 @@ class MessageViewSet(viewsets.ModelViewSet):
         We do not need more than IsAuthenticated to ensure no side effects.
         XXX This exposes potential Message IDs from an unhautorized account (not critical)
         """
-        message = self.get_object()
 
-        message.notifications.unread().filter(
-            public=True,
-        ).mark_all_as_read(self.request.user)
+        is_hijacked = getattr(request.user, "is_hijacked", False)
+
+        if not is_hijacked:
+            message = self.get_object()
+
+            message.notifications.unread().filter(
+                public=True,
+            ).mark_all_as_read(self.request.user)
 
         return Response(status=status.HTTP_202_ACCEPTED)
 
