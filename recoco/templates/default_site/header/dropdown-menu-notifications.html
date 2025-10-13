@@ -1,17 +1,20 @@
 {% load gravatar %}
 {% load static %}
 {% load common_tags %}
+{% comment %} {{ grouped_notifications|json_script:"notifications" }} {% endcomment %}
 {% get_verbs as verbs %}
-<ul class="dropdown-menu notifications" id="display-corrected">
+<ul class="dropdown-menu notifications">
     <li>
-        Notifications non lues
+        {% if unread_notifications_count > 0 %}
+            <span>{{ unread_notifications_count }} notification{{ unread_notifications_count|pluralize }}</span>
+        {% else %}
+            <span>Aucune notification</span>
+        {% endif %}
         <button class="notification__icon"
                 title="Fermer le menu"
                 @click="closeNotificationsMenu"
                 data-test-id="notification-menu-close">
-            <svg class="bi fr-mr-1v" width="16" height="16" fill="currentColor">
-                <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#x-lg" />
-            </svg>
+            <span class="fr-icon-close-line fr-icon--sm" aria-hidden="true"></span>
         </button>
     </li>
     <li>
@@ -26,36 +29,47 @@
                     x-show="isNotificationShown[`${ {{ forloop.counter }}{{ forloop.parentloop.counter0 }} }`]"
                     x-transition.duration.400ms>
                     <a :href="getNotificationLink({% if notification.verb == verbs.Recommendation.COMMENTED %}'{{ notification.action_object.task.get_absolute_url }}' {% elif notification.verb == verbs.Survey.STARTED or notification.verb == verbs.Survey.UPDATED %} `{{ notification.target.get_absolute_url }}connaissance` {% else %}'{{ notification.action_object.get_absolute_url }}' {% endif %})"
-                       @click="clickConsummeNotificationAndRedirect({{ notification.pk }}, {% if notification.verb == verbs.Recommendation.COMMENTED %}'{{ notification.action_object.task.get_absolute_url }}' {% elif notification.verb == verbs.Survey.STARTED or notification.verb == verbs.Survey.UPDATED %} `{{ notification.target.get_absolute_url }}connaissance` {% else %}'{{ notification.action_object.get_absolute_url }}' {% endif %})">
-                        {% include "user/user_card.html" with user=notification.actor project=notification.target user_popup_deactivate=True user_activity=False disable_links=True %}
-                        {% if notification.verb == verbs.Project.VALIDATED %}
-                            <div class="notification__project">{{ notification.target }}</div>
-                        {% endif %}
+                       @click="clickConsummeNotificationAndRedirect({{ notification.pk }}, {% if notification.verb == verbs.Recommendation.COMMENTED %}'{{ notification.action_object.task.get_absolute_url }}' {% elif notification.verb == verbs.Survey.STARTED or notification.verb == verbs.Survey.UPDATED %} `{{ notification.target.get_absolute_url }}connaissance` {% else %}'{{ notification.action_object.get_absolute_url }}' {% endif %})"
+                       class="stretched-link"></a>
+                    {% include "user/user_card.html" with user=notification.actor project=notification.target user_popup_deactivate=True user_activity=False disable_links=True %}
+                    {% if notification.verb == verbs.Project.VALIDATED %}
+                        <div class="notification__project">{{ notification.target }}</div>
+                    {% endif %}
+                    <!-- "Nouvelle conversation" notifications -->
+                    {% if not notification.action_object.content and "message" in notification.verb %}
+                        <div>
+                            <span class="notification__verb">
+                                vous a <span class="notification__verb--highlight"
+       x-text="getSummaryNotification({{ notification.pk }})"></span>
+                            </span>
+                            <span class="notification__project">
+                                <span class="notification__verb--no-margin">dans le dossier</span> {{ notification.target }}
+                            </span>
+                        </div>
+                    {% else %}
                         <div class="notification__verb">{{ notification.verb }}</div>
-                        {% if notification.verb == verbs.Recommendation.CREATED %}
-                            <span class="notification__project">{{ notification.action_object.feed_label }}</span>
-                        {% endif %}
-                        {% if notification.action_object.comment %}
-                            <span class="notification__project">{{ notification.action_object.task.resource.title }}</span>
-                            <div class="notification__message">"{{ notification.action_object.comment }}"</div>
-                        {% elif "projet" in notification.verb %}
-                            <div class="notification__project">{{ notification.target }}</div>
-                        {% elif notification.action_object.content and "message" in notification.verb %}
-                            <div class="notification__message">"{{ notification.action_object.content|truncatewords:100 }}"</div>
-                        {% endif %}
-                        {% if notification.verb in show_project_verb_list %}
-                            <div class="notification__project">
-                                <span class="notification__verb--no-margin">sur le dossier</span> {{ notification.target }}
-                            </div>
-                        {% endif %}
-                    </a>
+                    {% endif %}
+                    {% if notification.verb == verbs.Recommendation.CREATED %}
+                        <span class="notification__project">{{ notification.action_object.feed_label }}</span>
+                    {% endif %}
+                    {% if notification.action_object.comment %}
+                        <span class="notification__project">{{ notification.action_object.task.resource.title }}</span>
+                        <div class="notification__message">"{{ notification.action_object.comment }}"</div>
+                    {% elif "projet" in notification.verb %}
+                        <div class="notification__project">{{ notification.target }}</div>
+                    {% elif notification.action_object.content and "message" in notification.verb %}
+                        <div class="notification__message">"{{ notification.action_object.content|truncatewords:100 }}"</div>
+                    {% endif %}
+                    {% if notification.verb in show_project_verb_list %}
+                        <div class="notification__project">
+                            <span class="notification__verb--no-margin">dans le dossier</span> {{ notification.target }}
+                        </div>
+                    {% endif %}
                     <button class="notification__icon"
                             title="Supprimer la notification"
                             data-test-id="notification-mark-as-read-one"
                             @click="markNotificationAsRead({{ notification.id }}, $el, `${ {{ forloop.counter }}{{ forloop.parentloop.counter0 }} }`)">
-                        <svg class="bi fr-mr-1v" width="16" height="16" fill="currentColor">
-                            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#x-lg" />
-                        </svg>
+                        <span class="fr-icon-close-line fr-icon--sm" aria-hidden="true"></span>
                     </button>
                 </li>
             {% endfor %}

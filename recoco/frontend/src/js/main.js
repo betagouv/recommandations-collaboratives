@@ -39,7 +39,7 @@ import '../css/layouts/stack.css';
 
 //Global reused component CSS
 import '../css/flags.css';
-import '../css/user.css';
+import '../css/userCard.scss';
 import '../css/callout.css';
 import '../css/markdown.css';
 import '../css/miscellaneous.css';

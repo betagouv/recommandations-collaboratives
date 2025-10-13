@@ -5,6 +5,8 @@
 .dropdown-menu.notifications {
   box-shadow: 18px 20px 19px -13px rgba(0, 0, 0, 0.2);
   max-width: 480px;
+  font-size: 0.75rem;
+  line-height: 20px;
   // padding-right: 1rem;
 
   & li {
@@ -78,6 +80,9 @@
       }
     }
 
+    &__date:not(:first-child) {
+      margin-top: 0.5rem;
+    }
     &__date {
       padding: 0 0.625rem;
       font-style: italic;
@@ -87,6 +92,7 @@
       // color: #161616;
       font-size: 12px;
       font-weight: 700;
+      white-space: normal;
       // line-height: 20px
     }
 
@@ -107,6 +113,12 @@
       right: 0;
       top: 0.6rem;
       cursor: pointer;
+      color: #666;
+      z-index: 1;
+      &:hover {
+        background: #fff;
+        color: #000;
+      }
       // display: flex;
       // align-items: center;
       // justify-content: center;
