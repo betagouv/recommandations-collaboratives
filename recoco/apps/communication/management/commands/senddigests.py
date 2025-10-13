@@ -79,6 +79,14 @@ class Command(BaseCommand):
                             f"Sent new reco digest for {user} on {project.name}"
                         )
 
+        # Message digests
+        logger.info("** Sending message digests **")  # FIXME include inactive project?
+        for project in project_models.Project.on_site.all():
+            for user in user_qs.intersection(
+                project.members.union(project.switchtenders)
+            ):
+                digests.send_msg_digest_by_user_and_project(project, user, dry_run)
+
         # Digests for non switchtenders
         logger.info("** Sending general digests **")  # FIXME include inactive project?
         for user in user_qs.exclude(groups__in=[advisor_group]):

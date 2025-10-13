@@ -478,6 +478,40 @@ def make_digest_for_new_site(notification, user):
 
 
 ########################################################################
+# message digests
+########################################################################
+
+
+def send_msg_digest_by_user_and_project(project, user, dry_run=False):
+    notifications = (
+        user.notifications(manager="on_site")
+        .unsent()
+        .filter(verb=verbs.Conversation.POST_MESSAGE)  # todo better filtering
+    )
+    if notifications.count() == 0:
+        return 0
+
+    digest = make_msg_digest_by_user_and_project(notifications, user, project)
+    if not dry_run:
+        send_email(
+            communication_constants.TPL_MESSAGES_DIGEST,
+            {"name": normalize_user_name(user), "email": user.email},
+            params=digest,
+        )
+        notifications.mark_as_sent()
+    else:
+        logger.info(
+            f"[DRY RUN] Would have sent one email with {len(digest)} message notifications to <{user}>."
+        )
+    return notifications.count()
+
+
+def make_msg_digest_by_user_and_project(notifications, user, project, site):
+    return {}
+    # https://docs.google.com/document/d/1atR08eb2H2DyvUGg5VkMrbA7VvMO-ZNFYVqAgjjgZ_c/edit?tab=t.0
+
+
+########################################################################
 # send digest by user
 ########################################################################
 
