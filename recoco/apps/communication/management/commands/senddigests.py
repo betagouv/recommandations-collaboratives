@@ -52,14 +52,14 @@ class Command(BaseCommand):
         advisor_group = get_group_for_site("advisor", site, create=True)
 
         # only send emails to active users and those actually linked to the current site
-        active_users = auth_models.User.objects
+        user_qs = auth_models.User.objects
 
         if user_id is not None:
-            active_users = active_users.filter(pk=user_id)
+            user_qs = user_qs.filter(pk=user_id)
 
             logger.info("Specific user required. Ignoring whatsup by project digests")
         else:
-            active_users = active_users.filter(is_active=True, profile__sites=site)
+            user_qs = user_qs.filter(is_active=True, profile__sites=site)
 
             # Send reminders (new recommendation + whatsup)
             logger.info("** Sending Project Reminders **")
@@ -81,14 +81,14 @@ class Command(BaseCommand):
 
         # Digests for non switchtenders
         logger.info("** Sending general digests **")  # FIXME include inactive project?
-        for user in active_users.exclude(groups__in=[advisor_group]):
+        for user in user_qs.exclude(groups__in=[advisor_group]):
             if digests.send_digest_for_non_switchtender_by_user(user, dry_run):
                 logger.info(f"Sent general digest for {user}")
 
         # Digests for switchtenders
         logger.info("** Sending general switchtender digests **")
         # XXX pourquoi groups__in=[] et non groups=advisor_group
-        for user in active_users.filter(groups__in=[advisor_group]):
+        for user in user_qs.filter(groups__in=[advisor_group]):
             if digests.send_digests_for_new_sites_by_user(user, dry_run):
                 logger.info(f"* Sent new site digest for {user}")
 
