@@ -31,7 +31,7 @@ class ShowcasePage(Page):
 
     gallery = StreamField(
         [("pictures", ImageChooserBlock())],
-        min_num=1,
+        min_num=0,
         max_num=3,
         verbose_name="Gallerie",
         blank=True,
