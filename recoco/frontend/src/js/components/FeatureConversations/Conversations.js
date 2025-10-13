@@ -46,6 +46,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
   async init() {
     await this.getActivities();
     await this.getMessages();
+    console.log(this.feed.messages);
     this.createFullFeed();
     this.messagesLoaded = true;
     setTimeout(() => {
