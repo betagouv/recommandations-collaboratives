@@ -80,7 +80,7 @@ class Command(BaseCommand):
                         )
 
         # Message digests
-        logger.info("** Sending message digests **")  # FIXME include inactive project?
+        logger.info("** Sending message digests **")
         for project in project_models.Project.on_site.all():
             for user in user_qs.intersection(
                 project.members.union(project.switchtenders)
@@ -88,7 +88,7 @@ class Command(BaseCommand):
                 digests.send_msg_digest_by_user_and_project(project, user, dry_run)
 
         # Digests for non switchtenders
-        logger.info("** Sending general digests **")  # FIXME include inactive project?
+        logger.info("** Sending general digests **")
         for user in user_qs.exclude(groups__in=[advisor_group]):
             if digests.send_digest_for_non_switchtender_by_user(user, dry_run):
                 logger.info(f"Sent general digest for {user}")
