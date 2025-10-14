@@ -15,6 +15,7 @@
     position: sticky;
     height: calc(100vh - 128px);
     top: 128px;
+
     // overflow-y: auto;
     overflow-y: hidden;
     &-header {
@@ -152,7 +153,8 @@
       height: 100vh;
     }
     &-feed {
-      min-height: calc(100vh - 174px); //555px
+      min-height: calc(100vh - 174px);
+      //555px
       display: flex;
       flex-direction: column;
       justify-content: end;
@@ -189,8 +191,11 @@
       }
       .message-item {
         scroll-margin-top: 133px;
+
         // &:target {
+
         //   background-color: #ffa !important;
+
         // }
         .action-button {
           display: none;
@@ -202,10 +207,6 @@
         }
         .contact-card {
           border: 1px solid #c0c0c0;
-        }
-        p {
-          margin-bottom: 0.5rem;
-          font-size: 0.875rem;
         }
         &.other-user-message {
           background: #f6f6f6;
@@ -275,14 +276,26 @@
         }
       }
       .task-item {
-        & > p {
-          color: var(--light-neutral-grey-200, #3a3a3a);
-          font-family: Marianne;
-          font-size: 0.875rem;
-          font-style: normal;
-          font-weight: 400;
-          line-height: 1.5em;
-          margin-bottom: 0.625rem;
+        &__topic {
+          --color-topic: #667dcf;
+          color: var(--color-topic);
+          line-height: 100%;
+          margin-bottom: 0.25rem;
+          display: flex;
+          align-items: baseline;
+          &-icon {
+            width: 8px;
+            height: 8px;
+            background-color: var(--color-topic);
+            border-radius: 2px;
+            margin-right: 4px;
+          }
+          &-name {
+            color: var(--color-topic);
+            font-size: 0.625rem;
+            font-weight: 700;
+            line-height: 100%;
+          }
         }
         &__content {
           color: var(--light-neutral-grey-200, #3a3a3a);
@@ -301,16 +314,14 @@
             color: var(--text-action-high-blue-france);
             font-family: Marianne;
             font-size: 0.875rem;
-            font-style: normal;
             font-weight: 700;
             line-height: 1.5em;
             margin-bottom: 0.5rem;
           }
-          p {
+          &-subtitle {
             overflow: hidden;
             text-overflow: ellipsis;
             font-size: 0.75rem;
-            font-style: normal;
             font-weight: 400;
             line-height: 1.5em;
           }
@@ -389,10 +400,15 @@
       .tiptap-menu-custom {
         top: 0.5rem;
       }
+
       // .file-upload-wrapper {
+
       //   position: absolute;
+
       //   bottom: 0.5rem;
+
       //   left: 0.5rem;
+
       // }
       .send-message {
         position: absolute;
@@ -401,10 +417,13 @@
       }
     }
   }
+
   // Override tiptap styles
   .editor-container {
     // .button-add-reco,
+
     // .button-module__container,
+
     // .module__container,
     .tiptap-menu-custom,
     .tiptap.ProseMirror .contact-card {
@@ -413,6 +432,7 @@
     }
     .tiptap.ProseMirror {
       min-height: 3.5rem;
+
       // max-height: 3.5rem;
       height: 5.3rem;
       padding: 0.75rem 0.5rem;
@@ -430,9 +450,13 @@
 }
 
 // .message-form {
+
 //   .contact-card {
+
 //     display: none;
+
 //   }
+
 // }
 
 .message-form {
