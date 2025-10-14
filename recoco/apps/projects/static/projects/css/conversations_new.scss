@@ -57,7 +57,7 @@
       }
       &-subtitle {
         color: var(--light-text-default-grey, #3a3a3a);
-        font-size: 1rem;
+        font-size: 0.875rem;
         font-weight: 400;
         line-height: 1.5em;
         margin: 0;
@@ -216,7 +216,7 @@
             background: #e4e4fe;
           }
         }
-        &__date {
+        .message-item__date {
           color: var(--light-neutral-grey-625, #929292);
           font-size: 12px;
           font-style: italic;
@@ -362,6 +362,7 @@
     font-style: normal;
     font-weight: 700;
     text-align: center;
+    margin-top: 1rem;
     margin-bottom: 1rem;
   }
 
