@@ -68,6 +68,7 @@ const config = {
         projectQueue: resolve('./src/js/store/projectQueue.js'),
         showRole: resolve('./src/js/store/showRole.js'),
         projects: resolve('./src/js/store/projects.js'),
+        tutorialsEvents: resolve('./src/js/store/tutorialsEvents.js'),
         ClickToSeeUser: resolve('./src/js/components/ClickToSeeUser.js'),
         ActionPusher: resolve('./src/js/components/ActionPusher.js'),
         NotificationEater: resolve('./src/js/components/NotificationEater.js'),
@@ -83,6 +84,7 @@ const config = {
         User: resolve('./src/js/components/User.js'),
         MutliSelect: resolve('./src/js/components/MultiSelect.js'),
         ContactBook: resolve('./src/js/components/ContactBook.js'),
+        projectPageTutorial: resolve('./src/js/components/onboarding-tutorials/ProjectPageTutorial.js'),
         pageInvitation: resolve('./src/js/apps/pageInvitation.js'),
       },
       output: {

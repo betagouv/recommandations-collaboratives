@@ -53,3 +53,11 @@
         margin-bottom: 0px;
     }
 }
+
+.text-linethrough {
+    text-decoration: line-through;
+}
+.disabled {
+    color: var(--light-text-disabled-grey, #929292);
+    pointer-events: none;
+}

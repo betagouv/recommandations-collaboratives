@@ -1,21 +1,28 @@
 {% load sass_tags %}
+{% load django_vite %}
 {% block css %}
     <link href="{% sass_src 'projects/css/onboarding_tutorial.scss' %}"
           rel="stylesheet"
           type="text/css">
 {% endblock css %}
+{% block js %}
+    {% vite_asset 'js/components/onboarding-tutorials/ProjectPageTutorial.js' %}
+{% endblock js %}
 {% block content %}
-<div x-data="{isPopupOpen: false}" class="onboarding-tutorial">
-    <button type="button" class="onboarding-tutorial__button" @click="isPopupOpen = !isPopupOpen">
-        <span class="fr-icon-information-line" aria-hidden="true"></span>
-    </button>
-
-    <div x-show="isPopupOpen" class="onboarding-tutorial__popup">
-        <div class="onboarding-tutorial__popup-content">
-            <button type="button" class="onboarding-tutorial__close-button" @click="isPopupOpen = false"><span aria-hidden="true" class="fr-icon-close-line"></span></button>
-            <!-- TODO - variabiliser l'appelle du composant à inclure -->
-            {% include "projects/project/fragments/onboarding-tutorials/project-page-tutorial.html" %}
+<div x-data="ProjectPageTutorial" >
+    <template x-if="isOpenTutorialButtonVisible">
+        <div class="onboarding-tutorial">
+            <button type="button" class="onboarding-tutorial__button" @click="isPopupOpen = !isPopupOpen">
+                <span class="fr-icon-information-line" aria-hidden="true"></span>
+            </button>
+            <div x-show="isPopupOpen" class="onboarding-tutorial__popup">
+                <div class="onboarding-tutorial__popup-content">
+                    <button type="button" class="onboarding-tutorial__close-button" @click="isPopupOpen = false"><span aria-hidden="true" class="fr-icon-close-line"></span></button>
+                    <!-- TODO - variabiliser l'appelle du composant à inclure -->
+                    {% include "projects/project/fragments/onboarding-tutorials/project-page-tutorial.html" %}
+                </div>
+            </div>
         </div>
-    </div>
+    </template>
 </div>
 {% endblock %}

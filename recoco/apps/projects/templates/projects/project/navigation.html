@@ -16,6 +16,7 @@
     {% vite_asset 'js/store/projectQueue.js' %}
     {% vite_asset 'js/components/ExpandableMenuHandler.js' %}
     {% vite_asset 'js/store/showRole.js' %}
+    {% vite_asset 'js/store/tutorialsEvents.js' %}
 {% endblock js %}
 {% get_obj_perms request.user for request.site as "user_site_perms" %}
 {% get_obj_perms request.user for project as "user_project_perms" %}
@@ -50,14 +51,14 @@
                     </div>
                 {% endif %}
                 {% if "list_projects" in user_site_perms or "view_surveys" in user_project_perms %}
-                    <div class="fr-segmented__element">
+                    <div class="fr-segmented__element" :class="{'visual-hint': $store.tutorialsEvents.isTutorialForProjectPage==1}" id="overview-step-2">
                         <input value="survey"
                                type="radio"
                                {% if state_of_play %}checked{% endif %}
                                aria-checked="{% if state_of_play %}true{% else %}false{% endif %}"
                                id="segmented-control-survey"
                                name="segmented-control-project"
-                               @click="window.location='{% url 'projects-project-detail-knowledge' project.pk %}'">
+                               @click="$store.tutorialsEvents.isTutorialForProjectPageOneCompleted=true;console.log('Étape 2 complétée');window.location='{% url 'projects-project-detail-knowledge' project.pk %}';">
                         <label class="fr-label" for="segmented-control-survey">
                             <a class="stretched-link"
                                data-test-id="project-navigation-knowledge"
