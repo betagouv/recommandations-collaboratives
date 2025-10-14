@@ -16,6 +16,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 from django.db.models.query import QuerySet
 from django.urls import reverse
+from django_gravatar.helpers import get_gravatar_url
 
 from recoco import utils, verbs
 from recoco.apps.home.models import SiteConfiguration
@@ -29,10 +30,12 @@ from recoco.apps.reminders.api import (
 from recoco.apps.tasks import models as tasks_models
 from recoco.apps.tasks.models import Task
 
+from ..conversations.models import MarkdownNode
 from . import constants as communication_constants
 from .api import send_email
 
 logger = logging.getLogger("main")
+
 
 ########################################################################
 # Reminders
@@ -507,7 +510,142 @@ def send_msg_digest_by_user_and_project(project, user, dry_run=False):
 
 
 def make_msg_digest_by_user_and_project(notifications, user, project, site):
-    return {}
+    project_digest = make_project_digest(project, user, "conversations-new")
+    notifications = notifications.order_by("timestamp")
+
+    # formatting utils
+    def easy_plural(noun, nb, plural_mark="s"):
+        if nb <= 1:
+            return noun
+        return noun + plural_mark
+
+    def format_nb(nb):
+        if nb == 1:
+            return "un"
+        return str(nb)
+
+    md_node_ct = ContentType.objects.get_for_model(MarkdownNode)
+
+    # counting messages and objects by type for intro sentence
+    annotations = [
+        notif.data["annotations"] for notif in notifications if notif.data is not None
+    ]
+    aggregated_counts = {
+        "message": sum(
+            1
+            for notif in notifications
+            if notif.action_object.nodes.filter(
+                polymorphic_ctype_id=md_node_ct
+            ).exists()
+        ),
+        "contact": sum(note["contacts"]["count"] for note in annotations),
+        "recommendation": sum(note["recommendations"]["count"] for note in annotations),
+        "document": sum(note["documents"]["count"] for note in annotations),
+        # le décompte de "messages" c'est le nombre de messages qui ont du texte
+        # ne pas se prendre la tête pour le nœud reco qui est bizarre
+    }
+    aggregated_counts = {
+        key: count for key, count in aggregated_counts.items() if count > 0
+    }
+
+    # generic field makes it painful to query purely through orm
+    first_text_msg = next(
+        (
+            n.action_object
+            for n in notifications
+            if n.action_object.nodes.filter(polymorphic_ctype_id=md_node_ct).exists()
+        ),
+        None,
+    )
+    first_obj_msg = next(
+        (
+            n.action_object
+            for n in notifications
+            if n.action_object.nodes.exclude(polymorphic_ctype_id=md_node_ct).exists()
+        ),
+        None,
+    )
+    first_object_node = (
+        (
+            first_obj_msg.nodes.exclude(polymorphic_ctype=md_node_ct)
+            .order_by("position")
+            .first()
+        )
+        if first_obj_msg is not None
+        else None
+    )
+
+    # extracting elements that will be fully displayed
+    counts_less_recap = aggregated_counts.copy()
+    if first_text_msg:
+        counts_less_recap["message"] -= 1
+        first_text = "\n".join(
+            node.text
+            for node in first_text_msg.nodes.filter(polymorphic_ctype_id=md_node_ct)
+        )
+    else:
+        first_text = None
+    if first_object_node:
+        counts_less_recap[first_object_node.count_label] -= 1
+
+    # formatting counts for intro sentence
+    count_elements = [
+        f"{format_nb(count)} {easy_plural(key, count)}"
+        for key, count in aggregated_counts.items()
+    ]
+    pretty_count = f"{', '.join(count_elements[:-1])}{' et ' if len(count_elements) > 1 else ''}{count_elements[-1]}"
+
+    # formatting counts for mail object
+    count_remaining_elements = [
+        f"{format_nb(count)} {easy_plural('autre', count) + ' ' if index == 0 else ''}{easy_plural(key, count)}"
+        for index, (key, count) in enumerate(counts_less_recap.items())
+        if count > 0
+    ]
+    pretty_count_remaining = (
+        f"{', '.join(count_remaining_elements[:-1])}{' et ' if len(count_remaining_elements) > 1 else ''}{count_remaining_elements[-1]}"
+        if len(count_remaining_elements) > 0
+        else None
+    )
+
+    # counting and formatting 'remaining' sentence
+    nodes = [n for notif in notifications for n in notif.action_object.nodes.all()]
+    nodes_types = set(node.count_label for node in nodes)
+    if len(nodes_types) > 1:
+        msg_count = notifications.count()
+        single_type = "message"
+    else:
+        msg_count = len(nodes)
+        single_type = nodes_types.pop()
+    intro_count = f"{format_nb(msg_count)} {easy_plural('nouveau', msg_count, 'x')} {easy_plural(single_type, msg_count)}"
+
+    # prepare data about sender(s)
+    main_sender = notifications[0].actor
+    other_senders = notifications.values_list("actor_object_id", flat=True).count() > 1
+
+    return {
+        "project": project_digest,
+        "title_count": pretty_count,
+        "intro_count": intro_count,
+        "remaining_count": pretty_count_remaining,
+        "site_name": site.name,
+        "first_sender": {
+            "pk": main_sender.pk,
+            "image": get_gravatar_url(main_sender.email),  # todo less pixels ?
+            "first_name_initial": main_sender.first_name[:1].capitalize(),
+            "first_name": main_sender.first_name.capitalize(),
+            "last_name": main_sender.last_name.capitalize(),
+            "organization": getattr(main_sender.profile.organization, "name", ""),
+        },
+        "other_senders": other_senders,
+        "text": first_text,
+        "first_object": first_object_node.get_digest_recap()
+        if first_object_node
+        else None,
+        "message_url": utils.build_absolute_url(
+            notifications.first().action_object.get_absolute_url(),
+            auto_login_user=user,
+        ),
+    }
     # https://docs.google.com/document/d/1atR08eb2H2DyvUGg5VkMrbA7VvMO-ZNFYVqAgjjgZ_c/edit?tab=t.0
 
 
@@ -712,7 +850,8 @@ class NotificationFormatter:
         return fmt(notification)
 
     # ------ Formatter Utils -----#
-    def _represent_user(self, user):
+    @staticmethod
+    def _represent_user(user):
         if not user:
             fmt = "--compte indisponible--"
             return fmt
@@ -727,32 +866,38 @@ class NotificationFormatter:
 
         return fmt
 
-    def _represent_recommendation(self, recommendation):
+    @staticmethod
+    def _represent_recommendation(recommendation):
         if recommendation.resource:
             return recommendation.resource.title
 
         return recommendation.intent
 
-    def _represent_recommendation_excerpt(self, recommendation):
+    @staticmethod
+    def _represent_recommendation_excerpt(recommendation):
         return recommendation.content[:50]
 
-    def _represent_project(self, project):
+    @staticmethod
+    def _represent_project(project):
         fmt = f"{project.name}"
         if project.commune:
             fmt += f" ({project.commune})"
 
         return fmt
 
-    def _represent_project_excerpt(self, project):
+    @staticmethod
+    def _represent_project_excerpt(project):
         if project.description:
             return project.description[:50]
 
         return None
 
-    def _represent_note_excerpt(self, note):
+    @staticmethod
+    def _represent_note_excerpt(note):
         return note.content[:200] or None
 
-    def _represent_followup(self, followup):
+    @staticmethod
+    def _represent_followup(followup):
         return followup.comment[:50]
 
     # -------- Routers -----------#
