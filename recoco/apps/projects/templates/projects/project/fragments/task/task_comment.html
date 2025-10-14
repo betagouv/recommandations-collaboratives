@@ -3,16 +3,16 @@
      {% if height == "100" %}class="w-100 h-100"{% endif %}>
     <template x-if="!isEditing && currentTask.content !== ''">
         <div data-test-id="task-initial-comment"
-             class="position-relative fr-p-2w bg-grey-light rounded-3 fr-p-2w {% if height == "100" %}w-100 h-100{% endif %}">
+             class="position-relative bg-grey-light rounded-3 fr-p-2w {% if height == "100" %}w-100 h-100{% endif %}">
             <div x-html="truncate(renderMarkdown(task.content),400)"
-                 class="text-info-custom font-small text-dark fr-mb-2w {% if content == 'tiny' %}font-size-12px{% endif %}">
+                 class="text-info-custom font-small text-dark {% if content == 'tiny' %}font-size-12px{% endif %}">
             </div>
             <template x-if="task.contact">
                 <div x-data="{contact: task.contact,isOpenDeleteContact:null}">{% include "tools/contacts/contact_card.html" %}</div>
             </template>
             {% if embed_view is not True %}
                 {% if "manage_tasks" in user_project_perms and not disable_edit %}
-                    <button class="fr-btn fr-btn--sm fr-btn--tertiary fr-btn--tertiary-light-background fr-icon-pencil-line position-absolute bottom-0 end-0 fr-color--mention_button fr-m-2w"
+                    <button class="fr-btn fr-btn--sm fr-btn--tertiary fr-btn--tertiary-light-background fr-icon-pencil-line position-absolute bottom-0 end-0 fr-color--mention_button fr-m-3v"
                             @click.stop="isEditing = true;"
                             data-test-id="edit-comment-button">
                         Modifier le commentaire initial de la recommandation

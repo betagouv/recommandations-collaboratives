@@ -37,7 +37,7 @@ body.modal-open {
 }
 
 .task-item p {
-  margin-bottom: 5px;
+  margin-bottom: 0px;
 }
 
 .task-item h4 {

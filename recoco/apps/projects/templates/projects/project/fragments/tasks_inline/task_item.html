@@ -42,7 +42,7 @@
                     <span class="topic-indicator bg-purple fr-mr-1v"></span>
                     <h5 data-test-id="task-kanban-topic"
                         x-text="task.topic.name"
-                        class="fw-bold tiny fr-mb-0 color-purple"></h5>
+                        class="lineheight-1-25 fw-bold tiny fr-mb-0 color-purple"></h5>
                 </div>
             </template>
             {% if embed_view is not True %}
@@ -52,7 +52,7 @@
             {% endif %}
         </div>
         <div class="d-flex align-items-center justify-content-between">
-            <h6 class="fr-mb-0 fr-mt-2v fw-bold title-info text-transform-none text-blue text-decoration-underline"
+            <h6 class="fr-mb-0 fr-mt-1v fw-bold title-info text-transform-none text-blue text-decoration-underline"
                         x-text="currentTask.intent"></h6>
         </div>
         {% if embed_view is not True %}
@@ -74,7 +74,7 @@
             </article>
         {% endif %}
         <template x-if="task.resource">
-            <article class="w-100 h-100">{% include "projects/project/fragments/task/task_comment.html" with content="tiny" height="100" %}</article>
+            <article class="fr-mb-2v w-100 h-100">{% include "projects/project/fragments/task/task_comment.html" with content="tiny" height="100" %}</article>
         </template>
         <!-- DS integration -->
         <template x-if="task.ds_folder && task.ds_folder.prefilled_count > 0">
@@ -99,23 +99,14 @@
             </div>
         </template>
         <footer class="fr-mt-auto">
-            <div>
-                <span class="align-middle text-grey-dark font-very-small specific-lineheight-20 fr-icon-calendar-line fr-icon--sm"
-                      x-text="(() => {
-                                let diffDays = Math.floor((new Date() - new Date(currentTask.created_on)) / (1000 * 60 * 60 * 24));
-                                if (diffDays === 0) {
-                                    return 'Aujourd\'hui';
-                                } else if (diffDays === 1) {
-                                    return 'Il y a 1 jour';
-                                } else {
-                                    return `Il y a ${diffDays} jours`;
-                                }
-                            })()"></span>
-            </div>
             <div class="d-flex justify-content-between align-items-center">
                 {% if embed_view is not True %}
                     <div class="tiny d-flex align-items-center">
                         {% include "projects/project/fragments/task/task_user_card.html" %}
+                        <span class="align-middle text-grey-dark font-very-small specific-lineheight-20 fr-icon-calendar-line fr-icon--sm fr-ml-1v">
+                            le <span x-text="formatDate(currentTask.created_on, { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })"></span>
+
+                        </span>
                     </div>
                     <template x-if="task.public">
                         {% include "projects/project/fragments/tasks_inline_kanban/tasks_status_buttons.html" with full_width=False %}

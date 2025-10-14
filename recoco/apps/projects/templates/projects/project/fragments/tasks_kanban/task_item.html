@@ -4,7 +4,7 @@
 {% get_obj_perms request.user for project as "user_project_perms" %}
 <div x-data="Task(task)"
      :id="task.uuid"
-     class="drag-targetable fr-py-1v position-relative"
+     class="drag-targetable fr-py-1v position-relative max-height-320px"
      @dragover="onDragOver(event)"
      @drop="onDrop(event, board.status, task.uuid)"
      @dragenter="onDragEnter(event)"
@@ -44,7 +44,7 @@
                             <span class="topic-indicator bg-purple fr-mr-1v"></span>
                             <h5 data-test-id="task-kanban-topic"
                                 x-text="task.topic.name"
-                                class="fw-bold tiny text-gray-800 fr-mb-0 color-purple"></h5>
+                                class="lineheight-1-25 fw-bold tiny text-gray-800 fr-mb-0 color-purple"></h5>
                         </div>
                     </template>
                     <h6 class="fr-mb-0 fw-bold title-info text-transform-none text-blue text-decoration-underline"
