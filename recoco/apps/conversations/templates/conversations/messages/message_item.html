@@ -64,20 +64,22 @@
                                     <button class="fr-btn fr-btn--sm fr-btn--tertiary fr-mr-1v"
                                             @click="onClickHandleEdit(element)">Modifier</button>
                                 </template>
+                                <button data-fr-opened="false"
+                                        aria-controls="modal"
+                                        type="button"
+                                        class="fr-btn fr-btn--sm fr-btn--tertiary fr-mr-1v"
+                                        @click="setElementToDelete(element)">Supprimer</button>
                             </div>
                         </template>
-                        <!-- Reply button -->
-                        <div class="action-button">
-                            <div class="d-flex justify-content-end">
-                                <button class="fr-btn fr-btn--sm fr-btn--tertiary"
-                                        @click="onClickHandleReply(element)">Répondre</button>
+                        <template x-if="!element.deleted">
+                            <!-- Reply button -->
+                            <div class="action-button">
+                                <div class="d-flex justify-content-end">
+                                    <button class="fr-btn fr-btn--sm fr-btn--tertiary"
+                                            @click="onClickHandleReply(element)">Répondre</button>
+                                </div>
                             </div>
-                        </div>
-                        <button data-fr-opened="false"
-                                aria-controls="modal"
-                                type="button"
-                                class="fr-btn fr-btn--sm fr-btn--tertiary fr-ml-1v"
-                                @click="setElementToDelete(element)">Supprimer</button>
+                        </template>
                     </div>
                 </div>
             </div>
