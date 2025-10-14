@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% load wagtailcore_tags wagtailimages_tags %}
+{% load sass_tags %}
+{% block css %}
+    <link href="{% sass_src 'home/css/home/home.scss' %}"
+          rel="stylesheet"
+          type="text/css">
+    <link href="{% sass_src 'home/css/dsfr/custom-dsfr.scss' %}"
+          rel="stylesheet"
+          type="text/css">
+    <link href="{% sass_src 'home/css/cms/page-showcase.css' %}"
+          rel="stylesheet"
+          type="text/css">
+{% endblock css %}
+{% block title %}
+    {{ page.title }}
+{% endblock title %}
+{% block og_title %}
+    {{ page.title }}
+{% endblock og_title %}
+{% block content %}
+    <div class="g-0 fr-mx-auto font-marianne">
+        <!--------------------- page.heading --------------------->
+        {% for block in page.heading %}
+            {% if block.block_type == 'hero' %}
+                {% image block.value.bg_image fill-1200x800 as bg_image %}
+                <div class="hero tmp-usevar"
+                     style="background-image: url('{{ bg_image.url }}');
+                            background-color: {{ block.value.bg_color }}">
+                    {% if block.value.darken %}<div class="overlay"></div>{% endif %}
+                    <div class="content">
+                        <h1>{{ block.value.title }}</h1>
+                        {% if block.value.text %}<span>{{ block.value.text }}</span>{% endif %}
+                        {% if block.value.cta_label and block.value.cta_link %}
+                            <a href="{{ block.value.cta_link }}"
+                               class="fr-btn fr-btn--secondary fr-background-alt--blue-france fr-btn--lg fr-btn--lg">
+                                {{ block.value.cta_label }}
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endif %}
+        {% endfor %}
+        <!--------------------- page.gallery --------------------->
+        <div class="fr-container">
+            <div class="fr-grid-row fr-grid-row--gutters fr-py-3w">
+                {% for block in page.gallery %}
+                    <div class="fr-col-12 fr-col-sm">{% image block.value original class='fr-responsive-img Image_in_gallery' %}</div>
+                {% endfor %}
+            </div>
+        </div>
+        <!--------------------- page.content ---------------------->
+        <div class="colored-back-section fr-py-3w fr-my-3w">
+            <div class="fr-container">
+                {% for block in page.content %}
+                    {% if block.block_type == 'multicol' %}
+                        <div class="multi-column">
+                            <div class="fr-grid-row fr-grid-row--gutters fr-py-3w">
+                                {% for column in block.value %}
+                                    {% if column.block_type == 'title' %}
+                                        <div class="column-title fr-col-12 fr-col-sm">
+                                            <h2>{{ column.value }}</h2>
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                            <div class="fr-grid-row fr-grid-row--gutters fr-py-3w">
+                                {% for column in block.value %}
+                                    {% if column.block_type == 'columns' %}
+                                        <div class="column fr-col-12 fr-col-sm">{{ column.value.text|richtext }}</div>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% elif block.block_type == 'richtext' %}
+                        <div class="richtext">{{ block.value|richtext }}</div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+        <!--------------------- page.quote ------------------------>
+        {% for block in page.quote %}
+            <div class="fr-py-3w fr-my-1w">
+                <div class="fr-container">
+                    <div class="fr-grid-row fr-grid-row--gutters fr-py-1w">
+                        <div class="fr-col-12 fr-col-sm">
+                            <figure class="fr-quote fr-quote--column">
+                                <blockquote>
+                                    <p>{{ block.value.quote }}</p>
+                                </blockquote>
+                                <figcaption>
+                                    <p class="fr-quote__author">{{ block.value.author_name }}</p>
+                                    <p class="fr-quote__source">{{ block.value.author_title }}</p>
+                                    <div class="fr-quote__image">{% image block.value.image width-400 class='left_image' %}</div>
+                                </figcaption>
+                            </figure>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock content %}
