@@ -40,6 +40,12 @@
       transition: max-height 0.3s ease-in-out;
       .list-member-toggle {
         padding-bottom: 1rem;
+        background: linear-gradient(
+          to bottom,
+          rgba(255, 255, 255, 0) 0%,
+          rgba(255, 255, 255, 1) 100%
+        );
+        height: 3rem;
       }
       &.open {
         max-height: unset;
