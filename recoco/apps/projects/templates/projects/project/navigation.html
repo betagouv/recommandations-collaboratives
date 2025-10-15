@@ -58,10 +58,11 @@
                                aria-checked="{% if state_of_play %}true{% else %}false{% endif %}"
                                id="segmented-control-survey"
                                name="segmented-control-project"
-                               @click="$store.tutorialsEvents.isTutorialForProjectPageOneCompleted=true;console.log('Étape 2 complétée');window.location='{% url 'projects-project-detail-knowledge' project.pk %}';">
+                               @click="window.location='{% url 'projects-project-detail-knowledge' project.pk %}';">
                         <label class="fr-label" for="segmented-control-survey">
                             <a class="stretched-link"
                                data-test-id="project-navigation-knowledge"
+                               @click="$store.tutorialsEvents.isTutorialForProjectPageOneCompleted=true;"
                                href="{% url 'projects-project-detail-knowledge' project.pk %}">État des lieux
                                 {% comment %} TODO
                            <span class="fr-text--sm text-ease">({{ project.survey.completion }}%)</span>
@@ -91,6 +92,7 @@
                 </div>
                 {% flag "conversations_new" %}
                 <div class="fr-segmented__element"
+                    :class="{'visual-hint': $store.tutorialsEvents.isTutorialForProjectPage === 3 || $store.tutorialsEvents.isTutorialForProjectPage === 4}"
                      id="overview-step-3"
                      {% if "view_public_notes" not in user_project_perms and "use_public_notes" not in user_project_perms %} aria-describedby="tooltip-lock-access-conversations" {% endif %}>
                     {% include "projects/project/fragments/navigation/tooltip_lock_access.html" with id="tooltip-lock-access-conversations" %}
@@ -98,7 +100,7 @@
                            type="radio"
                            {% if conversations_new %}checked{% endif %}
                            aria-checked="{% if conversations_new %}true{% else %}false{% endif %}"
-                           {% if "view_public_notes" in user_project_perms or "use_public_notes" in user_project_perms %} @click="window.location='{% url 'projects-project-detail-conversations-new' project.pk %}'" {% else %} disabled {% endif %}
+                           {% if "view_public_notes" in user_project_perms or "use_public_notes" in user_project_perms %} @click="window.location='{% url 'projects-project-detail-conversations-new' project.pk %}';if ($store.tutorialsEvents.isTutorialForProjectPage === 3) { $store.tutorialsEvents.isTutorialForProjectPage = 3.5; }" {% else %} disabled {% endif %}
                            id="segmented-control-tasks"
                            name="segmented-control-project">
                     <label class="fr-label" for="segmented-control-tasks">
@@ -315,6 +317,7 @@
                                     {% else %}
                                         <button class="fr-btn background-dsfr-primary-button w-100 justify-content-center"
                                                 data-test-id="button-validate-role"
+                                                @click="if ($store.tutorialsEvents.isTutorialForProjectPage==2) { $store.tutorialsEvents.isTutorialForProjectPageTwoCompleted=true; }"
                                                 :disabled="!is_clickable">Choisir un rôle</button>
                                     {% endif %}
                                 </div>
