@@ -43,3 +43,25 @@ import '../css/userCard.scss';
 import '../css/callout.css';
 import '../css/markdown.css';
 import '../css/miscellaneous.css';
+
+/**
+ * MATOMO TRACKING
+ */
+
+import {
+  trackClickOnRecoLink,
+  trackClickOnFileLink,
+  trackScrollDepth,
+  trackReplyToMessage,
+  trackOpenRessource,
+  trackSeeMoreParticipants,
+  trackCopyContactEmail,
+} from './utils/TrackingMatomo';
+
+window.trackCopyContactEmail = trackCopyContactEmail;
+window.trackClickOnRecoLink = trackClickOnRecoLink;
+window.trackClickOnFileLink = trackClickOnFileLink;
+window.trackScrollDepth = trackScrollDepth;
+window.trackReplyToMessage = trackReplyToMessage;
+window.trackOpenRessource = trackOpenRessource;
+window.trackSeeMoreParticipants = trackSeeMoreParticipants;

@@ -33,6 +33,7 @@ Parameter Alpine:
                         <h4 class="fr-link">
                             <a :href="recommendation.resource.web_url"
                                target="_blank"
+                               @click="trackOpenRessource"
                                x-text="recommendation.intent"></a>
                         </h4>
                     </template>

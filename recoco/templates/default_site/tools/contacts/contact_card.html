@@ -70,7 +70,7 @@ Example usage in parent:
                         <span class="fr-icon--sm fr-icon-link" x-text="contact.email"></span>
                     </a>
                     <button class="fr-ml-3w fr-px-2v fr-py-0 fr-btn fr-btn--secondary fr-btn--xs"
-                            @click.prevent="clipboardCopy(`L'email`, contact.email)"
+                            @click.prevent="clipboardCopy(`L'email`, contact.email);trackCopyContactEmail()"
                             title="Copier l'email">
                         <svg class="bi align-baseline" width="10" height="10" fill="currentColor">
                             <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#clipboard" />

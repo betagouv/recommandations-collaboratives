@@ -59,7 +59,7 @@
                 </ul>
                 <div class="list-member-toggle position-sticky bottom-0 start-0 text-center w-100 fr-pb-0">
                     <button class="fr-btn fr-btn--sm fr-btn--secondary bg-white "
-                            @click="isOpen = !isOpen"
+                            @click="isOpen = !isOpen; !isOpen && trackSeeMoreParticipants();"
                             x-text="isOpen ? 'Voir moins' : 'Voir plus'"></button>
                 </div>
             </div>

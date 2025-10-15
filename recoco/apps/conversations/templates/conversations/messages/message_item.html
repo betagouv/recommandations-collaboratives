@@ -76,7 +76,9 @@
                             <div class="action-button">
                                 <div class="d-flex justify-content-end">
                                     <button class="fr-btn fr-btn--sm fr-btn--tertiary"
-                                            @click="onClickHandleReply(element)">Répondre</button>
+                                            @click="onClickHandleReply(element);trackReplyToMessage();">
+                                        Répondre
+                                    </button>
                                 </div>
                             </div>
                         </template>
