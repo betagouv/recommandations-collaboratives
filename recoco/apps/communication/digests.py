@@ -591,7 +591,7 @@ def make_msg_digest_by_user_and_project(notifications, user, project, site):
         f"{format_nb(count)} {easy_plural(key, count)}"
         for key, count in aggregated_counts.items()
     ]
-    pretty_count = f"{', '.join(count_elements[:-1])}{' et ' if len(count_elements) > 1 else ''}{count_elements[-1]}"
+    pretty_intro_count = f"{', '.join(count_elements[:-1])}{' et ' if len(count_elements) > 1 else ''}{count_elements[-1]}"
 
     # formatting counts for mail object
     count_remaining_elements = [
@@ -614,7 +614,7 @@ def make_msg_digest_by_user_and_project(notifications, user, project, site):
     else:
         msg_count = len(nodes)
         single_type = nodes_types.pop()
-    intro_count = f"{format_nb(msg_count)} {easy_plural('nouveau', msg_count, 'x')} {easy_plural(single_type, msg_count)}"
+    pretty_title_count = f"{format_nb(msg_count)} {easy_plural('nouveau', msg_count, 'x')} {easy_plural(single_type, msg_count)}"
 
     # prepare data about sender(s)
     main_sender = notifications[0].actor
@@ -622,8 +622,8 @@ def make_msg_digest_by_user_and_project(notifications, user, project, site):
 
     return {
         "project": project_digest,
-        "title_count": pretty_count,
-        "intro_count": intro_count,
+        "title_count": pretty_title_count,
+        "intro_count": pretty_intro_count,
         "remaining_count": pretty_count_remaining,
         "site_name": site.name,
         "first_sender": {
