@@ -485,7 +485,7 @@ def make_digest_for_new_site(notification, user):
 ########################################################################
 
 
-def send_msg_digest_by_user_and_project(project, user, dry_run=False):
+def send_msg_digest_by_user_and_project(project, user, site, dry_run=False):
     notifications = (
         user.notifications(manager="on_site")
         .unsent()
@@ -494,7 +494,7 @@ def send_msg_digest_by_user_and_project(project, user, dry_run=False):
     if notifications.count() == 0:
         return 0
 
-    digest = make_msg_digest_by_user_and_project(notifications, user, project)
+    digest = make_msg_digest_by_user_and_project(notifications, user, project, site)
     if not dry_run:
         send_email(
             communication_constants.TPL_MESSAGES_DIGEST,
