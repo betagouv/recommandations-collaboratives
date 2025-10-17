@@ -95,7 +95,7 @@ class RecommendationNode(Node, MarkdownTextMixin):
         res = {"type": "recommendation"}
 
         if self.recommendation.resource is None:
-            res["text"] = self.text
+            res += {"text": self.text, "title": self.recommendation.intent}
         else:
             res += {
                 "title": self.recommendation.resource.title,
