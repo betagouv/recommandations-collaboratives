@@ -76,9 +76,10 @@ Parameters:
     </template>
     <div class="position-relative">
         <div class="tiptap-editor {% if wide %}is-wide{% endif %}"
+             :class="{'visual-hint': $store.tutorialsEvents.isTutorialForProjectPage==3.5 || $store.tutorialsEvents.isTutorialForProjectPage==4.3 }"
              data-test-id="tiptap-editor-content"
              x-ref="element"
-             @click.stop="isFocus = true"
+             @click.stop="isFocus = true; $store.tutorialsEvents.isTutorialForProjectPage==3.5 ? $store.tutorialsEvents.isTutorialForProjectPageThreeCompleted=true : null ; $store.tutorialsEvents.isTutorialForProjectPage==4.3 ? $store.tutorialsEvents.isTutorialForProjectPage=4.6 : null;"
              id="comment-text-ref"></div>
         <textarea class="position-absolute top-0 opacity-0 specific-height-0"
                   {% if model %} x-model="{{ model }}.text" x-modelable="markdownContent" {% else %} x-model="markdownContent" {% endif  %}
@@ -144,7 +145,9 @@ Parameters:
                 {% if can_add_reco %}
                     <a data-test-id="create-task-button"
                        :href="`{% url 'projects-create-task' %}?project_id={{ project.pk }}{% if next_url_add_reco %}&next={% url next_url_add_reco project.pk %}{% endif %}&content=${encodeURIComponent(markdownContent || '')}`"
-                       class="fr-btn fr-btn--tertiary fr-btn--sm justify-content-center fr-text--sm button-add-reco">
+                       @click="$store.tutorialsEvents.isTutorialForProjectPage==4.6 ? $store.tutorialsEvents.isTutorialForProjectPageFourCompleted=true : null;"
+                       class="fr-btn fr-btn--tertiary fr-btn--sm justify-content-center fr-text--sm button-add-reco"
+                       :class="{'visual-hint': $store.tutorialsEvents.isTutorialForProjectPage==4.6 }">
                         Créer une recommandation
                     </a>
                 {% endif %}
