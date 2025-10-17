@@ -117,6 +117,7 @@ class ContactNode(Node):
             "last_name": c.last_name,
             "email": c.email,
             "phone_no": c.phone_no,
+            "mobile_no": c.mobile_no,
             "function": c.division,
             "organization_name": c.organization.name,
         }
