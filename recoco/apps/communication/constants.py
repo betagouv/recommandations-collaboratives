@@ -33,4 +33,5 @@ TPL_CHOICES = (
     (TPL_PROJECT_ADDED_TO_NEW_SITE, "Le Dossier a été validé sur un nouveau portail"),
     (TPL_ADVISOR_ACCESS_REQUEST_ACCEPTED, "Demande d'accès conseillers acceptée"),
     (TPL_ADVISOR_ACCESS_REQUEST_REFUSED, "Demande d'accès conseillers refusée"),
+    (TPL_MESSAGES_DIGEST, "Résumé des messages reçus (nouvelle conv')"),
 )
