@@ -520,9 +520,7 @@ def make_msg_digest_by_user_and_project(notifications, user, project, site):
         return noun + plural_mark
 
     def format_nb(nb):
-        if nb == 1:
-            return "un"
-        return str(nb)
+        return nb
 
     md_node_ct = ContentType.objects.get_for_model(MarkdownNode)
 
@@ -860,7 +858,7 @@ class NotificationFormatter:
         if user.last_name:
             first_name = (
                 user.first_name[:1].capitalize() if is_short else user.first_name
-            )
+            ) + "."
             fmt = f"{first_name} {user.last_name}"
         else:
             fmt = f"{user}"
