@@ -21,6 +21,7 @@
 {% block project_detail %}
     {{ project.pk|json_script:"djangoProjectId" }}
     {% include "projects/project/navigation.html" with conversations_new=True %}
+    {% include "projects/project/fragments/project_banner/banner_wrapper.html" with part='open' %}
     {% comment %} TODO: build topic_list in django view {% endcomment %}
     {% regroup feed by topic as topic_list %}
     <div class="conversation-new d-flex"
@@ -96,4 +97,5 @@
             {% endif %}
         </div>
     </div>
+    {% include "projects/project/fragments/project_banner/banner_wrapper.html" with part='close' %}
 {% endblock project_detail %}
