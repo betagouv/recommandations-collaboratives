@@ -3,7 +3,7 @@
 from django.contrib.contenttypes.models import ContentType
 from django.db import transaction
 
-from . import models
+from . import models, signals
 from .models import ContactNode, DocumentNode, RecommendationNode
 
 
@@ -21,6 +21,10 @@ def post_public_message_with_recommendation(recommendation, text=None):
             position=1,
             text=text or recommendation.content,
             recommendation=recommendation,
+        )
+
+        signals.message_posted.send(
+            sender=post_public_message_with_recommendation, message=msg
         )
 
     return msg
