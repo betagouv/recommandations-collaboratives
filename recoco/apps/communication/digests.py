@@ -489,7 +489,7 @@ def send_msg_digest_by_user_and_project(project, user, site, dry_run=False):
     notifications = (
         user.notifications(manager="on_site")
         .unsent()
-        .filter(verb=verbs.Conversation.POST_MESSAGE)  # todo better filtering
+        .filter(verb=verbs.Conversation.POST_MESSAGE, target_object_id=project.id)
     )
     if notifications.count() == 0:
         return 0
