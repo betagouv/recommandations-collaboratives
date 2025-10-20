@@ -509,9 +509,9 @@ def send_msg_digest_by_user_and_project(project, user, site, dry_run=False):
     return notifications.count()
 
 
-def make_msg_digest_by_user_and_project(notifications, user, project, site):
+def make_msg_digest_by_user_and_project(notifications_qs, user, project, site):
     project_digest = make_project_digest(project, user, "conversations-new")
-    notifications = notifications.order_by("timestamp")
+    notifications_qs = notifications_qs.order_by("timestamp")
 
     # formatting utils
     def easy_plural(noun, nb, plural_mark="s"):
@@ -526,12 +526,14 @@ def make_msg_digest_by_user_and_project(notifications, user, project, site):
 
     # counting messages and objects by type for intro sentence
     annotations = [
-        notif.data["annotations"] for notif in notifications if notif.data is not None
+        notif.data["annotations"]
+        for notif in notifications_qs
+        if notif.data is not None
     ]
     aggregated_counts = {
         "message": sum(
             1
-            for notif in notifications
+            for notif in notifications_qs
             if notif.action_object.nodes.filter(
                 polymorphic_ctype_id=md_node_ct
             ).exists()
@@ -550,7 +552,7 @@ def make_msg_digest_by_user_and_project(notifications, user, project, site):
     first_text_msg = next(
         (
             n.action_object
-            for n in notifications
+            for n in notifications_qs
             if n.action_object.nodes.filter(polymorphic_ctype_id=md_node_ct).exists()
         ),
         None,
@@ -558,7 +560,7 @@ def make_msg_digest_by_user_and_project(notifications, user, project, site):
     first_obj_msg = next(
         (
             n.action_object
-            for n in notifications
+            for n in notifications_qs
             if n.action_object.nodes.exclude(polymorphic_ctype_id=md_node_ct).exists()
         ),
         None,
@@ -606,10 +608,10 @@ def make_msg_digest_by_user_and_project(notifications, user, project, site):
     )
 
     # counting and formatting 'remaining' sentence
-    nodes = [n for notif in notifications for n in notif.action_object.nodes.all()]
+    nodes = [n for notif in notifications_qs for n in notif.action_object.nodes.all()]
     nodes_types = set(node.count_label for node in nodes)
     if len(nodes_types) > 1:
-        msg_count = notifications.count()
+        msg_count = notifications_qs.count()
         single_type = "message"
     else:
         msg_count = len(nodes)
@@ -617,8 +619,10 @@ def make_msg_digest_by_user_and_project(notifications, user, project, site):
     pretty_title_count = f"{format_nb(msg_count)} {easy_plural('nouveau', msg_count, 'x')} {easy_plural(single_type, msg_count)}"
 
     # prepare data about sender(s)
-    main_sender = notifications[0].actor
-    other_senders = notifications.values_list("actor_object_id", flat=True).count() > 1
+    main_sender = notifications_qs[0].actor
+    other_senders = (
+        notifications_qs.values_list("actor_object_id", flat=True).count() > 1
+    )
 
     return {
         "project": project_digest,
@@ -627,7 +631,7 @@ def make_msg_digest_by_user_and_project(notifications, user, project, site):
         "remaining_count": pretty_count_remaining,
         "site_name": site.name,
         "first_sender": {
-            "pk": main_sender.pk,
+            "pk": main_sender.id,
             "image": get_gravatar_url(main_sender.email, 50),
             "first_name_initial": main_sender.first_name[:1].capitalize(),
             "first_name": main_sender.first_name.capitalize(),
@@ -641,7 +645,7 @@ def make_msg_digest_by_user_and_project(notifications, user, project, site):
         if first_object_node
         else None,
         "message_url": utils.build_absolute_url(
-            notifications.first().action_object.get_absolute_url(),
+            notifications_qs.first().action_object.get_absolute_url(),
             auto_login_user=user,
         ),
     }
