@@ -14,14 +14,14 @@ from recoco.apps.projects import models as projects_models
 from recoco.apps.tasks import models as tasks_models
 
 
-class MessageNotDeleted(models.Manager):
+class MessageNotDeletedManager(models.Manager):
     def get_queryset(self):
         return super().get_queryset().filter(deleted=None)
 
 
 class Message(TimeStampedModel):
     objects = models.Manager()  # todo ordering ?
-    not_deleted = MessageNotDeleted()
+    not_deleted = MessageNotDeletedManager()
 
     project = models.ForeignKey(
         projects_models.Project,
@@ -59,10 +59,11 @@ class Message(TimeStampedModel):
     deleted = models.DateTimeField(null=True, blank=True)
 
     def soft_delete(self):
-        self.deleted = datetime.now()
-        for node in self.nodes.all():
-            node.delete()
-        self.save()
+        with transaction.atomic():
+            self.deleted = datetime.now()
+            for node in self.nodes.all():
+                node.delete()
+            self.save()
 
 
 class Node(PolymorphicModel):
