@@ -138,10 +138,15 @@ export const ContactCardExtension = Node.create({
       insertContactCard:
         (attributes) =>
         ({ commands }) => {
-          return commands.insertContent({
-            type: this.name,
-            attrs: attributes,
-          });
+          return commands.insertContent([
+            {
+              type: this.name,
+              attrs: attributes,
+            },
+            {
+              type: 'paragraph',
+            },
+          ]);
         },
       removeContactCard:
         () =>

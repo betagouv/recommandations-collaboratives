@@ -90,10 +90,15 @@ const FileCardExtension = Node.create({
       insertFileCard:
         (attributes) =>
         ({ commands }) => {
-          return commands.insertContent({
-            type: this.name,
-            attrs: attributes,
-          });
+          return commands.insertContent([
+            {
+              type: this.name,
+              attrs: attributes,
+            },
+            {
+              type: 'paragraph',
+            },
+          ]);
         },
       removeFileCard:
         () =>
