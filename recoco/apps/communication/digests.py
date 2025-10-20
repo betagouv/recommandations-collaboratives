@@ -635,6 +635,7 @@ def make_msg_digest_by_user_and_project(notifications, user, project, site):
             "first_name": main_sender.first_name.capitalize(),
             "last_name": main_sender.last_name.capitalize(),
             "organization": getattr(main_sender.profile.organization, "name", ""),
+            "short": NotificationFormatter._represent_user(main_sender, True),
         },
         "other_senders": other_senders,
         "text": first_text,
@@ -851,13 +852,16 @@ class NotificationFormatter:
 
     # ------ Formatter Utils -----#
     @staticmethod
-    def _represent_user(user):
+    def _represent_user(user, is_short=False):
         if not user:
             fmt = "--compte indisponible--"
             return fmt
 
         if user.last_name:
-            fmt = f"{user.first_name} {user.last_name}"
+            first_name = (
+                user.first_name[:1].capitalize() if is_short else user.first_name
+            )
+            fmt = f"{first_name} {user.last_name}"
         else:
             fmt = f"{user}"
 
