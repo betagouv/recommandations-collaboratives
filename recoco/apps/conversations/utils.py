@@ -25,7 +25,6 @@ def post_public_message_with_recommendation(recommendation, text=None):
 
         node_count = 1
 
-        print(recommendation.contact)
         if recommendation.contact:
             node_count += 1
             ContactNode.objects.create(
@@ -35,7 +34,7 @@ def post_public_message_with_recommendation(recommendation, text=None):
         for document in recommendation.document.all():
             node_count += 1
             DocumentNode.objects.create(
-                message=msg, position=node_count, document=document.pk
+                message=msg, position=node_count, document=document
             )
 
         signals.message_posted.send(

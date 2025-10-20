@@ -81,6 +81,7 @@ def test_send_digests_for_new_reco_for_collaborators(client, request, make_proje
     assert collaborator.notifications.unsent().count() == 1
 
     digests.send_digests_for_new_recommendations_by_user(collaborator, dry_run=False)
+    # FIXME: Replace with new call that handle message containing a recommendation
 
     assert collaborator.notifications.unsent().count() == 0
 
