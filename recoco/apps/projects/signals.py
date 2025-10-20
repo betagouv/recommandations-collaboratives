@@ -340,18 +340,6 @@ def project_document_uploaded(sender, instance, **kwargs):
         target=project,
     )
 
-    notification = {
-        "sender": instance.uploaded_by,
-        "verb": verbs.Document.ADDED,
-        "action_object": instance,
-        "target": project,
-    }
-
-    # Notify other project's people and advisors
-    notify_advisors_of_project(project, notification, exclude=instance.uploaded_by)
-    if not project.inactive_since:
-        notify_members_of_project(project, notification, exclude=instance.uploaded_by)
-
 
 ################################################################
 # Project Survey events

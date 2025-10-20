@@ -554,7 +554,7 @@ class ProjectSiteViewSet(viewsets.GenericViewSet):
 class DocumentViewSet(
     mixins.RetrieveModelMixin, mixins.CreateModelMixin, viewsets.GenericViewSet
 ):
-    """API endpoint that allows searching for topics"""
+    """API endpoint that allows manipulating Documents"""
 
     permission_classes = [permissions.IsAuthenticated, BaseConversationPermission]
     queryset = models.Document.objects
