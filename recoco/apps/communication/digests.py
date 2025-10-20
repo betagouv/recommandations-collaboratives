@@ -630,7 +630,7 @@ def make_msg_digest_by_user_and_project(notifications, user, project, site):
         "site_name": site.name,
         "first_sender": {
             "pk": main_sender.pk,
-            "image": get_gravatar_url(main_sender.email),  # todo less pixels ?
+            "image": get_gravatar_url(main_sender.email, 50),
             "first_name_initial": main_sender.first_name[:1].capitalize(),
             "first_name": main_sender.first_name.capitalize(),
             "last_name": main_sender.last_name.capitalize(),
