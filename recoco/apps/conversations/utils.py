@@ -23,6 +23,21 @@ def post_public_message_with_recommendation(recommendation, text=None):
             recommendation=recommendation,
         )
 
+        node_count = 1
+
+        print(recommendation.contact)
+        if recommendation.contact:
+            node_count += 1
+            ContactNode.objects.create(
+                message=msg, position=node_count, contact=recommendation.contact
+            )
+
+        for document in recommendation.document.all():
+            node_count += 1
+            DocumentNode.objects.create(
+                message=msg, position=node_count, document=document.pk
+            )
+
         signals.message_posted.send(
             sender=post_public_message_with_recommendation, message=msg
         )

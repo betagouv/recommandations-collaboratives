@@ -621,9 +621,12 @@ def test_message_is_posted_upon_reco_creation(project_ready, request):
 
     tasks_signals.action_created.send(
         sender=test_message_is_posted_upon_reco_creation,
-        task=tasks_models.Task.objects.create(
+        task=baker.make(
+            tasks_models.Task,
             public=True,
             project=project_ready,
+            contact__first_name="bob",
+            document__name="my doc",
             site=current_site,
             created_by=user,
         ),
