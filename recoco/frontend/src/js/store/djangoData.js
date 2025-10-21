@@ -15,6 +15,7 @@ document.addEventListener('alpine:init', () => {
     ),
     canUseTasks: getDjangoPermsData('userProjectPerms', 'use_tasks'),
     canManageTasks: getDjangoPermsData('userProjectPerms', 'manage_tasks'),
+    isProjectOwner: getDjangoData('isProjectOwner'),
   });
 });
 
