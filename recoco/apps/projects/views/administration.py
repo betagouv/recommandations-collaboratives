@@ -173,7 +173,6 @@ def project_administration(request, project_id):
             "is_regional_actor": is_regional_actor,
             "has_any_required_perm": has_any_required_perm,
             "advising_position": advising_position,
-            "advising": advising,
         },
     )
 

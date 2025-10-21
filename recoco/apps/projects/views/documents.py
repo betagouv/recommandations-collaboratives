@@ -21,11 +21,7 @@ from recoco.utils import has_perm_or_403
 
 from .. import models, signals
 from ..forms import DocumentUploadForm
-from ..utils import (
-    get_advising_context_for_project,
-    get_collaborators_for_project,
-    is_regional_actor_for_project,
-)
+from ..utils import get_collaborators_for_project
 
 
 @login_required
@@ -40,14 +36,6 @@ def document_list(request, project_id=None):
     )
 
     has_perm_or_403(request.user, "manage_documents", project)
-
-    is_regional_actor = is_regional_actor_for_project(
-        request.site, project, request.user, allow_national=True
-    )
-
-    advising, advising_position = get_advising_context_for_project(
-        request.user, project
-    )
 
     all_files = models.Document.objects.filter(project_id=project.pk).exclude(
         the_file__in=["", None]
@@ -70,20 +58,7 @@ def document_list(request, project_id=None):
             target_object_id=project.pk,
         ).mark_all_as_read()
 
-    return render(
-        request,
-        "projects/project/documents.html",
-        context={
-            "project": project,
-            "all_files": all_files,
-            "pinned_files": pinned_files,
-            "links": links,
-            "is_regional_actor": is_regional_actor,
-            "answers_with_files": answers_with_files,
-            "advising_position": advising_position,
-            "advising": advising,
-        },
-    )
+    return render(request, "projects/project/documents.html", locals())
 
 
 @login_required
