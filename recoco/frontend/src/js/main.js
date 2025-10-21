@@ -56,7 +56,7 @@ import {
   trackOpenRessource,
   trackSeeMoreParticipants,
   trackCopyContactEmail,
-} from './utils/TrackingMatomo';
+} from './utils/trackingMatomo';
 
 window.trackCopyContactEmail = trackCopyContactEmail;
 window.trackClickOnRecoLink = trackClickOnRecoLink;
