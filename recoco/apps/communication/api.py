@@ -160,7 +160,7 @@ def fetch_transaction_content(transaction_id):
     return None
 
 
-if settings.DEBUG and getattr(settings, "BREVO_FORCE_DEBUG", False):
+if settings.DEBUG:
     send_email = send_debug_email
 else:
     send_email = brevo_email
