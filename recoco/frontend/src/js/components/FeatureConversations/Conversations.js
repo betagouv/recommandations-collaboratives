@@ -142,7 +142,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
       const recommendationToSummarize = await this.getRecommendationById(
         recommendationIdToSummarize
       );
-      contentToSummarize = `Recommandation - ${recommendationToSummarize.content}`;
+      contentToSummarize = `Recommandation - ${recommendationToSummarize.intent}`;
     } else if (shortMessage.nodes[0].type === 'ContactNode') {
       const contactIdToSummarize = shortMessage.nodes[0].contact_id;
       const contactToSummarize =
@@ -157,6 +157,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     } else {
       contentToSummarize = shortMessage.nodes[0].text;
     }
+    contentToSummarize = contentToSummarize.replace(/\n/g, ' ');
 
     return `${contentToSummarize.slice(0, 120)}${contentToSummarize.length > 120 ? '...' : ''}`;
   },
