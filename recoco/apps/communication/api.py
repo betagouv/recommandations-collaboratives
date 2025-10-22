@@ -163,6 +163,9 @@ def fetch_transaction_content(transaction_id):
 def send_mail_filter_recipient(
     template_name, recipients, params=None, test=False, related=None
 ):
+    if not isinstance(recipients, list):
+        recipients = [recipients]
+
     white_listed_recipients = getattr(settings, "DEBUG_EMAIL_WHITELIST", [])
     to_really_send, to_debug_send = [], []
     for recipient in recipients:
@@ -171,11 +174,19 @@ def send_mail_filter_recipient(
             recipient
         )
 
-    res_debug = send_debug_email(
-        template_name, to_debug_send, params=params, test=test, related=related
+    res_debug = (
+        send_debug_email(
+            template_name, to_debug_send, params=params, test=test, related=related
+        )
+        if len(to_debug_send) > 0
+        else True
     )
-    res_brevo = brevo_email(
-        template_name, to_really_send, params=params, test=test, related=related
+    res_brevo = (
+        brevo_email(
+            template_name, to_really_send, params=params, test=test, related=related
+        )
+        if len(to_really_send) > 0
+        else True
     )
     return res_brevo and res_debug
 

@@ -286,4 +286,22 @@ def test_use_debug_filter(mocker):
         [random_recipient],
         **kwargs,
     )
-    pass
+
+
+@override_settings(
+    BREVO_FORCE_DEBUG=True, DEBUG=True, DEBUG_EMAIL_WHITELIST=["superadmin@recoco.fr"]
+)
+def test_use_debug_filter_single_recipient(mocker):
+    brevo_mock = mocker.patch("recoco.apps.communication.api.brevo_email")
+    debug_mock = mocker.patch("recoco.apps.communication.api.send_debug_email")
+    args = ("a template",)
+    kwargs = {
+        "params": "params",
+        "test": "test",
+        "related": "related",
+    }
+    white_listed_recipient = {"name": "admin", "email": "superadmin@recoco.fr"}
+    send_email(*args, white_listed_recipient, **kwargs)
+    # the assertion depends on giving args as args or kwargs, and it shouldn't need to be
+    brevo_mock.assert_called_with(*args, [white_listed_recipient], **kwargs)
+    debug_mock.assert_not_called()
