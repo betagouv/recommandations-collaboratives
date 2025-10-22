@@ -18,7 +18,7 @@
           type="text/css">
 {% endblock css %}
 {% block js %}
-    {% vite_asset 'js/components/ActionPusher.js' %}
+    {% vite_asset 'js/apps/actionPusher.js' %}
     {% vite_asset 'js/apps/tutorial.js' %}
     {% vite_asset 'js/apps/featureAddContact.js' %}
     {% vite_asset 'js/components/User.js' %}
@@ -26,18 +26,19 @@
 {% block content %}
     <div class="col-10 fr-py-6w fr-mx-auto push-reco">
         <h2 class="push-reco__main-title">Créer une recommandation</h2>
-        <div x-data="ActionPusher()" x-init="create_recommendation()" x-cloak>
-            <form class="form"
-                  method="post"
-                  action="."
-                  enctype="multipart/form-data"
-                  x-data="{message: {text: '', contact: ''}}">
+        <div x-data="ActionPusher()"
+             x-init="create_recommendation()"
+             x-cloak
+             @set-contact="handleSetContact($event.detail)">
+            <form class="form" method="post" action="." enctype="multipart/form-data">
                 {% csrf_token %}
                 {% include "projects/project/fragments/action_pusher/project_selector.html" %}
                 {% include "projects/project/fragments/action_pusher/type.html" %}
                 {% include "projects/project/fragments/action_pusher/resource_search.html" %}
                 {% include "projects/project/fragments/action_pusher/details_form.html" with form=type_form %}
-                <input type="hidden" name="next" :value="draft ? '' : '{{ type_form.next.value }}'">
+                <input type="hidden"
+                       name="next"
+                       :value="draft ? '' : '{{ type_form.next.value }}'">
                 <input type="hidden" name="public" x-model="public">
             </form>
         </div>

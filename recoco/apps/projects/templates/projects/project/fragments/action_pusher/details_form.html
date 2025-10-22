@@ -46,7 +46,7 @@
 <!-- Action message -->
 <div class="fr-input-group">
     <label class="push-reco__title-section" for="content">Commentaire personnalisé</label>
-    {% include "tools/editor.html" with input_file_name="the_file" model="message" input_name="content" initial_content=form.content.value|default:preserved_content|default:'' initial_content_escapejs=True errors=form.content.errors is_task=True %}
+    {% include "tools/editor.html" with input_file_name="the_file" model="message" input_name="content" initial_content=form.content.value|default:preserved_content|default:'' initial_content_escapejs=True errors=form.content.errors is_task=True add_file_input=True is_action_pusher=True %}
     <template x-if="message.contact">
         <input type="hidden"
                name="{{ form.contact.name }}"

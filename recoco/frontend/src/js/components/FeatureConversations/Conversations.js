@@ -10,6 +10,7 @@ import api, {
   editTaskUrl,
 } from '../../utils/api';
 import { formatDateFrench } from '../../utils/date';
+import { openDB } from 'idb';
 
 Alpine.data('Conversations', (projectId, currentUserId) => ({
   projectId,
@@ -443,5 +444,25 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
         behavior: 'auto',
       });
     });
+  },
+
+  async goToCreateRecommendation(url) {
+    if (this.$store.editor.currentMessageJSON) {
+      const parsedNodesFromEditor = this.$store.editor.parseTipTapContent(
+        this.$store.editor.currentMessageJSON
+      );
+      if (parsedNodesFromEditor.some((node) => node.type === 'DocumentNode')) {
+        const documentNode = parsedNodesFromEditor.find(
+          (node) => node.type === 'DocumentNode'
+        );
+        // connect to the database
+        await this.$store.idbObjectStoreMgmt.init();
+        const value = await this.$store.idbObjectStoreMgmt.add({
+          file: documentNode.file,
+        });
+      }
+    }
+
+    window.location.href = url;
   },
 }));

@@ -9,10 +9,11 @@ import { formatDate } from '../utils/date';
 import Placeholder from '@tiptap/extension-placeholder';
 import { ContactCardExtension } from './ContactCardExtension';
 import { FileCardExtension } from './FileCardExtension';
+import { ToastType } from '../models/toastType';
 
 const MarkdownEditor = createMarkdownEditor(Editor);
 
-Alpine.data('editor', (content, placeholder) => {
+Alpine.data('editor', (content, placeholder, isActionPusher = false) => {
   let editor;
 
   return {
@@ -52,6 +53,37 @@ Alpine.data('editor', (content, placeholder) => {
         ],
         content: content,
         onCreate({ editor }) {
+          _this.$store.editor.currentMessage = editor.getMarkdown();
+          _this.$store.editor.currentMessageJSON = editor.getJSON();
+          console.log(editor.getJSON());
+          if (isActionPusher) {
+            const jsonContent = editor.getJSON();
+            const newContent = { type: 'doc', content: [] };
+            let numberContact = 0,
+              numberFile = 0;
+            for (const node of jsonContent.content) {
+              if (node.type === 'contactCard') {
+                numberContact++;
+                if (numberContact <= 1) {
+                  newContent.content.push(node);
+                  _this.$dispatch('set-contact', node.attrs.id);
+                }
+              } else if (node.type === 'fileCard') {
+                numberFile++;
+                if (numberFile <= 1) {
+                  newContent.content.push(node);
+                }
+              } else {
+                newContent.content.push(node);
+              }
+            }
+            editor.commands.setContent(newContent);
+            _this.$store.app.notification.message =
+              "Dans ce formulaire, vous ne pouvez ajouter qu'un seul contact par recommandation.";
+            _this.$store.app.notification.timeout = 5000;
+            _this.$store.app.notification.isOpen = true;
+            _this.$store.app.notification.type = ToastType.warning;
+          }
           _this.updatedAt = Date.now();
           _this.renderMarkdown();
           _this.isEditorEmpty = editor.isEmpty;

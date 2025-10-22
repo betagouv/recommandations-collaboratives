@@ -14,6 +14,7 @@ Parameters:
 - input_file_required (boolean)
 - tools_disabled (list of tool names: <title>)
 - placeholder (string)
+- is_action_pusher (boolean)
 {% endcomment %}
 {% load static %}
 {% load sass_tags %}
@@ -27,7 +28,7 @@ Parameters:
 {% endblock css %}
 {% comment %} TODO @set-comment.window to fix{% endcomment %}
 <div class="w-100 position-relative editor-container"
-     {% if initial_content_escapejs %} x-data='editor("{{ initial_content|escapejs }}", "{{ placeholder }}")' {% elif initial_content_js %} x-data='editor({{ initial_content }}, "{{ placeholder }}")' {% else %} x-data='editor("{{ initial_content }}", "{{ placeholder }}")' {% endif %}
+     {% if initial_content_escapejs %} x-data='editor("{{ initial_content|escapejs }}", "{{ placeholder }}", "{{ is_action_pusher }}" == "True" )' {% elif initial_content_js %} x-data='editor({{ initial_content }}, "{{ placeholder }}", "{{ is_action_pusher }}" == "True")' {% else %} x-data='editor("{{ initial_content }}", "{{ placeholder }}", "{{ is_action_pusher }}" == "True")' {% endif %}
      @reset-contact="handleResetContact()"
      @set-comment.window="setMarkdownContent(event)"
      @modal-response="closeSearchContactModal($event)"
@@ -85,13 +86,14 @@ Parameters:
                   {% if input_required %} required {% endif %}></textarea>
         <div class="module__container">
             <div class="info-module__container fr-mb-2v">
-                {% if can_attach_files %}
+                {% if can_attach_files or add_file_input %}
                     <input x-ref="fileUploadInput"
                            {% if model %} x-model="{{ model }}.the_file" x-modelable="currentFile" {% else %} x-model="currentFile" {% endif %}
                            type="file"
                            id="file-upload"
                            name="{{ input_file_name|default:"the_file" }}"
                            @change='handleFileUpload'
+                           multiple
                            {% if input_file_required %}required{% endif %}
                            class="d-none file-upload-input">
                     {% comment %} <template x-if="{% if model %}{{ model }}.the_file{% else %} currentFile{% endif %}"> {% endcomment %}
@@ -137,12 +139,16 @@ Parameters:
                 {% endif %}
                 <!-- Recommendation module -->
                 {% if can_add_reco %}
-                    <a data-test-id="create-task-button"
-                       :href="`{% url 'projects-create-task' %}?project_id={{ project.pk }}{% if next_url_add_reco %}&next={% url next_url_add_reco project.pk %}{% endif %}&content=${encodeURIComponent(markdownContent || '')}`"
-                       class="fr-btn fr-btn--tertiary fr-btn--tertiary-dark-background fr-btn--sm justify-content-center fr-text--sm button-add-reco">
+                    {% comment %} <a data-test-id="create-task-button" :href="`{% url 'projects-create-task' %}?project_id={{ project.pk }}{% if next_url_add_reco %}&next={% url next_url_add_reco project.pk %}{% endif %}&content=${encodeURIComponent(markdownContent || '')}`" class="fr-btn fr-btn--tertiary fr-btn--tertiary-dark-background fr-btn--sm justify-content-center fr-text--sm button-add-reco">
                         <span class="fr-icon-list-check-line fr-icon--sm"></span>
                         Créer une recommandation
-                    </a>
+                    </a> {% endcomment %}
+                    <button data-test-id="create-task-button"
+                            @click.prevent="goToCreateRecommendation(`{% url 'projects-create-task' %}?project_id={{ project.pk }}{% if next_url_add_reco %}&next={% url next_url_add_reco project.pk %}{% endif %}&content=${encodeURIComponent(markdownContent || '')}`)"
+                            class="fr-btn fr-btn--tertiary fr-btn--tertiary-dark-background fr-btn--sm justify-content-center fr-text--sm button-add-reco">
+                        <span class="fr-icon-list-check-line fr-icon--sm"></span>
+                        Créer une recommandation
+                    </button>
                 {% endif %}
                 <!-- Contact module -->
                 {% if can_attach_contact %}
