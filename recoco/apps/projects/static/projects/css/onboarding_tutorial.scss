@@ -61,3 +61,15 @@
     color: var(--light-text-disabled-grey, #929292);
     pointer-events: none;
 }
+
+.circle-visual-hint {
+    fill: #0974F6;
+    stroke-width: 4px;
+    stroke: rgba(0, 0, 0, 0.08);
+    filter: drop-shadow(0 0 0 rgba(225, 225, 225, 0.35));
+}
+
+.position-visual-circle-hint {
+    position: absolute;
+    transform: translate(-15px, -15px);
+}

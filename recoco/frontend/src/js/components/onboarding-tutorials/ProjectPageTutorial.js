@@ -8,10 +8,12 @@ Alpine.data('ProjectPageTutorial', () => {
     challengesStatus: [],
     challenges: [],
     firstChallengeNotAcquired: null,
-    isPopupOpen: false,
+    isTutorialPopupOpen: false,
     async init() {
       this.$store.tutorialsEvents.isTutorialForProjectPage = 0;
-
+      if( localStorage.getItem('projectPageTutorialPopupOpen') === 'true' ) {
+        this.isTutorialPopupOpen = true;
+      }
       const challengesName = [
         'project-page-tutorial-part1',
         'project-page-tutorial-part2',
@@ -22,7 +24,6 @@ Alpine.data('ProjectPageTutorial', () => {
         ...challengesName.map((name) => api.get(challengeUrl(name))),
       ];
       const responses = await Promise.all(requests);
-      console.log(responses);
       if (responses) {
         for (const response of responses) {
           this.challenges.push(response.data);
@@ -44,7 +45,6 @@ Alpine.data('ProjectPageTutorial', () => {
           }
         }
       }
-      console.log(this.challengesStatus);
       // Watch for completion of step 1 triggered on a navigation click
       this.$watch(
         () => this.$store.tutorialsEvents.isTutorialForProjectPageOneCompleted,
@@ -141,14 +141,22 @@ Alpine.data('ProjectPageTutorial', () => {
         }
     },
     async acquireChallenge(code) {
-        try {
-          const json = await api.patch(challengeUrl(code), {
-            acquire: true,
-          });
-          return json.data;
-        } catch (err) {
-          console.warn(err);
-        }
-      },
+      try {
+        const json = await api.patch(challengeUrl(code), {
+          acquire: true,
+        });
+        return json.data;
+      } catch (err) {
+        console.warn(err);
+      }
+    },
+    handleTutorialPopup() {
+      this.isTutorialPopupOpen = !this.isTutorialPopupOpen;
+      localStorage.setItem('projectPageTutorialPopupOpen', this.isTutorialPopupOpen);
+    },
+    handleCloseTutorialPopup() {
+      this.isTutorialPopupOpen = false;
+      localStorage.setItem('projectPageTutorialPopupOpen', 'false');
+    },
   };
 });

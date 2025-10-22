@@ -52,6 +52,9 @@
                 {% endif %}
                 {% if "list_projects" in user_site_perms or "view_surveys" in user_project_perms %}
                     <div class="fr-segmented__element" :class="{'visual-hint': $store.tutorialsEvents.isTutorialForProjectPage==1}" id="overview-step-2">
+                        <template x-if="$store.tutorialsEvents.isTutorialForProjectPage==1">
+                            {% include "projects/project/fragments/onboarding-tutorials/visual-hint.html" %}
+                        </template>
                         <input value="survey"
                                type="radio"
                                {% if state_of_play %}checked{% endif %}
@@ -95,6 +98,9 @@
                     :class="{'visual-hint': $store.tutorialsEvents.isTutorialForProjectPage === 3 || $store.tutorialsEvents.isTutorialForProjectPage === 4}"
                      id="overview-step-3"
                      {% if "view_public_notes" not in user_project_perms and "use_public_notes" not in user_project_perms %} aria-describedby="tooltip-lock-access-conversations" {% endif %}>
+                    <template x-if="$store.tutorialsEvents.isTutorialForProjectPage === 3 || $store.tutorialsEvents.isTutorialForProjectPage === 4">
+                        {% include "projects/project/fragments/onboarding-tutorials/visual-hint.html" %}
+                    </template>
                     {% include "projects/project/fragments/navigation/tooltip_lock_access.html" with id="tooltip-lock-access-conversations" %}
                     <input value="conversations_new"
                            type="radio"
