@@ -524,6 +524,25 @@ def make_msg_digest_by_user_and_project(notifications_qs, user, project, site):
 
     md_node_ct = ContentType.objects.get_for_model(MarkdownNode)
 
+    # msg count and title count
+    nodes = [n for notif in notifications_qs for n in notif.action_object.nodes.all()]
+    nodes_types = set(node.count_label for node in nodes)
+    if len(nodes_types) > 1:
+        msg_count = notifications_qs.count()
+        single_type = "message"
+        adjective = easy_plural("nouveau", msg_count, "x")
+    else:
+        single_type = nodes_types.pop()
+        msg_count = len(nodes)
+        adjective = (
+            easy_plural("nouvelle", msg_count)
+            if single_type == "recommandation"
+            else easy_plural("nouveau", msg_count, "x")
+        )
+    pretty_title_count = (
+        f"{format_nb(msg_count)} {adjective} {easy_plural(single_type, msg_count)}"
+    )
+
     # counting messages and objects by type for intro sentence
     annotations = [
         notif.data["annotations"]
@@ -531,15 +550,9 @@ def make_msg_digest_by_user_and_project(notifications_qs, user, project, site):
         if notif.data is not None
     ]
     aggregated_counts = {
-        "message": sum(
-            1
-            for notif in notifications_qs
-            if notif.action_object.nodes.filter(
-                polymorphic_ctype_id=md_node_ct
-            ).exists()
-        ),
+        "message": msg_count,
         "contact": sum(note["contacts"]["count"] for note in annotations),
-        "recommendation": sum(note["recommendations"]["count"] for note in annotations),
+        "recommandation": sum(note["recommendations"]["count"] for note in annotations),
         "document": sum(note["documents"]["count"] for note in annotations),
         # le décompte de "messages" c'est le nombre de messages qui ont du texte
         # ne pas se prendre la tête pour le nœud reco qui est bizarre
@@ -587,13 +600,19 @@ def make_msg_digest_by_user_and_project(notifications_qs, user, project, site):
         first_text = None
     if first_object_node:
         counts_less_recap[first_object_node.count_label] -= 1
+        if first_text_msg != first_obj_msg:
+            counts_less_recap["message"] -= 1
 
     # formatting counts for intro sentence
-    count_elements = [
+    count_objects = [
         f"{format_nb(count)} {easy_plural(key, count)}"
         for key, count in aggregated_counts.items()
+        if key != "message"
     ]
-    pretty_intro_count = f"{', '.join(count_elements[:-1])}{' et ' if len(count_elements) > 1 else ''}{count_elements[-1]}"
+    pretty_msg = f"{format_nb(msg_count)} {easy_plural('message', msg_count)}"
+    pretty_intro_count = f"{pretty_msg}"
+    if len(count_objects) > 0:
+        pretty_intro_count += f", dont {', '.join(count_objects[:-1])}{' et ' if len(count_objects) > 1 else ''}{count_objects[-1]}"
 
     # formatting counts for mail object
     count_remaining_elements = [
@@ -608,20 +627,12 @@ def make_msg_digest_by_user_and_project(notifications_qs, user, project, site):
     )
 
     # counting and formatting 'remaining' sentence
-    nodes = [n for notif in notifications_qs for n in notif.action_object.nodes.all()]
-    nodes_types = set(node.count_label for node in nodes)
-    if len(nodes_types) > 1:
-        msg_count = notifications_qs.count()
-        single_type = "message"
-    else:
-        msg_count = len(nodes)
-        single_type = nodes_types.pop()
-    pretty_title_count = f"{format_nb(msg_count)} {easy_plural('nouveau', msg_count, 'x')} {easy_plural(single_type, msg_count)}"
 
     # prepare data about sender(s)
     main_sender = notifications_qs[0].actor
     other_senders = (
-        notifications_qs.values_list("actor_object_id", flat=True).count() > 1
+        notifications_qs.values_list("actor_object_id", flat=True).distinct().count()
+        > 1
     )
 
     return {

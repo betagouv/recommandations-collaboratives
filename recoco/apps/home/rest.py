@@ -27,6 +27,7 @@ class UserNotificationsMarkOneAsRead(APIView):
             if notification.unread:
                 count = 1
                 notification.mark_as_read()
+            notification.mark_as_sent()
 
         return Response({"marked_as_read": count}, status=status.HTTP_200_OK)
 

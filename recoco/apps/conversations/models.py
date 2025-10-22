@@ -90,7 +90,7 @@ class MarkdownNode(Node, MarkdownTextMixin):
 
 class RecommendationNode(Node, MarkdownTextMixin):
     recommendation = models.ForeignKey(tasks_models.Task, on_delete=models.CASCADE)
-    count_label = "recommendation"
+    count_label = "recommandation"
 
     def get_digest_recap(self):
         res = {"type": "recommendation"}
@@ -101,6 +101,7 @@ class RecommendationNode(Node, MarkdownTextMixin):
             res = res | {
                 "title": self.recommendation.resource.title,
                 "subtitle": self.recommendation.resource.subtitle,
+                "text": self.text,
             }
         return res
 
