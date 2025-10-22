@@ -78,11 +78,13 @@ Alpine.data('editor', (content, placeholder, isActionPusher = false) => {
               }
             }
             editor.commands.setContent(newContent);
-            _this.$store.app.notification.message =
-              "Dans ce formulaire, vous ne pouvez ajouter qu'un seul contact par recommandation.";
-            _this.$store.app.notification.timeout = 5000;
-            _this.$store.app.notification.isOpen = true;
-            _this.$store.app.notification.type = ToastType.warning;
+            if (numberContact > 1) {
+              _this.$store.app.notification.message =
+                "Dans ce formulaire, vous ne pouvez ajouter qu'un seul contact par recommandation.";
+              _this.$store.app.notification.timeout = 5000;
+              _this.$store.app.notification.isOpen = true;
+              _this.$store.app.notification.type = ToastType.warning;
+            }
           }
           _this.updatedAt = Date.now();
           _this.renderMarkdown();

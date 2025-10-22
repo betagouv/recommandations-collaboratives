@@ -204,7 +204,14 @@ Alpine.data('ActionPusher', () => {
     handleSetContact(contactId) {
       this.message.contact = { id: contactId };
     },
-
+    handleSendRecommendation({ isDraft = false }) {
+      this.set_draft(isDraft);
+      this.$store.editor.currentMessageJSON.content =
+        this.$store.editor.currentMessageJSON.content.filter(
+          (node) => node.type !== 'contactCard' && node.type !== 'fileCard'
+        );
+      this.$store.editor.setContent(this.$store.editor.currentMessageJSON);
+    },
     set_draft(draft) {
       this.draft = draft;
       this.public = !this.draft;

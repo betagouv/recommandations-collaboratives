@@ -56,12 +56,12 @@
 <!-- Action submit -->
 <div class="d-flex justify-content-center">
     {% if not disable_draft %}
-        <button @click="set_draft(true)"
+        <button @click="handleSendRecommendation({isDraft: true})"
                 class="fr-btn fr-btn--secondary fr-btn--lg fr-mr-3w"
                 :disabled="(push_type == 'single' && !selected_resource) || !$store.actionPusher.isSelectedProject"
                 data-test-id="publish-draft-task-button">Enregistrer en brouillon</button>
     {% endif %}
-    <button @click="set_draft(false)"
+    <button @click="handleSendRecommendation({isDraft: false})"
             type="submit"
             class="fr-btn fr-btn--lg"
             data-cy="button-submit-task"
