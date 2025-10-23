@@ -22,3 +22,8 @@
 .fr-icon-corner-down-right-line::before {
   mask-image: url(../assets/corner-down-right-line.svg);
 }
+
+.fr-icon-attachment-2::after,
+.fr-icon-attachment-2::before {
+  mask-image: url(../assets/attachment-2.svg);
+}

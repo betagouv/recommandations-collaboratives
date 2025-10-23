@@ -297,6 +297,10 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     this.isEditorInReplyMode = true;
     Alpine.raw(this.$store.editor.editorInstance).commands.focus();
   },
+  onClickHandleAttachment() {
+    this.isEditorFocused = true;
+    Alpine.raw(this.$store.editor.editorInstance).commands.focus();
+  },
   onClickCancelReply() {
     this.messageIdToReply = null;
     this.isEditorInReplyMode = false;
