@@ -347,15 +347,6 @@ def test_edit_message_keeps_doc_restores_it(
     assert message.nodes.count() == 2
 
 
-# test envoi message
-# test serializer à l'édition du message
-# test édition du message
-#   - supprime les docs OK
-#   - garde le contact
-#   - garde la reco
-# réactive le projet
-
-
 #####--- "unread" attribute ---#####
 @pytest.mark.django_db
 def test_unread_is_zero_if_no_notifications(
