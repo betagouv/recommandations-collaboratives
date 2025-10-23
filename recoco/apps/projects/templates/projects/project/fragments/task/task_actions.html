@@ -33,15 +33,13 @@
                    @click.stop
                    :href="editTaskUrl(task.id, '{{ request.path }}')">Modifier</a>
             </li>
-            <template x-if="task.public">
+            {% comment %} <template x-if="task.public">
                 <li>
-                    <button id="unpublish-task-button"
-                            @click.stop="onSetTaskPublic(task, false)"
-                            class="fr-btn fr-btn--sm fr-btn--secondary fr-icon-draft-line fr-btn--icon-left w-100 justify-content-center fr-color--mention_button">
+                    <button id="unpublish-task-button" @click.stop="onSetTaskPublic(task, false)" class="fr-btn fr-btn--sm fr-btn--secondary fr-icon-draft-line fr-btn--icon-left w-100 justify-content-center fr-color--mention_button">
                         Passer en brouillon
                     </button>
                 </li>
-            </template>
+            </template> {% endcomment %}
             <template x-if="!task.public && task.content">
                 <li>
                     <button id="publish-task-button"
