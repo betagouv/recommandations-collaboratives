@@ -116,9 +116,9 @@
                                 </div>
                             </template>
                             {% if not is_project_owner %}
-                                {% include "tools/editor.html" with model="message" input_name=posting_form.content.name initial_content=posting_form.content.value|default:'' errors=posting_form.content.errors input_required=True can_add_reco=True next_url_add_reco="projects-project-detail-conversations-new" can_attach_files=True can_attach_contact=True show_send_button=True form_id="conversation-form" placeholder="Écrivez votre message ici. Ajoutez des fichiers, contacts ou une recommandation…" %}
+                                {% include "tools/editor.html" with model="message" input_name=posting_form.content.name initial_content=posting_form.content.value|default:'' errors=posting_form.content.errors input_required=True can_add_reco=True next_url_add_reco="projects-project-detail-conversations" can_attach_files=True can_attach_contact=True show_send_button=True form_id="conversation-form" placeholder="Écrivez votre message ici. Ajoutez des fichiers, contacts ou une recommandation…" %}
                             {% else %}
-                                {% include "tools/editor.html" with model="message" input_name=posting_form.content.name initial_content=posting_form.content.value|default:'' errors=posting_form.content.errors input_required=True can_add_reco=False next_url_add_reco="projects-project-detail-conversations-new" can_attach_files=True can_attach_contact=False show_send_button=True form_id="conversation-form" placeholder="Écrivez votre message ici. Vous pouvez ajouter des fichiers." %}
+                                {% include "tools/editor.html" with model="message" input_name=posting_form.content.name initial_content=posting_form.content.value|default:'' errors=posting_form.content.errors input_required=True can_add_reco=False next_url_add_reco="projects-project-detail-conversations" can_attach_files=True can_attach_contact=False show_send_button=True form_id="conversation-form" placeholder="Écrivez votre message ici. Vous pouvez ajouter des fichiers." %}
                             {% endif %}
                             <input type="hidden" name="contact" :value="message?.contact?.id">
                         </div>
