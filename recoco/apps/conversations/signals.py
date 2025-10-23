@@ -4,6 +4,7 @@ from actstream.models import action_object_stream
 from django.contrib.contenttypes.models import ContentType
 from django.db.models.signals import post_delete, pre_delete, pre_save
 from django.dispatch import receiver
+from django.utils import timezone
 from notifications import models as notifications_models
 
 from recoco import verbs
@@ -62,7 +63,8 @@ def delete_activity_on_message_delete(sender, instance, **kwargs):
 )
 def delete_reco_on_node_delete(sender, instance, **kwargs):
     if instance.recommendation:
-        instance.recommendation.delete()
+        instance.recommendation.deleted = timezone.now()
+        instance.recommendation.save()
 
 
 @receiver(
