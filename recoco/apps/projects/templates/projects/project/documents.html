@@ -46,7 +46,7 @@
                                           id="tooltip-add-file"
                                           style="z-index: 1001">
                                         L'ajout de nouveaux fichiers se fait <a class="fr-link fr-text--xs fr-text--bold"
-    href="{% url 'projects-project-detail-conversations-new' project.pk %}">dans la conversation</a>.
+    href="{% url 'projects-project-detail-conversations' project.pk %}">dans la conversation</a>.
                                     </span>
                                     {% comment %} {% url 'projects-documents-upload-document' project.pk as upload_action %}
                                     {% include "projects/project/fragments/files_links/file_upload_button.html" with type="project" action=upload_action small=True %} {% endcomment %}
