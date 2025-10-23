@@ -16,7 +16,7 @@ from recoco.apps.tasks.signals import action_created
 
 from ..projects.utils import reactivate_if_necessary
 from . import models
-from .models import Message
+from .models import RecommendationNode
 from .utils import (
     gather_annotations_for_message_notification,
     post_public_message_with_recommendation,
@@ -66,13 +66,16 @@ def delete_reco_on_node_delete(sender, instance, **kwargs):
 
 
 @receiver(
-    post_delete,
+    pre_save,
     sender=tasks_models.Task,
     dispatch_uid="reco_delete_message_sync",
 )
 def delete_message_on_reco_delete(sender, instance, **kwargs):
-    for message in Message.objects.filter(nodes__recommendation=instance):
-        message.soft_delete()
+    if instance.deleted is None:
+        return
+
+    for node in RecommendationNode.objects.filter(recommendation=instance):
+        node.message.soft_delete()
 
 
 @receiver(message_posted)
