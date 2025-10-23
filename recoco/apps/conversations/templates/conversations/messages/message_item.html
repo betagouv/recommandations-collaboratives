@@ -62,6 +62,11 @@
                     <div class="d-flex">
                         <template x-if="element.posted_by == {{ request.user.id }} && !element.deleted">
                             <div class="d-flex">
+                                <button data-fr-opened="false"
+                                        aria-controls="modal"
+                                        type="button"
+                                        class="fr-btn fr-btn--sm fr-btn--tertiary fr-mr-1v"
+                                        @click="setElementToDelete(element)">Supprimer</button>
                                 <template x-if="element.nodes.some(x => x.type == 'RecommendationNode')">
                                     <a class="fr-btn fr-btn--sm fr-btn--tertiary fr-mr-1v"
                                        :href="editTaskUrl(element.nodes.find(x => x.type == 'RecommendationNode').recommendation_id, '{{ request.path }}')">Modifier</a>
@@ -70,11 +75,6 @@
                                     <button class="fr-btn fr-btn--sm fr-btn--tertiary fr-mr-1v"
                                             @click="onClickHandleEdit(element)">Modifier</button>
                                 </template>
-                                <button data-fr-opened="false"
-                                        aria-controls="modal"
-                                        type="button"
-                                        class="fr-btn fr-btn--sm fr-btn--tertiary fr-mr-1v"
-                                        @click="setElementToDelete(element)">Supprimer</button>
                             </div>
                         </template>
                         <template x-if="!element.deleted">
