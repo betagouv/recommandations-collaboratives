@@ -78,26 +78,5 @@
                 {% endfor %}
             </div>
         </div>
-        <!--------------------- page.quote ------------------------>
-        {% for block in page.quote %}
-            <div class="fr-py-3w fr-my-1w">
-                <div class="fr-container">
-                    <div class="fr-grid-row fr-grid-row--gutters fr-py-1w">
-                        <div class="fr-col-12 fr-col-sm">
-                            <figure class="fr-quote fr-quote--column">
-                                <blockquote>
-                                    <p>{{ block.value.quote }}</p>
-                                </blockquote>
-                                <figcaption>
-                                    <p class="fr-quote__author">{{ block.value.author_name }}</p>
-                                    <p class="fr-quote__source">{{ block.value.author_title }}</p>
-                                    <div class="fr-quote__image">{% image block.value.image width-400 class='left_image' %}</div>
-                                </figcaption>
-                            </figure>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        {% endfor %}
     </div>
 {% endblock content %}

@@ -57,13 +57,13 @@ class ShowcasePage(Page):
     ]
 
 
-class ActualityListPage(Page):
-    """List all actualities in a fancy manner"""
+class NewsListPage(Page):
+    """List all news articles in a fancy manner"""
 
-    subpage_types = ["ActualityPage"]
+    subpage_types = ["NewsPage"]
 
 
-class ActualityPage(Page):
+class NewsPage(Page):
     heading = StreamField(
         [("hero", HeroBlock(label="Hero"))],
         min_num=1,
@@ -87,13 +87,8 @@ class ActualityPage(Page):
         verbose_name="Contenu",
     )
 
-    quote = StreamField(
-        [("quote", QuoteBlock(label="Citation"))], min_num=0, max_num=1, blank=True
-    )
-
     content_panels = Page.content_panels + [
         FieldPanel("heading"),
         FieldPanel("gallery"),
         FieldPanel("content"),
-        FieldPanel("quote"),
     ]
