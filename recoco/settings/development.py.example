@@ -104,6 +104,7 @@ SECRET_KEY = os.getenv("SECRET_KEY", "secret")
 
 BREVO_API_KEY = os.environ.get("BREVO_API_KEY")
 BREVO_FORCE_DEBUG = True
+DEBUG_EMAIL_WHITELIST = []
 
 # Recaptcha
 RECAPTCHA_REQUIRED_SCORE = 0

@@ -11,6 +11,7 @@ TPL_PROJECT_REMINDERS_WHATS_UP_DIGEST = "project_reminders_whats_up_digest"
 TPL_PROJECT_ADDED_TO_NEW_SITE = "project_added_to_new_site"
 TPL_ADVISOR_ACCESS_REQUEST_ACCEPTED = "advisor_access_request_accepted"
 TPL_ADVISOR_ACCESS_REQUEST_REFUSED = "advisor_access_request_refused"
+TPL_MESSAGES_DIGEST = "messages_digest"
 
 TPL_CHOICES = (
     (TPL_PROJECT_RECEIVED, "Dossier bien reçu"),
@@ -32,4 +33,5 @@ TPL_CHOICES = (
     (TPL_PROJECT_ADDED_TO_NEW_SITE, "Le Dossier a été validé sur un nouveau portail"),
     (TPL_ADVISOR_ACCESS_REQUEST_ACCEPTED, "Demande d'accès conseillers acceptée"),
     (TPL_ADVISOR_ACCESS_REQUEST_REFUSED, "Demande d'accès conseillers refusée"),
+    (TPL_MESSAGES_DIGEST, "Résumé des messages reçus (nouvelle conv')"),
 )
