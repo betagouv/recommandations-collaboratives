@@ -2,7 +2,7 @@ import django.dispatch
 from actstream import action
 from actstream.models import action_object_stream
 from django.contrib.contenttypes.models import ContentType
-from django.db.models.signals import pre_delete, pre_save
+from django.db.models.signals import post_delete, pre_delete, pre_save
 from django.dispatch import receiver
 from notifications import models as notifications_models
 
@@ -50,6 +50,17 @@ def delete_activity_on_message_delete(sender, instance, **kwargs):
     ).delete()
 
     action_object_stream(instance).delete()
+
+
+# Synchronize message/reco deletion
+@receiver(
+    post_delete,
+    sender=models.RecommendationNode,
+    dispatch_uid="reco_node_hard_delete_sync",
+)
+def delete_reco_on_node_delete(sender, instance, **kwargs):
+    if instance.recommendation:
+        instance.recommendation.delete()
 
 
 @receiver(message_posted)
