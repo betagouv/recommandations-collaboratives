@@ -195,6 +195,7 @@ def send_digests_for_new_recommendations_by_user(user, dry_run):
     notifications = (
         user.notifications(manager="on_site")
         .unsent()
+        .unread()
         .filter(target_content_type=project_ct, verb=verbs.Recommendation.CREATED)
         .order_by("target_object_id")
     )
@@ -410,6 +411,7 @@ def send_digests_for_new_sites_by_user(user, dry_run=False):
     notifications = (
         user.notifications(manager="on_site")
         .unsent()
+        .unread()
         .filter(target_content_type=project_ct, verb=verbs.Project.AVAILABLE)
         .order_by("target_object_id")
     )
@@ -679,6 +681,7 @@ def send_digest_for_non_switchtender_by_user(user, dry_run=False):
         .filter(target_content_type=project_ct)
         .exclude(target_content_type=project_ct, verb=verbs.Recommendation.CREATED)
         .unsent()
+        .unread()
     )
 
     return send_digest_by_user(
@@ -699,6 +702,7 @@ def send_digest_for_switchtender_by_user(user, dry_run=False):
         .filter(target_content_type=project_ct)
         .exclude(verb=verbs.Recommendation.CREATED)
         .unsent()
+        .unread()
     )
 
     context = {
@@ -729,6 +733,7 @@ def send_digest_by_user(
             user.notifications(manager="on_site")
             .filter(target_content_type=project_ct)
             .unsent()
+            .unread()
         )
     else:
         notifications = queryset
