@@ -72,4 +72,9 @@
 .position-visual-circle-hint {
     position: absolute;
     transform: translate(-15px, -15px);
+    z-index: 1002;
+    &--higher {
+        transform: translate(-15px, -50px);
+
+    }
 }

@@ -80,7 +80,11 @@ Parameters:
              data-test-id="tiptap-editor-content"
              x-ref="element"
              @click.stop="isFocus = true; $store.tutorialsEvents.isTutorialForProjectPage==3.5 ? $store.tutorialsEvents.isTutorialForProjectPageThreeCompleted=true : null ; $store.tutorialsEvents.isTutorialForProjectPage==4.3 ? $store.tutorialsEvents.isTutorialForProjectPage=4.6 : null;"
-             id="comment-text-ref"></div>
+             id="comment-text-ref">
+             <template x-if="$store.tutorialsEvents.isTutorialForProjectPage==3.5 || $store.tutorialsEvents.isTutorialForProjectPage==4.3">
+                {% include "projects/project/fragments/onboarding-tutorials/visual-hint.html" %}
+             </template>
+        </div>
         <textarea class="position-absolute top-0 opacity-0 specific-height-0"
                   {% if model %} x-model="{{ model }}.text" x-modelable="markdownContent" {% else %} x-model="markdownContent" {% endif  %}
                   name="{{input_name|default:"content"}}"
@@ -143,13 +147,18 @@ Parameters:
                 {% endif %}
                 <!-- Recommendation module -->
                 {% if can_add_reco %}
-                    <a data-test-id="create-task-button"
-                       :href="`{% url 'projects-create-task' %}?project_id={{ project.pk }}{% if next_url_add_reco %}&next={% url next_url_add_reco project.pk %}{% endif %}&content=${encodeURIComponent(markdownContent || '')}`"
-                       @click="$store.tutorialsEvents.isTutorialForProjectPage==4.6 ? $store.tutorialsEvents.isTutorialForProjectPageFourCompleted=true : null;"
-                       class="fr-btn fr-btn--tertiary fr-btn--sm justify-content-center fr-text--sm button-add-reco"
-                       :class="{'visual-hint': $store.tutorialsEvents.isTutorialForProjectPage==4.6 }">
-                        Créer une recommandation
-                    </a>
+                    <div>
+                        <a data-test-id="create-task-button"
+                        :href="`{% url 'projects-create-task' %}?project_id={{ project.pk }}{% if next_url_add_reco %}&next={% url next_url_add_reco project.pk %}{% endif %}&content=${encodeURIComponent(markdownContent || '')}`"
+                        @click="$store.tutorialsEvents.isTutorialForProjectPage==4.6 ? $store.tutorialsEvents.isTutorialForProjectPageFourCompleted=true : null;"
+                        class="fr-btn fr-btn--tertiary fr-btn--sm justify-content-center fr-text--sm button-add-reco"
+                        :class="{'visual-hint': $store.tutorialsEvents.isTutorialForProjectPage==4.6 }">
+                            Créer une recommandation
+                        </a>
+                        <template x-if="$store.tutorialsEvents.isTutorialForProjectPage==4.6">
+                            {% include "projects/project/fragments/onboarding-tutorials/visual-hint.html" with extra_classes='position-visual-circle-hint--higher' %}
+                        </template>
+                    </div>
                 {% endif %}
                 <!-- Contact module -->
                 {% if can_attach_contact %}
