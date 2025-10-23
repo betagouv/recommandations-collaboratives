@@ -15,6 +15,7 @@ Parameters:
 - tools_disabled (list of tool names: <title>)
 - placeholder (string)
 - is_action_pusher (boolean)
+- can_compress_editor (boolean)
 {% endcomment %}
 {% load static %}
 {% load sass_tags %}
@@ -75,7 +76,7 @@ Parameters:
         </div>
     </template>
     <div class="position-relative">
-        {% if can_attach_files or can_attach_contact %}
+        {% if can_compress_editor %}
             <div class="button-attachment-container">
                 <button class="fr-btn fr-btn--sm fr-icon-attachment-2"
                         type="button"
