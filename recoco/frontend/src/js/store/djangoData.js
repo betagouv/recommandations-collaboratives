@@ -27,9 +27,6 @@ function getDjangoData(id) {
 }
 
 function getDjangoPermsData(id, perm) {
-  if (id == 'manage_documents') {
-    console.log('manage_documents', perm);
-  }
   const userProjectPerms = document.getElementById(id)?.textContent;
 
   if (userProjectPerms) {

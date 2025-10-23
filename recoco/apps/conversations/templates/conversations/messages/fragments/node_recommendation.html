@@ -44,13 +44,6 @@ Parameter Alpine:
                         <p class="task-item__resource-subtitle fr-mt-1w fr-mb-0"
                            x-text="recommendation.resource.subtitle"></p>
                     </template>
-                    {% comment %} <template x-for="document in recommendation.document" :key="document.id">
-                        <div>
-                            <span class="fr-mb-2w">🚧 TODO: Liste des documents 🚧</span>
-                            <span class="fr-mb-2w">There is a document to display</span>
-                        </div>
-                        {% include "projects/project/fragments/files_links/file_list_item_embedded.html" with document=document %}
-                    </template> {% endcomment %}
                     {% include "projects/project/fragments/conversations_new/tasks_status_buttons_js.html" %}
                 </div>
             </div>

@@ -37,31 +37,12 @@ instance.interceptors.response.use(
 
 export default instance;
 
-// Projects :
-// export function searchProjectUrl(search, departments) {
-//   if (search) {
-//     search = `search=${search}`;
-//   }
-//   if (departments.length) {
-//     departments = departments.map((code) => `departments=${code}`).join('&');
-//   }
-//   return `/api/projects/?${search}${search && departments.length > 0 ? '&' : ''}${departments}`;
-// }
-
-// export function projectsMyDepartmentsUrl() {
-//   return '/api/projects/my_departments';
-// }
-
 export function projectsUrl(search, departments, lastActivity) {
   // if search with tags, make a different url
   let url;
   if (search.includes('#')) {
     search = search.substring(1);
   }
-  //   search.paragraph.replace(' ', '_');
-  //   url = '/api/projects/?tags=' + search.substring(1);
-  //   console.log(url);
-  // } else {
   const params = new URLSearchParams({
     search: search,
     last_activity: lastActivity,

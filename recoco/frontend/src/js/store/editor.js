@@ -243,19 +243,12 @@ document.addEventListener('alpine:init', () => {
 
       return text;
     },
-    // !!! ************************
-    // !!! ************************
-    // !!! **  TODO REVIEW This  **
-    // !!! ************************
-    // !!! ************************
-
     /**
      * Convert parsed nodes back to TipTap JSON structure
      * @param {Array} nodes - Array of nodes with position, type, and relevant data
      * @returns {Object} TipTap JSON structure
      */
     convertNodesToTipTapJson(nodes) {
-      console.log('convertNodesToTipTapJson', nodes);
       if (!nodes || nodes.length === 0) {
         return {
           type: 'doc',
