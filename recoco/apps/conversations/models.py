@@ -20,7 +20,7 @@ class MessageNotDeletedManager(models.Manager):
 
 
 class Message(TimeStampedModel):
-    objects = models.Manager()  # todo ordering ?
+    objects = models.Manager()
     not_deleted = MessageNotDeletedManager()
 
     project = models.ForeignKey(
