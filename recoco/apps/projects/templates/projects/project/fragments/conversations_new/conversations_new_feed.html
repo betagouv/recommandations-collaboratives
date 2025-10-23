@@ -4,11 +4,6 @@
     {% if not topic_list %}
         {% regroup feed by topic as topic_list %}
     {% endif %}
-    {% comment %}
-    ****************************************
-    ************** NEW STREAM **************
-    ****************************************
-    {% endcomment %}
     <!-- Loop through all messages -->
     <div class="conversation-new__container-topic">
         <template x-for="(element, index) in feed.elements">
@@ -36,11 +31,6 @@
             </div>
         </template>
     </div>
-    {% comment %}
-    ****************************************
-    ************** NEW STREAM **************
-    ****************************************
-    {% endcomment %}
 </div>
 <template x-if="feed.elements.length == 0">
     <div class="feed-element-item fr-px-3v fr-mb-3v">

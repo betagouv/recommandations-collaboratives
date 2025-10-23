@@ -86,13 +86,9 @@
                  @topic-switched.window="scrollToFirstNotification($event.detail)"
                  {% endcomment %}>
                 {% get_obj_perms request.user for project as "user_project_perms" %}
-                {% include "projects/project/partials/conversations_new_partial.html" %}
+                {% include "projects/project/fragments/conversations_new/conversations_new_feed.html" %}
                 {% if "use_public_notes" in user_project_perms %}
                     <!-- Post message -->
-                    {% comment %} hx-post="{% url 'projects-project-detail-conversations-new-partial' project.pk %}"
-                hx-trigger="submit"
-                hx-swap="outerHTML"
-                    hx-target="#conversation-new-container" {% endcomment %}
                     <form class="form editor-form fr-px-3v fr-pr-12w"
                           @submit.prevent="sendFormMessage(message)"
                           enctype="multipart/form-data"
