@@ -25,6 +25,7 @@
     {% is_project_owner project request.user as is_project_owner %}
     {{ is_project_owner|json_script:"isProjectOwner" }}
     {% include "projects/project/navigation.html" with conversations_new=True %}
+    {% include "projects/project/fragments/project_banner/banner_wrapper.html" with part="open" %}
     {% regroup feed by topic as topic_list %}
     <div class="conversation-new d-flex"
          x-data="Conversations({{ project.id }}, {{ request.user.id }})">
@@ -171,4 +172,5 @@
             </div>
         </dialog>
     </div>
+    {% include "projects/project/fragments/project_banner/banner_wrapper.html" with part="close" %}
 {% endblock project_detail %}

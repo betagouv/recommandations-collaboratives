@@ -82,6 +82,22 @@ a {
   }
 }
 
+/* ¯¯¯¯ *\
+  INPUTS
+\* ˍˍˍˍ */
+
+.fr-input::placeholder {
+  color: #acacac;
+}
+
+/* ¯¯¯¯ *\
+  ICONS
+\* ˍˍˍˍ */
+
+.fr-icon-margin-right-sm::before {
+  margin-right: 0.2rem;
+}
+
 p a {
   text-decoration: underline;
   color: #0000ee;
@@ -763,6 +779,10 @@ form > p {
 
 .border-bottom {
   border-bottom: 1px solid var(--light-border-default-grey, #e5e5e5) !important;
+}
+
+.no-interaction-possible {
+  pointer-events: none;
 }
 
 /* ¯¯¯¯ *\
