@@ -115,7 +115,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     // // MOKED DATA
     let countOfUnread = 0;
     this.feed.elements.forEach((el) => {
-      if (el.unread > 0 && !countOfUnread) {
+      if (el.unread > 0 && !countOfUnread && !el.deleted) {
         el.firstUnread = true;
         countOfUnread++;
       }
@@ -265,7 +265,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
   },
   countElementsInDiscussion() {
     for (const message of this.feed.elements) {
-      if (message.unread > 0) {
+      if (message.unread > 0 && !message.deleted) {
         this.countOf.new_messages += 1;
       }
       this.updateCountOfElementsInDiscussion(message);
@@ -273,7 +273,6 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     this.countOf.isLoaded = true;
   },
   updateCountOfElementsInDiscussion(element, decrease = false) {
-    let sameNode = false;
     if (element.nodes) {
       for (const node of element.nodes) {
         if (node.type === 'DocumentNode') {
@@ -285,10 +284,11 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
         if (node.type === 'ContactNode') {
           this.countOf.contacts += decrease ? -1 : 1;
         }
-        if (node.type === 'MarkdownNode' && !sameNode) {
-          this.countOf.messages += decrease ? -1 : 1;
-          sameNode = true;
-        }
+      }
+      if (!element.deleted) {
+        this.countOf.messages += decrease ? -1 : 1;
+      } else if (decrease) {
+        this.countOf.messages += -1;
       }
     }
   },
@@ -385,6 +385,8 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
         this.feed.elements = this.feed.elements.map((el) =>
           el.id === this.elementToDelete.id ? { ...el, deleted: true } : el
         );
+        this.updateCountOfElementsInDiscussion(this.elementToDelete, true);
+        this.elementToDelete = null;
       }, 200);
     } catch (error) {
       throw new Error('Failed to delete message', error);
