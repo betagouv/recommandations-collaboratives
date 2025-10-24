@@ -8,17 +8,10 @@ created : 2021-05-26 15:54:25 CEST
 """
 
 from django.urls import path
+from django.views.generic import RedirectView
 
 from . import views
-from .views import (
-    administration,
-    detail,
-    documents,
-    export,
-    feeds,
-    notes,
-    sharing,
-)
+from .views import administration, detail, documents, export, feeds, notes, sharing
 
 urlpatterns = [
     path(
@@ -137,18 +130,13 @@ urlpatterns = [
     ),
     path(
         r"project/<int:project_id>/conversations",
-        detail.project_conversations,
+        detail.project_conversations_new,
         name="projects-project-detail-conversations",
     ),
-    path(
+    path(  # XXX Remove in a future version
         r"project/<int:project_id>/conversations-new",
-        detail.project_conversations_new,
+        RedirectView.as_view(pattern_name="projects-project-detail-conversations"),
         name="projects-project-detail-conversations-new",
-    ),
-    path(
-        r"project/<int:project_id>/conversations-new-partial",
-        detail.project_conversations_new_partial,
-        name="projects-project-detail-conversations-new-partial",
     ),
     path(
         r"project/<int:project_id>/switchtender/join",

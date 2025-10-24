@@ -80,6 +80,20 @@ def delete_message_on_reco_delete(sender, instance, **kwargs):
         node.message.soft_delete()
 
 
+@receiver(
+    pre_save,
+    sender=tasks_models.Task,
+    dispatch_uid="reco_delete_message_if_back_to_draft",
+)
+def delete_message_on_reco_back_to_draft(sender, instance, **kwargs):
+    if instance.deleted:
+        return
+
+    if instance.pk and instance.public is False:
+        for node in RecommendationNode.objects.filter(recommendation=instance):
+            node.message.soft_delete()
+
+
 @receiver(message_posted)
 def notify_message_created(sender, message, **kwargs):
     project = message.project

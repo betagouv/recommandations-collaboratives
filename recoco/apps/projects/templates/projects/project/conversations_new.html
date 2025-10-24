@@ -86,13 +86,9 @@
                  @topic-switched.window="scrollToFirstNotification($event.detail)"
                  {% endcomment %}>
                 {% get_obj_perms request.user for project as "user_project_perms" %}
-                {% include "projects/project/partials/conversations_new_partial.html" %}
+                {% include "projects/project/fragments/conversations_new/conversations_new_feed.html" %}
                 {% if "use_public_notes" in user_project_perms %}
                     <!-- Post message -->
-                    {% comment %} hx-post="{% url 'projects-project-detail-conversations-new-partial' project.pk %}"
-                hx-trigger="submit"
-                hx-swap="outerHTML"
-                    hx-target="#conversation-new-container" {% endcomment %}
                     <form class="form editor-form fr-px-3v fr-pr-12w"
                           @submit.prevent="sendFormMessage(message)"
                           enctype="multipart/form-data"
@@ -120,9 +116,9 @@
                                 </div>
                             </template>
                             {% if not is_project_owner %}
-                                {% include "tools/editor.html" with model="message" input_name=posting_form.content.name initial_content=posting_form.content.value|default:'' errors=posting_form.content.errors input_required=True can_add_reco=True next_url_add_reco="projects-project-detail-conversations-new" can_attach_files=True can_attach_contact=True show_send_button=True form_id="conversation-form" placeholder="Écrivez votre message ici. Ajoutez des fichiers, contacts ou une recommandation…" %}
+                                {% include "tools/editor.html" with model="message" input_name=posting_form.content.name initial_content=posting_form.content.value|default:'' errors=posting_form.content.errors input_required=True can_add_reco=True next_url_add_reco="projects-project-detail-conversations" can_attach_files=True can_attach_contact=True show_send_button=True form_id="conversation-form" placeholder="Écrivez votre message ici. Ajoutez des fichiers, contacts ou une recommandation…" %}
                             {% else %}
-                                {% include "tools/editor.html" with model="message" input_name=posting_form.content.name initial_content=posting_form.content.value|default:'' errors=posting_form.content.errors input_required=True can_add_reco=False next_url_add_reco="projects-project-detail-conversations-new" can_attach_files=True can_attach_contact=False show_send_button=True form_id="conversation-form" placeholder="Écrivez votre message ici. Vous pouvez ajouter des fichiers." %}
+                                {% include "tools/editor.html" with model="message" input_name=posting_form.content.name initial_content=posting_form.content.value|default:'' errors=posting_form.content.errors input_required=True can_add_reco=False next_url_add_reco="projects-project-detail-conversations" can_attach_files=True can_attach_contact=False show_send_button=True form_id="conversation-form" placeholder="Écrivez votre message ici. Vous pouvez ajouter des fichiers." %}
                             {% endif %}
                             <input type="hidden" name="contact" :value="message?.contact?.id">
                         </div>

@@ -91,7 +91,7 @@
                                         <p class="fw-normal font-size-14px fr-mb-2w">
                                             Nos conseiller·es vous proposeront tout d'abord un échange de vive voix, puis vous recommanderont des actions à entreprendre dans cet espace.
                                         </p>
-                                        <a href="{% if "view_public_notes" in user_project_perms or "use_public_notes" in user_project_perms %} {% url 'projects-project-detail-conversations-new' project.pk %}{% else %}#{% endif %}"
+                                        <a href="{% if "view_public_notes" in user_project_perms or "use_public_notes" in user_project_perms %} {% url 'projects-project-detail-conversations' project.pk %}{% else %}#{% endif %}"
                                            class="fr-btn"
                                            data-test-id="see-suggest-task-button">Aller à la conversation</a>
                                     </div>
