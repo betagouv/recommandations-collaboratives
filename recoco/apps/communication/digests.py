@@ -529,7 +529,7 @@ def make_msg_digest_by_user_and_project(notifications_qs, user, project, site):
     # msg count and title count
     nodes = [n for notif in notifications_qs for n in notif.action_object.nodes.all()]
     nodes_types = set(node.count_label for node in nodes)
-    if len(nodes_types) > 1:
+    if len(nodes_types) > 1 or next(iter(nodes_types)) == "message":
         msg_count = notifications_qs.count()
         single_type = "message"
         adjective = easy_plural("nouveau", msg_count, "x")
