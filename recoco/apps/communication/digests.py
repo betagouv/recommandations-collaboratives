@@ -31,7 +31,7 @@ from recoco.apps.reminders.api import (
 from recoco.apps.tasks import models as tasks_models
 from recoco.apps.tasks.models import Task
 
-from ..conversations.models import MarkdownNode
+from ..conversations.models import MarkdownNode, RecommendationNode
 from . import constants as communication_constants
 from .api import send_email
 
@@ -526,6 +526,7 @@ def make_msg_digest_by_user_and_project(notifications_qs, user, project, site):
         return nb
 
     md_node_ct = ContentType.objects.get_for_model(MarkdownNode)
+    reco_node_ct = ContentType.objects.get_for_model(RecommendationNode)
 
     # msg count and title count
     nodes = [n for notif in notifications_qs for n in notif.action_object.nodes.all()]
@@ -569,7 +570,9 @@ def make_msg_digest_by_user_and_project(notifications_qs, user, project, site):
         (
             n.action_object
             for n in notifications_qs
-            if n.action_object.nodes.filter(polymorphic_ctype_id=md_node_ct).exists()
+            if n.action_object.nodes.filter(
+                polymorphic_ctype_id__in=[md_node_ct, reco_node_ct]
+            ).exists()
         ),
         None,
     )
@@ -598,7 +601,9 @@ def make_msg_digest_by_user_and_project(notifications_qs, user, project, site):
         first_text = markdownify(
             "\n\n".join(
                 node.text
-                for node in first_text_msg.nodes.filter(polymorphic_ctype_id=md_node_ct)
+                for node in first_text_msg.nodes.filter(
+                    polymorphic_ctype_id__in=[md_node_ct, reco_node_ct]
+                )
             )
         )
     else:
@@ -614,7 +619,7 @@ def make_msg_digest_by_user_and_project(notifications_qs, user, project, site):
         for key, count in aggregated_counts.items()
         if key != "message"
     ]
-    pretty_msg = f"{format_nb(msg_count)} {easy_plural('message', msg_count)}"
+    pretty_msg = f"{format_nb(aggregated_counts['message'])} {easy_plural('message', aggregated_counts['message'])}"
     pretty_intro_count = pretty_msg
     if len(count_objects) > 0:
         pretty_intro_count += f", dont {', '.join(count_objects[:-1])}{' et ' if len(count_objects) > 1 else ''}{count_objects[-1]}"
@@ -625,13 +630,14 @@ def make_msg_digest_by_user_and_project(notifications_qs, user, project, site):
         for index, (key, count) in enumerate(counts_less_recap.items())
         if count > 0 and key != "message"
     ]
-    pretty_remaining_msg = f"{format_nb(msg_count)} {easy_plural('autre', msg_count)} {easy_plural('message', msg_count)}"
+    pretty_remaining_msg = f"{format_nb(counts_less_recap['message'])} {easy_plural('autre', counts_less_recap['message'])} {easy_plural('message', counts_less_recap['message'])}"
     pretty_count_remaining = pretty_remaining_msg
-    pretty_count_remaining += (
-        f", dont {', '.join(count_remaining_elements[:-1])}{' et ' if len(count_remaining_elements) > 1 else ''}{count_remaining_elements[-1]}"
-        if len(count_remaining_elements) > 0
-        else None
-    )
+    if len(count_remaining_elements) > 0:
+        pretty_count_remaining += (
+            f", dont {', '.join(count_remaining_elements[:-1])}{' et ' if len(count_remaining_elements) > 1 else ''}{count_remaining_elements[-1]}"
+            if len(count_remaining_elements) > 0
+            else None
+        )
 
     # counting and formatting 'remaining' sentence
 
