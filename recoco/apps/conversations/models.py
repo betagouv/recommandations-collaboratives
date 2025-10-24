@@ -5,6 +5,7 @@ from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models, transaction
 from django.urls import reverse
 from django.utils.http import urlencode
+from markdownx.utils import markdownify
 from model_utils.models import TimeStampedModel
 from notifications.models import Notification
 from polymorphic.models import PolymorphicModel
@@ -96,12 +97,15 @@ class RecommendationNode(Node, MarkdownTextMixin):
         res = {"type": "recommendation"}
 
         if self.recommendation.resource is None:
-            res = res | {"text": self.text, "title": self.recommendation.intent}
+            res = res | {
+                "text": markdownify(self.text),
+                "title": self.recommendation.intent,
+            }
         else:
             res = res | {
                 "title": self.recommendation.resource.title,
                 "subtitle": self.recommendation.resource.subtitle,
-                "text": self.text,
+                "text": markdownify(self.text),
             }
         return res
 
