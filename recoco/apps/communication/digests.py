@@ -615,7 +615,7 @@ def make_msg_digest_by_user_and_project(notifications_qs, user, project, site):
         if key != "message"
     ]
     pretty_msg = f"{format_nb(msg_count)} {easy_plural('message', msg_count)}"
-    pretty_intro_count = f"{pretty_msg}"
+    pretty_intro_count = pretty_msg
     if len(count_objects) > 0:
         pretty_intro_count += f", dont {', '.join(count_objects[:-1])}{' et ' if len(count_objects) > 1 else ''}{count_objects[-1]}"
 
@@ -623,10 +623,12 @@ def make_msg_digest_by_user_and_project(notifications_qs, user, project, site):
     count_remaining_elements = [
         f"{format_nb(count)} {easy_plural('autre', count) + ' ' if index == 0 else ''}{easy_plural(key, count)}"
         for index, (key, count) in enumerate(counts_less_recap.items())
-        if count > 0
+        if count > 0 and key != "message"
     ]
-    pretty_count_remaining = (
-        f"{', '.join(count_remaining_elements[:-1])}{' et ' if len(count_remaining_elements) > 1 else ''}{count_remaining_elements[-1]}"
+    pretty_remaining_msg = f"{format_nb(msg_count)} {easy_plural('autre', msg_count)} {easy_plural('message', msg_count)}"
+    pretty_count_remaining = pretty_remaining_msg
+    pretty_count_remaining += (
+        f", dont {', '.join(count_remaining_elements[:-1])}{' et ' if len(count_remaining_elements) > 1 else ''}{count_remaining_elements[-1]}"
         if len(count_remaining_elements) > 0
         else None
     )
