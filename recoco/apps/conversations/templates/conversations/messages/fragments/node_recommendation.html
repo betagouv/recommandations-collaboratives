@@ -18,35 +18,35 @@ Parameter Alpine:
          x-init="recommendation = getRecommendationById(node.recommendation_id)"
          class="task-item rounded-3 fr-my-2v">
         <template x-if="recommendation">
-            <div>
-                <p x-html="renderMarkdown(recommendation.content)"></p>
-                <div class="task-item__resource">
-                    <template x-if="recommendation.topic">
-                        <div class="task-item__topic"
-                             :style="{ '--color-topic': stringToColor(recommendation.topic?.name) }">
-                            <span class="task-item__topic-icon"></span>
-                            <p class="task-item__topic-name fr-mb-0"
-                               x-text="recommendation.topic?.name"></p>
-                        </div>
-                    </template>
-                    <template x-if="recommendation.resource">
-                        <h4 class="fr-link">
-                            <a :href="recommendation.resource.web_url"
-                               target="_blank"
-                               @click="trackOpenRessource"
-                               x-text="recommendation.intent"></a>
-                        </h4>
-                    </template>
-                    <template x-if="!recommendation.resource">
-                        <h4 x-text="recommendation.intent"></h4>
-                    </template>
-                    <template x-if="recommendation.resource">
-                        <p class="task-item__resource-subtitle fr-mt-1w fr-mb-0"
-                           x-text="recommendation.resource.subtitle"></p>
-                    </template>
-                    {% include "projects/project/fragments/conversations_new/tasks_status_buttons_js.html" %}
+            <a :href="recommendation.resource.web_url"
+               class="stretched-link"
+               target="_blank"
+               @click="trackOpenRessource">
+                <div>
+                    <p x-html="renderMarkdown(recommendation.content)"></p>
+                    <div class="task-item__resource">
+                        <template x-if="recommendation.topic">
+                            <div class="task-item__topic"
+                                 :style="{ '--color-topic': stringToColor(recommendation.topic?.name) }">
+                                <span class="task-item__topic-icon"></span>
+                                <p class="task-item__topic-name fr-mb-0"
+                                   x-text="recommendation.topic?.name"></p>
+                            </div>
+                        </template>
+                        <template x-if="recommendation.resource">
+                            <h4 class="fr-link" x-text="recommendation.intent"></h4>
+                        </template>
+                        <template x-if="!recommendation.resource">
+                            <h4 x-text="recommendation.intent"></h4>
+                        </template>
+                        <template x-if="recommendation.resource">
+                            <p class="task-item__resource-subtitle fr-mt-1w fr-mb-0"
+                               x-text="recommendation.resource.subtitle"></p>
+                        </template>
+                        {% include "projects/project/fragments/conversations_new/tasks_status_buttons_js.html" %}
+                    </div>
                 </div>
-            </div>
+            </a>
         </template>
     </div>
 </template>

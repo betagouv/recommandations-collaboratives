@@ -10,15 +10,15 @@
             class="button tiny black fw-medium fr-mr-2v fr-font--capitalize"
             :class="(activeStatus(STATUSES.INPROGRESS) || recommendation.status === STATUSES.BLOCKED) && 'bg-blue text-white border-blue pointer-events-none'"
             x-text="statusText(STATUSES.INPROGRESS)"
-            @click.stop="handleStatusClick(STATUSES.INPROGRESS)">En cours</button>
+            @click.stop.prevent="handleStatusClick(STATUSES.INPROGRESS)">En cours</button>
     <button data-test-id="done-status-task-button"
             class="button tiny black fw-medium fr-mr-2v fr-font--capitalize"
             :class="activeStatus(STATUSES.DONE) && 'bg-green-dark text-white border-green-dark pointer-events-none'"
             x-text="statusText(STATUSES.DONE)"
-            @click.stop="handleStatusClick(STATUSES.DONE)">Fait</button>
+            @click.stop.prevent="handleStatusClick(STATUSES.DONE)">Fait</button>
     <button data-test-id="not-interested-status-task-button"
             class="button tiny black fw-medium fr-mr-2v fr-font--capitalize"
             :class="activeStatus(STATUSES.NOT_INTERESTED) && 'bg-grey-dark text-white border-grey-dark pointer-events-none'"
             x-text="statusText(STATUSES.NOT_INTERESTED)"
-            @click.stop="handleStatusClick(STATUSES.NOT_INTERESTED)">Non applicable</button>
+            @click.stop.prevent="handleStatusClick(STATUSES.NOT_INTERESTED)">Non applicable</button>
 </div>
