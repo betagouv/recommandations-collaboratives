@@ -605,7 +605,6 @@ document.addEventListener('alpine:init', () => {
      * Remove contactCard and fileCard nodes from the content
      */
     removeContactCardAndFileCardNodes() {
-      debugger;
       this.currentMessageJSON.content = this.currentMessageJSON.content.filter(
         (node) => node.type !== 'contactCard' && node.type !== 'fileCard'
       );
