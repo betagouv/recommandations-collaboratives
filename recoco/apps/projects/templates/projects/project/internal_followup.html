@@ -22,58 +22,59 @@
     <div class="col-12 fr-mx-auto">
         {% include "projects/project/navigation.html" with internal_followup=True full_page=True %}
         {% include "projects/project/fragments/project_banner/banner_wrapper.html" with part='open' %}
-                    <div class="container-fluid">
-                        <div class="row fr-p-2w">
-                            <div class="col-8">
-                                <div class="flag orange fr-mb-3w d-flex align-items-center justify-content-start">
-                                    <svg class="bi align-middle fr-mr-3w fr-ml-2v"
-                                         width="25"
-                                         height="25"
-                                         fill="currentColor">
-                                        <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#eye-fill" />
-                                    </svg>
-                                    <p class="text-info-custom fr-my-0">
-                                        Seuls les acteurs positionnés sur ce dossier et les équipes de conseil (ex: {{ request.site.name }}) ont accès à cet espace, pas le demandeur.
-                                    </p>
-                                </div>
-                                {% activity_stream "target" project %}
-                                {% regroup stream by timestamp.date as stream_by_day %}
-                                {% if "use_private_notes" in user_project_perms %}
-                                    <hr />
-                                    <form class="form d-flex align-items-end flex-column"
-                                          method="post"
-                                          x-data="{message: {text: '', contact: ''}}"
-                                          action="{% url 'projects-create-note' project.pk %}">
-                                        {% csrf_token %}
-                                        {% include "tools/editor.html" with model="message" can_attach_contact=True input_name=private_note_form.content.name initial_content=private_note_form.content.value|default:'' input_required=True %}
-                                        <label class="visually-hidden" for="input-project-content">{{ private_note_form.content.label }}</label>
-                                        {% for error in private_note_form.content.errors %}<div class="text-danger text-end">{{ error }}</div>{% endfor %}
-                                        <div class="d-flex justify-content-end fr-mt-2v">
-                                            <button x-data
-                                                    data-test-id="submit-message-button-on-advisor-space"
-                                                    :disabled="$store.editor.currentMessage === ''"
-                                                    class="fr-btn"
-                                                    type="submit">Enregistrer</button>
-                                        </div>
-                                        <input type="hidden"
-                                               name="{{ private_note_form.contact.name }}"
-                                               :value="message.contact.id">
-                                    </form>
-                                {% endif %}
-                                {% include "projects/project/fragments/private_conversation.html" with reversed=True %}
-                            </div>
-                            <div class="col-4">
-                                <h5>Équipe de suivi</h5>
-                                <ul class="d-flex flex-column list-unstyled fr-mb-0">
-                                    {% for advisor in project.switchtender_sites.all %}
-                                        {% if advisor.switchtender.is_active %}
-                                            <li>{% include "user/user_card.html" with user=advisor.switchtender user_activity=True %}</li>
-                                        {% endif %}
-                                    {% endfor %}
-                                </ul>
-                            </div>
-                        </div>
+        <div class="container-fluid">
+            <div class="row fr-p-2w">
+                <div class="col-8">
+                    <div class="flag orange fr-mb-3w d-flex align-items-center justify-content-start">
+                        <svg class="bi align-middle fr-mr-3w fr-ml-2v"
+                             width="25"
+                             height="25"
+                             fill="currentColor">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#eye-fill" />
+                        </svg>
+                        <p class="text-info-custom fr-my-0">
+                            Seuls les acteurs positionnés sur ce dossier et les équipes de conseil (ex: {{ request.site.name }}) ont accès à cet espace, pas le demandeur.
+                        </p>
                     </div>
+                    {% activity_stream "target" project %}
+                    {% regroup stream by timestamp.date as stream_by_day %}
+                    {% if "use_private_notes" in user_project_perms %}
+                        <hr />
+                        <form class="form d-flex align-items-end flex-column"
+                              method="post"
+                              x-data="{message: {text: '', contact: ''}}"
+                              action="{% url 'projects-create-note' project.pk %}">
+                            {% csrf_token %}
+                            {% include "tools/editor.html" with model="message" can_attach_contact=True input_name=private_note_form.content.name initial_content=private_note_form.content.value|default:'' input_required=True %}
+                            <label class="visually-hidden" for="input-project-content">{{ private_note_form.content.label }}</label>
+                            {% for error in private_note_form.content.errors %}<div class="text-danger text-end">{{ error }}</div>{% endfor %}
+                            <div class="d-flex justify-content-end fr-mt-2v">
+                                <button x-data
+                                        data-test-id="submit-message-button-on-advisor-space"
+                                        @click="$store.editor.removeContactCardAndFileCardNodes()"
+                                        :disabled="$store.editor.currentMessage === ''"
+                                        class="fr-btn"
+                                        type="submit">Enregistrer</button>
+                            </div>
+                            <input type="hidden"
+                                   name="{{ private_note_form.contact.name }}"
+                                   :value="message.contact.id">
+                        </form>
+                    {% endif %}
+                    {% include "projects/project/fragments/private_conversation.html" with reversed=True %}
+                </div>
+                <div class="col-4">
+                    <h5>Équipe de suivi</h5>
+                    <ul class="d-flex flex-column list-unstyled fr-mb-0">
+                        {% for advisor in project.switchtender_sites.all %}
+                            {% if advisor.switchtender.is_active %}
+                                <li>{% include "user/user_card.html" with user=advisor.switchtender user_activity=True %}</li>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
         {% include "projects/project/fragments/project_banner/banner_wrapper.html" with part='close' %}
     </div>
 {% endblock project_detail %}
