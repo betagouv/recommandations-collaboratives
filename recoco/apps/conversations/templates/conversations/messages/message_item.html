@@ -18,18 +18,20 @@
         </template>
         <template x-if="!element.deleted">
             <template x-for="node in element.nodes">
-                <template x-if="node.type == 'MarkdownNode'">
-                    {% include "conversations/messages/fragments/node_markdown.html" %}
-                </template>
-                <template x-if="node.type == 'ContactNode'">
-                    {% include "conversations/messages/fragments/node_contact.html" %}
-                </template>
-                <template x-if="node.type == 'DocumentNode'">
-                    {% include "conversations/messages/fragments/node_document.html" %}
-                </template>
-                <template x-if="node.type == 'RecommendationNode'">
-                    {% include "conversations/messages/fragments/node_recommendation.html" %}
-                </template>
+                <div>
+                    <template x-if="node.type == 'MarkdownNode'">
+                        {% include "conversations/messages/fragments/node_markdown.html" %}
+                    </template>
+                    <template x-if="node.type == 'ContactNode'">
+                        {% include "conversations/messages/fragments/node_contact.html" %}
+                    </template>
+                    <template x-if="node.type == 'DocumentNode'">
+                        {% include "conversations/messages/fragments/node_document.html" %}
+                    </template>
+                    <template x-if="node.type == 'RecommendationNode'">
+                        {% include "conversations/messages/fragments/node_recommendation.html" %}
+                    </template>
+                </div>
             </template>
         </template>
         <template x-if="element.posted_by && messagesParticipants.length > 0">
