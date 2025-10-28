@@ -68,9 +68,6 @@ class Message(TimeStampedModel):
 
 
 class Node(PolymorphicModel):
-    class Meta:
-        unique_together = ("position", "message")
-
     position = models.PositiveIntegerField()
     message = models.ForeignKey(Message, on_delete=models.CASCADE, related_name="nodes")
 
