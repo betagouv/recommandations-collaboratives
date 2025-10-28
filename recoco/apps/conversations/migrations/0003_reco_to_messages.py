@@ -64,7 +64,7 @@ def create_messages_from_recommendations(apps, schema_editor):
                     )
 
                     MarkdownNode.objects.create(
-                        message=msg, position=1, text=followup.comment
+                        message=foll_msg, position=1, text=followup.comment
                     )
 
                     if followup.contact:
