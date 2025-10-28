@@ -739,7 +739,7 @@ def send_digest_by_user(
     """
     project_ct = ContentType.objects.get_for_model(projects_models.Project)
 
-    if not queryset:
+    if queryset is None:
         notifications = (
             user.notifications(manager="on_site")
             .filter(target_content_type=project_ct)
