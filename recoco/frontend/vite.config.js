@@ -86,6 +86,7 @@ const config = {
         pageInvitation: resolve('./src/js/apps/pageInvitation.js'),
         idbObjectStoreMgmt: resolve('./src/js/store/idbObjectStoreMgmt.js'),
         actionPusher: resolve('./src/js/apps/actionPusher.js'),
+        NewFeatureBanner: resolve('./src/js/components/NewFeatureBanner.js'),
       },
       output: {
         chunkFileNames: undefined,

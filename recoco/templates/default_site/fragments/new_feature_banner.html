@@ -1,0 +1,20 @@
+{% load django_vite %}
+{% vite_asset 'js/components/NewFeatureBanner.js' %}
+<div x-data="NewFeatureBanner"
+     class="fr-notice fr-notice--info fr-notice--no-icon"
+     x-show="shouldShow">
+    <div class="fr-container">
+        <div class="fr-notice__body">
+            <div class="fr-icon-info-fill fr-mr-1w"></div>
+            <p>
+                <span class="fr-notice__title">Nouvelle fonctionnalité</span>
+                <span class="fr-notice__desc">Refonte de l'espace conversation permet d'envoyer des contacts, des fichiers et des recommandations dans une espace de discussion.</span>
+                {% comment %} <a title="Lien de consultation - nouvelle fenêtre" href="#" target="_blank" rel="noopener external" class="fr-notice__link">Lien de consultation</a> {% endcomment %}
+            </p>
+            <button title="Masquer le message"
+                    @click="hide()"
+                    type="button"
+                    class="fr-btn--close fr-btn">Masquer le message</button>
+        </div>
+    </div>
+</div>
