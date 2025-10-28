@@ -80,7 +80,7 @@ def create_public_note(request, project_id=None):
             )
 
     if request.POST.get("new", None):
-        url = reverse("projects-project-detail-conversations-new", args=[project_id])
+        url = reverse("projects-project-detail-conversations", args=[project_id])
         return redirect(
             f"{url}?{urlencode({'topic-slug': slugify(topic_name or 'general'), 'topic-name': topic_name})}"
         )

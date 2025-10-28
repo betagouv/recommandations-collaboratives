@@ -623,7 +623,7 @@ class TestMsgDigest:
         # project's digest should be tested else where
         del digest["project"]
         assert digest["message_url"].startswith(
-            f"https://example.com/project/{project_ready.id}/conversations-new?message-id={msg1.id}"
+            f"https://example.com/project/{project_ready.id}/conversations?message-id={msg1.id}"
         )
         del digest["message_url"]
         assert digest == expected
