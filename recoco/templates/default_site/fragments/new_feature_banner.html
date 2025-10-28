@@ -6,10 +6,16 @@
     <div class="fr-container">
         <div class="fr-notice__body">
             <div class="fr-icon-info-fill fr-mr-1w"></div>
-            <p>
-                <span class="fr-notice__title">Nouvelle fonctionnalité</span>
-                <span class="fr-notice__desc">Refonte de l'espace conversation permet d'envoyer des contacts, des fichiers et des recommandations dans une espace de discussion.</span>
-                {% comment %} <a title="Lien de consultation - nouvelle fenêtre" href="#" target="_blank" rel="noopener external" class="fr-notice__link">Lien de consultation</a> {% endcomment %}
+            <p class="w-100">
+                <span class="fr-notice__title">Nouveau</span>
+                <span class="fr-notice__desc">La conversation a changé ! Vous y retrouverez recommandations, fichiers et contacts.
+                    <br />
+                    <a title="Lien de consultation - nouvelle fenêtre"
+                       href="https://reco-co.gitbook.io/reco-co/la-conversation-riche"
+                       target="_blank"
+                       rel="noopener external"
+                       class="fr-notice__link">Apprenez-en plus ici</a>
+                ou utilisez le chat pour de l'aide (en bas à droite de l'écran).</span>
             </p>
             <button title="Masquer le message"
                     @click="hide()"
