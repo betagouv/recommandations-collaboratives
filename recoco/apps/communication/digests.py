@@ -17,6 +17,7 @@ from django.contrib.sites.models import Site
 from django.db.models.query import QuerySet
 from django.urls import reverse
 from django_gravatar.helpers import get_gravatar_url
+from markdownx.utils import markdownify
 
 from recoco import utils, verbs
 from recoco.apps.home.models import SiteConfiguration
@@ -30,7 +31,7 @@ from recoco.apps.reminders.api import (
 from recoco.apps.tasks import models as tasks_models
 from recoco.apps.tasks.models import Task
 
-from ..conversations.models import MarkdownNode
+from ..conversations.models import MarkdownNode, RecommendationNode
 from . import constants as communication_constants
 from .api import send_email
 
@@ -525,11 +526,12 @@ def make_msg_digest_by_user_and_project(notifications_qs, user, project, site):
         return nb
 
     md_node_ct = ContentType.objects.get_for_model(MarkdownNode)
+    reco_node_ct = ContentType.objects.get_for_model(RecommendationNode)
 
     # msg count and title count
     nodes = [n for notif in notifications_qs for n in notif.action_object.nodes.all()]
     nodes_types = set(node.count_label for node in nodes)
-    if len(nodes_types) > 1:
+    if len(nodes_types) > 1 or next(iter(nodes_types)) == "message":
         msg_count = notifications_qs.count()
         single_type = "message"
         adjective = easy_plural("nouveau", msg_count, "x")
@@ -568,7 +570,9 @@ def make_msg_digest_by_user_and_project(notifications_qs, user, project, site):
         (
             n.action_object
             for n in notifications_qs
-            if n.action_object.nodes.filter(polymorphic_ctype_id=md_node_ct).exists()
+            if n.action_object.nodes.filter(
+                polymorphic_ctype_id__in=[md_node_ct, reco_node_ct]
+            ).exists()
         ),
         None,
     )
@@ -594,9 +598,13 @@ def make_msg_digest_by_user_and_project(notifications_qs, user, project, site):
     counts_less_recap = aggregated_counts.copy()
     if first_text_msg:
         counts_less_recap["message"] -= 1
-        first_text = "\n".join(
-            node.text
-            for node in first_text_msg.nodes.filter(polymorphic_ctype_id=md_node_ct)
+        first_text = markdownify(
+            "\n\n".join(
+                node.text
+                for node in first_text_msg.nodes.filter(
+                    polymorphic_ctype_id__in=[md_node_ct, reco_node_ct]
+                )
+            )
         )
     else:
         first_text = None
@@ -611,8 +619,8 @@ def make_msg_digest_by_user_and_project(notifications_qs, user, project, site):
         for key, count in aggregated_counts.items()
         if key != "message"
     ]
-    pretty_msg = f"{format_nb(msg_count)} {easy_plural('message', msg_count)}"
-    pretty_intro_count = f"{pretty_msg}"
+    pretty_msg = f"{format_nb(aggregated_counts['message'])} {easy_plural('message', aggregated_counts['message'])}"
+    pretty_intro_count = pretty_msg
     if len(count_objects) > 0:
         pretty_intro_count += f", dont {', '.join(count_objects[:-1])}{' et ' if len(count_objects) > 1 else ''}{count_objects[-1]}"
 
@@ -620,13 +628,16 @@ def make_msg_digest_by_user_and_project(notifications_qs, user, project, site):
     count_remaining_elements = [
         f"{format_nb(count)} {easy_plural('autre', count) + ' ' if index == 0 else ''}{easy_plural(key, count)}"
         for index, (key, count) in enumerate(counts_less_recap.items())
-        if count > 0
+        if count > 0 and key != "message"
     ]
-    pretty_count_remaining = (
-        f"{', '.join(count_remaining_elements[:-1])}{' et ' if len(count_remaining_elements) > 1 else ''}{count_remaining_elements[-1]}"
-        if len(count_remaining_elements) > 0
-        else None
-    )
+    pretty_remaining_msg = f"{format_nb(counts_less_recap['message'])} {easy_plural('autre', counts_less_recap['message'])} {easy_plural('message', counts_less_recap['message'])}"
+    pretty_count_remaining = pretty_remaining_msg
+    if len(count_remaining_elements) > 0:
+        pretty_count_remaining += (
+            f", dont {', '.join(count_remaining_elements[:-1])}{' et ' if len(count_remaining_elements) > 1 else ''}{count_remaining_elements[-1]}"
+            if len(count_remaining_elements) > 0
+            else None
+        )
 
     # counting and formatting 'remaining' sentence
 
@@ -679,7 +690,10 @@ def send_digest_for_non_switchtender_by_user(user, dry_run=False):
     queryset = (
         user.notifications(manager="on_site")
         .filter(target_content_type=project_ct)
-        .exclude(target_content_type=project_ct, verb=verbs.Recommendation.CREATED)
+        .exclude(
+            target_content_type=project_ct,
+            verb__in=[verbs.Recommendation.CREATED, verbs.Conversation.POST_MESSAGE],
+        )
         .unsent()
         .unread()
     )
@@ -700,7 +714,9 @@ def send_digest_for_switchtender_by_user(user, dry_run=False):
     queryset = (
         user.notifications(manager="on_site")
         .filter(target_content_type=project_ct)
-        .exclude(verb=verbs.Recommendation.CREATED)
+        .exclude(
+            verb__in=[verbs.Recommendation.CREATED, verbs.Conversation.POST_MESSAGE]
+        )
         .unsent()
         .unread()
     )
@@ -728,7 +744,7 @@ def send_digest_by_user(
     """
     project_ct = ContentType.objects.get_for_model(projects_models.Project)
 
-    if not queryset:
+    if queryset is None:
         notifications = (
             user.notifications(manager="on_site")
             .filter(target_content_type=project_ct)
