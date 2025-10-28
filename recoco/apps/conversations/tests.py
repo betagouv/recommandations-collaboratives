@@ -257,7 +257,7 @@ def test_post_message_with_document(project_ready, request, client, project_edit
     assert doc.attached_object == message
     assert (
         doc.attached_object.get_absolute_url()
-        == f"/project/{project_ready.pk}/conversations-new?message-id={message.pk}"
+        == f"/project/{project_ready.pk}/conversations?message-id={message.pk}"
     )
 
 

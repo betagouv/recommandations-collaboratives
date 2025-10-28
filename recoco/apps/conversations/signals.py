@@ -76,6 +76,9 @@ def delete_message_on_reco_delete(sender, instance, **kwargs):
     if instance.deleted is None:
         return
 
+    if not instance.pk:
+        return
+
     for node in RecommendationNode.objects.filter(recommendation=instance):
         node.message.soft_delete()
 
