@@ -59,7 +59,9 @@
 }
 
 .tiptap p.is-editor-empty:first-child::before {
-  color: #adb5bd;
+  color: #666;
+  font-style: italic;
+  opacity: 1;
   content: attr(data-placeholder);
   float: left;
   height: 0;

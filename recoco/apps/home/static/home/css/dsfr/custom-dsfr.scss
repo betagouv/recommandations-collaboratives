@@ -86,8 +86,11 @@ a {
   INPUTS
 \* ˍˍˍˍ */
 
-.fr-input::placeholder {
-  color: #acacac;
+.fr-input::placeholder,
+.fr-textarea::placeholder {
+  color: var(--text-mention-grey);
+  font-style: italic;
+  opacity: 1;
 }
 
 /* ¯¯¯¯ *\
