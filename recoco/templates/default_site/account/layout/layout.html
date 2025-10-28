@@ -56,12 +56,6 @@
             {% endblock layout_content %}
         </div>
     </div>
-    {% if layout_secondary_content %}
-        <div class="container__form d-flex justify-content-center">
-            <div class="layout__form">
-                {% block layout_secondary_content %}
-                {% endblock layout_secondary_content %}
-            </div>
-        </div>
-    {% endif %}
+    {% block layout_secondary_content %}
+    {% endblock layout_secondary_content %}
 </div>

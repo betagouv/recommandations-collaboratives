@@ -55,7 +55,6 @@ Alpine.data('editor', (content, placeholder, isActionPusher = false) => {
         onCreate({ editor }) {
           _this.$store.editor.currentMessage = editor.getMarkdown();
           _this.$store.editor.currentMessageJSON = editor.getJSON();
-          console.log(editor.getJSON());
           if (isActionPusher) {
             const jsonContent = editor.getJSON();
             const newContent = { type: 'doc', content: [] };
@@ -185,7 +184,6 @@ Alpine.data('editor', (content, placeholder, isActionPusher = false) => {
       editor.chain().focus().unsetLink().run();
     },
     setMarkdownContent(event) {
-      console.log('setMarkdownContent', event);
       editor.commands.setContent(event.detail.text);
       if (event.detail.contact) {
         this.selectedContact = event.detail.contact;
@@ -226,8 +224,6 @@ Alpine.data('editor', (content, placeholder, isActionPusher = false) => {
     },
     insertContactCard(contact) {
       if (editor && contact) {
-        console.log('Inserting contact card:', contact);
-
         const contactAttributes = {
           id: contact.id,
           firstName: contact.first_name,
@@ -240,8 +236,6 @@ Alpine.data('editor', (content, placeholder, isActionPusher = false) => {
           modified: contact.modified,
           created: contact.created,
         };
-
-        console.log('Contact attributes:', contactAttributes);
 
         editor.chain().focus().insertContactCard(contactAttributes).run();
 
@@ -287,8 +281,6 @@ Alpine.data('editor', (content, placeholder, isActionPusher = false) => {
 
         // Insérer la carte de fichier dans l'éditeur
         if (editor) {
-          console.log('Inserting file card for:', file.name);
-
           const fileAttributes = {
             fileName: file.name,
             fileSize: file.size,
@@ -297,15 +289,12 @@ Alpine.data('editor', (content, placeholder, isActionPusher = false) => {
             file: file,
           };
 
-          console.log('File attributes:', fileAttributes);
-
           try {
             const result = editor
               .chain()
               .focus()
               .insertFileCard(fileAttributes)
               .run();
-            console.log('Insert result:', result);
           } catch (error) {
             console.error('Error inserting file card:', error);
             console.error('Error stack:', error.stack);

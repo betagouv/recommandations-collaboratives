@@ -5,7 +5,6 @@ Alpine.store('idbObjectStoreMgmt', {
   async init() {
     const db = await openDB('Conversations', 2, {
       upgrade(db, oldVersion) {
-        debugger;
         // Delete the old store if it exists
         if (db.objectStoreNames.contains('files')) {
           db.deleteObjectStore('files');

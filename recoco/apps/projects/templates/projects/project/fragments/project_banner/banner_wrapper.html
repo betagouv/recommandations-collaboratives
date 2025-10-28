@@ -1,0 +1,37 @@
+{% if project.inactive_since %}
+    {% if part == 'open' %}
+        <div class="specific-border-4pxsolid1e1e1e">
+            {% include "projects/project/fragments/project_banner/paused_project_banner.html" %}
+            <div>
+    {% elif part == 'close' %}
+            </div>
+        </div>
+    {% endif %}
+{% elif project.status == 'REJECTED' %}
+    {% if part == 'open' %}
+        <div class="specific-border-4pxsolid1e1e1e">
+            {% include "projects/project/fragments/project_banner/deleted_project_banner.html" %}
+            <div class="no-interaction-possible">
+    {% elif part == 'close' %}
+            </div>
+        </div>
+    {% endif %}
+{% elif project.status == 'DRAFT' %}
+    {% if part == 'open' %}
+        <div class="specific-border-4pxsolid000091">
+            {% include "projects/project/fragments/project_banner/non_published_project_banner.html" %}
+    {% elif part == 'close' %}
+        </div>
+    {% endif %}
+{% elif not advising and is_regional_actor and not is_staff %}
+    {% if part == 'open' %}
+        <div x-data
+                x-init="$nextTick(() => $store.showRole.init())"
+                class="specific-border-4pxsolid000091">
+            {% include "projects/project/fragments/project_banner/join_project_banner.html" %}
+            <div>
+    {% elif part == 'close' %}
+            </div>
+        </div>
+    {% endif %}
+{% endif %}

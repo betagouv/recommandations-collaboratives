@@ -20,14 +20,7 @@
     {% get_obj_perms request.user for request.site as "user_site_perms" %}
     {% get_obj_perms request.user for project as "user_project_perms" %}
     {% include "projects/project/navigation.html" with files_links=True %}
-    {% if project.inactive_since != None %}
-        <div class="specific-border-4pxsolid1e1e1e">
-            {% include "projects/project/fragments/project_banner/paused_project_banner.html" %}
-            <div>
-            {% elif project.status == 'DRAFT' %}
-                <div class="specific-border-4pxsolid000091">
-                    {% include "projects/project/fragments/project_banner/non_published_project_banner.html" %}
-                {% endif %}
+    {% include "projects/project/fragments/project_banner/banner_wrapper.html" with part='open' %}
                 <div class="fr-p-3w">
                     <div class="row">
                         <div class="col-8">
@@ -41,10 +34,9 @@
                                 {% if "manage_documents" in user_project_perms %}
                                     <button class="fr-btn fr-btn--sm fr-btn--secondary"
                                             aria-describedby="tooltip-add-file">Ajouter un fichier</button>
-                                    <span class="fr-tooltip fr-placement fr-placement-bottom fr-text--xs"
+                                    <span class="fr-tooltip fr-placement fr-placement-bottom fr-text--xs z-1001"
                                           role="tooltip"
-                                          id="tooltip-add-file"
-                                          style="z-index: 1001">
+                                          id="tooltip-add-file">
                                         L'ajout de nouveaux fichiers se fait <a class="fr-link fr-text--xs fr-text--bold"
     href="{% url 'projects-project-detail-conversations' project.pk %}">dans la conversation</a>.
                                     </span>
@@ -110,10 +102,5 @@
                         </div>
                     </div>
                 </div>
-                {% if project.inactive_since != None %}
-                </div>
-            </div>
-        {% elif project.status == 'DRAFT' %}
-        </div>
-    {% endif %}
+                {% include "projects/project/fragments/project_banner/banner_wrapper.html" with part='close' %}
 {% endblock project_detail %}
