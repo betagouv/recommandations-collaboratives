@@ -76,13 +76,11 @@ Parameters:
         </div>
     </template>
     <div class="position-relative">
-        {% if can_compress_editor %}
+        {% comment %} {% if can_compress_editor %}
             <div class="button-attachment-container">
-                <button class="fr-btn fr-btn--sm fr-icon-attachment-2"
-                        type="button"
-                        @click.stop="onClickHandleAttachment">Rédiger avec une pièce jointe</button>
+                <button class="fr-btn fr-btn--sm fr-icon-attachment-2" type="button" @click.stop="onClickHandleAttachment">Rédiger avec une pièce jointe</button>
             </div>
-        {% endif %}
+        {% endif %} {% endcomment %}
         <div class="tiptap-editor {% if wide %}is-wide{% endif %}"
              data-test-id="tiptap-editor-content"
              x-ref="element"
