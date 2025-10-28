@@ -13,7 +13,6 @@ from django.conf import settings
 from django.contrib.auth import models as auth_models
 from django.contrib.sites.models import Site
 from django.core.management.base import BaseCommand
-from django.db.models import Q
 
 from recoco.apps.communication import digests
 from recoco.apps.projects import models as project_models
@@ -79,17 +78,6 @@ class Command(BaseCommand):
                         logger.info(
                             f"Sent new reco digest for {user} on {project.name}"
                         )
-
-        # Message digests
-        logger.info("** Sending message digests **")
-        for project in project_models.Project.on_site.all():
-            members_or_switchtenders = Q(projectmember__project=project) | Q(
-                projects_switchtended_per_site__project=project
-            )
-            for user in user_qs.filter(members_or_switchtenders).distinct():
-                digests.send_msg_digest_by_user_and_project(
-                    project, user, site, dry_run
-                )
 
         # Digests for non switchtenders
         logger.info("** Sending general digests **")

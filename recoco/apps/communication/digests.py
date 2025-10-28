@@ -690,7 +690,10 @@ def send_digest_for_non_switchtender_by_user(user, dry_run=False):
     queryset = (
         user.notifications(manager="on_site")
         .filter(target_content_type=project_ct)
-        .exclude(target_content_type=project_ct, verb=verbs.Recommendation.CREATED)
+        .exclude(
+            target_content_type=project_ct,
+            verb__in=[verbs.Recommendation.CREATED, verbs.Conversation.POST_MESSAGE],
+        )
         .unsent()
         .unread()
     )
@@ -711,7 +714,9 @@ def send_digest_for_switchtender_by_user(user, dry_run=False):
     queryset = (
         user.notifications(manager="on_site")
         .filter(target_content_type=project_ct)
-        .exclude(verb=verbs.Recommendation.CREATED)
+        .exclude(
+            verb__in=[verbs.Recommendation.CREATED, verbs.Conversation.POST_MESSAGE]
+        )
         .unsent()
         .unread()
     )
