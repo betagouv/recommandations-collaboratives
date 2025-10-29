@@ -50,5 +50,19 @@
             "division": "Un service",
             "organization": 1
         }
+    },
+    {
+        "model": "addressbook.contact",
+        "pk": 4,
+        "fields": {
+            "site": 1,
+            "first_name": "contact",
+            "last_name": "à supprimer",
+            "phone_no": "1234567890",
+            "mobile_no": "",
+            "email": "supprime-ce@contact.fr",
+            "division": "Un service",
+            "organization": 1
+        }
     }
 ]
