@@ -34,6 +34,7 @@ def create_messages_from_recommendations(apps, schema_editor):
                     posted_by_id=task.created_by_id or anonymous_user.pk,
                     created=task.created_on,
                     modified=task.updated_on,
+                    deleted=task.deleted,
                 )
                 prev_node = RecommendationNode.objects.create(
                     message=msg, position=1, text=task.content, recommendation=task

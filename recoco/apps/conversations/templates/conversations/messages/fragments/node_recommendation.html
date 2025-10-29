@@ -18,7 +18,7 @@ Parameter Alpine:
          x-init="recommendation = getRecommendationById(node.recommendation_id)"
          class="task-item rounded-3 fr-my-2v">
         <template x-if="recommendation">
-            <a :href="recommendation.resource.web_url"
+            <a :href="recommendation?.resource?.web_url"
                class="stretched-link"
                target="_blank"
                @click="trackOpenRessource">
