@@ -39,8 +39,13 @@ class Command(BaseCommand):
         old_projects = (
             project_models.Project.objects.filter(inactive_since=None)
             .exclude(created_on__gt=twelve_months_ago)
+            .prefetch_related("members")
             .annotate(last_log=Max("members__last_login"))
             .filter(Q(last_log__lte=twelve_months_ago) | Q(last_log=None))
+            .filter(
+                Q(last_manual_reactivation__lte=twelve_months_ago)
+                | Q(last_manual_reactivation=None)
+            )
         )
 
         if dry_run:
