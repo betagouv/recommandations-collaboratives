@@ -30,6 +30,7 @@
     {{ request.user.id|json_script:"djangoCurrentUserId" }}
     {{ request.user.profile.organization.name|json_script:"djangoCurrentUserOrganizationName" }}
     {{ request.user.profile.organization_position|json_script:"djangoCurrentUserOrganizationPosition" }}
+    {{ recipients|json_script:"djangoRecipients" }}
     {% include "projects/project/navigation.html" with conversations_new=True %}
     {% include "projects/project/fragments/project_banner/banner_wrapper.html" with part="open" %}
     {% regroup feed by topic as topic_list %}
