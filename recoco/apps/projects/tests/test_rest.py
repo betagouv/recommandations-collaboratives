@@ -7,11 +7,14 @@ authors: raphael.marvie@beta.gouv.fr, guillaume.libersat@beta.gouv.fr
 created: 2021-06-01 10:11:56 CEST
 """
 
+from datetime import datetime
+
 import pytest
 from actstream.models import user_stream
 from django.contrib.auth import models as auth_models
 from django.contrib.sites import models as sites_models
 from django.contrib.sites.shortcuts import get_current_site
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
@@ -25,6 +28,8 @@ from recoco.apps.tasks import models as tasks_models
 from recoco.utils import login
 
 from .. import models, utils
+from ..models import Document
+from ..utils import assign_advisor
 
 ########################################################################
 # list of projects
@@ -1140,6 +1145,70 @@ def test_topics_are_restricted_to_nonexistent_via_rest_api(request, api_client):
 
     assert response.status_code == 200
     assert len(response.data.get("results")) == 0
+
+
+########################################################################
+# REST API: document upload
+########################################################################
+
+
+@pytest.mark.django_db
+def test_doc_upload(project_ready, project_editor, client):
+    url = reverse("projects-documents-list", args=[project_ready.pk])
+
+    png = SimpleUploadedFile("img.png", b"file_content", content_type="image/png")
+    data = {"description": "this is some content", "the_file": png}
+
+    client.force_login(project_editor)
+    res = client.post(url, data)
+
+    assert res.status_code == 201
+    assert res.data["id"] is not None
+    assert Document.objects.filter(pk=res.data["id"]).exists()
+    # send signal..?
+
+
+@pytest.fixture
+def inactive_project(request, make_project):
+    yield make_project(inactive_since=datetime.today())
+
+
+@pytest.mark.django_db
+def test_doc_upload_reactivates_project(project_editor, inactive_project, client):
+    url = reverse("projects-documents-list", args=[inactive_project.pk])
+    inactive_project.members.add(project_editor)
+    assign_perm("projects.view_public_notes", project_editor, inactive_project)
+    assign_perm("projects.use_public_notes", project_editor, inactive_project)
+
+    png = SimpleUploadedFile("img.png", b"file_content", content_type="image/png")
+    data = {"description": "this is some content", "the_file": png}
+
+    client.force_login(project_editor)
+    res = client.post(url, data)
+
+    assert res.status_code == 201
+    inactive_project.refresh_from_db()
+    assert inactive_project.inactive_since is None
+
+
+@pytest.mark.django_db
+def test_doc_upload_by_advisors_lets_projects_unactivated(
+    current_site, project_editor, inactive_project, client
+):
+    url = reverse("projects-documents-list", args=[inactive_project.pk])
+    assign_advisor(project_editor, inactive_project)
+    assign_perm("projects.view_public_notes", project_editor, inactive_project)
+    assign_perm("projects.use_public_notes", project_editor, inactive_project)
+
+    png = SimpleUploadedFile("img.png", b"file_content", content_type="image/png")
+    data = {"description": "this is some content", "the_file": png}
+
+    client.force_login(project_editor)
+    res = client.post(url, data)
+
+    assert res.status_code == 201
+    inactive_project.refresh_from_db()
+    assert inactive_project.inactive_since is not None
 
 
 # eof

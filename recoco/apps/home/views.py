@@ -58,8 +58,8 @@ class LoginRedirectView(View):
 
         projects = request.session.get("projects", None)
 
-        if projects:
-            return redirect("projects-project-detail-actions", projects[0]["id"])
+        if projects is not None and len(projects) > 0:
+            return redirect("projects-project-detail-conversations", projects[0]["id"])
 
         return redirect("home")
 

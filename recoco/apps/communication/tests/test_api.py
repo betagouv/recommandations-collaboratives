@@ -12,12 +12,14 @@ import test  # noqa
 import pytest
 from django.contrib.auth import models as auth
 from django.contrib.sites.shortcuts import get_current_site
+from django.test import override_settings
 from model_bakery import baker
 from model_bakery.recipe import Recipe
 from recoco.apps.home import models as home_models
 from recoco.apps.projects import models as projects_models
 
 from .. import api, brevo, models
+from ..api import send_email
 
 
 @pytest.mark.django_db
@@ -260,3 +262,46 @@ def test_send_brevo_email_use_overrided_template(mocker, request):
         },
         test=False,
     )
+
+
+@override_settings(
+    BREVO_FORCE_DEBUG=True, DEBUG=True, DEBUG_EMAIL_WHITELIST=["superadmin@recoco.fr"]
+)
+def test_use_debug_filter(mocker):
+    brevo_mock = mocker.patch("recoco.apps.communication.api.brevo_email")
+    debug_mock = mocker.patch("recoco.apps.communication.api.send_debug_email")
+    args = ("a template",)
+    kwargs = {
+        "params": "params",
+        "test": "test",
+        "related": "related",
+    }
+    white_listed_recipient = {"name": "admin", "email": "superadmin@recoco.fr"}
+    random_recipient = "randomuser@recoco.fr"
+    send_email(*args, [white_listed_recipient, random_recipient], **kwargs)
+    # the assertion depends on giving args as args or kwargs, and it shouldn't need to be
+    brevo_mock.assert_called_with(*args, [white_listed_recipient], **kwargs)
+    debug_mock.assert_called_with(
+        *args,
+        [random_recipient],
+        **kwargs,
+    )
+
+
+@override_settings(
+    BREVO_FORCE_DEBUG=True, DEBUG=True, DEBUG_EMAIL_WHITELIST=["superadmin@recoco.fr"]
+)
+def test_use_debug_filter_single_recipient(mocker):
+    brevo_mock = mocker.patch("recoco.apps.communication.api.brevo_email")
+    debug_mock = mocker.patch("recoco.apps.communication.api.send_debug_email")
+    args = ("a template",)
+    kwargs = {
+        "params": "params",
+        "test": "test",
+        "related": "related",
+    }
+    white_listed_recipient = {"name": "admin", "email": "superadmin@recoco.fr"}
+    send_email(*args, white_listed_recipient, **kwargs)
+    # the assertion depends on giving args as args or kwargs, and it shouldn't need to be
+    brevo_mock.assert_called_with(*args, [white_listed_recipient], **kwargs)
+    debug_mock.assert_not_called()

@@ -1,31 +1,37 @@
-<div class="w-100">
+<div class="w-100 fr-mb-5v">
     <div class="d-flex align-items-center justify-content-between w-100">
         <template x-if="$store.djangoData.canManageTasks">
             <div class="d-flex align-items-center w-100 justify-content-between">
-                <div class="d-flex flex-column">
-                    {% include "projects/project/fragments/tasks_inline_kanban/tasks_inline_kanban_tasks_count.html" %}
+                <div class="d-flex">
+                    <div class="d-flex fr-mr-3w">
+                        {% include "projects/project/fragments/tasks_inline_kanban/tasks_inline_kanban_tasks_count.html" %}
+                    </div>
                     {% if embed_view is not True %}
-                        <div>
-                            <a data-test-id="create-task-button"
-                               href="{% url 'projects-create-task' %}?project_id={{ project.pk }}"
-                               class="fr-btn fr-btn--sm">Créer une recommandation</a>
-                            <a href="{% url 'projects-project-tasks-suggest' project.pk %}"
-                               class="fr-btn fr-btn--secondary fr-btn--sm"
-                               data-test-id="see-suggest-task-button">Examiner les ressources suggérées</a>
-                        </div>
+                        {% include "projects/project/fragments/tasks_inline_kanban/tasks_inline_kanban_switcher.html" %}
                     {% endif %}
                 </div>
-                {% if embed_view is not True %}
-                    {% include "projects/project/fragments/tasks_inline_kanban/tasks_inline_kanban_switcher.html" %}
+                {% if advising or is_staff %}
+                    <a href="{% url 'projects-project-tasks-suggest' project.pk %}"
+                        class="fr-btn fr-btn--secondary"
+                        data-test-id="see-suggest-task-button">Examiner les ressources suggérées</a>
                 {% endif %}
             </div>
         </template>
         <template x-if="!$store.djangoData.canManageTasks">
             <div class="d-flex justify-content-between align-items-center w-100">
-                {% include "projects/project/fragments/tasks_inline_kanban/tasks_inline_kanban_tasks_count.html" %}
-                {% if embed_view is not True %}
-                    {% include "projects/project/fragments/tasks_inline_kanban/tasks_inline_kanban_switcher.html" %}
-                {% endif %}
+                <div>
+                    <div class="d-flex fr-mr-3w">
+                        {% include "projects/project/fragments/tasks_inline_kanban/tasks_inline_kanban_tasks_count.html" %}
+                    </div>
+                    {% if embed_view is not True %}
+                        {% include "projects/project/fragments/tasks_inline_kanban/tasks_inline_kanban_switcher.html" %}
+                    {% endif %}
+                </div>
+                    {% if advising or is_staff %}
+                        <a href="{% url 'projects-project-tasks-suggest' project.pk %}"
+                            class="fr-btn fr-btn--secondary"
+                            data-test-id="see-suggest-task-button">Examiner les ressources suggérées</a>
+                    {% endif %}
             </div>
         </template>
     </div>

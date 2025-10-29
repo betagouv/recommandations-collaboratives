@@ -28,7 +28,7 @@ from . import apps
 logger = logging.getLogger(__name__)
 
 
-# We need the permission to be associated to the site and not to the projects
+# We need the permission to be associated to the site and not to the Contact
 @receiver(post_migrate)
 def create_site_permissions(sender, **kwargs):
     if sender.name != apps.AddressbookConfig.name:
@@ -39,6 +39,12 @@ def create_site_permissions(sender, **kwargs):
     auth_models.Permission.objects.get_or_create(
         codename="use_addressbook",
         name="Can use the addressbook for site",
+        content_type=site_ct,
+    )
+
+    auth_models.Permission.objects.get_or_create(
+        codename="change_addressbook",
+        name="Can change the addressbook objects for site",
         content_type=site_ct,
     )
 

@@ -12,13 +12,13 @@
         <div class="col fr-px-2v">
             <div class="medium-border-radius drop-column bg-grey-light"
                  :data-test-id="`board-targetable-${index}`">
-                <div class="d-flex align-items-center justify-content-between fr-px-2v fr-pt-2v fr-pb-0">
+                <div class="d-flex align-items-center justify-content-between fr-px-2v fr-pt-3v fr-pb-0">
                     <div class="d-flex align-items-center">
                         <span :class="board.color_class" class="status-color-indicator fr-mr-2v"></span>
                         <h5 x-text="board.title" class="fs-6 fw-normal text-gray-800 fr-mb-0"></h5>
                     </div>
                 </div>
-                <div class="fr-px-2v fr-pt-2v fr-mt-2v fr-pb-1v overflow-auto position-relative specific-height-80vh">
+                <div class="fr-px-2v fr-mt-2v fr-pb-1v overflow-auto position-relative specific-height-80vh">
                     <template x-if="column(board.status).length === 0">
                         <div class="drag-targetable fr-py-2w"
                              @dragover="onDragOver(event, null)"

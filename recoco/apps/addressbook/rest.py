@@ -1,25 +1,35 @@
 from django.contrib.sites.shortcuts import get_current_site
 from rest_framework.filters import BaseFilterBackend
+from rest_framework.permissions import SAFE_METHODS, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
-from recoco.rest_api.filters import (
-    StrictWordTrigramSimilaritySearchFilter,
-)
+from recoco.rest_api.filters import StrictWordTrigramSimilaritySearchFilter
 from recoco.rest_api.pagination import StandardResultsSetPagination
-from recoco.rest_api.permissions import (
-    IsStaffForSiteOrIsAuthenticatedReadOnly,
-    IsStaffForSiteOrReadOnly,
-)
+from recoco.utils import has_perm
 
 from . import serializers
 from .models import Contact, Organization, OrganizationGroup
 
 
+class AddressbookPermissionOrRetrieveOnly(IsAuthenticated):
+    def has_permission(self, request, view):
+        if not super().has_permission(request, view):
+            return False
+
+        if request.method in SAFE_METHODS:
+            if view.action == "retrieve":  # everyone should be able to read a contact
+                return True
+
+            return has_perm(request.user, "sites.use_addressbook", request.site)
+
+        return has_perm(request.user, "sites.change_addressbook", request.site)
+
+
 class OrganizationGroupViewSet(ModelViewSet):
     serializer_class = serializers.OrganizationGroupSerializer
     queryset = OrganizationGroup.objects.all()
-    permission_classes = [IsStaffForSiteOrReadOnly]
+    permission_classes = [AddressbookPermissionOrRetrieveOnly]
     pagination_class = StandardResultsSetPagination
 
     filter_backends = [StrictWordTrigramSimilaritySearchFilter]
@@ -29,7 +39,7 @@ class OrganizationGroupViewSet(ModelViewSet):
 
 
 class OrganizationViewSet(ModelViewSet):
-    permission_classes = [IsStaffForSiteOrReadOnly]
+    permission_classes = [AddressbookPermissionOrRetrieveOnly]
     pagination_class = StandardResultsSetPagination
     filter_backends = [StrictWordTrigramSimilaritySearchFilter]
 
@@ -92,7 +102,7 @@ class ContactViewSet(ModelViewSet):
         ByDepartmentFilterBackend,
         StrictWordTrigramSimilaritySearchFilter,
     ]
-    permission_classes = [IsStaffForSiteOrIsAuthenticatedReadOnly]
+    permission_classes = [AddressbookPermissionOrRetrieveOnly]
     pagination_class = StandardResultsSetPagination
 
     trgm_search_fields = [

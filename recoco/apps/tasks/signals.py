@@ -51,26 +51,15 @@ def log_action_created(sender, task, project, user, **kwargs):
 
 
 @receiver(action_created)
-def notify_action_created(sender, task, project, user, **kwargs):
+def update_creation_date_on_action_created(sender, task, project, user, **kwargs):
     if task.public is False:
         return
 
     if project.project_sites.current().status == "DRAFT" or project.muted:
         return
 
-    notification = {
-        "sender": user,
-        "verb": verbs.Recommendation.CREATED,
-        "action_object": task,
-        "target": project,
-    }
-
     task.created_on = timezone.now()
     task.save()
-
-    notify_advisors_of_project(project, notification, exclude=user)
-    if not project.inactive_since:
-        notify_members_of_project(project, notification)
 
 
 @receiver(action_visited)

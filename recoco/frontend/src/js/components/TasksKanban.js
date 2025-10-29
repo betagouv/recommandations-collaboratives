@@ -9,7 +9,7 @@ export default function boardTasksApp(projectId) {
     boards: [
       {
         status: TASK_STATUSES.PROPOSED,
-        title: 'Sans statut',
+        title: 'Nouveau',
         color_class: 'bg-white',
         color: '#fff',
       },
@@ -104,7 +104,10 @@ export default function boardTasksApp(projectId) {
     },
     async moveTask(data, status, nextData) {
       await this.$store.tasksData.issueFollowup(data, status);
-      if (nextData) await this.$store.tasksData.moveTask(data.id, nextData.id);
+      if (nextData)
+        await this.$store.tasksData.moveTask(data.id, nextData.id, {
+          direction: 'above',
+        });
     },
   };
 
