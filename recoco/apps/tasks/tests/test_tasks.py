@@ -1002,9 +1002,7 @@ def test_create_new_action_with_document(request, client, project_ready):
 
     document = project_models.Document.objects.first()
     assert document
-
-    task = models.Task.on_site.first()
-    assert task.document.first() == document
+    assert document.attached_object
 
 
 @pytest.mark.django_db

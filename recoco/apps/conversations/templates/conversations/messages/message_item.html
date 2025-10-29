@@ -1,0 +1,94 @@
+<div class="observed-element"
+     :data-notifications="JSON.stringify({id: element.id, unread: element.unread, type: element.type})">
+    <div class="message-item rounded-3 fr-p-3v fr-my-2v"
+         :id="`message-${element.id}`"
+         :class="{'current-user-message fr-ml-5w': {{ request.user.id }} == element.posted_by, 'other-user-message fr-mr-5w': {{ request.user.id }} != element.posted_by}">
+        <template x-if="element.in_reply_to">
+            <div class="message-item__reply-to text-muted fr-italic fr-small">
+                <p class="d-flex">
+                    <span class="fr-icon-corner-down-right-line fr-icon--sm"></span>
+                    en réponse à : <a class="fr-ml-1v"
+    :href="`#message-${element.in_reply_to}`"
+    x-html="renderMarkdown(await getShortMessageInReplyTo(element.in_reply_to))"></a>
+                </p>
+            </div>
+        </template>
+        <template x-if="element.deleted">
+            <div class="text-muted fr-italic fr-small">(Ce contenu a été supprimé)</div>
+        </template>
+        <template x-if="!element.deleted">
+            <template x-for="node in element.nodes">
+                <div>
+                    <template x-if="node.type == 'MarkdownNode'">
+                        {% include "conversations/messages/fragments/node_markdown.html" %}
+                    </template>
+                    <template x-if="node.type == 'ContactNode'">
+                        {% include "conversations/messages/fragments/node_contact.html" %}
+                    </template>
+                    <template x-if="node.type == 'DocumentNode'">
+                        {% include "conversations/messages/fragments/node_document.html" %}
+                    </template>
+                    <template x-if="node.type == 'RecommendationNode'">
+                        {% include "conversations/messages/fragments/node_recommendation.html" %}
+                    </template>
+                </div>
+            </template>
+        </template>
+        <template x-if="element.posted_by && messagesParticipants.length > 0">
+            <div class="d-flex justify-content-between">
+                <div class="d-flex">
+                    <div class="d-flex align-items-center"
+                         x-data="{user: null}"
+                         x-init="user = getUserById(element.posted_by);">{% include "user/user_card_js.html" %}</div>
+                    <p class="fr-m-0 fr-ml-1v message-item__date align-self-center">
+                        le <span x-text="formatDate(element.type == 'message' ? element.created : element.timestamp, { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })"></span>
+                        <template x-if="element.type ==='message' && formatDate(element.created, { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' }) !== formatDate(element.modified, { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' }) && !element.deleted">
+                            <span class="fr-m-0 fr-ml-1v message-item__date align-self-center"
+                                  :title="`modifié le ${formatDate(element.modified, { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })}`">
+                                (modifié)
+                            </span>
+                        </template>
+                        <template x-if="element.type ==='message' && element.deleted">
+                            <span class="fr-m-0 fr-ml-1v message-item__date align-self-center"
+                                  :title="`supprimé le ${formatDate(element.deleted, { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })}`">
+                                (supprimé)
+                            </span>
+                        </template>
+                    </p>
+                </div>
+                <div class="action-button">
+                    <div class="d-flex">
+                        <template x-if="element.posted_by == {{ request.user.id }} && !element.deleted">
+                            <div class="d-flex">
+                                <button data-fr-opened="false"
+                                        aria-controls="modal"
+                                        type="button"
+                                        class="fr-btn fr-btn--sm fr-btn--tertiary fr-mr-1v"
+                                        @click="setElementToDelete(element)">Supprimer</button>
+                                <template x-if="element.nodes.some(x => x.type == 'RecommendationNode')">
+                                    <a class="fr-btn fr-btn--sm fr-btn--tertiary fr-mr-1v"
+                                       :href="editTaskUrl(element.nodes.find(x => x.type == 'RecommendationNode').recommendation_id, '{{ request.path }}')">Modifier</a>
+                                </template>
+                                <template x-if="!element.nodes.some(x => x.type == 'RecommendationNode')">
+                                    <button class="fr-btn fr-btn--sm fr-btn--tertiary fr-mr-1v"
+                                            @click="onClickHandleEdit(element)">Modifier</button>
+                                </template>
+                            </div>
+                        </template>
+                        <template x-if="!element.deleted">
+                            <!-- Reply button -->
+                            <div class="action-button">
+                                <div class="d-flex justify-content-end">
+                                    <button class="fr-btn fr-btn--sm fr-btn--tertiary"
+                                            @click="onClickHandleReply(element);trackReplyToMessage();">
+                                        Répondre
+                                    </button>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </div>
+        </template>
+    </div>
+</div>

@@ -1,9 +1,11 @@
 # global personal configuration of pytest
 import pytest
+from django.contrib.auth import models as auth_models
 from django.contrib.auth.models import Group, User
 from django.contrib.sites.models import Site
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.management import call_command
+from guardian.shortcuts import assign_perm
 from model_bakery import baker
 from rest_framework.test import APIClient
 
@@ -86,6 +88,21 @@ def project(request, make_project):
 
 
 project_ready = project
+
+
+@pytest.fixture()
+def project_reader(project_ready):
+    project_reader = baker.make(auth_models.User)
+    assign_perm("projects.view_public_notes", project_reader, project_ready)
+    return project_reader
+
+
+@pytest.fixture()
+def project_editor(project_ready):
+    project_editor = baker.make(auth_models.User)
+    assign_perm("projects.view_public_notes", project_editor, project_ready)
+    assign_perm("projects.use_public_notes", project_editor, project_ready)
+    return project_editor
 
 
 # eof

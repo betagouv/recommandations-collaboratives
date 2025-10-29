@@ -1,6 +1,7 @@
 import Alpine from 'alpinejs';
 import api, {
   contactsUrl,
+  contactUrl,
   searchContactsUrl,
   getOrganizationById,
 } from '../utils/api';
@@ -141,7 +142,7 @@ Alpine.data('ContactBook', (departments, regions) => {
     },
 
     deleteContact(contact) {
-      api.delete(`${contactsUrl()}${contact.id}/`).then((response) => {
+      api.delete(`${contactUrl(contact.id)}`).then((response) => {
         location.reload();
       });
     },

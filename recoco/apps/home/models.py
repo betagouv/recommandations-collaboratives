@@ -45,12 +45,13 @@ SITE_GROUP_PERMISSIONS = {
         "sites.manage_resources",
         "sites.use_crm",
         "sites.use_addressbook",
+        "sites.change_addressbook",
     ),
     "admin": (
         "sites.manage_surveys",
         "sites.manage_configuration",
     ),
-    "advisor": ("sites.list_projects",),
+    "advisor": ("sites.list_projects", "sites.use_addressbook"),
 }
 
 

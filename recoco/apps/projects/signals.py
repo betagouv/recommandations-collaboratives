@@ -21,6 +21,7 @@ from .utils import (
     get_regional_actors_for_project,
     notify_advisors_of_project,
     notify_members_of_project,
+    reactivate_if_necessary,
 )
 
 ########################################################################
@@ -325,6 +326,9 @@ def project_userproject_trace_status_changes(sender, old_one, new_one, **kwargs)
 @receiver(document_uploaded)
 def project_document_uploaded(sender, instance, **kwargs):
     project = instance.project
+
+    reactivate_if_necessary(project, instance.uploaded_by)
+
     if project.project_sites.current().status == "DRAFT" or project.muted:
         return
 
@@ -335,18 +339,6 @@ def project_document_uploaded(sender, instance, **kwargs):
         action_object=instance,
         target=project,
     )
-
-    notification = {
-        "sender": instance.uploaded_by,
-        "verb": verbs.Document.ADDED,
-        "action_object": instance,
-        "target": project,
-    }
-
-    # Notify other project's people and advisors
-    notify_advisors_of_project(project, notification, exclude=instance.uploaded_by)
-    if not project.inactive_since:
-        notify_members_of_project(project, notification, exclude=instance.uploaded_by)
 
 
 ################################################################

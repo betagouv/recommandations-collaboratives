@@ -11,10 +11,9 @@ body.modal-open {
 }
 
 .topic-indicator {
-  width: 12px;
-  height: 12px;
-
-  border-radius: 50%;
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
 }
 
 .status-color-indicator.big {
@@ -38,7 +37,7 @@ body.modal-open {
 }
 
 .task-item p {
-  margin-bottom: 5px;
+  margin-bottom: 0px;
 }
 
 .task-item h4 {
@@ -194,4 +193,8 @@ body.modal-open {
 .icon-banner {
   width: 65px;
   height: 65px;
+}
+
+.add-gap {
+  gap: 10px;
 }

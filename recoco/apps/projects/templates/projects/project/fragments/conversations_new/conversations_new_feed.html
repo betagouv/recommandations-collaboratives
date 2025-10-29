@@ -1,0 +1,39 @@
+{% load projects_extra %}
+<div class="conversation-new__container-feed fr-p-3v flex-grow-1"
+     id="conversation-new-container">
+    {% if not topic_list %}
+        {% regroup feed by topic as topic_list %}
+    {% endif %}
+    <!-- Loop through all messages -->
+    <div class="conversation-new__container-topic">
+        <template x-for="(element, index) in feed.elements">
+            <div>
+                <!-- Date separator using simple Alpine.js approach -->
+                <template x-if="shouldShowDate(element)">
+                    <p class="conversation-new__date"
+                       x-text="formatDateFrench(element.type == 'message' ? element.created : element.timestamp)"></p>
+                </template>
+                <template x-if="element.firstUnread">
+                    <div class="notification-limit" x-ref="scrollLine_general">
+                        <div class="notification-limit__line"></div>
+                        <p class="notification-limit__message-number fr-mx-2w">
+                            <span x-text='feed.elements.length - index'></span> <span x-text='feed.elements.length - index > 1 ? "éléments non lus" : "élément non lu" '></span>
+                        </p>
+                        <div class="notification-limit__line"></div>
+                    </div>
+                </template>
+                <template x-if="element.type == 'message'">
+                    {% include "conversations/messages/message_item.html" %}
+                </template>
+                <template x-if="element.type == 'activity'">
+                    {% include "projects/project/fragments/conversations_new/message_type/type_followup_item.html" with element="node" %}
+                </template>
+            </div>
+        </template>
+    </div>
+</div>
+<template x-if="feed.elements.length == 0">
+    <div class="feed-element-item fr-px-3v fr-mb-3v">
+        {% include "projects/project/fragments/conversations_new/message_type/empty_message_list.html" %}
+    </div>
+</template>

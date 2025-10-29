@@ -37,31 +37,12 @@ instance.interceptors.response.use(
 
 export default instance;
 
-// Projects :
-// export function searchProjectUrl(search, departments) {
-//   if (search) {
-//     search = `search=${search}`;
-//   }
-//   if (departments.length) {
-//     departments = departments.map((code) => `departments=${code}`).join('&');
-//   }
-//   return `/api/projects/?${search}${search && departments.length > 0 ? '&' : ''}${departments}`;
-// }
-
-// export function projectsMyDepartmentsUrl() {
-//   return '/api/projects/my_departments';
-// }
-
 export function projectsUrl(search, departments, lastActivity) {
   // if search with tags, make a different url
   let url;
   if (search.includes('#')) {
     search = search.substring(1);
   }
-  //   search.paragraph.replace(' ', '_');
-  //   url = '/api/projects/?tags=' + search.substring(1);
-  //   console.log(url);
-  // } else {
   const params = new URLSearchParams({
     search: search,
     last_activity: lastActivity,
@@ -254,4 +235,33 @@ export function deleteTaskReminderUrl(taskId) {
 
 export function editReminderUrl(taskId) {
   return `/task/${taskId}/remind/`;
+}
+
+// Conversations
+export function conversationsMessagesUrl(projectId) {
+  return `/api/projects/${projectId}/conversations/messages/`;
+}
+
+export function conversationsMessageUrl(projectId, messageId) {
+  return `/api/projects/${projectId}/conversations/messages/${messageId}/`;
+}
+
+export function conversationsActivitiesUrl(projectId) {
+  return `/api/projects/${projectId}/conversations/activities/`;
+}
+
+export function conversationsParticipantsUrl(projectId) {
+  return `/api/projects/${projectId}/conversations/participants/`;
+}
+
+export function conversationsMessageMarkAsReadUrl(projectId, messageId) {
+  return `/api/projects/${projectId}/conversations/messages/${messageId}/mark_as_read/`;
+}
+
+// Documents
+export function documentsUrl(projectId) {
+  return `/api/projects/${projectId}/documents/`;
+}
+export function documentUrl(projectId, documentId) {
+  return `/api/projects/${projectId}/documents/${documentId}/`;
 }

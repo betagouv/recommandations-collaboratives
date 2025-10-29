@@ -1,0 +1,29 @@
+{% load django_vite %}
+{% vite_asset 'js/components/NewFeatureBanner.js' %}
+{% if request.user.is_authenticated %}
+    <div x-data="NewFeatureBanner"
+         class="fr-notice fr-notice--info fr-notice--no-icon"
+         x-show="shouldShow"
+         x-cloak>
+        <div class="fr-container">
+            <div class="fr-notice__body">
+                <div class="fr-icon-info-fill fr-mr-1w"></div>
+                <p class="w-100">
+                    <span class="fr-notice__title">Nouveau</span>
+                    <span class="fr-notice__desc">La conversation a changé ! Vous y retrouverez recommandations, fichiers et contacts.
+                        <br />
+                        <a title="Lien de consultation - nouvelle fenêtre"
+                           href="https://reco-co.gitbook.io/reco-co/la-conversation-riche"
+                           target="_blank"
+                           rel="noopener external"
+                           class="fr-notice__link">Apprenez-en plus ici</a>
+                    ou utilisez le chat pour de l'aide (en bas à droite de l'écran).</span>
+                </p>
+                <button title="Masquer le message"
+                        @click="hide()"
+                        type="button"
+                        class="fr-btn--close fr-btn">Masquer le message</button>
+            </div>
+        </div>
+    </div>
+{% endif %}

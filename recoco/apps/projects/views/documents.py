@@ -21,11 +21,7 @@ from recoco.utils import has_perm_or_403
 
 from .. import models, signals
 from ..forms import DocumentUploadForm
-from ..utils import (
-    get_advising_context_for_project,
-    get_collaborators_for_project,
-    is_regional_actor_for_project,
-)
+from ..utils import get_advising_context_for_project, is_regional_actor_for_project
 
 
 @login_required
@@ -104,15 +100,6 @@ def document_upload(request, project_id):
 
             try:
                 instance.save()
-
-                # Reactivate project if was set inactive
-                if request.user in get_collaborators_for_project(project):
-                    project.last_members_activity_at = timezone.now()
-
-                    if project.inactive_since:
-                        project.reactivate()
-
-                    project.save()
 
                 signals.document_uploaded.send(
                     sender=document_upload, instance=instance
