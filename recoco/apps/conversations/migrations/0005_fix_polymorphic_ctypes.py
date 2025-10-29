@@ -20,7 +20,7 @@ def forwards_func(apps, schema_editor):
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("conversations", "0003_reco_to_messages"),
+        ("conversations", "0004_reco_to_messages"),
     ]
 
     operations = [
