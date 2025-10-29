@@ -163,3 +163,32 @@ def test_command_update_inactive_flag_honors_existing_inactivity_date(request):
     project.refresh_from_db()
 
     assert project.inactive_since == inactive_since
+
+
+@pytest.mark.django_db
+def test_command_update_inactive_flag_honors_manual_reactivation(request):
+    site = get_current_site(request)
+
+    user = baker.make(
+        auth_models.User, username="jdoe", email="jdoe@example.org", last_login=None
+    )
+    user.profile.sites.add(site)
+
+    last_manual_reactivation = timezone.now() - timedelta(days=30)
+
+    project = baker.make(
+        projects_models.Project,
+        name="A project",
+        sites=[site],
+        members=[user],
+        created_on=datetime(2010, 1, 1, 12, 0, 0),
+        last_manual_reactivation=last_manual_reactivation,
+    )
+
+    assert project.inactive_since is None
+
+    call_command("update_inactive_flag")
+
+    project.refresh_from_db()
+
+    assert project.inactive_since is None
