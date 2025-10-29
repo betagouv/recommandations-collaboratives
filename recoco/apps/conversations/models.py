@@ -5,6 +5,7 @@ from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models, transaction
 from django.urls import reverse
 from django.utils.http import urlencode
+from markdownx.utils import markdownify
 from model_utils.models import TimeStampedModel
 from notifications.models import Notification
 from polymorphic.models import PolymorphicModel
@@ -50,7 +51,7 @@ class Message(TimeStampedModel):
 
     def get_absolute_url(self):
         url_no_query = reverse(
-            "projects-project-detail-conversations-new",
+            "projects-project-detail-conversations",
             kwargs={"project_id": self.project.pk},
         )
         query_kwargs = {"message-id": self.pk}
@@ -73,6 +74,9 @@ class Node(PolymorphicModel):
     position = models.PositiveIntegerField()
     message = models.ForeignKey(Message, on_delete=models.CASCADE, related_name="nodes")
 
+    def get_digest_recap(self):
+        raise NotImplementedError()
+
 
 class MarkdownTextMixin(models.Model):
     text = models.TextField()
@@ -82,19 +86,54 @@ class MarkdownTextMixin(models.Model):
 
 
 class MarkdownNode(Node, MarkdownTextMixin):
-    pass
+    count_label = "message"
+
+    def get_digest_recap(self):
+        return {"type": "text", "text": self.text}
 
 
 class RecommendationNode(Node, MarkdownTextMixin):
     recommendation = models.ForeignKey(tasks_models.Task, on_delete=models.CASCADE)
+    count_label = "recommandation"
+
+    def get_digest_recap(self):
+        res = {"type": "recommendation"}
+
+        if self.recommendation.resource is None:
+            res = res | {
+                "text": markdownify(self.text),
+                "title": self.recommendation.intent,
+            }
+        else:
+            res = res | {
+                "title": self.recommendation.resource.title,
+                "subtitle": self.recommendation.resource.subtitle,
+                "text": markdownify(self.text),
+            }
+        return res
 
 
 class ContactNode(Node):
     contact = models.ForeignKey(addressbook_models.Contact, on_delete=models.CASCADE)
+    count_label = "contact"
+
+    def get_digest_recap(self):
+        c: addressbook_models.Contact = self.contact
+        return {
+            "type": "contact",
+            "first_name": c.first_name,
+            "last_name": c.last_name,
+            "email": c.email,
+            "phone_no": c.phone_no,
+            "mobile_no": c.mobile_no,
+            "function": c.division,
+            "organization_name": c.organization.name,
+        }
 
 
 class DocumentNode(Node):
     document = models.ForeignKey(projects_models.Document, on_delete=models.CASCADE)
+    count_label = "document"
 
     def save(self, **kwargs):
         with transaction.atomic():
@@ -107,3 +146,7 @@ class DocumentNode(Node):
         with transaction.atomic():
             self.document.soft_delete()
             super().delete(**kwargs)
+
+    def get_digest_recap(self):
+        d: projects_models.Document = self.document
+        return {"type": "document", "name": d.filename()}
