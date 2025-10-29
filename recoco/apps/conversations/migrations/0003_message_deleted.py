@@ -5,7 +5,7 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("conversations", "0004_fix_polymorphic_ctypes"),
+        ("conversations", "0002_public_note_to_messages"),
     ]
 
     operations = [
