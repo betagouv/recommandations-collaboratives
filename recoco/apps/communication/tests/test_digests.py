@@ -48,7 +48,9 @@ from .. import digests
 
 
 @pytest.mark.django_db
-def test_send_digests_for_new_reco_for_collaborators(client, request, make_project):
+def test_send_digests_for_new_reco_for_collaborators_with_msg(
+    client, request, make_project
+):
     current_site = get_current_site(request)
     baker.make(home_models.SiteConfiguration, site=current_site)
 
@@ -70,7 +72,7 @@ def test_send_digests_for_new_reco_for_collaborators(client, request, make_proje
 
     # Generate a notification
     tasks_signals.action_created.send(
-        sender=test_send_digests_for_new_reco_for_collaborators,
+        sender=test_send_digests_for_new_reco_for_collaborators_with_msg,
         task=tasks_models.Task.objects.create(
             public=True,
             project=project,
@@ -84,7 +86,13 @@ def test_send_digests_for_new_reco_for_collaborators(client, request, make_proje
     assert collaborator.notifications.unsent().count() == 1
 
     digests.send_digests_for_new_recommendations_by_user(collaborator, dry_run=False)
-    # FIXME: Replace with new call that handle message containing a recommendation
+    assert (
+        collaborator.notifications.unsent().count() == 1
+    )  # the notification goes with messages now
+
+    digests.send_msg_digest_by_user_and_project(
+        project, collaborator, current_site, dry_run=False
+    )
 
     assert collaborator.notifications.unsent().count() == 0
 
@@ -318,7 +326,7 @@ def test_send_digests_for_switchtender_by_user(request, client, make_project):
 
 
 @pytest.mark.django_db
-def test_send_digests_for_switchtender_includes_new_recos(
+def test_send_digests_for_switchtender_does_not_include_new_recos(
     client, request, make_project
 ):
     current_site = get_current_site(request)
@@ -361,6 +369,10 @@ def test_send_digests_for_switchtender_includes_new_recos(
     assert another_advisor.notifications.unsent().count() == 1
 
     digests.send_digest_for_switchtender_by_user(another_advisor)
+
+    assert another_advisor.notifications.unsent().count() == 1
+
+    digests.send_msg_digest_by_user_and_project(project, another_advisor, current_site)
 
     assert another_advisor.notifications.unsent().count() == 0
 
@@ -608,11 +620,11 @@ class TestMsgDigest:
                 "pk": sender.id,
                 "short": "M. Lexpère",
             },
-            "intro_count": "1 message, 2 contacts, 1 recommendation et 1 document",
-            "other_senders": True,
-            "remaining_count": "1 contact, 1 recommendation et 1 document",
+            "intro_count": "2 messages, dont 2 contacts, 1 recommandation et 1 document",
+            "other_senders": False,
+            # "remaining_count": "1 contact, dont 1 contact, 1 recommandation et 1 document",
             "site_name": "example.com",
-            "text": "toto",
+            "text": "<p>toto</p>",
             "title_count": "2 nouveaux messages",
         }
 
