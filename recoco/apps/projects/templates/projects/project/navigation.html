@@ -110,20 +110,36 @@
                            id="segmented-control-tasks"
                            name="segmented-control-project">
                     <label class="fr-label" for="segmented-control-tasks">
-                    <a class="stretched-link"
-                       @click="if ($store.tutorialsEvents.isTutorialForProjectPage === 3) { localStorage.setItem('isTutorialForProjectPage', 3.5) } else if ($store.tutorialsEvents.isTutorialForProjectPage === 4) { localStorage.setItem('isTutorialForProjectPage', 4.3) }"
-                       href="{% if "view_public_notes" in user_project_perms or "use_public_notes" in user_project_perms %} {% url 'projects-project-detail-conversations-new' project.pk %}{% else %}#{% endif %}">Conversations <span class="badge text-bg-primary">New 🎉</span>
-                    {% if "view_public_notes" in user_project_perms or "use_public_notes" in user_project_perms %}
-                        {% if active_project_conversation_notifications_count %}
-                            <span class="badge text-bg-danger" data-test-id="badge-tab-new-message">{{ active_project_conversation_notifications_count }}</span>
-                        {% endif %}
-                    {% else %}
-                        <span class="fr-icon--sm fr-icon-lock-line" aria-hidden="true"></span>
-                    {% endif %}
-                </a>
-            </label>
-        </div>
-    {% else %}
+                        <a class="stretched-link"
+                        @click="if ($store.tutorialsEvents.isTutorialForProjectPage === 3) { localStorage.setItem('isTutorialForProjectPage', 3.5) } else if ($store.tutorialsEvents.isTutorialForProjectPage === 4) { localStorage.setItem('isTutorialForProjectPage', 4.3) }"
+                        href="{% if "view_public_notes" in user_project_perms or "use_public_notes" in user_project_perms %} {% url 'projects-project-detail-conversations-new' project.pk %}{% else %}#{% endif %}">Conversations <span class="badge text-bg-primary">New 🎉</span>
+                            {% if "view_public_notes" in user_project_perms or "use_public_notes" in user_project_perms %}
+                                {% if active_project_conversation_notifications_count %}
+                                    <span class="badge text-bg-danger" data-test-id="badge-tab-new-message">{{ active_project_conversation_notifications_count }}</span>
+                                {% endif %}
+                            {% else %}
+                                <span class="fr-icon--sm fr-icon-lock-line" aria-hidden="true"></span>
+                            {% endif %}
+                        </a>
+                    </label>
+                    <template x-if="$store.tutorialsEvents.isTutorialForProjectPage === 3 || $store.tutorialsEvents.isTutorialForProjectPage === 4">
+                        <svg class="hint-border" aria-hidden="true" viewBox="0 0 100 100" preserveAspectRatio="none">
+                            <!-- Outer rect path; vector-effect keeps thickness constant -->
+                            <rect
+                              x="3" y="3" width="94" height="18"
+                              fill="none"
+                              stroke="var(--vh-color)"
+                              stroke-width="var(--vh-thickness)"
+                              vector-effect="non-scaling-stroke"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-dasharray="14 6 5 10 18 7 9 5 12 8"
+                              style="animation: vh-dash var(--vh-speed) linear infinite;"
+                            />
+                          </svg>
+                    </template>
+                </div>
+            {% else %}
         <div class="fr-segmented__element"
              id="overview-step-3"
              {% if "view_public_notes" not in user_project_perms and "use_public_notes" not in user_project_perms %} aria-describedby="tooltip-lock-access-conversations" {% endif %}>

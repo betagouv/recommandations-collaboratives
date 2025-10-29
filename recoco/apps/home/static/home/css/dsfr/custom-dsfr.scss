@@ -842,6 +842,28 @@ form > p {
   hint
 \* ˍˍˍˍˍˍˍˍ */
 
-.visual-hint {
-  border: 2px dashed blue;
+// .visual-hint {
+//   border: 2px dashed blue;
+// }
+
+.visual-hint.visual-hint--svg {
+  position: relative;
+  border: none;
+}
+
+.visual-hint .hint-border {
+  position: absolute;
+  inset: -6px;
+  pointer-events: none;
+}
+
+:root {
+  --vh-color: #2563eb;
+  --vh-thickness: 2.5px;
+  --vh-radius: 10px;
+  --vh-speed: 10s;
+}
+
+@keyframes vh-dash {
+  to { stroke-dashoffset: -160; }
 }
