@@ -10,7 +10,6 @@ import api, {
   editTaskUrl,
 } from '../../utils/api';
 import { formatDateFrench } from '../../utils/date';
-import { openDB } from 'idb';
 
 Alpine.data('Conversations', (projectId, currentUserId) => ({
   projectId,
@@ -154,6 +153,9 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     return `${contentToSummarize.slice(0, 120)}${contentToSummarize.length > 120 ? '...' : ''}`;
   },
   getUserById(id) {
+    if (id === this.currentUserId) {
+      return this.$store.djangoData.currentUser;
+    }
     const foundUser = this.messagesParticipants.find((user) => user.id === +id);
     if (!foundUser) {
       /** MOCK DATA */

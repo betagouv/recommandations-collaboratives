@@ -1,4 +1,5 @@
 import json
+from urllib.parse import urlparse
 
 import pytest
 from actstream.models import action_object_stream
@@ -255,10 +256,12 @@ def test_post_message_with_document(project_ready, request, client, project_edit
     message = Message.objects.first()
     doc.refresh_from_db()
     assert doc.attached_object == message
-    assert (
-        doc.attached_object.get_absolute_url()
-        == f"/project/{project_ready.pk}/conversations?message-id={message.pk}"
+
+    parsed_url = urlparse(doc.attached_object.get_absolute_url())
+    assert parsed_url.path == reverse(
+        "projects-project-detail-conversations", args=[project_ready.pk]
     )
+    assert f"message-id={message.pk}" in parsed_url.query
 
 
 @pytest.mark.django_db
