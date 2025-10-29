@@ -513,7 +513,7 @@ def send_msg_digest_by_user_and_project(project, user, site, dry_run=False):
 
 
 def make_msg_digest_by_user_and_project(notifications_qs, user, project, site):
-    project_digest = make_project_digest(project, user, "conversations-new")
+    project_digest = make_project_digest(project, user, "conversations")
     notifications_qs = notifications_qs.order_by("timestamp")
 
     # formatting utils
@@ -652,7 +652,8 @@ def make_msg_digest_by_user_and_project(notifications_qs, user, project, site):
         "project": project_digest,
         "title_count": pretty_title_count,
         "intro_count": pretty_intro_count,
-        "remaining_count": pretty_count_remaining,
+        # below is probably no longer used, clean later when this is stabilized
+        # "remaining_count": pretty_count_remaining,
         "site_name": site.name,
         "first_sender": {
             "pk": main_sender.id,
@@ -893,8 +894,8 @@ class NotificationFormatter:
 
         if user.last_name:
             first_name = (
-                user.first_name[:1].capitalize() if is_short else user.first_name
-            ) + "."
+                f"{user.first_name[:1].capitalize()}." if is_short else user.first_name
+            )
             fmt = f"{first_name} {user.last_name}"
         else:
             fmt = f"{user}"
