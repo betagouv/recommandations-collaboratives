@@ -25,8 +25,10 @@
         <div class="rounded bg-grey-light fr-mb-3w fr-px-2w d-flex flex-column fr-py-2w justify-content-between align-items-start task-item position-relative">
             <div class="d-flex flex-column align-items-center justify-content-center w-100 fr-py-3w">
                 <span class="text-info-custom font-very-small name fw-normal fr-color--disabled-grey fr-mb-2v fw-bold">Pas de commentaire initial</span>
-                <button class="fr-btn fr-btn--secondary fr-btn-secondary-rework"
-                        @click.stop="isEditing = true;">Ajouter un commentaire</button>
+                {% if "manage_tasks" in user_project_perms and not disable_edit %}
+                    <button class="fr-btn fr-btn--secondary fr-btn-secondary-rework"
+                            @click.stop="isEditing = true;">Ajouter un commentaire</button>
+                {% endif %}
             </div>
         </div>
     </template>
