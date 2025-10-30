@@ -145,6 +145,10 @@ Alpine.data('ProjectPageTutorial', () => {
             this.$store.tutorialsEvents.isTutorialForProjectPage = 4;
         }
     },
+    launchChallenge5() {
+      // TODO: trigger the recommendation creation flow
+      this.$store.tutorialsEvents.isTutorialForProjectPage = 5;
+    },
     async acquireChallenge(code) {
       try {
         const json = await api.patch(challengeUrl(code), {
