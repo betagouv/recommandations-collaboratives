@@ -55,3 +55,40 @@ class ShowcasePage(Page):
         FieldPanel("content"),
         FieldPanel("quote"),
     ]
+
+
+class NewsListPage(Page):
+    """List all news articles in a fancy manner"""
+
+    subpage_types = ["NewsPage"]
+
+
+class NewsPage(Page):
+    heading = StreamField(
+        [("hero", HeroBlock(label="Hero"))],
+        min_num=1,
+        max_num=1,
+        verbose_name="En-tête",
+    )
+
+    gallery = StreamField(
+        [("pictures", ImageChooserBlock())],
+        min_num=0,
+        max_num=3,
+        verbose_name="Gallerie",
+        blank=True,
+    )
+
+    content = StreamField(
+        [
+            ("multicol", MultiColumnsBlock(label="Multi Colonnes")),
+            ("richtext", RichTextBlock(label="Texte riche")),
+        ],
+        verbose_name="Contenu",
+    )
+
+    content_panels = Page.content_panels + [
+        FieldPanel("heading"),
+        FieldPanel("gallery"),
+        FieldPanel("content"),
+    ]
