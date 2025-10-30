@@ -291,6 +291,19 @@ def project_conversations_new(request, project_id=None):
 
     recipients = get_notification_recipients_for_project(project)
 
+    # Convert QuerySet to list of dicts for JSON serialization
+    recipients_data = list(
+        recipients.values(
+            "id",
+            "email",
+            "first_name",
+            "last_name",
+            "profile__organization__name",
+            "profile__organization_position",
+            "is_active",
+        )
+    )
+
     return render(
         request,
         "projects/project/conversations_new.html",
@@ -298,7 +311,7 @@ def project_conversations_new(request, project_id=None):
             "project": project,
             "is_regional_actor": is_regional_actor,
             "advising": advising,
-            "recipients": recipients,
+            "recipients": recipients_data,
         },
     )
 

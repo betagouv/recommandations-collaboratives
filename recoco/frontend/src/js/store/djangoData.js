@@ -31,6 +31,7 @@ document.addEventListener('alpine:init', () => {
         },
       },
     },
+    recipients: getDjangoData('djangoRecipients'),
   });
 });
 

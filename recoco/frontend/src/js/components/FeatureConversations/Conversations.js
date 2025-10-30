@@ -44,6 +44,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
   formatDateFrench,
   editTaskUrl,
   async init() {
+    this.getMessagesParticipants();
     await this.getActivities();
     await this.getMessages();
     this.createFullFeed();
@@ -51,7 +52,6 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     setTimeout(() => {
       this.showMessages = true;
     }, 500);
-    this.getMessagesParticipants();
     this.$store.tasksData._subscribe(() => {
       this.tasks = this.$store.tasksData.tasks;
     });
@@ -108,15 +108,26 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
       }
     });
   },
-  async getMessagesParticipants() {
-    try {
-      const messagesParticipants = await api.get(
-        conversationsParticipantsUrl(this.projectId)
-      );
-      this.messagesParticipants = messagesParticipants.data;
-    } catch (error) {
-      throw new Error('Failed to get messages participants');
-    }
+  getMessagesParticipants() {
+    this.messagesParticipants = this.$store.djangoData.recipients.map(
+      (recipient) => ({
+        id: +recipient.id,
+        first_name: recipient.first_name,
+        last_name: recipient.last_name,
+        email: recipient.email,
+        phone_no: recipient.phone_no,
+        last_login: {
+          date: recipient.last_login,
+        },
+        is_active: recipient.is_active,
+        profile: {
+          organization_position: recipient.profile__organization_position,
+          organization: {
+            name: recipient.profile__organization__name,
+          },
+        },
+      })
+    );
   },
   async getShortMessageInReplyTo(id) {
     const shortMessage = this.getMessageById(id);
