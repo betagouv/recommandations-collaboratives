@@ -7,12 +7,15 @@ authors: raphael.marvie@beta.gouv.fr, guillaume.libersat@beta.gouv.fr
 created: 2022-12-26 11:54:56 CEST
 """
 
+from datetime import datetime
+
 import pytest
 from actstream.models import action_object_stream
 from django.contrib.auth import models as auth_models
 from django.contrib.sites import models as site_models
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
+from freezegun import freeze_time
 from guardian.shortcuts import assign_perm
 from model_bakery import baker
 from model_bakery.recipe import Recipe
@@ -689,6 +692,23 @@ def test_staff_can_resend_collaborator_invitation(request, client, mocker, proje
     assert response.status_code == 302
 
     communication_api.send_email.assert_called_once()
+
+
+@pytest.mark.django_db
+def test_set_project_active_date_is_saved(client, project_ready, current_site):
+    project_ready.inactive_since = datetime(2024, 1, 1)
+    project_ready.save()
+
+    date = datetime(2024, 1, 16)
+    url = reverse("projects-project-set-active", args=[project_ready.id])
+    with login(client, is_staff=True, groups=["example_com_staff"]):
+        with freeze_time("2024-01-16"):
+            client.post(url)
+
+    project_ready.refresh_from_db()
+    assert project_ready.last_manual_reactivation.astimezone() == date.astimezone()
+    assert project_ready.inactive_since is None
+    assert project_ready.inactive_reason is None
 
 
 # eof
