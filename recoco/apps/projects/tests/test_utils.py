@@ -16,7 +16,11 @@ from model_bakery import baker
 
 from recoco import verbs
 from recoco.apps.geomatics import models as geomatics
-from recoco.apps.projects.utils import assign_advisor, assign_collaborator
+from recoco.apps.projects.utils import (
+    assign_advisor,
+    assign_collaborator,
+    reactivate_if_necessary,
+)
 
 from .. import models, utils
 
@@ -267,6 +271,12 @@ def test_notify_members_of_project(project_ready, request):
     with settings.SITE_ID.override(current_site):
         assert userA.notifications(manager="on_site").count() == 1
         assert userB.notifications(manager="on_site").count() == 1
+
+
+@pytest.mark.django_db
+def test_reactivation_by_activity_does_not_remember(project_ready):
+    reactivate_if_necessary(project_ready)
+    assert project_ready.last_manual_reactivation is None
 
 
 # eof
