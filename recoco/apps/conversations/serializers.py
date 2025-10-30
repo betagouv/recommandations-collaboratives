@@ -67,7 +67,7 @@ class DocumentNodeSerializer(serializers.ModelSerializer):
         )
 
     document_id = serializers.PrimaryKeyRelatedField(
-        source="document", queryset=Document.on_site.all()
+        source="document", queryset=Document.on_site
     )
 
 
