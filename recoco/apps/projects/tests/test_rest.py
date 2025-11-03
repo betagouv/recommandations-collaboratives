@@ -1168,6 +1168,25 @@ def test_doc_upload(project_ready, project_editor, client):
     # send signal..?
 
 
+@pytest.mark.django_db
+def test_doc_upload_does_not_accept_malicious_files(
+    client, request, project_ready, project_editor
+):
+    url = reverse("projects-documents-list", args=[project_ready.id])
+
+    my_file = SimpleUploadedFile(
+        "doc.html", b"<html>file_content</html>", content_type="text/html"
+    )
+    data = {"description": "this is some content", "the_file": my_file}
+
+    client.force_login(project_editor)
+    response = client.post(url, data=data)
+
+    assert response.status_code == 400
+
+    assert models.Document.objects.count() == 0
+
+
 @pytest.fixture
 def inactive_project(request, make_project):
     yield make_project(inactive_since=datetime.today())

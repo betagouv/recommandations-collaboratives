@@ -44,6 +44,7 @@ from recoco.utils import (
 
 from . import apps
 from .utils import generate_ro_key
+from .validators import MimetypeValidator
 
 FEED_LABEL_MAX_LENGTH = 50
 
@@ -890,6 +891,17 @@ class DeletedDocumentManager(models.Manager):
 class Document(models.Model):
     """Représente un document associé à un project"""
 
+    mimetype_validator = MimetypeValidator(
+        forbids=[
+            "text/html",
+            "application/json",
+            "text/css",
+            "text/javascript",
+            "image/svg+xml",
+            "application/octet-stream",
+        ]
+    )
+
     objects = DocumentManager()
     on_site = DocumentOnSiteManager()
     objects_deleted = DeletedDocumentManager()
@@ -924,7 +936,9 @@ class Document(models.Model):
     def upload_path(self, filename):
         return "projects/%d/%s" % (self.project.pk, filename)
 
-    the_file = models.FileField(null=True, blank=True, upload_to=upload_path)
+    the_file = models.FileField(
+        null=True, blank=True, upload_to=upload_path, validators=[mimetype_validator]
+    )
     the_link = models.URLField(max_length=500, null=True, blank=True)
 
     def filename(self):
