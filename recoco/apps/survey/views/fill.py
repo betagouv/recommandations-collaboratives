@@ -33,12 +33,16 @@ class SessionDetailsView(LoginRequiredMixin, DetailView):
     context_object_name = "session"
     template_name = "survey/session_details.html"
 
+    # FIXME: add permission check
+
 
 class SessionResultsView(LoginRequiredMixin, DetailView):
     model = models.Session
     pk_url_kwarg = "session_id"
     context_object_name = "session"
     template_name = "survey/session_results.html"
+
+    # FIXME: add permission check
 
 
 class SessionDoneView(LoginRequiredMixin, RedirectView):
@@ -50,6 +54,8 @@ class SessionDoneView(LoginRequiredMixin, RedirectView):
         session = get_object_or_404(models.Session, pk=kwargs["session_id"])
         project = get_object_or_404(projects_models.Project, pk=session.project.id)
         return super().get_redirect_url(*args, project_id=project.id)
+
+    # FIXME: add permission check
 
 
 #####
@@ -69,6 +75,8 @@ def survey_question_details(request, session_id, question_id):
         answer = models.Answer.objects.get(question=question, session=session)
     except models.Answer.DoesNotExist:
         answer = None
+
+    has_perm_or_403(request.user, "projects.use_surveys", session.project)
 
     if request.method == "POST":
         form = forms.AnswerForm(question, answer, request.POST, files=request.FILES)
@@ -101,6 +109,7 @@ def survey_create_session_for_project(request, project_id, site_id=None):
     project = get_object_or_404(
         projects_models.Project, sites=request.site, pk=project_id
     )
+    has_perm_or_403(request.user, "projects.use_surveys", project)
 
     site_config = request.site_config
 
@@ -132,6 +141,7 @@ def survey_create_session_for_project(request, project_id, site_id=None):
 def survey_next_question(request, session_id, question_id=None):
     """Redirect to next unanswered/answerable question from survey"""
     session = get_object_or_404(models.Session, pk=session_id)
+    has_perm_or_403(request.user, "projects.use_surveys", session.project)
 
     if question_id is not None:
         question = get_object_or_404(models.Question, pk=question_id)
@@ -156,6 +166,8 @@ def survey_previous_question(request, session_id, question_id):
     """Redirect to previous unanswered/answerable question from survey"""
     session = get_object_or_404(models.Session, pk=session_id)
     question = get_object_or_404(models.Question, pk=question_id)
+
+    has_perm_or_403(request.user, "projects.use_surveys", session.project)
 
     previous_question = session.previous_question(question)
     if previous_question:

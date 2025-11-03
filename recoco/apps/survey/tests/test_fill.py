@@ -483,6 +483,23 @@ def test_previous_question_redirects_to_survey_when_not_more_questions(request, 
 
 
 ########################################################################
+# Permissions
+########################################################################
+@pytest.mark.django_db
+def test_question_is_not_reachable_for_non_member(request, client):
+    survey = Recipe(models.Survey, site=get_current_site(request)).make()
+    session = Recipe(models.Session, survey=survey).make()
+    qs = Recipe(models.QuestionSet, survey=survey).make()
+    q1 = Recipe(models.Question, question_set=qs).make()
+
+    with login(client, is_staff=False):
+        url = reverse("survey-question-details", args=(session.id, q1.id))
+        response = client.get(url)
+
+        assert response.status_code == 403
+
+
+########################################################################
 # Signals refresh
 ########################################################################
 
