@@ -2,6 +2,7 @@ import Alpine from 'alpinejs';
 import { createPopper } from '@popperjs/core';
 import appStore from '../store/app';
 import { gravatar_url } from '../utils/gravatar';
+import { formatPhone } from '../utils/formatPhone';
 
 Alpine.data('User', User);
 
@@ -9,6 +10,7 @@ function User(user) {
   return {
     popper: null,
     isOpening: false,
+    formatPhone,
     gravatar_url,
     currentUser: user,
     init() {
@@ -58,6 +60,14 @@ function User(user) {
     selectText: function (text) {
       appStore.notification.message = `${text} a bien été copié`;
       appStore.notification.isOpen = true;
+    },
+    getUserDisplayedName() {
+      if (this.currentUser.first_name && this.currentUser.last_name) {
+        return `${this.currentUser.first_name} ${this.currentUser.last_name}`;
+      } else if (this.currentUser.email) {
+        return this.currentUser.email;
+      }
+      return 'Inconnu';
     },
   };
 }

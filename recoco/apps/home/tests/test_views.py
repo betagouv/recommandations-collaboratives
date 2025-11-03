@@ -328,8 +328,10 @@ def test_project_owner_is_sent_to_action_page_on_login(request, client, project)
         response = client.get(url)
 
     assert response.status_code == 302
-    project_action_url = reverse("projects-project-detail-actions", args=(project.pk,))
-    assertRedirects(response, project_action_url)
+    project_conversation_url = reverse(
+        "projects-project-detail-conversations", args=(project.pk,)
+    )
+    assertRedirects(response, project_conversation_url)
 
 
 @pytest.mark.django_db

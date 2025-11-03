@@ -3,6 +3,8 @@ from django.contrib.sites.models import Site
 from django.urls import reverse
 from model_bakery import baker
 
+from recoco.utils import login
+
 from ...geomatics.models import Department
 from ..models import Contact, Organization, OrganizationGroup
 
@@ -17,40 +19,71 @@ def acme_organization(current_site):
 
 
 @pytest.mark.django_db
-def test_anonymous_can_list_organizations_but_not_create(api_client):
+def test_anonymous_cannot_list_organizations_nor_create(api_client):
     url = reverse("api-addressbook-organization-list")
 
     response = api_client.get(url)
-    assert response.status_code == 200
+    assert response.status_code == 403
 
     response = api_client.post(url, data={})
     assert response.status_code == 403
 
 
 @pytest.mark.django_db
-def test_anonymous_can_search_organizations(api_client, acme_organization):
-    url = reverse("api-addressbook-organization-list")
-    response = api_client.get(url, {"search": "acme"})
+def test_logged_in_user_cannot_list_organizations_nor_create(api_client):
+    with login(api_client):
+        url = reverse("api-addressbook-organization-list")
 
-    assert response.status_code == 200
-    assert len(response.data) > 0
+        response = api_client.get(url)
+        assert response.status_code == 403
+
+        response = api_client.post(url, data={})
+        assert response.status_code == 403
 
 
 @pytest.mark.django_db
-def test_anonymous_can_read_organization_but_not_update(api_client, acme_organization):
+def test_anonymous_cannot_search_organizations(api_client, acme_organization):
+    url = reverse("api-addressbook-organization-list")
+    response = api_client.get(url, {"search": "acme"})
+
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_logged_in_user_cannot_search_organizations(api_client, acme_organization):
+    with login(api_client):
+        url = reverse("api-addressbook-organization-list")
+        response = api_client.get(url, {"search": "acme"})
+
+        assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_anonymous_cannot_read_organization(api_client, acme_organization):
     url = reverse("api-addressbook-organization-detail", args=[acme_organization.pk])
 
     response = api_client.get(url)
-    assert response.status_code == 200
-
-    response = api_client.put(url, data={})
     assert response.status_code == 403
 
-    response = api_client.patch(url, data={})
-    assert response.status_code == 403
 
-    response = api_client.delete(url, data={})
-    assert response.status_code == 403
+@pytest.mark.django_db
+def test_logged_in_user_can_read_organization_but_not_update(
+    api_client, acme_organization
+):
+    url = reverse("api-addressbook-organization-detail", args=[acme_organization.pk])
+
+    with login(api_client):
+        response = api_client.get(url)
+        assert response.status_code == 200
+
+        response = api_client.put(url, data={})
+        assert response.status_code == 403
+
+        response = api_client.patch(url, data={})
+        assert response.status_code == 403
+
+        response = api_client.delete(url, data={})
+        assert response.status_code == 403
 
 
 @pytest.mark.django_db

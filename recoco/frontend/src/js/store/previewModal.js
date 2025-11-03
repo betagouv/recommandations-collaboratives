@@ -1,6 +1,5 @@
 import Alpine from 'alpinejs';
 import api, {
-  followupsUrl,
   markTaskNotificationAsVisited,
   taskNotificationsUrl,
 } from '../utils/api';
@@ -11,7 +10,6 @@ document.addEventListener('alpine:init', () => {
     taskId: null,
     currentTask: null,
     handle: null,
-    followups: null,
 
     isPaginated: false,
     index: null,
@@ -122,11 +120,6 @@ document.addEventListener('alpine:init', () => {
 
     setLocation(taskId) {
       location.hash = `#action-${taskId}`;
-    },
-    async loadFollowups() {
-      const { data } = await api.get(followupsUrl(this.projectId, this.taskId));
-      Alpine.store('tasksData').markAllAsRead(this.taskId);
-      this.followups = data;
     },
     async loadNotifications() {
       const { data } = await api.get(

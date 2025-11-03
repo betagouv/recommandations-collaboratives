@@ -18,7 +18,7 @@ Alpine.data('CreateOrganizationModal', (data = null) => {
     departments: null,
     selectedDepartments: null,
     isFormInEditMode: false,
-    isOrgaAlreadyExistingOnOtherPortal: false,
+    isOrgaAlreadyExisting: false,
     organization: {
       name: '',
       group: null,
@@ -140,7 +140,7 @@ Alpine.data('CreateOrganizationModal', (data = null) => {
               error.response.data.name[0] ===
                 'Un objet organization avec ce champ Nom existe déjà.'
             ) {
-              this.isOrgaAlreadyExistingOnOtherPortal = true;
+              this.isOrgaAlreadyExisting = true;
             }
             throw new Error('Error while creating organization ', error);
           });

@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "django.contrib.postgres",
     "django.contrib.sites",
+    "polymorphic",
     "multisite",
     "reversion",
     "reversion_compare",
@@ -78,6 +79,7 @@ INSTALLED_APPS = [
     "recoco.apps.onboarding",
     "recoco.apps.home",
     "recoco.apps.projects",
+    "recoco.apps.conversations",
     "recoco.apps.tasks",
     "recoco.apps.resources",
     "recoco.apps.geomatics",
@@ -393,6 +395,8 @@ MFA_TOTP_TOLERANCE = 1
 DJANGO_VITE_ASSETS_PATH = BASE_DIR / "frontend/dist"
 STATICFILES_DIRS += [DJANGO_VITE_ASSETS_PATH]
 
+# Notifications
+DJANGO_NOTIFICATIONS_CONFIG = {"USE_JSONFIELD": True}
 
 # Phonenumbers
 PHONENUMBER_DEFAULT_REGION = "FR"

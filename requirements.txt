@@ -469,7 +469,9 @@ django==5.1.13 \
     #   django-otp
     #   django-permissionedforms
     #   django-phonenumber-field
+    #   django-polymorphic
     #   django-recaptcha
+    #   django-rest-polymorphic
     #   django-reversion
     #   django-reversion-compare
     #   django-sesame
@@ -609,9 +611,19 @@ django-phonenumber-field==6.3.0 \
     --hash=sha256:188ca55b27ef1ac4d9b279d90ee3f1377ece6cd9ed8c63f0a66efd565bf9ad6f \
     --hash=sha256:668db2e61559908ce8dcd660ac716262c7922cc29ec76ede3f9b88772992dc28
     # via recoco
+django-polymorphic==4.1.0 \
+    --hash=sha256:0ce3984999e103a0d1a434a5c5617f2c7f990dc3d5fb3585ce0fadadf9ff90ea \
+    --hash=sha256:4438d95a0aef6c4307cd6c83ead387e1142ce80b65188a931ec2f0dbdd9bfc51
+    # via
+    #   django-rest-polymorphic
+    #   recoco
 django-recaptcha==3.0.0 \
     --hash=sha256:1aed69fd6ac8fd9e99e52665392ae6748f8b6339ace656fad779fe0c6c915a52 \
     --hash=sha256:253197051288923cae675d7eff91b619e3775311292a5dbaf27a8a55ffebc670
+    # via recoco
+django-rest-polymorphic==0.1.10 \
+    --hash=sha256:2960f58ed9a8bb0d42bc72c8ffaadfbd7f37d2573d42a1cd9a6460f3d572b519 \
+    --hash=sha256:f3980e3e2af73357e7913f9b1410ef856866bcfcc46903b70fe9621118bb538c
     # via recoco
 django-reversion==5.0.2 \
     --hash=sha256:243a12ee4e04c1611c0f076fbfc3074f1ad40afc45adc64de5ba2414cc4eaf29 \
@@ -661,6 +673,7 @@ djangorestframework==3.15.2 \
     --hash=sha256:2b8871b062ba1aefc2de01f773875441a961fefbf79f5eed1e32b2f096944b20 \
     --hash=sha256:36fe88cd2d6c6bec23dca9804bab2ba5517a8bb9d8f47ebc68981b56840107ad
     # via
+    #   django-rest-polymorphic
     #   djangorestframework-simplejwt
     #   drf-spectacular
     #   recoco
@@ -1927,6 +1940,7 @@ six==1.17.0 \
     --hash=sha256:ff70335d468e7eb6ec65b95b99d3a2836546063f63acc5171de367e834932a81
     # via
     #   django-clone
+    #   django-rest-polymorphic
     #   html5lib
     #   l18n
     #   python-dateutil
