@@ -114,6 +114,7 @@ Alpine.data('NotificationEater', (projectId) => {
     },
     async consumeRecommendationNotification(id) {
       const parentFeed = Alpine.$data(this.$el.parentElement).feed;
+      const parentTasks = Alpine.$data(this.$el.parentElement).tasks;
       const foundMessage = parentFeed.messages.find(
         (message) => message.id == id
       );
@@ -124,6 +125,12 @@ Alpine.data('NotificationEater', (projectId) => {
         (node) => node.type == 'RecommendationNode'
       );
       if (!foundRecommendation) {
+        return null;
+      }
+      const foundTask = parentTasks.find(
+        (task) => task.id == foundRecommendation.recommendation_id
+      );
+      if (!foundTask || foundTask.resource) {
         return null;
       }
       try {
