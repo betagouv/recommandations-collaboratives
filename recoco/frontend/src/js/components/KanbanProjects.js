@@ -53,11 +53,11 @@ Alpine.data('KanbanProjects', function (currentSiteId, departments, regions) {
         projectsUrl(searchText, searchDepartment, lastActivity)
       );
       this.projectList = await this.$store.projects.mapperProjetsProjectSites(
-        projects.data,
+        projects.data.results,
         this.currentSiteId
       );
 
-      this.projectList = projects.data.map((d) =>
+      this.projectList = projects.data.results.map((d) =>
         Object.assign(d, {
           uuid: generateUUID(),
         })
@@ -246,7 +246,7 @@ Alpine.data('KanbanProjects', function (currentSiteId, departments, regions) {
     },
     async onTagClick(tag) {
       this.backendSearch.searchText = tag;
-      this.searchText = "#" + tag;
+      this.searchText = '#' + tag;
       await this.backendSearchProjects({ resetLastActivity: true });
     },
   };

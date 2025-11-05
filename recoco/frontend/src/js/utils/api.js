@@ -37,15 +37,23 @@ instance.interceptors.response.use(
 
 export default instance;
 
-export function projectsUrl(search, departments, lastActivity) {
+export function projectsUrl(
+  search,
+  departments,
+  lastActivity,
+  { limit, offset, page } = { limit: 2000, offset: 0, page: 1 }
+) {
   // if search with tags, make a different url
   let url;
   if (search.includes('#')) {
     search = search.substring(1);
   }
   const params = new URLSearchParams({
-    search: search,
+    search,
     last_activity: lastActivity,
+    limit,
+    offset,
+    page,
   });
 
   url = '/api/projects/?' + params.toString();
