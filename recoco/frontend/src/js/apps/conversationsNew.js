@@ -2,7 +2,6 @@ import '../store/tasksData.js';
 import '../store/tasks.js';
 import '../store/idbObjectStoreMgmt.js';
 
-import '../utils/htmx.js';
 import { renderMarkdown } from '../utils/markdown.js';
 
 import '../components/Task.js';
