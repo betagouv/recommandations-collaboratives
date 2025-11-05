@@ -295,6 +295,7 @@ class ProjectSite(models.Model):
         ]
 
     PROJECTSITE_STATES = (
+        ("PRE_DRAFT", "Incomplet"),
         ("DRAFT", "Brouillon"),
         ("TO_PROCESS", "A traiter"),
         ("READY", "En attente"),  # FIXME A renommer en validé ?

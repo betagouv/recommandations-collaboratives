@@ -631,7 +631,7 @@ form > p {
   text-decoration: none !important;
 }
 
-.text-underline {
+.fr-link--underline .text-underline {
   text-decoration: underline !important;
 }
 
@@ -1004,4 +1004,13 @@ form > p {
   100% {
     background: var(--light-background-alt-blue-france, #f5f5fe);
   }
+}
+
+/* ¯¯¯¯¯ *\
+  BADGES
+\* ˍˍˍˍˍ */
+
+.fr-badge--success-lighter {
+  background-color: #d2e9db;
+  color: var(--success-425, #27a959);
 }
