@@ -469,7 +469,11 @@ function PersonalAdvisorDashboard(currentSiteId, departments, regions) {
     async getDataFiltered() {
       const { searchText, searchDepartment, lastActivity } = this.backendSearch;
       const projects = await api.get(
-        projectsUrl(searchText, searchDepartment, lastActivity)
+        projectsUrl({
+          search: searchText,
+          departments: searchDepartment,
+          lastActivity,
+        })
       );
       this.projectList = await this.$store.projects.mapperProjetsProjectSites(
         projects.data.results,
