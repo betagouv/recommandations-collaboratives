@@ -40,7 +40,7 @@ export default instance;
 export function projectsUrl({
   search = '',
   departments = [],
-  lastActivity = 30,
+  lastActivity = 1460,
   limit = 2000,
   offset = 0,
   page = 1,

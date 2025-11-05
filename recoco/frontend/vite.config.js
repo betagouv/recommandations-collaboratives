@@ -87,6 +87,7 @@ const config = {
         idbObjectStoreMgmt: resolve('./src/js/store/idbObjectStoreMgmt.js'),
         actionPusher: resolve('./src/js/apps/actionPusher.js'),
         NewFeatureBanner: resolve('./src/js/components/NewFeatureBanner.js'),
+        projectListCrm: resolve('./src/js/apps/projectListCrm.js'),
       },
       output: {
         chunkFileNames: undefined,

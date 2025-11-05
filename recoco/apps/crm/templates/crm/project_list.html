@@ -13,6 +13,7 @@
 {% endblock og_title %}
 {% block js %}
     {% vite_asset 'js/apps/crm.js' %}
+    {% vite_asset 'js/apps/CRM/projectListCrm.js' %}
 {% endblock js %}
 {% block css %}
     <link href="{% sass_src 'home/css/dsfr/marianne.css' %}"
@@ -22,7 +23,8 @@
 {% block content %}
     <div x-data="Crm" class="d-flex fr-px-0 crm">
         {% include "crm/fragments/sidebar.html" with search=True back_button=True user_advised_projects=False user_projects=False %}
-        <div class="w-75 d-flex flex-column justify-content-start">
+        <div x-data="ProjectListCrm"
+             class="w-75 d-flex flex-column justify-content-start">
             <div class="crm-header fr-px-3w fr-py-3w fr-mb-2w">
                 <div class="d-flex justify-content-between align-items-center fr-mb-2v">
                     <h3>Gestion des dossiers {{ request.site.name }}</h3>
@@ -75,107 +77,82 @@
                     </form>
                 {% endwith %}
             </div>
+            <div x-show="projects" x-transition.opacity.duration.500ms>
+                <span x-text="projectsCountLabel()"></span>
+            </div>
             <div class="fr-mb-2w table-responsive">
                 <table class="project-table">
-                    {% with projects.qs.count as projects_count %}
-                        {% if projects_count > 0 %}
-                            <caption class="fr-ml-2v">{{ projects_count }} résultat{{ projects_count|pluralize }}</caption>
-                        {% else %}
-                            <caption class="fr-ml-2v">Aucun résultat</caption>
-                        {% endif %}
-                    {% endwith %}
+                    <caption x-show="projects"
+                             x-transition.opacity.duration.500ms
+                             class="fr-ml-2v"> <span x-text="projectsCountLabel()"></span></caption>
                     <thead class="project-table__thead">
                         <tr>
                             <th scope="col">Nom du dossier</th>
                             <th scope="col">Organisation</th>
                             <th scope="col">Localisation</th>
                             <th scope="col">Date de dépôt</th>
-                            <th scope="col">État</th>
-                            <th scope="col"></th>
+                            <th scope="col">Statut</th>
+                            <th scope="col">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {% for project in projects.qs %}
+                        <template x-for="project in projects">
                             <tr>
                                 <td>
                                     <a class="fr-link project-table__project-name"
-                                       href="{% url 'crm-project-details' project.pk %}">{{ project.name|truncatechars:48 }}</a>
+                                       :href="'{% url 'crm-project-details' 0 %}'.replace('0', project.id)"
+                                       x-text="project.name"></a>
                                 </td>
                                 <td>
-                                    {% if project.owner.profile.organization %}
+                                    <template x-if="project?.owner?.profile?.organization">
                                         <a class="fr-link project-table__project-org-name"
-                                           href="{% url 'crm-organization-details' project.owner.profile.organization.pk %}">{{ project.owner.profile.organization.name }}</a>
-                                    {% else %}
-                                        <span class="project-table__project-org-name">{{ project.owner.profile.organization.name }}</span>
-                                    {% endif %}
+                                           :href="'{% url 'crm-organization-details' 0 %}'.replace('0', project.owner.profile.organization.id)"
+                                           x-text="project.owner.profile.organization.name"></a>
+                                    </template>
+                                    <template x-if="!project?.owner?.profile?.organization">
+                                        <span class="project-table__project-org-name" x-text="project.org_name"></span>
+                                    </template>
                                 </td>
-                                <td>{{ project.commune }} ({{ project.commune.postal }})</td>
-                                <td>{{ project.created_on|date:"d/m/Y" }}</td>
+                                <td x-text="`${project?.commune?.name} (${project?.commune?.postal})`"></td>
+                                <td x-text="new Date(project?.created_on).toLocaleDateString('fr-FR')"></td>
                                 <td class="project-table__status">
-                                    {% if project.status == "PRE_DRAFT" %}
-                                        <span class="fr-badge fr-badge--new fr-badge--no-icon">Incomplet</span>
-                                    {% elif project.status == "DRAFT" %}
-                                        <span class="fr-badge fr-badge--new fr-badge--no-icon">Brouillon</span>
-                                    {% elif project.status == "TO_PROCESS" %}
-                                        <span class="fr-badge fr-badge--info fr-badge--no-icon">A modérer</span>
-                                    {% elif project.status == "READY" %}
-                                        <span class="fr-badge fr-badge--success-lighter fr-badge--no-icon">En attente</span>
-                                    {% elif project.status == "IN_PROGRESS" %}
-                                        <span class="fr-badge fr-badge--success-lighter fr-badge--no-icon">En cours</span>
-                                    {% elif project.status == "DONE" %}
-                                        <span class="fr-badge fr-badge--success-lighter fr-badge--no-icon">Traité</span>
-                                    {% elif project.status == "STUCK" %}
-                                        <span class="fr-badge fr-badge--success-lighter fr-badge--no-icon">Bloqué</span>
-                                    {% elif project.status == "REJECTED" %}
-                                        <span class="fr-badge fr-badge--error fr-badge--no-icon">Refusé</span>
-                                    {% endif %}
+                                    <span x-text="projectStatusLabel(project.status)"
+                                          class="fr-badge fr-badge--no-icon"
+                                          :class="projectStatusColor(project.status)"></span>
                                 </td>
                                 <td>
-                                    {% if project.muted %}
-                                        <svg data-bs-toggle="tooltip"
-                                             data-bs-title="Notifications désactivées"
-                                             class="align-middle bi"
-                                             width="12px"
-                                             height="12px"
-                                             fill="currentColor">
-                                            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#bell-slash" />
-                                        </svg>
-                                    {% else %}
-                                        <svg data-bs-toggle="tooltip"
-                                             data-bs-title="Notifications actives"
-                                             class="align-middle bi"
-                                             width="12px"
-                                             height="12px"
-                                             fill="currentColor">
-                                            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#bell-fill" />
-                                        </svg>
-                                    {% endif %}
-                                    {% if project.exclude_stats %}
-                                        <svg data-bs-toggle="tooltip"
-                                             data-bs-title="Exclu des statistiques"
-                                             class="align-middle bi"
-                                             width="12px"
-                                             height="12px"
-                                             fill="currentColor">
+                                    <!-- inclure dans les statistiques -->
+                                    {% comment %} {% if project.exclude_stats %}
+                                        <svg data-bs-toggle="tooltip" data-bs-title="Exclu des statistiques" class="align-middle bi" width="12px" height="12px" fill="currentColor">
                                             <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#clipboard-x" />
                                         </svg>
                                     {% else %}
-                                        <svg data-bs-toggle="tooltip"
-                                             data-bs-title="Inclu dans les statistiques"
-                                             class="align-middle bi"
-                                             width="12px"
-                                             height="12px"
-                                             fill="currentColor">
+                                        <svg data-bs-toggle="tooltip" data-bs-title="Inclu dans les statistiques" class="align-middle bi" width="12px" height="12px" fill="currentColor">
                                             <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#clipboard-data-fill" />
                                         </svg>
                                     {% endif %}
+                                    <!-- activer/couper les notifs -->
+                                    {% if project.muted %}
+                                        <svg data-bs-toggle="tooltip" data-bs-title="Notifications désactivées" class="align-middle bi" width="12px" height="12px" fill="currentColor">
+                                            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#bell-slash" />
+                                        </svg>
+                                    {% else %}
+                                        <svg data-bs-toggle="tooltip" data-bs-title="Notifications actives" class="align-middle bi" width="12px" height="12px" fill="currentColor">
+                                            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#bell-fill" />
+                                        </svg>
+                                    {% endif %} {% endcomment %}
+                                    <!-- editer -->
+                                    <a class="fr-button fr-icon-pencil-line"
+                                       :href="'{% url 'crm-project-update' 0 %}'.replace('0', project.id)">Éditer</a>
+                                    <!-- DELETE -->
                                 </td>
                             </tr>
-                        {% empty %}
+                        </template>
+                        <template x-if="projects == null">
                             <tr>
                                 <td colspan="5">-- Aucun résultat --</td>
                             </tr>
-                        {% endfor %}
+                        </template>
                     </tbody>
                 </table>
             </div>

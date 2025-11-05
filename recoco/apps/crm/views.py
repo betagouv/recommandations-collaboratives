@@ -762,18 +762,7 @@ def user_reminder_details(request, user_id, reminder_pk):
 def project_list(request):
     has_perm_or_403(request.user, "use_crm", request.site)
 
-    # filtered projects
-    projects = filters.ProjectFilter(
-        request.GET,
-        queryset=Project.all_on_site.order_by("name")
-        .select_related("commune__department")
-        .prefetch_related("project_sites__site"),
-    )
-
-    # required by default on crm
-    search_form = forms.CRMSearchForm()
-
-    return render(request, "crm/project_list.html", locals())
+    return render(request, "crm/project_list.html")
 
 
 @login_required
