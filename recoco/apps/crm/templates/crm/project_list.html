@@ -122,29 +122,55 @@
                                 </td>
                                 <td>
                                     <!-- inclure dans les statistiques -->
-                                    {% comment %} {% if project.exclude_stats %}
-                                        <svg data-bs-toggle="tooltip" data-bs-title="Exclu des statistiques" class="align-middle bi" width="12px" height="12px" fill="currentColor">
-                                            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#clipboard-x" />
-                                        </svg>
-                                    {% else %}
-                                        <svg data-bs-toggle="tooltip" data-bs-title="Inclu dans les statistiques" class="align-middle bi" width="12px" height="12px" fill="currentColor">
-                                            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#clipboard-data-fill" />
-                                        </svg>
-                                    {% endif %}
+                                    <template x-if="project.exclude_stats">
+                                        <button @click="updateProject(project.id, { exclude_stats: false })"
+                                                data-bs-toggle="tooltip"
+                                                data-bs-title="Inclure dans les statistiques"
+                                                data-bs-placement="top"
+                                                class="fr-btn fr-btn--sm fr-icon-line-chart-off-line fr-btn--tertiary-no-outline position-relative"
+                                                title="Inclure dans les statistiques">
+                                            Inclure dans les statistiques
+                                        </button>
+                                    </template>
+                                    <template x-if="!project.exclude_stats">
+                                        <button @click="updateProject(project.id, { exclude_stats: true })"
+                                                data-bs-toggle="tooltip"
+                                                data-bs-title="Exclure des statistiques"
+                                                data-bs-placement="top"
+                                                class="fr-btn fr-btn--sm fr-icon-line-chart-on-line fr-btn--tertiary-no-outline position-relative"
+                                                title="Exclure des statistiques">Exclure des statistiques</button>
+                                    </template>
                                     <!-- activer/couper les notifs -->
-                                    {% if project.muted %}
-                                        <svg data-bs-toggle="tooltip" data-bs-title="Notifications désactivées" class="align-middle bi" width="12px" height="12px" fill="currentColor">
-                                            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#bell-slash" />
-                                        </svg>
-                                    {% else %}
-                                        <svg data-bs-toggle="tooltip" data-bs-title="Notifications actives" class="align-middle bi" width="12px" height="12px" fill="currentColor">
-                                            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#bell-fill" />
-                                        </svg>
-                                    {% endif %} {% endcomment %}
+                                    <template x-if="project.muted">
+                                        <button @click="updateProject(project.id, { muted: false })"
+                                                data-bs-toggle="tooltip"
+                                                data-bs-title="Activer les notifications"
+                                                data-bs-placement="top"
+                                                class="fr-btn fr-btn--sm fr-icon-notification-off-line fr-btn--tertiary-no-outline position-relative"
+                                                title="Activer les notifications">Activer les notifications</button>
+                                    </template>
+                                    <template x-if="!project.muted">
+                                        <button @click="updateProject(project.id, { muted: true })"
+                                                data-bs-toggle="tooltip"
+                                                data-bs-title="Désactiver les notifications"
+                                                data-bs-placement="top"
+                                                class="fr-btn fr-btn--sm fr-icon-notification-on-line fr-btn--tertiary-no-outline position-relative"
+                                                title="Désactiver les notifications">
+                                            Désactiver les notifications
+                                        </button>
+                                    </template>
                                     <!-- editer -->
-                                    <a class="fr-button fr-icon-pencil-line"
-                                       :href="'{% url 'crm-project-update' 0 %}'.replace('0', project.id)">Éditer</a>
+                                    <button class="fr-btn fr-btn--sm fr-icon-pencil-line fr-btn--tertiary-no-outline position-relative"
+                                            title="Éditer le dossier">
+                                        <a :href="'{% url 'crm-project-update' 0 %}'.replace('0', project.id)"
+                                           class="stretched-link">Éditer</a>
+                                    </button>
                                     <!-- DELETE -->
+                                    <button class="fr-btn fr-btn--sm fr-icon-delete-line fr-btn--tertiary-no-outline position-relative"
+                                            title="Supprimer le dossier">
+                                        <a :href="'{% url 'crm-project-delete' 0 %}'.replace('0', project.id)"
+                                           class="stretched-link">Supprimer</a>
+                                    </button>
                                 </td>
                             </tr>
                         </template>

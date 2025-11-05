@@ -1,5 +1,5 @@
 import Alpine from 'alpinejs';
-import api, { projectsUrl } from '../../utils/api';
+import api, { projectsUrl, projectUrl } from '../../utils/api';
 
 Alpine.data('ProjectListCrm', () => ({
   projects: null,
@@ -14,6 +14,23 @@ Alpine.data('ProjectListCrm', () => ({
       );
       this.projects = response.data.results;
       this.projectsTotal = response.data.count;
+    } catch (error) {
+      console.error(error);
+    }
+  },
+  async updateProject(projectId, data) {
+    try {
+      const response = await api.patch(projectUrl(projectId), data);
+      let index = this.projects.findIndex(
+        (project) => project.id === projectId
+      );
+      if (index !== -1) {
+        this.projects[index] = {
+          ...this.projects[index],
+          ...response.data.exclude_stats,
+          ...response.data.muted,
+        };
+      }
     } catch (error) {
       console.error(error);
     }
