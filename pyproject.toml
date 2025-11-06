@@ -10,7 +10,7 @@ license = { name = "AGPL-v3", file = "LICENSE" }
 
 description = "Recommandations Collaboratives"
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.11,<3.14"
 dependencies = [
     "beautifulsoup4==4.12.3",
     "celery==5.4.0",
