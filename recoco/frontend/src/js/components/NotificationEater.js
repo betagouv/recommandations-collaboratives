@@ -1,5 +1,8 @@
 import Alpine from 'alpinejs';
-import api, { conversationsMessageMarkAsReadUrl } from '../utils/api';
+import api, {
+  conversationsMessageMarkAsReadUrl,
+  markTaskNotificationAsVisited,
+} from '../utils/api';
 
 Alpine.data('NotificationEater', (projectId) => {
   return {
@@ -91,15 +94,55 @@ Alpine.data('NotificationEater', (projectId) => {
       if (scrollLineNewNotification.length == 0) return;
       scrollLineNewNotification[0].classList.remove('d-none');
     },
-    consumeNotification(message, messageElement) {
-      api.post(conversationsMessageMarkAsReadUrl(this.projectId, message.id));
-      messageElement.setAttribute(
-        'data-notifications',
-        JSON.stringify({
-          ...message,
-          unread: 0,
-        })
+    async consumeNotification(message, messageElement) {
+      try {
+        await api.post(
+          conversationsMessageMarkAsReadUrl(this.projectId, message.id)
+        );
+
+        messageElement.setAttribute(
+          'data-notifications',
+          JSON.stringify({
+            ...message,
+            unread: 0,
+          })
+        );
+        await this.consumeRecommendationNotification(message.id);
+      } catch (error) {
+        throw new Error('Failed to consume notification', error);
+      }
+    },
+    async consumeRecommendationNotification(id) {
+      const parentFeed = Alpine.$data(this.$el.parentElement).feed;
+      const parentTasks = Alpine.$data(this.$el.parentElement).tasks;
+      const foundMessage = parentFeed.messages.find(
+        (message) => message.id == id
       );
+      if (!foundMessage) {
+        return null;
+      }
+      const foundRecommendation = foundMessage.nodes.find(
+        (node) => node.type == 'RecommendationNode'
+      );
+      if (!foundRecommendation) {
+        return null;
+      }
+      const foundTask = parentTasks.find(
+        (task) => task.id == foundRecommendation.recommendation_id
+      );
+      if (!foundTask || foundTask.resource) {
+        return null;
+      }
+      try {
+        await api.post(
+          markTaskNotificationAsVisited(
+            this.projectId,
+            foundRecommendation.recommendation_id
+          )
+        );
+      } catch (error) {
+        throw new Error('Failed to consume recommendation notification', error);
+      }
     },
   };
 });
