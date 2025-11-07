@@ -6,6 +6,7 @@ from django.db.models.signals import post_delete, pre_delete, pre_save
 from django.dispatch import receiver
 from django.utils import timezone
 from notifications import models as notifications_models
+from notifications.models import Notification
 
 from recoco import verbs
 from recoco.apps.projects.utils import (
@@ -65,6 +66,23 @@ def delete_reco_on_node_delete(sender, instance, **kwargs):
     if instance.recommendation:
         instance.recommendation.deleted = timezone.now()
         instance.recommendation.save()
+
+
+@receiver(
+    pre_save,
+    sender=models.Message,
+    dispatch_uid="msg_delete_notif_sync",
+)
+def delete_notif_on_msg_delete(sender, instance, **kwargs):
+    if instance.deleted is None:
+        return
+
+    if not instance.pk:
+        return
+
+    Notification.objects.filter(
+        action_object_object_id=instance.pk, verb=verbs.Conversation.POST_MESSAGE
+    ).delete()
 
 
 @receiver(
