@@ -47,9 +47,9 @@ Alpine.data('ProjectListCrm', () => ({
       case 'PRE_DRAFT':
         return 'Incomplet';
       case 'DRAFT':
-        return 'Brouillon';
-      case 'TO_PROCESS':
         return 'A modérer';
+      case 'TO_PROCESS':
+        return 'A traiter';
       case 'READY':
         return 'En attente';
       case 'IN_PROGRESS':
@@ -70,11 +70,11 @@ Alpine.data('ProjectListCrm', () => ({
       case 'DRAFT':
         return 'fr-badge--new';
       case 'TO_PROCESS':
+      case 'STUCK':
         return 'fr-badge--info';
       case 'READY':
       case 'IN_PROGRESS':
       case 'DONE':
-      case 'STUCK':
         return 'fr-badge--success-lighter';
       case 'REJECTED':
         return 'fr-badge--error';
