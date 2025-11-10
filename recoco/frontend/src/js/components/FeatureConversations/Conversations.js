@@ -8,7 +8,9 @@ import api, {
   documentUrl,
   documentsUrl,
   editTaskUrl,
+  markTaskNotificationAsVisited,
 } from '../../utils/api';
+import { trackOpenRessource } from '../../utils/trackingMatomo';
 import { formatDateFrench } from '../../utils/date';
 
 Alpine.data('Conversations', (projectId, currentUserId) => ({
@@ -402,6 +404,16 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     if (!activateEditMode) {
       Alpine.raw(this.$store.editor.editorInstance).commands.clearContent();
     }
+  },
+  async onClickRessourceConsummeNotification(taskId) {
+    try {
+      if (!Alpine.store('djangoData').isAdvisor) {
+        await api.post(markTaskNotificationAsVisited(this.projectId, taskId));
+      }
+    } catch (error) {
+      throw new Error('Failed to mark task notification as visited', error);
+    }
+    trackOpenRessource();
   },
   async onSubmitUpdateMessage(message, messageIdToEdit) {
     if (this.$store.editor.currentMessageJSON) {

@@ -444,6 +444,11 @@ class Project(models.Model):
         default="",
         verbose_name="Raison de l'inactivité du dossier",
     )
+    last_manual_reactivation = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name="Quand le dossier a été manuellement réactivé",
+    )
 
     def reactivate(self):
         """Switch back project to active state"""
