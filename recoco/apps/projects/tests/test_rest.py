@@ -1188,12 +1188,33 @@ def test_doc_upload_does_not_accept_malicious_files(
 
 
 @pytest.mark.django_db
-def test_doc_upload_does_not_accept_malicious_files_when_fake_exts(
+def test_doc_upload_does_not_accept_malicious_files_detects_html(
     client, request, project_ready, project_editor
 ):
     url = reverse("projects-documents-list", args=[project_ready.id])
 
-    my_file = SimpleUploadedFile("doc.html", b"Blah", content_type="text/html")
+    my_file = SimpleUploadedFile(
+        "doc.html", b"Blah <script></script>", content_type="text/html"
+    )
+    data = {"description": "this is some content", "the_file": my_file}
+
+    client.force_login(project_editor)
+    response = client.post(url, data=data)
+
+    assert response.status_code == 400
+
+    assert models.Document.objects.count() == 0
+
+
+@pytest.mark.django_db
+def test_doc_upload_does_not_accept_malicious_files_by_extension(
+    client, request, project_ready, project_editor
+):
+    url = reverse("projects-documents-list", args=[project_ready.id])
+
+    my_file = SimpleUploadedFile(
+        "doc.html", b"simple plain text", content_type="text/html"
+    )
     data = {"description": "this is some content", "the_file": my_file}
 
     client.force_login(project_editor)

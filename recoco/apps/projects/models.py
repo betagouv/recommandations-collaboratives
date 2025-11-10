@@ -17,6 +17,7 @@ from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelatio
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.managers import CurrentSiteManager
 from django.contrib.sites.models import Site
+from django.core.validators import FileExtensionValidator
 from django.db import models
 from django.db.models import F, Func, OuterRef, Q, Subquery
 from django.db.models.functions import Cast
@@ -917,6 +918,26 @@ class Document(models.Model):
         ],
     )
 
+    filextension_validator = FileExtensionValidator(
+        [
+            "txt",
+            "md",
+            "png",
+            "jpg",
+            "jpeg",
+            "pdf",
+            "doc",
+            "docx",
+            "odt",
+            "xls",
+            "xlsx",
+            "odc",
+            "ppt",
+            "pptx",
+            "odp",
+        ]
+    )
+
     objects = DocumentManager()
     on_site = DocumentOnSiteManager()
     objects_deleted = DeletedDocumentManager()
@@ -952,7 +973,10 @@ class Document(models.Model):
         return "projects/%d/%s" % (self.project.pk, filename)
 
     the_file = models.FileField(
-        null=True, blank=True, upload_to=upload_path, validators=[mimetype_validator]
+        null=True,
+        blank=True,
+        upload_to=upload_path,
+        validators=[mimetype_validator, filextension_validator],
     )
     the_link = models.URLField(max_length=500, null=True, blank=True)
 
