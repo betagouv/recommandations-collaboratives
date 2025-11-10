@@ -15,7 +15,6 @@ class MimetypeValidator(object):
     def __call__(self, value):
         try:
             mime = magic.from_buffer(value.read(2048), mime=True)
-            print(mime)
 
             if (mime in self.forbidden_mimetypes) or (
                 mime not in self.allowed_mimetypes
