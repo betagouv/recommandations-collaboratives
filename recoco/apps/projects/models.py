@@ -898,6 +898,7 @@ class Document(models.Model):
 
     mimetype_validator = MimetypeValidator(
         allows=[
+            "text/plain",
             "image/png",
             "image/jpg",
             "image/gif",
