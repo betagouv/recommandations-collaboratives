@@ -219,9 +219,12 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     }
     return foundContact;
   },
-  async sendFormMessage(message) {
+  async sendFormMessage() {
     if (this.isEditorInEditMode) {
-      await this.onSubmitUpdateMessage(message, this.messageIdToEdit);
+      await this.sendMessage({
+        updateMessage: true,
+        messageIdToEdit: this.messageIdToEdit,
+      });
     } else {
       await this.sendMessage();
     }
@@ -235,7 +238,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
       },
     });
   },
-  async sendMessage() {
+  async sendMessage({ updateMessage = false, messageIdToEdit = null } = {}) {
     if (this.$store.editor.currentMessageJSON) {
       let promises = [];
       const parsedNodesFromEditor = this.$store.editor.parseTipTapContent(
@@ -258,18 +261,35 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
           nodes: parsedNodesFromEditor,
           in_reply_to: this.messageIdToReply,
         };
-        const messageResponse = await api.post(
-          conversationsMessagesUrl(this.projectId),
-          payload
-        );
-        this.updateCountOfElementsInDiscussion(messageResponse.data);
-        this.feed.elements.push({ ...messageResponse.data, type: 'message' });
+        let messageResponse;
+        if (updateMessage) {
+          messageResponse = await api.patch(
+            conversationsMessageUrl(this.projectId, messageIdToEdit),
+            payload
+          );
+          this.updateCountOfElementsInDiscussion(this.oldMessageToEdit, true);
+          this.replaceMessage(messageResponse.data, messageIdToEdit);
+          this.oldMessageToEdit = null;
+          this.messageIdToEdit = null;
+          this.isEditorInEditMode = false;
+        } else {
+          messageResponse = await api.post(
+            conversationsMessagesUrl(this.projectId),
+            payload
+          );
+          this.feed.elements.push({ ...messageResponse.data, type: 'message' });
+          this.isEditorInReplyMode = false;
+          this.scrollToNewMessage();
+        }
         this.$store.editor.clearEditorContent();
+        this.updateCountOfElementsInDiscussion(messageResponse.data);
         this.messageIdToReply = null;
-        this.isEditorInReplyMode = false;
-        this.scrollToNewMessage();
       } catch (error) {
-        throw new Error('Failed to send message', error);
+        if (updateMessage) {
+          throw new Error('Failed to send message', error);
+        } else {
+          throw new Error('Failed to update message', error);
+        }
       }
     }
   },
@@ -414,33 +434,6 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
       throw new Error('Failed to mark task notification as visited', error);
     }
     trackOpenRessource();
-  },
-  async onSubmitUpdateMessage(message, messageIdToEdit) {
-    if (this.$store.editor.currentMessageJSON) {
-      const parsedNodesFromEditor = this.$store.editor.parseTipTapContent(
-        this.$store.editor.currentMessageJSON
-      );
-      try {
-        const payload = {
-          nodes: parsedNodesFromEditor,
-          in_reply_to: this.messageIdToReply,
-        };
-        const messageResponse = await api.patch(
-          conversationsMessageUrl(this.projectId, messageIdToEdit),
-          payload
-        );
-        this.updateCountOfElementsInDiscussion(this.oldMessageToEdit, true);
-        this.oldMessageToEdit = null;
-        this.updateCountOfElementsInDiscussion(messageResponse.data);
-        this.replaceMessage(messageResponse.data, messageIdToEdit);
-        this.messageIdToEdit = null;
-        this.messageIdToReply = null;
-        this.isEditorInEditMode = false;
-        this.$store.editor.clearEditorContent();
-      } catch (error) {
-        throw new Error('Failed to update message', error);
-      }
-    }
   },
   replaceMessage(message, messageIdToEdit) {
     const messageIndex = this.feed.elements.findIndex(
