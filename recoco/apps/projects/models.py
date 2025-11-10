@@ -897,14 +897,23 @@ class Document(models.Model):
     """Représente un document associé à un project"""
 
     mimetype_validator = MimetypeValidator(
-        forbids=[
-            "text/html",
-            "application/json",
-            "text/css",
-            "text/javascript",
-            "image/svg+xml",
-            "application/octet-stream",
-        ]
+        allows=[
+            "image/png",
+            "image/jpg",
+            "image/gif",
+            "image/jpeg",
+            "image/pjpeg",
+            "application/pdf",
+            "application/msword",
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            "application/vnd.oasis.opendocument.text",
+            "application/vnd.ms-excel",
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            "application/vnd.oasis.opendocument.spreadsheet",
+            "application/vnd.ms-powerpoint",
+            "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+            "application/vnd.oasis.opendocument.presentation",
+        ],
     )
 
     objects = DocumentManager()
