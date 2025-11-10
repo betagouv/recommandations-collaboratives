@@ -1353,6 +1353,13 @@ psutil==7.0.0 \
     --hash=sha256:a5f098451abc2828f7dc6b58d44b532b22f2088f4999a937557b603ce72b1993 \
     --hash=sha256:ba3fcef7523064a6c9da440fc4d6bd07da93ac726b5733c29027d7dc95b39d99
     # via ipykernel
+psycopg==3.2.12 \
+    --hash=sha256:85c08d6f6e2a897b16280e0ff6406bef29b1327c045db06d21f364d7cd5da90b \
+    --hash=sha256:8a1611a2d4c16ae37eada46438be9029a35bb959bb50b3d0e1e93c0f3d54c9ee
+    # via recoco
+psycopg-c==3.2.12 ; implementation_name != 'pypy' \
+    --hash=sha256:1c80042067d5df90d184c6fbd58661350b3620f99d87a01c882953c4d5dfa52b
+    # via psycopg
 ptyprocess==0.7.0 ; os_name != 'nt' or (sys_platform != 'emscripten' and sys_platform != 'win32') \
     --hash=sha256:4b41f3967fce3af57cc7e94b888626c18bf37a083e3651ca8feeb66d492fef35 \
     --hash=sha256:5c5d0a3b48ceee0b48485e0c26037c0acd7d29765ca3fbb5cb3831d347423220
@@ -2062,6 +2069,7 @@ typing-extensions==4.14.0 \
     # via
     #   domdf-python-tools
     #   ipython
+    #   psycopg
     #   pyee
     #   referencing
     #   semgrep
@@ -2073,6 +2081,7 @@ tzdata==2025.2 \
     #   celery
     #   django
     #   kombu
+    #   psycopg
 ua-parser==1.0.1 \
     --hash=sha256:b059f2cb0935addea7e551251cbbf42e9a8872f86134163bc1a4f79e0945ffea \
     --hash=sha256:f9d92bf19d4329019cef91707aecc23c6d65143ad7e29a233f0580fb0d15547d
