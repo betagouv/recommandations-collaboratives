@@ -6,6 +6,7 @@ from django.db.models.signals import post_delete, pre_delete, pre_save
 from django.dispatch import receiver
 from django.utils import timezone
 from notifications import models as notifications_models
+from notifications.models import Notification
 
 from recoco import verbs
 from recoco.apps.projects.utils import (
@@ -17,7 +18,6 @@ from recoco.apps.tasks.signals import action_created
 
 from ..projects.utils import reactivate_if_necessary
 from . import models
-from .models import RecommendationNode
 from .utils import (
     gather_annotations_for_message_notification,
     post_public_message_with_recommendation,
@@ -69,6 +69,26 @@ def delete_reco_on_node_delete(sender, instance, **kwargs):
 
 @receiver(
     pre_save,
+    sender=models.Message,
+    dispatch_uid="msg_delete_notif_sync",
+)
+def delete_notif_on_msg_delete(sender, instance, **kwargs):
+    if instance.deleted is None:
+        return
+
+    if not instance.pk:
+        return
+
+    msg_ct = ContentType.objects.get_for_model(models.Message)
+    Notification.objects.filter(
+        action_object_object_id=instance.pk,
+        verb=verbs.Conversation.POST_MESSAGE,
+        action_object_content_type=msg_ct,
+    ).delete()
+
+
+@receiver(
+    pre_save,
     sender=tasks_models.Task,
     dispatch_uid="reco_delete_message_sync",
 )
@@ -79,7 +99,7 @@ def delete_message_on_reco_delete(sender, instance, **kwargs):
     if not instance.pk:
         return
 
-    for node in RecommendationNode.objects.filter(recommendation=instance):
+    for node in models.RecommendationNode.objects.filter(recommendation=instance):
         node.message.soft_delete()
 
 
@@ -93,7 +113,7 @@ def delete_message_on_reco_back_to_draft(sender, instance, **kwargs):
         return
 
     if instance.pk and instance.public is False:
-        for node in RecommendationNode.objects.filter(recommendation=instance):
+        for node in models.RecommendationNode.objects.filter(recommendation=instance):
             node.message.soft_delete()
 
 

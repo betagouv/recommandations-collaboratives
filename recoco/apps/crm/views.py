@@ -1213,6 +1213,7 @@ def crm_list_tags(request):
 
 
 def compute_tag_occurences(site):
+    """FIXME Looks like we're missing some filter (such as Project state)"""
     project_tags = dict(
         (tag["name"], tag["occurrences"])
         for tag in (
