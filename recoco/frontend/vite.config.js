@@ -81,7 +81,9 @@ const config = {
           './src/js/components/RegionDepartmentPreparer.js'
         ),
         User: resolve('./src/js/components/User.js'),
-        MutliSelect: resolve('./src/js/components/MultiSelect.js'),
+        MultiSelectRegionDepartment: resolve(
+          './src/js/components/MultiSelectRegionDepartment.js'
+        ),
         ContactBook: resolve('./src/js/components/ContactBook.js'),
         pageInvitation: resolve('./src/js/apps/pageInvitation.js'),
         idbObjectStoreMgmt: resolve('./src/js/store/idbObjectStoreMgmt.js'),
