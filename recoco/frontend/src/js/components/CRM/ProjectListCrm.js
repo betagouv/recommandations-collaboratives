@@ -1,10 +1,18 @@
 import Alpine from 'alpinejs';
-import api, { projectsUrl, projectUrl } from '../../utils/api';
+import api, { projectsUrl } from '../../utils/api';
 import htmx from 'htmx.org';
 
-Alpine.data('ProjectListCrm', () => ({
+Alpine.data('ProjectListCrm', (departments, regions) => ({
   projects: null,
   projectsTotal: 0,
+  departments: JSON.parse(departments.textContent),
+  regions: JSON.parse(regions.textContent),
+  territorySelectAll: true,
+  backendSearch: {
+    searchText: '',
+    searchDepartment: [],
+  },
+  searchText: '',
   async init() {
     await this.getProjects();
   },
@@ -18,6 +26,28 @@ Alpine.data('ProjectListCrm', () => ({
     } catch (error) {
       console.error(error);
     }
+  },
+  async handleProjectSearch() {
+    const projects = await api.get(
+      projectsUrl({
+        limit: 42,
+        offset: 0,
+        page: 1,
+        search: this.backendSearch.searchText,
+        departments: this.backendSearch.searchDepartment,
+      })
+    );
+    this.projects = projects.data.results;
+    this.projectsTotal = projects.data.count;
+  },
+  async saveSelectedDepartment(event) {
+    if (!event.detail) return;
+
+    this.backendSearch.searchDepartment = [...event.detail];
+    await this.handleProjectSearch();
+  },
+  async onSearch() {
+    await this.handleProjectSearch();
   },
   async updateProject(projectId, url, data) {
     htmx.ajax('POST', url, {
