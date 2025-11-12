@@ -5,6 +5,8 @@
 .dropdown-menu.notifications {
   box-shadow: 18px 20px 19px -13px rgba(0, 0, 0, 0.2);
   max-width: 480px;
+  font-size: 0.75rem;
+  line-height: 20px;
   // padding-right: 1rem;
 
   & li {
@@ -38,10 +40,29 @@
   }
 
   .notification {
-    &__verb,
-    &__project,
-    &__message {
-      margin-left: 1.7rem;
+    font-size: 0.75rem;
+    color: var(--light-text-mention-grey, #666);
+    font-weight: 400;
+    line-height: 20px;
+    text-wrap: wrap;
+    &__sender {
+      color: var(--light-neutral-grey-200, #3a3a3a);
+      font-weight: 700;
+    }
+
+    &__organization {
+      color: var(--light-text-mention-grey, #666);
+      font-style: italic;
+      font-weight: 400;
+    }
+
+    &__verb {
+      color: var(--light-text-mention-grey, #666);
+      font-weight: 400;
+      &--highlight {
+        color: #161616;
+        font-weight: 700;
+      }
     }
 
     &__date,
@@ -59,6 +80,9 @@
       }
     }
 
+    &__date:not(:first-child) {
+      margin-top: 0.5rem;
+    }
     &__date {
       padding: 0 0.625rem;
       font-style: italic;
@@ -68,6 +92,7 @@
       // color: #161616;
       font-size: 12px;
       font-weight: 700;
+      white-space: normal;
       // line-height: 20px
     }
 
@@ -88,6 +113,12 @@
       right: 0;
       top: 0.6rem;
       cursor: pointer;
+      color: #666;
+      z-index: 1;
+      &:hover {
+        background: #fff;
+        color: #000;
+      }
       // display: flex;
       // align-items: center;
       // justify-content: center;

@@ -29,7 +29,7 @@ Exemple dans le template du composant parent :
 
 Placer le svg dans le dossier `recoco/frontend/src/assets/`.
 
-Pour ajouter une icône personnalisée, il faut ajouter le nom de l'icône dans le fichier `recoco/frontend/src/css/main.css`.
+Pour ajouter une icône personnalisée, il faut ajouter le nom de l'icône dans le fichier `recoco/frontend/src/css/custom-icon.css`.
 
 Exemple :
 

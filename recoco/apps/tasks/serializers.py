@@ -2,7 +2,6 @@ from typing import Any
 
 from django.contrib.auth import models as auth_models
 from django.contrib.contenttypes.models import ContentType
-from django.utils import timezone
 from generic_relations.relations import GenericRelatedField
 from notifications import models as notifications_models
 from ordered_model.serializers import OrderedModelSerializer
@@ -13,7 +12,7 @@ from recoco.apps.addressbook.serializers import NestedContactSerializer
 from recoco.apps.demarches_simplifiees.serializers import DSFolderSerializer
 from recoco.apps.home.serializers import UserSerializer
 from recoco.apps.projects.serializers import DocumentSerializer, TopicSerializer
-from recoco.apps.projects.utils import get_collaborators_for_project
+from recoco.apps.projects.utils import reactivate_if_necessary
 from recoco.apps.resources.models import Resource
 from recoco.apps.resources.serializers import (
     ResourceSerializer,
@@ -59,12 +58,7 @@ class TaskFollowupCreateUpdateSerializer(
         return followup
 
     def _update_activity_flags_and_states(self, followup):
-        project = followup.task.project
-        if followup.who in get_collaborators_for_project(project):
-            project.last_members_activity_at = timezone.now()
-            if project.inactive_since:
-                project.reactivate()
-            project.save()
+        reactivate_if_necessary(followup.task.project, followup.who)
 
 
 class TaskFollowupSerializer(serializers.ModelSerializer):
