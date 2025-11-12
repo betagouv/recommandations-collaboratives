@@ -1,5 +1,6 @@
 import Alpine from 'alpinejs';
 import api, { projectsUrl, projectUrl } from '../../utils/api';
+import htmx from 'htmx.org';
 
 Alpine.data('ProjectListCrm', () => ({
   projects: null,
@@ -18,22 +19,31 @@ Alpine.data('ProjectListCrm', () => ({
       console.error(error);
     }
   },
-  async updateProject(projectId, data) {
-    try {
-      const response = await api.patch(projectUrl(projectId), data);
-      let index = this.projects.findIndex(
-        (project) => project.id === projectId
-      );
-      if (index !== -1) {
-        this.projects[index] = {
-          ...this.projects[index],
-          ...response.data.exclude_stats,
-          ...response.data.muted,
-        };
-      }
-    } catch (error) {
-      console.error(error);
-    }
+  async updateProject(projectId, url, data) {
+    htmx.ajax('POST', url, {
+      values: data,
+      headers: {
+        'X-CSRFToken': document.querySelector('[name="csrfmiddlewaretoken"]')
+          .value,
+      },
+      swap: 'innerHTML',
+    });
+
+    // try {
+    //   const response = await api.patch(projectUrl(projectId), data);
+    //   let index = this.projects.findIndex(
+    //     (project) => project.id === projectId
+    //   );
+    //   if (index !== -1) {
+    //     this.projects[index] = {
+    //       ...this.projects[index],
+    //       ...response.data.exclude_stats,
+    //       ...response.data.muted,
+    //     };
+    //   }
+    // } catch (error) {
+    //   console.error(error);
+    // }
   },
   projectsCountLabel() {
     if (this.projectsTotal > 0) {
