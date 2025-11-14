@@ -109,6 +109,7 @@ def survey_create_session_for_project(request, project_id, site_id=None):
     project = get_object_or_404(
         projects_models.Project, sites=request.site, pk=project_id
     )
+
     has_perm_or_403(request.user, "projects.use_surveys", project)
 
     site_config = request.site_config
