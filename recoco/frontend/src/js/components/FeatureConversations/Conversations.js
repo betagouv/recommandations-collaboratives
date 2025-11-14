@@ -8,7 +8,9 @@ import api, {
   documentUrl,
   documentsUrl,
   editTaskUrl,
+  markTaskNotificationAsVisited,
 } from '../../utils/api';
+import { trackOpenRessource } from '../../utils/trackingMatomo';
 import { formatDateFrench } from '../../utils/date';
 
 Alpine.data('Conversations', (projectId, currentUserId) => ({
@@ -108,26 +110,34 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
       }
     });
   },
-  getMessagesParticipants() {
-    this.messagesParticipants = this.$store.djangoData.recipients.map(
-      (recipient) => ({
-        id: +recipient.id,
-        first_name: recipient.first_name,
-        last_name: recipient.last_name,
-        email: recipient.email,
-        phone_no: recipient.phone_no,
-        last_login: {
-          date: recipient.last_login,
-        },
-        is_active: recipient.is_active,
-        profile: {
-          organization_position: recipient.profile__organization_position,
-          organization: {
-            name: recipient.profile__organization__name,
+  async getMessagesParticipants() {
+    try {
+      const participants = await api.get(
+        conversationsParticipantsUrl(this.projectId)
+      );
+      this.messagesParticipants = [
+        ...participants.data,
+        ...this.$store.djangoData.recipients.map((recipient) => ({
+          id: +recipient.id,
+          first_name: recipient.first_name,
+          last_name: recipient.last_name,
+          email: recipient.email,
+          phone_no: recipient.phone_no,
+          last_login: {
+            date: recipient.last_login,
           },
-        },
-      })
-    );
+          is_active: recipient.is_active,
+          profile: {
+            organization_position: recipient.profile__organization_position,
+            organization: {
+              name: recipient.profile__organization__name,
+            },
+          },
+        })),
+      ];
+    } catch (error) {
+      throw new Error('Failed to get messages participants');
+    }
   },
   async getShortMessageInReplyTo(id) {
     const shortMessage = this.getMessageById(id);
@@ -217,9 +227,12 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     }
     return foundContact;
   },
-  async sendFormMessage(message) {
+  async sendFormMessage() {
     if (this.isEditorInEditMode) {
-      await this.onSubmitUpdateMessage(message, this.messageIdToEdit);
+      await this.sendMessage({
+        updateMessage: true,
+        messageIdToEdit: this.messageIdToEdit,
+      });
     } else {
       await this.sendMessage();
     }
@@ -233,7 +246,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
       },
     });
   },
-  async sendMessage() {
+  async sendMessage({ updateMessage = false, messageIdToEdit = null } = {}) {
     if (this.$store.editor.currentMessageJSON) {
       let promises = [];
       const parsedNodesFromEditor = this.$store.editor.parseTipTapContent(
@@ -256,18 +269,35 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
           nodes: parsedNodesFromEditor,
           in_reply_to: this.messageIdToReply,
         };
-        const messageResponse = await api.post(
-          conversationsMessagesUrl(this.projectId),
-          payload
-        );
-        this.updateCountOfElementsInDiscussion(messageResponse.data);
-        this.feed.elements.push({ ...messageResponse.data, type: 'message' });
+        let messageResponse;
+        if (updateMessage) {
+          messageResponse = await api.patch(
+            conversationsMessageUrl(this.projectId, messageIdToEdit),
+            payload
+          );
+          this.updateCountOfElementsInDiscussion(this.oldMessageToEdit, true);
+          this.replaceMessage(messageResponse.data, messageIdToEdit);
+          this.oldMessageToEdit = null;
+          this.messageIdToEdit = null;
+          this.isEditorInEditMode = false;
+        } else {
+          messageResponse = await api.post(
+            conversationsMessagesUrl(this.projectId),
+            payload
+          );
+          this.feed.elements.push({ ...messageResponse.data, type: 'message' });
+          this.isEditorInReplyMode = false;
+          this.scrollToNewMessage();
+        }
         this.$store.editor.clearEditorContent();
+        this.updateCountOfElementsInDiscussion(messageResponse.data);
         this.messageIdToReply = null;
-        this.isEditorInReplyMode = false;
-        this.scrollToNewMessage();
       } catch (error) {
-        throw new Error('Failed to send message', error);
+        if (updateMessage) {
+          throw new Error('Failed to send message', error);
+        } else {
+          throw new Error('Failed to update message', error);
+        }
       }
     }
   },
@@ -403,32 +433,15 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
       Alpine.raw(this.$store.editor.editorInstance).commands.clearContent();
     }
   },
-  async onSubmitUpdateMessage(message, messageIdToEdit) {
-    if (this.$store.editor.currentMessageJSON) {
-      const parsedNodesFromEditor = this.$store.editor.parseTipTapContent(
-        this.$store.editor.currentMessageJSON
-      );
-      try {
-        const payload = {
-          nodes: parsedNodesFromEditor,
-          in_reply_to: this.messageIdToReply,
-        };
-        const messageResponse = await api.patch(
-          conversationsMessageUrl(this.projectId, messageIdToEdit),
-          payload
-        );
-        this.updateCountOfElementsInDiscussion(this.oldMessageToEdit, true);
-        this.oldMessageToEdit = null;
-        this.updateCountOfElementsInDiscussion(messageResponse.data);
-        this.replaceMessage(messageResponse.data, messageIdToEdit);
-        this.messageIdToEdit = null;
-        this.messageIdToReply = null;
-        this.isEditorInEditMode = false;
-        this.$store.editor.clearEditorContent();
-      } catch (error) {
-        throw new Error('Failed to update message', error);
+  async onClickRessourceConsummeNotification(taskId) {
+    try {
+      if (!Alpine.store('djangoData').isAdvisor) {
+        await api.post(markTaskNotificationAsVisited(this.projectId, taskId));
       }
+    } catch (error) {
+      throw new Error('Failed to mark task notification as visited', error);
     }
+    trackOpenRessource();
   },
   replaceMessage(message, messageIdToEdit) {
     const messageIndex = this.feed.elements.findIndex(
