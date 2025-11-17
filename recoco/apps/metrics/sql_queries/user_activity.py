@@ -22,7 +22,7 @@ def get_queryset() -> QuerySet:
                 verbs.Project.BECAME_ADVISOR,
                 verbs.Survey.STARTED,
                 verbs.Survey.UPDATED,
-                verbs.Conversation.PUBLIC_MESSAGE,
+                verbs.Conversation.POST_MESSAGE,
                 verbs.Conversation.PRIVATE_MESSAGE,
                 verbs.Document.ADDED,
                 verbs.Recommendation.CREATED,
