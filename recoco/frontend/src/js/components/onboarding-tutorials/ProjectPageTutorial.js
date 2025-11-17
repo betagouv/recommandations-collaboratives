@@ -144,13 +144,10 @@ Alpine.data('ProjectPageTutorial', () => {
     launchChallenge3() {
         const currentUrl = new URL(location.href);
         if (currentUrl.pathname.includes('/conversations')) {
-          console.log('test', this.$store.tutorialsEvents.isTutorialForProjectPage);
           this.$store.tutorialsEvents.isTutorialForProjectPage = 3.5;
-          console.log('test', this.$store.tutorialsEvents.isTutorialForProjectPage);
         }
         else {
           this.$store.tutorialsEvents.isTutorialForProjectPage = 3;
-          console.log('test', this.$store.tutorialsEvents.isTutorialForProjectPage);
         }
     },
     launchChallenge4() {
@@ -164,7 +161,6 @@ Alpine.data('ProjectPageTutorial', () => {
     },
     launchChallenge5() {
       // TODO: trigger the recommendation creation flow
-      console.log('before challenge 5 - ', this.$store.tutorialsEvents.isTutorialForProjectPage);
       const currentUrl = new URL(location.href);
       if (currentUrl.pathname.includes('/administration/#user-management')) {
         this.$store.tutorialsEvents.isTutorialForProjectPage = 5.5;
@@ -172,9 +168,8 @@ Alpine.data('ProjectPageTutorial', () => {
       else if (currentUrl.pathname.includes('/administration')) {
         this.$store.tutorialsEvents.isTutorialForProjectPage = 5.5;
       }
-      else {
+      else {é
         this.$store.tutorialsEvents.isTutorialForProjectPage = 5;
-        console.log('test', this.$store.tutorialsEvents.isTutorialForProjectPage);
       }
     },
     async acquireChallenge(code) {
