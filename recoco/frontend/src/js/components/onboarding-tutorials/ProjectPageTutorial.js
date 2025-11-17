@@ -19,6 +19,7 @@ Alpine.data('ProjectPageTutorial', () => {
         'project-page-tutorial-part2',
         'project-page-tutorial-part3',
         'project-page-tutorial-part4',
+        'project-page-tutorial-part5',
       ];
       const requests = [
         ...challengesName.map((name) => api.get(challengeUrl(name))),
@@ -105,6 +106,21 @@ Alpine.data('ProjectPageTutorial', () => {
             this.challengesStatus[3] = 'acquired';
             this.challengesStatus[4] = 'todo';
             this.$store.tutorialsEvents.isTutorialForProjectPage = 0;
+          }
+        }
+      );
+      // Watch for completion of step 5 triggered on click on invite collaborators button
+      this.$watch(
+        () => this.$store.tutorialsEvents.isTutorialForProjectPageFiveCompleted,
+        (isCompleted) => {
+          if (
+            this.$store.tutorialsEvents.isTutorialForProjectPage === 5.5 &&
+            isCompleted
+          ) {
+            this.acquireChallenge('project-page-tutorial-part5');
+            this.challengesStatus[4] = 'acquired';
+            this.challengesStatus[5] = 'todo';
+            this.$store.tutorialsEvents.isTutorialForProjectPage = 0;
             localStorage.removeItem('isTutorialForProjectPage');
             localStorage.removeItem('projectPageTutorialPopupOpen');
           }
@@ -127,18 +143,19 @@ Alpine.data('ProjectPageTutorial', () => {
     },
     launchChallenge3() {
         const currentUrl = new URL(location.href);
-        if (currentUrl.pathname.includes('/conversations-new')) {
+        if (currentUrl.pathname.includes('/conversations')) {
           console.log('test', this.$store.tutorialsEvents.isTutorialForProjectPage);
           this.$store.tutorialsEvents.isTutorialForProjectPage = 3.5;
           console.log('test', this.$store.tutorialsEvents.isTutorialForProjectPage);
         }
         else {
           this.$store.tutorialsEvents.isTutorialForProjectPage = 3;
+          console.log('test', this.$store.tutorialsEvents.isTutorialForProjectPage);
         }
     },
     launchChallenge4() {
         const currentUrl = new URL(location.href);
-        if (currentUrl.pathname.includes('/conversations-new')) {
+        if (currentUrl.pathname.includes('/conversations')) {
             this.$store.tutorialsEvents.isTutorialForProjectPage = 4.3;
         }
         else {
@@ -147,7 +164,18 @@ Alpine.data('ProjectPageTutorial', () => {
     },
     launchChallenge5() {
       // TODO: trigger the recommendation creation flow
-      this.$store.tutorialsEvents.isTutorialForProjectPage = 5;
+      console.log('before challenge 5 - ', this.$store.tutorialsEvents.isTutorialForProjectPage);
+      const currentUrl = new URL(location.href);
+      if (currentUrl.pathname.includes('/administration/#user-management')) {
+        this.$store.tutorialsEvents.isTutorialForProjectPage = 5.5;
+      }
+      else if (currentUrl.pathname.includes('/administration')) {
+        this.$store.tutorialsEvents.isTutorialForProjectPage = 5.5;
+      }
+      else {
+        this.$store.tutorialsEvents.isTutorialForProjectPage = 5;
+        console.log('test', this.$store.tutorialsEvents.isTutorialForProjectPage);
+      }
     },
     async acquireChallenge(code) {
       try {

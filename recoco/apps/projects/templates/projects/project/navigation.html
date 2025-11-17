@@ -72,6 +72,22 @@
                                 {% endcomment %}
                             </a>
                         </label>
+                        <template x-if="$store.tutorialsEvents.isTutorialForProjectPage==1">
+                            <svg class="hint-border" aria-hidden="true" viewBox="0 0 100 100" preserveAspectRatio="none">
+                                <!-- Outer rect path; vector-effect keeps thickness constant -->
+                                <rect
+                                  x="4" y="5" width="94" height="28"
+                                  fill="none"
+                                  stroke="var(--vh-color)"
+                                  stroke-width="var(--vh-thickness)"
+                                  vector-effect="non-scaling-stroke"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  stroke-dasharray="14 6 5 10 18 7 9 5 12 8"
+                                  style="animation: vh-dash var(--vh-speed) linear infinite;"
+                                />
+                              </svg>
+                        </template>
                     </div>
                 {% endif %}
                 {% flag "conversations_new" %}
@@ -122,8 +138,12 @@
                 </div>
             {% else %}
         <div class="fr-segmented__element"
+            :class="{'visual-hint': $store.tutorialsEvents.isTutorialForProjectPage === 3 || $store.tutorialsEvents.isTutorialForProjectPage === 4}"
              id="overview-step-2"
              {% if "view_public_notes" not in user_project_perms and "use_public_notes" not in user_project_perms %} aria-describedby="tooltip-lock-access-conversations" {% endif %}>
+            <template x-if="$store.tutorialsEvents.isTutorialForProjectPage === 3 || $store.tutorialsEvents.isTutorialForProjectPage === 4">
+                {% include "projects/project/fragments/onboarding-tutorials/visual-hint.html" %}
+            </template>
             {% include "projects/project/fragments/navigation/tooltip_lock_access.html" with id="tooltip-lock-access-conversations" %}
             <input value="conversations"
                    type="radio"
@@ -135,6 +155,7 @@
                    name="segmented-control-project">
             <label class="fr-label" for="segmented-control-tasks">
                 <a class="stretched-link"
+                    @click="if ($store.tutorialsEvents.isTutorialForProjectPage === 3) { localStorage.setItem('isTutorialForProjectPage', 3.5) } else if ($store.tutorialsEvents.isTutorialForProjectPage === 4) { localStorage.setItem('isTutorialForProjectPage', 4.3) }"
                    href="{% if "view_public_notes" in user_project_perms or "use_public_notes" in user_project_perms %} {% url 'projects-project-detail-conversations' project.pk %}{% else %}#{% endif %}">Conversation
                     {% if "view_public_notes" in user_project_perms or "use_public_notes" in user_project_perms %}
                         {% if active_project_conversation_notifications_count %}
@@ -145,6 +166,22 @@
                     {% endif %}
                 </a>
             </label>
+            <template x-if="$store.tutorialsEvents.isTutorialForProjectPage === 3 || $store.tutorialsEvents.isTutorialForProjectPage === 4">
+                <svg class="hint-border" aria-hidden="true" viewBox="0 0 100 100" preserveAspectRatio="none">
+                    <!-- Outer rect path; vector-effect keeps thickness constant -->
+                    <rect
+                      x="4" y="5" width="94" height="28"
+                      fill="none"
+                      stroke="var(--vh-color)"
+                      stroke-width="var(--vh-thickness)"
+                      vector-effect="non-scaling-stroke"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-dasharray="14 6 5 10 18 7 9 5 12 8"
+                      style="animation: vh-dash var(--vh-speed) linear infinite;"
+                    />
+                  </svg>
+            </template>
         </div>
     {% endflag %}
     <div class="fr-segmented__element" id="overview-step-3">
@@ -245,9 +282,15 @@
             <a class="fr-btn fr-btn--tertiary fr-btn--sm fr-btn--icon-left fr-icon-pulse-line justify-content-center fr-mr-2v"
                href="{% url 'crm-project-details' project.pk %}">CRM</a>
         {% endif %}
-        <button class="fr-btn fr-btn--sm fr-btn--tertiary">
+        <button class="fr-btn fr-btn--sm fr-btn--tertiary"
+                :class="{'visual-hint': $store.tutorialsEvents.isTutorialForProjectPage === 5}"
+                data-test-id="button-invite-collaborators"
+                @click="if ($store.tutorialsEvents.isTutorialForProjectPage === 5) { localStorage.setItem('isTutorialForProjectPage', 5.5) };">
             <a href="{% url 'projects-project-administration' project.pk %}#user-management">Inviter</a>
         </button>
+        <template x-if="$store.tutorialsEvents.isTutorialForProjectPage === 5">
+            {% include "projects/project/fragments/onboarding-tutorials/visual-hint.html" %}
+        </template>
     </div>
     {% if "list_projects" in user_site_perms or 'use_private_notes' in user_project_perms %}
         <div x-data="ExpandableMenuHandler"

@@ -103,7 +103,7 @@
         </div>
     </template>
     <template x-if="challengesStatus[3] == 'todo'">
-        <div class="d-flex fr-p-3v cursor-pointer" @click="launchChallenge4()">
+        <div class="d-flex fr-p-3v cursor-pointer onboarding-tutorial__popup-content__part" @click="launchChallenge4()">
             <svg class="fr-mr-3v" width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path fill-rule="evenodd" clip-rule="evenodd" d="M56.25 46.5C55.8364 46.5 55.5 46.1636 55.5 45.75C55.5 45.3364 55.8364 45 56.25 45C56.6636 45 57 45.3364 57 45.75C57 46.1636 56.6636 46.5 56.25 46.5Z" fill="#ECECFE"/>
                 <path fill-rule="evenodd" clip-rule="evenodd" d="M41.25 3C40.8364 3 40.5 2.66355 40.5 2.25C40.5 1.83641 40.8364 1.5 41.25 1.5C41.6636 1.5 42 1.83641 42 2.25C42 2.66355 41.6636 3 41.25 3Z" fill="#ECECFE"/>
@@ -127,12 +127,12 @@
         </div>
     </template>
     <template x-if="challengesStatus[3] == 'not-acquired'">
-        <div class="fr-p-3v">
+        <div class="fr-p-3v onboarding-tutorial__popup-content__part">
             <h3>4. Faites votre première recommandation</h3>
         </div>
     </template>
     <template x-if="challengesStatus[3] == 'acquired'">
-        <div class="fr-p-3v">
+        <div class="fr-p-3v onboarding-tutorial__popup-content__part">
             <h3 class="text-linethrough disabled">4. Faites votre première recommandation</h3>
         </div>
     </template>

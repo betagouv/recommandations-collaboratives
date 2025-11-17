@@ -74,7 +74,11 @@
     transform: translate(-15px, -15px);
     z-index: 1002;
     &--higher {
-        transform: translate(-15px, -50px);
+        transform: translate(-25px, -40px);
+
+    }
+    &--85px-y {
+        transform: translate(-15px, -85px);
 
     }
 }
