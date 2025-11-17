@@ -76,7 +76,6 @@ class Survey:
 
 
 class Conversation:
-    PUBLIC_MESSAGE = "a envoyé un message dans l'espace conversation"
     PRIVATE_MESSAGE = "a envoyé un message dans l'espace conseillers"
     POST_MESSAGE = "a envoyé un message"
 
