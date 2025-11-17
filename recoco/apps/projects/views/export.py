@@ -103,12 +103,12 @@ def project_list_export_csv(request):
             task__site=request.site,
         )
 
-        notes = project.notes.filter(
+        private_conversations = project.notes.filter(
             created_by__in=switchtenders,
             created_by__is_staff=False,
         )
 
-        conversations = project.notes.filter(public=True)
+        conversations = project.public_messages.filter(deleted=None)
 
         published_tasks = project.tasks.filter(site=request.site).exclude(public=False)
         first_reco = published_tasks.order_by("created_on").first()
@@ -155,11 +155,15 @@ def project_list_export_csv(request):
             #     tasks__project=project,
             #     origin=reminders_models.Reminder.SELF,
             # ).count(),  # Reminders
-            notes.filter(public=True).count(),  # conversations conseillers
+            conversations.filter(
+                posted_by__in=switchtenders, posted_by__is_staff=False
+            ).count(),  # conversations conseillers
             max(
-                0, conversations.filter(created_by__in=collaborators).count() - 1
-            ),  # conversations collectivite. -1 to remove a message from the system
-            notes.filter(public=False).count(),  # suivi interne conseillers
+                0, conversations.filter(posted_by__in=collaborators).count()
+            ),  # conversations project members
+            private_conversations.filter(
+                public=False
+            ).count(),  # suivi interne conseillers
             switchtenders.exclude(
                 groups__in=[staff_group]
             ).count(),  # non staff switchtender count
