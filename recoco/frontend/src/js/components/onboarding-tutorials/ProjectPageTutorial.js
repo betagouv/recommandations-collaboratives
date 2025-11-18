@@ -8,9 +8,8 @@ Alpine.data('ProjectPageTutorial', () => {
     challengesStatus: [],
     challenges: [],
     firstChallengeNotAcquired: null,
-    isTutorialPopupOpen: false,
+    isTutorialPopupOpen: true,
     async init() {
-      // this.$store.tutorialsEvents.isTutorialForProjectPage = 0;
       if( localStorage.getItem('projectPageTutorialPopupOpen') === 'true' ) {
         this.isTutorialPopupOpen = true;
       }

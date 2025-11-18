@@ -3,6 +3,10 @@
     bottom: 20px;
     right: 20px;
     z-index: 1003;
+    &--with-crisp-chat {
+        right: 22px; /* Adjust position if Crisp chat is enabled */
+        bottom: 90px;
+    }
     &__dialog {
         background-color: hsla(0, 0%, 0%, 0);
     }
@@ -12,6 +16,10 @@
         bottom: 94px;
         background: #FFF;
         max-width: 450px;
+        &--with-crisp-chat {
+            right: 22px; /* Adjust position if Crisp chat is enabled */
+            bottom: 160px;
+        }
     }
     &__button {
         border-radius: 99px;

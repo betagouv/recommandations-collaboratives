@@ -11,13 +11,13 @@
 {% block content %}
 <div x-data="ProjectPageTutorial" >
     <template x-if="isOpenTutorialButtonVisible">
-        <div class="onboarding-tutorial">
+        <div class="onboarding-tutorial {% if site_config.crisp_token %}onboarding-tutorial--with-crisp-chat{% endif %}">
             <button type="button" class="onboarding-tutorial__button" @click="handleTutorialPopup()"
                     x-bind:aria-expanded="isTutorialPopupOpen.toString()"
                     aria-controls="onboarding-tutorial__popup">
                 <span class="fr-icon-information-line" aria-hidden="true"></span>
             </button>
-            <div x-show="isTutorialPopupOpen" class="onboarding-tutorial__popup">
+            <div x-show="isTutorialPopupOpen" class="onboarding-tutorial__popup {% if site_config.crisp_token %}onboarding-tutorial__popup--with-crisp-chat{% endif %}">
                 <div class="onboarding-tutorial__popup-content">
                     <button type="button" class="onboarding-tutorial__close-button" @click="handleCloseTutorialPopup()"><span aria-hidden="true" class="fr-icon-close-line"></span></button>
                     <!-- TODO - variabiliser l'appel du composant à inclure -->
