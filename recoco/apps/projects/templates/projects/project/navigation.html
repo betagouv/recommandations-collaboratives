@@ -92,10 +92,10 @@
                 {% endif %}
                 {% flag "conversations_new" %}
                 <div class="fr-segmented__element"
-                    :class="{'visual-hint': $store.tutorialsEvents.isTutorialForProjectPage === 3 || $store.tutorialsEvents.isTutorialForProjectPage === 4}"
+                    :class="{'visual-hint': $store.tutorialsEvents.isTutorialForProjectPage === 3}"
                      id="overview-step-2"
                      {% if "view_public_notes" not in user_project_perms and "use_public_notes" not in user_project_perms %} aria-describedby="tooltip-lock-access-conversations" {% endif %}>
-                    <template x-if="$store.tutorialsEvents.isTutorialForProjectPage === 3 || $store.tutorialsEvents.isTutorialForProjectPage === 4">
+                    <template x-if="$store.tutorialsEvents.isTutorialForProjectPage === 3">
                         {% include "projects/project/fragments/onboarding-tutorials/visual-hint.html" %}
                     </template>
                     {% include "projects/project/fragments/navigation/tooltip_lock_access.html" with id="tooltip-lock-access-conversations" %}
@@ -108,7 +108,7 @@
                            name="segmented-control-project">
                     <label class="fr-label" for="segmented-control-tasks">
                         <a class="stretched-link"
-                        @click="if ($store.tutorialsEvents.isTutorialForProjectPage === 3) { localStorage.setItem('isTutorialForProjectPage', 3.5) } else if ($store.tutorialsEvents.isTutorialForProjectPage === 4) { localStorage.setItem('isTutorialForProjectPage', 4.3) }"
+                        @click="if ($store.tutorialsEvents.isTutorialForProjectPage === 3) { localStorage.setItem('isTutorialForProjectPage', 3.5) }"
                         href="{% if "view_public_notes" in user_project_perms or "use_public_notes" in user_project_perms %} {% url 'projects-project-detail-conversations' project.pk %}{% else %}#{% endif %}">Conversation <span class="badge text-bg-primary">Nouv. 🎉</span>
                             {% if "view_public_notes" in user_project_perms or "use_public_notes" in user_project_perms %}
                                 {% if active_project_conversation_notifications_count %}
@@ -119,7 +119,7 @@
                             {% endif %}
                         </a>
                     </label>
-                    <template x-if="$store.tutorialsEvents.isTutorialForProjectPage === 3 || $store.tutorialsEvents.isTutorialForProjectPage === 4">
+                    <template x-if="$store.tutorialsEvents.isTutorialForProjectPage === 3">
                         <svg class="hint-border" aria-hidden="true" viewBox="0 0 100 100" preserveAspectRatio="none">
                             <!-- Outer rect path; vector-effect keeps thickness constant -->
                             <rect
@@ -138,10 +138,10 @@
                 </div>
             {% else %}
         <div class="fr-segmented__element"
-            :class="{'visual-hint': $store.tutorialsEvents.isTutorialForProjectPage === 3 || $store.tutorialsEvents.isTutorialForProjectPage === 4}"
+            :class="{'visual-hint': $store.tutorialsEvents.isTutorialForProjectPage === 3}"
              id="overview-step-2"
              {% if "view_public_notes" not in user_project_perms and "use_public_notes" not in user_project_perms %} aria-describedby="tooltip-lock-access-conversations" {% endif %}>
-            <template x-if="$store.tutorialsEvents.isTutorialForProjectPage === 3 || $store.tutorialsEvents.isTutorialForProjectPage === 4">
+            <template x-if="$store.tutorialsEvents.isTutorialForProjectPage === 3">
                 {% include "projects/project/fragments/onboarding-tutorials/visual-hint.html" %}
             </template>
             {% include "projects/project/fragments/navigation/tooltip_lock_access.html" with id="tooltip-lock-access-conversations" %}
@@ -155,7 +155,7 @@
                    name="segmented-control-project">
             <label class="fr-label" for="segmented-control-tasks">
                 <a class="stretched-link"
-                    @click="if ($store.tutorialsEvents.isTutorialForProjectPage === 3) { localStorage.setItem('isTutorialForProjectPage', 3.5) } else if ($store.tutorialsEvents.isTutorialForProjectPage === 4) { localStorage.setItem('isTutorialForProjectPage', 4.3) }"
+                    @click="if ($store.tutorialsEvents.isTutorialForProjectPage === 3) { localStorage.setItem('isTutorialForProjectPage', 3.5) }"
                    href="{% if "view_public_notes" in user_project_perms or "use_public_notes" in user_project_perms %} {% url 'projects-project-detail-conversations' project.pk %}{% else %}#{% endif %}">Conversation
                     {% if "view_public_notes" in user_project_perms or "use_public_notes" in user_project_perms %}
                         {% if active_project_conversation_notifications_count %}
@@ -166,7 +166,7 @@
                     {% endif %}
                 </a>
             </label>
-            <template x-if="$store.tutorialsEvents.isTutorialForProjectPage === 3 || $store.tutorialsEvents.isTutorialForProjectPage === 4">
+            <template x-if="$store.tutorialsEvents.isTutorialForProjectPage === 3">
                 <svg class="hint-border" aria-hidden="true" viewBox="0 0 100 100" preserveAspectRatio="none">
                     <!-- Outer rect path; vector-effect keeps thickness constant -->
                     <rect
@@ -283,12 +283,12 @@
                href="{% url 'crm-project-details' project.pk %}">CRM</a>
         {% endif %}
         <button class="fr-btn fr-btn--sm fr-btn--tertiary"
-                :class="{'visual-hint': $store.tutorialsEvents.isTutorialForProjectPage === 5}"
+                :class="{'visual-hint': $store.tutorialsEvents.isTutorialForProjectPage === 4}"
                 data-test-id="button-invite-collaborators"
-                @click="if ($store.tutorialsEvents.isTutorialForProjectPage === 5) { localStorage.setItem('isTutorialForProjectPage', 5.5) };">
+                @click="if ($store.tutorialsEvents.isTutorialForProjectPage === 4) { localStorage.setItem('isTutorialForProjectPage', 4.5) };">
             <a href="{% url 'projects-project-administration' project.pk %}#user-management">Inviter</a>
         </button>
-        <template x-if="$store.tutorialsEvents.isTutorialForProjectPage === 5">
+        <template x-if="$store.tutorialsEvents.isTutorialForProjectPage === 4">
             {% include "projects/project/fragments/onboarding-tutorials/visual-hint.html" %}
         </template>
     </div>

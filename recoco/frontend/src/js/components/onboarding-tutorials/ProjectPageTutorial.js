@@ -18,7 +18,6 @@ Alpine.data('ProjectPageTutorial', () => {
         'project-page-tutorial-part2',
         'project-page-tutorial-part3',
         'project-page-tutorial-part4',
-        'project-page-tutorial-part5',
       ];
       const requests = [
         ...challengesName.map((name) => api.get(challengeUrl(name))),
@@ -93,32 +92,17 @@ Alpine.data('ProjectPageTutorial', () => {
           }
         }
       );
-      // Watch for completion of step 4 triggered on click on create reco button
+      // Watch for completion of step 4 triggered on click on invite collaborators button
       this.$watch(
         () => this.$store.tutorialsEvents.isTutorialForProjectPageFourCompleted,
         (isCompleted) => {
           if (
-            this.$store.tutorialsEvents.isTutorialForProjectPage === 4.6 &&
+            this.$store.tutorialsEvents.isTutorialForProjectPage === 4.5 &&
             isCompleted
           ) {
             this.acquireChallenge('project-page-tutorial-part4');
             this.challengesStatus[3] = 'acquired';
             this.challengesStatus[4] = 'todo';
-            this.$store.tutorialsEvents.isTutorialForProjectPage = 0;
-          }
-        }
-      );
-      // Watch for completion of step 5 triggered on click on invite collaborators button
-      this.$watch(
-        () => this.$store.tutorialsEvents.isTutorialForProjectPageFiveCompleted,
-        (isCompleted) => {
-          if (
-            this.$store.tutorialsEvents.isTutorialForProjectPage === 5.5 &&
-            isCompleted
-          ) {
-            this.acquireChallenge('project-page-tutorial-part5');
-            this.challengesStatus[4] = 'acquired';
-            this.challengesStatus[5] = 'todo';
             this.$store.tutorialsEvents.isTutorialForProjectPage = 0;
             localStorage.removeItem('isTutorialForProjectPage');
             localStorage.removeItem('projectPageTutorialPopupOpen');
@@ -150,25 +134,15 @@ Alpine.data('ProjectPageTutorial', () => {
         }
     },
     launchChallenge4() {
-        const currentUrl = new URL(location.href);
-        if (currentUrl.pathname.includes('/conversations')) {
-            this.$store.tutorialsEvents.isTutorialForProjectPage = 4.3;
-        }
-        else {
-            this.$store.tutorialsEvents.isTutorialForProjectPage = 4;
-        }
-    },
-    launchChallenge5() {
-      // TODO: trigger the recommendation creation flow
       const currentUrl = new URL(location.href);
       if (currentUrl.pathname.includes('/administration/#user-management')) {
-        this.$store.tutorialsEvents.isTutorialForProjectPage = 5.5;
+        this.$store.tutorialsEvents.isTutorialForProjectPage = 4.5;
       }
       else if (currentUrl.pathname.includes('/administration')) {
-        this.$store.tutorialsEvents.isTutorialForProjectPage = 5.5;
+        this.$store.tutorialsEvents.isTutorialForProjectPage = 4.5;
       }
-      else {é
-        this.$store.tutorialsEvents.isTutorialForProjectPage = 5;
+      else {
+        this.$store.tutorialsEvents.isTutorialForProjectPage = 4;
       }
     },
     async acquireChallenge(code) {

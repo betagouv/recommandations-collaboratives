@@ -131,11 +131,11 @@
                 <div class="col">
                     <p class="text-info-custom fr-mb-2v">Équipe de suivi</p>
                     {% if "invite_advisors" in user_project_perms %}
-                        <button @click="openInviteSwitchtenderModal; $store.tutorialsEvents.isTutorialForProjectPageFiveCompleted = true;"
+                        <button @click="openInviteSwitchtenderModal; $store.tutorialsEvents.isTutorialForProjectPageFourCompleted = true;"
                                 data-toggle="modal"
                                 data-target="#InviteSwitchtenderModal"
                                 class="{% if project.site_status == 'DRAFT' %} disabled{% endif %} button d-inline-flex justify-content-center w-100 fr-mb-3w cursor-pointer"
-                                :class="{'visual-hint': $store.tutorialsEvents.isTutorialForProjectPage === 5.5 }">
+                                :class="{'visual-hint': $store.tutorialsEvents.isTutorialForProjectPage === 4.5 }">
                             {% if project.site_status == 'DRAFT' %}
                                 <svg class="bi align-middle" width="18" height="18" fill="currentColor">
                                     <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#lock-fill" />
@@ -144,7 +144,7 @@
                             {% endif %}
                             <span>Inviter un conseiller</span>
                         </button>
-                        <template x-if="$store.tutorialsEvents.isTutorialForProjectPage === 5.5">
+                        <template x-if="$store.tutorialsEvents.isTutorialForProjectPage === 4.5">
                             {% include "projects/project/fragments/onboarding-tutorials/visual-hint.html" with extra_classes="position-visual-circle-hint--85px-y" %}
                         </template>
                     {% endif %}
@@ -196,20 +196,20 @@
                 <div class="col">
                     <p class="text-info-custom fr-mb-2v">Equipe du demandeur et partenaires</p>
                     {% if "invite_collaborators" in user_project_perms %}
-                        <button @click="openInviteMemberModal; $store.tutorialsEvents.isTutorialForProjectPageFiveCompleted = true;"
+                        <button @click="openInviteMemberModal; $store.tutorialsEvents.isTutorialForProjectPageFourCompleted = true;"
                                 data-toggle="modal"
                                 data-target="#InviteMemberModal"
                                 data-cy="button-invite-project-member"
                                 class="{% if project.site_status == 'DRAFT' %} disabled{% endif %} button d-inline-flex justify-content-center w-100 fr-mb-3w cursor-pointer"
-                                :class="{'visual-hint': $store.tutorialsEvents.isTutorialForProjectPage === 5 }">
+                                :class="{'visual-hint': $store.tutorialsEvents.isTutorialForProjectPage === 4.5 }">
                             {% if project.site_status == 'DRAFT' %}
                                 <svg class="bi align-middle" width="18" height="18" fill="currentColor">
-                                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#lock-fill" />
+                                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#lock-fill" />
                                 </svg>
                             {% endif %}
                             <span>Inviter un membre demandeur ou un partenaire</span>
                         </button>
-                        <template x-if="$store.tutorialsEvents.isTutorialForProjectPage === 5.5">
+                        <template x-if="$store.tutorialsEvents.isTutorialForProjectPage === 4.5">
                             {% include "projects/project/fragments/onboarding-tutorials/visual-hint.html" with extra_classes="position-visual-circle-hint--85px-y" %}
                         </template>
                     {% endif %}
