@@ -4,7 +4,8 @@
         <p>Ci-dessous vos prochaines étapes pour prendre en main  la plateforme :</p>
     </div>
     <template x-if="challengesStatus[0] == 'todo'">
-        <div class="d-flex fr-p-3v onboarding-tutorial__popup-content__part cursor-pointer" @click="launchChallenge1()">
+        <div class="d-flex fr-p-3v onboarding-tutorial__popup-content__part cursor-pointer"
+            {% if advising_position.is_advisor or advising_position.is_observer %} @click="launchChallenge1(true)" {% else %} @click="launchChallenge1(false)" {% endif %}>
             <svg class="fr-mr-3v" width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path fill-rule="evenodd" clip-rule="evenodd" d="M44.25 57C43.8364 57 43.5 56.6636 43.5 56.25C43.5 55.8364 43.8364 55.5 44.25 55.5C44.6636 55.5 45 55.8364 45 56.25C45 56.6636 44.6636 57 44.25 57Z" fill="#ECECFE"/>
                 <path fill-rule="evenodd" clip-rule="evenodd" d="M50.25 6C49.8364 6 49.5 5.66355 49.5 5.25C49.5 4.83641 49.8364 4.5 50.25 4.5C50.6636 4.5 51 4.83641 51 5.25C51 5.66355 50.6636 6 50.25 6Z" fill="#ECECFE"/>
@@ -21,20 +22,19 @@
                 <path d="M7.5 23.25C7.88463 23.25 8.20163 23.5395 8.24495 23.9125L8.25 24V37.5C8.25 37.9142 7.91421 38.25 7.5 38.25C7.11537 38.25 6.79837 37.9605 6.75505 37.5875L6.75 37.5V24C6.75 23.5858 7.08579 23.25 7.5 23.25Z" fill="#0063CB"/>
             </svg>
             <div class="fr-mr-3v">
-                <h3>1. Etudiez l’état des lieux du projet</h3>
-                <p>Egestas nec ultrices tincidunt vitae vestibulum. Malesuada urna nec velit a varius et. Feugiat habitant in sit et.</p>
+                <h3>1. Rejoignez le dossier</h3>
+                <p>Vous aurez accès à tout son contenu et serez notifié·e des nouvelles activités par email.</p>
             </div>
             <span class="fr-icon-arrow-right-line" aria-hidden="true"></span>
         </div>
     </template>
     <template x-if="challengesStatus[0] == 'acquired'">
         <div class="fr-p-3v onboarding-tutorial__popup-content__part">
-            <h3 class="text-linethrough disabled">1. Etudiez l’état des lieux du projet</h3>
+            <h3 class="text-linethrough disabled">1. Rejoignez le dossier</h3>
         </div>
     </template>
     <template x-if="challengesStatus[1] == 'todo'">
-        <div class="d-flex fr-p-3v onboarding-tutorial__popup-content__part cursor-pointer"
-             {% if advising_position.is_advisor or advising_position.is_observer %} @click="launchChallenge2(true)" {% else %} @click="launchChallenge2(false)" {% endif %}>
+        <div class="d-flex fr-p-3v onboarding-tutorial__popup-content__part cursor-pointer" @click="launchChallenge2()">
             <svg class="fr-mr-3v" width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path fill-rule="evenodd" clip-rule="evenodd" d="M11.25 10.5C10.8364 10.5 10.5 10.1636 10.5 9.75C10.5 9.33641 10.8364 9 11.25 9C11.6636 9 12 9.33641 12 9.75C12 10.1636 11.6636 10.5 11.25 10.5Z" fill="#ECECFE"/>
                 <path fill-rule="evenodd" clip-rule="evenodd" d="M3.75 52.5C3.33645 52.5 3 52.1636 3 51.75C3 51.3364 3.33645 51 3.75 51C4.16355 51 4.5 51.3364 4.5 51.75C4.5 52.1636 4.16355 52.5 3.75 52.5Z" fill="#ECECFE"/>
@@ -46,20 +46,20 @@
                 <path fill-rule="evenodd" clip-rule="evenodd" d="M41.9974 26.1877C41.4651 19.7995 37.8906 16.5 31.5 16.5C25.1094 16.5 21.5349 19.7995 21.0026 26.1877C20.9623 26.6711 21.3846 27.065 21.864 26.9913L23.25 26.7781V27.1057C22.7132 27.2092 22.3174 27.3524 22.04 27.5592C21.3366 28.0837 20.9999 28.9224 20.9999 30C20.9999 31.9142 22.0857 33 23.9999 33C24.0816 33 24.1602 32.9869 24.2338 32.9628C25.0316 34.51 26.2685 35.7741 27.7714 36.5714C27.7574 36.6287 27.75 36.6885 27.75 36.75C27.75 37.724 27.2858 38.5896 26.5666 39.1376C26.555 39.1459 26.5437 39.1544 26.5326 39.1632C26.0342 39.5319 25.4176 39.75 24.75 39.75H23.25L23.0813 39.7531C20.6742 39.8418 18.75 41.8212 18.75 44.25C18.75 44.6642 19.0858 45 19.5 45C19.9142 45 20.25 44.6642 20.25 44.25C20.25 42.5931 21.5931 41.25 23.25 41.25H24.75L24.9187 41.2469C25.546 41.2238 26.1405 41.0723 26.6767 40.8178C27.4808 42.0833 28.9638 42.4696 30.9319 41.9776C31.3337 41.8771 31.5781 41.4699 31.4776 41.0681C31.3771 40.6663 30.9699 40.4219 30.5681 40.5224C29.1658 40.873 28.3467 40.6832 27.9098 39.954C28.6437 39.2301 29.1302 38.2559 29.2307 37.1699C29.9513 37.3849 30.7126 37.5 31.5 37.5C32.2874 37.5 33.0487 37.3849 33.7693 37.1699C33.976 39.4031 35.8145 41.1634 38.0813 41.2469L38.25 41.25H39.75C41.4069 41.25 42.75 42.5931 42.75 44.25C42.75 44.6642 43.0858 45 43.5 45C43.9142 45 44.25 44.6642 44.25 44.25C44.25 41.8212 42.3258 39.8418 39.9187 39.7531L39.75 39.75H38.25C36.5931 39.75 35.25 38.4069 35.25 36.75C35.25 36.6885 35.2426 36.6287 35.2286 36.5714C36.7315 35.7741 37.9683 34.51 38.7662 32.9628C38.8398 32.987 38.9184 33 39 33C40.9142 33 42 31.9142 42 30C42 28.9224 41.6633 28.0837 40.9599 27.5592C40.5807 27.2765 39.9804 27.1127 39.1008 27.0067C39.0687 27.0024 39.036 27.0001 39.0028 27L39.0016 26.9999C38.9292 26.9997 38.8587 27.0099 38.7917 27.0293C38.6836 27.0605 38.5856 27.1153 38.5036 27.1878C38.3585 27.316 38.2634 27.4996 38.2513 27.7054C38.2502 27.7242 38.2497 27.7429 38.25 27.7615V28.875L38.2472 29.0818C38.1435 32.9287 35.1543 36 31.5 36C27.7805 36 24.75 32.818 24.75 28.875V26.5473L31.614 25.4913L31.7025 25.4721C31.9048 25.4154 32.0756 25.2758 32.1708 25.0854L32.9208 23.5854L32.9554 23.5049C33.0835 23.1519 32.9294 22.7512 32.5854 22.5792L32.5049 22.5446C32.1519 22.4165 31.7512 22.5706 31.5792 22.9146L31.002 24.0675L22.605 25.359L22.6187 25.2624C23.3537 20.3633 26.2525 18 31.5 18L31.7693 18.0021C36.7578 18.0808 39.5596 20.3654 40.3414 25.0113L40.38 25.2592L35.4319 24.0224L35.3458 24.0061C34.9734 23.9576 34.6157 24.195 34.5224 24.5681C34.4219 24.9699 34.6663 25.3771 35.0681 25.4776L41.0681 26.9776L41.1557 26.9942C41.6206 27.0545 42.0376 26.6697 41.9974 26.1877ZM23.25 28.6426C23.0909 28.6844 22.9848 28.7259 22.9366 28.7618C22.6555 28.9714 22.4999 29.359 22.4999 30C22.4999 30.9539 22.8196 31.3895 23.6335 31.4812C23.4047 30.7259 23.2728 29.9259 23.2527 29.0973L23.25 28.875V28.6426ZM40.5 30C40.5 30.9539 40.1803 31.3894 39.3665 31.4812C39.6157 30.6586 39.75 29.7829 39.75 28.875V28.6426C39.909 28.6844 40.0152 28.7259 40.0633 28.7618C40.3444 28.9714 40.5 29.359 40.5 30Z" fill="#0063CB"/>
             </svg>
             <div class="fr-mr-3v">
-                <h3>2. Positionnez vous sur le projet</h3>
-                <p>Egestas nec ultrices tincidunt vitae vestibulum. Malesuada urna nec velit a varius et. Feugiat habitant in sit et.</p>
+                <h3>2. Découvrez l'état des lieux</h3>
+                <p>Il s’agit des éléments renseignés par le demandeur en déposant sa demande.</p>
             </div>
             <span class="fr-icon-arrow-right-line" aria-hidden="true"></span>
         </div>
     </template>
     <template x-if="challengesStatus[1] == 'not-acquired'">
         <div class="fr-p-3v onboarding-tutorial__popup-content__part">
-            <h3>2. Positionnez vous sur le projet</h3>
+            <h3>2. Découvrez l'état des lieux</h3>
         </div>
     </template>
     <template x-if="challengesStatus[1] == 'acquired'">
         <div class="fr-p-3v onboarding-tutorial__popup-content__part">
-            <h3 class="text-linethrough disabled">2. Positionnez vous sur le projet</h3>
+            <h3 class="text-linethrough disabled">2. Découvrez l'état des lieux</h3>
         </div>
     </template>
     <template x-if="challengesStatus[2] == 'todo'">
@@ -86,20 +86,20 @@
                 <path d="M18 45C17.5864 45 17.25 44.6636 17.25 44.25C17.25 43.8364 17.5864 43.5 18 43.5C18.4136 43.5 18.75 43.8364 18.75 44.25C18.75 44.6636 18.4136 45 18 45Z" fill="#0063CB"/>
             </svg>
             <div class="fr-mr-3v">
-                <h3>3. Envoyez un message d’introduction</h3>
-                <p>Egestas nec ultrices tincidunt vitae vestibulum. Malesuada urna nec velit a varius et. Feugiat habitant in sit et.</p>
+                <h3>3. Présentez-vous brièvement dans la conversation</h3>
+                <p>Expliquez votre rôle, précisez de quelle manière vous pouvez intervenir ou aider.</p>
             </div>
             <span class="fr-icon-arrow-right-line" aria-hidden="true"></span>
         </div>
     </template>
     <template x-if="challengesStatus[2] == 'not-acquired'">
         <div class="fr-p-3v onboarding-tutorial__popup-content__part">
-            <h3>3. Envoyez un message d’introduction</h3>
+            <h3>3. Présentez-vous brièvement dans la conversation</h3>
         </div>
     </template>
     <template x-if="challengesStatus[2] == 'acquired'">
         <div class="fr-p-3v onboarding-tutorial__popup-content__part">
-            <h3 class="text-linethrough disabled">3. Envoyez un message d’introduction</h3>
+            <h3 class="text-linethrough disabled">3. Présentez-vous brièvement dans la conversation</h3>
         </div>
     </template>
     <template x-if="challengesStatus[3] == 'todo'">
@@ -120,20 +120,20 @@
                 <path d="M46.5 13.5C46.8846 13.5 47.2016 13.7895 47.245 14.1625L47.25 14.25V51.75C47.25 52.1346 46.9605 52.4516 46.5875 52.495L46.5 52.5H21C20.5858 52.5 20.25 52.1642 20.25 51.75C20.25 51.3654 20.5395 51.0484 20.9125 51.005L21 51H45.75V14.25C45.75 13.8654 46.0395 13.5484 46.4125 13.505L46.5 13.5Z" fill="#0063CB"/>
             </svg>
             <div class="fr-mr-3v">
-                <h3>4. Envoyer une invitation</h3>
-                <p>Egestas nec ultrices tincidunt vitae vestibulum. Malesuada urna nec velit a varius et. Feugiat habitant in sit et.</p>
+                <h3>4. Invitez des personnes sur le dossier</h3>
+                <p>Elles recevront un email les invitant à rejoindre ce dossier spécifique, avec votre message personnalisé.</p>
             </div>
             <span class="fr-icon-arrow-right-line" aria-hidden="true"></span>
         </div>
     </template>
     <template x-if="challengesStatus[3] == 'not-acquired'">
         <div class="fr-p-3v">
-            <h3>4. Envoyer une invitation</h3>
+            <h3>4. Invitez des personnes sur le dossier</h3>
         </div>
     </template>
     <template x-if="challengesStatus[3] == 'acquired'">
         <div class="fr-p-3v">
-            <h3 class="text-linethrough disabled">4. Envoyer une invitation</h3>
+            <h3 class="text-linethrough disabled">4. Invitez des personnes sur le dossier</h3>
         </div>
     </template>
 </div>

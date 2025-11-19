@@ -44,12 +44,12 @@ Alpine.data('ProjectPageTutorial', () => {
           }
         }
       }
-      // Watch for completion of step 1 triggered on a navigation click
+      // Watch for completion of step 1 triggered on role selection validation
       this.$watch(
         () => this.$store.tutorialsEvents.isTutorialForProjectPageOneCompleted,
         (isCompleted) => {
           if (
-            this.$store.tutorialsEvents.isTutorialForProjectPage === 1 &&
+            this.$store.tutorialsEvents.isTutorialForProjectPage === 1.5 &&
             isCompleted
           ) {
             this.acquireChallenge('project-page-tutorial-part1');
@@ -60,12 +60,12 @@ Alpine.data('ProjectPageTutorial', () => {
           }
         }
       );
-      // Watch for completion of step 2 triggered on role selection validation
+      // Watch for completion of step 2 triggered on a navigation click
       this.$watch(
         () => this.$store.tutorialsEvents.isTutorialForProjectPageTwoCompleted,
         (isCompleted) => {
           if (
-            this.$store.tutorialsEvents.isTutorialForProjectPage === 2.5 &&
+            this.$store.tutorialsEvents.isTutorialForProjectPage === 2 &&
             isCompleted
           ) {
             this.acquireChallenge('project-page-tutorial-part2');
@@ -110,15 +110,24 @@ Alpine.data('ProjectPageTutorial', () => {
         }
       );
     },
-    launchChallenge1() {
-      this.$store.tutorialsEvents.isTutorialForProjectPage = 1;
-    },
-    launchChallenge2(isSwitchTender) {
+    launchChallenge1(isSwitchTender) {
       if (isSwitchTender) {
+        this.acquireChallenge('project-page-tutorial-part1');
+        this.challengesStatus[0] = 'acquired';
+        this.challengesStatus[1] = 'todo';
+        this.$store.tutorialsEvents.isTutorialForProjectPage = 0;
+      }
+      else {
+        this.$store.tutorialsEvents.isTutorialForProjectPage = 1;
+      }
+    },
+    launchChallenge2() {
+      const currentUrl = new URL(location.href);
+      if (currentUrl.pathname.includes('/connaissance')) {
         this.acquireChallenge('project-page-tutorial-part2');
-            this.challengesStatus[1] = 'acquired';
-            this.challengesStatus[2] = 'todo';
-            this.$store.tutorialsEvents.isTutorialForProjectPage = 0;
+        this.challengesStatus[1] = 'acquired';
+        this.challengesStatus[2] = 'todo';
+        this.$store.tutorialsEvents.isTutorialForProjectPage = 0;
       }
       else {
         this.$store.tutorialsEvents.isTutorialForProjectPage = 2;
