@@ -291,127 +291,135 @@
         <template x-if="$store.tutorialsEvents.isTutorialForProjectPage === 4">
             {% include "projects/project/fragments/onboarding-tutorials/visual-hint.html" %}
         </template>
+        <template x-if="$store.tutorialsEvents.isTutorialForProjectPage === 4">
+            <svg class="hint-border-over" aria-hidden="true" viewBox="0 0 100 100" preserveAspectRatio="none">
+                <!-- Outer rect path; vector-effect keeps thickness constant -->
+                <rect
+                  x="87.6" y="35" width="3.7" height="50"
+                  fill="none"
+                  stroke="var(--vh-color)"
+                  stroke-width="var(--vh-thickness)"
+                  vector-effect="non-scaling-stroke"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-dasharray="14 6 5 10 18 7 9 5 12 8"
+                  style="animation: vh-dash var(--vh-speed) linear infinite;"
+                />
+              </svg>
+        </template>
     </div>
     {% if "list_projects" in user_site_perms or 'use_private_notes' in user_project_perms %}
-        <div x-data="ExpandableMenuHandler"
-             @click.outside="toggle"
-             class="project-navigation__container-btn-role-selection"
+        <div class="project-navigation__container-btn-role-selection"
              data-test-id="header-banner-advising-position"
              id="overview-step-5">
-            <button class="fr-btn fr-btn--tertiary-no-outline fr-icon-team-line {% if advising_position.is_advisor or advising_position.is_observer %}fr-pr-18v{% else %}fr-pr-28v{% endif %}"
-                    :class="{'visual-hint': $store.tutorialsEvents.isTutorialForProjectPage === 1}"
-                    role="button"
-                    x-ref="expandMenuButton"
+            <button data-fr-opened="false"
+                    aria-controls="modal-action"
+                    type="button"
                     id="select-observer-or-advisor-button"
-                    aria-expanded="false"
-                    aria-controls="select-observer-or-advisor"
-                    data-test-id="show-banner"
+                    class="fr-btn fr-btn--tertiary-no-outline fr-icon-team-line {% if advising_position.is_advisor or advising_position.is_observer %}fr-pr-25v{% else %}fr-pr-28v{% endif %}"
+                    :class="{'visual-hint': $store.tutorialsEvents.isTutorialForProjectPage === 1}"
                     @click="if ($store.tutorialsEvents.isTutorialForProjectPage==1) { $store.tutorialsEvents.isTutorialForProjectPage=1.5 };">
                 {% if advising_position.is_advisor or advising_position.is_observer %}
-                    Rôle
+                    Quitter
                 {% else %}
                     Rejoindre
                 {% endif %}
             </button>
-            <div class="fr-collapse fr-menu menu-modal-correct-fr-menu"
-                 id="select-observer-or-advisor">
-                <div class="fr-menu__list specific-width-25rem" x-data="{role:
-                    {% if advising_position.is_advisor %}
-                        '{% url 'projects-project-switchtender-join' project.id %}'
-                    {% elif advising_position.is_observer %}
-                        '{% url 'projects-project-observer-join' project.id %}'
-                    {% else %}
-                        ''
-                    {% endif %}
-                    , is_clickable: false }" x-init="$watch('role', value => is_clickable = true)">
-                    <div class="d-flex justify-content-between fr-p-3v">
-                        <div>
-                            <span class="fw-bolder specific-fontsize-14px">Changer de rôle</span>
-                        </div>
-                        <div>
-                            <button class="fr-btn--close fr-btn specific-button-close-from-dsfr"
-                                    title="Fermer le menu déroulant"
-                                    aria-controls="select-observer-or-advisor">Fermer</button>
-                        </div>
-                    </div>
-                    <hr class="divider-specific">
-                    <div class="d-flex flex-column">
-                        <form method="post" :action="role">
-                            {% csrf_token %}
-                            <div class="fr-p-3v"
-                                 x-on:click="role='{% url 'projects-project-observer-join' project.id %}'">
-                                <div class="fr-radio-group">
-                                    <input type="radio"
-                                           id="role-observer"
-                                           name="role"
-                                           value="{% url 'projects-project-observer-join' project.id %}"
-                                           x-model="role"
-                                           data-test-id="selector-join-as-observer">
-                                    <label for="role-observer" class="fw-bolder specific-fontsize-14px">Observateur</label>
+            <template x-if="$store.tutorialsEvents.isTutorialForProjectPage === 1">
+                <svg class="hint-border-over" aria-hidden="true" viewBox="0 0 100 100" preserveAspectRatio="none">
+                    <!-- Outer rect path; vector-effect keeps thickness constant -->
+                    <rect
+                      x="12" y="24" width="87" height="70"
+                      fill="none"
+                      stroke="var(--vh-color)"
+                      stroke-width="var(--vh-thickness)"
+                      vector-effect="non-scaling-stroke"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-dasharray="14 6 5 10 18 7 9 5 12 8"
+                      style="animation: vh-dash var(--vh-speed) linear infinite;"
+                    />
+                  </svg>
+            </template>
+            <dialog id="modal-action" class="fr-modal" aria-labelledby="modal-action-title">
+                <div class="fr-container fr-container--fluid fr-container-md">
+                    <div class="fr-grid-row fr-grid-row--center">
+                        <div class="fr-col-12 fr-col-md-8 fr-col-lg-6">
+                            <div class="fr-modal__body">
+                                <div class="fr-modal__header">
+                                    <button aria-controls="modal-action" title="Fermer" type="button" class="fr-btn--close fr-btn">Fermer</button>
                                 </div>
-                                <div>
-                                    <p class="fr-pl-8v fr-mb-0 specific-fontsize-14px">
-                                        Vous avez accès à l'intégralité du dossier et recevez les notifications de mises à jour,
-                                        mais vous n'êtes pas identifié comme un interlocuteur actif.
-                                    </p>
-                                </div>
-                            </div>
-                            <hr class="divider-specific">
-                            <div class="fr-p-3v"
-                                 x-on:click="role='{% url 'projects-project-switchtender-join' project.id %}'">
-                                <div class="fr-radio-group">
-                                    <input type="radio"
-                                           id="role-advisor"
-                                           name="role"
-                                           value="{% url 'projects-project-switchtender-join' project.id %}"
-                                           x-model="role"
-                                           data-test-id="selector-join-as-advisor">
-                                    <label for="role-advisor" class="fw-bolder specific-fontsize-14px">Conseiller</label>
-                                </div>
-                                <div>
-                                    <p class="fr-pl-8v fr-mb-0 specific-fontsize-14px">
-                                        Vous avez accès à l'intégralité du dossier et à ses notifications par email,
-                                        et êtes identifié comme un interlocuteur disponible sur ce dossier.
-                                    </p>
-                                </div>
-                            </div>
-                            <hr class="divider-specific">
-                            <div class="d-flex justify-content-between">
-                                <div class="fr-p-3v {% if not advising_position.is_advisor and not advising_position.is_observer %}w-100{% endif %}">
+                                <div class="fr-modal__content">
+                                    <h3 id="modal-action-title" class="fr-modal__title">
+                                        {% if advising_position.is_advisor or advising_position.is_observer %}
+                                            Êtes-vous sûr de vouloir quitter ce dossier ?
+                                        {% else %}
+                                            Voulez vous devenir conseiller sur ce projet ?
+                                        {% endif %}
+                                    </h3>
                                     {% if advising_position.is_advisor or advising_position.is_observer %}
-                                        <button class="fr-btn background-dsfr-primary-button w-100 justify-content-center"
-                                                data-test-id="button-validate-role"
-                                                :disabled="!is_clickable">Changer de rôle</button>
+                                        <p class="fr-m-0">
+                                            Vous n'aurez plus accès à l'intégralité du dossier et à ses notifications par email,
+                                            et ne serez plus identifié comme un interlocuteur disponible sur ce dossier.
+                                        </p>
                                     {% else %}
-                                        <button class="fr-btn background-dsfr-primary-button w-100 justify-content-center"
-                                                :class="{'visual-hint': $store.tutorialsEvents.isTutorialForProjectPage === 1.5}"
-                                                data-test-id="button-validate-role"
-                                                @click="if ($store.tutorialsEvents.isTutorialForProjectPage==1.5) { $store.tutorialsEvents.isTutorialForProjectPageTwoCompleted=true; }"
-                                                :disabled="!is_clickable">Choisir un rôle</button>
-                                        <template x-if="$store.tutorialsEvents.isTutorialForProjectPage === 1.5">
-                                            {% include "projects/project/fragments/onboarding-tutorials/visual-hint.html" %}
-                                        </template>
+                                        <p class="fr-m-0">
+                                            Vous avez accès à l'intégralité du dossier et à ses notifications par email,
+                                            et êtes identifié comme un interlocuteur disponible sur ce dossier.
+                                        </p>
+                                    {% endif %}
+                                    </div>
+                                <!-- Zone d'action de la modale -->
+                                <div class="fr-modal__footer d-flex">
+                                    {% if advising_position.is_advisor or advising_position.is_observer %}
+                                        <form method="post"
+                                              class="fr-m-auto"
+                                              action="{% url 'projects-project-access-advisor-delete' project.pk request.user.username %}">
+                                            {% csrf_token %}
+                                            <button class="fr-btn fr-btn--sm fr-btn--tertiary w-100 justify-content-center"
+                                                    data-test-id="button-quit-role">Quitter le dossier</button>
+                                        </form>
+                                    {% else %}
+                                        <form method="post"
+                                              class="fr-m-auto"
+                                              action="{% url 'projects-project-switchtender-join' project.pk %}">
+                                            {% csrf_token %}
+                                            <button class="fr-btn fr-btn--sm w-100 justify-content-center"
+                                                    :class="{'visual-hint': $store.tutorialsEvents.isTutorialForProjectPage === 1.5}"
+                                                    @click="if ($store.tutorialsEvents.isTutorialForProjectPage==1.5) { $store.tutorialsEvents.isTutorialForProjectPageOneCompleted=true; }"
+                                                    data-test-id="button-quit-role">Devenir conseiller</button>
+                                            <template x-if="$store.tutorialsEvents.isTutorialForProjectPage === 1.5">
+                                                {% include "projects/project/fragments/onboarding-tutorials/visual-hint.html" with extra_classes="position-visual-circle-hint--45px-y" %}
+                                            </template>
+                                            <template x-if="$store.tutorialsEvents.isTutorialForProjectPage === 1.5">
+                                                <svg class="hint-border-over" aria-hidden="true" viewBox="0 0 100 100" preserveAspectRatio="none">
+                                                    <!-- Outer rect path; vector-effect keeps thickness constant -->
+                                                    <rect
+                                                      x="38.6" y="38" width="24.6" height="36.5"
+                                                      fill="none"
+                                                      stroke="var(--vh-color)"
+                                                      stroke-width="var(--vh-thickness)"
+                                                      vector-effect="non-scaling-stroke"
+                                                      stroke-linecap="round"
+                                                      stroke-linejoin="round"
+                                                      stroke-dasharray="14 6 5 10 18 7 9 5 12 8"
+                                                      style="animation: vh-dash var(--vh-speed) linear infinite;"
+                                                    />
+                                                  </svg>
+                                            </template>
+                                        </form>
                                     {% endif %}
                                 </div>
-                            </form>
-                            {% if advising_position.is_advisor or advising_position.is_observer %}
-                                <div class="fr-p-3v">
-                                    <form method="post"
-                                          action="{% url 'projects-project-access-advisor-delete' project.pk request.user.username %}">
-                                        {% csrf_token %}
-                                        <button class="fr-btn fr-btn--sm fr-btn--tertiary w-100 justify-content-center"
-                                                data-test-id="button-quit-role">Quitter le dossier</button>
-                                    </form>
-                                </div>
-                            {% endif %}
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            </dialog>
             <template x-if="$store.tutorialsEvents.isTutorialForProjectPage === 1">
                 {% include "projects/project/fragments/onboarding-tutorials/visual-hint.html" %}
             </template>
         </div>
+
     {% endif %}
 </div>
 </div>
