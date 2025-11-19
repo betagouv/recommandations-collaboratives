@@ -14,6 +14,7 @@ document.addEventListener('alpine:init', () => {
           }
         }
       } catch (error) {
+        //TODO sentry see this error occurs too often
         throw new Error('Error loading tasks while view initialization : ' + error);
       }
     },

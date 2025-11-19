@@ -213,6 +213,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
         this.documents.push(document.data);
         return document.data;
       } catch (error) {
+        // TODO sentry see this error occurs too often
         return null;
       }
     }
@@ -293,7 +294,8 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
         this.updateCountOfElementsInDiscussion(messageResponse.data);
         this.messageIdToReply = null;
       } catch (error) {
-        if (updateMessage) {
+        // TODO sentry see this error occurs too often
+        if (!updateMessage) {
           throw new Error('Failed to send message', error);
         } else {
           throw new Error('Failed to update message', error);
