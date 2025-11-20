@@ -158,9 +158,9 @@ def project_list_export_csv(request):
             conversations.filter(
                 posted_by__in=switchtenders, posted_by__is_staff=False
             ).count(),  # conversations conseillers
-            max(
-                0, conversations.filter(posted_by__in=collaborators).count()
-            ),  # conversations project members
+            conversations.filter(
+                posted_by__in=collaborators
+            ).count(),  # conversations project members
             private_conversations.filter(
                 public=False
             ).count(),  # suivi interne conseillers
