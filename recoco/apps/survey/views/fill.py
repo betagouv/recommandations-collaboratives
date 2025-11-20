@@ -9,7 +9,7 @@ created: 2021-08-03 14:26:39 CEST
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.contrib.sites.models import Site
 from django.core.exceptions import BadRequest
 from django.shortcuts import get_object_or_404, redirect, render
@@ -18,7 +18,7 @@ from django.views.generic import DetailView, RedirectView
 
 from recoco.apps.projects import models as projects_models
 from recoco.apps.projects.utils import reactivate_if_necessary
-from recoco.utils import has_perm_or_403
+from recoco.utils import has_perm, has_perm_or_403
 
 from .. import forms, models, signals
 
@@ -27,25 +27,29 @@ from .. import forms, models, signals
 #####
 
 
-class SessionDetailsView(LoginRequiredMixin, DetailView):
+class SessionDetailsView(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
     model = models.Session
     pk_url_kwarg = "session_id"
     context_object_name = "session"
     template_name = "survey/session_details.html"
 
-    # FIXME: add permission check
+    def has_permission(self):
+        object = self.get_object()
+        return has_perm(self.request.user, "projects.use_surveys", object.project)
 
 
-class SessionResultsView(LoginRequiredMixin, DetailView):
+class SessionResultsView(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
     model = models.Session
     pk_url_kwarg = "session_id"
     context_object_name = "session"
     template_name = "survey/session_results.html"
 
-    # FIXME: add permission check
+    def has_permission(self):
+        object = self.get_object()
+        return has_perm(self.request.user, "projects.use_surveys", object.project)
 
 
-class SessionDoneView(LoginRequiredMixin, RedirectView):
+class SessionDoneView(LoginRequiredMixin, PermissionRequiredMixin, RedirectView):
     permanent = False
     query_string = True
     pattern_name = "projects-project-detail-knowledge"
@@ -55,7 +59,9 @@ class SessionDoneView(LoginRequiredMixin, RedirectView):
         project = get_object_or_404(projects_models.Project, pk=session.project.id)
         return super().get_redirect_url(*args, project_id=project.id)
 
-    # FIXME: add permission check
+    def has_permission(self):
+        object = self.get_object()
+        return has_perm(self.request.user, "projects.use_surveys", object.project)
 
 
 #####
