@@ -29,7 +29,7 @@ from ..utils import assign_advisor, assign_collaborator
 
 
 @pytest.mark.django_db
-def test_create_note_not_available_for_non_staff_users(request, client):
+def test_create_private_note_not_available_for_non_staff_users(request, client):
     project = Recipe(models.Project, sites=[get_current_site(request)]).make()
     url = reverse("projects-create-note", args=[project.id])
     with login(client):
@@ -38,7 +38,7 @@ def test_create_note_not_available_for_non_staff_users(request, client):
 
 
 @pytest.mark.django_db
-def test_create_note_available_for_advisor(request, client):
+def test_create_private_note_available_for_advisor(request, client):
     project = Recipe(models.Project, sites=[get_current_site(request)]).make()
     url = reverse("projects-create-note", args=[project.id])
 
@@ -107,7 +107,7 @@ def test_private_note_hidden_from_project_members(request, client, project):
 
 
 @pytest.mark.django_db
-def test_update_note_not_available_for_non_staff_users(request, client):
+def test_update_private_note_not_available_for_non_staff_users(request, client):
     note = Recipe(models.Note, site=get_current_site(request)).make()
     url = reverse("projects-update-note", args=[note.id])
     with login(client):
@@ -116,7 +116,7 @@ def test_update_note_not_available_for_non_staff_users(request, client):
 
 
 @pytest.mark.django_db
-def test_advisor_can_update_own_note(request, client):
+def test_advisor_can_update_own_private_note(request, client):
     site = get_current_site(request)
 
     with login(client) as user:
@@ -132,7 +132,7 @@ def test_advisor_can_update_own_note(request, client):
 
 
 @pytest.mark.django_db
-def test_advisor_cant_update_other_advisor_note(request, client):
+def test_advisor_cant_update_other_advisor_private_note(request, client):
     current_site = get_current_site(request)
     note = Recipe(models.Note, site=current_site).make()
     url = reverse("projects-update-note", args=[note.id])
@@ -201,7 +201,7 @@ def test_collaborator_cant_delete_other_people_note(request, client, project):
 
 
 @pytest.mark.django_db
-def test_delete_note_removes_activity(request, client, project):
+def test_delete_private_note_removes_activity(request, client, project):
     with login(client, username="addman") as user:
         assign_advisor(user, project)
 
