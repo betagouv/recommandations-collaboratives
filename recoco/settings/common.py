@@ -25,7 +25,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -118,7 +117,6 @@ SILENCED_SYSTEM_CHECKS = [
     "sites.E101"  # Check to ensure SITE_ID is an int - ours is an object
 ]
 
-
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -138,7 +136,6 @@ MIDDLEWARE = [
     "waffle.middleware.WaffleMiddleware",
     "django_htmx.middleware.HtmxMiddleware",
 ]
-
 
 ROOT_URLCONF = "recoco.urls"
 
@@ -181,13 +178,19 @@ CRISPY_TEMPLATE_PACK = "dsrc_crispy_forms"
 
 WSGI_APPLICATION = "recoco.wsgi.application"
 
-
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",  # noqa
+        "OPTIONS": {
+            "user_attributes": (
+                "first_name",
+                "last_name",
+                "email",
+            )  # removing username since it is a duplication of email
+        },
     },
     {
         "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
@@ -228,7 +231,6 @@ TIME_ZONE = "Europe/Paris"
 USE_I18N = True
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
@@ -238,7 +240,6 @@ STATIC_ROOT = os.path.join(BASE_DIR, "..", "static")
 STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
-
 
 STATICFILES_FINDERS = [
     "django.contrib.staticfiles.finders.FileSystemFinder",
@@ -308,7 +309,6 @@ TEAM_EMAILS = ["friches@beta.gouv.fr"]
 # BREVO
 BREVO_API_KEY = "NO-API-KEY-DEFINED"
 
-
 # IFrames
 X_FRAME_OPTIONS = "SAMEORIGIN"
 
@@ -357,7 +357,6 @@ SOCIALACCOUNT_EMAIL_REQUIRED = True
 SOCIALACCOUNT_EMAIL_AUTHENTICATION = True
 SOCIALACCOUNT_EMAIL_AUTHENTICATION_AUTO_CONNECT = True
 
-
 SOCIALACCOUNT_FORMS = {
     "signup": "recoco.apps.social_account.forms.SignupForm",
 }
@@ -389,7 +388,6 @@ SOCIALACCOUNT_PROVIDERS = {
 
 # allow one step back for TOTP
 MFA_TOTP_TOLERANCE = 1
-
 
 # Django vite
 DJANGO_VITE_ASSETS_PATH = BASE_DIR / "frontend/dist"
@@ -548,7 +546,6 @@ CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL", default="redis://localhost:63
 CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
 CELERY_RESULT_BACKEND = "django-db"
 
-
 # Metabase
 METABASE_HOST = os.environ.get("METABASE_HOST")
 METABASE_API_KEY = os.environ.get("METABASE_API_KEY")
@@ -576,16 +573,13 @@ DS_AUTOLOAD_SCHEMA = True
 DS_AUTOCREATE_FOLDER = True
 DS_ADAPTERS_DIR = BASE_DIR / "apps/demarches_simplifiees/adapters"
 
-
 # Resource importers
 AIDES_TERRITOIRES_TOKEN = os.environ.get("AIDES_TERRITOIRES_TOKEN")
-
 
 # Waffle (feature flags)
 WAFFLE_FLAG_MODEL = "feature_flag.Flag"
 WAFFLE_SWITCH_MODEL = "feature_flag.Switch"
 WAFFLE_SAMPLE_MODEL = "feature_flag.Sample"
-
 
 # Watson
 
