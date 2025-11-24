@@ -128,7 +128,7 @@
             <div x-data="ProjectShare" class="row fr-mt-2v position-relative">
                 <div id="user-management" class="invisible-anchor-high"></div>
                 <h6 class="text-uppercase fw-bold d-block fr-mb-2w font-small">Gestion des utilisateurs</h6>
-                <div class="col">
+                <div class="col position-relative">
                     <p class="text-info-custom fr-mb-2v">Équipe de suivi</p>
                     {% if "invite_advisors" in user_project_perms %}
                         <button @click="openInviteSwitchtenderModal; $store.tutorialsEvents.isTutorialForProjectPageFourCompleted = true;"
@@ -151,7 +151,7 @@
                             <svg class="hint-border-over" aria-hidden="true" viewBox="0 0 100 40" preserveAspectRatio="none">
                                 <!-- Outer rect path; vector-effect keeps thickness constant -->
                                 <rect
-                                  x="1.5" y="9.7" width="48.3" height="6.1"
+                                  x="2.4" y="7.9" width="96.9" height="10"
                                   fill="none"
                                   stroke="var(--vh-color)"
                                   stroke-width="var(--vh-thickness)"
@@ -209,7 +209,7 @@
                         </ul>
                     {% endif %}
                 </div>
-                <div class="col">
+                <div class="col position-relative">
                     <p class="text-info-custom fr-mb-2v">Equipe du demandeur et partenaires</p>
                     {% if "invite_collaborators" in user_project_perms %}
                         <button @click="openInviteMemberModal; $store.tutorialsEvents.isTutorialForProjectPageFourCompleted = true;"
@@ -232,7 +232,7 @@
                             <svg class="hint-border-over" aria-hidden="true" viewBox="0 0 100 40" preserveAspectRatio="none">
                                 <!-- Outer rect path; vector-effect keeps thickness constant -->
                                 <rect
-                                  x="50.9" y="9.7" width="48.3" height="6.1"
+                                  x="2.4" y="7.9" width="96.9" height="10"
                                   fill="none"
                                   stroke="var(--vh-color)"
                                   stroke-width="var(--vh-thickness)"

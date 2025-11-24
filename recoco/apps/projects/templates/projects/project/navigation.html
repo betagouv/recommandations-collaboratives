@@ -277,7 +277,7 @@
 </fieldset>
 {% endwith %}
 <div class="d-flex">
-    <div class="d-flex fr-px-4w align-items-center">
+    <div class="d-flex fr-px-4w align-items-center position-relative">
         {% if "use_crm" in user_site_perms and not disable_crm %}
             <a class="fr-btn fr-btn--tertiary fr-btn--sm fr-btn--icon-left fr-icon-pulse-line justify-content-center fr-mr-2v"
                href="{% url 'crm-project-details' project.pk %}">CRM</a>
@@ -295,7 +295,7 @@
             <svg class="hint-border-over" aria-hidden="true" viewBox="0 0 100 100" preserveAspectRatio="none">
                 <!-- Outer rect path; vector-effect keeps thickness constant -->
                 <rect
-                  x="87.6" y="35" width="3.7" height="50"
+                  x="30" y="35" width="50" height="50"
                   fill="none"
                   stroke="var(--vh-color)"
                   stroke-width="var(--vh-thickness)"
