@@ -1,4 +1,5 @@
 import Alpine from '../../utils/globals';
+import { ToastType } from '../../models/toastType';
 import api, {
   conversationsMessagesUrl,
   conversationsActivitiesUrl,
@@ -293,11 +294,15 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
         this.updateCountOfElementsInDiscussion(messageResponse.data);
         this.messageIdToReply = null;
       } catch (error) {
-        if (updateMessage) {
-          throw new Error('Failed to send message', error);
-        } else {
-          throw new Error('Failed to update message', error);
-        }
+        this.$store.app.displayToastMessage({
+          message: `Erreur lors de ${updateMessage ? 'la modification' : "l'envoi"} du message: ${Object.values(JSON.parse(error.request.responseText)).join(', ')}`,
+          timeout: 5000,
+          type: ToastType.error,
+        });
+        throw new Error(
+          `Failed to ${updateMessage ? 'update' : 'send'} message`,
+          error
+        );
       }
     }
   },
