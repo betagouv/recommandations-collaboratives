@@ -5,7 +5,9 @@ from . import models
 
 @admin.register(models.ChallengeDefinition)
 class ChallengeDefinitionAdmin(admin.ModelAdmin):
-    list_display = ["name", "description"]
+    list_display = ["name", "description", "site"]
+
+    list_filter = ["site"]
 
 
 @admin.register(models.Challenge)
