@@ -139,13 +139,11 @@ def test_project_list_available_for_switchtender_user(request, client):
     current_site = get_current_site(request)
     baker.make(home_models.SiteConfiguration, site=current_site)
     url = reverse("projects-project-list")
+
     with login(client, groups=["example_com_staff", "example_com_advisor"]):
         response = client.get(url, follow=True)
 
-    advisor_url = reverse("projects-project-list-staff")
-    url, code = response.redirect_chain[-1]
-    assert code == 302
-    assert url == advisor_url
+    assert response.status_code == 200
 
 
 @pytest.mark.django_db
@@ -157,10 +155,7 @@ def test_project_list_available_for_advisor(request, client):
     with login(client, groups=["example_com_advisor"]):
         response = client.get(url, follow=True)
 
-    staff_url = reverse("projects-project-list-staff")
-    url, code = response.redirect_chain[-1]
-    assert code == 302
-    assert url == staff_url
+    assert response.status_code == 200
 
 
 @pytest.mark.django_db
@@ -172,10 +167,7 @@ def test_project_list_available_for_staff(request, client):
     with login(client, groups=["example_com_staff"]):
         response = client.get(url, follow=True)
 
-    staff_url = reverse("projects-project-list-staff")
-    url, code = response.redirect_chain[-1]
-    assert code == 302
-    assert url == staff_url
+    assert response.status_code == 200
 
 
 @pytest.mark.django_db

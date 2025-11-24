@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% load django_vite %}
+{% load static %}
+{% load sass_tags %}
+{% load crispy_forms_tags %}
+{% block title %}
+    Déposer un dossier pour le compte du demandeur {{ block.super }}
+{% endblock title %}
+{% block og_title %}
+    Déposer un dossier pour le compte du demandeur {{ block.super }}
+{% endblock og_title %}
+{% block js %}
+    {% vite_asset 'js/apps/advisorCreateProject.js' %}
+{% endblock js %}
+{% block css %}
+    <link href="{% sass_src 'home/css/dsfr/custom-dsfr.scss' %}"
+          rel="stylesheet"
+          type="text/css">
+    <link href="{% sass_src 'home/css/dsfr/marianne.css' %}"
+          rel="stylesheet"
+          type="text/css">
+    <link href="{% sass_src 'onboarding/css/prefill-user.scss' %}"
+          rel="stylesheet"
+          type="text/css">
+{% endblock css %}
+{% block content %}
+    <div class="container">
+        <div class="banner  text-center">
+            {% if site_config.email_logo %}
+                <img src="{{ site_config.email_logo.url }}"
+                     width="10%"
+                     height="auto"
+                     alt="Logo {{ request.site.name }}" />
+            {% endif %}
+            <h1>
+                <strong>Décrivez votre demande sur</strong> {{ request.site.name }}
+            </h1>
+        </div>
+        <div class="fr-stepper fr-mb-2w">
+            <h2 class="fr-stepper__title">
+                Identifiez la personne pour laquelle vous déposez cette demande
+                <span class="fr-stepper__state">Étape 1 sur 2</span>
+            </h2>
+            <div class="fr-stepper__steps" data-fr-current-step="1" data-fr-steps="2"></div>
+            <p class="fr-stepper__details">
+                <span class="fr-text--bold">Étape suivante :</span> Décrivez votre demande
+            </p>
+        </div>
+        <div class="container__form justify-content-center"
+             x-data="AjvValidationSchema('schemaOnboardingPrefillSetuserFormValidator')">
+            <div class="onboarding__form">
+                <h3 class="fr-stepper__title text-align-center fr-mb-4w">Vous êtes référent sur le dossier</h3>
+                <div class="blue-text-block fr-mb-4w fr-p-1w">
+                    <p class="fr-m-0">Vous pourrez inviter le demandeur  ultérieurement. Vous recevrez les emails relatifs au dossier.</p>
+                </div>
+                <a href="{% url 'onboarding-project' %}?prefill=true"
+                   class="fr-btn justify-content-center fr-mb-4w w-100">Déposer un dossier</a>
+            </div>
+            <div class="fr-mb-4w d-flex flex-it-well">
+                <div class="separator"></div>
+                <p class="place-it-well">OU</p>
+                <div class="separator"></div>
+            </div>
+            <div class="onboarding__form"
+                 x-data="DsrcFormValidator('{{ form.helper.form_id }}', schemaValidator, '{{ request.method }}')"
+                 x-init="init">
+                <h3 class="fr-stepper__title text-align-center fr-mb-4w">Une autre personne est référente sur le dossier</h3>
+                <div class="blue-text-block fr-mb-4w fr-p-1w">
+                    <p class="fr-m-0">
+                        Entrez ici les coordonnées de l'interlocuteur ou l'interlocutrice chez le demandeur.
+                        Elle recevra les emails relatifs au dossier, notamment pour l’inviter à finaliser sa création.
+                    </p>
+                </div>
+                {% include "onboarding/fragments/form-user.html" with include_password_field=False include_message_field=True %}
+            </div>
+        </div>
+    </div>
+{% endblock content %}

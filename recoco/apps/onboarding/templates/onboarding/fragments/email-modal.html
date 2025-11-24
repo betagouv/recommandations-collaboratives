@@ -1,0 +1,46 @@
+<div x-data="{ show: false }"
+     x-init="setTimeout(() => { show = !!localStorage.getItem('userEmailProjectCreationStep') && JSON.parse(localStorage.getItem('userReachSignup')) }, 500)">
+    <dialog aria-labelledby="email-modal-title"
+            id="email-modal"
+            class="fr-modal"
+            :open="show"
+            :class="{ 'fr-modal--opened': show }"
+            :aria-modal="show"
+            role="dialog">
+        <div class="fr-container fr-container--fluid fr-container-md">
+            <div class="fr-grid-row fr-grid-row--center">
+                <div class="fr-col-12 fr-col-md-8 fr-col-lg-6">
+                    <div class="fr-modal__body">
+                        <div class="fr-modal__header">
+                            <button class="fr-btn--close fr-btn"
+                                    aria-controls="email-modal"
+                                    @click="show = false">Fermer</button>
+                        </div>
+                        <div class="fr-modal__content">
+                            <h1 id="email-modal-title" class="fr-modal__title">
+                                <span class="fr-icon-arrow-right-line fr-icon--lg"></span>
+                                Saisie précédente non terminée
+                            </h1>
+                            <p>
+                                Nous avons détecté que vous avez déjà commencé à créer un dossier avec l'email suivant :
+                                <strong data-cy="found-email-onboarding"
+                                        x-text="localStorage.getItem('userEmailProjectCreationStep')"></strong>.
+                                <br />
+                                Souhaitez-vous continuer ou l'abandonner ?
+                            </p>
+                            <div class="fr-btns-group fr-btns-group--inline-sm">
+                                <button class="fr-btn fr-btn--secondary"
+                                        @click="show = false; localStorage.removeItem('userEmailProjectCreationStep')">
+                                    Abandonner
+                                </button>
+                                <a class="fr-btn"
+                                   data-cy="continue-onboarding"
+                                   href="{% url 'onboarding-signup' %}">Continuer</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </dialog>
+</div>

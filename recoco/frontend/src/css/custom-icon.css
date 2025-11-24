@@ -1,0 +1,24 @@
+.fr-icon-double-check-line::after,
+.fr-icon-double-check-line::before {
+  mask-image: url(../assets/check-double-line.svg);
+}
+
+.fr-icon-list-check-line::after,
+.fr-icon-list-check-line::before {
+  mask-image: url(../assets/list-check.svg);
+}
+
+.fr-icon-contact-book-line::after,
+.fr-icon-contact-book-line::before {
+  mask-image: url(../assets/contacts-book-line.svg);
+}
+
+.fr-icon-tag-line::after,
+.fr-icon-tag-line::before {
+  mask-image: url(../assets/tag-line.svg);
+}
+
+.fr-icon-corner-down-right-line::after,
+.fr-icon-corner-down-right-line::before {
+  mask-image: url(../assets/corner-down-right-line.svg);
+}

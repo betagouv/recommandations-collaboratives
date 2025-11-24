@@ -1,0 +1,148 @@
+{% load static %}
+{% load django_vite %}
+{% load phone_filters %}
+{% block js %}
+    {% vite_asset 'js/apps/user.js' %}
+{% endblock js %}
+{% load guardian_tags %}
+{% load projects_extra %}
+{% load sass_tags %}
+{% block css %}
+    <link href="{% sass_src 'css/user/user_card.scss' %}"
+          rel="stylesheet"
+          type="text/css">
+{% endblock css %}
+{% get_obj_perms request.user for request.site as "user_site_perms" %}
+{% get_obj_perms request.user for project as "user_project_perms" %}
+<template x-cloak x-if="user">
+    <div x-data="User(user)"
+         class="user-card position-relative d-flex fr-my-1v flex-column justify-content-between align-items-start">
+        <div class="position-relative d-flex align-items-center justify-content-between {% if user_activity %}w-100{% endif %}">
+            <button x-ref="user"
+                    type="button"
+                    {% if not user_popup_deactivate %}@click="onUserClick"{% endif %}
+                    class="d-flex align-items-center flex-wrap user-info border-0 fr-p-0 bg-transparent {% if user_popup_deactivate %}no-underline{% endif %}"
+                    data-test-id="button-open-tooltip-user-card">
+                <span class="fr-mr-1v d-flex align-items-center font-very-small">
+                    <img class="user-card__gravatar rounded-circle fr-mr-1v"
+                         :class="user.is_active ? 'border-0' : 'neutral-role-border border-2'"
+                         :src='gravatar_url(currentUser.email, 18, `${currentUser.first_name} ${currentUser.last_name}`, stringToColor(currentUser.email) )'
+                         :style="{ '--current-bg-color': stringToColor(currentUser.email) }"
+                         :alt="`${currentUser.first_name} ${currentUser.last_name}`">
+                    <template x-if="currentUser">
+                        <strong class="user-card__name text-nowrap text-capitalize"
+                                :class="!currentUser.is_active && 'inactive-status'"
+                                data-test-id="user-card-intro">
+                            <span x-text="getUserDisplayedName()"></span>
+                        </strong>
+                    </template>
+                </span>
+                <template x-if="currentUser?.profile?.organization?.name">
+                    <span class="user-card__org-name fw-normal font-italic font-very-small"
+                          x-text="currentUser.profile.organization.name"></span>
+                </template>
+                <template x-if="!currentUser?.profile?.organization?.name">
+                    <span class="user-card__org-name fw-normal font-italic font-very-small">{{ project.org_name }}</span>
+                </template>
+            </button>
+            {% if 'use_crm' in user_site_perms and user_activity %}
+                {% if not disable_links %}
+                    <a class="small fr-ml-1v" href="{% url 'crm-user-details' user.pk %}">
+                        <svg class="bi fr-mr-1v" width="16" height="16" fill="currentColor">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#activity" />
+                        </svg>
+                    </a>
+                {% else %}
+                    <span class="small fr-ml-1v">
+                        <svg class="bi fr-mr-1v" width="16" height="16" fill="currentColor">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#activity" />
+                        </svg>
+                    </span>
+                {% endif %}
+            {% endif %}
+        </div>
+        <div x-cloak
+             x-ref="userTooltip"
+             id="user-tooltip"
+             @click.outside="onOutsideUserClick"
+             data-test-id="tooltip-user-card"
+             class="user-card-popup flex-column"
+             :class="user.is_active && 'neutral-role-border'">
+            <template x-if="currentUser?.profile?.organization_position">
+                <div class="d-flex align-items-center justify-content-between text-blue font-very-small specific-my">
+                    <div class="d-flex align-items-center">
+                        <svg class="bi align-middle fr-mr-2v specific-ml-012"
+                             width="18"
+                             height="18"
+                             fill="currentColor">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#briefcase" />
+                        </svg>
+                        <span class="text-decoration-none text-blue"
+                              x-text="currentUser.profile.organization_position"></span>
+                    </div>
+                </div>
+            </template>
+            <template x-if="currentUser.is_active">
+                <span class="d-flex align-items-center justify-content-between text-blue font-very-small fr-mt-1v">
+                    <div class="d-flex align-items-center">
+                        <svg class="bi align-middle fr-mr-2v"
+                             width="18"
+                             height="18"
+                             fill="currentColor">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#link-45deg" />
+                        </svg>
+                        {% if not disable_links %}
+                            <a class="text-decoration-none text-blue"
+                               :href="`mailto:${currentUser.email}`"
+                               x-text="currentUser.email"></a>
+                        {% else %}
+                            <span x-text="currentUser.email"></span>
+                        {% endif %}
+                    </div>
+                    <button class="fr-ml-3w fr-px-2v fr-py-0 btn small btn-outline-primary"
+                            @click="clipboardCopy(`L'email`, currentUser.email)">
+                        <svg class="bi align-baseline" width="10" height="10" fill="currentColor">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#clipboard" />
+                        </svg>
+                    </button>
+                </span>
+            </template>
+            {% if not advising_position.is_observer %}
+                <template x-if="currentUser.is_active && currentUser.phone_no">
+                    <span class="d-flex align-items-center justify-content-between text-blue font-very-small fr-mt-1v">
+                        <div class="d-flex align-items-center">
+                            <svg class="bi align-middle fr-mr-2v"
+                                 width="15"
+                                 height="15"
+                                 fill="currentColor">
+                                <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#telephone" />
+                            </svg>
+                            {% if not disable_links %}
+                                <a class="text-decoration-none text-blue"
+                                   :href="`tel:${currentUser.phone_no}`"
+                                   x-text="formatPhone(currentUser.phone_no)"></a>
+                            {% else %}
+                                <span x-text="formatPhone(currentUser.phone_no)"></span>
+                            {% endif %}
+                        </div>
+                        <button class="fr-ml-3w fr-px-2v fr-py-0 btn small btn-outline-primary"
+                                @click="clipboardCopy('Le numéro de téléphone', currentUser.phone_no)">
+                            <svg class="bi align-baseline" width="10" height="10" fill="currentColor">
+                                <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#clipboard" />
+                            </svg>
+                        </button>
+                    </span>
+                </template>
+            {% endif %}
+            <template x-if="currentUser && !currentUser.is_active">
+                <span data-test-id="deactivated-user-details"
+                      class="fr-p-1v fr-px-2v font-very-small bg-grey-light w-100 d-flex fr-mt-1v text-nowrap specific-borderradius-2px"
+                      x-text="`Compte desactivé depuis le ${new Date(currentUser.last_login.date).toLocaleDateString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' })}`"></span>
+            </template>
+            <template x-if="!currentUser">
+                <span data-test-id="deleted-user-details"
+                      class="fr-p-1v fr-px-2v font-very-small bg-grey-light w-100 d-flex fr-mt-1v text-nowrap specific-borderradius-2px">Compte desactivé</span>
+            </template>
+        </div>
+    </div>
+</template>

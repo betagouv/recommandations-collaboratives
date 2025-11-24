@@ -1,9 +1,11 @@
 document.addEventListener('alpine:init', () => {
   Alpine.data('alpineMultiSelect', (obj) => ({
+    displayRegions: obj.displayRegions || false,
     elementId: obj.elementId || 'select-list',
+    objectsToSelect: obj.objectsToSelect || [],
+    regions: [],
     options: [],
     selected: obj.selected || [],
-    objectsToSelect: obj.objectsToSelect,
     selectedElms: [],
     show: false,
     search: '',
@@ -19,47 +21,86 @@ document.addEventListener('alpine:init', () => {
     isOpen() {
       return this.show === true;
     },
-
-    // Initializing component
     init() {
-      for (let i = 0; i < this.objectsToSelect.length; i++) {
-        this.options.push({
-          value: this.objectsToSelect[i].code,
-          text: `(${this.objectsToSelect[i].code}) ${this.objectsToSelect[i].name}`,
-          search: `(${this.objectsToSelect[i].code}) ${this.objectsToSelect[i].name}`,
-          selected: Object.values(this.selected).includes(
-            this.objectsToSelect[i].code
-          ),
-        });
-        if (this.options[i].selected) {
-          this.selectedElms.push(this.options[i]);
-        }
-      }
+      this.buildOptions();
       // searching for the given value
       this.$watch('search', (e) => {
-        this.options = [];
-        const options = document.getElementById(this.elementId).options;
-        Object.values(options)
-          .filter((el) => {
+        if (this.displayRegions) {
+          document.querySelectorAll('.department-item').forEach((dep) => {
             let reg = new RegExp(this.search, 'gi');
-            return el.dataset.search.match(reg);
-          })
-          .forEach((el) => {
-            let newel = {
-              value: el.value,
-              text: el.innerText,
-              search: el.dataset.search,
-              selected: Object.values(this.selected).includes(el.value),
-            };
-            this.options.push(newel);
+            if (dep.innerText.match(reg)) {
+              dep.classList.remove('d-none');
+            } else {
+              dep.classList.add('d-none');
+            }
           });
+          const regionHeaders = document.querySelectorAll('.region-header');
+          regionHeaders.forEach((region) => {
+            const departmentItem =
+              region.parentElement.querySelectorAll('.department-item');
+            const departmentItemHide = region.parentElement.querySelectorAll(
+              '.department-item.d-none'
+            );
+            if (departmentItem.length == departmentItemHide.length) {
+              region.classList.add('d-none');
+            } else region.classList.remove('d-none');
+          });
+        } else {
+          const options =
+            document.getElementById(this.elementId)?.options || [];
+          Object.values(options)
+            .filter((el) => {
+              let reg = new RegExp(this.search, 'gi');
+              return el.dataset.search.match(reg);
+            })
+            .forEach((el) => {
+              let newel = {
+                value: el.value,
+                text: el.innerText,
+                search: el.dataset.search,
+                selected: this.selected.includes(el.value),
+              };
+              this.options.push(newel);
+            });
+        }
       });
     },
-    // clear search field
+    buildOptions() {
+      const data = this.objectsToSelect;
+      if (this.displayRegions) {
+        this.regions = data || [];
+        this.options = [];
+        this.regions.forEach((region) => {
+          region.departments.forEach((dep) => {
+            this.options.push({
+              value: dep.code,
+              text: `(${dep.code}) ${dep.name}`,
+              search: `(${dep.code}) ${dep.name}`,
+              selected: this.selected.includes(dep.code),
+              region: region.name,
+            });
+          });
+        });
+        this.selectedElms = this.options.filter((opt) => opt.selected);
+      } else {
+        this.options = [];
+        data.forEach((item) => {
+          const newItem = {
+            value: item.code,
+            text: `(${item.code}) ${item.name}`,
+            search: `(${item.code}) ${item.name}`,
+            selected: this.selected.includes(item.code),
+          };
+          this.options.push(newItem);
+          if (newItem.selected) {
+            this.selectedElms.push(newItem);
+          }
+        });
+      }
+    },
     clear() {
       this.search = '';
     },
-    // deselect selected options
     deselect() {
       setTimeout(() => {
         this.selected = [];
@@ -69,15 +110,17 @@ document.addEventListener('alpine:init', () => {
         });
       }, 100);
     },
-    // select given option
     select(index, event) {
       if (!this.options[index].selected) {
         this.options[index].selected = true;
-        this.options[index].element = event.target;
+        this.options[index].element = event ? event.target : null;
         this.selected.push(this.options[index].value);
         this.selectedElms.push(this.options[index]);
       } else {
-        this.selected.splice(this.selected.lastIndexOf(index), 1);
+        this.selected.splice(
+          this.selected.lastIndexOf(this.options[index].value),
+          1
+        );
         this.options[index].selected = false;
         Object.keys(this.selectedElms).forEach((key) => {
           if (this.selectedElms[key].value == this.options[index].value) {
@@ -89,7 +132,6 @@ document.addEventListener('alpine:init', () => {
       }
       this.$dispatch('set-departments', this.selected);
     },
-    // remove from selected option
     remove(index, option) {
       this.selectedElms.splice(index, 1);
       Object.keys(this.selected).forEach((skey) => {
@@ -104,11 +146,9 @@ document.addEventListener('alpine:init', () => {
       });
       this.$dispatch('set-departments', this.selected);
     },
-    // filter out selected elements
     selectedElements() {
       return this.options.filter((op) => op.selected === true);
     },
-    // get selected values
     selectedValues() {
       return this.options
         .filter((op) => op.selected === true)
@@ -120,6 +160,50 @@ document.addEventListener('alpine:init', () => {
       Object.keys(this.options).forEach((key) => {
         this.options[key].selected = false;
       });
+    },
+    // Region-specific methods
+    handleRegionSelect(region) {
+      if (!this.displayRegions) return;
+      const allSelected = region.departments.every((dep) =>
+        this.selected.includes(dep.code)
+      );
+      if (allSelected) {
+        region.departments.forEach((dep) => {
+          const idx = this.selected.indexOf(dep.code);
+          if (idx !== -1) this.selected.splice(idx, 1);
+        });
+      } else {
+        region.departments.forEach((dep) => {
+          if (!this.selected.includes(dep.code)) {
+            this.selected.push(dep.code);
+          }
+        });
+      }
+      this.selectedElms = this.options.filter((opt) =>
+        this.selected.includes(opt.value)
+      );
+      this.$dispatch('set-departments', this.selected);
+    },
+    isRegionSelected(region) {
+      if (!this.displayRegions) return false;
+      return region.departments.every((dep) =>
+        this.selected.includes(dep.code)
+      );
+    },
+    handleDepartmentSelect(dep) {
+      const idx = this.selected.indexOf(dep.code);
+      if (idx === -1) {
+        this.selected.push(dep.code);
+      } else {
+        this.selected.splice(idx, 1);
+      }
+      this.selectedElms = this.options.filter((opt) =>
+        this.selected.includes(opt.value)
+      );
+      this.$dispatch('set-departments', this.selected);
+    },
+    isDepartmentSelected(dep) {
+      return this.selected.includes(dep.code);
     },
   }));
 });

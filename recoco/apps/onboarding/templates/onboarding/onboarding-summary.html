@@ -9,6 +9,9 @@
     <link href="{% sass_src 'home/css/dsfr/custom-dsfr.scss' %}"
           rel="stylesheet"
           type="text/css">
+    <link href="{% sass_src 'projects/css/kanban.scss' %}"
+          rel="stylesheet"
+          type="text/css">
 {% endblock css %}
 {% block title %}
     | Solliciter l'équipe {{ request.site.name }}
@@ -23,7 +26,8 @@
     Ces informations nous permettent de traiter votre demande dans les meilleures conditions.
 {% endblock tagline %}
 {% block content %}
-    <div class="container onboarding__summary">
+    <div class="container onboarding__summary"
+         x-data="{init: function() { localStorage.removeItem('userEmailProjectCreationStep') }}">
         <div class="banner  text-center">
             {% if site_config.email_logo %}
                 <img src="{{ site_config.email_logo.url }}"
@@ -36,19 +40,19 @@
             </h1>
         </div>
         <div class="container__form">
-            <div class="project-card">
+            <div class="project-card project-card__border--highlight">
                 <div class="project-card__content">
                     <div class="project__title">
                         {% if project.commune %}
-                            <p class="project__title-city">{{ project.commune.name }}</p>
+                            <p class="project__title-city">{{ project.name }}</p>
                         {% else %}
                             <p class="project__title-city">Pas encore de commune associée</p>
                         {% endif %}
-                        <p class="project__title-name">{{ project.name }}</p>
+                        <p class="project__title-name">{{ project.owner.profile.organization.name|default:project.org_name }}</p>
                     </div>
                     <div class="project__info">
                         {% if project.commune %}
-                            <p class="project__info-insee fr-icon-map-pin-2-line">INSEE: {{ project.commune.insee }}</p>
+                            <p class="project__info-insee fr-icon-map-pin-2-line">{{ project.commune.name }}</p>
                         {% endif %}
                         <p class="project__info-date fr-icon-calendar-event-line">déposé aujourd'hui</p>
                     </div>

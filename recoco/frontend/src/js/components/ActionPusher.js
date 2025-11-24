@@ -2,13 +2,18 @@ import Alpine from 'alpinejs';
 import MiniSearch from 'minisearch';
 import api, { postExternalRessourceUrl } from '../utils/api';
 
+import { ToastType } from '../models/toastType';
+
 Alpine.data('ActionPusher', () => {
   return {
     isBusy: true,
     isBusyExternalResource: false,
     canLoadNewExternalResource: false,
     search: '',
-
+    message: {
+      text: '',
+      contact: '',
+    },
     db: new MiniSearch({
       fields: ['title', 'subtitle', 'tags'], // fields to index for full-text search
       storeFields: [
@@ -17,7 +22,9 @@ Alpine.data('ActionPusher', () => {
         'url',
         'embeded_url',
         'has_dsresource',
-      ], //
+        'status',
+        'category',
+      ],
     }),
 
     push_type: 'single',
@@ -38,6 +45,32 @@ Alpine.data('ActionPusher', () => {
     public: true,
     draft: false,
     next: null,
+    async init() {
+      await this.$store.idbObjectStoreMgmt.init();
+      const getAllvalue = await this.$store.idbObjectStoreMgmt.getAll();
+
+      if (getAllvalue.length > 0) {
+        // Create a DataTransfer object to set the file
+        const dataTransfer = new DataTransfer();
+        dataTransfer.items.add(getAllvalue[0].file);
+
+        // Set the files to the input element
+        const fileInput = document.getElementById('file-upload');
+        if (fileInput) {
+          fileInput.files = dataTransfer.files;
+        }
+
+        await this.$store.idbObjectStoreMgmt.delete(getAllvalue[0].id);
+      }
+
+      if (getAllvalue.length > 1) {
+        this.$store.app.notification.message =
+          "Dans ce formulaire, vous ne pouvez ajouter qu'un seul fichier par recommandation.";
+        this.$store.app.notification.timeout = 5000;
+        this.$store.app.notification.isOpen = true;
+        this.$store.app.notification.type = ToastType.warning;
+      }
+    },
     searchResources(text = null) {
       if (!text) {
         text = this.search;
@@ -128,7 +161,8 @@ Alpine.data('ActionPusher', () => {
           url: t.web_url,
           embeded_url: t.embeded_url,
           has_dsresource: t.has_dsresource,
-          category: t.category,
+          category: t.category ? t.category.name : null,
+          status: t.status,
         };
 
         this.resources.push(entry);
@@ -167,6 +201,17 @@ Alpine.data('ActionPusher', () => {
       this.isBusyExternalResource = false;
     },
 
+    handleSetContact(contactId) {
+      this.message.contact = { id: contactId };
+    },
+    handleSendRecommendation({ isDraft = false }) {
+      this.set_draft(isDraft);
+      this.$store.editor.currentMessageJSON.content =
+        this.$store.editor.currentMessageJSON.content.filter(
+          (node) => node.type !== 'contactCard' && node.type !== 'fileCard'
+        );
+      this.$store.editor.setContent(this.$store.editor.currentMessageJSON);
+    },
     set_draft(draft) {
       this.draft = draft;
       this.public = !this.draft;

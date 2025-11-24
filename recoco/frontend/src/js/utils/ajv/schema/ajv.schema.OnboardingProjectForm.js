@@ -11,12 +11,19 @@ export const schemaOnboardingStep2ProjectFormValidator = {
     location: {
       type: 'string',
     },
+    email: {
+      type: 'string',
+      format: 'email',
+      errorMessage: {
+        format: "L'adresse email doit être au format prenom.nom@domaine.fr",
+      },
+    },
     description: {
       type: 'string',
       minLength: 3,
       errorMessage: minLengthErrorMessage(3),
     },
   },
-  required: ['name', 'description'],
+  required: ['name', 'description', 'email'],
   definitions: schemaFormInputs,
 };

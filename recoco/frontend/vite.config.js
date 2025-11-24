@@ -71,15 +71,22 @@ const config = {
         ClickToSeeUser: resolve('./src/js/components/ClickToSeeUser.js'),
         ActionPusher: resolve('./src/js/components/ActionPusher.js'),
         NotificationEater: resolve('./src/js/components/NotificationEater.js'),
-        actionPusher: resolve('./src/js/store/actionPusher.js'),
+        actionPusherStore: resolve('./src/js/store/actionPusher.js'),
         conversationsNew: resolve('./src/js/apps/conversationsNew.js'),
         featureAddContact: resolve('./src/js/apps/featureAddContact.js'),
         DepartmentsSelector: resolve(
           './src/js/components/DepartmentsSelector.js'
         ),
+        RegionDepartmentPreparer: resolve(
+          './src/js/components/RegionDepartmentPreparer.js'
+        ),
         User: resolve('./src/js/components/User.js'),
         MutliSelect: resolve('./src/js/components/MultiSelect.js'),
         ContactBook: resolve('./src/js/components/ContactBook.js'),
+        pageInvitation: resolve('./src/js/apps/pageInvitation.js'),
+        idbObjectStoreMgmt: resolve('./src/js/store/idbObjectStoreMgmt.js'),
+        actionPusher: resolve('./src/js/apps/actionPusher.js'),
+        NewFeatureBanner: resolve('./src/js/components/NewFeatureBanner.js'),
       },
       output: {
         chunkFileNames: undefined,

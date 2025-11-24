@@ -47,8 +47,10 @@
     .navigation__item-moderation,
     .navigation__item-invitation {
       .badge {
+        line-height: 0.75rem;
+        align-self: center;
         margin-left: 0.5rem;
-        line-height: 1rem;
+        padding: 0.1rem 0.4rem;
       }
     }
 
@@ -94,11 +96,28 @@
           &:nth-child(2) > .fr-nav__link {
             box-shadow: none;
           }
+          color: var(--light-text-mention-grey, #666);
         }
 
         &__project-name {
-          color: #666666;
-          text-decoration: none;
+          font-size: 14px;
+          font-style: normal;
+          font-weight: 700;
+        }
+        &__project-org-name {
+          font-size: 10px;
+          font-style: normal;
+          font-weight: 400;
+          &_title {
+            font-size: 14px;
+            color: var(--light-text-mention-grey, #666);
+            font-weight: 400;
+          }
+        }
+        &__project-commune {
+          font-size: 10px;
+          font-style: normal;
+          font-weight: 400;
         }
       }
       li.list-project__search-container {
@@ -190,7 +209,7 @@
     display: block;
   }
 }
- @media (max-width: 991.98px) {
+@media (max-width: 991.98px) {
   .responsive-header__element-not-mobile {
     display: none !important;
   }

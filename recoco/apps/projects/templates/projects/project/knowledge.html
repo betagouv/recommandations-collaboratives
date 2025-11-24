@@ -69,27 +69,8 @@
     </style>
     <div x-data x-init="$nextTick(() => $store.showRole.init())" class="col-12">
         {% include "projects/project/navigation.html" with state_of_play=True %}
-        {% if project.inactive_since != None %}
-            <div class="specific-border-4pxsolid1e1e1e">
-                {% include "projects/project/fragments/project_banner/paused_project_banner.html" %}
-                <div>
-                {% elif project.status == 'DRAFT' %}
-                    <div class="specific-border-4pxsolid000091">
-                        {% include "projects/project/fragments/project_banner/non_published_project_banner.html" %}
-                    {% elif not advising and is_regional_actor and not is_staff %}
-                        <div class="specific-border-4pxsolid000091">
-                            {% include "projects/project/fragments/project_banner/join_project_banner.html" %}
-                            <div>
-                            {% endif %}
-                            {% include "projects/project/fragments/survey_grid.html" %}
-                            {% if project.inactive_since != None %}
-                            </div>
-                        </div>
-                    {% elif project.status == 'DRAFT' %}
-                    </div>
-                {% elif not advising and is_regional_actor and not is_staff %}
-                </div>
-            </div>
-        {% endif %}
+        {% include "projects/project/fragments/project_banner/banner_wrapper.html" with part='open' %}
+        {% include "projects/project/fragments/survey_grid.html" %}
+        {% include "projects/project/fragments/project_banner/banner_wrapper.html" with part='close' %}
     </div>
 {% endblock project_detail %}

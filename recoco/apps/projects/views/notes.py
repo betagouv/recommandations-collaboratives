@@ -23,7 +23,7 @@ from recoco.utils import has_perm, has_perm_or_403
 
 from .. import models, signals
 from ..forms import DocumentUploadForm, NoteForm, PublicNoteForm, StaffNoteForm
-from ..utils import can_administrate_project, get_collaborators_for_project
+from ..utils import can_administrate_project, reactivate_if_necessary
 
 
 @login_required
@@ -70,14 +70,7 @@ def create_public_note(request, project_id=None):
 
                     document.save()
 
-            # Reactivate project if was set inactive
-            if request.user in get_collaborators_for_project(project):
-                project.last_members_activity_at = timezone.now()
-
-                if project.inactive_since:
-                    project.reactivate()
-
-                project.save()
+            reactivate_if_necessary(project, request.user)
 
             signals.note_created.send(
                 sender=create_public_note,
@@ -87,7 +80,7 @@ def create_public_note(request, project_id=None):
             )
 
     if request.POST.get("new", None):
-        url = reverse("projects-project-detail-conversations-new", args=[project_id])
+        url = reverse("projects-project-detail-conversations", args=[project_id])
         return redirect(
             f"{url}?{urlencode({'topic-slug': slugify(topic_name or 'general'), 'topic-name': topic_name})}"
         )

@@ -41,7 +41,35 @@
   }
 }
 
-.close-contact-button-style {
+.module__container {
+  position: absolute;
+  bottom: 0.5rem;
+  left: 0.5rem;
+  display: flex;
+  width: 100%;
+  padding-right: 1rem;
+}
+
+.button-module__container {
+  display: flex;
+  gap: 0.5rem;
+  // position: absolute;
+  // bottom: 0.5rem;
+  // left: 0.5rem;
+}
+
+.tiptap p.is-editor-empty:first-child::before {
+  color: #666;
+  font-style: italic;
+  opacity: 1;
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
+.close-contact-button-style,
+.close-file-button-style {
   height: 40px;
   box-shadow: none;
 }
@@ -50,25 +78,130 @@
 .editor-container {
   .contact-card {
     padding-right: 49px !important;
-    &__container {
-      max-width: 25rem;
-    }
   }
 
-  .file-upload-wrapper {
-    position: absolute;
-    bottom: 0.5rem;
-    left: 0.5rem;
-  }
+  // .file-upload-wrapper {
+  //   position: absolute;
+  //   bottom: 0.5rem;
+  //   left: 0.5rem;
+  // }
 
   // .button-add-contact {
   //   position: absolute;
   //   bottom: 0.5rem;
   //   left: 11.75rem;
   // }
-  .button-add-reco {
-    position: absolute;
-    bottom: 0.5rem;
-    left: 11.75rem;
+  // .button-add-reco {
+  //   position: absolute;
+  //   bottom: 0.5rem;
+  //   left: 11.75rem;
+  // }
+}
+
+// .selected-contact.editor-container {
+//   .tiptap.ProseMirror {
+//     padding-bottom: 6rem;
+//   }
+// }
+
+// File plugin styles
+.file-card {
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  transition: all 0.2s ease-in-out;
+
+  &__details {
+    flex: 1;
+    min-width: 0; // Pour permettre le truncate
+  }
+
+  &__name {
+    color: #212529;
+    margin-bottom: 0.25rem;
+    word-break: break-word;
+    line-height: 1.2;
+  }
+
+  &__meta {
+    color: #6c757d;
+    line-height: 1.2;
+
+    span {
+      display: inline-block;
+      margin-right: 0.5rem;
+
+      &:last-child {
+        margin-right: 0;
+      }
+    }
+  }
+
+  &__actions {
+    margin-left: 1rem;
+  }
+
+  // Styles pour les différents types de fichiers
+  &--image .file-card__icon {
+    color: #28a745;
+  }
+
+  &--video .file-card__icon {
+    color: #dc3545;
+  }
+
+  &--audio .file-card__icon {
+    color: #fd7e14;
+  }
+
+  &--document .file-card__icon {
+    color: #007bff;
+  }
+
+  &--archive .file-card__icon {
+    color: #6f42c1;
+  }
+
+  // Responsive
+  @media (max-width: 576px) {
+    &__content {
+      flex-direction: column;
+      align-items: flex-start !important;
+    }
+
+    &__actions {
+      margin-left: 0;
+      margin-top: 0.5rem;
+      align-self: flex-end;
+    }
+  }
+}
+
+// Styles pour l'éditeur TipTap
+.ProseMirror {
+  .file-card {
+    margin: 0.5rem 0;
+
+    // Empêcher la sélection du contenu de la carte
+    * {
+      user-select: none;
+    }
+  }
+}
+
+// File card styles
+.file__card {
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  transition: all 0.2s ease-in-out;
+  font-size: 13px;
+  line-height: 1rem;
+}
+
+.module__container {
+  display: flex;
+  flex-direction: column;
+  .info-module__container {
+    display: flex;
+    flex-direction: column;
   }
 }

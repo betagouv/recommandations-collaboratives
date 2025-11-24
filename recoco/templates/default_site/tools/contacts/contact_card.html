@@ -27,6 +27,7 @@ Example usage in parent:
 {% load sass_tags %}
 {% load static %}
 {% load django_vite %}
+{% load guardian_tags %}
 {% block js %}
     {% vite_asset 'js/components/User.js' %}
 {% endblock js %}
@@ -38,270 +39,290 @@ Example usage in parent:
           rel="stylesheet"
           type="text/css" />
 {% endblock css %}
-<div x-data="User()">
-    <template x-if="contact">
-        <div class="contact-card fr-p-3v bg-white {% if button_actions %}actions{% endif %}"
-         :class="{'active': isOpenDeleteContact}"
-            data-test-id="contact-card">
-            <div class="contact-card__firstline-container">
-                <span x-show="contact.first_name || contact.last_name"
-                    x-text="`${contact.first_name} ${contact.last_name}`"
-                    :title="`${contact.first_name} ${contact.last_name}`"
-                    class="contact-info__name contact-names fr-pr-1v"></span>
-                <span x-show="contact.organization.name"
-                    x-text="contact.organization.name"
-                    :title="contact.organization.name"
-                    class="contact-info__organization color-3a3a3a text-position"></span>
-            </div>
-            <div :title="contact.division"
-                x-show="contact.division"
-                class="contact-info__division">
-                <span x-text="contact.division" class="color-3a3a3a text-organization"></span>
-            </div>
-            <div x-show="!contact.division" class="contact-info-empty__division"></div>
-            <div x-show="contact.email" class="contact-info__email">
-                <a :href="'mailto:'+contact.email"
-                class="contact-card__link text-position">
-                    <span class="fr-icon--sm fr-icon-link" x-text="contact.email"></span>
-                </a>
-                <button class="fr-ml-3w fr-px-2v fr-py-0 fr-btn fr-btn--secondary fr-btn--xs"
-                        @click.prevent="clipboardCopy(`L'email`, contact.email)"
-                        title="Copier l'email">
-                    <svg class="bi align-baseline" width="10" height="10" fill="currentColor">
-                        <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#clipboard" />
-                    </svg>
-                </button>
-            </div>
-            <div x-show="!contact.email" class="contact-info-empty__email"></div>
-            <div x-show="contact.phone_no" class="contact-info__phone">
-                <a :href="'tel:'+contact.phone_no"
-                class="contact-card__link text-position">
-                    <span class="fr-icon--sm fr-icon-phone-line" x-text="contact.phone_no"></span>
-                </a>
-            </div>
-            <div x-show="!contact.phone_no" class="contact-info-empty__phone"></div>
-            <div x-show="contact.mobile_no" class="contact-info__phone">
-                <a :href="'tel:'+contact.mobile_no"
-                class="contact-card__link text-position">
-                    <span class="fr-icon--sm fr-icon-phone-line" x-text="contact.mobile_no"></span>
-                </a>
-            </div>
-            <div x-show="!contact.mobile_no" class="contact-info-empty__phone"></div>
-            <template x-if="contact.modified">
-                <div class="contact-card__updated-at contact-info__updated-at">
-                    <span class="text-date">mis à jour le</span>
-                    <span class="text-date"
-                        x-text="`${formatDate(contact.modified, { year: 'numeric', month: 'long', day: 'numeric' })}`"></span>
+{% block content %}
+    {% if user.is_authenticated %}
+        {% get_obj_perms request.user for request.site as "user_site_perms" %}
+    {% endif %}
+    <div x-data="User()">
+        <template x-if="typeof contact !== 'undefined' && contact">
+            <div class="contact-card fr-p-3v bg-white {% if button_actions %}actions{% endif %}"
+                 :class="{'active': isOpenDeleteContact}"
+                 data-test-id="contact-card">
+                <div class="contact-card__firstline-container">
+                    <span x-show="contact.first_name || contact.last_name"
+                          x-text="`${contact.first_name} ${contact.last_name}`"
+                          :title="`${contact.first_name} ${contact.last_name}`"
+                          class="contact-info__name contact-names fr-pr-1v"></span>
+                    <span x-show="contact?.organization?.name"
+                          x-text="contact?.organization?.name"
+                          :title="contact?.organization?.name"
+                          class="contact-info__organization color-3a3a3a text-position"></span>
                 </div>
-            </template>
-            <template x-if="contact.created && !contact.modified">
-                <div class="contact-card__updated-at contact-info__updated-at">
-                    <span class="text-date">mis à jour le</span>
-                    <span class="text-date"
-                        x-text="`${formatDate(contact.created, { year: 'numeric', month: 'long', day: 'numeric' })}`"></span>
+                <div :title="contact.division"
+                     x-show="contact.division"
+                     class="contact-info__division">
+                    <span x-text="contact.division" class="color-3a3a3a text-organization"></span>
                 </div>
-            </template>
-            {% if button_actions %}
-            <div class="button__actions">
-                <button class="fr-btn fr-btn--tertiary-no-outline fr-btn--sm fr-icon-pencil-line button__actions-edit"
-                        @click="openModalCreateContact(contact)">Éditer le contact</button>
-                <div @click.outside="isOpenDeleteContact = false"
-                     class="position-relative">
-                    <button class="fr-btn fr-btn--tertiary-no-outline fr-btn--sm fr-icon-delete-line button__actions-delete"
-                            @click="isOpenDeleteContact = !isOpenDeleteContact">Supprimer le contact</button>
-                    <ul x-show="isOpenDeleteContact"
-                        :class="{'isOpenDeleteContact':open}"
-                        class="modal__confirm-delete positioning-dropdown">
-                        <li class="modal__header">
-                            Supprimer un contact
-                            <button class="notification__icon"
-                                    title="Fermer le menu"
-                                    @click="isOpenDeleteContact = false">
+                <div x-show="!contact.division" class="contact-info-empty__division"></div>
+                <div x-show="contact.email" class="contact-info__email">
+                    <a :href="'mailto:'+contact.email"
+                       class="contact-card__link text-position">
+                        <span class="fr-icon--sm fr-icon-link" x-text="contact.email"></span>
+                    </a>
+                    <button class="fr-ml-3w fr-px-2v fr-py-0 fr-btn fr-btn--secondary fr-btn--xs"
+                            @click.prevent="clipboardCopy(`L'email`, contact.email);trackCopyContactEmail()"
+                            title="Copier l'email">
+                        <svg class="bi align-baseline" width="10" height="10" fill="currentColor">
+                            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#clipboard" />
+                        </svg>
+                    </button>
+                </div>
+                <div x-show="!contact.email" class="contact-info-empty__email"></div>
+                <div x-show="contact.phone_no" class="contact-info__phone">
+                    <a :href="'tel:'+contact.phone_no"
+                       class="contact-card__link text-position">
+                        <span class="fr-icon--sm fr-icon-phone-line" x-text="contact.phone_no"></span>
+                    </a>
+                </div>
+                <div x-show="!contact.phone_no" class="contact-info-empty__phone"></div>
+                <div x-show="contact.mobile_no" class="contact-info__phone">
+                    <a :href="'tel:'+contact.mobile_no"
+                       class="contact-card__link text-position">
+                        <span class="fr-icon--sm fr-icon-phone-line" x-text="contact.mobile_no"></span>
+                    </a>
+                </div>
+                <div x-show="!contact.mobile_no" class="contact-info-empty__phone"></div>
+                <template x-if="contact.modified">
+                    <div class="contact-card__updated-at contact-info__updated-at">
+                        <span class="text-date">mis à jour le</span>
+                        <span class="text-date"
+                              x-text="`${formatDate(contact.modified, { year: 'numeric', month: 'long', day: 'numeric' })}`"></span>
+                    </div>
+                </template>
+                <template x-if="contact.created && !contact.modified">
+                    <div class="contact-card__updated-at contact-info__updated-at">
+                        <span class="text-date">mis à jour le</span>
+                        <span class="text-date"
+                              x-text="`${formatDate(contact.created, { year: 'numeric', month: 'long', day: 'numeric' })}`"></span>
+                    </div>
+                </template>
+                {% if button_actions %}
+                    <div class="button__actions">
+                        <button class="fr-btn fr-btn--tertiary-no-outline fr-btn--sm fr-icon-pencil-line button__actions-edit"
+                                @click="openModalCreateContact(contact)"
+                                data-test-id="button-edit-contact">Éditer le contact</button>
+                        <div @click.outside="isOpenDeleteContact = false"
+                             class="position-relative">
+                            <button class="fr-btn fr-btn--tertiary-no-outline fr-btn--sm fr-icon-delete-line button__actions-delete"
+                                    @click="isOpenDeleteContact = !isOpenDeleteContact"
+                                    data-test-id="button-delete-contact">Supprimer le contact</button>
+                            <ul x-show="isOpenDeleteContact"
+                                :class="{'isOpenDeleteContact':open}"
+                                class="modal__confirm-delete positioning-dropdown">
+                                <li class="modal__header">
+                                    Supprimer un contact
+                                    <button class="notification__icon"
+                                            title="Fermer le menu"
+                                            @click="isOpenDeleteContact = false">
+                                        <svg class="bi fr-mr-1v" width="16" height="16" fill="currentColor">
+                                            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#x-lg" />
+                                        </svg>
+                                    </button>
+                                </li>
+                                <li>
+                                    <hr class="dropdown-divider fr-pb-0">
+                                </li>
+                                <li class="modal__body">
+                                    <p class="modal__text">Êtes-vous sûr de vouloir supprimer le contact suivant :</p>
+                                    <div class="contact__resume">
+                                        <div>
+                                            <span x-show="contact.first_name"
+                                                  x-text="contact.first_name"
+                                                  class="contact-names fr-pr-1v no-wrap"></span>
+                                            <span x-show="contact.last_name"
+                                                  x-text="contact.last_name"
+                                                  class="contact-names fr-pr-1v no-wrap"></span>
+                                            <span x-show="contact?.organization?.name"
+                                                  x-text="contact?.organization?.name"
+                                                  class="color-3a3a3a text-organisation"></span>
+                                        </div>
+                                        <div x-show="contact.division">
+                                            <span x-text="contact.division" class="color-3a3a3a text-position"></span>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <hr class="dropdown-divider fr-pb-0">
+                                </li>
+                                <li class="modal__footer d-inline-flex gap-1">
+                                    <button class="modal__footer-cancel" @click="isOpenDeleteContact = false">Annuler</button>
+                                    <button class="modal__footer-confirm" @click="deleteContact(contact)">Confirmer la suppression</button>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </template>
+        {% if is_django_data %}
+            {% if is_type_user %}
+                <div class="contact-card fr-p-3v bg-white" data-test-id="contact-card">
+                    <div class="contact-card__firstline-container">
+                        {% if contact.first_name or contact.last_name %}
+                            <span title="{{ contact.first_name }} {{ contact.last_name }}"
+                                  class="contact-info__name contact-names fr-pr-1v">{{ contact.first_name }} {{ contact.last_name }}</span>
+                        {% endif %}
+                        {% if contact.profile.organization.name %}
+                            <span title="{{ contact.profile.organization.name }}"
+                                  class="contact-info__organization color-3a3a3a text-position">{{ contact.profile.organization.name }}</span>
+                        {% endif %}
+                        {% if 'use_crm' in user_site_perms %}
+                            <a class="small fr-ml-2v" href="{% url 'crm-user-details' contact.id %}">
                                 <svg class="bi fr-mr-1v" width="16" height="16" fill="currentColor">
-                                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#x-lg" />
+                                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#activity" />
+                                </svg>
+                            </a>
+                        {% endif %}
+                    </div>
+                    {% if contact.profile.organization_position %}
+                        <div title="{{ contact.profile.organization_position }}"
+                             class="contact-info__division">
+                            <span class="color-3a3a3a text-organization">{{ contact.profile.organization_position }}</span>
+                        </div>
+                    {% else %}
+                        <div class="contact-info-empty__division"></div>
+                    {% endif %}
+                    {% if contact.email %}
+                        <div class="contact-info__email">
+                            <a href="mailto:{{ contact.email }}"
+                               class="contact-card__link text-position">
+                                <span class="fr-icon--sm fr-icon-link">{{ contact.email }}</span>
+                            </a>
+                            <button class="fr-ml-3w fr-px-2v fr-py-0 fr-btn fr-btn--secondary fr-btn--xs"
+                                    @click.prevent="clipboardCopy(`L'email`, '{{ contact.email }}')"
+                                    title="Copier l'email">
+                                <svg class="bi align-baseline" width="10" height="10" fill="currentColor">
+                                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#clipboard" />
                                 </svg>
                             </button>
-                        </li>
-                        <li>
-                            <hr class="dropdown-divider fr-pb-0">
-                        </li>
-                        <li class="modal__body">
-                            <p class="modal__text">Êtes-vous sûr de vouloir supprimer le contact suivant :</p>
-                            <div class="contact__resume">
-                                <div>
-                                    <span x-show="contact.first_name"
-                                          x-text="contact.first_name"
-                                          class="contact-names fr-pr-1v no-wrap"></span>
-                                    <span x-show="contact.last_name"
-                                          x-text="contact.last_name"
-                                          class="contact-names fr-pr-1v no-wrap"></span>
-                                    <span x-show="contact.organization.name"
-                                          x-text="contact.organization.name"
-                                          class="color-3a3a3a text-organisation"></span>
-                                </div>
-                                <div x-show="contact.division">
-                                    <span x-text="contact.division" class="color-3a3a3a text-position"></span>
-                                </div>
+                        </div>
+                    {% else %}
+                        <div class="contact-info-empty__email"></div>
+                    {% endif %}
+                    {% if contact.profile.phone_no %}
+                        <div class="contact-info__phone">
+                            <a href="tel:{{ contact.profile.phone_no }}"
+                               class="contact-card__link text-position">
+                                <span class="fr-icon--sm fr-icon-phone-line">{{ contact.profile.phone_no }}</span>
+                            </a>
+                        </div>
+                    {% else %}
+                        <div class="contact-info-empty__phone"></div>
+                    {% endif %}
+                    {% if contact.profile.mobile_no %}
+                        <div class="contact-info__phone">
+                            <a href="tel:{{ contact.profile.mobile_no }}"
+                               class="contact-card__link text-position">
+                                <span class="fr-icon--sm fr-icon-phone-line">{{ contact.profile.mobile_no }}</span>
+                            </a>
+                        </div>
+                    {% else %}
+                        <div class="contact-info-empty__phone"></div>
+                    {% endif %}
+                    {% if contact.modified %}
+                        <div class="contact-card__updated-at contact-info__updated-at">
+                            <span class="text-date">mis
+                            à jour le</span>
+                            <span class="text-date">{{ contact.modified|date:"d/m/Y" }}</span>
+                        {% endif %}
+                        {% if contact.created and not contact.modified %}
+                            <div class="contact-card__updated-at contact-info__updated-at">
+                                <span class="text-date">mis
+                                à jour le</span>
+                                <span class="text-date">{{ contact.created|date:"d/m/Y" }}</span>
                             </div>
-                        </li>
-                        <li>
-                            <hr class="dropdown-divider fr-pb-0">
-                        </li>
-                        <li class="modal__footer d-inline-flex gap-1">
-                            <button class="modal__footer-cancel" @click="isOpenDeleteContact = false">Annuler</button>
-                            <button class="modal__footer-confirm" @click="deleteContact(contact)">Confirmer la suppression</button>
-                        </li>
-                    </ul>
+                        </div>
+                    {% endif %}
                 </div>
-            </div>
+            {% else %}
+                <div class="contact-card fr-p-3v bg-white" data-test-id="contact-card">
+                    <div class="contact-card__firstline-container">
+                        {% if contact.first_name or contact.last_name %}
+                            <span title="{{ contact.first_name }} {{ contact.last_name }}"
+                                  class="contact-info__name contact-names fr-pr-1v">{{ contact.first_name }} {{ contact.last_name }}</span>
+                        {% endif %}
+                        {% if contact.organization.name %}
+                            <span title="{{ contact.organization.name }}"
+                                  class="contact-info__organization color-3a3a3a text-position">{{ contact.organization.name }}</span>
+                        {% endif %}
+                        {% if 'use_crm' in user_site_perms %}
+                            <a class="small fr-ml-2v" href="{% url 'crm-user-details' contact.id %}">
+                                <svg class="bi fr-mr-1v" width="16" height="16" fill="currentColor">
+                                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#activity" />
+                                </svg>
+                            </a>
+                        {% endif %}
+                    </div>
+                    {% if contact.division %}
+                        <div title="{{ contact.division }}" class="contact-info__division">
+                            <span class="color-3a3a3a text-organization">{{ contact.division }}</span>
+                        </div>
+                    {% else %}
+                        <div class="contact-info-empty__division"></div>
+                    {% endif %}
+                    {% if contact.email %}
+                        <div class="contact-info__email">
+                            <a href="mailto:{{ contact.email }}"
+                               class="contact-card__link text-position">
+                                <span class="fr-icon--sm fr-icon-link">{{ contact.email }}</span>
+                            </a>
+                            <button class="fr-ml-3w fr-px-2v fr-py-0 fr-btn fr-btn--secondary fr-btn--xs"
+                                    @click.prevent="clipboardCopy(`L'email`, '{{ contact.email }}')"
+                                    title="Copier l'email">
+                                <svg class="bi align-baseline" width="10" height="10" fill="currentColor">
+                                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#clipboard" />
+                                </svg>
+                            </button>
+                        </div>
+                    {% else %}
+                        <div class="contact-info-empty__email"></div>
+                    {% endif %}
+                    {% if contact.phone_no %}
+                        <div class="contact-info__phone">
+                            <a href="tel:{{ contact.phone_no }}"
+                               class="contact-card__link text-position">
+                                <span class="fr-icon--sm fr-icon-phone-line">{{ contact.phone_no }}</span>
+                            </a>
+                        </div>
+                    {% else %}
+                        <div class="contact-info-empty__phone"></div>
+                    {% endif %}
+                    {% if contact.mobile_no %}
+                        <div class="contact-info__phone">
+                            <a href="tel:{{ contact.mobile_no }}"
+                               class="contact-card__link text-position">
+                                <span class="fr-icon--sm fr-icon-phone-line">{{ contact.mobile_no }}</span>
+                            </a>
+                        </div>
+                    {% else %}
+                        <div class="contact-info-empty__phone"></div>
+                    {% endif %}
+                    {% if contact.modified %}
+                        <div class="contact-card__updated-at contact-info__updated-at">
+                            <span class="text-date">mis
+                            à jour le</span>
+                            <span class="text-date">{{ contact.modified|date:"d/m/Y" }}</span>
+                        </div>
+                    {% endif %}
+                    {% if contact.created and not contact.modified %}
+                        <div class="contact-card__updated-at contact-info__updated-at">
+                            <span class="text-date">mis
+                            à jour le</span>
+                            <span class="text-date">{{ contact.created|date:"d/m/Y" }}</span>
+                        </div>
+                    {% endif %}
+                </div>
+            {% endif %}
         {% endif %}
     </div>
-    </template>
-    {% if is_django_data %}
-        {% if is_type_user %}
-            <div class="contact-card fr-p-3v bg-white" data-test-id="contact-card">
-                <div class="contact-card__firstline-container">
-                    {% if contact.first_name or contact.last_name %}
-                        <span title="{{ contact.first_name }} {{ contact.last_name }}"
-                            class="contact-info__name contact-names fr-pr-1v">{{ contact.first_name }} {{ contact.last_name }}</span>
-                    {% endif %}
-                    {% if contact.profile.organization.name %}
-                        <span title="{{ contact.profile.organization.name }}"
-                            class="contact-info__organization color-3a3a3a text-position">{{ contact.profile.organization.name }}</span>
-                    {% endif %}
-                </div>
-                {% if contact.profile.organization_position %}
-                    <div title="{{ contact.profile.organization_position }}"
-                        class="contact-info__division">
-                        <span class="color-3a3a3a text-organization">{{ contact.profile.organization_position }}</span>
-                    </div>
-                {% else %}
-                    <div class="contact-info-empty__division"></div>
-                {% endif %}
-                {% if contact.email %}
-                    <div class="contact-info__email">
-                        <a href="mailto:{{ contact.email }}"
-                        class="contact-card__link text-position">
-                            <span class="fr-icon--sm fr-icon-link">{{ contact.email }}</span>
-                        </a>
-                        <button class="fr-ml-3w fr-px-2v fr-py-0 fr-btn fr-btn--secondary fr-btn--xs"
-                                @click.prevent="clipboardCopy(`L'email`, '{{ contact.email }}')"
-                                title="Copier l'email">
-                            <svg class="bi align-baseline" width="10" height="10" fill="currentColor">
-                                <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#clipboard" />
-                            </svg>
-                        </button>
-                    </div>
-                {% else %}
-                    <div class="contact-info-empty__email"></div>
-                {% endif %}
-                {% if contact.profile.phone_no %}
-                    <div class="contact-info__phone">
-                        <a href="tel:{{ contact.profile.phone_no }}"
-                        class="contact-card__link text-position">
-                            <span class="fr-icon--sm fr-icon-phone-line">{{ contact.profile.phone_no }}</span>
-                        </a>
-                    </div>
-                {% else %}
-                    <div class="contact-info-empty__phone"></div>
-                {% endif %}
-                {% if contact.profile.mobile_no %}
-                    <div class="contact-info__phone">
-                        <a href="tel:{{ contact.profile.mobile_no }}"
-                        class="contact-card__link text-position">
-                            <span class="fr-icon--sm fr-icon-phone-line">{{ contact.profile.mobile_no }}</span>
-                        </a>
-                    </div>
-                {% else %}
-                    <div class="contact-info-empty__phone"></div>
-                {% endif %}
-                {% if contact.modified %}
-                    <div class="contact-card__updated-at contact-info__updated-at">
-                        <span class="text-date">mis
-                        à jour le</span>
-                        <span class="text-date">{{ contact.modified|date:"d/m/Y" }}</span>
-                    {% endif %}
-                    {% if contact.created and not contact.modified %}
-                        <div class="contact-card__updated-at contact-info__updated-at">
-                            <span class="text-date">mis
-                            à jour le</span>
-                            <span class="text-date">{{ contact.created|date:"d/m/Y" }}</span>
-                        </div>
-                    </div>
-                {% endif %}
-            </div>
-        {% else %}
-            <div class="contact-card fr-p-3v bg-white" data-test-id="contact-card">
-                <div class="contact-card__firstline-container">
-                    {% if contact.first_name or contact.last_name %}
-                        <span title="{{ contact.first_name }} {{ contact.last_name }}"
-                            class="contact-info__name contact-names fr-pr-1v">{{ contact.first_name }} {{ contact.last_name }}</span>
-                    {% endif %}
-                    {{ contact.organization }}
-                    {% if contact.organization.name %}
-                        <span title="{{ contact.organization.name }}"
-                            class="contact-info__organization color-3a3a3a text-position">{{ contact.organization.name }}</span>
-                    {% endif %}
-                </div>
-                {% if contact.division %}
-                    <div title="{{ contact.division }}" class="contact-info__division">
-                        <span class="color-3a3a3a text-organization">{{ contact.division }}</span>
-                    </div>
-                {% else %}
-                    <div class="contact-info-empty__division"></div>
-                {% endif %}
-                {% if contact.email %}
-                    <div class="contact-info__email">
-                        <a href="mailto:{{ contact.email }}"
-                        class="contact-card__link text-position">
-                            <span class="fr-icon--sm fr-icon-link">{{ contact.email }}</span>
-                        </a>
-                        <button class="fr-ml-3w fr-px-2v fr-py-0 fr-btn fr-btn--secondary fr-btn--xs"
-                                @click.prevent="clipboardCopy(`L'email`, '{{ contact.email }}')"
-                                title="Copier l'email">
-                            <svg class="bi align-baseline" width="10" height="10" fill="currentColor">
-                                <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#clipboard" />
-                            </svg>
-                        </button>
-                    </div>
-                {% else %}
-                    <div class="contact-info-empty__email"></div>
-                {% endif %}
-                {% if contact.phone_no %}
-                    <div class="contact-info__phone">
-                        <a href="tel:{{ contact.phone_no }}"
-                        class="contact-card__link text-position">
-                            <span class="fr-icon--sm fr-icon-phone-line">{{ contact.phone_no }}</span>
-                        </a>
-                    </div>
-                {% else %}
-                    <div class="contact-info-empty__phone"></div>
-                {% endif %}
-                {% if contact.mobile_no %}
-                    <div class="contact-info__phone">
-                        <a href="tel:{{ contact.mobile_no }}"
-                        class="contact-card__link text-position">
-                            <span class="fr-icon--sm fr-icon-phone-line">{{ contact.mobile_no }}</span>
-                        </a>
-                    </div>
-                {% else %}
-                    <div class="contact-info-empty__phone"></div>
-                {% endif %}
-                {% if contact.modified %}
-                    <div class="contact-card__updated-at contact-info__updated-at">
-                        <span class="text-date">mis
-                        à jour le</span>
-                        <span class="text-date">{{ contact.modified|date:"d/m/Y" }}</span>
-                    {% endif %}
-                    {% if contact.created and not contact.modified %}
-                        <div class="contact-card__updated-at contact-info__updated-at">
-                            <span class="text-date">mis
-                            à jour le</span>
-                            <span class="text-date">{{ contact.created|date:"d/m/Y" }}</span>
-                        </div>
-                    </div>
-                {% endif %}
-            </div>
-        {% endif %}
-    {% endif %}
-</div>
+{% endblock content %}

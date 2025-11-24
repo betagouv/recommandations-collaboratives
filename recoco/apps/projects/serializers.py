@@ -27,7 +27,13 @@ class DocumentSerializer(serializers.HyperlinkedModelSerializer):
             "pinned",
         ]
 
-    uploaded_by = UserSerializer(read_only=True, many=False)
+    uploaded_by = UserSerializer(read_only=True)
+
+
+class NewDocumentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Document
+        fields = ["the_file", "the_link", "description", "id"]
 
 
 class InlineProjectSiteSerializer(serializers.ModelSerializer):
@@ -214,6 +220,7 @@ class ProjectForListSerializer(BaseSerializerMixin):
                 and self.current_user.has_perm("projects.use_private_notes", data)
                 else None
             ),
+            "owner": format_owner(data),
         }
 
 
@@ -257,6 +264,28 @@ class UserProjectStatusForListSerializer(serializers.BaseSerializer):
                 "project_sites": format_sites(data.project),
             },
         }
+
+
+def format_owner(project):
+    owner = project.owner
+    if not owner:
+        return None
+    return {
+        "id": owner.id,
+        "first_name": owner.first_name,
+        "last_name": owner.last_name,
+        "username": owner.username,
+        "email": owner.email,
+        "profile": {
+            "organization": {
+                "name": (
+                    owner.profile.organization.name
+                    if owner.profile.organization
+                    else ""
+                ),
+            }
+        },
+    }
 
 
 def format_commune(commune):

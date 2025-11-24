@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "django.contrib.postgres",
     "django.contrib.sites",
+    "polymorphic",
     "multisite",
     "reversion",
     "reversion_compare",
@@ -78,6 +79,7 @@ INSTALLED_APPS = [
     "recoco.apps.onboarding",
     "recoco.apps.home",
     "recoco.apps.projects",
+    "recoco.apps.conversations",
     "recoco.apps.tasks",
     "recoco.apps.resources",
     "recoco.apps.geomatics",
@@ -197,6 +199,9 @@ AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
+    {
+        "NAME": "recoco.apps.home.password_validation.UppercaseAndDigitPasswordValidator",
+    },
 ]
 
 AUTHENTICATION_BACKENDS = [
@@ -267,7 +272,7 @@ LOGIN_URL = "/accounts/login/"
 LOGIN_REDIRECT_URL = "login-redirect"
 MAGICAUTH_FROM_EMAIL = EMAIL_FROM
 MAGICAUTH_ADAPTER = "recoco.apps.home.adapters.UVMagicauthAdapter"
-MAGICAUTH_EMAIL_SUBJECT = "Connectez-vous à Recoco ici"
+MAGICAUTH_EMAIL_SUBJECT = "Connectez-vous à votre compte en un clic"
 MAGICAUTH_EMAIL_FIELD = "email"
 MAGICAUTH_LOGGED_IN_REDIRECT_URL_NAME = "login-redirect"
 MAGICAUTH_TOKEN_DURATION_SECONDS = 60 * 60 * 24 * 3
@@ -316,9 +321,9 @@ DYNAMIC_FORMS_CUSTOM_JS = ""
 
 # ALLAUTH
 ACCOUNT_ADAPTER = "recoco.apps.home.adapters.UVAccountAdapter"
-ACCOUNT_AUTHENTICATION_METHOD = "email"
+ACCOUNT_LOGIN_METHODS = {"email"}
 ACCOUNT_PRESERVE_USERNAME_CASING = False
-ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_SIGNUP_FIELDS = ["email*", "password1*", "password2*"]
 ACCOUNT_CONFIRM_EMAIL_ON_GET = True
 ACCOUNT_EMAIL_VERIFICATION = "optional"
 ACCOUNT_RATE_LIMITS = {
@@ -327,7 +332,6 @@ ACCOUNT_RATE_LIMITS = {
 ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
 ACCOUNT_LOGOUT_ON_GET = True
 ACCOUNT_UNIQUE_EMAIL = True
-ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_LOGIN_ON_PASSWORD_RESET = True
 ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = "/login-redirect"
 
@@ -392,6 +396,8 @@ MFA_TOTP_TOLERANCE = 1
 DJANGO_VITE_ASSETS_PATH = BASE_DIR / "frontend/dist"
 STATICFILES_DIRS += [DJANGO_VITE_ASSETS_PATH]
 
+# Notifications
+DJANGO_NOTIFICATIONS_CONFIG = {"USE_JSONFIELD": True}
 
 # Phonenumbers
 PHONENUMBER_DEFAULT_REGION = "FR"

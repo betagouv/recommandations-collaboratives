@@ -1,4 +1,13 @@
-.kanban {
+.kanban-card {
+  --font-size: 10px;
+  --font-size-md: 14px;
+}
+.project-card {
+  --font-size: 12px;
+  --font-size-md: 16px;
+}
+.kanban,
+.project {
   &-header {
     flex-wrap: wrap;
     &__middle-part {
@@ -68,14 +77,17 @@
   &-card-container {
     padding-top: 0.5rem;
     padding-bottom: 0.5rem;
-    margin-top: 0.5rem;
-    margin-bottom: 0.5rem;
+    // margin-top: 0.5rem;
+    // margin-bottom: 0.5rem;
   }
 
   &-card {
     border: solid 1px #e5e5e5;
     background-color: #fafafa;
     box-shadow: 2px 2px 4px 0px #0000001a;
+    border-radius: 0.375rem;
+    width: 100%;
+    padding: 1rem;
 
     &__state {
       &-container {
@@ -86,7 +98,7 @@
       }
 
       &--pause {
-        padding: 0.25rem 0.5rem;
+        padding: 0.2rem 0.5rem;
         font-size: 12px;
         text-transform: uppercase;
         font-weight: 700;
@@ -97,7 +109,8 @@
     }
 
     &__border {
-      &--is-switchtender {
+      &--is-switchtender,
+      &--highlight {
         border: 1px solid var(--background-action-high-blue-france);
         background-color: white;
       }
@@ -116,16 +129,14 @@
 
     &__commune {
       &-container {
-        margin-top: 2px;
-        color: #3a3a3a;
+        height: 24px;
       }
 
       &-name,
       &-postal {
-        font-size: 14px;
-        font-weight: 700;
-        font-family: 'Marianne';
-        color: #3a3a3a;
+        font-size: var(--font-size);
+        font-weight: 400;
+        color: #666;
       }
     }
 
@@ -134,22 +145,49 @@
         margin-top: -5px;
         overflow: hidden;
         text-overflow: ellipsis;
+        display: flex;
+        flex-direction: column;
       }
 
       &-push-by-container,
+      &-site,
       &-insee,
-      &-date {
+      &-date,
+      &-org {
         color: #666666;
-        font-size: 10px;
+        font-size: var(--font-size);
         line-height: 24px;
       }
 
       &-name {
-        color: #666666;
-        font-size: 14px;
-        font-weight: 400;
-        font-family: 'Marianne';
+        color: #161616;
+        font-size: var(--font-size-md);
+        font-weight: 700;
         white-space: nowrap;
+        height: 22px;
+      }
+
+      &-organization {
+        color: var(--light-text-mention-grey, #666);
+        font-size: var(--font-size-md);
+        font-style: normal;
+        font-weight: 400;
+        line-height: 18px; /* 128.571% */
+      }
+
+      &-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        color: var(--light-background-flat-info, #0063cb);
+        font-size: var(--font-size);
+        font-weight: 400;
+        line-height: 16px;
+        text-decoration-line: underline;
+        text-decoration-style: solid;
+        .icon {
+          color: #666666;
+        }
       }
 
       &-date-container {
@@ -182,7 +220,7 @@ h5 {
 }
 
 .fake-a-link {
-  color: var(--light-background-flat-info, #0063CB);
+  color: var(--light-background-flat-info, #0063cb);
   font-size: 10px;
   font-style: normal;
   font-weight: 400;

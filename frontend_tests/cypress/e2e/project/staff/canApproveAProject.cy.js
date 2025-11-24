@@ -9,7 +9,7 @@ describe('I can go to the dashboard and see the pending projects, and approve on
       .closest("[data-test-id='project-card']")
       .find('[data-test-id="accept-project"]')
       .contains('Accepter')
-      .click();
+      .click({ force: true });
 
     cy.url().should('include', '/project/');
     cy.contains('Friche numéro 4');

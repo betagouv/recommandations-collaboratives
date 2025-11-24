@@ -149,6 +149,7 @@ class TestRessourceAddonViewSet:
                 "title": "Hub avec iframe",
                 "iframe_url": "https://www.example.com",
             },
+            enabled=True,
         )
 
         api_client.force_authenticate(user)
@@ -163,6 +164,7 @@ class TestRessourceAddonViewSet:
                 "title": "Hub avec iframe",
                 "iframe_url": "https://www.example.com",
             },
+            "enabled": True,
         }
 
     @pytest.mark.django_db
@@ -185,6 +187,7 @@ class TestRessourceAddonViewSet:
                         "iframe_url": "https://www.example.com",
                     }
                 ),
+                "enabled": True,
             },
         )
         assert response.status_code == 201
@@ -199,3 +202,4 @@ class TestRessourceAddonViewSet:
             "title": "Hub avec iframe",
             "iframe_url": "https://www.example.com",
         }
+        assert addon.enabled is True

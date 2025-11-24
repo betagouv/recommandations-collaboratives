@@ -6,6 +6,7 @@ from django.urls import reverse
 from django.utils import timezone
 
 from recoco.apps.addressbook import models as addressbook_models
+from recoco.apps.home.models import SiteConfiguration
 from recoco.apps.projects import signals as projects_signals
 from recoco.apps.projects.utils import (
     assign_advisor,
@@ -16,12 +17,33 @@ from recoco.apps.projects.utils import (
 from . import forms, models
 
 
-def invite_accept(request, invite_id):
-    invite = get_object_or_404(
-        models.Invite, pk=invite_id, site=request.site, accepted_on=None
-    )
-    project = invite.project
+class InviteExpired(Exception):
+    def __init__(self, invite):
+        self.project_id = invite.project_id
+        super(Exception, self).__init__()
 
+    def redirect(self):
+        return redirect("projects-project-detail", self.project_id)
+
+
+def get_fresh_invite_or_throw(request, invite_id):
+    invite = get_object_or_404(
+        models.Invite,
+        pk=invite_id,
+        site=request.site,
+    )
+    if invite.accepted_on is not None or invite.refused_on is not None:
+        raise InviteExpired(invite)
+    return invite
+
+
+def invite_accept(request, invite_id):
+    try:
+        invite = get_fresh_invite_or_throw(request, invite_id)
+    except InviteExpired as e:
+        return e.redirect()
+
+    project = invite.project
     current_site = request.site
 
     # Check if this email already exists as an account
@@ -96,11 +118,38 @@ def invite_accept(request, invite_id):
     return redirect(reverse("invites-invite-details", args=(invite.pk,)))
 
 
-def invite_details(request, invite_id):
-    invite = get_object_or_404(models.Invite, site=request.site, pk=invite_id)
+def invite_refuse(request, invite_id):
+    try:
+        invite = get_fresh_invite_or_throw(request, invite_id)
+    except InviteExpired as e:
+        return e.redirect()
 
-    if invite.accepted_on:
-        return redirect(reverse("account_login"))
+    if request.method == "POST":
+        # Check if this email already exists as an account
+        try:
+            existing_account = auth_models.User.objects.get(username=invite.email)
+            if existing_account != request.user:
+                return HttpResponseForbidden()
+        except auth_models.User.DoesNotExist:
+            # we shouldn't be logged in at this point
+            if request.user.is_authenticated:
+                return HttpResponseForbidden()
+
+        invite.refused_on = timezone.now()
+        invite.save()
+
+        return redirect(reverse("home"))
+
+    return redirect(reverse("invites-invite-details", args=(invite.pk,)))
+
+
+def invite_details(request, invite_id):
+    try:
+        invite = get_fresh_invite_or_throw(request, invite_id)
+    except InviteExpired as e:
+        return e.redirect()
+
+    site_config = SiteConfiguration.objects.get(site=request.site)
 
     # Check if this email already exists as an account
     existing_account = None

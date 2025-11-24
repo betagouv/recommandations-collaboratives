@@ -81,6 +81,80 @@ def test_get_current_site_sender_without_configuration(request):
 
 
 @pytest.mark.django_db
+def test_create_user_requires_8characters_password(client, request):
+    data = {
+        "first_name": "Test",
+        "last_name": "test",
+        "organization": "test",
+        "organization_position": "test",
+        "email": "kkkd@kdkdk.fr",
+        "phone_no": "0303003033",
+        "password1": "1234567",
+        "password2": "1234567",
+    }
+    response = client.post(reverse("account_signup"), data)
+    assert response.status_code == 200
+
+    assert auth_models.User.objects.filter(email=data["email"]).count() == 0
+
+
+@pytest.mark.django_db
+def test_create_user_requires_caps_in_password(client, request):
+    data = {
+        "first_name": "Test",
+        "last_name": "test",
+        "organization": "test",
+        "organization_position": "test",
+        "email": "kkkd@kdkdk.fr",
+        "phone_no": "0303003033",
+        "password1": "onlylowercase",
+        "password2": "onlylowercase",
+    }
+    response = client.post(reverse("account_signup"), data)
+    assert response.status_code == 200
+
+    assert auth_models.User.objects.filter(email=data["email"]).count() == 0
+
+
+@pytest.mark.django_db
+def test_create_user_requires_special_chars_in_password(client, request):
+    data = {
+        "first_name": "Test",
+        "last_name": "test",
+        "organization": "test",
+        "organization_position": "test",
+        "email": "kkkd@kdkdk.fr",
+        "phone_no": "0303003033",
+        "password1": "LowerCaseButNoSpecials",
+        "password2": "LowerCaseButNoSpecials",
+    }
+    response = client.post(reverse("account_signup"), data)
+    assert response.status_code == 200
+
+    assert auth_models.User.objects.filter(email=data["email"]).count() == 0
+
+
+@pytest.mark.django_db
+def test_create_user(client, request):
+    data = {
+        "first_name": "Test",
+        "last_name": "test",
+        "organization": "test",
+        "organization_position": "test",
+        "email": "kkkd@kdkdk.fr",
+        "phone_no": "0303003033",
+        "password1": "LowerCaseButNoSpecials12",
+        "password2": "LowerCaseButNoSpecials12",
+    }
+    response = client.post(reverse("account_signup"), data)
+    assert response.status_code == 302
+
+    user = auth_models.User.objects.get(email=data["email"])
+
+    assert len(user.profile.sites.all()) == 1
+
+
+@pytest.mark.django_db
 def test_create_user_assign_current_site_via_allauth(client, request):
     site = get_current_site(request)
     data = {
@@ -254,8 +328,10 @@ def test_project_owner_is_sent_to_action_page_on_login(request, client, project)
         response = client.get(url)
 
     assert response.status_code == 302
-    project_action_url = reverse("projects-project-detail-actions", args=(project.pk,))
-    assertRedirects(response, project_action_url)
+    project_conversation_url = reverse(
+        "projects-project-detail-conversations", args=(project.pk,)
+    )
+    assertRedirects(response, project_conversation_url)
 
 
 @pytest.mark.django_db

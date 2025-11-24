@@ -41,25 +41,32 @@
           padding: 20px;
         }
 
-        /* .content-block {
-          padding-bottom: 10px;
-          padding-top: 10px;
-        } */
-
         .footer {
           text-align: center;
+          background-color: #f6f6f6;
+          padding: 15px;
         }
-        /* .footer td,
-        .footer p,
-        .footer span,
-        .footer a { */
-          /* text-align: center; } */
+
+        .banner {
+          background-color: #f6f6f6;
+          display: flex;
+          justify-content: center !important;
+          padding: 15px;
+        }
+
+        .banner p{
+          vertical-align: middle;
+          margin-left: 10px;
+        }
 
         /* -------------------------------------
             TYPOGRAPHY
         ------------------------------------- */
 
-        a {
+        p a {
+          color: #3498db;
+        }
+        strong a {
           color: #3498db;
         }
 
@@ -78,7 +85,7 @@
           width: fit-content;
           margin: auto;
           margin-top: 10px;
-          color: white;
+          color: white !important;
           text-decoration: none;
           font-weight: 700;
         }
@@ -99,36 +106,6 @@
           text-decoration: none;
           font-weight: 700;
         }
-        /* .btn > tbody > tr > td {
-          padding-bottom: 15px; }
-        .btn table {
-          width: auto; }
-        .btn table td {
-          background-color: #ffffff;
-          border-radius: 5px;
-          text-align: center; } */
-        /* .btn a {
-          background-color: #ffffff;
-          border: solid 1px #3498db;
-          border-radius: 5px;
-          box-sizing: border-box;
-          color: #3498db;
-          cursor: pointer;
-          display: inline-block;
-          font-size: 14px;
-          font-weight: bold;
-          margin: 0;
-          padding: 12px 25px;
-          text-decoration: none;
-          text-transform: capitalize; } */
-
-        /* .btn-primary table td {
-          background-color: #3498db; }
-
-        .btn-primary a {
-          background-color: #3498db;
-          border-color: #3498db;
-          color: #ffffff; } */
 
         /* -------------------------------------
             OTHER STYLES THAT MIGHT BE USEFUL
@@ -144,21 +121,6 @@
         .mb0 {
           margin-bottom: 0;
         }
-
-        /* .preheader {
-          color: transparent;
-          display: none;
-          height: 0;
-          max-height: 0;
-          max-width: 0;
-          opacity: 0;
-          overflow: hidden;
-          mso-hide: all;
-          visibility: hidden;
-          width: 0; } */
-
-        /* .subtitle {
-          font-style: italic; }  */
 
         .text-strong {
           font-size: 140%;
@@ -249,29 +211,17 @@
         table {
           width: 100%;
         }
-
-        .banner {
-          background-color: #f6f6f6;
-          display: flex;
-          justify-content: center;
-          padding: 15px;
-        }
-
-        .footer {
-          background-color: #f6f6f6;
-          padding: 15px;
-        }
       </style>
     </head>
   <body>
     <div class="banner">
-      {% if site.configuration.logo_small %}
-        <img src="{{ site.configuration.logo_small.url }}"
+      {% if current_site.configuration.email_logo %}
+        <img src="https://{{ current_site.domain }}{{ current_site.configuration.email_logo.url }}"
              width="auto"
              height="40px"
              alt="" />
       {% endif %}
-      {{ site.name }}
+      <p>{{ current_site.name }}</p>
     </div>
       <table border="0" cellpadding="0" cellspacing="0" class="body">
           <tr>
@@ -288,7 +238,7 @@
                                           <td>
                                               <p class="text-strong">Bonjour,</p>
                                               {% autoescape off %}
-                                                  <p>Merci de vous être inscrit·e sur {{ site.name }}
+                                                  <p>Merci de vous être inscrit·e sur {{ current_site.name }}
                                                   </p>
                                               {% endautoescape %}
                                           </br>
@@ -305,9 +255,9 @@
                                               </p>
                                               <p>Ce lien est valable pendant 24 heures. Si vous ne confirmez pas votre adresse dans ce délai,
                                                 vous devrez recommencer la procédure d’inscription.</p>
-                                              <p>Si vous n’êtes pas à l’origine de cette inscription, vous pouvez nous le signaler en nous écrivant à : {{ site.configuration.contact_form_recipient }}</p>
+                                              <p>Si vous n’êtes pas à l’origine de cette inscription, vous pouvez nous le signaler en nous écrivant à : {{ current_site.configuration.contact_form_recipient }}</p>
                                               <p>À bientôt,</p>
-                                              <p>L'équipe {{ site.name }}</p>
+                                              <p>L'équipe {{ current_site.name }}</p>
                                           </div>
                                       </td>
                                   </tr>
@@ -322,7 +272,7 @@
         </tr>
     </table>
     <div class="footer">
-      <p>{{ site.name }}</p>
+      <p>{{ current_site.name }}</p>
       <p>Cet email a été adressé à {{ user.email }}</p>
     </div>
   </body>

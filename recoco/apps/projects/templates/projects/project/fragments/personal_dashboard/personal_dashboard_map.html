@@ -2,10 +2,7 @@
 <div x-cloak
      class="fr-p-0 personal-dashboard-map-container"
      :class="{'is-small':mapIsSmall}">
-    <div class="h-100 w-100"
-         x-ref="map"
-         id="map"
-         class="personal-dashboard-map"></div>
+    <div class="h-100 w-100 personal-dashboard-map" x-ref="map" id="map"></div>
     <div class="map-increase-height-button" x-on:click="handleMapOpen">
         <svg :class="!mapIsSmall ? 'd-none' : 'd-block'"
              class="z-1"

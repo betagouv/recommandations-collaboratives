@@ -38,7 +38,17 @@ Deux choix :
 
 ### Virtualenv
 
-Commencez par installer `uv` sur votre machine avec pip ou votre gestionnaire de paquets. Si vous n'avez pas de moyen connu, référez vous à la page de `uv` ( https://github.com/astral-sh/uv ).
+#### Prérequis
+
+Installez `pandoc` et `gdal`
+
+Pour les sytèmes debian:
+
+```sh
+sudo apt install python3-gdal pandoc
+```
+
+Installez `uv` sur votre machine avec pip ou votre gestionnaire de paquets. Si vous n'avez pas de moyen connu, référez vous à la page de `uv` ( https://github.com/astral-sh/uv ).
 
 Créez et sourcez l'environnement:
 
@@ -50,6 +60,21 @@ source .venv/bin/activate
 ```sh
 uv sync
 ```
+
+Il faut aussi une base de données postgres. Configurez-là pour le projet:
+```sh
+sudo -u postgres psql < sql/init.sql
+```
+La base ainsi créée s'appelle `recoco` et appartient à un utilisateur nommé `recoco` avec le mot de passe `recoco`. À ne laisser tel quel ue pour un environement de développement pour des raisons de sécurité.
+
+Les modules suivants sont installés en production et peuvent être requis (à affiner, plusieurs ne sont plus vraiment utilisés) :
+* agestore
+* pgcrypto
+* trgm
+* postgis
+* postgis topology
+* unaccent
+* uuid-ossp
 
 #### Configuration de l'applicatif
 
@@ -72,6 +97,7 @@ DJANGO_VITE_TEST_SERVER_PORT=3001
 DJANGO_VITE_DEV_SERVER_PORT=3000
 GDAL_LIBRARY_PATH=
 GEOS_LIBRARY_PATH=
+SKIP_TEST_METRICS_CREATE_ROLES=
 ```
 
 Copiez le fichier de configuration d'exemple :
@@ -105,14 +131,6 @@ _Les commandes suivantes ne sont pas nécessaire si vous êtes avec Docker._
 
 Pour lancer l'applicatif en mode `développement`:
 
-- compilez le module `dsrc_ui`:
-
-```sh
-cd recoco/frontend/modules/dsrc_ui
-yarn install
-yarn build
-```
-
 - installez les dépendances:
 
 ```sh
@@ -136,7 +154,9 @@ Puis, exécutez le backend :
 
 Vous devriez pouvoir vous connecter sur http://localhost:8000 !
 
-## Chargement des données de démo
+## Chargement de données
+
+### données de démo
 
 ```bash
 ./manage.py loaddata data/geomatics.json
@@ -150,9 +170,38 @@ Création du premier site
 
 ```python
 from recoco.apps.home import utils
-site = utils.make_new_site("Example", "example.com", "sender@example.com", "Sender")
+site = utils.make_new_site("Example", "example.com", "sender@example.com", "Sender", "noreply@example.com", "postal adress")
 site.aliases.create(domain="localhost", redirect_to_canonical=False)
 ```
+
+### données de la prod
+
+Avec un dump de db de prod, vous pouvez restaurer ces donnés:
+
+```bash
+sudo -u postgres psql < [path vers le dump]
+```
+
+
+### Récupérer les portails existants
+Plusieurs portails (ie sites) ont déjà été configurés et sont disponibles sur le dépôt [recoco-portails](https://github.com/betagouv/recoco-portails). Pour y avoir accès en local, il faut cloner ce dépôt dans un dossier `multisites` à la racine du projet global.
+
+Pour créer les bons alias dans l'interface d'administration, exécuter depuis le shell django
+
+```python
+run scripts/create_site_localhost_aliases.py
+```
+Pour vérifier que ç'a bien fonctionner, vérifiez que l'accès à http://sosponts.localhost:8000 fonctionne bien (par ex)
+
+## Environnement de développement
+
+### pre-commit
+
+Pour que des PRs soient acceptées, on requiert que pre-commit ait été passé. La configuration est en principe bonne avec les étapes précédentes, mais il faut exécuter la commande
+```bash
+pre-commit install
+```
+pour que cette configuration soit bien appliquée.
 
 ## Tests
 

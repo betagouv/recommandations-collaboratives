@@ -12,10 +12,10 @@ main {
   position: relative;
   background-color: #e6e6e6;
   background: #f6f6f6;
-  border-width: 1px 1px 0px 0px;
+  border-width: 1px 1px 1px 1px;
   border-style: solid;
   border-color: #e5e5e5;
-  border-radius: 0px 4px 0px 0px;
+  border-radius: 4px 4px 4px 4px;
 }
 
 .positioning-dropdown {
@@ -72,7 +72,7 @@ main {
 
 .personal-dashboard-map-container {
   position: relative;
-  height: 40vh;
+  height: 70vh;
   width: 100%;
   z-index: 100;
 
@@ -87,7 +87,7 @@ main {
   border-bottom: 1px solid transparent;
 }
 
-.personal-dashboard-container-inner .project-link::after {
+/* .personal-dashboard-container-inner .project-link::after {
   content: '';
   position: absolute;
 
@@ -98,7 +98,7 @@ main {
   height: 1px;
 
   background-color: var(--background-action-high-blue-france);
-}
+} */
 
 .project-item {
   transition: opacity 0.25s ease;
@@ -266,7 +266,7 @@ main {
 
 .project-card .project-link,
 .project-card .title-info {
-  color: var(--background-action-high-blue-france);
+  /* color: var(--background-action-high-blue-france); */
 }
 
 .project-card.inactive .project-link,

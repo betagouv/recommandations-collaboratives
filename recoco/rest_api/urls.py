@@ -4,6 +4,7 @@ from rest_framework import routers
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 from recoco.apps.addressbook import rest as addressbook_rest
+from recoco.apps.conversations import rest as conversations_rest
 from recoco.apps.geomatics import rest as geomatics_rest
 from recoco.apps.home import rest as home_rest
 from recoco.apps.ml import rest as ml_rest
@@ -61,6 +62,11 @@ router.register(
     basename="topics",
 )
 router.register(
+    r"projects/(?P<project_id>[^/.]+)/documents",
+    projects_rest.DocumentViewSet,
+    basename="projects-documents",
+)
+router.register(
     r"challenges/definitions",
     training_rest.ChallengeDefinitionViewSet,
     basename="challenge-definitions",
@@ -69,6 +75,21 @@ router.register(
     r"projects/projectsites",
     projects_rest.ProjectSiteViewSet,
     basename="projects-projectsites",
+)
+router.register(
+    r"projects/(?P<project_id>[^/.]+)/conversations/messages",
+    conversations_rest.MessageViewSet,
+    basename="projects-conversations-messages",
+)
+router.register(
+    r"projects/(?P<project_id>[^/.]+)/conversations/activities",
+    conversations_rest.ActivityViewSet,
+    basename="projects-conversations-activities",
+)
+router.register(
+    r"projects/(?P<project_id>[^/.]+)/conversations/participants",
+    conversations_rest.ParticipantViewSet,
+    basename="projects-conversations-participants",
 )
 router.register(
     r"sites",

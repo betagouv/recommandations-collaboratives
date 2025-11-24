@@ -18,7 +18,6 @@ from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
-from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods
 from notifications import models as notifications_models
@@ -31,6 +30,7 @@ from recoco.apps.communication.digests import normalize_user_name
 from recoco.apps.geomatics import models as geomatics_models
 from recoco.apps.geomatics.serializers import DepartmentSerializer, RegionSerializer
 from recoco.apps.home.models import AdvisorAccessRequest
+from recoco.apps.projects.models import ProjectCreationRequest
 from recoco.utils import (
     check_if_advisor,
     get_group_for_site,
@@ -95,6 +95,8 @@ def project_moderation_list(request):
         .select_related("user")
     ).order_by("-created")
 
+    project_creation_requests = ProjectCreationRequest.on_site.order_by("-created")
+
     return render(
         request,
         "projects/projects_moderation.html",
@@ -102,6 +104,7 @@ def project_moderation_list(request):
             "site_config": site_config,
             "draft_projects": draft_projects,
             "advisor_access_requests": advisor_access_requests,
+            "project_creation_requests": project_creation_requests,
         },
     )
 
@@ -229,7 +232,8 @@ def project_moderation_project_accept(request: HttpRequest, project_id: int):
             join = form.cleaned_data["join"]
 
             if join:
-                # Assign current user as advisor if requested
+                # Assign current user as advisor if requeste
+                # d
                 assign_advisor(request.user, project, request.site)
                 messages.success(
                     request,
@@ -357,59 +361,19 @@ def project_moderation_advisor_modify(
 # List, dashboards
 # ----
 @login_required
-def project_list(request):
-    if is_staff_for_site(request.user, request.site) or check_if_advisor(
-        request.user, request.site
-    ):
-        return redirect("projects-project-list-staff")
-
-    if can_administrate_project(project=None, user=request.user):
-        return redirect("projects-project-list-advisor")
-
-    raise PermissionDenied("Vous n'avez pas le droit d'accéder à ceci.")
+def project_list_for_staff(request):
+    return redirect("projects-project-list")
 
 
 @login_required
-@ensure_csrf_cookie
-@never_cache
 def project_list_for_advisor(request):
     """Return the projects for the advisor"""
-    if not (
-        check_if_advisor(request.user, request.site)
-        or can_administrate_project(project=None, user=request.user)
-    ):
-        raise PermissionDenied("Vous n'avez pas le droit d'accéder à ceci.")
-
-    # unread_notifications = notifications_models.Notification.on_site.unread().filter(
-    #    recipient=request.user, public=True
-    # )
-
-    mark_general_notifications_as_seen(request.user)
-
-    project_ct = ContentType.objects.get_for_model(models.Project)
-    user_project_pks = list(
-        request.user.project_states.filter(
-            project__switchtenders=request.user
-        ).values_list("project__pk", flat=True)
-    )
-
-    action_stream = (
-        request.user.notifications.filter(
-            target_content_type=project_ct,
-            target_object_id__in=user_project_pks,
-        )
-        .prefetch_related("actor__profile__organization")
-        .prefetch_related("action_object")
-        .prefetch_related("target")
-        .order_by("-timestamp")[:20]
-    )
-
-    return render(request, "projects/project/personal_advisor_dashboard.html", locals())
+    return redirect("projects-project-list")
 
 
 @login_required
 @ensure_csrf_cookie
-def project_list_for_staff(request):
+def project_list(request):
     """
     Return the projects for the staff (and for other people as a fallback until the
     new dashboard is fully completed).
@@ -473,7 +437,33 @@ def project_maplist(request):
         .order_by("-timestamp")[:100]
     )
 
-    return render(request, "projects/project/list-map.html", locals())
+    # Provide departments/regions for filters on the map list, similar to staff view
+    department_queryset = (
+        geomatics_models.Department.objects.filter(
+            code__in=(
+                models.Project.on_site.for_user(request.user)
+                .order_by("-created_on", "-updated_on")
+                .prefetch_related("commune__department")
+                .values_list("commune__department", flat=True)
+            )
+        )
+        | request.user.profile.departments.all()
+    ).distinct()
+
+    region_queryset = (
+        geomatics_models.Region.objects.filter(departments__in=department_queryset)
+        .prefetch_related("departments")
+        .distinct()
+        .order_by("name")
+    )
+
+    context = {
+        "departments": list(DepartmentSerializer(department_queryset, many=True).data),
+        "regions": list(RegionSerializer(region_queryset, many=True).data),
+        **locals(),
+    }
+
+    return render(request, "projects/project/list-map.html", context)
 
 
 # ----

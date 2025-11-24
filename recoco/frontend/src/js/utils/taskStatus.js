@@ -10,12 +10,12 @@ export const STATUSES = {
 };
 
 export const STATUS_TEXT = {
-  0: 'nouveau',
-  1: 'en cours',
-  2: 'en attente',
-  3: 'faite',
-  4: 'non applicable',
-  5: 'faite', // ALREADY_DONE: Legacy status, kind of
+  0: 'Nouveau',
+  1: 'En cours',
+  2: 'En attente',
+  3: 'Faite',
+  4: 'Non applicable',
+  5: 'Faite', // ALREADY_DONE: Legacy status, kind of
 };
 
 export const STATUS_HUMAN_READ = {
@@ -48,7 +48,10 @@ export function isArchivedStatus(status) {
 }
 
 export function isStatusUpdate(followup) {
-  return isArchivedStatus(followup.status) || (followup.comment === '' && followup.contact == null);
+  return (
+    isArchivedStatus(followup.status) ||
+    (followup.comment === '' && followup.contact == null)
+  );
 }
 
 export function truncate(input, size = 30) {

@@ -46,7 +46,7 @@
 <!-- Action message -->
 <div class="fr-input-group">
     <label class="push-reco__title-section" for="content">Commentaire personnalisé</label>
-    {% include "tools/editor.html" with can_attach_files=True input_file_name="the_file" model="message" can_attach_contact=True input_name="content" initial_content=form.content.value|default:'' initial_content_escapejs=True errors=form.content.errors is_task=True %}
+    {% include "tools/editor.html" with input_file_name="the_file" model="message" input_name="content" initial_content=form.content.value|default:preserved_content|default:'' initial_content_escapejs=True errors=form.content.errors is_task=True add_file_input=True is_action_pusher=True %}
     <template x-if="message.contact">
         <input type="hidden"
                name="{{ form.contact.name }}"
@@ -56,12 +56,12 @@
 <!-- Action submit -->
 <div class="d-flex justify-content-center">
     {% if not disable_draft %}
-        <button @click="set_draft(true)"
+        <button @click="handleSendRecommendation({isDraft: true})"
                 class="fr-btn fr-btn--secondary fr-btn--lg fr-mr-3w"
                 :disabled="(push_type == 'single' && !selected_resource) || !$store.actionPusher.isSelectedProject"
                 data-test-id="publish-draft-task-button">Enregistrer en brouillon</button>
     {% endif %}
-    <button @click="set_draft(false)"
+    <button @click="handleSendRecommendation({isDraft: false})"
             type="submit"
             class="fr-btn fr-btn--lg"
             data-cy="button-submit-task"

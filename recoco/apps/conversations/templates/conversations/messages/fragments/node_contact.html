@@ -1,0 +1,4 @@
+<div x-data="{contact: null, isOpenDeleteContact: false}"
+     x-effect="contact = await getContactById(node.contact_id )">
+    {% include "tools/contacts/contact_card.html" with contact=contact is_django_data=False %}
+</div>

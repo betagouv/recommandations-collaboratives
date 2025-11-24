@@ -60,14 +60,16 @@
                     </div>
                     <header class="d-flex align-items-center justify-content-between w-100 fr-mb-1v">
                         <div class="d-flex align-items-center">
-                            <a class="project-link d-flex align-items-center"
+                            <a class="project-link d-flex align-items-center no-underline"
                                data-test-id="project-link"
                                :href="makeProjectURL('{% url 'projects-project-detail' 0 %}', item.project.id)">
-                                <template x-if="item.project.commune">
-                                    <span class="fw-bold title-info fr-mr-2v location"
-                                          x-text="item.project.commune.name">1</span>
+                                <span class="text-info-custom name no-underline project-card__name"
+                                      x-text="item.project.name"></span>
+                                <p>&nbsp;</p>
+                                <template x-if="item.project.org_name">
+                                    <span class="fw-bold title-info fr-mr-2v location no-underline project-card__org-name"
+                                          x-text="item.project.org_name"></span>
                                 </template>
-                                <span class="text-info-custom name" x-text="item.project.name">2</span>
                             </a>
                         </div>
                         <div class="d-flex align-items-center fr-mr-1v">

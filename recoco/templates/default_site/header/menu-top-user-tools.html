@@ -22,7 +22,7 @@
         {% get_obj_perms request.user for request.site as "user_site_perms" %}
         <!-- Notifications -->
         <div class="dropdown user-tools__notification-menu"
-             x-data="MenuNotifications({{ unread_notifications_count }})">
+             x-data="MenuNotifications({{ unread_notifications_count }}, {{ unread_notifications }})">
             <button class="fr-btn fr-btn--tertiary-no-outline fr-icon-notification-3-line"
                     id="notification-menu-button"
                     role="button"
@@ -70,7 +70,9 @@
                         <li>
                             <a href="{% url 'addressbook-contact-list' %}"
                                class="fr-nav__link"
-                               {% if 'addressbook-contact' in url_name %}aria-current="page"{% endif %}>Carnet de contacts <span class="badge text-bg-primary">New</span></a>
+                               data-test-id="button-address-book"
+                               {% if 'addressbook-contact' in url_name %}aria-current="page"{% endif %}>
+                            Carnet de contacts <span class="badge text-bg-primary">New</span></a>
                         </li>
                     {% endif %}
                     {% if is_staff %}
@@ -95,7 +97,8 @@
             </div>
         </div>
     {% else %}
-        <a class="responsive-header__element-not-mobile" href="{% url 'account_login' %}">
+        <a class="responsive-header__element-not-mobile"
+           href="{% url 'account_login' %}">
             <svg class="bi fr-mr-2v align-middle" width="16" height="16">
                 <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#person-circle" />
             </svg>

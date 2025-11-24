@@ -29,11 +29,14 @@ describe('I can go to tasks tab', () => {
         .type(`reco test from action description`, { force: true, delay: 0 })
         .should('have.value', `reco test from action description`);
 
-      cy.get('[type=submit]').click();
+      cy.get('.ProseMirror p').click();
+      cy.focused().type('reco test for draft task');
+
+      cy.get('[data-test-id="publish-draft-task-button"]').click();
 
       cy.url().should('include', '/actions');
 
-      cy.contains('reco test from action');
+      cy.contains('draft project');
 
       cy.get('[data-test-id="list-tasks-switch-button"]').should('be.checked');
 

@@ -1,0 +1,29 @@
+.user-card {
+  .user-card-popup {
+    display: none;
+
+    position: absolute;
+
+    padding: 12px 15px;
+
+    font-size: 0.75rem;
+    line-height: 20px;
+
+    background: #ffffff;
+    box-shadow:
+      0px 1px 1px rgba(0, 0, 0, 0.16),
+      0px 1px 0px -2px rgba(0, 0, 0, 0.16),
+      0px 1px 4px rgba(0, 0, 0, 0.23);
+    border-radius: 2px;
+
+    z-index: 10;
+  }
+  .user-card-popup[data-show] {
+    display: block;
+  }
+  &__org-name {
+    color: var(--light-text-mention-grey, #666);
+    font-style: italic;
+    font-weight: 400;
+  }
+}

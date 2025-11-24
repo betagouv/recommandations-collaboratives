@@ -4,13 +4,14 @@
 {% load django_vite %}
 {% load projects_extra %}
 {% block title %}
-    Nouvelle conversation - {{ block.super }}
+    Conversation - {{ block.super }}
 {% endblock title %}
 {% block og_title %}
-    Nouvelle conversation - {{ block.super }}
+    Conversation - {{ block.super }}
 {% endblock og_title %}
 {% block js %}
     {% vite_asset 'js/apps/conversationsNew.js' %}
+    {% vite_asset 'js/apps/featureAddContact.js' %}
 {% endblock js %}
 {% block css %}
     <link href="{% sass_src 'projects/css/conversations_new.scss' %}"
@@ -19,22 +20,34 @@
 {% endblock css %}
 {% block project_detail %}
     {{ project.pk|json_script:"djangoProjectId" }}
+    {{ feed|json_script:"djangoFeed" }}
+    {{ user_project_perms|json_script:"userProjectPerms" }}
+    {% is_project_owner project request.user as is_project_owner %}
+    {{ is_project_owner|json_script:"isProjectOwner" }}
+    {{ request.user.first_name|json_script:"djangoCurrentUserFirstName" }}
+    {{ request.user.last_name|json_script:"djangoCurrentUserLastName" }}
+    {{ request.user.email|json_script:"djangoCurrentUserEmail" }}
+    {{ request.user.id|json_script:"djangoCurrentUserId" }}
+    {{ request.user.profile.organization.name|json_script:"djangoCurrentUserOrganizationName" }}
+    {{ request.user.profile.organization_position|json_script:"djangoCurrentUserOrganizationPosition" }}
+    {{ recipients|json_script:"djangoRecipients" }}
     {% include "projects/project/navigation.html" with conversations_new=True %}
-    {% comment %} TODO: build topic_list in django view {% endcomment %}
+    {% include "projects/project/fragments/project_banner/banner_wrapper.html" with part="open" %}
     {% regroup feed by topic as topic_list %}
     <div class="conversation-new d-flex"
-         x-data="ConversationTopicSwitch({{ project.pk }})"
-         hx-history="false">
+         x-data="Conversations({{ project.id }}, {{ request.user.id }})">
         <div class="conversation-new__topics">
             <div class="justify-content-between">
-                <div class="conversation-new__topics-header">
+                {% comment %} <div class="conversation-new__topics-header">
                     <h2 class="conversation-new__topics-header-title">Fils de discussion</h2>
-                </div>
-                {% for topic in topic_list %}
-                    {% include "projects/project/fragments/conversations_new/conversation_topic.html" with topic_name=topic.grouper message_number=topic.list %}
-                {% endfor %}
+                </div> {% endcomment %}
+                {% comment %} {% for topic in topic_list %} {% endcomment %}
+                {% include "projects/project/fragments/conversations_new/conversation_topic.html" with topic_name=topic.grouper message_number=topic.list %}
+                {% comment %} {% endfor %} {% endcomment %}
             </div>
-            <div class="conversation-new__topics-list-member fr-p-2w">
+            <div class="conversation-new__topics-list-member fr-px-2w fr-pt-2w"
+                 x-data="{isOpen: false}"
+                 :class="{'open': isOpen}">
                 <h2 class="conversation-new__topics-list-member-title">Participants</h2>
                 <h3 class="fr-mt-2w conversation-new__topics-list-member-subtitle">Porteur de projet et partenaires</h3>
                 <ul class="flex-column list-unstyled fr-mb-0">
@@ -54,54 +67,117 @@
                         {% endif %}
                     {% endfor %}
                 </ul>
+                <div class="list-member-toggle position-sticky bottom-0 start-0 text-center w-100 fr-pb-0">
+                    <button class="fr-btn fr-btn--sm fr-btn--secondary bg-white "
+                            @click="isOpen = !isOpen; !isOpen && trackSeeMoreParticipants();"
+                            x-text="isOpen ? 'Voir moins' : 'Voir plus'"></button>
+                </div>
             </div>
         </div>
-        <div class="conversation-new__container"
-             x-data="NotificationEater({{ project.id }})"
-             @topic-switched.window="scrollToFirstNotification($event.detail)">
-            {% get_obj_perms request.user for project as "user_project_perms" %}
-            {% include "projects/project/partials/conversations_new_partial.html" %}
-            {% if "use_public_notes" in user_project_perms %}
-                <!-- Post message -->
-                <form class="form editor-form fr-px-5v"
-                      hx-post="{% url 'projects-project-detail-conversations-new-partial' project.pk %}"
-                      hx-trigger="submit"
-                      hx-swap="outerHTML"
-                      hx-target="#conversation-new-container"
-                      enctype="multipart/form-data"
-                      id="conversation-form">
-                    {% csrf_token %}
-                    <div class="message-form fr-mt-3w bg-light border-form editor-form__container fr-input-group">
-                        {% include "tools/editor.html" with input_name=posting_form.content.name initial_content=posting_form.content.value|default:'' errors=posting_form.content.errors input_required=True can_add_reco=True next_url_add_reco="projects-project-detail-conversations-new" %}
-                        {% comment %} {% include "projects/project/fragments/files_links/file_upload_input_standalone.html" %} {% endcomment %}
-                        <!-- Action file -->
-                        <button x-data="{fileName: ''}"
-                                class="fr-btn fr-btn--sm fr-btn--tertiary fr-icon-file-add-line fr-btn--icon-left file-upload-wrapper"
-                                type="button"
-                                @click="$refs.fileUploadInput.click()">
-                            <span class="file-upload-text">Ajouter un fichier</span>
-                            <span class="fr-ml-1w" x-text="fileName"></span>
-                            <input x-ref="fileUploadInput"
-                                   type="file"
-                                   id="file-upload"
-                                   name="the_file"
-                                   @change="fileName = $refs.fileUploadInput.files.length > 0 ? $refs.fileUploadInput.files[0].name : ''"
-                                   class="d-none file-upload-input">
-                        </button>
-                        <button data-test-id="send-message-conversation"
-                                x-data
-                                :disabled="$store.editor.currentMessage === '' "
-                                form="conversation-form"
-                                class="fr-btn send-message"
-                                type="submit">Envoyer</button>
+        <template x-if="!messagesLoaded">
+            <div class="position-relative w-100">
+                <div x-transition
+                     class="position-absolute w-100 h-100 d-flex justify-content-center align-items-center"
+                     data-cy="loader">
+                    <div class="spinner-border" role="status">
+                        <span class="visually-hidden">Chargement des messages...</span>
                     </div>
-                    {% for error in posting_form.content.errors %}<div class="text-danger text-end">{{ error }}</div>{% endfor %}
-                    <label class="visually-hidden" for="input-project-content">{{ posting_form.content.label }}</label>
-                    <input type="hidden" name="new" value="1">
-                    <input type="hidden" name="topic_name" :value="valueTopicFormMessageSend">
-                    <div class="d-flex justify-content-end fr-mt-3w"></div>
-                </form>
-            {% endif %}
-        </div>
+                </div>
+            </div>
+        </template>
+        <template x-if="messagesLoaded">
+            <div class="conversation-new__container"
+                 x-show="showMessages"
+                 x-transition.opacity.duration.500ms
+                 x-data="NotificationEater({{ project.id }})"
+                 {% comment %}
+                 @topic-switched.window="scrollToFirstNotification($event.detail)"
+                 {% endcomment %}>
+                {% get_obj_perms request.user for project as "user_project_perms" %}
+                {% include "projects/project/fragments/conversations_new/conversations_new_feed.html" %}
+                {% if "use_public_notes" in user_project_perms %}
+                    <!-- Post message -->
+                    <form class="form editor-form fr-px-3v fr-pr-12w"
+                          @submit.prevent="sendFormMessage(message)"
+                          enctype="multipart/form-data"
+                          id="conversation-form">
+                        {% csrf_token %}
+                        <div class="message-form fr-my-3v bg-light border-form editor-form__container fr-input-group position-relative"
+                             :class="{'focus': isEditorFocused || isEditorInEditMode || isEditorInReplyMode, 'edit-mode': isEditorInEditMode, 'reply-mode': isEditorInReplyMode}"
+                             @click.outside="isEditorFocused = false">
+                            <template x-if="isEditorInEditMode">
+                                <div class="edit-mode__message-container">
+                                    <p class="fr-text--sm fr-mb-0">
+                                        Vous êtes en train de modifier un message.
+                                        <button class="fr-link edit-mode__button fr-text--sm"
+                                                @click="toggleEditMode({ activateEditMode: false })">Annuler</button>
+                                    </p>
+                                </div>
+                            </template>
+                            <template x-if="isEditorInReplyMode">
+                                <div class="reply-mode__message-container">
+                                    <p class="fr-text--sm fr-mb-0">
+                                        Vous êtes en train de répondre à un message.
+                                        <button class="fr-link reply-mode__button fr-text--sm"
+                                                @click="onClickCancelReply">Annuler</button>
+                                    </p>
+                                </div>
+                            </template>
+                            {% if not is_project_owner %}
+                                {% include "tools/editor.html" with model="message" input_name=posting_form.content.name initial_content=posting_form.content.value|default:'' errors=posting_form.content.errors input_required=True can_add_reco=True next_url_add_reco="projects-project-detail-conversations" can_attach_files=True can_attach_contact=True show_send_button=True form_id="conversation-form" placeholder="Écrivez votre message ici. Ajoutez des fichiers, contacts ou une recommandation…" can_compress_editor=True %}
+                            {% else %}
+                                {% include "tools/editor.html" with model="message" input_name=posting_form.content.name initial_content=posting_form.content.value|default:'' errors=posting_form.content.errors input_required=True can_add_reco=False next_url_add_reco="projects-project-detail-conversations" can_attach_files=True can_attach_contact=False show_send_button=True form_id="conversation-form" placeholder="Écrivez votre message ici. Vous pouvez ajouter des fichiers." can_compress_editor=True %}
+                            {% endif %}
+                            <input type="hidden" name="contact" :value="message?.contact?.id">
+                        </div>
+                        {% for error in posting_form.content.errors %}<div class="text-danger text-end">{{ error }}</div>{% endfor %}
+                        <label class="visually-hidden" for="input-project-content">{{ posting_form.content.label }}</label>
+                        <input type="hidden" name="new" value="1">
+                        {% comment %} <input type="hidden" name="topic_name" :value="valueTopicFormMessageSend"> {% endcomment %}
+                        <div class="d-flex justify-content-end fr-mt-3v"></div>
+                    </form>
+                {% endif %}
+            </div>
+        </template>
+        <dialog id="modal"
+                class="fr-modal"
+                aria-labelledby="supprimer-message"
+                aria-modal="true">
+            <div class="fr-container fr-container--fluid fr-container-md">
+                <div class="fr-grid-row fr-grid-row--center">
+                    <div class="fr-col-12 fr-col-md-8 fr-col-lg-6">
+                        <div class="fr-modal__body">
+                            <h5 id="modal-title" class="fr-modal__header">
+                                <svg xmlns="http://www.w3.org/2000/svg"
+                                     width="25"
+                                     height="25"
+                                     viewBox="0 0 12 12"
+                                     fill="none"
+                                     class="fr-mr-2v">
+                                    <path d="M8.91669 2.50008H11.8334V3.66675H10.6667V11.2501C10.6667 11.5723 10.4055 11.8334 10.0834 11.8334H1.91669C1.59452 11.8334 1.33335 11.5723 1.33335 11.2501V3.66675H0.166687V2.50008H3.08335V0.750081C3.08335 0.427918 3.34452 0.166748 3.66669 0.166748H8.33335C8.65553 0.166748 8.91669 0.427918 8.91669 0.750081V2.50008ZM9.50002 3.66675H2.50002V10.6667H9.50002V3.66675ZM4.25002 5.41675H5.41669V8.91675H4.25002V5.41675ZM6.58335 5.41675H7.75002V8.91675H6.58335V5.41675ZM4.25002 1.33341V2.50008H7.75002V1.33341H4.25002Z" fill="black" />
+                                </svg>
+                                Etes-vous sûr de vouloir supprimer ce message ?
+                            </h5>
+                            <div class="fr-modal__content">
+                                <div class="flag red d-block d-flex flex-column">
+                                    <span class="title text-red text-uppercase fw-bold fr-mb-2v d-block d-flex align-items-center fr-m-auto fr-mb-4w">
+                                        <span class="fr-icon-warning-fill"></span>
+                                        Supression de message
+                                    </span>
+                                    <div class="d-flex justify-content-center">
+                                        <button class="button filled red fr-mr-2w"
+                                                aria-controls="modal"
+                                                type="button"
+                                                @click="onClickHandleDelete()">Supprimer</button>
+                                        <button class="button" aria-controls="modal" type="button">Annuler</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </dialog>
     </div>
+    {% include "projects/project/fragments/project_banner/banner_wrapper.html" with part="close" %}
 {% endblock project_detail %}

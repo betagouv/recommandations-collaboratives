@@ -1,5 +1,6 @@
 {% load static %}
 {% load django_vite %}
+{% load gravatar %}
 {% load phone_filters %}
 {% block js %}
     {% vite_asset 'js/apps/user.js' %}
@@ -15,16 +16,17 @@
 {% get_obj_perms request.user for request.site as "user_site_perms" %}
 {% get_obj_perms request.user for project as "user_project_perms" %}
 <div x-data="User()"
-     class="user-card position-relative d-flex fr-my-1v flex-column justify-content-between align-items-start">
+     class="user-card position-relative d-flex flex-column justify-content-between align-items-start">
     <div class="position-relative d-flex align-items-center justify-content-between {% if user_activity %}w-100{% endif %}">
         <button x-ref="user"
                 type="button"
                 {% if not user_popup_deactivate %}@click="onUserClick"{% endif %}
                 class="d-flex align-items-center flex-wrap user-info border-0 fr-p-0 bg-transparent {% if user_popup_deactivate %}no-underline{% endif %}"
                 data-test-id="button-open-tooltip-user-card">
-            <span class="fr-mr-1v d-flex align-items-center font-very-small">
+            <span class="fr-mr-1v d-flex align-items-center font-size-12px">
                 <img class="user-card__gravatar rounded-circle fr-mr-1v {% if not user.is_active %}border-0{% elif advising_position.is_advisor %}advisor-border border-2{% elif advising_position.is_observer %}observer-border border-2{% else %}neutral-role-border border-2{% endif %}"
-                     :src='gravatar_url("{{ user.email }}", 18, "{{ user.first_name }}" + " " + "{{ user.last_name }}")'
+                     :src='gravatar_url("{{ user.email }}", 18, "{{ user.first_name }}" + " " + "{{ user.last_name }}", stringToColor("{{ user.email }}") )'
+                     :style="{ '--current-bg-color': stringToColor('{{ user.email }}') }"
                      alt="{{ action.actor }}">
                 {% if user %}
                     <strong class="user-card__name text-nowrap text-capitalize {% if not user.is_active %}inactive-status{% endif %}"
@@ -41,9 +43,9 @@
                 {% endif %}
             </span>
             {% if user.profile.organization.name %}
-                <span class="user-card__org-name fw-normal font-italic font-very-small">{{ user.profile.organization.name }}</span>
+                <span class="user-card__org-name fw-normal font-italic font-size-12px">{{ user.profile.organization.name }}</span>
             {% elif project_owner and project.org_name %}
-                <span class="user-card__org-name fw-normal font-italic font-very-small">{{ project.org_name }}</span>
+                <span class="user-card__org-name fw-normal font-italic font-size-12px">{{ project.org_name }}</span>
             {% endif %}
         </button>
         {% if 'use_crm' in user_site_perms and user_activity %}
@@ -67,38 +69,7 @@
          id="user-tooltip"
          @click.outside="onOutsideUserClick"
          data-test-id="tooltip-user-card"
-         class="user-card-popup flex-column {% if not user.is_active %}...{% elif advising_position.is_advisor %}advisor-border{% elif advising_position.is_observer %}observer-border{% else %}neutral-role-border{% endif %}">
-        {% if user.is_active and advising_position.is_advisor %}
-            <div class="user-role position-absolute">
-                <span class="fr-py-1v fr-px-2v fw-bold text-uppercase tiny advisor-background text-white specific-borderradius-2px">Conseiller</span>
-            </div>
-        {% elif user.is_active and advising_position.is_observer %}
-            <div class="user-role position-absolute">
-                <span class="fr-py-1v fr-px-2v fw-bold text-uppercase tiny observer-background text-white specific-borderradius-2px">Observateur</span>
-            </div>
-        {% endif %}
-        <div class="d-flex align-items-center flex-wrap">
-            <span class="fr-mr-2v d-flex align-items-center font-very-small">
-                <img class="rounded-circle fr-mr-2v {% if not user.is_active %}border-0{% elif advising_position.is_advisor %}advisor-border border-2{% elif advising_position.is_observer %}observer-border border-2{% else %}neutral-role-border border-2{% endif %}"
-                     :src='gravatar_url("{{ user.email }}", 25, "{{ user.first_name }}" + " " + "{{ user.last_name }}")'
-                     alt="{{ action.actor }}">
-                <strong class="text-nowrap text-capitalize {% if not user.is_active %}inactive-status{% endif %}">
-                    {% if user.get_full_name %}
-                        {{ user.get_full_name }}
-                    {% elif user and project and project.first_name and project.last_name %}
-                        {{ project.first_name }}
-                        {{ project.last_name }}
-                    {% else %}
-                        {{ user.email }}
-                    {% endif %}
-                </strong>
-            </span>
-            {% if user.profile.organization.name %}
-                <span class="text-dark fw-normal font-italic font-very-small">{{ user.profile.organization.name }}</span>
-            {% elif project_owner and project.org_name %}
-                <span class="text-dark fw-normal font-italic font-very-small">{{ project.org_name }}</span>
-            {% endif %}
-        </div>
+         class="user-card-popup flex-column {% if user.is_active %}neutral-role-border{% endif %}">
         {% if user.profile.organization_position %}
             <div class="d-flex align-items-center justify-content-between text-blue font-very-small specific-my">
                 <div class="d-flex align-items-center">
@@ -161,10 +132,10 @@
         {% endif %}
         {% if user and not user.is_active %}
             <span data-test-id="deactivated-user-details"
-                  class="fr-p-1v fr-px-2v font-very-small bg-grey-light w-100 d-flex fr-mt-1v text-nowrap specific-borderradius-2px">Compte desactivé depuis {{ user.last_login.date|date:"F" }}  {{ user.last_login.date|date:"Y" }}</span>
+                  class="fr-p-1v fr-px-2v font-very-small bg-grey-light w-100 d-flex fr-mt-1v text-nowrap specific-borderradius-2px">Compte désactivé depuis {{ user.last_login.date|date:"F" }}  {{ user.last_login.date|date:"Y" }}</span>
         {% elif not user %}
             <span data-test-id="deleted-user-details"
-                  class="fr-p-1v fr-px-2v font-very-small bg-grey-light w-100 d-flex fr-mt-1v text-nowrap specific-borderradius-2px">Compte desactivé</span>
+                  class="fr-p-1v fr-px-2v font-very-small bg-grey-light w-100 d-flex fr-mt-1v text-nowrap specific-borderradius-2px">Compte désactivé</span>
         {% endif %}
     </div>
 </div>
