@@ -75,6 +75,12 @@ def deploy(cnx, site=None):
         "&& ./manage.py collectstatic --noinput"
     )
 
+    print("Copying manifest.json to static dir...")
+    cnx.run(
+        f"cd recoco-{site} "
+        "&& cp .venv/lib/python3*/site-packages/recoco/frontend/dist/.vite/manifest.json public/static/"
+    )
+
 
 def ad_staging_create_database(db_name: str):
     """Create a new database on alwaysdata infrastructure"""
