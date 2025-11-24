@@ -1,11 +1,11 @@
 {% if embed_view is not True %}
-    <div class="d-flex align-items-center fr-mr-1v fr-mb-2v">
+    <div class="d-flex align-items-center fr-m-auto">
         <span class="fw-bold custom-info-title"
               data-test-id="tasks-count"
               x-text="$store.tasksData.validatedTasks.length > 1 ? `${$store.tasksData.validatedTasks.length} recommandations` :  `${$store.tasksData.validatedTasks.length} recommandation`"></span>
     </div>
 {% else %}
-    <div class="d-flex align-items-center fr-mr-1v fr-mb-2v">
+    <div class="d-flex align-items-center fr-m-auto">
         <span class="fw-bold custom-info-title" data-test-id="tasks-count">
             {% if actions|length > 1 %}
                 {{ actions|length }} recommandations

@@ -9,6 +9,7 @@ created : 2021-05-26 13:33:11 CEST
 
 import os
 import uuid
+from datetime import datetime
 
 from django.apps import apps as django_apps
 from django.contrib.auth import models as auth_models
@@ -441,6 +442,11 @@ class Project(models.Model):
         null=True,
         default="",
         verbose_name="Raison de l'inactivité du dossier",
+    )
+    last_manual_reactivation = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name="Quand le dossier a été manuellement réactivé",
     )
 
     def reactivate(self):
@@ -952,6 +958,10 @@ class Document(models.Model):
 
     def __str__(self):  # pragma: nocover
         return f"Document {self.id}"
+
+    def soft_delete(self):
+        self.deleted = datetime.now()
+        self.save()
 
 
 ########################################################################

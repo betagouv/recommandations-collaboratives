@@ -18,21 +18,21 @@ def test_anonymous_can_not_reach_contact_list_endpoint(api_client):
 
 
 @pytest.mark.django_db
-def test_non_staff_user_can_list_contacts_but_not_create(api_client):
+def test_logged_in_user_cannot_list_contacts_or_create(api_client):
     user = baker.make("User")
     api_client.force_authenticate(user)
 
     url = reverse("api-addressbook-contact-list")
 
     response = api_client.get(url)
-    assert response.status_code == 200
+    assert response.status_code == 403
 
     response = api_client.post(url, data={})
     assert response.status_code == 403
 
 
 @pytest.mark.django_db
-def test_non_staff_user_can_read_contact_but_not_update(api_client, current_site):
+def test_logged_in_user_can_read_contact_but_not_update(api_client, current_site):
     contact = baker.make(Contact, site=current_site)
 
     user = baker.make("User")
@@ -215,7 +215,7 @@ class TestInputContactSearch:
             refuse = []
         if accept is None:
             accept = []
-        with login(api_client):
+        with login(api_client, groups=["example_com_staff"]):
             url = reverse("api-addressbook-contact-list")
             query = {}
             if letter is not None:
@@ -324,6 +324,7 @@ class TestInputContactSearch:
 
     @pytest.mark.django_db
     def test_adac_results(self, api_client, request):
+        api_client.login()
         ademe_contact = self.generate_result(
             first_name="Laurent",
             division="Référent Aides travaux et études opérationnelles",
@@ -479,7 +480,7 @@ class TestInputContactSearch:
         )
         search = "zassembler"
 
-        with login(api_client):
+        with login(api_client, groups=["example_com_staff"]):
             url = reverse("api-addressbook-contact-list")
             url = f"{url}?search={search}"
             response = api_client.get(url)

@@ -28,7 +28,7 @@
     {% get_obj_perms request.user for request.site as "user_site_perms" %}
     {% get_obj_perms request.user for project as "user_project_perms" %}
     {% include "projects/project/navigation.html" with recommandations=True %}
-    {% include "projects/project/fragments/project_banner/banner_wrapper.html" with part='open' %}
+    {% include "projects/project/fragments/project_banner/banner_wrapper.html" with part="open" %}
     {{ can_administrate|json_script:"canAdministrate" }}
     {{ user_project_perms|json_script:"userProjectPerms" }}
     {{ is_switchtender|json_script:"isSwitchtender" }}
@@ -36,40 +36,55 @@
     {{ advising_position.is_observer|json_script:"isObserverOnProject" }}
     {{ advising_position.is_advisor|json_script:"isAdvisorOnProject" }}
     {% if is_switchtender and project.tasks.all.count == 0 %}
-        <div data-test-id="no-tasks-banner" class="bg-light fr-p-3w rounded-2">
-            <h3 class="fw-light">Pas encore de recommandations au demandeur ?</h3>
-            <p class="fst-italic fw-light fr-mb-2w">
-                Soyez la première personne à proposer des recommandations ou des ressources au demandeur !
-            </p>
-            {% if advising or is_staff %}
-                <a data-test-id="submit-task-button"
-                    href="{% url 'projects-create-task' %}?project_id={{ project.id }}"
-                    class="fr-btn">Émettre une recommandation</a>
-                <a href="{% url 'projects-project-tasks-suggest' project.pk %}"
-                    class="fr-btn fr-btn--secondary"
-                    data-test-id="see-suggest-task-button">Examiner les ressources suggérées</a>
-            {% else %}
-                <button class="fr-btn"
-                        data-bs-toggle="dropdown"
-                        data-bs-auto-close="outside"
-                        aria-expanded="false"
-                        aria-controls="select-observer-or-advisor">
-                    Rejoindre ce dossier pour l'aiguiller
-                </button>
-            {% endif %}
+        <div data-test-id="no-tasks-banner"
+             class="bg-light fr-p-5w rounded-2 fr-m-5v">
+            <div class="d-flex">
+                <img width="135"
+                     height="135"
+                     class="fr-mr-4w"
+                     src="{% static 'svg/empty-state.svg' %}">
+                <div>
+                    <h3 class="size-20px fw-bold fr-mb-0">Il n’y a encore aucune recommandation pour ce projet</h3>
+                    <p class="fw-normal font-size-14px fr-mb-2w">
+                        Vous pouvez examiner les recommandations suggérées automatiquement pour ce projet, pour éventuellement les proposer à la collectivité.
+                    </p>
+                    {% if advising or is_staff %}
+                        <a href="{% url 'projects-project-tasks-suggest' project.pk %}"
+                           class="fr-btn"
+                           data-test-id="see-suggest-task-button">Consulter les recommandations suggérées</a>
+                    {% else %}
+                        <button class="fr-btn"
+                                data-bs-toggle="dropdown"
+                                data-bs-auto-close="outside"
+                                aria-expanded="false"
+                                aria-controls="select-observer-or-advisor">
+                            Rejoindre ce dossier pour l'aiguiller
+                        </button>
+                    {% endif %}
+                </div>
+            </div>
         </div>
-    {% elif not is_switchtender and project.tasks.public.count == 0 %}
-        <div class="bg-light fr-p-3w rounded-2">
-            <h3 class="fw-light">Vous n'avez pas de recommandations en cours</h3>
-            <p class="fst-italic fw-light">Des recommandations vous seront proposées par notre équipe dès que possible.</p>
-            <p class="fst-italic fw-light">
-                Vous pouvez accélerer les recommandations <span class="fw-bolder">en complétant le questionnaire d'exploration</span>.
-            </p>
-            <a href="{% url 'survey-project-session' project.id %}" class="fr-btn">Compléter le questionnaire d'exploration</a>
+    {% elif not is_switchtender and project.tasks.published.count == 0 %}
+        <div class="bg-light fr-p-5w rounded-2 fr-m-5v">
+            <div class="d-flex">
+                <img width="135"
+                     height="135"
+                     class="fr-mr-4w"
+                     src="{% static 'svg/empty-state.svg' %}">
+                <div>
+                    <h3 class="size-20px fw-bold fr-mb-0">Vous n’avez pas encore de recommandations</h3>
+                    <p class="fw-normal font-size-14px fr-mb-2w">
+                        Nos conseiller·es vous proposeront tout d'abord un échange de vive voix, puis vous recommanderont des actions à entreprendre dans cet espace.
+                    </p>
+                    <a href="{% if "view_public_notes" in user_project_perms or "use_public_notes" in user_project_perms %} {% url 'projects-project-detail-conversations' project.pk %}{% else %}#{% endif %}"
+                       class="fr-btn"
+                       data-test-id="see-suggest-task-button">Aller à la conversation</a>
+                </div>
+            </div>
         </div>
     {% else %}
         {% include "projects/project/fragments/tasks_inline_kanban/tasks_inline_kanban.html" %}
     {% endif %}
-    {% include "projects/project/fragments/project_banner/banner_wrapper.html" with part='close' %}
+    {% include "projects/project/fragments/project_banner/banner_wrapper.html" with part="close" %}
     {% include "projects/project/onboarding_tutorial.html" %}
 {% endblock project_detail %}

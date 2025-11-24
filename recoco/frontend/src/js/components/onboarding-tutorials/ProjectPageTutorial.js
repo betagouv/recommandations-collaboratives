@@ -8,10 +8,11 @@ Alpine.data('ProjectPageTutorial', () => {
     challengesStatus: [],
     challenges: [],
     firstChallengeNotAcquired: null,
-    isPopupOpen: false,
+    isTutorialPopupOpen: true,
     async init() {
-      this.$store.tutorialsEvents.isTutorialForProjectPage = 0;
-
+      if( localStorage.getItem('projectPageTutorialPopupOpen') === 'true' ) {
+        this.isTutorialPopupOpen = true;
+      }
       const challengesName = [
         'project-page-tutorial-part1',
         'project-page-tutorial-part2',
@@ -22,7 +23,6 @@ Alpine.data('ProjectPageTutorial', () => {
         ...challengesName.map((name) => api.get(challengeUrl(name))),
       ];
       const responses = await Promise.all(requests);
-      console.log(responses);
       if (responses) {
         for (const response of responses) {
           this.challenges.push(response.data);
@@ -44,23 +44,23 @@ Alpine.data('ProjectPageTutorial', () => {
           }
         }
       }
-      console.log(this.challengesStatus);
-      // Watch for completion of step 1 triggered on a navigation click
+      // Watch for completion of step 1 triggered on role selection validation
       this.$watch(
         () => this.$store.tutorialsEvents.isTutorialForProjectPageOneCompleted,
         (isCompleted) => {
           if (
-            this.$store.tutorialsEvents.isTutorialForProjectPage === 1 &&
+            this.$store.tutorialsEvents.isTutorialForProjectPage === 1.5 &&
             isCompleted
           ) {
             this.acquireChallenge('project-page-tutorial-part1');
             this.challengesStatus[0] = 'acquired';
             this.challengesStatus[1] = 'todo';
             this.$store.tutorialsEvents.isTutorialForProjectPage = 0;
+            localStorage.setItem('isTutorialForProjectPage', '0');
           }
         }
       );
-      // Watch for completion of step 2 triggered on role selection validation
+      // Watch for completion of step 2 triggered on a navigation click
       this.$watch(
         () => this.$store.tutorialsEvents.isTutorialForProjectPageTwoCompleted,
         (isCompleted) => {
@@ -72,6 +72,7 @@ Alpine.data('ProjectPageTutorial', () => {
             this.challengesStatus[1] = 'acquired';
             this.challengesStatus[2] = 'todo';
             this.$store.tutorialsEvents.isTutorialForProjectPage = 0;
+            localStorage.setItem('isTutorialForProjectPage', '0');
           }
         }
       );
@@ -87,34 +88,46 @@ Alpine.data('ProjectPageTutorial', () => {
             this.challengesStatus[2] = 'acquired';
             this.challengesStatus[3] = 'todo';
             this.$store.tutorialsEvents.isTutorialForProjectPage = 0;
+            localStorage.setItem('isTutorialForProjectPage', '0');
           }
         }
       );
-      // Watch for completion of step 4 triggered on click on create reco button
+      // Watch for completion of step 4 triggered on click on invite collaborators button
       this.$watch(
         () => this.$store.tutorialsEvents.isTutorialForProjectPageFourCompleted,
         (isCompleted) => {
           if (
-            this.$store.tutorialsEvents.isTutorialForProjectPage === 4.6 &&
+            this.$store.tutorialsEvents.isTutorialForProjectPage === 4.5 &&
             isCompleted
           ) {
             this.acquireChallenge('project-page-tutorial-part4');
             this.challengesStatus[3] = 'acquired';
             this.challengesStatus[4] = 'todo';
             this.$store.tutorialsEvents.isTutorialForProjectPage = 0;
+            localStorage.removeItem('isTutorialForProjectPage');
+            localStorage.removeItem('projectPageTutorialPopupOpen');
           }
         }
       );
     },
-    launchChallenge1() {
-      this.$store.tutorialsEvents.isTutorialForProjectPage = 1;
-    },
-    launchChallenge2(isSwitchTender) {
+    launchChallenge1(isSwitchTender) {
       if (isSwitchTender) {
+        this.acquireChallenge('project-page-tutorial-part1');
+        this.challengesStatus[0] = 'acquired';
+        this.challengesStatus[1] = 'todo';
+        this.$store.tutorialsEvents.isTutorialForProjectPage = 0;
+      }
+      else {
+        this.$store.tutorialsEvents.isTutorialForProjectPage = 1;
+      }
+    },
+    launchChallenge2() {
+      const currentUrl = new URL(location.href);
+      if (currentUrl.pathname.includes('/connaissance')) {
         this.acquireChallenge('project-page-tutorial-part2');
-            this.challengesStatus[1] = 'acquired';
-            this.challengesStatus[2] = 'todo';
-            this.$store.tutorialsEvents.isTutorialForProjectPage = 0;
+        this.challengesStatus[1] = 'acquired';
+        this.challengesStatus[2] = 'todo';
+        this.$store.tutorialsEvents.isTutorialForProjectPage = 0;
       }
       else {
         this.$store.tutorialsEvents.isTutorialForProjectPage = 2;
@@ -122,33 +135,42 @@ Alpine.data('ProjectPageTutorial', () => {
     },
     launchChallenge3() {
         const currentUrl = new URL(location.href);
-        console.log(currentUrl.pathname);
-        if (currentUrl.pathname.includes('/conversations-new')) {
+        if (currentUrl.pathname.includes('/conversations')) {
           this.$store.tutorialsEvents.isTutorialForProjectPage = 3.5;
         }
         else {
           this.$store.tutorialsEvents.isTutorialForProjectPage = 3;
         }
-        console.log(this.$store.tutorialsEvents.isTutorialForProjectPage);
     },
     launchChallenge4() {
-        const currentUrl = new URL(location.href);
-        if (currentUrl.pathname.includes('/conversations-new')) {
-            this.$store.tutorialsEvents.isTutorialForProjectPage = 4.3;
-        }
-        else {
-            this.$store.tutorialsEvents.isTutorialForProjectPage = 4;
-        }
+      const currentUrl = new URL(location.href);
+      if (currentUrl.pathname.includes('/administration/#user-management')) {
+        this.$store.tutorialsEvents.isTutorialForProjectPage = 4.5;
+      }
+      else if (currentUrl.pathname.includes('/administration')) {
+        this.$store.tutorialsEvents.isTutorialForProjectPage = 4.5;
+      }
+      else {
+        this.$store.tutorialsEvents.isTutorialForProjectPage = 4;
+      }
     },
     async acquireChallenge(code) {
-        try {
-          const json = await api.patch(challengeUrl(code), {
-            acquire: true,
-          });
-          return json.data;
-        } catch (err) {
-          console.warn(err);
-        }
-      },
+      try {
+        const json = await api.patch(challengeUrl(code), {
+          acquire: true,
+        });
+        return json.data;
+      } catch (err) {
+        console.warn(err);
+      }
+    },
+    handleTutorialPopup() {
+      this.isTutorialPopupOpen = !this.isTutorialPopupOpen;
+      localStorage.setItem('projectPageTutorialPopupOpen', this.isTutorialPopupOpen);
+    },
+    handleCloseTutorialPopup() {
+      this.isTutorialPopupOpen = false;
+      localStorage.setItem('projectPageTutorialPopupOpen', 'false');
+    },
   };
 });

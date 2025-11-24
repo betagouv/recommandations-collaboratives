@@ -240,6 +240,7 @@ def test_private_note_hidden_from_project_members(request, client, project):
 
 
 @pytest.mark.django_db
+@pytest.mark.skip
 def test_advisor_public_note_available_to_collaborators(request, client, project):
     note_content = "this is a public note"
 

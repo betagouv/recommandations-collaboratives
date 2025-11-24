@@ -3,6 +3,10 @@
     bottom: 20px;
     right: 20px;
     z-index: 1003;
+    &--with-crisp-chat {
+        right: 22px; /* Adjust position if Crisp chat is enabled */
+        bottom: 90px;
+    }
     &__dialog {
         background-color: hsla(0, 0%, 0%, 0);
     }
@@ -12,6 +16,10 @@
         bottom: 94px;
         background: #FFF;
         max-width: 450px;
+        &--with-crisp-chat {
+            right: 22px; /* Adjust position if Crisp chat is enabled */
+            bottom: 160px;
+        }
     }
     &__button {
         border-radius: 99px;
@@ -60,4 +68,29 @@
 .disabled {
     color: var(--light-text-disabled-grey, #929292);
     pointer-events: none;
+}
+
+.circle-visual-hint {
+    fill: #0974F6;
+    stroke-width: 4px;
+    stroke: rgba(0, 0, 0, 0.08);
+    filter: drop-shadow(0 0 0 rgba(225, 225, 225, 0.35));
+}
+
+.position-visual-circle-hint {
+    position: absolute;
+    transform: translate(-15px, -15px);
+    z-index: 1002;
+    &--higher {
+        transform: translate(-25px, -40px);
+
+    }
+    &--85px-y {
+        transform: translate(-15px, -85px);
+
+    }
+    &--45px-y {
+        transform: translate(-15px, -45px);
+
+    }
 }

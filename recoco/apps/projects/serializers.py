@@ -27,7 +27,13 @@ class DocumentSerializer(serializers.HyperlinkedModelSerializer):
             "pinned",
         ]
 
-    uploaded_by = UserSerializer(read_only=True, many=False)
+    uploaded_by = UserSerializer(read_only=True)
+
+
+class NewDocumentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Document
+        fields = ["the_file", "the_link", "description", "id"]
 
 
 class InlineProjectSiteSerializer(serializers.ModelSerializer):

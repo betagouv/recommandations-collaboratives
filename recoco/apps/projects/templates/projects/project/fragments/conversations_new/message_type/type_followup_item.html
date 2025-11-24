@@ -1,24 +1,10 @@
 <div class="observed-element"
-     data-notifications="{{ element.notifications }}"
+     :data-notifications="JSON.stringify({id: element.id, unread: element.unread, type: element.type})"
      x-data="TaskStatus()">
-    {% if element.object.status %}
-        <div class="fr-mb-0 d-flex align-items-center justify-content-center">
-            {% comment %} <strong>{{ element.object.who.first_name }} {{ element.object.who.last_name }}</strong> a changé le statut de la recommandation en <strong>{{ element.object.status_txt }}</strong> {% endcomment %}
-            {% include "user/user_card.html" with user=element.object.who %}
-            <span class="followup-item__action fr-ml-1v">a indiqué que la recommandation <strong>{{ element.object.task.intent }}</strong> est <strong x-text="humanReadableTaskStatus('{{ element.object.status_txt }}')"></strong></span>
-        </div>
-    {% endif %}
-    {% if element.object.comment_rendered %}
-        <div class="followup-item__message rounded-3 fr-p-2w fr-my-2v {% if request.user == element.object.who %}bg-blue-light fr-ml-5w{% else %}bg-grey-light fr-mr-5w{% endif %}">
-            {{ element.object.comment_rendered|safe }}
-            {% if element.object.document.count %}
-                {% for document in element.object.document.all %}
-                    {% include "projects/project/fragments/files_links/file_list_item_embedded.html" with document=document %}
-                {% endfor %}
-            {% endif %}
-            {% if element.object.who %}
-                <div class="d-flex align-items-center">{% include "user/user_card.html" with user=element.object.who %}</div>
-            {% endif %}
-        </div>
-    {% endif %}
+    <div class="fr-mb-0 d-flex align-items-center justify-content-center">
+        <div class="d-flex align-items-center"
+             x-data="{user: null}"
+             x-init="user = getUserById(element.actor.id);">{% include "user/user_card_js.html" %}</div>
+        <span class="followup-item__action fr-ml-1v" x-text="element.verb"></span>
+    </div>
 </div>
