@@ -254,23 +254,9 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
       this.$store.editor.currentMessageJSON
     );
 
-    parsedNodesFromEditor.forEach((node) => {
-      if (
-        node.type === 'DocumentNode' &&
-        !node.document_id &&
-        node.attrs &&
-        node.attrs.id
-      ) {
-        node.document_id = node.attrs.id;
-      }
-    });
-
     // Only upload files for *new* documents
     const documentNodesToUpload = parsedNodesFromEditor.filter(
-      (node) =>
-        node.type === 'DocumentNode' &&
-        !node.document_id &&
-        node.file
+      (node) => node.type === 'DocumentNode' && !node.document_id && node.file
     );
 
     let uploadResponses = [];
