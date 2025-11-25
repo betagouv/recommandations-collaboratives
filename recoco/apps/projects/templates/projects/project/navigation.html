@@ -316,6 +316,7 @@
                     aria-controls="modal-action"
                     type="button"
                     id="select-observer-or-advisor-button"
+                    data-test-id="select-observer-or-advisor-button"
                     class="fr-btn fr-btn--tertiary-no-outline fr-icon-team-line {% if advising_position.is_advisor or advising_position.is_observer %}fr-pr-25v{% else %}fr-pr-28v{% endif %}"
                     :class="{'visual-hint': $store.tutorialsEvents.isTutorialForProjectPage === 1}"
                     @click="if ($store.tutorialsEvents.isTutorialForProjectPage==1) { $store.tutorialsEvents.isTutorialForProjectPage=1.5 };">
@@ -399,7 +400,7 @@
                                                 <button class="fr-btn fr-btn--sm w-100 justify-content-center"
                                                         :class="{'visual-hint': $store.tutorialsEvents.isTutorialForProjectPage === 1.5}"
                                                         @click="if ($store.tutorialsEvents.isTutorialForProjectPage==1.5) { $store.tutorialsEvents.isTutorialForProjectPageOneCompleted=true; }"
-                                                        data-test-id="button-quit-role">Rejoindre le dossier</button>
+                                                        data-test-id="button-become-advisor">Rejoindre le dossier</button>
                                                 <template x-if="$store.tutorialsEvents.isTutorialForProjectPage === 1.5">
                                                     {% include "projects/project/fragments/onboarding-tutorials/visual-hint.html" with extra_classes="position-visual-circle-hint--45px-y" %}
                                                 </template>
