@@ -135,6 +135,24 @@ def test_create_user_requires_special_chars_in_password(client, request):
 
 
 @pytest.mark.django_db
+def test_create_user_no_similar(client, request):
+    data = {
+        "first_name": "Test",
+        "last_name": "test",
+        "organization": "test",
+        "organization_position": "test",
+        "email": "jeanmichel@kdkdk.fr",
+        "phone_no": "0303003033",
+        "password1": "Jeanmichel01",
+        "password2": "Jeanmichel01",
+    }
+    response = client.post(reverse("account_signup"), data)
+    assert response.status_code == 200
+
+    assert auth_models.User.objects.filter(email=data["email"]).count() == 0
+
+
+@pytest.mark.django_db
 def test_create_user(client, request):
     data = {
         "first_name": "Test",
