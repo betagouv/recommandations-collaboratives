@@ -4,10 +4,10 @@ describe('Signup advisor @demande-compte-conseiller', () => {
     '[name=last_name]': 'Successful',
     '[name=organization]': 'Signup Corp',
     '[name=organization_position]': 'Tester',
-    '[name=email]': 'signup4@success.test',
+    '[name=email]': 'signupuuhu@success.test',
     '[name=phone_no]': '0102030405',
-    '[name=password1]': 'Coco2000',
-    '[name=password2]': 'Coco2000',
+    '[name=password1]': 'Recoco2000',
+    '[name=password2]': 'Recoco2000',
   };
 
   it('signup a new advisor', function () {
@@ -33,8 +33,10 @@ describe('Signup advisor @demande-compte-conseiller', () => {
         expect(loc.pathname).to.eq('/advisor-access-request');
       });
 
-      cy.get('[type=submit]').click();
       cy.url().should('include', '/advisor-access-request');
+      cy.get('[data-test-id="advisor-access-type-national"]').check({
+        force: true,
+      });
 
       cy.get('[name="comment"]').type("Tester c'est douter");
       cy.get('[type=submit]').click();

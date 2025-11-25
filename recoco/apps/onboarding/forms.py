@@ -55,7 +55,7 @@ class OnboardingSignupForm(DsrcBaseForm):
             "help_text": "Votre mot de passe doit contenir :",
             "messages": [
                 {
-                    "text": "(8 caractères minimum et au moins 1 majuscule et 1 chiffre)",
+                    "text": "(10 caractères minimum et au moins 1 majuscule et 1 chiffre)",
                     "type": "info",
                 }
             ],
@@ -82,7 +82,7 @@ class OnboardingSignupForm(DsrcBaseForm):
     password = forms.CharField(
         label="Mot de passe *",
         required=True,
-        help_text="Votre mot de passe doit contenir 8 caractères minimum et au moins 1 majuscule et 1 chiffre",
+        help_text="Votre mot de passe doit contenir 10 caractères minimum et au moins 1 majuscule et 1 chiffre",
         widget=forms.PasswordInput(
             attrs={"size": "sm", "message_group": password_message_group()}
         ),
