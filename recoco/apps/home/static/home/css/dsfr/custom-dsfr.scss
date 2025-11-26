@@ -833,6 +833,10 @@ form > p {
   color: #3a3a3a;
 }
 
+.border-bottom {
+  border-bottom: 1px solid var(--light-border-default-grey, #E5E5E5);
+}
+
 /* ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯ *\
    Buttons
 \* ˍˍˍˍˍˍˍˍˍˍˍˍˍˍˍ */
@@ -855,6 +859,20 @@ form > p {
     opacity: 0.9;
   }
 }
+
+.border-none {
+  box-shadow: none;
+}
+
+.alert-color-error {
+  background: var(--light-border-plain-error, #CE0500);
+  color: var(--light-background-default-grey, #FFF) !important;
+}
+
+.border-radius-1px {
+  border-radius: 1px;
+}
+
 
 /* ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯ *\
   CRM - Custom styles
@@ -889,6 +907,11 @@ form > p {
 }
 .z-1001 {
   z-index: 1001 !important;
+}
+
+.z-11 {
+  z-index: 11 !important;
+
 }
 
 /* ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯ *\
@@ -971,6 +994,26 @@ form > p {
   line-height: 150%;
   margin: auto;
 }
+.text-modal-title {
+color: #3A3A3A;
+font-size: 12px;
+font-style: normal;
+font-weight: 700;
+}
+
+.text-modal-main-msg {
+  color: #3A3A3A;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 170%; /* 23.8px */
+}
+
+.text-modal-content {
+  color: var(--light-text-mention-grey, #666);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 150%; /* 21px */
+}
 
 /* ¯¯¯ *\
   Size
@@ -978,6 +1021,10 @@ form > p {
 
 .w-49 {
   width: 49%;
+}
+
+.w-360px {
+  width: 360px;
 }
 
 /* ¯¯¯¯¯¯¯¯ *\
