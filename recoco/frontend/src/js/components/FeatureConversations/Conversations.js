@@ -1,4 +1,5 @@
 import Alpine from '../../utils/globals';
+import { ToastType } from '../../models/toastType';
 import api, {
   conversationsMessagesUrl,
   conversationsActivitiesUrl,
@@ -213,6 +214,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
         this.documents.push(document.data);
         return document.data;
       } catch (error) {
+        // TODO sentry see this error occurs too often
         return null;
       }
     }
@@ -247,57 +249,81 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     });
   },
   async sendMessage({ updateMessage = false, messageIdToEdit = null } = {}) {
-    if (this.$store.editor.currentMessageJSON) {
-      let promises = [];
-      const parsedNodesFromEditor = this.$store.editor.parseTipTapContent(
-        this.$store.editor.currentMessageJSON
-      );
-      if (parsedNodesFromEditor.some((node) => node.type === 'DocumentNode')) {
-        promises = parsedNodesFromEditor
-          .filter((node) => node.type === 'DocumentNode')
-          .map((node) => this.uploadFile(node.file));
+    if (!this.$store.editor.currentMessageJSON) return;
+
+    const parsedNodesFromEditor = this.$store.editor.parseTipTapContent(
+      this.$store.editor.currentMessageJSON
+    );
+
+    // Only upload files for *new* documents
+    const documentNodesToUpload = parsedNodesFromEditor.filter(
+      (node) => node.type === 'DocumentNode' && !node.document_id && node.file
+    );
+
+    let uploadResponses = [];
+    if (documentNodesToUpload.length > 0) {
+      try {
+        uploadResponses = await Promise.all(
+          documentNodesToUpload.map((node) => this.uploadFile(node.file))
+        );
+      } catch (error) {
+        if (!updateMessage) {
+          throw new Error('Failed to upload documents', { error });
+        } else {
+          throw new Error('Failed to upload documents while updating message', {
+            error,
+          });
+        }
       }
 
-      try {
-        const responseUploadFiles = await Promise.all(promises);
-        parsedNodesFromEditor.forEach((node) => {
-          if (node.type === 'DocumentNode') {
-            node.document_id = responseUploadFiles.shift().data.id;
-          }
-        });
-        const payload = {
-          nodes: parsedNodesFromEditor,
-          in_reply_to: this.messageIdToReply,
-        };
-        let messageResponse;
-        if (updateMessage) {
-          messageResponse = await api.patch(
-            conversationsMessageUrl(this.projectId, messageIdToEdit),
-            payload
-          );
-          this.updateCountOfElementsInDiscussion(this.oldMessageToEdit, true);
-          this.replaceMessage(messageResponse.data, messageIdToEdit);
-          this.oldMessageToEdit = null;
-          this.messageIdToEdit = null;
-          this.isEditorInEditMode = false;
-        } else {
-          messageResponse = await api.post(
-            conversationsMessagesUrl(this.projectId),
-            payload
-          );
-          this.feed.elements.push({ ...messageResponse.data, type: 'message' });
-          this.isEditorInReplyMode = false;
-          this.scrollToNewMessage();
-        }
-        this.$store.editor.clearEditorContent();
-        this.updateCountOfElementsInDiscussion(messageResponse.data);
-        this.messageIdToReply = null;
-      } catch (error) {
-        if (updateMessage) {
-          throw new Error('Failed to send message', error);
-        } else {
-          throw new Error('Failed to update message', error);
-        }
+      documentNodesToUpload.forEach((node, index) => {
+        node.document_id = uploadResponses[index].data.id;
+      });
+    }
+
+    const payload = {
+      nodes: parsedNodesFromEditor,
+      in_reply_to: this.messageIdToReply,
+    };
+
+    try {
+      let messageResponse;
+      if (updateMessage) {
+        messageResponse = await api.patch(
+          conversationsMessageUrl(this.projectId, messageIdToEdit),
+          payload
+        );
+
+        this.updateCountOfElementsInDiscussion(this.oldMessageToEdit, true);
+        this.replaceMessage(messageResponse.data, messageIdToEdit);
+
+        this.oldMessageToEdit = null;
+        this.messageIdToEdit = null;
+        this.isEditorInEditMode = false;
+      } else {
+        messageResponse = await api.post(
+          conversationsMessagesUrl(this.projectId),
+          payload
+        );
+        this.feed.elements.push({ ...messageResponse.data, type: 'message' });
+        this.isEditorInReplyMode = false;
+        this.scrollToNewMessage();
+      }
+
+      this.$store.editor.clearEditorContent();
+      this.updateCountOfElementsInDiscussion(messageResponse.data);
+      this.messageIdToReply = null;
+    } catch (error) {
+      this.$store.app.displayToastMessage({
+        message: `Erreur lors de ${updateMessage ? 'la modification' : "l'envoi"} du message: ${Object.values(JSON.parse(error.request.responseText)).join(', ')}`,
+        timeout: 5000,
+        type: ToastType.error,
+      });
+
+      if (!updateMessage) {
+        throw new Error('Failed to send message', { cause: error });
+      } else {
+        throw new Error('Failed to update message', { cause: error });
       }
     }
   },

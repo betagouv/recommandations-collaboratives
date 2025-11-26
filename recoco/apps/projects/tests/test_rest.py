@@ -24,6 +24,7 @@ from notifications.signals import notify
 from pytest_django.asserts import assertContains
 
 from recoco import verbs
+from recoco.apps.conversations import models as conversations_models
 from recoco.apps.tasks import models as tasks_models
 from recoco.utils import login
 
@@ -92,13 +93,13 @@ def test_project_list_includes_only_projects_in_switchtender_departments(
     )
 
     # a public note with notification
-    pub_note = baker.make(models.Note, public=True, project=project)
-    verb = verbs.Conversation.PUBLIC_MESSAGE
+    message = baker.make(conversations_models.Message, project=project, posted_by=user)
+    verb = verbs.Conversation.POST_MESSAGE
     notify.send(
         sender=user,
         recipient=user,
         verb=verb,
-        action_object=pub_note,
+        action_object=message,
         target=project,
         public=False,  # only appear on crm stream
     )
@@ -447,13 +448,13 @@ def create_project_with_notifications(site, user, make_project):
     )
 
     # a public note with notification
-    pub_note = baker.make(models.Note, public=True, project=project)
-    verb = verbs.Conversation.PUBLIC_MESSAGE
+    message = baker.make(conversations_models.Message, project=project, posted_by=user)
+    verb = verbs.Conversation.POST_MESSAGE
     notify.send(
         sender=user,
         recipient=user,
         verb=verb,
-        action_object=pub_note,
+        action_object=message,
         target=project,
         public=False,  # only appear on crm stream
     )
@@ -718,13 +719,13 @@ def test_user_project_status_contains_only_my_projects(
         models.ProjectSwitchtender, site=site, switchtender=user, project=project
     )
     # a public note with notification for myself
-    pub_note = baker.make(models.Note, public=True, project=mine.project)
-    verb = verbs.Conversation.PUBLIC_MESSAGE
+    message = baker.make(conversations_models.Message, project=project, posted_by=user)
+    verb = verbs.Conversation.POST_MESSAGE
     notify.send(
         sender=user,
         recipient=user,
         verb=verb,
-        action_object=pub_note,
+        action_object=message,
         target=project,
         public=False,  # only appear on crm stream
     )
@@ -1166,6 +1167,63 @@ def test_doc_upload(project_ready, project_editor, client):
     assert res.data["id"] is not None
     assert Document.objects.filter(pk=res.data["id"]).exists()
     # send signal..?
+
+
+@pytest.mark.django_db
+def test_doc_upload_does_not_accept_malicious_files(
+    client, request, project_ready, project_editor
+):
+    url = reverse("projects-documents-list", args=[project_ready.id])
+
+    my_file = SimpleUploadedFile(
+        "doc.html", b"<html>file_content</html>", content_type="text/html"
+    )
+    data = {"description": "this is some content", "the_file": my_file}
+
+    client.force_login(project_editor)
+    response = client.post(url, data=data)
+
+    assert response.status_code == 400
+
+    assert models.Document.objects.count() == 0
+
+
+@pytest.mark.django_db
+def test_doc_upload_does_not_accept_malicious_files_detects_html(
+    client, request, project_ready, project_editor
+):
+    url = reverse("projects-documents-list", args=[project_ready.id])
+
+    my_file = SimpleUploadedFile(
+        "doc.html", b"Blah <script></script>", content_type="text/html"
+    )
+    data = {"description": "this is some content", "the_file": my_file}
+
+    client.force_login(project_editor)
+    response = client.post(url, data=data)
+
+    assert response.status_code == 400
+
+    assert models.Document.objects.count() == 0
+
+
+@pytest.mark.django_db
+def test_doc_upload_does_not_accept_malicious_files_by_extension(
+    client, request, project_ready, project_editor
+):
+    url = reverse("projects-documents-list", args=[project_ready.id])
+
+    my_file = SimpleUploadedFile(
+        "doc.html", b"simple plain text", content_type="text/html"
+    )
+    data = {"description": "this is some content", "the_file": my_file}
+
+    client.force_login(project_editor)
+    response = client.post(url, data=data)
+
+    assert response.status_code == 400
+
+    assert models.Document.objects.count() == 0
 
 
 @pytest.fixture

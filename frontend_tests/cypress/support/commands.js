@@ -85,7 +85,7 @@ Cypress.Commands.add('login', (role) => {
       form: true,
       body: {
         login: username,
-        password: 'Coco2000',
+        password: 'Recoco2000',
         csrfmiddlewaretoken: token,
       },
     }).then((response) => {

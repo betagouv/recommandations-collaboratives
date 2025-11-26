@@ -164,11 +164,6 @@ urlpatterns = [
         name="projects-project-delete",
     ),
     path(
-        r"project/<int:project_id>/conversation/",
-        notes.create_public_note,
-        name="projects-conversation-create-message",
-    ),
-    path(
         r"project/<int:project_id>/documents/televerser",
         documents.document_upload,
         name="projects-documents-upload-document",
@@ -190,12 +185,12 @@ urlpatterns = [
     ),
     path(
         r"note/<int:note_id>/delete/",
-        notes.delete_note,
+        notes.delete_private_note,
         name="projects-delete-note",
     ),
     path(
         r"note/<int:note_id>/",
-        notes.update_note,
+        notes.update_private_note,
         name="projects-update-note",
     ),
     path(
