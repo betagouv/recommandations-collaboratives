@@ -4,7 +4,7 @@
      x-transition:enter-start="grow-enter-start"
      x-transition:leave="grow-leave"
      class="position-relative"
-     id="external-resources-step" >
+     id="external-resources-step">
     <label class="fr-label push-reco__title-section"
            for="external-resource-url-input">
         Désignation de la ressource externe à récupérer
@@ -14,18 +14,17 @@
         <input class="fr-input"
                type="text"
                placeholder="https://"
-
                x-ref="external_resource_url"
                @input="canLoadNewExternalResource = $refs.external_resource_url.value != ''"
                name="external-resource-url-input"
                data-cy="input-external-resource-url">
-               <button class="fr-btn"
-               type="button"
-               :disabled="!canLoadNewExternalResource"
-               @click="postExternalResource($refs.external_resource_url.value)"
-               data-cy="button-external-resource-load">Charger la ressource</button>
-            </div>
-            {% include "tutorial/tutorial_hint.html" with type='searchExtRes' %}
+        <button class="fr-btn"
+                type="button"
+                :disabled="!canLoadNewExternalResource"
+                @click="postExternalResource($refs.external_resource_url.value)"
+                data-cy="button-external-resource-load">Charger la ressource</button>
+    </div>
+    {% include "tutorial/tutorial_hint.html" with type="searchExtRes" %}
     <div x-show="isBusyExternalResource"
          x-transition
          class="position-absolute top-0 text-center w-100">

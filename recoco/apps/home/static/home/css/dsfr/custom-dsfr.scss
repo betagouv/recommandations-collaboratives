@@ -54,6 +54,19 @@
   font-weight: 700;
 }
 
+.fr-italic {
+  font-style: italic;
+}
+
+.fr-small,
+.fr-small > * {
+  font-size: 0.875rem !important;
+}
+
+.fr-font--capitalize::first-letter {
+  text-transform: uppercase;
+}
+
 /* ¯¯¯¯ *\
   BUTTONS
 \* ˍˍˍˍ */
@@ -67,6 +80,25 @@ a {
   &.link-secondary {
     text-decoration: none;
   }
+}
+
+/* ¯¯¯¯ *\
+  INPUTS
+\* ˍˍˍˍ */
+
+.fr-input::placeholder,
+.fr-textarea::placeholder {
+  color: var(--text-mention-grey);
+  font-style: italic;
+  opacity: 1;
+}
+
+/* ¯¯¯¯ *\
+  ICONS
+\* ˍˍˍˍ */
+
+.fr-icon-margin-right-sm::before {
+  margin-right: 0.2rem;
 }
 
 p a {
@@ -85,6 +117,18 @@ p {
   &:has(textarea) {
     margin-top: 0;
     margin-bottom: 1rem;
+  }
+}
+
+.fr-btn--grey {
+  background-color: var(--light-background-alt-grey, #f6f6f6);
+  color: var(--light-text-default-grey, #3a3a3a);
+  font-size: 14px;
+  font-weight: 700;
+  &:not(:disabled):hover {
+    background-color: var(--light-background-alt-grey-hover, #e6e6e6);
+    background: var(--light-background-alt-grey-hover, #e6e6e6);
+    color: var(--light-text-default-grey-hover, #3a3a3a);
   }
 }
 
@@ -159,6 +203,20 @@ a.fr-text-inverted--grey {
   .mt-n150px {
     margin-top: -150px;
   }
+}
+
+.lineheight-1-25 {
+  line-height: 1.25 !important;
+}
+
+.specific-position-rt-12px {
+  top: 12px;
+  right: 12px;
+}
+
+.max-height-320px {
+  max-height: 320px;
+  overflow: auto;
 }
 
 /* ¯¯¯ *\
@@ -491,6 +549,16 @@ form > p {
   }
 }
 
+/* ¯¯¯ *\
+  USER TOOLS
+\* ˍˍˍ */
+
+.fr-menu__list {
+  li:last-child {
+    padding-bottom: 0;
+  }
+}
+
 /* -------------------- *\
   Add from 1.5.2 of DSFR
 \* -------------------- */
@@ -654,11 +722,33 @@ form > p {
 .specific-background-grey {
   background-color: #fafafa;
 }
+
 .specific-flex-basis-48 {
   flex-basis: 48.8%;
 }
+
 .font-size-14px {
   font-size: 14px;
+}
+
+.font-size-14px p {
+  font-size: 14px;
+}
+
+.font-size-12px {
+  font-size: 12px;
+}
+
+.font-size-12px p {
+  font-size: 12px;
+}
+
+.fw-400 {
+  font-weight: 400;
+}
+
+.fw-400 p {
+  font-weight: 400;
 }
 
 .centered-item {
@@ -684,9 +774,24 @@ form > p {
   border-radius: 0.3rem;
 }
 
+.form-mandatory-element {
+  color: #e1000f;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.border-bottom {
+  border-bottom: 1px solid var(--light-border-default-grey, #e5e5e5) !important;
+}
+
+.no-interaction-possible {
+  pointer-events: none;
+}
+
 /* ¯¯¯¯ *\
   COLORS
 \* ˍˍˍˍ */
+
 .fr-color {
   color: white;
   &--success {
@@ -700,14 +805,55 @@ form > p {
   &--error {
     background-color: #dc3444;
   }
+
+  &--mention {
+    color: var(--light-text-mention-grey, #666);
+
+    &_button {
+      color: var(--light-text-mention-grey, #666);
+      border: 1px solid var(--light-text-mention-grey, #666);
+      box-shadow: none;
+    }
+  }
+
+  &--disabled-grey {
+    color: var(--light-text-disabled-grey, #929292);
+  }
+}
+
+.color-purple {
+  color: #667dcf;
+}
+
+.color-purple p {
+  color: #667dcf;
+}
+
+.specific-color-3a {
+  color: #3a3a3a;
 }
 
 /* ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯ *\
-  Tutorials buttons
+   Buttons
 \* ˍˍˍˍˍˍˍˍˍˍˍˍˍˍˍ */
 
 .introjs-skipbutton {
   cursor: pointer !important;
+}
+
+// rewrite dsfr btn style
+.fr-btn--tertiary {
+  color: #3a3a3a !important;
+  background: var(--light-background-alt-grey, #f6f6f6);
+  &-dark-background {
+    background: var(--light-background-default-grey, #fff);
+  }
+  &:not(:disabled):hover {
+    background-color: var(--light-background-alt-grey-hover, #e6e6e6);
+    background: var(--light-background-alt-grey-hover, #e6e6e6);
+    color: var(--light-text-default-grey-hover, #3a3a3a);
+    opacity: 0.9;
+  }
 }
 
 /* ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯ *\
@@ -741,6 +887,54 @@ form > p {
 .z-1002 {
   z-index: 1002 !important;
 }
+.z-1001 {
+  z-index: 1001 !important;
+}
+
+/* ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯ *\
+  resize text elements
+\* ˍˍˍˍˍˍˍˍˍˍˍˍˍˍˍˍˍˍ */
+
+.dsfr-stepper__title-resize {
+  font-size: 18px !important;
+}
+
+.h2-rework {
+  font-size: 28px;
+}
+
+.size-20px {
+  font-size: 20px;
+}
+
+.h5-rework {
+  font-size: 16px !important;
+  line-height: 150% !important;
+  color: #242424;
+  font-weight: 500 !important;
+}
+
+.description-help-text {
+  color: var(--light-text-mention-grey, #666);
+  font-size: 12px !important;
+  font-weight: 400;
+  line-height: 150% !important; /* 18px */
+}
+
+.fr-label-rework {
+  color: var(--light-text-default-grey, #3a3a3a);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 170%; /* 20.4px */
+  height: 25px;
+}
+
+.label-helptext-rework {
+  color: var(--light-text-default-grey, #3a3a3a);
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 150%; /* 18px */
+}
 
 /* ¯¯ *\
   Link
@@ -749,4 +943,71 @@ form > p {
 .non-stylish-link {
   color: white !important;
   text-decoration: none !important;
+}
+
+/* ¯¯¯¯¯ *\
+  Buttons
+\* ˍˍˍˍˍ */
+
+.fr-btn-secondary-rework {
+  border-radius: 1px;
+  padding: 6px 8px;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 700;
+  min-height: 0;
+}
+
+/* ¯¯¯ *\
+  Text
+\* ˍˍˍ */
+
+.text-light-centered {
+  color: #999;
+  text-align: center;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 150%;
+  margin: auto;
+}
+
+.text-ellipsis {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ¯¯¯ *\
+  Size
+\* ˍˍˍ */
+
+.w-49 {
+  width: 49%;
+}
+
+/* ¯¯¯¯¯¯¯¯ *\
+  Espacement
+\* ˍˍˍˍˍˍˍˍ */
+
+.fr-pt-05v {
+  padding-top: 2px;
+}
+
+/* Conversations - delete highlight effect */
+.message-item--deleting {
+  position: relative;
+  animation: message-delete-pulse 600ms ease-in-out 0s 1 normal forwards;
+}
+
+@keyframes message-delete-pulse {
+  0% {
+    background-color: rgba(220, 53, 68, 0.12); /* error red, subtle */
+  }
+  40% {
+    background-color: rgba(220, 53, 68, 0.24);
+  }
+  100% {
+    background: var(--light-background-alt-blue-france, #f5f5fe);
+  }
 }

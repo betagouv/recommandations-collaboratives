@@ -17,117 +17,10 @@ from django.urls import reverse
 
 from recoco.apps.dsrc.forms import DsrcBaseForm
 
-from . import models
-
-
-##################################################
-# Notes
-##################################################
-class OnboardingResponseForm(forms.ModelForm):
-    class Meta:
-        model = models.OnboardingResponse
-        fields = [
-            "first_name",
-            "last_name",
-            "phone",
-            "org_name",
-            "email",
-            "name",
-            "location",
-            "insee",
-            "description",
-            "response",
-        ]
-
-    first_name = forms.CharField(label="Prénom du contact", initial="", required=True)
-    last_name = forms.CharField(label="Nom du contact", initial="", required=True)
-    phone = forms.CharField(max_length=16, label="Téléphone", initial="", required=True)
-    email = forms.CharField(label="Courriel", required=True)
-
-    def clean_email(self):
-        """Make sure email is lowercased"""
-        email = self.cleaned_data["email"]
-        return email.lower()
-
-    org_name = forms.CharField(
-        label="Nom de votre structure", initial="", required=True
-    )
-
-    name = forms.CharField(label="Nom du dossier", max_length=128, required=True)
-    location = forms.CharField(label="Adresse", required=False)
-    postcode = forms.CharField(max_length=5, required=False, label="Code Postal")
-    insee = forms.CharField(max_length=5, required=False, label="Code Insee")
-
-    description = forms.CharField(label="Description")
-
-
-class OnboardingResponseWithCaptchaForm(OnboardingResponseForm):
-    class Meta:
-        model = models.OnboardingResponse
-        fields = [
-            "first_name",
-            "last_name",
-            "phone",
-            "org_name",
-            "email",
-            "name",
-            "location",
-            "insee",
-            "description",
-            "response",
-            "captcha",
-        ]
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # Skip captcha during tests
-        if "PYTEST_CURRENT_TEST" in os.environ:
-            self.fields.pop("captcha")
-
-    captcha = ReCaptchaField(widget=ReCaptchaV2Checkbox(api_params={"hl": "fr"}))
-
-
-class SelectCommuneForm(forms.Form):
-    def __init__(self, communes, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields["commune"] = forms.ModelChoiceField(
-            queryset=communes, widget=forms.RadioSelect, label="Votre commune :"
-        )
-
 
 ##################################################
 # Onboarding multi-step forms
 ##################################################
-class OnboardingEmailForm(DsrcBaseForm):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.helper.form_id = "id-onboarding-email-form"  # The form id is used for validation, it must be set and unique in the page
-        self.helper.form_method = "post"
-        self.helper.action_button = {
-            "submit": {
-                "label": "Décrivez votre demande",
-            }
-        }
-        self.helper.layout = Layout(
-            Fieldset(
-                "",  # The first argument is the legend of the fieldset
-                "email",
-            ),
-        )
-
-    def clean_email(self):
-        """Make sure email is lowercased"""
-        email = self.cleaned_data["email"]
-        return email.lower()
-
-    email = forms.EmailField(
-        label="Adresse email",
-        help_text="Format attendu : prenom.nom@domaine.fr",
-        required=True,
-        initial="",
-    )
-
-
 class OnboardingSignupForm(DsrcBaseForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -147,12 +40,8 @@ class OnboardingSignupForm(DsrcBaseForm):
                 "email",
                 "phone",
                 "password",
-                "captcha",
             ),
         )
-        # Skip captcha during tests
-        if "PYTEST_CURRENT_TEST" in os.environ:
-            self.fields.pop("captcha")
 
     # Example clean method
     def clean_email(self):
@@ -166,7 +55,7 @@ class OnboardingSignupForm(DsrcBaseForm):
             "help_text": "Votre mot de passe doit contenir :",
             "messages": [
                 {
-                    "text": "(8 caractères minimum et au moins 1 majuscule et 1 chiffre)",
+                    "text": "(10 caractères minimum et au moins 1 majuscule et 1 chiffre)",
                     "type": "info",
                 }
             ],
@@ -186,13 +75,14 @@ class OnboardingSignupForm(DsrcBaseForm):
         label="Adresse email *",
         help_text="Format attendu : prenom.nom@domaine.fr",
         required=True,
+        disabled=True,
     )
 
     # Password input, with a password widget, show/hide control, and a help text
     password = forms.CharField(
         label="Mot de passe *",
         required=True,
-        help_text="Votre mot de passe doit contenir 8 caractères minimum et au moins 1 majuscule et 1 chiffre",
+        help_text="Votre mot de passe doit contenir 10 caractères minimum et au moins 1 majuscule et 1 chiffre",
         widget=forms.PasswordInput(
             attrs={"size": "sm", "message_group": password_message_group()}
         ),
@@ -206,7 +96,6 @@ class OnboardingSignupForm(DsrcBaseForm):
         help_text="Votre numéro de téléphone ne sera jamais diffusé en dehors du site. Il permet aux administrateurs ou aux partenaires de votre dossier de vous joindre plus facilement. Format attendu: 0102030405.",
         required=True,
     )
-    captcha = ReCaptchaField(widget=ReCaptchaV2Checkbox(api_params={"hl": "fr"}))
 
 
 class OnboardingProject(DsrcBaseForm):
@@ -224,26 +113,32 @@ class OnboardingProject(DsrcBaseForm):
 
         self.helper.layout = Layout(
             Fieldset(
-                "",  # The first argument is the legend of the fieldset
+                "Créez votre dossier",  # The first argument is the legend of the fieldset
                 "name",
                 "location",
                 "postcode",
                 "insee",
                 "description",
+                "email",
+                "captcha",
             )
         )
 
+        # Skip captcha during tests
+        if "PYTEST_CURRENT_TEST" in os.environ:
+            self.fields.pop("captcha")
+
     name = forms.CharField(
-        label="Titre de la demande *",
+        label="Nom de votre dossier *",
         initial="",
         required=True,
-        help_text="Indiquez un nom court qui décrit la demande ou le dossier. Inutile d'ajouter le nom de la commune, l'adresse ou le programme.",
+        help_text="Donnez un nom court pour désigner le dossier ou le projet. Inutile d'ajouter le nom de la commune ou l'adresse.",
     )
     location = forms.CharField(
         label="Adresse",
+        initial="",
         required=False,
         help_text="Indiquez une adresse ou une indication pour localiser le lieu, ou laissez vide si ça n'est pas applicable.",
-        initial="",
     )
     postcode = forms.CharField(label="Code postal *", initial="", required=True)
 
@@ -254,12 +149,20 @@ class OnboardingProject(DsrcBaseForm):
     )
 
     description = forms.CharField(
-        label="Résumé de la demande *",
+        label="Résumé de votre demande *",
         initial="",
         required=True,
         help_text="Décrivez votre demande ou dossier et son contexte en quelques mots.",
         widget=forms.Textarea(attrs={"rows": 3}),
     )
+
+    email = forms.EmailField(
+        label="Adresse email *",
+        required=True,
+        help_text="Format attendu : prenom.nom@domaine.fr",
+    )
+
+    captcha = ReCaptchaField(widget=ReCaptchaV2Checkbox(api_params={"hl": "fr"}))
 
 
 class PrefillSetuserForm(DsrcBaseForm):
@@ -354,10 +257,10 @@ class PrefillProjectForm(DsrcBaseForm):
         )
 
     name = forms.CharField(
-        label="Nom du dossier *",
+        label="Nom de votre dossier *",
         initial="",
         required=True,
-        help_text="Indiquez un nom court qui décrit le dossier. Inutile d'ajouter le nom de la commune, l'adresse ou le programme.",
+        help_text="Donnez un nom court pour désigner le dossier ou le projet. Inutile d'ajouter le nom de la commune ou l'adresse.",
     )
     location = forms.CharField(
         label="Adresse",
@@ -374,7 +277,7 @@ class PrefillProjectForm(DsrcBaseForm):
     )
 
     description = forms.CharField(
-        label="Résumé du dossier *",
+        label="Résumé de votre demande *",
         initial="",
         required=True,
         help_text="Décrivez votre dossier et son contexte en quelques mots.",

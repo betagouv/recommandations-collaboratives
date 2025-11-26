@@ -50,19 +50,6 @@ class PrivateNoteForm(forms.ModelForm):
         self.fields["contact"].queryset = contact_queryset
 
 
-class PublicNoteForm(forms.ModelForm):
-    """Public Note creation"""
-
-    class Meta:
-        model = models.Note
-        fields = ["content", "contact", "topic_name"]
-
-    topic_name = forms.CharField(label="Thématique", max_length=100, required=False)
-
-    def set_contact_queryset(self, contact_queryset: QuerySet[Contact]):
-        self.fields["contact"].queryset = contact_queryset
-
-
 ##################################################
 # Project
 ##################################################

@@ -18,6 +18,7 @@ Alpine.data('CreateOrganizationModal', (data = null) => {
     departments: null,
     selectedDepartments: null,
     isFormInEditMode: false,
+    isOrgaAlreadyExisting: false,
     organization: {
       name: '',
       group: null,
@@ -87,7 +88,7 @@ Alpine.data('CreateOrganizationModal', (data = null) => {
     },
     onSelectGroup(group) {
       this.isAnOrgaGroupSelected = true;
-      this.organization.group = group.id;
+      this.organization.group = group;
       this.userInput = group.name;
       this.showOrgaGroupsresults = false;
     },
@@ -101,7 +102,7 @@ Alpine.data('CreateOrganizationModal', (data = null) => {
         api
           .post(organizationGroupsUrl(), this.organization.group)
           .then((response) => {
-            this.organization.group = response.data.id;
+            this.organization.group = response.data;
           });
       } catch (error) {
         throw new Error('Error while creating organization group ', error);
@@ -122,7 +123,10 @@ Alpine.data('CreateOrganizationModal', (data = null) => {
         (!this.formState.fields.isGroupNat && this.formState.fields.isOrgaName)
       ) {
         api
-          .post(organizationsUrl(), this.organization)
+          .post(organizationsUrl(), {
+            ...this.organization,
+            group_id: this.organization?.group?.id || null,
+          })
           .then((response) => {
             if (isItReturningData) {
               this.Modal.responseModal(response.data);
@@ -131,6 +135,13 @@ Alpine.data('CreateOrganizationModal', (data = null) => {
             }
           })
           .catch((error) => {
+            if (
+              error.response.data.name &&
+              error.response.data.name[0] ===
+                'Un objet organization avec ce champ Nom existe déjà.'
+            ) {
+              this.isOrgaAlreadyExisting = true;
+            }
             throw new Error('Error while creating organization ', error);
           });
       }
@@ -149,20 +160,26 @@ Alpine.data('CreateOrganizationModal', (data = null) => {
           this.formState.fields.isOrgaName) ||
         (!this.formState.fields.isGroupNat && this.formState.fields.isOrgaName)
       ) {
-        this.organization.group = this.organization.group.id;
-        api
-          .patch(getOrganizationById(this.organization.id), this.organization)
-          .then((response) => {
-            if (isItReturningData) {
-              this.Modal.responseModal(response.data);
-            } else {
-              this.Modal.closeModal();
-              location.reload();
-            }
-          })
-          .catch((error) => {
-            throw new Error('Error while updating organization ', error);
-          });
+        try {
+          const payload = {
+            ...this.organization,
+            group_id:
+              this.organization?.group?.id || this.organization?.group || null,
+          };
+          delete payload.group;
+          api
+            .patch(getOrganizationById(this.organization.id), payload)
+            .then((response) => {
+              if (isItReturningData) {
+                this.Modal.responseModal(response.data);
+              } else {
+                this.Modal.closeModal();
+                location.reload();
+              }
+            });
+        } catch (error) {
+          throw new Error('Error while updating organization ', error);
+        }
       }
     },
     handleDepartmentsSelection(departments) {

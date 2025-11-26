@@ -2,6 +2,7 @@
 {% load django_vite %}
 {% block js %}
     {% vite_asset 'js/components/MultiSelect.js' %}
+    {% vite_asset 'js/components/RegionDepartmentPreparer.js' %}
 {% endblock js %}
 {% block title %}
     Devenir conseiller·e
@@ -15,7 +16,7 @@
         {% if advisor_access_request %}
             {% include "account/fragments/pending_advisor_request_redirect.html" with title="Devenir conseiller·e" %}
         {% else %}
-            {% include "account/fragments/departements_select_form.html" with stepper=True total_steps=2 step_number=2 current_step_title="Sélection des départements" title="Devenir conseiller•e" %}
+            {% include "account/fragments/departements_select_form.html" with stepper=True total_steps=2 step_number=2 current_step_title="Précisions sur votre demande" title="Devenir conseiller•e" %}
         {% endif %}
     </div>
 {% endblock content %}

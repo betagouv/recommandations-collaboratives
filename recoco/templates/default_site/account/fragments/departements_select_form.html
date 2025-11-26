@@ -4,17 +4,57 @@
           action="{% url 'advisor-access-request' %}"
           method="post">
         {% csrf_token %}
-        <fieldset class="fr-fieldset">
-            <h4 class="fr-mb-3w d-block">Sélectionnez vos départements d'action</h4>
-            <div class="fr-fieldset__content">
-                <div class="fr-input-group fr-mt-4v"
-                     x-data="{objectsToSelect: JSON.parse(document.getElementById('departmentsArray').textContent), selectedDepartments: []}"
-                     @set-departments="selectedDepartments = $event.detail">
-                    {% include "tools/contacts/multi_select.html" with placeholder="Cherchez et sélectionnez vos départements pour avoir accès aux dossiers" label="Sélectionnez un ou plusieurs départements, laissez vide pour toute la France" %}
-                    <template x-for="dept in selectedDepartments" :key="dept">
-                        <input type="hidden" name="departments" :value="dept">
+        <fieldset class="fr-fieldset flex-column align-items-start">
+            <h4 class="fr-mb-2w d-block size-20px">Précisez votre demande</h4>
+            <h5 class="fr-text fr-mb-2v h5-rework">
+                Territoire concerné<span class="form-mandatory-element">*</span>
+            </h5>
+            <p class="fr-text--sm fr-mb-2v description-help-text">
+                Indiquez le territoire sur lequel vous souhaitez consulter les dossiers déposés sur UrbanVitaliz.
+            </p>
+            <div class="fr-fieldset__element modal-create-organization__yes fr-mb-0 fr-p-2w border-bottom w-100">
+                <div class="fr-radio-group fr-radio-group--sm">
+                    <input type="radio"
+                           id="selectDepartments-no"
+                           name="{{ form.advisor_access_type.name }}"
+                           value="{{ form.fields.advisor_access_type.choices.0.0 }}"
+                           data-test-id="advisor-access-type-national"
+                           {% if form.advisor_access_type.value == 'National' %}checked{% endif %}>
+                    <label class="fr-label-rework fr-pt-05v" for="selectDepartments-no">
+                        {{ form.fields.advisor_access_type.choices.0.1 }}
+                    </label>
+                </div>
+                {% if form.advisor_access_type.errors %}
+                    <div class="fr-error-text form-mandatory-element">{{ form.advisor_access_type.errors.0 }}</div>
+                {% endif %}
+            </div>
+            <div class="fr-fieldset__element fr-p-2w fr-mb-0 w-100">
+                <div class="fr-radio-group fr-radio-group--sm">
+                    <input type="radio"
+                           id="selectDepartments-yes"
+                           name="{{ form.advisor_access_type.name }}"
+                           value="{{ form.fields.advisor_access_type.choices.1.0 }}"
+                           {% if form.advisor_access_type.value == 'Regional' %}checked{% endif %}>
+                    <label class="fr-label-rework fr-pt-05v" for="selectDepartments-yes">
+                        {{ form.fields.advisor_access_type.choices.1.1 }}
+                    </label>
+                </div>
+                <div class="fr-input-group fr-ml-4w"
+                     x-data="RegionDepartmentPreparer({ selectedDepartments: [] })">
+                    <template x-if="objectsToSelect && objectsToSelect.length">
+                        <div x-data="alpineMultiSelect({ selected: selectedDepartments, objectsToSelect: objectsToSelect, displayRegions: true })">
+                            {% include "tools/contacts/multi_select.html" with placeholder="Cherchez et sélectionnez vos départements pour avoir accès aux dossiers" label="Sélectionnez-le(s) ci-dessous : " display_regions=True %}
+                            <template x-for="dept in selectedDepartments" :key="dept">
+                                <input type="hidden" name="departments" :value="dept">
+                            </template>
+                            {% if form.departments.errors %}
+                                <div class="fr-error-text form-mandatory-element">{{ form.departments.errors.0 }}</div>
+                            {% endif %}
+                        </div>
                     </template>
                 </div>
+            </div>
+            <div class="fr-fieldset__content">
                 <div class="fr-input-group fr-mt-4v">
                     <label for="comment" class="fr-label">
                         {{ form.fields.comment.label }}
@@ -24,14 +64,14 @@
                             <span>(facultatif)</span>
                         {% endif %}
                     </label>
-                    <helptext>{{ form.fields.comment.help_text }}</helptext>
+                    <helptext class="description-help-text">{{ form.fields.comment.help_text }}</helptext>
                     <textarea name="comment"
                               class="fr-input"
                               id="comment"
                               rows="3"
                               {% if form.fields.comment.required %}required{% endif %}></textarea>
                 </div>
-                <button class="fr-btn custom-login-button w-100" type="submit">S'inscrire</button>
+                <button class="fr-btn custom-login-button w-100" type="submit">Envoyer la demande</button>
             </div>
         </fieldset>
     </form>

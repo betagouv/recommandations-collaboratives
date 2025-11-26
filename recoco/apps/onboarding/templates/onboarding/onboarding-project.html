@@ -26,6 +26,9 @@
 {% endblock tagline %}
 {% block content %}
     <div class="container">
+        {% if not is_prefill_step %}
+            {% include "onboarding/fragments/email-modal.html" %}
+        {% endif %}
         <div class="banner  text-center">
             {% if site_config.email_logo %}
                 <img src="{{ site_config.email_logo.url }}"
@@ -40,12 +43,22 @@
         <div class="fr-stepper fr-mb-2w">
             <h2 class="fr-stepper__title">
                 Décrivez votre demande
-                <span class="fr-stepper__state">Étape 2 sur 2</span>
+                <span class="fr-stepper__state">Étape
+                    {% if is_prefill_step %}
+                        2
+                    {% else %}
+                        1
+                    {% endif %}
+                sur 2</span>
             </h2>
-            <div class="fr-stepper__steps" data-fr-current-step="2" data-fr-steps="2"></div>
-            <p class="fr-stepper__details">
-                <span class="fr-text--bold">Étape suivante :</span> Décrivez votre demande
-            </p>
+            <div class="fr-stepper__steps"
+                 data-fr-current-step="{% if is_prefill_step %}2{% else %}1{% endif %}"
+                 data-fr-steps="2"></div>
+            {% if not is_prefill_step %}
+                <p class="fr-stepper__details">
+                    <span class="fr-text--bold">Étape suivante :</span> Création d'un compte
+                </p>
+            {% endif %}
         </div>
         <div class="container__form d-flex justify-content-center"
              x-data="AjvValidationSchema('schemaOnboardingStep2ProjectFormValidator')">

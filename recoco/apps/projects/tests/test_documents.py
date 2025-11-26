@@ -96,7 +96,7 @@ def test_upload_document_is_either_link_or_file(client, request, project):
 
 
 @pytest.mark.django_db
-def test_upload_file_triggers_notifications(client, request, project):
+def test_upload_file_does_not_trigger_notifications(client, request, project):
     png = SimpleUploadedFile("img.png", b"file_content", content_type="image/png")
     data = {"description": "this is some content", "the_file": png}
 
@@ -116,7 +116,7 @@ def test_upload_file_triggers_notifications(client, request, project):
 
     assert action_object_stream(document).count() == 1
     assert user.notifications.count() == 0
-    assert other_user.notifications.count() == 1
+    assert other_user.notifications.count() == 0
 
 
 @pytest.mark.django_db

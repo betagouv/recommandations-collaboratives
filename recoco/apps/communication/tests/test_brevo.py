@@ -7,6 +7,9 @@ authors: raphael.marvie@beta.gouv.fr, guillaume.libersat@beta.gouv.fr
 created: 2021-12-24 12:37:56 CEST
 """
 
+import pytest
+from django.core.exceptions import ValidationError
+
 from ..brevo import Brevo
 
 
@@ -54,3 +57,16 @@ def test_brevo_send_test_email(mocker, client):
     )
 
     brevo.api_instance.send_test_template.assert_called_once()
+
+
+def test_brevo_send_email_checks_address_format(mocker, client):
+    brevo = Brevo()
+
+    mocker.patch("sib_api_v3_sdk.TransactionalEmailsApi.send_transac_email")
+
+    with pytest.raises(ValidationError):
+        brevo.send_email(
+            template_id=1,
+            recipients={"name": "Bob", "email": "bob@.com"},
+            params={"p1": "v1"},
+        )

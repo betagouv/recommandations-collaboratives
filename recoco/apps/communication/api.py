@@ -160,8 +160,42 @@ def fetch_transaction_content(transaction_id):
     return None
 
 
-if settings.DEBUG and getattr(settings, "BREVO_FORCE_DEBUG", False):
-    send_email = send_debug_email
+def send_mail_filter_recipient(
+    template_name, recipients, params=None, test=False, related=None
+):
+    if not isinstance(recipients, list):
+        recipients = [recipients]
+
+    white_listed_recipients = getattr(settings, "DEBUG_EMAIL_WHITELIST", [])
+    to_really_send, to_debug_send = [], []
+    for recipient in recipients:
+        email = recipient if isinstance(recipient, str) else recipient["email"]
+        (to_really_send if email in white_listed_recipients else to_debug_send).append(
+            recipient
+        )
+
+    res_debug = (
+        send_debug_email(
+            template_name, to_debug_send, params=params, test=test, related=related
+        )
+        if len(to_debug_send) > 0
+        else True
+    )
+    res_brevo = (
+        brevo_email(
+            template_name, to_really_send, params=params, test=test, related=related
+        )
+        if len(to_really_send) > 0
+        else True
+    )
+    return res_brevo and res_debug
+
+
+if settings.DEBUG:
+    if getattr(settings, "BREVO_FORCE_DEBUG", False):
+        send_email = send_mail_filter_recipient
+    else:
+        send_email = send_debug_email
 else:
     send_email = brevo_email
 

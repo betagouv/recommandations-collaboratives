@@ -1,37 +1,57 @@
 {% load projects_extra %}
 {% count_has_notifications topic.list as new_message_count %}
 {% count_message_by_type topic.list "reco" as reco_count %}
+{% count_message_by_type topic.list "contact" as contact_count %}
+{% count_message_by_type topic.list "document" as document_count %}
 {% count_message_by_type topic.list "reco" "posting" "followup" as message_count %}
 {% with topic_slug=topic_name|default:"general"|slugify %}
-    <div class="topic-item__container position-relative {% if is_open %}topic-item__container--open{% endif %}">
-        <label class="topic-item__title stretched-link"
-               for="selector-{{ topic_slug }}">
+    <div class="topic-item__container position-relative topic-item__container--open {% if is_open %}topic-item__container--open{% endif %}">
+        <label class="topic-item__title " for="selector-{{ topic_slug }}">
             <input type="radio"
                    name="topic-selector"
-                   x-model="topicSelector"
                    class="d-none"
                    id="selector-{{ topic_slug }}"
                    value="{{ topic_slug }}"
-                   data-topic-name="{{ topic_name }}"
-                   @change="setActiveTopic($event.target.value, '{{ topic_name }}')">
+                   data-topic-name="{{ topic_name }}">
             <span class="topic-item__label {% if topic_name %}color{% endif %}"
-                  :style="{ '--current-bg-color': stringToColor('{{ topic_slug }}')}">{{ topic_name|default:"Général" }}</span>
-            {% if not topic_name %}
-                <div class="topic-item__description">
-                    <p class="topic-item__description-content">Discussion générale entre le porteur de projet et l’équipe de conseil</p>
-                    <span class="topic-item__description-icon fr-icon-arrow-right-line fr-icon--sm"
-                          aria-hidden="true"></span>
+                  :style="{ '--current-bg-color': stringToColor('{{ topic_slug }}')}">{{ topic_name|default:"Discussion" }}</span>
+            <div x-show="countOf.isLoaded" x-transition.opacity.duration.500ms>
+                <div class="d-flex">
+                    <p class="topic-item__message-len fr-mt-0 fr-mr-1v">
+                        <span class="fr-icon-chat-2-line fr-icon--sm" aria-hidden="true"></span>
+                        <span x-text="`${countOf.messages} message${countOf.messages > 1 ? 's' : ''}`"></span>
+                    </p>
+                    <template x-if="countOf.new_messages > 0">
+                        <p class="topic-item__message-len topic-item__message-len--new fr-mt-0">
+                            <span x-text="`(${countOf.new_messages} ${countOf.new_messages > 1 ? 'nouveaux' : 'nouveau'})`"></span>
+                        </p>
+                    </template>
                 </div>
-            {% endif %}
-            <p class="topic-item__message-len">
-                <span class="fr-icon-chat-2-line fr-icon--sm" aria-hidden="true"></span> {{ message_count }} message{{ message_count|pluralize }}
-                {% if new_message_count > 0 %}
-                    <span class="topic-item__message-len--new">({{ new_message_count }} {{ new_message_count|pluralize:"nouveau,nouveaux" }})</span>
-                {% endif %}
-                {% if reco_count > 0 %}
-                    <span class="fr-icon-list-check-line fr-icon--sm" aria-hidden="true"></span> <span>{{ reco_count }} recommandation{{ reco_count|pluralize }}</span>
-                {% endif %}
-            </p>
+                <template x-if="countOf.tasks > 0">
+                    <a class="topic-item__message-len fr-mt-0"
+                       @click="trackClickOnRecoLink"
+                       href="{% url 'projects-project-detail-actions' project.pk %}">
+                        <p class="topic-item__message-len fr-mt-0">
+                            <span class="fr-icon-list-check-line fr-icon--sm" aria-hidden="true"></span>
+                            <span x-text="`${countOf.tasks} recommandation${countOf.tasks > 1 ? 's' : ''}`"></span>
+                        </p>
+                    </a>
+                </template>
+                <template x-if="countOf.documents > 0">
+                    <a class="topic-item__message-len fr-mt-0"
+                       @click="trackClickOnFileLink"
+                       href="{% url 'projects-project-detail-documents' project.pk %}">
+                        <span class="fr-icon-file-download-line fr-icon--sm" aria-hidden="true"></span>
+                        <span x-text="`${countOf.documents} document${countOf.documents > 1 ? 's' : ''}`"></span>
+                    </a>
+                </template>
+                <template x-if="countOf.contacts > 0">
+                    <p class="topic-item__message-len fr-mt-0">
+                        <span class="fr-icon-contact-book-line fr-icon--sm" aria-hidden="true"></span>
+                        <span x-text="`${countOf.contacts} contact${countOf.contacts > 1 ? 's' : ''}`"></span>
+                    </p>
+                </template>
+            </div>
         </label>
     </div>
 {% endwith %}

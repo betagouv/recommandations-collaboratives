@@ -42,38 +42,8 @@
                 <span class="visually-hidden">Loading...</span>
             </div>
         </div>
-        <div class="kanban-header topbar d-flex justify-content-between align-items-center fr-p-2v">
-            <div class="kanban-header__view-selector fs-5 fr-mr-6v">
-                {% include "projects/project/fragments/navigation/display_select.html" %}
-            </div>
-            <div x-data="Tutorial('time-filter-tutorial-on-kanban')"
-                 class="kanban-header__middle-part">
-                <div class="kanban-header__searchbar position-relative">
-                    {% include "projects/project/fragments/search_bar.html" with action_search="onSearch" x_model="searchText" placeholder="Rechercher commune, #tag, nom du dossier..." %}
-                </div>
-                <div class="kanban-header__lastactivity-filter fr-select-group d-flex fr-m-0 fr-mr-6v align-items-center"
-                     id="kanban-time-filter">
-                    <label class="fr-label no-wrap fr-mr-1v"
-                           for="select-filter-project-duration">Dossiers actifs depuis :</label>
-                    <select class="fr-select fr-m-0"
-                            name="select-filter-project-duration"
-                            x-ref="selectFilterProjectDuration"
-                            x-model="filterProjectLastActivity"
-                            @change='onLastActivityChange'>
-                        <option value="30">1 mois</option>
-                        <option value="90">3 mois</option>
-                        <option value="180">6 mois</option>
-                        <option value="365">1 an</option>
-                        <option value="1460">Plus</option>
-                    </select>
-                </div>
-                <div class="kanban-header__my-projects-toggle">
-                    {% include "projects/project/fragments/only_my_projects_toggle.html" %}
-                </div>
-                <div class="kanban-header__region-filter">
-                    {% include "projects/project/fragments/departments_selector.html" with label="Projets de mon territoire" filter_by_regions=True zone_objects="regions" select_all=True %}
-                </div>
-            </div>
+        <div>
+            {% include "projects/project/fragments/tasks_inline_kanban/tasks_inline_kanban_filters.html" %}
             <div class="kanban-header__toolbar">{% include "projects/project/fragments/list-toolbars.html" %}</div>
         </div>
         <template x-if="isViewInitialized && projectList.length == 0">
@@ -141,15 +111,14 @@
                                                                     </div>
                                                                 </template>
                                                                 <template x-if="t.notifications.count > 0">
-                                                                    <span class="kanban-card__notification-container position-absolute top-25 start-100 badge bg-info"
-                                                                          :class="{'bg-danger': t.notifications.has_collaborator_activity == true}"><span x-text="t.notifications.count"></span> <span class="visually-hidden">nouvelle activité</span></span>
+                                                                    <span class="kanban-card__notification-container position-absolute top-25 start-100 badge bg-danger"><span x-text="t.notifications.count"></span> <span class="visually-hidden">nouvelle activité</span></span>
                                                                 </template>
                                                                 <div class="kanban-card__project-container fr-mb-2v">
                                                                     <span class="kanban-card__project-name project-link"
                                                                           x-text="truncate(t.name)"></span>
-                                                                    <template x-if="t.owner.profile.organization">
+                                                                    <template x-if="t.owner?.profile?.organization">
                                                                         <span class="kanban-card__project-organization"
-                                                                                x-text="t.owner.profile.organization.name"></span>
+                                                                              x-text="t.owner.profile.organization.name"></span>
                                                                     </template>
                                                                 </div>
                                                                 <template x-if="t.origin">
@@ -186,7 +155,8 @@
                                                                     </template>
                                                                 </template>
                                                                 <template x-if="t.commune">
-                                                                    <div class="kanban-card__commune-container">
+                                                                    <div class="kanban-card__commune-container text-ellipsis"
+                                                                         :title="`${t.commune.name} (${t.commune.postal})`">
                                                                         <span class="kanban-card__commune fr-icon--sm fr-icon-map-pin-2-line not-a-link"></span>
                                                                         <span class="kanban-card__commune-name" x-text="t.commune.name"></span>
                                                                         <span class="kanban-card__commune-postal" x-text="`(${t.commune.postal})`"></span>
@@ -201,8 +171,7 @@
                                                                 </div>
                                                                 <template x-if="t.tags.length > 0">
                                                                     <div class="kanban-card__tags-container d-flex">
-                                                                        <span class="fr-icon-pantone-line fr-icon--sm not-a-link"
-                                                                              aria-hidden="true"></span>
+                                                                        <span class="fr-icon-tag-line fr-icon--sm not-a-link" aria-hidden="true"></span>
                                                                         <div class="d-flex flex-wrap align-items-center limit-height">
                                                                             <template x-for="tag in t.tags">
                                                                                 <div @click.prevent="onTagClick(tag)" class="fr-mr-1v">

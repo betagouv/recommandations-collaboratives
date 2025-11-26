@@ -5,27 +5,15 @@
           rel="stylesheet"
           type="text/css" />
 {% endblock css %}
-<div class="d-flex align-items-center position-relative">
+<div class="d-flex align-items-center position-absolute specific-position-rt-12px">
     <template x-if="i > 0">
-        <button class="fr-btn fr-btn--sm fr-btn--tertiary fr-mr-1v no-wrap"
-                title="Déplacer en haut"
-                @click.stop="handleMoveFast('top', task)"
-                data-cy="move-task-to-top">Déplacer en haut</button>
-    </template>
-    <template x-if="i < column(board.status).length - 1">
-        <button class="fr-btn fr-btn--sm fr-btn--tertiary fr-mr-1v no-wrap"
-                title="Déplacer en bas"
-                @click.stop="handleMoveFast('bottom', task)"
-                data-cy="move-task-to-bottom">Déplacer en bas</button>
-    </template>
-    <template x-if="i > 0">
-        <button class="fr-btn fr-btn--sm fr-btn--tertiary fr-icon-arrow-up-line fr-mr-1v"
+        <button class="fr-btn fr-btn--sm fr-btn--tertiary fr-icon-arrow-up-line fr-mr-1v fr-color--mention"
                 title="Monter la recommandation"
                 @click.stop="handleMove('above',task, column(board.status)[i - 1])"
                 data-cy="move-task-above">Monter la recommandation</button>
     </template>
     <template x-if="i < column(board.status).length - 1">
-        <button class="fr-btn fr-btn--sm fr-btn--tertiary fr-icon-arrow-down-line fr-mr-1v"
+        <button class="fr-btn fr-btn--sm fr-btn--tertiary fr-icon-arrow-down-line fr-mr-1v fr-color--mention"
                 :class="{'active':open}"
                 title="Descendre la recommandation"
                 @click.stop="handleMove('below',task, column(board.status)[i + 1])"
@@ -35,13 +23,13 @@
         <button data-test-id="open-task-actions-button"
                 x-on:click.stop="open = !open"
                 :class="{'bg-grey':open}"
-                class="fr-btn fr-btn--sm fr-btn--tertiary fr-icon-more-fill">Plus d'action</button>
+                class="fr-btn fr-btn--sm fr-btn--tertiary fr-icon-more-fill fr-color--mention">Plus d'action</button>
         <ul x-show="open"
             :class="{'show':open}"
             class="common-dropdown list-unstyled flex-column item-no-space">
             <li>
                 <a data-test-id="update-task-action-button"
-                   class="fr-btn fr-btn--sm fr-btn--secondary fr-icon-pencil-line fr-btn--icon-left w-100 justify-content-center"
+                   class="fr-btn fr-btn--sm fr-btn--secondary fr-icon-pencil-line fr-btn--icon-left w-100 justify-content-center fr-color--mention_button"
                    @click.stop
                    :href="editTaskUrl(task.id, '{{ request.path }}')">Modifier</a>
             </li>
@@ -49,7 +37,7 @@
                 <li>
                     <button id="unpublish-task-button"
                             @click.stop="onSetTaskPublic(task, false)"
-                            class="fr-btn fr-btn--sm fr-btn--secondary fr-icon-draft-line fr-btn--icon-left w-100 justify-content-center">
+                            class="fr-btn fr-btn--sm fr-btn--secondary fr-icon-draft-line fr-btn--icon-left w-100 justify-content-center fr-color--mention_button">
                         Passer en brouillon
                     </button>
                 </li>
@@ -58,15 +46,31 @@
                 <li>
                     <button id="publish-task-button"
                             @click.stop="onSetTaskPublic(task, true)"
-                            class="fr-btn fr-btn--sm fr-btn--secondary fr-icon-draft-line fr-btn--icon-left w-100 justify-content-center">
+                            class="fr-btn fr-btn--sm fr-btn--secondary fr-icon-draft-line fr-btn--icon-left w-100 justify-content-center fr-color--mention_button">
                         Publier
                     </button>
+                </li>
+            </template>
+            <template x-if="i > 0">
+                <li>
+                    <button class="fr-btn fr-btn--sm fr-btn--secondary fr-icon-arrow-up-line fr-btn--icon-left w-100 justify-content-center fr-color--mention_button"
+                            title="Déplacer en haut"
+                            @click.stop="handleMoveFast('top', task)"
+                            data-cy="move-task-to-top">Déplacer en haut</button>
+                </li>
+            </template>
+            <template x-if="i < column(board.status).length - 1">
+                <li>
+                    <button class="fr-btn fr-btn--sm fr-btn--secondary fr-icon-arrow-down-line fr-btn--icon-left w-100 justify-content-center fr-color--mention_button"
+                            title="Déplacer en bas"
+                            @click.stop="handleMoveFast('bottom', task)"
+                            data-cy="move-task-to-bottom">Déplacer en bas</button>
                 </li>
             </template>
             <li>
                 <button data-test-id="delete-task-action-button"
                         @click.stop="handleOpenDeleteModal()"
-                        class="fr-btn fr-btn--sm fr-btn--secondary fr-icon-delete-line fr-btn--icon-left w-100 justify-content-center">
+                        class="fr-btn fr-btn--sm fr-btn--secondary fr-icon-delete-line fr-btn--icon-left w-100 justify-content-center fr-color--mention_button">
                     Supprimer
                 </button>
             </li>

@@ -6,8 +6,8 @@ describe('The Signup Page', () => {
     '[name=organization_position]': 'Tester',
     '[name=email]': 'signup3@success.test',
     '[name=phone_no]': '0102030405',
-    '[name=password1]': 'derpderp',
-    '[name=password2]': 'derpderp',
+    '[name=password1]': 'Recoco2000',
+    '[name=password2]': 'Recoco2000',
   };
 
   it('signup a new user', function () {

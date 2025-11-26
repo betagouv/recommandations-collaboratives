@@ -23,7 +23,7 @@ def test_contact_list_not_available_for_non_staff(client):
 def test_contact_list_available(client, current_site):
     url = reverse("addressbook-contact-list")
     with login(client) as user:
-        assign_perm("site.use_addressbook", user, current_site)
+        assign_perm("sites.change_addressbook", user, current_site)
         response = client.get(url)
 
     assert response.status_code == 200

@@ -13,6 +13,11 @@
   mask-image: url(../assets/contacts-book-line.svg);
 }
 
+.fr-icon-calendar-line::after,
+.fr-icon-calendar-line::before {
+  mask-image: url(../assets/calendar.svg);
+}
+
 .text-ellipsis {
   white-space: nowrap;
   text-overflow: ellipsis;

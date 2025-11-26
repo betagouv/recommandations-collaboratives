@@ -39,6 +39,7 @@
         {% endif %}
         <h1 class="visually-hidden">{{ request.site.name }}</h1>
         {% include "header/skip-links.html" %}
+        {% include "fragments/new_feature_banner.html" %}
         {% if url_name != "projects-project-detail-recommandations-embed" %}
             {% include "header/menu-top.html" %}
         {% endif %}
@@ -104,7 +105,7 @@
             </div>
         </main>
         {% if not debug %}
-            <script src="https://sentry.incubateur.net/js-sdk-loader/5b872cee93efddce4396cc52605838c1.min.js"
+            <script src="https://sentry.incubateur.net/js-sdk-loader/caf46e9eca66a6aee8e9dfc9434f00a8.min.js"
                     crossorigin="anonymous"></script>
         {% endif %}
         {% block js %}

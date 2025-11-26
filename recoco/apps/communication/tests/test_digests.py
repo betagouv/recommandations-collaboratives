@@ -9,11 +9,14 @@ created: 2022-02-03 16:14:54 CET
 
 from datetime import datetime, timezone
 from unittest.mock import ANY, patch
+from urllib.parse import urlparse
 
 import pytest
 import test  # noqa
 from django.contrib.auth import models as auth
+from django.contrib.auth.models import User
 from django.contrib.sites.shortcuts import get_current_site
+from django.urls import reverse
 from freezegun import freeze_time
 from model_bakery import baker
 from model_bakery.recipe import Recipe
@@ -27,6 +30,7 @@ from recoco.apps.communication.digests import (
     send_new_recommendations_reminders_digest_by_project,
     send_whatsup_reminders_digest_by_project,
 )
+from recoco.apps.conversations import models as conversations_models
 from recoco.apps.geomatics import models as geomatics_models
 from recoco.apps.home import models as home_models
 from recoco.apps.projects import models as projects_models
@@ -37,6 +41,7 @@ from recoco.apps.resources import models as resources_models
 from recoco.apps.tasks import models as tasks_models
 from recoco.apps.tasks import signals as tasks_signals
 
+from ...conversations.utils import gather_annotations_for_message_notification
 from .. import digests
 
 ########################################################################
@@ -45,7 +50,9 @@ from .. import digests
 
 
 @pytest.mark.django_db
-def test_send_digests_for_new_reco_for_collaborators(client, request, make_project):
+def test_send_digests_for_new_reco_for_collaborators_with_msg(
+    client, request, make_project
+):
     current_site = get_current_site(request)
     baker.make(home_models.SiteConfiguration, site=current_site)
 
@@ -67,7 +74,7 @@ def test_send_digests_for_new_reco_for_collaborators(client, request, make_proje
 
     # Generate a notification
     tasks_signals.action_created.send(
-        sender=test_send_digests_for_new_reco_for_collaborators,
+        sender=test_send_digests_for_new_reco_for_collaborators_with_msg,
         task=tasks_models.Task.objects.create(
             public=True,
             project=project,
@@ -81,6 +88,13 @@ def test_send_digests_for_new_reco_for_collaborators(client, request, make_proje
     assert collaborator.notifications.unsent().count() == 1
 
     digests.send_digests_for_new_recommendations_by_user(collaborator, dry_run=False)
+    assert (
+        collaborator.notifications.unsent().count() == 1
+    )  # the notification goes with messages now
+
+    digests.send_msg_digest_by_user_and_project(
+        project, collaborator, current_site, dry_run=False
+    )
 
     assert collaborator.notifications.unsent().count() == 0
 
@@ -314,7 +328,7 @@ def test_send_digests_for_switchtender_by_user(request, client, make_project):
 
 
 @pytest.mark.django_db
-def test_send_digests_for_switchtender_includes_new_recos(
+def test_send_digests_for_switchtender_does_not_include_new_recos(
     client, request, make_project
 ):
     current_site = get_current_site(request)
@@ -358,6 +372,10 @@ def test_send_digests_for_switchtender_includes_new_recos(
 
     digests.send_digest_for_switchtender_by_user(another_advisor)
 
+    assert another_advisor.notifications.unsent().count() == 1
+
+    digests.send_msg_digest_by_user_and_project(project, another_advisor, current_site)
+
     assert another_advisor.notifications.unsent().count() == 0
 
 
@@ -379,7 +397,6 @@ def test_notification_formatter(request, make_project):
         content="A very nice content",
         resource=resource,
     ).make()
-    public_note = Recipe(projects_models.Note, content="my content", public=True).make()
     private_note = Recipe(
         projects_models.Note, content="my content", public=False
     ).make()
@@ -387,14 +404,6 @@ def test_notification_formatter(request, make_project):
     followup = Recipe(tasks_models.TaskFollowup, task=task, comment="Hello!").make()
 
     tests = [
-        (
-            verbs.Conversation.PUBLIC_MESSAGE,
-            public_note,
-            (
-                f"Bobi Joe (DuckCorp) {verbs.Conversation.PUBLIC_MESSAGE}",
-                "my content",
-            ),
-        ),
         (
             verbs.Conversation.PRIVATE_MESSAGE,
             private_note,
@@ -492,14 +501,141 @@ def test_notification_formatter_with_bogus_user():
     formatter = digests.NotificationFormatter()
 
     user = Recipe(auth.User, username="Bob", first_name="Bobi", last_name="Joe").make()
-    note = Recipe(projects_models.Note).make()
+    private_note = baker.make(projects_models.Note)
 
     notification = Notification(
-        user, verb=verbs.Conversation.PUBLIC_MESSAGE, action_object=note
+        user, verb=verbs.Conversation.PRIVATE_MESSAGE, action_object=private_note
     )
 
     fmt_reco = formatter.format(notification)
     assert "compte indisponible" in str(fmt_reco)
+
+
+@pytest.mark.django_db
+class TestMsgDigest:
+    def prepare(self, project_ready, current_site):
+        recipient = baker.make(User)
+        sender = baker.make(User, last_name="Lexpère", first_name="Mosio")
+        project_ready.members.add(recipient)
+        project_ready.members.add(sender)
+        contact1 = baker.make(
+            addressbook_models.Contact, first_name="Léa", last_name="Bonchancel"
+        )
+        contact2 = baker.make(addressbook_models.Contact)
+        doc = baker.make(projects_models.Document, the_link="something")
+        reco = baker.make(tasks_models.Task, site=current_site, intent="Holala fais ça")
+
+        msg1 = baker.make(
+            conversations_models.Message, posted_by=sender, project=project_ready
+        )
+        msg2 = baker.make(
+            conversations_models.Message, posted_by=sender, project=project_ready
+        )
+        (
+            conversations_models.ContactNode.objects.create(
+                contact=contact1, position=1, message=msg1
+            ),
+        )
+        conversations_models.DocumentNode.objects.create(
+            document=doc, position=2, message=msg1
+        )
+        (
+            conversations_models.ContactNode.objects.create(
+                contact=contact2, position=1, message=msg2
+            ),
+        )
+        conversations_models.MarkdownNode.objects.create(
+            text="toto", position=2, message=msg2
+        )
+        conversations_models.RecommendationNode.objects.create(
+            recommendation=reco, position=3, message=msg2
+        )
+
+        notifs = [
+            {
+                "sender": sender,
+                "verb": verbs.Conversation.POST_MESSAGE,
+                "action_object": msg1,
+                "target": project_ready,
+                "annotations": gather_annotations_for_message_notification(msg1),
+            },
+            {
+                "sender": sender,
+                "verb": verbs.Conversation.POST_MESSAGE,
+                "action_object": msg2,
+                "target": project_ready,
+                "annotations": gather_annotations_for_message_notification(msg2),
+            },
+        ]
+        for notif in notifs:
+            notify.send(
+                recipient=[recipient],
+                site=current_site,
+                **notif,
+            )
+
+        return recipient, sender, contact1, [msg1, msg2]
+
+    def test_send_msg_digest(self, project_ready, current_site):
+        (recipient, sender, first_object, [msg1, msg2]) = self.prepare(
+            project_ready, current_site
+        )
+        baker.make(home_models.SiteConfiguration, site=current_site)
+
+        assert recipient.notifications.unsent().count() == 2
+        digests.send_msg_digest_by_user_and_project(
+            project_ready, recipient, current_site, dry_run=False
+        )
+        assert recipient.notifications.unsent().count() == 0
+
+    def test_make_msg_digest(self, project_ready, current_site):
+        (recipient, sender, first_object, [msg1, msg2]) = self.prepare(
+            project_ready, current_site
+        )
+
+        expected = {
+            "first_object": {
+                "email": "",
+                "first_name": "Léa",
+                "function": "",
+                "last_name": "Bonchancel",
+                "mobile_no": "",
+                "organization_name": first_object.organization.name,
+                "phone_no": "",
+                "type": "contact",
+            },
+            "first_sender": {
+                "first_name": "Mosio",
+                "first_name_initial": "M",
+                "image": "https://secure.gravatar.com/avatar/d41d8cd98f00b204e9800998ecf8427e.jpg?s=50&d=mm&r=g",
+                "last_name": "Lexpère",
+                "organization": "",
+                "pk": sender.id,
+                "short": "M. Lexpère",
+            },
+            "intro_count": "2 messages, dont 2 contacts, 1 recommandation et 1 document",
+            "other_senders": False,
+            # "remaining_count": "1 contact, dont 1 contact, 1 recommandation et 1 document",
+            "site_name": "example.com",
+            "text": "<p>toto</p>",
+            "title_count": "2 nouveaux messages",
+        }
+
+        digest = digests.make_msg_digest_by_user_and_project(
+            Notification.objects.all(), recipient, project_ready, current_site
+        )
+
+        # project's digest should be tested else where
+        del digest["project"]
+
+        parsed_url = urlparse(digest["message_url"])
+        assert parsed_url.path == reverse(
+            "projects-project-detail-conversations", args=[project_ready.pk]
+        )
+        assert f"message-id={msg1.id}" in parsed_url.query
+
+        del digest["message_url"]
+        assert digest == expected
 
 
 @pytest.mark.django_db

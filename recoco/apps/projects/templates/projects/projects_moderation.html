@@ -28,15 +28,7 @@
         {% get_project_moderation_count as projects_to_moderate_count %}
     {% endif %}
     <div x-data="{ show: sessionStorage.getItem('view') }"
-        {% if projects_to_moderate_count and advisor_access_requests.count %}
-            x-init="if (sessionStorage.getItem('view') !== null) { show = sessionStorage.getItem('view') } else { sessionStorage.setItem('view', 'projects'); show = 'projects' }"
-        {% elif projects_to_moderate_count %}
-            x-init="sessionStorage.setItem('view', 'projects'); show = 'projects'"
-        {% elif advisor_access_requests.count %}
-            x-init="sessionStorage.setItem('view', 'advisor'); show = 'advisor'"
-        {% else %}
-            x-init="sessionStorage.setItem('view', null);"
-        {% endif %}>
+         {% if projects_to_moderate_count and advisor_access_requests.count %} x-init="if (sessionStorage.getItem('view') !== null) { show = sessionStorage.getItem('view') } else { sessionStorage.setItem('view', 'projects'); show = 'projects' }" {% elif projects_to_moderate_count %} x-init="sessionStorage.setItem('view', 'projects'); show = 'projects'" {% elif advisor_access_requests.count %} x-init="sessionStorage.setItem('view', 'advisor'); show = 'advisor'" {% else %} x-init="sessionStorage.setItem('view', null);" {% endif %}>
         {% if projects_to_moderate_count > 0 and advisor_access_requests.count > 0 %}
             <div class="d-flex col-11 fr-py-5v fr-mx-auto">
                 <div class="row">
@@ -45,11 +37,11 @@
                             <div class="fr-segmented__elements">
                                 <div class="fr-segmented__element">
                                     <input value="1"
-                                        type="radio"
-                                        :checked="show === 'projects'"
-                                        id="segmented-moderation-projects"
-                                        name="segmented-moderation"
-                                        @click="sessionStorage.setItem('view', 'projects'); show = 'projects'">
+                                           type="radio"
+                                           :checked="show === 'projects'"
+                                           id="segmented-moderation-projects"
+                                           name="segmented-moderation"
+                                           @click="sessionStorage.setItem('view', 'projects'); show = 'projects'">
                                     <label class="fr-label" for="segmented-moderation-projects">
                                         Nouveaux dossiers
                                         {% if projects_to_moderate_count %}
@@ -59,12 +51,12 @@
                                 </div>
                                 <div class="fr-segmented__element">
                                     <input value="2"
-                                        type="radio"
-                                        :checked="show === 'advisor'"
-                                        id="segmented-moderation-advisors"
-                                        name="segmented-moderation"
-                                        @click="sessionStorage.setItem('view', 'advisor'); show = 'advisor'"
-                                        data-test-id="advisor-view">
+                                           type="radio"
+                                           :checked="show === 'advisor'"
+                                           id="segmented-moderation-advisors"
+                                           name="segmented-moderation"
+                                           @click="sessionStorage.setItem('view', 'advisor'); show = 'advisor'"
+                                           data-test-id="advisor-view">
                                     <label class="fr-label" for="segmented-moderation-advisors">
                                         Comptes conseiller
                                         {% if advisor_access_requests.count %}
@@ -99,8 +91,8 @@
                                     <h3 class="project-card__title">
                                         <a href="{% url 'projects-project-detail' project.id %}">
                                             <span class="project-card__city">{{ project.name }}</span>
-                                            {% if project.org_name %}
-                                            <span class="project-card__name">{{ project.org_name }}</span>
+                                            {% if project.org_name or project.owner.profile.organization.name %}
+                                                <span class="project-card__name">{{ project.owner.profile.organization.name|default:project.org_name }}</span>
                                             {% endif %}
                                         </a>
                                     </h3>
@@ -230,7 +222,8 @@
                             {% for advisor in advisor_access_requests %}
                                 <div class="moderation-advisor__card fr-col-4-min fr-mx-1v fr-mb-2w"
                                      data-test-id="moderation-advisor-card">
-                                    <div x-data="{contact:null,isOpenDeleteContact:null}" class="moderation-advisor__contact-card fr-m-3v">
+                                    <div x-data="{contact:null,isOpenDeleteContact:null}"
+                                         class="moderation-advisor__contact-card fr-m-3v">
                                         {% include "tools/contacts/contact_card.html" with is_django_data=True contact=advisor.user is_type_user=True %}
                                     </div>
                                     <div>

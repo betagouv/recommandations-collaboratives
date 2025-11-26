@@ -85,7 +85,7 @@ Cypress.Commands.add('login', (role) => {
       form: true,
       body: {
         login: username,
-        password: 'derpderp',
+        password: 'Recoco2000',
         csrfmiddlewaretoken: token,
       },
     }).then((response) => {
@@ -191,6 +191,14 @@ Cypress.Commands.add('createProject', (label, objProject = project) => {
     .type(objProject.description || project.description, { delay: 0 })
     .should('have.value', objProject.description || project.description)
     .should('have.class', 'fr-input--valid');
+
+  // Handle captcha
+  cy.document().then((doc) => {
+    const iframe = doc.getElementById('id_captcha').querySelector('iframe');
+    const innerDoc = iframe.contentDocument || iframe.contentWindow.document;
+    innerDoc.querySelector('.recaptcha-checkbox').click();
+    cy.wait(400);
+  });
 
   cy.get('button[type="submit"]').click().should('be.disabled');
 
@@ -300,7 +308,7 @@ Cypress.Commands.add(
 
         cy.url().should('include', '/actions');
 
-        if(!withResource) {
+        if (!withResource) {
           cy.contains(`${label}`);
         } else {
           cy.contains(currentResource.fields.title);

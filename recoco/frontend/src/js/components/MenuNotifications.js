@@ -90,6 +90,53 @@ function MenuNotifications(notificationNumber, listNofification) {
       appStore.notification.isOpen = true;
       appStore.notification.type = type || ToastType.error;
     },
+    getSummaryNotification(notificationId) {
+      const notification = this.listNofification.find(
+        (notification) => notification.pk === notificationId
+      );
+      return this.summarizeNotification(notification);
+    },
+    summarizeNotification(notification) {
+      const annotations = JSON.parse(notification?.fields?.data)?.annotations;
+      if (!annotations) {
+        return notification.verb;
+      }
+      let summary = [];
+      const count =
+        annotations.recommendations.count +
+        annotations.contacts.count +
+        annotations.documents.count;
+      if (count === 0) {
+        return ` envoyé un message`;
+      }
+      if (annotations.recommendations.count > 0) {
+        summary.push(
+          `${annotations.recommendations.count} recommandation${annotations.recommendations.count > 1 ? 's' : ''}`
+        );
+      }
+      if (annotations.contacts.count > 0) {
+        summary.push(
+          `${annotations.contacts.count} contact${annotations.contacts.count > 1 ? 's' : ''}`
+        );
+      }
+      if (annotations.documents.count > 0) {
+        summary.push(
+          `${annotations.documents.count} document${annotations.documents.count > 1 ? 's' : ''}`
+        );
+      }
+      summary = summary
+        .map((item, index) => {
+          if (index == 0) {
+            return `${item}`;
+          }
+          if (index == summary.length - 1 && summary.length > 1) {
+            return ` et ${item} `;
+          }
+          return `, ${item} `;
+        })
+        .join('');
+      return ` envoyé ${summary}`;
+    },
   };
 }
 

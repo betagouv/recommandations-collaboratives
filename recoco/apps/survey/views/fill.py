@@ -9,17 +9,16 @@ created: 2021-08-03 14:26:39 CEST
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.contrib.sites.models import Site
 from django.core.exceptions import BadRequest
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
-from django.utils import timezone
 from django.views.generic import DetailView, RedirectView
 
 from recoco.apps.projects import models as projects_models
-from recoco.apps.projects.utils import get_collaborators_for_project
-from recoco.utils import has_perm_or_403
+from recoco.apps.projects.utils import reactivate_if_necessary
+from recoco.utils import has_perm, has_perm_or_403
 
 from .. import forms, models, signals
 
@@ -28,21 +27,29 @@ from .. import forms, models, signals
 #####
 
 
-class SessionDetailsView(LoginRequiredMixin, DetailView):
+class SessionDetailsView(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
     model = models.Session
     pk_url_kwarg = "session_id"
     context_object_name = "session"
     template_name = "survey/session_details.html"
 
+    def has_permission(self):
+        object = self.get_object()
+        return has_perm(self.request.user, "projects.use_surveys", object.project)
 
-class SessionResultsView(LoginRequiredMixin, DetailView):
+
+class SessionResultsView(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
     model = models.Session
     pk_url_kwarg = "session_id"
     context_object_name = "session"
     template_name = "survey/session_results.html"
 
+    def has_permission(self):
+        object = self.get_object()
+        return has_perm(self.request.user, "projects.use_surveys", object.project)
 
-class SessionDoneView(LoginRequiredMixin, RedirectView):
+
+class SessionDoneView(LoginRequiredMixin, PermissionRequiredMixin, RedirectView):
     permanent = False
     query_string = True
     pattern_name = "projects-project-detail-knowledge"
@@ -51,6 +58,10 @@ class SessionDoneView(LoginRequiredMixin, RedirectView):
         session = get_object_or_404(models.Session, pk=kwargs["session_id"])
         project = get_object_or_404(projects_models.Project, pk=session.project.id)
         return super().get_redirect_url(*args, project_id=project.id)
+
+    def has_permission(self):
+        object = self.get_object()
+        return has_perm(self.request.user, "projects.use_surveys", object.project)
 
 
 #####
@@ -71,19 +82,14 @@ def survey_question_details(request, session_id, question_id):
     except models.Answer.DoesNotExist:
         answer = None
 
+    has_perm_or_403(request.user, "projects.use_surveys", session.project)
+
     if request.method == "POST":
         form = forms.AnswerForm(question, answer, request.POST, files=request.FILES)
         if form.is_valid():
             form.update_session(session, request.user)
 
-            # Reactivate project if was set inactive
-            if request.user in get_collaborators_for_project(session.project):
-                session.project.last_members_activity_at = timezone.now()
-
-                if session.project.inactive_since:
-                    session.project.reactivate()
-
-                session.project.save()
+            reactivate_if_necessary(session.project, request.user)
 
             signals.survey_session_updated.send(
                 sender=survey_question_details,
@@ -109,6 +115,8 @@ def survey_create_session_for_project(request, project_id, site_id=None):
     project = get_object_or_404(
         projects_models.Project, sites=request.site, pk=project_id
     )
+
+    has_perm_or_403(request.user, "projects.use_surveys", project)
 
     site_config = request.site_config
 
@@ -140,6 +148,7 @@ def survey_create_session_for_project(request, project_id, site_id=None):
 def survey_next_question(request, session_id, question_id=None):
     """Redirect to next unanswered/answerable question from survey"""
     session = get_object_or_404(models.Session, pk=session_id)
+    has_perm_or_403(request.user, "projects.use_surveys", session.project)
 
     if question_id is not None:
         question = get_object_or_404(models.Question, pk=question_id)
@@ -164,6 +173,8 @@ def survey_previous_question(request, session_id, question_id):
     """Redirect to previous unanswered/answerable question from survey"""
     session = get_object_or_404(models.Session, pk=session_id)
     question = get_object_or_404(models.Question, pk=question_id)
+
+    has_perm_or_403(request.user, "projects.use_surveys", session.project)
 
     previous_question = session.previous_question(question)
     if previous_question:

@@ -407,10 +407,7 @@ def test_crm_user_update_profile_information_and_email_address(request, client):
 
     # the confirmation email has been sent
     assert len(django.core.mail.outbox) == 1
-    assert (
-        "Pour activer votre compte, vous pouvez copier-coller le lien ci-dessous dans votre navigateur internet"
-        in django.core.mail.outbox[0].subject
-    )
+    assert "Confirmez votre adresse email" in django.core.mail.outbox[0].subject
 
 
 @pytest.mark.django_db
