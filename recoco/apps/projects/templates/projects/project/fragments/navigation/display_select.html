@@ -6,16 +6,16 @@
         <div class="fr-segmented__elements">
             <div class="fr-segmented__element">
                 <input value="table"
-                       {% if url_name == 'projects-project-list-staff' %}checked{% endif %}
+                       {% if url_name == 'projects-project-list' %}checked{% endif %}
                        type="radio"
                        id="table-display"
                        name="display-select-radio"
                        @click="window.location.href='{% url "projects-project-list-staff" %}'">
                 <label class="fr-label" for="table-display">
-                    <a href="{% url "projects-project-list-staff" %}">Tableau</a>
+                    <a href="{% url "projects-project-list" %}">Tableau</a>
                 </label>
             </div>
-            <div class="fr-segmented__element">
+            {% comment %} <div class="fr-segmented__element">
                 <input value="list"
                        {% if url_name == 'projects-project-list-advisor' %}checked{% endif %}
                        type="radio"
@@ -25,7 +25,7 @@
                 <label class="fr-label" for="list-display">
                     <a href="{% url "projects-project-list-advisor" %}">Liste</a>
                 </label>
-            </div>
+            </div> {% endcomment %}
             <div class="fr-segmented__element">
                 <input value="map"
                        {% if url_name == 'projects-project-list-map' %}checked{% endif %}

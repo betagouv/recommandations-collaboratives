@@ -34,7 +34,7 @@ class UVSignupForm(SignupForm):
 
         self.fields[
             "password1"
-        ].label = "Définissez votre mot de passe (8 caractères minimum et au moins 1 majuscule et 1 chiffre)"
+        ].label = "Définissez votre mot de passe (10 caractères minimum et au moins 1 majuscule et 1 chiffre)"
         self.fields["password1"].widget = forms.PasswordInput(
             attrs={"class": "fr-input fr-mt-2v fr-mb-4v"}
         )
@@ -67,7 +67,7 @@ class UVResetPasswordKeyForm(ResetPasswordKeyForm):
         super(UVResetPasswordKeyForm, self).__init__(*args, **kwargs)
         self.fields[
             "password1"
-        ].label = "Nouveau mot de passe (8 caractères minimum et au moins 1 majuscule et 1 chiffre)"
+        ].label = "Nouveau mot de passe (10 caractères minimum et au moins 1 majuscule et 1 chiffre)"
         self.fields["password1"].widget = forms.PasswordInput(
             attrs={"class": "fr-input fr-mt-2v fr-mb-4v"}
         )
@@ -152,7 +152,7 @@ class AdvisorAccessRequestForm(forms.Form):
         cleaned_data = super().clean()
         advisor_access_type = cleaned_data.get("advisor_access_type")
         departments = cleaned_data.get("departments")
-        if advisor_access_type == "Regional" and departments and len(departments) == 0:
+        if advisor_access_type == "Regional" and not departments:
             self.add_error(
                 "departments", "Merci de sélectionner au moins un département."
             )

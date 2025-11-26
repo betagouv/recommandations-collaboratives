@@ -89,8 +89,8 @@ export const schemaFormInputs = {
       {
         type: 'string',
         format: 'password',
-        minLength: 8,
-        errorMessage: minLengthErrorMessage(8),
+        minLength: 10,
+        errorMessage: minLengthErrorMessage(10),
       },
       {
         type: 'string',

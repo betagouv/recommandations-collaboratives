@@ -72,6 +72,12 @@ def get_advisor_access_requests_count():
     )
 
 
+@register.simple_tag
+def is_project_owner(project, user):
+    """Return True if the given user is the owner of the given project"""
+    return project.owner == user
+
+
 @register.filter(name="to_json")
 def to_json(value, fields=None):
     """Transforme un objet Python en JSON avec des champs spécifiques."""

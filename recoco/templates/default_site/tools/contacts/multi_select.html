@@ -1,12 +1,13 @@
 {% comment %}
     This template is used to create a multi-select component.
-
     Parameters django template:
     - placeholder: The placeholder text for the input.
     - label: The label text for the input.
+    - display_regions: If true, display regions.
     Parameters alpine:
     - objectsToSelect: The objects to select from.
     - helptext: The help text for the input.
+    - displayRegions: If true, use region-grouped mode.
 {% endcomment %}
 {% load sass_tags %}
 {% block css %}
@@ -17,33 +18,30 @@
 <template x-if="objectsToSelect">
     <div class="bg-white">
         <div>
-            <label class="modal-create-organization__label label-helptext-rework" for="select-list-input">{{ label|default:'Départements' }}</label>
-            {% if helptext %}
-                <p class="fr-hint-text fr-mb-0">{{ helptext }}</p>
-            {% endif %}
+            <label class="modal-create-organization__label label-helptext-rework"
+                   for="select-list-input">{{ label|default:'Départements' }}</label>
+            {% if helptext %}<p class="fr-hint-text fr-mb-0">{{ helptext }}</p>{% endif %}
             <div class="d-flex justify-center mt-8">
-                <!-- Define component with preselected options -->
                 <div class="w-100"
-                     x-data="alpineMultiSelect({selected:selectedDepartments, objectsToSelect})">
-                    <!-- Select Options -->
-                    <select class="d-none" x-on:change="init" id="select-list">
-                        <template x-for="department in objectsToSelect" :key="department.code">
-                            <option :value="department.code"
-                                    :data-search="'(' + department.code + ')' + ' ' + department.name"
-                                    x-text="'(' + department.code + ')' + ' ' + department.name" />
-                        </template>
-                    </select>
+                     x-data="alpineMultiSelect({selected:selectedDepartments, objectsToSelect, displayRegions: '{{ display_regions }}' == 'True'})">
+                    <input type="hidden" x-bind:value="selectedValues()">
+                    <template x-if="!displayRegions">
+                        <!-- Select Options -->
+                        <select class="d-none" x-on:change="init" id="select-list">
+                            <template x-for="department in objectsToSelect" :key="department.code">
+                                <option :value="department.code"
+                                        :data-search="'(' + department.code + ')' + ' ' + department.name"
+                                        x-text="'(' + department.code + ')' + ' ' + department.name" />
+                            </template>
+                        </select>
+                    </template>
                     <div class="w-100 d-flex flex-column align-items-center h-64 mx-auto"
                          @keyup.alt="toggle">
-                        <!-- Selected department -->
-                        <input type="hidden" x-bind:value="selectedValues()">
                         <div class="inline-block position-relative w-100">
                             <div class="d-flex flex-column align-items-center position-relative">
-                                <!-- Selected elements container -->
                                 <div class="w-100">
                                     <div class="my-2 p-1 d-flex border border-gray-200 bg-white rounded">
                                         <div class="d-flex flex-auto flex-wrap w-100" x-on:click="open">
-                                            <!-- iterating over selected elements -->
                                             <template x-for="(option,index) in selectedElms" :key="option.value">
                                                 <div x-show="index < 2"
                                                      class="d-flex justify-center align-items-center m-1 font-medium py-1 px-2 rounded text-indigo-700 selected-item border">
@@ -65,7 +63,6 @@
                                                     </div>
                                                 </div>
                                             </template>
-                                            <!-- None items selected -->
                                             <div x-show="selectedElms.length == 0" class="flex-grow-1">
                                                 <input placeholder="{{ placeholder|default:'Sélectionnez un ou plusieurs départements' }}"
                                                        class="bg-transparent p-1 px-2 appearance-none outline-none h-full w-100 text-gray-800"
@@ -73,7 +70,6 @@
                                                        id="select-list-input">
                                             </div>
                                         </div>
-                                        <!-- Drop down toogle with icons-->
                                         <div class="text-gray-300 w-8 py-1 pl-2 pr-1 d-flex align-items-center border-gray-200 fr-ml-auto border-left">
                                             <button type="button"
                                                     x-show="!isOpen()"
@@ -104,7 +100,6 @@
                                         </div>
                                     </div>
                                 </div>
-                                <!-- Dropdown container -->
                                 <div class="w-100">
                                     <div x-show.transition.origin.top="isOpen()"
                                          x-trap="isOpen()"
@@ -112,7 +107,6 @@
                                          x-on:click.away="close">
                                         <div class="d-flex flex-column w-100">
                                             <div class="fr-px-1w fr-py-1w">
-                                                <!-- Search input-->
                                                 <div class="mt-1 position-relative rounded shadow-sm">
                                                     <div class="position-absolute fr-pl-1w d-flex align-items-center pointer-events-none top-0 bottom-0">
                                                         <svg xmlns="http://www.w3.org/2000/svg"
@@ -133,25 +127,61 @@
                                                            placeholder="Recherchez">
                                                 </div>
                                             </div>
-                                            <!-- Options container -->
                                             <ul class="z-10 fr-mt-0 w-100 bg-white shadow-lg max-h-80 rounded fr-py-0 hide-ul-style overflow-y-auto sm:text-sm"
                                                 tabindex="-1"
                                                 role="listbox"
-                                                @keyup.delete="deselect">
-                                                <template x-for="(option,index) in options" :key="option.text">
-                                                    <li class="text-gray-900 cursor-default select-none position-relative"
-                                                        role="option">
-                                                        <div class="cursor-pointer w-100 border-gray-100 rounded border-b hover:bg-slate-100"
-                                                             x-bind:class="option.selected ? 'selected-item' : ''"
-                                                             @click="select(index,$event)">
-                                                            <div x-bind:class="option.selected ? 'selected-item' : ''"
-                                                                 class="d-flex w-100 align-items-center p-2 pl-2 border-transparent border-radius-03 border-l-2 position-relative">
-                                                                <div class="w-100 align-items-center d-flex">
-                                                                    <div class="mx-2 leading-6" x-model="option" x-text="option.text"></div>
+                                                @keyup.delete="deselect"
+                                                data-test-id="select-list-options">
+                                                <template x-if="displayRegions">
+                                                    <template x-for="region in regions" :key="region.code">
+                                                        <li>
+                                                            <div class="d-flex align-items-center region-header px-2 py-1 rounded cursor-pointer position-relative"
+                                                                 :class="isRegionSelected(region) ? 'selected-item' : ''">
+                                                                <input type="checkbox"
+                                                                       :checked="isRegionSelected(region)"
+                                                                       @change="handleRegionSelect(region)"
+                                                                       class="mr-2 d-none"
+                                                                       :id="`region-${region.code}`">
+                                                                <label class="fw-bold stretched-link"
+                                                                       x-text="region.name"
+                                                                       :for="`region-${region.code}`"></label>
+                                                            </div>
+                                                            <div class="departments-list"
+                                                                 style="margin-left: 1.5em"
+                                                                 x-ref="departmentsList">
+                                                                <template x-for="dep in region.departments" :key="dep.code">
+                                                                    <div class="d-flex align-items-center department-item px-2 py-1 rounded cursor-pointer position-relative"
+                                                                         :class="isDepartmentSelected(dep) ? 'selected-item' : ''">
+                                                                        <input type="checkbox"
+                                                                               :checked="isDepartmentSelected(dep)"
+                                                                               @change="handleDepartmentSelect(dep)"
+                                                                               class="mr-2 d-none "
+                                                                               :id="`department-${dep.code}`">
+                                                                        <label class="stretched-link"
+                                                                               x-text="`(${dep.code}) ${dep.name}`"
+                                                                               :for="`department-${dep.code}`"></label>
+                                                                    </div>
+                                                                </template>
+                                                            </div>
+                                                        </li>
+                                                    </template>
+                                                </template>
+                                                <template x-if="!displayRegions">
+                                                    <template x-for="(option,index) in options" :key="option.text">
+                                                        <li class="text-gray-900 cursor-default select-none position-relative"
+                                                            role="option">
+                                                            <div class="cursor-pointer w-100 border-gray-100 rounded border-b hover:bg-slate-100"
+                                                                 x-bind:class="option.selected ? 'selected-item' : ''"
+                                                                 @click="select(index,$event)">
+                                                                <div x-bind:class="option.selected ? 'selected-item' : ''"
+                                                                     class="d-flex w-100 align-items-center p-2 pl-2 border-transparent border-radius-03 border-l-2 position-relative">
+                                                                    <div class="w-100 align-items-center d-flex">
+                                                                        <div class="mx-2 leading-6" x-model="option" x-text="option.text"></div>
+                                                                    </div>
                                                                 </div>
                                                             </div>
-                                                        </div>
-                                                    </li>
+                                                        </li>
+                                                    </template>
                                                 </template>
                                             </ul>
                                         </div>
@@ -162,6 +192,18 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+</template>
+<template x-if="!objectsToSelect">
+    <div class="bg-white">
+        <div>
+            <label class="modal-create-organization__label" for="select-list-input">{{ label|default:'Départements' }}</label>
+            {% if helptext %}<p class="fr-hint-text fr-mb-0">{{ helptext }}</p>{% endif %}
+            <input type="text"
+                   id="select-list-input"
+                   placeholder="{{ placeholder|default:'Sélectionnez un ou plusieurs départements' }}"
+                   class="bg-transparent p-1 px-2 appearance-none outline-none h-full w-100 text-gray-800">
         </div>
     </div>
 </template>

@@ -47,8 +47,10 @@
     .navigation__item-moderation,
     .navigation__item-invitation {
       .badge {
+        line-height: 0.75rem;
+        align-self: center;
         margin-left: 0.5rem;
-        line-height: 1rem;
+        padding: 0.1rem 0.4rem;
       }
     }
 
@@ -207,7 +209,7 @@
     display: block;
   }
 }
- @media (max-width: 991.98px) {
+@media (max-width: 991.98px) {
   .responsive-header__element-not-mobile {
     display: none !important;
   }

@@ -16,6 +16,8 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 from django.db.models.query import QuerySet
 from django.urls import reverse
+from django_gravatar.helpers import get_gravatar_url
+from markdownx.utils import markdownify
 
 from recoco import utils, verbs
 from recoco.apps.home.models import SiteConfiguration
@@ -29,10 +31,12 @@ from recoco.apps.reminders.api import (
 from recoco.apps.tasks import models as tasks_models
 from recoco.apps.tasks.models import Task
 
+from ..conversations.models import MarkdownNode, RecommendationNode
 from . import constants as communication_constants
 from .api import send_email
 
 logger = logging.getLogger("main")
+
 
 ########################################################################
 # Reminders
@@ -192,6 +196,7 @@ def send_digests_for_new_recommendations_by_user(user, dry_run):
     notifications = (
         user.notifications(manager="on_site")
         .unsent()
+        .unread()
         .filter(target_content_type=project_ct, verb=verbs.Recommendation.CREATED)
         .order_by("target_object_id")
     )
@@ -407,6 +412,7 @@ def send_digests_for_new_sites_by_user(user, dry_run=False):
     notifications = (
         user.notifications(manager="on_site")
         .unsent()
+        .unread()
         .filter(target_content_type=project_ct, verb=verbs.Project.AVAILABLE)
         .order_by("target_object_id")
     )
@@ -478,6 +484,206 @@ def make_digest_for_new_site(notification, user):
 
 
 ########################################################################
+# message digests
+########################################################################
+
+
+def send_msg_digest_by_user_and_project(project, user, site, dry_run=False):
+    notifications = (
+        user.notifications(manager="on_site")
+        .unsent()
+        .filter(verb=verbs.Conversation.POST_MESSAGE, target_object_id=project.id)
+    )
+    if notifications.count() == 0:
+        return 0
+
+    try:
+        digest = make_msg_digest_by_user_and_project(notifications, user, project, site)
+    except StopIteration:
+        # in case a message has no node. Should not happen,
+        # but if it does we don't want it to crash the whole command
+        return 0
+
+    if not dry_run:
+        send_email(
+            communication_constants.TPL_MESSAGES_DIGEST,
+            {"name": normalize_user_name(user), "email": user.email},
+            params=digest,
+        )
+        notifications.mark_as_sent()
+    else:
+        logger.info(
+            f"[DRY RUN] Would have sent one email with {len(digest)} message notifications to <{user}>."
+        )
+    return notifications.count()
+
+
+def make_msg_digest_by_user_and_project(notifications_qs, user, project, site):
+    project_digest = make_project_digest(project, user, "conversations")
+    notifications_qs = notifications_qs.order_by("timestamp")
+
+    # formatting utils
+    def easy_plural(noun, nb, plural_mark="s"):
+        if nb <= 1:
+            return noun
+        return noun + plural_mark
+
+    def format_nb(nb):
+        return nb
+
+    md_node_ct = ContentType.objects.get_for_model(MarkdownNode)
+    reco_node_ct = ContentType.objects.get_for_model(RecommendationNode)
+
+    # msg count and title count
+    nodes = [n for notif in notifications_qs for n in notif.action_object.nodes.all()]
+    nodes_types = set(node.count_label for node in nodes)
+    if len(nodes_types) > 1 or next(iter(nodes_types)) == "message":
+        msg_count = notifications_qs.count()
+        single_type = "message"
+        adjective = easy_plural("nouveau", msg_count, "x")
+    else:
+        single_type = nodes_types.pop()
+        msg_count = len(nodes)
+        adjective = (
+            easy_plural("nouvelle", msg_count)
+            if single_type == "recommandation"
+            else easy_plural("nouveau", msg_count, "x")
+        )
+    pretty_title_count = (
+        f"{format_nb(msg_count)} {adjective} {easy_plural(single_type, msg_count)}"
+    )
+
+    # counting messages and objects by type for intro sentence
+    annotations = [
+        notif.data["annotations"]
+        for notif in notifications_qs
+        if notif.data is not None
+    ]
+    aggregated_counts = {
+        "message": msg_count,
+        "contact": sum(note["contacts"]["count"] for note in annotations),
+        "recommandation": sum(note["recommendations"]["count"] for note in annotations),
+        "document": sum(note["documents"]["count"] for note in annotations),
+        # le décompte de "messages" c'est le nombre de messages qui ont du texte
+        # ne pas se prendre la tête pour le nœud reco qui est bizarre
+    }
+    aggregated_counts = {
+        key: count for key, count in aggregated_counts.items() if count > 0
+    }
+
+    # generic field makes it painful to query purely through orm
+    first_text_msg = next(
+        (
+            n.action_object
+            for n in notifications_qs
+            if n.action_object.nodes.filter(
+                polymorphic_ctype_id__in=[md_node_ct, reco_node_ct]
+            ).exists()
+        ),
+        None,
+    )
+    first_obj_msg = next(
+        (
+            n.action_object
+            for n in notifications_qs
+            if n.action_object.nodes.exclude(polymorphic_ctype_id=md_node_ct).exists()
+        ),
+        None,
+    )
+    first_object_node = (
+        (
+            first_obj_msg.nodes.exclude(polymorphic_ctype=md_node_ct)
+            .order_by("position")
+            .first()
+        )
+        if first_obj_msg is not None
+        else None
+    )
+
+    # extracting elements that will be fully displayed
+    counts_less_recap = aggregated_counts.copy()
+    if first_text_msg:
+        counts_less_recap["message"] -= 1
+        first_text = markdownify(
+            "\n\n".join(
+                node.text
+                for node in first_text_msg.nodes.filter(
+                    polymorphic_ctype_id__in=[md_node_ct, reco_node_ct]
+                )
+            )
+        )
+    else:
+        first_text = None
+    if first_object_node:
+        counts_less_recap[first_object_node.count_label] -= 1
+        if first_text_msg != first_obj_msg:
+            counts_less_recap["message"] -= 1
+
+    # formatting counts for intro sentence
+    count_objects = [
+        f"{format_nb(count)} {easy_plural(key, count)}"
+        for key, count in aggregated_counts.items()
+        if key != "message"
+    ]
+    pretty_msg = f"{format_nb(aggregated_counts['message'])} {easy_plural('message', aggregated_counts['message'])}"
+    pretty_intro_count = pretty_msg
+    if len(count_objects) > 0:
+        pretty_intro_count += f", dont {', '.join(count_objects[:-1])}{' et ' if len(count_objects) > 1 else ''}{count_objects[-1]}"
+
+    # formatting counts for mail object
+    count_remaining_elements = [
+        f"{format_nb(count)} {easy_plural('autre', count) + ' ' if index == 0 else ''}{easy_plural(key, count)}"
+        for index, (key, count) in enumerate(counts_less_recap.items())
+        if count > 0 and key != "message"
+    ]
+    pretty_remaining_msg = f"{format_nb(counts_less_recap['message'])} {easy_plural('autre', counts_less_recap['message'])} {easy_plural('message', counts_less_recap['message'])}"
+    pretty_count_remaining = pretty_remaining_msg
+    if len(count_remaining_elements) > 0:
+        pretty_count_remaining += (
+            f", dont {', '.join(count_remaining_elements[:-1])}{' et ' if len(count_remaining_elements) > 1 else ''}{count_remaining_elements[-1]}"
+            if len(count_remaining_elements) > 0
+            else None
+        )
+
+    # counting and formatting 'remaining' sentence
+
+    # prepare data about sender(s)
+    main_sender = notifications_qs[0].actor
+    other_senders = (
+        notifications_qs.values_list("actor_object_id", flat=True).distinct().count()
+        > 1
+    )
+
+    return {
+        "project": project_digest,
+        "title_count": pretty_title_count,
+        "intro_count": pretty_intro_count,
+        # below is probably no longer used, clean later when this is stabilized
+        # "remaining_count": pretty_count_remaining,
+        "site_name": site.name,
+        "first_sender": {
+            "pk": main_sender.id,
+            "image": get_gravatar_url(main_sender.email, 50),
+            "first_name_initial": main_sender.first_name[:1].capitalize(),
+            "first_name": main_sender.first_name.capitalize(),
+            "last_name": main_sender.last_name.capitalize(),
+            "organization": getattr(main_sender.profile.organization, "name", ""),
+            "short": NotificationFormatter._represent_user(main_sender, True),
+        },
+        "other_senders": other_senders,
+        "text": first_text,
+        "first_object": (
+            first_object_node.get_digest_recap() if first_object_node else None
+        ),
+        "message_url": utils.build_absolute_url(
+            notifications_qs.first().action_object.get_absolute_url(),
+            auto_login_user=user,
+        ),
+    }
+    # https://docs.google.com/document/d/1atR08eb2H2DyvUGg5VkMrbA7VvMO-ZNFYVqAgjjgZ_c/edit?tab=t.0
+
+
+########################################################################
 # send digest by user
 ########################################################################
 
@@ -491,8 +697,12 @@ def send_digest_for_non_switchtender_by_user(user, dry_run=False):
     queryset = (
         user.notifications(manager="on_site")
         .filter(target_content_type=project_ct)
-        .exclude(target_content_type=project_ct, verb=verbs.Recommendation.CREATED)
+        .exclude(
+            target_content_type=project_ct,
+            verb__in=[verbs.Recommendation.CREATED, verbs.Conversation.POST_MESSAGE],
+        )
         .unsent()
+        .unread()
     )
 
     return send_digest_by_user(
@@ -511,8 +721,11 @@ def send_digest_for_switchtender_by_user(user, dry_run=False):
     queryset = (
         user.notifications(manager="on_site")
         .filter(target_content_type=project_ct)
-        .exclude(verb=verbs.Recommendation.CREATED)
+        .exclude(
+            verb__in=[verbs.Recommendation.CREATED, verbs.Conversation.POST_MESSAGE]
+        )
         .unsent()
+        .unread()
     )
 
     context = {
@@ -538,11 +751,12 @@ def send_digest_by_user(
     """
     project_ct = ContentType.objects.get_for_model(projects_models.Project)
 
-    if not queryset:
+    if queryset is None:
         notifications = (
             user.notifications(manager="on_site")
             .filter(target_content_type=project_ct)
             .unsent()
+            .unread()
         )
     else:
         notifications = queryset
@@ -649,9 +863,10 @@ class FormattedNotification:
 
 
 class NotificationFormatter:
+    """Format notifications for email dispatch"""
+
     def __init__(self):
         self.dispatch_table = {
-            verbs.Conversation.PUBLIC_MESSAGE: self.format_public_note_created,
             verbs.Conversation.PRIVATE_MESSAGE: self.format_private_note_created,
             verbs.Project.BECAME_ADVISOR: self.format_action_became_advisor,
             verbs.Project.BECAME_OBSERVER: self.format_action_became_observer,
@@ -676,13 +891,17 @@ class NotificationFormatter:
         return fmt(notification)
 
     # ------ Formatter Utils -----#
-    def _represent_user(self, user):
+    @staticmethod
+    def _represent_user(user, is_short=False):
         if not user:
             fmt = "--compte indisponible--"
             return fmt
 
         if user.last_name:
-            fmt = f"{user.first_name} {user.last_name}"
+            first_name = (
+                f"{user.first_name[:1].capitalize()}." if is_short else user.first_name
+            )
+            fmt = f"{first_name} {user.last_name}"
         else:
             fmt = f"{user}"
 
@@ -691,44 +910,42 @@ class NotificationFormatter:
 
         return fmt
 
-    def _represent_recommendation(self, recommendation):
+    @staticmethod
+    def _represent_recommendation(recommendation):
         if recommendation.resource:
             return recommendation.resource.title
 
         return recommendation.intent
 
-    def _represent_recommendation_excerpt(self, recommendation):
+    @staticmethod
+    def _represent_recommendation_excerpt(recommendation):
         return recommendation.content[:50]
 
-    def _represent_project(self, project):
+    @staticmethod
+    def _represent_project(project):
         fmt = f"{project.name}"
         if project.commune:
             fmt += f" ({project.commune})"
 
         return fmt
 
-    def _represent_project_excerpt(self, project):
+    @staticmethod
+    def _represent_project_excerpt(project):
         if project.description:
             return project.description[:50]
 
         return None
 
-    def _represent_note_excerpt(self, note):
+    @staticmethod
+    def _represent_note_excerpt(note):
         return note.content[:200] or None
 
-    def _represent_followup(self, followup):
+    @staticmethod
+    def _represent_followup(followup):
         return followup.comment[:50]
 
     # -------- Routers -----------#
     # ------ Real Formatters -----#
-    def format_public_note_created(self, notification):
-        """A public note was written by a user"""
-        subject = self._represent_user(notification.actor)
-        summary = f"{subject} {verbs.Conversation.PUBLIC_MESSAGE}"
-        excerpt = self._represent_note_excerpt(notification.action_object)
-
-        return FormattedNotification(summary=summary, excerpt=excerpt)
-
     def format_private_note_created(self, notification):
         """A note was written by a switchtender"""
         subject = self._represent_user(notification.actor)

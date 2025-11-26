@@ -8,6 +8,8 @@ created : 2021-05-26 13:33:11 CEST
 """
 
 import os
+import uuid
+from datetime import datetime
 
 from django.apps import apps as django_apps
 from django.contrib.auth import models as auth_models
@@ -15,15 +17,18 @@ from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelatio
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.managers import CurrentSiteManager
 from django.contrib.sites.models import Site
+from django.core.validators import FileExtensionValidator
 from django.db import models
 from django.db.models import F, Func, OuterRef, Q, Subquery
 from django.db.models.functions import Cast
+from django.db.models.query import QuerySet
 from django.db.models.signals import post_migrate
 from django.dispatch import receiver
 from django.urls import reverse
 from django.utils import timezone
 from guardian.shortcuts import get_objects_for_user
 from markdownx.utils import markdownify
+from model_utils.models import TimeStampedModel
 from notifications import models as notifications_models
 from notifications.models import Notification
 from taggit.managers import TaggableManager
@@ -40,6 +45,7 @@ from recoco.utils import (
 
 from . import apps
 from .utils import generate_ro_key
+from .validators import MimetypeValidator
 
 FEED_LABEL_MAX_LENGTH = 50
 
@@ -400,10 +406,10 @@ class Project(models.Model):
 
     last_name = models.CharField(
         max_length=128, default="", verbose_name="Nom du contact"
-    )
+    )  # DEPRECATED, DNU
     first_name = models.CharField(
         max_length=128, default="", verbose_name="Prénom du contact"
-    )
+    )  # DEPRECATED, DNU
 
     publish_to_cartofriches = models.BooleanField(
         verbose_name="Publier sur cartofriches", default=False
@@ -439,6 +445,11 @@ class Project(models.Model):
         default="",
         verbose_name="Raison de l'inactivité du dossier",
     )
+    last_manual_reactivation = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name="Quand le dossier a été manuellement réactivé",
+    )
 
     def reactivate(self):
         """Switch back project to active state"""
@@ -461,7 +472,7 @@ class Project(models.Model):
 
     org_name = models.CharField(
         max_length=256, blank=True, default="", verbose_name="Nom de votre structure"
-    )
+    )  # DEPRECATED, DNU
 
     created_on = models.DateTimeField(
         default=timezone.now, verbose_name="Date de création"
@@ -475,7 +486,7 @@ class Project(models.Model):
     name = models.CharField(max_length=128, verbose_name="Nom du dossier")
     phone = models.CharField(
         max_length=16, default="", blank=True, verbose_name="Téléphone"
-    )
+    )  # DEPRECATED, DNU
     description = models.TextField(verbose_name="Description", default="", blank=True)
 
     # Internal advisors note
@@ -702,6 +713,52 @@ class ProjectTopic(models.Model):
     site = models.ForeignKey(Site, on_delete=models.CASCADE)
 
 
+class ProjectCreationRequestQuerySet(QuerySet):
+    def not_completed(self):
+        return self.annotate(
+            has_associated_user=models.Subquery(
+                models.Exists(auth_models.User.objects.filter(email=self.email))
+            )
+        ).exclude(has_associated_user=True)
+
+
+class ProjectCreationRequestManager(
+    models.Manager.from_queryset(ProjectCreationRequestQuerySet)
+):
+    use_in_migrations = False
+
+    def get_queryset(self):
+        return super().get_queryset().select_related("project")
+
+
+class ProjectCreationRequestSiteManager(
+    CurrentSiteManager.from_queryset(ProjectCreationRequestQuerySet)
+):
+    use_in_migrations = False
+
+    def get_queryset(self):
+        return super().get_queryset().select_related("project")
+
+
+class ProjectCreationRequest(TimeStampedModel):
+    site = models.ForeignKey(Site, on_delete=models.CASCADE)
+    email = models.EmailField(blank=True, verbose_name="Courriel")
+    project = models.ForeignKey(
+        Project, on_delete=models.CASCADE, related_name="project_creation_requests"
+    )
+    uuid = models.UUIDField(default=uuid.uuid4)
+
+    objects = ProjectCreationRequestManager()
+    on_site = ProjectCreationRequestSiteManager()
+
+    class Meta:
+        verbose_name = "Demande de création de projet"
+        verbose_name_plural = "Demandes de création de projet"
+
+    def __str__(self):
+        return f"{self.email} - {self.project.name}"
+
+
 class NoteManager(models.Manager):
     """Manager for active tasks"""
 
@@ -840,6 +897,47 @@ class DeletedDocumentManager(models.Manager):
 class Document(models.Model):
     """Représente un document associé à un project"""
 
+    mimetype_validator = MimetypeValidator(
+        allows=[
+            "text/plain",
+            "image/png",
+            "image/jpg",
+            "image/gif",
+            "image/jpeg",
+            "image/pjpeg",
+            "application/pdf",
+            "application/msword",
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            "application/vnd.oasis.opendocument.text",
+            "application/vnd.ms-excel",
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            "application/vnd.oasis.opendocument.spreadsheet",
+            "application/vnd.ms-powerpoint",
+            "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+            "application/vnd.oasis.opendocument.presentation",
+        ],
+    )
+
+    filextension_validator = FileExtensionValidator(
+        [
+            "txt",
+            "md",
+            "png",
+            "jpg",
+            "jpeg",
+            "pdf",
+            "doc",
+            "docx",
+            "odt",
+            "xls",
+            "xlsx",
+            "odc",
+            "ppt",
+            "pptx",
+            "odp",
+        ]
+    )
+
     objects = DocumentManager()
     on_site = DocumentOnSiteManager()
     objects_deleted = DeletedDocumentManager()
@@ -874,7 +972,12 @@ class Document(models.Model):
     def upload_path(self, filename):
         return "projects/%d/%s" % (self.project.pk, filename)
 
-    the_file = models.FileField(null=True, blank=True, upload_to=upload_path)
+    the_file = models.FileField(
+        null=True,
+        blank=True,
+        upload_to=upload_path,
+        validators=[mimetype_validator, filextension_validator],
+    )
     the_link = models.URLField(max_length=500, null=True, blank=True)
 
     def filename(self):
@@ -903,6 +1006,10 @@ class Document(models.Model):
 
     def __str__(self):  # pragma: nocover
         return f"Document {self.id}"
+
+    def soft_delete(self):
+        self.deleted = datetime.now()
+        self.save()
 
 
 ########################################################################

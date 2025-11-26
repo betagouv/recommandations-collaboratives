@@ -14,12 +14,14 @@ from copy import copy
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
+from django.contrib.sites.shortcuts import get_current_site
 from django.db.models import Count, F, OuterRef, Q, QuerySet, Subquery
 from django.http import Http404
 from django.shortcuts import get_object_or_404
 from notifications import models as notifications_models
-from rest_framework import permissions, status, viewsets
+from rest_framework import mixins, permissions, status, viewsets
 from rest_framework.generics import ListAPIView
+from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -30,6 +32,7 @@ from recoco.rest_api.filters import (
     WatsonSearchFilter,
 )
 from recoco.rest_api.pagination import LargeResultsSetPagination
+from recoco.rest_api.permissions import BaseConversationPermission
 from recoco.utils import (
     get_group_for_site,
     has_perm,
@@ -39,6 +42,8 @@ from recoco.utils import (
 from .. import models, signals
 from ..filters import DepartmentsFilter, ProjectActivityFilter
 from ..serializers import (
+    DocumentSerializer,
+    NewDocumentSerializer,
     ProjectForListSerializer,
     ProjectSiteSerializer,
     TopicSerializer,
@@ -189,7 +194,7 @@ class ProjectList(ListAPIView):
             .annotate(count=Count("id", distinct=True))
             .annotate(
                 unread_public_messages=Count(
-                    "id", filter=Q(verb=verbs.Conversation.PUBLIC_MESSAGE)
+                    "id", filter=Q(verb=verbs.Conversation.POST_MESSAGE)
                 )
             )
             .annotate(
@@ -380,7 +385,7 @@ def update_project_statuses_with_their_notifications(site, user, project_statuse
         .annotate(count=Count("id", distinct=True))
         .annotate(
             unread_public_messages=Count(
-                "id", filter=Q(verb=verbs.Conversation.PUBLIC_MESSAGE)
+                "id", filter=Q(verb=verbs.Conversation.POST_MESSAGE)
             )
         )
         .annotate(
@@ -539,6 +544,42 @@ class ProjectSiteViewSet(viewsets.GenericViewSet):
             return Response(status=status.HTTP_204_NO_CONTENT)
 
         return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+########################################################################
+# Document API
+########################################################################
+
+
+class DocumentViewSet(
+    mixins.RetrieveModelMixin, mixins.CreateModelMixin, viewsets.GenericViewSet
+):
+    """API endpoint that allows manipulating Documents"""
+
+    permission_classes = [permissions.IsAuthenticated, BaseConversationPermission]
+    queryset = models.Document.objects
+    parsers = (
+        JSONParser,
+        MultiPartParser,
+        FormParser,
+    )
+
+    def get_queryset(self):
+        project_id = int(self.kwargs["project_id"])
+        return self.queryset.filter(project_id=project_id)
+
+    def get_serializer_class(self):
+        if self.action == "create":
+            return NewDocumentSerializer
+        return DocumentSerializer
+
+    def perform_create(self, serializer):
+        instance = serializer.save(
+            project_id=int(self.kwargs["project_id"]),
+            uploaded_by=self.request.user,
+            site=get_current_site(self.request),
+        )
+        signals.document_uploaded.send(sender=self.create, instance=instance)
 
 
 # eof

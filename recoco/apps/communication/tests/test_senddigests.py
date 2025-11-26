@@ -14,7 +14,6 @@ import pytest
 from django.contrib.auth import models as auth_models
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.management import call_command
-from django.test import override_settings
 from django.utils import timezone
 from model_bakery import baker
 
@@ -29,7 +28,6 @@ from .. import digests
 
 
 @pytest.mark.django_db
-@override_settings(BREVO_FORCE_DEBUG=True)
 def test_command_send_digest_executes_all_tasks(request, mocker, caplog, make_project):
     caplog.set_level(logging.DEBUG)
 
@@ -83,7 +81,6 @@ def test_command_send_digest_executes_all_tasks(request, mocker, caplog, make_pr
 
 
 @pytest.mark.django_db
-@override_settings(BREVO_FORCE_DEBUG=True)
 def test_command_do_not_send_digest_to_deactivated_users(request, mocker, caplog):
     caplog.set_level(logging.DEBUG)
 
@@ -141,7 +138,6 @@ def test_command_do_not_send_digest_to_deactivated_users(request, mocker, caplog
 # Reminders
 #################################################################
 @pytest.mark.django_db
-@override_settings(BREVO_FORCE_DEBUG=True)
 def test_command_reminder_are_treated(request, mocker, project):
     current_site = get_current_site(request)
     baker.make(home_models.SiteConfiguration, site=current_site)
@@ -157,7 +153,6 @@ def test_command_reminder_are_treated(request, mocker, project):
 
 
 @pytest.mark.django_db
-@override_settings(BREVO_FORCE_DEBUG=True)
 def test_command_pending_recommendation_reminder_sent(request, mocker, project):
     current_site = get_current_site(request)
     baker.make(home_models.SiteConfiguration, site=current_site)
@@ -180,7 +175,6 @@ def test_command_pending_recommendation_reminder_sent(request, mocker, project):
 
 
 @pytest.mark.django_db
-@override_settings(BREVO_FORCE_DEBUG=True)
 def test_command_pending_recommendation_reminder_not_sent_if_advisor(
     request, mocker, project
 ):
@@ -207,7 +201,6 @@ def test_command_pending_recommendation_reminder_not_sent_if_advisor(
 
 
 @pytest.mark.django_db
-@override_settings(BREVO_FORCE_DEBUG=True)
 def test_command_pending_reminder_sent_and_rescheduled(request, mocker, make_project):
     current_site = get_current_site(request)
     baker.make(home_models.SiteConfiguration, site=current_site)
@@ -236,7 +229,6 @@ def test_command_pending_reminder_sent_and_rescheduled(request, mocker, make_pro
 
 
 @pytest.mark.django_db
-@override_settings(BREVO_FORCE_DEBUG=True)
 def test_command_pending_recommendation_reminder_not_send_if_no_owner(
     request, mocker, project
 ):
@@ -257,7 +249,6 @@ def test_command_pending_recommendation_reminder_not_send_if_no_owner(
 
 
 @pytest.mark.django_db
-@override_settings(BREVO_FORCE_DEBUG=True)
 def test_command_pending_reminders_not_sent_if_project_inactive(
     request, mocker, make_project
 ):
@@ -282,7 +273,6 @@ def test_command_pending_reminders_not_sent_if_project_inactive(
 
 
 @pytest.mark.django_db
-@override_settings(BREVO_FORCE_DEBUG=True)
 def test_command_pending_reminders_not_sent_if_project_muted(
     request, mocker, make_project
 ):

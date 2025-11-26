@@ -19,8 +19,8 @@ describe('The Login Page', () => {
       .should('have.value', username);
 
     cy.get('#id_password')
-      .type('derpderp', { force: true })
-      .should('have.value', 'derpderp');
+      .type('Recoco2000', { force: true })
+      .should('have.value', 'Recoco2000');
 
     cy.get('[type=submit]').click({ force: true });
 
