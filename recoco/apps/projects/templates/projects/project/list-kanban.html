@@ -155,7 +155,8 @@
                                                                     </template>
                                                                 </template>
                                                                 <template x-if="t.commune">
-                                                                    <div class="kanban-card__commune-container">
+                                                                    <div class="kanban-card__commune-container text-ellipsis"
+                                                                         :title="`${t.commune.name} (${t.commune.postal})`">
                                                                         <span class="kanban-card__commune fr-icon--sm fr-icon-map-pin-2-line not-a-link"></span>
                                                                         <span class="kanban-card__commune-name" x-text="t.commune.name"></span>
                                                                         <span class="kanban-card__commune-postal" x-text="`(${t.commune.postal})`"></span>

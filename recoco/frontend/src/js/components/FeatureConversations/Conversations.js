@@ -1,4 +1,5 @@
 import Alpine from '../../utils/globals';
+import { ToastType } from '../../models/toastType';
 import api, {
   conversationsMessagesUrl,
   conversationsActivitiesUrl,
@@ -7,7 +8,9 @@ import api, {
   documentUrl,
   documentsUrl,
   editTaskUrl,
+  markTaskNotificationAsVisited,
 } from '../../utils/api';
+import { trackOpenRessource } from '../../utils/trackingMatomo';
 import { formatDateFrench } from '../../utils/date';
 
 Alpine.data('Conversations', (projectId, currentUserId) => ({
@@ -107,26 +110,34 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
       }
     });
   },
-  getMessagesParticipants() {
-    this.messagesParticipants = this.$store.djangoData.recipients.map(
-      (recipient) => ({
-        id: +recipient.id,
-        first_name: recipient.first_name,
-        last_name: recipient.last_name,
-        email: recipient.email,
-        phone_no: recipient.phone_no,
-        last_login: {
-          date: recipient.last_login,
-        },
-        is_active: recipient.is_active,
-        profile: {
-          organization_position: recipient.profile__organization_position,
-          organization: {
-            name: recipient.profile__organization__name,
+  async getMessagesParticipants() {
+    try {
+      const participants = await api.get(
+        conversationsParticipantsUrl(this.projectId)
+      );
+      this.messagesParticipants = [
+        ...participants.data,
+        ...this.$store.djangoData.recipients.map((recipient) => ({
+          id: +recipient.id,
+          first_name: recipient.first_name,
+          last_name: recipient.last_name,
+          email: recipient.email,
+          phone_no: recipient.phone_no,
+          last_login: {
+            date: recipient.last_login,
           },
-        },
-      })
-    );
+          is_active: recipient.is_active,
+          profile: {
+            organization_position: recipient.profile__organization_position,
+            organization: {
+              name: recipient.profile__organization__name,
+            },
+          },
+        })),
+      ];
+    } catch (error) {
+      throw new Error('Failed to get messages participants');
+    }
   },
   async getShortMessageInReplyTo(id) {
     const shortMessage = this.getMessageById(id);
@@ -202,6 +213,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
         this.documents.push(document.data);
         return document.data;
       } catch (error) {
+        // TODO sentry see this error occurs too often
         return null;
       }
     }
@@ -216,9 +228,12 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     }
     return foundContact;
   },
-  async sendFormMessage(message) {
+  async sendFormMessage() {
     if (this.isEditorInEditMode) {
-      await this.onSubmitUpdateMessage(message, this.messageIdToEdit);
+      await this.sendMessage({
+        updateMessage: true,
+        messageIdToEdit: this.messageIdToEdit,
+      });
     } else {
       await this.sendMessage();
     }
@@ -232,41 +247,82 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
       },
     });
   },
-  async sendMessage() {
-    if (this.$store.editor.currentMessageJSON) {
-      let promises = [];
-      const parsedNodesFromEditor = this.$store.editor.parseTipTapContent(
-        this.$store.editor.currentMessageJSON
-      );
-      if (parsedNodesFromEditor.some((node) => node.type === 'DocumentNode')) {
-        promises = parsedNodesFromEditor
-          .filter((node) => node.type === 'DocumentNode')
-          .map((node) => this.uploadFile(node.file));
+  async sendMessage({ updateMessage = false, messageIdToEdit = null } = {}) {
+    if (!this.$store.editor.currentMessageJSON) return;
+
+    const parsedNodesFromEditor = this.$store.editor.parseTipTapContent(
+      this.$store.editor.currentMessageJSON
+    );
+
+    // Only upload files for *new* documents
+    const documentNodesToUpload = parsedNodesFromEditor.filter(
+      (node) => node.type === 'DocumentNode' && !node.document_id && node.file
+    );
+
+    let uploadResponses = [];
+    if (documentNodesToUpload.length > 0) {
+      try {
+        uploadResponses = await Promise.all(
+          documentNodesToUpload.map((node) => this.uploadFile(node.file))
+        );
+      } catch (error) {
+        if (!updateMessage) {
+          throw new Error('Failed to upload documents', { error });
+        } else {
+          throw new Error('Failed to upload documents while updating message', {
+            error,
+          });
+        }
       }
 
-      try {
-        const responseUploadFiles = await Promise.all(promises);
-        parsedNodesFromEditor.forEach((node) => {
-          if (node.type === 'DocumentNode') {
-            node.document_id = responseUploadFiles.shift().data.id;
-          }
-        });
-        const payload = {
-          nodes: parsedNodesFromEditor,
-          in_reply_to: this.messageIdToReply,
-        };
-        const messageResponse = await api.post(
+      documentNodesToUpload.forEach((node, index) => {
+        node.document_id = uploadResponses[index].data.id;
+      });
+    }
+
+    const payload = {
+      nodes: parsedNodesFromEditor,
+      in_reply_to: this.messageIdToReply,
+    };
+
+    try {
+      let messageResponse;
+      if (updateMessage) {
+        messageResponse = await api.patch(
+          conversationsMessageUrl(this.projectId, messageIdToEdit),
+          payload
+        );
+
+        this.updateCountOfElementsInDiscussion(this.oldMessageToEdit, true);
+        this.replaceMessage(messageResponse.data, messageIdToEdit);
+
+        this.oldMessageToEdit = null;
+        this.messageIdToEdit = null;
+        this.isEditorInEditMode = false;
+      } else {
+        messageResponse = await api.post(
           conversationsMessagesUrl(this.projectId),
           payload
         );
-        this.updateCountOfElementsInDiscussion(messageResponse.data);
         this.feed.elements.push({ ...messageResponse.data, type: 'message' });
-        this.$store.editor.clearEditorContent();
-        this.messageIdToReply = null;
         this.isEditorInReplyMode = false;
         this.scrollToNewMessage();
-      } catch (error) {
-        throw new Error('Failed to send message', error);
+      }
+
+      this.$store.editor.clearEditorContent();
+      this.updateCountOfElementsInDiscussion(messageResponse.data);
+      this.messageIdToReply = null;
+    } catch (error) {
+      this.$store.app.displayToastMessage({
+        message: `Erreur lors de ${updateMessage ? 'la modification' : "l'envoi"} du message: ${Object.values(JSON.parse(error.request.responseText)).join(', ')}`,
+        timeout: 5000,
+        type: ToastType.error,
+      });
+
+      if (!updateMessage) {
+        throw new Error('Failed to send message', { cause: error });
+      } else {
+        throw new Error('Failed to update message', { cause: error });
       }
     }
   },
@@ -402,32 +458,15 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
       Alpine.raw(this.$store.editor.editorInstance).commands.clearContent();
     }
   },
-  async onSubmitUpdateMessage(message, messageIdToEdit) {
-    if (this.$store.editor.currentMessageJSON) {
-      const parsedNodesFromEditor = this.$store.editor.parseTipTapContent(
-        this.$store.editor.currentMessageJSON
-      );
-      try {
-        const payload = {
-          nodes: parsedNodesFromEditor,
-          in_reply_to: this.messageIdToReply,
-        };
-        const messageResponse = await api.patch(
-          conversationsMessageUrl(this.projectId, messageIdToEdit),
-          payload
-        );
-        this.updateCountOfElementsInDiscussion(this.oldMessageToEdit, true);
-        this.oldMessageToEdit = null;
-        this.updateCountOfElementsInDiscussion(messageResponse.data);
-        this.replaceMessage(messageResponse.data, messageIdToEdit);
-        this.messageIdToEdit = null;
-        this.messageIdToReply = null;
-        this.isEditorInEditMode = false;
-        this.$store.editor.clearEditorContent();
-      } catch (error) {
-        throw new Error('Failed to update message', error);
+  async onClickRessourceConsummeNotification(taskId) {
+    try {
+      if (!Alpine.store('djangoData').isAdvisor) {
+        await api.post(markTaskNotificationAsVisited(this.projectId, taskId));
       }
+    } catch (error) {
+      throw new Error('Failed to mark task notification as visited', error);
     }
+    trackOpenRessource();
   },
   replaceMessage(message, messageIdToEdit) {
     const messageIndex = this.feed.elements.findIndex(

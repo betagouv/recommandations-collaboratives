@@ -6,6 +6,8 @@ author  : raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created : 2021-05-26 15:56:20 CEST
 """
 
+from datetime import datetime
+
 from actstream import action
 from django.contrib import messages
 from django.contrib.auth import models as auth_models
@@ -573,6 +575,8 @@ def set_project_active(request, project_id: int):
         raise PermissionDenied("L'information demandée n'est pas disponible")
 
     project.reactivate()
+    project.last_manual_reactivation = datetime.now()
+    project.save()
 
     # Action trace
     action.send(

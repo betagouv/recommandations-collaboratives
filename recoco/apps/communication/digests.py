@@ -497,7 +497,13 @@ def send_msg_digest_by_user_and_project(project, user, site, dry_run=False):
     if notifications.count() == 0:
         return 0
 
-    digest = make_msg_digest_by_user_and_project(notifications, user, project, site)
+    try:
+        digest = make_msg_digest_by_user_and_project(notifications, user, project, site)
+    except StopIteration:
+        # in case a message has no node. Should not happen,
+        # but if it does we don't want it to crash the whole command
+        return 0
+
     if not dry_run:
         send_email(
             communication_constants.TPL_MESSAGES_DIGEST,

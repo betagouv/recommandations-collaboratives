@@ -10,11 +10,11 @@ license = { name = "AGPL-v3", file = "LICENSE" }
 
 description = "Recommandations Collaboratives"
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.11,<3.14"
 dependencies = [
     "beautifulsoup4==4.12.3",
     "celery==5.4.0",
-    "django>=5.1.13,<5.2",
+    "django>=5.1.14,<5.2",
     "django-activity-stream",
     "django-admin-csvexport==2.2",
     "django-allauth[mfa,openid,socialaccount]==65.9.0",
@@ -66,7 +66,8 @@ dependencies = [
     "mwclient==0.11.0",
     "pandoc==2.4",
     "pillow==11.3.0",
-    "psycopg[binary]>3",
+    "psycopg[c]>=3.2.12",
+    "python-magic>=0.4.27",
     "redis==5.0.4",
     "requests-html==0.10.0",
     "rest-framework-generic-relations>=2.2.0",
