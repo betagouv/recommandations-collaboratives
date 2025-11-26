@@ -7,6 +7,8 @@ authors: raphael.marvie@beta.gouv.fr, guillaume.libersat@beta.gouv.fr
 created: 2022-12-26 11:54:56 CEST
 """
 
+import json
+
 import pytest
 from actstream.models import Action
 from django.contrib.auth import models as auth_models
@@ -329,12 +331,6 @@ def test_notifications_are_not_dispatched_to_collaborators_if_project_is_inactiv
             "post-data": {},
         },  # project member joined ✓
         {
-            "url-name": "projects-conversation-create-message",
-            "url-args": {"project_id": project.pk},
-            "user": superuser,
-            "post-data": {"content": "this is some content"},
-        },  # public conversation posted ✓
-        {
             "url-name": "projects-documents-upload-document",
             "url-args": {"project_id": project.pk},
             "user": superuser,
@@ -373,28 +369,19 @@ def test_notifications_are_not_dispatched_to_collaborators_if_project_is_inactiv
 
 # -- Implicit reactivation
 @pytest.mark.django_db
-def test_project_is_reactivated_on_conversation_message(request, client, make_project):
-    site = get_current_site(request)
-
-    project = make_project(
-        site=site,
-        status="READY",
-        inactive_since=timezone.now(),
-    )
-
-    url = reverse(
-        "projects-conversation-create-message", kwargs={"project_id": project.pk}
-    )
+def test_project_is_reactivated_on_conversation_message(client, request, project_ready):
+    url = reverse("projects-conversations-messages-list", args=[project_ready.pk])
+    data = {"nodes": [{"text": "toto", "type": "MarkdownNode", "position": 1}]}
 
     with login(client) as owner:
-        assign_collaborator(owner, project, is_owner=True)
-        response = client.post(url, data={"content": "this is some content"})
+        assign_collaborator(owner, project_ready, is_owner=True)
+        response = client.post(url, json.dumps(data), content_type="application/json")
 
-    assert response.status_code == 302
+    assert response.status_code == 201
 
-    project.refresh_from_db()
+    project_ready.refresh_from_db()
 
-    assert project.inactive_since is None
+    assert project_ready.inactive_since is None
 
 
 @pytest.mark.django_db

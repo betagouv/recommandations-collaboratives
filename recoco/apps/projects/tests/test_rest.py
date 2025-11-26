@@ -24,6 +24,7 @@ from notifications.signals import notify
 from pytest_django.asserts import assertContains
 
 from recoco import verbs
+from recoco.apps.conversations import models as conversations_models
 from recoco.apps.tasks import models as tasks_models
 from recoco.utils import login
 
@@ -92,13 +93,13 @@ def test_project_list_includes_only_projects_in_switchtender_departments(
     )
 
     # a public note with notification
-    pub_note = baker.make(models.Note, public=True, project=project)
-    verb = verbs.Conversation.PUBLIC_MESSAGE
+    message = baker.make(conversations_models.Message, project=project, posted_by=user)
+    verb = verbs.Conversation.POST_MESSAGE
     notify.send(
         sender=user,
         recipient=user,
         verb=verb,
-        action_object=pub_note,
+        action_object=message,
         target=project,
         public=False,  # only appear on crm stream
     )
@@ -447,13 +448,13 @@ def create_project_with_notifications(site, user, make_project):
     )
 
     # a public note with notification
-    pub_note = baker.make(models.Note, public=True, project=project)
-    verb = verbs.Conversation.PUBLIC_MESSAGE
+    message = baker.make(conversations_models.Message, project=project, posted_by=user)
+    verb = verbs.Conversation.POST_MESSAGE
     notify.send(
         sender=user,
         recipient=user,
         verb=verb,
-        action_object=pub_note,
+        action_object=message,
         target=project,
         public=False,  # only appear on crm stream
     )
@@ -718,13 +719,13 @@ def test_user_project_status_contains_only_my_projects(
         models.ProjectSwitchtender, site=site, switchtender=user, project=project
     )
     # a public note with notification for myself
-    pub_note = baker.make(models.Note, public=True, project=mine.project)
-    verb = verbs.Conversation.PUBLIC_MESSAGE
+    message = baker.make(conversations_models.Message, project=project, posted_by=user)
+    verb = verbs.Conversation.POST_MESSAGE
     notify.send(
         sender=user,
         recipient=user,
         verb=verb,
-        action_object=pub_note,
+        action_object=message,
         target=project,
         public=False,  # only appear on crm stream
     )

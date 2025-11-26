@@ -59,7 +59,7 @@ def unread_notifications_processor(request):
         verbs.Document.ADDED_LINK,
         verbs.Recommendation.COMMENTED,
         verbs.Recommendation.CREATED,
-        verbs.Conversation.PUBLIC_MESSAGE,
+        verbs.Conversation.POST_MESSAGE,
         verbs.Conversation.PRIVATE_MESSAGE,
         verbs.Survey.STARTED,
         verbs.Survey.UPDATED,
