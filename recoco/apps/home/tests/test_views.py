@@ -81,7 +81,7 @@ def test_get_current_site_sender_without_configuration(request):
 
 
 @pytest.mark.django_db
-def test_create_user_requires_8characters_password(client, request):
+def test_create_user_requires_10characters_password(client, request):
     data = {
         "first_name": "Test",
         "last_name": "test",
@@ -89,8 +89,8 @@ def test_create_user_requires_8characters_password(client, request):
         "organization_position": "test",
         "email": "kkkd@kdkdk.fr",
         "phone_no": "0303003033",
-        "password1": "1234567",
-        "password2": "1234567",
+        "password1": "123456789",
+        "password2": "123456789",
     }
     response = client.post(reverse("account_signup"), data)
     assert response.status_code == 200
