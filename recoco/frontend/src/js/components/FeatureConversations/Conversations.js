@@ -4,6 +4,7 @@ import api, {
   conversationsMessagesUrl,
   conversationsActivitiesUrl,
   contactUrl,
+  conversationsParticipantsUrl,
   conversationsMessageUrl,
   documentUrl,
   documentsUrl,
