@@ -34,22 +34,6 @@
                     {% else %}
                         <a class="d-inline text-decoration-none hover-underline text-dark fw-bold"
                            href="{{ action.action_object.get_absolute_url }}">{{ action.verb }} {{ action.action_object.feed_label }}</a>
-                        {% if action.target %}
-                            <div class="d-inline-block">
-                                <svg class="bi fr-mr-1v flex-shrink-0"
-                                     width="14"
-                                     height="14"
-                                     fill="currentColor">
-                                    <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#folder-fill" />
-                                </svg>
-                                {% if action.target.get_absolute_url %}
-                                    <a class="text-decoration-none hover-underline text-dark"
-                                       href="{{ action.target.get_absolute_url }}">{{ action.target }}</a>
-                                {% else %}
-                                    {{ action.target }}
-                                {% endif %}
-                            </div>
-                        {% endif %}
                         {% if action.description %}<div class="d-inline-block">{{ action.description }}</div>{% endif %}
                     {% endif %}
                 </span>
