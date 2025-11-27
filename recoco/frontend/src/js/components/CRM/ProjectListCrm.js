@@ -1,5 +1,6 @@
 import Alpine from 'alpinejs';
 import api, { projectsUrl } from '../../utils/api';
+import { ToastType } from '../../models/toastType';
 
 Alpine.data('ProjectListCrm', (departments, regions) => ({
   projects: null,
@@ -59,7 +60,6 @@ Alpine.data('ProjectListCrm', (departments, regions) => ({
   async updateProject(projectToUpdate, url, data) {
     let formData = new FormData();
     for (let key in data) {
-      console.log(key, data[key]);
       formData.append(key, data[key]);
     }
     try {
@@ -82,9 +82,38 @@ Alpine.data('ProjectListCrm', (departments, regions) => ({
 
       this.projects.splice(updatedProjectIndex, 1, updatedProject);
       this.projects = [...this.projects];
+      this.showToast(
+        this.getToastMessage(projectToUpdate, data),
+        ToastType.success
+      );
     } catch (error) {
+      this.showToast(
+        'Erreur lors de la mise à jour des paramètres du projet',
+        ToastType.error
+      );
       throw new Error('Error while updating project param', error);
     }
+  },
+  getToastMessage(projectToUpdate, dataToUpdate) {
+    if (dataToUpdate.statistics === projectToUpdate.exclude_stats) {
+      if (dataToUpdate.statistics) {
+        return 'Le projet apparaitra dans les statistics';
+      } else {
+        return "Le projet n'apparaitra pas dans les statistics";
+      }
+    } else if (dataToUpdate.notifications === projectToUpdate.muted) {
+      if (dataToUpdate.notifications) {
+        return 'Les notifications sont activées pour le projet';
+      } else {
+        return 'Les notifications sont désactivées pour le projet';
+      }
+    }
+  },
+  showToast(message, type) {
+    this.$store.app.notification.message = message;
+    this.$store.app.notification.timeout = 5000;
+    this.$store.app.notification.isOpen = true;
+    this.$store.app.notification.type = type || ToastType.error;
   },
   projectsCountLabel() {
     if (this.projectsTotal > 0) {
