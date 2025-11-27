@@ -1,6 +1,5 @@
 import Alpine from 'alpinejs';
 import api, { projectsUrl } from '../../utils/api';
-import htmx from 'htmx.org';
 
 Alpine.data('ProjectListCrm', (departments, regions) => ({
   projects: null,
@@ -13,6 +12,11 @@ Alpine.data('ProjectListCrm', (departments, regions) => ({
     searchDepartment: [],
   },
   searchText: '',
+  pagination: {
+    currentPage: 1,
+    limit: 42,
+    total: 0,
+  },
   async init() {
     await this.getProjects();
   },
@@ -30,7 +34,7 @@ Alpine.data('ProjectListCrm', (departments, regions) => ({
   async handleProjectSearch() {
     const projects = await api.get(
       projectsUrl({
-        limit: 42,
+        limit: this.pagination.limit,
         offset: 0,
         page: 1,
         search: this.backendSearch.searchText,
@@ -39,6 +43,9 @@ Alpine.data('ProjectListCrm', (departments, regions) => ({
     );
     this.projects = projects.data.results;
     this.projectsTotal = projects.data.count;
+    this.pagination.total = Math.ceil(
+      projects.data.count / this.pagination.limit
+    );
   },
   async saveSelectedDepartment(event) {
     if (!event.detail) return;
@@ -49,31 +56,35 @@ Alpine.data('ProjectListCrm', (departments, regions) => ({
   async onSearch() {
     await this.handleProjectSearch();
   },
-  async updateProject(projectId, url, data) {
-    htmx.ajax('POST', url, {
-      values: data,
-      headers: {
-        'X-CSRFToken': document.querySelector('[name="csrfmiddlewaretoken"]')
-          .value,
-      },
-      swap: 'innerHTML',
-    });
+  async updateProject(projectToUpdate, url, data) {
+    let formData = new FormData();
+    for (let key in data) {
+      console.log(key, data[key]);
+      formData.append(key, data[key]);
+    }
+    try {
+      await fetch(url, {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'X-CSRFToken': document.querySelector('[name="csrfmiddlewaretoken"]')
+            .value,
+        },
+      });
+      const updatedProject = {
+        ...projectToUpdate,
+        exclude_stats: !data.statistics,
+        muted: !data.notifications,
+      };
+      const updatedProjectIndex = this.projects.findIndex(
+        (x) => x.id === projectToUpdate.id
+      );
 
-    // try {
-    //   const response = await api.patch(projectUrl(projectId), data);
-    //   let index = this.projects.findIndex(
-    //     (project) => project.id === projectId
-    //   );
-    //   if (index !== -1) {
-    //     this.projects[index] = {
-    //       ...this.projects[index],
-    //       ...response.data.exclude_stats,
-    //       ...response.data.muted,
-    //     };
-    //   }
-    // } catch (error) {
-    //   console.error(error);
-    // }
+      this.projects.splice(updatedProjectIndex, 1, updatedProject);
+      this.projects = [...this.projects];
+    } catch (error) {
+      throw new Error('Error while updating project param', error);
+    }
   },
   projectsCountLabel() {
     if (this.projectsTotal > 0) {

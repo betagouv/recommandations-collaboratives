@@ -38,6 +38,11 @@
             <div class="project-list-crm__filters fr-px-5v fr-pt-5v">
                 {% include "projects/project/fragments/search_bar.html" with action_search="onSearch" x_model="backendSearch.searchText" placeholder="Rechercher commune, #tag, nom du dossier..." %}
                 {% include "projects/project/fragments/departments_selector.html" with label="Projets de mon territoire" filter_by_regions=True zone_objects="regions" select_all=True %}
+                <div x-data="{options: [{value: 'te_1', text: 'Arsenal', search: 'Arsenal'}, {value: 'te_2', text: 'Spurs', search: 'Spurs'}, {value: 'te_3', text: 'Man City', search: 'Man City'}]}"
+                     class="d-flex align-items-center">
+                    <span class="fr-mr-2v">Statut:</span>
+                    {% include "tools/multi_select.html" %}
+                </div>
                 <button class="fr-btn fr-btn--sm no-wrap" title="Télécharger en CSV">🚧Télécharger en CSV</button>
                 {% comment %} {% with projects.form as form %}
                     <form x-data="" class="row g-3" method="get" action="{% url 'crm-project-list' %}">
@@ -113,7 +118,7 @@
                                 <td>
                                     <!-- inclure dans les statistiques -->
                                     <template x-if="project.exclude_stats">
-                                        <button @click="updateProject(project.id, '{% url 'crm-project-update' 0 %}'.replace('0', project.id), { exclude_stats: false })"
+                                        <button @click="updateProject(project, '{% url 'crm-project-update' 0 %}'.replace('0', project.id), { statistics: true, notifications: !project.muted })"
                                                 data-bs-toggle="tooltip"
                                                 data-bs-title="Inclure dans les statistiques"
                                                 data-bs-placement="top"
@@ -124,7 +129,7 @@
                                         </button>
                                     </template>
                                     <template x-if="!project.exclude_stats">
-                                        <button @click="updateProject(project.id, '{% url 'crm-project-update' 0 %}'.replace('0', project.id), { exclude_stats: true })"
+                                        <button @click="updateProject(project, '{% url 'crm-project-update' 0 %}'.replace('0', project.id), { statistics: false, notifications: !project.muted })"
                                                 data-bs-toggle="tooltip"
                                                 data-bs-title="Exclure des statistiques"
                                                 data-bs-placement="top"
@@ -134,7 +139,7 @@
                                     </template>
                                     <!-- activer/couper les notifs -->
                                     <template x-if="project.muted">
-                                        <button @click="updateProject(project.id, '{% url 'crm-project-update' 0 %}'.replace('0', project.id), { muted: false })"
+                                        <button @click="updateProject(project, '{% url 'crm-project-update' 0 %}'.replace('0', project.id), { statistics: !project.exclude_stats, notifications: true })"
                                                 data-bs-toggle="tooltip"
                                                 data-bs-title="Activer les notifications"
                                                 data-bs-placement="top"
@@ -142,7 +147,7 @@
                                                 title="Activer les notifications">Activer les notifications</button>
                                     </template>
                                     <template x-if="!project.muted">
-                                        <button @click="updateProject(project.id, '{% url 'crm-project-update' 0 %}'.replace('0', project.id), { muted: true })"
+                                        <button @click="updateProject(project, '{% url 'crm-project-update' 0 %}'.replace('0', project.id), { statistics: !project.exclude_stats, notifications: false })"
                                                 data-bs-toggle="tooltip"
                                                 data-bs-title="Désactiver les notifications"
                                                 data-bs-placement="top"
@@ -173,6 +178,7 @@
                         </template>
                     </tbody>
                 </table>
+                {% include "tools/pagination.html" with page=pagination.page total_pages=pagination.total %}
             </div>
         </div>
     </div>
