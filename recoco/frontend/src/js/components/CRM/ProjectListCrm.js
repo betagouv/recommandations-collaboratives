@@ -3,7 +3,8 @@ import api, { projectsUrl } from '../../utils/api';
 import { ToastType } from '../../models/toastType';
 
 Alpine.data('ProjectListCrm', (departments, regions) => ({
-  projects: null,
+  projects: [],
+  projectsToDisplay: [],
   projectsTotal: 0,
   departments: JSON.parse(departments.textContent),
   regions: JSON.parse(regions.textContent),
@@ -19,17 +20,30 @@ Alpine.data('ProjectListCrm', (departments, regions) => ({
     total: 0,
   },
   async init() {
-    await this.getProjects();
+    const projectsResponse = await this.getProjects();
+    this.projects.push(...projectsResponse.results);
+    this.projectsToDisplay = [...this.projects];
+    this.projectsTotal = projectsResponse.count;
+    this.pagination.total = Math.ceil(
+      projectsResponse.count / this.pagination.limit
+    );
   },
-  async getProjects() {
+  async getProjects({ offset = 0, page = 1 } = {}) {
     try {
       const response = await api.get(
-        projectsUrl({ limit: 42, offset: 0, page: 1 })
+        projectsUrl({
+          limit: this.pagination.limit,
+          offset: offset,
+          page: page,
+        })
       );
-      this.projects = response.data.results;
-      this.projectsTotal = response.data.count;
+      return response.data;
     } catch (error) {
-      console.error(error);
+      this.showToast(
+        `Erreur lors de la récupération des projets de la page ${page}`,
+        ToastType.error
+      );
+      throw new Error(`Error while getting projects from page ${page}`, error);
     }
   },
   async handleProjectSearch() {
@@ -47,6 +61,33 @@ Alpine.data('ProjectListCrm', (departments, regions) => ({
     this.pagination.total = Math.ceil(
       projects.data.count / this.pagination.limit
     );
+  },
+  async onChangePage(pageNumber) {
+    if (this.projects.length <= this.pagination.limit * (pageNumber - 1)) {
+      const projectsResponse = await this.getProjects({
+        offset: this.pagination.limit * (pageNumber - 1),
+        page: pageNumber,
+      });
+      this.projects.push(...projectsResponse.results);
+    }
+    this.projectsToDisplay = [...this.projects].slice(
+      this.pagination.limit * (pageNumber - 1),
+      this.pagination.limit * pageNumber
+    );
+    this.pagination.currentPage = pageNumber;
+  },
+  async handleChangePage(pageNumber) {
+    const projects = await api.get(
+      projectsUrl({
+        limit: this.pagination.limit,
+        offset: 0,
+        page: 1,
+        search: this.backendSearch.searchText,
+        departments: this.backendSearch.searchDepartment,
+      })
+    );
+    this.projects.push(...projects.data.results);
+    this.pagination.currentPage = pageNumber;
   },
   async saveSelectedDepartment(event) {
     if (!event.detail) return;

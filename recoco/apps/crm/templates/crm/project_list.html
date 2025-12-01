@@ -91,7 +91,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <template x-for="project in projects">
+                        <template x-for="project in projectsToDisplay" :key="project.id">
                             <tr>
                                 <td>
                                     <a class="fr-link project-table__project-name"
