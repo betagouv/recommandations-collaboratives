@@ -96,20 +96,46 @@
     }
 }
 
+@media screen and (max-height: 600px) {
+    .onboarding-tutorial__button {
+        width: 54px;
+        height: 54px;
+    }
+    .onboarding-tutorial {
+        &--with-crisp-chat {
+            right: 15px;
+            bottom: 80px;
+        }
+    }
+}
+
 @media screen and (max-width: 1465px) {
     .onboarding-tutorial {
         &--with-crisp-chat {
-            right: 75px;
-            bottom: 10px;
+            right: 90px;
+            bottom: 20px;
         }
         &__popup--with-crisp-chat {
-            right: 150px;
-            bottom: 10px;
-            //width: 90vw;
+            right: 160px;
+            bottom: 20px;
         }
         &__close-button {
-            right: 155px;
+            right: 165px;
         }
     }
-
+}
+@media screen and (max-width: 1465px) and (max-height: 600px) {
+    .onboarding-tutorial {
+        &--with-crisp-chat {
+            right: 80px;
+            bottom: 15px;
+        }
+        &__popup--with-crisp-chat {
+            right: 145px;
+            bottom: 15px;
+        }
+        &__close-button {
+            right: 150px;
+        }
+    }
 }

@@ -74,13 +74,13 @@ Parameters:
                     x-bind:disabled="!isActive('link', updatedAt)">Détacher un lien</button>
         </div>
     </template>
-    <div class="position-relative">
+    <div class="">
         {% comment %} {% if can_compress_editor %}
             <div class="button-attachment-container">
                 <button class="fr-btn fr-btn--sm fr-icon-attachment-2" type="button" @click.stop="onClickHandleAttachment">Rédiger avec une pièce jointe</button>
             </div>
         {% endif %} {% endcomment %}
-        <div class="tiptap-editor {% if wide %}is-wide{% endif %}"
+        <div class="tiptap-editor position-relative {% if wide %}is-wide{% endif %}"
              :class="{'visual-hint': $store.tutorialsEvents.isTutorialForProjectPage==3.5}"
              data-test-id="tiptap-editor-content"
              x-ref="element"
@@ -93,7 +93,7 @@ Parameters:
                 <svg class="hint-border z-1002" aria-hidden="true" viewBox="0 0 100 10" preserveAspectRatio="none">
                     <!-- Outer rect path; vector-effect keeps thickness constant -->
                     <rect
-                      x="0.5" y="0.5" width="99" height="6"
+                      x="0.5" y="0.5" width="99" height="8"
                       fill="none"
                       stroke="var(--vh-color)"
                       stroke-width="var(--vh-thickness)"
