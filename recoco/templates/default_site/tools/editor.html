@@ -74,7 +74,7 @@ Parameters:
                     x-bind:disabled="!isActive('link', updatedAt)">Détacher un lien</button>
         </div>
     </template>
-    <div class="">
+    <div>
         {% comment %} {% if can_compress_editor %}
             <div class="button-attachment-container">
                 <button class="fr-btn fr-btn--sm fr-icon-attachment-2" type="button" @click.stop="onClickHandleAttachment">Rédiger avec une pièce jointe</button>
@@ -90,10 +90,10 @@ Parameters:
                 {% include "projects/project/fragments/onboarding-tutorials/visual-hint.html" %}
              </template>
              <template x-if="$store.tutorialsEvents.isTutorialForProjectPage==3.5">
-                <svg class="hint-border z-1002" aria-hidden="true" viewBox="0 0 100 10" preserveAspectRatio="none">
+                <svg class="hint-border-over z-1002" aria-hidden="true" viewBox="0 0 100 10" preserveAspectRatio="none">
                     <!-- Outer rect path; vector-effect keeps thickness constant -->
                     <rect
-                      x="0.5" y="0.5" width="99" height="8"
+                      x="0.1" y="0.3" width="99.7" height="9.2"
                       fill="none"
                       stroke="var(--vh-color)"
                       stroke-width="var(--vh-thickness)"
