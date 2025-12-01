@@ -95,3 +95,21 @@
 
     }
 }
+
+@media screen and (max-width: 1465px) {
+    .onboarding-tutorial {
+        &--with-crisp-chat {
+            right: 75px;
+            bottom: 10px;
+        }
+        &__popup--with-crisp-chat {
+            right: 150px;
+            bottom: 10px;
+            //width: 90vw;
+        }
+        &__close-button {
+            right: 155px;
+        }
+    }
+
+}
