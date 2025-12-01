@@ -288,25 +288,47 @@
                 @click="if ($store.tutorialsEvents.isTutorialForProjectPage === 4) { localStorage.setItem('isTutorialForProjectPage', 4.5) };">
             <a href="{% url 'projects-project-administration' project.pk %}#user-management">Inviter</a>
         </button>
-        <template x-if="$store.tutorialsEvents.isTutorialForProjectPage === 4">
-            {% include "projects/project/fragments/onboarding-tutorials/visual-hint.html" %}
-        </template>
-        <template x-if="$store.tutorialsEvents.isTutorialForProjectPage === 4">
-            <svg class="hint-border-over" aria-hidden="true" viewBox="0 0 100 100" preserveAspectRatio="none">
-                <!-- Outer rect path; vector-effect keeps thickness constant -->
-                <rect
-                  x="30" y="35" width="50" height="50"
-                  fill="none"
-                  stroke="var(--vh-color)"
-                  stroke-width="var(--vh-thickness)"
-                  vector-effect="non-scaling-stroke"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-dasharray="14 6 5 10 18 7 9 5 12 8"
-                  style="animation: vh-dash var(--vh-speed) linear infinite;"
-                />
-              </svg>
-        </template>
+        {% if "use_crm" in user_site_perms and not disable_crm %}
+            <template x-if="$store.tutorialsEvents.isTutorialForProjectPage === 4">
+                {% include "projects/project/fragments/onboarding-tutorials/visual-hint.html" with extra_classes='position-visual-circle-hint--if-crm-chat' %}
+            </template>
+            <template x-if="$store.tutorialsEvents.isTutorialForProjectPage === 4">
+                <svg class="hint-border-over" aria-hidden="true" viewBox="0 0 100 100" preserveAspectRatio="none">
+                    <!-- Outer rect path; vector-effect keeps thickness constant -->
+                    <rect
+                    x="57" y="35" width="31" height="50"
+                    fill="none"
+                    stroke="var(--vh-color)"
+                    stroke-width="var(--vh-thickness)"
+                    vector-effect="non-scaling-stroke"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-dasharray="14 6 5 10 18 7 9 5 12 8"
+                    style="animation: vh-dash var(--vh-speed) linear infinite;"
+                    />
+                </svg>
+            </template>
+        {% else %}
+            <template x-if="$store.tutorialsEvents.isTutorialForProjectPage === 4">
+                {% include "projects/project/fragments/onboarding-tutorials/visual-hint.html" %}
+            </template>
+            <template x-if="$store.tutorialsEvents.isTutorialForProjectPage === 4">
+                <svg class="hint-border-over" aria-hidden="true" viewBox="0 0 100 100" preserveAspectRatio="none">
+                    <!-- Outer rect path; vector-effect keeps thickness constant -->
+                    <rect
+                    x="30" y="35" width="50" height="50"
+                    fill="none"
+                    stroke="var(--vh-color)"
+                    stroke-width="var(--vh-thickness)"
+                    vector-effect="non-scaling-stroke"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-dasharray="14 6 5 10 18 7 9 5 12 8"
+                    style="animation: vh-dash var(--vh-speed) linear infinite;"
+                    />
+                </svg>
+            </template>
+        {% endif %}
     </div>
     {% if "list_projects" in user_site_perms or 'use_private_notes' in user_project_perms %}
         <div class="project-navigation__container-btn-role-selection"

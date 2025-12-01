@@ -94,6 +94,13 @@
         transform: translate(-15px, -45px);
 
     }
+    &--if-crm-chat {
+        transform: translate(72px, -15px);
+    }
+}
+
+.inset-0 {
+    inset:0;
 }
 
 @media screen and (max-height: 600px) {
