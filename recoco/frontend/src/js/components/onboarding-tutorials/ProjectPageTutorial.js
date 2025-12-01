@@ -9,9 +9,6 @@ Alpine.data('ProjectPageTutorial', () => {
     challenges: [],
     firstChallengeNotAcquired: null,
     async init() {
-      if( localStorage.getItem('projectPageTutorialPopupOpen') === 'true' ) {
-        this.$store.tutorialsEvents.isTutorialPopupOpen = true;
-      }
       const challengesName = [
         'project-page-tutorial-part1',
         'project-page-tutorial-part2',
@@ -42,6 +39,9 @@ Alpine.data('ProjectPageTutorial', () => {
             this.challengesStatus.push('not-acquired');
           }
         }
+      }
+      if( localStorage.getItem('projectPageTutorialPopupOpen') === 'true' || localStorage.getItem('projectPageTutorialPopupOpen') === null ) {
+        this.$store.tutorialsEvents.isTutorialPopupOpen = true;
       }
       // Watch for completion of step 1 triggered on role selection validation
       this.$watch(
