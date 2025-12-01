@@ -16,7 +16,7 @@
     {% vite_asset 'js/store/projectQueue.js' %}
     {% vite_asset 'js/components/ExpandableMenuHandler.js' %}
     {% vite_asset 'js/store/showRole.js' %}
-    {% vite_asset 'js/store/tutorialsEvents.js' %}
+    {% comment %} {% vite_asset 'js/store/tutorialsEvents.js' %} {% endcomment %}
 {% endblock js %}
 {% get_obj_perms request.user for request.site as "user_site_perms" %}
 {% get_obj_perms request.user for project as "user_project_perms" %}
@@ -319,7 +319,7 @@
                     data-test-id="select-observer-or-advisor-button"
                     class="fr-btn fr-btn--tertiary-no-outline fr-icon-team-line {% if advising_position.is_advisor or advising_position.is_observer %}fr-pr-25v{% else %}fr-pr-28v{% endif %}"
                     :class="{'visual-hint': $store.tutorialsEvents.isTutorialForProjectPage === 1}"
-                    @click="if ($store.tutorialsEvents.isTutorialForProjectPage==1) { $store.tutorialsEvents.isTutorialForProjectPage=1.5 };">
+                    @click="if ($store.tutorialsEvents.isTutorialForProjectPage==1) { $store.tutorialsEvents.isTutorialForProjectPage=1.5; } if ($store.tutorialsEvents.isTutorialPopupOpen) { $store.tutorialsEvents.wasOpen=true; $store.tutorialsEvents.isTutorialPopupOpen = false; }">
                 {% if advising_position.is_advisor or advising_position.is_observer %}
                     Quitter
                 {% else %}
@@ -353,7 +353,11 @@
                                     {% else %}
                                         <p class="fr-mb-0 text-modal-title">Rejoindre le dossier</p>
                                     {% endif %}
-                                    <button aria-controls="modal-action" title="Fermer" type="button" class="fr-btn--close fr-btn"></button>
+                                    <button aria-controls="modal-action"
+                                            title="Fermer"
+                                            type="button"
+                                            class="fr-btn--close fr-btn"
+                                            @click="if ($store.tutorialsEvents.wasOpen) { $store.tutorialsEvents.isTutorialPopupOpen = true; $store.tutorialsEvents.wasOpen = false; }"></button>
                                 </div>
                                 <div class="fr-modal__content fr-p-3v fr-mb-0">
                                     <h3 id="modal-action-title" class="fr-modal__title text-modal-main-msg fr-mb-0">
@@ -378,7 +382,10 @@
                                             <button class="fr-btn fr-btn--sm fr-btn--tertiary fr-mr-5v border-none border-radius-1px"
                                                     aria-controls="modal-action"
                                                     title="Fermer"
-                                                    type="button">Annuler</button>
+                                                    type="button"
+                                                    @click="if ($store.tutorialsEvents.wasOpen) { $store.tutorialsEvents.isTutorialPopupOpen = true; $store.tutorialsEvents.wasOpen = false; }">
+                                                Annuler
+                                            </button>
                                             <form method="post"
                                                 class="fr-m-auto w-100"
                                                 action="{% url 'projects-project-access-advisor-delete' project.pk request.user.username %}">
@@ -392,14 +399,17 @@
                                             <button class="fr-btn fr-btn--sm fr-btn--tertiary fr-mr-5v border-none border-radius-1px"
                                                     aria-controls="modal-action"
                                                     title="Fermer"
-                                                    type="button">Annuler</button>
+                                                    type="button"
+                                                    @click="if ($store.tutorialsEvents.wasOpen) { $store.tutorialsEvents.isTutorialPopupOpen = true; $store.tutorialsEvents.wasOpen = false; }">
+                                                Annuler
+                                            </button>
                                             <form method="post"
                                                   class="fr-m-auto w-100"
                                                   action="{% url 'projects-project-switchtender-join' project.pk %}">
                                                 {% csrf_token %}
                                                 <button class="fr-btn fr-btn--sm w-100 justify-content-center"
                                                         :class="{'visual-hint': $store.tutorialsEvents.isTutorialForProjectPage === 1.5}"
-                                                        @click="if ($store.tutorialsEvents.isTutorialForProjectPage==1.5) { $store.tutorialsEvents.isTutorialForProjectPageOneCompleted=true; }"
+                                                        @click="if ($store.tutorialsEvents.isTutorialForProjectPage==1.5) { $store.tutorialsEvents.isTutorialForProjectPageOneCompleted=true; } if ($store.tutorialsEvents.wasOpen) { $store.tutorialsEvents.wasOpen=false; localStorage.setItem('projectPageTutorialPopupOpen', true); }"
                                                         data-test-id="button-become-advisor">Rejoindre le dossier</button>
                                                 <template x-if="$store.tutorialsEvents.isTutorialForProjectPage === 1.5">
                                                     {% include "projects/project/fragments/onboarding-tutorials/visual-hint.html" with extra_classes="position-visual-circle-hint--45px-y" %}
@@ -408,7 +418,7 @@
                                                     <svg class="hint-border-over" aria-hidden="true" viewBox="0 0 100 100" preserveAspectRatio="none">
                                                         <!-- Outer rect path; vector-effect keeps thickness constant -->
                                                         <rect
-                                                        x="38.6" y="38" width="24.6" height="36.5"
+                                                        x="32" y="82" width="66.5" height="15.5"
                                                         fill="none"
                                                         stroke="var(--vh-color)"
                                                         stroke-width="var(--vh-thickness)"

@@ -8,10 +8,9 @@ Alpine.data('ProjectPageTutorial', () => {
     challengesStatus: [],
     challenges: [],
     firstChallengeNotAcquired: null,
-    isTutorialPopupOpen: true,
     async init() {
       if( localStorage.getItem('projectPageTutorialPopupOpen') === 'true' ) {
-        this.isTutorialPopupOpen = true;
+        this.$store.tutorialsEvents.isTutorialPopupOpen = true;
       }
       const challengesName = [
         'project-page-tutorial-part1',
@@ -165,11 +164,11 @@ Alpine.data('ProjectPageTutorial', () => {
       }
     },
     handleTutorialPopup() {
-      this.isTutorialPopupOpen = !this.isTutorialPopupOpen;
-      localStorage.setItem('projectPageTutorialPopupOpen', this.isTutorialPopupOpen);
+      this.$store.tutorialsEvents.isTutorialPopupOpen = !this.$store.tutorialsEvents.isTutorialPopupOpen;
+      localStorage.setItem('projectPageTutorialPopupOpen', this.$store.tutorialsEvents.isTutorialPopupOpen);
     },
     handleCloseTutorialPopup() {
-      this.isTutorialPopupOpen = false;
+      this.$store.tutorialsEvents.isTutorialPopupOpen = false;
       localStorage.setItem('projectPageTutorialPopupOpen', 'false');
     },
   };
