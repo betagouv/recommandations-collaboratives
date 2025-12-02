@@ -9,6 +9,7 @@ created: 2021-06-01 10:11:56 CEST
 
 import csv
 import io
+import json
 
 import pytest
 from django.contrib.auth import models as auth
@@ -1442,51 +1443,6 @@ def test_project_list_excludes_non_site_projects_for_user(make_project):
     assert result == [project]
 
 
-#################################################################
-# Activity flags
-#################################################################
-@pytest.mark.django_db
-def test_last_members_activity_is_updated_by_public_comment_from_member(
-    client, request, project
-):
-    url = reverse(
-        "projects-conversation-create-message", kwargs={"project_id": project.pk}
-    )
-
-    before_update = timezone.now()
-
-    with login(client) as owner:
-        utils.assign_collaborator(owner, project, is_owner=True)
-        response = client.post(url, data={"content": "this is some content"})
-
-    assert response.status_code == 302
-
-    project.refresh_from_db()
-
-    assert project.last_members_activity_at > before_update
-
-
-@pytest.mark.django_db
-def test_last_members_activity_not_updated_by_public_comment_from_advisor(
-    client, request, project
-):
-    url = reverse(
-        "projects-conversation-create-message", kwargs={"project_id": project.pk}
-    )
-
-    before_update = timezone.now()
-
-    with login(client) as user:
-        utils.assign_advisor(user, project)
-        response = client.post(url, data={"content": "this is some content"})
-
-    assert response.status_code == 302
-
-    project.refresh_from_db()
-
-    assert project.last_members_activity_at < before_update
-
-
 @pytest.mark.django_db
 def test_last_members_activity_is_updated_by_document_upload_from_member(
     client, request, project
@@ -1509,6 +1465,44 @@ def test_last_members_activity_is_updated_by_document_upload_from_member(
     project.refresh_from_db()
 
     assert project.last_members_activity_at > before_update
+
+
+@pytest.mark.django_db
+def test_last_members_activity_is_updated_by_member_message(
+    client, request, project_ready
+):
+    url = reverse("projects-conversations-messages-list", args=[project_ready.pk])
+    data = {"nodes": [{"text": "toto", "type": "MarkdownNode", "position": 1}]}
+
+    before_update = timezone.now()
+    with login(client) as owner:
+        utils.assign_collaborator(owner, project_ready, is_owner=True)
+        response = client.post(url, json.dumps(data), content_type="application/json")
+
+    assert response.status_code == 201
+
+    project_ready.refresh_from_db()
+
+    assert project_ready.last_members_activity_at > before_update
+
+
+@pytest.mark.django_db
+def test_last_members_activity_is_not_updated_by_advisor_message(
+    client, request, project_ready
+):
+    url = reverse("projects-conversations-messages-list", args=[project_ready.pk])
+    data = {"nodes": [{"text": "toto", "type": "MarkdownNode", "position": 1}]}
+
+    before_update = timezone.now()
+    with login(client) as advisor:
+        utils.assign_advisor(advisor, project_ready)
+        response = client.post(url, json.dumps(data), content_type="application/json")
+
+    assert response.status_code == 201
+
+    project_ready.refresh_from_db()
+
+    assert project_ready.last_members_activity_at < before_update
 
 
 @pytest.mark.django_db

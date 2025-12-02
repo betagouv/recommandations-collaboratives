@@ -129,7 +129,13 @@ def test_send_brevo_email_creates_transaction(mocker, request):
 
     template = baker.make(models.EmailTemplate, name="a template", site=current_site)
 
-    user1 = Recipe(auth.User, username="Bob", first_name="Bobi", last_name="Joe").make()
+    user1 = Recipe(
+        auth.User,
+        username="Bob",
+        email="bob@joe.com",
+        first_name="Bobi",
+        last_name="Joe",
+    ).make()
     user1.profile.sites.add(current_site)
 
     recipients = [{"name": user1.username, "email": user1.email}]

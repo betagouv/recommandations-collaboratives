@@ -1,5 +1,7 @@
 import sib_api_v3_sdk as brevo_sdk
 from django.conf import settings
+from django.core.exceptions import ValidationError
+from django.core.validators import validate_email
 
 
 class Brevo:
@@ -20,6 +22,14 @@ class Brevo:
     def send_email(self, template_id, recipients, params=None, test=False):
         if not isinstance(recipients, list):
             recipients = [recipients]
+
+        # Check email adresses
+        for recipient in recipients:
+            email = recipient if isinstance(recipient, str) else recipient["email"]
+            try:
+                validate_email(email)
+            except ValidationError as e:
+                raise ValidationError(f"Incorrect email address: {email}") from e
 
         if test:
             send_test_email = (

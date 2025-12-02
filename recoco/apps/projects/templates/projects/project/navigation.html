@@ -90,7 +90,6 @@
                         </template>
                     </div>
                 {% endif %}
-                {% flag "conversations_new" %}
                 <div class="fr-segmented__element"
                     :class="{'visual-hint': $store.tutorialsEvents.isTutorialForProjectPage === 3}"
                      id="overview-step-2"
@@ -99,7 +98,7 @@
                         {% include "projects/project/fragments/onboarding-tutorials/visual-hint.html" %}
                     </template>
                     {% include "projects/project/fragments/navigation/tooltip_lock_access.html" with id="tooltip-lock-access-conversations" %}
-                    <input value="conversations_new"
+                    <input value="conversations"
                            type="radio"
                            {% if conversations_new %}checked{% endif %}
                            aria-checked="{% if conversations_new %}true{% else %}false{% endif %}"

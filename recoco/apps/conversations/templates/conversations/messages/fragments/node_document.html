@@ -1,6 +1,6 @@
 <div x-data="{document: null}"
      x-show="document"
-     x-init="document = await getDocumentById(node.document_id)"
+     x-effect="document = await getDocumentById(node.document_id)"
      class="document-item">
     <template x-if="document">
         <div class="document-item__content">

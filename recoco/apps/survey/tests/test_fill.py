@@ -44,7 +44,8 @@ def test_new_survey_session_is_created(request, client, project):
     ).make()
 
     url = reverse("survey-project-session", args=(project.id,))
-    with login(client, is_staff=False):
+    with login(client, is_staff=False) as user:
+        assign_collaborator(user, project, is_owner=True)
         response = client.get(url)
 
     new_session = models.Session.objects.get(survey=survey, project=project)
@@ -70,7 +71,8 @@ def test_existing_survey_session_is_reused(request, client, project):
     session = Recipe(models.Session, project=project, survey=survey).make()
 
     url = reverse("survey-project-session", args=(project.id,))
-    with login(client, is_staff=False):
+    with login(client, is_staff=False) as user:
+        assign_collaborator(user, project, is_owner=True)
         response = client.get(url)
 
     new_session = models.Session.objects.get(survey=survey, project=project)
@@ -97,7 +99,9 @@ def test_answered_question_with_comment_only_is_saved_to_session(
 ):
     current_site = get_current_site(request)
     survey = Recipe(models.Survey, site=current_site).make()
-    session = Recipe(models.Session, survey=survey, project=project).make()
+    session = Recipe(
+        models.Session, survey=survey, project=project, project__sites=[current_site]
+    ).make()
 
     qs = Recipe(models.QuestionSet, survey=survey).make()
     q1 = Recipe(models.Question, question_set=qs).make()
@@ -105,7 +109,8 @@ def test_answered_question_with_comment_only_is_saved_to_session(
 
     my_comment = "this is a comment"
     url = reverse("survey-question-details", args=(session.id, q1.id))
-    with login(client, is_staff=False):
+    with login(client, is_staff=False) as user:
+        assign_collaborator(user, session.project, is_owner=True)
         client.post(url, data={"comment": my_comment})
 
     # Fetch persisted answer
@@ -127,7 +132,8 @@ def test_answered_question_with_upload_has_attachment_saved(request, client):
     Recipe(models.Question, question_set=qs).make()
 
     url = reverse("survey-question-details", args=(session.id, q1.id))
-    with login(client, is_staff=False):
+    with login(client, is_staff=False) as user:
+        assign_collaborator(user, session.project, is_owner=True)
         client.post(url, data={"comment": "blah", "attachment": the_file})
 
     # Fetch persisted answer
@@ -149,7 +155,8 @@ def test_answer_question_with_upload_only_keeps_attachment(request, client):
     Recipe(models.Question, question_set=qs).make()
 
     url = reverse("survey-question-details", args=(session.id, q1.id))
-    with login(client, is_staff=False):
+    with login(client, is_staff=False) as user:
+        assign_collaborator(user, session.project, is_owner=True)
         response = client.post(url, data={"attachment": the_file})
 
     assert response.status_code == 200
@@ -158,8 +165,11 @@ def test_answer_question_with_upload_only_keeps_attachment(request, client):
 
 @pytest.mark.django_db
 def test_answered_question_with_single_choice_is_saved_to_session(request, client):
+    current_site = get_current_site(request)
     survey = Recipe(models.Survey, site=get_current_site(request)).make()
-    session = Recipe(models.Session, survey=survey).make()
+    session = Recipe(
+        models.Session, survey=survey, project__sites=[current_site]
+    ).make()
     qs = Recipe(models.QuestionSet, survey=survey).make()
     q1 = Recipe(models.Question, question_set=qs).make()
     Recipe(models.Question, question_set=qs).make()
@@ -168,7 +178,8 @@ def test_answered_question_with_single_choice_is_saved_to_session(request, clien
 
     my_comment = "this is a comment"
     url = reverse("survey-question-details", args=(session.id, q1.id))
-    with login(client, is_staff=False):
+    with login(client, is_staff=False) as user:
+        assign_collaborator(user, session.project, is_owner=True)
         client.post(url, data={"answer": choice.value, "comment": my_comment})
 
     # Fetch persisted answer
@@ -192,7 +203,8 @@ def test_answered_question_with_multiple_choice_is_saved_to_session(request, cli
 
     my_comment = "this is a comment"
     url = reverse("survey-question-details", args=(session.id, q1.id))
-    with login(client, is_staff=False):
+    with login(client, is_staff=False) as user:
+        assign_collaborator(user, session.project, is_owner=True)
         client.post(url, data={"answer": [choice.value], "comment": my_comment})
 
     # Fetch persisted answer
@@ -202,15 +214,19 @@ def test_answered_question_with_multiple_choice_is_saved_to_session(request, cli
 
 
 @pytest.mark.django_db
-def test_question_with_comment_only_make_comment_field_mandatory(client):
+def test_question_with_comment_only_make_comment_field_mandatory(client, request):
+    current_site = get_current_site(request)
     survey = Recipe(models.Survey).make()
-    session = Recipe(models.Session, survey=survey).make()
+    session = Recipe(
+        models.Session, survey=survey, project__sites=[current_site]
+    ).make()
     qs = Recipe(models.QuestionSet, survey=survey).make()
     q1 = Recipe(models.Question, question_set=qs).make()
     Recipe(models.Question, question_set=qs).make()
 
     url = reverse("survey-question-details", args=(session.id, q1.id))
-    with login(client, is_staff=False):
+    with login(client, is_staff=False) as user:
+        assign_collaborator(user, session.project, is_owner=True)
         client.post(url, data={})
 
     with pytest.raises(models.Answer.DoesNotExist):
@@ -233,7 +249,8 @@ def test_question_with_single_choice_signals_are_copied_over_answer(request, cli
     ).make()
 
     url = reverse("survey-question-details", args=(session.id, q1.id))
-    with login(client, is_staff=False):
+    with login(client, is_staff=False) as user:
+        assign_collaborator(user, session.project, is_owner=True)
         client.post(url, data={"answer": choice.value})
 
     # Fetch persisted answer
@@ -245,7 +262,9 @@ def test_question_with_single_choice_signals_are_copied_over_answer(request, cli
 def test_question_with_single_multiple_signals_are_copied_over_answer(request, client):
     current_site = get_current_site(request)
     survey = Recipe(models.Survey, site=current_site).make()
-    session = Recipe(models.Session, survey=survey).make()
+    session = Recipe(
+        models.Session, survey=survey, project__sites=[current_site]
+    ).make()
 
     qs = Recipe(models.QuestionSet, survey=survey).make()
     q1 = Recipe(models.Question, is_multiple=True, question_set=qs).make()
@@ -256,7 +275,8 @@ def test_question_with_single_multiple_signals_are_copied_over_answer(request, c
     c2 = Recipe(models.Choice, question=q1, value="b", signals="alpha-tango").make()
 
     url = reverse("survey-question-details", args=(session.id, q1.id))
-    with login(client, is_staff=False):
+    with login(client, is_staff=False) as user:
+        assign_collaborator(user, session.project, is_owner=True)
         client.post(url, data={"answer": [c1.value, c2.value]})
 
     # Fetch persisted answer
@@ -286,7 +306,8 @@ def test_answered_question_is_updated_to_session(request, client):
     choice2 = Recipe(models.Choice, question=q1, value="yep", signals=my_signals).make()
 
     url = reverse("survey-question-details", args=(session.id, q1.id))
-    with login(client, is_staff=False):
+    with login(client, is_staff=False) as user:
+        assign_collaborator(user, session.project, is_owner=True)
         client.post(url, data={"answer": choice1.value})
 
         answer = models.Answer.objects.get(session=session, question=q1)
@@ -317,7 +338,8 @@ def test_question_redirects_to_next_question(request, client):
     choice = Recipe(models.Choice, question=q1, value="yep").make()
 
     url = reverse("survey-question-details", args=(session.id, q1.id))
-    with login(client, is_staff=False):
+    with login(client, is_staff=False) as user:
+        assign_collaborator(user, session.project, is_owner=True)
         response = client.post(url, data={"answer": choice.value})
 
     assert response.status_code == 302
@@ -328,7 +350,9 @@ def test_question_redirects_to_next_question(request, client):
 def test_answered_question_triggers_notification(request, client):
     current_site = get_current_site(request)
     survey = Recipe(models.Survey, site=current_site).make()
-    session = Recipe(models.Session, survey=survey).make()
+    session = Recipe(
+        models.Session, survey=survey, project__sites=[current_site]
+    ).make()
 
     qs = Recipe(models.QuestionSet, survey=survey).make()
     q1 = Recipe(models.Question, question_set=qs).make()
@@ -343,6 +367,7 @@ def test_answered_question_triggers_notification(request, client):
     assign_advisor(st, session.project, current_site)
 
     with login(client, is_staff=False) as user:
+        assign_collaborator(user, session.project, is_owner=True)
         client.post(url, data={"answer": choice.value, "comment": my_comment})
 
     assert user.notifications.unread().count() == 0
@@ -353,7 +378,9 @@ def test_answered_question_triggers_notification(request, client):
 def test_answered_question_debounces_notification(request, client):
     current_site = get_current_site(request)
     survey = Recipe(models.Survey, site=current_site).make()
-    session = Recipe(models.Session, survey=survey).make()
+    session = Recipe(
+        models.Session, survey=survey, project__sites=[current_site]
+    ).make()
 
     qs = Recipe(models.QuestionSet, survey=survey).make()
     q1 = Recipe(models.Question, question_set=qs).make()
@@ -368,6 +395,7 @@ def test_answered_question_debounces_notification(request, client):
     assign_advisor(st, session.project, current_site)
 
     with login(client, is_staff=False) as user:
+        assign_collaborator(user, session.project, is_owner=True)
         client.post(url, data={"answer": choice.value, "comment": my_comment})
         client.post(url, data={"answer": choice.value, "comment": my_comment})
 
@@ -382,14 +410,18 @@ def test_answered_question_debounces_notification(request, client):
 
 @pytest.mark.django_db
 def test_next_question_redirects_to_next_available_question(request, client):
+    current_site = get_current_site(request)
     survey = Recipe(models.Survey, site=get_current_site(request)).make()
-    session = Recipe(models.Session, survey=survey).make()
+    session = Recipe(
+        models.Session, survey=survey, project__sites=[current_site]
+    ).make()
 
     qs = Recipe(models.QuestionSet, survey=survey).make()
     q1 = Recipe(models.Question, question_set=qs).make()
     q2 = Recipe(models.Question, question_set=qs).make()
 
-    with login(client, is_staff=False):
+    with login(client, is_staff=False) as user:
+        assign_collaborator(user, session.project, is_owner=True)
         url = reverse("survey-question-next", args=(session.id, q1.id))
         response = client.get(url)
 
@@ -399,13 +431,17 @@ def test_next_question_redirects_to_next_available_question(request, client):
 
 @pytest.mark.django_db
 def test_next_question_redirects_to_done_when_no_more_questions(request, client):
+    current_site = get_current_site(request)
     survey = Recipe(models.Survey, site=get_current_site(request)).make()
-    session = Recipe(models.Session, survey=survey).make()
+    session = Recipe(
+        models.Session, survey=survey, project__sites=[current_site]
+    ).make()
 
     qs = Recipe(models.QuestionSet, survey=survey).make()
     q1 = Recipe(models.Question, question_set=qs).make()
 
-    with login(client, is_staff=False):
+    with login(client, is_staff=False) as user:
+        assign_collaborator(user, session.project, is_owner=True)
         url = reverse("survey-question-next", args=(session.id, q1.id))
         response = client.get(url)
 
@@ -414,8 +450,11 @@ def test_next_question_redirects_to_done_when_no_more_questions(request, client)
 
 @pytest.mark.django_db
 def test_next_question_redirects_to_next_question_set(request, client):
+    current_site = get_current_site(request)
     survey = Recipe(models.Survey, site=get_current_site(request)).make()
-    session = Recipe(models.Session, survey=survey).make()
+    session = Recipe(
+        models.Session, survey=survey, project__sites=[current_site]
+    ).make()
     qs1 = Recipe(models.QuestionSet, survey=survey, priority=30).make()
     q1 = Recipe(models.Question, question_set=qs1).make()
 
@@ -425,7 +464,8 @@ def test_next_question_redirects_to_next_question_set(request, client):
     qs3 = Recipe(models.QuestionSet, survey=survey, priority=20).make()
     q3 = Recipe(models.Question, question_set=qs3).make()
 
-    with login(client, is_staff=False):
+    with login(client, is_staff=False) as user:
+        assign_collaborator(user, session.project, is_owner=True)
         url = reverse("survey-question-next", args=(session.id, q1.id))
         response = client.get(url)
 
@@ -435,13 +475,17 @@ def test_next_question_redirects_to_next_question_set(request, client):
 
 @pytest.mark.django_db
 def test_previous_question_redirects_to_previous_available_question(request, client):
+    current_site = get_current_site(request)
     survey = Recipe(models.Survey, site=get_current_site(request)).make()
-    session = Recipe(models.Session, survey=survey).make()
+    session = Recipe(
+        models.Session, survey=survey, project__sites=[current_site]
+    ).make()
     qs = Recipe(models.QuestionSet, survey=survey).make()
     q1 = Recipe(models.Question, question_set=qs).make()
     q2 = Recipe(models.Question, question_set=qs).make()
 
-    with login(client, is_staff=False):
+    with login(client, is_staff=False) as user:
+        assign_collaborator(user, session.project, is_owner=True)
         url = reverse("survey-question-previous", args=(session.id, q2.id))
         response = client.get(url)
 
@@ -451,15 +495,19 @@ def test_previous_question_redirects_to_previous_available_question(request, cli
 
 @pytest.mark.django_db
 def test_previous_question_redirects_to_previous_question_set(request, client):
+    current_site = get_current_site(request)
     survey = Recipe(models.Survey, site=get_current_site(request)).make()
-    session = Recipe(models.Session, survey=survey).make()
+    session = Recipe(
+        models.Session, survey=survey, project__sites=[current_site]
+    ).make()
     qs1 = Recipe(models.QuestionSet, survey=survey).make()
     q1 = Recipe(models.Question, question_set=qs1).make()
 
     qs2 = Recipe(models.QuestionSet, survey=survey).make()
     q2 = Recipe(models.Question, question_set=qs2).make()
 
-    with login(client, is_staff=False):
+    with login(client, is_staff=False) as user:
+        assign_collaborator(user, session.project, is_owner=True)
         url = reverse("survey-question-previous", args=(session.id, q2.id))
         response = client.get(url)
 
@@ -469,17 +517,38 @@ def test_previous_question_redirects_to_previous_question_set(request, client):
 
 @pytest.mark.django_db
 def test_previous_question_redirects_to_survey_when_not_more_questions(request, client):
+    current_site = get_current_site(request)
+    survey = Recipe(models.Survey, site=get_current_site(request)).make()
+    session = Recipe(
+        models.Session, survey=survey, project__sites=[current_site]
+    ).make()
+    qs = Recipe(models.QuestionSet, survey=survey).make()
+    q1 = Recipe(models.Question, question_set=qs).make()
+
+    with login(client, is_staff=False) as user:
+        assign_collaborator(user, session.project, is_owner=True)
+        url = reverse("survey-question-previous", args=(session.id, q1.id))
+        response = client.get(url)
+
+    new_url = reverse("survey-session-details", args=(session.id,))
+    assertRedirects(response, new_url)
+
+
+########################################################################
+# Permissions
+########################################################################
+@pytest.mark.django_db
+def test_question_is_not_reachable_for_non_member(request, client):
     survey = Recipe(models.Survey, site=get_current_site(request)).make()
     session = Recipe(models.Session, survey=survey).make()
     qs = Recipe(models.QuestionSet, survey=survey).make()
     q1 = Recipe(models.Question, question_set=qs).make()
 
     with login(client, is_staff=False):
-        url = reverse("survey-question-previous", args=(session.id, q1.id))
+        url = reverse("survey-question-details", args=(session.id, q1.id))
         response = client.get(url)
 
-    new_url = reverse("survey-session-details", args=(session.id,))
-    assertRedirects(response, new_url)
+        assert response.status_code == 403
 
 
 ########################################################################
@@ -500,8 +569,11 @@ def test_refresh_signals_only_for_staff(request, client):
 
 @pytest.mark.django_db
 def test_refresh_signals(request, client):
+    current_site = get_current_site(request)
     survey = Recipe(models.Survey, site=get_current_site(request)).make()
-    session = Recipe(models.Session, survey=survey).make()
+    session = Recipe(
+        models.Session, survey=survey, project__sites=[current_site]
+    ).make()
 
     qs = Recipe(models.QuestionSet, survey=survey).make()
     q1 = Recipe(models.Question, question_set=qs).make()
@@ -512,8 +584,10 @@ def test_refresh_signals(request, client):
 
     # Answer question first
     url = reverse("survey-question-details", args=(session.id, q1.id))
-    with login(client, username="non_site_admin"):
-        client.post(url, data={"answer": choice.value})
+    with login(client, username="non_site_admin") as user:
+        assign_collaborator(user, session.project, is_owner=True)
+        response = client.post(url, data={"answer": choice.value})
+        assert response.status_code == 302
 
     # Update choice signal and refresh
     new_signal = "new-signal"

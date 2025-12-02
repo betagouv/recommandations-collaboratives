@@ -164,7 +164,7 @@ class UserProjectSerializer(ProjectSerializer):
         ).unread()
 
         unread_public_messages = unread_notifications.filter(
-            verb=verbs.Conversation.PUBLIC_MESSAGE
+            verb=verbs.Conversation.POST_MESSAGE
         )
         unread_private_messages = unread_notifications.filter(
             verb=verbs.Conversation.PRIVATE_MESSAGE

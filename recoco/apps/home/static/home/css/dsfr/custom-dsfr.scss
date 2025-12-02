@@ -1015,6 +1015,12 @@ font-weight: 700;
   line-height: 150%; /* 21px */
 }
 
+.text-ellipsis {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 /* ¯¯¯ *\
   Size
 \* ˍˍˍ */

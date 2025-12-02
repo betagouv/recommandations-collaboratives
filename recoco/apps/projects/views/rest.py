@@ -194,7 +194,7 @@ class ProjectList(ListAPIView):
             .annotate(count=Count("id", distinct=True))
             .annotate(
                 unread_public_messages=Count(
-                    "id", filter=Q(verb=verbs.Conversation.PUBLIC_MESSAGE)
+                    "id", filter=Q(verb=verbs.Conversation.POST_MESSAGE)
                 )
             )
             .annotate(
@@ -385,7 +385,7 @@ def update_project_statuses_with_their_notifications(site, user, project_statuse
         .annotate(count=Count("id", distinct=True))
         .annotate(
             unread_public_messages=Count(
-                "id", filter=Q(verb=verbs.Conversation.PUBLIC_MESSAGE)
+                "id", filter=Q(verb=verbs.Conversation.POST_MESSAGE)
             )
         )
         .annotate(
