@@ -161,12 +161,18 @@ Alpine.data('ProjectListCrm', (departments, regions) => ({
         exclude_stats: !data.statistics,
         muted: !data.notifications,
       };
-      const updatedProjectIndex = this.projects.findIndex(
-        (x) => x.id === projectToUpdate.id
-      );
+      const updatedProjectIndex = this.projects[
+        this.pagination.currentPage - 1
+      ].findIndex((x) => x.id === projectToUpdate.id);
 
-      this.projects.splice(updatedProjectIndex, 1, updatedProject);
-      this.projects = [...this.projects];
+      this.projects[this.pagination.currentPage - 1].splice(
+        updatedProjectIndex,
+        1,
+        updatedProject
+      );
+      this.projectsToDisplay = [
+        ...this.projects[this.pagination.currentPage - 1],
+      ];
       this.showToast(
         this.getToastMessage(projectToUpdate, data),
         ToastType.success
