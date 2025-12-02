@@ -19,61 +19,76 @@ Alpine.data('ProjectListCrm', (departments, regions) => ({
     limit: 42,
     total: 0,
   },
+  options: [
+    { value: 'PRE_DRAFT', text: 'Incomplet', color: 'fr-badge--new' },
+    { value: 'DRAFT', text: 'A modérer', color: 'fr-badge--new' },
+    { value: 'TO_PROCESS', text: 'A traiter', color: 'fr-badge--info' },
+    { value: 'READY', text: 'En attente', color: 'fr-badge--success-lighter' },
+    {
+      value: 'IN_PROGRESS',
+      text: 'En cours',
+      color: 'fr-badge--success-lighter',
+    },
+    { value: 'DONE', text: 'Traité', color: 'fr-badge--success-lighter' },
+    { value: 'STUCK', text: 'Conseil interrompu', color: 'fr-badge--info' },
+    { value: 'REJECTED', text: 'Rejeté', color: 'fr-badge--error' },
+  ],
+  displayProjectIndex: false,
   async init() {
     const projectsResponse = await this.getProjects();
-    this.projects.push(...projectsResponse.results);
-    this.projectsToDisplay = [...this.projects];
+    this.projects.push([...projectsResponse.results]);
+    this.projectsToDisplay = [...projectsResponse.results];
     this.projectsTotal = projectsResponse.count;
     this.pagination.total = Math.ceil(
       projectsResponse.count / this.pagination.limit
     );
   },
-  async getProjects({ offset = 0, page = 1 } = {}) {
-    try {
-      const response = await api.get(
-        projectsUrl({
-          limit: this.pagination.limit,
-          offset: offset,
-          page: page,
-        })
-      );
-      return response.data;
-    } catch (error) {
-      this.showToast(
-        `Erreur lors de la récupération des projets de la page ${page}`,
-        ToastType.error
-      );
-      throw new Error(`Error while getting projects from page ${page}`, error);
-    }
+  /************************
+   * Filtering functions
+   **************************/
+  async saveSelectedDepartment(event) {
+    if (!event.detail) return;
+
+    this.backendSearch.searchDepartment = [...event.detail];
+    await this.handleProjectSearch();
+  },
+  async onSearch() {
+    const projects = await this.handleProjectSearch();
+    this.projects = [];
+    this.projects.push([...projects.results]);
+    this.projectsToDisplay = [...projects.results];
+    this.projectsTotal = projects.count;
+    this.pagination.total = Math.ceil(projects.count / this.pagination.limit);
   },
   async handleProjectSearch() {
-    const projects = await api.get(
-      projectsUrl({
-        limit: this.pagination.limit,
+    try {
+      return await this.getProjects({
         offset: 0,
         page: 1,
         search: this.backendSearch.searchText,
         departments: this.backendSearch.searchDepartment,
-      })
-    );
-    this.projects = projects.data.results;
-    this.projectsTotal = projects.data.count;
-    this.pagination.total = Math.ceil(
-      projects.data.count / this.pagination.limit
-    );
+      });
+    } catch (error) {
+      this.showToast(
+        `Erreur lors de la recherche des projets`,
+        ToastType.error
+      );
+      throw new Error(`Error while searching projects`, error);
+    }
   },
+
+  /************************
+   * Pagination functions
+   **************************/
   async onChangePage(pageNumber) {
     if (this.projects.length <= this.pagination.limit * (pageNumber - 1)) {
       const projectsResponse = await this.getProjects({
         offset: this.pagination.limit * (pageNumber - 1),
         page: pageNumber,
       });
-      this.projects.push(...projectsResponse.results);
+      this.projects[pageNumber - 1] = [...projectsResponse.results];
     }
-    this.projectsToDisplay = [...this.projects].slice(
-      this.pagination.limit * (pageNumber - 1),
-      this.pagination.limit * pageNumber
-    );
+    this.projectsToDisplay = [...this.projects[pageNumber - 1]];
     this.pagination.currentPage = pageNumber;
   },
   async handleChangePage(pageNumber) {
@@ -89,14 +104,29 @@ Alpine.data('ProjectListCrm', (departments, regions) => ({
     this.projects.push(...projects.data.results);
     this.pagination.currentPage = pageNumber;
   },
-  async saveSelectedDepartment(event) {
-    if (!event.detail) return;
 
-    this.backendSearch.searchDepartment = [...event.detail];
-    await this.handleProjectSearch();
-  },
-  async onSearch() {
-    await this.handleProjectSearch();
+  /************************
+   * CRUD functions
+   **************************/
+  async getProjects({ offset = 0, page = 1 } = {}) {
+    try {
+      const response = await api.get(
+        projectsUrl({
+          limit: this.pagination.limit,
+          offset: offset,
+          page: page,
+          search: this.backendSearch.searchText,
+          departments: this.backendSearch.searchDepartment,
+        })
+      );
+      return response.data;
+    } catch (error) {
+      this.showToast(
+        `Erreur lors de la récupération des projets de la page ${page}`,
+        ToastType.error
+      );
+      throw new Error(`Error while getting projects from page ${page}`, error);
+    }
   },
   async updateProject(projectToUpdate, url, data) {
     let formData = new FormData();
@@ -135,6 +165,10 @@ Alpine.data('ProjectListCrm', (departments, regions) => ({
       throw new Error('Error while updating project param', error);
     }
   },
+
+  /************************
+   * Informational functions
+   **************************/
   getToastMessage(projectToUpdate, dataToUpdate) {
     if (dataToUpdate.statistics === projectToUpdate.exclude_stats) {
       if (dataToUpdate.statistics) {
@@ -156,6 +190,10 @@ Alpine.data('ProjectListCrm', (departments, regions) => ({
     this.$store.app.notification.isOpen = true;
     this.$store.app.notification.type = type || ToastType.error;
   },
+
+  /*******************
+   * Display functions
+   ********************/
   projectsCountLabel() {
     if (this.projectsTotal > 0) {
       return `${this.projectsTotal} résultat${this.projectsTotal > 1 ? 's' : ''}`;
