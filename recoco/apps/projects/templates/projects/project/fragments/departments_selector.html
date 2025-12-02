@@ -28,8 +28,8 @@
         - user-close-selector: when the user closes the selector, the event is triggered with the selected departments
 
 {% endcomment %}
-<div class="d-flex align-items-center fr-mr-6v">
-    <label class="fr-segmented__legend inline text-nowrap fr-m-0">{{ label_filter | default:"Filtrer :" }}</label>
+<div class="d-flex align-items-center">
+    <label class="fr-segmented__legend inline text-nowrap fr-mb-0">{{ label_filter | default:"Filtrer :" }}</label>
     <div class="input-item position-relative active specific-border-solid1pxE5E5E5"
          x-data="DepartmentsSelector({ listZone: {{ zone_objects|default:'null' }}, selectAll : '{{ select_all | default:'False' }}' == 'True', filterByRegions : '{{ filter_by_regions }}' == 'True' , selectedDepartments: {{ selected_departments|default:'null' }} })"
          x-on:click.outside="open && $dispatch('user-close-selector'); open = false; ">

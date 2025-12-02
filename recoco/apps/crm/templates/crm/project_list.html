@@ -36,18 +36,23 @@
                     <h3>Gestion des dossiers {{ request.site.name }}</h3>
                 </div>
             </div>
-            <div class="project-list-crm__filters fr-px-5v fr-pt-5v">
-                {% include "projects/project/fragments/search_bar.html" with action_search="onSearch" x_model="backendSearch.searchText" placeholder="Rechercher commune, #tag, nom du dossier..." %}
+            <div class="project-list-crm__filters fr-px-5v fr-py-5v">
+                <div class="d-flex align-items-center" x-transition.opacity.duration.500ms>
+                    <span class="project-list-crm__projects-count-label"
+                          x-show="dataLoaded"
+                          x-text="projectsCountLabel()"></span>
+                    <span class="project-list-crm__projects-count-label" x-show="!dataLoaded">Chargement</span>
+                </div>
+                <div class="w-100 position-relative">
+                    {% include "projects/project/fragments/search_bar.html" with action_search="onSearch" x_model="backendSearch.searchText" placeholder="Rechercher" %}
+                </div>
                 {% include "projects/project/fragments/departments_selector.html" with label="Projets de mon territoire" label_filter="Localisation :" filter_by_regions=True zone_objects="regions" select_all=True %}
                 <div class="d-flex align-items-center w-100">
-                    <label class="fr-segmented__legend inline text-nowrap fr-m-0">Statut:</label>
+                    <label class="filter__label">Statut:</label>
                     {% include "tools/multi_select.html" %}
                 </div>
                 {% comment %} TODO Add CSV download button with backend functionnality {% endcomment %}
                 {% comment %} <button class="fr-btn fr-btn--sm no-wrap" title="Télécharger en CSV">🚧Télécharger en CSV</button> {% endcomment %}
-            </div>
-            <div x-show="projects" x-transition.opacity.duration.500ms>
-                <span x-text="projectsCountLabel()"></span>
             </div>
             <div class="fr-mb-2w table-responsive fr-px-5v fr-pb-5v">
                 {% csrf_token %}

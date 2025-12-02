@@ -10,14 +10,14 @@ variables to pass :
 {% endcomment %}
 {% load sass_tags %}
 {% block css %}
-<link href="{% sass_src 'projects/css/searchbar.scss' %}"
-      rel="stylesheet"
-      type="text/css">
+    <link href="{% sass_src 'projects/css/searchbar.scss' %}"
+          rel="stylesheet"
+          type="text/css">
 {% endblock css %}
 <input x-ref="search_bar"
        type="search"
        data-cy="search-bar-project"
-       class="fr-icon-search-line placeholder-position"
+       class="placeholder-position"
        placeholder="{{ placeholder|default:"Rechercher" }}"
        @input.debounce.500ms="{{ action_search }}"
        {% if x_model %}x-model="{{ x_model }}"{% endif %}>

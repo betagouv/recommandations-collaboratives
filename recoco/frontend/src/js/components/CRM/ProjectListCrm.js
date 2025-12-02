@@ -3,6 +3,7 @@ import api, { projectsUrl } from '../../utils/api';
 import { ToastType } from '../../models/toastType';
 
 Alpine.data('ProjectListCrm', (departments, regions) => ({
+  dataLoaded: false,
   projects: [],
   projectsToDisplay: [],
   projectsTotal: 0,
@@ -43,6 +44,7 @@ Alpine.data('ProjectListCrm', (departments, regions) => ({
     this.pagination.total = Math.ceil(
       projectsResponse.count / this.pagination.limit
     );
+    this.dataLoaded = true;
   },
   /************************
    * Filtering functions

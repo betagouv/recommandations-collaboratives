@@ -4,6 +4,21 @@
     flex-direction: row;
     align-items: center;
     gap: 1rem;
+    .filter__label,
+    label {
+      color: var(--light-text-mention-grey, #666);
+      font-size: 0.875rem;
+      font-weight: 400;
+      line-height: 1.5rem;
+      margin-right: 0.625rem;
+    }
+  }
+  &__projects-count-label {
+    color: var(--light-text-default-grey, #3a3a3a);
+    font-size: 0.875rem;
+    font-weight: 700;
+    line-height: 1.5rem;
+    text-wrap: nowrap;
   }
 
   .multi-select {
