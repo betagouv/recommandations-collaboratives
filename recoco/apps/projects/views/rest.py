@@ -43,7 +43,7 @@ from recoco.utils import (
 )
 
 from .. import models, signals
-from ..filters import DepartmentsFilter, ProjectActivityFilter
+from ..filters import DepartmentsFilter, ProjectActivityFilter, ProjectSiteStatusFilter
 from ..serializers import (
     DocumentSerializer,
     NewDocumentSerializer,
@@ -111,6 +111,7 @@ class ProjectList(ListAPIView):
         WatsonSearchFilter,
         DepartmentsFilter,
         ProjectActivityFilter,
+        ProjectSiteStatusFilter,
     ]
 
     def get_queryset(self):
