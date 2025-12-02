@@ -24,6 +24,13 @@
     {{ user_project_perms|json_script:"userProjectPerms" }}
     {% is_project_owner project request.user as is_project_owner %}
     {{ is_project_owner|json_script:"isProjectOwner" }}
+    {{ request.user.first_name|json_script:"djangoCurrentUserFirstName" }}
+    {{ request.user.last_name|json_script:"djangoCurrentUserLastName" }}
+    {{ request.user.email|json_script:"djangoCurrentUserEmail" }}
+    {{ request.user.id|json_script:"djangoCurrentUserId" }}
+    {{ request.user.profile.organization.name|json_script:"djangoCurrentUserOrganizationName" }}
+    {{ request.user.profile.organization_position|json_script:"djangoCurrentUserOrganizationPosition" }}
+    {{ recipients|json_script:"djangoRecipients" }}
     {% include "projects/project/navigation.html" with conversations_new=True %}
     {% include "projects/project/fragments/project_banner/banner_wrapper.html" with part="open" %}
     {% regroup feed by topic as topic_list %}

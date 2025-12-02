@@ -43,28 +43,22 @@ def get_queryset() -> QuerySet:
         )
         .annotate(
             public_message_count=Count(
-                "notes",
-                filter=Q(
-                    notes__public=True,
-                    notes__site_id=F("site_id"),
-                ),
+                "public_messages",
                 distinct=True,
             ),
             public_message_from_members_count=Count(
-                "notes",
+                "public_messages",
                 filter=Q(
-                    notes__public=True,
-                    notes__site_id=F("site_id"),
-                    notes__created_by__in=F("members"),
+                    public_messages__posted_by__in=F("members"),
                 ),
                 distinct=True,
             ),
             public_message_from_advisors_count=Count(
-                "notes",
+                "public_messages",
                 filter=Q(
-                    notes__public=True,
-                    notes__site_id=F("site_id"),
-                    notes__created_by__in=F("switchtender_sites__switchtender"),
+                    public_messages__posted_by__in=F(
+                        "switchtender_sites__switchtender"
+                    ),
                 ),
                 distinct=True,
             ),

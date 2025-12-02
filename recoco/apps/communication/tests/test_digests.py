@@ -9,12 +9,14 @@ created: 2022-02-03 16:14:54 CET
 
 from datetime import datetime, timezone
 from unittest.mock import ANY, patch
+from urllib.parse import urlparse
 
 import pytest
 import test  # noqa
 from django.contrib.auth import models as auth
 from django.contrib.auth.models import User
 from django.contrib.sites.shortcuts import get_current_site
+from django.urls import reverse
 from freezegun import freeze_time
 from model_bakery import baker
 from model_bakery.recipe import Recipe
@@ -634,9 +636,13 @@ class TestMsgDigest:
 
         # project's digest should be tested else where
         del digest["project"]
-        assert digest["message_url"].startswith(
-            f"https://example.com/project/{project_ready.id}/conversations?message-id={msg1.id}"
+
+        parsed_url = urlparse(digest["message_url"])
+        assert parsed_url.path == reverse(
+            "projects-project-detail-conversations", args=[project_ready.pk]
         )
+        assert f"message-id={msg1.id}" in parsed_url.query
+
         del digest["message_url"]
         assert digest == expected
 

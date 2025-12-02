@@ -42,3 +42,8 @@
 .fr-icon-line-chart-on-line::before {
   mask-image: url(../assets/line-chart-on-line.svg);
 }
+
+.fr-icon-tools-line::after,
+.fr-icon-tools-line::before {
+  mask-image: url(../assets/tools-line.svg);
+}

@@ -1,4 +1,5 @@
 import json
+from urllib.parse import urlparse
 
 import pytest
 from actstream.models import action_object_stream
@@ -15,6 +16,7 @@ from recoco.apps.tasks import models as tasks_models
 from recoco.apps.tasks import signals as tasks_signals
 from recoco.utils import login
 
+from ..projects.utils import assign_collaborator
 from . import signals
 from .models import DocumentNode, Message
 from .utils import (
@@ -231,6 +233,36 @@ def test_delete_message(message, sender, project_ready, client):
 
 
 @pytest.mark.django_db
+def test_delete_message_deletes_notifications(sender, project_ready, client):
+    sender = baker.make(auth_models.User)
+    reader = baker.make(auth_models.User)
+    assign_perm("projects.use_public_notes", sender, project_ready)
+    assign_collaborator(reader, project_ready)
+
+    message_deleted = baker.make(Message, project=project_ready, posted_by=sender)
+    message_normal = baker.make(Message, project=project_ready, posted_by=sender)
+    signals.message_posted.send(
+        sender=test_delete_message_deletes_notifications, message=message_deleted
+    )
+    signals.message_posted.send(
+        sender=test_delete_message_deletes_notifications, message=message_normal
+    )
+
+    assert message_deleted.notifications.exists()
+    assert message_normal.notifications.exists()
+
+    url = reverse(
+        "projects-conversations-messages-detail",
+        args=[project_ready.pk, message_deleted.pk],
+    )
+    client.force_login(sender)
+    client.delete(url)
+
+    assert not message_deleted.notifications.exists()
+    assert message_normal.notifications.exists()
+
+
+@pytest.mark.django_db
 def test_post_message_with_document(project_ready, request, client, project_editor):
     current_site = get_current_site(request)
 
@@ -255,10 +287,12 @@ def test_post_message_with_document(project_ready, request, client, project_edit
     message = Message.objects.first()
     doc.refresh_from_db()
     assert doc.attached_object == message
-    assert (
-        doc.attached_object.get_absolute_url()
-        == f"/project/{project_ready.pk}/conversations?message-id={message.pk}"
+
+    parsed_url = urlparse(doc.attached_object.get_absolute_url())
+    assert parsed_url.path == reverse(
+        "projects-project-detail-conversations", args=[project_ready.pk]
     )
+    assert f"message-id={message.pk}" in parsed_url.query
 
 
 @pytest.mark.django_db

@@ -16,6 +16,22 @@ document.addEventListener('alpine:init', () => {
     canUseTasks: getDjangoPermsData('userProjectPerms', 'use_tasks'),
     canManageTasks: getDjangoPermsData('userProjectPerms', 'manage_tasks'),
     isProjectOwner: getDjangoData('isProjectOwner'),
+    currentUser: {
+      id: getDjangoData('djangoCurrentUserId'),
+      first_name: getDjangoData('djangoCurrentUserFirstName'),
+      last_name: getDjangoData('djangoCurrentUserLastName'),
+      email: getDjangoData('djangoCurrentUserEmail'),
+      is_active: true,
+      profile: {
+        organization_position: getDjangoData(
+          'djangoCurrentUserOrganizationPosition'
+        ),
+        organization: {
+          name: getDjangoData('djangoCurrentUserOrganizationName'),
+        },
+      },
+    },
+    recipients: getDjangoData('djangoRecipients'),
   });
 });
 
