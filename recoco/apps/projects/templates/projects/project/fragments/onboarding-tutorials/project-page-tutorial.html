@@ -1,11 +1,12 @@
-<div>
+<div data-test-id="onboarding-tutorial__popup-content">
     <div class="fr-p-3v onboarding-tutorial__popup-content__part">
         <h3 class="onboarding-tutorial__popup-title">Bienvenue sur UrbanVitaliz</h3>
         <p>Ci-dessous vos prochaines étapes pour prendre en main  la plateforme :</p>
     </div>
     <template x-if="challengesStatus[0] == 'todo'">
         <div class="d-flex fr-p-3v onboarding-tutorial__popup-content__part cursor-pointer"
-            {% if advising_position.is_advisor or advising_position.is_observer %} @click="launchChallenge1(true)" {% else %} @click="launchChallenge1(false)" {% endif %}>
+             data-test-id="onboarding-tutorial__popup-challenge-1"
+             {% if advising_position.is_advisor or advising_position.is_observer %} @click="launchChallenge1(true)" {% else %} @click="launchChallenge1(false)" {% endif %}>
             <svg class="fr-mr-3v" width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path fill-rule="evenodd" clip-rule="evenodd" d="M44.25 57C43.8364 57 43.5 56.6636 43.5 56.25C43.5 55.8364 43.8364 55.5 44.25 55.5C44.6636 55.5 45 55.8364 45 56.25C45 56.6636 44.6636 57 44.25 57Z" fill="#ECECFE"/>
                 <path fill-rule="evenodd" clip-rule="evenodd" d="M50.25 6C49.8364 6 49.5 5.66355 49.5 5.25C49.5 4.83641 49.8364 4.5 50.25 4.5C50.6636 4.5 51 4.83641 51 5.25C51 5.66355 50.6636 6 50.25 6Z" fill="#ECECFE"/>
@@ -34,7 +35,9 @@
         </div>
     </template>
     <template x-if="challengesStatus[1] == 'todo'">
-        <div class="d-flex fr-p-3v onboarding-tutorial__popup-content__part cursor-pointer" @click="launchChallenge2()">
+        <div class="d-flex fr-p-3v onboarding-tutorial__popup-content__part cursor-pointer"
+             data-test-id="onboarding-tutorial__popup-challenge-2"
+             @click="launchChallenge2()">
             <svg class="fr-mr-3v" width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path fill-rule="evenodd" clip-rule="evenodd" d="M11.25 10.5C10.8364 10.5 10.5 10.1636 10.5 9.75C10.5 9.33641 10.8364 9 11.25 9C11.6636 9 12 9.33641 12 9.75C12 10.1636 11.6636 10.5 11.25 10.5Z" fill="#ECECFE"/>
                 <path fill-rule="evenodd" clip-rule="evenodd" d="M3.75 52.5C3.33645 52.5 3 52.1636 3 51.75C3 51.3364 3.33645 51 3.75 51C4.16355 51 4.5 51.3364 4.5 51.75C4.5 52.1636 4.16355 52.5 3.75 52.5Z" fill="#ECECFE"/>
@@ -63,7 +66,9 @@
         </div>
     </template>
     <template x-if="challengesStatus[2] == 'todo'">
-        <div class="d-flex fr-p-3v onboarding-tutorial__popup-content__part cursor-pointer" @click="launchChallenge3()">
+        <div class="d-flex fr-p-3v onboarding-tutorial__popup-content__part cursor-pointer"
+             data-test-id="onboarding-tutorial__popup-challenge-3"
+             @click="launchChallenge3()">
             <svg class="fr-mr-3v" width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path fill-rule="evenodd" clip-rule="evenodd" d="M44.25 57C43.8364 57 43.5 56.6636 43.5 56.25C43.5 55.8364 43.8364 55.5 44.25 55.5C44.6636 55.5 45 55.8364 45 56.25C45 56.6636 44.6636 57 44.25 57Z" fill="#ECECFE"/>
                 <path fill-rule="evenodd" clip-rule="evenodd" d="M50.25 9C49.8364 9 49.5 8.66355 49.5 8.25C49.5 7.83641 49.8364 7.5 50.25 7.5C50.6636 7.5 51 7.83641 51 8.25C51 8.66355 50.6636 9 50.25 9Z" fill="#ECECFE"/>
@@ -103,7 +108,9 @@
         </div>
     </template>
     <template x-if="challengesStatus[3] == 'todo'">
-        <div class="d-flex fr-p-3v cursor-pointer" @click="launchChallenge4()">
+        <div class="d-flex fr-p-3v cursor-pointer"
+             data-test-id="onboarding-tutorial__popup-challenge-4"
+             @click="launchChallenge4()">
             <svg class="fr-mr-3v" width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path fill-rule="evenodd" clip-rule="evenodd" d="M56.25 46.5C55.8364 46.5 55.5 46.1636 55.5 45.75C55.5 45.3364 55.8364 45 56.25 45C56.6636 45 57 45.3364 57 45.75C57 46.1636 56.6636 46.5 56.25 46.5Z" fill="#ECECFE"/>
                 <path fill-rule="evenodd" clip-rule="evenodd" d="M41.25 3C40.8364 3 40.5 2.66355 40.5 2.25C40.5 1.83641 40.8364 1.5 41.25 1.5C41.6636 1.5 42 1.83641 42 2.25C42 2.66355 41.6636 3 41.25 3Z" fill="#ECECFE"/>

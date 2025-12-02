@@ -108,8 +108,9 @@
                            name="segmented-control-project">
                     <label class="fr-label" for="segmented-control-tasks">
                         <a class="stretched-link"
-                        @click="if ($store.tutorialsEvents.isTutorialForProjectPage === 3) { localStorage.setItem('isTutorialForProjectPage', 3.5) }"
-                        href="{% if "view_public_notes" in user_project_perms or "use_public_notes" in user_project_perms %} {% url 'projects-project-detail-conversations' project.pk %}{% else %}#{% endif %}">Conversation <span class="badge text-bg-primary">Nouv. 🎉</span>
+                           data-test-id="project-navigation-conversations-new"
+                           @click="if ($store.tutorialsEvents.isTutorialForProjectPage === 3) { localStorage.setItem('isTutorialForProjectPage', 3.5) }"
+                           href="{% if "view_public_notes" in user_project_perms or "use_public_notes" in user_project_perms %} {% url 'projects-project-detail-conversations' project.pk %}{% else %}#{% endif %}">Conversation <span class="badge text-bg-primary">Nouv. 🎉</span>
                             {% if "view_public_notes" in user_project_perms or "use_public_notes" in user_project_perms %}
                                 {% if active_project_conversation_notifications_count %}
                                     <span class="badge text-bg-danger" data-test-id="badge-tab-new-message">{{ active_project_conversation_notifications_count }}</span>
@@ -155,7 +156,8 @@
                    name="segmented-control-project">
             <label class="fr-label" for="segmented-control-tasks">
                 <a class="stretched-link"
-                    @click="if ($store.tutorialsEvents.isTutorialForProjectPage === 3) { localStorage.setItem('isTutorialForProjectPage', 3.5) }"
+                   data-test-id="project-navigation-conversations-new"
+                   @click="if ($store.tutorialsEvents.isTutorialForProjectPage === 3) { localStorage.setItem('isTutorialForProjectPage', 3.5) }"
                    href="{% if "view_public_notes" in user_project_perms or "use_public_notes" in user_project_perms %} {% url 'projects-project-detail-conversations' project.pk %}{% else %}#{% endif %}">Conversation
                     {% if "view_public_notes" in user_project_perms or "use_public_notes" in user_project_perms %}
                         {% if active_project_conversation_notifications_count %}
@@ -286,7 +288,7 @@
                 :class="{'visual-hint': $store.tutorialsEvents.isTutorialForProjectPage === 4}"
                 data-test-id="button-invite-collaborators"
                 @click="if ($store.tutorialsEvents.isTutorialForProjectPage === 4) { localStorage.setItem('isTutorialForProjectPage', 4.5) };">
-            <a href="{% url 'projects-project-administration' project.pk %}#user-management">Inviter</a>
+            <a data-test-id="link-invite-collaborators" href="{% url 'projects-project-administration' project.pk %}#user-management">Inviter</a>
         </button>
         {% if "use_crm" in user_site_perms and not disable_crm %}
             <template x-if="$store.tutorialsEvents.isTutorialForProjectPage === 4">

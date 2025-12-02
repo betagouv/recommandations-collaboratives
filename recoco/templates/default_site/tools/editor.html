@@ -74,7 +74,7 @@ Parameters:
                     x-bind:disabled="!isActive('link', updatedAt)">Détacher un lien</button>
         </div>
     </template>
-    <div>
+    <div data-test-id="tiptap-editor-form-container">
         {% comment %} {% if can_compress_editor %}
             <div class="button-attachment-container">
                 <button class="fr-btn fr-btn--sm fr-icon-attachment-2" type="button" @click.stop="onClickHandleAttachment">Rédiger avec une pièce jointe</button>
@@ -106,7 +106,8 @@ Parameters:
                   </svg>
             </template>
         </div>
-        <textarea class="position-absolute top-0 opacity-0 specific-height-0"
+        <textarea class="position-absolute top-0 opacity-0 specific-height-0"*
+                  data-test-id="tiptap-editor-textarea"
                   {% if model %} x-model="{{ model }}.text" x-modelable="markdownContent" {% else %} x-model="markdownContent" {% endif  %}
                   name="{{input_name|default:"content"}}"
                   {% if input_required %} required {% endif %}></textarea>
