@@ -89,6 +89,10 @@ document.addEventListener('alpine:init', () => {
           }
         });
       }
+      this.dispatchChange();
+    },
+    dispatchChange() {
+      this.$dispatch('multi-select-change', this.selected);
     },
     // remove from selected option
     remove(index, option) {
@@ -103,6 +107,7 @@ document.addEventListener('alpine:init', () => {
           this.options[key].selected = false;
         }
       });
+      this.dispatchChange();
     },
     // filter out selected elements
     selectedElements() {

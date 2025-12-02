@@ -1,3 +1,14 @@
+{% comment %}
+
+    Multi select component
+
+    Parameters:
+        - options: The options to select from.
+        - selected: The selected options.
+
+    Event to listen in parent component:
+        - multi-select-change: when the selected options change, the event is triggered with the selected options
+{% endcomment %}
 {% load sass_tags %}
 {% block css %}
     <link href="{% sass_src 'css/tools/multi-select.scss' %}"

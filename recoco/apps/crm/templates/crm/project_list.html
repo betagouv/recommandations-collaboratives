@@ -29,6 +29,7 @@
         {% include "crm/fragments/sidebar.html" with search=True back_button=True user_advised_projects=False user_projects=False %}
         <div x-data="ProjectListCrm(departmentsArray, regionsArray)"
              @selected-departments="saveSelectedDepartment($event)"
+             @multi-select-change="saveSelectedStatus($event)"
              class="w-75 d-flex flex-column justify-content-start project-list-crm">
             <div class="crm-header fr-px-3w fr-py-3w fr-mb-2w">
                 <div class="d-flex justify-content-between align-items-center fr-mb-2v">

@@ -12,6 +12,7 @@ Alpine.data('ProjectListCrm', (departments, regions) => ({
   backendSearch: {
     searchText: '',
     searchDepartment: [],
+    searchStatus: [],
   },
   searchText: '',
   pagination: {
@@ -60,6 +61,13 @@ Alpine.data('ProjectListCrm', (departments, regions) => ({
     const projects = await this.handleProjectSearch();
     this.updateProjectListAndPagination(projects);
   },
+  async saveSelectedStatus(event) {
+    if (!event.detail) return;
+
+    this.backendSearch.searchStatus = [...event.detail];
+    const projects = await this.handleProjectSearch();
+    this.updateProjectListAndPagination(projects);
+  },
   async onSearch() {
     const projects = await this.handleProjectSearch();
     this.updateProjectListAndPagination(projects);
@@ -71,6 +79,7 @@ Alpine.data('ProjectListCrm', (departments, regions) => ({
         page: 1,
         search: this.backendSearch.searchText,
         departments: this.backendSearch.searchDepartment,
+        status: this.backendSearch.searchStatus,
       });
     } catch (error) {
       this.showToast(
@@ -121,6 +130,7 @@ Alpine.data('ProjectListCrm', (departments, regions) => ({
           page: page,
           search: this.backendSearch.searchText,
           departments: this.backendSearch.searchDepartment,
+          status: this.backendSearch.searchStatus,
         })
       );
       return response.data;

@@ -44,6 +44,7 @@ export function projectsUrl({
   limit = 2000,
   offset = 0,
   page = 1,
+  status = [],
 } = {}) {
   // if search with tags, make a different url
   let url;
@@ -63,6 +64,10 @@ export function projectsUrl({
   if (departments.length) {
     departments = departments.map((code) => `departments=${code}`).join('&');
     url = url + '&' + departments;
+  }
+  if (status.length) {
+    status = status.map((status) => `status=${status}`).join('&');
+    url = url + '&' + status;
   }
   return url;
 }
