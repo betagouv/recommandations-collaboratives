@@ -17,6 +17,12 @@ class DepartmentSerializer(serializers.ModelSerializer):
     region = RegionNestedSerializer(read_only=True)
 
 
+class DepartmentNestedSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Department
+        fields = ["name", "code"]
+
+
 class CommuneSerializer(serializers.ModelSerializer):
     class Meta:
         model = Commune
@@ -30,4 +36,4 @@ class RegionSerializer(serializers.ModelSerializer):
         model = Region
         fields = ["name", "code", "departments"]
 
-    departments = DepartmentSerializer(read_only=True, many=True)
+    departments = DepartmentNestedSerializer(read_only=True, many=True)
