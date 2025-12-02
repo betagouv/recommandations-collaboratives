@@ -46,19 +46,23 @@ Alpine.data('ProjectListCrm', (departments, regions) => ({
   /************************
    * Filtering functions
    **************************/
-  async saveSelectedDepartment(event) {
-    if (!event.detail) return;
-
-    this.backendSearch.searchDepartment = [...event.detail];
-    await this.handleProjectSearch();
-  },
-  async onSearch() {
-    const projects = await this.handleProjectSearch();
+  updateProjectListAndPagination(projects) {
     this.projects = [];
     this.projects.push([...projects.results]);
     this.projectsToDisplay = [...projects.results];
     this.projectsTotal = projects.count;
     this.pagination.total = Math.ceil(projects.count / this.pagination.limit);
+  },
+  async saveSelectedDepartment(event) {
+    if (!event.detail) return;
+
+    this.backendSearch.searchDepartment = [...event.detail];
+    const projects = await this.handleProjectSearch();
+    this.updateProjectListAndPagination(projects);
+  },
+  async onSearch() {
+    const projects = await this.handleProjectSearch();
+    this.updateProjectListAndPagination(projects);
   },
   async handleProjectSearch() {
     try {
