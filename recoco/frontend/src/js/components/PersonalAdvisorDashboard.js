@@ -152,6 +152,9 @@ function PersonalAdvisorDashboard(currentSiteId, departments, regions) {
     },
 
     async getDataFiltered() {
+      /**
+       * TODO : check if it's possible to filter projects in the backend
+       */
       const { searchText, searchDepartment, lastActivity } = this.backendSearch;
       const projects = await api.get(
         projectsUrl(searchText, searchDepartment, lastActivity)
