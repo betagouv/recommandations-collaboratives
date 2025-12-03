@@ -19,6 +19,20 @@
         </legend>
         <div class="fr-segmented__elements">
             <div class="fr-segmented__element">
+                <input value="dashboard"
+                       type="radio"
+                       {% if dashboard %}checked{% endif %}
+                       aria-checked="{% if projects %}true{% else %}false{% endif %}"
+                       id="segmented-control-dashboard"
+                       name="segmented-control-dashboard"
+                       @click="window.location='{% url 'crm-site-dashboard' %}'">
+                <label class="fr-label" for="segmented-control-dashboard">
+                    <a class="stretched-link"
+                       data-test-id="project-navigation-dashboard"
+                       href="{% url 'crm-site-dashboard' %}">Tableau de bord</a>
+                </label>
+            </div>
+            <div class="fr-segmented__element">
                 <input value="projects"
                        type="radio"
                        {% if projects %}checked{% endif %}
@@ -66,46 +80,30 @@
                     <a class="stretched-link" data-test-id="project-navigation-resources" href="{% url 'crm-resource-list' %}">Ressources</a>
                 </label>
             </div> {% endcomment %}
-            <div class="fr-segmented__element">
-                <input value="overview"
-                       type="radio"
-                       {% if overview %}checked{% endif %}
-                       aria-checked="{% if overview %}true{% else %}false{% endif %}"
-                       id="segmented-control-overview"
-                       name="segmented-control-project"
-                       @click="window.location='#'">
+            {% comment %} <div class="fr-segmented__element">
+                <input value="overview" type="radio" {% if overview %}checked{% endif %} aria-checked="{% if overview %}true{% else %}false{% endif %}" id="segmented-control-overview" name="segmented-control-project" @click="window.location='#'">
                 <label class="fr-label" for="segmented-control-overview">
-                    <a class="stretched-link"
-                       data-test-id="project-navigation-overview"
-                       href="#">Statistiques</a>
+                    <a class="stretched-link" data-test-id="project-navigation-overview" href="#">Statistiques</a>
                 </label>
-            </div>
-            <div class="fr-segmented__element">
-                <input value="overview"
-                       type="radio"
-                       {% if overview %}checked{% endif %}
-                       aria-checked="{% if overview %}true{% else %}false{% endif %}"
-                       id="segmented-control-overview"
-                       name="segmented-control-project"
-                       @click="window.location='#'">
+            </div> {% endcomment %}
+            {% comment %} <div class="fr-segmented__element">
+                <input value="overview" type="radio" {% if overview %}checked{% endif %} aria-checked="{% if overview %}true{% else %}false{% endif %}" id="segmented-control-overview" name="segmented-control-project" @click="window.location='#'">
                 <label class="fr-label" for="segmented-control-overview">
-                    <a class="stretched-link"
-                       data-test-id="project-navigation-overview"
-                       href="#">Activité</a>
+                    <a class="stretched-link" data-test-id="project-navigation-overview" href="#">Activité</a>
                 </label>
-            </div>
+            </div> {% endcomment %}
             <div class="fr-segmented__element">
                 <input value="overview"
                        type="radio"
-                       {% if overview %}checked{% endif %}
-                       aria-checked="{% if overview %}true{% else %}false{% endif %}"
-                       id="segmented-control-overview"
-                       name="segmented-control-project"
-                       @click="window.location='#'">
-                <label class="fr-label" for="segmented-control-overview">
+                       {% if site_configuration %}checked{% endif %}
+                       aria-checked="{% if site_configuration %}true{% else %}false{% endif %}"
+                       id="segmented-control-site-configuration"
+                       name="segmented-control-site-configuration"
+                       @click="window.location='{% url 'crm-site-configuration' %}'">
+                <label class="fr-label" for="segmented-control-site-configuration">
                     <a class="stretched-link"
-                       data-test-id="project-navigation-overview"
-                       href="#">Paramètres</a>
+                       data-test-id="project-navigation-site-configuration"
+                       href="{% url 'crm-site-configuration' %}">Paramètres du site</a>
                 </label>
             </div>
         </div>
