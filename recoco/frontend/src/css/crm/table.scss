@@ -1,10 +1,9 @@
 .crm {
   .project-table {
     font-size: 12px;
-    overflow: hidden;
-    text-overflow: ellipsis;
     white-space: nowrap;
     line-height: 24px; /* 200% */
+    table-layout: fixed;
 
     &__thead {
       font-weight: 700;
@@ -20,12 +19,15 @@
     .column {
       &--large {
         width: 22%;
+        max-width: 22%;
       }
       &--medium {
         width: 15%;
+        max-width: 15%;
       }
       &--small {
         width: 8%;
+        max-width: 8%;
       }
     }
     .fr-link {

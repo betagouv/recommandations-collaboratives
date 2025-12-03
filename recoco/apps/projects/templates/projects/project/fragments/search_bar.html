@@ -17,7 +17,7 @@ variables to pass :
 <input x-ref="search_bar"
        type="search"
        data-cy="search-bar-project"
-       class="placeholder-position"
+       class="placeholder-position searchbar-input"
        placeholder="{{ placeholder|default:"Rechercher" }}"
        @input.debounce.500ms="{{ action_search }}"
        {% if x_model %}x-model="{{ x_model }}"{% endif %}>
