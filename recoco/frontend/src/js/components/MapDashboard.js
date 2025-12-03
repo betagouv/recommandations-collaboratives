@@ -11,7 +11,7 @@ import 'leaflet/dist/leaflet.css';
 import 'leaflet-control-geocoder/dist/Control.Geocoder.css';
 import _ from 'lodash';
 
-function PersonalAdvisorDashboard(currentSiteId, departments, regions) {
+function MapDashboard(currentSiteId, regions) {
   return {
     currentSiteId: currentSiteId,
     data: [],
@@ -341,8 +341,4 @@ function markerPopupTemplate(item) {
     `;
 }
 
-export function makeProjectPositioningActionURL(url, id) {
-  return url.replace('0', id);
-}
-
-Alpine.data('PersonalAdvisorDashboard', PersonalAdvisorDashboard);
+Alpine.data('MapDashboard', MapDashboard);
