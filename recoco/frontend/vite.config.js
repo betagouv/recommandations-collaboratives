@@ -21,7 +21,7 @@ const config = {
   build: {
     outDir: resolve('./dist'),
     assetsDir: '',
-    manifest: true,
+    manifest: 'manifest.json',
     emptyOutDir: true,
     target: 'es2020',
     rollupOptions: {
@@ -90,6 +90,7 @@ const config = {
         actionPusher: resolve('./src/js/apps/actionPusher.js'),
         NewFeatureBanner: resolve('./src/js/components/NewFeatureBanner.js'),
         projectListCrm: resolve('./src/js/apps/CRM/projectListCrm.js'),
+        crmNavigation: resolve('./src/js/apps/CRM/crmNavigation.js'),
       },
       output: {
         chunkFileNames: undefined,
