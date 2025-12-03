@@ -14,6 +14,7 @@ from django.urls import reverse
 from model_bakery import baker
 
 from recoco.apps.home import models as home_models
+from recoco.apps.projects.utils import assign_collaborator
 from recoco.utils import login
 
 from .. import models
@@ -43,7 +44,8 @@ def test_additional_survey_session_is_created(request, client, project):
     project.sites.add(another_site)
 
     url = reverse("survey-project-session", args=(project.id, another_site.id))
-    with login(client, is_staff=False):
+    with login(client, is_staff=False) as user:
+        assign_collaborator(user, project)
         response = client.get(url)
 
     assert response.status_code == 302
@@ -78,7 +80,8 @@ def test_additional_survey_session_not_created_if_not_on_site_using_it(
     )
 
     url = reverse("survey-project-session", args=(project.id, another_survey.id))
-    with login(client, is_staff=False):
+    with login(client, is_staff=False) as user:
+        assign_collaborator(user, project)
         response = client.get(url)
 
     assert response.status_code == 400

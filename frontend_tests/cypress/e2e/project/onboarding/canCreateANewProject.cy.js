@@ -111,9 +111,21 @@ describe('I can create a new project as a new user', () => {
       .type(signupInfo.phone_no, { delay: 0 })
       .should('have.value', signupInfo.phone_no);
 
+    cy.get('[name=password]').type('nope', { delay: 0 });
+
+    cy.get('[id="error_0_password"]').should('be.visible'); // min length error
+    cy.get('[id="error_1_password"]').should('be.visible'); // number error
+    cy.get('[id="error_2_password"]').should('be.visible'); // uppercase error
+
+    cy.get('[name=password]').clear();
+
     cy.get('[name=password]')
       .type(signupInfo.password1, { delay: 0 })
       .should('have.value', signupInfo.password1);
+
+    cy.get('[id="valid_0_password"]').should('be.visible'); // min length error
+    cy.get('[id="valid_1_password"]').should('be.visible'); // number error
+    cy.get('[id="valid_2_password"]').should('be.visible'); // uppercase error
 
     // Submit signup form
     cy.get('[type=submit]').click();

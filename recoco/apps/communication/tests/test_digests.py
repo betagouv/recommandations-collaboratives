@@ -397,7 +397,6 @@ def test_notification_formatter(request, make_project):
         content="A very nice content",
         resource=resource,
     ).make()
-    public_note = Recipe(projects_models.Note, content="my content", public=True).make()
     private_note = Recipe(
         projects_models.Note, content="my content", public=False
     ).make()
@@ -405,14 +404,6 @@ def test_notification_formatter(request, make_project):
     followup = Recipe(tasks_models.TaskFollowup, task=task, comment="Hello!").make()
 
     tests = [
-        (
-            verbs.Conversation.PUBLIC_MESSAGE,
-            public_note,
-            (
-                f"Bobi Joe (DuckCorp) {verbs.Conversation.PUBLIC_MESSAGE}",
-                "my content",
-            ),
-        ),
         (
             verbs.Conversation.PRIVATE_MESSAGE,
             private_note,
@@ -510,10 +501,10 @@ def test_notification_formatter_with_bogus_user():
     formatter = digests.NotificationFormatter()
 
     user = Recipe(auth.User, username="Bob", first_name="Bobi", last_name="Joe").make()
-    note = Recipe(projects_models.Note).make()
+    private_note = baker.make(projects_models.Note)
 
     notification = Notification(
-        user, verb=verbs.Conversation.PUBLIC_MESSAGE, action_object=note
+        user, verb=verbs.Conversation.PRIVATE_MESSAGE, action_object=private_note
     )
 
     fmt_reco = formatter.format(notification)

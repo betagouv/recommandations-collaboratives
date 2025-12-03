@@ -672,9 +672,9 @@ def make_msg_digest_by_user_and_project(notifications_qs, user, project, site):
         },
         "other_senders": other_senders,
         "text": first_text,
-        "first_object": first_object_node.get_digest_recap()
-        if first_object_node
-        else None,
+        "first_object": (
+            first_object_node.get_digest_recap() if first_object_node else None
+        ),
         "message_url": utils.build_absolute_url(
             notifications_qs.first().action_object.get_absolute_url(),
             auto_login_user=user,
@@ -867,7 +867,6 @@ class NotificationFormatter:
 
     def __init__(self):
         self.dispatch_table = {
-            verbs.Conversation.PUBLIC_MESSAGE: self.format_public_note_created,
             verbs.Conversation.PRIVATE_MESSAGE: self.format_private_note_created,
             verbs.Project.BECAME_ADVISOR: self.format_action_became_advisor,
             verbs.Project.BECAME_OBSERVER: self.format_action_became_observer,
@@ -947,14 +946,6 @@ class NotificationFormatter:
 
     # -------- Routers -----------#
     # ------ Real Formatters -----#
-    def format_public_note_created(self, notification):
-        """A public note was written by a user"""
-        subject = self._represent_user(notification.actor)
-        summary = f"{subject} {verbs.Conversation.PUBLIC_MESSAGE}"
-        excerpt = self._represent_note_excerpt(notification.action_object)
-
-        return FormattedNotification(summary=summary, excerpt=excerpt)
-
     def format_private_note_created(self, notification):
         """A note was written by a switchtender"""
         subject = self._represent_user(notification.actor)

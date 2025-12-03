@@ -18,6 +18,7 @@
                            id="selectDepartments-no"
                            name="{{ form.advisor_access_type.name }}"
                            value="{{ form.fields.advisor_access_type.choices.0.0 }}"
+                           data-test-id="advisor-access-type-national"
                            {% if form.advisor_access_type.value == 'National' %}checked{% endif %}>
                     <label class="fr-label-rework fr-pt-05v" for="selectDepartments-no">
                         {{ form.fields.advisor_access_type.choices.0.1 }}
