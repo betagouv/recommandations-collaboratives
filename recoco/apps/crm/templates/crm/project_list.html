@@ -22,9 +22,8 @@
 {% endblock css %}
 {% block content %}
     {% include "crm/fragments/navigation.html" %}
-    <div x-data="{ breadcrumbs: { links: [{url: '{% url 'crm-site-dashboard' %}', title: 'CRM'}], current: 'Dossiers' } }">
-        {% include "tools/breadcrumb.html" %}
-    </div>
+    <div x-data="{ breadcrumbs: { links: [{url: '{% url 'crm-site-dashboard' %}', title: 'CRM'}], current: 'Dossiers' } }"
+         class="fr-p-0">{% include "tools/breadcrumb.html" %}</div>
     {{ departments|json_script:"departmentsArray" }}
     {{ regions|json_script:"regionsArray" }}
     <span x-text="departmentsArray.textContent"></span>
@@ -34,12 +33,7 @@
              @selected-departments="saveSelectedDepartment($event)"
              @multi-select-change="saveSelectedStatus($event)"
              class="w-100 d-flex flex-column justify-content-start project-list-crm">
-            <div class="crm-header fr-px-3w fr-py-3w fr-mb-2w">
-                <div class="d-flex justify-content-between align-items-center fr-mb-2v">
-                    <h3>Gestion des dossiers {{ request.site.name }}</h3>
-                </div>
-            </div>
-            <div class="project-list-crm__filters fr-px-5v fr-py-5v">
+            <div class="project-list-crm__filters fr-px-5v fr-pb-5v">
                 <div class="d-flex align-items-center" x-transition.opacity.duration.500ms>
                     <span class="project-list-crm__projects-count-label"
                           x-show="dataLoaded"
