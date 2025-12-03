@@ -13,53 +13,59 @@
     {% vite_asset 'js/apps/crm/crmDossier.js' %}
 {% endblock js %}
 <div class="crm-navigation d-flex justify-content-between">
-    <fieldset class="fr-segmented fr-segmented--md fr-px-3w">
+    <fieldset class="fr-segmented fr-segmented--md fr-pr-3w">
         <legend class="crm-navigation__legend fr-segmented__legend">
             <span class="fr-icon-tools-line fr-mr-1w" aria-hidden="true"></span>Administration
         </legend>
         <div class="fr-segmented__elements">
             <div class="fr-segmented__element">
-                <input value="overview"
+                <input value="projects"
                        type="radio"
-                       {% if overview %}checked{% endif %}
-                       aria-checked="{% if overview %}true{% else %}false{% endif %}"
-                       id="segmented-control-overview"
+                       {% if projects %}checked{% endif %}
+                       aria-checked="{% if projects %}true{% else %}false{% endif %}"
+                       id="segmented-control-projects"
                        name="segmented-control-project"
-                       @click="window.location='#'">
-                <label class="fr-label" for="segmented-control-overview">
+                       @click="window.location='{% url 'crm-project-list' %}'">
+                <label class="fr-label" for="segmented-control-projects">
                     <a class="stretched-link"
-                       data-test-id="project-navigation-overview"
-                       href="#">Dossiers</a>
+                       data-test-id="project-navigation-projects"
+                       href="{% url 'crm-project-list' %}">Dossiers</a>
                 </label>
             </div>
             <div class="fr-segmented__element">
-                <input value="overview"
+                <input value="users"
                        type="radio"
-                       {% if overview %}checked{% endif %}
-                       aria-checked="{% if overview %}true{% else %}false{% endif %}"
-                       id="segmented-control-overview"
+                       {% if users %}checked{% endif %}
+                       aria-checked="{% if users %}true{% else %}false{% endif %}"
+                       id="segmented-control-users"
                        name="segmented-control-project"
-                       @click="window.location='#'">
-                <label class="fr-label" for="segmented-control-overview">
+                       @click="window.location='{% url 'crm-user-list' %}'">
+                <label class="fr-label" for="segmented-control-users">
                     <a class="stretched-link"
-                       data-test-id="project-navigation-overview"
-                       href="#">Utilisateurs & Organisations</a>
+                       data-test-id="project-navigation-users"
+                       href="{% url 'crm-user-list' %}">Utilisateurs</a>
                 </label>
             </div>
             <div class="fr-segmented__element">
-                <input value="overview"
+                <input value="organizations"
                        type="radio"
-                       {% if overview %}checked{% endif %}
-                       aria-checked="{% if overview %}true{% else %}false{% endif %}"
-                       id="segmented-control-overview"
+                       {% if organizations %}checked{% endif %}
+                       aria-checked="{% if organizations %}true{% else %}false{% endif %}"
+                       id="segmented-control-organizations"
                        name="segmented-control-project"
-                       @click="window.location='#'">
-                <label class="fr-label" for="segmented-control-overview">
+                       @click="window.location='{% url 'crm-organization-list' %}'">
+                <label class="fr-label" for="segmented-control-organizations">
                     <a class="stretched-link"
-                       data-test-id="project-navigation-overview"
-                       href="#">Ressources</a>
+                       data-test-id="project-navigation-organizations"
+                       href="{% url 'crm-organization-list' %}">Organisations</a>
                 </label>
             </div>
+            {% comment %} <div class="fr-segmented__element">
+                <input value="resources" type="radio" {% if resources %}checked{% endif %} aria-checked="{% if resources %}true{% else %}false{% endif %}" id="segmented-control-resources" name="segmented-control-project" @click="window.location='{% url 'crm-resource-list' %}'">
+                <label class="fr-label" for="segmented-control-overview">
+                    <a class="stretched-link" data-test-id="project-navigation-resources" href="{% url 'crm-resource-list' %}">Ressources</a>
+                </label>
+            </div> {% endcomment %}
             <div class="fr-segmented__element">
                 <input value="overview"
                        type="radio"
@@ -104,4 +110,5 @@
             </div>
         </div>
     </fieldset>
+    {% include "crm/fragments/general_search_input.html" %}
 </div>

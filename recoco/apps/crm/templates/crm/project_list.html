@@ -21,7 +21,7 @@
           type="text/css">
 {% endblock css %}
 {% block content %}
-    {% include "crm/fragments/navigation.html" %}
+    {% include "crm/fragments/navigation.html" with projects=True %}
     <div x-data="{ breadcrumbs: { links: [{url: '{% url 'crm-site-dashboard' %}', title: 'CRM'}], current: 'Dossiers' } }"
          class="fr-p-0">{% include "tools/breadcrumb.html" %}</div>
     {{ departments|json_script:"departmentsArray" }}
@@ -41,7 +41,7 @@
                     <span class="project-list-crm__projects-count-label" x-show="!dataLoaded">Chargement</span>
                 </div>
                 <div class="w-100 position-relative">
-                    {% include "projects/project/fragments/search_bar.html" with action_search="onSearch" x_model="backendSearch.searchText" placeholder="Rechercher" %}
+                    {% include "projects/project/fragments/search_bar.html" with action_search="onSearch" x_model="backendSearch.searchText" placeholder="Rechercher parmi les dossiers" %}
                 </div>
                 {% include "projects/project/fragments/departments_selector.html" with label="Projets de mon territoire" label_filter="Localisation :" filter_by_regions=True zone_objects="regions" select_all=True %}
                 <div class="d-flex align-items-center w-100">
