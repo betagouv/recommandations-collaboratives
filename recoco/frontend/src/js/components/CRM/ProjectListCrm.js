@@ -18,7 +18,7 @@ Alpine.data('ProjectListCrm', (departments, regions) => ({
   searchText: '',
   pagination: {
     currentPage: 1,
-    limit: 42,
+    limit: 10,
     total: 0,
   },
   options: [
