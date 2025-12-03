@@ -105,7 +105,7 @@
                             {% if "manage_configuration" in user_site_perms %}
                                 <li class="fr-mr-2v col-2">
                                     {% url 'crm-site-configuration' as url %}
-                                    {% include "crm/fragments/crm_icon_button.html" with link_url=url name="Réglages du Site" icon="gear" %}
+                                    {% include "crm/fragments/crm_icon_button.html" with link_url=url name="Paramètres du Site" icon="gear" %}
                                 </li>
                             {% endif %}
                             {% if perms.wagtailadmin.access_admin %}
