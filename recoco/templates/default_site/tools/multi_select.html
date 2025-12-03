@@ -117,9 +117,12 @@
                                              x-bind:class="option.selected ? 'selected-item' : ''"
                                              @click="select(index,$event)">
                                             <div x-bind:class="option.selected ? 'selected-item-list-item' : ''"
-                                                 class="d-flex w-100 align-items-center p-2 border-transparent border-l-2 position-relative">
+                                                 class="d-flex w-100 align-items-center p-1 border-transparent border-l-2 position-relative">
                                                 <div class="w-100 align-items-center d-flex">
-                                                    <div class="mx-2 leading-6" x-model="option" x-text="option.text"></div>
+                                                    <div class="mx-2"
+                                                         x-model="option"
+                                                         x-text="option.text"
+                                                         :class="option.color"></div>
                                                 </div>
                                             </div>
                                         </div>

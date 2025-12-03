@@ -22,18 +22,49 @@ Alpine.data('ProjectListCrm', (departments, regions) => ({
     total: 0,
   },
   options: [
-    { value: 'PRE_DRAFT', text: 'Incomplet', color: 'fr-badge--new' },
-    { value: 'DRAFT', text: 'A modérer', color: 'fr-badge--new' },
-    { value: 'TO_PROCESS', text: 'A traiter', color: 'fr-badge--info' },
-    { value: 'READY', text: 'En attente', color: 'fr-badge--success-lighter' },
+    {
+      value: 'PRE_DRAFT',
+      text: 'Incomplet',
+      color: 'fr-badge--new fr-badge fr-badge--no-icon font-size-10px',
+    },
+    {
+      value: 'DRAFT',
+      text: 'A modérer',
+      color: 'fr-badge--new fr-badge fr-badge--no-icon font-size-10px',
+    },
+    {
+      value: 'TO_PROCESS',
+      text: 'A traiter',
+      color: 'fr-badge--info fr-badge fr-badge--no-icon font-size-10px',
+    },
+    {
+      value: 'READY',
+      text: 'En attente',
+      color:
+        'fr-badge--success-lighter fr-badge fr-badge--no-icon font-size-10px',
+    },
     {
       value: 'IN_PROGRESS',
       text: 'En cours',
-      color: 'fr-badge--success-lighter',
+      color:
+        'fr-badge--success-lighter fr-badge fr-badge--no-icon font-size-10px',
     },
-    { value: 'DONE', text: 'Traité', color: 'fr-badge--success-lighter' },
-    { value: 'STUCK', text: 'Conseil interrompu', color: 'fr-badge--info' },
-    { value: 'REJECTED', text: 'Rejeté', color: 'fr-badge--error' },
+    {
+      value: 'DONE',
+      text: 'Traité',
+      color:
+        'fr-badge--success-lighter fr-badge fr-badge--no-icon font-size-10px',
+    },
+    {
+      value: 'STUCK',
+      text: 'Conseil interrompu',
+      color: 'fr-badge--info fr-badge fr-badge--no-icon font-size-10px',
+    },
+    {
+      value: 'REJECTED',
+      text: 'Rejeté',
+      color: 'fr-badge--error fr-badge fr-badge--no-icon font-size-10px',
+    },
   ],
   displayProjectIndex: false,
   async init() {
