@@ -32,7 +32,7 @@
             <div class="d-flex flex-column align-items-center position-relative">
                 <!-- Selected elements container -->
                 <div class="w-100">
-                    <div class="multi-select__container d-flex border border-gray-200 bg-white">
+                    <div class="multi-select__container d-flex  custom-input-border bg-white">
                         <div class="d-flex flex-auto flex-wrap w-100" x-on:click="open">
                             <!-- iterating over selected elements -->
                             <template x-for="(option,index) in selectedElms" :key="option.value">
@@ -52,7 +52,7 @@
                             <!-- None items selected -->
                             <div x-show="selectedElms.length == 0" class="flex-grow-1">
                                 <input placeholder="Sélectionnez pour filtrer"
-                                       class="multi-select__input bg-transparent p-1 px-2 appearance-none outline-none h-full w-100 text-gray-800 "
+                                       class="multi-select__input bg-transparent p-1 px-2 appearance-none outline-none h-full w-100 text-gray-800 border-0"
                                        x-bind:value="selectedElements()">
                             </div>
                         </div>
