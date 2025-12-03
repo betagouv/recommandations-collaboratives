@@ -22,6 +22,9 @@
 {% endblock css %}
 {% block content %}
     {% include "crm/fragments/navigation.html" %}
+    <div x-data="{ breadcrumbs: { links: [{url: '{% url 'crm-site-dashboard' %}', title: 'CRM'}], current: 'Dossiers' } }">
+        {% include "tools/breadcrumb.html" %}
+    </div>
     {{ departments|json_script:"departmentsArray" }}
     {{ regions|json_script:"regionsArray" }}
     <span x-text="departmentsArray.textContent"></span>

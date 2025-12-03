@@ -1020,3 +1020,10 @@ form > p {
   background-color: #d2e9db;
   color: var(--success-425, #18753c);
 }
+
+/* ¯¯¯¯¯¯¯¯¯ *\
+  BREADCRUMB
+\* ˍˍˍˍˍˍˍˍˍ */
+.fr-breadcrumb .fr-breadcrumb__list li.fr-breadcrumb__link--first:before {
+  display: none;
+}
