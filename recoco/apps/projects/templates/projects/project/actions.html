@@ -44,9 +44,9 @@
                      class="fr-mr-4w"
                      src="{% static 'svg/empty-state.svg' %}">
                 <div>
-                    <h3 class="size-20px fw-bold fr-mb-0">Il n’y a encore aucune recommandation pour ce projet</h3>
+                    <h3 class="size-20px fw-bold fr-mb-0">Il n’y a encore aucune recommandation sur ce dossier.</h3>
                     <p class="fw-normal font-size-14px fr-mb-2w">
-                        Vous pouvez examiner les recommandations suggérées automatiquement pour ce projet, pour éventuellement les proposer à la collectivité.
+                        Vous pouvez examiner les recommandations suggérées automatiquement pour ce dossier, pour éventuellement les adresser au demandeur.
                     </p>
                     {% if advising or is_staff %}
                         <a href="{% url 'projects-project-tasks-suggest' project.pk %}"
