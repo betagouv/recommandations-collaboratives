@@ -23,14 +23,14 @@
         <!-- Notifications -->
         <div class="dropdown user-tools__notification-menu"
              x-data="MenuNotifications({{ unread_notifications_count }}, {{ unread_notifications }})">
-            <button class="fr-btn fr-btn--tertiary-no-outline fr-icon-notification-3-line"
+            <button class="fr-nav__btn user-tools__main-menu-button"
                     id="notification-menu-button"
                     role="button"
                     data-bs-toggle="dropdown"
                     data-bs-auto-close="outside"
                     aria-expanded="false"
                     data-test-id="notification-menu-open">
-                Notifications
+                <span class="fr-icon-notification-3-line" aria-hidden="true"></span>
                 <span class="badge text-bg-danger"
                       x-show="notificationNumber > 0"
                       x-text="notificationNumber"

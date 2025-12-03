@@ -23,7 +23,7 @@
       margin-left: var(--padding-y-navigation);
       margin-right: var(--padding-y-navigation);
       max-height: 2.25rem;
-      max-width: 2.25rem;
+      max-width: 4.5rem;
       margin: 6px;
       &::before {
         --icon-size: 1.25rem;
@@ -50,6 +50,10 @@
     --ul-type: none;
     z-index: 1040;
   }
+}
+
+.fr-nav__btn:after {
+ margin-left: 0px;
 }
 
 #display-corrected {
