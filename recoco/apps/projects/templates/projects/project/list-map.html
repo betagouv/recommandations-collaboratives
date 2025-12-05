@@ -22,12 +22,12 @@
           type="text/css">
 {% endblock css %}
 {% block project_list_content %}
-    {{ departments|json_script:"departmentsArray" }}
     {{ regions|json_script:"regionsArray" }}
     <div class="col-12 fr-mx-auto font-marianne">
-        <div x-data="PersonalAdvisorDashboard({{ request.site.id }}, departmentsArray, regionsArray)"
+        <div x-data="MapDashboard({{ request.site.id }}, regionsArray)"
              x-init='getData("{{ request.user }}");'
              @selected-departments="saveSelectedDepartment($event)">
+            <div class="kanban-header topbar d-flex justify-content-between align-items-center fr-p-2v">
                 {% include "projects/project/fragments/tasks_inline_kanban/tasks_inline_kanban_filters.html" %}
                 <div class="kanban-header__toolbar">{% include "projects/project/fragments/list-toolbars.html" %}</div>
             </div>
