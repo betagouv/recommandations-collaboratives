@@ -48,16 +48,19 @@ Alpine.data('KanbanProjects', function (currentSiteId, departments, regions) {
       this.isViewInitialized = true;
     },
     async getData() {
-      const { searchText, searchDepartment, lastActivity } = this.backendSearch;
       const projects = await api.get(
-        projectsUrl(searchText, searchDepartment, lastActivity)
+        projectsUrl({
+          search: this.backendSearch.searchText,
+          departments: this.backendSearch.searchDepartment,
+          lastActivity: this.backendSearch.lastActivity,
+        })
       );
       this.projectList = await this.$store.projects.mapperProjetsProjectSites(
-        projects.data,
+        projects.data.results,
         this.currentSiteId
       );
 
-      this.projectList = projects.data.map((d) =>
+      this.projectList = projects.data.results.map((d) =>
         Object.assign(d, {
           uuid: generateUUID(),
         })
@@ -246,7 +249,7 @@ Alpine.data('KanbanProjects', function (currentSiteId, departments, regions) {
     },
     async onTagClick(tag) {
       this.backendSearch.searchText = tag;
-      this.searchText = "#" + tag;
+      this.searchText = '#' + tag;
       await this.backendSearchProjects({ resetLastActivity: true });
     },
   };

@@ -21,7 +21,7 @@ const config = {
   build: {
     outDir: resolve('./dist'),
     assetsDir: '',
-    manifest: true,
+    manifest: 'manifest.json',
     emptyOutDir: true,
     target: 'es2020',
     rollupOptions: {
@@ -81,12 +81,16 @@ const config = {
           './src/js/components/RegionDepartmentPreparer.js'
         ),
         User: resolve('./src/js/components/User.js'),
-        MutliSelect: resolve('./src/js/components/MultiSelect.js'),
+        MultiSelectRegionDepartment: resolve(
+          './src/js/components/MultiSelectRegionDepartment.js'
+        ),
         ContactBook: resolve('./src/js/components/ContactBook.js'),
         pageInvitation: resolve('./src/js/apps/pageInvitation.js'),
         idbObjectStoreMgmt: resolve('./src/js/store/idbObjectStoreMgmt.js'),
         actionPusher: resolve('./src/js/apps/actionPusher.js'),
         NewFeatureBanner: resolve('./src/js/components/NewFeatureBanner.js'),
+        projectListCrm: resolve('./src/js/apps/CRM/projectListCrm.js'),
+        crmNavigation: resolve('./src/js/apps/CRM/crmNavigation.js'),
       },
       output: {
         chunkFileNames: undefined,

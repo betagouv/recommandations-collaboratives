@@ -52,6 +52,7 @@
   },
   "devDependencies": {
     "@babel/preset-env": "^7.26.0",
+    "@types/alpinejs": "^3.13.11",
     "babel-plugin-lodash": "^3.3.4",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "9.1.0",
