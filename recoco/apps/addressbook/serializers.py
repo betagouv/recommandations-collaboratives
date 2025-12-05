@@ -113,6 +113,7 @@ class NestedOrganizationSerializer(OrganizationListSerializer):
             "id",
             "name",
             "group",
+            "departments",
             "_link",
         ]
 

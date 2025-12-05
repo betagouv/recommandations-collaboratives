@@ -4,6 +4,7 @@ import api, {
   contactUrl,
   searchContactsUrl,
   getOrganizationById,
+  departmentsUrl,
 } from '../utils/api';
 import _ from 'lodash';
 import { formatDate } from '../utils/date';
@@ -23,6 +24,7 @@ Alpine.data('ContactBook', (departments, regions) => {
     regions: JSON.parse(regions.textContent),
     contactSearched: [],
     isContactDataLoaded: false,
+    departments: [],
     async init() {
       try {
         const response = await api.get(contactsUrl());
@@ -41,12 +43,13 @@ Alpine.data('ContactBook', (departments, regions) => {
       }
     },
     async getDepartmentsOrganization(nationalGroupList) {
+      this.departments = (await api.get(departmentsUrl())).data;
       for (const nationalGroup of nationalGroupList) {
         for (const orga of nationalGroup.organizations) {
           if (orga.id) {
-            orga.departments = (
-              await api.get(getOrganizationById(orga.id))
-            ).data.departments;
+            orga.departments = orga.departments.map((department) => {
+              return this.departments.find((d) => d.code == department);
+            });
           }
         }
       }
@@ -99,6 +102,7 @@ Alpine.data('ContactBook', (departments, regions) => {
       for (const key in contactByOrganization) {
         contactByOrganizationArray.push({
           name: key,
+          departments: contactByOrganization[key][0].organization.departments,
           id: contactByOrganization[key][0].organization.id,
           contacts: contactByOrganization[key],
         });
