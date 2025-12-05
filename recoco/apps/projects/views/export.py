@@ -113,6 +113,13 @@ def project_list_export_csv(request):
         published_tasks = project.tasks.filter(site=request.site).exclude(public=False)
         first_reco = published_tasks.order_by("created_on").first()
 
+        if project.submitted_by:
+            submitted_by = (
+                f"{project.submitted_by.first_name} {project.submitted_by.last_name}"
+            )
+        else:
+            submitted_by = "Inconnu"
+
         row = [
             project.commune.department.code if project.commune else "??",
             project.commune.insee if project.commune else "??",
@@ -120,7 +127,7 @@ def project_list_export_csv(request):
             project.name,
             project.location,
             project.created_on.date(),
-            f"{project.submitted_by.first_name} {project.submitted_by.last_name}",
+            submitted_by,
             [m.email for m in project.members.all()],
             project.phone,
             switchtenders_txt,
