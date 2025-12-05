@@ -26,7 +26,7 @@
                     {% include "conversations/messages/message_item.html" %}
                 </template>
                 <template x-if="element.type == 'activity'">
-                    {% include "projects/project/fragments/conversations_new/message_type/type_followup_item.html" with element="node" %}
+                    {% include "conversations/messages/fragments/type_followup_item.html" with element="node" %}
                 </template>
             </div>
         </template>
@@ -34,6 +34,6 @@
 </div>
 <template x-if="feed.elements.length == 0">
     <div class="feed-element-item fr-px-3v fr-mb-3v">
-        {% include "projects/project/fragments/conversations_new/message_type/empty_message_list.html" %}
+        {% include "conversations/messages/fragments/empty_message_list.html" %}
     </div>
 </template>
