@@ -59,6 +59,7 @@ from recoco.apps.addressbook import models as addressbook_models
 from recoco.apps.addressbook.models import Organization
 from recoco.apps.communication import api
 from recoco.apps.geomatics import models as geomatics
+from recoco.apps.geomatics.serializers import RegionSerializer
 from recoco.apps.home import models as home_models
 from recoco.apps.onboarding import utils as onboarding_utils
 from recoco.apps.projects.models import Project, Topic
@@ -762,18 +763,30 @@ def user_reminder_details(request, user_id, reminder_pk):
 def project_list(request):
     has_perm_or_403(request.user, "use_crm", request.site)
 
-    # filtered projects
-    projects = filters.ProjectFilter(
-        request.GET,
-        queryset=Project.all_on_site.order_by("name")
-        .select_related("commune__department")
-        .prefetch_related("project_sites__site"),
+    department_queryset = (
+        geomatics.Department.objects.filter(
+            code__in=(
+                Project.on_site.for_user(request.user)
+                .order_by("-created_on", "-updated_on")
+                .prefetch_related("commune__department")
+                .values_list("commune__department", flat=True)
+            )
+        )
+        | request.user.profile.departments.all()
+    ).distinct()
+
+    region_queryset = (
+        geomatics.Region.objects.filter(departments__in=department_queryset)
+        .prefetch_related("departments")
+        .distinct()
+        .order_by("name")
     )
 
-    # required by default on crm
-    search_form = forms.CRMSearchForm()
+    context = {
+        "regions": list(RegionSerializer(region_queryset, many=True).data),
+    }
 
-    return render(request, "crm/project_list.html", locals())
+    return render(request, "crm/project_list.html", context)
 
 
 @login_required

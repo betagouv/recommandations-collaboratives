@@ -1,3 +1,6 @@
 import '../../css/crm.css';
-import '../components/Crm';
+import '../../css/crm/table.scss';
+
+import '../components/Crm.js';
+
 import '../utils/htmx.js';

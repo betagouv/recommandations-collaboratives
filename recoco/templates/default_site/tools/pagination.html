@@ -1,0 +1,59 @@
+{% comment %} Pagination template
+In parent component, you need to pass the following variables:
+- pagination: the pagination object (currentPage, total, limit)
+- onChangePage: the function to call when the page is changed
+{% endcomment %}
+<nav role="navigation" class="fr-pagination" aria-label="Pagination">
+    <ul class="fr-pagination__list justify-content-center">
+        <li>
+            <button class="fr-pagination__link fr-pagination__link--prev fr-pagination__link--lg-label"
+                    @click="onChangePage(pagination.currentPage - 1)"
+                    title="Page précédente"
+                    :disabled="pagination.currentPage === 1"
+                    :class="{ 'fr-pagination__link--disabled': pagination.currentPage === 1 }">Page précédente</button>
+        </li>
+        <li>
+            <button class="fr-pagination__link"
+                    title="Page 1"
+                    :aria-current="pagination.currentPage === 1"
+                    :class="{ 'fr-pagination__link--current': pagination.currentPage === 1}"
+                    @click="onChangePage(1)">1</button>
+        </li>
+        <li>
+            <span class="fr-pagination__link fr-hidden fr-mx-0"
+                  :class="{ 'fr-unhidden-lg': pagination.currentPage > 4 }">…</span>
+        </li>
+        <template x-for="i in Array(pagination.total).fill().map((x,i) => i+1).slice(1,pagination.total-1)"
+                  :key="i">
+            <li>
+                <button class="fr-pagination__link fr-hidden"
+                        :title="`Page ${i}`"
+                        :aria-current="i === pagination.currentPage"
+                        :class="{ 'fr-pagination__link--current': i === pagination.currentPage,  'fr-unhidden-lg': (i >= pagination.currentPage - 2 && i <= pagination.currentPage + 2) }"
+                        x-text="i"
+                        @click="onChangePage(i)"></button>
+            </li>
+        </template>
+        <li>
+            <span class="fr-pagination__link fr-hidden"
+                  :class="{ 'fr-unhidden-lg': pagination.currentPage < pagination.total - 3 }">…</span>
+        </li>
+        <li x-show="pagination.total > 1">
+            <button class="fr-pagination__link"
+                    :title="`Page ${pagination.total}`"
+                    :aria-current="pagination.currentPage === pagination.total"
+                    :class="{ 'fr-pagination__link--current': pagination.currentPage === pagination.total}"
+                    @click="onChangePage(pagination.total)"
+                    x-text="pagination.total"></button>
+        </li>
+        <li>
+            <button class="fr-pagination__link fr-pagination__link--next fr-pagination__link--lg-label"
+                    @click="onChangePage(pagination.currentPage + 1)"
+                    title="Page suivante"
+                    :disabled="pagination.currentPage === pagination.total"
+                    :class="{ 'fr-pagination__link--disabled': pagination.currentPage === pagination.total }">
+                Page suivante
+            </button>
+        </li>
+    </ul>
+</nav>

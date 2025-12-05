@@ -57,3 +57,11 @@ class DepartmentsFilter(BaseFilterBackend):
         if departments:
             queryset = queryset.filter(commune__department__code__in=departments)
         return queryset
+
+
+class ProjectSiteStatusFilter(BaseFilterBackend):
+    def filter_queryset(self, request, queryset, view):
+        project_site_status = request.GET.getlist("status", None)
+        if project_site_status:
+            queryset = queryset.filter(project_site_status__in=project_site_status)
+        return queryset

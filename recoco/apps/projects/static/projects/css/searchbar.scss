@@ -1,7 +1,8 @@
-input {
+input.searchbar-input {
   border: 1px solid var(--light-border-default-grey, #e5e5e5);
   height: 100%;
   padding: 0.3rem 0.75rem;
+  padding-left: 32px;
   width: 100%;
   border-radius: 100px;
 }

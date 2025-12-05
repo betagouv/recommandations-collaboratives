@@ -1,0 +1,31 @@
+{% comment %}
+
+    Breadcrumb component
+    In parent component, you need to pass the following variables in x-data:
+    - breadcrumbs = {
+        "links": [{"url": "first-url", "title": "First title"}, {...}],
+        "current": "Current page title",
+    }
+{% endcomment %}
+<!-- Breadcrumb -->
+<nav role="navigation"
+     class="fr-breadcrumb fr-mb-3v fr-mt-0 fr-px-5v fr-pt-5v"
+     aria-label="vous êtes ici :">
+    <button class="fr-breadcrumb__button"
+            aria-expanded="false"
+            aria-controls="breadcrumb">Voir le fil d’Ariane</button>
+    <div class="fr-collapse" id="breadcrumb">
+        <ol class="fr-breadcrumb__list">
+            <template x-for="(link, index) in breadcrumbs.links" :key="link.url">
+                <li :class="{ 'fr-breadcrumb__link--first': index == 0 }">
+                    <a class="fr-breadcrumb__link"  :href="link.url" x-text="link.title"></a>
+                </li>
+            </template>
+            <li>
+                <a class="fr-breadcrumb__link"
+                   aria-current="page"
+                   x-text="breadcrumbs.current"></a>
+            </li>
+        </ol>
+    </div>
+</nav>
