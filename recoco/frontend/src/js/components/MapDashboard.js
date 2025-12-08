@@ -14,9 +14,6 @@ import _ from 'lodash';
 function MapDashboard(currentSiteId, regions) {
   return {
     currentSiteId: currentSiteId,
-    data: [],
-    displayedData: [],
-    errors: null,
     formatDate,
     gravatar_url,
     makeProjectURL,
@@ -38,103 +35,29 @@ function MapDashboard(currentSiteId, regions) {
     mapIsSmall: false,
     markersLayer: '',
     //*** options
-    //*** header's height + some px
-    bodyScrollTopPadding: 80,
     allProjects: [],
     async init() {
-      this.allProjects = await this.$store.projects.getUserProjetsStatus();
+      // this.allProjects = await this.$store.projects.getUserProjetsStatus();
+      // if (this.map) {
+      //   this.map.remove();
+      // }
+      // if (this.markersLayer) {
+      //   this.markersLayer.remove();
+      // }
+      // const { map, markersLayer } = initMap(this.allProjects);
+
+      // this.map = map;
+      // this.markersLayer = markersLayer;
+
+      // if (this.allProjects.length > 0) {
+      //   zoomToCentroid(this.map, this.markersLayer);
+      // } else {
+      //   setTimeout(() => this.map.invalidateSize(), 251);
+      // }
       await this.getDataFiltered();
-    },
-    async getData(currentUser) {
-      const projects = await this.$store.projects.getUserProjetsStatus();
-      await this.$store.projects.mapperProjetsProjectSites(
-        projects,
-        this.currentSiteId
-      );
-      this.nbNewProjects = projects.filter((p) => p.status === 'NEW').length;
-
-      this.data = projects.map((project) => ({ ...project, isLoading: false }));
-
-      this.data = _.unionBy(this.data, 'project.id');
-      this.displayedData = this.data.sort(this.sortProjectDate);
-      if (this.map) {
-        this.map.remove();
-      }
-      if (this.markersLayer) {
-        this.markersLayer.remove();
-      }
-      const { map, markersLayer } = initMap(projects);
-
-      this.map = map;
-      this.markersLayer = markersLayer;
-
-      if (projects.length > 0) {
-        zoomToCentroid(this.map, this.markersLayer);
-      } else {
-        setTimeout(() => this.map.invalidateSize(), 251);
-      }
     },
     get isBusy() {
       return this.$store.app.isLoading;
-    },
-    regionsFilterResponse(event) {
-      if (!event.detail) return;
-
-      this.departments = event.detail;
-
-      return (this.displayedData = this.filterProjectsByDepartments(
-        this.searchProjects(this.search)
-      ).sort(this.currentSort));
-    },
-    filterProjectsByDepartments(projects) {
-      this.addCurrentStateToStore('departments', this.departments);
-
-      //find department item from departments for each project and return if the department is active
-      return projects.filter(
-        (item) =>
-          this.departments.find(
-            (department) =>
-              department.code === item.project.commune?.department?.code
-          )?.active
-      );
-    },
-    handleProjectsSearch(event) {
-      const searchValue = event.target.value;
-
-      if (searchValue === '') {
-        this.addCurrentStateToStore('search', searchValue);
-        return (this.displayedData = this.filterProjectsByDepartments(
-          this.data
-        ).sort(this.currentSort));
-      }
-
-      const newProjectList = this.searchProjects(searchValue);
-
-      this.addCurrentStateToStore('search', searchValue);
-
-      return (this.displayedData = this.filterProjectsByDepartments(
-        newProjectList
-      ).sort(this.currentSort));
-    },
-    searchProjects(searchValue) {
-      return this.data.filter((item) => {
-        if (
-          item.project.name?.toLowerCase().includes(searchValue.toLowerCase())
-        )
-          return item;
-        if (
-          item.project.commune?.name
-            ?.toLowerCase()
-            .includes(searchValue.toLowerCase())
-        )
-          return item;
-        if (item.project.commune?.insee?.includes(searchValue)) return item;
-        if (
-          item.project.id.toString().includes(searchValue) &&
-          searchValue.length < 4
-        )
-          return item;
-      });
     },
     handleMapOpen() {
       //251 -> 0.25s for the map height transition +1 ms
@@ -163,11 +86,6 @@ function MapDashboard(currentSiteId, regions) {
         projects.data,
         this.currentSiteId
       );
-      this.projectList = this.projectList
-        .filter((fp) => this.allProjects.some((p) => p.project.id === fp.id))
-        .map((fp) => {
-          return this.allProjects.find((p) => p.project.id === fp.id);
-        });
       this.projectListFiltered = [...this.projectList];
       this.filterMyProjects();
     },
@@ -175,7 +93,7 @@ function MapDashboard(currentSiteId, regions) {
     filterMyProjects() {
       if (this.isDisplayingOnlyUserProjects) {
         this.projectListFiltered = this.projectList.filter(
-          (d) => d.project.is_observer || d.project.is_switchtender
+          (d) => d.is_observer || d.is_switchtender
         );
       } else {
         this.projectListFiltered = [...this.projectList];
@@ -261,6 +179,7 @@ function initMap(projects) {
   L.tileLayer.provider('CartoDB.Positron').addTo(map);
 
   const markers = createMapMarkers(map, projects);
+  debugger;
   const markersLayer = createMarkersLayer(map, markers);
 
   return { map, markersLayer };
@@ -284,9 +203,11 @@ function zoomToCentroid(map, markersLayer) {
 // Crete layers composed with markers
 function createMapMarkers(map, projects) {
   return projects.map((item) => {
-    if (item.project?.commune?.latitude && item.project?.commune?.longitude) {
-      let lat = item.project?.commune?.latitude + Math.random() * 0.001;
-      let long = item.project?.commune?.longitude + Math.random() * 0.001;
+    let lat = item.latitude || item.commune?.latitude;
+    let long = item.longitude || item.commune?.longitude;
+    if (lat && long) {
+      lat = lat + Math.random() * 0.001;
+      long = long + Math.random() * 0.001;
 
       return L.marker([lat, long], { icon: createMarkerIcon(item) })
         .addTo(map)
@@ -314,7 +235,7 @@ function markerPopupTemplate(item) {
         `;
   }
 
-  if (item.project.is_observer) {
+  if (item.is_observer) {
     roleTemplate = `
         <div class="project-card-top-information observer">
             <span>Observateur</span>
@@ -322,7 +243,7 @@ function markerPopupTemplate(item) {
         `;
   }
 
-  if (item.project.is_switchtender && !item.project.is_observer) {
+  if (item.is_switchtender && !item.is_observer) {
     roleTemplate = `
         <div class="project-card-top-information advisor">
             <span>Conseiller</span>
@@ -333,9 +254,9 @@ function markerPopupTemplate(item) {
   return `
         <div class="dashboard-marker-popup ${item.status === 'NEW' && 'new-project'} tmp-usevar" style="${item.status === 'NEW' ? 'border:solid 1px #FDCD6D' : 'border:solid 1px #222'}">
             ${roleTemplate != null ? roleTemplate : ''}
-            <a class="text-nowrap project-link d-flex align-items-center" href="/project/${item.project.id}/presentation">
-                <span class="text-nowrap fw-bold title-info text-dark fr-mr-2v location">${item.project.commune.name}</span>
-                <span class="text-nowrap text-info-custom text-grey-dark name">${item.project.name}</span>
+            <a class="text-nowrap project-link d-flex align-items-center" href="/project/${item.id}/presentation">
+                <span class="text-nowrap fw-bold title-info text-dark fr-mr-2v location">${item.commune.name}</span>
+                <span class="text-nowrap text-info-custom text-grey-dark name">${item.name}</span>
             </a>
         </div>
     `;
