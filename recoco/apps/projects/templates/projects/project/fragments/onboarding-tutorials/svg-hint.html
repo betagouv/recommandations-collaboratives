@@ -1,6 +1,6 @@
 {% comment %}
 
-This component needs three kinds of variables:
+This component needs four kinds of variables:
 
 - the class hint-border or hint-border-over
 
@@ -8,9 +8,11 @@ This component needs three kinds of variables:
 
 - the viewBox size
 
+- the inset correction
+
 {% endcomment %}
 
-<svg class="hint-border{% if is_over %}-over{% endif %}" aria-hidden="true" viewBox="{{ view_box_size }}" preserveAspectRatio="none">
+<svg class="hint-border{% if is_over %}-over{% endif %}{%if inset0 %} inset-0{% endif %}" aria-hidden="true" viewBox="{{ view_box_size }}" preserveAspectRatio="none">
     <!-- Outer rect path; vector-effect keeps thickness constant -->
     <rect
       x="{{ rect_x }}" y="{{ rect_y }}" width="{{ rect_width }}" height="{{ rect_height }}"

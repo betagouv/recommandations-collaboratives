@@ -96,10 +96,10 @@ Parameters:
                 {% include "projects/project/fragments/onboarding-tutorials/visual-hint.html" %}
              </template>
              <template x-if="$store.tutorialsEvents.isTutorialForProjectPage==3.5">
-                {% include "projects/project/fragments/onboarding-tutorials/svg-hint.html" with rect_x="0.1" rect_y="0.3" rect_width="99.7" rect_height="9.2" view_box_size="0 0 100 10" %}
+                {% include "projects/project/fragments/onboarding-tutorials/svg-hint.html" with rect_x="0.1" rect_y="0.3" rect_width="99.7" rect_height="9.2" view_box_size="0 0 100 10" is_over=True inset0=True %}
             </template>
         </div>
-        <textarea class="position-absolute top-0 opacity-0 specific-height-0"*
+        <textarea class="position-absolute top-0 opacity-0 specific-height-0"
                   data-test-id="tiptap-editor-textarea"
                   {% if model %}
                     x-model="{{ model }}.text" x-modelable="markdownContent"
