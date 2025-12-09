@@ -26,46 +26,54 @@ Alpine.data('ProjectListCrm', (departments, regions) => ({
       value: 'PRE_DRAFT',
       text: 'Incomplet',
       color: 'fr-badge--new fr-badge fr-badge--no-icon font-size-10px',
-      tooltip: "Le demandeur ou la demandeuse n'a pas encore créé son compte",
+      tooltip:
+        "Le déposant n'est pas allé jusqu'au bout du dépôt de sa demande",
       dataTestId: 'status-pre-draft',
     },
     {
       value: 'DRAFT',
       text: 'A modérer',
       color: 'fr-badge--new fr-badge fr-badge--no-icon font-size-10px',
+      tooltip: 'En attente de validation ou refus de votre part',
     },
     {
       value: 'TO_PROCESS',
       text: 'A traiter',
       color: 'fr-badge--info fr-badge fr-badge--no-icon font-size-10px',
+      tooltip: "Statut d'avancement du dossier selon votre tableau de bord",
     },
     {
       value: 'READY',
       text: 'En attente',
       color:
         'fr-badge--success-lighter fr-badge fr-badge--no-icon font-size-10px',
+      tooltip: "Statut d'avancement du dossier selon votre tableau de bord",
     },
     {
       value: 'IN_PROGRESS',
       text: 'En cours',
       color:
         'fr-badge--success-lighter fr-badge fr-badge--no-icon font-size-10px',
+      tooltip: "Statut d'avancement du dossier selon votre tableau de bord",
     },
     {
       value: 'DONE',
       text: 'Traité',
       color:
         'fr-badge--success-lighter fr-badge fr-badge--no-icon font-size-10px',
+      tooltip: "Statut d'avancement du dossier selon votre tableau de bord",
     },
     {
       value: 'STUCK',
       text: 'Interrompu',
       color: 'fr-badge--info fr-badge fr-badge--no-icon font-size-10px',
+      tooltip: "Statut d'avancement du dossier selon votre tableau de bord",
     },
     {
       value: 'REJECTED',
       text: 'Rejeté',
       color: 'fr-badge--error fr-badge fr-badge--no-icon font-size-10px',
+      tooltip: "Dossier refusé à l'étape de la modération",
     },
   ],
   displayProjectIndex: false,
