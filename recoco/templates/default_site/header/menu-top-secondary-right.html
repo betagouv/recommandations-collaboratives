@@ -2,12 +2,10 @@
 {% wagtail_site as current_site %}
 {% url 'home' as home_url %}
 
-{% if not user.is_authenticated %}
-    {% for menuitem in current_site.root_page.get_children.live.in_menu %}
+{% for menuitem in current_site.root_page.get_children.live.in_menu %}
     <li x-data="{ width: window.innerWidth }"
         x-on:resize.window="width = window.innerWidth"
         class="navigation__item-resource responsive-header__element-not-mobile">
         <a href="{% pageurl menuitem %}" {% if request.path in menuitem.url and not request.path == home_url %}aria-current="page"{% endif %} class="fr-link {% if request.path in menuitem.url and not request.path == home_url %}active{% endif %}" :class="width < 992 ? 'fr-nav__link' : ''"><span class="fr-mx-1v align-middle">{{ menuitem.title }}</span></a>
     </li>
-    {% endfor %}
-{% endif %}
+{% endfor %}
