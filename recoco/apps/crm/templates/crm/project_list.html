@@ -92,6 +92,7 @@
                                 <td class="project-table__status">
                                     <span x-text="projectStatusLabel(project.status)"
                                           class="fr-badge fr-badge--no-icon"
+                                          x-tooltip="`${projectTooltip(project)} ${project.name}`"
                                           :class="projectStatusColor(project.status)"></span>
                                 </td>
                                 <td>

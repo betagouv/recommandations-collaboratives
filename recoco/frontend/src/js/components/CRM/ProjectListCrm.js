@@ -26,6 +26,7 @@ Alpine.data('ProjectListCrm', (departments, regions) => ({
       value: 'PRE_DRAFT',
       text: 'Incomplet',
       color: 'fr-badge--new fr-badge fr-badge--no-icon font-size-10px',
+      tooltip: "Le demandeur ou la demandeuse n'a pas encore créé son compte",
     },
     {
       value: 'DRAFT',
@@ -293,5 +294,9 @@ Alpine.data('ProjectListCrm', (departments, regions) => ({
       default:
         return 'fr-badge--white';
     }
+  },
+  projectTooltip(project) {
+    return this.options.find((option) => option.value === project.status)
+      .tooltip;
   },
 }));
