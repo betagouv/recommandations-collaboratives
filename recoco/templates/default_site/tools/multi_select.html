@@ -53,7 +53,8 @@
                             <div x-show="selectedElms.length == 0" class="flex-grow-1">
                                 <input placeholder="Sélectionnez pour filtrer"
                                        class="multi-select__input bg-transparent p-1 px-2 appearance-none outline-none h-full w-100 text-gray-800 border-0"
-                                       x-bind:value="selectedElements()">
+                                       x-bind:value="selectedElements()"
+                                       data-test-id="multi-select-input">
                             </div>
                         </div>
                         <!-- Drop down toogle with icons-->
@@ -122,6 +123,7 @@
                                                     <div class="mx-2"
                                                          x-model="option"
                                                          x-text="option.text"
+                                                         :data-test-id="option.dataTestId"
                                                          :class="option.color"></div>
                                                 </div>
                                             </div>

@@ -27,6 +27,7 @@ Alpine.data('ProjectListCrm', (departments, regions) => ({
       text: 'Incomplet',
       color: 'fr-badge--new fr-badge fr-badge--no-icon font-size-10px',
       tooltip: "Le demandeur ou la demandeuse n'a pas encore créé son compte",
+      dataTestId: 'status-pre-draft',
     },
     {
       value: 'DRAFT',
