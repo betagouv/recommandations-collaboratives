@@ -1,0 +1,26 @@
+{% comment %}
+
+This component needs three kinds of variables:
+
+- the class hint-border or hint-border-over
+
+- the size of the rectangle of the svg and the position on x and y axis
+
+- the viewBox size
+
+{% endcomment %}
+
+<svg class="hint-border{% if is_over %}-over{% endif %}" aria-hidden="true" viewBox="{{ view_box_size }}" preserveAspectRatio="none">
+    <!-- Outer rect path; vector-effect keeps thickness constant -->
+    <rect
+      x="{{ rect_x }}" y="{{ rect_y }}" width="{{ rect_width }}" height="{{ rect_height }}"
+      fill="none"
+      stroke="var(--vh-color)"
+      stroke-width="var(--vh-thickness)"
+      vector-effect="non-scaling-stroke"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      stroke-dasharray="14 6 5 10 18 7 9 5 12 8"
+      style="animation: vh-dash var(--vh-speed) linear infinite;"
+    />
+</svg>

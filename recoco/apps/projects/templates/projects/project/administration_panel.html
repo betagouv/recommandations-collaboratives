@@ -144,20 +144,7 @@
                             {% endif %}
                             <span>Inviter un conseiller</span>
                             <template x-if="$store.tutorialsEvents.isTutorialForProjectPage === 4.5">
-                                <svg class="hint-border-over inset-0" aria-hidden="true" viewBox="0 0 100 100" preserveAspectRatio="none">
-                                    <!-- Outer rect path; vector-effect keeps thickness constant -->
-                                    <rect
-                                      x="0.15" y="3" width="99.8" height="94"
-                                      fill="none"
-                                      stroke="var(--vh-color)"
-                                      stroke-width="var(--vh-thickness)"
-                                      vector-effect="non-scaling-stroke"
-                                      stroke-linecap="round"
-                                      stroke-linejoin="round"
-                                      stroke-dasharray="14 6 5 10 18 7 9 5 12 8"
-                                      style="animation: vh-dash var(--vh-speed) linear infinite;"
-                                    />
-                                  </svg>
+                                {% include "projects/project/fragments/onboarding-tutorials/svg-hint.html" with rect_x="0.15" rect_y="3" rect_width="99.8" rect_height="28" view_box_size="0 0 100 100" %}
                             </template>
                         </button>
                         <template x-if="$store.tutorialsEvents.isTutorialForProjectPage === 4.5">
@@ -225,26 +212,12 @@
                             {% endif %}
                             <span>Inviter un membre demandeur ou un partenaire</span>
                             <template x-if="$store.tutorialsEvents.isTutorialForProjectPage === 4.5">
-                                <svg class="hint-border-over inset-0" aria-hidden="true" viewBox="0 0 100 100" preserveAspectRatio="none">
-                                    <!-- Outer rect path; vector-effect keeps thickness constant -->
-                                    <rect
-                                      x="0.15" y="3" width="99.8" height="94"
-                                      fill="none"
-                                      stroke="var(--vh-color)"
-                                      stroke-width="var(--vh-thickness)"
-                                      vector-effect="non-scaling-stroke"
-                                      stroke-linecap="round"
-                                      stroke-linejoin="round"
-                                      stroke-dasharray="14 6 5 10 18 7 9 5 12 8"
-                                      style="animation: vh-dash var(--vh-speed) linear infinite;"
-                                    />
-                                  </svg>
+                                {% include "projects/project/fragments/onboarding-tutorials/svg-hint.html" with rect_x="0.15" rect_y="3" rect_width="99.8" rect_height="28" view_box_size="0 0 100 100" %}
                             </template>
                         </button>
                         <template x-if="$store.tutorialsEvents.isTutorialForProjectPage === 4.5">
                             {% include "projects/project/fragments/onboarding-tutorials/visual-hint.html" with extra_classes="position-visual-circle-hint--85px-y" %}
                         </template>
-
                     {% endif %}
                     <ul class="flex-column list-unstyled fr-mb-0">
                         {% for pm in project.projectmember_set.all %}

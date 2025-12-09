@@ -73,20 +73,7 @@
                             </a>
                         </label>
                         <template x-if="$store.tutorialsEvents.isTutorialForProjectPage==2">
-                            <svg class="hint-border" aria-hidden="true" viewBox="0 0 100 100" preserveAspectRatio="none">
-                                <!-- Outer rect path; vector-effect keeps thickness constant -->
-                                <rect
-                                  x="4" y="5" width="94" height="28"
-                                  fill="none"
-                                  stroke="var(--vh-color)"
-                                  stroke-width="var(--vh-thickness)"
-                                  vector-effect="non-scaling-stroke"
-                                  stroke-linecap="round"
-                                  stroke-linejoin="round"
-                                  stroke-dasharray="14 6 5 10 18 7 9 5 12 8"
-                                  style="animation: vh-dash var(--vh-speed) linear infinite;"
-                                />
-                              </svg>
+                            {% include "projects/project/fragments/onboarding-tutorials/svg-hint.html" with rect_x="4" rect_y="5" rect_width="94" rect_height="28" view_box_size="0 0 100 100" %}
                         </template>
                     </div>
                 {% endif %}
@@ -120,23 +107,10 @@
                         </a>
                     </label>
                     <template x-if="$store.tutorialsEvents.isTutorialForProjectPage === 3">
-                        <svg class="hint-border" aria-hidden="true" viewBox="0 0 100 100" preserveAspectRatio="none">
-                            <!-- Outer rect path; vector-effect keeps thickness constant -->
-                            <rect
-                              x="3" y="3" width="94" height="18"
-                              fill="none"
-                              stroke="var(--vh-color)"
-                              stroke-width="var(--vh-thickness)"
-                              vector-effect="non-scaling-stroke"
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                              stroke-dasharray="14 6 5 10 18 7 9 5 12 8"
-                              style="animation: vh-dash var(--vh-speed) linear infinite;"
-                            />
-                          </svg>
+                        {% include "projects/project/fragments/onboarding-tutorials/svg-hint.html" with rect_x="3" rect_y="3" rect_width="94" rect_height="18" view_box_size="0 0 100 100" %}
                     </template>
                 </div>
-            {% else %}
+
         <div class="fr-segmented__element"
             :class="{'visual-hint': $store.tutorialsEvents.isTutorialForProjectPage === 3}"
              id="overview-step-2"
@@ -168,20 +142,7 @@
                 </a>
             </label>
             <template x-if="$store.tutorialsEvents.isTutorialForProjectPage === 3">
-                <svg class="hint-border" aria-hidden="true" viewBox="0 0 100 100" preserveAspectRatio="none">
-                    <!-- Outer rect path; vector-effect keeps thickness constant -->
-                    <rect
-                      x="4" y="5" width="94" height="28"
-                      fill="none"
-                      stroke="var(--vh-color)"
-                      stroke-width="var(--vh-thickness)"
-                      vector-effect="non-scaling-stroke"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-dasharray="14 6 5 10 18 7 9 5 12 8"
-                      style="animation: vh-dash var(--vh-speed) linear infinite;"
-                    />
-                  </svg>
+                {% include "projects/project/fragments/onboarding-tutorials/svg-hint.html" with rect_x="4" rect_y="5" rect_width="94" rect_height="28" view_box_size="0 0 100 100" %}
             </template>
         </div>
     {% endflag %}
@@ -294,40 +255,14 @@
                 {% include "projects/project/fragments/onboarding-tutorials/visual-hint.html" with extra_classes='position-visual-circle-hint--if-crm-chat' %}
             </template>
             <template x-if="$store.tutorialsEvents.isTutorialForProjectPage === 4">
-                <svg class="hint-border-over" aria-hidden="true" viewBox="0 0 100 100" preserveAspectRatio="none">
-                    <!-- Outer rect path; vector-effect keeps thickness constant -->
-                    <rect
-                    x="57" y="35" width="31" height="50"
-                    fill="none"
-                    stroke="var(--vh-color)"
-                    stroke-width="var(--vh-thickness)"
-                    vector-effect="non-scaling-stroke"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-dasharray="14 6 5 10 18 7 9 5 12 8"
-                    style="animation: vh-dash var(--vh-speed) linear infinite;"
-                    />
-                </svg>
+                {% include "projects/project/fragments/onboarding-tutorials/svg-hint.html" with rect_x="57" rect_y="35" rect_width="31" rect_height="50" view_box_size="0 0 100 100" %}
             </template>
         {% else %}
             <template x-if="$store.tutorialsEvents.isTutorialForProjectPage === 4">
                 {% include "projects/project/fragments/onboarding-tutorials/visual-hint.html" %}
             </template>
             <template x-if="$store.tutorialsEvents.isTutorialForProjectPage === 4">
-                <svg class="hint-border-over" aria-hidden="true" viewBox="0 0 100 100" preserveAspectRatio="none">
-                    <!-- Outer rect path; vector-effect keeps thickness constant -->
-                    <rect
-                    x="30" y="35" width="50" height="50"
-                    fill="none"
-                    stroke="var(--vh-color)"
-                    stroke-width="var(--vh-thickness)"
-                    vector-effect="non-scaling-stroke"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-dasharray="14 6 5 10 18 7 9 5 12 8"
-                    style="animation: vh-dash var(--vh-speed) linear infinite;"
-                    />
-                </svg>
+                {% include "projects/project/fragments/onboarding-tutorials/svg-hint.html" with rect_x="30" rect_y="35" rect_width="50" rect_height="50" view_box_size="0 0 100 100" %}
             </template>
         {% endif %}
     </div>
@@ -350,20 +285,7 @@
                 {% endif %}
             </button>
             <template x-if="$store.tutorialsEvents.isTutorialForProjectPage === 1">
-                <svg class="hint-border-over" aria-hidden="true" viewBox="0 0 100 100" preserveAspectRatio="none">
-                    <!-- Outer rect path; vector-effect keeps thickness constant -->
-                    <rect
-                      x="12" y="24" width="87" height="70"
-                      fill="none"
-                      stroke="var(--vh-color)"
-                      stroke-width="var(--vh-thickness)"
-                      vector-effect="non-scaling-stroke"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-dasharray="14 6 5 10 18 7 9 5 12 8"
-                      style="animation: vh-dash var(--vh-speed) linear infinite;"
-                    />
-                  </svg>
+                {% include "projects/project/fragments/onboarding-tutorials/svg-hint.html" with rect_x="12" rect_y="24" rect_width="87" rect_height="70" view_box_size="0 0 100 100" %}
             </template>
             <dialog id="modal-action" class="fr-modal" aria-labelledby="modal-action-title">
                 <div class="fr-container fr-container--fluid fr-container-md">
@@ -438,20 +360,7 @@
                                                     {% include "projects/project/fragments/onboarding-tutorials/visual-hint.html" with extra_classes="position-visual-circle-hint--45px-y" %}
                                                 </template>
                                                 <template x-if="$store.tutorialsEvents.isTutorialForProjectPage === 1.5">
-                                                    <svg class="hint-border-over" aria-hidden="true" viewBox="0 0 100 100" preserveAspectRatio="none">
-                                                        <!-- Outer rect path; vector-effect keeps thickness constant -->
-                                                        <rect
-                                                        x="32" y="82" width="66.5" height="15.5"
-                                                        fill="none"
-                                                        stroke="var(--vh-color)"
-                                                        stroke-width="var(--vh-thickness)"
-                                                        vector-effect="non-scaling-stroke"
-                                                        stroke-linecap="round"
-                                                        stroke-linejoin="round"
-                                                        stroke-dasharray="14 6 5 10 18 7 9 5 12 8"
-                                                        style="animation: vh-dash var(--vh-speed) linear infinite;"
-                                                        />
-                                                    </svg>
+                                                    {% include "projects/project/fragments/onboarding-tutorials/svg-hint.html" with rect_x="32" rect_y="82" rect_width="66.5" rect_height="15.5" view_box_size="0 0 100 100" %}
                                                 </template>
                                             </form>
                                         </div>
