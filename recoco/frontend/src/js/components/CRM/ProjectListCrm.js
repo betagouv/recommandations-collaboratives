@@ -59,7 +59,7 @@ Alpine.data('ProjectListCrm', (departments, regions) => ({
     },
     {
       value: 'STUCK',
-      text: 'Conseil interrompu',
+      text: 'Interrompu',
       color: 'fr-badge--info fr-badge fr-badge--no-icon font-size-10px',
     },
     {
@@ -257,26 +257,9 @@ Alpine.data('ProjectListCrm', (departments, regions) => ({
     }
   },
   projectStatusLabel(status) {
-    switch (status) {
-      case 'PRE_DRAFT':
-        return 'Incomplet';
-      case 'DRAFT':
-        return 'A modérer';
-      case 'TO_PROCESS':
-        return 'A traiter';
-      case 'READY':
-        return 'En attente';
-      case 'IN_PROGRESS':
-        return 'En cours';
-      case 'DONE':
-        return 'Traité';
-      case 'STUCK':
-        return 'Bloqué';
-      case 'REJECTED':
-        return 'Rejeté';
-      default:
-        return status;
-    }
+    return (
+      this.options.find((option) => option.value === status).text || status
+    );
   },
   projectStatusColor(status) {
     switch (status) {
