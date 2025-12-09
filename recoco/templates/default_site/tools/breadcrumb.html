@@ -18,7 +18,10 @@
         <ol class="fr-breadcrumb__list">
             <template x-for="(link, index) in breadcrumbs.links" :key="link.url">
                 <li :class="{ 'fr-breadcrumb__link--first': index == 0 }">
-                    <a class="fr-breadcrumb__link"  :href="link.url" x-text="link.title"></a>
+                    <a class="fr-breadcrumb__link"
+                       :class="{ 'text-decoration-underline': index < breadcrumbs.links.length }"
+                       :href="link.url"
+                       x-text="link.title"></a>
                 </li>
             </template>
             <li>
