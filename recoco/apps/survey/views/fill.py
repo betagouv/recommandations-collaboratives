@@ -59,10 +59,6 @@ class SessionDoneView(LoginRequiredMixin, PermissionRequiredMixin, RedirectView)
         project = get_object_or_404(projects_models.Project, pk=session.project.id)
         return super().get_redirect_url(*args, project_id=project.id)
 
-    def has_permission(self):
-        object = self.get_object()
-        return has_perm(self.request.user, "projects.use_surveys", object.project)
-
 
 #####
 # Questions
