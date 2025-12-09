@@ -7,6 +7,7 @@ import api, {
 } from '../utils/api';
 import _ from 'lodash';
 import { formatDate } from '../utils/date';
+import { ToastType } from '../models/toastType';
 
 Alpine.data('ContactBook', (departments, regions) => {
   return {
@@ -35,27 +36,28 @@ Alpine.data('ContactBook', (departments, regions) => {
         }
         this.isContactDataLoaded = true;
       } catch (error) {
-        // TODO add a toast
-        console.error(error);
-        throw new Error('Erreur lors de la récupération des contacts');
+        this.$store.app.displayToastMessage({
+          message: `Erreur lors de la récupération des contacts`,
+          timeout: 5000,
+          type: ToastType.error,
+        });
+        this.isContactDataLoaded = true;
+        throw new Error('Error while fetching contacts', { cause: error });
       }
     },
     initScrollToLoadOrganizationDepartments() {
       requestAnimationFrame(() => {
-        const observer = new IntersectionObserver(
-          (entries) => {
-            entries.forEach((entry) => {
-              if (entry.isIntersecting) {
-                console.log('entry.target', entry.target);
-                const organizationId = entry.target.getAttribute(
-                  'data-organization-id'
-                );
-                this.getDepartmentsOrganization(organizationId);
-              }
-            });
-          }
-          // , { rootMargin: '100px' }
-        );
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              console.log('entry.target', entry.target);
+              const organizationId = entry.target.getAttribute(
+                'data-organization-id'
+              );
+              this.getDepartmentsOrganization(organizationId);
+            }
+          });
+        });
         const organizationContainers = document.querySelectorAll(
           '.organization-container'
         );
