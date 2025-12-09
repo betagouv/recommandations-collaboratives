@@ -27,9 +27,7 @@
                        name="segmented-control-dashboard"
                        @click="window.location='{% url 'crm-site-dashboard' %}'">
                 <label class="fr-label" for="segmented-control-dashboard">
-                    <a class="stretched-link"
-                       data-test-id="project-navigation-dashboard"
-                       href="{% url 'crm-site-dashboard' %}">Tableau de bord</a>
+                    <a class="stretched-link" href="{% url 'crm-site-dashboard' %}">Accueil</a>
                 </label>
             </div>
             <div class="fr-segmented__element">
@@ -41,9 +39,7 @@
                        name="segmented-control-project"
                        @click="window.location='{% url 'crm-project-list' %}'">
                 <label class="fr-label" for="segmented-control-projects">
-                    <a class="stretched-link"
-                       data-test-id="project-navigation-projects"
-                       href="{% url 'crm-project-list' %}">Dossiers</a>
+                    <a class="stretched-link" href="{% url 'crm-project-list' %}">Dossiers</a>
                 </label>
             </div>
             <div class="fr-segmented__element">
@@ -55,9 +51,7 @@
                        name="segmented-control-project"
                        @click="window.location='{% url 'crm-user-list' %}'">
                 <label class="fr-label" for="segmented-control-users">
-                    <a class="stretched-link"
-                       data-test-id="project-navigation-users"
-                       href="{% url 'crm-user-list' %}">Utilisateurs</a>
+                    <a class="stretched-link" href="{% url 'crm-user-list' %}">Utilisateurs</a>
                 </label>
             </div>
             <div class="fr-segmented__element">
@@ -69,29 +63,9 @@
                        name="segmented-control-project"
                        @click="window.location='{% url 'crm-organization-list' %}'">
                 <label class="fr-label" for="segmented-control-organizations">
-                    <a class="stretched-link"
-                       data-test-id="project-navigation-organizations"
-                       href="{% url 'crm-organization-list' %}">Organisations</a>
+                    <a class="stretched-link" href="{% url 'crm-organization-list' %}">Organisations</a>
                 </label>
             </div>
-            {% comment %} <div class="fr-segmented__element">
-                <input value="resources" type="radio" {% if resources %}checked{% endif %} aria-checked="{% if resources %}true{% else %}false{% endif %}" id="segmented-control-resources" name="segmented-control-project" @click="window.location='{% url 'crm-resource-list' %}'">
-                <label class="fr-label" for="segmented-control-overview">
-                    <a class="stretched-link" data-test-id="project-navigation-resources" href="{% url 'crm-resource-list' %}">Ressources</a>
-                </label>
-            </div> {% endcomment %}
-            {% comment %} <div class="fr-segmented__element">
-                <input value="overview" type="radio" {% if overview %}checked{% endif %} aria-checked="{% if overview %}true{% else %}false{% endif %}" id="segmented-control-overview" name="segmented-control-project" @click="window.location='#'">
-                <label class="fr-label" for="segmented-control-overview">
-                    <a class="stretched-link" data-test-id="project-navigation-overview" href="#">Statistiques</a>
-                </label>
-            </div> {% endcomment %}
-            {% comment %} <div class="fr-segmented__element">
-                <input value="overview" type="radio" {% if overview %}checked{% endif %} aria-checked="{% if overview %}true{% else %}false{% endif %}" id="segmented-control-overview" name="segmented-control-project" @click="window.location='#'">
-                <label class="fr-label" for="segmented-control-overview">
-                    <a class="stretched-link" data-test-id="project-navigation-overview" href="#">Activité</a>
-                </label>
-            </div> {% endcomment %}
             <div class="fr-segmented__element">
                 <input value="overview"
                        type="radio"
@@ -101,9 +75,7 @@
                        name="segmented-control-site-configuration"
                        @click="window.location='{% url 'crm-site-configuration' %}'">
                 <label class="fr-label" for="segmented-control-site-configuration">
-                    <a class="stretched-link"
-                       data-test-id="project-navigation-site-configuration"
-                       href="{% url 'crm-site-configuration' %}">Paramètres du site</a>
+                    <a class="stretched-link" href="{% url 'crm-site-configuration' %}">Paramètres du site</a>
                 </label>
             </div>
         </div>
