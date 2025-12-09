@@ -22,7 +22,7 @@
 {% endblock css %}
 {% block content %}
     {% include "crm/fragments/navigation.html" with projects=True %}
-    <div x-data="{ breadcrumbs: { links: [{url: '{% url 'crm-site-dashboard' %}', title: 'CRM'}], current: 'Dossiers' } }"
+    <div x-data="{ breadcrumbs: { links: [{url: '{% url 'crm-site-dashboard' %}', title: 'Admin'}], current: 'Dossiers' } }"
          class="fr-p-0">{% include "tools/breadcrumb.html" %}</div>
     {{ departments|json_script:"departmentsArray" }}
     {{ regions|json_script:"regionsArray" }}

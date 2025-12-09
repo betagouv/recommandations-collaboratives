@@ -24,7 +24,7 @@
 {% endblock css %}
 {% block content %}
     {% include "crm/fragments/navigation.html" with users=True %}
-    <div x-data="{ breadcrumbs: { links: [{url: '{% url 'crm-site-dashboard' %}', title: 'CRM'}], current: 'Utilisateurs et utilisatrices' } }"
+    <div x-data="{ breadcrumbs: { links: [{url: '{% url 'crm-site-dashboard' %}', title: 'Admin'}], current: 'Utilisateurs et utilisatrices' } }"
          class="fr-p-0">{% include "tools/breadcrumb.html" %}</div>
     <div x-data="Crm" class="d-flex fr-px-0">
         <div class="w-100 d-flex flex-column justify-content-start">
