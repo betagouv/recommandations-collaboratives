@@ -17,18 +17,18 @@
 {% endblock js %}
 {% is_staff_for_current_site request.user as is_staff %}
 <!-- User -->
-<div class="user-tools d-flex">
+<div class="user-tools d-flex" x-data="ExpandableMenuHandler">
     {% if user.is_authenticated %}
         {% get_obj_perms request.user for request.site as "user_site_perms" %}
         <!-- Notifications -->
-        <div class="dropdown user-tools__notification-menu"
-             x-data="MenuNotifications({{ unread_notifications_count }}, {{ unread_notifications }})">
-            <button class="fr-nav__btn user-tools__main-menu-button"
+        <div class="dropdown user-tools__notification-menu fr-p-0 h-64"
+             x-data="MenuNotifications({{ unread_notifications_count }}, {{ unread_notifications }})"
+             @click.outside="toggle">
+            <button class="fr-nav__btn user-tools__main-menu-button h-64 fr-m-0"
                     id="notification-menu-button"
-                    role="button"
+                    x-ref="expandMenuButton"
                     data-bs-toggle="dropdown"
                     data-bs-auto-close="outside"
-                    aria-expanded="false"
                     data-test-id="notification-menu-open">
                 <span class="fr-icon-notification-3-line" aria-hidden="true"></span>
                 <span class="badge text-bg-danger"
@@ -38,7 +38,7 @@
             </button>
             {% include "header/dropdown-menu-notifications.html" %}
         </div>
-        <div x-data="ExpandableMenuHandler" @click.outside="toggle">
+        <div @click.outside="toggle">
             <button class="fr-nav__btn user-tools__main-menu-button h-100"
                     x-ref="expandMenuButton"
                     aria-expanded="false"
