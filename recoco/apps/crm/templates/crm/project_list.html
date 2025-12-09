@@ -135,13 +135,19 @@
                                             Désactiver les notifications
                                         </button>
                                     </template>
-                                    <!-- editer -->
+                                    <!-- Go to project page -->
+                                    <button class="fr-btn fr-btn--sm fr-icon-computer-line fr-btn--tertiary-no-outline position-relative"
+                                            title="Accéder à la page du dossier">
+                                        <a :href="'{% url 'projects-project-detail' 0 %}'.replace('0', project.id)"
+                                           class="stretched-link">Accéder à la page du dossier</a>
+                                    </button>
+                                    <!-- Edit -->
                                     <button class="fr-btn fr-btn--sm fr-icon-pencil-line fr-btn--tertiary-no-outline position-relative"
                                             title="Éditer le dossier">
                                         <a :href="'{% url 'crm-project-update' 0 %}'.replace('0', project.id)"
                                            class="stretched-link">Éditer</a>
                                     </button>
-                                    <!-- DELETE -->
+                                    <!-- Delete -->
                                     <button class="fr-btn fr-btn--sm fr-icon-delete-line fr-btn--tertiary-no-outline position-relative"
                                             title="Supprimer le dossier">
                                         <a :href="'{% url 'crm-project-delete' 0 %}'.replace('0', project.id)"
