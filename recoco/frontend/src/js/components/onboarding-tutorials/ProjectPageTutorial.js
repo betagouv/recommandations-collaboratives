@@ -51,10 +51,7 @@ Alpine.data('ProjectPageTutorial', () => {
             this.$store.tutorialsEvents.isTutorialForProjectPage === 1.5 &&
             isCompleted
           ) {
-            this.acquireChallenge('project-page-tutorial-part1');
-            this.challengesStatus[0] = 'acquired';
-            this.challengesStatus[1] = 'todo';
-            this.$store.tutorialsEvents.isTutorialForProjectPage = 0;
+            this.handleNextTutorialStep(1);
             localStorage.setItem('isTutorialForProjectPage', '0');
           }
         }
@@ -67,10 +64,7 @@ Alpine.data('ProjectPageTutorial', () => {
             this.$store.tutorialsEvents.isTutorialForProjectPage === 2 &&
             isCompleted
           ) {
-            this.acquireChallenge('project-page-tutorial-part2');
-            this.challengesStatus[1] = 'acquired';
-            this.challengesStatus[2] = 'todo';
-            this.$store.tutorialsEvents.isTutorialForProjectPage = 0;
+            this.handleNextTutorialStep(2);
             localStorage.setItem('isTutorialForProjectPage', '0');
           }
         }
@@ -83,10 +77,7 @@ Alpine.data('ProjectPageTutorial', () => {
             this.$store.tutorialsEvents.isTutorialForProjectPage === 3.5 &&
             isCompleted
           ) {
-            this.acquireChallenge('project-page-tutorial-part3');
-            this.challengesStatus[2] = 'acquired';
-            this.challengesStatus[3] = 'todo';
-            this.$store.tutorialsEvents.isTutorialForProjectPage = 0;
+            this.handleNextTutorialStep(3);
             localStorage.setItem('isTutorialForProjectPage', '0');
           }
         }
@@ -99,10 +90,7 @@ Alpine.data('ProjectPageTutorial', () => {
             this.$store.tutorialsEvents.isTutorialForProjectPage === 4.5 &&
             isCompleted
           ) {
-            this.acquireChallenge('project-page-tutorial-part4');
-            this.challengesStatus[3] = 'acquired';
-            this.challengesStatus[4] = 'todo';
-            this.$store.tutorialsEvents.isTutorialForProjectPage = 0;
+            this.handleNextTutorialStep(4);
             localStorage.removeItem('isTutorialForProjectPage');
             localStorage.removeItem('projectPageTutorialPopupOpen');
           }
@@ -111,10 +99,7 @@ Alpine.data('ProjectPageTutorial', () => {
     },
     launchChallenge1(isSwitchTender) {
       if (isSwitchTender) {
-        this.acquireChallenge('project-page-tutorial-part1');
-        this.challengesStatus[0] = 'acquired';
-        this.challengesStatus[1] = 'todo';
-        this.$store.tutorialsEvents.isTutorialForProjectPage = 0;
+        this.handleNextTutorialStep(1);
       }
       else {
         this.$store.tutorialsEvents.isTutorialForProjectPage = 1;
@@ -123,10 +108,7 @@ Alpine.data('ProjectPageTutorial', () => {
     launchChallenge2() {
       const currentUrl = new URL(location.href);
       if (currentUrl.pathname.includes('/connaissance')) {
-        this.acquireChallenge('project-page-tutorial-part2');
-        this.challengesStatus[1] = 'acquired';
-        this.challengesStatus[2] = 'todo';
-        this.$store.tutorialsEvents.isTutorialForProjectPage = 0;
+        this.handleNextTutorialStep(2);
       }
       else {
         this.$store.tutorialsEvents.isTutorialForProjectPage = 2;
@@ -162,6 +144,12 @@ Alpine.data('ProjectPageTutorial', () => {
       } catch (err) {
         console.warn(err);
       }
+    },
+    handleNextTutorialStep(step) {
+      this.acquireChallenge(`project-page-tutorial-part${step}`);
+      this.challengesStatus[step - 1] = 'acquired';
+      this.challengesStatus[step] = 'todo';
+      this.$store.tutorialsEvents.isTutorialForProjectPage = 0;
     },
     handleTutorialPopup() {
       this.$store.tutorialsEvents.isTutorialPopupOpen = !this.$store.tutorialsEvents.isTutorialPopupOpen;
