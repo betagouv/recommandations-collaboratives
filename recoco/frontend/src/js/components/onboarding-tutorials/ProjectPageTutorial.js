@@ -1,5 +1,6 @@
 import Alpine from 'alpinejs';
 import '../../store/tutorialsEvents';
+import { ToastType } from '../../models/toastType';
 import api, { challengeUrl, challengeDefinitionUrl } from '../../utils/api';
 
 Alpine.data('ProjectPageTutorial', () => {
@@ -142,7 +143,12 @@ Alpine.data('ProjectPageTutorial', () => {
         });
         return json.data;
       } catch (err) {
-        console.warn(err);
+        this.$store.app.displayToastMessage({
+                message: `Erreur lors de l'étape ${code.substring(code.length - 1)} du tutoriel`,
+                timeout: 5000,
+                type: ToastType.error,
+              });
+        throw new Error(`Failed to acquire challenge ${code.substring(code.length - 1)}`);
       }
     },
     handleNextTutorialStep(step) {
