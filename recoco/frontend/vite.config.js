@@ -52,7 +52,6 @@ const config = {
         user: resolve('./src/js/apps/user.js'),
         tutorial: resolve('./src/js/apps/tutorial.js'),
         contactApp: resolve('./src/js/apps/contactApp.js'),
-        projectDetailsCss: resolve('./src/css/projectDetails.css'),
         mapViewerStatic: resolve('./src/js/apps/mapViewerStatic.js'),
         mapViewerInteractive: resolve('./src/js/apps/mapViewerInteractive.js'),
         projectEmailReminder: resolve('./src/js/apps/projectEmailReminder.js'),
@@ -87,6 +86,7 @@ const config = {
         idbObjectStoreMgmt: resolve('./src/js/store/idbObjectStoreMgmt.js'),
         actionPusher: resolve('./src/js/apps/actionPusher.js'),
         NewFeatureBanner: resolve('./src/js/components/NewFeatureBanner.js'),
+        contactBookApp: resolve('./src/js/apps/contactBookApp.js'),
       },
       output: {
         chunkFileNames: undefined,

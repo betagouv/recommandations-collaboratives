@@ -9,16 +9,8 @@
 {% block og_title %}
     Carnet de contacts {{ block.super }}
 {% endblock og_title %}
-{% block css %}
-    <link href="{% sass_src 'addressbook/css/contact_list.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-    <link href="{% sass_src 'projects/css/segmented_ctrl.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-{% endblock css %}
 {% block js %}
-    {% vite_asset 'js/components/ContactBook.js' %}
+    {% vite_asset 'js/apps/contactBookApp.js' %}
     {% vite_asset 'js/apps/featureAddContact.js' %}
 {% endblock js %}
 {% block content %}
