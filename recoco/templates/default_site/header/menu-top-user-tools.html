@@ -22,7 +22,7 @@
         {% get_obj_perms request.user for request.site as "user_site_perms" %}
         <!-- Notifications -->
         <div class="dropdown user-tools__notification-menu fr-p-0 h-64"
-             x-data="MenuNotifications({{ unread_notifications_count }}, {{ unread_notifications }})"
+             x-data="MenuNotifications({{ unread_notifications_count }}, {% if unread_notifications|length > 0 %}{{ unread_notifications }} {% else %}[]{% endif %} )"
              @click.outside="toggle">
             <button class="fr-nav__btn user-tools__main-menu-button h-64 fr-m-0"
                     id="notification-menu-button"

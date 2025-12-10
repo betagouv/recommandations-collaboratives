@@ -460,6 +460,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     }
   },
   async onClickRessourceConsummeNotification(taskId) {
+    trackOpenRessource();
     try {
       if (!Alpine.store('djangoData').isAdvisor) {
         await api.post(markTaskNotificationAsVisited(this.projectId, taskId));
@@ -467,7 +468,6 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     } catch (error) {
       throw new Error('Failed to mark task notification as visited', error);
     }
-    trackOpenRessource();
   },
   replaceMessage(message, messageIdToEdit) {
     const messageIndex = this.feed.elements.findIndex(
