@@ -337,6 +337,9 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     this.countOf.isLoaded = true;
   },
   updateCountOfElementsInDiscussion(element, decrease = false) {
+    if (element.deleted) {
+      return;
+    }
     if (element.nodes) {
       for (const node of element.nodes) {
         if (node.type === 'DocumentNode') {
@@ -349,11 +352,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
           this.countOf.contacts += decrease ? -1 : 1;
         }
       }
-      if (!element.deleted) {
-        this.countOf.messages += decrease ? -1 : 1;
-      } else if (decrease) {
-        this.countOf.messages += -1;
-      }
+      this.countOf.messages += decrease ? -1 : 1;
     }
   },
   onClickHandleReply(message) {
