@@ -1,0 +1,33 @@
+{% load sass_tags %}
+{% load django_vite %}
+{% block css %}
+    <link href="{% sass_src 'projects/css/onboarding_tutorial.scss' %}"
+          rel="stylesheet"
+          type="text/css">
+{% endblock css %}
+{% block js %}
+    {% vite_asset 'js/components/onboarding-tutorials/ProjectPageTutorial.js' %}
+{% endblock js %}
+{% block content %}
+{% if is_staff or is_switchtender %}
+    <div x-data="ProjectPageTutorial" >
+        <template x-if="isOpenTutorialButtonVisible">
+            <div class="onboarding-tutorial {% if request.site_config.crisp_token %}onboarding-tutorial--with-crisp-chat{% endif %}"
+                data-test-id="opening-onboarding-tutorial">
+                <button type="button" class="onboarding-tutorial__button" @click="handleTutorialPopup()"
+                        x-bind:aria-expanded="$store.tutorialsEvents.isTutorialPopupOpen.toString()"
+                        aria-controls="onboarding-tutorial__popup">
+                    <span class="fr-icon-information-line" aria-hidden="true"></span>
+                </button>
+                <div x-show="$store.tutorialsEvents.isTutorialPopupOpen" class="onboarding-tutorial__popup {% if request.site_config.crisp_token %}onboarding-tutorial__popup--with-crisp-chat{% endif %}">
+                    <div class="onboarding-tutorial__popup-content">
+                        <button type="button" class="onboarding-tutorial__close-button" @click="handleCloseTutorialPopup()"><span aria-hidden="true" class="fr-icon-close-line"></span></button>
+                        <!-- TODO - variabiliser l'appel du composant à inclure -->
+                        {% include "projects/project/fragments/onboarding-tutorials/project-page-tutorial.html" %}
+                    </div>
+                </div>
+            </div>
+        </template>
+    </div>
+{% endif %}
+{% endblock %}

@@ -50,3 +50,23 @@
 .background-dsfr-primary-button:hover {
   background-color: var(--hover-tint) !important;
 }
+
+// Hint border around the role selection button
+.project-navigation__container-btn-role-selection {
+  position: relative;
+  overflow: visible;
+}
+
+.hint-border-over {
+  position: absolute;
+  inset: -6px;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 10;
+}
+
+#select-observer-or-advisor-button {
+  position: relative;
+  z-index: 0;
+}

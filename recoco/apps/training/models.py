@@ -24,9 +24,12 @@ class ChallengeDefinitionOnSiteManager(CurrentSiteManager):
 
 
 class ChallengeDefinition(models.Model):
-    objects = ChallengeDefinitionOnSiteManager()
+    objects = models.Manager()
+    on_site = ChallengeDefinitionOnSiteManager()
 
-    site = models.ForeignKey(site_models.Site, on_delete=models.CASCADE)
+    site = models.ForeignKey(
+        site_models.Site, null=True, blank=True, on_delete=models.CASCADE
+    )
     code = models.SlugField(max_length=128)
     name = models.CharField(max_length=128)
     description = models.TextField(null=True, blank=True)
