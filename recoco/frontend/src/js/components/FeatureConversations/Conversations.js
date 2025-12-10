@@ -267,6 +267,11 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
           documentNodesToUpload.map((node) => this.uploadFile(node.file))
         );
       } catch (error) {
+        this.$store.app.displayToastMessage({
+          message: `Erreur lors de l'envoie d'un document`,
+          timeout: 5000,
+          type: ToastType.error,
+        });
         if (!updateMessage) {
           throw new Error('Failed to upload documents', { error });
         } else {
