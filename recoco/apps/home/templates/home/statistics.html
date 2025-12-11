@@ -76,15 +76,12 @@
     {% leaflet_css %}
     <link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/leaflet.fullscreen.css'
           rel='stylesheet' />
-    <link href="{% sass_src 'home/css/statistics/statistics.scss' %}"
-          rel="stylesheet"
-          type="text/css">
 {% endblock css %}
 {% block content %}
     <div class="col-9 fr-py-6w fr-mx-auto">
         <h2>Quel est l'impact d'UrbanVitaliz ?</h2>
         <p>Mis à jour en continu</p>
-        <div class="border border-1 fr-p-3w rounded-4 text-center text-white fr-mb-3w bg-color">
+        <div class="border border-1 fr-p-3w rounded-4 text-center text-white fr-mb-3w bg-color-04466c">
             <h2 class="text-white fr-mb-2v">
                 <strong>{{ reco_following_pc }}%</strong>
                 <br />
@@ -113,7 +110,7 @@
                 <div class="rounded-4 border border-1 fr-p-3w fr-mb-3w text-center w-100">
                     <h4 class="fw-bold fr-mb-2v">Sollicitations de nouvelles friches</h4>
                     <div id="chart-new" class="d-flex align-items-center h-100 ">
-                        <svg class="w-100 min-height">
+                        <svg class="w-100 specific-minheight-300">
                         </svg>
                     </div>
                 </div>
@@ -123,11 +120,13 @@
                     <h4 class="fw-bold fr-mb-2v">Exemples de blocages levés</h4>
                     <div class="row">
                         <div class="col-6">
-                            <img src="{% static "home/img/statistics/handshake.jpg" %}" alt="handshake" />
+                            <img src="{% static "home/img/statistics/handshake.jpg" %}"
+                                 alt="handshake" />
                             <p>Qui peut m'aider pour rédiger ou relire un dossier d'appel à projet ?</p>
                         </div>
                         <div class="col-6">
-                            <img src="{% static "/home/img/statistics/question.jpg" %}" alt="questions" />
+                            <img src="{% static "/home/img/statistics/question.jpg" %}"
+                                 alt="questions" />
                             <p>Le site de la friche a été construit illégalement. Que faire ?</p>
                         </div>
                         <div class="col-6">
