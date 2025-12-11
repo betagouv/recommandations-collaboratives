@@ -8,11 +8,6 @@
 {% load guardian_tags %}
 {% load projects_extra %}
 {% load common_tags %}
-{% block css %}
-    <link href="{% sass_src 'crm/css/site_dashboard.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-{% endblock css %}
 {% block js %}
     {% vite_asset 'js/apps/crm.js' %}
 {% endblock js %}

@@ -1,0 +1,96 @@
+.project-info {
+  color: var(--light-text-mention-grey, #666);
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 400; }
+  .project-info__name {
+    color: var(--light-text-default-grey, #3a3a3a);
+    font-weight: 700; }
+  .project-info__org-name {
+    font-style: normal; }
+  .project-info__secondary {
+    font-size: 12px; }
+  .project-info__container-tags {
+    line-height: 22px; }
+  .project-info__tag {
+    color: var(--light-background-flat-info, var(--background-action-high-blue-france));
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 22px;
+    text-decoration-line: underline; }
+
+.arrow-link {
+  transition-property: transform;
+  transition-duration: 0.3s; }
+
+.task-opening:hover .arrow-link {
+  transform: translateX(5px); }
+
+.rephrase-update label {
+  margin-bottom: 15px;
+  display: none; }
+
+.rephrase-update p {
+  display: flex !important;
+  flex-direction: column !important; }
+
+.project-card-details {
+  background-color: #f6f6f6;
+  min-width: 200px;
+  padding: 1em; }
+  .project-card-details article {
+    color: #3a3a3a;
+    font-weight: 400;
+    font-size: 1rem; }
+  .project-card-details .text-info-custom {
+    font-size: 0.875em; }
+
+.project-card-details.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100px;
+  padding: 2em; }
+
+.small-markdown {
+  font-size: 14px; }
+  .small-markdown h1 {
+    font-size: 18px; }
+  .small-markdown h2 {
+    font-size: 16px; }
+  .small-markdown h4 {
+    font-size: 14px; }
+
+.topic-form .topic-label input {
+  display: block;
+  width: 100%;
+  height: calc(1.5em + 0.75rem + 2px);
+  padding: 25px 15px;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #495057;
+  background-color: #fff;
+  background-clip: padding-box;
+  border: 1px solid #ced4da;
+  border-radius: 0.25rem;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out; }
+
+.advisor-item .advisor-item-icon {
+  padding: 10px 15px;
+  background-color: #ff8e8e;
+  position: absolute;
+  top: 0;
+  right: 0;
+  border-bottom-left-radius: 6px; }
+
+.advisor-item > div {
+  padding-top: 0 !important; }
+
+@media only screen and (max-width: 990px) {
+  .responsive-wrapper {
+    height: auto !important; } }
+
+.specific-fontweight-500 {
+  font-weight: 500; }

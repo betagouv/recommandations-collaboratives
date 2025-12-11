@@ -1,0 +1,43 @@
+.correct-p {
+  margin-bottom: 0px; }
+
+.border-left {
+  border-left: 1px solid var(--light-border-default-grey, #e5e5e5); }
+
+.little-img {
+  width: 20px;
+  height: 20px; }
+
+.selected-items {
+  font-size: 14px;
+  font-weight: 700; }
+
+.hover-background:hover {
+  background-color: white !important; }
+
+.specific-height-2p5rem {
+  height: 2.5rem; }
+
+.color-gray-400 {
+  color: var(--color-grey-400, #b3b3b3); }
+
+.max-h-80 {
+  max-height: 12rem; }
+
+.selected-item {
+  background-color: #e8edff;
+  color: #0063cb;
+  border: #0063cb 1px solid; }
+
+.hide-ul-style {
+  list-style-type: none;
+  margin: 0;
+  padding: 0; }
+
+@media screen and (max-height: 720px) {
+  .max-h-80 {
+    max-height: 10rem; } }
+
+@media screen and (max-height: 665px) {
+  .max-h-80 {
+    max-height: 8rem; } }

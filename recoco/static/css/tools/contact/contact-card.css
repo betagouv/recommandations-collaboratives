@@ -1,0 +1,43 @@
+.contact-card,
+.contact-card-light {
+  max-width: 26rem; }
+  .contact-card div,
+  .contact-card-light div {
+    line-height: 1rem; }
+  .contact-card__link,
+  .contact-card-light__link {
+    text-decoration: underline;
+    color: #0000ee; }
+  .contact-card__firstline-container,
+  .contact-card-light__firstline-container {
+    display: flex;
+    align-items: baseline;
+    width: 100%; }
+  .contact-card .contact-info__name, .contact-card .contact-info__organization, .contact-card .contact-info__division, .contact-card .contact-info__email, .contact-card .contact-info__phone, .contact-card .contact-info__updated-at,
+  .contact-card-light .contact-info__name,
+  .contact-card-light .contact-info__organization,
+  .contact-card-light .contact-info__division,
+  .contact-card-light .contact-info__email,
+  .contact-card-light .contact-info__phone,
+  .contact-card-light .contact-info__updated-at {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap; }
+  .contact-card .contact-info__organization, .contact-card .contact-info__division, .contact-card .contact-info__email, .contact-card .contact-info__phone,
+  .contact-card-light .contact-info__organization,
+  .contact-card-light .contact-info__division,
+  .contact-card-light .contact-info__email,
+  .contact-card-light .contact-info__phone {
+    padding-top: 0.25rem; }
+  .contact-card .contact-info__updated-at,
+  .contact-card-light .contact-info__updated-at {
+    padding-top: 0.625rem; }
+  .contact-card .contact-info-empty__organization, .contact-card .contact-info-empty__division, .contact-card .contact-info-empty__email, .contact-card .contact-info-empty__phone,
+  .contact-card-light .contact-info-empty__organization,
+  .contact-card-light .contact-info-empty__division,
+  .contact-card-light .contact-info-empty__email,
+  .contact-card-light .contact-info-empty__phone {
+    height: 1rem; }
+
+.contact-card-light {
+  max-width: 100%; }

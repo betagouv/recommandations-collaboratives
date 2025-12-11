@@ -1,0 +1,39 @@
+.layout-form .banner {
+  margin-top: 2.5rem; }
+  .layout-form .banner img {
+    width: 5rem; }
+  .layout-form .banner h2 {
+    font-weight: 400;
+    margin-top: 1rem; }
+
+.layout-form__site-name {
+  font-weight: 400; }
+
+.row.background--grey-light {
+  background-color: #fafafa; }
+
+.container__form {
+  padding-top: 1.5rem;
+  background-color: #fff;
+  margin-bottom: 4rem; }
+
+.layout__form {
+  padding: 0 1rem;
+  width: 100%; }
+
+.g-recaptcha {
+  margin-left: 0.5rem; }
+
+@media screen and (min-width: 768px) {
+  .layout-form.container {
+    width: 70%; }
+  .layout-form .banner {
+    margin-top: 2.5rem; }
+    .layout-form .banner img {
+      width: 5rem; }
+    .layout-form .banner h1 {
+      font-size: 2rem; }
+  .layout-form__site-name {
+    font-weight: 400; }
+  .container__form {
+    padding: 3rem 2rem 1rem; } }

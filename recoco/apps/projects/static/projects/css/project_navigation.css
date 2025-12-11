@@ -1,0 +1,41 @@
+.project-navigation {
+  width: 100%;
+  height: 64px;
+  border-bottom: solid 1px #ccc;
+  background: white;
+  position: sticky;
+  z-index: 1001;
+  top: 65px; }
+  .project-navigation__container-btn-role-selection {
+    padding: 0 10px;
+    height: 100%;
+    border-left: solid 1px #ccc;
+    display: flex;
+    align-items: center; }
+    .project-navigation__container-btn-role-selection:has(> #select-observer-or-advisor.fr-collapse--expanded) {
+      background-color: #1b0093; }
+    .project-navigation__container-btn-role-selection button:has(+ #select-observer-or-advisor.fr-collapse--expanded) {
+      color: white; }
+    .project-navigation__container-btn-role-selection button:hover {
+      background-color: inherit; }
+  .project-navigation .fr-segmented input + label {
+    padding: 0.5rem 0.75rem; }
+
+.divider-specific {
+  border-top: solid 1px #e5e5e5;
+  padding: 0;
+  opacity: 1; }
+
+.specific-fontsize-14px {
+  font-size: 14px; }
+
+.specific-width-25rem {
+  width: 25rem; }
+
+.specific-button-close-from-dsfr {
+  min-height: 1.7rem;
+  padding: 0;
+  padding-right: 10px; }
+
+.background-dsfr-primary-button:hover {
+  background-color: var(--hover-tint) !important; }

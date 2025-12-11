@@ -4,9 +4,9 @@
 {% load training %}
 {% load guardian_tags %}
 {% load django_vite %}
-{% block css %}
+{% comment %} {% block css %}
     {% vite_asset 'css/projectDetails.css' %}
-{% endblock css %}
+{% endblock css %} {% endcomment %}
 {% block js %}
     {% vite_asset 'js/store/showRole.js' %}
 {% endblock js %}
@@ -67,7 +67,9 @@
         }
 	}
     </style>
-    <div x-data x-init="$nextTick(() => $store.showRole.init())" class="col-12">
+    <div x-data
+         x-init="$nextTick(() => $store.showRole.init())"
+         class="col-12">
         {% include "projects/project/navigation.html" with state_of_play=True %}
         {% include "projects/project/fragments/project_banner/banner_wrapper.html" with part='open' %}
         {% include "projects/project/fragments/survey_grid.html" %}

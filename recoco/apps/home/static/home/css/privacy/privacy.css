@@ -1,0 +1,21 @@
+.privacy-div {
+  border-right: 1px solid #dee2e6; }
+
+.privacy-div p {
+  border-bottom: 1px solid #dee2e6; }
+
+.p-in-dev-1 {
+  height: 70px; }
+
+.p-in-dev-2 {
+  height: 200px; }
+
+.p-in-dev-3 {
+  height: 100px; }
+
+thead, tbody, tfoot, tr, td, th {
+  border: 1px solid #000000 !important;
+  padding: 5px !important; }
+
+thead {
+  background-color: #e9ecef !important; }

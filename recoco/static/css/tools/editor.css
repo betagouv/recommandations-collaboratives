@@ -1,0 +1,116 @@
+.tiptap.ProseMirror {
+  --idle: transparent;
+  --hover: var(--background-contrast-grey-hover);
+  --active: var(--background-contrast-grey-active);
+  background-color: var(--background-contrast-grey);
+  border-radius: 0.25rem 0.25rem 0 0;
+  box-shadow: inset 0 -2px 0 0 var(--border-plain-grey);
+  color: var(--text-default-grey);
+  display: block;
+  font-size: 1rem;
+  line-height: 1.5rem;
+  padding: 3rem 0.5rem;
+  width: 100%;
+  margin-top: 0;
+  margin-bottom: 0;
+  min-height: 10rem; }
+  .tiptap.ProseMirror p {
+    margin-bottom: 0; }
+
+.tiptap-menu-custom {
+  position: absolute;
+  z-index: 1;
+  top: 0.5rem;
+  left: 0.5rem; }
+  .tiptap-menu-custom button {
+    color: #3a3a3a; }
+    .tiptap-menu-custom button.text-white:disabled {
+      color: #3a3a3a !important; }
+
+.module__container {
+  position: absolute;
+  bottom: 0.5rem;
+  left: 0.5rem;
+  display: flex;
+  width: 100%;
+  padding-right: 1rem; }
+
+.button-module__container {
+  display: flex;
+  gap: 0.5rem; }
+
+.tiptap p.is-editor-empty:first-child::before {
+  color: #666;
+  font-style: italic;
+  opacity: 1;
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none; }
+
+.close-contact-button-style,
+.close-file-button-style {
+  height: 40px;
+  box-shadow: none; }
+
+.editor-container .contact-card {
+  padding-right: 49px !important; }
+
+.file-card {
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  transition: all 0.2s ease-in-out; }
+  .file-card__details {
+    flex: 1;
+    min-width: 0; }
+  .file-card__name {
+    color: #212529;
+    margin-bottom: 0.25rem;
+    word-break: break-word;
+    line-height: 1.2; }
+  .file-card__meta {
+    color: #6c757d;
+    line-height: 1.2; }
+    .file-card__meta span {
+      display: inline-block;
+      margin-right: 0.5rem; }
+      .file-card__meta span:last-child {
+        margin-right: 0; }
+  .file-card__actions {
+    margin-left: 1rem; }
+  .file-card--image .file-card__icon {
+    color: #28a745; }
+  .file-card--video .file-card__icon {
+    color: #dc3545; }
+  .file-card--audio .file-card__icon {
+    color: #fd7e14; }
+  .file-card--document .file-card__icon {
+    color: #007bff; }
+  .file-card--archive .file-card__icon {
+    color: #6f42c1; }
+  @media (max-width: 576px) {
+    .file-card__content {
+      flex-direction: column;
+      align-items: flex-start !important; }
+    .file-card__actions {
+      margin-left: 0;
+      margin-top: 0.5rem;
+      align-self: flex-end; } }
+.ProseMirror .file-card {
+  margin: 0.5rem 0; }
+  .ProseMirror .file-card * {
+    user-select: none; }
+
+.file__card {
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  transition: all 0.2s ease-in-out;
+  font-size: 13px;
+  line-height: 1rem; }
+
+.module__container {
+  display: flex;
+  flex-direction: column; }
+  .module__container .info-module__container {
+    display: flex;
+    flex-direction: column; }

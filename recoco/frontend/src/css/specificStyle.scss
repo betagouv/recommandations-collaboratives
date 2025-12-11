@@ -1,0 +1,322 @@
+// Background
+.specific-bgcolor {
+  background-color: #f6f6f6;
+}
+
+.btn-background0 {
+  background: 0;
+}
+
+.specific-background-transparent {
+  background-color: transparent;
+}
+
+.specific-backgroundimage-none {
+  background-image: none;
+}
+
+.specific-backgroundcolor-grey {
+  background-color: grey !important;
+}
+
+// Border
+.specific-border-solid2px58B77D {
+  border: solid 2px #58b77d;
+}
+
+.specific-border-radius-2px,
+.specific-borderradius-2px {
+  border-radius: 2px;
+}
+
+.specific-bordercolor-ccc {
+  border-color: #ccc;
+}
+
+.specific-border-radiusy-0 {
+  border-bottom-left-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+}
+
+.specific-border-left-solid1pxEEE {
+  border-left: 1px solid #eeeeee;
+}
+
+.specific-border-top-solid1pxEEE {
+  border-top: 1px solid #eeeeee;
+}
+
+// Color
+.specific-color-grey {
+  color: grey;
+}
+
+.specific-color-666 {
+  color: #666666;
+}
+
+.specific-color-929292 {
+  color: #929292;
+}
+
+.specific-color-high-blue-france {
+  color: var(--background-action-high-blue-france) !important;
+}
+
+.specific-color-white {
+  color: white !important;
+  &:hover {
+    color: white !important;
+  }
+}
+
+.specific-color-inherit {
+  color: inherit;
+}
+
+// Font
+
+.specific-fontsize-07 {
+  font-size: 0.7em;
+}
+
+.specific-fontsize-08 {
+  font-size: 0.8rem;
+}
+
+.specific-fontsize-09 {
+  font-size: 0.9em;
+}
+
+.specific-fontsize-16 {
+  font-size: 16px;
+}
+
+.specific-fontsize-18 {
+  font-size: 18px;
+}
+
+.a-specific-fontsize-14 {
+  font-size: 14px;
+}
+
+.a-specific-fontsize-1 {
+  font-size: 1rem;
+}
+
+.div-specific-fontsize {
+  font-size: 0.95rem;
+}
+
+.legend-specific-fontsize-1--5 {
+  font-size: 1.5rem;
+}
+
+.h2-specific-fontsize-12 {
+  font-size: 12px;
+}
+
+.h6-specific-fontsize-14 {
+  font-size: 14px;
+}
+
+.h6-specific-fontsize-22 {
+  font-size: 22px;
+}
+
+.span-specific-fontsize-15 {
+  font-size: 15px;
+}
+
+.span-specific-fontsize-16 {
+  font-size: 16px;
+}
+
+.span-specific-fontsize-30 {
+  font-size: 30px;
+}
+
+.specific-lineheight-20 {
+  line-height: 20px;
+}
+
+.specific-fontweight-500 {
+  font-weight: 500;
+}
+
+// Link
+.a-style {
+  cursor: pointer;
+  color: #222;
+}
+
+// Margin
+.specific-ml-15px {
+  margin-left: 15px;
+}
+
+.specific-mb-6 {
+  margin-bottom: 6px;
+}
+
+.specific-mt-50 {
+  margin-top: 50px;
+}
+
+.specific-ml-2vw {
+  margin-left: 2vw;
+}
+
+.specific-mr-2vw {
+  margin-right: 2vw;
+}
+
+.specific-my {
+  margin-bottom: 0.35rem;
+  margin-top: 0.75rem;
+}
+
+.specific-ml-012 {
+  margin-left: 0.12rem;
+}
+
+.specific-mt-45px {
+  margin-top: 45px;
+}
+
+.specific-mb-20px {
+  margin-bottom: 20px;
+}
+
+.specific-mt-15 {
+  margin-top: 15px !important;
+}
+
+.specific-ml-30 {
+  margin-left: 30px;
+}
+
+// Overflow
+
+.overflow-y-auto-x-hidden {
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.overflow-x-scroll {
+  overflow-x: scroll;
+}
+
+// Padding
+.organization-specific-pl-0 {
+  padding-left: 0;
+}
+
+.specific-pr-40 {
+  padding-right: 40px !important;
+}
+
+.specific-pt-0 {
+  padding-top: 0 !important;
+}
+
+.header-specific-pl-15 {
+  padding-left: 15px;
+}
+
+.specific-padding-3px {
+  padding: 3px;
+}
+
+// Size
+
+.specific-height-100px {
+  height: 100px;
+}
+
+.specific-minheight-100 {
+  min-height: 100px;
+}
+
+.specific-minheight-300 {
+  min-height: 300px;
+}
+
+.specific-height-80vh {
+  height: 80vh;
+}
+
+.img-specific-size {
+  width: 40px;
+  height: 40px;
+}
+
+.specific-maxwidth-200 {
+  max-width: 200px;
+}
+
+.specific-size {
+  width: 24px;
+  height: 24px;
+}
+
+.specific-width-33pct {
+  width: 33%;
+}
+
+.specific-width {
+  width: 90%;
+}
+
+.specific-maxheight-90vh {
+  max-height: 90vh;
+}
+
+.activity-img-specific-size {
+  width: 16px;
+  height: 16px;
+}
+
+.svg-specific-size {
+  width: 30px;
+  height: 30px;
+}
+
+.specific-height-1px {
+  height: 1px;
+}
+
+.specific-width-60pct {
+  width: 60%;
+}
+
+.specific-width-40pct {
+  width: 40%;
+}
+
+.header-img-specific-size {
+  width: 16px;
+  height: 16px;
+}
+
+.specific-height-0 {
+  height: 0;
+}
+
+// Special style
+
+.specific-span {
+  text-decoration: underline !important;
+  color: #000091;
+  cursor: pointer;
+}
+
+.svg-specific-fill-white {
+  fill: white;
+}
+
+// Text
+
+.underline {
+  text-decoration: underline;
+}

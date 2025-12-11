@@ -1,0 +1,27 @@
+@media screen and (min-width: 992px) {
+  .menu-burger__btn {
+    display: none; } }
+
+.fr-modal__header h1 {
+  margin-bottom: 0px; }
+
+.fr-menu__list li {
+  list-style: none; }
+
+.correct-margin {
+  margin-top: 32px;
+  margin-bottom: 0px; }
+
+@media (max-width: 991px) {
+  .fr-modal--opened {
+    display: block; } }
+
+.responsive-header .responsive-header__element-not-mobile {
+  display: block !important; }
+
+.responsive-header span {
+  margin-left: 0px !important; }
+
+.fr-modal:after,
+.fr-modal:before {
+  height: 0 !important; }

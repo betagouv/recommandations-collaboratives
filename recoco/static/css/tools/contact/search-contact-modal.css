@@ -1,0 +1,111 @@
+.modal-contact {
+  width: 450px;
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 4px;
+  border: 1px solid var(--light-border-default-grey, #e5e5e5);
+  background: #fff;
+  box-shadow: 4px 8px 6px 0px rgba(0, 0, 0, 0.2);
+  z-index: 1020; }
+  .modal-contact .contact-card {
+    max-width: 26rem; }
+  .modal-contact .button-cancel-contact {
+    position: absolute;
+    right: 0; }
+
+.specific-height {
+  max-height: 20rem; }
+
+.color-666 {
+  color: var(--light-text-mention-grey, #666); }
+
+.border-bottom-666 {
+  border-bottom: 1px solid var(--light-border-default-grey, #e5e5e5); }
+
+.correct-p {
+  margin-bottom: 0px; }
+
+.better-positionning {
+  transform: translate(-12px, -12px); }
+
+.specific-width-26rem {
+  width: 26.5rem; }
+
+.specific-banner {
+  border-radius: 1px;
+  background: var(--light-background-alt-grey, #f6f6f6);
+  text-align: center; }
+
+.text-style {
+  color: var(--light-text-mention-grey, #666);
+  text-align: right;
+  font-family: Marianne;
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 150%; }
+
+.color-3a3a3a {
+  color: var(--light-text-mention-grey, #666); }
+
+.same-for-all-text {
+  font-family: Marianne;
+  font-style: normal;
+  line-height: 150%; }
+
+.contact-names {
+  font-size: 13px;
+  font-weight: 800; }
+
+.text-position {
+  font-size: 11px;
+  font-weight: 400; }
+
+.text-organization {
+  font-size: 11px;
+  font-weight: 700; }
+
+.text-date {
+  font-size: 11px;
+  font-style: italic;
+  font-weight: 400; }
+
+.add-borders {
+  border-bottom: 1px solid var(--light-border-default-grey, #e5e5e5); }
+
+.design-dropdown {
+  border-radius: 0px 0px 4px 4px;
+  border: 1px solid var(--light-border-default-grey, #e5e5e5); }
+
+.border-radius-4px {
+  border-radius: 4px; }
+
+.correct-centering-text {
+  text-align: center;
+  display: inline; }
+
+.long-text-adaptation {
+  display: inline-block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  height: 20px;
+  width: 150px;
+  white-space: nowrap;
+  padding-top: 2px; }
+
+.btn-create-contact {
+  background: #f5f5fe;
+  color: #000091; }
+
+.correct-position {
+  top: 0px;
+  left: 24px;
+  position: relative; }
+
+@media (max-height: 850px) {
+  .modal-contact {
+    top: 30%; }
+  .rwd-resize {
+    width: 26.5rem !important; } }

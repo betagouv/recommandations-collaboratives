@@ -3,14 +3,13 @@
 {% load static %}
 {% load humanize %}
 {% load crm_tags %}
-{% block title %}Utilisation des tags sur les dossiers - CRM{% endblock %}
-{% block og_title %}Utilisation des tags sur les dossiers - CRM{% endblock %}
+{% block title %}
+    Utilisation des tags sur les dossiers - CRM
+{% endblock title %}
+{% block og_title %}
+    Utilisation des tags sur les dossiers - CRM
+{% endblock og_title %}
 {% load sass_tags %}
-{% block css %}
-    <link href="{% sass_src 'crm/css/tags.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-{% endblock css %}
 {% block js %}
     {% vite_asset 'js/apps/crm.js' %}
     <script src="{% static "/js/d3.min.js" %}"></script>
