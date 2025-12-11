@@ -78,7 +78,7 @@ def deploy(cnx, site=None):
     print("Copying manifest.json to static dir...")
     cnx.run(
         f"cd recoco-{site} "
-        "&& cp .venv/lib/python3*/site-packages/recoco/frontend/dist/.vite/manifest.json public/static/"
+        "&& cp .venv/lib/python3*/site-packages/recoco/frontend/dist/manifest.json public/static/"
     )
 
 

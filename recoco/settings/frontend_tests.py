@@ -73,7 +73,7 @@ DJANGO_VITE = {
     "default": {
         "dev_mode": False,
         "dev_server_port": 3001,
-        "manifest_path": DJANGO_VITE_ASSETS_PATH / ".vite" / "manifest.json",
+        "manifest_path": DJANGO_VITE_ASSETS_PATH / "manifest.json",
     }
 }
 

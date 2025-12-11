@@ -1,5 +1,5 @@
 document.addEventListener('alpine:init', () => {
-  Alpine.data('alpineMultiSelect', (obj) => ({
+  Alpine.data('MultiSelectRegionDepartment', (obj) => ({
     displayRegions: obj.displayRegions || false,
     elementId: obj.elementId || 'select-list',
     objectsToSelect: obj.objectsToSelect || [],
