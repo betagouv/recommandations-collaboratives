@@ -36,6 +36,10 @@ def create_messages_from_recommendations(apps, schema_editor):
                     modified=task.updated_on,
                     deleted=task.deleted,
                 )
+
+                if task.deleted:
+                    return
+
                 prev_node = RecommendationNode.objects.create(
                     message=msg, position=1, text=task.content, recommendation=task
                 )
@@ -51,7 +55,7 @@ def create_messages_from_recommendations(apps, schema_editor):
                     content_type_id=ContentType.objects.get_for_model(Task).pk,
                     object_id=task.pk,
                 ).first():
-                    prev_node = DocumentNode.objects.create(
+                    DocumentNode.objects.create(
                         message=msg, position=prev_node.position + 1, document=document
                     )
 
