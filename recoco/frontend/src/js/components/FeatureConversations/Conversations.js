@@ -271,7 +271,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
           error.response?.data?.the_file?.[0] ||
           "Contactez nous via le chat pour obtenir de l'aide.";
         this.$store.app.displayToastMessage({
-          message: `Erreur lors de l'envoie d'un document : ${errorMessage}`,
+          message: `Erreur lors de l'envoi d'un document : ${errorMessage}`,
           timeout: 5000,
           type: ToastType.error,
         });
