@@ -179,7 +179,7 @@ function initMap(projects) {
   L.tileLayer.provider('CartoDB.Positron').addTo(map);
 
   const markers = createMapMarkers(map, projects);
-  debugger;
+
   const markersLayer = createMarkersLayer(map, markers);
 
   return { map, markersLayer };
