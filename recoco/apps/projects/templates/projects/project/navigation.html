@@ -218,7 +218,7 @@
             </button>
             {% if "use_crm" in user_site_perms and not disable_crm %}
                 <template x-if="$store.tutorialsEvents.isTutorialForProjectPage === 4">
-                    {% include "projects/project/fragments/onboarding-tutorials/visual-hint.html" with extra_classes='position-visual-circle-hint--if-crm-chat' %}
+                    {% include "projects/project/fragments/onboarding-tutorials/visual-hint.html" with extra_classes="position-visual-circle-hint--if-crm-chat" %}
                 </template>
                 <template x-if="$store.tutorialsEvents.isTutorialForProjectPage === 4">
                     {% include "projects/project/fragments/onboarding-tutorials/svg-hint.html" with rect_x="57" rect_y="35" rect_width="31" rect_height="50" view_box_size="0 0 100 100" is_over=True %}
