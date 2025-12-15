@@ -69,7 +69,10 @@ Alpine.data('ContactBook', (departments, regions) => {
     async getDepartmentsOrganization(organizationId) {
       this.contactListGroupByNationalGroup.forEach((nationalGroup) =>
         nationalGroup.organizations.forEach(async (organization) => {
-          if (organization.id == organizationId) {
+          if (
+            organization.id == organizationId &&
+            organization.departments == undefined
+          ) {
             const response = await api.get(getOrganizationById(organizationId));
             organization.departments = response.data.departments;
           }
