@@ -5,12 +5,6 @@
 {% block js %}
     {% vite_asset 'js/apps/consent.js' %}
 {% endblock js %}
-{% load sass_tags %}
-{% block css %}
-    <link href="{% sass_src 'home/css/dsfr/custom-dsfr.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-{% endblock css %}
 {% block content %}
     <div class="fr-container fr-container--fluid fr-container-md">
         <div class="fr-grid-row fr-grid-row--center">

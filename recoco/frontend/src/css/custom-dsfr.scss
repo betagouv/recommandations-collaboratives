@@ -432,10 +432,14 @@ form > p {
   width: calc(100% - 1rem);
   height: calc(100% - 0.25rem);
   background-image: var(--underline-img), var(--underline-img);
-  background-position: 50% calc(50% + 0.65625em), 50% calc(50% + 0.65625em);
+  background-position:
+    50% calc(50% + 0.65625em),
+    50% calc(50% + 0.65625em);
   background-repeat: no-repeat, no-repeat;
   transition: background-size 0s;
-  background-size: 0 0.125em, 100% 0.0625em;
+  background-size:
+    0 0.125em,
+    100% 0.0625em;
 }
 
 .fr-consent-service__radios {
