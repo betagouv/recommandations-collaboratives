@@ -57,4 +57,5 @@ $enable-shadows: true;
 @import 'specificStyle.scss';
 
 // DSFR custom
-@import 'custom-dsfr.scss';
+@import './DSFR/custom-dsfr.scss';
+@import './DSFR/marianne.css';
