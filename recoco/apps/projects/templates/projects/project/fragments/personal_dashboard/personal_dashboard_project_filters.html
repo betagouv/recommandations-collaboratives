@@ -1,10 +1,8 @@
 {% load static %}
-{% load sass_tags %}
-{% block css %}
-    <link href="{% sass_src 'projects/css/fragments/personnal_dashboard/personnal_dashboard.scss' %}"
-          rel="stylesheet"
-          type="text/css" />
-{% endblock css %}
+{% load django_vite %}
+{% block js %}
+    {% vite_asset 'js/styles/personnal-dashboard.css.js' %}
+{% endblock js %}
 <div class="d-flex align-items-center fr-mb-3w fr-mt-3w w-100 justify-content-between projects-filters-container">
     <div class="d-flex align-items-center projects-filters-select">
         <span class="text-custom-info text-grey-dark fw-light fr-mr-2v">Trier :</span>

@@ -1,10 +1,8 @@
 {% load static %}
-{% load sass_tags %}
-{% block css %}
-    <link href="{% sass_src 'projects/css/fragments/personnal_dashboard/personnal_dashboard.scss' %}"
-          rel="stylesheet"
-          type="text/css" />
-{% endblock css %}
+{% load django_vite %}
+{% block js %}
+    {% vite_asset 'js/styles/personnal-dashboard.css.js' %}
+{% endblock js %}
 <div class="d-flex flex-column" id="projectsList">
     {% include "projects/project/fragments/personal_dashboard/personal_dashboard_project_filters.html" %}
     <ul class="list-unstyled list d-flex flex-column">

@@ -90,6 +90,18 @@ const config = {
         departmentsSelector: resolve(
           './src/js/styles/departments-selector.css.js'
         ),
+        surveyGridStyles: resolve('./src/js/styles/survey-grid.css.js'),
+        personnalDashboardStyles: resolve(
+          './src/js/styles/personnal-dashboard.css.js'
+        ),
+        tasksModalStyles: resolve('./src/js/styles/tasks-modal.css.js'),
+        switchtenderListStyles: resolve(
+          './src/js/styles/switchtender-list.css.js'
+        ),
+        projectBannerStyles: resolve('./src/js/styles/project-banner.css.js'),
+        inviteNotAcceptedBannerStyles: resolve(
+          './src/js/styles/invite-not-accepted-banner.css.js'
+        ),
       },
       output: {
         chunkFileNames: undefined,
