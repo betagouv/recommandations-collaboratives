@@ -33,9 +33,9 @@
                             data-test-id="user-card-intro">
                         {% if user.get_full_name %}
                             {{ user.get_full_name }}
-                        {% elif project and project_owner and project.first_name and project.last_name %}
-                            {{ project.first_name }}
-                            {{ project.last_name }}
+                        {% elif project and project_owner and project.submitted_by.first_name and project.submitted_by.last_name %}
+                            {{ project.submitted_by.first_name }}
+                            {{ project.submitted_by.last_name }}
                         {% elif user.email %}
                             {{ user.email }}
                         {% endif %}

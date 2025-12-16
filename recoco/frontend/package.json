@@ -18,6 +18,7 @@
     "@gouvfr/dsfr": "^1.11.2",
     "@iframe-resizer/child": "^5.3.1",
     "@popperjs/core": "^2.11.5",
+    "@ryangjchandler/alpine-tooltip": "^2.0.1",
     "@tiptap/core": "^2.0.0-beta.218",
     "@tiptap/extension-hard-break": "^2.1.16",
     "@tiptap/extension-link": "^2.0.0-beta.199",
@@ -43,6 +44,7 @@
     "list.js": "^2.3.1",
     "lodash": "^4.17.21",
     "marked": "^4.2.5",
+    "masonry-layout": "^4.2.2",
     "md5": "^2.3.0",
     "minisearch": "^7.1.0",
     "prosemirror-model": "^1.18.1",
@@ -52,6 +54,7 @@
   },
   "devDependencies": {
     "@babel/preset-env": "^7.26.0",
+    "@types/alpinejs": "^3.13.11",
     "babel-plugin-lodash": "^3.3.4",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "9.1.0",

@@ -76,6 +76,8 @@ class ProjectSerializer(
             "tags",
             "is_diagnostic_done",
             "advisors_note",
+            "exclude_stats",
+            "muted",
         ]
 
     switchtenders = UserSerializer(read_only=True, many=True)
@@ -117,6 +119,16 @@ class ProjectSerializer(
             "projects.use_private_notes", obj
         ):
             return obj.advisors_note
+
+    exclude_stats = serializers.SerializerMethodField()
+
+    def get_exclude_stats(self, obj):
+        return obj.exclude_stats
+
+    muted = serializers.SerializerMethodField()
+
+    def get_muted(self, obj):
+        return obj.muted
 
 
 class UserProjectSerializer(ProjectSerializer):
@@ -215,6 +227,8 @@ class ProjectForListSerializer(BaseSerializerMixin):
             "project_sites": format_sites(data),
             "tags": [tag.name for tag in data.tags.all()],
             "owner": format_owner(data),
+            "muted": data.muted,
+            "exclude_stats": data.exclude_stats,
         }
 
 
@@ -272,6 +286,9 @@ def format_owner(project):
         "email": owner.email,
         "profile": {
             "organization": {
+                "id": owner.profile.organization.id
+                if owner.profile.organization
+                else None,
                 "name": (
                     owner.profile.organization.name
                     if owner.profile.organization

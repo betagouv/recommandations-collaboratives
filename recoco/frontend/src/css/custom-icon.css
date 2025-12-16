@@ -22,3 +22,28 @@
 .fr-icon-corner-down-right-line::before {
   mask-image: url(../assets/corner-down-right-line.svg);
 }
+
+.fr-icon-notification-off-line::after,
+.fr-icon-notification-off-line::before {
+  mask-image: url(../assets/notification-off-line.svg);
+}
+
+.fr-icon-notification-on-line::after,
+.fr-icon-notification-on-line::before {
+  mask-image: url(../assets/notification-on-line.svg);
+}
+
+.fr-icon-line-chart-off-line::after,
+.fr-icon-line-chart-off-line::before {
+  mask-image: url(../assets/line-chart-off-line.svg);
+}
+
+.fr-icon-line-chart-on-line::after,
+.fr-icon-line-chart-on-line::before {
+  mask-image: url(../assets/line-chart-on-line.svg);
+}
+
+.fr-icon-tools-line::after,
+.fr-icon-tools-line::before {
+  mask-image: url(../assets/tools-line.svg);
+}

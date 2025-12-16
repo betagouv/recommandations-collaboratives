@@ -21,6 +21,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
   messages: [],
   messagesLoaded: false,
   showMessages: false,
+  sendingMessage: false,
   tasks: [],
   users: [],
   messagesParticipants: [],
@@ -230,6 +231,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     return foundContact;
   },
   async sendFormMessage() {
+    this.sendingMessage = true;
     if (this.isEditorInEditMode) {
       await this.sendMessage({
         updateMessage: true,
@@ -313,7 +315,9 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
       this.$store.editor.clearEditorContent();
       this.updateCountOfElementsInDiscussion(messageResponse.data);
       this.messageIdToReply = null;
+      this.sendingMessage = false;
     } catch (error) {
+      this.sendingMessage = false;
       this.$store.app.displayToastMessage({
         message: `Erreur lors de ${updateMessage ? 'la modification' : "l'envoi"} du message: ${Object.values(JSON.parse(error.request.responseText)).join(', ')}`,
         timeout: 5000,
@@ -337,23 +341,23 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     this.countOf.isLoaded = true;
   },
   updateCountOfElementsInDiscussion(element, decrease = false) {
+    if (element.deleted) {
+      return;
+    }
+    const change = decrease ? -1 : 1;
     if (element.nodes) {
       for (const node of element.nodes) {
         if (node.type === 'DocumentNode') {
-          this.countOf.documents += decrease ? -1 : 1;
+          this.countOf.documents += change;
         }
         if (node.type === 'RecommendationNode') {
-          this.countOf.tasks += decrease ? -1 : 1;
+          this.countOf.tasks += change;
         }
         if (node.type === 'ContactNode') {
-          this.countOf.contacts += decrease ? -1 : 1;
+          this.countOf.contacts += change;
         }
       }
-      if (!element.deleted) {
-        this.countOf.messages += decrease ? -1 : 1;
-      } else if (decrease) {
-        this.countOf.messages += -1;
-      }
+      this.countOf.messages += change;
     }
   },
   onClickHandleReply(message) {
@@ -460,6 +464,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     }
   },
   async onClickRessourceConsummeNotification(taskId) {
+    trackOpenRessource();
     try {
       if (!Alpine.store('djangoData').isAdvisor) {
         await api.post(markTaskNotificationAsVisited(this.projectId, taskId));
@@ -467,7 +472,6 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     } catch (error) {
       throw new Error('Failed to mark task notification as visited', error);
     }
-    trackOpenRessource();
   },
   replaceMessage(message, messageIdToEdit) {
     const messageIndex = this.feed.elements.findIndex(

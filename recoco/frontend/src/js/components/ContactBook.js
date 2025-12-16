@@ -7,6 +7,7 @@ import api, {
 } from '../utils/api';
 import _ from 'lodash';
 import { formatDate } from '../utils/date';
+import { ToastType } from '../models/toastType';
 
 Alpine.data('ContactBook', (departments, regions) => {
   return {
@@ -29,27 +30,54 @@ Alpine.data('ContactBook', (departments, regions) => {
         this.contactListGroupByNationalGroup = this.groupContactByNationalGroup(
           response.data.results
         );
-        this.getDepartmentsOrganization(this.contactListGroupByNationalGroup);
+        this.initScrollToLoadOrganizationDepartments();
         if (sessionStorage.getItem('letter')) {
           this.loadOrganizationStartingWith(sessionStorage.getItem('letter'));
         }
         this.isContactDataLoaded = true;
       } catch (error) {
-        // TODO add a toast
-        console.error(error);
-        throw new Error('Erreur lors de la récupération des contacts');
+        this.$store.app.displayToastMessage({
+          message: `Erreur lors de la récupération des contacts`,
+          timeout: 5000,
+          type: ToastType.error,
+        });
+        this.isContactDataLoaded = true;
+        throw new Error('Error while fetching contacts', { cause: error });
       }
     },
-    async getDepartmentsOrganization(nationalGroupList) {
-      for (const nationalGroup of nationalGroupList) {
-        for (const orga of nationalGroup.organizations) {
-          if (orga.id) {
-            orga.departments = (
-              await api.get(getOrganizationById(orga.id))
-            ).data.departments;
+    initScrollToLoadOrganizationDepartments() {
+      requestAnimationFrame(() => {
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              console.log('entry.target', entry.target);
+              const organizationId = entry.target.getAttribute(
+                'data-organization-id'
+              );
+              this.getDepartmentsOrganization(organizationId);
+            }
+          });
+        });
+        const organizationContainers = document.querySelectorAll(
+          '.organization-container'
+        );
+        organizationContainers.forEach((organizationContainer) => {
+          observer.observe(organizationContainer);
+        });
+      });
+    },
+    async getDepartmentsOrganization(organizationId) {
+      this.contactListGroupByNationalGroup.forEach((nationalGroup) =>
+        nationalGroup.organizations.forEach(async (organization) => {
+          if (
+            organization.id == organizationId &&
+            organization.departments == undefined
+          ) {
+            const response = await api.get(getOrganizationById(organizationId));
+            organization.departments = response.data.departments;
           }
-        }
-      }
+        })
+      );
     },
     searchContacts(search) {
       this.searchParams.search = search;
@@ -81,7 +109,7 @@ Alpine.data('ContactBook', (departments, regions) => {
         this.contactListGroupByNationalGroup = this.groupContactByNationalGroup(
           response.data.results
         );
-        this.getDepartmentsOrganization(this.contactListGroupByNationalGroup);
+        this.initScrollToLoadOrganizationDepartments();
       }
     },
 

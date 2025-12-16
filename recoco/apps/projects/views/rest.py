@@ -31,7 +31,10 @@ from recoco.rest_api.filters import (
     VectorSearchFilter,
     WatsonSearchFilter,
 )
-from recoco.rest_api.pagination import LargeResultsSetPagination
+from recoco.rest_api.pagination import (
+    LargeResultsSetPagination,
+    StandardResultsSetPagination,
+)
 from recoco.rest_api.permissions import BaseConversationPermission
 from recoco.utils import (
     get_group_for_site,
@@ -40,7 +43,7 @@ from recoco.utils import (
 )
 
 from .. import models, signals
-from ..filters import DepartmentsFilter, ProjectActivityFilter
+from ..filters import DepartmentsFilter, ProjectActivityFilter, ProjectSiteStatusFilter
 from ..serializers import (
     DocumentSerializer,
     NewDocumentSerializer,
@@ -102,11 +105,13 @@ class ProjectList(ListAPIView):
 
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = ProjectForListSerializer
+    pagination_class = StandardResultsSetPagination
     filter_backends = [
         TagsFilterbackend,
         WatsonSearchFilter,
         DepartmentsFilter,
         ProjectActivityFilter,
+        ProjectSiteStatusFilter,
     ]
 
     def get_queryset(self):
@@ -142,10 +147,20 @@ class ProjectList(ListAPIView):
             )
         )
 
+        # Paginate the queryset
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            # Convert paginated queryset to list for _update_the_site_projects
+            projects = self._update_the_site_projects(
+                queryset=page, site=request.site, user=request.user
+            )
+            serializer = self.get_serializer(projects, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        # Fallback if pagination is not configured
         projects = self._update_the_site_projects(
             queryset=queryset, site=request.site, user=request.user
         )
-
         serializer = self.get_serializer(projects, many=True)
         return Response(serializer.data)
 

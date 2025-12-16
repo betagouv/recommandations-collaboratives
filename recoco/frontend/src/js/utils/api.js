@@ -37,15 +37,26 @@ instance.interceptors.response.use(
 
 export default instance;
 
-export function projectsUrl(search, departments, lastActivity) {
+export function projectsUrl({
+  searchText = '',
+  departments = [],
+  lastActivity = 1460,
+  limit = 2000,
+  offset = 0,
+  page = 1,
+  status = [],
+} = {}) {
   // if search with tags, make a different url
   let url;
-  if (search.includes('#')) {
-    search = search.substring(1);
+  if (searchText.includes('#')) {
+    searchText = searchText.substring(1);
   }
   const params = new URLSearchParams({
-    search: search,
+    search: searchText,
     last_activity: lastActivity,
+    limit,
+    offset,
+    page,
   });
 
   url = '/api/projects/?' + params.toString();
@@ -53,6 +64,10 @@ export function projectsUrl(search, departments, lastActivity) {
   if (departments.length) {
     departments = departments.map((code) => `departments=${code}`).join('&');
     url = url + '&' + departments;
+  }
+  if (status.length) {
+    status = status.map((status) => `status=${status}`).join('&');
+    url = url + '&' + status;
   }
   return url;
 }

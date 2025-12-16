@@ -79,7 +79,6 @@ Alpine.data(
             active: this.territorySelectAll,
           })),
         }));
-
         if (!init) {
           this.$dispatch('is-select-all-departments', this.territorySelectAll);
           this.$dispatch(
@@ -104,7 +103,6 @@ Alpine.data(
         this.territorySelectAll =
           this.regions.filter((region) => region.active).length ===
           this.regions.length;
-
         this.$dispatch(
           'selected-departments',
           this.extractDepartmentFromSelectedRegions(this.regions)

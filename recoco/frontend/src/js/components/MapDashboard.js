@@ -83,7 +83,7 @@ function MapDashboard(currentSiteId, regions) {
         projectsUrl(searchText, searchDepartment, lastActivity)
       );
       this.projectList = await this.$store.projects.mapperProjetsProjectSites(
-        projects.data,
+        projects.data.results,
         this.currentSiteId
       );
       this.projectListFiltered = [...this.projectList];
