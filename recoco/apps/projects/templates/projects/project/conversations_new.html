@@ -99,7 +99,8 @@
                         {% csrf_token %}
                         <div class="message-form fr-my-3v bg-light border-form editor-form__container fr-input-group position-relative"
                              :class="{'focus': isEditorFocused || isEditorInEditMode || isEditorInReplyMode, 'edit-mode': isEditorInEditMode, 'reply-mode': isEditorInReplyMode}"
-                             @click.outside="isEditorFocused = false">
+                             @click.outside="isEditorFocused = false"
+                             data-test-id="tiptap-editor-container">
                             <template x-if="isEditorInEditMode">
                                 <div class="edit-mode__message-container">
                                     <p class="fr-text--sm fr-mb-0">
@@ -134,6 +135,7 @@
                 {% endif %}
             </div>
         </template>
+        {% include "projects/project/onboarding_tutorial.html" %}
         <dialog id="modal"
                 class="fr-modal"
                 aria-labelledby="supprimer-message"

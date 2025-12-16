@@ -37,5 +37,57 @@
       "site_id": 1,
       "week_inactivity_repeat": 0
     }
+  },
+  {
+    "model": "training.challengedefinition",
+    "pk": 4,
+    "fields": {
+      "name": "project-page-tutorial-part1",
+      "description": "project-page-tutorial-part1",
+      "next_challenge": null,
+      "code": "project-page-tutorial-part1",
+      "icon_name": null,
+      "site_id": 1,
+      "week_inactivity_repeat": 0
+    }
+  },
+  {
+    "model": "training.challengedefinition",
+    "pk": 5,
+    "fields": {
+      "name": "project-page-tutorial-part2",
+      "description": "project-page-tutorial-part2",
+      "next_challenge": null,
+      "code": "project-page-tutorial-part2",
+      "icon_name": null,
+      "site_id": 1,
+      "week_inactivity_repeat": 0
+    }
+  },
+  {
+    "model": "training.challengedefinition",
+    "pk": 6,
+    "fields": {
+      "name": "project-page-tutorial-part3",
+      "description": "project-page-tutorial-part3",
+      "next_challenge": null,
+      "code": "project-page-tutorial-part3",
+      "icon_name": null,
+      "site_id": 1,
+      "week_inactivity_repeat": 0
+    }
+  },
+  {
+    "model": "training.challengedefinition",
+    "pk": 7,
+    "fields": {
+      "name": "project-page-tutorial-part4",
+      "description": "project-page-tutorial-part4",
+      "next_challenge": null,
+      "code": "project-page-tutorial-part4",
+      "icon_name": null,
+      "site_id": 1,
+      "week_inactivity_repeat": 0
+    }
   }
 ]

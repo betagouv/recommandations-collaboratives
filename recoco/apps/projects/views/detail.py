@@ -311,6 +311,7 @@ def project_conversations_new(request, project_id=None):
             "project": project,
             "is_regional_actor": is_regional_actor,
             "advising": advising,
+            "advising_position": advising_position,
             "recipients": recipients_data,
         },
     )
