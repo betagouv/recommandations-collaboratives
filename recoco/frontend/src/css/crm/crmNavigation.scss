@@ -1,0 +1,16 @@
+.crm-navigation {
+  background: #e6eefe;
+  padding: 12px 20px;
+  align-items: center;
+  &__legend {
+    color: var(--light-text-default-grey, #3a3a3a);
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 24px;
+    margin: 0;
+    margin-right: 10px;
+  }
+  .fr-segmented__elements {
+    background: white;
+  }
+}

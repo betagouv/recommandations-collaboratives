@@ -20,7 +20,6 @@ from django.urls import reverse
 from django.utils import timezone
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods
-from notifications import models as notifications_models
 
 from recoco import verbs
 from recoco.apps.communication import constants as communication_constants
@@ -427,15 +426,6 @@ def project_maplist(request):
         or can_administrate_project(project=None, user=request.user)
     ):
         raise PermissionDenied("Vous n'avez pas le droit d'accéder à ceci.")
-
-    unread_notifications = (
-        notifications_models.Notification.on_site.unread()
-        .filter(recipient=request.user, public=True)
-        .prefetch_related("actor__profile__organization")
-        .prefetch_related("action_object")
-        .prefetch_related("target")
-        .order_by("-timestamp")[:100]
-    )
 
     # Provide departments/regions for filters on the map list, similar to staff view
     department_queryset = (

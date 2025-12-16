@@ -8,6 +8,7 @@ function Crm() {
     init() {
       // Sidebar behaviour
       const sidebar = this.$refs.sidebar;
+      if (!sidebar) return;
       const sidebarHeight = sidebar.offsetHeight;
       const windowHeight = window.innerHeight;
 

@@ -34,7 +34,7 @@
                     <div class="fr-input-group fr-ml-4w"
                          x-data="RegionDepartmentPreparer({ selectedDepartments: selectedDepartments })">
                         <template x-if="objectsToSelect && objectsToSelect.length">
-                            <div x-data="alpineMultiSelect({ selected: selectedDepartments, objectsToSelect: objectsToSelect, displayRegions: true })">
+                            <div x-data="MultiSelectRegionDepartment({ selected: selectedDepartments, objectsToSelect: objectsToSelect, displayRegions: true })">
                                 {% include "tools/contacts/multi_select.html" with placeholder="Cherchez et sélectionnez les départements à affecter" label="Cherchez et sélectionnez les départements à affecter" display_regions=True %}
                                 <template x-for="dept in selectedDepartments" :key="dept">
                                     <input type="hidden" name="departments" :value="dept">

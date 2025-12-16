@@ -341,23 +341,23 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     this.countOf.isLoaded = true;
   },
   updateCountOfElementsInDiscussion(element, decrease = false) {
+    if (element.deleted) {
+      return;
+    }
+    const change = decrease ? -1 : 1;
     if (element.nodes) {
       for (const node of element.nodes) {
         if (node.type === 'DocumentNode') {
-          this.countOf.documents += decrease ? -1 : 1;
+          this.countOf.documents += change;
         }
         if (node.type === 'RecommendationNode') {
-          this.countOf.tasks += decrease ? -1 : 1;
+          this.countOf.tasks += change;
         }
         if (node.type === 'ContactNode') {
-          this.countOf.contacts += decrease ? -1 : 1;
+          this.countOf.contacts += change;
         }
       }
-      if (!element.deleted) {
-        this.countOf.messages += decrease ? -1 : 1;
-      } else if (decrease) {
-        this.countOf.messages += -1;
-      }
+      this.countOf.messages += change;
     }
   },
   onClickHandleReply(message) {
