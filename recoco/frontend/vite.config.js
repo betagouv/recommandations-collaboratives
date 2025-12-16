@@ -85,7 +85,7 @@ const config = {
         MultiSelectRegionDepartment: resolve(
           './src/js/components/MultiSelectRegionDepartment.js'
         ),
-        MultiSelect: resolve('./src/js/components/MultiSelect.js'),
+        MultiSelect2: resolve('./src/js/components/MultiSelect2.js'),
         ContactBook: resolve('./src/js/components/ContactBook.js'),
         ProjectPageTutorial: resolve('./src/js/components/onboarding-tutorials/ProjectPageTutorial.js'),
         pageInvitation: resolve('./src/js/apps/pageInvitation.js'),
