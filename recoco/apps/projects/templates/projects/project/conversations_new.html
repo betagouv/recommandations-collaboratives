@@ -38,12 +38,7 @@
          x-data="Conversations({{ project.id }}, {{ request.user.id }})">
         <div class="conversation-new__topics">
             <div class="justify-content-between">
-                {% comment %} <div class="conversation-new__topics-header">
-                    <h2 class="conversation-new__topics-header-title">Fils de discussion</h2>
-                </div> {% endcomment %}
-                {% comment %} {% for topic in topic_list %} {% endcomment %}
-                {% include "projects/project/fragments/conversations_new/conversation_topic.html" with topic_name=topic.grouper message_number=topic.list %}
-                {% comment %} {% endfor %} {% endcomment %}
+                {% include "conversations/messages/fragments/conversation_topic.html" with topic_name=topic.grouper message_number=topic.list %}
             </div>
             <div class="conversation-new__topics-list-member fr-px-2w fr-pt-2w"
                  x-data="{isOpen: false}"
@@ -69,7 +64,7 @@
                 </ul>
                 <div class="list-member-toggle position-sticky bottom-0 start-0 text-center w-100 fr-pb-0">
                     <button class="fr-btn fr-btn--sm fr-btn--secondary bg-white "
-                            @click="isOpen = !isOpen; !isOpen && trackSeeMoreParticipants();"
+                            @click="!isOpen && trackSeeMoreParticipants(); isOpen = !isOpen;"
                             x-text="isOpen ? 'Voir moins' : 'Voir plus'"></button>
                 </div>
             </div>
@@ -94,7 +89,7 @@
                  @topic-switched.window="scrollToFirstNotification($event.detail)"
                  {% endcomment %}>
                 {% get_obj_perms request.user for project as "user_project_perms" %}
-                {% include "projects/project/fragments/conversations_new/conversations_new_feed.html" %}
+                {% include "conversations/messages/fragments/conversations_new_feed.html" %}
                 {% if "use_public_notes" in user_project_perms %}
                     <!-- Post message -->
                     <form class="form editor-form fr-px-3v fr-pr-12w"
@@ -104,7 +99,8 @@
                         {% csrf_token %}
                         <div class="message-form fr-my-3v bg-light border-form editor-form__container fr-input-group position-relative"
                              :class="{'focus': isEditorFocused || isEditorInEditMode || isEditorInReplyMode, 'edit-mode': isEditorInEditMode, 'reply-mode': isEditorInReplyMode}"
-                             @click.outside="isEditorFocused = false">
+                             @click.outside="isEditorFocused = false"
+                             data-test-id="tiptap-editor-container">
                             <template x-if="isEditorInEditMode">
                                 <div class="edit-mode__message-container">
                                     <p class="fr-text--sm fr-mb-0">
@@ -139,6 +135,7 @@
                 {% endif %}
             </div>
         </template>
+        {% include "projects/project/onboarding_tutorial.html" %}
         <dialog id="modal"
                 class="fr-modal"
                 aria-labelledby="supprimer-message"

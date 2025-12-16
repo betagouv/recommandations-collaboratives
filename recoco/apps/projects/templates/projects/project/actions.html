@@ -13,9 +13,6 @@
 {% block og_title %}Recommandations - {{ block.super }}{% endblock og_title %}
 <!-- djlint:on -->
 {% block js %}
-    {% comment %} TODO import in node_modules {% endcomment %}
-    <script src="https://cdn.jsdelivr.net/npm/js-md5@0.7.3/src/md5.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     {% vite_asset 'js/store/showRole.js' %}
     {% vite_asset 'js/apps/featureAddContact.js' %}
 {% endblock js %}
@@ -44,9 +41,9 @@
                      class="fr-mr-4w"
                      src="{% static 'svg/empty-state.svg' %}">
                 <div>
-                    <h3 class="size-20px fw-bold fr-mb-0">Il n’y a encore aucune recommandation pour ce projet</h3>
+                    <h3 class="size-20px fw-bold fr-mb-0">Il n’y a encore aucune recommandation sur ce dossier.</h3>
                     <p class="fw-normal font-size-14px fr-mb-2w">
-                        Vous pouvez examiner les recommandations suggérées automatiquement pour ce projet, pour éventuellement les proposer à la collectivité.
+                        Vous pouvez examiner les recommandations suggérées automatiquement pour ce dossier, pour éventuellement les adresser au demandeur.
                     </p>
                     {% if advising or is_staff %}
                         <a href="{% url 'projects-project-tasks-suggest' project.pk %}"
@@ -86,4 +83,5 @@
         {% include "projects/project/fragments/tasks_inline_kanban/tasks_inline_kanban.html" %}
     {% endif %}
     {% include "projects/project/fragments/project_banner/banner_wrapper.html" with part="close" %}
+    {% include "projects/project/onboarding_tutorial.html" %}
 {% endblock project_detail %}
