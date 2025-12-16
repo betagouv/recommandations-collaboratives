@@ -9,11 +9,12 @@ created : 2021-05-26 15:56:20 CEST
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
-from django.db.models import Prefetch
+from django.db.models import Prefetch, QuerySet
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -27,7 +28,7 @@ from recoco.apps.communication import digests
 from recoco.apps.communication.api import send_email
 from recoco.apps.communication.digests import normalize_user_name
 from recoco.apps.geomatics import models as geomatics_models
-from recoco.apps.geomatics.serializers import DepartmentSerializer, RegionSerializer
+from recoco.apps.geomatics.serializers import RegionSerializer
 from recoco.apps.home.models import AdvisorAccessRequest
 from recoco.apps.projects.models import ProjectCreationRequest
 from recoco.utils import (
@@ -370,6 +371,29 @@ def project_list_for_advisor(request):
     return redirect("projects-project-list")
 
 
+def territory_filtering_queryset(user: User) -> QuerySet:
+    # Provide departments/regions for filters
+    department_queryset = (
+        geomatics_models.Department.objects.filter(
+            code__in=(
+                models.Project.on_site.for_user(user)
+                .order_by("-created_on", "-updated_on")
+                .prefetch_related("commune__department")
+                .values_list("commune__department", flat=True)
+                .distinct()
+            )
+        )
+        | user.profile.departments.all()
+    ).distinct()
+
+    return (
+        geomatics_models.Region.objects.filter(departments__in=department_queryset)
+        .prefetch_related(Prefetch("departments", department_queryset))
+        .distinct()
+        .order_by("name")
+    )
+
+
 @login_required
 @ensure_csrf_cookie
 def project_list(request):
@@ -388,30 +412,11 @@ def project_list(request):
 
     mark_general_notifications_as_seen(request.user)
 
-    department_queryset = (
-        geomatics_models.Department.objects.filter(
-            code__in=(
-                models.Project.on_site.for_user(request.user)
-                .order_by("-created_on", "-updated_on")
-                .prefetch_related("commune__department")
-                .values_list("commune__department", flat=True)
-            )
-        )
-        | request.user.profile.departments.all()
-    ).distinct()
-
-    region_queryset = (
-        geomatics_models.Region.objects.filter(departments__in=department_queryset)
-        .prefetch_related("departments")
-        .distinct()
-        .order_by("name")
-    )
+    regions_to_filter = territory_filtering_queryset(request.user)
 
     context = {
         "site_config": site_config,
-        "departments": list(DepartmentSerializer(department_queryset, many=True).data),
-        "regions": list(RegionSerializer(region_queryset, many=True).data),
-        **locals(),
+        "regions": list(RegionSerializer(regions_to_filter, many=True).data),
     }
 
     return render(request, "projects/project/list-kanban.html", context)
@@ -427,30 +432,10 @@ def project_maplist(request):
     ):
         raise PermissionDenied("Vous n'avez pas le droit d'accéder à ceci.")
 
-    # Provide departments/regions for filters on the map list, similar to staff view
-    department_queryset = (
-        geomatics_models.Department.objects.filter(
-            code__in=(
-                models.Project.on_site.for_user(request.user)
-                .order_by("-created_on", "-updated_on")
-                .prefetch_related("commune__department")
-                .values_list("commune__department", flat=True)
-            )
-        )
-        | request.user.profile.departments.all()
-    ).distinct()
-
-    region_queryset = (
-        geomatics_models.Region.objects.filter(departments__in=department_queryset)
-        .prefetch_related("departments")
-        .distinct()
-        .order_by("name")
-    )
+    regions_to_filter = territory_filtering_queryset(request.user)
 
     context = {
-        "departments": list(DepartmentSerializer(department_queryset, many=True).data),
-        "regions": list(RegionSerializer(region_queryset, many=True).data),
-        **locals(),
+        "regions": list(RegionSerializer(regions_to_filter, many=True).data),
     }
 
     return render(request, "projects/project/list-map.html", context)

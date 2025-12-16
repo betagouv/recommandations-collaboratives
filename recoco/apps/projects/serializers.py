@@ -226,12 +226,6 @@ class ProjectForListSerializer(BaseSerializerMixin):
             "notifications": data.notifications,
             "project_sites": format_sites(data),
             "tags": [tag.name for tag in data.tags.all()],
-            "advisors_note": (
-                data.advisors_note
-                if self.current_user
-                and self.current_user.has_perm("projects.use_private_notes", data)
-                else None
-            ),
             "owner": format_owner(data),
             "muted": data.muted,
             "exclude_stats": data.exclude_stats,

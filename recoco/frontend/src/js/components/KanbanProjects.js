@@ -23,8 +23,6 @@ Alpine.data('KanbanProjects', function (currentSiteId, departments, regions) {
     },
     searchText: '',
     filterProjectLastActivity: localStorage.getItem('lastActivity') ?? '30',
-    selectedDepartment: null, // is it used ?
-    departments: JSON.parse(departments.textContent),
     regions: JSON.parse(regions.textContent),
     territorySelectAll: true,
     boards: [
@@ -44,7 +42,6 @@ Alpine.data('KanbanProjects', function (currentSiteId, departments, regions) {
     ],
     async init() {
       await this.getData();
-      this.constructRegionsFilter(this.departments, this.regions);
       this.isViewInitialized = true;
     },
     async getData() {
@@ -159,52 +156,6 @@ Alpine.data('KanbanProjects', function (currentSiteId, departments, regions) {
       } else {
         this.projectListFiltered = [...this.projectList];
       }
-    },
-    constructRegionsFilter(departments, regions) {
-      const currentRegions = [];
-      const displayedProjectsDepartments =
-        this.extractDepartmentFromDisplayedProjects(this.projectList);
-
-      regions.forEach((region) => {
-        //Iterate through regions.departments and look for advisors departments
-        const foundDepartments = departments
-          .filter((department) =>
-            region.departments.find(
-              (regionDepartment) => regionDepartment.code === department.code
-            )
-          )
-          .map((department) => {
-            const isIncludeInDisplayedProjects =
-              displayedProjectsDepartments.includes(department.code);
-            const departmentData = {
-              ...department,
-              active: isIncludeInDisplayedProjects,
-            };
-            if (isIncludeInDisplayedProjects)
-              this.departments.push(departmentData);
-            return departmentData;
-          });
-
-        if (foundDepartments.length > 0) {
-          const currentRegion = {
-            code: region.code,
-            departments: foundDepartments,
-            name: region.name,
-            active:
-              foundDepartments.length ===
-              foundDepartments.filter((department) => department.active).length,
-          };
-
-          return currentRegions.push(currentRegion);
-        }
-      });
-      this.regions = currentRegions;
-    },
-    extractDepartmentFromDisplayedProjects(projects) {
-      const departments = projects.map(
-        (project) => project?.commune?.department.code
-      );
-      return [...new Set(departments)];
     },
     async onSearch(event) {
       this.backendSearch.searchText = event.target.value;

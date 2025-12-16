@@ -395,6 +395,11 @@ class Project(models.Model):
 
     @property
     def owner(self):
+        if hasattr(self, "_owner") and len(self._owner):
+            try:
+                return self._owner[0]
+            except IndexError:
+                return None
         return self.members.filter(projectmember__is_owner=True).first()
 
     ro_key = models.CharField(

@@ -15,7 +15,7 @@ from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 from django.contrib.sites.shortcuts import get_current_site
-from django.db.models import Count, F, OuterRef, Q, QuerySet, Subquery
+from django.db.models import Count, F, OuterRef, Prefetch, Q, QuerySet, Subquery
 from django.http import Http404
 from django.shortcuts import get_object_or_404
 from notifications import models as notifications_models
@@ -125,16 +125,27 @@ class ProjectList(ListAPIView):
                     ).values("status")
                 )
             )
-            .prefetch_related(
-                "commune__department",
-                "switchtenders__profile__organization",
-                "project_sites",
-                "tags",
-            )
         )
 
     def list(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset())
+        queryset = (
+            self.filter_queryset(self.get_queryset())
+            .prefetch_related(
+                "switchtenders__profile__organization",
+                "project_sites",
+                "tags",
+                Prefetch(
+                    "members",
+                    User.objects.filter(projectmember__is_owner=True).select_related(
+                        "profile", "profile__organization"
+                    ),
+                    to_attr="_owner",
+                ),  # _owner is looked at in getter
+            )
+            .select_related(
+                "commune__department__region",
+            )
+        )
 
         # Paginate the queryset
         page = self.paginate_queryset(queryset)

@@ -151,7 +151,7 @@ Alpine.data(
         }));
         this.$dispatch('selected-departments', this.departments);
       },
-      handleTerritoryFilter(selectedDepartment) {
+      handleTerritoryFilter(selectedDepartment, isInit = false) {
         this.departments = this.departments.map((department) => {
           if (department.code === selectedDepartment.code) {
             department.active = !department.active;
@@ -164,9 +164,6 @@ Alpine.data(
           this.departments.filter((department) => department.active).length ===
           this.departments.length;
 
-        // return (this.displayedData = this.filterProjectsByDepartments(
-        //   this.searchProjects(this.search)
-        // ).sort(this.currentSort));
         this.$dispatch('selected-departments', this.departments);
       },
     };
