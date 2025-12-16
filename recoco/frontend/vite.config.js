@@ -102,6 +102,8 @@ const config = {
         inviteNotAcceptedBannerStyles: resolve(
           './src/js/styles/invite-not-accepted-banner.css.js'
         ),
+        homeStyles: resolve('./src/js/styles/home.css.js'),
+        kanbanStyles: resolve('./src/js/styles/kanban.css.js'),
       },
       output: {
         chunkFileNames: undefined,

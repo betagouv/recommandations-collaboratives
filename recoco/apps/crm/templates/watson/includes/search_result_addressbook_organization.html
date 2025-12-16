@@ -1,5 +1,4 @@
 {% load static %}
-{% load sass_tags %}
 <div class="d-flex">
     <div>
         <svg class="bi fr-mr-2v" width="16" height="16" fill="currentColor">
@@ -8,7 +7,7 @@
         <a href="{% url 'crm-organization-details' obj.pk %}">{{ obj.name }}</a>
         {% if obj.departments.all %}
             <div class="list-unstyled d-flex fr-pt-2v align-items-center flex-wrap div-specific-fontsize">
-                {% for dpt in  obj.departments.all %}
+                {% for dpt in obj.departments.all %}
                     <span class="fr-mr-1v crm-region-tag">
                         <span>{{ dpt.name }}</span>
                         <strong>({{ dpt.code }})</strong>

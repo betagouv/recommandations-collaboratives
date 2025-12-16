@@ -1,7 +1,6 @@
 {% extends "projects/project/list.html" %}
 {% load django_vite %}
 {% load static %}
-{% load sass_tags %}
 {% block title %}
     Carte des dossiers {{ block.super }}
 {% endblock title %}
@@ -12,15 +11,8 @@
     {% vite_asset 'js/apps/advisorDashboard.js' %}
     {% vite_asset 'js/apps/tutorial.js' %}
     {% vite_asset 'js/apps/boardProjects.js' %}
+    {% vite_asset 'js/styles/kanban.css.js' %}
 {% endblock js %}
-{% block css %}
-    <link href="{% sass_src 'projects/css/kanban.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-    <link href="{% sass_src 'projects/css/coco.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-{% endblock css %}
 {% block project_list_content %}
     {{ departments|json_script:"departmentsArray" }}
     {{ regions|json_script:"regionsArray" }}

@@ -1,6 +1,5 @@
 <!-- Page set in multisite -->
 {% extends "base.html" %}
-{% load sass_tags %}
 {% load static %}
 {% block title %}
     Page d'accueil
@@ -11,12 +10,8 @@
 {% load django_vite %}
 {% block js %}
     {% vite_asset 'js/apps/home.js' %}
+    {% vite_asset 'js/styles/home.css.js' %}
 {% endblock js %}
-{% block css %}
-    <link href="{% sass_src 'home/css/home/home.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-{% endblock css %}
 {% block content %}
     <div class="fr-container">
         <div class="custom-background-home-image">
