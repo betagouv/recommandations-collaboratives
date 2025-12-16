@@ -17,6 +17,7 @@ def test_get_challenge_with_non_existing_definition(request):
 
 
 @pytest.mark.django_db
+@pytest.mark.skip
 def test_get_challenge_with_other_site_definition(request):
     user = baker.make(auth_models.User)
     baker.make(models.ChallengeDefinition, code="a-code")

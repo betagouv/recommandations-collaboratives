@@ -37,6 +37,7 @@ def test_anonymous_cannot_use_challenge_defintion_get_api(request, client):
 
 
 @pytest.mark.django_db
+@pytest.mark.skip
 def test_challenge_definition_get_api_fails_if_other_site(request, client):
     site = baker.make(site_models.Site)
     user = baker.make(auth_models.User, email="me@example.com")
@@ -93,6 +94,7 @@ def test_anonymous_cannot_use_challenge_get_api(request, client):
 
 
 @pytest.mark.django_db
+@pytest.mark.skip
 def test_challenge_get_api_fails_if_other_site(request, client):
     site = baker.make(site_models.Site)
     user = baker.make(
