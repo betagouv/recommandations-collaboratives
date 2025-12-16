@@ -12,7 +12,7 @@
 {% if project.owner %}
     <div class="d-flex align-items-start fr-mb-2v">
         <span class="fr-mr-2v d-flex align-items-center justify-content-between">
-            <div class="d-flex align-items-center">
+            <div class="d-flex align-items-center font-size-12px">
                 <img class="rounded-circle fr-mr-2v"
                      src="{% gravatar_url project.owner.email size=16 %}"
                      alt="{{ action.actor }}">
@@ -23,7 +23,7 @@
                 </strong>
             </div>
         </span>
-        <span class="project-card__orgname fw-light specific-color-666">
+        <span class="project-card__orgname fw-light specific-color-666 font-size-12px">
             {{ project.owner.profile.organization.name|default:project.org_name }}
         </span>
         {% if 'use_crm' in user_site_perms %}
