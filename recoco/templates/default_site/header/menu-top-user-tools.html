@@ -55,11 +55,6 @@
                             <a class="fr-nav__link " href="{% url 'projects-project-list' %}">Accueil</a>
                         </li>
                     {% endif %}
-                    {% if "use_crm" in user_site_perms %}
-                        <li>
-                            <a class="fr-nav__link " href="{% url 'crm-site-dashboard' %}">CRM</a>
-                        </li>
-                    {% endif %}
                     {% if user.is_staff %}
                         <li>
                             <a class="fr-nav__link" href="{% url 'admin:index' %}">Administration Reco-co</a>

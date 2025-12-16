@@ -30,106 +30,12 @@ def test_crm_project_list_not_available_for_non_staff(client):
 
 
 @pytest.mark.django_db
-def test_crm_project_list_contains_site_projects(request, client):
-    site = get_current_site(request)
-    expected = baker.make(projects_models.Project, sites=[site])
-    other = baker.make(site_models.Site)
-    unexpected = baker.make(projects_models.Project, sites=[other])
-
+def test_crm_project_list_available_for_staff(client):
     url = reverse("crm-project-list")
     with login(client, groups=["example_com_staff"]):
         response = client.get(url)
 
     assert response.status_code == 200
-
-    expected = reverse("crm-project-details", args=[expected.id])
-    assertContains(response, expected)
-    unexpected = reverse("crm-project-details", args=[unexpected.id])
-    assertNotContains(response, unexpected)
-
-
-@pytest.mark.django_db
-def test_crm_project_list_filters_active_ones(request, client):
-    site = get_current_site(request)
-    active = baker.make(projects_models.Project, sites=[site])
-    inactive = baker.make(
-        projects_models.Project,
-        deleted=timezone.now(),
-        sites=[site],
-    )
-
-    url = reverse("crm-project-list")
-    with login(client, groups=["example_com_staff"]):
-        response = client.get(url)
-
-    assert response.status_code == 200
-
-    expected = reverse("crm-project-details", args=[active.id])
-    assertContains(response, expected)
-    unexpected = reverse("crm-project-details", args=[inactive.id])
-    assertNotContains(response, unexpected)
-
-
-@pytest.mark.django_db
-def test_crm_project_list_filters_inactive_ones(request, client):
-    site = get_current_site(request)
-    active = baker.make(projects_models.Project, sites=[site])
-    inactive = baker.make(
-        projects_models.Project,
-        deleted=timezone.now(),
-        sites=[site],
-    )
-
-    url = reverse("crm-project-list") + "?inactive=True"
-    with login(client, groups=["example_com_staff"]):
-        response = client.get(url)
-
-    assert response.status_code == 200
-
-    unexpected = reverse("crm-project-details", args=[active.id])
-    assertNotContains(response, unexpected)
-    expected = reverse("crm-project-details", args=[inactive.id])
-    assertContains(response, expected)
-
-
-@pytest.mark.django_db
-def test_crm_project_list_filters_by_project_name(request, client):
-    site = get_current_site(request)
-    expected = baker.make(projects_models.Project, sites=[site], name="expected")
-    unexpected = baker.make(projects_models.Project, sites=[site], name="unexpected")
-
-    url = reverse("crm-project-list") + f"?query={expected.name}"
-    with login(client, groups=["example_com_staff"]):
-        response = client.get(url)
-
-    assert response.status_code == 200
-
-    expected = reverse("crm-project-details", args=[expected.id])
-    assertContains(response, expected)
-    unexpected = reverse("crm-project-details", args=[unexpected.id])
-    assertNotContains(response, unexpected)
-
-
-@pytest.mark.django_db
-def test_crm_project_list_filters_by_commune_name(request, client):
-    site = get_current_site(request)
-    expected = baker.make(
-        projects_models.Project, sites=[site], commune__name="recherchée"
-    )
-    unexpected = baker.make(
-        projects_models.Project, sites=[site], commune__name="ignorée"
-    )
-
-    url = reverse("crm-project-list") + f"?query={expected.commune.name}"
-    with login(client, groups=["example_com_staff"]):
-        response = client.get(url)
-
-    assert response.status_code == 200
-
-    expected = reverse("crm-project-details", args=[expected.id])
-    assertContains(response, expected)
-    unexpected = reverse("crm-project-details", args=[unexpected.id])
-    assertNotContains(response, unexpected)
 
 
 ########################################################################
