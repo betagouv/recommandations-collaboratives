@@ -21,6 +21,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
   messages: [],
   messagesLoaded: false,
   showMessages: false,
+  sendingMessage: false,
   tasks: [],
   users: [],
   messagesParticipants: [],
@@ -230,6 +231,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     return foundContact;
   },
   async sendFormMessage() {
+    this.sendingMessage = true;
     if (this.isEditorInEditMode) {
       await this.sendMessage({
         updateMessage: true,
@@ -313,7 +315,9 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
       this.$store.editor.clearEditorContent();
       this.updateCountOfElementsInDiscussion(messageResponse.data);
       this.messageIdToReply = null;
+      this.sendingMessage = false;
     } catch (error) {
+      this.sendingMessage = false;
       this.$store.app.displayToastMessage({
         message: `Erreur lors de ${updateMessage ? 'la modification' : "l'envoi"} du message: ${Object.values(JSON.parse(error.request.responseText)).join(', ')}`,
         timeout: 5000,

@@ -194,7 +194,7 @@ Parameters:
             <div class="d-flex justify-content-end">
                 <div class="d-flex gap-2 send-message">
                     <button data-test-id="send-message-conversation"
-                            :disabled="!isFormValid"
+                            :disabled="!isFormValid || sendingMessage"
                             form="{{ form_id|default:'conversation-form' }}"
                             class="fr-btn fr-btn--sm"
                             type="submit"
