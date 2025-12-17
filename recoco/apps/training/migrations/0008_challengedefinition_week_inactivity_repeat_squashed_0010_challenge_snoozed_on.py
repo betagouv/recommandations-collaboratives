@@ -4,12 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-    replaces = [
-        ("training", "0008_challengedefinition_week_inactivity_repeat"),
-        ("training", "0009_alter_challenge_unique_together"),
-        ("training", "0010_challenge_snoozed_on"),
-    ]
-
     dependencies = [
         ("training", "0007_auto_20230620_1815"),
     ]

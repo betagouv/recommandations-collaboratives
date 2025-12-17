@@ -7,7 +7,10 @@ from django.db import migrations
 class Migration(migrations.Migration):
     dependencies = [
         ("taggit", "0005_auto_20220424_2025"),
-        ("resources", "0026_rename_tags_resource_old_tags"),
+        (
+            "resources",
+            "0025_auto_20220504_1538_squashed_0026_rename_tags_resource_old_tags",
+        ),
     ]
 
     operations = [

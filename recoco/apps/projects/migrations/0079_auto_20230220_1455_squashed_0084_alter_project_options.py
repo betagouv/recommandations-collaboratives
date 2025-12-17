@@ -4,15 +4,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-    replaces = [
-        ("projects", "0079_auto_20230220_1455"),
-        ("projects", "0080_alter_project_options"),
-        ("projects", "0081_alter_project_options"),
-        ("projects", "0082_alter_project_options"),
-        ("projects", "0083_update_to_project_permissions"),
-        ("projects", "0084_alter_project_options"),
-    ]
-
     dependencies = [
         ("projects", "0078_merge_20230213_1432"),
     ]
