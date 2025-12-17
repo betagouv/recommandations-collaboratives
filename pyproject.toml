@@ -35,6 +35,7 @@ dependencies = [
     "django-magicauth",
     "django-markdownx==4.0.7",
     "django-mcp-server>=0.5.7",
+    "django-model-info>=2024.11.5",
     "django-multisite2>=2.0.1",
     "django-notifications-hq",
     "django-ordered-model==3.7.4",

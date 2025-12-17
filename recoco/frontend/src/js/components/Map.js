@@ -5,7 +5,7 @@ import 'leaflet-providers';
 
 import { statusToText, statusToColorClass } from '../utils/statusToText';
 
-import api from '../utils/api';
+import api, { projectsUrl } from '../utils/api';
 Alpine.data('Map', Map);
 
 function Map() {
@@ -17,9 +17,9 @@ function Map() {
     },
 
     async getData() {
-      const json = await api.get('/api/projects/');
+      const json = await api.get(projectsUrl());
 
-      this.data = json.data;
+      this.data = json.data.results;
     },
 
     async init() {
