@@ -21,7 +21,7 @@ const config = {
   build: {
     outDir: resolve('./dist'),
     assetsDir: '',
-    manifest: true,
+    manifest: 'manifest.json',
     emptyOutDir: true,
     target: 'es2020',
     rollupOptions: {
@@ -68,6 +68,7 @@ const config = {
         projectQueue: resolve('./src/js/store/projectQueue.js'),
         showRole: resolve('./src/js/store/showRole.js'),
         projects: resolve('./src/js/store/projects.js'),
+        tutorialsEvents: resolve('./src/js/store/tutorialsEvents.js'),
         ClickToSeeUser: resolve('./src/js/components/ClickToSeeUser.js'),
         ActionPusher: resolve('./src/js/components/ActionPusher.js'),
         NotificationEater: resolve('./src/js/components/NotificationEater.js'),
@@ -81,12 +82,18 @@ const config = {
           './src/js/components/RegionDepartmentPreparer.js'
         ),
         User: resolve('./src/js/components/User.js'),
-        MutliSelect: resolve('./src/js/components/MultiSelect.js'),
+        MultiSelectRegionDepartment: resolve(
+          './src/js/components/MultiSelectRegionDepartment.js'
+        ),
+        MultiSelect2: resolve('./src/js/components/MultiSelect2.js'),
         ContactBook: resolve('./src/js/components/ContactBook.js'),
+        ProjectPageTutorial: resolve('./src/js/components/onboarding-tutorials/ProjectPageTutorial.js'),
         pageInvitation: resolve('./src/js/apps/pageInvitation.js'),
         idbObjectStoreMgmt: resolve('./src/js/store/idbObjectStoreMgmt.js'),
         actionPusher: resolve('./src/js/apps/actionPusher.js'),
         NewFeatureBanner: resolve('./src/js/components/NewFeatureBanner.js'),
+        projectListCrm: resolve('./src/js/apps/CRM/projectListCrm.js'),
+        crmNavigation: resolve('./src/js/apps/CRM/crmNavigation.js'),
       },
       output: {
         chunkFileNames: undefined,

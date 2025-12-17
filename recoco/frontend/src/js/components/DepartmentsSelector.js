@@ -33,7 +33,7 @@ Alpine.data(
         }
 
         if (selectAll) {
-          this.handleTerritorySelectAll(selectAll);
+          this.handleTerritorySelectAll(selectAll, { init: true });
         }
       },
       initSelectedDepartments() {
@@ -65,7 +65,10 @@ Alpine.data(
           });
         }
       },
-      handleTerritorySelectAll(selectAll = !this.territorySelectAll) {
+      handleTerritorySelectAll(
+        selectAll = !this.territorySelectAll,
+        { init = false } = {}
+      ) {
         this.territorySelectAll = selectAll;
 
         this.regions = this.regions.map((region) => ({
@@ -76,11 +79,13 @@ Alpine.data(
             active: this.territorySelectAll,
           })),
         }));
-        this.$dispatch('is-select-all-departments', this.territorySelectAll);
-        this.$dispatch(
-          'selected-departments',
-          this.extractDepartmentFromSelectedRegions(this.regions)
-        );
+        if (!init) {
+          this.$dispatch('is-select-all-departments', this.territorySelectAll);
+          this.$dispatch(
+            'selected-departments',
+            this.extractDepartmentFromSelectedRegions(this.regions)
+          );
+        }
       },
       handleRegionFilter(selectedRegion) {
         this.regions = this.regions.map((region) => {
@@ -98,7 +103,6 @@ Alpine.data(
         this.territorySelectAll =
           this.regions.filter((region) => region.active).length ===
           this.regions.length;
-
         this.$dispatch(
           'selected-departments',
           this.extractDepartmentFromSelectedRegions(this.regions)
@@ -147,7 +151,7 @@ Alpine.data(
         }));
         this.$dispatch('selected-departments', this.departments);
       },
-      handleTerritoryFilter(selectedDepartment) {
+      handleTerritoryFilter(selectedDepartment, isInit = false) {
         this.departments = this.departments.map((department) => {
           if (department.code === selectedDepartment.code) {
             department.active = !department.active;
@@ -160,9 +164,6 @@ Alpine.data(
           this.departments.filter((department) => department.active).length ===
           this.departments.length;
 
-        // return (this.displayedData = this.filterProjectsByDepartments(
-        //   this.searchProjects(this.search)
-        // ).sort(this.currentSort));
         this.$dispatch('selected-departments', this.departments);
       },
     };
