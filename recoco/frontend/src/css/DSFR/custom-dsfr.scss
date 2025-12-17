@@ -847,7 +847,7 @@ form > p {
 }
 
 .border-bottom {
-  border-bottom: 1px solid var(--light-border-default-grey, #E5E5E5);
+  border-bottom: 1px solid var(--light-border-default-grey, #e5e5e5);
 }
 
 /* ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯ *\
@@ -878,14 +878,13 @@ form > p {
 }
 
 .alert-color-error {
-  background: var(--light-border-plain-error, #CE0500);
-  color: var(--light-background-default-grey, #FFF) !important;
+  background: var(--light-border-plain-error, #ce0500);
+  color: var(--light-background-default-grey, #fff) !important;
 }
 
 .border-radius-1px {
   border-radius: 1px;
 }
-
 
 /* ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯ *\
   CRM - Custom styles
@@ -924,7 +923,6 @@ form > p {
 
 .z-11 {
   z-index: 11 !important;
-
 }
 
 /* ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯ *\
@@ -1008,14 +1006,14 @@ form > p {
   margin: auto;
 }
 .text-modal-title {
-color: #3A3A3A;
-font-size: 12px;
-font-style: normal;
-font-weight: 700;
+  color: #3a3a3a;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 700;
 }
 
 .text-modal-main-msg {
-  color: #3A3A3A;
+  color: #3a3a3a;
   font-size: 14px;
   font-weight: 700;
   line-height: 170%; /* 23.8px */
@@ -1081,7 +1079,9 @@ font-weight: 700;
 }
 
 @keyframes vh-dash {
-  to { stroke-dashoffset: -160; }
+  to {
+    stroke-dashoffset: -160;
+  }
 }
 
 /* Conversations - delete highlight effect */

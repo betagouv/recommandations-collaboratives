@@ -1,5 +1,4 @@
 {% load static %}
-{% load sass_tags %}
 {% load django_vite %}
 {% block js %}
     {% vite_asset 'js/styles/contact-search-organization.css.js' %}
@@ -29,7 +28,7 @@
                        type="search"
                        id="search-organization-input"
                        name="search-organization-input"
-                          @focusin="setTimeout(()=> {focusOnInput = true},200)"
+                       @focusin="setTimeout(()=> {focusOnInput = true},200)"
                        @input.debounce="onSearch"
                        x-model="userInputSearchOrganization"
                        required>
@@ -51,7 +50,7 @@
                                                     </div>
                                                 </template>
                                                 <div class="fr-pt-1w fr-px-1w add-borders cursor-pointer"
-                                                    @click="onSelectOrga(orga)">
+                                                     @click="onSelectOrga(orga)">
                                                     <span x-text="orga.name"></span>
                                                 </div>
                                             </div>
@@ -60,8 +59,8 @@
                                 </template>
                                 <template x-if="userInputSearchOrganization.length > 0 && showOrgAsResults && selectedOrga == null && focusOnInput">
                                     <div class="btn-create-orga fr-p-1w cursor-pointer"
-                                        data-test-id="button-create-organization"
-                                        @click="openModalCreateOrganization">
+                                         data-test-id="button-create-organization"
+                                         @click="openModalCreateOrganization">
                                         <span class="fr-icon-add-line" aria-hidden="true"></span><span>Créer une nouvelle organisation</span>
                                     </div>
                                 </template>

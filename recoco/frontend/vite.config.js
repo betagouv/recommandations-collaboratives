@@ -199,6 +199,9 @@ const config = {
         projectListCrm: resolve('./src/js/apps/CRM/projectListCrm.js'),
         crmNavigation: resolve('./src/js/apps/CRM/crmNavigation.js'),
         multiSelectStyles: resolve('./src/js/styles/multi-select.css.js'),
+        projectsOnboardingTutorialStyles: resolve(
+          './src/js/styles/projects-onboarding-tutorial.css.js'
+        ),
       },
       output: {
         chunkFileNames: undefined,

@@ -1,7 +1,6 @@
 {% load gravatar %}
 {% load static %}
 {% load guardian_tags %}
-{% load sass_tags %}
 {% get_obj_perms request.user for request.site as "user_site_perms" %}
 {% get_obj_perms request.user for project as "user_project_perms" %}
 <div class="d-flex align-items-start justify-content-between fr-mb-2v">

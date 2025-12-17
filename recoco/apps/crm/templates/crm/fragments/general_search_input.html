@@ -1,9 +1,7 @@
-{% load sass_tags %}
-{% block css %}
-    <link href="{% sass_src 'projects/css/searchbar.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-{% endblock css %}
+{% load django_vite %}
+{% block js %}
+    {% vite_asset 'js/styles/projects-searchbar.css.js' %}
+{% endblock js %}
 <div class="flex-grow-1">
     <form method="post"
           action="{% url 'crm-search' %}"

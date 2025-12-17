@@ -1,9 +1,18 @@
 //Bootstrap librairie
 // import 'bootstrap/dist/css/bootstrap.min.css';
-import '../css/main.scss';
+import '../css/custom-bootstrap.scss';
 import '@gouvfr/dsfr/dist/dsfr.min.css';
 import '@gouvfr/dsfr/dist/utility/utility.min.css';
 import '@gouvfr/dsfr/dist/dsfr.module.min';
+
+// Specific styles
+import '../css/specificStyle.scss';
+
+// DSFR custom
+import '../css/DSFR/custom-dsfr.scss';
+import '../css/DSFR/marianne.css';
+// Tooltips
+import 'tippy.js/dist/tippy.css';
 
 import 'vite/modulepreload-polyfill';
 import './utils/globals';
@@ -32,7 +41,6 @@ import '../css/text-colors.css';
 import '../css/border.css';
 import '../css/role.css';
 import '../css/custom-icon.css';
-import '../css/main.css';
 
 //Layouts CSS
 import '../css/layouts/stack.css';

@@ -18,20 +18,13 @@ Parameters:
 - can_compress_editor (boolean)
 {% endcomment %}
 {% load static %}
-{% load sass_tags %}
 {% load django_vite %}
 {% block js %}
     {% vite_asset 'js/styles/tools-editor.css.js' %}
     {% vite_asset 'js/styles/contact-card.css.js' %}
 {% endblock js %}
 <div class="w-100 position-relative editor-container"
-     {% if initial_content_escapejs %}
-        x-data='editor("{{ initial_content|escapejs }}", "{{ placeholder }}", "{{ is_action_pusher }}" == "True" )'
-     {% elif initial_content_js %}
-        x-data='editor({{ initial_content }}, "{{ placeholder }}", "{{ is_action_pusher }}" == "True")'
-     {% else %}
-        x-data='editor("{{ initial_content }}", "{{ placeholder }}", "{{ is_action_pusher }}" == "True")'
-     {% endif %}
+     {% if initial_content_escapejs %} x-data='editor("{{ initial_content|escapejs }}", "{{ placeholder }}", "{{ is_action_pusher }}" == "True" )' {% elif initial_content_js %} x-data='editor({{ initial_content }}, "{{ placeholder }}", "{{ is_action_pusher }}" == "True")' {% else %} x-data='editor("{{ initial_content }}", "{{ placeholder }}", "{{ is_action_pusher }}" == "True")' {% endif %}
      @reset-contact="handleResetContact()"
      @set-comment.window="setMarkdownContent(event)"
      @modal-response="closeSearchContactModal($event)"
@@ -89,20 +82,16 @@ Parameters:
              x-ref="element"
              @click.stop="isEditorFocused = true; $store.tutorialsEvents.isTutorialForProjectPage==3.5 ? $store.tutorialsEvents.isTutorialForProjectPageThreeCompleted=true : null ;"
              id="comment-text-ref">
-             <template x-if="$store.tutorialsEvents.isTutorialForProjectPage==3.5">
+            <template x-if="$store.tutorialsEvents.isTutorialForProjectPage==3.5">
                 {% include "projects/project/fragments/onboarding-tutorials/visual-hint.html" %}
-             </template>
-             <template x-if="$store.tutorialsEvents.isTutorialForProjectPage==3.5">
+            </template>
+            <template x-if="$store.tutorialsEvents.isTutorialForProjectPage==3.5">
                 {% include "projects/project/fragments/onboarding-tutorials/svg-hint.html" with rect_x="0.1" rect_y="0.3" rect_width="99.7" rect_height="9.2" view_box_size="0 0 100 10" is_over=True inset0=True %}
             </template>
         </div>
         <textarea class="position-absolute top-0 opacity-0 specific-height-0"
                   data-test-id="tiptap-editor-textarea"
-                  {% if model %}
-                    x-model="{{ model }}.text" x-modelable="markdownContent"
-                  {% else %}
-                    x-model="markdownContent"
-                  {% endif %}
+                  {% if model %} x-model="{{ model }}.text" x-modelable="markdownContent" {% else %} x-model="markdownContent" {% endif %}
                   name="{{input_name|default:"content"}}"
                   {% if input_required %} required {% endif %}></textarea>
         <div class="module__container">

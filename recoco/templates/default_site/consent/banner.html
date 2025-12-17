@@ -4,7 +4,6 @@
     {% vite_asset 'js/styles/consent-banner.css.js' %}
     {% vite_asset 'js/apps/consent.js' %}
 {% endblock js %}
-{% load sass_tags %}
 <div x-data="Consent">
     <template x-if="!userHasSelectedCookies">
         <div class="fr-consent-banner" data-test-id="fr-consent-banner">

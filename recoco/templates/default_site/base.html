@@ -1,5 +1,4 @@
 {% load static %}
-{% load sass_tags %}
 {% load django_vite %}
 {% load cookie_consent_tags %}
 {% load cache %}
@@ -89,7 +88,7 @@
                 </div>
             {% endif %}
             <div class="container-fluid bg-white" id="content">
-                <div class="row background--grey-light">
+                <div class="row">
                     {% block content %}
                     {% endblock content %}
                 </div>

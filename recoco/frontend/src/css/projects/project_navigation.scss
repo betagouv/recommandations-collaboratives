@@ -18,9 +18,6 @@
     button:has(+ #select-observer-or-advisor.fr-collapse--expanded) {
       color: white;
     }
-    button:hover {
-      background-color: inherit;
-    }
   }
   .fr-segmented input + label {
     padding: 0.5rem 0.75rem;

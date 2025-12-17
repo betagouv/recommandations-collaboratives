@@ -52,12 +52,3 @@ $enable-shadows: true;
 @import 'bootstrap/scss/grid';
 @import 'bootstrap/scss/helpers';
 @import 'bootstrap/scss/utilities/api';
-
-// Specific styles
-@import 'specificStyle.scss';
-
-// DSFR custom
-@import './DSFR/custom-dsfr.scss';
-@import './DSFR/marianne.css';
-// Tooltips
-@import 'tippy.js/dist/tippy.css';

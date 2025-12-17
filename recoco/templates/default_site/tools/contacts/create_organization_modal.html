@@ -1,4 +1,3 @@
-{% load sass_tags %}
 {% load django_vite %}
 {% block js %}
     {% vite_asset 'js/styles/contact-create-organization-modal.css.js' %}
@@ -28,7 +27,9 @@
                     <p class="modal-create-organization__label-info color-important">Le nom de votre organisation est obligatoire *</p>
                 </template>
                 <template x-if="isOrgaAlreadyExisting">
-                    <p class="modal-create-organization__label-info color-important">Cette organisation existe déjà. Vous pouvez la sélectionner depuis l'étape précédente, dans le menu déroulant des organisations proposées.</p>
+                    <p class="modal-create-organization__label-info color-important">
+                        Cette organisation existe déjà. Vous pouvez la sélectionner depuis l'étape précédente, dans le menu déroulant des organisations proposées.
+                    </p>
                 </template>
                 <input type="text"
                        class="fr-input"
