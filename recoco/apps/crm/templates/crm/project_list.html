@@ -12,155 +12,155 @@
 {% endblock og_title %}
 {% block js %}
     {% vite_asset 'js/apps/crm.js' %}
+    {% vite_asset 'js/apps/CRM/projectListCrm.js' %}
 {% endblock js %}
 {% block content %}
-    <div x-data="Crm" class="d-flex fr-px-0">
-        {% include "crm/fragments/sidebar.html" with search=True back_button=True user_advised_projects=False user_projects=False %}
-        <div class="w-75 d-flex flex-column justify-content-start">
-            <div class="crm-header fr-px-3w fr-py-3w fr-mb-2w">
-                <div class="d-flex justify-content-between align-items-center fr-mb-2v">
-                    <h3>Gestion des dossiers {{ request.site.name }}</h3>
+    {% include "crm/fragments/navigation.html" with projects=True %}
+    <div x-data="{ breadcrumbs: { links: [{url: '{% url 'crm-site-dashboard' %}', title: 'Admin'}], current: 'Dossiers' } }"
+         class="fr-p-0">{% include "tools/breadcrumb.html" %}</div>
+    {{ departments|json_script:"departmentsArray" }}
+    {{ regions|json_script:"regionsArray" }}
+    <span x-text="departmentsArray.textContent"></span>
+    <span x-text="regionsArray.textContent"></span>
+    <div x-data="Crm({{ request.site.id }})" class="d-flex fr-px-0 crm">
+        <div x-data="ProjectListCrm(departmentsArray, regionsArray)"
+             @selected-departments="saveSelectedDepartment($event)"
+             @multi-select-change="saveSelectedStatus($event)"
+             class="w-100 d-flex flex-column justify-content-start project-list-crm">
+            <div class="project-list-crm__filters fr-px-5v fr-pb-5v">
+                <div class="d-flex align-items-center" x-transition.opacity.duration.500ms>
+                    <span class="project-list-crm__projects-count-label"
+                          x-show="dataLoaded"
+                          x-text="projectsCountLabel()"></span>
+                    <span class="project-list-crm__projects-count-label" x-show="!dataLoaded">Chargement</span>
                 </div>
+                <div class="w-100 position-relative">
+                    {% include "projects/project/fragments/search_bar.html" with action_search="onSearch" x_model="backendSearch.searchText" placeholder="Rechercher parmi les dossiers" %}
+                </div>
+                {% include "projects/project/fragments/departments_selector.html" with label="Projets de mon territoire" label_filter="Localisation :" filter_by_regions=True zone_objects="regions" select_all=True %}
+                <div class="d-flex align-items-center w-100">
+                    <label class="filter__label">Statut:</label>
+                    {% include "tools/multi_select.html" %}
+                </div>
+                {% comment %} TODO Add CSV download button with backend functionnality {% endcomment %}
+                {% comment %} <button class="fr-btn fr-btn--sm no-wrap" title="Télécharger en CSV">🚧Télécharger en CSV</button> {% endcomment %}
             </div>
-            <div class="fr-px-3w fr-pt-3w fr-mb-2w">
-                {% with projects.form as form %}
-                    <form x-data=""
-                          class="row g-3"
-                          method="get"
-                          action="{% url 'crm-project-list' %}">
-                        {{ form.non_field_errors }}
-                        <div class="col-md-6">
-                            <div class="input-group fr-mb-2w">
-                                <input type="text"
-                                       class="form-control"
-                                       name="{{ form.query.name }}"
-                                       id="{{ form.query.id }}"
-                                       placeholder="Nom du dossier"
-                                       aria-label="Recherche"
-                                       value="{{ form.query.value|default:"" }}"
-                                       aria-describedby="button-search">
-                                <button class="btn btn-outline-secondary" type="submit" id="button-search">Rechercher</button>
-                            </div>
-                            <div class="form-check form-switch fr-mb-2w">
-                                <input @click="$event.target.form.submit();"
-                                       class="form-check-input"
-                                       type="checkbox"
-                                       id="{{ form.inactive.name }}"
-                                       name="{{ form.inactive.name }}"
-                                       {% if form.inactive.value == True %}checked{% endif %}>
-                                <label class="form-check-label" for="{{ form.inactive.name }}">Uniquement les dossiers rejetés</label>
-                            </div>
-                            <hr />
-                            <div>
-                                <label for="{{ form.ordering.name }}" class="form-label fr-mr-2v">Trier par :</label>
-                                <select class="form-control"
-                                        name="{{ form.ordering.name }}"
-                                        id="{{ form.ordering.name }}">
-                                    {% for choice in form.ordering.field.choices %}
-                                        <option @click="$event.target.form.submit();"
-                                                value="{{ choice.0 }}"
-                                                {% if choice.0 == form.ordering.value.0 %}selected{% endif %}>
-                                            {{ choice.1 }}
-                                        </option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                        </div>
-                    </form>
-                {% endwith %}
-            </div>
-            <div class="fr-mb-2w table-responsive">
-                <table class="table table-striped table-hover caption-top">
-                    {% with projects.qs.count as projects_count %}
-                        {% if projects_count > 0 %}
-                            <caption class="fr-ml-2v">{{ projects_count }} résultat{{ projects_count|pluralize }}</caption>
-                        {% else %}
-                            <caption class="fr-ml-2v">Aucun résultat</caption>
-                        {% endif %}
-                    {% endwith %}
-                    <thead>
+            <div class="fr-mb-2w table-responsive fr-px-5v fr-pb-5v">
+                {% csrf_token %}
+                <table class="project-table">
+                    <caption x-show="projects"
+                             x-transition.opacity.duration.500ms
+                             class="fr-ml-2v"> <span x-text="projectsCountLabel()" data-test-id="projects-count-label"></span></caption>
+                    <thead class="project-table__thead">
                         <tr>
-                            <th scope="col">Nom</th>
-                            <th scope="col">Commune</th>
-                            <th scope="col">Dépôts</th>
-                            <th scope="col">État</th>
-                            <th scope="col"></th>
+                            <th scope="col" class="column column--large">Nom du dossier</th>
+                            <th scope="col" class="column column--large">Organisation</th>
+                            <th scope="col" class="column column--large">Localisation</th>
+                            <th scope="col" class="column column--small">Date de dépôt</th>
+                            <th scope="col" class="column column--small">Statut</th>
+                            <th scope="col" class="column column--small">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {% for project in projects.qs %}
+                        <template x-for="(project, index) in projectsToDisplay" :key="project.id">
                             <tr>
                                 <td>
-                                    <a href="{% url 'crm-project-details' project.pk %}">{{ project.name|truncatechars:48 }}</a>
+                                    <span x-show="displayProjectIndex"
+                                          x-text="index + 1 + (pagination.currentPage - 1) * pagination.limit"></span>
+                                    <a class="fr-link project-table__project-name"
+                                       :href="'{% url 'crm-project-details' 0 %}'.replace('0', project.id)"
+                                       x-text="project.name"></a>
                                 </td>
-                                <td>{{ project.commune }}</td>
                                 <td>
-                                    <span class="small">le {{ project.created_on|date }}</span>
-                                    <br />
-                                    {% for ps in project.project_sites.all %}
-                                        {% if ps.site != request.site %}
-                                            {% with ps.site.configuration as conf %}
-                                                {% if conf.logo_small %}
-                                                    <img height="24px"
-                                                         src="{{ conf.logo_small.url }}"
-                                                         alt="{{ ps.site.name }}"
-                                                         title="Multipublié sur {{ ps.site.name }}">
-                                                {% else %}
-                                                    <span class="small">[{{ ps.site.name }}]</span>&nbsp;
-                                                {% endif %}
-                                            {% endwith %}
-                                        {% endif %}
-                                    {% endfor %}
+                                    <template x-if="project?.owner?.profile?.organization">
+                                        <a class="fr-link project-table__project-org-name"
+                                           :href="'{% url 'crm-organization-details' 0 %}'.replace('0', project.owner.profile.organization.id)"
+                                           x-text="project.owner.profile.organization.name"></a>
+                                    </template>
+                                    <template x-if="!project?.owner?.profile?.organization">
+                                        <span class="project-table__project-org-name" x-text="project.org_name"></span>
+                                    </template>
                                 </td>
-                                <td>{{ project.get_status_display }}</td>
+                                <td x-text="`${project?.commune?.name} (${project?.commune?.postal})`"></td>
+                                <td x-text="new Date(project?.created_on).toLocaleDateString('fr-FR')"></td>
+                                <td class="project-table__status">
+                                    <span x-text="projectStatusLabel(project.status)"
+                                          class="fr-badge fr-badge--no-icon"
+                                          x-tooltip="projectTooltip(project)"
+                                          :class="projectStatusColor(project.status)"></span>
+                                </td>
                                 <td>
-                                    {% if project.muted %}
-                                        <svg data-bs-toggle="tooltip"
-                                             data-bs-title="Notifications désactivées"
-                                             class="align-middle bi"
-                                             width="12px"
-                                             height="12px"
-                                             fill="currentColor">
-                                            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#bell-slash" />
-                                        </svg>
-                                    {% else %}
-                                        <svg data-bs-toggle="tooltip"
-                                             data-bs-title="Notifications actives"
-                                             class="align-middle bi"
-                                             width="12px"
-                                             height="12px"
-                                             fill="currentColor">
-                                            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#bell-fill" />
-                                        </svg>
-                                    {% endif %}
-                                    {% if project.exclude_stats %}
-                                        <svg data-bs-toggle="tooltip"
-                                             data-bs-title="Exclu des statistiques"
-                                             class="align-middle bi"
-                                             width="12px"
-                                             height="12px"
-                                             fill="currentColor">
-                                            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#clipboard-x" />
-                                        </svg>
-                                    {% else %}
-                                        <svg data-bs-toggle="tooltip"
-                                             data-bs-title="Inclu dans les statistiques"
-                                             class="align-middle bi"
-                                             width="12px"
-                                             height="12px"
-                                             fill="currentColor">
-                                            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#clipboard-data-fill" />
-                                        </svg>
-                                    {% endif %}
+                                    <!-- inclure dans les statistiques -->
+                                    <template x-if="project.exclude_stats">
+                                        <button @click="updateProject(project, '{% url 'crm-project-update' 0 %}'.replace('0', project.id), { statistics: true, notifications: !project.muted })"
+                                                data-bs-toggle="tooltip"
+                                                data-bs-title="Inclure dans les statistiques"
+                                                data-bs-placement="top"
+                                                :id="'include-stats-' + project.id"
+                                                class="fr-btn fr-btn--sm fr-icon-line-chart-off-line fr-btn--tertiary-no-outline position-relative"
+                                                title="Inclure dans les statistiques">
+                                            Inclure dans les statistiques
+                                        </button>
+                                    </template>
+                                    <template x-if="!project.exclude_stats">
+                                        <button @click="updateProject(project, '{% url 'crm-project-update' 0 %}'.replace('0', project.id), { statistics: false, notifications: !project.muted })"
+                                                data-bs-toggle="tooltip"
+                                                data-bs-title="Exclure des statistiques"
+                                                data-bs-placement="top"
+                                                :id="'exclude-stats-' + project.id"
+                                                class="fr-btn fr-btn--sm fr-icon-line-chart-on-line fr-btn--tertiary-no-outline position-relative"
+                                                title="Exclure des statistiques">Exclure des statistiques</button>
+                                    </template>
+                                    <!-- activer/couper les notifs -->
+                                    <template x-if="project.muted">
+                                        <button @click="updateProject(project, '{% url 'crm-project-update' 0 %}'.replace('0', project.id), { statistics: !project.exclude_stats, notifications: true })"
+                                                data-bs-toggle="tooltip"
+                                                data-bs-title="Activer les notifications"
+                                                data-bs-placement="top"
+                                                class="fr-btn fr-btn--sm fr-icon-notification-off-line fr-btn--tertiary-no-outline position-relative"
+                                                title="Activer les notifications">Activer les notifications</button>
+                                    </template>
+                                    <template x-if="!project.muted">
+                                        <button @click="updateProject(project, '{% url 'crm-project-update' 0 %}'.replace('0', project.id), { statistics: !project.exclude_stats, notifications: false })"
+                                                data-bs-toggle="tooltip"
+                                                data-bs-title="Désactiver les notifications"
+                                                data-bs-placement="top"
+                                                class="fr-btn fr-btn--sm fr-icon-notification-on-line fr-btn--tertiary-no-outline position-relative"
+                                                title="Désactiver les notifications">
+                                            Désactiver les notifications
+                                        </button>
+                                    </template>
+                                    <!-- Go to project page -->
+                                    <button class="fr-btn fr-btn--sm fr-icon-eye-line fr-btn--tertiary-no-outline position-relative"
+                                            title="Accéder à la page du dossier">
+                                        <a :href="'{% url 'projects-project-detail' 0 %}'.replace('0', project.id)"
+                                           class="stretched-link">Accéder à la page du dossier</a>
+                                    </button>
+                                    <!-- Edit -->
+                                    <button class="fr-btn fr-btn--sm fr-icon-pencil-line fr-btn--tertiary-no-outline position-relative"
+                                            title="Éditer le dossier">
+                                        <a :href="'{% url 'crm-project-update' 0 %}'.replace('0', project.id)"
+                                           class="stretched-link">Éditer</a>
+                                    </button>
+                                    <!-- Delete -->
+                                    <button class="fr-btn fr-btn--sm fr-icon-delete-line fr-btn--tertiary-no-outline position-relative"
+                                            title="Supprimer le dossier">
+                                        <a :href="'{% url 'crm-project-delete' 0 %}'.replace('0', project.id)"
+                                           class="stretched-link">Supprimer</a>
+                                    </button>
                                 </td>
                             </tr>
-                        {% empty %}
+                        </template>
+                        <template x-if="projects == null">
                             <tr>
                                 <td colspan="5">-- Aucun résultat --</td>
                             </tr>
-                        {% endfor %}
+                        </template>
                     </tbody>
                 </table>
+                <template x-if="projectsToDisplay.length > 0">
+                    {% include "tools/pagination.html" with page=pagination.page total_pages=pagination.total %}
+                </template>
             </div>
         </div>
     </div>

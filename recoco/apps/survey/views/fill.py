@@ -49,7 +49,7 @@ class SessionResultsView(LoginRequiredMixin, PermissionRequiredMixin, DetailView
         return has_perm(self.request.user, "projects.use_surveys", object.project)
 
 
-class SessionDoneView(LoginRequiredMixin, PermissionRequiredMixin, RedirectView):
+class SessionDoneView(LoginRequiredMixin, RedirectView):
     permanent = False
     query_string = True
     pattern_name = "projects-project-detail-knowledge"

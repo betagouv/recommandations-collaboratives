@@ -1,32 +1,31 @@
-<div class="kanban-header topbar d-flex justify-content-between align-items-center fr-p-2v">
-    <div class="kanban-header__view-selector fs-5 fr-mr-6v">
-        {% include "projects/project/fragments/navigation/display_select.html" %}
+<div class="kanban-header__view-selector fs-5 fr-mr-6v">
+    {% include "projects/project/fragments/navigation/display_select.html" %}
+</div>
+<div x-data="Tutorial('time-filter-tutorial-on-kanban')"
+     class="kanban-header__middle-part">
+    <div class="kanban-header__searchbar position-relative">
+        {% include "projects/project/fragments/search_bar.html" with action_search="onSearch" x_model="searchText" placeholder="Rechercher commune, #tag, nom du dossier..." %}
     </div>
-    <div x-data="Tutorial('time-filter-tutorial-on-kanban')"
-         class="kanban-header__middle-part">
-        <div class="kanban-header__searchbar position-relative">
-            {% include "projects/project/fragments/search_bar.html" with action_search="onSearch" x_model="searchText" placeholder="Rechercher commune, #tag, nom du dossier..." %}
-        </div>
-        <div class="kanban-header__lastactivity-filter fr-select-group d-flex fr-m-0 fr-mr-6v align-items-center"
-             id="kanban-time-filter">
-            <label class="fr-label no-wrap fr-mr-1v"
-                   for="select-filter-project-duration">Dossiers actifs depuis :</label>
-            <select class="fr-select fr-m-0"
-                    name="select-filter-project-duration"
-                    x-ref="selectFilterProjectDuration"
-                    x-model="filterProjectLastActivity"
-                    @change='onLastActivityChange'>
-                <option value="30">1 mois</option>
-                <option value="90">3 mois</option>
-                <option value="180">6 mois</option>
-                <option value="365">1 an</option>
-                <option value="1460">Plus</option>
-            </select>
-        </div>
-        <div class="kanban-header__my-projects-toggle">
-            {% include "projects/project/fragments/only_my_projects_toggle.html" %}
-        </div>
-        <div class="kanban-header__region-filter">
-            {% include "projects/project/fragments/departments_selector.html" with label="Projets de mon territoire" filter_by_regions=True zone_objects="regions" select_all=True %}
-        </div>
+    <div class="kanban-header__lastactivity-filter fr-select-group d-flex fr-m-0 fr-mr-6v align-items-center"
+         id="kanban-time-filter">
+        <label class="fr-label no-wrap fr-mr-1v"
+               for="select-filter-project-duration">Dossiers actifs depuis :</label>
+        <select class="fr-select fr-m-0"
+                name="select-filter-project-duration"
+                x-ref="selectFilterProjectDuration"
+                x-model="filterProjectLastActivity"
+                @change='onLastActivityChange'>
+            <option value="30">1 mois</option>
+            <option value="90">3 mois</option>
+            <option value="180">6 mois</option>
+            <option value="365">1 an</option>
+            <option value="1460">Plus</option>
+        </select>
     </div>
+    <div class="kanban-header__my-projects-toggle">
+        {% include "projects/project/fragments/only_my_projects_toggle.html" %}
+    </div>
+    <div class="kanban-header__region-filter fr-mr-6v">
+        {% include "projects/project/fragments/departments_selector.html" with label="Projets de mon territoire" filter_by_regions=True zone_objects="regions" select_all=True %}
+    </div>
+</div>

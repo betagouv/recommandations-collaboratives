@@ -38,8 +38,7 @@
                         <button type="submit"
                                 href="{% url 'crm-project-delete' project.pk %}"
                                 class="btn btn-danger">Oui, supprimer ce dossier</button>
-                        <a href="{% url 'crm-project-details' project.pk %}"
-                           class="btn btn-outline-secondary">Non, annuler la suppression</a>
+                        <a href="{% url 'crm-project-list' %}" class="btn btn-outline-secondary">Non, annuler la suppression</a>
                     </form>
                 </div>
             </div>

@@ -1,6 +1,6 @@
 import '../store/projects';
 
-import '../components/PersonalAdvisorDashboard';
+import '../components/MapDashboard';
 import '../components/GravatarCache';
 
 import '../../css/personalAdvisorDashboard.css';

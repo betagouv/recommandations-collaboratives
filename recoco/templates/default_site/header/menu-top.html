@@ -6,8 +6,9 @@
     {% vite_asset 'js/styles/menu-top.css.js' %}
 {% endblock js %}
 {% load projects_extra %}
+{% url 'home' as home_url %}
 {% if user.is_authenticated %}
-    <nav class="navbar navbar-expand-lg sticky-top navbar-light bg-white flex-column navigation fr-p-0"
+    <nav class="navbar navbar-expand-lg sticky-top navbar-light bg-white flex-column navigation fr-p-0{% if request.path == home_url %} fr-header position-sticky{% endif %}"
          aria-label="Main navigation">
         {% comment %} <div class="navbar-border-top navbar-shadow w-100 fr-py-2v"> {% endcomment %}
         <div class="w-100">
@@ -19,6 +20,25 @@
                 <div class="bg-white">{% include "header/menu-top-user-tools.html" %}</div>
             </div>
         </div>
+        {% if request.path == home_url %}
+            <div class="fr-header__menu fr-modal w-100"
+                id="modal-header"
+                aria-labelledby="button-header">
+                <div class="fr-container">
+                    <button aria-controls="modal-header"
+                            title="Fermer"
+                            type="button"
+                            id="button-2168"
+                            class="fr-btn--close fr-btn">Fermer</button>
+                    <div class="fr-header__menu-links"></div>
+                    <nav class="fr-nav" role="navigation" aria-label="Menu principal">
+                        <ul class="fr-nav__list">
+                            {% include "header/fragments/offline_menu.html" %}
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        {% endif %}
     </nav>
 {% else %}
     <header role="banner" class="fr-header">
