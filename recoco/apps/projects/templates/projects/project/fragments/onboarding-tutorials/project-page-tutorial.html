@@ -1,6 +1,6 @@
 <div data-test-id="onboarding-tutorial__popup-content">
     <div class="fr-p-3v onboarding-tutorial__popup-content__part">
-        <h3 class="onboarding-tutorial__popup-title">Bienvenue sur UrbanVitaliz</h3>
+        <h3 class="onboarding-tutorial__popup-title">Bienvenue sur {{ request.site.name }}</h3>
         <p>Ci-dessous vos prochaines étapes pour prendre en main  la plateforme :</p>
     </div>
     <template x-if="challengesStatus[0] == 'todo'">
