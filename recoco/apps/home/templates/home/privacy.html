@@ -11,13 +11,9 @@
     Politique de confidentialité
 {% endblock og_title %}
 {% block js %}
+    {% vite_asset 'js/styles/home-privacy.css.js' %}
     {% vite_asset 'js/styles/home.css.js' %}
 {% endblock js %}
-{% block css %}
-    <link href="{% sass_src 'home/css/privacy/privacy.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-{% endblock css %}
 {% block content %}
     <div class="col-8 fr-mt-3w fr-py-2w g-0 fr-mx-auto font-marianne">
         <h2>Politique de confidentialité de {{ request.site.name }}</h2>

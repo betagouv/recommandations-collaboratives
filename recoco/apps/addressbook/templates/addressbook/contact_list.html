@@ -11,6 +11,7 @@
 {% block js %}
     {% vite_asset 'js/apps/contactBookApp.js' %}
     {% vite_asset 'js/apps/featureAddContact.js' %}
+    {% vite_asset 'js/styles/segmented_ctrl.css.js' %}
 {% endblock js %}
 {% block content %}
     {{ departments|json_script:"departmentsArray" }}

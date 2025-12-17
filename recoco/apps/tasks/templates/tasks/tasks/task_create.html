@@ -9,15 +9,9 @@
 {% block og_title %}
     Créer une recommandation
 {% endblock og_title %}
-{% block css %}
-    <link href="{% sass_src 'resources/resources.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-    <link href="{% sass_src 'projects/css/push.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-{% endblock css %}
 {% block js %}
+    {% vite_asset 'js/styles/resources.css.js' %}
+    {% vite_asset 'js/styles/projects-push.css.js' %}
     {% vite_asset 'js/apps/actionPusher.js' %}
     {% vite_asset 'js/apps/tutorial.js' %}
     {% vite_asset 'js/apps/featureAddContact.js' %}

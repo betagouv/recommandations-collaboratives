@@ -10,11 +10,10 @@
     - displayRegions: If true, use region-grouped mode.
 {% endcomment %}
 {% load sass_tags %}
-{% block css %}
-    <link href="{% sass_src 'css/tools/contact/multi-select.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-{% endblock css %}
+{% load django_vite %}
+{% block js %}
+    {% vite_asset 'js/styles/contact-multi-select.css.js' %}
+{% endblock js %}
 <template x-if="objectsToSelect">
     <div class="bg-white">
         <div>

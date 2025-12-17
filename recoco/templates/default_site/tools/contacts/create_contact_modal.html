@@ -1,9 +1,8 @@
 {% load sass_tags %}
-{% block css %}
-    <link href="{% sass_src 'css/tools/contact/create-contact-modal.scss' %}"
-          rel="stylesheet"
-          type="text/css" />
-{% endblock css %}
+{% load django_vite %}
+{% block js %}
+    {% vite_asset 'js/styles/contact-create-contact-modal.css.js' %}
+{% endblock js %}
 <template x-if="isCreateContactModalOpen">
     <div x-data="CreateContactModal"
          @modal-response="closeCreateOrganizationModal($event)"

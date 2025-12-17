@@ -13,11 +13,9 @@
 {% load static %}
 {% load sass_tags %}
 {% load django_vite %}
-{% block css %}
-    <link href="{% sass_src 'css/account/layout-form.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-{% endblock css %}
+{% block js %}
+    {% vite_asset 'js/styles/account-layout-form.css.js' %}
+{% endblock js %}
 <div class="layout-form container">
     <div class="banner text-center">
         {% comment %} TODO ADD site_config in context {% endcomment %}

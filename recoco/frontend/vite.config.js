@@ -104,6 +104,91 @@ const config = {
         ),
         homeStyles: resolve('./src/js/styles/home.css.js'),
         kanbanStyles: resolve('./src/js/styles/kanban.css.js'),
+        baseStyles: resolve('./src/js/styles/base.css.js'),
+        markdownxStyles: resolve('./src/js/styles/markdownx.css.js'),
+        consentBannerStyles: resolve('./src/js/styles/consent-banner.css.js'),
+        menuTopStyles: resolve('./src/js/styles/menu-top.css.js'),
+        headerUserToolsStyles: resolve(
+          './src/js/styles/header-user-tools.css.js'
+        ),
+        headerMenuBurgerStyles: resolve(
+          './src/js/styles/header-menu-burger.css.js'
+        ),
+        accountLoginStyles: resolve('./src/js/styles/account-login.css.js'),
+        accountLayoutFormStyles: resolve(
+          './src/js/styles/account-layout-form.css.js'
+        ),
+        toolsEditorStyles: resolve('./src/js/styles/tools-editor.css.js'),
+        contactCardStyles: resolve('./src/js/styles/contact-card.css.js'),
+        contactMultiSelectStyles: resolve(
+          './src/js/styles/contact-multi-select.css.js'
+        ),
+        contactSearchOrganizationStyles: resolve(
+          './src/js/styles/contact-search-organization.css.js'
+        ),
+        contactSearchContactModalStyles: resolve(
+          './src/js/styles/contact-search-contact-modal.css.js'
+        ),
+        contactCreateOrganizationModalStyles: resolve(
+          './src/js/styles/contact-create-organization-modal.css.js'
+        ),
+        contactCreateContactModalStyles: resolve(
+          './src/js/styles/contact-create-contact-modal.css.js'
+        ),
+        homeAuthStyles: resolve('./src/js/styles/home-auth.css.js'),
+        homePrivacyStyles: resolve('./src/js/styles/home-privacy.css.js'),
+        homeActorsStyles: resolve('./src/js/styles/home-actors.css.js'),
+        homeCmsPageTextStyles: resolve(
+          './src/js/styles/home-cms-page-text.css.js'
+        ),
+        homeCmsPageShowcaseStyles: resolve(
+          './src/js/styles/home-cms-page-showcase.css.js'
+        ),
+        onboardingPrefillUserStyles: resolve(
+          './src/js/styles/onboarding-prefill-user.css.js'
+        ),
+        pagesShowcaseListStyles: resolve(
+          './src/js/styles/pages-showcase-list.css.js'
+        ),
+        projectsBoardStyles: resolve('./src/js/styles/projects-board.css.js'),
+        projectsProjectStyles: resolve(
+          './src/js/styles/projects-project.css.js'
+        ),
+        projectsOverviewStyles: resolve(
+          './src/js/styles/projects-overview.css.js'
+        ),
+        projectsProjectNavigationStyles: resolve(
+          './src/js/styles/projects-project-navigation.css.js'
+        ),
+        projectsProjectModerationStyles: resolve(
+          './src/js/styles/projects-project-moderation.css.js'
+        ),
+        projectsConversationsNewStyles: resolve(
+          './src/js/styles/projects-conversations-new.css.js'
+        ),
+        projectsAdministrationStyles: resolve(
+          './src/js/styles/projects-administration.css.js'
+        ),
+        projectsPushStyles: resolve('./src/js/styles/projects-push.css.js'),
+        projectsSearchbarStyles: resolve(
+          './src/js/styles/projects-searchbar.css.js'
+        ),
+        projectsFileUploadStyles: resolve(
+          './src/js/styles/projects-file-upload.css.js'
+        ),
+        projectsActionListStyles: resolve(
+          './src/js/styles/projects-action-list.css.js'
+        ),
+        projectsCardInfoStyles: resolve(
+          './src/js/styles/projects-card-info.css.js'
+        ),
+        projectsKanbanProjectStyles: resolve(
+          './src/js/styles/projects-kanban-project.css.js'
+        ),
+        resourcesStyles: resolve('./src/js/styles/resources.css.js'),
+        resourceCardStyles: resolve('./src/js/styles/resource-card.css.js'),
+        surveyStyles: resolve('./src/js/styles/survey.css.js'),
+        segmentedCtrlStyles: resolve('./src/js/styles/segmented_ctrl.css.js'),
       },
       output: {
         chunkFileNames: undefined,

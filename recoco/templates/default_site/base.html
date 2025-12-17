@@ -21,12 +21,8 @@
     {% endcache %}
     {% include "seo.html" %}
     {% include "matomo.html" %}
-    <link href="{% sass_src 'css/base.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-    <link href="{% sass_src 'css/markdownx.scss' %}"
-          rel="stylesheet"
-          type="text/css">
+    {% vite_asset 'js/styles/base.css.js' %}
+    {% vite_asset 'js/styles/markdownx.css.js' %}
     <!-- Extra CSS -->
     {% block css %}
     {% endblock css %}

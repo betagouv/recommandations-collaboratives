@@ -1,11 +1,10 @@
 {% load static %}
 {% load gravatar %}
 {% load sass_tags %}
-{% block css %}
-    <link href="{% sass_src 'css/menu-top.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-{% endblock css %}
+{% load django_vite %}
+{% block js %}
+    {% vite_asset 'js/styles/menu-top.css.js' %}
+{% endblock js %}
 {% load projects_extra %}
 {% if user.is_authenticated %}
     <nav class="navbar navbar-expand-lg sticky-top navbar-light bg-white flex-column navigation fr-p-0"

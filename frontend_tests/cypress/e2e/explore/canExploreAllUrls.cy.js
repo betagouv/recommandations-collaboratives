@@ -105,7 +105,7 @@ const dynamicUrls = [
   '/onboarding/summary/1',
   // '/project/partage/{project_ro_key}/',
   // '/project/survey/{session_id}/results',
-  '/project/1/overview',
+  '/project/1/presentation',
   '/project/1/actions',
   '/project/1/actions/inline',
   '/project/1/activite',

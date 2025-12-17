@@ -1,9 +1,8 @@
 {% load sass_tags %}
-{% block css %}
-    <link href="{% sass_src 'css/tools/contact/create-organization-modal.scss' %}"
-          rel="stylesheet"
-          type="text/css" />
-{% endblock css %}
+{% load django_vite %}
+{% block js %}
+    {% vite_asset 'js/styles/contact-create-organization-modal.css.js' %}
+{% endblock js %}
 <template x-if="isCreateOrganizationModalOpen">
     <div x-data="CreateOrganizationModal(typeof contact !== 'undefined' && contact.organization ? contact.organization.name : '')"
          id="create-organization-modal"

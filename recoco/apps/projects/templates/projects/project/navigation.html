@@ -4,12 +4,8 @@
 {% load waffle_tags %}
 {% load projects_extra %}
 {% load django_vite %}
-{% block css %}
-    <link href="{% sass_src 'projects/css/project_navigation.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-{% endblock css %}
 {% block js %}
+    {% vite_asset 'js/styles/projects-project-navigation.css.js' %}
     {% vite_asset 'js/store/projectQueue.js' %}
     {% vite_asset 'js/components/ExpandableMenuHandler.js' %}
     {% vite_asset 'js/store/showRole.js' %}

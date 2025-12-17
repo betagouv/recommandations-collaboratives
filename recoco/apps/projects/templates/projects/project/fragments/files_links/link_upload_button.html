@@ -2,11 +2,9 @@
 {% load sass_tags %}
 {% load humanize %}
 {% load django_vite %}
-{% block css %}
-    <link href="{% sass_src 'projects/css/file_upload.scss' %}"
-          rel="stylesheet"
-          type="text/css" />
-{% endblock css %}
+{% block js %}
+    {% vite_asset 'js/styles/projects-file-upload.css.js' %}
+{% endblock js %}
 <div class="link-upload-btn" x-data="FileUpload('{{ type }}')">
     <button x-ref="button"
             class="fr-btn fr-btn--sm fr-btn--secondary"

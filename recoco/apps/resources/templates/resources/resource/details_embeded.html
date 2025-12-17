@@ -2,12 +2,8 @@
 {% load static %}
 {% load sass_tags %}
 {% load common_tags %}
-<link href="{% sass_src 'css/base.scss' %}"
-      rel="stylesheet"
-      type="text/css">
-<link href="{% sass_src 'resources/resources.scss' %}"
-      rel="stylesheet"
-      type="text/css">
+{% vite_asset 'js/styles/base.css.js' %}
+{% vite_asset 'js/styles/resources.css.js' %}
 {% block js %}
     {% vite_asset 'js/main.js' %}
     {% vite_asset 'js/apps/embedResource.js' %}

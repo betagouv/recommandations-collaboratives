@@ -2,11 +2,10 @@
 {% load gravatar %}
 {% load humanize %}
 {% load sass_tags %}
-{% block css %}
-    <link href="{% sass_src 'projects/css/action_list.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-{% endblock css %}
+{% load django_vite %}
+{% block js %}
+    {% vite_asset 'js/styles/projects-action-list.css.js' %}
+{% endblock js %}
 <div id="modal-action-{{ task.id }}" class="modal fade" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content text-center">

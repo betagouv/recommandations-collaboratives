@@ -12,13 +12,9 @@
     Recommandations - {{ block.super }}
 {% endblock og_title %}
 {% block js %}
+    {% vite_asset 'js/styles/projects-board.css.js' %}
     {% vite_asset 'js/apps/actionsEmbed.js' %}
 {% endblock js %}
-{% block css %}
-    <link href="{% sass_src 'projects/css/board.scss' %}"
-          rel="stylesheet"
-          type="text/css" />
-{% endblock css %}
 {% block project_detail %}
     {% get_obj_perms request.user for request.site as "user_site_perms" %}
     {% get_obj_perms request.user for project as "user_project_perms" %}

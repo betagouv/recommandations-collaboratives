@@ -10,14 +10,10 @@
     Conversation - {{ block.super }}
 {% endblock og_title %}
 {% block js %}
+    {% vite_asset 'js/styles/projects-conversations-new.css.js' %}
     {% vite_asset 'js/apps/conversationsNew.js' %}
     {% vite_asset 'js/apps/featureAddContact.js' %}
 {% endblock js %}
-{% block css %}
-    <link href="{% sass_src 'projects/css/conversations_new.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-{% endblock css %}
 {% block project_detail %}
     {{ project.pk|json_script:"djangoProjectId" }}
     {{ feed|json_script:"djangoFeed" }}

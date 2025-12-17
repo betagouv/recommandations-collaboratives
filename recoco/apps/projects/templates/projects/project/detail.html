@@ -4,23 +4,17 @@
 {% load django_vite %}
 {% load projects_extra %}
 {% load sass_tags %}
+{% block js %}
+    {% vite_asset 'js/styles/resources.css.js' %}
+    {% vite_asset 'js/styles/resource-card.css.js' %}
+    {% vite_asset 'js/styles/projects-project.css.js' %}
+{% endblock js %}
 {% block title %}
     {{ project.name }}
 {% endblock title %}
 <!-- djlint:off -->
 {% block og_title %}{{ project.name }}{% endblock og_title %}
 <!-- djlint:on -->
-{% block css %}
-    <link href="{% sass_src 'resources/resources.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-    <link href="{% sass_src 'resources/resource_card.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-    <link href="{% sass_src 'projects/css/project.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-{% endblock css %}
 {% block content %}
     {% is_staff_for_current_site request.user as is_staff %}
     <div class="col-12 fr-p-0 fr-mx-auto">

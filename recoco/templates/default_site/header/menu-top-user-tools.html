@@ -4,12 +4,8 @@
 {% load projects_extra %}
 {% load sass_tags %}
 {% load django_vite %}
-{% block css %}
-    <link href="{% sass_src 'css/header/user-tools.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-{% endblock css %}
 {% block js %}
+    {% vite_asset 'js/styles/header-user-tools.css.js' %}
     {% vite_asset 'js/components/ExpandableMenuHandler.js' %}
 {% endblock js %}
 {% is_staff_for_current_site request.user as is_staff %}

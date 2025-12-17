@@ -1,11 +1,10 @@
 {% load static %}
 {% load gravatar %}
 {% load sass_tags %}
-{% block css %}
-    <link href="{% sass_src 'projects/css/fragments/kanban_projects/kanban_project.scss' %}"
-          rel="stylesheet"
-          type="text/css" />
-{% endblock css %}
+{% load django_vite %}
+{% block js %}
+    {% vite_asset 'js/styles/projects-kanban-project.css.js' %}
+{% endblock js %}
 <div :id="p.project.id"
      class="drag-targetable fr-py-1v fr-my-1v"
      @dragover="onDragOver(event)"

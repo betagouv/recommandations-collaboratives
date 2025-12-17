@@ -1,23 +1,19 @@
 {% extends "base.html" %}
 {% load static %}
 {% load sass_tags %}
-{% block css %}
-    <link href="{% sass_src 'survey/css/survey.scss' %}"
-          rel="stylesheet"
-          type="text/css" />
-{% endblock css %}
 {% load humanize %}
 {% load django_vite %}
 {% load waffle_tags %}
+{% block js %}
+    {% vite_asset 'js/styles/survey.css.js' %}
+    {% vite_asset 'js/apps/tutorial.js' %}
+{% endblock js %}
 {% block title %}
     {{ question.text }} - {{ request.site.name }}
 {% endblock title %}
 {% block og_title %}
     {{ question.text }} - {{ request.site.name }}
 {% endblock og_title %}
-{% block js %}
-    {% vite_asset 'js/apps/tutorial.js' %}
-{% endblock js %}
 {% block content %}
     <div x-data="Tutorial('survey')"
          x-init="await init(); await handleStartTour()"

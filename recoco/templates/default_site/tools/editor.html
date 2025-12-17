@@ -19,14 +19,11 @@ Parameters:
 {% endcomment %}
 {% load static %}
 {% load sass_tags %}
-{% block css %}
-    <link href="{% sass_src 'css/tools/editor.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-    <link href="{% sass_src 'css/tools/contact/contact-card.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-{% endblock css %}
+{% load django_vite %}
+{% block js %}
+    {% vite_asset 'js/styles/tools-editor.css.js' %}
+    {% vite_asset 'js/styles/contact-card.css.js' %}
+{% endblock js %}
 <div class="w-100 position-relative editor-container"
      {% if initial_content_escapejs %} x-data='editor("{{ initial_content|escapejs }}", "{{ placeholder }}", "{{ is_action_pusher }}" == "True" )' {% elif initial_content_js %} x-data='editor({{ initial_content }}, "{{ placeholder }}", "{{ is_action_pusher }}" == "True")' {% else %} x-data='editor("{{ initial_content }}", "{{ placeholder }}", "{{ is_action_pusher }}" == "True")' {% endif %}
      @reset-contact="handleResetContact()"

@@ -1,10 +1,9 @@
 {% load static %}
 {% load sass_tags %}
-{% block css %}
-    <link href="{% sass_src 'css/tools/contact/search-organization.scss' %}"
-          rel="stylesheet"
-          type="text/css" />
-{% endblock css %}
+{% load django_vite %}
+{% block js %}
+    {% vite_asset 'js/styles/contact-search-organization.css.js' %}
+{% endblock js %}
 <div x-data="SearchOrganization"
      class="fr-p-3v modal-create-contact__block"
      :class="{'fr-input-group--error': formState.isSubmitted && !formState.fields.isOrgaSelected}">

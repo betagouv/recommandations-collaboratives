@@ -6,17 +6,15 @@
 {% load sass_tags %}
 {% load projects_extra %}
 {% load survey %}
+{% block js %}
+    {% vite_asset 'js/styles/projects-project-moderation.css.js' %}
+{% endblock js %}
 {% block title %}
     Dossiers à examiner
 {% endblock title %}
 {% block og_title %}
     Dossiers à examiner
 {% endblock og_title %}
-{% block css %}
-    <link href="{% sass_src 'projects/css/project_moderation.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-{% endblock css %}
 {% block content %}
     {% if user.is_authenticated %}
         {% get_obj_perms request.user for request.site as "user_site_perms" %}
