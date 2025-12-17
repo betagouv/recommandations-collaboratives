@@ -153,7 +153,7 @@ Alpine.data('ProjectListCrm', (departments, regions) => ({
         limit: this.pagination.limit,
         offset: 0,
         page: 1,
-        search: this.backendSearch.searchText,
+        searchText: this.backendSearch.searchText,
         departments: this.backendSearch.searchDepartment,
       })
     );
@@ -171,7 +171,7 @@ Alpine.data('ProjectListCrm', (departments, regions) => ({
           limit: this.pagination.limit,
           offset: offset,
           page: page,
-          search: this.backendSearch.searchText,
+          searchText: this.backendSearch.searchText,
           departments: this.backendSearch.searchDepartment,
           status: this.backendSearch.searchStatus,
         })

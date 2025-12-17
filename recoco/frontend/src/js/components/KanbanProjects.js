@@ -47,7 +47,7 @@ Alpine.data('KanbanProjects', function (currentSiteId, departments, regions) {
     async getData() {
       const projects = await api.get(
         projectsUrl({
-          search: this.backendSearch.searchText,
+          searchText: this.backendSearch.searchText,
           departments: this.backendSearch.searchDepartment,
           lastActivity: this.backendSearch.lastActivity,
         })
