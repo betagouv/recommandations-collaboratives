@@ -26,7 +26,10 @@ def create_default_onboarding(apps, schema_editor):
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("onboarding", "0003_alter_onboardingresponse_onboarding"),
+        (
+            "onboarding",
+            "0001_initial_squashed_0003_alter_onboardingresponse_onboarding",
+        ),
         ("home", "0006_alter_siteconfiguration_site"),
     ]
 

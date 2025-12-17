@@ -8,7 +8,7 @@ import recoco.apps.projects.models
 class Migration(migrations.Migration):
     dependencies = [
         ("sites", "0002_alter_domain_unique"),
-        ("projects", "0089_auto_20230522_1137"),
+        ("projects", "0086_alter_note_managers_squashed_0089_auto_20230522_1137"),
     ]
 
     operations = [

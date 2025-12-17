@@ -7,7 +7,10 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
     dependencies = [
         ("projects", "0057_auto_20220801_1717"),
-        ("onboarding", "0003_alter_onboardingresponse_onboarding"),
+        (
+            "onboarding",
+            "0001_initial_squashed_0003_alter_onboardingresponse_onboarding",
+        ),
     ]
 
     operations = [

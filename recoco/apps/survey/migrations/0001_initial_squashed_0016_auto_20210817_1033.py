@@ -7,25 +7,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-    replaces = [
-        ("survey", "0001_initial"),
-        ("survey", "0002_question_text"),
-        ("survey", "0003_auto_20210727_1430"),
-        ("survey", "0004_session_survey"),
-        ("survey", "0005_auto_20210727_1716"),
-        ("survey", "0006_survey_name"),
-        ("survey", "0007_auto_20210803_1053"),
-        ("survey", "0008_auto_20210803_1554"),
-        ("survey", "0009_choice_signals"),
-        ("survey", "0010_alter_choice_signals"),
-        ("survey", "0011_alter_questionset_icon"),
-        ("survey", "0012_question_precondition"),
-        ("survey", "0013_answer_signals"),
-        ("survey", "0014_question_priority"),
-        ("survey", "0015_auto_20210817_1008"),
-        ("survey", "0016_auto_20210817_1033"),
-    ]
-
     dependencies = []
 
     operations = [

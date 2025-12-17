@@ -6,12 +6,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-    replaces = [
-        ("onboarding", "0001_initial"),
-        ("onboarding", "0002_onboardingresponse"),
-        ("onboarding", "0003_alter_onboardingresponse_onboarding"),
-    ]
-
     dependencies = []
 
     operations = [
