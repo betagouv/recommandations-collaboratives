@@ -66,3 +66,29 @@ class SessionSerializer(serializers.ModelSerializer):
             "survey",
             "project",
         ]
+
+
+class AnswerSummarySerializer(serializers.ModelSerializer):
+    question = QuestionSerializer()
+    choices = ChoiceSerializer(many=True)
+
+    class Meta:
+        model = Answer
+        fields = [
+            "question",
+            "choices",
+            "values",
+            "comment",
+        ]
+
+
+class FullSessionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Session
+        fields = [
+            "id",
+            "survey",
+            "answers",
+        ]
+
+    answers = AnswerSummarySerializer(many=True)

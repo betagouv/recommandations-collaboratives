@@ -109,6 +109,7 @@ INSTALLED_APPS = [
     "django_json_widget",
     "waffle",
     "django_htmx",
+    "mcp_server",
 ]
 
 SITE_ID = SiteID(default=1)

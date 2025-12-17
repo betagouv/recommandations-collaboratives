@@ -36,6 +36,7 @@ admin.site.login = secure_admin_login(admin.site.login)
 
 urlpatterns = [
     path("api/", include(rest_api_urls)),
+    path("", include("mcp_server.urls")),
     path("accounts/", include("allauth.urls")),
     path("logout/", auth_views.LogoutView.as_view(), name="logout"),
     path("markdownx/", include("markdownx.urls")),

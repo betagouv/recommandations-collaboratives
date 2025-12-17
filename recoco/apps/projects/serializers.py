@@ -6,6 +6,7 @@ from taggit.serializers import TagListSerializerField, TaggitSerializer
 from recoco import verbs
 from recoco.apps.geomatics.serializers import CommuneSerializer
 from recoco.apps.home.serializers import UserSerializer
+from recoco.apps.survey.serializers import FullSessionSerializer
 from recoco.apps.tasks import models as task_models
 from recoco.rest_api.serializers import BaseSerializerMixin
 from recoco.utils import get_group_for_site
@@ -117,6 +118,15 @@ class ProjectSerializer(
             "projects.use_private_notes", obj
         ):
             return obj.advisors_note
+
+
+class ProjectSummarySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Project
+
+        fields = ["name", "description", "commune", "survey_session"]
+
+    survey_session = FullSessionSerializer(many=True)
 
 
 class UserProjectSerializer(ProjectSerializer):
