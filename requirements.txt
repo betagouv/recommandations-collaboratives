@@ -498,8 +498,9 @@ django-admin-csvexport==2.2 \
     --hash=sha256:29567ea1454984434aa1e5053916e7f5b252aa5bf82e8f4a028c571a2b24d7b8 \
     --hash=sha256:d228fbcf7b4c4677cdcb26f0979ef663605cd6b934261fd524c9f1fd3722f5a6
     # via recoco
-django-allauth==65.9.0 \
-    --hash=sha256:a06bca9974df44321e94c33bcf770bb6f924d1a44b57defbce4d7ec54a55483e
+django-allauth==65.13.0 \
+    --hash=sha256:119c0cf1cc2e0d1a0fe2f13588f30951d64989256084de2d60f13ab9308f9fa0 \
+    --hash=sha256:7d7b7e7ad603eb3864c142f051e2cce7be2f9a9c6945a51172ec83d48c6c843b
     # via recoco
 django-appconf==1.1.0 \
     --hash=sha256:7abd5a163ff57557f216e84d3ce9dac36c37ffce1ab9a044d3d53b7c943dd10f \
