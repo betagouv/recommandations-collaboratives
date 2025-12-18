@@ -1111,10 +1111,12 @@ mccabe==0.7.0 \
     --hash=sha256:348e0240c33b60bbdf4e523192ef919f28cb2c3d7d5c7794f74009290f236325 \
     --hash=sha256:6c2d30ab6be0e4a46919781807b4f0d834ebdd6c6e3dca0bda5a15f863427b6e
     # via pylint
-mcp==1.23.3 \
-    --hash=sha256:32768af4b46a1b4f7df34e2bfdf5c6011e7b63d7f1b0e321d0fdef4cd6082031 \
-    --hash=sha256:b3b0da2cc949950ce1259c7bfc1b081905a51916fcd7c8182125b85e70825201
-    # via django-mcp-server
+mcp==1.24.0 \
+    --hash=sha256:aeaad134664ce56f2721d1abf300666a1e8348563f4d3baff361c3b652448efc \
+    --hash=sha256:db130e103cc50ddc3dffc928382f33ba3eaef0b711f7a87c05e7ded65b1ca062
+    # via
+    #   django-mcp-server
+    #   recoco
 mdit-py-plugins==0.4.2 \
     --hash=sha256:0c673c3f889399a33b95e88d2f0d111b4447bdfea7f237dab2d488f459835636 \
     --hash=sha256:5f2cd1fdb606ddf152d37ec30e46101a60512bc0e5fa1a7002c36647b09e26b5
@@ -1529,6 +1531,7 @@ pyjwt==2.10.1 \
     #   django-allauth
     #   djangorestframework-simplejwt
     #   mcp
+    #   recoco
 pylint==3.3.7 \
     --hash=sha256:2b11de8bde49f9c5059452e0c310c079c746a0a8eeaa789e5aa966ecc23e4559 \
     --hash=sha256:43860aafefce92fca4cf6b61fe199cdc5ae54ea28f9bf4cd49de267b5195803d
@@ -2248,7 +2251,9 @@ ua-parser-builtins==0.18.0.post1 \
 uritemplate==4.2.0 \
     --hash=sha256:480c2ed180878955863323eea31b0ede668795de182617fef9c6ca09e6ec9d0e \
     --hash=sha256:962201ba1c4edcab02e60f9a0d3821e82dfc5d2d6662a21abd533879bdb8a686
-    # via drf-spectacular
+    # via
+    #   django-mcp-server
+    #   drf-spectacular
 urllib3==2.6.2 \
     --hash=sha256:016f9c98bb7e98085cb2b4b17b87d2c702975664e4f060c6532e64d1c1a5e797 \
     --hash=sha256:ec21cddfe7724fc7cb4ba4bea7aa8e2ef36f607a4bab81aa6ce42a13dc3f03dd
