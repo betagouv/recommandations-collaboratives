@@ -11,10 +11,12 @@ from datetime import datetime, timedelta
 
 from actstream import action
 from actstream.models import Action, actor_stream, target_stream
+from allauth.account.internal.flows.email_verification import (
+    send_verification_email_for_user,
+)
 from allauth.account.models import EmailAddress
 from allauth.account.utils import (
     filter_users_by_email,
-    send_email_confirmation,
     setup_user_email,
 )
 from django import forms as django_forms
@@ -534,7 +536,10 @@ def user_update(request, user_id=None):
                     )
                     if email_changed:
                         setup_user_email(request, crm_user, [])
-                        send_email_confirmation(request, crm_user, signup=True)
+                        # XXX this method comes from the "internal" package of allauth
+                        # and should probably not be used directly -- fixing sec bug
+                        # when moving from 65.9 to 65.12
+                        send_verification_email_for_user(request, crm_user)
 
                     messages.success(request, success_message)
                     return redirect(reverse("crm-user-details", args=[crm_user.id]))
