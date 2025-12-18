@@ -234,6 +234,10 @@ ul.item-no-space > li {
   }
 }
 
+ul.fr-btns-group {
+  padding-left: 0;
+}
+
 /* ¯¯¯ *\
   FORMS
 \* ˍˍˍ */
@@ -977,6 +981,11 @@ form > p {
 .non-stylish-link {
   color: white !important;
   text-decoration: none !important;
+}
+
+[href] {
+  background-image: none;
+  transition: none;
 }
 
 /* ¯¯¯¯¯ *\
