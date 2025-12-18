@@ -31,7 +31,6 @@ import './components/FieldValidator';
 import './components/Toast';
 
 //Global CSS
-import '../css/dsfr-custom.css';
 import '../css/buttons.css';
 import '../css/input.css';
 import '../css/typography.css';

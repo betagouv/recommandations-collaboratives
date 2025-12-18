@@ -202,6 +202,7 @@ const config = {
         projectsOnboardingTutorialStyles: resolve(
           './src/js/styles/projects-onboarding-tutorial.css.js'
         ),
+        marianneStyles: resolve('./src/js/styles/marianne.css.js'),
       },
       output: {
         chunkFileNames: undefined,

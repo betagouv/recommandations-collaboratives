@@ -68,7 +68,7 @@ BREVO_FORCE_DEBUG = True
 RECAPTCHA_REQUIRED_SCORE = 0
 
 # Vite
-DJANGO_VITE_ASSETS_PATH = BASE_DIR / "frontend" / "dist" / ".vite"
+DJANGO_VITE_ASSETS_PATH = BASE_DIR / "frontend" / "dist"
 DJANGO_VITE = {
     "default": {
         "dev_mode": False,
