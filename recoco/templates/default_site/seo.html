@@ -1,8 +1,6 @@
 <meta name="description"
       content="{% block description %}{% if request.site.configuration %}{{ request.site.configuration.description }} {% else %}{{ request.site.name }} est un outil pour aider les collectivités dans leurs dossiers{% endif %}{% endblock description %}">
 <meta name="robots" content="index, archive" />
-<meta property="og:title"
-      content="{% block og_title %}{% endblock og_title %} - {{ request.site.name }}" />
 <meta property="og:locale" content="fr" />
 <meta property="og:site_name" content="{{ request.site.name }}" />
 <meta property="og:description"
