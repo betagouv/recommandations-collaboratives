@@ -1,17 +1,15 @@
 {% extends "base.html" %}
-{% load sass_tags %}
 {% load static %}
+{% load django_vite %}
 {% block title %}
     Déclaration d'accessibilité
 {% endblock title %}
 {% block og_title %}
     Déclaration d'accessibilité
 {% endblock og_title %}
-{% block css %}
-    <link href="{% sass_src 'home/css/home/home.scss' %}"
-          rel="stylesheet"
-          type="text/css" />
-{% endblock css %}
+{% block js %}
+    {% vite_asset 'js/styles/home.css.js' %}
+{% endblock js %}
 {% block content %}
     <div class="col-8 fr-py-2w g-0 fr-mx-auto">
         <h1>Déclaration d’accessibilité de {{ request.site.name }}</h1>

@@ -1,16 +1,9 @@
 {% extends "base.html" %}
 {% load static %}
-{% load sass_tags %}
 {% load django_vite %}
-{% block css %}
-    <link href="{% sass_src 'resources/resources.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-    <link href="{% sass_src 'projects/css/push.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-{% endblock css %}
 {% block js %}
+    {% vite_asset 'js/styles/resources.css.js' %}
+    {% vite_asset 'js/styles/projects-push.css.js' %}
     {% vite_asset 'js/components/ActionPusher.js' %}
     {% vite_asset 'js/store/actionPusher.js' %}
     {% vite_asset 'js/apps/tutorial.js' %}

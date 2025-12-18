@@ -2,21 +2,17 @@
 {% load static %}
 {% load humanize %}
 {% load guardian_tags %}
-{% load sass_tags %}
+{% load django_vite %}
+{% block js %}
+    {% vite_asset 'js/styles/resources.css.js' %}
+    {% vite_asset 'js/styles/resource-card.css.js' %}
+{% endblock js %}
 {% block title %}
     Liste des ressources
 {% endblock title %}
 {% block og_title %}
     Liste des ressources
 {% endblock og_title %}
-{% block css %}
-    <link href="{% sass_src 'resources/resources.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-    <link href="{% sass_src 'resources/resource_card.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-{% endblock css %}
 {% block content %}
     {% if user.is_authenticated %}
         {% get_obj_perms request.user for request.site as "user_site_perms" %}

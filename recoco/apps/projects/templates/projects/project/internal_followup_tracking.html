@@ -3,12 +3,6 @@
 {% load static %}
 {% load gravatar %}
 {% load activity_tags %}
-{% load sass_tags %}
-{% block css %}
-    <link href="{% sass_src 'projects/css/internal_followup.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-{% endblock css %}
 {% block project_detail %}
     {% activity_stream "target" project %}
     <div class="w-100 h-100">

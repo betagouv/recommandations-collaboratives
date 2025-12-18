@@ -1,12 +1,10 @@
 {% extends "base.html" %}
 {% load static %}
 {% load humanize %}
-{% load sass_tags %}
-{% block css %}
-    <link href="{% sass_src 'projects/css/project.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-{% endblock css %}
+{% load django_vite %}
+{% block js %}
+    {% vite_asset 'js/styles/projects-project.css.js' %}
+{% endblock js %}
 {% block content %}
     <div class="col-12 fr-p-3w fr-mx-auto">
         <section>

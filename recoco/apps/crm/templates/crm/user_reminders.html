@@ -1,5 +1,4 @@
 {% extends "base.html" %}
-{% load sass_tags %}
 {% load static %}
 {% load django_vite %}
 {% block title %}
@@ -29,9 +28,6 @@
     </script>
 {% endblock js %}
 {% block css %}
-    <link href="{% sass_src 'home/css/dsfr/marianne.css' %}"
-          rel="stylesheet"
-          type="text/css">
     <style>
  [x-cloak] { display: none !important;
      visibility: hidden;

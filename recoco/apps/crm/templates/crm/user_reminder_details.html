@@ -1,5 +1,4 @@
 {% extends "base.html" %}
-{% load sass_tags %}
 {% load static %}
 {% load django_vite %}
 {% block js %}
@@ -22,11 +21,6 @@
  )})
     </script>
 {% endblock js %}
-{% block css %}
-    <link href="{% sass_src 'home/css/dsfr/marianne.css' %}"
-          rel="stylesheet"
-          type="text/css">
-{% endblock css %}
 {% block content %}
     <div x-data="Crm" class="d-flex fr-px-0">
         <aside class="w-25 crm-aside">

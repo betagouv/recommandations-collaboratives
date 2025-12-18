@@ -1,10 +1,4 @@
 {% load static %}
-{% load sass_tags %}
-{% block css %}
-    <link href="{% sass_src 'css/header/header.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-{% endblock css %}
 {% if user.is_authenticated and request.site.configuration.logo_small %}
     <a href="{% url 'home' %}"
        class="d-flex align-middle align-items-center">
@@ -23,7 +17,7 @@
     <div class="navbar-logo">
         <a href="{% url 'home' %}"
            class="d-flex align-middle fr-p-2w align-items-center">
-            {% include 'header/menu-top-logo-supp.html' %}
+            {% include "header/menu-top-logo-supp.html" %}
             <img class="logo-{{ request.site.name|lower }}"
                  src="{{ request.site.configuration.logo_large.url }}"
                  width="auto"
@@ -35,7 +29,7 @@
     <div class="navbar-logo">
         <a href="{% url 'home' %}"
            class="d-flex align-middle fr-p-2w align-items-center">
-            {% include 'header/menu-top-logo-supp.html' %}
+            {% include "header/menu-top-logo-supp.html" %}
             <span class="fw-bold span-specific-fontsize-30 specific-ml-30">{{ request.site.name }}</span>
         </a>
     </div>

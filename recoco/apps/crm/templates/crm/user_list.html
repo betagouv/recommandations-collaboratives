@@ -1,5 +1,4 @@
 {% extends "base.html" %}
-{% load sass_tags %}
 {% load static %}
 {% load django_vite %}
 {% load humanize %}
@@ -14,14 +13,6 @@
 {% block js %}
     {% vite_asset 'js/apps/crm.js' %}
 {% endblock js %}
-{% block css %}
-    <link href="{% sass_src 'home/css/dsfr/marianne.css' %}"
-          rel="stylesheet"
-          type="text/css">
-    <link href="{% sass_src 'projects/css/departments_selector.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-{% endblock css %}
 {% block content %}
     {% include "crm/fragments/navigation.html" with users=True %}
     <div x-data="{ breadcrumbs: { links: [{url: '{% url 'crm-site-dashboard' %}', title: 'Admin'}], current: 'Utilisateurs et utilisatrices' } }"

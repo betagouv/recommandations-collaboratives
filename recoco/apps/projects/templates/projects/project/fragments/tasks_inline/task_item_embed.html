@@ -1,12 +1,6 @@
 {% load static %}
 {% load gravatar %}
 {% load guardian_tags %}
-{% load sass_tags %}
-{% block css %}
-    <link href="{% sass_src 'projects/css/fragments/task_inline/task.scss' %}"
-          rel="stylesheet"
-          type="text/css" />
-{% endblock css %}
 {% get_obj_perms request.user for request.site as "user_site_perms" %}
 {% get_obj_perms request.user for project as "user_project_perms" %}
 <div x-data="Task({id:{{ task.id }}, public:Boolean(`{{ task.public }}`), topic:{name :`{{ task.topic }}` == `None` ? null : `{{ task.topic }}`}, intent:`{{ task.intent }}`, resource:`{{ task.resource }}`, ds_folder:`{{ task.ds_folder }}`, comments_count:Number(`{{ task.comments_count }}`), content:`{{ task.content }}`, created_by:{ email : `{{ task.created_by.email }}`, first_name: `{{ task.created_by.first_name }}`, last_name: `{{ task.created_by.last_name }}`, is_active: Boolean(`{{ task.created_by.is_active }}`), profile : {organization: { name: `{{ task.created_by.profile.organization.name }}` }}}  })"
@@ -42,7 +36,6 @@
         <template x-if="currentTask.resource">
             <article>{% include "projects/project/fragments/task/task_comment.html" %}</article>
         </template>
-
         <!-- DS integration -->
         <hr class="fr-mt-3w">
         {% if task.ds_folder and task.ds_folder.prefilled_count > 0 %}
@@ -66,12 +59,9 @@
                 <a class="fr-btn fr-btn--secondary fr-btn--sm"
                    @click.stop=""
                    href="{{ task.ds_folder.dossier_url }}"
-                   target="_blank">Aller sur Demarches-simplifiees.fr
-                </a>
+                   target="_blank">Aller sur Demarches-simplifiees.fr</a>
             </div>
         {% endif %}
-
         <hr class="fr-mt-3w">
-
     </div>
 </div>

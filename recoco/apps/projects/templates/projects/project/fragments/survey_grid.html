@@ -1,14 +1,9 @@
 {% load survey %}
 {% load static %}
-{% load sass_tags %}
 {% load django_vite %}
 {% load projects_extra %}
-{% block css %}
-    <link href="{% sass_src 'projects/css/fragments/survey_grid.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-{% endblock css %}
 {% block js %}
+    {% vite_asset 'js/styles/survey-grid.css.js' %}
     {% vite_asset 'js/apps/projectKnowledge.js' %}
 {% endblock js %}
 <div class="container-fluid knowledge">

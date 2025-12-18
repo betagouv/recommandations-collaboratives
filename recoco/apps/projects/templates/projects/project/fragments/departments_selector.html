@@ -1,13 +1,8 @@
 {% load static %}
-{% load sass_tags %}
 {% load django_vite %}
-{% block css %}
-    <link href="{% sass_src 'projects/css/departments_selector.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-{% endblock css %}
 {% block js %}
     {% vite_asset 'js/components/DepartmentsSelector.js' %}
+    {% vite_asset 'js/styles/departments-selector.css.js' %}
 {% endblock js %}
 {% comment %}
 

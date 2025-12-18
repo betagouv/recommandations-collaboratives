@@ -1,5 +1,4 @@
 {% extends "base.html" %}
-{% load sass_tags %}
 {% load static %}
 {% load django_vite %}
 {% load humanize %}
@@ -27,12 +26,6 @@
     {% vite_asset 'js/components/User.js' %}
 {% endblock js %}
 {% block css %}
-    <link href="{% sass_src 'home/css/dsfr/marianne.css' %}"
-          rel="stylesheet"
-          type="text/css">
-    <link href="{% sass_src 'crm/css/user_details.scss' %}"
-          rel="stylesheet"
-          type="text/css">
     <style>
     html, body {
         scroll-padding-top: 240px;

@@ -1,10 +1,4 @@
 {% load static %}
-{% load sass_tags %}
-{% block css %}
-    <link href="{% sass_src 'projects/css/fragments/task_inline_kanban/task_inline.scss' %}"
-          rel="stylesheet"
-          type="text/css" />
-{% endblock css %}
 <template x-if="$store.tasksData.newTasks.length > 0 && !$store.djangoData.isAdvisor">
     <div data-test-id="banner-new-tasks"
          class="fr-py-1v flag dark-blue fr-mb-2v d-flex align-items-center justify-content-start text-white small-border-radius fr-mt-3w">

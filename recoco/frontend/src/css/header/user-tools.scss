@@ -1,0 +1,93 @@
+.user-tools {
+  .dropdown-menu {
+    transform: translate3d(-60px, 0, 0);
+    &.notifications {
+      transform: none;
+      right: 0;
+      left: auto;
+      text-wrap: wrap;
+
+      span {
+        text-wrap: wrap;
+        display: inline;
+      }
+    }
+  }
+
+  &__notification-menu {
+    padding: var(--padding-navigation);
+    height: 100%;
+    border-left: solid 1px #ccc;
+    border-right: solid 1px #ccc;
+    button#notification-menu-button {
+      margin-left: var(--padding-y-navigation);
+      margin-right: var(--padding-y-navigation);
+      max-width: 4.5rem;
+      margin: 6px;
+      &::before {
+        --icon-size: 1.25rem;
+      }
+    }
+    .badge {
+      position: absolute;
+      bottom: 4px;
+      right: 6px;
+      padding: 0.1rem 0.4rem;
+      align-self: center;
+      line-height: 0.75rem;
+    }
+  }
+
+  &__main-menu-button {
+    color: var(--text-action-high-blue-france);
+    font-size: 1rem;
+    max-width: none !important;
+    &::after {
+      --icon-size: 1.5rem;
+    }
+  }
+  &__main-menu {
+    --ul-type: none;
+    z-index: 1040;
+  }
+}
+
+.fr-nav__btn:after {
+  margin-left: 0px;
+}
+
+// #display-corrected {
+//   transform: none;
+//   right: 0;
+//   left: auto;
+//   text-wrap: wrap;
+// }
+
+// #display-corrected span {
+//   text-wrap: wrap;
+//   display: inline-block;
+// }
+
+.h-64 {
+  height: 64px;
+}
+
+@media (max-width: 1200px) {
+  .user-info .dropdown-menu {
+    transform: translate3d(-130px, 0, 0);
+  }
+}
+
+/* copy drodown menu effect from dsfr */
+.user-tools__notification-menu .dropdown-menu.notifications {
+  display: block !important;
+  max-height: none;
+  clip-path: inset(0 0 100% 0);
+  pointer-events: none;
+  transition: clip-path 0.15s ease-out;
+}
+
+.user-tools__notification-menu .dropdown-menu.notifications.show {
+  clip-path: inset(0 0 0 0);
+  pointer-events: auto;
+}

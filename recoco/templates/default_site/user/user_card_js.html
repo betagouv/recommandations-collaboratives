@@ -6,12 +6,6 @@
 {% endblock js %}
 {% load guardian_tags %}
 {% load projects_extra %}
-{% load sass_tags %}
-{% block css %}
-    <link href="{% sass_src 'css/user/user_card.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-{% endblock css %}
 {% get_obj_perms request.user for request.site as "user_site_perms" %}
 {% get_obj_perms request.user for project as "user_project_perms" %}
 <template x-cloak x-if="user">

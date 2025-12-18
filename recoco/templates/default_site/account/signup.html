@@ -1,21 +1,14 @@
 {% extends "base.html" %}
-{% load sass_tags %}
 {% load static %}
 {% load i18n %}
+{% load django_vite %}
+{% block js %}
+    {% vite_asset 'js/styles/home-auth.css.js' %}
+    {% vite_asset 'js/styles/account-login.css.js' %}
+{% endblock js %}
 {% block head_title %}
     {% trans "Signup" %}
 {% endblock head_title %}
-{% block css %}
-    <link href="{% sass_src 'home/css/dsfr/custom-dsfr.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-    <link href="{% sass_src 'home/css/auth/auth.css' %}"
-          rel="stylesheet"
-          type="text/css">
-    <link href="{% sass_src 'css/account/login.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-{% endblock css %}
 {% block content %}
     <div>
         {% with request.GET.next as next_url %}

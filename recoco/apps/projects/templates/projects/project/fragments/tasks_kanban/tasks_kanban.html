@@ -1,9 +1,3 @@
-{% load sass_tags %}
-{% block css %}
-    <link href="{% sass_src 'projects/css/fragments/tasks_kanban/kanban_header.scss' %}"
-          rel="stylesheet"
-          type="text/css" />
-{% endblock css %}
 <!-- Index of tasks kanban app -->
 <div x-data="KanbanTasks({{ project.id }})"
      x-init="initTooltips(); loadCanAdministrate(); loadUserProjectPerms(); loadIsSwitchtender(); loadUserId();"

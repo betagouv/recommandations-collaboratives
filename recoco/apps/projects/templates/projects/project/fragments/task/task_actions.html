@@ -1,10 +1,4 @@
 {% load static %}
-{% load sass_tags %}
-{% block css %}
-    <link href="{% sass_src 'projects/css/fragments/task/task.scss' %}"
-          rel="stylesheet"
-          type="text/css" />
-{% endblock css %}
 <div class="d-flex align-items-center position-absolute specific-position-rt-12px">
     <template x-if="i > 0">
         <button class="fr-btn fr-btn--sm fr-btn--tertiary fr-icon-arrow-up-line fr-mr-1v fr-color--mention"

@@ -1,11 +1,9 @@
 {% load static %}
 {% load guardian_tags %}
-{% load sass_tags %}
-{% block css %}
-    <link href="{% sass_src 'projects/css/fragments/tasks_modal/modal.scss' %}"
-          rel="stylesheet"
-          type="text/css" />
-{% endblock css %}
+{% load django_vite %}
+{% block js %}
+    {% vite_asset 'js/styles/tasks-modal.css.js' %}
+{% endblock js %}
 {% get_obj_perms request.user for request.site as "user_site_perms" %}
 {% get_obj_perms request.user for project as "user_project_perms" %}
 <div x-data="PreviewModal()"
@@ -81,7 +79,6 @@
                                 <div class="fr-py-2v fr-px-2w position-sticky top-0 d-flex justify-content-between bg-white z-1 border-bottom-grey">
                                     <span class="fw-medium title-info text-dark">Commentaire du conseiller</span>
                                 </div>
-
                                 {% comment %} <div class="position-absolute d-flex justify-content-center align-items-center w-100 h-100">
                                     <div x-show="followupsIsLoading" class="fr-ml-2v specific-size">
                                         <output class="spinner-border spinner-border-sm text-primary"></output>
@@ -105,15 +102,13 @@
                                             </template>
                                             <template x-if="currentTask && taskId && currentTask?.content !== ''">
                                                 <div class="d-flex justify-content-between align-items-center specific-fontsize-09">
-                                                    <div class="d-flex flex-column">
-                                                        {% include "projects/project/fragments/task/task_user_card.html" %}
-                                                    </div>
+                                                    <div class="d-flex flex-column">{% include "projects/project/fragments/task/task_user_card.html" %}</div>
                                                 </div>
                                             </template>
                                         </div>
                                     </template>
                                     <template x-if="!currentTask?.resource_id">
-                                         <div class="rounded bg-light fr-p-2v fr-m-2w">
+                                        <div class="rounded bg-light fr-p-2v fr-m-2w">
                                             <p class="text-light-centered">Aucun commentaire</p>
                                         </div>
                                     </template>

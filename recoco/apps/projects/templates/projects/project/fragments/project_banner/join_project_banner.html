@@ -1,9 +1,7 @@
-{% load sass_tags %}
-{% block css %}
-    <link href="{% sass_src 'projects/css/fragments/project_banner/project_banner.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-{% endblock css %}
+{% load django_vite %}
+{% block js %}
+    {% vite_asset 'js/styles/project-banner.css.js' %}
+{% endblock js %}
 <div class="d-flex justify-content-center banner-container banner banner--join fr-pb-2v fr-px-3v fr-pt-2v">
     <span class="bold-text">Certains espaces sont réservés aux membres du dossier. Pour y accéder,&nbsp;</span>
     <span class="text-underline specific-hover-blue bold-text"
