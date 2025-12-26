@@ -7,7 +7,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
     dependencies = [
         ("taggit", "0005_auto_20220424_2025"),
-        ("crm", "0006_alter_note_title"),
+        ("crm", "0004_note_sticky_squashed_0006_alter_note_title"),
     ]
 
     operations = [

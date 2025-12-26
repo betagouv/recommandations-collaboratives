@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
     dependencies = [
         ("sites", "0002_alter_domain_unique"),
-        ("resources", "0021_remove_resource_public"),
+        ("resources", "0020_resource_status_squashed_0021_remove_resource_public"),
     ]
 
     operations = [

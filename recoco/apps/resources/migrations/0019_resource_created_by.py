@@ -8,7 +8,10 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ("resources", "0018_alter_resource_expires_on"),
+        (
+            "resources",
+            "0017_resource_expires_on_squashed_0018_alter_resource_expires_on",
+        ),
     ]
 
     operations = [

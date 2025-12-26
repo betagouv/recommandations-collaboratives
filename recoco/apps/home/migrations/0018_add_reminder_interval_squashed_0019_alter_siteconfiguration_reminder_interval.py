@@ -4,11 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-    replaces = [
-        ("home", "0018_add_reminder_interval"),
-        ("home", "0019_alter_siteconfiguration_reminder_interval"),
-    ]
-
     dependencies = [
         ("home", "0017_update_verbs"),
     ]

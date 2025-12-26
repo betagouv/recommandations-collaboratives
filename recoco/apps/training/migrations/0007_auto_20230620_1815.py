@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
     dependencies = [
         ("sites", "0002_alter_domain_unique"),
-        ("training", "0006_auto_20230620_1540"),
+        ("training", "0001_initial_squashed_0006_auto_20221104_1324"),
     ]
 
     operations = [
