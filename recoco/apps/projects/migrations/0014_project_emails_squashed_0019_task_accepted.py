@@ -5,15 +5,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-    replaces = [
-        ("projects", "0014_project_emails"),
-        ("projects", "0015_alter_note_project"),
-        ("projects", "0016_task_priority"),
-        ("projects", "0017_alter_task_priority"),
-        ("projects", "0018_alter_task_priority"),
-        ("projects", "0019_task_accepted"),
-    ]
-
     dependencies = [
         ("projects", "0013_auto_20210720_1232"),
     ]

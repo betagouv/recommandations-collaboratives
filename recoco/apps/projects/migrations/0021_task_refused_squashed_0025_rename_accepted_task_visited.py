@@ -5,14 +5,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-    replaces = [
-        ("projects", "0021_task_refused"),
-        ("projects", "0022_project_ro_key"),
-        ("projects", "0023_alter_project_ro_key"),
-        ("projects", "0024_alter_project_ro_key"),
-        ("projects", "0025_rename_accepted_task_visited"),
-    ]
-
     dependencies = [
         ("projects", "0020_task_created_by"),
     ]
