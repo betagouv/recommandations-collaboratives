@@ -18,7 +18,7 @@ from ..mcp import ProjectQueryTool
 @pytest.mark.django_db
 @pytest.mark.asyncio
 def test_get_project(client, project):
-    baker.make(survey_models.Session, project=project)
+    survey_session = baker.make(survey_models.Session, project=project)
 
     tool = ProjectQueryTool()
     result = tool.get_project(id=project.pk)
@@ -31,7 +31,9 @@ def test_get_project(client, project):
         "name": project.name,
         "description": project.description,
         "commune": None,
-        "survey_session": [],
+        "survey_session": [
+            {"id": survey_session.pk, "survey": survey_session.survey.pk, "answers": []}
+        ],
     }
 
     assert ret == expected
