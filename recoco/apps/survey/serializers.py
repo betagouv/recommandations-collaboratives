@@ -2,7 +2,7 @@ from rest_framework import serializers
 
 from recoco.apps.home.serializers import UserSerializer
 
-from .models import Answer, Choice, Question, Session
+from .models import Answer, Choice, Question, QuestionSet, Session, Survey
 
 
 class ChoiceSerializer(serializers.ModelSerializer):
@@ -82,13 +82,31 @@ class AnswerSummarySerializer(serializers.ModelSerializer):
         ]
 
 
+class QuestionWithAnswerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Question
+        fields = ["text"]
+
+
+class QuestionSetSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = QuestionSet
+        fields = ["questions"]
+
+    questions = QuestionWithAnswerSerializer(many=True)
+
+
+class SurveyWithQSSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Survey
+        fields = ["question_sets"]
+
+    question_sets = QuestionSetSerializer(many=True)
+
+
 class FullSessionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Session
-        fields = [
-            "id",
-            "survey",
-            "answers",
-        ]
+        fields = ["id", "survey"]
 
-    answers = AnswerSummarySerializer(many=True)
+    survey = SurveyWithQSSerializer()
