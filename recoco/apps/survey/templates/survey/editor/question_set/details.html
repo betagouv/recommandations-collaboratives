@@ -1,11 +1,5 @@
 {% extends "base.html" %}
 {% load static %}
-{% load sass_tags %}
-{% block css %}
-    <link href="{% sass_src 'survey/css/editor/question_set.scss' %}"
-          rel="stylesheet"
-          type="text/css" />
-{% endblock css %}
 {% block title %}
     Groupe de questions {{ question_set.survey.name }}
 {% endblock title %}

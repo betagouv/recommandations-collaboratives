@@ -2,12 +2,6 @@
 {% load static %}
 {% load gravatar %}
 {% load activity_tags %}
-{% load sass_tags %}
-{% block css %}
-    <link href="{% sass_src 'projects/css/fragments/timeline/timeline.scss' %}"
-          rel="stylesheet"
-          type="text/css" />
-{% endblock css %}
 {% activity_stream "target" project %}
 <div class="fr-pt-3w fr-pr-3w w-100 h-100 fr-mb-6w"
      data-test-id="project-activity-tracking-observer">

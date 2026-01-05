@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% load gravatar %}
-{% load sass_tags %}
+{% load django_vite %}
 {% load cookie_consent_tags %}
 {% load static %}
 {% block title %}
@@ -9,17 +9,10 @@
 {% block og_title %}
     Politique de confidentialité
 {% endblock og_title %}
-{% block css %}
-    <link href="{% sass_src 'home/css/home/home.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-    <link href="{% sass_src 'home/css/dsfr/custom-dsfr.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-    <link href="{% sass_src 'home/css/privacy/privacy.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-{% endblock css %}
+{% block js %}
+    {% vite_asset 'js/styles/home-privacy.css.js' %}
+    {% vite_asset 'js/styles/home.css.js' %}
+{% endblock js %}
 {% block content %}
     <div class="col-8 fr-mt-3w fr-py-2w g-0 fr-mx-auto font-marianne">
         <h2>Politique de confidentialité de {{ request.site.name }}</h2>

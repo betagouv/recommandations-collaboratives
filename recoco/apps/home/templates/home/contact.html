@@ -1,20 +1,11 @@
 {% extends "base.html" %}
 {% load static %}
-{% load sass_tags %}
 {% block title %}
     Nous contacter
 {% endblock title %}
 {% block og_title %}
     Nous contacter
 {% endblock og_title %}
-{% block css %}
-    <link href="{% sass_src 'home/css/dsfr/custom-dsfr.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-    <link href="{% sass_src 'home/css/contact/contact.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-{% endblock css %}
 {% block content %}
     <div class="col-9 fr-py-6w fr-mx-auto">
         <h2 class="fr-mb-2w">

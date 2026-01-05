@@ -12,13 +12,11 @@ Example usage in parent:
 </div>
 
 {% endcomment %}
-{% load sass_tags %}
 {% load static %}
-{% block css %}
-    <link href="{% sass_src 'css/tools/contact/contact-card.scss' %}"
-          rel="stylesheet"
-          type="text/css" />
-{% endblock css %}
+{% load django_vite %}
+{% block js %}
+    {% vite_asset 'js/styles/contact-card.css.js' %}
+{% endblock js %}
 <div>
     <template x-if="typeof contact !== 'undefined' && contact">
         <div class="contact-card-light fr-p-3v bg-white">

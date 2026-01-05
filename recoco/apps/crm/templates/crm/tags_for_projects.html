@@ -3,16 +3,15 @@
 {% load static %}
 {% load humanize %}
 {% load crm_tags %}
-{% block title %}Utilisation des tags sur les dossiers - CRM{% endblock %}
-{% block og_title %}Utilisation des tags sur les dossiers - CRM{% endblock %}
-{% load sass_tags %}
-{% block css %}
-    <link href="{% sass_src 'crm/css/tags.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-{% endblock css %}
+{% block title %}
+    Utilisation des tags sur les dossiers - CRM
+{% endblock title %}
+{% block og_title %}
+    Utilisation des tags sur les dossiers - CRM
+{% endblock og_title %}
 {% block js %}
     {% vite_asset 'js/apps/crm.js' %}
+    {% comment %} TODO retravailler cette partie pour intégrer les scripts de d3 et nv.d3 à un component Alpine {% endcomment %}
     <script src="{% static "/js/d3.min.js" %}"></script>
     <script src="{% static "/js/nv.d3.min.js" %}"></script>
     <!-- Charts -->
