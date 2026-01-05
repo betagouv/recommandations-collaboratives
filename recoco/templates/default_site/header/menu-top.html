@@ -1,17 +1,9 @@
 {% load static %}
 {% load gravatar %}
-{% load sass_tags %}
-{% block css %}
-    <link href="{% sass_src 'home/css/dsfr/marianne.css' %}"
-          rel="stylesheet"
-          type="text/css">
-    <link href="{% sass_src 'css/menu-top.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-    <link href="{% sass_src 'css/header/header.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-{% endblock css %}
+{% load django_vite %}
+{% block js %}
+    {% vite_asset 'js/styles/menu-top.css.js' %}
+{% endblock js %}
 {% load projects_extra %}
 {% url 'home' as home_url %}
 {% if user.is_authenticated %}
@@ -28,9 +20,9 @@
             </div>
         </div>
         {% if request.path == home_url %}
-            <div class="fr-header__menu fr-modal w-100"
-                id="modal-header"
-                aria-labelledby="button-header">
+            <div class="fr-header__menu fr-modal w-100 z-1"
+                 id="modal-header"
+                 aria-labelledby="button-header">
                 <div class="fr-container">
                     <button aria-controls="modal-header"
                             title="Fermer"

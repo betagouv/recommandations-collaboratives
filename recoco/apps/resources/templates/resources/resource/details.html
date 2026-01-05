@@ -3,7 +3,7 @@
 {% load humanize %}
 {% load gravatar %}
 {% load guardian_tags %}
-{% load sass_tags %}
+{% load django_vite %}
 {% block title %}
     {{ resource.title }}
 {% endblock title %}
@@ -16,10 +16,10 @@
 {% block og_description %}
     {{ resource.subtitle }}
 {% endblock og_description %}
+{% block js %}
+    {% vite_asset 'js/styles/resources.css.js' %}
+{% endblock js %}
 {% block css %}
-    <link href="{% sass_src 'resources/resources.scss' %}"
-          rel="stylesheet"
-          type="text/css">
     <style type="text/css">
     html, body {
         scroll-padding-top: 80px;

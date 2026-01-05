@@ -1,15 +1,10 @@
 {% load static %}
-{% load sass_tags %}
 {% load guardian_tags %}
 {% load waffle_tags %}
 {% load projects_extra %}
 {% load django_vite %}
-{% block css %}
-    <link href="{% sass_src 'home/css/dsfr/marianne.css' %}"
-          rel="stylesheet"
-          type="text/css">
-{% endblock css %}
 {% block js %}
+    {% vite_asset 'js/styles/marianne.css.js' %}
     {% vite_asset 'js/apps/CRM/crmNavigation.js' %}
 {% endblock js %}
 <div class="crm-navigation d-flex justify-content-between">

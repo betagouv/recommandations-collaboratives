@@ -2,21 +2,12 @@
 {% load django_vite %}
 {% load static %}
 {% load i18n %}
-{% load sass_tags %}
 {% load crispy_forms_tags %}
 {% load crispy_forms_field %}
 {% block js %}
     {% vite_asset 'js/apps/onboarding.js' %}
     {% vite_asset 'js/apps/auth.js' %}
 {% endblock js %}
-{% block css %}
-    <link href="{% sass_src 'home/css/dsfr/custom-dsfr.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-    <link href="{% sass_src 'onboarding/css/signin.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-{% endblock css %}
 {% block title %}
     Connexion | Solliciter l'équipe {{ request.site.name }}
 {% endblock title %}

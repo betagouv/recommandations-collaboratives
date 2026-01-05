@@ -213,7 +213,7 @@ dev = [
     "graphviz==0.20.1",
     "ipykernel==6.20.1",
     "ipython>=8.32.0",
-    "jupyter==1.0.0",
+    "jupyter==1.1.1",
     "jupytext==1.16.1",
     "model-bakery==1.20.4",
     "notebook==6.4.12",
@@ -240,6 +240,7 @@ dev = [
     "sphinx-toolbox>=3.8.2",
     "sphinxcontrib-django>=2.5",
     "sphinxcontrib-django-urls>=0.3",
+    "uv>=0.9.6",
 ]
 
 

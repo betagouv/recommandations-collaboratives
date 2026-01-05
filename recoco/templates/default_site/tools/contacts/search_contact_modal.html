@@ -1,10 +1,8 @@
 {% load static %}
-{% load sass_tags %}
-{% block css %}
-    <link href="{% sass_src 'css/tools/contact/search-contact-modal.scss' %}"
-          rel="stylesheet"
-          type="text/css" />
-{% endblock css %}
+{% load django_vite %}
+{% block js %}
+    {% vite_asset 'js/styles/contact-search-contact-modal.css.js' %}
+{% endblock js %}
 <template x-if="isSearchContactModalOpen">
     <div x-data="SearchContactModal"
          @modal-response="closeCreateContactModal($event)"
