@@ -74,6 +74,9 @@
         max-height: 70vh;
         width: 25rem;
         overflow-y: auto;
+        &__container.fr-menu {
+          top: calc(100% - 56px);
+        }
         & > li {
           border: none;
           --padding-y-item: none;
@@ -194,7 +197,9 @@
     overflow-y: auto;
     visibility: hidden;
     background-color: #343a40;
-    transition: transform 0.3s ease-in-out, visibility 0.3s ease-in-out;
+    transition:
+      transform 0.3s ease-in-out,
+      visibility 0.3s ease-in-out;
   }
 
   .offcanvas-collapse.open {
