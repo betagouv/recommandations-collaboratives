@@ -1,11 +1,5 @@
 {% load static %}
 {% load projects_extra %}
-{% load sass_tags %}
-{% block css %}
-    <link href="{% sass_src 'resources/widget/card.scss' %}"
-          rel="stylesheet"
-          type="text/css" />
-{% endblock css %}
 {% is_staff_for_current_site request.user as is_staff %}
 <!-- Card -->
 <div class="card-resource card h-100 specific-minheight-300">

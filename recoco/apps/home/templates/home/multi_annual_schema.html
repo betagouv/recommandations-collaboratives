@@ -1,6 +1,6 @@
 <!-- prettier-ignore -->
 {% extends "base.html" %}
-{% load sass_tags %}
+{% load django_vite %}
 {% load static %}
 {% block title %}
     Déclaration d'accessibilité
@@ -8,11 +8,9 @@
 {% block og_title %}
     Déclaration d'accessibilité
 {% endblock og_title %}
-{% block css %}
-    <link href="{% sass_src 'home/css/home/home.scss' %}"
-          rel="stylesheet"
-          type="text/css" />
-{% endblock css %}
+{% block js %}
+    {% vite_asset 'js/styles/home.css.js' %}
+{% endblock js %}
 <!-- prettier-ignore -->
 {% block content %}
     <div class="col-8 fr-py-2w g-0 fr-mx-auto">
