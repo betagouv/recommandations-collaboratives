@@ -359,13 +359,13 @@ class TaskRecommendation(models.Model):
         blank=True,
         verbose_name="Départements concernés",
     )
-    condition_tags_taggit = TaggableManager(blank=True)
+    condition_tags = TaggableManager(blank=True)
 
     def trigged_by(self):
         from recoco.apps.survey import models as survey_models
 
         triggers = {}
-        for tag in self.condition_tags_taggit.all():
+        for tag in self.condition_tags.all():
             triggers[tag] = TaggedItem.objects.get_by_model(
                 survey_models.Choice.objects.prefetch_related(
                     "question__question_set"
@@ -379,7 +379,7 @@ class TaskRecommendation(models.Model):
         return f"{self.resource.title} - {self.text}"
 
 
-tagging_register(TaskRecommendation, tag_descriptor_attr="condition_tags")
+tagging_register(TaskRecommendation, tag_descriptor_attr="condition_tags_tagging")
 
 
 ########################################################################
