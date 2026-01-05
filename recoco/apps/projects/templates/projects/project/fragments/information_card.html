@@ -1,12 +1,10 @@
 {% load static %}
 {% load gravatar %}
 {% load guardian_tags %}
-{% load sass_tags %}
-{% block css %}
-    <link href="{% sass_src 'projects/css/card_info.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-{% endblock css %}
+{% load django_vite %}
+{% block js %}
+    {% vite_asset 'js/styles/projects-card-info.css.js' %}
+{% endblock js %}
 {% get_obj_perms request.user for request.site as "user_site_perms" %}
 {% get_obj_perms request.user for project as "user_project_perms" %}
 <div class="{% if padding_end is True %}pe-4{% endif %} {% if padding_top is True %}pt-4{% endif %}  {% if full_width %}w-100{% else %}w-50{% endif %} {% if full_height %}h-100{% endif %}"

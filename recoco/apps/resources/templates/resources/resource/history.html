@@ -3,7 +3,6 @@
 {% load humanize %}
 {% load gravatar %}
 {% load guardian_tags %}
-{% load sass_tags %}
 {% block title %}
     {{ resource.title }}
 {% endblock title %}
@@ -17,9 +16,6 @@
     {{ resource.subtitle }}
 {% endblock og_description %}
 {% block css %}
-    <link href="{% sass_src 'home/css/dsfr/custom-dsfr.scss' %}"
-          rel="stylesheet"
-          type="text/css">
     <style type="text/css">
  /* minimal style for the diffs */
  pre.highlight {

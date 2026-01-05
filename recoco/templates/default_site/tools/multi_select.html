@@ -9,12 +9,10 @@
     Event to listen in parent component:
         - multi-select-change: when the selected options change, the event is triggered with the selected options
 {% endcomment %}
-{% load sass_tags %}
-{% block css %}
-    <link href="{% sass_src 'css/tools/multi-select.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-{% endblock css %}
+{% load django_vite %}
+{% block js %}
+    {% vite_asset 'js/styles/multi-select.css.js' %}
+{% endblock js %}
 <div class="w-100 multi-select"
      x-data="MultiSelect2({elementId:'multiSelect2', options: options})">
     <select class="d-none" id="multiSelect2">

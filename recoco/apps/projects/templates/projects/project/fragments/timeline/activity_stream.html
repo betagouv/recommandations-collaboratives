@@ -2,12 +2,6 @@
 {% load static %}
 {% load gravatar %}
 {% load activity_tags %}
-{% load sass_tags %}
-{% block css %}
-    <link href="{% sass_src 'projects/css/fragments/timeline/timeline.scss' %}"
-          rel="stylesheet"
-          type="text/css" />
-{% endblock css %}
 {% activity_stream "target" project %}
 {% regroup stream by timestamp.date as stream_by_day %}
 <ul class="list-group">

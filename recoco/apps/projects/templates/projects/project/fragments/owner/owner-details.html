@@ -1,16 +1,10 @@
 {% load static %}
 {% load django_vite %}
-{% load sass_tags %}
 {% load projects_extra %}
 {% block js %}
     {% vite_asset 'js/components/ClickToSeeUser.js' %}
     {% vite_asset 'js/components/User.js' %}
 {% endblock js %}
-{% block css %}
-    <link href="{% sass_src 'projects/css/fragments/owner/owner-details.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-{% endblock css %}
 {% load phone_filters %}
 {{ users_to_display|json_script:"usersToDisplay" }}
 <div x-data='ClickToSeeUser({{ project.owner.id }}, {{ request.user.id }}, "{{ is_staff }}" == "True", {{ project.id }}, JSON.parse(document.getElementById("usersToDisplay").textContent))'>
