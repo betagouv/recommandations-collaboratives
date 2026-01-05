@@ -460,7 +460,9 @@ def presuggest_task(request, project_id):
             ):
                 continue
 
-        reco_tags = set(recommandation.condition_tags.values_list("name", flat=True))
+        reco_tags = set(
+            recommandation.condition_tags_taggit.values_list("name", flat=True)
+        )
         if reco_tags.issubset(signals):
             tasks.append(
                 models.Task(
