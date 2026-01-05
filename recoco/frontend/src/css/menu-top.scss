@@ -75,7 +75,7 @@
         width: 25rem;
         overflow-y: auto;
         &__container.fr-menu {
-          top: calc(100% - 56px);
+          top: auto;
         }
         & > li {
           border: none;
