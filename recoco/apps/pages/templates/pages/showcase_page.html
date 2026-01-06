@@ -1,17 +1,10 @@
 {% extends "base.html" %}
 {% load wagtailcore_tags wagtailimages_tags %}
-{% load sass_tags %}
-{% block css %}
-    <link href="{% sass_src 'home/css/home/home.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-    <link href="{% sass_src 'home/css/dsfr/custom-dsfr.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-    <link href="{% sass_src 'home/css/cms/page-showcase.css' %}"
-          rel="stylesheet"
-          type="text/css">
-{% endblock css %}
+{% load django_vite %}
+{% block js %}
+    {% vite_asset 'js/styles/home-cms-page-showcase.css.js' %}
+    {% vite_asset 'js/styles/home.css.js' %}
+{% endblock js %}
 {% block title %}
     {{ page.title }}
 {% endblock title %}

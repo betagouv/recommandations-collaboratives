@@ -61,7 +61,7 @@
                         </template>
                     {% endif %}
                 </button>
-                <div class="fr-collapse fr-menu" id="project_list">
+                <div class="fr-collapse fr-menu list-project__container" id="project_list">
                     <ul x-data="{search:''}"class="fr-menu__list list-project">
                         {% comment %} <li class="list-project__search-container">
                                 <input type="search" class="fr-input" placeholder="Rechercher votre dossier" @input.debounce.400ms="onSearch()" x-model="search">

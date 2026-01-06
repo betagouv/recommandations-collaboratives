@@ -1,5 +1,4 @@
 {% load static %}
-{% load sass_tags %}
 {% load django_vite %}
 {% load cookie_consent_tags %}
 {% load cache %}
@@ -21,12 +20,8 @@
     {% endcache %}
     {% include "seo.html" %}
     {% include "matomo.html" %}
-    <link href="{% sass_src 'css/base.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-    <link href="{% sass_src 'css/markdownx.scss' %}"
-          rel="stylesheet"
-          type="text/css">
+    {% vite_asset 'js/styles/base.css.js' %}
+    {% vite_asset 'js/styles/markdownx.css.js' %}
     <!-- Extra CSS -->
     {% block css %}
     {% endblock css %}
@@ -93,7 +88,7 @@
                 </div>
             {% endif %}
             <div class="container-fluid bg-white" id="content">
-                <div class="row background--grey-light">
+                <div class="row">
                     {% block content %}
                     {% endblock content %}
                 </div>

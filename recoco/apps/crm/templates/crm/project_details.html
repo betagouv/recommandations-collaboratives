@@ -1,5 +1,4 @@
 {% extends "base.html" %}
-{% load sass_tags %}
 {% load static %}
 {% load django_vite %}
 {% block title %}
@@ -11,11 +10,6 @@
 {% block js %}
     {% vite_asset 'js/apps/crm.js' %}
 {% endblock js %}
-{% block css %}
-    <link href="{% sass_src 'home/css/dsfr/marianne.css' %}"
-          rel="stylesheet"
-          type="text/css" />
-{% endblock css %}
 {% block content %}
     <div x-data="Crm" class="d-flex fr-px-0 crm-font">
         {% include "crm/fragments/sidebar.html" with search=True back_button=True project_advisors=True project_members=True %}

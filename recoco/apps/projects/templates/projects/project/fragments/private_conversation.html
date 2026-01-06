@@ -1,14 +1,8 @@
 {% load static %}
 {% load humanize %}
 {% load gravatar %}
-{% load sass_tags %}
-{% block css %}
-    <link href="{% sass_src 'projects/css/private_conversation.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-{% endblock css %}
 {% regroup project.notes.private by created_on.date as notes_by_day %}
-<div class="message-window flex-grow-1 d-flex flex-column-reverse scroll-gestion">
+<div class="message-window flex-grow-1 d-flex flex-column-reverse overflow-y-auto-x-hidden">
     <ul class="list-unstyled list-group">
         {% for date, notes in notes_by_day|slice:":20" %}
             <li class="list-group-item border-0 fr-m-0 fr-p-0">
