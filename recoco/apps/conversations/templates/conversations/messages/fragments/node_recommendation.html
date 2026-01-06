@@ -23,10 +23,16 @@ Parameter Alpine:
                     <a :href="recommendation?.resource?.web_url"
                        class="stretched-link"
                        target="_blank"
-                       @click="await onClickRessourceConsummeNotification(recommendation.id)">
+                       :title="`ouvrir la fiche ressource - nouvel onglet`"
+                       @click="await onClickRessourceConsummeNotification(recommendation, element)">
                         <div>
                             <p x-html="renderMarkdown(recommendation.content)"></p>
-                            <div class="task-item__resource">
+                            <div class="task-item__resource"
+                                 :class="{'task-item__resource--bordered': !recommendation.visited}">
+                                <template x-if="!recommendation.visited">
+                                    <span class="badge text-white task-item__resource-badge"
+                                          x-text="!$store.djangoData.isAdvisor ? 'Nouveau' : 'Non lu par le demandeur' "></span>
+                                </template>
                                 <template x-if="recommendation.topic">
                                     <div class="task-item__topic"
                                          :style="{ '--color-topic': stringToColor(recommendation.topic?.name) }">
@@ -45,7 +51,12 @@ Parameter Alpine:
                                     <p class="task-item__resource-subtitle fr-mt-1w fr-mb-0"
                                        x-text="recommendation.resource.subtitle"></p>
                                 </template>
-                                {% include "conversations/messages/fragments/tasks_status_buttons_js.html" %}
+                                <div class="d-flex justify-content-between">
+                                    {% include "conversations/messages/fragments/tasks_status_buttons_js.html" %}
+                                    <template x-if="recommendation.resource">
+                                        <button class="fr-btn fr-btn--sm fr-btn--primary fr-mt-1w">Consulter</button>
+                                    </template>
+                                </div>
                             </div>
                         </div>
                     </a>

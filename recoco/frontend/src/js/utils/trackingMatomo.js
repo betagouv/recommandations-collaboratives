@@ -4,7 +4,8 @@ const generateTrackEvent = (
   name,
   path = window.location.pathname
 ) => {
-  _paq.push(['trackEvent', event, action, name, path]);
+  if (window._paq === undefined) return;
+  window._paq.push(['trackEvent', event, action, name, path]);
 };
 export const trackClickOnRecoLink = () => {
   generateTrackEvent('Click', 'reco-shortcut-link');

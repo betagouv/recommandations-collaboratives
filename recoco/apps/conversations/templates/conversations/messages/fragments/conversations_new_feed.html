@@ -17,7 +17,7 @@
                     <div class="notification-limit" x-ref="scrollLine_general">
                         <div class="notification-limit__line"></div>
                         <p class="notification-limit__message-number fr-mx-2w">
-                            <span x-text='feed.elements.length - index'></span> <span x-text='feed.elements.length - index > 1 ? "éléments non lus" : "élément non lu" '></span>
+                            <span x-text='getCountOfNewItemsLabel()'></span>
                         </p>
                         <div class="notification-limit__line"></div>
                     </div>
