@@ -472,6 +472,7 @@ class EditResourceForm(forms.ModelForm):
         ),
         required=False,
     )
+    support_orga = forms.CharField(label="Structure porteuse", required=False)
 
     class Meta:
         model = models.Resource
@@ -484,6 +485,7 @@ class EditResourceForm(forms.ModelForm):
             "category",
             "departments",
             "content",
+            "support_orga",
             "contacts",
             "expires_on",
         ]
