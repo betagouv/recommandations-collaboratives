@@ -249,6 +249,8 @@ class Resource(CloneMixin, models.Model):
         verbose_name="Départements concernés",
     )
 
+    support_orga = models.CharField(max_length=256, default="", blank=True)
+
     def content_rendered(self):
         """Return content as markdown"""
         return markdownify(self.content)
