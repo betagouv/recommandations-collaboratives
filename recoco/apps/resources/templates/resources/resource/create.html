@@ -1,9 +1,7 @@
 {% extends "base.html" %}
-{% load static %}
-{% load humanize %}
 {% load django_vite %}
 {% block js %}
-    {% vite_asset 'js/styles/resources.css.js' %}
+    {% vite_asset 'js/styles/create-resources.css.js' %}
 {% endblock js %}
 {% block title %}
     Créer une nouvelle fiche-ressource {{ block.super }}
@@ -18,5 +16,26 @@
     <div x-data="{ breadcrumbs: { links: [{url: '{% url 'crm-site-dashboard' %}', title: 'Admin'}, {url: '{% url 'resources-resource-search' %}', title: 'Ressources'}], current: 'Création de fiche ressource' } }"
          class="fr-p-0">{% include "tools/breadcrumb.html" %}</div>
     <!-- Form -->
-    <!--  -->
+    <div class="fr-container--fluid create-resources">
+        <div class="fr-grid-row">
+            <!-- Column 1 -->
+            <div class="fr-col-8 fr-col-md-12 fr-col-sm-12">
+                <h2 class="create-resources__title">Création de fiche ressource</h2>
+                <!-- Title -->
+                <!-- Subtitle -->
+                <!-- Summary -->
+                <!-- Content with tiptap editor -->
+            </div>
+            <!-- Column 2 -->
+            <div class="fr-col-4 fr-col-md-12 fr-col-sm-12 ">
+                <!-- Status select -->
+                <!-- Category select -->
+                <!-- Keywords multi-select -->
+                <!-- Carrier structure -->
+                <!-- Departments/regions multiple select -->
+                <!-- Expires on date picker -->
+                <!-- Contacts component (multiple) -->
+            </div>
+        </div>
+    </div>
 {% endblock content %}

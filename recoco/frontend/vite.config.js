@@ -203,6 +203,9 @@ const config = {
           './src/js/styles/projects-onboarding-tutorial.css.js'
         ),
         marianneStyles: resolve('./src/js/styles/marianne.css.js'),
+        createResourcesStyles: resolve(
+          './src/js/styles/resources/create-resources.css.js'
+        ),
       },
       output: {
         chunkFileNames: undefined,
