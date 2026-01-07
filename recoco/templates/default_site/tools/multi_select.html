@@ -3,7 +3,7 @@
     Multi select component
 
     Parameters:
-        - options: The options to select from.
+        - options: The options to select from (array of objects with value, text, search, selected, color, dataTestId).
         - selected: The selected options.
 
     Event to listen in parent component:
@@ -12,6 +12,7 @@
 {% load django_vite %}
 {% block js %}
     {% vite_asset 'js/styles/multi-select.css.js' %}
+    {% vite_asset 'js/components/MultiSelect2.js' %}
 {% endblock js %}
 <div class="w-100 multi-select"
      x-data="MultiSelect2({elementId:'multiSelect2', options: options})">
