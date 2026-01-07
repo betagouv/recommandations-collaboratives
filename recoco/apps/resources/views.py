@@ -409,6 +409,10 @@ def resource_create(request):
     """
     has_perm_or_403(request.user, "sites.manage_resources", request.site)
 
+    categories = list(
+        models.Category.on_site.values("id", "name", "color", "icon").order_by("name")
+    )
+
     if request.method == "POST":
         form = EditResourceForm(request.POST)
         if form.is_valid():
@@ -425,7 +429,13 @@ def resource_create(request):
             return redirect(next_url)
     else:
         form = EditResourceForm()
-    return render(request, "resources/resource/create.html", locals())
+    return render(
+        request,
+        "resources/resource/create.html",
+        {
+            "categories": categories,
+        },
+    )
 
 
 class EditResourceForm(forms.ModelForm):

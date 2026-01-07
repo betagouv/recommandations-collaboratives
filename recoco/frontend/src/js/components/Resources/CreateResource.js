@@ -9,7 +9,9 @@ Alpine.data('CreateResource', () => {
       title: '',
       subtitle: '',
       summary: '',
-      content: '',
+      content: {
+        text: '',
+      },
       status: 'DRAFT',
       category: '',
       keywords: [],
@@ -58,6 +60,10 @@ Alpine.data('CreateResource', () => {
         { id: 2, text: 'Économie', value: 'economie', search: 'economie' },
         { id: 3, text: 'Social', value: 'social', search: 'social' },
       ];
+    },
+    onSubmit(event) {
+      event.preventDefault();
+      console.log(this.newRessourcePayload);
     },
   };
 });

@@ -11,6 +11,7 @@
     Créer une nouvelle fiche-ressource {{ block.super }}
 {% endblock og_title %}
 {% block content %}
+    {{ categories|json_script:"categoriesArray" }}
     <!-- Admin navigation -->
     {% include "crm/fragments/navigation.html" with resources=True %}
     <!-- Breadcrumb -->
@@ -19,11 +20,13 @@
     <!-- Form -->
     <div x-data="CreateResource()"
          class="fr-container--fluid create-resources">
-         <div class="d-flex justify-content-between">
+        <div class="d-flex justify-content-between">
             <h2 class="create-resources__title text-modal-main-msg">Création de fiche ressource</h2>
             <div>
                 <button role="button" class="fr-btn fr-btn--tertiary fr-btn--sm fr-mr-1w">Prévisualiser</button>
-                <button role="submit" class="fr-btn fr-btn--primary fr-btn--sm fr-mr-1w">Sauvegarder</button>
+                <button role="submit"
+                        class="fr-btn fr-btn--primary fr-btn--sm fr-mr-1w"
+                        @click="onSubmit">Sauvegarder</button>
             </div>
         </div>
         <div class="fr-grid-row">
@@ -32,7 +35,12 @@
                 <!-- Title -->
                 <div class="fr-input-group">
                     <label class="fr-label text-modal-main-msg" for="id_title">Titre</label>
-                    <input type="text" name="title" class="fr-input" id="id_title" required>
+                    <input type="text"
+                           name="title"
+                           class="fr-input"
+                           id="id_title"
+                           required
+                           x-model="newRessourcePayload.title">
                 </div>
                 <!-- Subtitle -->
                 <div class="fr-input-group">
@@ -41,17 +49,23 @@
                            name="subtitle"
                            class="fr-input"
                            id="id_subtitle"
-                           required>
+                           required
+                           x-model="newRessourcePayload.subtitle">
                 </div>
                 <!-- Summary -->
                 <div class="fr-input-group">
                     <label class="fr-label text-modal-main-msg" for="id_summary">Résumé</label>
-                    <input type="text" name="summary" class="fr-input" id="id_summary" required>
+                    <input type="text"
+                           name="summary"
+                           class="fr-input"
+                           id="id_summary"
+                           required
+                           x-model="newRessourcePayload.summary">
                 </div>
                 <!-- Content with tiptap editor -->
                 <div class="fr-input-group">
                     <label class="fr-label text-modal-main-msg" for="id_content">Contenu</label>
-                    {% include "tools/editor.html" with model="message" input_name=posting_form.content.name initial_content=""  input_required=True can_add_reco=False can_attach_files=False can_attach_contact=False show_send_button=False can_compress_editor=False %}
+                    {% include "tools/editor.html" with model="newRessourcePayload.content" input_name="content" initial_content="" input_required=True can_add_reco=False can_attach_files=False can_attach_contact=False show_send_button=False can_compress_editor=False %}
                 </div>
             </div>
             <!-- Column 2 -->
@@ -62,22 +76,25 @@
                     <div class="d-flex">
                         <button type="button"
                                 class="fr-btn w-50 justify-content-center"
-                                :class="!is_draft ? 'fr-btn--secondary' : ''"
-                                @click="is_draft = true">Brouillon</button>
+                                :class="newRessourcePayload.status !== 'DRAFT' ? 'fr-btn--secondary' : ''"
+                                @click="newRessourcePayload.status = 'DRAFT'">Brouillon</button>
                         <button type="button"
                                 class="fr-btn w-50 justify-content-center"
-                                :class="is_draft ? 'fr-btn--secondary' : ''"
-                                @click="is_draft = false">Publié</button>
-                        </div>
+                                :class="newRessourcePayload.status !== 'PUBLISHED' ? 'fr-btn--secondary' : ''"
+                                @click="newRessourcePayload.status = 'PUBLISHED'">Publié</button>
+                    </div>
                 </div>
                 <!-- Category select -->
                 <div class="fr-input-group">
                     <label class="fr-label text-modal-main-msg" for="id_category">Catégorie</label>
-                    <select name="category" id="id_category" class="fr-select" required>
-                        <option value="" selected disabled>-- Sélectionner une catégorie --</option>
-                        <option value="cat1">Catégorie à fetch 1</option>
-                        <option value="cat2">Catégorie à fetch 2</option>
-                        <option value="cat3">Catégorie à fetch 3</option>
+                    <select name="category"
+                            id="id_category"
+                            class="fr-select"
+                            required
+                            valueAsNumber
+                            x-model="newRessourcePayload.category">
+                        <option value="" selected disabled>Sélectionner une catégorie</option>
+                        {% for category in categories %}<option value="{{ category.id }}">{{ category.name }}</option>{% endfor %}
                     </select>
                 </div>
                 <!-- Keywords multi-select -->
@@ -88,7 +105,11 @@
                 <!-- Carrier structure -->
                 <div class="fr-input-group">
                     <label class="fr-label text-modal-main-msg" for="id_carrier_structure">Structure porteuse</label>
-                    <input type="text" name="carrier_structure" class="fr-input" id="id_carrier_structure" required >
+                    <input type="text"
+                           name="carrier_structure"
+                           class="fr-input"
+                           id="id_carrier_structure"
+                           required>
                 </div>
                 <!-- Departments/regions multiple select -->
                 <div class="fr-input-group">
@@ -100,7 +121,11 @@
                 <!-- Expires on date picker -->
                 <div class="fr-input-group">
                     <label class="fr-label text-modal-main-msg" for="id_expires_on">Date d'expiration</label>
-                    <input type="date" name="expires_on" class="fr-input" id="id_expires_on" required>
+                    <input type="date"
+                           name="expires_on"
+                           class="fr-input"
+                           id="id_expires_on"
+                           required>
                 </div>
                 <!-- Contacts component (multiple) -->
                 <div class="fr-input-group">
