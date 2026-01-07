@@ -3,6 +3,8 @@
 {% block js %}
     {% vite_asset 'js/styles/create-resources.css.js' %}
     {% vite_asset 'js/components/Resources/CreateResource.js' %}
+    {% vite_asset 'js/components/MultiSelectRegionDepartment.js' %}
+    {% vite_asset 'js/components/RegionDepartmentPreparer.js' %}
 {% endblock js %}
 {% block title %}
     Créer une nouvelle fiche-ressource {{ block.super }}
@@ -91,11 +93,18 @@
                     <input type="text" name="carrier_structure" class="fr-input" id="id_carrier_structure" required >
                 </div>
                 <!-- Departments/regions multiple select -->
-                <div class="fr-input-group">
-                    <label class="fr-label text-modal-main-msg" for="id_departments">Départements/Régions</label>
-                    <div x-data="{objectsToSelect: departments}">
-                        {% include "tools/contacts/multi_select.html" with placeholder="Sélectionnez vos départements" label="Territoire" %}
-                    </div>
+                <div class="fr-input-group multi-select-region-from-resource" x-data="RegionDepartmentPreparer({ selectedDepartments: [] })">
+                    <template x-if="objectsToSelect && objectsToSelect.length">
+                        <div x-data="MultiSelectRegionDepartment({ selected: selectedDepartments, objectsToSelect: objectsToSelect, displayRegions: true })">
+                            {% include "tools/contacts/multi_select.html" with placeholder="Cherchez et sélectionnez vos départements pour avoir accès aux dossiers" label="Sélectionnez-le(s) ci-dessous : " display_regions=True %}
+                            <template x-for="dept in selectedDepartments" :key="dept">
+                                <input type="hidden" name="departments" :value="dept">
+                            </template>
+                            {% if form.departments.errors %}
+                                <div class="fr-error-text form-mandatory-element">{{ form.departments.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </template>
                 </div>
                 <!-- Expires on date picker -->
                 <div class="fr-input-group">
