@@ -46,9 +46,10 @@
                 <!-- Summary -->
                 <div class="fr-input-group">
                     <label class="fr-label" for="id_summary">Résumé</label>
-                    <textarea name="summary" class="fr-textarea" id="id_summary" required></textarea>
+                    <input type="text" name="summary" class="fr-input" id="id_summary" required>
                 </div>
                 <!-- Content with tiptap editor -->
+                {% include "tools/editor.html" with model="message" input_name=posting_form.content.name initial_content=""  input_required=True can_add_reco=False can_attach_files=False can_attach_contact=False show_send_button=False can_compress_editor=False %}
             </div>
             <!-- Column 2 -->
             <div class="fr-col-4 fr-col-md-4 fr-col-sm-12 ">
