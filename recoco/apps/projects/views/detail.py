@@ -57,6 +57,10 @@ def project_overview(request, project_id=None):
         pk=project_id,
     )
 
+    project_creation_request = models.ProjectCreationRequest.on_site.filter(
+        project=project
+    ).first()
+
     site_config = request.site_config
 
     is_regional_actor = is_regional_actor_for_project(

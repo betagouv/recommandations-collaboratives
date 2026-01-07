@@ -29,6 +29,24 @@
             </a>
         {% endif %}
     </div>
+{% elif project.status == 'PRE_DRAFT' %}
+    <div class="d-flex flex-column align-items-start fr-mb-2v">
+        <span class="fr-mr-2v d-flex align-items-center">
+            <img class="rounded-circle fr-mr-2v"
+                 src="{% gravatar_url project_creation_request.email size=24 %}"
+                 alt="{{ action.actor }}">
+            <strong class="text-nowrap project-card__projectowner">{{ project_creation_request.email }}</strong>
+        </span>
+        <div class="fr-notice fr-notice--warning fr-mt-2v">
+            <div class="fr-container">
+                <div class="fr-notice__body">
+                    <p>
+                        <span class="fr-notice__title font-size-14px">Cet utilisateur n'a pas encore créé son compte.</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
 {% else %}
     <div class="d-flex flex-column align-items-start fr-mb-2v">
         <span class="fr-mr-2v d-flex align-items-center">
