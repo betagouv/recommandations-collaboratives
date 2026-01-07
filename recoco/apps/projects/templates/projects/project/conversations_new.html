@@ -39,7 +39,7 @@
                  x-data="{isOpen: false}"
                  :class="{'open': isOpen}">
                 <h2 class="conversation-new__topics-list-member-title">Participants</h2>
-                <h3 class="fr-mt-2w conversation-new__topics-list-member-subtitle">Porteur de projet et partenaires</h3>
+                <h3 class="fr-mt-2w conversation-new__topics-list-member-subtitle">Demandeurs</h3>
                 <ul class="flex-column list-unstyled fr-mb-0">
                     {% for projectmember in project.projectmember_set.all %}
                         {% if projectmember.is_owner and projectmember.member.is_active %}
