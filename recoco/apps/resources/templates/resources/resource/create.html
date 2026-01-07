@@ -5,109 +5,18 @@
 {% block js %}
     {% vite_asset 'js/styles/resources.css.js' %}
 {% endblock js %}
-{% block title %}Créer une nouvelle fiche-ressource {{ block.super }}{% endblock %}
-{% block og_title %}Créer une nouvelle fiche-ressource {{ block.super }}{% endblock %}
+{% block title %}
+    Créer une nouvelle fiche-ressource {{ block.super }}
+{% endblock title %}
+{% block og_title %}
+    Créer une nouvelle fiche-ressource {{ block.super }}
+{% endblock og_title %}
 {% block content %}
-    <div class="col-12 fr-p-3w fr-mx-auto">
-        <!-- Breadcrumb -->
-        <nav role="navigation" class="fr-breadcrumb" aria-label="vous êtes ici :">
-            <button class="fr-breadcrumb__button"
-                    aria-expanded="false"
-                    aria-controls="breadcrumb-1">Voir le fil d’Ariane</button>
-            <div class="fr-collapse" id="breadcrumb-1">
-                <ol class="fr-breadcrumb__list">
-                    <li>
-                        <svg class="bi align-top" width="18" height="18" fill="currentColor">
-                            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#book" />
-                        </svg>
-                        &nbsp;
-                        <a class="fr-breadcrumb__link"
-                           href="{% url 'resources-resource-search' %}">Ressources</a>
-                    </li>
-                    <li>
-                        <a class="fr-breadcrumb__link" aria-current="page">Créer une nouvelle ressource</a>
-                    </li>
-                </ol>
-            </div>
-        </nav>
-        <section>
-            <form id="form-resource-create"
-                  data-cy="form-resource-create"
-                  method="post"
-                  action=".">
-                {% csrf_token %}
-                <h2>
-                    <svg class="bi " width="32" height="32" fill="currentColor">
-                        <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#book" />
-                    </svg>
-                    &nbsp;
-                    Créer une ressource
-                </h2>
-                <div class="bd-callout bd-info">
-                    <svg class="bi " width="16" height="16" fill="currentColor">
-                        <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#lightbulb" />
-                    </svg>
-                    &nbsp;
-                    Veuillez utiliser un titre qui reprend le problème de l'utilisateur, court et parlant.
-                    <p class="fr-mb-0">
-                        Par ex : <em class="text-secondary">"Financer des travaux de récupération des eaux pluviales"</em> plutôt que <em class="text-secondary">"Financements de l'Agence de l'eau"</em>
-                    </p>
-                </div>
-                <p>
-                    {{ form.title.label }}
-                    {{ form.title.errors }}
-                    {{ form.title }}
-                </p>
-                <p>
-                    {{ form.status.label }}
-                    {{ form.status.errors }}
-                    {{ form.status }}
-                </p>
-                <p>
-                    {{ form.subtitle.label }}
-                    {{ form.subtitle.errors }}
-                    {{ form.subtitle }}
-                </p>
-                <p>
-                    {{ form.summary.label }}
-                    {{ form.summary.errors }}
-                    {{ form.summary }}
-                </p>
-                <p>
-                    {{ form.tags.label }}
-                    {{ form.tags.errors }}
-                    {{ form.tags }}
-                </p>
-                <p>
-                    {{ form.category.label }}
-                    {{ form.category.errors }}
-                    {{ form.category }}
-                </p>
-                <hr />
-                <div class="d-flex fr-mt-3w fr-mb-3w">
-                    <div class="w-50 d-flex flex-column select-custom border-end fr-pr-3w fr-py-3w">
-                        {{ form.departments.errors }}
-                        {% include "tools/searchable_list.html" with list=form.departments label=form.departments.label search_list_id=form.departments.id_for_label search_options="['name']" item_label="département" %}
-                    </div>
-                    <div class="w-50 d-flex flex-column select-custom fr-ml-2v fr-ml-3w fr-py-3w">
-                        {{ form.contacts.errors }}
-                        {% include "tools/searchable_list.html" with list=form.contacts label=form.contacts.label search_list_id=form.contacts.id_for_label search_options="['name']" item_label="contact" %}
-                    </div>
-                </div>
-                <hr />
-                <div class="d-flex">
-                    {% include "tools/editor.html" with input_name=form.content.name initial_content=form.content.value|default:'' input_required=True initial_content_escapejs=True %}
-                </div>
-                <p>
-                    {{ form.expires_on.label }}
-                    {{ form.expires_on.errors }}
-                    {{ form.expires_on }}
-                </p>
-                <button type="submit"
-                        class="btn btn-primary"
-                        data-cy="button-ressource-create">Créer</button>
-            </form>
-            {{ form.media }}
-        </section>
-    </div>
+    <!-- Admin navigation -->
+    {% include "crm/fragments/navigation.html" with resources=True %}
+    <!-- Breadcrumb -->
+    <div x-data="{ breadcrumbs: { links: [{url: '{% url 'crm-site-dashboard' %}', title: 'Admin'}, {url: '{% url 'resources-resource-search' %}', title: 'Ressources'}], current: 'Création de fiche ressource' } }"
+         class="fr-p-0">{% include "tools/breadcrumb.html" %}</div>
+    <!-- Form -->
+    <!--  -->
 {% endblock content %}
