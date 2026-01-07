@@ -2,6 +2,7 @@
 {% load django_vite %}
 {% block js %}
     {% vite_asset 'js/styles/create-resources.css.js' %}
+    {% vite_asset 'js/components/Resources/CreateResource.js' %}
 {% endblock js %}
 {% block title %}
     Créer une nouvelle fiche-ressource {{ block.super }}
@@ -16,11 +17,18 @@
     <div x-data="{ breadcrumbs: { links: [{url: '{% url 'crm-site-dashboard' %}', title: 'Admin'}, {url: '{% url 'resources-resource-search' %}', title: 'Ressources'}], current: 'Création de fiche ressource' } }"
          class="fr-p-0">{% include "tools/breadcrumb.html" %}</div>
     <!-- Form -->
-    <div class="fr-container--fluid create-resources">
+    <div x-data="CreateResource()"
+         class="fr-container--fluid create-resources">
         <div class="fr-grid-row">
             <!-- Column 1 -->
             <div class="fr-col-8 fr-col-md-12 fr-col-sm-12">
-                <h2 class="create-resources__title">Création de fiche ressource</h2>
+                <div class="d-flex justify-content-between">
+                    <h2 class="create-resources__title">Création de fiche ressource</h2>
+                    <div>
+                        <button role="button" class="fr-btn fr-btn--tertiary fr-btn--sm fr-mr-1w">Prévisualiser</button>
+                        <button role="submit" class="fr-btn fr-btn--primary fr-btn--sm fr-mr-1w">Sauvegarder</button>
+                    </div>
+                </div>
                 <!-- Title -->
                 <!-- Subtitle -->
                 <!-- Summary -->

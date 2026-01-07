@@ -206,6 +206,9 @@ const config = {
         createResourcesStyles: resolve(
           './src/js/styles/resources/create-resources.css.js'
         ),
+        createResource: resolve(
+          './src/js/components/Resources/CreateResource.js'
+        ),
       },
       output: {
         chunkFileNames: undefined,
