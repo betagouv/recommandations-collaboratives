@@ -16,8 +16,11 @@
 <template x-if="objectsToSelect">
     <div class="bg-white">
         <div>
-            <label class="modal-create-organization__label label-helptext-rework"
+            {% if label == "none" %}
+            {% else %}
+                <label class="modal-create-organization__label label-helptext-rework"
                    for="select-list-input">{{ label|default:'Départements' }}</label>
+            {% endif %}
             {% if helptext %}<p class="fr-hint-text fr-mb-0">{{ helptext }}</p>{% endif %}
             <div class="d-flex justify-center mt-8">
                 <div class="w-100"
@@ -33,7 +36,7 @@
                             </template>
                         </select>
                     </template>
-                    <div class="w-100 d-flex flex-column align-items-center h-64 mx-auto"
+                    <div class="w-100 d-flex flex-column align-items-center h-auto mx-auto"
                          @keyup.alt="toggle">
                         <div class="inline-block position-relative w-100">
                             <div class="d-flex flex-column align-items-center position-relative">
