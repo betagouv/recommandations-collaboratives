@@ -21,7 +21,7 @@
          class="fr-container--fluid create-resources">
         <div class="fr-grid-row">
             <!-- Column 1 -->
-            <div class="fr-col-8 fr-col-md-12 fr-col-sm-12">
+            <div class="fr-col-8 fr-col-md-8 fr-col-sm-12">
                 <div class="d-flex justify-content-between">
                     <h2 class="create-resources__title">Création de fiche ressource</h2>
                     <div>
@@ -30,12 +30,28 @@
                     </div>
                 </div>
                 <!-- Title -->
+                <div class="fr-input-group">
+                    <label class="fr-label" for="id_title">Titre</label>
+                    <input type="text" name="title" class="fr-input" id="id_title" required>
+                </div>
                 <!-- Subtitle -->
+                <div class="fr-input-group">
+                    <label class="fr-label" for="id_subtitle">Sous-titre</label>
+                    <input type="text"
+                           name="subtitle"
+                           class="fr-input"
+                           id="id_subtitle"
+                           required>
+                </div>
                 <!-- Summary -->
+                <div class="fr-input-group">
+                    <label class="fr-label" for="id_summary">Résumé</label>
+                    <textarea name="summary" class="fr-textarea" id="id_summary" required></textarea>
+                </div>
                 <!-- Content with tiptap editor -->
             </div>
             <!-- Column 2 -->
-            <div class="fr-col-4 fr-col-md-12 fr-col-sm-12 ">
+            <div class="fr-col-4 fr-col-md-4 fr-col-sm-12 ">
                 <!-- Status select -->
                 <!-- Category select -->
                 <!-- Keywords multi-select -->
