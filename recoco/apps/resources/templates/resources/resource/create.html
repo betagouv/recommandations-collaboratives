@@ -94,9 +94,10 @@
                 </div>
                 <!-- Departments/regions multiple select -->
                 <div class="fr-input-group multi-select-region-from-resource" x-data="RegionDepartmentPreparer({ selectedDepartments: [] })">
+                    <label class="fr-label text-modal-main-msg" for="id_territory">Territoire</label>
                     <template x-if="objectsToSelect && objectsToSelect.length">
                         <div x-data="MultiSelectRegionDepartment({ selected: selectedDepartments, objectsToSelect: objectsToSelect, displayRegions: true })">
-                            {% include "tools/contacts/multi_select.html" with placeholder="Cherchez et sélectionnez vos départements pour avoir accès aux dossiers" label="Sélectionnez-le(s) ci-dessous : " display_regions=True %}
+                            {% include "tools/contacts/multi_select.html" with placeholder="Cherchez et sélectionnez vos départements et régions" label="none" display_regions=True %}
                             <template x-for="dept in selectedDepartments" :key="dept">
                                 <input type="hidden" name="departments" :value="dept">
                             </template>
