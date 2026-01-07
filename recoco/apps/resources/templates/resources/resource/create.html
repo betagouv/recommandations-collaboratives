@@ -19,24 +19,24 @@
     <!-- Form -->
     <div x-data="CreateResource()"
          class="fr-container--fluid create-resources">
+         <div class="d-flex justify-content-between">
+            <h2 class="create-resources__title text-modal-main-msg">Création de fiche ressource</h2>
+            <div>
+                <button role="button" class="fr-btn fr-btn--tertiary fr-btn--sm fr-mr-1w">Prévisualiser</button>
+                <button role="submit" class="fr-btn fr-btn--primary fr-btn--sm fr-mr-1w">Sauvegarder</button>
+            </div>
+        </div>
         <div class="fr-grid-row">
             <!-- Column 1 -->
-            <div class="fr-col-8 fr-col-md-8 fr-col-sm-12">
-                <div class="d-flex justify-content-between">
-                    <h2 class="create-resources__title">Création de fiche ressource</h2>
-                    <div>
-                        <button role="button" class="fr-btn fr-btn--tertiary fr-btn--sm fr-mr-1w">Prévisualiser</button>
-                        <button role="submit" class="fr-btn fr-btn--primary fr-btn--sm fr-mr-1w">Sauvegarder</button>
-                    </div>
-                </div>
+            <div class="fr-col-8 fr-col-md-8 fr-col-sm-12 fr-pr-4w">
                 <!-- Title -->
                 <div class="fr-input-group">
-                    <label class="fr-label" for="id_title">Titre</label>
+                    <label class="fr-label text-modal-main-msg" for="id_title">Titre</label>
                     <input type="text" name="title" class="fr-input" id="id_title" required>
                 </div>
                 <!-- Subtitle -->
                 <div class="fr-input-group">
-                    <label class="fr-label" for="id_subtitle">Sous-titre</label>
+                    <label class="fr-label text-modal-main-msg" for="id_subtitle">Sous-titre</label>
                     <input type="text"
                            name="subtitle"
                            class="fr-input"
@@ -45,15 +45,31 @@
                 </div>
                 <!-- Summary -->
                 <div class="fr-input-group">
-                    <label class="fr-label" for="id_summary">Résumé</label>
+                    <label class="fr-label text-modal-main-msg" for="id_summary">Résumé</label>
                     <input type="text" name="summary" class="fr-input" id="id_summary" required>
                 </div>
                 <!-- Content with tiptap editor -->
-                {% include "tools/editor.html" with model="message" input_name=posting_form.content.name initial_content=""  input_required=True can_add_reco=False can_attach_files=False can_attach_contact=False show_send_button=False can_compress_editor=False %}
+                <div class="fr-input-group">
+                    <label class="fr-label text-modal-main-msg" for="id_content">Contenu</label>
+                    {% include "tools/editor.html" with model="message" input_name=posting_form.content.name initial_content=""  input_required=True can_add_reco=False can_attach_files=False can_attach_contact=False show_send_button=False can_compress_editor=False %}
+                </div>
             </div>
             <!-- Column 2 -->
             <div class="fr-col-4 fr-col-md-4 fr-col-sm-12 ">
                 <!-- Status select -->
+                <div class="fr-input-group">
+                    <label class="fr-label text-modal-main-msg" for="id_summary">Statut de publication</label>
+                    <div class="d-flex">
+                        <button type="button"
+                                class="fr-btn w-50 justify-content-center"
+                                :class="!is_draft ? 'fr-btn--secondary' : ''"
+                                @click="is_draft = true">Brouillon</button>
+                        <button type="button"
+                                class="fr-btn w-50 justify-content-center"
+                                :class="is_draft ? 'fr-btn--secondary' : ''"
+                                @click="is_draft = false">Publié</button>
+                        </div>
+                </div>
                 <!-- Category select -->
                 <!-- Keywords multi-select -->
                 <!-- Carrier structure -->
