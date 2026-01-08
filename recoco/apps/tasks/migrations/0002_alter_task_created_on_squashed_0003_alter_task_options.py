@@ -5,11 +5,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-    replaces = [
-        ("tasks", "0002_alter_task_created_on"),
-        ("tasks", "0003_alter_task_options"),
-    ]
-
     dependencies = [
         ("tasks", "0001_initial"),
     ]

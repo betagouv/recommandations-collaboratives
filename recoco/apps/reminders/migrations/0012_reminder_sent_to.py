@@ -8,7 +8,7 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ("reminders", "0011_alter_reminder_sent_on"),
+        ("reminders", "0009_auto_20231023_1748_squashed_0011_alter_reminder_sent_on"),
     ]
 
     operations = [

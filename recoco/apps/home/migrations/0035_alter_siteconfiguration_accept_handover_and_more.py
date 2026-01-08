@@ -10,7 +10,10 @@ class Migration(migrations.Migration):
             "taggit",
             "0006_rename_taggeditem_content_type_object_id_taggit_tagg_content_8fc721_idx",
         ),
-        ("home", "0034_siteconfiguration_crisp_token"),
+        (
+            "home",
+            "0033_siteconfiguration_main_topic_squashed_0034_siteconfiguration_crisp_token",
+        ),
     ]
 
     operations = [

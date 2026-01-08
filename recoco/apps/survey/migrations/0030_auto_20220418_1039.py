@@ -9,7 +9,7 @@ import django.utils.timezone
 class Migration(migrations.Migration):
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ("survey", "0029_answer_choices"),
+        ("survey", "0019_auto_20210823_1513_squashed_0029_answer_choices"),
     ]
 
     operations = [

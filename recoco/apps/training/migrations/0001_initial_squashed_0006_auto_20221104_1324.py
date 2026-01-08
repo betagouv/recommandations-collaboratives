@@ -8,15 +8,6 @@ import django.utils.timezone
 
 
 class Migration(migrations.Migration):
-    replaces = [
-        ("training", "0001_initial"),
-        ("training", "0002_alter_challengedefinition_next_challenge"),
-        ("training", "0003_challenge_acquired_on"),
-        ("training", "0004_auto_20221104_1209"),
-        ("training", "0005_auto_20221104_1240"),
-        ("training", "0006_auto_20221104_1324"),
-    ]
-
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]

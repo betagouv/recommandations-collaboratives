@@ -4,12 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-    replaces = [
-        ("crm", "0004_note_sticky"),
-        ("crm", "0005_alter_note_unique_together"),
-        ("crm", "0006_alter_note_title"),
-    ]
-
     dependencies = [
         ("crm", "0003_auto_20220802_1048"),
     ]
