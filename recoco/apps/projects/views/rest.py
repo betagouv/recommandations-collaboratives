@@ -141,6 +141,7 @@ class ProjectList(ListAPIView):
                     ),
                     to_attr="_owner",
                 ),  # _owner is looked at in getter
+                "project_creation_requests",
             )
             .select_related(
                 "commune__department__region",

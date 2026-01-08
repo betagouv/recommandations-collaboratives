@@ -229,6 +229,9 @@ class ProjectForListSerializer(BaseSerializerMixin):
             "owner": format_owner(data),
             "muted": data.muted,
             "exclude_stats": data.exclude_stats,
+            "creator_email": data.project_creation_requests.first().email
+            if data.project_creation_requests.exists()
+            else None,
         }
 
 
