@@ -5,8 +5,8 @@
 {% block js %}
     {% vite_asset 'js/styles/resources.css.js' %}
 {% endblock js %}
-{% block title %}Modifier {{ resource.title }} {{ block.super }}{% endblock %}
-{% block og_title %}Modifier {{ resource.title }} {{ block.super }}{% endblock %}
+{% block title %}Créer une nouvelle fiche-ressource {{ block.super }}{% endblock %}
+{% block og_title %}Créer une nouvelle fiche-ressource {{ block.super }}{% endblock %}
 {% block content %}
     <div class="col-12 fr-p-3w fr-mx-auto">
         <!-- Breadcrumb -->
@@ -25,18 +25,34 @@
                            href="{% url 'resources-resource-search' %}">Ressources</a>
                     </li>
                     <li>
-                        <a class="fr-breadcrumb__link"
-                           aria-current="page"
-                           href="{% url 'resources-resource-detail' resource.id %}">{{ resource.title|title|truncatechars:20 }}
-                            <span class="badge bg-light text-dark align-middle">{{ resource.category.name|default:"Ressource" }}</span>
-                        </a>
+                        <a class="fr-breadcrumb__link" aria-current="page">Créer une nouvelle ressource</a>
                     </li>
                 </ol>
             </div>
         </nav>
         <section>
-            <form id="form-resource-update" method="post" action="." class="form">
+            <form id="form-resource-create"
+                  data-cy="form-resource-create"
+                  method="post"
+                  action=".">
                 {% csrf_token %}
+                <h2>
+                    <svg class="bi " width="32" height="32" fill="currentColor">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#book" />
+                    </svg>
+                    &nbsp;
+                    Créer une ressource
+                </h2>
+                <div class="bd-callout bd-info">
+                    <svg class="bi " width="16" height="16" fill="currentColor">
+                        <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#lightbulb" />
+                    </svg>
+                    &nbsp;
+                    Veuillez utiliser un titre qui reprend le problème de l'utilisateur, court et parlant.
+                    <p class="fr-mb-0">
+                        Par ex : <em class="text-secondary">"Financer des travaux de récupération des eaux pluviales"</em> plutôt que <em class="text-secondary">"Financements de l'Agence de l'eau"</em>
+                    </p>
+                </div>
                 <p>
                     {{ form.title.label }}
                     {{ form.title.errors }}
@@ -67,18 +83,13 @@
                     {{ form.category.errors }}
                     {{ form.category }}
                 </p>
-                <p>
-                    {{ form.support_orga.label }}
-                    {{ form.support_orga.errors }}
-                    {{ form.support_orga }}
-                </p>
                 <hr />
-                <div class="d-flex">
+                <div class="d-flex fr-mt-3w fr-mb-3w">
                     <div class="w-50 d-flex flex-column select-custom border-end fr-pr-3w fr-py-3w">
                         {{ form.departments.errors }}
                         {% include "tools/searchable_list.html" with list=form.departments label=form.departments.label search_list_id=form.departments.id_for_label search_options="['name']" item_label="département" %}
                     </div>
-                    <div class="w-50 fr-ml-2v d-flex flex-column select-custom fr-ml-2v fr-ml-3w fr-py-3w">
+                    <div class="w-50 d-flex flex-column select-custom fr-ml-2v fr-ml-3w fr-py-3w">
                         {{ form.contacts.errors }}
                         {% include "tools/searchable_list.html" with list=form.contacts label=form.contacts.label search_list_id=form.contacts.id_for_label search_options="['name']" item_label="contact" %}
                     </div>
@@ -92,16 +103,9 @@
                     {{ form.expires_on.errors }}
                     {{ form.expires_on }}
                 </p>
-                <div class="d-flex justify-content-between align-items-center">
-                    <button type="submit" class="button filled">Mettre à jour</button>
-                    <a href="{% url 'resources-resource-delete' resource.pk %}"
-                       class="button filled red btn-danger">
-                        <svg class="bi " width="16" height="16" fill="currentColor">
-                            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#trash" />
-                        </svg>
-                        Supprimer
-                    </a>
-                </div>
+                <button type="submit"
+                        class="btn btn-primary"
+                        data-cy="button-ressource-create">Créer</button>
             </form>
             {{ form.media }}
         </section>

@@ -1,113 +1,150 @@
 {% extends "base.html" %}
-{% load static %}
-{% load humanize %}
 {% load django_vite %}
 {% block js %}
-    {% vite_asset 'js/styles/resources.css.js' %}
+    {% vite_asset 'js/styles/create-resources.css.js' %}
+    {% vite_asset 'js/components/Resources/CreateResource.js' %}
+    {% vite_asset 'js/components/MultiSelectRegionDepartment.js' %}
+    {% vite_asset 'js/components/RegionDepartmentPreparer.js' %}
 {% endblock js %}
-{% block title %}Créer une nouvelle fiche-ressource {{ block.super }}{% endblock %}
-{% block og_title %}Créer une nouvelle fiche-ressource {{ block.super }}{% endblock %}
+{% block title %}
+    Créer une nouvelle fiche-ressource {{ block.super }}
+{% endblock title %}
+{% block og_title %}
+    Créer une nouvelle fiche-ressource {{ block.super }}
+{% endblock og_title %}
 {% block content %}
-    <div class="col-12 fr-p-3w fr-mx-auto">
-        <!-- Breadcrumb -->
-        <nav role="navigation" class="fr-breadcrumb" aria-label="vous êtes ici :">
-            <button class="fr-breadcrumb__button"
-                    aria-expanded="false"
-                    aria-controls="breadcrumb-1">Voir le fil d’Ariane</button>
-            <div class="fr-collapse" id="breadcrumb-1">
-                <ol class="fr-breadcrumb__list">
-                    <li>
-                        <svg class="bi align-top" width="18" height="18" fill="currentColor">
-                            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#book" />
-                        </svg>
-                        &nbsp;
-                        <a class="fr-breadcrumb__link"
-                           href="{% url 'resources-resource-search' %}">Ressources</a>
-                    </li>
-                    <li>
-                        <a class="fr-breadcrumb__link" aria-current="page">Créer une nouvelle ressource</a>
-                    </li>
-                </ol>
+    {{ categories|json_script:"categoriesArray" }}
+    <!-- Admin navigation -->
+    {% include "crm/fragments/navigation.html" with resources=True %}
+    <!-- Breadcrumb -->
+    <div x-data="{ breadcrumbs: { links: [{url: '{% url 'crm-site-dashboard' %}', title: 'Admin'}, {url: '{% url 'resources-resource-search' %}', title: 'Ressources'}], current: 'Création de fiche ressource' } }"
+         class="fr-p-0">{% include "tools/breadcrumb.html" %}</div>
+    <!-- Form -->
+    <div x-data="CreateResource()"
+         class="fr-container--fluid create-resources"
+         @multi-select-change="newRessourcePayload.keywords = $event.detail">
+        <div class="d-flex justify-content-between">
+            <h2 class="create-resources__title text-modal-main-msg">Création de fiche ressource</h2>
+            <div>
+                <button role="button" class="fr-btn fr-btn--tertiary fr-btn--sm fr-mr-1w">Prévisualiser</button>
+                <button role="submit"
+                        class="fr-btn fr-btn--primary fr-btn--sm fr-mr-1w"
+                        @click="onSubmit">Sauvegarder</button>
             </div>
-        </nav>
-        <section>
-            <form id="form-resource-create"
-                  data-cy="form-resource-create"
-                  method="post"
-                  action=".">
-                {% csrf_token %}
-                <h2>
-                    <svg class="bi " width="32" height="32" fill="currentColor">
-                        <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#book" />
-                    </svg>
-                    &nbsp;
-                    Créer une ressource
-                </h2>
-                <div class="bd-callout bd-info">
-                    <svg class="bi " width="16" height="16" fill="currentColor">
-                        <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#lightbulb" />
-                    </svg>
-                    &nbsp;
-                    Veuillez utiliser un titre qui reprend le problème de l'utilisateur, court et parlant.
-                    <p class="fr-mb-0">
-                        Par ex : <em class="text-secondary">"Financer des travaux de récupération des eaux pluviales"</em> plutôt que <em class="text-secondary">"Financements de l'Agence de l'eau"</em>
-                    </p>
+        </div>
+        <div class="fr-grid-row">
+            <!-- Column 1 -->
+            <div class="fr-col-8 fr-col-md-8 fr-col-sm-12 fr-pr-4w">
+                <!-- Title -->
+                <div class="fr-input-group">
+                    <label class="fr-label text-modal-main-msg" for="id_title">Titre</label>
+                    <input type="text"
+                           name="title"
+                           class="fr-input"
+                           id="id_title"
+                           required
+                           x-model="newRessourcePayload.title">
                 </div>
-                <p>
-                    {{ form.title.label }}
-                    {{ form.title.errors }}
-                    {{ form.title }}
-                </p>
-                <p>
-                    {{ form.status.label }}
-                    {{ form.status.errors }}
-                    {{ form.status }}
-                </p>
-                <p>
-                    {{ form.subtitle.label }}
-                    {{ form.subtitle.errors }}
-                    {{ form.subtitle }}
-                </p>
-                <p>
-                    {{ form.summary.label }}
-                    {{ form.summary.errors }}
-                    {{ form.summary }}
-                </p>
-                <p>
-                    {{ form.tags.label }}
-                    {{ form.tags.errors }}
-                    {{ form.tags }}
-                </p>
-                <p>
-                    {{ form.category.label }}
-                    {{ form.category.errors }}
-                    {{ form.category }}
-                </p>
-                <hr />
-                <div class="d-flex fr-mt-3w fr-mb-3w">
-                    <div class="w-50 d-flex flex-column select-custom border-end fr-pr-3w fr-py-3w">
-                        {{ form.departments.errors }}
-                        {% include "tools/searchable_list.html" with list=form.departments label=form.departments.label search_list_id=form.departments.id_for_label search_options="['name']" item_label="département" %}
-                    </div>
-                    <div class="w-50 d-flex flex-column select-custom fr-ml-2v fr-ml-3w fr-py-3w">
-                        {{ form.contacts.errors }}
-                        {% include "tools/searchable_list.html" with list=form.contacts label=form.contacts.label search_list_id=form.contacts.id_for_label search_options="['name']" item_label="contact" %}
+                <!-- Subtitle -->
+                <div class="fr-input-group">
+                    <label class="fr-label text-modal-main-msg" for="id_subtitle">Sous-titre</label>
+                    <input type="text"
+                           name="subtitle"
+                           class="fr-input"
+                           id="id_subtitle"
+                           required
+                           x-model="newRessourcePayload.subtitle">
+                </div>
+                <!-- Summary -->
+                <div class="fr-input-group">
+                    <label class="fr-label text-modal-main-msg" for="id_summary">Résumé</label>
+                    <input type="text"
+                           name="summary"
+                           class="fr-input"
+                           id="id_summary"
+                           required
+                           x-model="newRessourcePayload.summary">
+                </div>
+                <!-- Content with tiptap editor -->
+                <div class="fr-input-group">
+                    <label class="fr-label text-modal-main-msg" for="id_content">Contenu</label>
+                    {% include "tools/editor.html" with model="newRessourcePayload.content" input_name="content" initial_content="" input_required=True can_add_reco=False can_attach_files=False can_attach_contact=False show_send_button=False can_compress_editor=False %}
+                </div>
+            </div>
+            <!-- Column 2 -->
+            <div class="fr-col-4 fr-col-md-4 fr-col-sm-12 ">
+                <!-- Status select -->
+                <div class="fr-input-group">
+                    <label class="fr-label text-modal-main-msg" for="id_summary">Statut de publication</label>
+                    <div class="d-flex">
+                        <button type="button"
+                                class="fr-btn w-50 justify-content-center"
+                                :class="newRessourcePayload.status !== 'DRAFT' ? 'fr-btn--secondary' : ''"
+                                @click="newRessourcePayload.status = 'DRAFT'">Brouillon</button>
+                        <button type="button"
+                                class="fr-btn w-50 justify-content-center"
+                                :class="newRessourcePayload.status !== 'PUBLISHED' ? 'fr-btn--secondary' : ''"
+                                @click="newRessourcePayload.status = 'PUBLISHED'">Publié</button>
                     </div>
                 </div>
-                <hr />
-                <div class="d-flex">
-                    {% include "tools/editor.html" with input_name=form.content.name initial_content=form.content.value|default:'' input_required=True initial_content_escapejs=True %}
+                <!-- Category select -->
+                <div class="fr-input-group">
+                    <label class="fr-label text-modal-main-msg" for="id_category">Catégorie</label>
+                    <select name="category"
+                            id="id_category"
+                            class="fr-select"
+                            required
+                            valueAsNumber
+                            x-model="newRessourcePayload.category">
+                        <option value="" selected disabled>Sélectionner une catégorie</option>
+                        {% for category in categories %}<option value="{{ category.id }}">{{ category.name }}</option>{% endfor %}
+                    </select>
                 </div>
-                <p>
-                    {{ form.expires_on.label }}
-                    {{ form.expires_on.errors }}
-                    {{ form.expires_on }}
-                </p>
-                <button type="submit"
-                        class="btn btn-primary"
-                        data-cy="button-ressource-create">Créer</button>
-            </form>
-            {{ form.media }}
-        </section>
+                <!-- Keywords multi-select -->
+                <div class="fr-input-group create-resources__multi-select-container">
+                    <label class="fr-label text-modal-main-msg" for="id_keywords">Mots-clés</label>
+                    {% include "tools/multi_select.html" %}
+                </div>
+                <!-- Carrier structure -->
+                <div class="fr-input-group">
+                    <label class="fr-label text-modal-main-msg" for="id_carrier_structure">Structure porteuse</label>
+                    <input type="text"
+                           name="carrier_structure"
+                           class="fr-input"
+                           id="id_carrier_structure"
+                           required>
+                </div>
+                <!-- Departments/regions multiple select -->
+                <div class="fr-input-group multi-select-region-from-resource"
+                     x-data="RegionDepartmentPreparer({ selectedDepartments: [] })">
+                    <label class="fr-label text-modal-main-msg" for="id_territory">Territoire</label>
+                    <template x-if="objectsToSelect && objectsToSelect.length">
+                        <div x-data="MultiSelectRegionDepartment({ selected: selectedDepartments, objectsToSelect: objectsToSelect, displayRegions: true })">
+                            {% include "tools/contacts/multi_select.html" with placeholder="Cherchez et sélectionnez vos départements et régions" label="none" display_regions=True %}
+                            <template x-for="dept in selectedDepartments" :key="dept">
+                                <input type="hidden" name="departments" :value="dept">
+                            </template>
+                            {% if form.departments.errors %}
+                                <div class="fr-error-text form-mandatory-element">{{ form.departments.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </template>
+                </div>
+                <!-- Expires on date picker -->
+                <div class="fr-input-group">
+                    <label class="fr-label text-modal-main-msg" for="id_expires_on">Date d'expiration</label>
+                    <input type="date"
+                           name="expires_on"
+                           class="fr-input"
+                           id="id_expires_on"
+                           required>
+                </div>
+                <!-- Contacts component (multiple) -->
+                <div class="fr-input-group">
+                    <label class="fr-label text-modal-main-msg" for="id_contacts">Contacts</label>
+                    {% comment %} {% include "tools/contacts_component.html" with input_name="contacts" multiple=True %} {% endcomment %}
+                </div>
+            </div>
+        </div>
     </div>
 {% endblock content %}
