@@ -21,7 +21,8 @@
          class="fr-p-0">{% include "tools/breadcrumb.html" %}</div>
     <!-- Form -->
     <div x-data="CreateResource()"
-         class="fr-container--fluid create-resources">
+         class="fr-container--fluid create-resources"
+         @multi-select-change="newRessourcePayload.keywords = $event.detail">
         <div class="d-flex justify-content-between">
             <h2 class="create-resources__title text-modal-main-msg">Création de fiche ressource</h2>
             <div>
@@ -100,7 +101,7 @@
                     </select>
                 </div>
                 <!-- Keywords multi-select -->
-                <div class="fr-input-group">
+                <div class="fr-input-group create-resources__multi-select-container">
                     <label class="fr-label text-modal-main-msg" for="id_keywords">Mots-clés</label>
                     {% include "tools/multi_select.html" %}
                 </div>
@@ -114,7 +115,8 @@
                            required>
                 </div>
                 <!-- Departments/regions multiple select -->
-                <div class="fr-input-group multi-select-region-from-resource" x-data="RegionDepartmentPreparer({ selectedDepartments: [] })">
+                <div class="fr-input-group multi-select-region-from-resource"
+                     x-data="RegionDepartmentPreparer({ selectedDepartments: [] })">
                     <label class="fr-label text-modal-main-msg" for="id_territory">Territoire</label>
                     <template x-if="objectsToSelect && objectsToSelect.length">
                         <div x-data="MultiSelectRegionDepartment({ selected: selectedDepartments, objectsToSelect: objectsToSelect, displayRegions: true })">

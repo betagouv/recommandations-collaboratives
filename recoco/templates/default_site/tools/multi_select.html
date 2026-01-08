@@ -31,33 +31,35 @@
             <div class="d-flex flex-column align-items-center position-relative">
                 <!-- Selected elements container -->
                 <div class="w-100">
-                    <div class="multi-select__container d-flex  custom-input-border bg-white">
-                        <div class="d-flex flex-auto flex-wrap w-100" x-on:click="open">
+                    <div class="multi-select__container d-flex">
+                        <div class="d-flex flex-auto flex-wrap multi-select__" x-on:click="open">
                             <!-- iterating over selected elements -->
-                            <template x-for="(option,index) in selectedElms" :key="option.value">
-                                <div x-show="index < 0"
-                                     class="multi-select__selected-item d-flex justify-center align-items-center font-medium py-1 px-2 rounded text-indigo-700 selected-item border"
-                                     :class="option.color">
-                                    <div class="selected-items"
-                                         x-model="selectedElms[option]"
-                                         x-text="option.text"></div>
-                                    <div class="d-flex flex-auto flex-row-reverse">
-                                        <div x-on:click.stop="remove(index,option)">
-                                            <span class="fr-icon-close-circle-line fr-icon--sm fr-ml-0-5v"></span>
+                            <div x-show="selectedElms.length > 0" class="multi-select__input">
+                                <template x-for="(option,index) in selectedElms" :key="option.value">
+                                    <div x-show="index < 0"
+                                         class="multi-select__selected-item d-flex justify-center align-items-center font-medium py-1 px-2 rounded text-indigo-700 selected-item border"
+                                         :class="option.color">
+                                        <div class="selected-items"
+                                             x-model="selectedElms[option]"
+                                             x-text="option.text"></div>
+                                        <div class="d-flex flex-auto flex-row-reverse">
+                                            <div x-on:click.stop="remove(index,option)">
+                                                <span class="fr-icon-close-circle-line fr-icon--sm fr-ml-0-5v"></span>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            </template>
+                                </template>
+                            </div>
                             <!-- None items selected -->
                             <div x-show="selectedElms.length == 0" class="flex-grow-1">
                                 <input placeholder="Sélectionnez pour filtrer"
-                                       class="multi-select__input bg-transparent p-1 px-2 appearance-none outline-none h-full w-100 text-gray-800 border-0"
+                                       class="multi-select__input"
                                        x-bind:value="selectedElements()"
                                        data-test-id="multi-select-input">
                             </div>
                         </div>
                         <!-- Drop down toogle with icons-->
-                        <div class="text-gray-300 w-8 py-1 pl-2 pr-1 d-flex align-items-center border-gray-200 fr-ml-auto border-left">
+                        <div class="multi-select__dropdown-icon">
                             <button type="button"
                                     x-show="!isOpen()"
                                     x-on:click="open()"
