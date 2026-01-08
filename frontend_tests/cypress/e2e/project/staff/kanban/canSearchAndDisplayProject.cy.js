@@ -1,10 +1,8 @@
-import projects from '../../../../fixtures/projects/projects.json';
-
 let projectsLength;
 describe('I can go to the dashboard and search for project', () => {
   beforeEach(() => {
     cy.login('staff'); // TODO replace by staffOnSite and check behaviour
-    cy.visit('/projects/staff/');
+    cy.visit('/projects');
   });
 
   it('search project by name', () => {
@@ -21,6 +19,20 @@ describe('I can go to the dashboard and search for project', () => {
           .its('length')
           .should('be.lessThan', projectsLength);
         cy.contains('Map Area Commune');
+      });
+  });
+
+  it('does not display pre-draft projects on kanban', () => {
+    cy.get('[data-cy="loader"]').should('not.be.visible');
+    cy.get('[data-cy="card-project"]')
+      .its('length')
+      .then((length) => {
+        projectsLength = length;
+        expect(projectsLength).to.be.greaterThan(0);
+        cy.get('[data-cy="search-bar-project"]').type('pre-draft', {
+          delay: 0,
+        });
+        cy.contains('Dossier pre-draft').should('not.exist');
       });
   });
 

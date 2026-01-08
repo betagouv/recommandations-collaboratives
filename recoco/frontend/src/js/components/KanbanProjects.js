@@ -50,6 +50,7 @@ Alpine.data('KanbanProjects', function (currentSiteId, departments, regions) {
           searchText: this.backendSearch.searchText,
           departments: this.backendSearch.searchDepartment,
           lastActivity: this.backendSearch.lastActivity,
+          status: ['TO_PROCESS', 'STUCK', 'READY', 'IN_PROGRESS', 'DONE'],
         })
       );
       this.projectList = await this.$store.projects.mapperProjetsProjectSites(

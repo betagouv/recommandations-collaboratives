@@ -3,15 +3,9 @@
 {% load humanize %}
 {% load notifications_tags %}
 {% load gravatar %}
-{% load django_vite %}
 {% load leaflet_tags %}
 {% load guardian_tags %}
-{% block js %}
-    {% vite_asset 'js/styles/projects-board.css.js' %}
-    {% vite_asset 'js/apps/map.js' %}
-    {% vite_asset 'js/apps/boardProjects.js' %}
-    {% leaflet_js %}
-{% endblock js %}
+{% leaflet_js %}
 {% block content %}
     {% get_obj_perms request.user for request.site as "user_site_perms" %}
     <div class="col-12 fr-p-3w fr-mx-auto">
