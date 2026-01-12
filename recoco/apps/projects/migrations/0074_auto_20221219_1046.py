@@ -10,7 +10,7 @@ class Migration(migrations.Migration):
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ("sites", "0002_alter_domain_unique"),
-        ("projects", "0073_auto_20221201_1106"),
+        ("projects", "0070_auto_20221128_1637_squashed_0073_auto_20221201_1106"),
     ]
 
     operations = [

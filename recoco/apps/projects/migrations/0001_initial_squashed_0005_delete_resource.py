@@ -6,14 +6,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-    replaces = [
-        ("projects", "0001_initial"),
-        ("projects", "0002_auto_20210601_1244"),
-        ("projects", "0003_project_org_name"),
-        ("projects", "0004_alter_project_org_name"),
-        ("projects", "0005_delete_resource"),
-    ]
-
     dependencies = []
 
     operations = [

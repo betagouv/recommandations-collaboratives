@@ -6,12 +6,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-    replaces = [
-        ("reminders", "0009_auto_20231023_1748"),
-        ("reminders", "0010_auto_20231023_1834"),
-        ("reminders", "0011_alter_reminder_sent_on"),
-    ]
-
     dependencies = [
         ("reminders", "0008_reminders_on_site"),
     ]

@@ -8,7 +8,10 @@ import taggit.managers
 class Migration(migrations.Migration):
     dependencies = [
         ("taggit", "0005_auto_20220424_2025"),
-        ("home", "0030_siteconfiguration_logo_large_and_more"),
+        (
+            "home",
+            "0028_siteconfiguration_legal_owner_squashed_0030_siteconfiguration_logo_large_and_more",
+        ),
     ]
 
     operations = [

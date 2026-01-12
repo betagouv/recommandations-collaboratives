@@ -6,13 +6,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-    replaces = [
-        ("projects", "0086_alter_note_managers"),
-        ("projects", "0087_alter_project_options"),
-        ("projects", "0088_alter_project_options"),
-        ("projects", "0089_auto_20230522_1137"),
-    ]
-
     dependencies = [
         ("projects", "0085_add_on_site_to_notes"),
     ]
