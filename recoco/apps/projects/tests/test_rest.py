@@ -29,7 +29,7 @@ from recoco.apps.tasks import models as tasks_models
 from recoco.utils import login
 
 from .. import models, utils
-from ..models import Document
+from ..models import Document, ProjectCreationRequest
 from ..utils import assign_advisor
 
 ########################################################################
@@ -171,6 +171,58 @@ def test_project_list_includes_only_projects_in_switchtender_departments(
         "unread_public_messages": 1,
         "project_id": str(project.id),
     }
+
+
+@pytest.mark.django_db
+def test_pre_draft_includes_email(request, api_client, make_project):
+    user = baker.make(auth_models.User, email="me@example.com")
+    site = get_current_site(request)
+    api_client.force_authenticate(user=user)
+
+    email = "toto@je-regarde.fr"
+    project = make_project(
+        site=site,
+        status="PRE_DRAFT",
+        commune__department__code="02",
+    )
+    ProjectCreationRequest.objects.create(
+        site=site,
+        email=email,
+        project=project,
+    )
+
+    utils.assign_advisor(user, project, site)
+    url = reverse("projects-list")
+    response = api_client.get(url)
+
+    assert response.status_code == 200
+    assert len(response.data["results"]) == 1
+
+    data = response.data["results"][0]
+    assert data["creator_email"] == email
+
+
+@pytest.mark.django_db
+def test_draft_includes_None_creator_email(request, api_client, make_project):
+    user = baker.make(auth_models.User, email="me@example.com")
+    site = get_current_site(request)
+    api_client.force_authenticate(user=user)
+
+    project = make_project(
+        site=site,
+        status="PRE_DRAFT",
+        commune__department__code="02",
+    )
+
+    utils.assign_advisor(user, project, site)
+    url = reverse("projects-list")
+    response = api_client.get(url)
+
+    assert response.status_code == 200
+    assert len(response.data["results"]) == 1
+
+    data = response.data["results"][0]
+    assert data["creator_email"] is None
 
 
 @pytest.mark.django_db
