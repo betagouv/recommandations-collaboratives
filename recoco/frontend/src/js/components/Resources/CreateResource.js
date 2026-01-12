@@ -61,17 +61,8 @@ Alpine.data('CreateResource', () => {
         { id: 3, text: 'Social', value: 'social', search: 'social' },
       ];
     },
-<<<<<<< HEAD
-    onSubmit(event) {
-      event.preventDefault();
-      console.log(this.newRessourcePayload);
-=======
-    // openModalSearchContact() {
-    //   this.isSearchContactModalOpen = true;
-    // },
     closeCreateContactModal(event) {
       const contact = event.detail;
-      console.log('Adding contact to resource:', contact);
       // avoid duplicates
       const exists = this.newRessourcePayload.contacts.some(
         (c) => c.id === contact.id
@@ -84,7 +75,10 @@ Alpine.data('CreateResource', () => {
         console.log('Contact already exists in the resource');
         // TODO : show a message to the user
       }
->>>>>>> 6004b4477 ([feat] enhance contact search functionality and add contact modal integration)
+    },
+    onSubmit(event) {
+      event.preventDefault();
+      console.log(this.newRessourcePayload);
     },
   };
 });
