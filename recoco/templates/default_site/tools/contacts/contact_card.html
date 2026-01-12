@@ -38,7 +38,7 @@ Example usage in parent:
     {% endif %}
     <div x-data="User()">
         <template x-if="typeof contact !== 'undefined' && contact">
-            <div class="contact-card fr-p-3v bg-white {% if button_actions %}actions{% endif %}"
+            <div class="contact-card fr-p-3v bg-white {% if button_actions %}actions{% endif %} {% if full_width %}contact-card-light{% endif %}"
                  :class="{'active': isOpenDeleteContact}"
                  data-test-id="contact-card">
                 <div class="contact-card__firstline-container">
