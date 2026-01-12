@@ -128,7 +128,9 @@ def project_list_export_csv(request):
             project.location,
             project.created_on.date(),
             submitted_by,
-            [m.email for m in project.members.all()],
+            [project.project_creation_requests.filter(project=project).first().email]
+            if project.project_creation_requests.filter(project=project).exists()
+            else [m.email for m in project.members.all()],
             project.phone,
             switchtenders_txt,
             project.project_sites.current().status,
