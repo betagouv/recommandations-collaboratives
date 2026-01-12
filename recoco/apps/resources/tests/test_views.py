@@ -428,6 +428,7 @@ def test_create_new_resource_and_redirect(request, client):
         "summary": "a summary",
         "tags": "#tag",
         "content": "this is some content",
+        "support_orga": "Big Brother",
     }
 
     with login(client, groups=["example_com_staff"]):
@@ -489,6 +490,7 @@ def test_update_resource_from_origin_site_and_redirect(request, client):
         "summary": "a summary",
         "tags": "#tag",
         "content": "this is some updated content",
+        "support_orga": "New Big Brother",
     }
 
     with login(client, groups=["example_com_staff"]):

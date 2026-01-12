@@ -22,84 +22,17 @@
                       aria-hidden="true"
                       @click="Modal.closeModal()"></span>
             </div>
-            <div class="fr-p-3v">
-                <p class="fw-bold correct-p fr-pb-1w">Rechercher un contact</p>
-                <div class="fr-search-bar" id="header-search" role="search">
-                    <label class="fr-label" for="search-contact-input">Recherche</label>
-                    <input class="fr-input"
-                           placeholder="Nom d'organisation, contact, rôle"
-                           type="search"
-                           id="search-contact-input"
-                           name="search-contact-input"
-                           @input.debounce="onSearch"
-                           x-model="userInputSearchContact">
-                    <button class="fr-btn" title="Rechercher" @click.prevent="onSearch()">Rechercher</button>
-                </div>
-            </div>
-            <div>
-                <div class="fr-menu menu-modal-correct-fr-menu better-positionning border-radius-4px correct-position">
-                    <div class="fr-menu__list w-100 border-radius-4px position-absolute rwd-resize">
-                        <div class="fr-menu__list w-100 overflow-auto specific-height border-radius-4px fr-mb-0 rwd-resize">
-                            <template x-if="userInputSearchContact.length > 0 && contactsFound.length > 0 && selectedContact === null">
-                                <template class="fr-menu__item"
-                                          x-for="contact in contactsFound"
-                                          :key="contact.id">
-                                    <div class="fr-menu__item__content cursor-pointer fr-pt-1w fr-px-1w add-borders"
-                                         data-test-id="contact-to-select"
-                                         @click="onSelect(contact)">
-                                        <div x-data="{contact:contact,isOpenDeleteContact:null}">{% include "tools/contacts/contact_card.html" %}</div>
-                                    </div>
-                                </template>
-                            </template>
-                            <template class="fr-menu__item" x-if="selectedContact != null">
-                                <div class="design-dropdown">
-                                    <div class="d-flex justify-content-between add-borders">
-                                        <div x-data="{contact:selectedContact,isOpenDeleteContact:null}">{% include "tools/contacts/contact_card.html" %}</div>
-                                        <span class="fr-icon-close-line color-666 cursor-pointer fr-pt-3v fr-pr-3v button-cancel-contact"
-                                              aria-hidden="true"
-                                              @click="onCancelSelectContact"></span>
-                                    </div>
-                                    <div class="fr-p-3v text-align-center">
-                                        <button @click.prevent="addContact"
-                                                data-test-id="button-add-contact-to-tiptap-editor"
-                                                class="fr-btn w-100 correct-centering-text">
-                                            Attacher le contact
-                                        </button>
-                                    </div>
-                                </div>
-                            </template>
-                            <template class="fr-menu__item"
-                                      x-if="userInputSearchContact.length > 0 && selectedContact === null && !contactsFound.length > 0">
-                                <div>
-                                    <div class="fr-m-1w fr-p-3v specific-banner">
-                                        <span class="text-style">Aucun résultat</span>
-                                    </div>
-                                    <div class="btn-create-contact fr-p-1w cursor-pointer"
-                                         data-test-id="button-create-contact"
-                                         @click="openModalCreateContact">
-                                        <span class="fr-icon-add-line" aria-hidden="true"></span><span>Créer un nouveau contact</span>
-                                    </div>
-                                </div>
-                            </template>
-                        </div>
-                        <template x-if="userInputSearchContact.length > 0 && contactsFound.length > 0 && selectedContact === null">
-                            <div class="btn-create-contact fr-p-1w cursor-pointer"
-                                 data-test-id="button-create-contact"
-                                 @click="openModalCreateContact">
-                                <span class="fr-icon-add-line" aria-hidden="true"></span><span>Créer un nouveau contact</span>
-                            </div>
-                        </template>
+            <!--Body-->
+            <p class="fw-bold correct-p fr-pt-1w fr-pl-2w">Rechercher un contact</p>
+            {% include "tools/contacts/searchbar_for_contacts.html" with class_div='fr-p-3v' %}
+            <div class="flex justify-end pt-2">
+                <template x-if="noSearch && selectedContact === null">
+                    <div class="btn-create-contact fr-p-1w cursor-pointer"
+                         data-test-id="button-create-contact"
+                         @click="openModalCreateContact">
+                        <span class="fr-icon-add-line" aria-hidden="true"></span><span>Créer un nouveau contact</span>
                     </div>
-                </div>
-                <div class="flex justify-end pt-2">
-                    <template x-if="noSearch && selectedContact === null">
-                        <div class="btn-create-contact fr-p-1w cursor-pointer"
-                             data-test-id="button-create-contact"
-                             @click="openModalCreateContact">
-                            <span class="fr-icon-add-line" aria-hidden="true"></span><span>Créer un nouveau contact</span>
-                        </div>
-                    </template>
-                </div>
+                </template>
             </div>
         </div>
         {% include "tools/contacts/create_contact_modal.html" with is_it_returning_data=True %}
