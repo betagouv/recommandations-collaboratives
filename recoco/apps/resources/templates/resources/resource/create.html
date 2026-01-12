@@ -153,7 +153,7 @@
                 <div>
                     <template x-if="newRessourcePayload.contacts.length > 0">
                         <template x-for="contact in newRessourcePayload.contacts" :key="contact.id">
-                            <div class="fr-mb-2w" x-data="{contact:contact,isOpenDeleteContact:null}">{% include "tools/contacts/contact_card.html" %}</div>
+                            <div class="fr-mb-2w border-light-grey" x-data="{contact:contact,isOpenDeleteContact:null}">{% include "tools/contacts/contact_card.html" with full_width=true %}</div>
                         </template>
                     </template>
                 </div>

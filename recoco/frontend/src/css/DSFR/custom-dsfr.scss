@@ -801,6 +801,10 @@ form > p {
   pointer-events: none;
 }
 
+.border-light-grey {
+  border: 1px solid var(--light-border-default-grey, #E5E5E5);
+}
+
 /* ¯¯¯¯ *\
   COLORS
 \* ˍˍˍˍ */
