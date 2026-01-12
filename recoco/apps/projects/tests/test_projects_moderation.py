@@ -1,4 +1,4 @@
-from unittest.mock import Mock, patch
+from unittest.mock import ANY, Mock, patch
 
 import pytest
 from django.contrib.auth import models as auth
@@ -413,7 +413,13 @@ class TestProjectModerationAdvisorAccept:
             ],
             params={
                 "message": "My comment",
+                "dashboard_url": ANY,
             },
+        )
+        assert (
+            mock_send_email.mock_calls[0]
+            .kwargs["params"]["dashboard_url"]
+            .startswith("https://example.com/projects/?sesame=")
         )
 
 
