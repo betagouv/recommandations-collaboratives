@@ -20,7 +20,7 @@
                 <a class="fr-ml-1v fr-text--xs fr-mb-0"
                    href="https://www.google.com/maps/search/?api=1&query={{ project.location_y|unlocalize }}%2C{{ project.location_x|unlocalize }}"
                    target="_blank"
-                   rel="noopener noreferrer">Voir sur Google Maps</a>
+                   rel="noopener noreferrer">Voir sur Google Maps <span class="visually-hidden">Nouvelle fenêtre</span></a>
             </div>
         </div>
         {% if request.user in project.members.all or 'change_location' in user_project_perms %}
