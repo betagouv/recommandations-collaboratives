@@ -12,7 +12,10 @@ class Migration(migrations.Migration):
         ("contenttypes", "0002_remove_content_type_name"),
         ("sites", "0002_alter_domain_unique"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ("communication", "0009_alter_emailtemplate_name"),
+        (
+            "communication",
+            "0006_alter_emailtemplate_name_squashed_0009_alter_emailtemplate_name",
+        ),
     ]
 
     operations = [

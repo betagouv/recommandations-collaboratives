@@ -7,7 +7,7 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
     dependencies = [
         ("projects", "0096_alter_note_site"),
-        ("tasks", "0003_alter_task_options"),
+        ("tasks", "0002_alter_task_created_on_squashed_0003_alter_task_options"),
     ]
 
     operations = [

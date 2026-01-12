@@ -4,13 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-    replaces = [
-        ("projects", "0044_auto_20220131_1719"),
-        ("projects", "0045_auto_20220202_1635"),
-        ("projects", "0046_project_muted"),
-        ("projects", "0047_alter_task_priority"),
-    ]
-
     dependencies = [
         ("projects", "0043_auto_20220131_1710"),
     ]
