@@ -1034,6 +1034,7 @@ class ProjectSearchAdapter(watson.SearchAdapter):
         "commune__name",
         "commune__insee",
         "commune__postal",
+        "owner__profile__organization__name",
     )
 
     def tags_as_list(self, obj):
