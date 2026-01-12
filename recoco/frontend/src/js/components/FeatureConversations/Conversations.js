@@ -208,7 +208,6 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     return foundUser;
   },
   getCountOfNewItemsLabel() {
-    console.log(this.countOf);
     if (
       this.countOf.unread_recommendations > 0 &&
       this.countOf.unread_recommendations >= this.countOf.new_messages
