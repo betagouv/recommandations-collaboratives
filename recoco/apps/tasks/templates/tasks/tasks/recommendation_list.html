@@ -58,7 +58,7 @@
                                         </svg>
                                         <span class="align-middle">
                                             Condition :
-                                            {% for tag in recommendation.condition_tags_taggit.all %}
+                                            {% for tag in recommendation.condition_tags.all %}
                                                 <span class="badge bg-dark rounded-pill">{{ tag }}</span>
                                                 {% if not forloop.last %}+{% endif %}
                                             {% endfor %}
