@@ -7,7 +7,7 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
     dependencies = [
         ("contenttypes", "0002_remove_content_type_name"),
-        ("reminders", "0002_rename_sent_mail_sent_on"),
+        ("reminders", "0001_initial_squashed_0002_rename_sent_mail_sent_on"),
     ]
 
     operations = [

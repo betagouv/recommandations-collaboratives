@@ -5,7 +5,7 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("communication", "0002_emailtemplate"),
+        ("communication", "0001_initial_squashed_0002_emailtemplate"),
     ]
 
     operations = [

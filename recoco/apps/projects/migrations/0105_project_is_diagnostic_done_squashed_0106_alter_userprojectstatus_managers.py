@@ -4,11 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-    replaces = [
-        ("projects", "0105_project_is_diagnostic_done"),
-        ("projects", "0106_alter_userprojectstatus_managers"),
-    ]
-
     dependencies = [
         ("projects", "0104_projectsite_sent_by_projectsite_sent_from"),
     ]

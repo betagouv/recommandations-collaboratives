@@ -17,7 +17,7 @@ def assign_note_site_based_on_project_site(apps, schema_editor):
 class Migration(migrations.Migration):
     dependencies = [
         ("sites", "0002_alter_domain_unique"),
-        ("projects", "0084_alter_project_options"),
+        ("projects", "0079_auto_20230220_1455_squashed_0084_alter_project_options"),
     ]
 
     operations = [

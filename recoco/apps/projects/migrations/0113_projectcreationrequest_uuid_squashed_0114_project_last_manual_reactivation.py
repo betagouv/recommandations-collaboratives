@@ -5,11 +5,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-    replaces = [
-        ("projects", "0113_projectcreationrequest_uuid"),
-        ("projects", "0114_project_last_manual_reactivation"),
-    ]
-
     dependencies = [
         ("projects", "0112_projectcreationrequest"),
     ]

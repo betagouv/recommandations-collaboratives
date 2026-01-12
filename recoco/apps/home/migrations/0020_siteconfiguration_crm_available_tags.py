@@ -29,7 +29,10 @@ def set_default_tags(apps, schema_editor):
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("home", "0019_alter_siteconfiguration_reminder_interval"),
+        (
+            "home",
+            "0018_add_reminder_interval_squashed_0019_alter_siteconfiguration_reminder_interval",
+        ),
         ("crm", "0010_new_crm_tags"),
     ]
 
