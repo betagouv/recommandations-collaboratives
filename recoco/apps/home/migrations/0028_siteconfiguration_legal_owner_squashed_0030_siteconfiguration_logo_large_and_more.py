@@ -5,12 +5,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-    replaces = [
-        ("home", "0028_siteconfiguration_legal_owner"),
-        ("home", "0029_siteconfiguration_description"),
-        ("home", "0030_siteconfiguration_logo_large_and_more"),
-    ]
-
     dependencies = [
         ("home", "0027_merge_20240423_1117"),
     ]
