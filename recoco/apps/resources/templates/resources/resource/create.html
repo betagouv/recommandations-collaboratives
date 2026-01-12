@@ -5,6 +5,7 @@
     {% vite_asset 'js/components/Resources/CreateResource.js' %}
     {% vite_asset 'js/components/MultiSelectRegionDepartment.js' %}
     {% vite_asset 'js/components/RegionDepartmentPreparer.js' %}
+    {% vite_asset 'js/apps/featureAddContact.js' %}
 {% endblock js %}
 {% block title %}
     Créer une nouvelle fiche-ressource {{ block.super }}
@@ -22,6 +23,7 @@
     <!-- Form -->
     <div x-data="CreateResource()"
          class="fr-container--fluid create-resources"
+         @modal-response="closeCreateContactModal($event)"
          @multi-select-change="newRessourcePayload.keywords = $event.detail">
         <div class="d-flex justify-content-between">
             <h2 class="create-resources__title text-modal-main-msg">Création de fiche ressource</h2>
@@ -140,9 +142,18 @@
                            required>
                 </div>
                 <!-- Contacts component (multiple) -->
-                <div class="fr-input-group">
+                    <!-- add contacts -->
+                <div class="fr-input-group" x-data="SearchContactModal({searchbarOnly:true})">
                     <label class="fr-label text-modal-main-msg" for="id_contacts">Contacts</label>
-                    {% comment %} {% include "tools/contacts_component.html" with input_name="contacts" multiple=True %} {% endcomment %}
+                    {% include "tools/contacts/searchbar_for_contacts.html" with dropdown_position='relative' add_contact='from_search' %}
+                </div>
+                    <!-- display contacts -->
+                <div>
+                    <template x-if="newRessourcePayload.contacts.length > 0">
+                        <template x-for="contact in newRessourcePayload.contacts" :key="contact.id">
+                            <div class="fr-mb-2w" x-data="{contact:contact,isOpenDeleteContact:null}">{% include "tools/contacts/contact_card.html" %}</div>
+                        </template>
+                    </template>
                 </div>
             </div>
         </div>

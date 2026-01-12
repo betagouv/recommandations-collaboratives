@@ -3,7 +3,7 @@ import api, { searchContactsUrl } from '../../utils/api';
 import { Modal } from '../../models/Modal.model';
 import { formatDate } from '../../utils/date';
 
-Alpine.data('SearchContactModal', () => ({
+Alpine.data('SearchContactModal', ({searchbarOnly = false}= {}) => ({
   Modal: null,
   formatDate,
   contactsFound: [],
@@ -40,6 +40,11 @@ Alpine.data('SearchContactModal', () => ({
   },
   addContact() {
     this.Modal.responseModal(this.selectedContact);
+    if (searchbarOnly) {
+      this.selectedContact = null;
+      this.userInputSearchContact = '';
+      this.noSearch = true;
+    }
   },
   onCancelSelectContact() {
     this.selectedContact = null;
