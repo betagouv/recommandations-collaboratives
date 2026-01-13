@@ -12,5 +12,5 @@
     <!-- Breadcrumb -->
     <div x-data="{ breadcrumbs: { links: [{url: '{% url 'crm-site-dashboard' %}', title: 'Admin'}, {url: '{% url 'resources-resource-search' %}', title: 'Ressources'}, {url: '{% url 'resources-resource-detail' resource.id %}', title: '{{ resource.title|truncatechars:25 }}'}], current: 'Modification de fiche ressource' } }"
          class="fr-p-0">{% include "tools/breadcrumb.html" %}</div>
-    {% include "resources/resource/form_resource.html" with resource=resource %}
+    {% include "resources/resource/form_resource.html" with edit_resource=True %}
 {% endblock content %}

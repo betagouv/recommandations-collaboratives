@@ -51,8 +51,8 @@ class ResourceSerializer(
             "expires_on",
             "summary",
             "support_orga",
-            "contacts",  # id
-            "departments",  # pk = code
+            # "contacts",  # id
+            # "departments",  # pk = code
         ]
         read_only_fields = [
             "created_on",

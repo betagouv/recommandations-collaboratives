@@ -1,6 +1,6 @@
 import Alpine from 'alpinejs';
 
-import api, { resourceUrl } from '../../utils/api';
+import api, { resourcesUrl, resourceUrl } from '../../utils/api';
 import { schemaResourceFormValidator } from '../../utils/ajv/schema/ajv.schema.FormResource';
 
 import Ajv from 'ajv';
@@ -11,7 +11,7 @@ const ajv = new Ajv({ allErrors: true });
 addFormats(ajv);
 addErrors(ajv);
 
-Alpine.data('FormResource', (resource) => {
+Alpine.data('FormResource', (resourceId) => {
   return {
     is_draft: true,
     keywords_options: [],
@@ -54,9 +54,41 @@ Alpine.data('FormResource', (resource) => {
     ],
     init() {
       console.log('FormResource');
-      if (resource) {
-        console.log('Editing existing resource:', resource);
-        this.newRessourcePayload = { ...resource };
+      if (resourceId) {
+        // fetch resource data and populate newRessourcePayload
+        api.get(resourceUrl(resourceId)).then((response) => {
+          console.log('Fetched resource data:', response.data);
+          const {
+            title = '',
+            subtitle = '',
+            summary = '',
+            content = '',
+            status = 0,
+            category = null,
+            tags = [],
+            support_orga = '',
+            departments = [],
+            expires_on = '',
+            contacts = [],
+          } = response.data;
+
+          this.newRessourcePayload = {
+            // keep your exact payload shape
+            title,
+            subtitle,
+            summary,
+            content: { text: content },                 // ✅ API string -> nested object
+            status,
+            category: category?.name ?? '',             // ✅ API object -> name (string)
+            tags,
+            support_orga,
+            departments,
+            expires_on,
+            contacts,
+          };
+
+          console.log(this.newRessourcePayload);
+        });
       }
       this.fetchKeywords();
     },
@@ -118,14 +150,23 @@ Alpine.data('FormResource', (resource) => {
         ...this.newRessourcePayload,
         content: this.newRessourcePayload.content.text,
       };
-      api
-        .post(resourceUrl(), this.newRessourcePayload)
-        .then((response) => {
-          console.log('Resource created:', response.data);
-        })
-        .catch((error) => {
-          console.error('Error creating resource:', error);
-        });
+      if (resourceId) {
+        api.put(resourceUrl(resourceId), this.newRessourcePayload)
+          .then(response => {
+            console.log('Resource updated:', response.data);
+          })
+          .catch(error => {
+            console.error('Error updating resource:', error);
+          });
+      } else {
+        api.post(resourcesUrl(), this.newRessourcePayload)
+          .then(response => {
+            console.log('Resource created:', response.data);
+          })
+          .catch(error => {
+            console.error('Error creating resource:', error);
+          });
+      }
     },
 
     validate() {
