@@ -114,6 +114,7 @@ def test_staff_user_can_create_resource_with_api(request, api_client):
         "subtitle": "one resource to test",
         "status": 1,
         "tags": ["a tag"],
+        "content": "toto",
     }
     response = api_client.post(url, data=data)
 
