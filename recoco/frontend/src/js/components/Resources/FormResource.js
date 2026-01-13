@@ -2,7 +2,7 @@ import Alpine from 'alpinejs';
 
 import api,{resourceUrl} from '../../utils/api';
 
-Alpine.data('CreateResource', () => {
+Alpine.data('FormResource', () => {
   return {
     is_draft: true,
     keywords_options: [],
@@ -44,7 +44,7 @@ Alpine.data('CreateResource', () => {
       },
     ],
     init() {
-      console.log('CreateResource');
+      console.log('FormResource');
       this.fetchKeywords();
     },
     fetchKeywords() {

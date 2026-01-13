@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 {% load django_vite %}
 {% block js %}
-    {% vite_asset 'js/styles/create-resources.css.js' %}
-    {% vite_asset 'js/components/Resources/CreateResource.js' %}
+    {% vite_asset 'js/styles/form-resources.css.js' %}
+    {% vite_asset 'js/components/Resources/FormResource.js' %}
     {% vite_asset 'js/components/MultiSelectRegionDepartment.js' %}
     {% vite_asset 'js/components/RegionDepartmentPreparer.js' %}
     {% vite_asset 'js/apps/featureAddContact.js' %}
@@ -21,7 +21,7 @@
     <div x-data="{ breadcrumbs: { links: [{url: '{% url 'crm-site-dashboard' %}', title: 'Admin'}, {url: '{% url 'resources-resource-search' %}', title: 'Ressources'}], current: 'Création de fiche ressource' } }"
          class="fr-p-0">{% include "tools/breadcrumb.html" %}</div>
     <!-- Form -->
-    <div x-data="CreateResource()"
+    <div x-data="FormResource()"
          class="create-resources"
          @modal-response="closeCreateContactModal($event)"
          @multi-select-change="newRessourcePayload.keywords = $event.detail">

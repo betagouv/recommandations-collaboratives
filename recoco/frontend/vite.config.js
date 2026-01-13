@@ -203,11 +203,11 @@ const config = {
           './src/js/styles/projects-onboarding-tutorial.css.js'
         ),
         marianneStyles: resolve('./src/js/styles/marianne.css.js'),
-        createResourcesStyles: resolve(
-          './src/js/styles/resources/create-resources.css.js'
+        formResourcesStyles: resolve(
+          './src/js/styles/resources/form-resources.css.js'
         ),
-        createResource: resolve(
-          './src/js/components/Resources/CreateResource.js'
+        formResource: resolve(
+          './src/js/components/Resources/FormResource.js'
         ),
       },
       output: {
