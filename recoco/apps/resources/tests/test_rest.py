@@ -124,6 +124,42 @@ def test_staff_user_can_create_resource_with_api(request, api_client):
     assert response.data["created_by"]["last_name"] == staff.last_name
 
 
+@pytest.mark.django_db
+def test_staff_user_can_edit_resource_with_api(request, api_client):
+    site = get_current_site(request)
+
+    staff = baker.make(auth_models.User)
+    staff.profile.sites.add(site)
+    gstaff = auth_models.Group.objects.get(name="example_com_staff")
+    staff.groups.add(gstaff)
+    other_user = baker.make(auth_models.User)
+
+    resource = baker.make(
+        models.Resource,
+        title="titre",
+        content="blabla",
+        sites=[site],
+        created_by=other_user,
+    )
+
+    url = reverse("resources-detail", args=[resource.pk])
+    api_client.force_authenticate(user=staff)
+
+    data = {
+        "title": "one resource",
+        "subtitle": "one resource to test",
+        "status": 1,
+        "tags": ["a tag"],
+        "content": "toto",
+    }
+    response = api_client.put(url, data=data)
+
+    assert response.status_code == 200
+    assert response.data["title"] == data["title"]
+    assert response.data["created_by"]["first_name"] == resource.created_by.first_name
+    assert response.data["created_by"]["last_name"] == resource.created_by.last_name
+
+
 class TestRessourceAddonViewSet:
     @pytest.mark.django_db
     def test_not_authenticated(self, api_client):
