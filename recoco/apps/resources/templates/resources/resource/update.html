@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}
+    Modifier une fiche-ressource {{ block.super }}
+{% endblock title %}
+{% block og_title %}
+    Modifier une fiche-ressource {{ block.super }}
+{% endblock og_title %}
+{% block content %}
+    {{ categories|json_script:"categoriesArray" }}
+    <!-- Admin navigation -->
+    {% include "crm/fragments/navigation.html" with resources=True %}
+    <!-- Breadcrumb -->
+    <div x-data="{ breadcrumbs: { links: [{url: '{% url 'crm-site-dashboard' %}', title: 'Admin'}, {url: '{% url 'resources-resource-search' %}', title: 'Ressources'}, {url: '{% url 'resources-resource-detail' resource.id %}', title: '{{ resource.title|truncatechars:25 }}'}], current: 'Modification de fiche ressource' } }"
+         class="fr-p-0">{% include "tools/breadcrumb.html" %}</div>
+    {% include "resources/resource/form_resource.html" with resource=resource %}
+{% endblock content %}

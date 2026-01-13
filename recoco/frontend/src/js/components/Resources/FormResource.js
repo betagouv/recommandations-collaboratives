@@ -2,7 +2,7 @@ import Alpine from 'alpinejs';
 
 import api,{resourceUrl} from '../../utils/api';
 
-Alpine.data('FormResource', () => {
+Alpine.data('FormResource', (resource) => {
   return {
     is_draft: true,
     keywords_options: [],
@@ -45,6 +45,10 @@ Alpine.data('FormResource', () => {
     ],
     init() {
       console.log('FormResource');
+      if (resource) {
+        console.log('Editing existing resource:', resource);
+        this.newRessourcePayload = { ...resource };
+      }
       this.fetchKeywords();
     },
     fetchKeywords() {
