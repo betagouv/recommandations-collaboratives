@@ -4,6 +4,8 @@ from taggit.serializers import TagListSerializerField, TaggitSerializer
 
 from recoco.rest_api.serializers import BaseSerializerMixin
 
+from ..addressbook.models import Contact
+from ..geomatics.models import Department
 from .models import Category, Resource, ResourceAddon
 
 
@@ -58,6 +60,12 @@ class ResourceSerializer(
     created_by = ResourceCreatorSerializer(read_only=True, many=False)
     category = CategorySerializer(read_only=True)
     has_dsresource = serializers.BooleanField(read_only=True, default=False)
+    contacts = serializers.PrimaryKeyRelatedField(
+        queryset=Contact.objects.all(), many=True
+    )
+    departments = serializers.PrimaryKeyRelatedField(
+        queryset=Department.objects.all(), many=True
+    )
 
     def save(self, **kwargs):
         return super().save(
