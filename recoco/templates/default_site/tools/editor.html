@@ -30,46 +30,6 @@ Parameters:
      @modal-response="closeSearchContactModal($event)"
      x-ref="editor"
      data-test-id="tiptap-editor">
-    <template x-if="isLoaded()">
-        <div class="tiptap-menu-custom">
-            {% if not "title" in tools_disabled %}
-                <button @click.stop.prevent="toggleHeading({ level: 3 })"
-                        title="Titre"
-                        class="fr-btn fr-btn--sm fr-icon-h-1"
-                        :class="{ 'fr-btn--secondary': isActive('heading', { level: 3 }, updatedAt), 'fr-btn--tertiary': !isActive('heading', { level: 3 }, updatedAt), }">
-                    Titre
-                </button>
-            {% endif %}
-            <button @click.stop.prevent="toggleBold()"
-                    title="Gras"
-                    class="fr-btn fr-btn--sm fr-icon-bold"
-                    :class="{ 'fr-btn--secondary': isActive('bold', updatedAt), 'fr-btn--tertiary': !isActive('bold', updatedAt), }">
-                Gras
-            </button>
-            <button @click.stop.prevent="toggleItalic()"
-                    title="Italique"
-                    class="fr-btn fr-btn--sm fr-icon-italic"
-                    :class="{ 'fr-btn--secondary': isActive('italic', updatedAt), 'fr-btn--tertiary': !isActive('italic', updatedAt), }">
-                Italique
-            </button>
-            <button @click.stop.prevent="toggleBulletList()"
-                    title="Liste"
-                    class="fr-btn fr-btn--sm fr-icon-list-unordered"
-                    :class="{ 'fr-btn--secondary': isActive('bulletList', updatedAt), 'fr-btn--tertiary': !isActive('bulletList', updatedAt), }">
-                Liste
-            </button>
-            <button @click.stop.prevent="setLink()"
-                    title="Attacher un lien"
-                    class="fr-btn fr-btn--sm fr-icon-link"
-                    :class="{ 'fr-btn--secondary': isActive('link', updatedAt), 'fr-btn--tertiary': !isActive('link', updatedAt), }">
-                Attacher un lien
-            </button>
-            <button @click.stop.prevent="unsetLink()"
-                    title="Détacher un lien"
-                    class="fr-btn fr-btn--sm fr-icon-link-unlink text-white"
-                    x-bind:disabled="!isActive('link', updatedAt)">Détacher un lien</button>
-        </div>
-    </template>
     <div data-test-id="tiptap-editor-form-container">
         {% comment %} {% if can_compress_editor %}
             <div class="button-attachment-container">
@@ -82,6 +42,48 @@ Parameters:
              x-ref="element"
              @click.stop="isEditorFocused = true; $store.tutorialsEvents && $store.tutorialsEvents.isTutorialForProjectPage==3.5 ? $store.tutorialsEvents.isTutorialForProjectPageThreeCompleted=true : null ;"
              id="comment-text-ref">
+            <template x-if="isLoaded()">
+                <div class="tiptap-menu-custom__container">
+                    <div class="tiptap-menu-custom">
+                        {% if not "title" in tools_disabled %}
+                            <button @click.stop.prevent="toggleHeading({ level: 3 })"
+                                    title="Titre"
+                                    class="fr-btn fr-btn--sm fr-icon-h-1"
+                                    :class="{ 'fr-btn--secondary': isActive('heading', { level: 3 }, updatedAt), 'fr-btn--tertiary': !isActive('heading', { level: 3 }, updatedAt), }">
+                                Titre
+                            </button>
+                        {% endif %}
+                        <button @click.stop.prevent="toggleBold()"
+                                title="Gras"
+                                class="fr-btn fr-btn--sm fr-icon-bold"
+                                :class="{ 'fr-btn--secondary': isActive('bold', updatedAt), 'fr-btn--tertiary': !isActive('bold', updatedAt), }">
+                            Gras
+                        </button>
+                        <button @click.stop.prevent="toggleItalic()"
+                                title="Italique"
+                                class="fr-btn fr-btn--sm fr-icon-italic"
+                                :class="{ 'fr-btn--secondary': isActive('italic', updatedAt), 'fr-btn--tertiary': !isActive('italic', updatedAt), }">
+                            Italique
+                        </button>
+                        <button @click.stop.prevent="toggleBulletList()"
+                                title="Liste"
+                                class="fr-btn fr-btn--sm fr-icon-list-unordered"
+                                :class="{ 'fr-btn--secondary': isActive('bulletList', updatedAt), 'fr-btn--tertiary': !isActive('bulletList', updatedAt), }">
+                            Liste
+                        </button>
+                        <button @click.stop.prevent="setLink()"
+                                title="Attacher un lien"
+                                class="fr-btn fr-btn--sm fr-icon-link"
+                                :class="{ 'fr-btn--secondary': isActive('link', updatedAt), 'fr-btn--tertiary': !isActive('link', updatedAt), }">
+                            Attacher un lien
+                        </button>
+                        <button @click.stop.prevent="unsetLink()"
+                                title="Détacher un lien"
+                                class="fr-btn fr-btn--sm fr-icon-link-unlink text-white"
+                                x-bind:disabled="!isActive('link', updatedAt)">Détacher un lien</button>
+                    </div>
+                </div>
+            </template>
             <template x-if="$store.tutorialsEvents && $store.tutorialsEvents.isTutorialForProjectPage==3.5">
                 {% include "projects/project/fragments/onboarding-tutorials/visual-hint.html" %}
             </template>

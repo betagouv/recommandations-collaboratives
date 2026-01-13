@@ -26,6 +26,19 @@
     }
   }
 
+  // Editor
+  .tiptap-menu-custom__container {
+    position: sticky;
+    top: 57px;
+    width: 90%;
+    z-index: 1;
+  }
+
+  .tiptap-menu-custom {
+    padding: 0.5rem;
+    background-color: var(--background-contrast-grey);
+  }
+
   &__multi-select-container {
     .multi-select {
       &__container {

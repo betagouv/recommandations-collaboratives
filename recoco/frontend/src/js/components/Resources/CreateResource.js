@@ -68,9 +68,11 @@ Alpine.data('CreateResource', () => {
         (c) => c.id === contact.id
       );
       if (!exists) {
-        this.newRessourcePayload.contacts = [...this.newRessourcePayload.contacts, contact];
-      }
-      else {
+        this.newRessourcePayload.contacts = [
+          ...this.newRessourcePayload.contacts,
+          contact,
+        ];
+      } else {
         console.log('Contact already exists in the resource');
         // TODO : show a message to the user
       }

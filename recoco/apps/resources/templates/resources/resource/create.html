@@ -22,7 +22,7 @@
          class="fr-p-0">{% include "tools/breadcrumb.html" %}</div>
     <!-- Form -->
     <div x-data="CreateResource()"
-         class="fr-container--fluid create-resources"
+         class="create-resources"
          @modal-response="closeCreateContactModal($event)"
          @multi-select-change="newRessourcePayload.keywords = $event.detail">
         <div class="d-flex justify-content-between">
