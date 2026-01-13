@@ -135,7 +135,7 @@ def test_staff_user_can_create_resource_with_api(request, api_client):
 
     staff = baker.make(auth_models.User)
     staff.profile.sites.add(site)
-    gstaff = auth_models.Group.objects.get(name="example_com_staff")
+    gstaff = auth_models.Group.objects.get(name="example_com_advisor")
     staff.groups.add(gstaff)
 
     url = reverse("resources-list")
@@ -162,7 +162,7 @@ def test_staff_user_can_edit_resource_with_api(request, api_client):
 
     staff = baker.make(auth_models.User)
     staff.profile.sites.add(site)
-    gstaff = auth_models.Group.objects.get(name="example_com_staff")
+    gstaff = auth_models.Group.objects.get(name="example_com_advisor")
     staff.groups.add(gstaff)
     other_user = baker.make(auth_models.User)
 
