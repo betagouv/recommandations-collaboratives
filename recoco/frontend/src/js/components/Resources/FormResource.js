@@ -1,6 +1,15 @@
 import Alpine from 'alpinejs';
 
-import api,{resourceUrl} from '../../utils/api';
+import api, { resourceUrl } from '../../utils/api';
+import { schemaResourceFormValidator } from '../../utils/ajv/schema/ajv.schema.FormResource';
+
+import Ajv from 'ajv';
+import addFormats from 'ajv-formats';
+import addErrors from 'ajv-errors';
+
+const ajv = new Ajv({ allErrors: true });
+addFormats(ajv);
+addErrors(ajv);
 
 Alpine.data('FormResource', (resource) => {
   return {
@@ -84,14 +93,54 @@ Alpine.data('FormResource', (resource) => {
     },
     onSubmit(event) {
       event.preventDefault();
+      // this.validate();
+      // if (this.errors.length > 0) {
+      //   console.log('Errors:', this.errors);
+      //   return;
+      // }
+      this.newRessourcePayload = {
+        title: 'Mon titre',
+        subtitle: 'Mon sous-titre',
+        summary: 'Mon résumé',
+        content: {
+          text: 'Mon contenu',
+        },
+        status: 0,
+        category: 1,
+        tags: ['tag1', 'tag2'],
+        support_orga: 'Mon structure porteuse',
+        departments: ['01', '02'],
+        expires_on: new Date().toISOString().split('T')[0],
+        contacts: [],
+      };
       console.log(this.newRessourcePayload);
-      api.post(resourceUrl(), this.newRessourcePayload)
-        .then(response => {
+      this.newRessourcePayload = {
+        ...this.newRessourcePayload,
+        content: this.newRessourcePayload.content.text,
+      };
+      api
+        .post(resourceUrl(), this.newRessourcePayload)
+        .then((response) => {
           console.log('Resource created:', response.data);
         })
-        .catch(error => {
+        .catch((error) => {
           console.error('Error creating resource:', error);
         });
+    },
+
+    validate() {
+      const fields = Object.keys(this.$refs.createResourceForm);
+      const validateMap = {};
+      fields.forEach((field) => {
+        validateMap[field] = this.$refs.createResourceForm[field].value;
+      });
+      const validate = ajv.compile(schemaResourceFormValidator);
+      const valid = validate(validateMap);
+      if (valid) {
+        this.errors = [];
+      } else {
+        this.errors = validate.errors;
+      }
     },
   };
 });

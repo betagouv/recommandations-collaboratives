@@ -12,5 +12,10 @@
     <!-- Breadcrumb -->
     <div x-data="{ breadcrumbs: { links: [{url: '{% url 'crm-site-dashboard' %}', title: 'Admin'}, {url: '{% url 'resources-resource-search' %}', title: 'Ressources'}], current: 'Création de fiche ressource' } }"
          class="fr-p-0">{% include "tools/breadcrumb.html" %}</div>
-    {% include "resources/resource/form_resource.html" %}
+    <div x-data="AjvValidationSchema('schemaResourceFormValidator')">
+        <form id="form-resource" @submit.prevent="onSubmit">
+            {% csrf_token %}
+            {% include "resources/resource/form_resource.html" %}
+        </form>
+    </div>
 {% endblock content %}
