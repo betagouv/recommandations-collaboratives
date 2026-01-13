@@ -1,5 +1,6 @@
 import Alpine from 'alpinejs';
-import api from '../../utils/api';
+
+import api,{resourceUrl} from '../../utils/api';
 
 Alpine.data('CreateResource', () => {
   return {
@@ -12,9 +13,9 @@ Alpine.data('CreateResource', () => {
       content: {
         text: '',
       },
-      status: 'DRAFT',
+      status: 0,
       category: '',
-      keywords: [],
+      tags: [],
       support_orga: '',
       departments: [],
       expires_on: '',
@@ -80,6 +81,13 @@ Alpine.data('CreateResource', () => {
     onSubmit(event) {
       event.preventDefault();
       console.log(this.newRessourcePayload);
+      api.post(resourceUrl(), this.newRessourcePayload)
+        .then(response => {
+          console.log('Resource created:', response.data);
+        })
+        .catch(error => {
+          console.error('Error creating resource:', error);
+        });
     },
   };
 });

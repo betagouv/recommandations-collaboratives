@@ -92,12 +92,12 @@
                     <div class="d-flex">
                         <button type="button"
                                 class="fr-btn w-50 justify-content-center"
-                                :class="newRessourcePayload.status !== 'DRAFT' ? 'fr-btn--secondary' : ''"
-                                @click="newRessourcePayload.status = 'DRAFT'">Brouillon</button>
+                                :class="newRessourcePayload.status !== 0 ? 'fr-btn--secondary' : ''"
+                                @click="newRessourcePayload.status = 0">Brouillon</button>
                         <button type="button"
                                 class="fr-btn w-50 justify-content-center"
-                                :class="newRessourcePayload.status !== 'PUBLISHED' ? 'fr-btn--secondary' : ''"
-                                @click="newRessourcePayload.status = 'PUBLISHED'">Publié</button>
+                                :class="newRessourcePayload.status !== 2 ? 'fr-btn--secondary' : ''"
+                                @click="newRessourcePayload.status = 2">Publié</button>
                     </div>
                 </div>
                 <!-- Category select -->
