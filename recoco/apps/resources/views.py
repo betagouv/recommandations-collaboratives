@@ -358,6 +358,7 @@ def resource_update(request, resource_id=None):
     has_perm_or_403(request.user, "sites.manage_resources", request.site)
 
     resource = get_object_or_404(models.Resource, pk=resource_id)
+    selected_departments = list(resource.departments.values_list("code", flat=True))
 
     categories = list(
         models.Category.on_site.values("id", "name", "color", "icon").order_by("name")

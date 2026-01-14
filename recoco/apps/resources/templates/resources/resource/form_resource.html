@@ -148,24 +148,26 @@
                         </template>
                     </div>
                     <!-- Departments/regions multiple select -->
-                    <div class="fr-input-group multi-select-region"
-                         :class="formFields['departments']?.className"
-                         x-data="RegionDepartmentPreparer({ selectedDepartments: [] })">
-                        <label class="fr-label text-modal-main-msg" for="id_departments">Territoire</label>
-                        <template x-if="objectsToSelect && objectsToSelect.length">
-                            <div x-data="MultiSelectRegionDepartment({ selected: selectedDepartments, objectsToSelect: objectsToSelect, displayRegions: true })">
-                                {% include "tools/contacts/multi_select.html" with name="departments" id="id_departments" placeholder="Cherchez et sélectionnez vos départements et régions" label="none" display_regions=True %}
-                                <template x-for="dept in selectedDepartments" :key="dept">
-                                    <input type="hidden" name="departments" :value="dept">
-                                </template>
-                                {% if form.departments.errors %}
-                                    <div class="fr-error-text form-mandatory-element">{{ form.departments.errors.0 }}</div>
-                                {% endif %}
-                            </div>
-                        </template>
-                        <template x-for="(error, index) in getFieldErrors('departments')" :key="index">
-                            <p class="fr-error-text" x-text="error"></p>
-                        </template>
+                    <div x-data="{selectedDepartments: {{ selected_departments |default:'[]'|safe }}}">
+                        <div class="fr-input-group multi-select-region"
+                             :class="formFields['departments']?.className"
+                             x-data="RegionDepartmentPreparer({ selectedDepartments: selectedDepartments })">
+                            <label class="fr-label text-modal-main-msg" for="id_departments">Territoire</label>
+                            <template x-if="objectsToSelect && objectsToSelect.length">
+                                <div x-data="MultiSelectRegionDepartment({ selected: selectedDepartments, objectsToSelect: objectsToSelect, displayRegions: true })">
+                                    {% include "tools/contacts/multi_select.html" with name="departments" id="id_departments" placeholder="Cherchez et sélectionnez vos départements et régions" label="none" display_regions=True %}
+                                    <template x-for="dept in selectedDepartments" :key="dept">
+                                        <input type="hidden" name="departments" :value="dept">
+                                    </template>
+                                    {% if form.departments.errors %}
+                                        <div class="fr-error-text form-mandatory-element">{{ form.departments.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                            </template>
+                            <template x-for="(error, index) in getFieldErrors('departments')" :key="index">
+                                <p class="fr-error-text" x-text="error"></p>
+                            </template>
+                        </div>
                     </div>
                     <!-- Expires on date picker -->
                     <div class="fr-input-group" :class="formFields['expires_on']?.className">
