@@ -204,7 +204,7 @@ django-tagging = { git = "https://github.com/nextories/django-tagging.git", rev 
 django-webhook = { git = "https://github.com/etchegom/django-webhook.git", rev = "recoco" }
 
 [tool.uv-secure.vulnerability_criteria]
-ignore_vulnerabilities = ["GHSA-xm59-rqc7-hhvf"]
+ignore_vulnerabilities = ["GHSA-xm59-rqc7-hhvf"] # nbconvert does not have a fix yet. todo upgrade when we have a fix
 
 [dependency-groups]
 dev = [
