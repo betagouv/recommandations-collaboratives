@@ -166,13 +166,11 @@ Alpine.data('FormResource', (resourceId) => {
       this.resourcePayload = {
         ...this.resourceFormData,
         content: this.resourceFormData.content.text,
-        category: parseInt(this.newRessourcePayload.category),
-        category_id: this.resourceFormData.category,
+        category: parseInt(this.resourceFormData.category),
       };
       this.resourcePayload.contacts = this.resourceFormData.contacts.map((c) =>
         typeof c === 'object' ? c.id : c
       );
-      delete this.resourcePayload.category;
       console.log('Payload to submit:', this.resourcePayload);
       if (resourceId) {
         api
