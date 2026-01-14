@@ -3539,6 +3539,7 @@ dependencies = [
     { name = "sentry-sdk" },
     { name = "setuptools" },
     { name = "sib-api-v3-sdk" },
+    { name = "tqdm" },
     { name = "urllib3" },
     { name = "wagtail" },
 ]
@@ -3649,6 +3650,7 @@ requires-dist = [
     { name = "sentry-sdk", specifier = ">=2.20.0" },
     { name = "setuptools", specifier = "==78.1.1" },
     { name = "sib-api-v3-sdk", specifier = ">=7.6.0" },
+    { name = "tqdm", specifier = ">=4.67.1" },
     { name = "urllib3", specifier = ">=2.6.3" },
     { name = "wagtail", specifier = "==6.3.5" },
 ]
