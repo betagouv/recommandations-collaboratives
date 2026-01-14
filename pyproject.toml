@@ -203,6 +203,9 @@ django-cookie-consent = { git = "https://github.com/jazzband/django-cookie-conse
 django-tagging = { git = "https://github.com/nextories/django-tagging.git", rev = "bug/usage_for_model_with_filters_none" }
 django-webhook = { git = "https://github.com/etchegom/django-webhook.git", rev = "recoco" }
 
+[tool.uv-secure.vulnerability_criteria]
+ignore_vulnerabilities = ["GHSA-xm59-rqc7-hhvf"] # nbconvert does not have a fix yet. todo upgrade when we have a fix
+
 [dependency-groups]
 dev = [
     "coverage==7.4.1",
