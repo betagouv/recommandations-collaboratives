@@ -41,7 +41,8 @@
                                id="id_title"
                                required
                                x-model="newRessourcePayload.title"
-                               @blur="validateField('title')">
+                               @blur="validate()"
+                               @input="validate()">
                         <template x-for="(error, index) in getFieldErrors('title')" :key="index">
                             <p class="fr-error-text" x-text="error"></p>
                         </template>
@@ -56,7 +57,8 @@
                                id="id_subtitle"
                                required
                                x-model="newRessourcePayload.subtitle"
-                               @blur="validateField('subtitle')">
+                               @blur="validate()"
+                               @input="validate()">
                         <template x-for="(error, index) in getFieldErrors('subtitle')" :key="index">
                             <p class="fr-error-text" x-text="error"></p>
                         </template>
@@ -77,7 +79,7 @@
                                id="id_summary"
                                required
                                x-model="newRessourcePayload.summary"
-                               @blur="validateField('summary')">
+                               @blur="validate()">
                         <template x-for="(error, index) in getFieldErrors('summary')" :key="index">
                             <p class="fr-error-text" x-text="error"></p>
                         </template>
@@ -100,7 +102,7 @@
                      @set-departments="newRessourcePayload.departments = $event.detail">
                     <!-- Status select -->
                     <div class="fr-input-group">
-                        <label class="fr-label text-modal-main-msg" for="id_summary">Statut de publication</label>
+                        <label class="fr-label text-modal-main-msg" for="id_status">Statut de publication</label>
                         <div class="d-flex">
                             <button type="button"
                                     class="fr-btn w-50 justify-content-center"
@@ -121,7 +123,8 @@
                                 required
                                 valueAsNumber
                                 x-model="newRessourcePayload.category"
-                                @change="validateField('category')">
+                                @blur="validate()"
+                                @input="validate()">
                             <option value="" selected disabled>Sélectionner une catégorie</option>
                             {% for category in categories %}<option value="{{ category.id }}">{{ category.name }}</option>{% endfor %}
                         </select>
@@ -137,13 +140,14 @@
                     </div>
                     <!-- Carrier structure -->
                     <div class="fr-input-group" :class="getFieldGroupClass('support_orga')">
-                        <label class="fr-label text-modal-main-msg" for="id_carrier_structure">Structure porteuse</label>
+                        <label class="fr-label text-modal-main-msg" for="id_support_orga">Structure porteuse</label>
                         <input type="text"
-                               name="carrier_structure"
+                               name="support_orga"
                                class="fr-input"
-                               id="id_carrier_structure"
+                               id="id_support_orga"
                                x-model="newRessourcePayload.support_orga"
-                               @blur="validateField('support_orga')"
+                               @blur="validate()"
+                               @input="validate()"
                                required>
                         <template x-for="(error, index) in getFieldErrors('support_orga')" :key="index">
                             <p class="fr-error-text" x-text="error"></p>
@@ -177,7 +181,8 @@
                                class="fr-input"
                                id="id_expires_on"
                                x-model="newRessourcePayload.expires_on"
-                               @blur="validateField('expires_on')"
+                               @blur="validate()"
+                               @input="validate()"
                                required>
                         <template x-for="(error, index) in getFieldErrors('expires_on')" :key="index">
                             <p class="fr-error-text" x-text="error"></p>
@@ -188,7 +193,7 @@
                     <div class="fr-input-group"
                          x-data="SearchContactModal({searchbarOnly:true})">
                         <label class="fr-label text-modal-main-msg" for="id_contacts">Contacts</label>
-                        {% include "tools/contacts/searchbar_for_contacts.html" with dropdown_position='relative' add_contact='from_search' %}
+                        {% include "tools/contacts/searchbar_for_contacts.html" with dropdown_position="relative" add_contact="from_search" %}
                     </div>
                     <!-- display contacts -->
                     <div>

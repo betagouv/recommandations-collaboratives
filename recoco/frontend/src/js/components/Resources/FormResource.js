@@ -162,6 +162,7 @@ Alpine.data('FormResource', (resourceId) => {
     },
 
     validate() {
+      console.log('validate');
       // Build validation map from the reactive payload
       const validateMap = {
         title: this.newRessourcePayload.title,
@@ -230,14 +231,14 @@ Alpine.data('FormResource', (resourceId) => {
 
     getFieldGroupClass(fieldName) {
       if (!this.submitted) return '';
-      return this.hasFieldError(fieldName) ? 'fr-input-group--error' : '';
+      return this.hasFieldError(fieldName)
+        ? 'fr-input-group--error'
+        : 'fr-input-group--valid';
     },
 
     validateField(fieldName) {
       // Validate on blur/change for real-time feedback after first submit
-      if (this.submitted) {
-        this.validate();
-      }
+      this.validate();
     },
   };
 });

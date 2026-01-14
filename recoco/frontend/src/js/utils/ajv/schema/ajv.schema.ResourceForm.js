@@ -14,6 +14,7 @@ export const schemaResourceFormValidator = {
       errorMessage: 'Le titre est requis (max 255 caractères)',
     },
     subtitle: {
+      minLength: 1,
       type: 'string',
       maxLength: 500,
       errorMessage: 'Le sous-titre est requis (max 500 caractères)',
@@ -46,7 +47,9 @@ export const schemaResourceFormValidator = {
     },
     support_orga: {
       type: 'string',
+      minLength: 1,
       maxLength: 255,
+      errorMessage: 'La structure porteuse est requise (max 255 caractères)',
     },
     departments: {
       type: 'array',
