@@ -212,8 +212,12 @@ export function postExternalRessourceUrl() {
   return `/api/resources/import_from_uri/`;
 }
 
-export function resourceUrl() {
+export function resourcesUrl() {
   return `/api/resources/`;
+}
+
+export function resourceUrl(resourceId) {
+  return `/api/resources/${resourceId}/`;
 }
 
 // Regions :

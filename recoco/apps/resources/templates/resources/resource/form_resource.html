@@ -7,21 +7,21 @@
     {% vite_asset 'js/apps/featureAddContact.js' %}
     {% vite_asset 'js/components/AjvValidationSchema.js' %}
 {% endblock js %}
-{% comment %} {% if resource %}
-    <script>
-        const resource = {{ resource|json_script:"resource" }};
-</script>
-{% endif %} {% endcomment %}
 <!-- Form -->
 <div x-data="AjvValidationSchema('schemaResourceFormValidator')">
     <form id="form-resource" x-ref="formResource" @submit.prevent="onSubmit">
         {% csrf_token %}
-        <div x-data="{% if resource %}FormResource(resource){% else %}FormResource(){% endif %}"
+        <div x-data="FormResource({{ resource.id|default:'null'|safe }})"
+             x-init="init()"
              class="create-resources"
              @modal-response="closeCreateContactModal($event)"
              @multi-select-change="newRessourcePayload.keywords = $event.detail">
             <div class="d-flex justify-content-between">
-                <h2 class="create-resources__title text-modal-main-msg">Création de fiche ressource</h2>
+                {% if edit_resource %}
+                    <h2 class="create-resources__title text-modal-main-msg">Modification de fiche ressource</h2>
+                {% else %}
+                    <h2 class="create-resources__title text-modal-main-msg">Création de fiche ressource</h2>
+                {% endif %}
                 <div>
                     <button role="button" class="fr-btn fr-btn--tertiary fr-btn--sm fr-mr-1w">Prévisualiser</button>
                     <button role="submit"
@@ -130,7 +130,8 @@
                         </template>
                     </div>
                     <!-- Keywords multi-select -->
-                    <div class="fr-input-group create-resources__multi-select-container">
+                    <div class="fr-input-group create-resources__multi-select-container"
+                         x-data="{selected : newRessourcePayload.tags}">
                         <label class="fr-label text-modal-main-msg" for="id_keywords">Mots-clés</label>
                         {% include "tools/multi_select.html" %}
                     </div>
