@@ -312,5 +312,10 @@ Alpine.data('FormResource', (resourceId) => {
         });
       });
     },
+    suppressContact(contact) {
+      this.resourceFormData.contacts = this.resourceFormData.contacts.filter(
+        (c) => c.id !== contact.id
+      );
+    }
   };
 });

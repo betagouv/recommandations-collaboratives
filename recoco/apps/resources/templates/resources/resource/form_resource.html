@@ -199,6 +199,9 @@
                             <template x-for="contact in resourceFormData.contacts" :key="contact.id">
                                 <div class="fr-mb-2w border-light-grey"
                                      x-data="{contact:contact,isOpenDeleteContact:null}">
+                                     <div class="position-relative d-flex justify-content-end">
+                                            <span class="fr-icon-delete-line top-right-corner cursor-pointer" aria-label="supprimer contact" @click="suppressContact(contact)"></span>
+                                    </div>
                                     {% include "tools/contacts/contact_card.html" with full_width=true %}
                                 </div>
                             </template>
