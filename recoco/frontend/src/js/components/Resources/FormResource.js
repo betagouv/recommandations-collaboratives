@@ -1,6 +1,6 @@
 import Alpine from 'alpinejs';
 
-import api, { resourcesUrl, resourceUrl } from '../../utils/api';
+import api, { resourcesUrl, resourceUrl, contactUrl } from '../../utils/api';
 import { schemaResourceFormValidator } from '../../utils/ajv/schema/ajv.schema.ResourceForm';
 
 import Ajv from 'ajv';
@@ -80,7 +80,7 @@ Alpine.data('FormResource', (resourceId) => {
             title,
             subtitle,
             summary,
-            content: { text: content }, // ✅ API string -> nested object
+            content: { text: content },
             status,
             category: category?.id ?? '', // ✅ API object -> name (string)
             tags,
@@ -90,6 +90,7 @@ Alpine.data('FormResource', (resourceId) => {
             contacts,
           };
           this.$dispatch('set-content', { text: content });
+          this.fetchContacts();
 
           console.log(this.resourceFormData);
         });
@@ -110,6 +111,23 @@ Alpine.data('FormResource', (resourceId) => {
         { id: 2, text: 'Économie', value: 'economie', search: 'economie' },
         { id: 3, text: 'Social', value: 'social', search: 'social' },
       ];
+    },
+    fetchContacts() {
+      // fetch contact details for each contact id in newRessourcePayload.contacts
+      const contactIds = this.newRessourcePayload.contacts;
+      const contactPromises = contactIds.map((id) =>
+        api.get(contactUrl(id))
+      );
+      Promise.all(contactPromises)
+        .then((responses) => {
+          this.newRessourcePayload.contacts = responses.map(
+            (res) => res.data
+          );
+        }
+        )
+        .catch((error) => {
+          console.error('Error fetching contacts:', error);
+        });
     },
     closeCreateContactModal(event) {
       const contact = event.detail;
