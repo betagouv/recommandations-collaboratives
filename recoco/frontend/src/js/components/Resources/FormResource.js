@@ -113,14 +113,14 @@ Alpine.data('FormResource', (resourceId) => {
       ];
     },
     fetchContacts() {
-      // fetch contact details for each contact id in newRessourcePayload.contacts
-      const contactIds = this.newRessourcePayload.contacts;
+      // fetch contact details for each contact id in resourceFormData.contacts
+      const contactIds = this.resourceFormData.contacts;
       const contactPromises = contactIds.map((id) =>
         api.get(contactUrl(id))
       );
       Promise.all(contactPromises)
         .then((responses) => {
-          this.newRessourcePayload.contacts = responses.map(
+          this.resourceFormData.contacts = responses.map(
             (res) => res.data
           );
         }
