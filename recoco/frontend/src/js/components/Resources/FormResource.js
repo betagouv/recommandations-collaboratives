@@ -199,20 +199,20 @@ Alpine.data('FormResource', (resourceId) => {
       console.log('validate');
       // Build validation map from the reactive payload
       const validateMap = {
-        title: this.resourcePayload.title,
-        subtitle: this.resourcePayload.subtitle,
-        summary: this.resourcePayload.summary,
+        title: this.resourceFormData.title,
+        subtitle: this.resourceFormData.subtitle,
+        summary: this.resourceFormData.summary,
         content:
-          typeof this.resourcePayload.content === 'object'
-            ? this.resourcePayload.content.text
-            : this.resourcePayload.content,
-        status: this.resourcePayload.status,
-        category: parseInt(this.resourcePayload.category) || 0,
-        tags: this.resourcePayload.tags || [],
-        support_orga: this.resourcePayload.support_orga,
-        departments: this.resourcePayload.departments || [],
-        expires_on: this.resourcePayload.expires_on,
-        contacts: (this.resourcePayload.contacts || []).map((c) =>
+          typeof this.resourceFormData.content === 'object'
+            ? this.resourceFormData.content.text
+            : this.resourceFormData.content,
+        status: this.resourceFormData.status,
+        category: parseInt(this.resourceFormData.category) || 0,
+        tags: this.resourceFormData.tags || [],
+        support_orga: this.resourceFormData.support_orga,
+        departments: this.resourceFormData.departments || [],
+        expires_on: this.resourceFormData.expires_on,
+        contacts: (this.resourceFormData.contacts || []).map((c) =>
           typeof c === 'object' ? c.id : c
         ),
       };
