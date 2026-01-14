@@ -206,8 +206,9 @@ const config = {
         formResourcesStyles: resolve(
           './src/js/styles/resources/form-resources.css.js'
         ),
-        formResource: resolve(
-          './src/js/components/Resources/FormResource.js'
+        formResource: resolve('./src/js/components/Resources/FormResource.js'),
+        ajvValidationSchema: resolve(
+          './src/js/components/AjvValidationSchema.js'
         ),
       },
       output: {

@@ -5,164 +5,203 @@
     {% vite_asset 'js/components/MultiSelectRegionDepartment.js' %}
     {% vite_asset 'js/components/RegionDepartmentPreparer.js' %}
     {% vite_asset 'js/apps/featureAddContact.js' %}
+    {% vite_asset 'js/components/AjvValidationSchema.js' %}
 {% endblock js %}
 {% comment %} {% if resource %}
     <script>
         const resource = {{ resource|json_script:"resource" }};
-    </script>
+</script>
 {% endif %} {% endcomment %}
 <!-- Form -->
-<div x-data="{% if resource %}FormResource(resource){% else %}FormResource(){% endif %}"
-    class="create-resources"
-    @modal-response="closeCreateContactModal($event)"
-    @multi-select-change="newRessourcePayload.keywords = $event.detail">
-    <div class="d-flex justify-content-between">
-    <h2 class="create-resources__title text-modal-main-msg">Création de fiche ressource</h2>
-    <div>
-        <button role="button" class="fr-btn fr-btn--tertiary fr-btn--sm fr-mr-1w">Prévisualiser</button>
-        <button role="submit"
-                class="fr-btn fr-btn--primary fr-btn--sm fr-mr-1w"
-                @click="onSubmit">Sauvegarder</button>
-    </div>
-    </div>
-    <div class="fr-grid-row">
-        <!-- Column 1 -->
-        <div class="fr-col-8 fr-col-md-8 fr-col-sm-12 fr-pr-4w">
-            <!-- Title -->
-            <div class="fr-input-group">
-                <label class="fr-label text-modal-main-msg" for="id_title">Titre</label>
-                <input type="text"
-                        name="title"
-                        class="fr-input"
-                        id="id_title"
-                        required
-                        x-model="newRessourcePayload.title">
-            </div>
-            <!-- Subtitle -->
-            <div class="fr-input-group fr-mb-1w">
-                <label class="fr-label text-modal-main-msg" for="id_subtitle">Sous-titre</label>
-                <input type="text"
-                        name="subtitle"
-                        class="fr-input"
-                        id="id_subtitle"
-                        required
-                        x-model="newRessourcePayload.subtitle">
-            </div>
-            <div class="create-resources__help-text fr-mb-3w">
-                <span class="fr-icon fr-icon-information-line fr-icon--sm"></span>
-                <p>
-                    Affiché sur la page de la ressource, sur la liste des ressources, dans l’aperçu d’une recommandation avec ressource, dans l’email qui informe d’une nouvelle recommandation.
-                </p>
-            </div>
-            <!-- Summary -->
-            <div class="fr-input-group fr-mb-1w">
-                <label class="fr-label text-modal-main-msg" for="id_summary">Résumé</label>
-                <input type="text"
-                        name="summary"
-                        class="fr-input"
-                        id="id_summary"
-                        required
-                        x-model="newRessourcePayload.summary">
-            </div>
-            <div class="create-resources__help-text fr-mb-3w">
-                <span class="fr-icon fr-icon-information-line fr-icon--sm"></span>
-                <p>Affiché uniquement sur la page de la ressource.</p>
-            </div>
-            <!-- Content with tiptap editor -->
-            <div class="fr-input-group">
-                <label class="fr-label text-modal-main-msg" for="id_content">Contenu</label>
-                {% include "tools/editor.html" with model="newRessourcePayload.content" input_name="content" initial_content="" input_required=True can_add_reco=False can_attach_files=False can_attach_contact=False show_send_button=False can_compress_editor=False %}
-            </div>
-        </div>
-        <!-- Column 2 -->
-        <div class="fr-col-4 fr-col-md-4 fr-col-sm-12 "
-                @set-departments="newRessourcePayload.departments = $event.detail">
-            <!-- Status select -->
-            <div class="fr-input-group">
-                <label class="fr-label text-modal-main-msg" for="id_summary">Statut de publication</label>
-                <div class="d-flex">
-                    <button type="button"
-                            class="fr-btn w-50 justify-content-center"
-                            :class="newRessourcePayload.status !== 0 ? 'fr-btn--secondary' : ''"
-                            @click="newRessourcePayload.status = 0">Brouillon</button>
-                    <button type="button"
-                            class="fr-btn w-50 justify-content-center"
-                            :class="newRessourcePayload.status !== 2 ? 'fr-btn--secondary' : ''"
-                            @click="newRessourcePayload.status = 2">Publié</button>
+<div x-data="AjvValidationSchema('schemaResourceFormValidator')">
+    <form id="form-resource" x-ref="formResource" @submit.prevent="onSubmit">
+        {% csrf_token %}
+        <div x-data="{% if resource %}FormResource(resource){% else %}FormResource(){% endif %}"
+             class="create-resources"
+             @modal-response="closeCreateContactModal($event)"
+             @multi-select-change="newRessourcePayload.keywords = $event.detail">
+            <div class="d-flex justify-content-between">
+                <h2 class="create-resources__title text-modal-main-msg">Création de fiche ressource</h2>
+                <div>
+                    <button role="button" class="fr-btn fr-btn--tertiary fr-btn--sm fr-mr-1w">Prévisualiser</button>
+                    <button role="submit"
+                            class="fr-btn fr-btn--primary fr-btn--sm fr-mr-1w"
+                            @click="onSubmit">Sauvegarder</button>
                 </div>
             </div>
-            <!-- Category select -->
-            <div class="fr-input-group">
-                <label class="fr-label text-modal-main-msg" for="id_category">Catégorie</label>
-                <select name="category"
-                        id="id_category"
-                        class="fr-select"
-                        required
-                        valueAsNumber
-                        x-model="newRessourcePayload.category">
-                    <option value="" selected disabled>Sélectionner une catégorie</option>
-                    {% for category in categories %}<option value="{{ category.id }}">{{ category.name }}</option>{% endfor %}
-                </select>
-            </div>
-            <!-- Keywords multi-select -->
-            <div class="fr-input-group create-resources__multi-select-container">
-                <label class="fr-label text-modal-main-msg" for="id_keywords">Mots-clés</label>
-                {% include "tools/multi_select.html" %}
-            </div>
-            <!-- Carrier structure -->
-            <div class="fr-input-group">
-                <label class="fr-label text-modal-main-msg" for="id_carrier_structure">Structure porteuse</label>
-                <input type="text"
-                        name="carrier_structure"
-                        class="fr-input"
-                        id="id_carrier_structure"
-                        x-model="newRessourcePayload.support_orga"
-                        required>
-            </div>
-            <!-- Departments/regions multiple select -->
-            <div class="fr-input-group multi-select-region"
-                    x-data="RegionDepartmentPreparer({ selectedDepartments: [] })">
-                <label class="fr-label text-modal-main-msg" for="id_territory">Territoire</label>
-                <template x-if="objectsToSelect && objectsToSelect.length">
-                    <div x-data="MultiSelectRegionDepartment({ selected: selectedDepartments, objectsToSelect: objectsToSelect, displayRegions: true })">
-                        {% include "tools/contacts/multi_select.html" with placeholder="Cherchez et sélectionnez vos départements et régions" label="none" display_regions=True %}
-                        <template x-for="dept in selectedDepartments" :key="dept">
-                            <input type="hidden" name="departments" :value="dept">
+            <div class="fr-grid-row">
+                <!-- Column 1 -->
+                <div class="fr-col-8 fr-col-md-8 fr-col-sm-12 fr-pr-4w">
+                    <!-- Title -->
+                    <div class="fr-input-group" :class="getFieldGroupClass('title')">
+                        <label class="fr-label text-modal-main-msg" for="id_title">Titre</label>
+                        <input type="text"
+                               name="title"
+                               class="fr-input"
+                               id="id_title"
+                               required
+                               x-model="newRessourcePayload.title"
+                               @blur="validateField('title')">
+                        <template x-for="(error, index) in getFieldErrors('title')" :key="index">
+                            <p class="fr-error-text" x-text="error"></p>
                         </template>
-                        {% if form.departments.errors %}
-                            <div class="fr-error-text form-mandatory-element">{{ form.departments.errors.0 }}</div>
-                        {% endif %}
                     </div>
-                </template>
-            </div>
-            <!-- Expires on date picker -->
-            <div class="fr-input-group">
-                <label class="fr-label text-modal-main-msg" for="id_expires_on">Date d'expiration</label>
-                <input type="date"
-                        name="expires_on"
-                        class="fr-input"
-                        id="id_expires_on"
-                        x-model="newRessourcePayload.expires_on"
-                        required>
-            </div>
-            <!-- Contacts component (multiple) -->
-            <!-- add contacts -->
-            <div class="fr-input-group"
-                    x-data="SearchContactModal({searchbarOnly:true})">
-                <label class="fr-label text-modal-main-msg" for="id_contacts">Contacts</label>
-                {% include "tools/contacts/searchbar_for_contacts.html" with dropdown_position='relative' add_contact='from_search' %}
-            </div>
-            <!-- display contacts -->
-            <div>
-                <template x-if="newRessourcePayload.contacts.length > 0">
-                    <template x-for="contact in newRessourcePayload.contacts" :key="contact.id">
-                        <div class="fr-mb-2w border-light-grey"
-                                x-data="{contact:contact,isOpenDeleteContact:null}">
-                            {% include "tools/contacts/contact_card.html" with full_width=true %}
+                    <!-- Subtitle -->
+                    <div class="fr-input-group fr-mb-1w"
+                         :class="getFieldGroupClass('subtitle')">
+                        <label class="fr-label text-modal-main-msg" for="id_subtitle">Sous-titre</label>
+                        <input type="text"
+                               name="subtitle"
+                               class="fr-input"
+                               id="id_subtitle"
+                               required
+                               x-model="newRessourcePayload.subtitle"
+                               @blur="validateField('subtitle')">
+                        <template x-for="(error, index) in getFieldErrors('subtitle')" :key="index">
+                            <p class="fr-error-text" x-text="error"></p>
+                        </template>
+                    </div>
+                    <div class="create-resources__help-text fr-mb-3w">
+                        <span class="fr-icon fr-icon-information-line fr-icon--sm"></span>
+                        <p>
+                            Affiché sur la page de la ressource, sur la liste des ressources, dans l’aperçu d’une recommandation avec ressource, dans l’email qui informe d’une nouvelle recommandation.
+                        </p>
+                    </div>
+                    <!-- Summary -->
+                    <div class="fr-input-group fr-mb-1w"
+                         :class="getFieldGroupClass('summary')">
+                        <label class="fr-label text-modal-main-msg" for="id_summary">Résumé</label>
+                        <input type="text"
+                               name="summary"
+                               class="fr-input"
+                               id="id_summary"
+                               required
+                               x-model="newRessourcePayload.summary"
+                               @blur="validateField('summary')">
+                        <template x-for="(error, index) in getFieldErrors('summary')" :key="index">
+                            <p class="fr-error-text" x-text="error"></p>
+                        </template>
+                    </div>
+                    <div class="create-resources__help-text fr-mb-3w">
+                        <span class="fr-icon fr-icon-information-line fr-icon--sm"></span>
+                        <p>Affiché uniquement sur la page de la ressource.</p>
+                    </div>
+                    <!-- Content with tiptap editor -->
+                    <div class="fr-input-group" :class="getFieldGroupClass('content')">
+                        <label class="fr-label text-modal-main-msg" for="id_content">Contenu</label>
+                        {% include "tools/editor.html" with model="newRessourcePayload.content" input_name="content" initial_content="" input_required=True can_add_reco=False can_attach_files=False can_attach_contact=False show_send_button=False can_compress_editor=False %}
+                        <template x-for="(error, index) in getFieldErrors('content')" :key="index">
+                            <p class="fr-error-text" x-text="error"></p>
+                        </template>
+                    </div>
+                </div>
+                <!-- Column 2 -->
+                <div class="fr-col-4 fr-col-md-4 fr-col-sm-12 "
+                     @set-departments="newRessourcePayload.departments = $event.detail">
+                    <!-- Status select -->
+                    <div class="fr-input-group">
+                        <label class="fr-label text-modal-main-msg" for="id_summary">Statut de publication</label>
+                        <div class="d-flex">
+                            <button type="button"
+                                    class="fr-btn w-50 justify-content-center"
+                                    :class="newRessourcePayload.status !== 0 ? 'fr-btn--secondary' : ''"
+                                    @click="newRessourcePayload.status = 0">Brouillon</button>
+                            <button type="button"
+                                    class="fr-btn w-50 justify-content-center"
+                                    :class="newRessourcePayload.status !== 2 ? 'fr-btn--secondary' : ''"
+                                    @click="newRessourcePayload.status = 2">Publié</button>
                         </div>
-                    </template>
-                </template>
+                    </div>
+                    <!-- Category select -->
+                    <div class="fr-input-group" :class="getFieldGroupClass('category')">
+                        <label class="fr-label text-modal-main-msg" for="id_category">Catégorie</label>
+                        <select name="category"
+                                id="id_category"
+                                class="fr-select"
+                                required
+                                valueAsNumber
+                                x-model="newRessourcePayload.category"
+                                @change="validateField('category')">
+                            <option value="" selected disabled>Sélectionner une catégorie</option>
+                            {% for category in categories %}<option value="{{ category.id }}">{{ category.name }}</option>{% endfor %}
+                        </select>
+                        <template x-for="(error, index) in getFieldErrors('category')" :key="index">
+                            <p class="fr-error-text" x-text="error"></p>
+                        </template>
+                    </div>
+                    <!-- Keywords multi-select -->
+                    <div class="fr-input-group create-resources__multi-select-container">
+                        <label class="fr-label text-modal-main-msg" for="id_keywords">Mots-clés</label>
+                        {% include "tools/multi_select.html" %}
+                    </div>
+                    <!-- Carrier structure -->
+                    <div class="fr-input-group" :class="getFieldGroupClass('support_orga')">
+                        <label class="fr-label text-modal-main-msg" for="id_carrier_structure">Structure porteuse</label>
+                        <input type="text"
+                               name="carrier_structure"
+                               class="fr-input"
+                               id="id_carrier_structure"
+                               x-model="newRessourcePayload.support_orga"
+                               @blur="validateField('support_orga')"
+                               required>
+                        <template x-for="(error, index) in getFieldErrors('support_orga')" :key="index">
+                            <p class="fr-error-text" x-text="error"></p>
+                        </template>
+                    </div>
+                    <!-- Departments/regions multiple select -->
+                    <div class="fr-input-group multi-select-region"
+                         :class="getFieldGroupClass('departments')"
+                         x-data="RegionDepartmentPreparer({ selectedDepartments: [] })">
+                        <label class="fr-label text-modal-main-msg" for="id_territory">Territoire</label>
+                        <template x-if="objectsToSelect && objectsToSelect.length">
+                            <div x-data="MultiSelectRegionDepartment({ selected: selectedDepartments, objectsToSelect: objectsToSelect, displayRegions: true })">
+                                {% include "tools/contacts/multi_select.html" with placeholder="Cherchez et sélectionnez vos départements et régions" label="none" display_regions=True %}
+                                <template x-for="dept in selectedDepartments" :key="dept">
+                                    <input type="hidden" name="departments" :value="dept">
+                                </template>
+                                {% if form.departments.errors %}
+                                    <div class="fr-error-text form-mandatory-element">{{ form.departments.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </template>
+                        <template x-for="(error, index) in getFieldErrors('departments')" :key="index">
+                            <p class="fr-error-text" x-text="error"></p>
+                        </template>
+                    </div>
+                    <!-- Expires on date picker -->
+                    <div class="fr-input-group" :class="getFieldGroupClass('expires_on')">
+                        <label class="fr-label text-modal-main-msg" for="id_expires_on">Date d'expiration</label>
+                        <input type="date"
+                               name="expires_on"
+                               class="fr-input"
+                               id="id_expires_on"
+                               x-model="newRessourcePayload.expires_on"
+                               @blur="validateField('expires_on')"
+                               required>
+                        <template x-for="(error, index) in getFieldErrors('expires_on')" :key="index">
+                            <p class="fr-error-text" x-text="error"></p>
+                        </template>
+                    </div>
+                    <!-- Contacts component (multiple) -->
+                    <!-- add contacts -->
+                    <div class="fr-input-group"
+                         x-data="SearchContactModal({searchbarOnly:true})">
+                        <label class="fr-label text-modal-main-msg" for="id_contacts">Contacts</label>
+                        {% include "tools/contacts/searchbar_for_contacts.html" with dropdown_position='relative' add_contact='from_search' %}
+                    </div>
+                    <!-- display contacts -->
+                    <div>
+                        <template x-if="newRessourcePayload.contacts.length > 0">
+                            <template x-for="contact in newRessourcePayload.contacts" :key="contact.id">
+                                <div class="fr-mb-2w border-light-grey"
+                                     x-data="{contact:contact,isOpenDeleteContact:null}">
+                                    {% include "tools/contacts/contact_card.html" with full_width=true %}
+                                </div>
+                            </template>
+                        </template>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
+    </form>
 </div>

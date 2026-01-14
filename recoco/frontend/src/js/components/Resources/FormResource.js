@@ -1,7 +1,7 @@
 import Alpine from 'alpinejs';
 
 import api, { resourceUrl } from '../../utils/api';
-import { schemaResourceFormValidator } from '../../utils/ajv/schema/ajv.schema.FormResource';
+import { schemaResourceFormValidator } from '../../utils/ajv/schema/ajv.schema.ResourceForm';
 
 import Ajv from 'ajv';
 import addFormats from 'ajv-formats';
@@ -15,6 +15,9 @@ Alpine.data('FormResource', (resource) => {
   return {
     is_draft: true,
     keywords_options: [],
+    errors: [],
+    formFields: {},
+    submitted: false,
     newRessourcePayload: {
       title: '',
       subtitle: '',
@@ -53,9 +56,7 @@ Alpine.data('FormResource', (resource) => {
       },
     ],
     init() {
-      console.log('FormResource');
       if (resource) {
-        console.log('Editing existing resource:', resource);
         this.newRessourcePayload = { ...resource };
       }
       this.fetchKeywords();
@@ -93,26 +94,13 @@ Alpine.data('FormResource', (resource) => {
     },
     onSubmit(event) {
       event.preventDefault();
-      // this.validate();
-      // if (this.errors.length > 0) {
-      //   console.log('Errors:', this.errors);
-      //   return;
-      // }
-      this.newRessourcePayload = {
-        title: 'Mon titre',
-        subtitle: 'Mon sous-titre',
-        summary: 'Mon résumé',
-        content: {
-          text: 'Mon contenu',
-        },
-        status: 0,
-        category: 1,
-        tags: ['tag1', 'tag2'],
-        support_orga: 'Mon structure porteuse',
-        departments: ['01', '02'],
-        expires_on: new Date().toISOString().split('T')[0],
-        contacts: [],
-      };
+      this.submitted = true;
+      const isValid = this.validate();
+
+      if (!isValid) {
+        return;
+      }
+
       console.log(this.newRessourcePayload);
       this.newRessourcePayload = {
         ...this.newRessourcePayload,
@@ -129,17 +117,81 @@ Alpine.data('FormResource', (resource) => {
     },
 
     validate() {
-      const fields = Object.keys(this.$refs.createResourceForm);
-      const validateMap = {};
-      fields.forEach((field) => {
-        validateMap[field] = this.$refs.createResourceForm[field].value;
-      });
+      // Build validation map from the reactive payload
+      const validateMap = {
+        title: this.newRessourcePayload.title,
+        subtitle: this.newRessourcePayload.subtitle,
+        summary: this.newRessourcePayload.summary,
+        content:
+          typeof this.newRessourcePayload.content === 'object'
+            ? this.newRessourcePayload.content.text
+            : this.newRessourcePayload.content,
+        status: this.newRessourcePayload.status,
+        category: parseInt(this.newRessourcePayload.category) || 0,
+        tags: this.newRessourcePayload.tags || [],
+        support_orga: this.newRessourcePayload.support_orga,
+        departments: this.newRessourcePayload.departments || [],
+        expires_on: this.newRessourcePayload.expires_on,
+        contacts: (this.newRessourcePayload.contacts || []).map((c) =>
+          typeof c === 'object' ? c.id : c
+        ),
+      };
+
       const validate = ajv.compile(schemaResourceFormValidator);
       const valid = validate(validateMap);
+
       if (valid) {
         this.errors = [];
       } else {
         this.errors = validate.errors;
+      }
+
+      // Update formFields for per-field error tracking
+      this.updateFormFieldsErrors();
+
+      return valid;
+    },
+
+    updateFormFieldsErrors() {
+      // Reset all field errors
+      const fieldNames = Object.keys(schemaResourceFormValidator.properties);
+      fieldNames.forEach((field) => {
+        if (!this.formFields[field]) {
+          this.formFields[field] = { errors: [], hasError: false };
+        }
+        this.formFields[field].errors = [];
+        this.formFields[field].hasError = false;
+      });
+
+      // Map errors to their respective fields
+      this.errors.forEach((error) => {
+        const fieldName = error.instancePath.substring(1);
+        if (fieldName && this.formFields[fieldName]) {
+          this.formFields[fieldName].errors.push(error.message);
+          this.formFields[fieldName].hasError = true;
+        }
+      });
+    },
+
+    getFieldErrors(fieldName) {
+      if (!this.submitted) return [];
+      return this.formFields[fieldName]?.errors || [];
+    },
+
+    hasFieldError(fieldName) {
+      if (!this.submitted) return false;
+      return this.formFields[fieldName]?.hasError || false;
+    },
+
+    getFieldGroupClass(fieldName) {
+      if (!this.submitted) return '';
+      return this.hasFieldError(fieldName) ? 'fr-input-group--error' : '';
+    },
+
+    validateField(fieldName) {
+      // Validate on blur/change for real-time feedback after first submit
+      if (this.submitted) {
+        this.validate();
       }
     },
   };

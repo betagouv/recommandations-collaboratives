@@ -95,6 +95,7 @@ Parameters:
                   data-test-id="tiptap-editor-textarea"
                   {% if model %} x-model="{{ model }}.text" x-modelable="markdownContent" {% else %} x-model="markdownContent" {% endif %}
                   name="{{input_name|default:"content"}}"
+                  id="id_{{input_name|default:"content"}}"
                   {% if input_required %} required {% endif %}></textarea>
         <div class="module__container">
             <div class="info-module__container fr-mb-2v">
