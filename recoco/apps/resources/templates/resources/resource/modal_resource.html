@@ -1,0 +1,23 @@
+<!-- Full screen modal -->
+<div class="modal fade"
+    :id="`resource-preview-`+{{ resource.id|default:'null'|safe }}"
+    tabindex="-1"
+    :aria-labelledby="`resource-preview-`+{{ resource.id|default:'null'|safe }}"
+    aria-hidden="true">
+    <div class="modal-dialog modal-fullscreen">
+        <div class="modal-content">
+            <div class="modal-header justify-content-between">
+                <h5 class="modal-title">Prévisualisation de la ressource {{ resource.get_embeded_url }}</h5>
+                <button type="button"
+                        class="fr-btn fr-btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close">Fermer</button>
+            </div>
+            <div class="modal-body">
+                {% if resource.get_embeded_url %}
+                    <iframe class="w-100 h-100" :src="window.location.origin + '{{ resource.get_embeded_url|default:'' }}'"></iframe>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>

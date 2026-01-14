@@ -23,11 +23,14 @@
                     <h2 class="create-resources__title text-modal-main-msg">Création de fiche ressource</h2>
                 {% endif %}
                 <div>
-                    <button role="button" class="fr-btn fr-btn--tertiary fr-btn--sm fr-mr-1w">Prévisualiser</button>
+                    <button @click.prevent
+                            data-bs-toggle="modal"
+                            :data-bs-target="`#resource-preview-`+{{ resource.id|default:'null'|safe }}" role="button" class="fr-btn fr-btn--tertiary fr-btn--sm fr-mr-1w">Prévisualiser</button>
                     <button role="submit"
                             class="fr-btn fr-btn--primary fr-btn--sm fr-mr-1w"
                             @click="onSubmit">Sauvegarder</button>
                 </div>
+                {% include 'resources/resource/modal_resource.html' %}
             </div>
             <div class="fr-grid-row">
                 <!-- Column 1 -->
