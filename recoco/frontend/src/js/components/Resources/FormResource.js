@@ -18,19 +18,19 @@ Alpine.data('FormResource', (resourceId) => {
     errors: [],
     formFields: {},
     submitted: false,
-    newRessourcePayload: {
-      title: '',
-      subtitle: '',
-      summary: '',
+    resourceFormData: {
+      title: null,
+      subtitle: null,
+      summary: null,
       content: {
-        text: '',
+        text: null,
       },
       status: 0,
-      category: '',
+      category: null,
       tags: [],
-      support_orga: '',
+      support_orga: null,
       departments: [],
-      expires_on: '',
+      expires_on: null,
       contacts: [],
     },
     options: [
@@ -56,9 +56,9 @@ Alpine.data('FormResource', (resourceId) => {
       },
     ],
     init() {
-      console.log('FormResource');
+      // this.initFormFields(this.$refs.formResource);
       if (resourceId) {
-        // fetch resource data and populate newRessourcePayload
+        // fetch resource data and populate resourcePayload
         api.get(resourceUrl(resourceId)).then((response) => {
           console.log('Fetched resource data:', response.data);
           const {
@@ -75,22 +75,23 @@ Alpine.data('FormResource', (resourceId) => {
             contacts = [],
           } = response.data;
 
-          this.newRessourcePayload = {
+          this.resourceFormData = {
             // keep your exact payload shape
             title,
             subtitle,
             summary,
             content: { text: content }, // ✅ API string -> nested object
             status,
-            category: category?.name ?? '', // ✅ API object -> name (string)
+            category: category?.id ?? '', // ✅ API object -> name (string)
             tags,
             support_orga,
             departments,
             expires_on,
             contacts,
           };
+          this.$dispatch('set-content', { text: content });
 
-          console.log(this.newRessourcePayload);
+          console.log(this.resourceFormData);
         });
       }
       this.fetchKeywords();
@@ -113,12 +114,12 @@ Alpine.data('FormResource', (resourceId) => {
     closeCreateContactModal(event) {
       const contact = event.detail;
       // avoid duplicates
-      const exists = this.newRessourcePayload.contacts.some(
+      const exists = this.resourceFormData.contacts.some(
         (c) => c.id === contact.id
       );
       if (!exists) {
-        this.newRessourcePayload.contacts = [
-          ...this.newRessourcePayload.contacts,
+        this.resourceFormData.contacts = [
+          ...this.resourceFormData.contacts,
           contact,
         ];
       } else {
@@ -129,20 +130,48 @@ Alpine.data('FormResource', (resourceId) => {
     onSubmit(event) {
       event.preventDefault();
       this.submitted = true;
-      const isValid = this.validate();
 
-      if (!isValid) {
-        return;
-      }
+      // *********** TEST DATA ***********
 
-      console.log(this.newRessourcePayload);
-      this.newRessourcePayload = {
-        ...this.newRessourcePayload,
-        content: this.newRessourcePayload.content.text,
+      this.resourceFormData = {
+        title: 'Test',
+        subtitle: 'dez',
+        summary: 'dez',
+        content: { text: 'dez' },
+        status: 0,
+        tags: [],
+        support_orga: 'dezdez',
+        departments: [
+          '01',
+          '03',
+          '07',
+          '15',
+          '26',
+          '43',
+          '74',
+          '38',
+          '42',
+          '63',
+          '69',
+          '73',
+        ],
+        expires_on: '2026-01-23',
+        contacts: [],
+        keywords: ['PRE_DRAFT'],
+        category_id: '1',
       };
+      // *********** END TEST DATA ************/
+
+      console.log(this.resourceFormData);
+      this.resourcePayload = {
+        ...this.resourceFormData,
+        content: this.resourceFormData.content.text,
+        category_id: this.resourceFormData.category,
+      };
+      delete this.resourcePayload.category;
       if (resourceId) {
         api
-          .put(resourceUrl(resourceId), this.newRessourcePayload)
+          .put(resourceUrl(resourceId), this.resourcePayload)
           .then((response) => {
             console.log('Resource updated:', response.data);
           })
@@ -151,7 +180,7 @@ Alpine.data('FormResource', (resourceId) => {
           });
       } else {
         api
-          .post(resourcesUrl(), this.newRessourcePayload)
+          .post(resourcesUrl(), this.resourcePayload)
           .then((response) => {
             console.log('Resource created:', response.data);
           })
@@ -165,20 +194,20 @@ Alpine.data('FormResource', (resourceId) => {
       console.log('validate');
       // Build validation map from the reactive payload
       const validateMap = {
-        title: this.newRessourcePayload.title,
-        subtitle: this.newRessourcePayload.subtitle,
-        summary: this.newRessourcePayload.summary,
+        title: this.resourcePayload.title,
+        subtitle: this.resourcePayload.subtitle,
+        summary: this.resourcePayload.summary,
         content:
-          typeof this.newRessourcePayload.content === 'object'
-            ? this.newRessourcePayload.content.text
-            : this.newRessourcePayload.content,
-        status: this.newRessourcePayload.status,
-        category: parseInt(this.newRessourcePayload.category) || 0,
-        tags: this.newRessourcePayload.tags || [],
-        support_orga: this.newRessourcePayload.support_orga,
-        departments: this.newRessourcePayload.departments || [],
-        expires_on: this.newRessourcePayload.expires_on,
-        contacts: (this.newRessourcePayload.contacts || []).map((c) =>
+          typeof this.resourcePayload.content === 'object'
+            ? this.resourcePayload.content.text
+            : this.resourcePayload.content,
+        status: this.resourcePayload.status,
+        category: parseInt(this.resourcePayload.category) || 0,
+        tags: this.resourcePayload.tags || [],
+        support_orga: this.resourcePayload.support_orga,
+        departments: this.resourcePayload.departments || [],
+        expires_on: this.resourcePayload.expires_on,
+        contacts: (this.resourcePayload.contacts || []).map((c) =>
           typeof c === 'object' ? c.id : c
         ),
       };
@@ -230,6 +259,7 @@ Alpine.data('FormResource', (resourceId) => {
     },
 
     getFieldGroupClass(fieldName) {
+      // if (!this.$refs.formResource[field].dataset.dirty) return '';
       if (!this.submitted) return '';
       return this.hasFieldError(fieldName)
         ? 'fr-input-group--error'
@@ -240,5 +270,20 @@ Alpine.data('FormResource', (resourceId) => {
       // Validate on blur/change for real-time feedback after first submit
       this.validate();
     },
+
+    // validateField(field) {
+    //   // Vérifier l'état
+    //   const isPristine = !field.dataset.dirty;
+    //   console.log(this.$refs.formResource[field].pristine);
+    //   this.validate();
+    // },
+
+    // initFormFields(form) {
+    //   form.querySelectorAll('input, textarea, select').forEach((field) => {
+    //     field.addEventListener('input', () => {
+    //       field.dataset.dirty = 'true';
+    //     });
+    //   });
+    // },
   };
 });

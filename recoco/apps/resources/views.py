@@ -359,6 +359,10 @@ def resource_update(request, resource_id=None):
 
     resource = get_object_or_404(models.Resource, pk=resource_id)
 
+    categories = list(
+        models.Category.on_site.values("id", "name", "color", "icon").order_by("name")
+    )
+
     if request.method == "POST":
         form = EditResourceForm(request.POST, instance=resource)
 

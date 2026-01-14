@@ -15,7 +15,7 @@
              x-init="init()"
              class="create-resources"
              @modal-response="closeCreateContactModal($event)"
-             @multi-select-change="newRessourcePayload.keywords = $event.detail">
+             @multi-select-change="resourceFormData.keywords = $event.detail">
             <div class="d-flex justify-content-between">
                 {% if edit_resource %}
                     <h2 class="create-resources__title text-modal-main-msg">Modification de fiche ressource</h2>
@@ -40,7 +40,7 @@
                                class="fr-input"
                                id="id_title"
                                required
-                               x-model="newRessourcePayload.title"
+                               x-model="resourceFormData.title"
                                @blur="validate()"
                                @input="validate()">
                         <template x-for="(error, index) in getFieldErrors('title')" :key="index">
@@ -56,7 +56,7 @@
                                class="fr-input"
                                id="id_subtitle"
                                required
-                               x-model="newRessourcePayload.subtitle"
+                               x-model="resourceFormData.subtitle"
                                @blur="validate()"
                                @input="validate()">
                         <template x-for="(error, index) in getFieldErrors('subtitle')" :key="index">
@@ -78,7 +78,7 @@
                                class="fr-input"
                                id="id_summary"
                                required
-                               x-model="newRessourcePayload.summary"
+                               x-model="resourceFormData.summary"
                                @blur="validate()">
                         <template x-for="(error, index) in getFieldErrors('summary')" :key="index">
                             <p class="fr-error-text" x-text="error"></p>
@@ -91,7 +91,7 @@
                     <!-- Content with tiptap editor -->
                     <div class="fr-input-group" :class="getFieldGroupClass('content')">
                         <label class="fr-label text-modal-main-msg" for="id_content">Contenu</label>
-                        {% include "tools/editor.html" with model="newRessourcePayload.content" input_name="content" initial_content="" input_required=True can_add_reco=False can_attach_files=False can_attach_contact=False show_send_button=False can_compress_editor=False %}
+                        {% include "tools/editor.html" with model="resourceFormData.content" initial_content="resourceFormData.content.text" initial_content_js=True input_required=True %}
                         <template x-for="(error, index) in getFieldErrors('content')" :key="index">
                             <p class="fr-error-text" x-text="error"></p>
                         </template>
@@ -99,19 +99,19 @@
                 </div>
                 <!-- Column 2 -->
                 <div class="fr-col-4 fr-col-md-4 fr-col-sm-12 "
-                     @set-departments="newRessourcePayload.departments = $event.detail">
+                     @set-departments="resourceFormData.departments = $event.detail">
                     <!-- Status select -->
                     <div class="fr-input-group">
                         <label class="fr-label text-modal-main-msg" for="id_status">Statut de publication</label>
                         <div class="d-flex">
                             <button type="button"
                                     class="fr-btn w-50 justify-content-center"
-                                    :class="newRessourcePayload.status !== 0 ? 'fr-btn--secondary' : ''"
-                                    @click="newRessourcePayload.status = 0">Brouillon</button>
+                                    :class="resourceFormData.status !== 0 ? 'fr-btn--secondary' : ''"
+                                    @click="resourceFormData.status = 0">Brouillon</button>
                             <button type="button"
                                     class="fr-btn w-50 justify-content-center"
-                                    :class="newRessourcePayload.status !== 2 ? 'fr-btn--secondary' : ''"
-                                    @click="newRessourcePayload.status = 2">Publié</button>
+                                    :class="resourceFormData.status !== 2 ? 'fr-btn--secondary' : ''"
+                                    @click="resourceFormData.status = 2">Publié</button>
                         </div>
                     </div>
                     <!-- Category select -->
@@ -122,11 +122,14 @@
                                 class="fr-select"
                                 required
                                 valueAsNumber
-                                x-model="newRessourcePayload.category"
+                                x-model="resourceFormData.category"
                                 @blur="validate()"
                                 @input="validate()">
                             <option value="" selected disabled>Sélectionner une catégorie</option>
-                            {% for category in categories %}<option value="{{ category.id }}">{{ category.name }}</option>{% endfor %}
+                            {% for category in categories %}
+                                <option :data="JSON.stringify({id: {{ category.id }}, name: '{{ category.name }}'})"
+                                        value="{{ category.id }}">{{ category.name }}</option>
+                            {% endfor %}
                         </select>
                         <template x-for="(error, index) in getFieldErrors('category')" :key="index">
                             <p class="fr-error-text" x-text="error"></p>
@@ -134,7 +137,7 @@
                     </div>
                     <!-- Keywords multi-select -->
                     <div class="fr-input-group create-resources__multi-select-container"
-                         x-data="{selected : newRessourcePayload.tags}">
+                         x-data="{selected : resourceFormData.tags}">
                         <label class="fr-label text-modal-main-msg" for="id_keywords">Mots-clés</label>
                         {% include "tools/multi_select.html" %}
                     </div>
@@ -145,7 +148,7 @@
                                name="support_orga"
                                class="fr-input"
                                id="id_support_orga"
-                               x-model="newRessourcePayload.support_orga"
+                               x-model="resourceFormData.support_orga"
                                @blur="validate()"
                                @input="validate()"
                                required>
@@ -180,7 +183,7 @@
                                name="expires_on"
                                class="fr-input"
                                id="id_expires_on"
-                               x-model="newRessourcePayload.expires_on"
+                               x-model="resourceFormData.expires_on"
                                @blur="validate()"
                                @input="validate()"
                                required>
@@ -197,8 +200,8 @@
                     </div>
                     <!-- display contacts -->
                     <div>
-                        <template x-if="newRessourcePayload.contacts.length > 0">
-                            <template x-for="contact in newRessourcePayload.contacts" :key="contact.id">
+                        <template x-if="resourceFormData.contacts.length > 0">
+                            <template x-for="contact in resourceFormData.contacts" :key="contact.id">
                                 <div class="fr-mb-2w border-light-grey"
                                      x-data="{contact:contact,isOpenDeleteContact:null}">
                                     {% include "tools/contacts/contact_card.html" with full_width=true %}

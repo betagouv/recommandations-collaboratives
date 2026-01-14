@@ -26,7 +26,7 @@ Parameters:
 <div class="w-100 position-relative editor-container"
      {% if initial_content_escapejs %} x-data='editor("{{ initial_content|escapejs }}", "{{ placeholder }}", "{{ is_action_pusher }}" == "True" )' {% elif initial_content_js %} x-data='editor({{ initial_content }}, "{{ placeholder }}", "{{ is_action_pusher }}" == "True")' {% else %} x-data='editor("{{ initial_content }}", "{{ placeholder }}", "{{ is_action_pusher }}" == "True")' {% endif %}
      @reset-contact="handleResetContact()"
-     @set-comment.window="setMarkdownContent(event)"
+     @set-content.window="setMarkdownContent(event)"
      @modal-response="closeSearchContactModal($event)"
      x-ref="editor"
      data-test-id="tiptap-editor">
