@@ -16,6 +16,7 @@ from model_clone import CloneMixin
 from tagging.fields import TagField
 from tagging.models import Tag
 from tagging.registry import register as tagging_register
+from taggit.managers import TaggableManager
 
 from recoco.apps.projects import models as projects_models
 
@@ -85,6 +86,18 @@ class QuestionSet(CloneMixin, models.Model):
     )
 
     deleted = models.DateTimeField(null=True, blank=True)
+
+    precondition_tags = TaggableManager(
+        verbose_name="Pré-condition",
+        help_text="Affiche ce groupe de questions si TOUS les signaux saisis sont émis",
+        blank=True,
+    )
+
+    def check_precondition(self, session: "Session"):
+        """Return true if the precondition is met"""
+        # todo check compatibility with taggit
+        my_tags = set(self.precondition_tags.values_list("name", flat=True))
+        return my_tags.issubset(session.signals)
 
     def _following(self, order_by):
         """return the following question set defined by the given order_byi sequence"""
@@ -333,16 +346,30 @@ class Session(models.Model):
         )
 
         if not question:
-            question = self.first_question()
+            initial_question = self.first_question()
         else:
-            question = question.next()
+            initial_question = question.next()
+        question = initial_question
 
         while question:
-            if question.id not in answered_questions:
-                if question.check_precondition(self):
-                    return question
+            if question.id not in answered_questions and question.check_precondition(
+                self
+            ):
+                return question
             question = question.next()
+            if question is None:
+                # No next question in current question set, ask sibling
+                question = self._next_qestion_set(
+                    initial_question.question_set
+                ).first_question()
 
+        return None
+
+    def _next_qestion_set(self, qs):
+        qs = qs.question_set.next()
+        while qs:
+            if qs and qs.check_precondition(self.signals):
+                return qs
         return None
 
     def previous_question(self, question=None):
@@ -368,6 +395,7 @@ class Session(models.Model):
 
     def first_question(self):
         """Return the first Question of the first Question Set"""
+        # todo order_by qs ?
         for qs in self.survey.question_sets.all():
             for question in qs.questions.all().order_by("-priority", "id"):
                 return question
