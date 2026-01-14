@@ -109,16 +109,10 @@ class QuestionSet(CloneMixin, models.Model):
         return self._following(order_by=["priority", "-id"])
 
     def first_question(self):
-        for question in self.questions.all().order_by("-priority", "id"):
-            return question
-
-        return None
+        return self.questions.all().order_by("-priority", "id").first()
 
     def last_question(self):
-        for question in self.questions.all().order_by("priority", "-id"):
-            return question
-
-        return None
+        return self.questions.all().order_by("priority", "-id").first()
 
     _clone_m2o_or_o2m_fields = ["questions"]
 
@@ -332,7 +326,7 @@ class Session(models.Model):
         """Return the next unanswered question or None.
 
         It will trigger only the questions that passes their precondition.
-        This is the prefered interface to navigate questions
+        This is the preferred interface to navigate questions
         """
         answered_questions = Answer.objects.filter(session=self).values_list(
             "question__id", flat=True
