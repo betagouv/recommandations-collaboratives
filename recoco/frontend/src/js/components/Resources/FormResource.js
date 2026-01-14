@@ -56,7 +56,7 @@ Alpine.data('FormResource', (resourceId) => {
       },
     ],
     init() {
-      // this.initFormFields(this.$refs.formResource);
+      this.initFormFields(this.$refs.formResource);
       if (resourceId) {
         // fetch resource data and populate resourcePayload
         api.get(resourceUrl(resourceId)).then((response) => {
@@ -197,22 +197,21 @@ Alpine.data('FormResource', (resourceId) => {
       console.log('validate');
       // Build validation map from the reactive payload
       const validateMap = {
-        title: this.resourceFormData.title,
-        subtitle: this.resourceFormData.subtitle,
-        summary: this.resourceFormData.summary,
+        title: this.$refs.formResource['title'].value,
+        subtitle: this.$refs.formResource['subtitle'].value,
+        summary: this.$refs.formResource['summary'].value,
         content:
-          typeof this.resourceFormData.content === 'object'
-            ? this.resourceFormData.content.text
-            : this.resourceFormData.content,
-        status: this.resourceFormData.status,
-        category: parseInt(this.resourceFormData.category) || 0,
-        tags: this.resourceFormData.tags || [],
-        support_orga: this.resourceFormData.support_orga,
-        departments: this.resourceFormData.departments || [],
-        expires_on: this.resourceFormData.expires_on,
-        contacts: (this.resourceFormData.contacts || []).map((c) =>
-          typeof c === 'object' ? c.id : c
-        ),
+          typeof this.$refs.formResource['content'].value === 'object'
+            ? this.$refs.formResource['content'].value.text
+            : this.$refs.formResource['content'].value,
+        category: parseInt(this.$refs.formResource['category'].value) || 0,
+        tags: this.$refs.formResource['tags'].value || [],
+        support_orga: this.$refs.formResource['support_orga'].value,
+        departments: this.$refs.formResource['departments'].value || [],
+        expires_on: this.$refs.formResource['expires_on'].value,
+        // contacts: (this.$refs.formResource['contacts'].value || []).map((c) =>
+        //   typeof c === 'object' ? c.id : c
+        // ),
       };
 
       const validate = ajv.compile(schemaResourceFormValidator);
@@ -256,37 +255,44 @@ Alpine.data('FormResource', (resourceId) => {
       return this.formFields[fieldName]?.errors || [];
     },
 
-    hasFieldError(fieldName) {
-      if (!this.submitted) return false;
-      return this.formFields[fieldName]?.hasError || false;
-    },
-
-    getFieldGroupClass(fieldName) {
-      // if (!this.$refs.formResource[field].dataset.dirty) return '';
-      if (!this.submitted) return '';
-      return this.hasFieldError(fieldName)
-        ? 'fr-input-group--error'
-        : 'fr-input-group--valid';
-    },
-
-    validateField(fieldName) {
-      // Validate on blur/change for real-time feedback after first submit
-      this.validate();
-    },
-
-    // validateField(field) {
-    //   // Vérifier l'état
-    //   const isPristine = !field.dataset.dirty;
-    //   console.log(this.$refs.formResource[field].pristine);
+    // validateField(fieldName) {
+    //   // Validate on blur/change for real-time feedback after first submit
     //   this.validate();
     // },
 
-    // initFormFields(form) {
-    //   form.querySelectorAll('input, textarea, select').forEach((field) => {
-    //     field.addEventListener('input', () => {
-    //       field.dataset.dirty = 'true';
-    //     });
-    //   });
-    // },
+    validateField(field) {
+      this.validate();
+      if (
+        !this.formFields[field.name].pristine &&
+        (this.formFields[field.name]?.hasError || false)
+      ) {
+        this.formFields[field.name].className = 'fr-input-group--error';
+      } else {
+        this.formFields[field.name].className = 'fr-input-group--valid';
+      }
+    },
+
+    initFormFields(form) {
+      const fieldNames = Object.keys(schemaResourceFormValidator.properties);
+      fieldNames.forEach((fieldName) => {
+        this.formFields[fieldName] = {
+          pristine: true,
+          className: '',
+        };
+        const field = form.querySelector(`[name="${fieldName}"]`);
+        if (!field) return;
+
+        ['change', 'blur'].forEach((event) => {
+          field.addEventListener(event, (e) => {
+            this.formFields[e.target.name].pristine = false;
+            this.validateField(e.target);
+          });
+        });
+        field.addEventListener('input', (e) => {
+          if (this.formFields[e.target.name].pristine) return;
+          this.validateField(e.target);
+        });
+      });
+    },
   };
 });

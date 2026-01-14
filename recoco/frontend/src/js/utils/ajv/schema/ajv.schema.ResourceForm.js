@@ -30,11 +30,11 @@ export const schemaResourceFormValidator = {
       minLength: 1,
       errorMessage: 'Le contenu est requis',
     },
-    status: {
-      type: 'integer',
-      minimum: 0,
-      maximum: 10,
-    },
+    // status: {
+    //   type: 'integer',
+    //   minimum: 0,
+    //   maximum: 10,
+    // },
     category: {
       type: 'integer',
       minimum: 1,
@@ -74,7 +74,7 @@ export const schemaResourceFormValidator = {
     'content',
     'departments',
     'expires_on',
-    'status',
+    // 'status',
     'subtitle',
     'summary',
     'support_orga',

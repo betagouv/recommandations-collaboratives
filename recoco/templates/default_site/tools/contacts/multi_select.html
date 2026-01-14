@@ -4,6 +4,8 @@
     - placeholder: The placeholder text for the input.
     - label: The label text for the input.
     - display_regions: If true, display regions.
+    - name: The name of the input.
+    - id: The id of the input.
     Parameters alpine:
     - objectsToSelect: The objects to select from.
     - helptext: The help text for the input.
@@ -25,7 +27,10 @@
             <div class="d-flex justify-center mt-8">
                 <div class="w-100"
                      x-data="MultiSelectRegionDepartment({selected:selectedDepartments, objectsToSelect, displayRegions: '{{ display_regions }}' == 'True'})">
-                    <input type="hidden" x-bind:value="selectedValues()">
+                    <input name="{{ name|default:'departments[]' }}"
+                           type="hidden"
+                           id="{{ id|default:'id_departments' }}"
+                           x-bind:value="selectedValues()">
                     <template x-if="!displayRegions">
                         <!-- Select Options -->
                         <select class="d-none" x-on:change="init" id="select-list">

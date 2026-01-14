@@ -5,6 +5,8 @@
     Parameters:
         - options: The options to select from (array of objects with value, text, search, selected, color, dataTestId).
         - selected: The selected options.
+        - name: The name of the input.
+        - id: The id of the input.
 
     Event to listen in parent component:
         - multi-select-change: when the selected options change, the event is triggered with the selected options
@@ -26,7 +28,10 @@
     <div class="w-100 d-flex flex-column align-items-center mx-auto"
          @keyup.alt="toggle">
         <!-- Selected items -->
-        <input name="items[]" type="hidden" x-bind:value="selectedValues()">
+        <input name="{{ name|default:'items[]' }}"
+               type="hidden"
+               id="{{ id|default:'id_items' }}"
+               x-bind:value="selectedValues()">
         <div class="d-inline-block position-relative w-100">
             <div class="d-flex flex-column align-items-center position-relative">
                 <!-- Selected elements container -->

@@ -33,32 +33,28 @@
                 <!-- Column 1 -->
                 <div class="fr-col-8 fr-col-md-8 fr-col-sm-12 fr-pr-4w">
                     <!-- Title -->
-                    <div class="fr-input-group" :class="getFieldGroupClass('title')">
+                    <div class="fr-input-group" :class="formFields['title']?.className">
                         <label class="fr-label text-modal-main-msg" for="id_title">Titre</label>
                         <input type="text"
                                name="title"
                                class="fr-input"
                                id="id_title"
                                required
-                               x-model="resourceFormData.title"
-                               @blur="validate()"
-                               @input="validate()">
+                               x-model="resourceFormData.title">
                         <template x-for="(error, index) in getFieldErrors('title')" :key="index">
                             <p class="fr-error-text" x-text="error"></p>
                         </template>
                     </div>
                     <!-- Subtitle -->
                     <div class="fr-input-group fr-mb-1w"
-                         :class="getFieldGroupClass('subtitle')">
+                         :class="formFields['subtitle']?.className">
                         <label class="fr-label text-modal-main-msg" for="id_subtitle">Sous-titre</label>
                         <input type="text"
                                name="subtitle"
                                class="fr-input"
                                id="id_subtitle"
                                required
-                               x-model="resourceFormData.subtitle"
-                               @blur="validate()"
-                               @input="validate()">
+                               x-model="resourceFormData.subtitle">
                         <template x-for="(error, index) in getFieldErrors('subtitle')" :key="index">
                             <p class="fr-error-text" x-text="error"></p>
                         </template>
@@ -71,15 +67,14 @@
                     </div>
                     <!-- Summary -->
                     <div class="fr-input-group fr-mb-1w"
-                         :class="getFieldGroupClass('summary')">
+                         :class="formFields['summary']?.className">
                         <label class="fr-label text-modal-main-msg" for="id_summary">Résumé</label>
                         <input type="text"
                                name="summary"
                                class="fr-input"
                                id="id_summary"
                                required
-                               x-model="resourceFormData.summary"
-                               @blur="validate()">
+                               x-model="resourceFormData.summary">
                         <template x-for="(error, index) in getFieldErrors('summary')" :key="index">
                             <p class="fr-error-text" x-text="error"></p>
                         </template>
@@ -89,7 +84,7 @@
                         <p>Affiché uniquement sur la page de la ressource.</p>
                     </div>
                     <!-- Content with tiptap editor -->
-                    <div class="fr-input-group" :class="getFieldGroupClass('content')">
+                    <div class="fr-input-group" :class="formFields['content']?.className">
                         <label class="fr-label text-modal-main-msg" for="id_content">Contenu</label>
                         {% include "tools/editor.html" with model="resourceFormData.content" initial_content="resourceFormData.content.text" initial_content_js=True input_required=True %}
                         <template x-for="(error, index) in getFieldErrors('content')" :key="index">
@@ -115,16 +110,14 @@
                         </div>
                     </div>
                     <!-- Category select -->
-                    <div class="fr-input-group" :class="getFieldGroupClass('category')">
+                    <div class="fr-input-group" :class="formFields['category']?.className">
                         <label class="fr-label text-modal-main-msg" for="id_category">Catégorie</label>
                         <select name="category"
                                 id="id_category"
                                 class="fr-select"
                                 required
                                 valueAsNumber
-                                x-model="resourceFormData.category"
-                                @blur="validate()"
-                                @input="validate()">
+                                x-model="resourceFormData.category">
                             <option value="" selected disabled>Sélectionner une catégorie</option>
                             {% for category in categories %}
                                 <option :data="JSON.stringify({id: {{ category.id }}, name: '{{ category.name }}'})"
@@ -138,19 +131,17 @@
                     <!-- Keywords multi-select -->
                     <div class="fr-input-group create-resources__multi-select-container"
                          x-data="{selected : resourceFormData.tags}">
-                        <label class="fr-label text-modal-main-msg" for="id_keywords">Mots-clés</label>
-                        {% include "tools/multi_select.html" %}
+                        <label class="fr-label text-modal-main-msg" for="id_tags">Mots-clés</label>
+                        {% include "tools/multi_select.html" with name="tags" id="id_tags" %}
                     </div>
                     <!-- Carrier structure -->
-                    <div class="fr-input-group" :class="getFieldGroupClass('support_orga')">
+                    <div class="fr-input-group" :class="formFields['support_orga']?.className">
                         <label class="fr-label text-modal-main-msg" for="id_support_orga">Structure porteuse</label>
                         <input type="text"
                                name="support_orga"
                                class="fr-input"
                                id="id_support_orga"
                                x-model="resourceFormData.support_orga"
-                               @blur="validate()"
-                               @input="validate()"
                                required>
                         <template x-for="(error, index) in getFieldErrors('support_orga')" :key="index">
                             <p class="fr-error-text" x-text="error"></p>
@@ -158,12 +149,12 @@
                     </div>
                     <!-- Departments/regions multiple select -->
                     <div class="fr-input-group multi-select-region"
-                         :class="getFieldGroupClass('departments')"
+                         :class="formFields['departments']?.className"
                          x-data="RegionDepartmentPreparer({ selectedDepartments: [] })">
-                        <label class="fr-label text-modal-main-msg" for="id_territory">Territoire</label>
+                        <label class="fr-label text-modal-main-msg" for="id_departments">Territoire</label>
                         <template x-if="objectsToSelect && objectsToSelect.length">
                             <div x-data="MultiSelectRegionDepartment({ selected: selectedDepartments, objectsToSelect: objectsToSelect, displayRegions: true })">
-                                {% include "tools/contacts/multi_select.html" with placeholder="Cherchez et sélectionnez vos départements et régions" label="none" display_regions=True %}
+                                {% include "tools/contacts/multi_select.html" with name="departments" id="id_departments" placeholder="Cherchez et sélectionnez vos départements et régions" label="none" display_regions=True %}
                                 <template x-for="dept in selectedDepartments" :key="dept">
                                     <input type="hidden" name="departments" :value="dept">
                                 </template>
@@ -177,15 +168,13 @@
                         </template>
                     </div>
                     <!-- Expires on date picker -->
-                    <div class="fr-input-group" :class="getFieldGroupClass('expires_on')">
+                    <div class="fr-input-group" :class="formFields['expires_on']?.className">
                         <label class="fr-label text-modal-main-msg" for="id_expires_on">Date d'expiration</label>
                         <input type="date"
                                name="expires_on"
                                class="fr-input"
                                id="id_expires_on"
                                x-model="resourceFormData.expires_on"
-                               @blur="validate()"
-                               @input="validate()"
                                required>
                         <template x-for="(error, index) in getFieldErrors('expires_on')" :key="index">
                             <p class="fr-error-text" x-text="error"></p>
@@ -196,6 +185,10 @@
                     <div class="fr-input-group"
                          x-data="SearchContactModal({searchbarOnly:true})">
                         <label class="fr-label text-modal-main-msg" for="id_contacts">Contacts</label>
+                        <input type="hidden"
+                               name="contacts"
+                               id="id_contacts"
+                               x-model="resourceFormData.contacts">
                         {% include "tools/contacts/searchbar_for_contacts.html" with dropdown_position="relative" add_contact="from_search" %}
                     </div>
                     <!-- display contacts -->
