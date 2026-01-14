@@ -138,6 +138,8 @@ def test_staff_user_can_create_resource_with_api(request, api_client):
     gstaff = auth_models.Group.objects.get(name="example_com_advisor")
     staff.groups.add(gstaff)
 
+    category = baker.make(models.Category)
+
     url = reverse("resources-list")
     api_client.force_authenticate(user=staff)
 
@@ -147,6 +149,7 @@ def test_staff_user_can_create_resource_with_api(request, api_client):
         "status": 1,
         "tags": ["a tag"],
         "content": "toto",
+        "category": category.id,
     }
     response = api_client.post(url, data=data)
 
@@ -173,6 +176,7 @@ def test_staff_user_can_edit_resource_with_api(request, api_client):
         sites=[site],
         created_by=other_user,
     )
+    category = baker.make(models.Category)
 
     url = reverse("resources-detail", args=[resource.pk])
     api_client.force_authenticate(user=staff)
@@ -183,6 +187,7 @@ def test_staff_user_can_edit_resource_with_api(request, api_client):
         "status": 1,
         "tags": ["a tag"],
         "content": "toto",
+        "category": category.id,
     }
     response = api_client.put(url, data=data)
 
