@@ -139,7 +139,10 @@ Alpine.data('FormResource', (resourceId) => {
       this.newRessourcePayload = {
         ...this.newRessourcePayload,
         content: this.newRessourcePayload.content.text,
+        category: parseInt(this.newRessourcePayload.category),
       };
+      this.newRessourcePayload.contacts = this.newRessourcePayload.contacts.map(c => (typeof c === 'object' ? c.id : c));
+      console.log('Payload to submit:', this.newRessourcePayload);
       if (resourceId) {
         api
           .put(resourceUrl(resourceId), this.newRessourcePayload)

@@ -64,7 +64,7 @@ class ResourceSerializer(
     embeded_url = serializers.URLField(source="get_embeded_url", read_only=True)
     tags = TagListSerializerField()
     created_by = ResourceCreatorSerializer(read_only=True, many=False)
-    category = CategorySerializer(read_only=True)
+    category = CategorySerializer()
     has_dsresource = serializers.BooleanField(read_only=True, default=False)
     contacts = serializers.PrimaryKeyRelatedField(
         queryset=Contact.objects.all(), many=True
