@@ -12,6 +12,7 @@ from .serializers import (
     ResourceAddonSerializer,
     ResourceSerializer,
     ResourceURIImportSerializer,
+    ResourceWritableSerializer,
 )
 
 ########################################################################
@@ -47,7 +48,21 @@ class ResourceViewSet(viewsets.ModelViewSet):
             .order_by("-created_on", "-updated_on")
         )
 
-    serializer_class = ResourceSerializer
+    def get_serializer_class(self):
+        match self.action:
+            case "list":
+                return ResourceSerializer
+            case "retrieve":
+                return ResourceSerializer
+            case "partial_update":
+                return ResourceWritableSerializer
+            case "update":
+                return ResourceWritableSerializer
+            case "create":
+                return ResourceWritableSerializer
+            case _:
+                return ResourceSerializer
+
     permission_classes = [
         permissions.IsAuthenticatedOrReadOnly,
         IsResourceManagerOrReadOnly,

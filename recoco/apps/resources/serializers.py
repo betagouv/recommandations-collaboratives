@@ -1,5 +1,6 @@
 from django.contrib.auth import models as auth_models
 from rest_framework import serializers
+from rest_framework.relations import PrimaryKeyRelatedField
 from taggit.serializers import TagListSerializerField, TaggitSerializer
 
 from recoco.rest_api.serializers import BaseSerializerMixin
@@ -77,6 +78,10 @@ class ResourceSerializer(
         return super().save(
             created_by=self.current_user, sites=[self.current_site], **kwargs
         )
+
+
+class ResourceWritableSerializer(ResourceSerializer):
+    category = PrimaryKeyRelatedField(queryset=Category.objects.all())
 
 
 class ResourceURIImportSerializer(serializers.Serializer):
