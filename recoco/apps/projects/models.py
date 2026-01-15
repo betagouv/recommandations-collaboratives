@@ -921,6 +921,8 @@ class Document(models.Model):
             "application/vnd.ms-powerpoint",
             "application/vnd.openxmlformats-officedocument.presentationml.presentation",
             "application/vnd.oasis.opendocument.presentation",
+            "application/x-zip-compressed",
+            "application/zip",
         ],
     )
 
@@ -941,6 +943,7 @@ class Document(models.Model):
             "ppt",
             "pptx",
             "odp",
+            "zip",
         ]
     )
 
