@@ -17,7 +17,7 @@
 {% block project_detail %}
     {% get_obj_perms request.user for project as "user_project_perms" %}
     <div x-data="ProjectShare" class="col-12">
-        <div x-data="Tutorial('project-advisor-overview')">
+        <div>
             <div class="row">
                 {% if not is_switchtender %}
                     {% if "use_surveys" in user_project_perms and session and session.next_question and session.completion < 80 %}

@@ -19,14 +19,9 @@
         <fieldset class="fr-segmented fr-segmented--md fr-px-3w"
                   x-init="$nextTick(() => $store.projectQueue.addCurrentProjectId({{ project.id }}, `{{ project.name }}`, `{{ project.commune.name }}`,`{{ project.commune.insee }}`, `{{ project.owner.profile.organization.name|default:project.org_name }}` ))">
             <legend class="fr-segmented__legend visually-hidden">Onglets du dossier</legend>
-            {% if overview %}
-                {% if advising_position.is_advisor or advising_position.is_observer or is_regional_actor %}
-                    {% include "tutorial/tutorial_hint.html" with type="navTuto" %}
-                {% endif %}
-            {% endif %}
             <div class="fr-segmented__elements">
                 {% if "list_projects" in user_site_perms or "view_project" in user_project_perms %}
-                    <div class="fr-segmented__element" id="overview-step-1">
+                    <div class="fr-segmented__element">
                         <input value="overview"
                                type="radio"
                                {% if overview %}checked{% endif %}
@@ -43,8 +38,7 @@
                 {% endif %}
                 {% if "list_projects" in user_site_perms or "view_surveys" in user_project_perms %}
                     <div class="fr-segmented__element"
-                         :class="{'visual-hint': $store.tutorialsEvents.isTutorialForProjectPage==2}"
-                         id="overview-step-2">
+                         :class="{'visual-hint': $store.tutorialsEvents.isTutorialForProjectPage==2}">
                         <template x-if="$store.tutorialsEvents.isTutorialForProjectPage==2">
                             {% include "projects/project/fragments/onboarding-tutorials/visual-hint.html" %}
                         </template>
@@ -72,7 +66,6 @@
                 {% endif %}
                 <div class="fr-segmented__element"
                      :class="{'visual-hint': $store.tutorialsEvents.isTutorialForProjectPage === 3}"
-                     id="overview-step-2"
                      {% if "view_public_notes" not in user_project_perms and "use_public_notes" not in user_project_perms %} aria-describedby="tooltip-lock-access-conversations" {% endif %}>
                     <template x-if="$store.tutorialsEvents.isTutorialForProjectPage === 3">
                         {% include "projects/project/fragments/onboarding-tutorials/visual-hint.html" %}
@@ -103,7 +96,7 @@
                         {% include "projects/project/fragments/onboarding-tutorials/svg-hint.html" with rect_x="3" rect_y="3" rect_width="60" rect_height="18" view_box_size="0 0 65 50" %}
                     </template>
                 </div>
-                <div class="fr-segmented__element" id="overview-step-3">
+                <div class="fr-segmented__element">
                     <input value="tasks"
                            type="radio"
                            {% if recommandations %}checked{% endif %}
@@ -148,7 +141,6 @@
                 </div>
                 {% if "list_projects" in user_site_perms or 'use_private_notes' in user_project_perms %}
                     <div class="fr-segmented__element"
-                         id="overview-step-4"
                          {% if 'use_private_notes' not in user_project_perms %}aria-describedby="tooltip-lock-access-internal-followup"{% endif %}>
                         {% include "projects/project/fragments/navigation/tooltip_lock_access.html" with id="tooltip-lock-access-internal-followup" %}
                         <input value="internalFollowup"
@@ -226,8 +218,7 @@
         </div>
         {% if "list_projects" in user_site_perms or 'use_private_notes' in user_project_perms %}
             <div class="project-navigation__container-btn-role-selection"
-                 data-test-id="header-banner-advising-position"
-                 id="overview-step-5">
+                 data-test-id="header-banner-advising-position">
                 <button data-fr-opened="false"
                         aria-controls="modal-action"
                         type="button"
