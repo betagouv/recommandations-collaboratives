@@ -36,7 +36,7 @@
                     </button>
                 </li>
             </template>
-            <template x-if="!task.public && task.content">
+            <template x-if="!task.public && (task.resource_id || task.content)">
                 <li>
                     <button id="publish-task-button"
                             @click.stop="onSetTaskPublic(task, true)"
