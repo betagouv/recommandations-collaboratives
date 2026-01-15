@@ -41,6 +41,10 @@ def convert_public_note_notifications(apps, schema_editor):
 class Migration(migrations.Migration):
     dependencies = [
         ("conversations", "0006_alter_node_options_alter_node_unique_together"),
+        (
+            "notifications",
+            "0012_rename_notification_recipient_unread_notificatio_recipie_8bedf2_idx",
+        ),
     ]
 
     operations = [
