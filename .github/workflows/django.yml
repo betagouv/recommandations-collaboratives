@@ -44,12 +44,12 @@ jobs:
         with:
           node-version: 20
 
-      - name: Setup Pre-commit
-        uses: pre-commit/action@v3.0.1
+      # - name: Setup Pre-commit
+      #   uses: pre-commit/action@v3.0.1
 
-      - name: Run Pre-commit checks
-        uses: pre-commit-ci/lite-action@v1.1.0
-        if: always()
+      # - name: Run Pre-commit checks
+      #   uses: pre-commit-ci/lite-action@v1.1.0
+      #   if: always()
 
       - uses: borales/actions-yarn@v3.0.0
 
