@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% load django_vite %}
+{% block js %}
+    {% vite_asset 'js/styles/resources.css.js' %}
+    {% vite_asset 'js/styles/resource-card.css.js' %}
+{% endblock js %}
+{% block title %}
+    Liste des ressources
+{% endblock title %}
+{% block og_title %}
+    Liste des ressources
+{% endblock og_title %}
+{% block content %}
+    {% if user.is_authenticated %}
+        {% get_obj_perms request.user for request.site as "user_site_perms" %}
+    {% endif %}
+    {% comment %} breadcrumb {% endcomment %}
+    {% include "components/breadcrumb.html" with
+        breadcrumb_items=[
+            {"name": "Accueil", "url": "/"},
+            {"name": "Ressources", "url": "/resources/"},
+            {"name": "Liste des ressources", "url": ""}
+        ]
+    %}
+    {% comment %} titre et nombre de ressources {% endcomment %}
+    <div>
+        <h1 class="align-items-center fr-mb-2w">
+            {% if resources_count %}<span class="text-secondary">({{ resources_count }})</span>{% endif %}
+            Ressources
+        </h1>
+    </div>
+    {% comment %} filter bar {% endcomment %}
+
+    {% comment %} liste ressource new cards {% endcomment %}
