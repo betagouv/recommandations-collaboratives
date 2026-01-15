@@ -199,6 +199,35 @@ def test_project_advisor_can_create_project_task_for_site(
 
 
 @pytest.mark.django_db
+def test_project_advisor_can_create_project_task_for_site_no_content(
+    api_client, current_site, project
+):
+    user = baker.make(auth_models.User)
+    utils.assign_advisor(user, project)
+    api_client.force_authenticate(user=user)
+    url = reverse("project-tasks-list", args=[project.id])
+
+    data = {
+        "status": 1,
+        "visited": False,
+        "public": True,
+        "priority": 9,
+        "order": 0,
+        "intent": "the intent",
+        "content": "",
+    }
+    response = api_client.post(url, data=data)
+    assert response.status_code == 201
+
+    created_task = models.Task.objects.filter(project=project).first()
+    assert created_task.site == current_site
+    assert created_task.project == project
+    assert created_task.created_by == user
+    assert created_task.intent == data["intent"]
+    assert created_task.content == data["content"]
+
+
+@pytest.mark.django_db
 def test_cannot_create_project_task_for_site_invalid_contact_or_resource(
     api_client, project
 ):
@@ -282,6 +311,27 @@ def test_project_advisor_can_update_project_task_for_site(request, project):
 
     task.refresh_from_db()
     assert task.public is True
+
+
+@pytest.mark.django_db
+def test_project_advisor_can_update_project_task_for_site_no_content(request, project):
+    user = baker.make(auth_models.User)
+    site = get_current_site(request)
+    task = baker.make(
+        models.Task, project=project, site=site, public=False, content="blabla"
+    )
+
+    utils.assign_advisor(user, project)
+
+    client = APIClient()
+    client.force_authenticate(user=user)
+    url = reverse("project-tasks-detail", args=[project.id, task.id])
+    response = client.patch(url, data={"content": ""})
+
+    assert response.status_code == 200
+
+    task.refresh_from_db()
+    assert task.content == ""
 
 
 ##################
