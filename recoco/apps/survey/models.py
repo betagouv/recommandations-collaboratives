@@ -95,8 +95,7 @@ class QuestionSet(CloneMixin, models.Model):
 
     def check_precondition(self, session: "Session"):
         """Return true if the precondition is met"""
-        # todo check compatibility with taggit
-        my_tags = set(self.precondition_tags.values_list("name", flat=True))
+        my_tags = set(self.precondition_tags.names())
         return my_tags.issubset(session.signals)
 
     def _following(self, order_by):
@@ -227,16 +226,7 @@ class Question(CloneMixin, models.Model):
 
     def next(self):
         """Return the next question"""
-        next_question = self._following(order_by=("-priority", "id"))
-        if next_question:
-            return next_question
-
-        # No next question in current question set, ask sibling
-        next_qs = self.question_set.next()
-        if next_qs:
-            return next_qs.first_question()
-
-        return None
+        return self._following(order_by=("-priority", "id"))
 
     def previous(self):
         """Return the previous question"""
@@ -335,6 +325,16 @@ class Session(models.Model):
             )
         }
 
+    def next_qs(self, qs=None):
+        initial_qs = qs.next() if qs else self.survey.question_sets.first()
+        qs = initial_qs
+
+        while qs:
+            if qs.check_precondition(self):
+                return qs
+            qs = qs.next()
+        return None
+
     def next_question(self, question=None):
         """Return the next unanswered question or None.
 
@@ -345,11 +345,19 @@ class Session(models.Model):
             "question__id", flat=True
         )
 
+        last_not_none_question = question or self.first_question()
+        if last_not_none_question is None:
+            return None
+
         if not question:
-            initial_question = self.first_question()
+            question = self.first_question()
+            last_not_none_question = question
         else:
-            initial_question = question.next()
-        question = initial_question
+            question = question.next()
+
+        if not question:
+            qs = self.next_qs(last_not_none_question.question_set)
+            question = qs.first_question() if qs else None
 
         while question:
             if question.id not in answered_questions and question.check_precondition(
@@ -359,10 +367,10 @@ class Session(models.Model):
             question = question.next()
             if question is None:
                 # No next question in current question set, ask sibling
-                question = self._next_qestion_set(
-                    initial_question.question_set
-                ).first_question()
-
+                qs = self.next_qs(last_not_none_question.question_set)
+                question = qs.first_question() if qs else None
+            else:
+                last_not_none_question = question
         return None
 
     def _next_qestion_set(self, qs):
