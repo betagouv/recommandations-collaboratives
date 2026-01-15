@@ -23,14 +23,13 @@
                     <h2 class="create-resources__title text-modal-main-msg">Création de fiche ressource</h2>
                 {% endif %}
                 <div>
-                    <button @click.prevent
-                            data-bs-toggle="modal"
-                            :data-bs-target="`#resource-preview-`+{{ resource.id|default:'null'|safe }}" role="button" class="fr-btn fr-btn--tertiary fr-btn--sm fr-mr-1w">Prévisualiser</button>
+                    {% comment %} TODO: Uncomment this when the preview modal is ready {% endcomment %}
+                    {% comment %} <button @click.prevent data-bs-toggle="modal" :data-bs-target="`#resource-preview-`+{{ resource.id|default:'null'|safe }}" role="button" class="fr-btn fr-btn--tertiary fr-btn--sm fr-mr-1w">Prévisualiser</button> {% endcomment %}
                     <button role="submit"
                             class="fr-btn fr-btn--primary fr-btn--sm fr-mr-1w"
                             @click="onSubmit">Sauvegarder</button>
                 </div>
-                {% include 'resources/resource/modal_resource.html' %}
+                {% include "resources/resource/modal_resource.html" %}
             </div>
             <div class="fr-grid-row">
                 <!-- Column 1 -->
@@ -151,7 +150,7 @@
                         </template>
                     </div>
                     <!-- Departments/regions multiple select -->
-                    <div x-data="{selectedDepartments: {{ selected_departments |default:'[]'|safe }}}">
+                    <div x-data="{selectedDepartments: {{ selected_departments |default:'[]'|safe }} }">
                         <div class="fr-input-group multi-select-region"
                              :class="formFields['departments']?.className"
                              x-data="RegionDepartmentPreparer({ selectedDepartments: selectedDepartments })">
@@ -194,7 +193,7 @@
                                name="contacts"
                                id="id_contacts"
                                x-model="resourceFormData.contacts">
-                        {% include "tools/contacts/searchbar_for_contacts.html" with dropdown_position="relative" add_contact="from_search" %}
+                        {% include "tools/contacts/searchbar_for_contacts.html" with add_contact="from_search" %}
                     </div>
                     <!-- display contacts -->
                     <div>
@@ -202,8 +201,10 @@
                             <template x-for="contact in resourceFormData.contacts" :key="contact.id">
                                 <div class="fr-mb-2w border-light-grey"
                                      x-data="{contact:contact,isOpenDeleteContact:null}">
-                                     <div class="position-relative d-flex justify-content-end">
-                                            <span class="fr-icon-delete-line top-right-corner cursor-pointer" aria-label="supprimer contact" @click="suppressContact(contact)"></span>
+                                    <div class="position-relative d-flex justify-content-end">
+                                        <span class="fr-icon-delete-line top-right-corner cursor-pointer"
+                                              aria-label="supprimer contact"
+                                              @click="suppressContact(contact)"></span>
                                     </div>
                                     {% include "tools/contacts/contact_card.html" with full_width=true %}
                                 </div>

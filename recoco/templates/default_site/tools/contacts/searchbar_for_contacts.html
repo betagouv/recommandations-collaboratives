@@ -1,5 +1,5 @@
 <div class="{% if class_div %}{{ class_div }}{% endif %}"
-    {% if add_contact == 'from_search' %}id="search-contact-modal"{% endif %}>
+     {% if add_contact == 'from_search' %}id="search-contact-modal"{% endif %}>
     <div class="fr-search-bar" id="header-search" role="search">
         <label class="fr-label" for="search-contact-input">Recherche</label>
         <input class="fr-input"
@@ -11,11 +11,9 @@
                x-model="userInputSearchContact">
         <button class="fr-btn" title="Rechercher" @click.prevent="onSearch()">Rechercher</button>
     </div>
-</div>
-<div>
-    <div class="fr-menu menu-modal-correct-fr-menu better-positionning border-radius-4px correct-position">
-        <div class="fr-menu__list w-100 border-radius-4px {% if dropdown_position == 'relative' %}position-relative{% else %}position-absolute{% endif %} rwd-resize">
-            <div class="fr-menu__list w-100 overflow-auto specific-height border-radius-4px fr-mb-0 rwd-resize">
+    <div class="fr-menu menu-modal-correct-fr-menu border-radius-4px position-relative">
+        <div class="fr-menu__list w-100 border-radius-4px {% if dropdown_position == 'relative' %}position-relative{% else %}position-absolute{% endif %} ">
+            <div class="fr-menu__list w-100 overflow-auto specific-height border-radius-4px fr-mb-0 ">
                 <template x-if="userInputSearchContact.length > 0 && contactsFound.length > 0 && selectedContact === null">
                     <template class="fr-menu__item"
                               x-for="contact in contactsFound"
@@ -38,9 +36,7 @@
                         <div class="fr-p-3v text-align-center">
                             <button @click.prevent="addContact"
                                     data-test-id="button-add-contact-to-tiptap-editor"
-                                    class="fr-btn w-100 correct-centering-text">
-                                Attacher le contact
-                            </button>
+                                    class="fr-btn w-100 correct-centering-text">Attacher le contact</button>
                         </div>
                     </div>
                 </template>
