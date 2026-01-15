@@ -117,7 +117,16 @@
                     {% for member in project.members.all %}
                         <li>{% include "crm/user_item.html" with user=member %}</li>
                     {% empty %}
-                        <li>no one</li>
+                        {% if project_creation_request %}
+                            <li>
+                                <svg class="bi fr-mr-2v" width="16" height="16" fill="currentColor">
+                                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#person-fill" />
+                                </svg>
+                                {{ project_creation_request.email }}
+                            </li>
+                        {% else %}
+                            <li>Aucun demandeur ou partenaire</li>
+                        {% endif %}
                     {% endfor %}
                 </ul>
             </div>

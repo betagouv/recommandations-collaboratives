@@ -821,6 +821,10 @@ def project_details(request, project_id):
         object_id=project.pk, content_type=project_ct
     ).order_by("-updated_on")
 
+    project_creation_request = project.project_creation_requests.filter(
+        project=project
+    ).first()
+
     sticky_notes = project_notes.filter(sticky=True)
 
     notes = project_notes.exclude(sticky=True) | participant_notes
