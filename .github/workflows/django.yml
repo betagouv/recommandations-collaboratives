@@ -37,7 +37,7 @@ jobs:
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
-          python-version-file: "pyproject.toml"
+          python-version-file: 'pyproject.toml'
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -62,7 +62,12 @@ jobs:
         uses: astral-sh/setup-uv@v5
         with:
           enable-cache: true
-          cache-dependency-glob: "uv.lock"
+          cache-dependency-glob: 'uv.lock'
+
+      - name: Check CSS files
+        working-directory: ./recoco/frontend
+        run: |
+          tree src/css
 
       - name: Compile JS
         working-directory: ./recoco/frontend
