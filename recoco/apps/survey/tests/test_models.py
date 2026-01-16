@@ -12,6 +12,7 @@ from django.utils import timezone
 from model_bakery.recipe import Recipe
 
 from .. import models, utils
+from ..models import DIRECTION
 
 ########################################################################
 # Session
@@ -90,6 +91,22 @@ def test_session_next_question_skips_untriggered_question():
     assert session.next_question(q1) == q3
 
 
+@pytest.mark.django_db
+def test_session_next_question_skips_untriggered_qs():
+    survey = Recipe(models.Survey).make()
+    qs = Recipe(models.QuestionSet, survey=survey, heading="QS1").make()
+    qs2 = Recipe(models.QuestionSet, survey=survey, heading="QS2").make()
+    qs2.precondition_tags.set(["oscar-mike"])
+    qs3 = Recipe(models.QuestionSet, survey=survey, heading="QS3").make()
+    q1 = Recipe(models.Question, text="Q1.1", question_set=qs).make()
+    Recipe(models.Question, text="Q2.1", question_set=qs2).make()
+    q3 = Recipe(models.Question, text="Q3.1", question_set=qs3).make()
+
+    session = Recipe(models.Session, survey=survey).make()
+
+    assert session.next_question(q1) == q3
+
+
 #
 # previous question
 
@@ -119,6 +136,22 @@ def test_session_previous_question_skips_untriggered_question():
         models.Question, text="Q2", precondition="oscar-mike", question_set=qs
     ).make()
     q3 = Recipe(models.Question, text="Q3", question_set=qs).make()
+
+    session = Recipe(models.Session, survey=survey).make()
+
+    assert session.previous_question(q3) == q1
+
+
+@pytest.mark.django_db
+def test_session_previous_question_skips_untriggered_qs():
+    survey = Recipe(models.Survey).make()
+    qs = Recipe(models.QuestionSet, survey=survey, heading="QS1").make()
+    qs2 = Recipe(models.QuestionSet, survey=survey, heading="QS2").make()
+    qs2.precondition_tags.set(["oscar-mike"])
+    qs3 = Recipe(models.QuestionSet, survey=survey, heading="QS3").make()
+    q1 = Recipe(models.Question, text="Q1.1", question_set=qs).make()
+    Recipe(models.Question, text="Q2.1", question_set=qs2).make()
+    q3 = Recipe(models.Question, text="Q3.1", question_set=qs3).make()
 
     session = Recipe(models.Session, survey=survey).make()
 
@@ -155,8 +188,8 @@ def test_question_set_next():
     qs1 = Recipe(models.QuestionSet, survey=survey, priority=20).make()
     qs2 = Recipe(models.QuestionSet, survey=survey, priority=10).make()
 
-    assert qs1.next() == qs2
-    assert qs2.next() is None
+    assert qs1.following(DIRECTION.NEXT) == qs2
+    assert qs2.following(DIRECTION.NEXT) is None
 
 
 @pytest.mark.django_db
@@ -165,8 +198,8 @@ def test_question_set_previous():
     qs1 = Recipe(models.QuestionSet, survey=survey, priority=20).make()
     qs2 = Recipe(models.QuestionSet, survey=survey, priority=10).make()
 
-    assert qs2.previous() == qs1
-    assert qs1.previous() is None
+    assert qs2.following(DIRECTION.PREVIOUS) == qs1
+    assert qs1.following(DIRECTION.PREVIOUS) is None
 
 
 @pytest.mark.django_db
@@ -176,7 +209,7 @@ def test_question_set_first_question():
     q1 = Recipe(models.Question, text="Q1", question_set=qs).make()
     Recipe(models.Question, text="Q2", question_set=qs).make()
 
-    assert qs.first_question() == q1
+    assert qs.extreme_question(DIRECTION.NEXT) == q1
 
 
 @pytest.mark.django_db
@@ -186,7 +219,7 @@ def test_question_set_last_question():
     q1 = Recipe(models.Question, text="Q1", question_set=qs).make()  # NOQA
     q2 = Recipe(models.Question, text="Q2", question_set=qs).make()
 
-    assert qs.last_question() == q2
+    assert qs.extreme_question(DIRECTION.PREVIOUS) == q2
 
 
 ########################################################################
@@ -201,8 +234,8 @@ def test_question_next_question():
     q1 = Recipe(models.Question, priority=0, text="Q1", question_set=qs).make()
     q2 = Recipe(models.Question, priority=0, text="Q2", question_set=qs).make()
 
-    assert q2 == q1.next()
-    assert q2.next() is None
+    assert q2 == q1.following(DIRECTION.NEXT)
+    assert q2.following(DIRECTION.NEXT) is None
 
 
 @pytest.mark.django_db
@@ -213,8 +246,8 @@ def test_question_next_question_with_priority():
     q2 = Recipe(models.Question, text="Q2", question_set=qs).make()
     q3 = Recipe(models.Question, text="Q2", priority=200, question_set=qs).make()
 
-    assert q1.next() == q3
-    assert q3.next() == q2
+    assert q1.following(DIRECTION.NEXT) == q3
+    assert q3.following(DIRECTION.NEXT) == q2
 
 
 @pytest.mark.django_db
@@ -224,8 +257,8 @@ def test_question_previous_question():
     q1 = Recipe(models.Question, priority=0, text="Q1", question_set=qs).make()
     q2 = Recipe(models.Question, priority=0, text="Q2", question_set=qs).make()
 
-    assert q1 == q2.previous()
-    assert q1.previous() is None
+    assert q1 == q2.following(DIRECTION.PREVIOUS)
+    assert q1.following(DIRECTION.PREVIOUS) is None
 
 
 @pytest.mark.django_db
