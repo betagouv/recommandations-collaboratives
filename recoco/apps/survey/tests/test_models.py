@@ -142,6 +142,22 @@ def test_session_previous_question_skips_untriggered_question():
     assert session.previous_question(q3) == q1
 
 
+@pytest.mark.django_db
+def test_session_previous_question_skips_untriggered_qs():
+    survey = Recipe(models.Survey).make()
+    qs = Recipe(models.QuestionSet, survey=survey, heading="QS1").make()
+    qs2 = Recipe(models.QuestionSet, survey=survey, heading="QS2").make()
+    qs2.precondition_tags.set(["oscar-mike"])
+    qs3 = Recipe(models.QuestionSet, survey=survey, heading="QS3").make()
+    q1 = Recipe(models.Question, text="Q1.1", question_set=qs).make()
+    Recipe(models.Question, text="Q2.1", question_set=qs2).make()
+    q3 = Recipe(models.Question, text="Q3.1", question_set=qs3).make()
+
+    session = Recipe(models.Session, survey=survey).make()
+
+    assert session.previous_question(q3) == q1
+
+
 #
 # use of question signals
 
