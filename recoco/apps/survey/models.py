@@ -99,15 +99,6 @@ class QuestionSet(CloneMixin, models.Model):
         blank=True,
     )
 
-    def ordering(self, direction: DIRECTION):
-        return (
-            ["-priority", "id"]
-            if direction == DIRECTION.NEXT
-            else ["priority", "-id"]
-            if direction == DIRECTION.PREVIOUS
-            else []
-        )
-
     def check_precondition(self, session: "Session"):
         """Return true if the precondition is met"""
         my_tags = set(self.precondition_tags.names())
@@ -117,7 +108,7 @@ class QuestionSet(CloneMixin, models.Model):
         """return the following question set defined by the given order_byi sequence"""
         question_sets = self.survey.question_sets
 
-        order_by = self.ordering(direction)
+        order_by = Question.ordering(direction)
         iterator = question_sets.order_by(*order_by).iterator()
         for question_set in iterator:
             if question_set == self:
@@ -129,7 +120,7 @@ class QuestionSet(CloneMixin, models.Model):
         return None
 
     def extreme_question(self, direction: DIRECTION):
-        order_by = self.ordering(direction)
+        order_by = Question.ordering(direction)
         return self.questions.all().order_by(*order_by).first()
 
     _clone_m2o_or_o2m_fields = ["questions"]
@@ -216,7 +207,8 @@ class Question(CloneMixin, models.Model):
         verbose_name="Titre du commentaire",
     )
 
-    def ordering(self, direction: DIRECTION):
+    @staticmethod
+    def ordering(direction: DIRECTION):
         return (
             ["-priority", "id"]
             if direction == DIRECTION.NEXT
@@ -386,18 +378,9 @@ class Session(models.Model):
     def previous_question(self, question=None):
         return self._following_question(DIRECTION.PREVIOUS, question)
 
-    def ordering(self, direction: DIRECTION):
-        return (
-            ["-priority", "id"]
-            if direction == DIRECTION.NEXT
-            else ["priority", "-id"]
-            if direction == DIRECTION.PREVIOUS
-            else []
-        )
-
     def extreme_question(self, direction: DIRECTION):
         """Return the first Question of the first Question Set"""
-        order_by = self.ordering(direction)
+        order_by = Question.ordering(direction)
 
         for qs in self.survey.question_sets.all():
             for question in qs.questions.all().order_by(*order_by):
