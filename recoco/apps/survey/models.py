@@ -1,6 +1,7 @@
 import math
 import statistics
 from datetime import timedelta
+from enum import Enum
 
 from autoslug import AutoSlugField
 from django.contrib.auth import models as auth_models
@@ -36,6 +37,11 @@ def create_site_permissions(sender, **kwargs):
         name="Can manage the surveys",
         content_type=site_ct,
     )
+
+
+class DIRECTION(Enum):
+    NEXT = "next"
+    PREVIOUS = "previous"
 
 
 class Survey(CloneMixin, models.Model):
@@ -93,15 +99,25 @@ class QuestionSet(CloneMixin, models.Model):
         blank=True,
     )
 
+    def ordering(self, direction: DIRECTION):
+        return (
+            ["-priority", "id"]
+            if direction == DIRECTION.NEXT
+            else ["priority", "-id"]
+            if direction == DIRECTION.PREVIOUS
+            else []
+        )
+
     def check_precondition(self, session: "Session"):
         """Return true if the precondition is met"""
         my_tags = set(self.precondition_tags.names())
         return my_tags.issubset(session.signals)
 
-    def _following(self, order_by):
+    def following(self, direction: DIRECTION):
         """return the following question set defined by the given order_byi sequence"""
         question_sets = self.survey.question_sets
 
+        order_by = self.ordering(direction)
         iterator = question_sets.order_by(*order_by).iterator()
         for question_set in iterator:
             if question_set == self:
@@ -112,19 +128,9 @@ class QuestionSet(CloneMixin, models.Model):
 
         return None
 
-    def next(self):
-        """Return the next question set"""
-        return self._following(order_by=["-priority", "id"])
-
-    def previous(self):
-        """Return the previous question set"""
-        return self._following(order_by=["priority", "-id"])
-
-    def first_question(self):
-        return self.questions.all().order_by("-priority", "id").first()
-
-    def last_question(self):
-        return self.questions.all().order_by("priority", "-id").first()
+    def extreme_question(self, direction: DIRECTION):
+        order_by = self.ordering(direction)
+        return self.questions.all().order_by(*order_by).first()
 
     _clone_m2o_or_o2m_fields = ["questions"]
 
@@ -210,10 +216,20 @@ class Question(CloneMixin, models.Model):
         verbose_name="Titre du commentaire",
     )
 
-    def _following(self, order_by: list):
+    def ordering(self, direction: DIRECTION):
+        return (
+            ["-priority", "id"]
+            if direction == DIRECTION.NEXT
+            else ["priority", "-id"]
+            if direction == DIRECTION.PREVIOUS
+            else []
+        )
+
+    def following(self, direction: DIRECTION):
         """return the following question defined by the given order_by"""
         questions = self.question_set.questions
 
+        order_by = self.ordering(direction)
         iterator = questions.order_by(*order_by).iterator()
         for question in iterator:
             if question == self:
@@ -221,23 +237,6 @@ class Question(CloneMixin, models.Model):
                     return next(iterator)
                 except StopIteration:
                     return None
-
-        return None
-
-    def next(self):
-        """Return the next question"""
-        return self._following(order_by=("-priority", "id"))
-
-    def previous(self):
-        """Return the previous question"""
-        previous_question = self._following(order_by=("priority", "-id"))
-        if previous_question:
-            return previous_question
-
-        # No previous question in current question set, ask sibling
-        previous_qs = self.question_set.previous()
-        if previous_qs:
-            return previous_qs.last_question()
 
         return None
 
@@ -325,17 +324,21 @@ class Session(models.Model):
             )
         }
 
-    def next_qs(self, qs=None):
-        initial_qs = qs.next() if qs else self.survey.question_sets.first()
+    def _following_qestion_set(self, direction: DIRECTION, qs=None):
+        initial_qs = (
+            qs.following(direction)
+            if qs
+            else self.survey.question_sets.extreme_question(direction)
+        )
         qs = initial_qs
 
         while qs:
             if qs.check_precondition(self):
                 return qs
-            qs = qs.next()
+            qs = qs.following(direction)
         return None
 
-    def next_question(self, question=None):
+    def _following_question(self, direction: DIRECTION, question=None):
         """Return the next unanswered question or None.
 
         It will trigger only the questions that passes their precondition.
@@ -345,67 +348,59 @@ class Session(models.Model):
             "question__id", flat=True
         )
 
-        last_not_none_question = question or self.first_question()
+        last_not_none_question = question or self.extreme_question(direction)
         if last_not_none_question is None:
             return None
 
         if not question:
-            question = self.first_question()
+            question = self.extreme_question(direction)
             last_not_none_question = question
         else:
-            question = question.next()
+            question = question.following(direction)
 
         if not question:
-            qs = self.next_qs(last_not_none_question.question_set)
-            question = qs.first_question() if qs else None
+            qs = self._following_qestion_set(
+                direction, qs=last_not_none_question.question_set
+            )
+            question = qs.extreme_question(direction) if qs else None
 
         while question:
             if question.id not in answered_questions and question.check_precondition(
                 self
             ):
                 return question
-            question = question.next()
+            question = question.following(direction)
             if question is None:
                 # No next question in current question set, ask sibling
-                qs = self.next_qs(last_not_none_question.question_set)
-                question = qs.first_question() if qs else None
+                qs = self._following_qestion_set(
+                    direction, qs=last_not_none_question.question_set
+                )
+                question = qs.extreme_question(direction) if qs else None
             else:
                 last_not_none_question = question
         return None
 
-    def _next_qestion_set(self, qs):
-        qs = qs.question_set.next()
-        while qs:
-            if qs and qs.check_precondition(self.signals):
-                return qs
-        return None
+    def next_question(self, question=None):
+        return self._following_question(DIRECTION.NEXT, question)
 
     def previous_question(self, question=None):
-        """Return the previous unanswered question or None.
+        return self._following_question(DIRECTION.PREVIOUS, question)
 
-        It will trigger only the questions that passes their precondition.
-        This is the prefered interface to navigate questions
-        """
-        answered_questions = Answer.objects.filter(session=self).values_list(
-            "question__id", flat=True
+    def ordering(self, direction: DIRECTION):
+        return (
+            ["-priority", "id"]
+            if direction == DIRECTION.NEXT
+            else ["priority", "-id"]
+            if direction == DIRECTION.PREVIOUS
+            else []
         )
-        if not question:
-            return None
 
-        question = question.previous()
-        while question:
-            if question.id not in answered_questions:
-                if question.check_precondition(self):
-                    return question
-            question = question.previous()
-
-        return None
-
-    def first_question(self):
+    def extreme_question(self, direction: DIRECTION):
         """Return the first Question of the first Question Set"""
-        # todo order_by qs ?
+        order_by = self.ordering(direction)
+
         for qs in self.survey.question_sets.all():
-            for question in qs.questions.all().order_by("-priority", "id"):
+            for question in qs.questions.all().order_by(*order_by):
                 return question
 
         return None
