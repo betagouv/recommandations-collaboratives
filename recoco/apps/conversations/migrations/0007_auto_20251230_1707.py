@@ -11,15 +11,31 @@ from recoco.apps.conversations.utils import gather_annotations_for_message_notif
 
 def convert_public_note_notifications(apps, schema_editor):
     Notification = apps.get_model("notifications", "Notification")
+    ContentType = apps.get_model("contenttypes", "ContentType")
+    Note = apps.get_model("projects", "Note")
     public_note_verb = "a envoyé un message dans l'espace conversation"
-    for notif in tqdm(Notification.objects.filter(verb=public_note_verb, unread=True)):
-        note = notif.action_object
+    content_type = ContentType.objects.get_for_model(Note)
+    for notif in tqdm(
+        Notification.objects.filter(
+            verb=public_note_verb,
+            unread=True,
+            action_object_content_type_id=content_type.id,
+        )
+    ):
+        note = Note.objects.get(pk=notif.action_object_object_id)
+
+        # inactive or muted project: we just mark the notification as read ond forget about it
         if note.project.inactive_since is not None or note.project.muted:
-            notif.mark_as_read()
+            notif.unread = False
+            notif.save()
             continue
+
+        # ignore private notes as they are not concerned
         if not note.public:
             continue
+
         try:
+            # get corresponding message to create its own notification
             message = Message.objects.get(
                 created=note.created_on, modified=note.updated_on, project=note.project
             )
@@ -33,7 +49,6 @@ def convert_public_note_notifications(apps, schema_editor):
             }
 
             notify.send(recipient=notif.recipient, site=notif.site, **notification)
-            notif.mark_as_read()
         except Message.DoesNotExist:
             print(f"no message found for {note}. skipped")
 
@@ -45,6 +60,7 @@ class Migration(migrations.Migration):
             "notifications",
             "0012_rename_notification_recipient_unread_notificatio_recipie_8bedf2_idx",
         ),
+        ("projects", "0116_alter_projectsite_status"),
     ]
 
     operations = [
