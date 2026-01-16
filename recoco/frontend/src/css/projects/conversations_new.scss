@@ -316,6 +316,20 @@
           border: 1px solid #c0c0c0;
           background: #fff;
           padding: 1em;
+          position: relative;
+          &--bordered {
+            border: 1px solid var(--background-action-high-blue-france, #000091);
+          }
+          &-badge {
+            background-color: var(
+              --background-action-high-blue-france,
+              #000091
+            );
+
+            position: absolute;
+            top: -0.625rem;
+            left: 1rem;
+          }
           h4 {
             color: var(--text-action-high-blue-france);
             font-family: Marianne;

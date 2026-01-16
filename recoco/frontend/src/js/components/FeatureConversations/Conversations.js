@@ -10,6 +10,7 @@ import api, {
   documentsUrl,
   editTaskUrl,
   markTaskNotificationAsVisited,
+  conversationsMessageMarkAsReadUrl,
 } from '../../utils/api';
 import { trackOpenRessource } from '../../utils/trackingMatomo';
 import { formatDateFrench } from '../../utils/date';
@@ -33,6 +34,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     messages: 0,
     new_messages: 0,
     tasks: 0,
+    unread_recommendations: 0,
     contacts: 0,
     documents: 0,
   },
@@ -205,6 +207,15 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     }
     return foundUser;
   },
+  getCountOfNewItemsLabel() {
+    if (
+      this.countOf.unread_recommendations > 0 &&
+      this.countOf.unread_recommendations >= this.countOf.new_messages
+    ) {
+      return `${this.countOf.unread_recommendations} fiche${this.countOf.unread_recommendations > 1 ? 's' : ''} ressource non lue${this.countOf.unread_recommendations > 1 ? 's' : ''}`;
+    }
+    return `${this.countOf.new_messages} élément${this.countOf.new_messages > 1 ? 's' : ''} non lu${this.countOf.new_messages > 1 ? 's' : ''}`;
+  },
   async getDocumentById(id) {
     const foundDocument = this.documents.find(
       (document) => document.id === +id
@@ -343,6 +354,13 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     for (const message of this.feed.elements) {
       if (message.unread > 0 && !message.deleted) {
         this.countOf.new_messages += 1;
+        if (
+          message.nodes.some(
+            (node) => node.type === 'RecommendationNode' && !node.visited
+          )
+        ) {
+          this.countOf.unread_recommendations += 1;
+        }
       }
       this.updateCountOfElementsInDiscussion(message);
     }
@@ -471,11 +489,20 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
       Alpine.raw(this.$store.editor.editorInstance).commands.clearContent();
     }
   },
-  async onClickRessourceConsummeNotification(taskId) {
+  async onClickRessourceConsummeNotification(recommendation, message) {
     trackOpenRessource();
     try {
       if (!Alpine.store('djangoData').isAdvisor) {
-        await api.post(markTaskNotificationAsVisited(this.projectId, taskId));
+        if (!recommendation.visited) {
+          await api.post(
+            markTaskNotificationAsVisited(this.projectId, recommendation.id)
+          );
+        }
+        if (message.unread > 0) {
+          await api.post(
+            conversationsMessageMarkAsReadUrl(this.projectId, message.id)
+          );
+        }
       }
     } catch (error) {
       throw new Error('Failed to mark task notification as visited', error);
