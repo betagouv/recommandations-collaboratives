@@ -48,6 +48,12 @@ class ResourceSerializer(
             "embeded_url",
             "has_dsresource",
             "category",
+            "content",
+            "expires_on",
+            "summary",
+            "support_orga",
+            "contacts",  # id
+            "departments",  # pk = code
         ]
         read_only_fields = [
             "created_on",
