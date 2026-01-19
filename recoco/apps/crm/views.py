@@ -911,6 +911,41 @@ def project_toggle_annotation(request, project_id=None):
     return redirect(url)
 
 
+########################################################################
+# resources
+########################################################################
+
+
+@login_required
+def resource_list(request):
+    has_perm_or_403(request.user, "use_crm", request.site)
+
+    department_queryset = (
+        geomatics.Department.objects.filter(
+            code__in=(
+                Project.on_site.for_user(request.user)
+                .order_by("-created_on", "-updated_on")
+                .prefetch_related("commune__department")
+                .values_list("commune__department", flat=True)
+            )
+        )
+        | request.user.profile.departments.all()
+    ).distinct()
+
+    region_queryset = (
+        geomatics.Region.objects.filter(departments__in=department_queryset)
+        .prefetch_related("departments")
+        .distinct()
+        .order_by("name")
+    )
+
+    context = {
+        "regions": list(RegionSerializer(region_queryset, many=True).data),
+    }
+
+    return render(request, "crm/resource_list.html", context)
+
+
 def handle_create_note_for_object(
     request, the_object, return_view_name, return_update_view_name
 ):
