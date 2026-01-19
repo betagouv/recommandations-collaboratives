@@ -10,9 +10,9 @@ from .importers import ResourceImporter
 from .models import Resource, ResourceAddon
 from .serializers import (
     ResourceAddonSerializer,
-    ResourceDetailSerializer,
     ResourceSerializer,
     ResourceURIImportSerializer,
+    ResourceWritableSerializer,
 )
 
 ########################################################################
@@ -38,7 +38,6 @@ class ResourceViewSet(viewsets.ModelViewSet):
     """
 
     serializer_class = ResourceSerializer
-    serializer_detail_class = ResourceDetailSerializer
     permission_classes = [
         permissions.IsAuthenticatedOrReadOnly,
         IsResourceManagerOrReadOnly,
@@ -57,9 +56,24 @@ class ResourceViewSet(viewsets.ModelViewSet):
         )
 
     def get_serializer_class(self):
-        if self.action == "retrieve":
-            return self.serializer_detail_class
-        return super().get_serializer_class()
+        match self.action:
+            case "list":
+                return ResourceSerializer
+            case "retrieve":
+                return ResourceSerializer
+            case "partial_update":
+                return ResourceWritableSerializer
+            case "update":
+                return ResourceWritableSerializer
+            case "create":
+                return ResourceWritableSerializer
+            case _:
+                return ResourceSerializer
+
+    permission_classes = [
+        permissions.IsAuthenticatedOrReadOnly,
+        IsResourceManagerOrReadOnly,
+    ]
 
     @action(
         detail=False,

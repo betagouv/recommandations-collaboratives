@@ -1,9 +1,12 @@
 from django.contrib.auth import models as auth_models
 from rest_framework import serializers
+from rest_framework.relations import PrimaryKeyRelatedField
 from taggit.serializers import TagListSerializerField, TaggitSerializer
 
 from recoco.rest_api.serializers import BaseSerializerMixin
 
+from ..addressbook.models import Contact
+from ..geomatics.models import Department
 from .models import Category, Resource, ResourceAddon
 
 
@@ -45,6 +48,12 @@ class ResourceSerializer(
             "embeded_url",
             "has_dsresource",
             "category",
+            "content",
+            "expires_on",
+            "summary",
+            "support_orga",
+            "contacts",  # id
+            "departments",  # pk = code
         ]
         read_only_fields = [
             "created_on",
@@ -58,6 +67,12 @@ class ResourceSerializer(
     created_by = ResourceCreatorSerializer(read_only=True, many=False)
     category = CategorySerializer(read_only=True)
     has_dsresource = serializers.BooleanField(read_only=True, default=False)
+    contacts = serializers.PrimaryKeyRelatedField(
+        queryset=Contact.objects.all(), many=True
+    )
+    departments = serializers.PrimaryKeyRelatedField(
+        queryset=Department.objects.all(), many=True
+    )
 
     def save(self, **kwargs):
         return super().save(
@@ -65,9 +80,8 @@ class ResourceSerializer(
         )
 
 
-class ResourceDetailSerializer(ResourceSerializer):
-    class Meta(ResourceSerializer.Meta):
-        fields = ResourceSerializer.Meta.fields + ["summary", "content"]
+class ResourceWritableSerializer(ResourceSerializer):
+    category = PrimaryKeyRelatedField(queryset=Category.objects.all())
 
 
 class ResourceURIImportSerializer(serializers.Serializer):
