@@ -55,110 +55,73 @@
                         <tr>
                             <th scope="col" class="column column--large">Nom de la ressource</th>
                             <th scope="col" class="column column--large">Structure</th>
-                            <th scope="col" class="column column--large">Départements</th>
+                            <th scope="col" class="column column--small">Départements</th>
                             <th scope="col" class="column column--small">Catégorie</th>
                             <th scope="col" class="column column--small">Date d'expiration</th>
                             <th scope="col" class="column column--small">Statut</th>
-                            <th scope="col" class="column column--small">Nb d'utilisation</th>
+                            {% comment %} <th scope="col" class="column column--small">Nb d'utilisation</th> {% endcomment %}
                             <th scope="col" class="column column--small">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         <template x-for="(resource, index) in resourcesToDisplay" :key="resource.id">
                             <tr>
+                                <!-- Title -->
                                 <td>
                                     <span x-show="displayResourceIndex"
                                           x-text="index + 1 + (pagination.currentPage - 1) * pagination.limit"></span>
                                     <a class="fr-link project-table__project-name"
                                        :href="'{% url 'resources-resource-detail' 0 %}'.replace('0', resource.id)"
-                                       x-text="resource.name"></a>
+                                       x-text="resource.title"></a>
                                 </td>
+                                <!-- Support organization -->
                                 <td>
-                                    <template x-if="resource?.owner?.profile?.organization">
-                                        <a class="fr-link resource-table__resource-org-name"
-                                           :href="'{% url 'crm-organization-details' 0 %}'.replace('0', resource.owner.profile.organization.id)"
-                                           x-text="resource.owner.profile.organization.name"></a>
-                                    </template>
-                                    <template x-if="!resource?.owner?.profile?.organization">
-                                        <span class="resource-table__resource-org-name" x-text="resource.org_name"></span>
-                                    </template>
+                                    <span class="resource-table__resource-org-name"
+                                          x-text="resource.support_orga ?? 'Non renseigné'"></span>
                                 </td>
-                                <td x-text="`${resource?.commune?.name} (${resource?.commune?.postal})`"></td>
-                                <td x-text="new Date(resource?.created_on).toLocaleDateString('fr-FR')"></td>
+                                <!-- Departments -->
+                                <td :title="resourceDepartmentsLabel(resource).fullLabel"
+                                    x-text="resourceDepartmentsLabel(resource).shortLabel"></td>
+                                <!-- Category -->
+                                <td x-text="resource.category?.name ?? 'Non renseigné'"></td>
+                                <!-- Expiration date -->
+                                <td :class="isResourceExpired(resource) ? 'text-danger fw-bold' : ''"
+                                    :title="isResourceExpired(resource) ? 'Cette ressource a expiré' : ''">
+                                    <span x-text="new Date(resource?.expires_on).toLocaleDateString('fr-FR')"></span>
+                                    <span x-text="isResourceExpired(resource) ? ' - Expirée' : ''"></span>
+                                </td>
+                                <!-- Status -->
                                 <td class="resource-table__status">
                                     <span x-text="resourceStatusLabel(resource.status)"
                                           class="fr-badge fr-badge--no-icon"
                                           x-tooltip="resourceTooltip(resource)"
                                           :class="resourceStatusColor(resource.status)"></span>
                                 </td>
-                                <td class="resource-table__status">
-                                    <span x-text="resourceStatusLabel(resource.status)"
-                                          class="fr-badge fr-badge--no-icon"
-                                          x-tooltip="resourceTooltip(resource)"
-                                          :class="resourceStatusColor(resource.status)"></span>
-                                </td>
-                                <td class="resource-table__status">
-                                    <span x-text="resourceStatusLabel(resource.status)"
-                                          class="fr-badge fr-badge--no-icon"
-                                          x-tooltip="resourceTooltip(resource)"
-                                          :class="resourceStatusColor(resource.status)"></span>
-                                </td>
+                                {% comment %} <!-- Number of uses -->
+                                <td class="resource-table__status">--</td> {% endcomment %}
+                                <!-- Actions -->
                                 <td>
-                                    <!-- inclure dans les statistiques -->
-                                    <template x-if="resource.exclude_stats">
-                                        <button @click="updateResource(resource, '{% url 'resources-resource-update' 0 %}'.replace('0', resource.id), { statistics: true, notifications: !resource.muted })"
-                                                data-bs-toggle="tooltip"
-                                                data-bs-title="Inclure dans les statistiques"
-                                                data-bs-placement="top"
-                                                :id="'include-stats-' + resource.id"
-                                                class="fr-btn fr-btn--sm fr-icon-line-chart-off-line fr-btn--tertiary-no-outline position-relative"
-                                                title="Inclure dans les statistiques">
-                                            Inclure dans les statistiques
-                                        </button>
-                                    </template>
-                                    <template x-if="!resource.exclude_stats">
-                                        <button @click="updateResource(resource, '{% url 'resources-resource-update' 0 %}'.replace('0', resource.id), { statistics: false, notifications: !resource.muted })"
-                                                data-bs-toggle="tooltip"
-                                                data-bs-title="Exclure des statistiques"
-                                                data-bs-placement="top"
-                                                :id="'exclude-stats-' + resource.id"
-                                                class="fr-btn fr-btn--sm fr-icon-line-chart-on-line fr-btn--tertiary-no-outline position-relative"
-                                                title="Exclure des statistiques">Exclure des statistiques</button>
-                                    </template>
-                                    <!-- activer/couper les notifs -->
-                                    <template x-if="resource.muted">
-                                        <button @click="updateResource(resource, '{% url 'resources-resource-update' 0 %}'.replace('0', resource.id), { statistics: !resource.exclude_stats, notifications: true })"
-                                                data-bs-toggle="tooltip"
-                                                data-bs-title="Activer les notifications"
-                                                data-bs-placement="top"
-                                                class="fr-btn fr-btn--sm fr-icon-notification-off-line fr-btn--tertiary-no-outline position-relative"
-                                                title="Activer les notifications">Activer les notifications</button>
-                                    </template>
-                                    <template x-if="!resource.muted">
-                                        <button @click="updateResource(resource, '{% url 'resources-resource-update' 0 %}'.replace('0', resource.id), { statistics: !resource.exclude_stats, notifications: false })"
-                                                data-bs-toggle="tooltip"
-                                                data-bs-title="Désactiver les notifications"
-                                                data-bs-placement="top"
-                                                class="fr-btn fr-btn--sm fr-icon-notification-on-line fr-btn--tertiary-no-outline position-relative"
-                                                title="Désactiver les notifications">
-                                            Désactiver les notifications
-                                        </button>
-                                    </template>
-                                    <!-- Go to project page -->
+                                    <!-- Go to resource page -->
                                     <button class="fr-btn fr-btn--sm fr-icon-eye-line fr-btn--tertiary-no-outline position-relative"
-                                            title="Accéder à la page du dossier">
+                                            title="Accéder à la page de la ressource">
                                         <a :href="'{% url 'resources-resource-detail' 0 %}'.replace('0', resource.id)"
-                                           class="stretched-link">Accéder à la page du dossier</a>
+                                           class="stretched-link">Accéder à la page de la ressource</a>
                                     </button>
                                     <!-- Edit -->
                                     <button class="fr-btn fr-btn--sm fr-icon-pencil-line fr-btn--tertiary-no-outline position-relative"
-                                            title="Éditer le dossier">
+                                            title="Éditer la ressource">
                                         <a :href="'{% url 'resources-resource-update' 0 %}'.replace('0', resource.id)"
                                            class="stretched-link">Éditer</a>
                                     </button>
+                                    <!-- Duplicate -->
+                                    <button class="fr-btn fr-btn--sm fr-icon-pencil-line fr-btn--tertiary-no-outline position-relative"
+                                            title="Dupliquer la ressource">
+                                        <a :href="'{% url 'resources-resource-update' 0 %}'.replace('0', resource.id)"
+                                           class="stretched-link">Dupliquer</a>
+                                    </button>
                                     <!-- Delete -->
                                     <button class="fr-btn fr-btn--sm fr-icon-delete-line fr-btn--tertiary-no-outline position-relative"
-                                            title="Supprimer le dossier">
+                                            title="Supprimer la ressource">
                                         <a :href="'{% url 'resources-resource-delete' 0 %}'.replace('0', resource.id)"
                                            class="stretched-link">Supprimer</a>
                                     </button>
