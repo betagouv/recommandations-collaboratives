@@ -203,6 +203,7 @@ const config = {
         ),
         marianneStyles: resolve('./src/js/styles/marianne.css.js'),
         projectDetailsStyles: resolve('./src/js/styles/project-details.css.js'),
+        resourceListCrm: resolve('./src/js/apps/CRM/resourceListCrm.js'),
       },
       output: {
         chunkFileNames: undefined,
