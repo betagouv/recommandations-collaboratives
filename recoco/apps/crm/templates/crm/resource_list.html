@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+{% load static %}
+{% load django_vite %}
+{% load humanize %}
+{% load training %}
+{% load hijack %}
+{% block title %}
+    Ressources - CRM
+{% endblock title %}
+{% block og_title %}
+    Ressources - CRM
+{% endblock og_title %}
+{% block js %}
+    {% vite_asset 'js/apps/crm.js' %}
+    {% vite_asset 'js/apps/CRM/resourceListCrm.js' %}
+{% endblock js %}
+{% block content %}
+    {% include "crm/fragments/navigation.html" with resources=True %}
+    <div x-data="{ breadcrumbs: { links: [{url: '{% url 'crm-site-dashboard' %}', title: 'Admin'}], current: 'Ressources' } }"
+         class="fr-p-0">{% include "tools/breadcrumb.html" %}</div>
+    {{ departments|json_script:"departmentsArray" }}
+    {{ regions|json_script:"regionsArray" }}
+    <span x-text="departmentsArray.textContent"></span>
+    <span x-text="regionsArray.textContent"></span>
+    <div x-data="Crm({{ request.site.id }})" class="d-flex fr-px-0 crm">
+        <div x-data="ResourceListCrm(departmentsArray, regionsArray)"
+             @selected-departments="saveSelectedDepartment($event)"
+             @multi-select-change="saveSelectedStatus($event)"
+             class="w-100 d-flex flex-column justify-content-start resource-list-crm">
+            <div class="resource-list-crm__filters fr-px-5v fr-pb-5v">
+                <div class="d-flex align-items-center" x-transition.opacity.duration.500ms>
+                    <span class="resource-list-crm__resources-count-label"
+                          x-show="dataLoaded"
+                          x-text="resourcesCountLabel()"></span>
+                    <span class="resource-list-crm__resources-count-label" x-show="!dataLoaded">Chargement</span>
+                </div>
+                <div class="w-100 position-relative">
+                    {% include "projects/project/fragments/search_bar.html" with action_search="onSearch" x_model="backendSearch.searchText" placeholder="Rechercher parmi les dossiers" %}
+                </div>
+                {% include "projects/project/fragments/departments_selector.html" with label="Projets de mon territoire" label_filter="Localisation :" filter_by_regions=True zone_objects="regions" select_all=True %}
+                <div class="d-flex align-items-center w-100">
+                    <label class="filter__label">Statut:</label>
+                    {% include "tools/multi_select.html" %}
+                </div>
+                {% comment %} TODO Add CSV download button with backend functionnality {% endcomment %}
+                {% comment %} <button class="fr-btn fr-btn--sm no-wrap" title="Télécharger en CSV">🚧Télécharger en CSV</button> {% endcomment %}
+            </div>
+            <div class="fr-mb-2w table-responsive fr-px-5v fr-pb-5v">
+                {% csrf_token %}
+                <table class="resource-table">
+                    <caption x-show="resources"
+                             x-transition.opacity.duration.500ms
+                             class="fr-ml-2v"> <span x-text="resourcesCountLabel()" data-test-id="resources-count-label"></span></caption>
+                    <thead class="resource-table__thead">
+                        <tr>
+                            <th scope="col" class="column column--large">Nom de la ressource</th>
+                            <th scope="col" class="column column--large">Structure</th>
+                            <th scope="col" class="column column--large">Départements</th>
+                            <th scope="col" class="column column--small">Catégorie</th>
+                            <th scope="col" class="column column--small">Date d'expiration</th>
+                            <th scope="col" class="column column--small">Statut</th>
+                            <th scope="col" class="column column--small">Nb d'utilisation</th>
+                            <th scope="col" class="column column--small">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template x-for="(resource, index) in resourcesToDisplay" :key="resource.id">
+                            <tr>
+                                <td>
+                                    <span x-show="displayResourceIndex"
+                                          x-text="index + 1 + (pagination.currentPage - 1) * pagination.limit"></span>
+                                    <a class="fr-link project-table__project-name"
+                                       :href="'{% url 'resources-resource-detail' 0 %}'.replace('0', resource.id)"
+                                       x-text="resource.name"></a>
+                                </td>
+                                <td>
+                                    <template x-if="resource?.owner?.profile?.organization">
+                                        <a class="fr-link resource-table__resource-org-name"
+                                           :href="'{% url 'crm-organization-details' 0 %}'.replace('0', resource.owner.profile.organization.id)"
+                                           x-text="resource.owner.profile.organization.name"></a>
+                                    </template>
+                                    <template x-if="!resource?.owner?.profile?.organization">
+                                        <span class="resource-table__resource-org-name" x-text="resource.org_name"></span>
+                                    </template>
+                                </td>
+                                <td x-text="`${resource?.commune?.name} (${resource?.commune?.postal})`"></td>
+                                <td x-text="new Date(resource?.created_on).toLocaleDateString('fr-FR')"></td>
+                                <td class="resource-table__status">
+                                    <span x-text="resourceStatusLabel(resource.status)"
+                                          class="fr-badge fr-badge--no-icon"
+                                          x-tooltip="resourceTooltip(resource)"
+                                          :class="resourceStatusColor(resource.status)"></span>
+                                </td>
+                                <td class="resource-table__status">
+                                    <span x-text="resourceStatusLabel(resource.status)"
+                                          class="fr-badge fr-badge--no-icon"
+                                          x-tooltip="resourceTooltip(resource)"
+                                          :class="resourceStatusColor(resource.status)"></span>
+                                </td>
+                                <td class="resource-table__status">
+                                    <span x-text="resourceStatusLabel(resource.status)"
+                                          class="fr-badge fr-badge--no-icon"
+                                          x-tooltip="resourceTooltip(resource)"
+                                          :class="resourceStatusColor(resource.status)"></span>
+                                </td>
+                                <td>
+                                    <!-- inclure dans les statistiques -->
+                                    <template x-if="resource.exclude_stats">
+                                        <button @click="updateResource(resource, '{% url 'resources-resource-update' 0 %}'.replace('0', resource.id), { statistics: true, notifications: !resource.muted })"
+                                                data-bs-toggle="tooltip"
+                                                data-bs-title="Inclure dans les statistiques"
+                                                data-bs-placement="top"
+                                                :id="'include-stats-' + resource.id"
+                                                class="fr-btn fr-btn--sm fr-icon-line-chart-off-line fr-btn--tertiary-no-outline position-relative"
+                                                title="Inclure dans les statistiques">
+                                            Inclure dans les statistiques
+                                        </button>
+                                    </template>
+                                    <template x-if="!resource.exclude_stats">
+                                        <button @click="updateResource(resource, '{% url 'resources-resource-update' 0 %}'.replace('0', resource.id), { statistics: false, notifications: !resource.muted })"
+                                                data-bs-toggle="tooltip"
+                                                data-bs-title="Exclure des statistiques"
+                                                data-bs-placement="top"
+                                                :id="'exclude-stats-' + resource.id"
+                                                class="fr-btn fr-btn--sm fr-icon-line-chart-on-line fr-btn--tertiary-no-outline position-relative"
+                                                title="Exclure des statistiques">Exclure des statistiques</button>
+                                    </template>
+                                    <!-- activer/couper les notifs -->
+                                    <template x-if="resource.muted">
+                                        <button @click="updateResource(resource, '{% url 'resources-resource-update' 0 %}'.replace('0', resource.id), { statistics: !resource.exclude_stats, notifications: true })"
+                                                data-bs-toggle="tooltip"
+                                                data-bs-title="Activer les notifications"
+                                                data-bs-placement="top"
+                                                class="fr-btn fr-btn--sm fr-icon-notification-off-line fr-btn--tertiary-no-outline position-relative"
+                                                title="Activer les notifications">Activer les notifications</button>
+                                    </template>
+                                    <template x-if="!resource.muted">
+                                        <button @click="updateResource(resource, '{% url 'resources-resource-update' 0 %}'.replace('0', resource.id), { statistics: !resource.exclude_stats, notifications: false })"
+                                                data-bs-toggle="tooltip"
+                                                data-bs-title="Désactiver les notifications"
+                                                data-bs-placement="top"
+                                                class="fr-btn fr-btn--sm fr-icon-notification-on-line fr-btn--tertiary-no-outline position-relative"
+                                                title="Désactiver les notifications">
+                                            Désactiver les notifications
+                                        </button>
+                                    </template>
+                                    <!-- Go to project page -->
+                                    <button class="fr-btn fr-btn--sm fr-icon-eye-line fr-btn--tertiary-no-outline position-relative"
+                                            title="Accéder à la page du dossier">
+                                        <a :href="'{% url 'resources-resource-detail' 0 %}'.replace('0', resource.id)"
+                                           class="stretched-link">Accéder à la page du dossier</a>
+                                    </button>
+                                    <!-- Edit -->
+                                    <button class="fr-btn fr-btn--sm fr-icon-pencil-line fr-btn--tertiary-no-outline position-relative"
+                                            title="Éditer le dossier">
+                                        <a :href="'{% url 'resources-resource-update' 0 %}'.replace('0', resource.id)"
+                                           class="stretched-link">Éditer</a>
+                                    </button>
+                                    <!-- Delete -->
+                                    <button class="fr-btn fr-btn--sm fr-icon-delete-line fr-btn--tertiary-no-outline position-relative"
+                                            title="Supprimer le dossier">
+                                        <a :href="'{% url 'resources-resource-delete' 0 %}'.replace('0', resource.id)"
+                                           class="stretched-link">Supprimer</a>
+                                    </button>
+                                </td>
+                            </tr>
+                        </template>
+                        <template x-if="resources == null">
+                            <tr>
+                                <td colspan="5">-- Aucun résultat --</td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+                <template x-if="resourcesToDisplay.length > 0">
+                    {% include "tools/pagination.html" with page=pagination.page total_pages=pagination.total %}
+                </template>
+            </div>
+        </div>
+    </div>
+{% endblock content %}
