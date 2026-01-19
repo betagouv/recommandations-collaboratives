@@ -23,66 +23,30 @@ Alpine.data('ResourceListCrm', (departments, regions) => ({
   },
   options: [
     {
-      value: 'PRE_DRAFT',
-      text: 'Incomplet',
+      value: 0,
+      text: 'Brouillon',// DRAFT
       color: 'fr-badge--new fr-badge fr-badge--no-icon font-size-10px',
       tooltip:
-        "Le déposant n'est pas allé jusqu'au bout du dépôt de sa demande",
-      dataTestId: 'status-pre-draft',
+        "La ressource est en cours de création",
     },
     {
-      value: 'DRAFT',
-      text: 'A modérer',
-      color: 'fr-badge--new fr-badge fr-badge--no-icon font-size-10px',
-      tooltip: 'En attente de validation ou refus de votre part',
-    },
-    {
-      value: 'TO_PROCESS',
-      text: 'A traiter',
+      value: 1,
+      text: 'A relire',// TO_REVIEW
       color: 'fr-badge--info fr-badge fr-badge--no-icon font-size-10px',
-      tooltip: "Statut d'avancement du dossier selon votre tableau de bord",
+      tooltip: 'La ressource est en attente de validation',
     },
     {
-      value: 'READY',
-      text: 'En attente',
-      color:
-        'fr-badge--success-lighter fr-badge fr-badge--no-icon font-size-10px',
-      tooltip: "Statut d'avancement du dossier selon votre tableau de bord",
-    },
-    {
-      value: 'IN_PROGRESS',
-      text: 'En cours',
-      color:
-        'fr-badge--success-lighter fr-badge fr-badge--no-icon font-size-10px',
-      tooltip: "Statut d'avancement du dossier selon votre tableau de bord",
-    },
-    {
-      value: 'DONE',
-      text: 'Traité',
-      color:
-        'fr-badge--success-lighter fr-badge fr-badge--no-icon font-size-10px',
-      tooltip: "Statut d'avancement du dossier selon votre tableau de bord",
-    },
-    {
-      value: 'STUCK',
-      text: 'Interrompu',
-      color: 'fr-badge--info fr-badge fr-badge--no-icon font-size-10px',
-      tooltip: "Statut d'avancement du dossier selon votre tableau de bord",
-    },
-    {
-      value: 'REJECTED',
-      text: 'Rejeté',
-      color: 'fr-badge--error fr-badge fr-badge--no-icon font-size-10px',
-      tooltip: "Dossier refusé à l'étape de la modération",
+      value: 2,
+      text: 'Publié',// PUBLISHED
+      color: 'fr-badge--success-lighter fr-badge fr-badge--no-icon font-size-10px',
+      tooltip: "La ressource est publiée",
     },
   ],
   displayResourceIndex: false,
   async init() {
     const resourcesResponse = await this.getResources();
-    // this.resources.push([...resourcesResponse.results]);
-    this.resources.push([...resourcesResponse]);
-    // this.resourcesToDisplay = [...resourcesResponse.results];
-    this.resourcesToDisplay = [...resourcesResponse];
+    this.resources.push([...resourcesResponse.results]);
+    this.resourcesToDisplay = [...resourcesResponse.results];
     this.resourcesTotal = resourcesResponse.count;
     this.pagination.total = Math.ceil(
       resourcesResponse.count / this.pagination.limit
@@ -94,10 +58,8 @@ Alpine.data('ResourceListCrm', (departments, regions) => ({
    **************************/
   updateResourceListAndPagination(resources) {
     this.resources = [];
-    // this.resources.push([...resources.results]);
-    this.resources.push([...resources]);
-    // this.resourcesToDisplay = [...resources.results];
-    this.resourcesToDisplay = [...resources];
+    this.resources.push([...resources.results]);
+    this.resourcesToDisplay = [...resources.results];
     this.resourcesTotal = resources.count;
     this.pagination.total = Math.ceil(resources.count / this.pagination.limit);
   },
@@ -146,8 +108,7 @@ Alpine.data('ResourceListCrm', (departments, regions) => ({
         offset: this.pagination.limit * (pageNumber - 1),
         page: pageNumber,
       });
-      // this.resources[pageNumber - 1] = [...resourcesResponse.results];
-      this.resources[pageNumber - 1] = [...resourcesResponse];
+      this.resources[pageNumber - 1] = [...resourcesResponse.results];
     }
     this.resourcesToDisplay = [...this.resources[pageNumber - 1]];
     this.pagination.currentPage = pageNumber;
@@ -162,8 +123,7 @@ Alpine.data('ResourceListCrm', (departments, regions) => ({
         departments: this.backendSearch.searchDepartment,
       })
     );
-    // this.resources.push(...resources.data.results);
-    this.resources.push(...resources.data);
+    this.resources.push(...resources.data.results);
     this.pagination.currentPage = pageNumber;
   },
 
@@ -275,22 +235,35 @@ Alpine.data('ResourceListCrm', (departments, regions) => ({
       this.options.find((option) => option.value === status).text || status
     );
   },
+  isResourceExpired(resource) {
+    return resource?.expires_on && new Date(resource?.expires_on) < new Date();
+  },
+  resourceDepartmentsLabel(resource) {
+    const response = {
+      shortLabel: 'Non renseigné',
+      fullLabel: 'Non renseigné',
+    }
+    if (resource?.departments.length) {
+      const departments = [...resource?.departments];
+      if(departments.length > 10) {
+        response.shortLabel = `${departments.slice(0, 10).join(', ')}...`;
+      } else {
+        response.shortLabel = departments.join(', ');
+      }
+      response.fullLabel = departments.join(', ');
+    }
+    return response;
+  },
   resourceStatusColor(status) {
     switch (status) {
-      case 'PRE_DRAFT':
-      case 'DRAFT':
+      case 0:
         return 'fr-badge--new';
-      case 'TO_PROCESS':
-      case 'STUCK':
+      case 1:
         return 'fr-badge--info';
-      case 'READY':
-      case 'IN_PROGRESS':
-      case 'DONE':
+      case 2:
         return 'fr-badge--success-lighter';
-      case 'REJECTED':
-        return 'fr-badge--error';
       default:
-        return 'fr-badge--white';
+        return '';
     }
   },
   resourceTooltip(resource) {
