@@ -34,8 +34,16 @@ class IsResourceManagerOrReadOnly(permissions.BasePermission):
 
 class ResourceViewSet(viewsets.ModelViewSet):
     """
-    API endpoint that allows resources to be listed or edited
+    API endpoint that allows resources to be listed or edited, with pagination support.
     """
+
+    serializer_class = ResourceSerializer
+    serializer_detail_class = ResourceDetailSerializer
+    permission_classes = [
+        permissions.IsAuthenticatedOrReadOnly,
+        IsResourceManagerOrReadOnly,
+    ]
+    pagination_class = StandardResultsSetPagination  # Add pagination
 
     def get_queryset(self):
         qs = Resource.on_site
@@ -48,20 +56,10 @@ class ResourceViewSet(viewsets.ModelViewSet):
             .order_by("-created_on", "-updated_on")
         )
 
-    serializer_class = ResourceSerializer
-    serializer_detail_class = ResourceDetailSerializer
-
     def get_serializer_class(self):
         if self.action == "retrieve":
             return self.serializer_detail_class
-
         return super().get_serializer_class()
-
-    serializer_class = ResourceSerializer
-    permission_classes = [
-        permissions.IsAuthenticatedOrReadOnly,
-        IsResourceManagerOrReadOnly,
-    ]
 
     @action(
         detail=False,
