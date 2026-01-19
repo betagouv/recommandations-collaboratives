@@ -92,7 +92,7 @@ Alpine.data('ResourceListCrm', (departments, regions) => ({
       });
     } catch (error) {
       this.showToast(
-        `Erreur lors de la recherche des projets`,
+        `Erreur lors de la recherche des ressources`,
         ToastType.error
       );
       throw new Error(`Error while searching resources`, error);
@@ -145,74 +145,16 @@ Alpine.data('ResourceListCrm', (departments, regions) => ({
       return response.data;
     } catch (error) {
       this.showToast(
-        `Erreur lors de la récupération des projets de la page ${page}`,
+        `Erreur lors de la récupération des ressources de la page ${page}`,
         ToastType.error
       );
       throw new Error(`Error while getting resources from page ${page}`, error);
-    }
-  },
-  async updateResource(resourceToUpdate, url, data) {
-    let formData = new FormData();
-    for (let key in data) {
-      formData.append(key, data[key]);
-    }
-    try {
-      await fetch(url, {
-        method: 'POST',
-        body: formData,
-        headers: {
-          'X-CSRFToken': document.querySelector('[name="csrfmiddlewaretoken"]')
-            .value,
-        },
-      });
-      const updatedResource = {
-        ...resourceToUpdate,
-        exclude_stats: !data.statistics,
-        muted: !data.notifications,
-      };
-      const updatedResourceIndex = this.resources[
-        this.pagination.currentPage - 1
-      ].findIndex((x) => x.id === resourceToUpdate.id);
-
-      this.resources[this.pagination.currentPage - 1].splice(
-        updatedResourceIndex,
-        1,
-        updatedResource
-      );
-      this.resourcesToDisplay = [
-        ...this.resources[this.pagination.currentPage - 1],
-      ];
-      this.showToast(
-        this.getToastMessage(resourceToUpdate, data),
-        ToastType.success
-      );
-    } catch (error) {
-      this.showToast(
-        'Erreur lors de la mise à jour des paramètres du projet',
-        ToastType.error
-      );
-      throw new Error('Error while updating resource param', error);
     }
   },
 
   /************************
    * Informational functions
    **************************/
-  getToastMessage(resourceToUpdate, dataToUpdate) {
-    if (dataToUpdate.statistics === resourceToUpdate.exclude_stats) {
-      if (dataToUpdate.statistics) {
-        return 'Le projet apparaitra dans les statistics';
-      } else {
-        return "Le projet n'apparaitra pas dans les statistics";
-      }
-    } else if (dataToUpdate.notifications === resourceToUpdate.muted) {
-      if (dataToUpdate.notifications) {
-        return 'Les notifications sont activées pour le projet';
-      } else {
-        return 'Les notifications sont désactivées pour le projet';
-      }
-    }
-  },
   showToast(message, type) {
     this.$store.app.notification.message = message;
     this.$store.app.notification.timeout = 5000;
