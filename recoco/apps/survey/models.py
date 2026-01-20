@@ -95,7 +95,7 @@ class QuestionSet(CloneMixin, models.Model):
 
     precondition_tags = TaggableManager(
         verbose_name="Pré-condition",
-        help_text="Affiche ce groupe de questions si TOUS les signaux saisis sont émis",
+        help_text='Affiche ce groupe de questions si TOUS les signaux saisis sont émis </br> Liste de tags séparés par une virgule. Si le tag contient plusieurs mots les encadrer par des guillemets.Attention, veillez à ne pas retirer un tag utilisé dans un projet, celui-ci ne pourra plus être retiré depuis le CRM. ex: "signature convention", diagnostic, "lancement travaux"',
         blank=True,
     )
 

@@ -19,7 +19,7 @@ class Migration(migrations.Migration):
             name="precondition_tags",
             field=taggit.managers.TaggableManager(
                 blank=True,
-                help_text="Affiche ce groupe de questions si TOUS les signaux saisis sont émis",
+                help_text='Affiche ce groupe de questions si TOUS les signaux saisis sont émis </br> Liste de tags séparés par une virgule. Si le tag contient plusieurs mots les encadrer par des guillemets.Attention, veillez à ne pas retirer un tag utilisé dans un projet, celui-ci ne pourra plus être retiré depuis le CRM. ex: "signature convention", diagnostic, "lancement travaux"',
                 through="taggit.TaggedItem",
                 to="taggit.Tag",
                 verbose_name="Pré-condition",
