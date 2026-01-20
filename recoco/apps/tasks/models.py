@@ -370,7 +370,7 @@ class TaskRecommendation(models.Model):
                 survey_models.Choice.objects.prefetch_related(
                     "question__question_set"
                 ).select_related("question"),
-                tag,
+                tag.name,
             )
 
         return triggers
