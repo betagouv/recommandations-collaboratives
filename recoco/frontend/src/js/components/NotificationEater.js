@@ -96,6 +96,16 @@ Alpine.data('NotificationEater', (projectId) => {
     },
     async consumeNotification(message, messageElement) {
       try {
+        const responseConsumedRecommendation =
+          await this.consumeRecommendationNotification(message.id);
+
+        if (
+          responseConsumedRecommendation.recommendationWithRessource ||
+          responseConsumedRecommendation.noMessage
+        ) {
+          return;
+        }
+
         await api.post(
           conversationsMessageMarkAsReadUrl(this.projectId, message.id)
         );
@@ -107,32 +117,45 @@ Alpine.data('NotificationEater', (projectId) => {
             unread: 0,
           })
         );
-        await this.consumeRecommendationNotification(message.id);
       } catch (error) {
         throw new Error('Failed to consume notification', error);
       }
     },
     async consumeRecommendationNotification(id) {
+      const response = {
+        noMessage: false,
+        noRecommendation: false,
+        noRessource: false,
+        recommendationWithRessource: false,
+      };
       const parentFeed = Alpine.$data(this.$el.parentElement).feed;
       const parentTasks = Alpine.$data(this.$el.parentElement).tasks;
       const foundMessage = parentFeed.messages.find(
         (message) => message.id == id
       );
       if (!foundMessage) {
-        return null;
+        response.noMessage = true;
+        return response;
       }
       const foundRecommendation = foundMessage.nodes.find(
         (node) => node.type == 'RecommendationNode'
       );
       if (!foundRecommendation) {
-        return null;
+        response.noRecommendation = true;
+        return response;
       }
       const foundTask = parentTasks.find(
         (task) => task.id == foundRecommendation.recommendation_id
       );
-      if (!foundTask || foundTask.resource) {
-        return null;
+      if (!foundTask) {
+        response.noRecommendation = true;
+        return response;
       }
+      if (foundTask.resource) {
+        response.recommendationWithRessource = true;
+        return response;
+      }
+
       try {
         await api.post(
           markTaskNotificationAsVisited(
@@ -140,6 +163,8 @@ Alpine.data('NotificationEater', (projectId) => {
             foundRecommendation.recommendation_id
           )
         );
+        response.noRessource = true;
+        return response;
       } catch (error) {
         throw new Error('Failed to consume recommendation notification', error);
       }

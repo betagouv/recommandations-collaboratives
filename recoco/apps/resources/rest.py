@@ -10,6 +10,7 @@ from .importers import ResourceImporter
 from .models import Resource, ResourceAddon
 from .serializers import (
     ResourceAddonSerializer,
+    ResourceDetailSerializer,
     ResourceSerializer,
     ResourceURIImportSerializer,
 )
@@ -46,6 +47,15 @@ class ResourceViewSet(viewsets.ModelViewSet):
             .prefetch_related("tags")
             .order_by("-created_on", "-updated_on")
         )
+
+    serializer_class = ResourceSerializer
+    serializer_detail_class = ResourceDetailSerializer
+
+    def get_serializer_class(self):
+        if self.action == "retrieve":
+            return self.serializer_detail_class
+
+        return super().get_serializer_class()
 
     serializer_class = ResourceSerializer
     permission_classes = [
