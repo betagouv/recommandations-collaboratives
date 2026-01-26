@@ -21,14 +21,18 @@
                         <ul class="info__survey-questions">
                             {% regroup session.the_answers.all by question.question_set as answer_list %}
                             {% for question_set, answers in answer_list %}
+                            {% question_set_visible session question_set_set  as qs_visible %}
+                            {% if qs_visible %}
                                 <li>
                                     <a class="fr-link"
                                        href="#{{ session.survey.site.id }}_{{ question_set.id }}">{{ question_set.heading }}</a>
                                 </li>
+                              {% endif %}
                             {% endfor %}
                             {% for question_set in session.survey.question_sets.all %}
                                 {% question_set_completion session question_set as qs_completion %}
-                                {% if qs_completion == 0 %}
+                                {% question_set_visible session question_set_set  as qs_visible %}
+                                {% if qs_completion == 0 and qs_visible %}
                                     <li>
                                         <a class="fr-link"
                                            href="#{{ session.survey.site.id }}_{{ question_set.id }}">{{ question_set.heading }}</a>
@@ -116,6 +120,8 @@
                         <!-- Show QS with progress -->
                         {% regroup session.the_answers.all by question.question_set as answer_list %}
                         {% for question_set, answers in answer_list %}
+                            {% question_set_visible session question_set_set  as qs_visible %}
+                            {% if qs_visible %}
                             <div class="col-12 col-xl-6 col-md-6 masonry-item">
                                 <div class="position-relative">
                                     <div class="invisible-anchor-high"
@@ -123,11 +129,13 @@
                                     {% include "survey/widgets/qs_summary_card.html" with question_set=question_set can_manage=can_manage_draft answers=answers show_conclusion=1 show_comment=1 %}
                                 </div>
                             </div>
+                          {% endif %}
                         {% endfor %}
                         <!-- Show other QS not yet started -->
                         {% for question_set in session.survey.question_sets.all %}
                             {% question_set_completion session question_set as qs_completion %}
-                            {% if qs_completion == 0 %}
+                            {% question_set_visible session question_set_set  as qs_visible %}
+                            {% if qs_completion == 0 and qs_visible %}
                                 <div class="col-12 col-xl-6 col-md-6 masonry-item">
                                     <div class="position-relative">
                                         <div class="invisible-anchor-high"

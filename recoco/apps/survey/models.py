@@ -316,7 +316,7 @@ class Session(models.Model):
             )
         }
 
-    def _following_qestion_set(self, direction: DIRECTION, qs=None):
+    def _following_question_set(self, direction: DIRECTION, qs=None):
         initial_qs = (
             qs.following(direction)
             if qs
@@ -351,7 +351,7 @@ class Session(models.Model):
             question = question.following(direction)
 
         if not question:
-            qs = self._following_qestion_set(
+            qs = self._following_question_set(
                 direction, qs=last_not_none_question.question_set
             )
             question = qs.extreme_question(direction) if qs else None
@@ -364,7 +364,7 @@ class Session(models.Model):
             question = question.following(direction)
             if question is None:
                 # No next question in current question set, ask sibling
-                qs = self._following_qestion_set(
+                qs = self._following_question_set(
                     direction, qs=last_not_none_question.question_set
                 )
                 question = qs.extreme_question(direction) if qs else None

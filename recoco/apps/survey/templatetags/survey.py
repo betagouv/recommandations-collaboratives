@@ -12,6 +12,11 @@ def question_set_completion(session, question_set):
 
 
 @register.simple_tag
+def question_set_visible(session, question_set):
+    return question_set.check_precondition(session)
+
+
+@register.simple_tag
 def question_answer(session, question):
     try:
         return Answer.objects.get(question=question, session=session)
