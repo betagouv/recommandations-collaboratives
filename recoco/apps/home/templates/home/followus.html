@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load sass_tags %}
+{% load django_vite %}
 {% load static %}
 {% block title %}
     Nous suivre
@@ -7,11 +7,9 @@
 {% block og_title %}
     Nous suivre
 {% endblock og_title %}
-{% block css %}
-    <link href="{% sass_src 'home/css/home/home.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-{% endblock css %}
+{% block js %}
+    {% vite_asset 'js/styles/home.css.js' %}
+{% endblock js %}
 {% block content %}
     <div class="col-8 fr-py-2w g-0 fr-mx-auto">
         <h2>Suivre le dossier</h2>
@@ -23,18 +21,18 @@
             <strong>Le 1er jeudi du mois à 15h.</strong>
         </p>
         <p>
-            Pour y participer la première fois, envoie un mail à <a href="mailto:friches@beta.gouv.fr">friches@beta.gouv.fr</a> et connecte-toi à <a href="https://us02web.zoom.us/j/82589512780" target="_new">cette url</a>.
+            Pour y participer la première fois, envoie un mail à <a href="mailto:friches@beta.gouv.fr">friches@beta.gouv.fr</a> et connecte-toi à <a href="https://us02web.zoom.us/j/82589512780" target="_blank">cette url <span class="visually-hidden">Nouvelle fenêtre</span></a>.
             Tu peux venir ou ne pas venir, sans prévenir. On commence à l'heure la démo dans tous les cas.
             Le contenu des démos des sprints précédents peut être retrouvé <a href="https://pad.incubateur.net/qor4zBVfQVKyxEI3a7wLTA?view"
-    target="_new">dans cette présentation</a> que l'équipe met à jour avant chaque démo.
+    target="_blank">dans cette présentation <span class="visually-hidden">Nouvelle fenêtre</span></a> que l'équipe met à jour avant chaque démo.
         </p>
         <p>
             Lors de la démo, on présente les travaux de l'équipe, comment le produit a évolué et les échanges avec les utilisateurs, etc. Puis on a un temps d'échange.
             Ça dure 30 à 60 min selon les échanges, et tu peux évidemment arriver en retard ou partir plus tôt.
         </p>
         <p>
-            Accédez ici aux éléments sous le format <a href="https://pad.incubateur.net/s/Cp_Sf9-8O#" target="_new">Journal de bord</a>. Accédez ici aux <a href="https://pad.incubateur.net/-fMhnZPmQKKp-o7q45E1Iw?edit#"
-    target="_new">éléments d'octobre 2020 à septembre 2021</a>.
+            Accédez ici aux éléments sous le format <a href="https://pad.incubateur.net/s/Cp_Sf9-8O#" target="_blank">Journal de bord <span class="visually-hidden">Nouvelle fenêtre</span></a>. Accédez ici aux <a href="https://pad.incubateur.net/-fMhnZPmQKKp-o7q45E1Iw?edit#"
+    target="_blank">éléments d'octobre 2020 à septembre 2021 <span class="visually-hidden">Nouvelle fenêtre</span></a>.
         </p>
     </div>
 {% endblock content %}

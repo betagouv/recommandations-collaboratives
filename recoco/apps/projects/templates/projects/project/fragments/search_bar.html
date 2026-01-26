@@ -8,16 +8,14 @@ variables to pass :
 - x_model : le nom du modèle x-data à lier à la barre de recherche (optionnel)
 
 {% endcomment %}
-{% load sass_tags %}
-{% block css %}
-<link href="{% sass_src 'projects/css/searchbar.scss' %}"
-      rel="stylesheet"
-      type="text/css">
-{% endblock css %}
+{% load django_vite %}
+{% block js %}
+    {% vite_asset 'js/styles/projects-searchbar.css.js' %}
+{% endblock js %}
 <input x-ref="search_bar"
        type="search"
        data-cy="search-bar-project"
-       class="fr-icon-search-line placeholder-position"
+       class="placeholder-position searchbar-input"
        placeholder="{{ placeholder|default:"Rechercher" }}"
        @input.debounce.500ms="{{ action_search }}"
        {% if x_model %}x-model="{{ x_model }}"{% endif %}>

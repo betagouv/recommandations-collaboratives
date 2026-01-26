@@ -1,5 +1,4 @@
 {% extends "base.html" %}
-{% load sass_tags %}
 {% load static %}
 {% load django_vite %}
 {% load humanize %}
@@ -13,11 +12,6 @@
 {% block js %}
     {% vite_asset 'js/apps/crm.js' %}
 {% endblock js %}
-{% block css %}
-    <link href="{% sass_src 'home/css/dsfr/marianne.css' %}"
-          rel="stylesheet"
-          type="text/css">
-{% endblock css %}
 {% block content %}
     <div x-data="Crm" class="d-flex fr-px-0">
         {% include "crm/fragments/sidebar.html" with search=True back_button=True user_advised_projects=False user_projects=False %}
@@ -44,8 +38,7 @@
                         <button type="submit"
                                 href="{% url 'crm-project-delete' project.pk %}"
                                 class="btn btn-danger">Oui, supprimer ce dossier</button>
-                        <a href="{% url 'crm-project-details' project.pk %}"
-                           class="btn btn-outline-secondary">Non, annuler la suppression</a>
+                        <a href="{% url 'crm-project-list' %}" class="btn btn-outline-secondary">Non, annuler la suppression</a>
                     </form>
                 </div>
             </div>

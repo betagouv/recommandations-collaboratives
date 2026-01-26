@@ -18,7 +18,7 @@ def set_order_from_priority(apps, schema_editor):
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("projects", "0047_alter_task_priority"),
+        ("projects", "0044_auto_20220131_1719_squashed_0047_alter_task_priority"),
     ]
 
     operations = [

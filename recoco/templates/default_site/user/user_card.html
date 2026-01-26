@@ -7,12 +7,6 @@
 {% endblock js %}
 {% load guardian_tags %}
 {% load projects_extra %}
-{% load sass_tags %}
-{% block css %}
-    <link href="{% sass_src 'css/user/user_card.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-{% endblock css %}
 {% get_obj_perms request.user for request.site as "user_site_perms" %}
 {% get_obj_perms request.user for project as "user_project_perms" %}
 <div x-data="User()"
@@ -24,7 +18,7 @@
                 class="d-flex align-items-center flex-wrap user-info border-0 fr-p-0 bg-transparent {% if user_popup_deactivate %}no-underline{% endif %}"
                 data-test-id="button-open-tooltip-user-card">
             <span class="fr-mr-1v d-flex align-items-center font-size-12px">
-                <img class="user-card__gravatar rounded-circle fr-mr-1v {% if not user.is_active %}border-0{% elif advising_position.is_advisor %}advisor-border border-2{% elif advising_position.is_observer %}observer-border border-2{% else %}neutral-role-border border-2{% endif %}"
+                <img class="user-card__gravatar rounded-circle fr-mr-1v {% if not user.is_active %}border-0{% else %}neutral-role-border border-2{% endif %}"
                      :src='gravatar_url("{{ user.email }}", 18, "{{ user.first_name }}" + " " + "{{ user.last_name }}", stringToColor("{{ user.email }}") )'
                      :style="{ '--current-bg-color': stringToColor('{{ user.email }}') }"
                      alt="{{ action.actor }}">

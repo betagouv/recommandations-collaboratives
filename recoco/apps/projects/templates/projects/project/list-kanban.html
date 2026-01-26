@@ -3,25 +3,13 @@
 {% load humanize %}
 {% load notifications_tags %}
 {% load gravatar %}
-{% load sass_tags %}
 {% load django_vite %}
-{% block css %}
-    <link href="{% sass_src 'home/css/dsfr/custom-dsfr.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-    <link href="{% sass_src 'projects/css/kanban.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-    <link href="{% sass_src 'projects/css/board.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-    <link href="{% sass_src 'projects/css/segmented_ctrl.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-{% endblock css %}
 {% block js %}
+    {% vite_asset 'js/styles/projects-board.css.js' %}
     {% vite_asset 'js/apps/boardProjects.js' %}
     {% vite_asset 'js/apps/tutorial.js' %}
+    {% vite_asset 'js/styles/kanban.css.js' %}
+    {% vite_asset 'js/styles/segmented_ctrl.css.js' %}
 {% endblock js %}
 {% block title %}
     Tableau de bord administrateur {{ block.super }}
@@ -42,7 +30,7 @@
                 <span class="visually-hidden">Loading...</span>
             </div>
         </div>
-        <div>
+        <div class="kanban-header topbar d-flex justify-content-between align-items-center fr-p-2v">
             {% include "projects/project/fragments/tasks_inline_kanban/tasks_inline_kanban_filters.html" %}
             <div class="kanban-header__toolbar">{% include "projects/project/fragments/list-toolbars.html" %}</div>
         </div>

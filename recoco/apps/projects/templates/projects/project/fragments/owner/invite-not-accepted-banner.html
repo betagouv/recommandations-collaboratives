@@ -1,9 +1,7 @@
-{% load sass_tags %}
-{% block css %}
-    <link href="{% sass_src 'projects/css/fragments/owner/invite-not-accepted-banner.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-{% endblock css %}
+{% load django_vite %}
+{% block js %}
+    {% vite_asset 'js/styles/invite-not-accepted-banner.css.js' %}
+{% endblock js %}
 {% if project.owner != project.submitted_by %}
     {% for invite in invites %}
         {% if invite.role == "COLLABORATOR" and invite.email == project.owner.email %}

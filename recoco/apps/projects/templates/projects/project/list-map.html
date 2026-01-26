@@ -1,7 +1,6 @@
 {% extends "projects/project/list.html" %}
 {% load django_vite %}
 {% load static %}
-{% load sass_tags %}
 {% block title %}
     Carte des dossiers {{ block.super }}
 {% endblock title %}
@@ -12,31 +11,17 @@
     {% vite_asset 'js/apps/advisorDashboard.js' %}
     {% vite_asset 'js/apps/tutorial.js' %}
     {% vite_asset 'js/apps/boardProjects.js' %}
+    {% vite_asset 'js/styles/kanban.css.js' %}
+    {% vite_asset 'js/styles/segmented_ctrl.css.js' %}
 {% endblock js %}
-{% block css %}
-    <link href="{% sass_src 'projects/css/segmented_ctrl.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-    <link href="{% sass_src 'projects/css/kanban.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-{% endblock css %}
 {% block project_list_content %}
-    {{ departments|json_script:"departmentsArray" }}
     {{ regions|json_script:"regionsArray" }}
     <div class="col-12 fr-mx-auto font-marianne">
-        <div x-data="PersonalAdvisorDashboard({{ request.site.id }}, departmentsArray, regionsArray)"
-             x-init='getData("{{ request.user }}");'
+        <div x-data="MapDashboard({{ request.site.id }}, regionsArray)"
              @selected-departments="saveSelectedDepartment($event)">
+            <div class="kanban-header topbar d-flex justify-content-between align-items-center fr-p-2v">
                 {% include "projects/project/fragments/tasks_inline_kanban/tasks_inline_kanban_filters.html" %}
                 <div class="kanban-header__toolbar">{% include "projects/project/fragments/list-toolbars.html" %}</div>
-            </div>
-            <div>
-                <span class="fr-mb-2w">Légende :</span>
-                <ul class="fr-ml-2w">
-                    <li>jaune : dossiers non consultés</li>
-                    <li>noir : dossiers déjà consultés</li>
-                </ul>
             </div>
             <div class="d-flex align-items-start fr-pt-3w">
                 <div class="personal-dashboard-container-inner w-100">

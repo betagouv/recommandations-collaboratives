@@ -10,8 +10,8 @@ Vous trouverez une interface à utiliser pour normaliser l'utilisation des fenet
 
 Elle permet de définir le comportement d'une fenetre modale lors de sa fermeture avec deux possibilités :
 
-- fermeture avec envoie de données `responseModal`
-- fermerture sans envoie de données `closeModal`
+- fermeture avec envoi de données `responseModal`
+- fermeture sans envoi de données `closeModal`
 
 Ces fonctions utilisent un evènement qui devra être écouté dans le composant parent de la fenetre modale : `@modal-response`
 

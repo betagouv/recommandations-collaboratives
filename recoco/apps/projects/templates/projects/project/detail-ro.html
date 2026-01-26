@@ -2,26 +2,17 @@
 {% load humanize %}
 {% load static %}
 {% load django_vite %}
-{% load sass_tags %}
 {% block title %}
     État des lieux du dossier {{ project.name }} {{ block.super }}
 {% endblock title %}
 {% block og_title %}
     État des lieux du dossier {{ project.name }} {{ block.super }}
 {% endblock og_title %}
-{% block css %}
-    <link href="{% sass_src 'resources/resources.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-    <link href="{% sass_src 'resources/resource_card.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-    <link href="{% sass_src 'projects/css/project.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-    {% vite_asset 'css/projectDetails.css' %}
-{% endblock css %}
 {% block js %}
+    {% vite_asset 'js/styles/resources.css.js' %}
+    {% vite_asset 'js/styles/resource-card.css.js' %}
+    {% vite_asset 'js/styles/projects-project.css.js' %}
+    {% vite_asset 'css/projectDetails.css' %}
     <script type="text/javascript">
         document.addEventListener('DOMContentLoaded', function() {
             activateTab();

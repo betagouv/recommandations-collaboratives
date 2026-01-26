@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 {% load guardian_tags %}
 {% load static %}
-{% load sass_tags %}
 {% load django_vite %}
 {% block title %}
     Carnet de contacts {{ block.super }}
@@ -9,17 +8,10 @@
 {% block og_title %}
     Carnet de contacts {{ block.super }}
 {% endblock og_title %}
-{% block css %}
-    <link href="{% sass_src 'addressbook/css/contact_list.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-    <link href="{% sass_src 'projects/css/segmented_ctrl.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-{% endblock css %}
 {% block js %}
-    {% vite_asset 'js/components/ContactBook.js' %}
+    {% vite_asset 'js/apps/contactBookApp.js' %}
     {% vite_asset 'js/apps/featureAddContact.js' %}
+    {% vite_asset 'js/styles/segmented_ctrl.css.js' %}
 {% endblock js %}
 {% block content %}
     {{ departments|json_script:"departmentsArray" }}
@@ -97,7 +89,8 @@
                         <h3 class="national-group__name fr-mb-0 no-wrap"
                             x-text="nationalGroup.name"></h3>
                         <template x-for="organization in nationalGroup.organizations" :key="index">
-                            <div class="organization-container">
+                            <div class="organization-container"
+                                 :data-organization-id="organization.id">
                                 <div class="d-flex align-items-center" data-test-id="organization-header">
                                     <h3 class="organization__name fr-mb-0 no-wrap" x-text="organization.name"></h3>
                                     <button class="fr-btn fr-btn--tertiary-no-outline fr-btn--sm fr-icon-pencil-line button__actions-edit"

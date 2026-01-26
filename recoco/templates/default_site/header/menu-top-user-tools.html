@@ -2,35 +2,27 @@
 {% load static %}
 {% load guardian_tags %}
 {% load projects_extra %}
-{% load sass_tags %}
 {% load django_vite %}
-{% block css %}
-    <link href="{% sass_src 'css/header/header.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-    <link href="{% sass_src 'css/header/user-tools.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-{% endblock css %}
 {% block js %}
+    {% vite_asset 'js/styles/header-user-tools.css.js' %}
     {% vite_asset 'js/components/ExpandableMenuHandler.js' %}
 {% endblock js %}
 {% is_staff_for_current_site request.user as is_staff %}
 <!-- User -->
-<div class="user-tools d-flex">
+<div class="user-tools d-flex" x-data="ExpandableMenuHandler">
     {% if user.is_authenticated %}
         {% get_obj_perms request.user for request.site as "user_site_perms" %}
         <!-- Notifications -->
-        <div class="dropdown user-tools__notification-menu"
-             x-data="MenuNotifications({{ unread_notifications_count }}, {% if unread_notifications|length > 0 %}{{ unread_notifications }} {% else %}[]{% endif %} )">
-            <button class="fr-btn fr-btn--tertiary-no-outline fr-icon-notification-3-line"
+        <div class="dropdown user-tools__notification-menu fr-p-0 h-64"
+             x-data="MenuNotifications({{ unread_notifications_count }}, {% if unread_notifications|length > 0 %}{{ unread_notifications }} {% else %}[]{% endif %} )"
+             @click.outside="toggle">
+            <button class="fr-nav__btn user-tools__main-menu-button h-64 fr-m-0"
                     id="notification-menu-button"
-                    role="button"
+                    x-ref="expandMenuButton"
                     data-bs-toggle="dropdown"
                     data-bs-auto-close="outside"
-                    aria-expanded="false"
                     data-test-id="notification-menu-open">
-                Notifications
+                <span class="fr-icon-notification-3-line" aria-hidden="true"></span>
                 <span class="badge text-bg-danger"
                       x-show="notificationNumber > 0"
                       x-text="notificationNumber"
@@ -38,7 +30,7 @@
             </button>
             {% include "header/dropdown-menu-notifications.html" %}
         </div>
-        <div x-data="ExpandableMenuHandler" @click.outside="toggle">
+        <div @click.outside="toggle">
             <button class="fr-nav__btn user-tools__main-menu-button h-100"
                     x-ref="expandMenuButton"
                     aria-expanded="false"
@@ -53,11 +45,6 @@
                     {% if is_switchtender or is_administrating_project %}
                         <li>
                             <a class="fr-nav__link " href="{% url 'projects-project-list' %}">Accueil</a>
-                        </li>
-                    {% endif %}
-                    {% if "use_crm" in user_site_perms %}
-                        <li>
-                            <a class="fr-nav__link " href="{% url 'crm-site-dashboard' %}">CRM</a>
                         </li>
                     {% endif %}
                     {% if user.is_staff %}
@@ -80,14 +67,14 @@
                             <a class="fr-nav__link"
                                href="https://reco-co.gitbook.io/reco-co/pour-les-administrateurs-dun-portail"
                                data-test-id="documentation-button-staff"
-                               target="_blank">Documentation</a>
+                               target="_blank">Documentation <span class="visually-hidden">Nouvelle fenêtre</span></a>
                         </li>
                     {% elif is_switchtender or is_administrating_project %}
                         <li>
                             <a class="fr-nav__link"
                                href="https://reco-co.gitbook.io/reco-co/pour-les-acteurs-publics-qui-conseillent-les-collectivites"
                                data-test-id="documentation-button-advisor"
-                               target="_blank">Documentation</a>
+                               target="_blank">Documentation <span class="visually-hidden">Nouvelle fenêtre</span></a>
                         </li>
                     {% endif %}
                     <li>

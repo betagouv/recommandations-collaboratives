@@ -328,5 +328,15 @@
       "project_id": 30,
       "site_id": 1
     }
+  },
+  {
+    "pk": 34,
+    "model": "projects.projectsite",
+    "fields": {
+      "status": "PRE_DRAFT",
+      "is_origin": true,
+      "project_id": 31,
+      "site_id": 1
+    }
   }
 ]

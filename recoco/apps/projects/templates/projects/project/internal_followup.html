@@ -5,7 +5,6 @@
 {% load activity_tags %}
 {% load gravatar %}
 {% load guardian_tags %}
-{% load sass_tags %}
 {% load django_vite %}
 {% block title %}
     Espace conseillers - {{ block.super }}
@@ -21,7 +20,7 @@
     {% get_obj_perms request.user for project as "user_project_perms" %}
     <div class="col-12 fr-mx-auto">
         {% include "projects/project/navigation.html" with internal_followup=True full_page=True %}
-        {% include "projects/project/fragments/project_banner/banner_wrapper.html" with part='open' %}
+        {% include "projects/project/fragments/project_banner/banner_wrapper.html" with part="open" %}
         <div class="container-fluid">
             <div class="row fr-p-2w">
                 <div class="col-8">
@@ -75,6 +74,7 @@
                 </div>
             </div>
         </div>
-        {% include "projects/project/fragments/project_banner/banner_wrapper.html" with part='close' %}
+        {% include "projects/project/fragments/project_banner/banner_wrapper.html" with part="close" %}
+        {% include "projects/project/onboarding_tutorial.html" %}
     </div>
 {% endblock project_detail %}

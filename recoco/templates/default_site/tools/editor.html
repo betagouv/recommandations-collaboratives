@@ -18,15 +18,11 @@ Parameters:
 - can_compress_editor (boolean)
 {% endcomment %}
 {% load static %}
-{% load sass_tags %}
-{% block css %}
-    <link href="{% sass_src 'css/tools/editor.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-    <link href="{% sass_src 'css/tools/contact/contact-card.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-{% endblock css %}
+{% load django_vite %}
+{% block js %}
+    {% vite_asset 'js/styles/tools-editor.css.js' %}
+    {% vite_asset 'js/styles/contact-card.css.js' %}
+{% endblock js %}
 <div class="w-100 position-relative editor-container"
      {% if initial_content_escapejs %} x-data='editor("{{ initial_content|escapejs }}", "{{ placeholder }}", "{{ is_action_pusher }}" == "True" )' {% elif initial_content_js %} x-data='editor({{ initial_content }}, "{{ placeholder }}", "{{ is_action_pusher }}" == "True")' {% else %} x-data='editor("{{ initial_content }}", "{{ placeholder }}", "{{ is_action_pusher }}" == "True")' {% endif %}
      @reset-contact="handleResetContact()"
@@ -74,19 +70,28 @@ Parameters:
                     x-bind:disabled="!isActive('link', updatedAt)">Détacher un lien</button>
         </div>
     </template>
-    <div class="position-relative">
+    <div data-test-id="tiptap-editor-form-container">
         {% comment %} {% if can_compress_editor %}
             <div class="button-attachment-container">
                 <button class="fr-btn fr-btn--sm fr-icon-attachment-2" type="button" @click.stop="onClickHandleAttachment">Rédiger avec une pièce jointe</button>
             </div>
         {% endif %} {% endcomment %}
-        <div class="tiptap-editor {% if wide %}is-wide{% endif %}"
+        <div class="tiptap-editor position-relative {% if wide %}is-wide{% endif %}"
+             :class="{'visual-hint': $store.tutorialsEvents.isTutorialForProjectPage==3.5}"
              data-test-id="tiptap-editor-content"
              x-ref="element"
-             @click.stop="isEditorFocused = true"
-             id="comment-text-ref"></div>
+             @click.stop="isEditorFocused = true; $store.tutorialsEvents.isTutorialForProjectPage==3.5 ? $store.tutorialsEvents.isTutorialForProjectPageThreeCompleted=true : null ;"
+             id="comment-text-ref">
+            <template x-if="$store.tutorialsEvents.isTutorialForProjectPage==3.5">
+                {% include "projects/project/fragments/onboarding-tutorials/visual-hint.html" %}
+            </template>
+            <template x-if="$store.tutorialsEvents.isTutorialForProjectPage==3.5">
+                {% include "projects/project/fragments/onboarding-tutorials/svg-hint.html" with rect_x="0.1" rect_y="0.3" rect_width="99.7" rect_height="9.2" view_box_size="0 0 100 10" is_over=True inset0=True %}
+            </template>
+        </div>
         <textarea class="position-absolute top-0 opacity-0 specific-height-0"
-                  {% if model %} x-model="{{ model }}.text" x-modelable="markdownContent" {% else %} x-model="markdownContent" {% endif  %}
+                  data-test-id="tiptap-editor-textarea"
+                  {% if model %} x-model="{{ model }}.text" x-modelable="markdownContent" {% else %} x-model="markdownContent" {% endif %}
                   name="{{input_name|default:"content"}}"
                   {% if input_required %} required {% endif %}></textarea>
         <div class="module__container">
@@ -145,10 +150,6 @@ Parameters:
                 {% endif %}
                 <!-- Recommendation module -->
                 {% if can_add_reco %}
-                    {% comment %} <a data-test-id="create-task-button" :href="`{% url 'projects-create-task' %}?project_id={{ project.pk }}{% if next_url_add_reco %}&next={% url next_url_add_reco project.pk %}{% endif %}&content=${encodeURIComponent(markdownContent || '')}`" class="fr-btn fr-btn--tertiary fr-btn--tertiary-dark-background fr-btn--sm justify-content-center fr-text--sm button-add-reco">
-                        <span class="fr-icon-list-check-line fr-icon--sm"></span>
-                        Créer une recommandation
-                    </a> {% endcomment %}
                     <button data-test-id="create-task-button"
                             @click.prevent="goToCreateRecommendation(`{% url 'projects-create-task' %}?project_id={{ project.pk }}{% if next_url_add_reco %}&next={% url next_url_add_reco project.pk %}{% endif %}&content=${encodeURIComponent(markdownContent || '')}`)"
                             class="fr-btn fr-btn--tertiary fr-btn--tertiary-dark-background fr-btn--sm justify-content-center fr-text--sm button-add-reco">
@@ -179,7 +180,7 @@ Parameters:
             <div class="d-flex justify-content-end">
                 <div class="d-flex gap-2 send-message">
                     <button data-test-id="send-message-conversation"
-                            :disabled="!isFormValid"
+                            :disabled="!isFormValid || sendingMessage"
                             form="{{ form_id|default:'conversation-form' }}"
                             class="fr-btn fr-btn--sm"
                             type="submit"

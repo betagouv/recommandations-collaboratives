@@ -1,18 +1,10 @@
 {% extends "base.html" %}
 {% load django_vite %}
-{% load sass_tags %}
 {% load crispy_forms_tags %}
 {% block js %}
     {% vite_asset 'js/apps/onboarding.js' %}
+    {% vite_asset 'js/styles/kanban.css.js' %}
 {% endblock js %}
-{% block css %}
-    <link href="{% sass_src 'home/css/dsfr/custom-dsfr.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-    <link href="{% sass_src 'projects/css/kanban.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-{% endblock css %}
 {% block title %}
     | Solliciter l'équipe {{ request.site.name }}
 {% endblock title %}

@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 {% load django_vite %}
 {% load static %}
-{% load sass_tags %}
 {% load crispy_forms_tags %}
 {% block title %}
     Déposer un dossier pour le compte du demandeur {{ block.super }}
@@ -10,19 +9,9 @@
     Déposer un dossier pour le compte du demandeur {{ block.super }}
 {% endblock og_title %}
 {% block js %}
+    {% vite_asset 'js/styles/onboarding-prefill-user.css.js' %}
     {% vite_asset 'js/apps/advisorCreateProject.js' %}
 {% endblock js %}
-{% block css %}
-    <link href="{% sass_src 'home/css/dsfr/custom-dsfr.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-    <link href="{% sass_src 'home/css/dsfr/marianne.css' %}"
-          rel="stylesheet"
-          type="text/css">
-    <link href="{% sass_src 'onboarding/css/prefill-user.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-{% endblock css %}
 {% block content %}
     <div class="container">
         <div class="banner  text-center">

@@ -1,5 +1,4 @@
 {% load static %}
-{% load sass_tags %}
 {% load django_vite %}
 {% load cookie_consent_tags %}
 {% load cache %}
@@ -21,12 +20,8 @@
     {% endcache %}
     {% include "seo.html" %}
     {% include "matomo.html" %}
-    <link href="{% sass_src 'css/base.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-    <link href="{% sass_src 'css/markdownx.scss' %}"
-          rel="stylesheet"
-          type="text/css">
+    {% vite_asset 'js/styles/base.css.js' %}
+    {% vite_asset 'js/styles/markdownx.css.js' %}
     <!-- Extra CSS -->
     {% block css %}
     {% endblock css %}
@@ -39,7 +34,6 @@
         {% endif %}
         <h1 class="visually-hidden">{{ request.site.name }}</h1>
         {% include "header/skip-links.html" %}
-        {% include "fragments/new_feature_banner.html" %}
         {% if url_name != "projects-project-detail-recommandations-embed" %}
             {% include "header/menu-top.html" %}
         {% endif %}
@@ -92,8 +86,8 @@
                     {% endfor %}
                 </div>
             {% endif %}
-            <div class="container-fluid bg-white" id="content">
-                <div class="row background--grey-light">
+            <div class="bg-white w-100" id="content">
+                <div class="background--grey-light">
                     {% block content %}
                     {% endblock content %}
                 </div>

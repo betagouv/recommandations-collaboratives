@@ -1,6 +1,6 @@
 <!-- prettier-ignore -->
 {% extends "base.html" %}
-{% load sass_tags %}
+{% load django_vite %}
 {% load static %}
 {% block title %}
     Déclaration d'accessibilité
@@ -8,11 +8,9 @@
 {% block og_title %}
     Déclaration d'accessibilité
 {% endblock og_title %}
-{% block css %}
-    <link href="{% sass_src 'home/css/home/home.scss' %}"
-          rel="stylesheet"
-          type="text/css" />
-{% endblock css %}
+{% block js %}
+    {% vite_asset 'js/styles/home.css.js' %}
+{% endblock js %}
 <!-- prettier-ignore -->
 {% block content %}
     <div class="col-8 fr-py-2w g-0 fr-mx-auto">
@@ -29,19 +27,19 @@
         </p>
         <ul>
             <li>
-                UrbanVitaliz (<a href="https://www.urbanvitaliz.fr">www.urbanvitaliz.fr</a>)
+                UrbanVitaliz (<a href="https://www.urbanvitaliz.fr" target="_blank">www.urbanvitaliz.fr <span class="visually-hidden">Nouvelle fenêtre</span></a>)
             </li>
             <li>
-                SOSPonts (<a href="https://sosponts.recoconseil.fr">https://sosponts.recoconseil.fr</a>)
+                SOSPonts (<a href="https://sosponts.recoconseil.fr" target="_blank">https://sosponts.recoconseil.fr <span class="visually-hidden">Nouvelle fenêtre</span></a>)
             </li>
             <li>
-                Conseils EcoQuartier (<a href="https://ecoquartiers.recoconseil.fr/">https://ecoquartiers.recoconseil.fr/</a>)
+                Conseils EcoQuartier (<a href="https://ecoquartiers.recoconseil.fr/" target="_blank">https://ecoquartiers.recoconseil.fr/ <span class="visually-hidden">Nouvelle fenêtre</span></a>)
             </li>
             <li>
-                Mon Espace Collectivité (<a href="https://monespacecollectivite.incubateur.anct.gouv.fr">https://monespacecollectivite.incubateur.anct.gouv.fr</a>)
+                Mon Espace Collectivité (<a href="https://monespacecollectivite.incubateur.anct.gouv.fr" target="_blank">https://monespacecollectivite.incubateur.anct.gouv.fr <span class="visually-hidden">Nouvelle fenêtre</span></a>)
             </li>
             <li>
-                Recommandations-collaboratives (<a href="https://recommandations-collaboratives.beta.gouv.fr">https://recommandations-collaboratives.beta.gouv.fr</a>)
+                Recommandations-collaboratives (<a href="https://recommandations-collaboratives.beta.gouv.fr" target="_blank">https://recommandations-collaboratives.beta.gouv.fr <span class="visually-hidden">Nouvelle fenêtre</span></a>)
             </li>
         </ul>
         <h3>Hors périmètre</h3>

@@ -1,0 +1,79 @@
+{% load static %}
+{% load guardian_tags %}
+{% load waffle_tags %}
+{% load projects_extra %}
+{% load django_vite %}
+{% block js %}
+    {% vite_asset 'js/styles/marianne.css.js' %}
+    {% vite_asset 'js/apps/CRM/crmNavigation.js' %}
+{% endblock js %}
+<div class="crm-navigation d-flex justify-content-between">
+    <fieldset class="fr-segmented fr-segmented--md fr-pr-3w">
+        <legend class="crm-navigation__legend fr-segmented__legend">
+            <span class="fr-icon-tools-line fr-mr-1w" aria-hidden="true"></span>Administration
+        </legend>
+        <div class="fr-segmented__elements">
+            <div class="fr-segmented__element">
+                <input value="dashboard"
+                       type="radio"
+                       {% if dashboard %}checked{% endif %}
+                       aria-checked="{% if projects %}true{% else %}false{% endif %}"
+                       id="segmented-control-dashboard"
+                       name="segmented-control-dashboard"
+                       @click="window.location='{% url 'crm-site-dashboard' %}'">
+                <label class="fr-label" for="segmented-control-dashboard">
+                    <a class="stretched-link" href="{% url 'crm-site-dashboard' %}">Accueil</a>
+                </label>
+            </div>
+            <div class="fr-segmented__element">
+                <input value="projects"
+                       type="radio"
+                       {% if projects %}checked{% endif %}
+                       aria-checked="{% if projects %}true{% else %}false{% endif %}"
+                       id="segmented-control-projects"
+                       name="segmented-control-project"
+                       @click="window.location='{% url 'crm-project-list' %}'">
+                <label class="fr-label" for="segmented-control-projects">
+                    <a class="stretched-link" href="{% url 'crm-project-list' %}">Dossiers</a>
+                </label>
+            </div>
+            <div class="fr-segmented__element">
+                <input value="users"
+                       type="radio"
+                       {% if users %}checked{% endif %}
+                       aria-checked="{% if users %}true{% else %}false{% endif %}"
+                       id="segmented-control-users"
+                       name="segmented-control-project"
+                       @click="window.location='{% url 'crm-user-list' %}'">
+                <label class="fr-label" for="segmented-control-users">
+                    <a class="stretched-link" href="{% url 'crm-user-list' %}">Utilisateurs</a>
+                </label>
+            </div>
+            <div class="fr-segmented__element">
+                <input value="organizations"
+                       type="radio"
+                       {% if organizations %}checked{% endif %}
+                       aria-checked="{% if organizations %}true{% else %}false{% endif %}"
+                       id="segmented-control-organizations"
+                       name="segmented-control-project"
+                       @click="window.location='{% url 'crm-organization-list' %}'">
+                <label class="fr-label" for="segmented-control-organizations">
+                    <a class="stretched-link" href="{% url 'crm-organization-list' %}">Organisations</a>
+                </label>
+            </div>
+            <div class="fr-segmented__element">
+                <input value="overview"
+                       type="radio"
+                       {% if site_configuration %}checked{% endif %}
+                       aria-checked="{% if site_configuration %}true{% else %}false{% endif %}"
+                       id="segmented-control-site-configuration"
+                       name="segmented-control-site-configuration"
+                       @click="window.location='{% url 'crm-site-configuration' %}'">
+                <label class="fr-label" for="segmented-control-site-configuration">
+                    <a class="stretched-link" href="{% url 'crm-site-configuration' %}">Paramètres du site</a>
+                </label>
+            </div>
+        </div>
+    </fieldset>
+    {% include "crm/fragments/general_search_input.html" %}
+</div>

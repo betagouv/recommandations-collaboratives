@@ -130,9 +130,9 @@ def test_project_list_includes_only_projects_in_switchtender_departments(
     response = api_client.get(url)
 
     assert response.status_code == 200
-    assert len(response.data) == 1
+    assert len(response.data["results"]) == 1
 
-    data = response.data[0]
+    data = response.data["results"][0]
 
     # project fields: not ideal
     expected = [
@@ -155,7 +155,8 @@ def test_project_list_includes_only_projects_in_switchtender_departments(
         "project_sites",
         "status",
         "tags",
-        "advisors_note",
+        "exclude_stats",
+        "muted",
     ]
     assert set(data.keys()) == set(expected)
 
@@ -189,19 +190,19 @@ def test_project_list_tags_filter(request, api_client):
 
     response = api_client.get(url)
     assert response.status_code == 200
-    assert len(response.data) == 2
+    assert len(response.data["results"]) == 2
 
     response = api_client.get(f"{url}?tags=tag1,tag3")
     assert response.status_code == 200
-    assert len(response.data) == 2
+    assert len(response.data["results"]) == 2
 
     response = api_client.get(f"{url}?tags=tag3")
     assert response.status_code == 200
-    assert len(response.data) == 1
+    assert len(response.data["results"]) == 1
 
     response = api_client.get(f"{url}?tags=tag5,tag6")
     assert response.status_code == 200
-    assert len(response.data) == 0
+    assert len(response.data["results"]) == 0
 
 
 @pytest.mark.django_db
@@ -222,23 +223,23 @@ def test_project_list_last_activity_filter(request, api_client):
     with freeze_time("2025-01-15"):
         response = api_client.get(f"{url}?last_activity=3")
         assert response.status_code == 200
-        assert len(response.data) == 0
+        assert len(response.data["results"]) == 0
 
         response = api_client.get(f"{url}?last_activity=5")
         assert response.status_code == 200
-        assert len(response.data) == 1
+        assert len(response.data["results"]) == 1
 
         response = api_client.get(f"{url}?last_activity=15")
         assert response.status_code == 200
-        assert len(response.data) == 2
+        assert len(response.data["results"]) == 2
 
         response = api_client.get(f"{url}?last_activity=dummy")
         assert response.status_code == 200
-        assert len(response.data) == 2
+        assert len(response.data["results"]) == 2
 
         response = api_client.get(f"{url}?last_activity=")
         assert response.status_code == 200
-        assert len(response.data) == 2
+        assert len(response.data["results"]) == 2
 
 
 @pytest.mark.django_db
@@ -282,37 +283,37 @@ def test_project_list_search_filter_fulltext(request, api_client):
 
     response = api_client.get(url)
     assert response.status_code == 200
-    assert len(response.data) == 3
+    assert len(response.data["results"]) == 3
 
     # project title
     response = api_client.get(f"{url}?search=niceproject")
     assert response.status_code == 200
-    assert len(response.data) == 1
+    assert len(response.data["results"]) == 1
 
     # city name
     response = api_client.get(f"{url}?search=maville")
     assert response.status_code == 200
-    assert len(response.data) == 1
+    assert len(response.data["results"]) == 1
 
     # postcode
     response = api_client.get(f"{url}?search=99666")
     assert response.status_code == 200
-    assert len(response.data) == 1
+    assert len(response.data["results"]) == 1
 
     # insee
     response = api_client.get(f"{url}?search=AZ37")
     assert response.status_code == 200
-    assert len(response.data) == 1
+    assert len(response.data["results"]) == 1
 
     # no result is fine?
     response = api_client.get(f"{url}?search=XIDJISJDI")
     assert response.status_code == 200
-    assert len(response.data) == 0
+    assert len(response.data["results"]) == 0
 
     # unaccent
     response = api_client.get(f"{url}?search=verite")
     assert response.status_code == 200
-    assert len(response.data) == 1
+    assert len(response.data["results"]) == 1
 
 
 @pytest.mark.django_db
@@ -348,26 +349,68 @@ def test_project_list_search_filter_departments(request, api_client):
 
     response = api_client.get(url)
     assert response.status_code == 200
-    assert len(response.data) == 2
+    assert len(response.data["results"]) == 2
 
     # cumulative query FTS+filter
     response = api_client.get(f"{url}?search=niceproject&departments=62")
     assert response.status_code == 200
-    assert len(response.data) == 1
+    assert len(response.data["results"]) == 1
 
     # Multiple departments
     response = api_client.get(f"{url}?departments=10&departments=62")
     assert response.status_code == 200
-    assert len(response.data) == 2
+    assert len(response.data["results"]) == 2
 
     response = api_client.get(f"{url}?departments=10&departments=33")
     assert response.status_code == 200
-    assert len(response.data) == 1
+    assert len(response.data["results"]) == 1
 
     # No department filter
     response = api_client.get(f"{url}?search=niceproject")
     assert response.status_code == 200
-    assert len(response.data) == 1
+    assert len(response.data["results"]) == 1
+
+
+@pytest.mark.django_db
+def test_project_list_search_status(request, api_client, make_project):
+    site = get_current_site(request)
+    user = baker.make(auth_models.User, is_superuser=True)
+
+    # useful one
+    make_project(site=site, name="The hidden niceproject", status="PRE_DRAFT")
+
+    # honeypot one
+    make_project(
+        site=site,
+        name="Noise noise noise",
+    )
+
+    api_client.force_authenticate(user=user)
+
+    url = reverse("projects-list")
+
+    response = api_client.get(url)
+    assert response.status_code == 200
+    assert len(response.data["results"]) == 2
+
+    # cumulative query FTS+filter
+    response = api_client.get(f"{url}?search=niceproject&status=PRE_DRAFT")
+    assert response.status_code == 200
+    assert len(response.data["results"]) == 1
+
+    # Multiple departments
+    response = api_client.get(f"{url}?search=niceproject&status=READY")
+    assert response.status_code == 200
+    assert len(response.data["results"]) == 0
+
+    response = api_client.get(f"{url}?search=niceproject&status=READY&status=PRE_DRAFT")
+    assert response.status_code == 200
+    assert len(response.data["results"]) == 1
+
+    # No department filter
+    response = api_client.get(f"{url}?search=niceproject")
+    assert response.status_code == 200
+    assert len(response.data["results"]) == 1
 
 
 @pytest.mark.django_db
@@ -384,7 +427,7 @@ def test_project_list_search_filter_is_cumulative(request, api_client):
 
     response = api_client.get(f"{url}?search=ABC&tags=tag1")
     assert response.status_code == 200
-    assert len(response.data) == 1
+    assert len(response.data["results"]) == 1
 
 
 ########################################################################
@@ -504,6 +547,8 @@ def check_project_content(project, data):
         "tags",
         "is_diagnostic_done",
         "advisors_note",
+        "exclude_stats",
+        "muted",
     ]
     assert set(data.keys()) == set(expected)
 

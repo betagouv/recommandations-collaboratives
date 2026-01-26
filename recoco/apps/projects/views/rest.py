@@ -15,7 +15,7 @@ from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 from django.contrib.sites.shortcuts import get_current_site
-from django.db.models import Count, F, OuterRef, Q, QuerySet, Subquery
+from django.db.models import Count, F, OuterRef, Prefetch, Q, QuerySet, Subquery
 from django.http import Http404
 from django.shortcuts import get_object_or_404
 from notifications import models as notifications_models
@@ -31,7 +31,10 @@ from recoco.rest_api.filters import (
     VectorSearchFilter,
     WatsonSearchFilter,
 )
-from recoco.rest_api.pagination import LargeResultsSetPagination
+from recoco.rest_api.pagination import (
+    LargeResultsSetPagination,
+    StandardResultsSetPagination,
+)
 from recoco.rest_api.permissions import BaseConversationPermission
 from recoco.utils import (
     get_group_for_site,
@@ -40,7 +43,7 @@ from recoco.utils import (
 )
 
 from .. import models, signals
-from ..filters import DepartmentsFilter, ProjectActivityFilter
+from ..filters import DepartmentsFilter, ProjectActivityFilter, ProjectSiteStatusFilter
 from ..serializers import (
     DocumentSerializer,
     NewDocumentSerializer,
@@ -102,11 +105,13 @@ class ProjectList(ListAPIView):
 
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = ProjectForListSerializer
+    pagination_class = StandardResultsSetPagination
     filter_backends = [
         TagsFilterbackend,
         WatsonSearchFilter,
         DepartmentsFilter,
         ProjectActivityFilter,
+        ProjectSiteStatusFilter,
     ]
 
     def get_queryset(self):
@@ -120,21 +125,42 @@ class ProjectList(ListAPIView):
                     ).values("status")
                 )
             )
-            .prefetch_related(
-                "commune__department",
-                "switchtenders__profile__organization",
-                "project_sites",
-                "tags",
-            )
         )
 
     def list(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset())
+        queryset = (
+            self.filter_queryset(self.get_queryset())
+            .prefetch_related(
+                "switchtenders__profile__organization",
+                "project_sites",
+                "tags",
+                Prefetch(
+                    "members",
+                    User.objects.filter(projectmember__is_owner=True).select_related(
+                        "profile", "profile__organization"
+                    ),
+                    to_attr="_owner",
+                ),  # _owner is looked at in getter
+            )
+            .select_related(
+                "commune__department__region",
+            )
+        )
 
+        # Paginate the queryset
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            # Convert paginated queryset to list for _update_the_site_projects
+            projects = self._update_the_site_projects(
+                queryset=page, site=request.site, user=request.user
+            )
+            serializer = self.get_serializer(projects, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        # Fallback if pagination is not configured
         projects = self._update_the_site_projects(
             queryset=queryset, site=request.site, user=request.user
         )
-
         serializer = self.get_serializer(projects, many=True)
         return Response(serializer.data)
 

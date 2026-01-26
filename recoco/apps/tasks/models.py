@@ -20,8 +20,9 @@ from django.utils import timezone
 from markdownx.utils import markdownify
 from ordered_model.models import OrderedModel, OrderedModelManager, OrderedModelQuerySet
 from tagging.fields import TagField
-from tagging.models import TaggedItem
+from tagging.models import TaggedItem  # remains necessary for survey-related code
 from tagging.registry import register as tagging_register
+from taggit.managers import TaggableManager
 
 from recoco.apps.addressbook import models as addressbook_models
 from recoco.apps.geomatics import models as geomatics_models
@@ -358,17 +359,18 @@ class TaskRecommendation(models.Model):
         blank=True,
         verbose_name="Départements concernés",
     )
+    condition_tags_taggit = TaggableManager(blank=True)
 
     def trigged_by(self):
         from recoco.apps.survey import models as survey_models
 
         triggers = {}
-        for tag in self.condition_tags:
+        for tag in self.condition_tags_taggit.all():
             triggers[tag] = TaggedItem.objects.get_by_model(
                 survey_models.Choice.objects.prefetch_related(
                     "question__question_set"
                 ).select_related("question"),
-                tag,
+                tag.name,
             )
 
         return triggers

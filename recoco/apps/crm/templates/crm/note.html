@@ -1,11 +1,5 @@
 {% load static %}
-{% load sass_tags %}
 {% load crm_tags %}
-{% block css %}
-    <link href="{% sass_src 'crm/css/fragments/note.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-{% endblock css %}
 <div x-data="Note"
      x-ref="note"
      class="relative crm-note"

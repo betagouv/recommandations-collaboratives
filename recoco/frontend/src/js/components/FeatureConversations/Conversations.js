@@ -10,6 +10,7 @@ import api, {
   documentsUrl,
   editTaskUrl,
   markTaskNotificationAsVisited,
+  conversationsMessageMarkAsReadUrl,
 } from '../../utils/api';
 import { trackOpenRessource } from '../../utils/trackingMatomo';
 import { formatDateFrench } from '../../utils/date';
@@ -21,6 +22,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
   messages: [],
   messagesLoaded: false,
   showMessages: false,
+  sendingMessage: false,
   tasks: [],
   users: [],
   messagesParticipants: [],
@@ -32,6 +34,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     messages: 0,
     new_messages: 0,
     tasks: 0,
+    unread_recommendations: 0,
     contacts: 0,
     documents: 0,
   },
@@ -204,6 +207,15 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     }
     return foundUser;
   },
+  getCountOfNewItemsLabel() {
+    if (
+      this.countOf.unread_recommendations > 0 &&
+      this.countOf.unread_recommendations >= this.countOf.new_messages
+    ) {
+      return `${this.countOf.unread_recommendations} fiche${this.countOf.unread_recommendations > 1 ? 's' : ''} ressource non lue${this.countOf.unread_recommendations > 1 ? 's' : ''}`;
+    }
+    return `${this.countOf.new_messages} élément${this.countOf.new_messages > 1 ? 's' : ''} non lu${this.countOf.new_messages > 1 ? 's' : ''}`;
+  },
   async getDocumentById(id) {
     const foundDocument = this.documents.find(
       (document) => document.id === +id
@@ -230,6 +242,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     return foundContact;
   },
   async sendFormMessage() {
+    this.sendingMessage = true;
     if (this.isEditorInEditMode) {
       await this.sendMessage({
         updateMessage: true,
@@ -267,6 +280,14 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
           documentNodesToUpload.map((node) => this.uploadFile(node.file))
         );
       } catch (error) {
+        const errorMessage =
+          error.response?.data?.the_file?.[0] ||
+          "Contactez nous via le chat pour obtenir de l'aide.";
+        this.$store.app.displayToastMessage({
+          message: `Erreur lors de l'envoi d'un document : ${errorMessage}`,
+          timeout: 5000,
+          type: ToastType.error,
+        });
         if (!updateMessage) {
           throw new Error('Failed to upload documents', { error });
         } else {
@@ -313,7 +334,9 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
       this.$store.editor.clearEditorContent();
       this.updateCountOfElementsInDiscussion(messageResponse.data);
       this.messageIdToReply = null;
+      this.sendingMessage = false;
     } catch (error) {
+      this.sendingMessage = false;
       this.$store.app.displayToastMessage({
         message: `Erreur lors de ${updateMessage ? 'la modification' : "l'envoi"} du message: ${Object.values(JSON.parse(error.request.responseText)).join(', ')}`,
         timeout: 5000,
@@ -331,29 +354,36 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     for (const message of this.feed.elements) {
       if (message.unread > 0 && !message.deleted) {
         this.countOf.new_messages += 1;
+        if (
+          message.nodes.some(
+            (node) => node.type === 'RecommendationNode' && !node.visited
+          )
+        ) {
+          this.countOf.unread_recommendations += 1;
+        }
       }
       this.updateCountOfElementsInDiscussion(message);
     }
     this.countOf.isLoaded = true;
   },
   updateCountOfElementsInDiscussion(element, decrease = false) {
+    if (element.deleted) {
+      return;
+    }
+    const change = decrease ? -1 : 1;
     if (element.nodes) {
       for (const node of element.nodes) {
         if (node.type === 'DocumentNode') {
-          this.countOf.documents += decrease ? -1 : 1;
+          this.countOf.documents += change;
         }
         if (node.type === 'RecommendationNode') {
-          this.countOf.tasks += decrease ? -1 : 1;
+          this.countOf.tasks += change;
         }
         if (node.type === 'ContactNode') {
-          this.countOf.contacts += decrease ? -1 : 1;
+          this.countOf.contacts += change;
         }
       }
-      if (!element.deleted) {
-        this.countOf.messages += decrease ? -1 : 1;
-      } else if (decrease) {
-        this.countOf.messages += -1;
-      }
+      this.countOf.messages += change;
     }
   },
   onClickHandleReply(message) {
@@ -459,11 +489,20 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
       Alpine.raw(this.$store.editor.editorInstance).commands.clearContent();
     }
   },
-  async onClickRessourceConsummeNotification(taskId) {
+  async onClickRessourceConsummeNotification(recommendation, message) {
     trackOpenRessource();
     try {
       if (!Alpine.store('djangoData').isAdvisor) {
-        await api.post(markTaskNotificationAsVisited(this.projectId, taskId));
+        if (!recommendation.visited) {
+          await api.post(
+            markTaskNotificationAsVisited(this.projectId, recommendation.id)
+          );
+        }
+        if (message.unread > 0) {
+          await api.post(
+            conversationsMessageMarkAsReadUrl(this.projectId, message.id)
+          );
+        }
       }
     } catch (error) {
       throw new Error('Failed to mark task notification as visited', error);

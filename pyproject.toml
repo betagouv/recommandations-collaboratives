@@ -17,7 +17,7 @@ dependencies = [
     "django>=5.1.15,<5.2",
     "django-activity-stream",
     "django-admin-csvexport==2.2",
-    "django-allauth[mfa,openid,socialaccount]==65.9.0",
+    "django-allauth[mfa,openid,socialaccount]==65.13.0",
     "django-autoslug==1.9.9",
     "django-celery-results==2.5.1",
     "django-clone==5.3.3",
@@ -34,6 +34,7 @@ dependencies = [
     "django-leaflet>=0.31.0",
     "django-magicauth",
     "django-markdownx==4.0.7",
+    "django-model-info>=2024.11.5",
     "django-multisite2>=2.0.1",
     "django-notifications-hq",
     "django-ordered-model==3.7.4",
@@ -74,7 +75,8 @@ dependencies = [
     "sentry-sdk>=2.20.0",
     "setuptools==78.1.1",
     "sib-api-v3-sdk>=7.6.0",
-    "urllib3>=2.5.0",
+    "tqdm>=4.67.1",
+    "urllib3>=2.6.3",
     "wagtail==6.3.5",
 ]
 
@@ -201,6 +203,9 @@ django-cookie-consent = { git = "https://github.com/jazzband/django-cookie-conse
 django-tagging = { git = "https://github.com/nextories/django-tagging.git", rev = "bug/usage_for_model_with_filters_none" }
 django-webhook = { git = "https://github.com/etchegom/django-webhook.git", rev = "recoco" }
 
+[tool.uv-secure.vulnerability_criteria]
+ignore_vulnerabilities = ["GHSA-xm59-rqc7-hhvf"] # nbconvert does not have a fix yet. todo upgrade when we have a fix
+
 [dependency-groups]
 dev = [
     "coverage==7.4.1",
@@ -212,7 +217,7 @@ dev = [
     "graphviz==0.20.1",
     "ipykernel==6.20.1",
     "ipython>=8.32.0",
-    "jupyter==1.0.0",
+    "jupyter==1.1.1",
     "jupytext==1.16.1",
     "model-bakery==1.20.4",
     "notebook==6.4.12",
@@ -239,6 +244,7 @@ dev = [
     "sphinx-toolbox>=3.8.2",
     "sphinxcontrib-django>=2.5",
     "sphinxcontrib-django-urls>=0.3",
+    "uv>=0.9.6",
 ]
 
 

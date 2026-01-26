@@ -24,7 +24,7 @@
                {% endif %}">
         <!-- Dashboard -->
         {% if is_switchtender or is_administrating_project %}
-            <li class="navigation__item-dashboard d-flex">
+            <li class="navigation__item-dashboard d-flex navigation__item--border-right">
                 <a href="{% url 'projects-project-list' %}"
                    class="fr-link {% if url_name == 'projects-project-list-advisor' or url_name == 'projects-project-list-staff' or url_name == 'projects-project-list-map' %}active{% endif %}">
                     <span class="fr-ml-1v align-middle no-wrap">Tous les dossiers</span></a>
@@ -32,7 +32,7 @@
         {% endif %}
         <!-- Projects -->
         {% if user.is_authenticated %}
-            <li class="navigation__item-projects"
+            <li class="navigation__item-projects navigation__item--border-right"
                 x-data="ExpandableMenuHandler"
                 @click.outside="toggle">
                 <button class="fr-select item-projects__button-open"
@@ -61,7 +61,7 @@
                         </template>
                     {% endif %}
                 </button>
-                <div class="fr-collapse fr-menu" id="project_list">
+                <div class="fr-collapse fr-menu list-project__container" id="project_list">
                     <ul x-data="{search:''}"class="fr-menu__list list-project">
                         {% comment %} <li class="list-project__search-container">
                                 <input type="search" class="fr-input" placeholder="Rechercher votre dossier" @input.debounce.400ms="onSearch()" x-model="search">
@@ -139,7 +139,17 @@
                 <span class="fr-mx-1v align-middle">Ressources</span>
             </a>
         </li>
+        {% if "use_crm" in user_site_perms %}
+            <!-- CRM -->
+            <li class="navigation__item-resource responsive-header__element-not-mobile"
+                style="{% if 'crm' in request.path %}activated{% endif %}">
+                <a href="{% url 'crm-site-dashboard' %}"
+                   class="fr-link {% if 'crm' in request.path %}active{% endif %}">
+                    <span class="fr-mx-1v align-middle">Admin</span>
+                </a>
+            </li>
+        {% endif %}
         {% comment %} surcharge pour ajouter des éléments au menu top à droite de ressources {% endcomment %}
-        {% include "header/menu-top-secondary-right.html" %}
+        {% comment %} {% include "header/menu-top-secondary-right.html" %} {% endcomment %}
     </ul>
 {% endwith %}

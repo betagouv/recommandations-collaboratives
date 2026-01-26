@@ -1,0 +1,45 @@
+.banner-container {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 401; }
+
+.banner {
+  border-radius: 0px 0px 4px 4px;
+  box-shadow: 0 4px 2px 0 rgba(0, 0, 0, 0.25);
+  color: white; }
+  .banner--paused {
+    background: #1e1e1e; }
+  .banner--join, .banner--non-publish {
+    background: var(--warning-425-625-hover); }
+
+.specific-hover-blue:hover {
+  color: black;
+  background-color: transparent !important;
+  cursor: pointer; }
+
+.specific-paddingtop-1px {
+  padding-top: 1px; }
+
+.bold-text {
+  font-weight: bold; }
+
+@media (max-width: 1850px) {
+  .banner-container {
+    width: 60%; } }
+
+@media (max-width: 1600px) {
+  .banner-container {
+    width: 70%; } }
+
+@media (max-width: 1400px) {
+  .banner-container {
+    width: 80%; } }
+
+@media (max-width: 1200px) {
+  .banner-container {
+    width: 90%; } }
+
+@media (max-width: 1035px) {
+  .banner-container {
+    width: 100%; } }

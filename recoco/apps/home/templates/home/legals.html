@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% load gravatar %}
-{% load sass_tags %}
+{% load django_vite %}
 {% load static %}
 {% block title %}
     Mentions légales
@@ -8,14 +8,9 @@
 {% block og_title %}
     Mentions légales
 {% endblock og_title %}
-{% block css %}
-    <link href="{% sass_src 'home/css/home/home.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-    <link href="{% sass_src 'home/css/dsfr/custom-dsfr.scss' %}"
-          rel="stylesheet"
-          type="text/css">
-{% endblock css %}
+{% block js %}
+    {% vite_asset 'js/styles/home.css.js' %}
+{% endblock js %}
 {% block content %}
     <div class="col-8 fr-mt-3w fr-py-2w g-0 fr-mx-auto font-marianne">
         <h2>Mentions légales de la plateforme {{ request.site.name }}</h2>
@@ -67,8 +62,10 @@
             <br />
             <ul>
                 <li>
-                    Utiliser le formulaire de contact en ligne <a class="text-decoration-underline"
-    href="https://formulaire.defenseurdesdroits.fr/code/afficher.php?ETAPE=accueil_2016">ici</a>
+                    Utiliser le formulaire de contact en ligne
+                    <a class="text-decoration-underline"
+                        href="https://formulaire.defenseurdesdroits.fr/code/afficher.php?ETAPE=accueil_2016"
+                        target="_blank">ici <span class="visually-hidden">Nouvelle fenêtre</span></a>
                 </li>
                 <li>Composer le 09 69 39 00 00 (du lundi au vendredi de 8h à 20h)</li>
                 <li>
@@ -84,7 +81,8 @@
             Pour en savoir plus sur la politique d’accessibilité numérique de l’État
             <a class="text-decoration-underline"
                href="https://accessibilite.numerique.gouv.fr"
-               target="_blank">accessibilite-numerique</a> 
+               target="_blank">accessibilite-numerique
+               <span class="visually-hidden">Nouvelle fenêtre</span></a> 
         </p>
         <p class="fr-mt-3w fr-mb-2v">
             <strong>Sécurité</strong>

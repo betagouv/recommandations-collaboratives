@@ -11,10 +11,12 @@ from datetime import datetime, timedelta
 
 from actstream import action
 from actstream.models import Action, actor_stream, target_stream
+from allauth.account.internal.flows.email_verification import (
+    send_verification_email_for_user,
+)
 from allauth.account.models import EmailAddress
 from allauth.account.utils import (
     filter_users_by_email,
-    send_email_confirmation,
     setup_user_email,
 )
 from django import forms as django_forms
@@ -59,6 +61,7 @@ from recoco.apps.addressbook import models as addressbook_models
 from recoco.apps.addressbook.models import Organization
 from recoco.apps.communication import api
 from recoco.apps.geomatics import models as geomatics
+from recoco.apps.geomatics.serializers import RegionSerializer
 from recoco.apps.home import models as home_models
 from recoco.apps.onboarding import utils as onboarding_utils
 from recoco.apps.projects.models import Project, Topic
@@ -533,7 +536,10 @@ def user_update(request, user_id=None):
                     )
                     if email_changed:
                         setup_user_email(request, crm_user, [])
-                        send_email_confirmation(request, crm_user, signup=True)
+                        # XXX this method comes from the "internal" package of allauth
+                        # and should probably not be used directly -- fixing sec bug
+                        # when moving from 65.9 to 65.12
+                        send_verification_email_for_user(request, crm_user)
 
                     messages.success(request, success_message)
                     return redirect(reverse("crm-user-details", args=[crm_user.id]))
@@ -762,18 +768,30 @@ def user_reminder_details(request, user_id, reminder_pk):
 def project_list(request):
     has_perm_or_403(request.user, "use_crm", request.site)
 
-    # filtered projects
-    projects = filters.ProjectFilter(
-        request.GET,
-        queryset=Project.all_on_site.order_by("name")
-        .select_related("commune__department")
-        .prefetch_related("project_sites__site"),
+    department_queryset = (
+        geomatics.Department.objects.filter(
+            code__in=(
+                Project.on_site.for_user(request.user)
+                .order_by("-created_on", "-updated_on")
+                .prefetch_related("commune__department")
+                .values_list("commune__department", flat=True)
+            )
+        )
+        | request.user.profile.departments.all()
+    ).distinct()
+
+    region_queryset = (
+        geomatics.Region.objects.filter(departments__in=department_queryset)
+        .prefetch_related("departments")
+        .distinct()
+        .order_by("name")
     )
 
-    # required by default on crm
-    search_form = forms.CRMSearchForm()
+    context = {
+        "regions": list(RegionSerializer(region_queryset, many=True).data),
+    }
 
-    return render(request, "crm/project_list.html", locals())
+    return render(request, "crm/project_list.html", context)
 
 
 @login_required
