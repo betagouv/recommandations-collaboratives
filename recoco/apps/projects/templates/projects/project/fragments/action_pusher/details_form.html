@@ -58,14 +58,12 @@
     {% if not disable_draft %}
         <button @click="handleSendRecommendation({isDraft: true})"
                 class="fr-btn fr-btn--secondary fr-btn--lg fr-mr-3w"
-                :disabled="(push_type == 'single' && !selected_resource) || !$store.actionPusher.isSelectedProject"
+                :disabled="!$store.actionPusher.isSelectedProject"
                 data-test-id="publish-draft-task-button">Enregistrer en brouillon</button>
     {% endif %}
     <button @click="handleSendRecommendation({isDraft: false})"
             type="submit"
             class="fr-btn fr-btn--lg"
             data-cy="button-submit-task"
-            :disabled="(push_type == 'single' && !selected_resource) || (push_type == 'noresource' && (intent == '' || message.text == '')  ) || !$store.actionPusher.isSelectedProject">
-        Publier la recommandation
-    </button>
+            :disabled="!$store.actionPusher.isSelectedProject">Publier la recommandation</button>
 </div>
