@@ -65,6 +65,11 @@ class ResourceSerializer(
         )
 
 
+class ResourceDetailSerializer(ResourceSerializer):
+    class Meta(ResourceSerializer.Meta):
+        fields = ResourceSerializer.Meta.fields + ["summary", "content"]
+
+
 class ResourceURIImportSerializer(serializers.Serializer):
     uri = serializers.URLField()
 
