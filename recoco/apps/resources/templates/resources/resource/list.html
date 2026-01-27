@@ -14,44 +14,23 @@
     Liste des ressources
 {% endblock og_title %}
 {% block content %}
-    {% if user.is_authenticated %}
-        {% get_obj_perms request.user for request.site as "user_site_perms" %}
-    {% endif %}
     <div class="col-12 fr-p-3w fr-mx-auto">
+        <div x-data="{ breadcrumbs: { links: [{url: '{% url 'home' %}', title: 'Accueil'}], current: 'Ressources' } }"
+             class="fr-p-0">{% include "tools/breadcrumb.html" with margin_bottom_only=True %}</div>
         <div class="row">
             <div class="col">
                 <h1 class=" align-items-center fr-mb-2w">
-                    <svg class="bi" width="38" height="38" fill="currentColor">
-                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#key" />
-                    </svg>
-                    Ressources
-                    {% if resources_count %}<span class="text-secondary">({{ resources_count }})</span>{% endif %}
+                    {% if resources_count %}{{ resources_count }}{% endif %} Ressources
                 </h1>
-                <div class="text-secondary small fr-mb-2w">
-                    Nous créons des ressources en fonction des besoins que vous nous soumettez !
-                </div>
             </div>
-            {% if "manage_resources" in user_site_perms %}
-                <!-- Sidebar -->
-                <div class="col-sm-4 col-lg-2 col-xl-2 align-content-top border-start fr-mb-2w">
-                    <span class="text-secondary small smallcaps">Administration</span>
-                    <!-- Staff actions -->
-                    <div class="d-grid gap-2 fr-mt-2w">
-                        <a class="btn btn-light btn-sm"
-                           href="{% url 'resources-resource-create' %}"
-                           role="button">
-                            <svg class="bi" width="16" height="16" fill="currentColor">
-                                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#plus-circle" />
-                            </svg>
-                            &nbsp;
-                            Créer une ressource
-                        </a>
-                    </div>
-                </div>
-            {% endif %}
+        </div>
+        <div>
+            <div class="kanban-header__searchbar position-relative">
+                {% include "projects/project/fragments/search_bar.html" with action_search="onSearch" x_model="searchText" placeholder="Rechercher commune, #tag, nom du dossier..." %}
+            </div>
         </div>
         <!-- Search -->
-        <div class="quick-search fr-mb-6w">
+        {% comment %} <div class="quick-search fr-mb-6w">
             <form method="get">
                 <input id="searching" type="hidden" value="on" name="searching">
                 <div class="input-group fr-mb-2w">
@@ -157,10 +136,6 @@
                                 </span>
                             </div>
                             <div class="filters-internal fr-mt-2v toggle-expired">
-                                {% comment %} <span class="form-check form-switch form-check-inline">
-                                    <input class="form-check-input" type="checkbox" name="{{ form.expired.name }}" id="check-expired" onchange="this.form.submit()" {% if form.expired.value %}checked{% endif %}>
-                                    <label class="form-check-label text-secondary" for="check-expired">Expirées</label>
-                                </span> {% endcomment %}
                                 <div class="fr-toggle fr-toggle--label-left">
                                     <input type="checkbox"
                                            class="fr-toggle__input"
@@ -184,7 +159,7 @@
                     </div>
                 </div>
             </form>
-        </div>
+        </div> {% endcomment %}
         <!-- Results -->
         {% if query %}
             <div class="row align-center fr-mb-2w">
@@ -210,7 +185,7 @@
             </div>
         {% endif %}
         <!-- Result cards -->
-        <div class="row row-cols-1 row-cols-md-4 g-4">
+        <div class="row row-cols-1 row-cols-md-4 g-4 fr-m-0">
             {% for resource in resources %}
                 <!-- Card Grid -->
                 <div class="col-xxl-3 col-xl-4 col-lg-6 col-md-12">{% include "resources/resource/widgets/card_standard.html" %}</div>
