@@ -1,6 +1,6 @@
 import Alpine from 'alpinejs';
 
-import api, { resourcesUrl, resourceUrl, contactUrl } from '../../utils/api';
+import api, { resourceUrl, contactUrl } from '../../utils/api';
 import { schemaResourceFormValidator } from '../../utils/ajv/schema/ajv.schema.ResourceForm';
 
 import Ajv from 'ajv';
@@ -26,7 +26,7 @@ Alpine.data('FormResource', (resourceId) => {
         text: null,
       },
       status: 0,
-      category: null,
+      category: "",
       tags: [],
       support_orga: null,
       departments: [],
@@ -146,69 +146,21 @@ Alpine.data('FormResource', (resourceId) => {
       }
     },
     onSubmit(event) {
-      event.preventDefault();
       this.submitted = true;
 
-      /*/ *********** TEST DATA ***********
+      // Validate the form using AJV
+      const isValid = this.validate();
 
-      this.resourceFormData = {
-        title: 'Test',
-        subtitle: 'dez',
-        summary: 'dez',
-        content: { text: 'dez' },
-        status: 0,
-        tags: [],
-        support_orga: 'dezdez',
-        departments: [
-          '01',
-          '03',
-          '07',
-          '15',
-          '26',
-          '43',
-          '74',
-          '38',
-          '42',
-          '63',
-          '69',
-          '73',
-        ],
-        expires_on: '2026-01-23',
-        contacts: [],
-        keywords: ['PRE_DRAFT'],
-        category_id: '1',
-      };
-      // *********** END TEST DATA ************/
-
-      console.log(this.resourceFormData);
-      this.resourcePayload = {
-        ...this.resourceFormData,
-        content: this.resourceFormData.content.text,
-        category: parseInt(this.resourceFormData.category),
-      };
-      this.resourcePayload.contacts = this.resourceFormData.contacts.map((c) =>
-        typeof c === 'object' ? c.id : c
-      );
-      console.log('Payload to submit:', this.resourcePayload);
-      if (resourceId) {
-        api
-          .put(resourceUrl(resourceId), this.resourcePayload)
-          .then((response) => {
-            console.log('Resource updated:', response.data);
-          })
-          .catch((error) => {
-            console.error('Error updating resource:', error);
-          });
-      } else {
-        api
-          .post(resourcesUrl(), this.resourcePayload)
-          .then((response) => {
-            console.log('Resource created:', response.data);
-          })
-          .catch((error) => {
-            console.error('Error creating resource:', error);
-          });
+      if (!isValid) {
+        // Prevent form submission if validation fails
+        event.preventDefault();
+        console.log('Validation failed:', this.errors);
+        return;
       }
+
+      // Form is valid - let the standard form submission proceed
+      // The hidden fields will carry the complex data (status, content, contacts)
+      console.log('Form is valid, submitting...', this.resourceFormData);
     },
 
     validate() {

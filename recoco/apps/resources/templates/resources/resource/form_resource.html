@@ -9,13 +9,24 @@
 {% endblock js %}
 <!-- Form -->
 <div x-data="AjvValidationSchema('schemaResourceFormValidator')">
-    <form id="form-resource" x-ref="formResource" @submit.prevent="onSubmit">
+    <form id="form-resource"
+          x-ref="formResource"
+          method="post"
+          action="{% if edit_resource %}{% url 'resources-resource-update' resource.id %}{% else %}{% url 'resources-resource-create' %}{% endif %}"
+          @submit="onSubmit">
         {% csrf_token %}
         <div x-data="FormResource({{ resource.id|default:'null'|safe }})"
              x-init="init()"
              class="create-resources"
              @modal-response="closeCreateContactModal($event)"
              @multi-select-change="resourceFormData.tags = $event.detail">
+            <!-- Hidden fields for complex data -->
+            <input type="hidden" name="status" :value="resourceFormData.status">
+            <input type="hidden" name="content" :value="resourceFormData.content.text">
+            <template x-for="contact in resourceFormData.contacts"
+                      :key="contact.id || contact">
+                <input type="hidden" name="contacts" :value="contact.id || contact">
+            </template>
             <div class="d-flex justify-content-between">
                 {% if edit_resource %}
                     <h2 class="create-resources__title text-modal-main-msg">Modification de fiche ressource</h2>
@@ -25,9 +36,7 @@
                 <div>
                     {% comment %} TODO: Uncomment this when the preview modal is ready {% endcomment %}
                     {% comment %} <button @click.prevent data-bs-toggle="modal" :data-bs-target="`#resource-preview-`+{{ resource.id|default:'null'|safe }}" role="button" class="fr-btn fr-btn--tertiary fr-btn--sm fr-mr-1w">Prévisualiser</button> {% endcomment %}
-                    <button role="submit"
-                            class="fr-btn fr-btn--primary fr-btn--sm fr-mr-1w"
-                            @click="onSubmit">Sauvegarder</button>
+                    <button type="submit" class="fr-btn fr-btn--primary fr-btn--sm fr-mr-1w">Sauvegarder</button>
                 </div>
                 {% include "resources/resource/modal_resource.html" %}
             </div>
@@ -189,10 +198,6 @@
                     <div class="fr-input-group"
                          x-data="SearchContactModal({searchbarOnly:true})">
                         <label class="fr-label text-modal-main-msg" for="id_contacts">Contacts</label>
-                        <input type="hidden"
-                               name="contacts"
-                               id="id_contacts"
-                               x-model="resourceFormData.contacts">
                         {% include "tools/contacts/searchbar_for_contacts.html" with add_contact="from_search" %}
                     </div>
                     <!-- display contacts -->
