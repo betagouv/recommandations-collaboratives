@@ -7,6 +7,7 @@ authors: raphael.marvie@beta.gouv.fr, guillaume.libersat@beta.gouv.fr
 created: 2022-05-31 10:11:56 CEST
 """
 
+import puremagic
 import pytest
 from actstream.models import action_object_stream
 from django.contrib.auth import models as auth_models
@@ -63,7 +64,9 @@ def test_upload_document_not_available_for_non_logged_users(client, request, pro
 
 @pytest.mark.django_db
 def test_upload_file_available_for_project_collaborators(client, request, project):
-    png = SimpleUploadedFile("img.png", b"file_content", content_type="image/png")
+    headers = puremagic.magic_header_array
+    header = [e for e in headers if e.extension == ".png"][0].byte_match
+    png = SimpleUploadedFile("img.png", header, content_type="image/png")
     data = {"description": "this is some content", "the_file": png}
 
     with login(client) as user:
@@ -97,7 +100,9 @@ def test_upload_document_is_either_link_or_file(client, request, project):
 
 @pytest.mark.django_db
 def test_upload_file_does_not_trigger_notifications(client, request, project):
-    png = SimpleUploadedFile("img.png", b"file_content", content_type="image/png")
+    headers = puremagic.magic_header_array
+    header = [e for e in headers if e.extension == ".png"][0].byte_match
+    png = SimpleUploadedFile("img.png", header, content_type="image/png")
     data = {"description": "this is some content", "the_file": png}
 
     other_user = baker.make(auth_models.User)
