@@ -106,7 +106,7 @@
                                 {% if project.submitted_by %}
                                     {% include "projects/project/fragments/information_card.html" with full_width=True padding_end=True padding_top=True full_height=True project=project title="Résumé du dossier" description=project.description updated_on=project.created_on card_user=project.submitted_by org_name=project.submitted_by.profile.organization.name data_test="context" %}
                                 {% else %}
-                                    {% include "projects/project/fragments/information_card.html" with full_width=True padding_end=True padding_top=True full_height=True project=project title="Résumé du dossier" description=project.description updated_on=project.created_on card_user=project.creator_email data_test="context" %}
+                                    {% include "projects/project/fragments/information_card.html" with full_width=True padding_end=True padding_top=True full_height=True project=project title="Résumé du dossier" description=project.description updated_on=project.created_on data_test="context" %}
                                 {% endif %}
                                 <!-- Onboarding -->
                                 {% if not onboarding_response and site_config.onboarding_questions.count %}

@@ -58,7 +58,6 @@
                             <th scope="col" class="column column--large">Localisation</th>
                             <th scope="col" class="column column--small">Date de dépôt</th>
                             <th scope="col" class="column column--small">Statut</th>
-                            <th scope="col" class="column column--small">Demandeur</th>
                             <th scope="col" class="column column--small">Actions</th>
                         </tr>
                     </thead>
@@ -90,7 +89,6 @@
                                           x-tooltip="projectTooltip(project)"
                                           :class="projectStatusColor(project.status)"></span>
                                 </td>
-                                <td x-text="project.creator_email ? project.creator_email : project.owner.email"></td>
                                 <td>
                                     <!-- inclure dans les statistiques -->
                                     <template x-if="project.exclude_stats">
