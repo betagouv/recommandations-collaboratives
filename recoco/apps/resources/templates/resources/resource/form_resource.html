@@ -64,7 +64,6 @@
                                name="subtitle"
                                class="fr-input"
                                id="id_subtitle"
-                               required
                                x-model="resourceFormData.subtitle">
                         <template x-for="(error, index) in getFieldErrors('subtitle')" :key="index">
                             <p class="fr-error-text" x-text="error"></p>
@@ -84,7 +83,6 @@
                                name="summary"
                                class="fr-input"
                                id="id_summary"
-                               required
                                x-model="resourceFormData.summary">
                         <template x-for="(error, index) in getFieldErrors('summary')" :key="index">
                             <p class="fr-error-text" x-text="error"></p>
@@ -126,7 +124,6 @@
                         <select name="category"
                                 id="id_category"
                                 class="fr-select"
-                                required
                                 valueAsNumber
                                 x-model="resourceFormData.category">
                             <option value="" selected disabled>Sélectionner une catégorie</option>
@@ -152,7 +149,7 @@
                     <div class="create-resources__help-text fr-mb-3w">
                         <span class="fr-icon fr-icon-information-line fr-icon--sm"></span>
                         <p>
-                            Saisissez vos mots clés séparés par des virgules
+                            Saisissez vos mots clés séparés par des virgules.
                             <br>
                             (ex: diagnostic, cahier des charges, financement études, …).
                         </p>
@@ -164,8 +161,7 @@
                                name="support_orga"
                                class="fr-input"
                                id="id_support_orga"
-                               x-model="resourceFormData.support_orga"
-                               required>
+                               x-model="resourceFormData.support_orga">
                         <template x-for="(error, index) in getFieldErrors('support_orga')" :key="index">
                             <p class="fr-error-text" x-text="error"></p>
                         </template>
@@ -199,8 +195,7 @@
                                name="expires_on"
                                class="fr-input"
                                id="id_expires_on"
-                               x-model="resourceFormData.expires_on"
-                               required>
+                               x-model="resourceFormData.expires_on">
                         <template x-for="(error, index) in getFieldErrors('expires_on')" :key="index">
                             <p class="fr-error-text" x-text="error"></p>
                         </template>
