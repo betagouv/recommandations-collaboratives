@@ -29,8 +29,7 @@
                      x-data="MultiSelectRegionDepartment({selected:selectedDepartments, objectsToSelect, displayRegions: '{{ display_regions }}' == 'True'})">
                     <input name="{{ name|default:'departments[]' }}"
                            type="hidden"
-                           id="{{ id|default:'id_departments' }}"
-                           x-bind:value="selectedValues()">
+                           id="{{ id|default:'id_departments' }}">
                     <template x-if="!displayRegions">
                         <!-- Select Options -->
                         <select class="d-none" x-on:change="init" id="select-list">
