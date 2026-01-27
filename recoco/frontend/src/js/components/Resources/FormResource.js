@@ -14,7 +14,6 @@ addErrors(ajv);
 Alpine.data('FormResource', (resourceId) => {
   return {
     is_draft: true,
-    keywords_options: [],
     errors: [],
     formFields: {},
     submitted: false,
@@ -33,34 +32,11 @@ Alpine.data('FormResource', (resourceId) => {
       expires_on: null,
       contacts: [],
     },
-    options: [
-      {
-        value: 'PRE_DRAFT',
-        text: 'Incomplet',
-      },
-      {
-        value: 'DRAFT',
-        text: 'A modérer',
-      },
-      {
-        value: 'TO_PROCESS',
-        text: 'A traiter',
-      },
-      {
-        value: 'VALIDATED',
-        text: 'Validé',
-      },
-      {
-        value: 'REJECTED',
-        text: 'Refusé',
-      },
-    ],
     init() {
       this.initFormFields(this.$refs.formResource);
       if (resourceId) {
         // fetch resource data and populate resourcePayload
         api.get(resourceUrl(resourceId)).then((response) => {
-          console.log('Fetched resource data:', response.data);
           const {
             title = '',
             subtitle = '',
@@ -95,22 +71,6 @@ Alpine.data('FormResource', (resourceId) => {
           console.log(this.resourceFormData);
         });
       }
-      this.fetchKeywords();
-    },
-    fetchKeywords() {
-      // api.get('/keywords').then(response => {
-      //   this.keywords_options = response.data;
-      // });
-      this.keywords_options = [
-        {
-          id: 1,
-          text: 'Environnement',
-          value: 'environnement',
-          search: 'environnement',
-        },
-        { id: 2, text: 'Économie', value: 'economie', search: 'economie' },
-        { id: 3, text: 'Social', value: 'social', search: 'social' },
-      ];
     },
     fetchContacts() {
       // fetch contact details for each contact id in resourceFormData.contacts

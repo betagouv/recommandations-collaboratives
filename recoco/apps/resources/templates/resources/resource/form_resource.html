@@ -140,10 +140,22 @@
                         </template>
                     </div>
                     <!-- Keywords multi-select -->
-                    <div class="fr-input-group create-resources__multi-select-container"
+                    <div class="fr-input-group fr-mb-1w"
                          x-data="{selected : resourceFormData.tags}">
                         <label class="fr-label text-modal-main-msg" for="id_tags">Mots-clés</label>
-                        {% include "tools/multi_select.html" with name="tags" id="id_tags" %}
+                        <input type="text"
+                               name="tags"
+                               class="fr-input"
+                               id="id_tags"
+                               x-model="resourceFormData.tags">
+                    </div>
+                    <div class="create-resources__help-text fr-mb-3w">
+                        <span class="fr-icon fr-icon-information-line fr-icon--sm"></span>
+                        <p>
+                            Saisissez vos mots clés séparés par des virgules
+                            <br>
+                            (ex: diagnostic, cahier des charges, financement études, …).
+                        </p>
                     </div>
                     <!-- Carrier structure -->
                     <div class="fr-input-group" :class="formFields['support_orga']?.className">
