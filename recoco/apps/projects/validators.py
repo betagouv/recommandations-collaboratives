@@ -14,7 +14,10 @@ class MimetypeValidator(object):
 
     def __call__(self, value):
         try:
-            mime = puremagic.from_string(value.read(2048), mime=True)
+            # filename is only used to distinguish same header mime types
+            mime = puremagic.from_string(
+                value.read(2048), mime=True, filename=value.name
+            )
 
             if (mime in self.forbidden_mimetypes) or (
                 mime not in self.allowed_mimetypes
