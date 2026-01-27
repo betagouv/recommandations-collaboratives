@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import magic
+import puremagic
 from django.core.exceptions import ValidationError
 from django.utils.deconstruct import deconstructible
 
@@ -14,7 +14,7 @@ class MimetypeValidator(object):
 
     def __call__(self, value):
         try:
-            mime = magic.from_buffer(value.read(2048), mime=True)
+            mime = puremagic.from_string(value.read(2048), mime=True)
 
             if (mime in self.forbidden_mimetypes) or (
                 mime not in self.allowed_mimetypes
