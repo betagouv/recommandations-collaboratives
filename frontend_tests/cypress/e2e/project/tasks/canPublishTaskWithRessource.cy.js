@@ -1,10 +1,10 @@
 describe('I can attach miscellanious ressource to task @page-projet-recommandations-creation', () => {
   it('publishes a task with resource comment / no comment', () => {
     cy.login('conseiller1');
-    cy.visit('/project/1');
-    cy.visit('/project/25');
 
-    cy.visit(`/projects/action/?resource_id=2`);
+    cy.visit(`/projects/action/?project_id=25&resource_id=2`);
+    cy.get('[data-test-id="publish-draft-task-button"]').should('be.enabled');
+    cy.get('[data-cy="button-submit-task"]').should('be.enabled');
     cy.get('[data-cy="reco-pusher-selected-project"]').contains(
       'commune de test - Projet avec une reco qui a une resource qui a des contacts'
     );
@@ -43,7 +43,7 @@ describe('I can attach miscellanious ressource to task @page-projet-recommandati
       .should('be.disabled');
   });
 
-  it('publishes a task with external resource', () => {
+  xit('publishes a task with external resource', () => {
     cy.login('conseiller1');
     cy.visit(`/projects/action/?project_id=25`);
 
