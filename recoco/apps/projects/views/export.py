@@ -129,9 +129,9 @@ def project_list_export_csv(request):
             project.location,
             project.created_on.date(),
             submitted_by,
-            [project.project_creation_requests.first().email]
-            if project.project_creation_requests.exists()
-            else [m.email for m in project.members.all()],
+            [m.email for m in project.members.all()]
+            if not project.project_creation_requests.exists()
+            else [project.project_creation_requests.first().email],
             project.phone,
             switchtenders_txt,
             project.project_sites.current().status,
