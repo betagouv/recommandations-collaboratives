@@ -9,8 +9,18 @@ export const schemaResourceFormValidator = {
   properties: {
     title: {
       type: 'string',
+      minLength: 1,
       maxLength: 256,
-      errorMessage: 'Le titre est limité à 256 caractères',
+      errorMessage: {
+        minLength: "Le titre est requis",
+        maxLength: "Le titre est limité à 256 caractères",
+      },
+    },
+    category: {
+      type: 'integer',
+    },
+    tags: {
+      type: 'string',
     },
     subtitle: {
       type: 'string',

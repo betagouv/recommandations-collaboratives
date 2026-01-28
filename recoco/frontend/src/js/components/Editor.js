@@ -322,7 +322,7 @@ Alpine.data('editor', (content, placeholder, isActionPusher = false) => {
       // - Un fichier sélectionné
       // - Des cartes de fichiers dans l'éditeur
       // unused variable hasMessage but necessary to force reactivity
-      const hasMessage = this.$store.editor.currentMessage !== '';
+      const hasMessage = this.$store?.editor.currentMessage !== '';
       const isEditorEmpty = !editor.state.doc.textContent.trim().length;
       const hasContact = this.selectedContact !== null;
       const hasFile = this.selectedFile !== null;

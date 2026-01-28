@@ -16,7 +16,6 @@
           @submit="onSubmit">
         {% csrf_token %}
         <div x-data="FormResource({{ resource.id|default:'null'|safe }})"
-             x-init="init()"
              class="create-resources"
              @modal-response="closeCreateContactModal($event)"
              @multi-select-change="resourceFormData.tags = $event.detail">
@@ -138,7 +137,8 @@
                     </div>
                     <!-- Keywords multi-select -->
                     <div class="fr-input-group fr-mb-1w"
-                         x-data="{selected : resourceFormData.tags}">
+                         x-data="{selected : resourceFormData.tags}"
+                         :class="formFields['tags']?.className">
                         <label class="fr-label text-modal-main-msg" for="id_tags">Mots-clés</label>
                         <input type="text"
                                name="tags"

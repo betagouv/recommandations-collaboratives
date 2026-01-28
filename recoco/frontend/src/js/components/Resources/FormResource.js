@@ -33,7 +33,10 @@ Alpine.data('FormResource', (resourceId) => {
       contacts: [],
     },
     init() {
-      this.initFormFields(this.$refs.formResource);
+      Alpine.nextTick(() => {
+        this.initFormFields(this.$refs.formResource);
+      });
+
       if (resourceId) {
         // fetch resource data and populate resourcePayload
         api.get(resourceUrl(resourceId)).then((response) => {
@@ -124,18 +127,14 @@ Alpine.data('FormResource', (resourceId) => {
     },
 
     validate() {
-      console.log('validate');
       // Build validation map from the reactive payload
       const validateMap = {
         title: this.$refs.formResource['title'].value,
         subtitle: this.$refs.formResource['subtitle'].value,
         summary: this.$refs.formResource['summary'].value,
-        content:
-          typeof this.$refs.formResource['content'].value === 'object'
-            ? this.$refs.formResource['content'].value.text
-            : this.$refs.formResource['content'].value,
+        content: Alpine.raw(this.$store.editor.currentMessage),
         category: parseInt(this.$refs.formResource['category'].value) || 0,
-        tags: this.$refs.formResource['tags'].value || [],
+        tags: this.$refs.formResource['tags'].value,
         support_orga: this.$refs.formResource['support_orga'].value,
         departments: this.$refs.formResource['departments'].value || [],
         expires_on: this.$refs.formResource['expires_on'].value,
@@ -181,7 +180,7 @@ Alpine.data('FormResource', (resourceId) => {
     },
 
     getFieldErrors(fieldName) {
-      if (!this.submitted) return [];
+      if (this.formFields[fieldName]?.pristine) return [];
       return this.formFields[fieldName]?.errors || [];
     },
 
@@ -209,19 +208,26 @@ Alpine.data('FormResource', (resourceId) => {
           pristine: true,
           className: '',
         };
-        const field = form.querySelector(`[name="${fieldName}"]`);
-        if (!field) return;
+        if (fieldName !== 'content') {
+          const field = form.querySelector(`[name="${fieldName}"]`);
+          if (!field) return;
 
-        ['change', 'blur'].forEach((event) => {
-          field.addEventListener(event, (e) => {
-            this.formFields[e.target.name].pristine = false;
+          ['change', 'blur'].forEach((event) => {
+            field.addEventListener(event, (e) => {
+              this.formFields[e.target.name].pristine = false;
+              this.validateField(e.target);
+            });
+          });
+          field.addEventListener('input', (e) => {
+            if (this.formFields[e.target.name].pristine) return;
             this.validateField(e.target);
           });
-        });
-        field.addEventListener('input', (e) => {
-          if (this.formFields[e.target.name].pristine) return;
-          this.validateField(e.target);
-        });
+        } else {
+          Alpine.raw(this.$store.editor.editorInstance).on('update', () => {
+            this.formFields[fieldName].pristine = false;
+            this.validateField({ name: 'content' });
+          });
+        }
       });
     },
     suppressContact(contact) {
