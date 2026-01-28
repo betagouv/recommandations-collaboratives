@@ -81,6 +81,18 @@ def test_upload_file_available_for_project_collaborators(
 
 
 @pytest.mark.django_db
+def test_upload_file_rejects_executables(client, request, project, malicious_file):
+    data = {"description": "this is some content", "the_file": malicious_file}
+
+    with login(client) as user:
+        assign_collaborator(user, project, is_owner=True)
+        url = reverse("projects-documents-upload-document", args=[project.id])
+        client.post(url, data=data)
+
+    assert not models.Document.objects.exists()
+
+
+@pytest.mark.django_db
 def test_upload_document_is_either_link_or_file(client, request, project):
     data = {"description": "this is some content"}
 
