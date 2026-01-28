@@ -142,6 +142,8 @@ def resource_search(request):
 
     resources = resources.filter(staff_redux)
 
+    category_map = {str(c.id): c.form_label for c in models.Category.on_site.all()}
+
     return render(
         request,
         "resources/resource/list.html",
