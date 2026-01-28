@@ -142,6 +142,10 @@ def resource_search(request):
 
     resources = resources.filter(staff_redux)
 
+    category_options = [
+        {"value": str(c.id), "text": str(c), "search": str(c)}
+        for c in models.Category.on_site.all()
+    ]
     category_map = {str(c.id): c.form_label for c in models.Category.on_site.all()}
 
     return render(

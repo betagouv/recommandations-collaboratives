@@ -10,6 +10,7 @@
     {% vite_asset 'js/styles/segmented_ctrl.css.js' %}
     {% vite_asset 'js/styles/multi_select.css.js' %}
     {% vite_asset 'js/components/MultiSelect2.js' %}
+    {% vite_asset 'js/components/resourceCategoryFilter.js' %}
 {% endblock js %}
 {% block title %}
     Liste des ressources
@@ -18,10 +19,8 @@
     Liste des ressources
 {% endblock og_title %}
 {% block content %}
-    {% comment %} {{ departments|json_script:"departmentsArray" }}
-    {{ regions|json_script:"regionsArray" }} {% endcomment %}
-    {{ category_map|json_script:"category-map" }}
-    <div x-data class="col-12 fr-p-3w fr-mx-auto">
+    {{ category_options|json_script:"categoryOptions" }}
+    <div x-data="ResourceFilter(JSON.parse(document.getElementById('categoryOptions').textContent))" class="col-12 fr-p-3w fr-mx-auto">
         <div x-data="{ breadcrumbs: { links: [{url: '{% url 'home' %}', title: 'Accueil'}], current: 'Ressources' } }"
              class="fr-p-0">{% include "tools/breadcrumb.html" with margin_bottom_only=True %}</div>
         <div class="row">
@@ -38,26 +37,7 @@
                     <input type="hidden" value="on" name="searching">
                 </div>
                 <div class="w-50 d-flex justify-content-around align-items-center">
-                    <div x-data="{selected: '{{ form.category_fields.selected_categories }}' }"
-                            class="d-flex justify-content-around align-items-center">
-                        <label for="categories" class="fr-segmented__legend inline text-nowrap">Catégories :</label>
-                        <select id="categories"
-                                :name="selected"
-                                class="form-select specific-minwidth-200 specific-flex rework-bootstrap-select"
-                                aria-label="Sélectionner une catégorie"
-                                onchange="this.form.submit()">
-                            <option value="">Toutes les catégories</option>
-                            {% for category in form.category_fields %}
-                                <option value="{{ category.id }}"
-                                        name="{{ category.the_category.form_label }}"
-                                        id="check-{{ category.the_category.form_label }}"
-                                        {% if category.checked %}checked{% endif %}
-                                        @click="selected = '{{ category.the_category.form_label }}';this.form.submit()">
-                                    {{ category.the_category }}
-                                </option>
-                            {% endfor %}
-                        </select>
-                    </div>
+
                             {% comment %} {% for category in form.category_fields %}
                             <span class="form-check form-switch form-check-inline">
                                 <input class="form-check-input"
@@ -73,24 +53,16 @@
                             </span>
                         {% endfor %} {% endcomment %}
 
-                        {% comment %} </select>
-                    </div> {% endcomment %}
-                    {% comment %} <div
-                        x-data="{
-                            categoryMap: JSON.parse(document.getElementById('category-map').textContent),
-                            selectedIds: [],
-                        }"
-                        @multi-select-change="
-                            selectedIds = $event.detail || [];
-                            $nextTick(() => $el.closest('form').submit());
-                        "
-                        >
+                        <div @multi-select-change="selectedIds = $event.detail || []; $nextTick(() => $el.closest('form').submit());">
+                        <!-- Adapter: emit GET params Django expects -->
                         <template x-for="id in selectedIds" :key="id">
-                            <input type="hidden" :name="categoryMap[id]" value="on">
+                          <input type="hidden" :name="categoryMap[id]" value="on">
                         </template>
+                        <div x-data="{ selected: selectedIds }">
+                            {% include "tools/multi_select.html" %}
+                        </div>
+                      </div>
 
-                        {% include "tools/multi_select.html" with options=category_options %}
-                    </div> {% endcomment %}
                     {% comment %} <div>
                         {% include "projects/project/fragments/departments_selector.html" with label="Projets de mon territoire" filter_by_regions=True zone_objects="regions" select_all=True %}
                     </div> {% endcomment %}
