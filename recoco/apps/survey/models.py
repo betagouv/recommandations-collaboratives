@@ -12,6 +12,7 @@ from django.db import models
 from django.db.models.signals import post_migrate
 from django.dispatch import receiver
 from django.utils import timezone
+from django.utils.functional import cached_property
 from markdownx.utils import markdownify
 from model_clone import CloneMixin
 from tagging.fields import TagField
@@ -306,7 +307,7 @@ class Session(models.Model):
         projects_models.Project, related_name="survey_session", on_delete=models.CASCADE
     )
 
-    @property
+    @cached_property
     def signals(self):
         """Return the union of signals from Answers of this Session"""
         return {
