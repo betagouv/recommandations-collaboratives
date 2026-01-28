@@ -26,7 +26,11 @@ class MimetypeValidator(object):
                     f"{value} n'est pas un fichier autorisé", code=self.code
                 )
 
-        except AttributeError as e:
-            raise ValidationError(
-                "Impossible d'évaluer le type de ficher", code=self.code
-            ) from e
+        except puremagic.main.PureError:
+            return "text/plain"
+
+            # puremagic does not detect mime if no header until v2 that needs python 3.12 or later
+
+            # raise ValidationError(
+            #     "Impossible d'évaluer le type de ficher", code=self.code
+            # ) from e
