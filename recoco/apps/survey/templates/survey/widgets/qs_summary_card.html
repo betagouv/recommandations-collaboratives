@@ -38,76 +38,79 @@
             <p class="card-text">
                 <ul class="list-unstyled">
                     {% for answer in answers %}
-                        <li class="answer fr-my-2v d-flex justify-content-between position-relative">
-                            <div class="flex-grow-1 specific-width">
-                                {% lookup_choices_from_answer answer as choices %}
-                                {% if show_question or not choices %}
-                                    <h6 class="fr-m-0 d-inline align-middle text-uppercase">
-                                        {% if "use_surveys" in user_project_perms %}
-                                            <a class="text-decoration-none stretched-link link-edit"
-                                               href="{% url 'survey-question-details' session.id answer.question.id %}">
-                                            </a>
-                                        {% endif %}
-                                        {{ answer.question.text_short|default:answer.question.text }}
-                                    </h6>
-                                {% endif %}
-                                {% if show_answers or show_conclusion %}
-                                    <ul class="list-unstyled fr-mt-0">
-                                        {% if "use_surveys" in user_project_perms and not show_question %}
-                                            <a class="link-edit stretched-link text-decoration-none"
-                                               data-cy="edit-survey"
-                                               href="{% url 'survey-question-details' session.id answer.question.id %}">
+                        {% question_answer_visible session answer.question as question_visible %}
+                        {% if question_visible %}
+                            <li class="answer fr-my-2v d-flex justify-content-between position-relative">
+                                <div class="flex-grow-1 specific-width">
+                                    {% lookup_choices_from_answer answer as choices %}
+                                    {% if show_question or not choices %}
+                                        <h6 class="fr-m-0 d-inline align-middle text-uppercase">
+                                            {% if "use_surveys" in user_project_perms %}
+                                                <a class="text-decoration-none stretched-link link-edit"
+                                                   href="{% url 'survey-question-details' session.id answer.question.id %}">
+                                                </a>
                                             {% endif %}
-                                            {% for choice in choices %}
-                                                {% if show_answers %}<li>{{ choice.text }}</li>{% endif %}
-                                                {% if show_conclusion %}<li>{{ choice.conclusion|default:choice.text|capfirst }}</li>{% endif %}
-                                            {% endfor %}
-                                            {% if "use_surveys" in user_project_perms and not show_question %}</a>{% endif %}
-                                    </ul>
-                                {% endif %}
-                                {% if show_comment and answer.comment or not choices %}
-                                    <div>
-                                        <span class="fr-icon-quote-line fr-icon--sm" aria-hidden="true"></span>
-                                        <span class="align-middle">{{ answer.comment|capfirst }}</span>
-                                    </div>
-                                {% endif %}
-                                {% if show_tags and answer.tags %}
-                                    <div>
-                                        <svg class="bi fr-mr-1v align-middle"
-                                             width="16"
-                                             height="16"
-                                             fill="currentColor">
-                                            <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#tags" />
-                                        </svg>
-                                        {% for tag in answer.tags %}<span class="badge bg-dark rounded-pill">{{ tag }}</span>{% endfor %}
-                                    </div>
-                                {% endif %}
-                                {% if answer.attachment %}
-                                    <div>
-                                        <span class="align-middle">
-                                            <a class="position-relative z-2 tmp-usevar"
-                                               style="color: {{ question_set.color|default:'black' }} !important"
-                                               target="_new"
-                                               href="{{ answer.attachment.url }}">Télécharger le fichier joint</a>
-                                        </span>
-                                    </div>
-                                {% endif %}
-                            </div>
-                            {% if "view_surveys" in user_project_perms %}
-                                <div class="flex-shrink-1 edit-answer">
-                                    <span class="fr-icon-pencil-line fr-icon--sm" aria-hidden="true"></span>
+                                            {{ answer.question.text_short|default:answer.question.text }}
+                                        </h6>
+                                    {% endif %}
+                                    {% if show_answers or show_conclusion %}
+                                        <ul class="list-unstyled fr-mt-0">
+                                            {% if "use_surveys" in user_project_perms and not show_question %}
+                                                <a class="link-edit stretched-link text-decoration-none"
+                                                   data-cy="edit-survey"
+                                                   href="{% url 'survey-question-details' session.id answer.question.id %}">
+                                                {% endif %}
+                                                {% for choice in choices %}
+                                                    {% if show_answers %}<li>{{ choice.text }}</li>{% endif %}
+                                                    {% if show_conclusion %}<li>{{ choice.conclusion|default:choice.text|capfirst }}</li>{% endif %}
+                                                {% endfor %}
+                                                {% if "use_surveys" in user_project_perms and not show_question %}</a>{% endif %}
+                                        </ul>
+                                    {% endif %}
+                                    {% if show_comment and answer.comment or not choices %}
+                                        <div>
+                                            <span class="fr-icon-quote-line fr-icon--sm" aria-hidden="true"></span>
+                                            <span class="align-middle">{{ answer.comment|capfirst }}</span>
+                                        </div>
+                                    {% endif %}
+                                    {% if show_tags and answer.tags %}
+                                        <div>
+                                            <svg class="bi fr-mr-1v align-middle"
+                                                 width="16"
+                                                 height="16"
+                                                 fill="currentColor">
+                                                <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#tags" />
+                                            </svg>
+                                            {% for tag in answer.tags %}<span class="badge bg-dark rounded-pill">{{ tag }}</span>{% endfor %}
+                                        </div>
+                                    {% endif %}
+                                    {% if answer.attachment %}
+                                        <div>
+                                            <span class="align-middle">
+                                                <a class="position-relative z-2 tmp-usevar"
+                                                   style="color: {{ question_set.color|default:'black' }} !important"
+                                                   target="_new"
+                                                   href="{{ answer.attachment.url }}">Télécharger le fichier joint</a>
+                                            </span>
+                                        </div>
+                                    {% endif %}
                                 </div>
-                            {% endif %}
-                        </li>
-                        {% if can_view_updated_answers and answer.updated_recently %}
-                            <li class="small bg-primary-subtle fr-p-1v">
-                                <div class="updated-by">
-                                    Cette réponse à été mise à jour {{ answer.updated_on|naturalday }}
-                                    {% if answer.updated_by %}par <strong>{{ answer.updated_by }}</strong>{% endif %}
-                                </div>
+                                {% if "view_surveys" in user_project_perms %}
+                                    <div class="flex-shrink-1 edit-answer">
+                                        <span class="fr-icon-pencil-line fr-icon--sm" aria-hidden="true"></span>
+                                    </div>
+                                {% endif %}
                             </li>
+                            {% if can_view_updated_answers and answer.updated_recently %}
+                                <li class="small bg-primary-subtle fr-p-1v">
+                                    <div class="updated-by">
+                                        Cette réponse à été mise à jour {{ answer.updated_on|naturalday }}
+                                        {% if answer.updated_by %}par <strong>{{ answer.updated_by }}</strong>{% endif %}
+                                    </div>
+                                </li>
+                            {% endif %}
+                            <hr class="fr-mt-1v fr-pb-1v">
                         {% endif %}
-                        <hr class="fr-mt-1v fr-pb-1v">
                     {% endfor %}
                 </ul>
             </p>

@@ -17,6 +17,11 @@ def question_set_visible(session, question_set):
 
 
 @register.simple_tag
+def question_answer_visible(session, question):
+    return question.check_precondition(session)
+
+
+@register.simple_tag
 def question_answer(session, question):
     try:
         return Answer.objects.get(question=question, session=session)
