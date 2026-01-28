@@ -14,7 +14,7 @@
     {% vite_asset 'js/styles/multi-select.css.js' %}
 {% endblock js %}
 <div class="w-100 multi-select"
-     x-data="MultiSelect2({elementId:'multiSelect2', options: options})">
+     x-data="MultiSelect2({elementId:'multiSelect2', options: options, selected: selected})">
     <select class="d-none" id="multiSelect2">
         <template x-for="option in options" :key="option.value">
             <option :value="option.value" :data-search="option.search">

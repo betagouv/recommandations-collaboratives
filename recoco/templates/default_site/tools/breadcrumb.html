@@ -9,7 +9,7 @@
 {% endcomment %}
 <!-- Breadcrumb -->
 <nav role="navigation"
-     class="fr-breadcrumb fr-mb-3v fr-mt-0 fr-px-5v fr-pt-5v"
+     class="fr-breadcrumb {% if margin_bottom_only %}fr-mt-0 fr-mb-2v {% else %}fr-mb-3v fr-mt-0 fr-px-5v fr-pt-5v{% endif %}"
      aria-label="vous êtes ici :">
     <button class="fr-breadcrumb__button"
             aria-expanded="false"
