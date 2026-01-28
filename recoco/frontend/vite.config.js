@@ -204,7 +204,7 @@ const config = {
         ),
         marianneStyles: resolve('./src/js/styles/marianne.css.js'),
         formResourcesStyles: resolve(
-          './src/js/styles/resources/form-resources.css.js'
+          './src/js/styles/form-resources.css.js'
         ),
         formResource: resolve('./src/js/components/Resources/FormResource.js'),
         ajvValidationSchema: resolve(
