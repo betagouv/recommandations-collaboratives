@@ -92,6 +92,7 @@ def question_set_create(request, survey_id=None):
             question_set = form.save(commit=False)
             question_set.survey = survey
             question_set.save()
+            form.save_m2m()
             next_url = reverse(
                 "survey-editor-question-set-details", args=[question_set.id]
             )
