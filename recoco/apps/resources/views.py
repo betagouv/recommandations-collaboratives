@@ -439,6 +439,7 @@ def resource_create(request):
         "resources/resource/create.html",
         {
             "categories": categories,
+            "form": form,
         },
     )
 

@@ -94,7 +94,7 @@
                     <!-- Content with tiptap editor -->
                     <div class="fr-input-group" :class="formFields['content']?.className">
                         <label class="fr-label text-modal-main-msg" for="id_content">Contenu</label>
-                        {% include "tools/editor.html" with model="resourceFormData.content" initial_content="resourceFormData.content.text" initial_content_js=True input_required=True %}
+                        {% include "tools/editor.html" with input_name=form.content.name initial_content=form.content.value|default:'' input_required=True initial_content_escapejs=True %}
                         <template x-for="(error, index) in getFieldErrors('content')" :key="index">
                             <p class="fr-error-text" x-text="error"></p>
                         </template>
