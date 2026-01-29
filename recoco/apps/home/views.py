@@ -31,9 +31,9 @@ from recoco.apps.projects.utils import (
 )
 from recoco.apps.resources import models as resources_models
 from recoco.apps.tasks import models as tasks
-from recoco.utils import check_if_advisor
+from recoco.utils import check_if_advisor, update_user
 
-from . import models
+from . import forms, models
 from .forms import (
     AdvisorAccessRequestForm,
     ContactForm,
@@ -428,6 +428,43 @@ class SiteCreateView(LoginRequiredMixin, PermissionRequiredMixin, FormView):
 
     def get_success_url(self):
         return reverse("site-create")
+
+
+def update_profile_if_incomplete(request):
+    """
+    If a user has missing infos, ask for completion.
+    This is triggered by the 'needs_profile_update'.
+    """
+    if not request.user.is_authenticated:
+        return redirect(reverse("home"))
+
+    form_user = forms.UserUpdateForm(request.POST or None, instance=request.user)
+    form_profile = forms.UserProfileUpdateForm(
+        request.POST or None, instance=request.user.profile
+    )
+
+    if request.method == "POST":
+        if form_user.is_valid() and form_profile.is_valid():
+            user = update_user(
+                site=request.site,
+                user=request.user,
+                first_name=form_user.cleaned_data.get("first_name"),
+                last_name=form_user.cleaned_data.get("last_name"),
+                org_name=form_profile.cleaned_data.get("org_name"),
+                org_position=form_profile.cleaned_data.get("organization_position"),
+                phone=form_profile.cleaned_data.get("phone"),
+            )
+
+            request.user.profile.needs_profile_update = False
+            request.user.profile.save()
+
+            next_page = request.GET.get("next", None)
+            if not url_has_allowed_host_and_scheme(next_page, allowed_hosts=None):
+                next_page = reverse("home")
+
+            return redirect(next_page)
+
+    return render(request, "home/update_incomplete_profile.html", locals())
 
 
 # eof
