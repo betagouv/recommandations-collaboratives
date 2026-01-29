@@ -66,6 +66,7 @@ from recoco.apps.home import models as home_models
 from recoco.apps.onboarding import utils as onboarding_utils
 from recoco.apps.projects.models import Project, Topic
 from recoco.apps.reminders import models as reminders_models
+from recoco.apps.resources.models import Category
 from recoco.apps.tasks.models import Task
 from recoco.utils import (
     get_group_for_site,
@@ -938,9 +939,13 @@ def resource_list(request):
         .distinct()
         .order_by("name")
     )
+    regions = list(RegionSerializer(region_queryset, many=True).data)
+
+    categories = list(Category.on_site.values("id", "name").order_by("name"))
 
     context = {
-        "regions": list(RegionSerializer(region_queryset, many=True).data),
+        "regions": regions,
+        "categories": categories,
     }
 
     return render(request, "crm/resource_list.html", context)
