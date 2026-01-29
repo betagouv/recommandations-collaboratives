@@ -11,7 +11,6 @@ import pytest
 from actstream.models import action_object_stream
 from django.contrib.auth import models as auth_models
 from django.contrib.sites.shortcuts import get_current_site
-from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db import transaction
 from django.urls import reverse
 from model_bakery import baker
@@ -62,9 +61,10 @@ def test_upload_document_not_available_for_non_logged_users(client, request, pro
 
 
 @pytest.mark.django_db
-def test_upload_file_available_for_project_collaborators(client, request, project):
-    png = SimpleUploadedFile("img.png", b"file_content", content_type="image/png")
-    data = {"description": "this is some content", "the_file": png}
+def test_upload_file_available_for_project_collaborators(
+    client, request, project, good_file
+):
+    data = {"description": "this is some content", "the_file": good_file}
 
     with login(client) as user:
         assign_collaborator(user, project, is_owner=True)
@@ -78,6 +78,18 @@ def test_upload_file_available_for_project_collaborators(client, request, projec
     assert document.description == data["description"]
     assert document.uploaded_by == user
     assert document.the_file is not None
+
+
+@pytest.mark.django_db
+def test_upload_file_rejects_executables(client, request, project, malicious_file):
+    data = {"description": "this is some content", "the_file": malicious_file}
+
+    with login(client) as user:
+        assign_collaborator(user, project, is_owner=True)
+        url = reverse("projects-documents-upload-document", args=[project.id])
+        client.post(url, data=data)
+
+    assert not models.Document.objects.exists()
 
 
 @pytest.mark.django_db
@@ -96,9 +108,10 @@ def test_upload_document_is_either_link_or_file(client, request, project):
 
 
 @pytest.mark.django_db
-def test_upload_file_does_not_trigger_notifications(client, request, project):
-    png = SimpleUploadedFile("img.png", b"file_content", content_type="image/png")
-    data = {"description": "this is some content", "the_file": png}
+def test_upload_file_does_not_trigger_notifications(
+    client, request, project, good_file
+):
+    data = {"description": "this is some content", "the_file": good_file}
 
     other_user = baker.make(auth_models.User)
 

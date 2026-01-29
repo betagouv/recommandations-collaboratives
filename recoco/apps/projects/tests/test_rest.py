@@ -1199,11 +1199,10 @@ def test_topics_are_restricted_to_nonexistent_via_rest_api(request, api_client):
 
 
 @pytest.mark.django_db
-def test_doc_upload(project_ready, project_editor, client):
+def test_doc_upload(project_ready, project_editor, client, good_file):
     url = reverse("projects-documents-list", args=[project_ready.pk])
 
-    png = SimpleUploadedFile("img.png", b"file_content", content_type="image/png")
-    data = {"description": "this is some content", "the_file": png}
+    data = {"description": "this is some content", "the_file": good_file}
 
     client.force_login(project_editor)
     res = client.post(url, data)
@@ -1277,14 +1276,15 @@ def inactive_project(request, make_project):
 
 
 @pytest.mark.django_db
-def test_doc_upload_reactivates_project(project_editor, inactive_project, client):
+def test_doc_upload_reactivates_project(
+    project_editor, inactive_project, client, good_file
+):
     url = reverse("projects-documents-list", args=[inactive_project.pk])
     inactive_project.members.add(project_editor)
     assign_perm("projects.view_public_notes", project_editor, inactive_project)
     assign_perm("projects.use_public_notes", project_editor, inactive_project)
 
-    png = SimpleUploadedFile("img.png", b"file_content", content_type="image/png")
-    data = {"description": "this is some content", "the_file": png}
+    data = {"description": "this is some content", "the_file": good_file}
 
     client.force_login(project_editor)
     res = client.post(url, data)
@@ -1296,15 +1296,14 @@ def test_doc_upload_reactivates_project(project_editor, inactive_project, client
 
 @pytest.mark.django_db
 def test_doc_upload_by_advisors_lets_projects_unactivated(
-    current_site, project_editor, inactive_project, client
+    current_site, project_editor, inactive_project, client, good_file
 ):
     url = reverse("projects-documents-list", args=[inactive_project.pk])
     assign_advisor(project_editor, inactive_project)
     assign_perm("projects.view_public_notes", project_editor, inactive_project)
     assign_perm("projects.use_public_notes", project_editor, inactive_project)
 
-    png = SimpleUploadedFile("img.png", b"file_content", content_type="image/png")
-    data = {"description": "this is some content", "the_file": png}
+    data = {"description": "this is some content", "the_file": good_file}
 
     client.force_login(project_editor)
     res = client.post(url, data)

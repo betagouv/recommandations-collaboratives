@@ -1,9 +1,11 @@
 # global personal configuration of pytest
+import puremagic
 import pytest
 from django.contrib.auth import models as auth_models
 from django.contrib.auth.models import Group, User
 from django.contrib.sites.models import Site
 from django.contrib.sites.shortcuts import get_current_site
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.management import call_command
 from guardian.shortcuts import assign_perm
 from model_bakery import baker
@@ -103,6 +105,20 @@ def project_editor(project_ready):
     assign_perm("projects.view_public_notes", project_editor, project_ready)
     assign_perm("projects.use_public_notes", project_editor, project_ready)
     return project_editor
+
+
+@pytest.fixture()
+def good_file():
+    headers = puremagic.magic_header_array
+    header = [e for e in headers if e.extension == ".png"][0].byte_match
+    return SimpleUploadedFile("img.png", header, content_type="image/png")
+
+
+@pytest.fixture()
+def malicious_file():
+    headers = puremagic.magic_header_array
+    header = [e for e in headers if e.extension == ".exe"][0].byte_match
+    return SimpleUploadedFile("fake-img.png", header, content_type="image/png")
 
 
 # eof

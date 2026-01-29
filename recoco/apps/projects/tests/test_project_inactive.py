@@ -13,7 +13,6 @@ import pytest
 from actstream.models import Action
 from django.contrib.auth import models as auth_models
 from django.contrib.sites.shortcuts import get_current_site
-from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 from django.utils import timezone
 from model_bakery import baker
@@ -268,7 +267,7 @@ def test_regular_collaborator_cannot_set_project_active(request, client, make_pr
 
 @pytest.mark.django_db
 def test_notifications_are_not_dispatched_to_collaborators_if_project_is_inactive(
-    request, client, subtests, make_project
+    request, client, subtests, make_project, good_file
 ):
     site = get_current_site(request)
     baker.make(home_models.SiteConfiguration, site=site)
@@ -309,8 +308,6 @@ def test_notifications_are_not_dispatched_to_collaborators_if_project_is_inactiv
         collaborator,
     )
 
-    png = SimpleUploadedFile("img.png", b"file_content", content_type="image/png")
-
     triggers = [
         {
             "url-name": "projects-project-switchtender-join",
@@ -334,7 +331,7 @@ def test_notifications_are_not_dispatched_to_collaborators_if_project_is_inactiv
             "url-name": "projects-documents-upload-document",
             "url-args": {"project_id": project.pk},
             "user": superuser,
-            "post-data": {"description": "this is some content", "the_file": png},
+            "post-data": {"description": "this is some content", "the_file": good_file},
         },  # document uploaded ✓
         {
             "url-name": "projects-create-task",
@@ -385,7 +382,9 @@ def test_project_is_reactivated_on_conversation_message(client, request, project
 
 
 @pytest.mark.django_db
-def test_project_is_reactivated_on_document_upload(request, client, make_project):
+def test_project_is_reactivated_on_document_upload(
+    request, client, make_project, good_file
+):
     site = get_current_site(request)
 
     project = make_project(
@@ -398,12 +397,10 @@ def test_project_is_reactivated_on_document_upload(request, client, make_project
         "projects-documents-upload-document", kwargs={"project_id": project.pk}
     )
 
-    png = SimpleUploadedFile("img.png", b"file_content", content_type="image/png")
-
     with login(client) as owner:
         assign_collaborator(owner, project, is_owner=True)
         response = client.post(
-            url, data={"description": "this is some content", "the_file": png}
+            url, data={"description": "this is some content", "the_file": good_file}
         )
 
     assert response.status_code == 302

@@ -15,7 +15,6 @@ import pytest
 from django.contrib.auth import models as auth
 from django.contrib.sites import models as sites
 from django.contrib.sites.shortcuts import get_current_site
-from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import override_settings
 from django.urls import reverse
 from django.utils import timezone
@@ -1445,19 +1444,17 @@ def test_project_list_excludes_non_site_projects_for_user(make_project):
 
 @pytest.mark.django_db
 def test_last_members_activity_is_updated_by_document_upload_from_member(
-    client, request, project
+    client, request, project, good_file
 ):
     url = reverse(
         "projects-documents-upload-document", kwargs={"project_id": project.pk}
     )
 
-    png = SimpleUploadedFile("img.png", b"file_content", content_type="image/png")
-
     before_update = timezone.now()
     with login(client) as owner:
         utils.assign_collaborator(owner, project, is_owner=True)
         response = client.post(
-            url, data={"description": "this is some content", "the_file": png}
+            url, data={"description": "this is some content", "the_file": good_file}
         )
 
     assert response.status_code == 302
@@ -1507,20 +1504,18 @@ def test_last_members_activity_is_not_updated_by_advisor_message(
 
 @pytest.mark.django_db
 def test_last_members_activity_not_updated_by_document_upload_from_advisor(
-    client, request, project
+    client, request, project, good_file
 ):
     url = reverse(
         "projects-documents-upload-document", kwargs={"project_id": project.pk}
     )
-
-    png = SimpleUploadedFile("img.png", b"file_content", content_type="image/png")
 
     before_update = timezone.now()
 
     with login(client) as user:
         utils.assign_advisor(user, project)
         response = client.post(
-            url, data={"description": "this is some content", "the_file": png}
+            url, data={"description": "this is some content", "the_file": good_file}
         )
 
     assert response.status_code == 302

@@ -68,7 +68,7 @@ dependencies = [
     "pandoc==2.4",
     "pillow==11.3.0",
     "psycopg[c]>=3.2.12",
-    "python-magic>=0.4.27",
+    "puremagic>=1.30",
     "redis==5.0.4",
     "requests-html==0.10.0",
     "rest-framework-generic-relations>=2.2.0",
