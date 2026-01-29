@@ -44,12 +44,18 @@
                 <div class="fr-col-8 fr-col-md-8 fr-col-sm-12 fr-pr-4w">
                     <!-- Title -->
                     <div class="fr-input-group" :class="formFields['title']?.className">
-                        <label class="fr-label text-modal-main-msg" for="id_title">Titre</label>
+                        <label class="fr-label text-modal-main-msg" for="id_title">
+                            Titre
+                            <span x-show="resourceFormData.title.length > 0" class="fr-text--xs">
+                                (<span x-text="256 - resourceFormData.title.length"></span>
+                            /256 caractères)</span>
+                        </label>
                         <input type="text"
                                name="title"
                                class="fr-input"
                                id="id_title"
                                required
+                               maxlength="256"
                                x-model="resourceFormData.title">
                         <template x-for="(error, index) in getFieldErrors('title')" :key="index">
                             <p class="fr-error-text" x-text="error"></p>
@@ -58,11 +64,17 @@
                     <!-- Subtitle -->
                     <div class="fr-input-group fr-mb-1w"
                          :class="formFields['subtitle']?.className">
-                        <label class="fr-label text-modal-main-msg" for="id_subtitle">Sous-titre</label>
+                        <label class="fr-label text-modal-main-msg" for="id_subtitle">
+                            Sous-titre
+                            <span x-show="resourceFormData.subtitle.length > 0" class="fr-text--xs">
+                                (<span x-text="512 - resourceFormData.subtitle.length"></span>
+                            /512 caractères)</span>
+                        </label>
                         <input type="text"
                                name="subtitle"
                                class="fr-input"
                                id="id_subtitle"
+                               maxlength="512"
                                x-model="resourceFormData.subtitle">
                         <template x-for="(error, index) in getFieldErrors('subtitle')" :key="index">
                             <p class="fr-error-text" x-text="error"></p>
@@ -77,12 +89,14 @@
                     <!-- Summary -->
                     <div class="fr-input-group fr-mb-1w"
                          :class="formFields['summary']?.className">
-                        <label class="fr-label text-modal-main-msg" for="id_summary">Résumé</label>
-                        <input type="text"
-                               name="summary"
-                               class="fr-input"
-                               id="id_summary"
-                               x-model="resourceFormData.summary">
+                        <label class="fr-label text-modal-main-msg" for="id_summary">
+                            Résumé
+                            <span x-show="resourceFormData.summary.length > 0" class="fr-text--xs">
+                                (<span x-text="512 - resourceFormData.summary.length"></span>
+                            /512 caractères)</span>
+                        </label>
+                        <textarea name="summary" class="fr-input" id="id_summary" maxlength="512" x-model="resourceFormData.summary">
+                        </textarea>
                         <template x-for="(error, index) in getFieldErrors('summary')" :key="index">
                             <p class="fr-error-text" x-text="error"></p>
                         </template>
@@ -156,11 +170,17 @@
                     </div>
                     <!-- Carrier structure -->
                     <div class="fr-input-group" :class="formFields['support_orga']?.className">
-                        <label class="fr-label text-modal-main-msg" for="id_support_orga">Structure porteuse</label>
+                        <label class="fr-label text-modal-main-msg" for="id_support_orga">
+                            Structure porteuse
+                            <span x-show="resourceFormData.support_orga.length > 0" class="fr-text--xs">
+                                (<span x-text="256 - resourceFormData.support_orga.length"></span>
+                            /256 caractères)</span>
+                        </label>
                         <input type="text"
                                name="support_orga"
                                class="fr-input"
                                id="id_support_orga"
+                               maxlength="256"
                                x-model="resourceFormData.support_orga">
                         <template x-for="(error, index) in getFieldErrors('support_orga')" :key="index">
                             <p class="fr-error-text" x-text="error"></p>
