@@ -17,8 +17,6 @@ export default function TaskComment() {
           content: this.comment.text,
         });
         await this.$store.tasksView.updateViewWithTask(task.id);
-        task.isLoading = false;
-        this.isEditing = false;
       } catch (error) {
         console.error(error);
         this.$store.app.displayToastMessage({
@@ -26,6 +24,7 @@ export default function TaskComment() {
           timeout: 5000,
           type: ToastType.error,
         });
+      } finally {
         task.isLoading = false;
         this.isEditing = false;
       }
