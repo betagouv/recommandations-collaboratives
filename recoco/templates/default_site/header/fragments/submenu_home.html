@@ -10,6 +10,7 @@
         {% if url_name == 'resources-resource-search' %}aria-current="page"{% endif %}>Ressources</a>
     </li>
 {% endif %}
+{% include "header/submenu_static_link.html" %}
 {% for menuitem in current_site.root_page.get_children.live.in_menu %}
     <li class="fr-nav__item">
         <a type="link"
