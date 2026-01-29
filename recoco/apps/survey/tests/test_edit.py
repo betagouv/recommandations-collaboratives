@@ -62,6 +62,7 @@ def test_question_set_create_and_redirect(request, client):
         "heading": "new heading",
         "subheading": "new sub heading",
         "icon": "an-icon",
+        "precondition_tags": "toto tata",
     }
 
     with login(client, groups=["example_com_admin"]):
@@ -70,6 +71,7 @@ def test_question_set_create_and_redirect(request, client):
     qs = models.QuestionSet.objects.all()[0]
     assert qs.heading == data["heading"]
     assert qs.subheading == data["subheading"]
+    assert set(qs.precondition_tags.names()) == {"toto", "tata"}
 
     new_url = reverse("survey-editor-question-set-details", args=[qs.id])
     assertRedirects(response, new_url)
@@ -101,12 +103,14 @@ def test_question_set_update_and_redirect(request, client):
         "heading": "new heading",
         "subheading": "new sub heading",
         "icon": "an-icon",
+        "precondition_tags": "toto tata",
     }
 
     with login(client, groups=["example_com_admin"]):
         response = client.post(url, data=data)
 
     qs = models.QuestionSet.objects.get(id=qs.id)
+    assert set(qs.precondition_tags.names()) == {"toto", "tata"}
     assert qs.heading == data["heading"]
     assert qs.subheading == data["subheading"]
 

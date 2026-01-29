@@ -28,7 +28,8 @@
                             {% endfor %}
                             {% for question_set in session.survey.question_sets.all %}
                                 {% question_set_completion session question_set as qs_completion %}
-                                {% if qs_completion == 0 %}
+                                {% question_set_visible session question_set as qs_visible %}
+                                {% if qs_completion == 0 and qs_visible %}
                                     <li>
                                         <a class="fr-link"
                                            href="#{{ session.survey.site.id }}_{{ question_set.id }}">{{ question_set.heading }}</a>
@@ -127,7 +128,8 @@
                         <!-- Show other QS not yet started -->
                         {% for question_set in session.survey.question_sets.all %}
                             {% question_set_completion session question_set as qs_completion %}
-                            {% if qs_completion == 0 %}
+                            {% question_set_visible session question_set as qs_visible %}
+                            {% if qs_completion == 0 and qs_visible %}
                                 <div class="col-12 col-xl-6 col-md-6 masonry-item">
                                     <div class="position-relative">
                                         <div class="invisible-anchor-high"
