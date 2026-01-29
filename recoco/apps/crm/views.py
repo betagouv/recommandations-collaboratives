@@ -921,30 +921,12 @@ def project_toggle_annotation(request, project_id=None):
 def resource_list(request):
     has_perm_or_403(request.user, "use_crm", request.site)
 
-    department_queryset = (
-        geomatics.Department.objects.filter(
-            code__in=(
-                Project.on_site.for_user(request.user)
-                .order_by("-created_on", "-updated_on")
-                .prefetch_related("commune__department")
-                .values_list("commune__department", flat=True)
-            )
-        )
-        | request.user.profile.departments.all()
-    ).distinct()
-
-    region_queryset = (
-        geomatics.Region.objects.filter(departments__in=department_queryset)
-        .prefetch_related("departments")
-        .distinct()
-        .order_by("name")
-    )
-    regions = list(RegionSerializer(region_queryset, many=True).data)
+    departments = list(geomatics.Department.objects.values("code", "name"))
 
     categories = list(Category.on_site.values("id", "name").order_by("name"))
 
     context = {
-        "regions": regions,
+        "departments": departments,
         "categories": categories,
     }
 

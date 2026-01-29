@@ -46,6 +46,11 @@ Alpine.data('ResourceListCrm', (departments, categories) => ({
   ],
   displayResourceIndex: false,
   async init() {
+    this.departmentsMap = this.departments.reduce((acc, department) => {
+      acc[department.code] = department.name;
+      return acc;
+    }, {});
+    console.log(this.departmentsMap);
     this.categoryOptions = (this.categories || []).map((cat) => ({
       value: cat.id,
       text: cat.name,
@@ -178,20 +183,12 @@ Alpine.data('ResourceListCrm', (departments, categories) => ({
     return resource?.expires_on && new Date(resource?.expires_on) < new Date();
   },
   resourceDepartmentsLabel(resource) {
-    const response = {
-      shortLabel: 'Non renseigné',
-      fullLabel: 'Non renseigné',
-    }
     if (resource?.departments.length) {
-      const departments = [...resource?.departments];
-      if (departments.length > 10) {
-        response.shortLabel = `${departments.slice(0, 10).join(', ')}...`;
-      } else {
-        response.shortLabel = departments.join(', ');
-      }
-      response.fullLabel = departments.join(', ');
+      let departments = [...resource?.departments];
+      departments = departments.map((department) => this.departmentsMap[department]);
+      return departments.join(', ');
     }
-    return response;
+    return "Non renseigné";
   },
   resourceStatusColor(status) {
     switch (status) {

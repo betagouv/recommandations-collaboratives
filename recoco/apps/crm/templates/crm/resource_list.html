@@ -49,14 +49,14 @@
             </div>
             <div class="fr-mb-2w table-responsive fr-px-5v fr-pb-5v">
                 {% csrf_token %}
-                <table class="resource-table">
+                <table class="resource-table w-100">
                     <caption x-show="resources"
                              x-transition.opacity.duration.500ms
                              class="fr-ml-2v"> <span x-text="resourcesCountLabel()" data-test-id="resources-count-label"></span></caption>
                     <thead class="resource-table__thead">
                         <tr>
                             <th scope="col" class="column column--large">Nom de la ressource</th>
-                            <th scope="col" class="column column--large">Structure</th>
+                            <th scope="col" class="column column--small">Structure</th>
                             <th scope="col" class="column column--small">Départements</th>
                             <th scope="col" class="column column--small">Catégorie</th>
                             <th scope="col" class="column column--small">Date d'expiration</th>
@@ -82,8 +82,8 @@
                                           x-text="resource.support_orga ?? 'Non renseigné'"></span>
                                 </td>
                                 <!-- Departments -->
-                                <td :title="resourceDepartmentsLabel(resource).fullLabel"
-                                    x-text="resourceDepartmentsLabel(resource).shortLabel"></td>
+                                <td :title="resourceDepartmentsLabel(resource)"
+                                    x-text="resourceDepartmentsLabel(resource)"></td>
                                 <!-- Category -->
                                 <td x-text="resource.category?.name ?? 'Non renseigné'"></td>
                                 <!-- Expiration date -->
