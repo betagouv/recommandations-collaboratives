@@ -53,9 +53,12 @@ def project_overview(request, project_id=None):
     project = get_object_or_404(
         models.Project.objects.filter(sites=request.site)
         .with_unread_notifications(user_id=request.user.id)
-        .select_related("commune__department"),
+        .select_related("commune__department")
+        .prefetch_related("project_creation_requests"),
         pk=project_id,
     )
+
+    project_creation_request = project.project_creation_requests.first()
 
     site_config = request.site_config
 

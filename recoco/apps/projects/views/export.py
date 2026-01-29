@@ -37,7 +37,8 @@ def project_list_export_csv(request):
         models.Project.on_site.for_user(request.user)
         .exclude(project_sites__status="DRAFT")
         .order_by("-created_on")
-        .prefetch_related("notes", "tasks")
+        .select_related("submitted_by")
+        .prefetch_related("notes", "tasks", "project_creation_requests")
     )
 
     today = datetime.datetime.today().date()
@@ -128,7 +129,9 @@ def project_list_export_csv(request):
             project.location,
             project.created_on.date(),
             submitted_by,
-            [m.email for m in project.members.all()],
+            [m.email for m in project.members.all()]
+            if not project.project_creation_requests.exists()
+            else [project.project_creation_requests.first().email],
             project.phone,
             switchtenders_txt,
             project.project_sites.current().status,
