@@ -69,7 +69,7 @@
                         <template x-for="(resource, index) in resourcesToDisplay" :key="resource.id">
                             <tr>
                                 <!-- Title -->
-                                <td>
+                                <td class="text-ellipsis" :title="resource.title">
                                     <span x-show="displayResourceIndex"
                                           x-text="index + 1 + (pagination.currentPage - 1) * pagination.limit"></span>
                                     <a class="fr-link project-table__project-name"
@@ -82,7 +82,8 @@
                                           x-text="resource.support_orga ?? 'Non renseigné'"></span>
                                 </td>
                                 <!-- Departments -->
-                                <td :title="resourceDepartmentsLabel(resource)"
+                                <td class="text-ellipsis"
+                                    :title="resourceDepartmentsLabel(resource)"
                                     x-text="resourceDepartmentsLabel(resource)"></td>
                                 <!-- Category -->
                                 <td x-text="resource.category?.name ?? 'Non renseigné'"></td>
