@@ -59,7 +59,7 @@ def test_task_recommendation_list_available_for_staff(client):
 @pytest.mark.django_db
 def test_task_recommendation_list(client, current_site):
     tr = baker.make(models.TaskRecommendation, site=current_site)
-    tr.condition_tags_taggit.add("test")
+    tr.condition_tags.add("test")
 
     url = reverse("projects-task-recommendation-list")
     with login(client, groups=["example_com_staff"]):
