@@ -3,9 +3,9 @@ from rest_framework.filters import BaseFilterBackend
 
 class ResourceCategoryFilter(BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
-        category = request.GET.get("category", None)
-        if category:
-            queryset = queryset.filter(category_id=category)
+        categories = request.GET.getlist("category", None)
+        if categories:
+            queryset = queryset.filter(category_id__in=categories)
         return queryset
 
 
