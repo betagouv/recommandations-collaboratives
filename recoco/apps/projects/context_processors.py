@@ -63,6 +63,22 @@ def unread_notifications_processor(request):
         verbs.Conversation.PRIVATE_MESSAGE,
         verbs.Survey.STARTED,
         verbs.Survey.UPDATED,
+        verbs.Project.INVITATION,
+        verbs.Project.JOINED,
+        verbs.Project.SUBMITTED,
+        verbs.Project.SUBMITTED_BY,
+        verbs.Project.VALIDATED,
+        verbs.Project.VALIDATED_BY,
+        verbs.Project.AVAILABLE,
+        verbs.Project.BECAME_SWITCHTENDER,
+        verbs.Project.BECAME_ADVISOR,
+        verbs.Project.BECAME_OBSERVER,
+        verbs.Project.LEFT_ADVISING,
+        verbs.Project.LEFT_OBSERVING,
+        verbs.Project.USER_STATUS_UPDATED,
+        verbs.Project.SET_INACTIVE,
+        verbs.Project.SET_ACTIVE,
+        verbs.Project.EDITED,
     ]
 
     for notification in unread_notifications:
