@@ -5,6 +5,8 @@
     Parameters:
         - options: The options to select from.
         - selected: The selected options.
+        - element_id: (optional) unique DOM id for the hidden select element. Default: 'multiSelect2'
+        - options_var: (optional) Alpine.js variable name for the options array. Default: 'options'
 
     Event to listen in parent component:
         - multi-select-change: when the selected options change, the event is triggered with the selected options
@@ -14,8 +16,8 @@
     {% vite_asset 'js/styles/multi-select.css.js' %}
 {% endblock js %}
 <div class="w-100 multi-select"
-     x-data="MultiSelect2({elementId:'multiSelect2', options: options})">
-    <select class="d-none" id="multiSelect2">
+     x-data="MultiSelect2({elementId:'{{ element_id|default:'multiSelect2' }}', options: {{ options_var|default:'options' }}})">
+    <select class="d-none" id="{{ element_id|default:'multiSelect2' }}">
         <template x-for="option in options" :key="option.value">
             <option :value="option.value" :data-search="option.search">
                 <span x-text="option.text"></span>

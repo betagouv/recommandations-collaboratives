@@ -219,14 +219,13 @@ export function resourcePreviewUrl(resourceId, taskId) {
 
 export function resourcesUrl({
   search = '',
-  category = '',
+  category = [],
   status = [],
   limit = 50,
   offset = 0,
 } = {}) {
   const params = new URLSearchParams();
   if (search) params.set('search', search);
-  if (category) params.set('category', category);
   if (limit) params.set('limit', limit);
   if (offset) params.set('offset', offset);
 
@@ -234,6 +233,11 @@ export function resourcesUrl({
   const paramStr = params.toString();
   if (paramStr) url += '?' + paramStr;
 
+  // category is multi-value: ?category=1&category=2
+  if (category.length) {
+    const sep = url.includes('?') ? '&' : '?';
+    url += sep + category.map((c) => `category=${c}`).join('&');
+  }
   // status is multi-value: ?status=0&status=2
   if (status.length) {
     const sep = url.includes('?') ? '&' : '?';
