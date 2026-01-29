@@ -232,6 +232,44 @@ def test_filter_resources_by_category(request, api_client):
 
 
 @pytest.mark.django_db
+def test_filter_resources_by_multiple_categories(request, api_client):
+    site = get_current_site(request)
+    cat_a = baker.make(models.Category, sites=[site])
+    cat_b = baker.make(models.Category, sites=[site])
+    cat_c = baker.make(models.Category, sites=[site])
+
+    Recipe(
+        models.Resource,
+        sites=[site],
+        status=models.Resource.PUBLISHED,
+        category=cat_a,
+        title="Resource A",
+    ).make()
+    Recipe(
+        models.Resource,
+        sites=[site],
+        status=models.Resource.PUBLISHED,
+        category=cat_b,
+        title="Resource B",
+    ).make()
+    Recipe(
+        models.Resource,
+        sites=[site],
+        status=models.Resource.PUBLISHED,
+        category=cat_c,
+        title="Resource C",
+    ).make()
+
+    url = reverse("resources-list")
+    response = api_client.get(url, {"category": [cat_a.pk, cat_b.pk]})
+    assert response.status_code == 200
+    results = response.data["results"]
+    assert len(results) == 2
+    titles = {r["title"] for r in results}
+    assert titles == {"Resource A", "Resource B"}
+
+
+@pytest.mark.django_db
 def test_filter_resources_by_single_status(request, api_client):
     site = get_current_site(request)
 
