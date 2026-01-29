@@ -35,7 +35,7 @@ def test_anonymous_can_see_resources_list_api(request, api_client):
     url = reverse("resources-list")
     response = api_client.get(url)
     assert response.status_code == 200
-    assert response.data[0]["title"] == resource.title
+    assert response.data["results"][0]["title"] == resource.title
 
 
 @pytest.mark.django_db
@@ -51,7 +51,7 @@ def test_resources_list_does_not_include_content(request, api_client):
     response = api_client.get(url)
     assert response.status_code == 200
 
-    assert "content" not in response.data[0]
+    assert "content" not in response.data["results"][0]
 
 
 @pytest.mark.django_db
@@ -82,7 +82,7 @@ def test_anonymous_cannot_see_unpublished_resource_in_list_api(request, api_clie
     url = reverse("resources-list")
     response = api_client.get(url)
     assert response.status_code == 200
-    assert len(response.data) == 0
+    assert response.data["count"] == 0
 
 
 @pytest.mark.django_db
@@ -104,8 +104,8 @@ def test_staff_can_see_unpublished_resource_in_list_api(request, api_client):
     api_client.force_authenticate(user=staff)
     response = api_client.get(url)
     assert response.status_code == 200
-    assert len(response.data) == 1
-    assert response.data[0]["title"] == resource.title
+    assert response.data["count"] == 1
+    assert response.data["results"][0]["title"] == resource.title
 
 
 @pytest.mark.django_db
@@ -195,6 +195,208 @@ def test_staff_user_can_edit_resource_with_api(request, api_client):
     assert response.data["title"] == data["title"]
     assert response.data["created_by"]["first_name"] == resource.created_by.first_name
     assert response.data["created_by"]["last_name"] == resource.created_by.last_name
+
+
+########################################################################
+# filters and search
+########################################################################
+
+
+@pytest.mark.django_db
+def test_filter_resources_by_category(request, api_client):
+    site = get_current_site(request)
+    cat_a = baker.make(models.Category, sites=[site])
+    cat_b = baker.make(models.Category, sites=[site])
+
+    Recipe(
+        models.Resource,
+        sites=[site],
+        status=models.Resource.PUBLISHED,
+        category=cat_a,
+        title="Resource A",
+    ).make()
+    Recipe(
+        models.Resource,
+        sites=[site],
+        status=models.Resource.PUBLISHED,
+        category=cat_b,
+        title="Resource B",
+    ).make()
+
+    url = reverse("resources-list")
+    response = api_client.get(url, {"category": cat_a.pk})
+    assert response.status_code == 200
+    results = response.data["results"]
+    assert len(results) == 1
+    assert results[0]["title"] == "Resource A"
+
+
+@pytest.mark.django_db
+def test_filter_resources_by_single_status(request, api_client):
+    site = get_current_site(request)
+
+    staff = baker.make(auth_models.User)
+    staff.profile.sites.add(site)
+    gstaff = auth_models.Group.objects.get(name="example_com_staff")
+    staff.groups.add(gstaff)
+
+    Recipe(
+        models.Resource,
+        sites=[site],
+        status=models.Resource.DRAFT,
+        title="Draft resource",
+    ).make()
+    Recipe(
+        models.Resource,
+        sites=[site],
+        status=models.Resource.PUBLISHED,
+        title="Published resource",
+    ).make()
+
+    url = reverse("resources-list")
+    api_client.force_authenticate(user=staff)
+    response = api_client.get(url, {"status": models.Resource.DRAFT})
+    assert response.status_code == 200
+    results = response.data["results"]
+    assert len(results) == 1
+    assert results[0]["title"] == "Draft resource"
+
+
+@pytest.mark.django_db
+def test_filter_resources_by_multiple_statuses(request, api_client):
+    site = get_current_site(request)
+
+    staff = baker.make(auth_models.User)
+    staff.profile.sites.add(site)
+    gstaff = auth_models.Group.objects.get(name="example_com_staff")
+    staff.groups.add(gstaff)
+
+    Recipe(
+        models.Resource,
+        sites=[site],
+        status=models.Resource.DRAFT,
+        title="Draft resource",
+    ).make()
+    Recipe(
+        models.Resource,
+        sites=[site],
+        status=models.Resource.TO_REVIEW,
+        title="To review resource",
+    ).make()
+    Recipe(
+        models.Resource,
+        sites=[site],
+        status=models.Resource.PUBLISHED,
+        title="Published resource",
+    ).make()
+
+    url = reverse("resources-list")
+    api_client.force_authenticate(user=staff)
+    response = api_client.get(
+        url, {"status": [models.Resource.DRAFT, models.Resource.TO_REVIEW]}
+    )
+    assert response.status_code == 200
+    results = response.data["results"]
+    assert len(results) == 2
+    titles = {r["title"] for r in results}
+    assert titles == {"Draft resource", "To review resource"}
+
+
+@pytest.mark.django_db
+def test_filter_resources_combined_category_and_status(request, api_client):
+    site = get_current_site(request)
+
+    staff = baker.make(auth_models.User)
+    staff.profile.sites.add(site)
+    gstaff = auth_models.Group.objects.get(name="example_com_staff")
+    staff.groups.add(gstaff)
+
+    cat = baker.make(models.Category, sites=[site])
+
+    Recipe(
+        models.Resource,
+        sites=[site],
+        status=models.Resource.PUBLISHED,
+        category=cat,
+        title="Published in category",
+    ).make()
+    Recipe(
+        models.Resource,
+        sites=[site],
+        status=models.Resource.DRAFT,
+        category=cat,
+        title="Draft in category",
+    ).make()
+    Recipe(
+        models.Resource,
+        sites=[site],
+        status=models.Resource.PUBLISHED,
+        category=None,
+        title="Published no category",
+    ).make()
+
+    url = reverse("resources-list")
+    api_client.force_authenticate(user=staff)
+    response = api_client.get(
+        url, {"category": cat.pk, "status": models.Resource.PUBLISHED}
+    )
+    assert response.status_code == 200
+    results = response.data["results"]
+    assert len(results) == 1
+    assert results[0]["title"] == "Published in category"
+
+
+@pytest.mark.django_db
+def test_search_resources_with_watson(request, api_client):
+    site = get_current_site(request)
+
+    Recipe(
+        models.Resource,
+        sites=[site],
+        status=models.Resource.PUBLISHED,
+        title="Urbanisme durable",
+    ).make()
+    Recipe(
+        models.Resource,
+        sites=[site],
+        status=models.Resource.PUBLISHED,
+        title="Mobilité douce",
+    ).make()
+
+    url = reverse("resources-list")
+    response = api_client.get(url, {"search": "urbanisme"})
+    assert response.status_code == 200
+    results = response.data["results"]
+    assert len(results) == 1
+    assert results[0]["title"] == "Urbanisme durable"
+
+
+@pytest.mark.django_db
+def test_search_resources_combined_with_filters(request, api_client):
+    site = get_current_site(request)
+    cat = baker.make(models.Category, sites=[site])
+
+    Recipe(
+        models.Resource,
+        sites=[site],
+        status=models.Resource.PUBLISHED,
+        category=cat,
+        title="Urbanisme durable",
+    ).make()
+    Recipe(
+        models.Resource,
+        sites=[site],
+        status=models.Resource.PUBLISHED,
+        category=None,
+        title="Urbanisme ancien",
+    ).make()
+
+    url = reverse("resources-list")
+    response = api_client.get(url, {"search": "urbanisme", "category": cat.pk})
+    assert response.status_code == 200
+    results = response.data["results"]
+    assert len(results) == 1
+    assert results[0]["title"] == "Urbanisme durable"
 
 
 class TestRessourceAddonViewSet:
