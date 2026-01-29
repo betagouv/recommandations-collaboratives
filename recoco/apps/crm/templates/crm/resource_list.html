@@ -118,12 +118,11 @@
                                         <a :href="'{% url 'resources-resource-update' 0 %}'.replace('0', resource.id)"
                                            class="stretched-link">Éditer</a>
                                     </button>
+                                    {% comment %} TODO Add duplicate button with backend functionnality {% endcomment %}
                                     <!-- Duplicate -->
-                                    <button class="fr-btn fr-btn--sm fr-icon-pencil-line fr-btn--tertiary-no-outline position-relative"
-                                            title="Dupliquer la ressource">
-                                        <a :href="'{% url 'resources-resource-update' 0 %}'.replace('0', resource.id)"
-                                           class="stretched-link">Dupliquer</a>
-                                    </button>
+                                    {% comment %} <button class="fr-btn fr-btn--sm fr-icon-pencil-line fr-btn--tertiary-no-outline position-relative" title="Dupliquer la ressource">
+                                        <a :href="'{% url 'resources-resource-update' 0 %}'.replace('0', resource.id)" class="stretched-link">Dupliquer</a>
+                                    </button> {% endcomment %}
                                     <!-- Delete -->
                                     <button class="fr-btn fr-btn--sm fr-icon-delete-line fr-btn--tertiary-no-outline position-relative"
                                             title="Supprimer la ressource">
