@@ -2,13 +2,12 @@ import Alpine from 'alpinejs';
 import api, { resourcesUrl } from '../../utils/api';
 import { ToastType } from '../../models/toastType';
 
-Alpine.data('ResourceListCrm', (departments, regions, categories) => ({
+Alpine.data('ResourceListCrm', (departments, categories) => ({
   dataLoaded: false,
   resources: [],
   resourcesToDisplay: [],
   resourcesTotal: 0,
   departments: JSON.parse(departments.textContent),
-  regions: JSON.parse(regions.textContent),
   categories: JSON.parse(categories.textContent),
   categoryOptions: [],
   territorySelectAll: true,
@@ -73,24 +72,11 @@ Alpine.data('ResourceListCrm', (departments, regions, categories) => ({
     this.pagination.currentPage = 1;
     this.pagination.total = Math.ceil(resources.count / this.pagination.limit);
   },
-  async saveSelectedDepartment(event) {
+
+  async saveSelectedFilter(event, key) {
     if (!event.detail) return;
 
-    this.backendSearch.searchDepartment = [...event.detail];
-    const resources = await this.handleResourceSearch();
-    this.updateResourceListAndPagination(resources);
-  },
-  async saveSelectedStatus(event) {
-    if (!event.detail) return;
-
-    this.backendSearch.searchStatus = [...event.detail];
-    const resources = await this.handleResourceSearch();
-    this.updateResourceListAndPagination(resources);
-  },
-  async saveSelectedCategory(event) {
-    if (!event.detail) return;
-
-    this.backendSearch.searchCategory = [...event.detail];
+    this.backendSearch[key] = [...event.detail];
     const resources = await this.handleResourceSearch();
     this.updateResourceListAndPagination(resources);
   },
@@ -198,7 +184,7 @@ Alpine.data('ResourceListCrm', (departments, regions, categories) => ({
     }
     if (resource?.departments.length) {
       const departments = [...resource?.departments];
-      if(departments.length > 10) {
+      if (departments.length > 10) {
         response.shortLabel = `${departments.slice(0, 10).join(', ')}...`;
       } else {
         response.shortLabel = departments.join(', ');
