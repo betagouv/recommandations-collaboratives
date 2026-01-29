@@ -3,9 +3,11 @@ from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
+from recoco.rest_api.filters import WatsonSearchFilter
 from recoco.rest_api.pagination import StandardResultsSetPagination
 from recoco.utils import has_perm
 
+from .filters import ResourceCategoryFilter, ResourceStatusFilter
 from .importers import ResourceImporter
 from .models import Resource, ResourceAddon
 from .serializers import (
@@ -42,7 +44,12 @@ class ResourceViewSet(viewsets.ModelViewSet):
         permissions.IsAuthenticatedOrReadOnly,
         IsResourceManagerOrReadOnly,
     ]
-    pagination_class = StandardResultsSetPagination  # Add pagination
+    pagination_class = StandardResultsSetPagination
+    filter_backends = [
+        WatsonSearchFilter,
+        ResourceCategoryFilter,
+        ResourceStatusFilter,
+    ]
 
     def get_queryset(self):
         qs = Resource.on_site
