@@ -217,8 +217,29 @@ export function resourcePreviewUrl(resourceId, taskId) {
   return `/ressource/${resourceId}/embed/`;
 }
 
-export function resourcesUrl() {
-  return `/api/resources/`;
+export function resourcesUrl({
+  search = '',
+  category = '',
+  status = [],
+  limit = 50,
+  offset = 0,
+} = {}) {
+  const params = new URLSearchParams();
+  if (search) params.set('search', search);
+  if (category) params.set('category', category);
+  if (limit) params.set('limit', limit);
+  if (offset) params.set('offset', offset);
+
+  let url = '/api/resources/';
+  const paramStr = params.toString();
+  if (paramStr) url += '?' + paramStr;
+
+  // status is multi-value: ?status=0&status=2
+  if (status.length) {
+    const sep = url.includes('?') ? '&' : '?';
+    url += sep + status.map((s) => `status=${s}`).join('&');
+  }
+  return url;
 }
 
 export function postExternalRessourceUrl() {

@@ -2,18 +2,20 @@ import Alpine from 'alpinejs';
 import api, { resourcesUrl } from '../../utils/api';
 import { ToastType } from '../../models/toastType';
 
-Alpine.data('ResourceListCrm', (departments, regions) => ({
+Alpine.data('ResourceListCrm', (departments, regions, categories) => ({
   dataLoaded: false,
   resources: [],
   resourcesToDisplay: [],
   resourcesTotal: 0,
   departments: JSON.parse(departments.textContent),
   regions: JSON.parse(regions.textContent),
+  categories: JSON.parse(categories.textContent),
   territorySelectAll: true,
   backendSearch: {
     searchText: '',
     searchDepartment: [],
     searchStatus: [],
+    searchCategory: '',
   },
   searchText: '',
   pagination: {
@@ -61,6 +63,7 @@ Alpine.data('ResourceListCrm', (departments, regions) => ({
     this.resources.push([...resources.results]);
     this.resourcesToDisplay = [...resources.results];
     this.resourcesTotal = resources.count;
+    this.pagination.currentPage = 1;
     this.pagination.total = Math.ceil(resources.count / this.pagination.limit);
   },
   async saveSelectedDepartment(event) {
@@ -77,6 +80,10 @@ Alpine.data('ResourceListCrm', (departments, regions) => ({
     const resources = await this.handleResourceSearch();
     this.updateResourceListAndPagination(resources);
   },
+  async saveSelectedCategory() {
+    const resources = await this.handleResourceSearch();
+    this.updateResourceListAndPagination(resources);
+  },
   async onSearch() {
     const resources = await this.handleResourceSearch();
     this.updateResourceListAndPagination(resources);
@@ -85,10 +92,6 @@ Alpine.data('ResourceListCrm', (departments, regions) => ({
     try {
       return await this.getResources({
         offset: 0,
-        page: 1,
-        search: this.backendSearch.searchText,
-        departments: this.backendSearch.searchDepartment,
-        status: this.backendSearch.searchStatus,
       });
     } catch (error) {
       this.showToast(
@@ -106,7 +109,6 @@ Alpine.data('ResourceListCrm', (departments, regions) => ({
     if (this.resources.length <= this.pagination.limit * (pageNumber - 1)) {
       const resourcesResponse = await this.getResources({
         offset: this.pagination.limit * (pageNumber - 1),
-        page: pageNumber,
       });
       this.resources[pageNumber - 1] = [...resourcesResponse.results];
     }
@@ -117,10 +119,10 @@ Alpine.data('ResourceListCrm', (departments, regions) => ({
     const resources = await api.get(
       resourcesUrl({
         limit: this.pagination.limit,
-        offset: 0,
-        page: 1,
-        searchText: this.backendSearch.searchText,
-        departments: this.backendSearch.searchDepartment,
+        offset: this.pagination.limit * (pageNumber - 1),
+        search: this.backendSearch.searchText,
+        status: this.backendSearch.searchStatus,
+        category: this.backendSearch.searchCategory,
       })
     );
     this.resources.push(...resources.data.results);
@@ -130,25 +132,24 @@ Alpine.data('ResourceListCrm', (departments, regions) => ({
   /************************
    * CRUD functions
    **************************/
-  async getResources({ offset = 0, page = 1 } = {}) {
+  async getResources({ offset = 0 } = {}) {
     try {
       const response = await api.get(
         resourcesUrl({
           limit: this.pagination.limit,
           offset: offset,
-          page: page,
-          searchText: this.backendSearch.searchText,
-          departments: this.backendSearch.searchDepartment,
+          search: this.backendSearch.searchText,
           status: this.backendSearch.searchStatus,
+          category: this.backendSearch.searchCategory,
         })
       );
       return response.data;
     } catch (error) {
       this.showToast(
-        `Erreur lors de la récupération des ressources de la page ${page}`,
+        `Erreur lors de la récupération des ressources`,
         ToastType.error
       );
-      throw new Error(`Error while getting resources from page ${page}`, error);
+      throw new Error(`Error while getting resources`, error);
     }
   },
 
