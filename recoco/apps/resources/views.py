@@ -56,8 +56,21 @@ def resource_search(request):
     form.is_valid()
     query = form.cleaned_data.get("query", "")
 
-    limit_area = form.cleaned_data.get("limit_area")
+    limit_area = form.cleaned_data.get("limit_area")  # string or None (legacy)
+    limit_areas = request.GET.getlist("limit_area")  # list (new)
+
+    # normalize: if list is provided, use it; else fallback to legacy single value
+    if not limit_areas and limit_area:
+        limit_areas = [limit_area]
+
+    selected_departments_codes = request.GET.getlist("limit_area")
+    if not selected_departments_codes:
+        if limit_area and limit_area not in ("AUTO", ""):
+            selected_departments_codes = [limit_area]
+
     searching = form.cleaned_data.get("searching", False)
+
+    select_all_departments = not bool(selected_departments_codes)
 
     if (not searching) and (limit_area is None):
         limit_area = "AUTO"
@@ -85,25 +98,28 @@ def resource_search(request):
     departments = geomatics_models.Department.objects.none()
     if check_if_advisor(request.user):
         departments = geomatics_models.Department.objects.order_by("name").all()
-        if limit_area:
-            selected_departments = geomatics_models.Department.objects.none()
-            if limit_area == "AUTO":
-                # Select departments from profile
+
+        if limit_areas:
+            selected_departments_qs = geomatics_models.Department.objects.none()
+
+            if "AUTO" in limit_areas:
                 user_departments = request.user.profile.departments.all()
                 if user_departments:
-                    selected_departments = geomatics_models.Department.objects.filter(
-                        code__in=user_departments
+                    selected_departments_qs = (
+                        geomatics_models.Department.objects.filter(
+                            code__in=user_departments
+                        )
                     )
-                else:
-                    limit_area = None
+                    selected_departments_codes = list(
+                        selected_departments_qs.values_list("code", flat=True)
+                    )
             else:
-                # Get current one from parameters
-                selected_departments = geomatics_models.Department.objects.filter(
-                    code=limit_area
+                selected_departments_qs = geomatics_models.Department.objects.filter(
+                    code__in=limit_areas
                 )
 
-            if selected_departments:
-                resources = resources.limit_area(selected_departments)
+            if selected_departments_qs.exists():
+                resources = resources.limit_area(selected_departments_qs)
 
     else:
         communes = []
@@ -146,7 +162,6 @@ def resource_search(request):
         {"value": str(c.id), "text": str(c), "search": str(c)}
         for c in models.Category.on_site.all()
     ]
-    category_map = {str(c.id): c.form_label for c in models.Category.on_site.all()}
 
     return render(
         request,
@@ -209,6 +224,15 @@ class SearchForm(forms.Form):
             if self.cleaned_data.get(category.form_label):
                 selected.append(category)
         return selected
+
+    def limit_area_values(self):
+        vals = self.data.getlist("limit_area")
+        # keep legacy single value too
+        if not vals:
+            one = self.cleaned_data.get("limit_area")
+            if one:
+                vals = [one]
+        return [v for v in vals if v]
 
 
 ########################################################################
