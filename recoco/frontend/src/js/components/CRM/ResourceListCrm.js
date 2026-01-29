@@ -10,12 +10,13 @@ Alpine.data('ResourceListCrm', (departments, regions, categories) => ({
   departments: JSON.parse(departments.textContent),
   regions: JSON.parse(regions.textContent),
   categories: JSON.parse(categories.textContent),
+  categoryOptions: [],
   territorySelectAll: true,
   backendSearch: {
     searchText: '',
     searchDepartment: [],
     searchStatus: [],
-    searchCategory: '',
+    searchCategory: [],
   },
   searchText: '',
   pagination: {
@@ -46,6 +47,12 @@ Alpine.data('ResourceListCrm', (departments, regions, categories) => ({
   ],
   displayResourceIndex: false,
   async init() {
+    this.categoryOptions = (this.categories || []).map((cat) => ({
+      value: cat.id,
+      text: cat.name,
+      search: cat.name,
+    }));
+
     const resourcesResponse = await this.getResources();
     this.resources.push([...resourcesResponse.results]);
     this.resourcesToDisplay = [...resourcesResponse.results];
@@ -80,7 +87,10 @@ Alpine.data('ResourceListCrm', (departments, regions, categories) => ({
     const resources = await this.handleResourceSearch();
     this.updateResourceListAndPagination(resources);
   },
-  async saveSelectedCategory() {
+  async saveSelectedCategory(event) {
+    if (!event.detail) return;
+
+    this.backendSearch.searchCategory = [...event.detail];
     const resources = await this.handleResourceSearch();
     this.updateResourceListAndPagination(resources);
   },
