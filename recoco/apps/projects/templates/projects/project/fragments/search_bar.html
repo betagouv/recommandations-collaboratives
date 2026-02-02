@@ -6,6 +6,7 @@ variables to pass :
 - action_search : la fonction à appeler lors de la recherche
 - placeholder : le texte à afficher dans la barre de recherche
 - x_model : le nom du modèle x-data à lier à la barre de recherche (optionnel)
+- value : la valeur initiale de la barre de recherche (optionnel)
 
 {% endcomment %}
 {% load django_vite %}
@@ -18,6 +19,7 @@ variables to pass :
        data-cy="search-bar-project"
        class="placeholder-position searchbar-input"
        placeholder="{{ placeholder|default:"Rechercher" }}"
+       {% if value %}value="{{ value }}"{% endif %}
        @input.debounce.500ms="{{ action_search }}"
        {% if x_model %}x-model="{{ x_model }}"{% endif %}>
 <span class="fr-icon-search-line correct-position" aria-hidden="true"></span>
