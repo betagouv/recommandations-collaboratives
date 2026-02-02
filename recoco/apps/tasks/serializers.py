@@ -15,7 +15,7 @@ from recoco.apps.projects.serializers import DocumentSerializer, TopicSerializer
 from recoco.apps.projects.utils import reactivate_if_necessary
 from recoco.apps.resources.models import Resource
 from recoco.apps.resources.serializers import (
-    ResourceSerializer,
+    ResourceDetailSerializer,
     ResourceWebhookSerializer,
 )
 from recoco.rest_api.serializers import BaseSerializerMixin
@@ -114,7 +114,7 @@ class TaskSerializer(BaseSerializerMixin, OrderedModelSerializer):
     contact = NestedContactSerializer(read_only=True)
     contact_id = serializers.IntegerField(write_only=True, required=False)
 
-    resource = ResourceSerializer(read_only=True)
+    resource = ResourceDetailSerializer(read_only=True)
     resource_id = serializers.IntegerField(required=False)
 
     created_by = UserSerializer(read_only=True)
