@@ -913,7 +913,7 @@ class Document(models.Model):
             "image/pjpeg",
             "application/pdf",
             "application/msword",
-            "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
             "application/vnd.oasis.opendocument.text",
             "application/vnd.ms-excel",
             "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -921,6 +921,8 @@ class Document(models.Model):
             "application/vnd.ms-powerpoint",
             "application/vnd.openxmlformats-officedocument.presentationml.presentation",
             "application/vnd.oasis.opendocument.presentation",
+            "application/x-zip-compressed",
+            "application/zip",
         ],
     )
 
@@ -941,6 +943,7 @@ class Document(models.Model):
             "ppt",
             "pptx",
             "odp",
+            "zip",
         ]
     )
 
