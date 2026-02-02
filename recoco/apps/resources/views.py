@@ -93,16 +93,22 @@ def resource_search(request):
             imported_from=None
         )
 
-    # If we are a advisor, allow any departement to be filtered
-    # Otherwise, show only departments related to my projects
+    # Determine available departments based on user role
     departments = geomatics_models.Department.objects.none()
     if check_if_advisor(request.user):
         departments = geomatics_models.Department.objects.order_by("name").all()
+    elif hasattr(request.user, "email"):
+        communes = [
+            p.commune for p in projects.Project.on_site.filter(members=request.user)
+        ]
+        departments = set(c.department for c in communes if c)
 
-        if limit_areas:
-            selected_departments_qs = geomatics_models.Department.objects.none()
+    # Apply department filter from URL parameters
+    if limit_areas:
+        selected_departments_qs = geomatics_models.Department.objects.none()
 
-            if "AUTO" in limit_areas:
+        if "AUTO" in limit_areas:
+            if hasattr(request.user, "profile"):
                 user_departments = request.user.profile.departments.all()
                 if user_departments:
                     selected_departments_qs = (
@@ -113,26 +119,13 @@ def resource_search(request):
                     selected_departments_codes = list(
                         selected_departments_qs.values_list("code", flat=True)
                     )
-            else:
-                selected_departments_qs = geomatics_models.Department.objects.filter(
-                    code__in=limit_areas
-                )
+        else:
+            selected_departments_qs = geomatics_models.Department.objects.filter(
+                code__in=limit_areas
+            )
 
-            if selected_departments_qs.exists():
-                resources = resources.limit_area(selected_departments_qs)
-
-    else:
-        communes = []
-        if hasattr(request.user, "email"):
-            communes = [
-                p.commune for p in projects.Project.on_site.filter(members=request.user)
-            ]
-            if not communes:
-                limit_area = None  # does not apply if no projects
-
-            departments = set(c.department for c in communes if c)
-            if limit_area:
-                resources = resources.limit_area(departments)
+        if selected_departments_qs.exists():
+            resources = resources.limit_area(selected_departments_qs)
 
     # staff can search resources
     staff_redux = Q()
