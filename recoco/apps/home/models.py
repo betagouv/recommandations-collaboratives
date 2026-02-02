@@ -51,7 +51,11 @@ SITE_GROUP_PERMISSIONS = {
         "sites.manage_surveys",
         "sites.manage_configuration",
     ),
-    "advisor": ("sites.list_projects", "sites.use_addressbook"),
+    "advisor": (
+        "sites.list_projects",
+        "sites.use_addressbook",
+        "sites.manage_resources",
+    ),
 }
 
 
