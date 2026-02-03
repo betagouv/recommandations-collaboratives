@@ -50,3 +50,9 @@
 .region-filter-item .region-departments li:last-child {
   padding-bottom: 5px;
 }
+
+// Inline chevron style (matches category selector)
+.departments-selector__chevron {
+  color: #666666;
+  flex-shrink: 0;
+}

@@ -43,7 +43,7 @@
                             <input type="hidden" :name="categoryMap[id]" value="on">
                         </template>
                         <div x-data="{ selected: selectedIds }">
-                            {% include "tools/multi_select.html" with extra_classes="multi-select--pill" placeholder="Toutes les catégories" %}
+                            {% include "tools/multi_select.html" with extra_classes="multi-select--pill align-items-center fr-pl-1w" placeholder="Toutes les catégories" %}
                         </div>
                     </div>
                     <div x-data="{ selectedCodes: {{ selected_departments_codes|default:'[]' }}, normalize(payload) { if (!payload) return []; if (Array.isArray(payload) && typeof payload[0] === 'string') return payload; if (Array.isArray(payload) && typeof payload[0] === 'object') { return payload.filter(d => d.active).map(d => d.code); } return []; }}"
@@ -52,7 +52,7 @@
                         <template x-for="code in selectedCodes" :key="code">
                             <input type="hidden" name="limit_area" :value="code">
                         </template>
-                        {% include "projects/project/fragments/departments_selector.html" with label="Sélectionnez des départements" filter_by_regions=True select_all=select_all_departments selected_departments=selected_departments_codes user_departments=user_departments_codes  label_filter="Territoire :" %}
+                        {% include "projects/project/fragments/departments_selector.html" with label="Sélectionnez des départements" filter_by_regions=True select_all=select_all_departments selected_departments=selected_departments_codes user_departments=user_departments_codes label_filter="Territoire :" extra_classes="inline-chevron" %}
                     </div>
                 </div>
             </div>

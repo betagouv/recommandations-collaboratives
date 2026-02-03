@@ -31,7 +31,7 @@
             <div class="d-flex flex-column align-items-center position-relative">
                 <!-- Selected elements container -->
                 <div class="w-100">
-                    <div class="multi-select__container d-flex  custom-input-border bg-white {% if extra_classes %}{{ extra_classes }}{% endif %}"
+                    <div class="multi-select__container d-flex custom-input-border bg-white {% if extra_classes %}{{ extra_classes }}{% endif %}"
                          :class="isOpen() ? 'multi-select--open' : ''"
                          data-test-id="multi-select-container">
                         <div class="d-flex flex-auto flex-wrap w-100" x-on:click="open">
@@ -63,7 +63,7 @@
                             <button type="button"
                                     x-show="!isOpen()"
                                     x-on:click="open()"
-                                    class="cursor-pointer w-6 h-6 text-gray-600 outline-none focus:outline-none hover-background">
+                                    class="cursor-pointer w-6 h-6 text-gray-600 outline-none focus:outline-none hover-background fr-pb-0-5v">
                                 <svg xmlns="http://www.w3.org/2000/svg"
                                      class="little-img"
                                      fill="none"
