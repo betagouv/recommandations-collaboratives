@@ -195,7 +195,7 @@
                             <label class="fr-label text-modal-main-msg" for="id_departments">Territoire</label>
                             <template x-if="objectsToSelect && objectsToSelect.length">
                                 <div x-data="MultiSelectRegionDepartment({ selected: selectedDepartments, objectsToSelect: objectsToSelect, displayRegions: true })">
-                                    {% include "tools/contacts/multi_select.html" with name="departments" id="id_departments" placeholder="Cherchez et sélectionnez vos départements et régions" label="none" display_regions=True %}
+                                    {% include "tools/contacts/multi_select.html" with name="departments" id="id_departments" placeholder="Cherchez et sélectionnez vos départements et régions" label="none" display_regions=True skip_hidden_input=True %}
                                     <template x-for="dept in selectedDepartments" :key="dept">
                                         <input type="hidden" name="departments" :value="dept">
                                     </template>

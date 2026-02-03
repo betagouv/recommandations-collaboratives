@@ -179,6 +179,11 @@ document.addEventListener('alpine:init', () => {
           }
         });
       }
+      this.options.forEach((opt) => {
+        if (opt.region == region.name) {
+          opt.selected = !opt.selected;
+        }
+      });
       this.selectedElms = this.options.filter((opt) =>
         this.selected.includes(opt.value)
       );
@@ -197,6 +202,11 @@ document.addEventListener('alpine:init', () => {
       } else {
         this.selected.splice(idx, 1);
       }
+      this.options.forEach((opt) => {
+        if (opt.value == dep.code) {
+          opt.selected = !opt.selected;
+        }
+      });
       this.selectedElms = this.options.filter((opt) =>
         this.selected.includes(opt.value)
       );
