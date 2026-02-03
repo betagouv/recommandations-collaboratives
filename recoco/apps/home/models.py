@@ -126,7 +126,20 @@ class UserProfile(models.Model):
 
     organization_position = models.CharField(null=True, blank=True, max_length=200)
 
-    previous_login_at = models.DateTimeField(null=True, blank=True)
+    previous_activity_at = models.DateTimeField(null=True, blank=True)
+
+    previous_deletion_warning_at = models.DateTimeField(null=True, blank=True)
+
+    previous_activity_site = models.ForeignKey(
+        Site,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        verbose_name="Dernier site consulté",
+        related_name="users_previous_activity",
+    )
+
+    nb_deletion_warnings = models.IntegerField(default=0)
 
     deleted = models.DateTimeField(null=True, blank=True)
 
