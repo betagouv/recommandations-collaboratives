@@ -35,7 +35,12 @@
                 <div>
                     {% comment %} TODO: Uncomment this when the preview modal is ready {% endcomment %}
                     {% comment %} <button @click.prevent data-bs-toggle="modal" :data-bs-target="`#resource-preview-`+{{ resource.id|default:'null'|safe }}" role="button" class="fr-btn fr-btn--tertiary fr-btn--sm fr-mr-1w">Prévisualiser</button> {% endcomment %}
-                    <button type="submit" class="fr-btn fr-btn--primary fr-btn--sm fr-mr-1w">Sauvegarder</button>
+                    <button type="submit"
+                            @click="resourceFormData.status = 0"
+                            class="fr-btn fr-btn--tertiary fr-mr-1w">Sauvegarder en brouillon</button>
+                    <button type="submit"
+                            @click="resourceFormData.status = 2"
+                            class="fr-btn fr-btn--primary fr-mr-1w">Sauvegarder et publier</button>
                 </div>
                 {% include "resources/resource/modal_resource.html" %}
             </div>
@@ -117,20 +122,6 @@
                 <!-- Column 2 -->
                 <div class="fr-col-4 fr-col-md-4 fr-col-sm-12 "
                      @set-departments="resourceFormData.departments = $event.detail">
-                    <!-- Status select -->
-                    <div class="fr-input-group">
-                        <label class="fr-label text-modal-main-msg" for="id_status">Statut de publication</label>
-                        <div class="d-flex">
-                            <button type="button"
-                                    class="fr-btn w-50 justify-content-center"
-                                    :class="resourceFormData.status !== 0 ? 'fr-btn--secondary' : ''"
-                                    @click="resourceFormData.status = 0">Brouillon</button>
-                            <button type="button"
-                                    class="fr-btn w-50 justify-content-center"
-                                    :class="resourceFormData.status !== 2 ? 'fr-btn--secondary' : ''"
-                                    @click="resourceFormData.status = 2">Publié</button>
-                        </div>
-                    </div>
                     <!-- Category select -->
                     <div class="fr-input-group" :class="formFields['category']?.className">
                         <label class="fr-label text-modal-main-msg" for="id_category">Catégorie</label>
