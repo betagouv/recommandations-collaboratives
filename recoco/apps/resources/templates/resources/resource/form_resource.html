@@ -9,16 +9,16 @@
 {% endblock js %}
 <!-- Form -->
 <div x-data="AjvValidationSchema('schemaResourceFormValidator')">
-    <form id="form-resource"
-          x-ref="formResource"
-          method="post"
-          action="{% if edit_resource %}{% url 'resources-resource-update' resource.id %}{% else %}{% url 'resources-resource-create' %}{% endif %}"
-          @submit="onSubmit">
-        {% csrf_token %}
-        <div x-data="FormResource({{ resource.id|default:'null'|safe }})"
-             class="create-resources"
-             @modal-response="closeCreateContactModal($event)"
-             @multi-select-change="resourceFormData.tags = $event.detail">
+    <div x-data="FormResource({{ resource.id|default:'null'|safe }})"
+         class="create-resources"
+         @modal-response="closeCreateContactModal($event)"
+         @multi-select-change="resourceFormData.tags = $event.detail">
+        <form id="form-resource"
+              x-ref="formResource"
+              method="post"
+              action="{% if edit_resource %}{% url 'resources-resource-update' resource.id %}{% else %}{% url 'resources-resource-create' %}{% endif %}"
+              @submit="onSubmit">
+            {% csrf_token %}
             <!-- Hidden fields for complex data -->
             <input type="hidden" name="status" :value="resourceFormData.status">
             <input type="hidden" name="content" :value="resourceFormData.content.text">
@@ -46,8 +46,8 @@
                     <div class="fr-input-group" :class="formFields['title']?.className">
                         <label class="fr-label text-modal-main-msg" for="id_title">
                             Titre
-                            <span x-show="resourceFormData.title.length > 0" class="fr-text--xs">
-                                (<span x-text="256 - resourceFormData.title.length"></span>
+                            <span x-show="resourceFormData?.title?.length > 0" class="fr-text--xs">
+                                (<span x-text="256 - resourceFormData?.title?.length"></span>
                             /256 caractères)</span>
                         </label>
                         <input type="text"
@@ -66,8 +66,8 @@
                          :class="formFields['subtitle']?.className">
                         <label class="fr-label text-modal-main-msg" for="id_subtitle">
                             Sous-titre
-                            <span x-show="resourceFormData.subtitle.length > 0" class="fr-text--xs">
-                                (<span x-text="512 - resourceFormData.subtitle.length"></span>
+                            <span x-show="resourceFormData?.subtitle?.length > 0" class="fr-text--xs">
+                                (<span x-text="512 - resourceFormData?.subtitle?.length"></span>
                             /512 caractères)</span>
                         </label>
                         <input type="text"
@@ -91,8 +91,8 @@
                          :class="formFields['summary']?.className">
                         <label class="fr-label text-modal-main-msg" for="id_summary">
                             Résumé
-                            <span x-show="resourceFormData.summary.length > 0" class="fr-text--xs">
-                                (<span x-text="512 - resourceFormData.summary.length"></span>
+                            <span x-show="resourceFormData?.summary?.length > 0" class="fr-text--xs">
+                                (<span x-text="512 - resourceFormData?.summary?.length"></span>
                             /512 caractères)</span>
                         </label>
                         <textarea name="summary" class="fr-input" id="id_summary" maxlength="512" x-model="resourceFormData.summary">
@@ -172,8 +172,9 @@
                     <div class="fr-input-group" :class="formFields['support_orga']?.className">
                         <label class="fr-label text-modal-main-msg" for="id_support_orga">
                             Structure porteuse
-                            <span x-show="resourceFormData.support_orga.length > 0" class="fr-text--xs">
-                                (<span x-text="256 - resourceFormData.support_orga.length"></span>
+                            <span x-show="resourceFormData?.support_orga?.length > 0"
+                                  class="fr-text--xs">
+                                (<span x-text="256 - resourceFormData?.support_orga?.length"></span>
                             /256 caractères)</span>
                         </label>
                         <input type="text"
@@ -245,6 +246,6 @@
                     </div>
                 </div>
             </div>
-        </div>
-    </form>
+        </form>
+    </div>
 </div>
