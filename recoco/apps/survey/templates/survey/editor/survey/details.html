@@ -77,6 +77,21 @@
                             </span>
                         </div>
                         <span class="align-middle text-secondary">{{ question_set.subheading }}</span>
+                        {% if question_set.precondition_tags.exists %}
+                            <div class="text-secondary fr-mt-2v fr-mb-2v d-inline-block">
+                                <svg class="bi fr-mr-1v align-middle"
+                                     width="16"
+                                     height="16"
+                                     fill="currentColor">
+                                    <use xlink:href="{% static 'svg/bootstrap-icons.svg'  %}#alt" />
+                                </svg>
+                                Pré-condition :
+                                {% for tag in question_set.precondition_tags.all %}
+                                    <span class="badge bg-dark rounded-pill">{{ tag }}</span>
+                                    {% if not forloop.last %}+{% endif %}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
                     </div>
                     {% with question_set.questions.count as questions_count %}
                         {% if questions_count > 0 %}

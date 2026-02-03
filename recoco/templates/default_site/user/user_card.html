@@ -18,11 +18,11 @@
                 class="d-flex align-items-center flex-wrap user-info border-0 fr-p-0 bg-transparent {% if user_popup_deactivate %}no-underline{% endif %}"
                 data-test-id="button-open-tooltip-user-card">
             <span class="fr-mr-1v d-flex align-items-center font-size-12px">
-                <img class="user-card__gravatar rounded-circle fr-mr-1v {% if not user.is_active %}border-0{% else %}neutral-role-border border-2{% endif %}"
-                     :src='gravatar_url("{{ user.email }}", 18, "{{ user.first_name }}" + " " + "{{ user.last_name }}", stringToColor("{{ user.email }}") )'
-                     :style="{ '--current-bg-color': stringToColor('{{ user.email }}') }"
-                     alt="{{ action.actor }}">
                 {% if user %}
+                    <img class="user-card__gravatar rounded-circle fr-mr-1v {% if not user.is_active and not user_email %}border-0{% else %}neutral-role-border border-2{% endif %}"
+                         :src='gravatar_url("{{ user.email }}", 18, "{{ user.first_name }}" + " " + "{{ user.last_name }}", stringToColor("{{ user.email }}") )'
+                         :style="{ '--current-bg-color': stringToColor('{{ user.email }}') }"
+                         alt="{{ action.actor }}">
                     <strong class="user-card__name text-nowrap text-capitalize {% if not user.is_active %}inactive-status{% endif %}"
                             data-test-id="user-card-intro">
                         {% if user.get_full_name %}
@@ -34,6 +34,12 @@
                             {{ user.email }}
                         {% endif %}
                     </strong>
+                {% elif user_email %}
+                    <img class="user-card__gravatar rounded-circle fr-mr-1v neutral-role-border border-2"
+                         :src='gravatar_url("{{ user_email }}", 18, "{{ user_email }}", stringToColor("{{ user_email }}") )'
+                         :style="{ '--current-bg-color': stringToColor('{{ user.email }}') }"
+                         alt="{{ action.actor }}">
+                    <strong class="user-card__name text-nowrap">{{ user_email }}</strong>
                 {% endif %}
             </span>
             {% if user.profile.organization.name %}

@@ -57,6 +57,18 @@ def test_task_recommendation_list_available_for_staff(client):
 
 
 @pytest.mark.django_db
+def test_task_recommendation_list(client, current_site):
+    tr = baker.make(models.TaskRecommendation, site=current_site)
+    tr.condition_tags.add("test")
+
+    url = reverse("projects-task-recommendation-list")
+    with login(client, groups=["example_com_staff"]):
+        response = client.get(url)
+
+    assert response.status_code == 200
+
+
+@pytest.mark.django_db
 def test_task_recommendation_create_not_available_for_non_staff(client):
     url = reverse("projects-task-recommendation-create")
     with login(client):

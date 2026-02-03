@@ -34,7 +34,11 @@
         <article class="overflow-hidden">{% include "projects/project/fragments/information_card_description.html" %}</article>
         {% if display_user is not False %}
             <footer class="d-flex fr-mt-3w justify-content-between {% if full_width %}align-items-center{% else %}flex-column{% endif %}">
-                {% include "user/user_card.html" with user=card_user %}
+                {% if card_user %}
+                    {% include "user/user_card.html" with user=card_user %}
+                {% else %}
+                    {% include "user/user_card.html" with user=None user_email=project_creation_request.email user_popup_deactivate=True show_only_email=True %}
+                {% endif %}
                 <div class=" {% if is_editable %}mt-0{% else %}mt-2{% endif %}">
                     <span class="font-italic d-flex fw-light text-end span-style">{{ updated_on }}</span>
                 </div>

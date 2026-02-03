@@ -39,6 +39,38 @@ def test_anonymous_can_see_resources_list_api(request, api_client):
 
 
 @pytest.mark.django_db
+def test_resources_list_does_not_include_content(request, api_client):
+    Recipe(
+        models.Resource,
+        sites=[get_current_site(request)],
+        status=models.Resource.PUBLISHED,
+        title=" public resource",
+    ).make()
+
+    url = reverse("resources-list")
+    response = api_client.get(url)
+    assert response.status_code == 200
+
+    assert "content" not in response.data[0]
+
+
+@pytest.mark.django_db
+def test_resource_details_includes_content(request, api_client):
+    resource = Recipe(
+        models.Resource,
+        sites=[get_current_site(request)],
+        status=models.Resource.PUBLISHED,
+        title=" public resource",
+    ).make()
+
+    url = reverse("resources-detail", args=(resource.pk,))
+    response = api_client.get(url)
+    assert response.status_code == 200
+
+    assert "content" in response.data
+
+
+@pytest.mark.django_db
 def test_anonymous_cannot_see_unpublished_resource_in_list_api(request, api_client):
     Recipe(
         models.Resource,
@@ -103,8 +135,10 @@ def test_staff_user_can_create_resource_with_api(request, api_client):
 
     staff = baker.make(auth_models.User)
     staff.profile.sites.add(site)
-    gstaff = auth_models.Group.objects.get(name="example_com_staff")
+    gstaff = auth_models.Group.objects.get(name="example_com_advisor")
     staff.groups.add(gstaff)
+
+    category = baker.make(models.Category)
 
     url = reverse("resources-list")
     api_client.force_authenticate(user=staff)
@@ -114,6 +148,8 @@ def test_staff_user_can_create_resource_with_api(request, api_client):
         "subtitle": "one resource to test",
         "status": 1,
         "tags": ["a tag"],
+        "content": "toto",
+        "category": category.id,
     }
     response = api_client.post(url, data=data)
 
@@ -121,6 +157,44 @@ def test_staff_user_can_create_resource_with_api(request, api_client):
     assert response.data["title"] == data["title"]
     assert response.data["created_by"]["first_name"] == staff.first_name
     assert response.data["created_by"]["last_name"] == staff.last_name
+
+
+@pytest.mark.django_db
+def test_staff_user_can_edit_resource_with_api(request, api_client):
+    site = get_current_site(request)
+
+    staff = baker.make(auth_models.User)
+    staff.profile.sites.add(site)
+    gstaff = auth_models.Group.objects.get(name="example_com_advisor")
+    staff.groups.add(gstaff)
+    other_user = baker.make(auth_models.User)
+
+    resource = baker.make(
+        models.Resource,
+        title="titre",
+        content="blabla",
+        sites=[site],
+        created_by=other_user,
+    )
+    category = baker.make(models.Category)
+
+    url = reverse("resources-detail", args=[resource.pk])
+    api_client.force_authenticate(user=staff)
+
+    data = {
+        "title": "one resource",
+        "subtitle": "one resource to test",
+        "status": 1,
+        "tags": ["a tag"],
+        "content": "toto",
+        "category": category.id,
+    }
+    response = api_client.put(url, data=data)
+
+    assert response.status_code == 200
+    assert response.data["title"] == data["title"]
+    assert response.data["created_by"]["first_name"] == resource.created_by.first_name
+    assert response.data["created_by"]["last_name"] == resource.created_by.last_name
 
 
 class TestRessourceAddonViewSet:

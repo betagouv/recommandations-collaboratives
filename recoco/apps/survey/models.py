@@ -1,6 +1,7 @@
 import math
 import statistics
 from datetime import timedelta
+from enum import Enum
 
 from autoslug import AutoSlugField
 from django.contrib.auth import models as auth_models
@@ -11,11 +12,13 @@ from django.db import models
 from django.db.models.signals import post_migrate
 from django.dispatch import receiver
 from django.utils import timezone
+from django.utils.functional import cached_property
 from markdownx.utils import markdownify
 from model_clone import CloneMixin
 from tagging.fields import TagField
 from tagging.models import Tag
 from tagging.registry import register as tagging_register
+from taggit.managers import TaggableManager
 
 from recoco.apps.projects import models as projects_models
 
@@ -35,6 +38,11 @@ def create_site_permissions(sender, **kwargs):
         name="Can manage the surveys",
         content_type=site_ct,
     )
+
+
+class DIRECTION(Enum):
+    NEXT = "next"
+    PREVIOUS = "previous"
 
 
 class Survey(CloneMixin, models.Model):
@@ -86,10 +94,22 @@ class QuestionSet(CloneMixin, models.Model):
 
     deleted = models.DateTimeField(null=True, blank=True)
 
-    def _following(self, order_by):
+    precondition_tags = TaggableManager(
+        verbose_name="Pré-condition",
+        help_text='Affiche ce groupe de questions si TOUS les signaux saisis sont émis </br> Liste de tags séparés par une virgule. Si le tag contient plusieurs mots les encadrer par des guillemets.Attention, veillez à ne pas retirer un tag utilisé dans un projet, celui-ci ne pourra plus être retiré depuis le CRM. ex: "signature convention", diagnostic, "lancement travaux"',
+        blank=True,
+    )
+
+    def check_precondition(self, session: "Session"):
+        """Return true if the precondition is met"""
+        my_tags = set(self.precondition_tags.names())
+        return my_tags.issubset(session.signals)
+
+    def following(self, direction: DIRECTION):
         """return the following question set defined by the given order_byi sequence"""
         question_sets = self.survey.question_sets
 
+        order_by = Question.ordering(direction)
         iterator = question_sets.order_by(*order_by).iterator()
         for question_set in iterator:
             if question_set == self:
@@ -100,25 +120,9 @@ class QuestionSet(CloneMixin, models.Model):
 
         return None
 
-    def next(self):
-        """Return the next question set"""
-        return self._following(order_by=["-priority", "id"])
-
-    def previous(self):
-        """Return the previous question set"""
-        return self._following(order_by=["priority", "-id"])
-
-    def first_question(self):
-        for question in self.questions.all().order_by("-priority", "id"):
-            return question
-
-        return None
-
-    def last_question(self):
-        for question in self.questions.all().order_by("priority", "-id"):
-            return question
-
-        return None
+    def extreme_question(self, direction: DIRECTION):
+        order_by = Question.ordering(direction)
+        return self.questions.all().order_by(*order_by).first()
 
     _clone_m2o_or_o2m_fields = ["questions"]
 
@@ -204,10 +208,21 @@ class Question(CloneMixin, models.Model):
         verbose_name="Titre du commentaire",
     )
 
-    def _following(self, order_by: list):
+    @staticmethod
+    def ordering(direction: DIRECTION):
+        return (
+            ["-priority", "id"]
+            if direction == DIRECTION.NEXT
+            else ["priority", "-id"]
+            if direction == DIRECTION.PREVIOUS
+            else []
+        )
+
+    def following(self, direction: DIRECTION):
         """return the following question defined by the given order_by"""
         questions = self.question_set.questions
 
+        order_by = self.ordering(direction)
         iterator = questions.order_by(*order_by).iterator()
         for question in iterator:
             if question == self:
@@ -215,32 +230,6 @@ class Question(CloneMixin, models.Model):
                     return next(iterator)
                 except StopIteration:
                     return None
-
-        return None
-
-    def next(self):
-        """Return the next question"""
-        next_question = self._following(order_by=("-priority", "id"))
-        if next_question:
-            return next_question
-
-        # No next question in current question set, ask sibling
-        next_qs = self.question_set.next()
-        if next_qs:
-            return next_qs.first_question()
-
-        return None
-
-    def previous(self):
-        """Return the previous question"""
-        previous_question = self._following(order_by=("priority", "-id"))
-        if previous_question:
-            return previous_question
-
-        # No previous question in current question set, ask sibling
-        previous_qs = self.question_set.previous()
-        if previous_qs:
-            return previous_qs.last_question()
 
         return None
 
@@ -318,7 +307,7 @@ class Session(models.Model):
         projects_models.Project, related_name="survey_session", on_delete=models.CASCADE
     )
 
-    @property
+    @cached_property
     def signals(self):
         """Return the union of signals from Answers of this Session"""
         return {
@@ -328,54 +317,74 @@ class Session(models.Model):
             )
         }
 
-    def next_question(self, question=None):
+    def _following_question_set(self, direction: DIRECTION, qs=None):
+        initial_qs = (
+            qs.following(direction)
+            if qs
+            else self.survey.question_sets.extreme_question(direction)
+        )
+        qs = initial_qs
+
+        while qs:
+            if qs.check_precondition(self):
+                return qs
+            qs = qs.following(direction)
+        return None
+
+    def _following_question(self, direction: DIRECTION, question=None):
         """Return the next unanswered question or None.
 
         It will trigger only the questions that passes their precondition.
-        This is the prefered interface to navigate questions
+        This is the preferred interface to navigate questions
         """
         answered_questions = Answer.objects.filter(session=self).values_list(
             "question__id", flat=True
         )
 
-        if not question:
-            question = self.first_question()
-        else:
-            question = question.next()
-
-        while question:
-            if question.id not in answered_questions:
-                if question.check_precondition(self):
-                    return question
-            question = question.next()
-
-        return None
-
-    def previous_question(self, question=None):
-        """Return the previous unanswered question or None.
-
-        It will trigger only the questions that passes their precondition.
-        This is the prefered interface to navigate questions
-        """
-        answered_questions = Answer.objects.filter(session=self).values_list(
-            "question__id", flat=True
-        )
-        if not question:
+        last_not_none_question = question or self.extreme_question(direction)
+        if last_not_none_question is None:
             return None
 
-        question = question.previous()
-        while question:
-            if question.id not in answered_questions:
-                if question.check_precondition(self):
-                    return question
-            question = question.previous()
+        if not question:
+            question = self.extreme_question(direction)
+            last_not_none_question = question
+        else:
+            question = question.following(direction)
 
+        if not question:
+            qs = self._following_question_set(
+                direction, qs=last_not_none_question.question_set
+            )
+            question = qs.extreme_question(direction) if qs else None
+
+        while question:
+            if question.id not in answered_questions and question.check_precondition(
+                self
+            ):
+                return question
+            question = question.following(direction)
+            if question is None:
+                # No next question in current question set, ask sibling
+                qs = self._following_question_set(
+                    direction, qs=last_not_none_question.question_set
+                )
+                question = qs.extreme_question(direction) if qs else None
+            else:
+                last_not_none_question = question
         return None
 
-    def first_question(self):
+    def next_question(self, question=None):
+        return self._following_question(DIRECTION.NEXT, question)
+
+    def previous_question(self, question=None):
+        return self._following_question(DIRECTION.PREVIOUS, question)
+
+    def extreme_question(self, direction: DIRECTION):
         """Return the first Question of the first Question Set"""
+        order_by = Question.ordering(direction)
+
         for qs in self.survey.question_sets.all():
-            for question in qs.questions.all().order_by("-priority", "id"):
+            for question in qs.questions.all().order_by(*order_by):
                 return question
 
         return None
