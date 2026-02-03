@@ -50,7 +50,6 @@ Alpine.data('ResourceListCrm', (departments, categories) => ({
       acc[department.code] = department.name;
       return acc;
     }, {});
-    console.log(this.departmentsMap);
     this.categoryOptions = (this.categories || []).map((cat) => ({
       value: cat.id,
       text: cat.name,

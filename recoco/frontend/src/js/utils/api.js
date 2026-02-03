@@ -228,21 +228,22 @@ export function resourcesUrl({
   if (search) params.set('search', search);
   if (limit) params.set('limit', limit);
   if (offset) params.set('offset', offset);
-
-  let url = '/api/resources/';
-  const paramStr = params.toString();
-  if (paramStr) url += '?' + paramStr;
-
   // category is multi-value: ?category=1&category=2
-  if (category.length) {
-    const sep = url.includes('?') ? '&' : '?';
-    url += sep + category.map((c) => `category=${c}`).join('&');
+  if (category) {
+    category.forEach((c) => {
+      params.append('category', c);
+    });
   }
   // status is multi-value: ?status=0&status=2
-  if (status.length) {
-    const sep = url.includes('?') ? '&' : '?';
-    url += sep + status.map((s) => `status=${s}`).join('&');
+  if (status) {
+    status.forEach((s) => {
+      params.append('status', s);
+    });
   }
+  const paramStr = params.toString();
+  let url = '/api/resources/';
+  if (paramStr) url += '?' + paramStr;
+  console.log(url);
   return url;
 }
 
