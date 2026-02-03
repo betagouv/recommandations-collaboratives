@@ -5,6 +5,7 @@
     Parameters:
         - options: The options to select from.
         - selected: The selected options.
+        - extra_classes: Additional CSS classes to apply to the multi-select container.
 
     Event to listen in parent component:
         - multi-select-change: when the selected options change, the event is triggered with the selected options
@@ -30,7 +31,9 @@
             <div class="d-flex flex-column align-items-center position-relative">
                 <!-- Selected elements container -->
                 <div class="w-100">
-                    <div class="multi-select__container d-flex  custom-input-border bg-white">
+                    <div class="multi-select__container d-flex  custom-input-border bg-white {% if extra_classes %}{{ extra_classes }}{% endif %}"
+                         :class="isOpen() ? 'multi-select--open' : ''"
+                         data-test-id="multi-select-container">
                         <div class="d-flex flex-auto flex-wrap w-100" x-on:click="open">
                             <!-- iterating over selected elements -->
                             <template x-for="(option,index) in selectedElms" :key="option.value">
@@ -49,7 +52,7 @@
                             </template>
                             <!-- None items selected -->
                             <div x-show="selectedElms.length == 0" class="flex-grow-1">
-                                <input placeholder="Sélectionnez pour filtrer"
+                                <input placeholder="{% if placeholder %}{{ placeholder }}{% else %}Sélectionnez pour filtrer{% endif %}"
                                        class="multi-select__input bg-transparent p-1 px-2 appearance-none outline-none h-full w-100 text-gray-800 border-0"
                                        x-bind:value="selectedElements()"
                                        data-test-id="multi-select-input">

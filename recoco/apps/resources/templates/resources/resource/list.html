@@ -19,8 +19,6 @@
 {% endblock og_title %}
 {% block content %}
     {{ category_options|json_script:"categoryOptions" }}
-    {% comment %} {{ departments|json_script:"departmentsArray" }}
-    {{ regions|json_script:"regionsArray" }} {% endcomment %}
     <div x-data="ResourceFilter(JSON.parse(document.getElementById('categoryOptions').textContent))" class="col-12 fr-p-3w fr-mx-auto">
         <div x-data="{ breadcrumbs: { links: [{url: '{% url 'home' %}', title: 'Accueil'}], current: 'Ressources' } }"
              class="fr-p-0">{% include "tools/breadcrumb.html" with margin_bottom_only=True %}</div>
@@ -38,82 +36,27 @@
                     <input type="hidden" value="on" name="searching">
                 </div>
                 <div class="w-50 d-flex justify-content-around align-items-center">
-                    <div @multi-select-change="selectedIds = $event.detail || []; $nextTick(() => $el.closest('form').submit());">
-                        <!-- Adapter: emit GET params Django expects -->
+                    <div @multi-select-change="selectedIds = $event.detail || []; $nextTick(() => $el.closest('form').submit());"
+                         class="d-flex align-items-center">
+                        <label class="fr-segmented__legend inline text-nowrap fr-mb-0 fr-mr-1w">Catégories :</label>
                         <template x-for="id in selectedIds" :key="id">
                             <input type="hidden" :name="categoryMap[id]" value="on">
                         </template>
                         <div x-data="{ selected: selectedIds }">
-                            {% include "tools/multi_select.html" %}
+                            {% include "tools/multi_select.html" with extra_classes=" rounded-pill" placeholder="Toutes les catégories" %}
                         </div>
                     </div>
-
-                    {% comment %} <div x-data="{ selectedDepartments: [], departments: [] }" @multi-select-change="selectedDepartments = $event.detail || []; $nextTick(() => $el.closest('form').submit());">
-                        {% include "projects/project/fragments/departments_selector.html" with label="Projets de mon territoire" filter_by_regions=True zone_objects="regions" select_all=True input_department_name="limit_area" %}
-                        <template x-for="code in selectedCodes" :key="code">
-                            <input type="hidden" name="limit_area" :value="code">
-                          </template>
-                    </div> {% endcomment %}
                     <div x-data="{ selectedCodes: {{ selected_departments_codes|default:'[]' }}, normalize(payload) { if (!payload) return []; if (Array.isArray(payload) && typeof payload[0] === 'string') return payload; if (Array.isArray(payload) && typeof payload[0] === 'object') { return payload.filter(d => d.active).map(d => d.code); } return []; }}"
                         @selected-departments="selectedCodes = normalize($event.detail)"
                         @user-close-selector="$nextTick(() => $el.closest('form').submit())">
-                        <!-- Submit values in a Django-friendly way -->
                         <template x-for="code in selectedCodes" :key="code">
                             <input type="hidden" name="limit_area" :value="code">
                         </template>
-
-                        {% include "projects/project/fragments/departments_selector.html" with label="Projets de mon territoire" filter_by_regions=True select_all=select_all_departments selected_departments=selected_departments_codes user_departments=user_departments_codes %}
+                        {% include "projects/project/fragments/departments_selector.html" with label="Sélectionnez des départements" filter_by_regions=True select_all=select_all_departments selected_departments=selected_departments_codes user_departments=user_departments_codes  label_filter="Territoire :" %}
                     </div>
                 </div>
             </div>
         </form>
-        <!-- Search -->
-        {% comment %} <div class="quick-search fr-mb-6w">
-            <form method="get">
-                <input id="searching" type="hidden" value="on" name="searching">
-                <div class="input-group fr-mb-2w">
-                    {% if is_switchtender %}
-
-                        <select id="limit_area"
-                                name="limit_area"
-                                class="form-select specific-minwidth-200 specific-flex"
-                                aria-label="Limiter la zone géographique">
-                            <option {% if not limit_area %}selected{% endif %} value="">France entière</option>
-                            <option {% if limit_area == 'AUTO' %}selected{% endif %} value="AUTO">Mes départements</option>
-                            {% for department in departments %}
-                                <option {% if department.code == limit_area %}selected{% endif %}
-                                        value="{{ department.code }}">{{ department.name }}</option>
-                            {% endfor %}
-                        </select>
-
-                    {% elif limit_area != '' and user.is_authenticated %}
-                        <select id="limit_area"
-                                name="limit_area"
-                                class="form-select specific-flex specific-minwidth-200 specific-flex"
-                                aria-label="Limiter la zone géographique">
-                            <option {% if not limit_area %}selected{% endif %} value="">France entière</option>
-                            <option {% if limit_area == 'AUTO' %}selected{% endif %} value="AUTO">
-                                {% for department in departments %}
-                                    {{ department.name }}
-                                    {% if not forloop.last %},{% endif %}
-                                {% endfor %}
-                            </option>
-                        </select>
-                    {% endif %}
-
-
-                </div>
-                <div class="fr-grid-row">
-
-                    <div class="fr-col">
-                        <div>
-                            <a href="{% url 'resources-resource-search' %}">Réinitialiser les filtres</a>
-                        </div>
-                    </div>
-
-                </div>
-            </form>
-        </div> {% endcomment %}
         <!-- Results -->
         {% if query %}
             <div class="row align-center fr-mb-2w">
