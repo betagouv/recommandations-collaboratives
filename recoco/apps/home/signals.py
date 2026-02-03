@@ -24,10 +24,6 @@ def log_connection_on_user_login(sender, user, request, **kwargs):
 
 @receiver(user_logged_in)
 def update_login_fields(sender, user, request, **kwargs):
-    profile = user.profile
-    profile.previous_activity_at = user.last_login
-    profile.save(update_fields=["previous_activity_at"])
-
     refresh_user_projects_in_session(request, user)
 
     # Call the original django handler
