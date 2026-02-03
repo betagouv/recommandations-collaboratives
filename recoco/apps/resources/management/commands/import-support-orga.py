@@ -6,7 +6,7 @@ from recoco.apps.resources.models import Resource
 
 
 class Command(BaseCommand):
-    help = "Check reminders and perform necessary actions"
+    help = "Imports resources' support organisations from a csv file"
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -25,9 +25,10 @@ class Command(BaseCommand):
         )
 
     def import_support_orga(self, input_file, id_key, orga_key):
-        self.stdout.write("Checking reminders NEW_RECO ...")
+        self.stdout.write("Opening csv file")
         batch = []
         with open(input_file, newline="") as csvfile:
+            self.stdout.write("Checking headers")
             reader = csv.DictReader(csvfile)
             if id_key not in reader.fieldnames:
                 self.stderr.write(f"{id_key} not in headers")
@@ -35,6 +36,7 @@ class Command(BaseCommand):
             if orga_key not in reader.fieldnames:
                 self.stderr.write(f"{orga_key} not in headers")
                 return 1
+            self.stdout.write("Importing csv file")
             for row in reader:
                 orga = row[orga_key].strip()
                 if orga == "-" or orga == "":
@@ -46,7 +48,7 @@ class Command(BaseCommand):
                 r.support_orga = orga
             Resource.objects.bulk_update(batch, ["support_orga"], 100)
 
-        self.stdout.write("Reminders check complete.")
+        self.stdout.write("csv importing ended successfully")
         return 0
 
     def handle(self, *args, **kwargs):

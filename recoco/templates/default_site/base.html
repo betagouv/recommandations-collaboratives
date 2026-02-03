@@ -34,7 +34,6 @@
         {% endif %}
         <h1 class="visually-hidden">{{ request.site.name }}</h1>
         {% include "header/skip-links.html" %}
-        {% include "fragments/new_feature_banner.html" %}
         {% if url_name != "projects-project-detail-recommandations-embed" %}
             {% include "header/menu-top.html" %}
         {% endif %}
@@ -87,8 +86,8 @@
                     {% endfor %}
                 </div>
             {% endif %}
-            <div class="container-fluid bg-white" id="content">
-                <div class="row">
+            <div class="bg-white w-100" id="content">
+                <div class="background--grey-light">
                     {% block content %}
                     {% endblock content %}
                 </div>

@@ -68,14 +68,15 @@ dependencies = [
     "pandoc==2.4",
     "pillow==11.3.0",
     "psycopg[c]>=3.2.12",
-    "python-magic>=0.4.27",
+    "puremagic>=1.30",
     "redis==5.0.4",
     "requests-html==0.10.0",
     "rest-framework-generic-relations>=2.2.0",
     "sentry-sdk>=2.20.0",
     "setuptools==78.1.1",
     "sib-api-v3-sdk>=7.6.0",
-    "urllib3>=2.6.0",
+    "tqdm>=4.67.1",
+    "urllib3>=2.6.3",
     "wagtail==6.3.5",
 ]
 
@@ -201,6 +202,9 @@ django-dbtemplates = { git = "https://github.com/jazzband/django-dbtemplates.git
 django-cookie-consent = { git = "https://github.com/jazzband/django-cookie-consent", rev = "master" }
 django-tagging = { git = "https://github.com/nextories/django-tagging.git", rev = "bug/usage_for_model_with_filters_none" }
 django-webhook = { git = "https://github.com/etchegom/django-webhook.git", rev = "recoco" }
+
+[tool.uv-secure.vulnerability_criteria]
+ignore_vulnerabilities = ["GHSA-xm59-rqc7-hhvf"] # nbconvert does not have a fix yet. todo upgrade when we have a fix
 
 [dependency-groups]
 dev = [

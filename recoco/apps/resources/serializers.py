@@ -41,23 +41,15 @@ class ResourceSerializer(
             "subtitle",
             "tags",
             "status",
-            "created_on",
-            "created_by",
-            "updated_on",
             "web_url",
             "embeded_url",
             "has_dsresource",
             "category",
-            "content",
-            "expires_on",
-            "summary",
             "support_orga",
-            "contacts",  # id
-            "departments",  # pk = code
+            "departments",
+            "created_by",
         ]
         read_only_fields = [
-            "created_on",
-            "updated_on",
             "created_by",
         ]
 
@@ -67,21 +59,39 @@ class ResourceSerializer(
     created_by = ResourceCreatorSerializer(read_only=True, many=False)
     category = CategorySerializer(read_only=True)
     has_dsresource = serializers.BooleanField(read_only=True, default=False)
-    contacts = serializers.PrimaryKeyRelatedField(
-        queryset=Contact.objects.all(), many=True
-    )
     departments = serializers.PrimaryKeyRelatedField(
-        queryset=Department.objects.all(), many=True
+        queryset=Department.objects, many=True
     )
+
+
+class ResourceDetailSerializer(ResourceSerializer):
+    class Meta(ResourceSerializer.Meta):
+        fields = ResourceSerializer.Meta.fields + [
+            "summary",
+            "content",
+            "created_on",
+            "updated_on",
+            "contacts",
+        ]
+        read_only_fields = ResourceSerializer.Meta.read_only_fields + [
+            "created_on",
+            "updated_on",
+            "created_by",
+        ]
+
+    contacts = serializers.PrimaryKeyRelatedField(queryset=Contact.objects, many=True)
+
+
+class ResourceWritableSerializer(ResourceDetailSerializer):
+    class Meta(ResourceDetailSerializer.Meta):
+        read_only_fields = []
+
+    category = PrimaryKeyRelatedField(queryset=Category.objects)
 
     def save(self, **kwargs):
         return super().save(
             created_by=self.current_user, sites=[self.current_site], **kwargs
         )
-
-
-class ResourceWritableSerializer(ResourceSerializer):
-    category = PrimaryKeyRelatedField(queryset=Category.objects.all())
 
 
 class ResourceURIImportSerializer(serializers.Serializer):

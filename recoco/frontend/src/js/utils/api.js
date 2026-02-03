@@ -44,7 +44,16 @@ export function projectsUrl({
   limit = 2000,
   offset = 0,
   page = 1,
-  status = [],
+  status = [
+    'PRE_DRAFT',
+    'DRAFT',
+    'TO_PROCESS',
+    'STUCK',
+    'READY',
+    'IN_PROGRESS',
+    'DONE',
+    'REJECTED',
+  ],
 } = {}) {
   // if search with tags, make a different url
   let url;

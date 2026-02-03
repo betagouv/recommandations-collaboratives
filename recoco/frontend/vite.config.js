@@ -42,7 +42,6 @@ const config = {
         projectAdministration: resolve(
           './src/js/apps/projectAdministration.js'
         ),
-        map: resolve('./src/js/apps/map.js'),
         documents: resolve('./src/js/apps/documents.js'),
         searchableList: resolve('./src/js/apps/searchableList.js'),
         consent: resolve('./src/js/apps/consent.js'),
@@ -210,6 +209,7 @@ const config = {
         ajvValidationSchema: resolve(
           './src/js/components/AjvValidationSchema.js'
         ),
+        projectDetailsStyles: resolve('./src/js/styles/project-details.css.js'),
       },
       output: {
         chunkFileNames: undefined,

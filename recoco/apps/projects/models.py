@@ -913,7 +913,7 @@ class Document(models.Model):
             "image/pjpeg",
             "application/pdf",
             "application/msword",
-            "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
             "application/vnd.oasis.opendocument.text",
             "application/vnd.ms-excel",
             "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -921,6 +921,8 @@ class Document(models.Model):
             "application/vnd.ms-powerpoint",
             "application/vnd.openxmlformats-officedocument.presentationml.presentation",
             "application/vnd.oasis.opendocument.presentation",
+            "application/x-zip-compressed",
+            "application/zip",
         ],
     )
 
@@ -941,6 +943,7 @@ class Document(models.Model):
             "ppt",
             "pptx",
             "odp",
+            "zip",
         ]
     )
 
@@ -1034,6 +1037,7 @@ class ProjectSearchAdapter(watson.SearchAdapter):
         "commune__name",
         "commune__insee",
         "commune__postal",
+        "owner__profile__organization__name",
     )
 
     def tags_as_list(self, obj):

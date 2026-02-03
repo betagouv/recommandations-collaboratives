@@ -5,13 +5,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-    replaces = [
-        ("projects", "0070_auto_20221128_1637"),
-        ("projects", "0071_auto_20221128_1639"),
-        ("projects", "0072_auto_20221128_1640"),
-        ("projects", "0073_auto_20221201_1106"),
-    ]
-
     dependencies = [
         ("contenttypes", "0002_remove_content_type_name"),
         ("projects", "0069_auto_20221128_1606"),

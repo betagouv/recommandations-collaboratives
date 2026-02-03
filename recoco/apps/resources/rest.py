@@ -10,6 +10,7 @@ from .importers import ResourceImporter
 from .models import Resource, ResourceAddon
 from .serializers import (
     ResourceAddonSerializer,
+    ResourceDetailSerializer,
     ResourceSerializer,
     ResourceURIImportSerializer,
     ResourceWritableSerializer,
@@ -53,7 +54,7 @@ class ResourceViewSet(viewsets.ModelViewSet):
             case "list":
                 return ResourceSerializer
             case "retrieve":
-                return ResourceSerializer
+                return ResourceDetailSerializer
             case "partial_update":
                 return ResourceWritableSerializer
             case "update":
@@ -89,7 +90,7 @@ class ResourceViewSet(viewsets.ModelViewSet):
             resource = Resource.on_site.filter(imported_from=resource_uri).first()
             if resource:
                 return Response(
-                    ResourceSerializer(resource).data, status=status.HTTP_200_OK
+                    ResourceDetailSerializer(resource).data, status=status.HTTP_200_OK
                 )
 
             # Try to fetch it since we don't have it
@@ -100,7 +101,7 @@ class ResourceViewSet(viewsets.ModelViewSet):
             resource.sites.add(request.site)
 
             return Response(
-                ResourceSerializer(resource).data, status=status.HTTP_201_CREATED
+                ResourceDetailSerializer(resource).data, status=status.HTTP_201_CREATED
             )
 
         return Response(status=status.HTTP_501_NOT_IMPLEMENTED)

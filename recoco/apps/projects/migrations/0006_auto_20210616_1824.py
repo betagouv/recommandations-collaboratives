@@ -6,7 +6,7 @@ import django.utils.timezone
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("projects", "0005_delete_resource"),
+        ("projects", "0001_initial_squashed_0005_delete_resource"),
     ]
 
     operations = [

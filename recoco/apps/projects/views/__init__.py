@@ -22,7 +22,7 @@ from django.utils import timezone
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods
 
-from recoco import verbs
+from recoco import utils, verbs
 from recoco.apps.communication import constants as communication_constants
 from recoco.apps.communication import digests
 from recoco.apps.communication.api import send_email
@@ -324,6 +324,10 @@ def project_moderation_advisor_accept(
         ],
         params={
             "message": advisor_access_request.comment,
+            "dashboard_url": utils.build_absolute_url(
+                reverse("projects-project-list"),
+                auto_login_user=advisor_access_request.user,
+            ),
         },
     )
 

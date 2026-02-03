@@ -26,6 +26,9 @@
     {{ request.user.profile.organization.name|json_script:"djangoCurrentUserOrganizationName" }}
     {{ request.user.profile.organization_position|json_script:"djangoCurrentUserOrganizationPosition" }}
     {{ recipients|json_script:"djangoRecipients" }}
+    {{ advising_position.is_observer|json_script:"isObserverOnProject" }}
+    {{ advising_position.is_advisor|json_script:"isAdvisorOnProject" }}
+    {{ is_switchtender|json_script:"isSwitchtender" }}
     {% include "projects/project/navigation.html" with conversations_new=True %}
     {% include "projects/project/fragments/project_banner/banner_wrapper.html" with part="open" %}
     {% regroup feed by topic as topic_list %}
@@ -39,7 +42,7 @@
                  x-data="{isOpen: false}"
                  :class="{'open': isOpen}">
                 <h2 class="conversation-new__topics-list-member-title">Participants</h2>
-                <h3 class="fr-mt-2w conversation-new__topics-list-member-subtitle">Porteur de projet et partenaires</h3>
+                <h3 class="fr-mt-2w conversation-new__topics-list-member-subtitle">Demandeurs</h3>
                 <ul class="flex-column list-unstyled fr-mb-0">
                     {% for projectmember in project.projectmember_set.all %}
                         {% if projectmember.is_owner and projectmember.member.is_active %}

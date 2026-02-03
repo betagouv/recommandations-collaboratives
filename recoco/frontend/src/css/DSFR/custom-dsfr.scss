@@ -802,7 +802,15 @@ form > p {
 }
 
 .border-light-grey {
-  border: 1px solid var(--light-border-default-grey, #E5E5E5);
+  border: 1px solid var(--light-border-default-grey, #e5e5e5);
+}
+
+.specific-backgroundcolor-1b1b35 {
+  background-color: #1b1b35;
+}
+
+.specific-maxwidth-160px {
+  max-width: 160px;
 }
 
 /* ¯¯¯¯ *\
@@ -1075,10 +1083,6 @@ form > p {
   hint
 \* ˍˍˍˍˍˍˍˍ */
 
-// .visual-hint {
-//   border: 2px dashed blue;
-// }
-
 .visual-hint.visual-hint--svg {
   position: relative;
   border: none;
@@ -1121,18 +1125,38 @@ form > p {
   }
 }
 
-/* ¯¯¯¯¯ *\
+/* ¯¯¯¯ *\
   BADGES
-\* ˍˍˍˍˍ */
+\* ˍˍˍˍ */
 
 .fr-badge--success-lighter {
   background-color: #d2e9db;
   color: var(--success-425, #18753c);
 }
 
-/* ¯¯¯¯¯¯¯¯¯ *\
+/* ¯¯¯¯¯¯¯¯ *\
   BREADCRUMB
-\* ˍˍˍˍˍˍˍˍˍ */
+\* ˍˍˍˍˍˍˍˍ */
 .fr-breadcrumb .fr-breadcrumb__list li.fr-breadcrumb__link--first:before {
   display: none;
+}
+
+/* ¯¯¯¯¯¯¯¯ *\
+  MULTISITES
+\* ˍˍˍˍˍˍˍˍ */
+
+.specific-width-160px {
+  width: 160px;
+}
+
+.home-images {
+  height: 250px;
+  width: auto;
+  margin: auto;
+}
+
+@media (min-width: 48em) {
+  .home-images {
+    max-height: 200px;
+  }
 }

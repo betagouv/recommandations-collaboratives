@@ -372,6 +372,48 @@ def test_project_list_search_filter_departments(request, api_client):
 
 
 @pytest.mark.django_db
+def test_project_list_search_status(request, api_client, make_project):
+    site = get_current_site(request)
+    user = baker.make(auth_models.User, is_superuser=True)
+
+    # useful one
+    make_project(site=site, name="The hidden niceproject", status="PRE_DRAFT")
+
+    # honeypot one
+    make_project(
+        site=site,
+        name="Noise noise noise",
+    )
+
+    api_client.force_authenticate(user=user)
+
+    url = reverse("projects-list")
+
+    response = api_client.get(url)
+    assert response.status_code == 200
+    assert len(response.data["results"]) == 2
+
+    # cumulative query FTS+filter
+    response = api_client.get(f"{url}?search=niceproject&status=PRE_DRAFT")
+    assert response.status_code == 200
+    assert len(response.data["results"]) == 1
+
+    # Multiple departments
+    response = api_client.get(f"{url}?search=niceproject&status=READY")
+    assert response.status_code == 200
+    assert len(response.data["results"]) == 0
+
+    response = api_client.get(f"{url}?search=niceproject&status=READY&status=PRE_DRAFT")
+    assert response.status_code == 200
+    assert len(response.data["results"]) == 1
+
+    # No department filter
+    response = api_client.get(f"{url}?search=niceproject")
+    assert response.status_code == 200
+    assert len(response.data["results"]) == 1
+
+
+@pytest.mark.django_db
 def test_project_list_search_filter_is_cumulative(request, api_client):
     site = get_current_site(request)
     user = baker.make(auth_models.User, is_superuser=True)
@@ -1157,11 +1199,10 @@ def test_topics_are_restricted_to_nonexistent_via_rest_api(request, api_client):
 
 
 @pytest.mark.django_db
-def test_doc_upload(project_ready, project_editor, client):
+def test_doc_upload(project_ready, project_editor, client, good_file):
     url = reverse("projects-documents-list", args=[project_ready.pk])
 
-    png = SimpleUploadedFile("img.png", b"file_content", content_type="image/png")
-    data = {"description": "this is some content", "the_file": png}
+    data = {"description": "this is some content", "the_file": good_file}
 
     client.force_login(project_editor)
     res = client.post(url, data)
@@ -1235,14 +1276,15 @@ def inactive_project(request, make_project):
 
 
 @pytest.mark.django_db
-def test_doc_upload_reactivates_project(project_editor, inactive_project, client):
+def test_doc_upload_reactivates_project(
+    project_editor, inactive_project, client, good_file
+):
     url = reverse("projects-documents-list", args=[inactive_project.pk])
     inactive_project.members.add(project_editor)
     assign_perm("projects.view_public_notes", project_editor, inactive_project)
     assign_perm("projects.use_public_notes", project_editor, inactive_project)
 
-    png = SimpleUploadedFile("img.png", b"file_content", content_type="image/png")
-    data = {"description": "this is some content", "the_file": png}
+    data = {"description": "this is some content", "the_file": good_file}
 
     client.force_login(project_editor)
     res = client.post(url, data)
@@ -1254,15 +1296,14 @@ def test_doc_upload_reactivates_project(project_editor, inactive_project, client
 
 @pytest.mark.django_db
 def test_doc_upload_by_advisors_lets_projects_unactivated(
-    current_site, project_editor, inactive_project, client
+    current_site, project_editor, inactive_project, client, good_file
 ):
     url = reverse("projects-documents-list", args=[inactive_project.pk])
     assign_advisor(project_editor, inactive_project)
     assign_perm("projects.view_public_notes", project_editor, inactive_project)
     assign_perm("projects.use_public_notes", project_editor, inactive_project)
 
-    png = SimpleUploadedFile("img.png", b"file_content", content_type="image/png")
-    data = {"description": "this is some content", "the_file": png}
+    data = {"description": "this is some content", "the_file": good_file}
 
     client.force_login(project_editor)
     res = client.post(url, data)

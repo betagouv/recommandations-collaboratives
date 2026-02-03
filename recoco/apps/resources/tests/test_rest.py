@@ -39,6 +39,38 @@ def test_anonymous_can_see_resources_list_api(request, api_client):
 
 
 @pytest.mark.django_db
+def test_resources_list_does_not_include_content(request, api_client):
+    Recipe(
+        models.Resource,
+        sites=[get_current_site(request)],
+        status=models.Resource.PUBLISHED,
+        title=" public resource",
+    ).make()
+
+    url = reverse("resources-list")
+    response = api_client.get(url)
+    assert response.status_code == 200
+
+    assert "content" not in response.data[0]
+
+
+@pytest.mark.django_db
+def test_resource_details_includes_content(request, api_client):
+    resource = Recipe(
+        models.Resource,
+        sites=[get_current_site(request)],
+        status=models.Resource.PUBLISHED,
+        title=" public resource",
+    ).make()
+
+    url = reverse("resources-detail", args=(resource.pk,))
+    response = api_client.get(url)
+    assert response.status_code == 200
+
+    assert "content" in response.data
+
+
+@pytest.mark.django_db
 def test_anonymous_cannot_see_unpublished_resource_in_list_api(request, api_client):
     Recipe(
         models.Resource,
