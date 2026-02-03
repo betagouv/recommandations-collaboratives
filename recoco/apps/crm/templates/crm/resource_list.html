@@ -46,6 +46,9 @@
                 </div>
                 {% comment %} TODO Add CSV download button with backend functionnality {% endcomment %}
                 {% comment %} <button class="fr-btn fr-btn--sm no-wrap" title="Télécharger en CSV">🚧Télécharger en CSV</button> {% endcomment %}
+                <a href="{% url 'resources-resource-create' %}"
+                   class="fr-btn fr-btn--sm fr-btn--primary no-wrap"
+                   title="Créer une ressource">Créer une ressource</a>
             </div>
             <div class="fr-mb-2w table-responsive fr-px-5v fr-pb-5v">
                 {% csrf_token %}
