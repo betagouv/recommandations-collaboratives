@@ -70,10 +70,19 @@ def resource_search(request):
 
     searching = form.cleaned_data.get("searching", False)
 
-    select_all_departments = not bool(selected_departments_codes)
+    # Get user's own departments (for "Mes départements" shortcut)
+    user_departments_codes = []
+    if request.user.is_authenticated and hasattr(request.user, "profile"):
+        user_departments_codes = list(
+            request.user.profile.departments.values_list("code", flat=True)
+        )
 
-    if (not searching) and (limit_area is None):
-        limit_area = "AUTO"
+    # Auto-filter on first arrival for users with departments
+    if not searching and not limit_areas and user_departments_codes:
+        limit_areas = list(user_departments_codes)
+        selected_departments_codes = list(user_departments_codes)
+
+    select_all_departments = not bool(selected_departments_codes)
 
     categories = form.selected_categories
 

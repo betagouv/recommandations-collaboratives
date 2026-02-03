@@ -62,7 +62,7 @@
                             <input type="hidden" name="limit_area" :value="code">
                         </template>
 
-                        {% include "projects/project/fragments/departments_selector.html" with label="Projets de mon territoire" filter_by_regions=True select_all=select_all_departments selected_departments=selected_departments_codes %}
+                        {% include "projects/project/fragments/departments_selector.html" with label="Projets de mon territoire" filter_by_regions=True select_all=select_all_departments selected_departments=selected_departments_codes user_departments=user_departments_codes %}
                     </div>
                 </div>
             </div>
