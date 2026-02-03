@@ -42,11 +42,6 @@ export const schemaResourceFormValidator = {
       maxLength: 256,
       errorMessage: 'La nom de la structure porteuse est limitée à 256 caractères',
     },
-    expires_on: {
-      type: 'string',
-      format: 'date',
-      errorMessage: "La date d'expiration doit être au format YYYY-MM-DD",
-    },
   },
   required: [
     'content',

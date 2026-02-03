@@ -139,11 +139,7 @@ Alpine.data('FormResource', (resourceId) => {
         category: parseInt(this.$refs.formResource['category'].value) || 0,
         tags: this.$refs.formResource['tags'].value,
         support_orga: this.$refs.formResource['support_orga'].value,
-        departments: this.$refs.formResource['departments'].value || [],
         expires_on: this.$refs.formResource['expires_on'].value,
-        // contacts: (this.$refs.formResource['contacts'].value || []).map((c) =>
-        //   typeof c === 'object' ? c.id : c
-        // ),
       };
 
       const validate = ajv.compile(schemaResourceFormValidator);
