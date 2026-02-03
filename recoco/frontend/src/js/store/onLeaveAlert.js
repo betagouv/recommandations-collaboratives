@@ -61,7 +61,14 @@ Alpine.store('onLeaveAlert', {
         if (link.hasAttribute('aria-controls')) return;
 
         const href = link.getAttribute('href');
-        if (!href || href.startsWith('#') || href.startsWith('javascript:'))
+        const normalizedHref = href ? href.trim().toLowerCase() : '';
+        if (
+          !href ||
+          normalizedHref.startsWith('#') ||
+          normalizedHref.startsWith('javascript:') ||
+          normalizedHref.startsWith('data:') ||
+          normalizedHref.startsWith('vbscript:')
+        )
           return;
 
         event.preventDefault();
