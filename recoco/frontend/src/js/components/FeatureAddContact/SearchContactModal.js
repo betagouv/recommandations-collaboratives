@@ -3,7 +3,7 @@ import api, { searchContactsUrl } from '../../utils/api';
 import { Modal } from '../../models/Modal.model';
 import { formatDate } from '../../utils/date';
 
-Alpine.data('SearchContactModal', ({searchbarOnly = false}= {}) => ({
+Alpine.data('SearchContactModal', ({ searchbarOnly = false, noModal = false } = {}) => ({
   Modal: null,
   formatDate,
   contactsFound: [],
@@ -54,9 +54,11 @@ Alpine.data('SearchContactModal', ({searchbarOnly = false}= {}) => ({
   },
   isCreateContactModalOpen: false,
   openModalCreateContact() {
-    // hide search contact modal
-    this.modalSearchContact = this.$refs.searchContactModal;
-    this.modalSearchContact.classList.toggle('d-none');
+    if (!noModal) {
+      // hide search contact modal
+      this.modalSearchContact = this.$refs.searchContactModal;
+      this.modalSearchContact.classList.toggle('d-none');
+    }
     // create contact modal
     this.isCreateContactModalOpen = true;
   },
@@ -68,6 +70,8 @@ Alpine.data('SearchContactModal', ({searchbarOnly = false}= {}) => ({
       this.onSelect(event.detail);
     }
     this.isCreateContactModalOpen = false;
-    this.modalSearchContact.classList.toggle('d-none');
+    if (!noModal) {
+      this.modalSearchContact.classList.toggle('d-none');
+    }
   },
 }));

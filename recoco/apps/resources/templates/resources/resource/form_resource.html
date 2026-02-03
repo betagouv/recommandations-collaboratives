@@ -224,9 +224,11 @@
                     <!-- Contacts component (multiple) -->
                     <!-- add contacts -->
                     <div class="fr-input-group"
-                         x-data="SearchContactModal({searchbarOnly:true})">
+                         x-data="SearchContactModal({searchbarOnly:true, noModal:true})"
+                         @modal-response="closeCreateContactModal($event)">
                         <label class="fr-label text-modal-main-msg" for="id_contacts">Contacts</label>
                         {% include "tools/contacts/searchbar_for_contacts.html" with add_contact="from_search" %}
+                        {% include "tools/contacts/create_contact_modal.html" with is_it_returning_data=True %}
                     </div>
                     <!-- display contacts -->
                     <div>

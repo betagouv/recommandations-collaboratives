@@ -93,6 +93,9 @@ Alpine.data('FormResource', (resourceId) => {
         });
     },
     closeCreateContactModal(event) {
+      if (event.target.id !== 'search-contact-modal' && event.target.id !== '') {
+        return;
+      }
       const contact = event.detail;
       // avoid duplicates
       const exists = this.resourceFormData.contacts.some(
