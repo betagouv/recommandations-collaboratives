@@ -67,6 +67,11 @@ def fill_previous_activity_site(apps, schema_editor):
             profile.previous_activity_site = profile.sites.first()
 
         profile.save()
+
+    counted_sites_profiles.filter(
+        previous_activity_site__isnull=True, count_site=0
+    ).update(previous_activity_site_id=1)
+
     print(
         f"{count} users with no defined site. Random site set up but you may want to modify. Active users will have the field updated anyway"
     )
