@@ -12,6 +12,8 @@ TPL_PROJECT_ADDED_TO_NEW_SITE = "project_added_to_new_site"
 TPL_ADVISOR_ACCESS_REQUEST_ACCEPTED = "advisor_access_request_accepted"
 TPL_ADVISOR_ACCESS_REQUEST_REFUSED = "advisor_access_request_refused"
 TPL_MESSAGES_DIGEST = "messages_digest"
+TPL_RGDP_DELETION_FIRST_WARNING = "first_warning"
+TPL_RGDP_DELETION_SECOND_WARNING = "second_warning"
 
 TPL_CHOICES = (
     (TPL_PROJECT_RECEIVED, "Dossier bien reçu"),
@@ -34,4 +36,12 @@ TPL_CHOICES = (
     (TPL_ADVISOR_ACCESS_REQUEST_ACCEPTED, "Demande d'accès conseillers acceptée"),
     (TPL_ADVISOR_ACCESS_REQUEST_REFUSED, "Demande d'accès conseillers refusée"),
     (TPL_MESSAGES_DIGEST, "Résumé des messages reçus (nouvelle conv')"),
+    (
+        TPL_RGDP_DELETION_FIRST_WARNING,
+        "Premier avertissement avant suppression pour inactivité",
+    ),
+    (
+        TPL_RGDP_DELETION_SECOND_WARNING,
+        "Second et dernier avertissement avant suppression pour inactivité",
+    ),
 )

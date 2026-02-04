@@ -18,9 +18,12 @@ from django.db import transaction
 from django.utils import timezone
 from guardian.shortcuts import assign_perm
 
+from recoco.apps.communication import constants as communication_constants
+from recoco.apps.communication.api import send_email
 from recoco.apps.survey import models as survey_models
 from recoco.utils import assign_site_staff, get_group_for_site
 
+from ..communication.digests import normalize_user_name
 from . import models
 
 
@@ -126,6 +129,40 @@ def reactivate_user(crm_user: User):
     profile = crm_user.profile
     profile.deleted = None
     profile.save()
+
+
+def send_deletion_warning_to_profiles(profiles, warning_time):
+    template = (
+        communication_constants.TPL_RGDP_DELETION_FIRST_WARNING
+        if warning_time == 1
+        else communication_constants.TPL_RGDP_DELETION_SECOND_WARNING
+    )
+    users_by_site = {}
+    for profile in profiles:
+        users_by_site[profile.previous_activity_site.pk] = (
+            [profile.user]
+            if profile.previous_activity_site.pk not in users_by_site.keys()
+            else users_by_site[profile.previous_activity_site.pk] + [profile.users]
+        )
+    for site_id, users in users_by_site.items():
+        send_deletion_warning_by_site(users, template, site_id)
+
+
+def send_deletion_warning_by_site(users, template, site_id):
+    with settings.SITE_ID.override(site_id):
+        send_email(
+            template_name=template,
+            recipients=[
+                {
+                    "name": normalize_user_name(user),
+                    "email": user.email,
+                }
+                for user in users
+            ],
+            params={
+                #     site_name, legal_owner, legal_address, site_logo, dashboard_url
+            },
+        )
 
 
 # eof
