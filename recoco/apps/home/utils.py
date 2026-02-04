@@ -170,10 +170,12 @@ def send_deletion_warning_to_profiles(profiles, warning_time):
     )
     users_by_site = {}
     for profile in profiles:
+        if profile.previous_activity_site is None:
+            continue
         users_by_site[profile.previous_activity_site.pk] = (
             [profile.user]
             if profile.previous_activity_site.pk not in users_by_site.keys()
-            else users_by_site[profile.previous_activity_site.pk] + [profile.users]
+            else users_by_site[profile.previous_activity_site.pk] + [profile.user]
         )
     for site_id, users in users_by_site.items():
         send_deletion_warning_by_site(users, template, site_id)
@@ -190,9 +192,6 @@ def send_deletion_warning_by_site(users, template, site_id):
                 }
                 for user in users
             ],
-            params={
-                #     site_name, legal_owner, legal_address, site_logo, dashboard_url
-            },
         )
 
 
