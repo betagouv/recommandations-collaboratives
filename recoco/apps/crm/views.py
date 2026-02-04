@@ -74,6 +74,7 @@ from recoco.utils import (
     make_group_name_for_site,
 )
 
+from ..home.utils import deactivate_user, reactivate_user
 from . import filters, forms, models
 from .forms import SiteConfigurationForm
 
@@ -566,11 +567,7 @@ def user_deactivate(request, user_id=None):
     crm_user = get_object_or_404(User, pk=user_id, profile__sites=request.site)
 
     if request.method == "POST":
-        crm_user.is_active = False
-        crm_user.save()
-        profile = crm_user.profile
-        profile.deleted = timezone.now()
-        profile.save()
+        deactivate_user(crm_user)
         return redirect(reverse("crm-user-details", args=[crm_user.id]))
 
     # required by default on crm
@@ -586,11 +583,7 @@ def user_reactivate(request, user_id=None):
     crm_user = get_object_or_404(User, pk=user_id, profile__sites=request.site)
 
     if request.method == "POST":
-        crm_user.is_active = True
-        crm_user.save()
-        profile = crm_user.profile
-        profile.deleted = None
-        profile.save()
+        reactivate_user(crm_user)
         return redirect(reverse("crm-user-details", args=[crm_user.id]))
 
     # required by default on crm

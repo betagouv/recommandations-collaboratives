@@ -15,6 +15,7 @@ from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.core.files import File
 from django.db import transaction
+from django.utils import timezone
 from guardian.shortcuts import assign_perm
 
 from recoco.apps.survey import models as survey_models
@@ -106,6 +107,25 @@ def make_new_site(
         return site
 
     return None
+
+
+# rgpd users auto deletion
+
+
+def deactivate_user(user: User):
+    user.is_active = False
+    user.save()
+    profile = user.profile
+    profile.deleted = timezone.now()
+    profile.save()
+
+
+def reactivate_user(crm_user: User):
+    crm_user.is_active = True
+    crm_user.save()
+    profile = crm_user.profile
+    profile.deleted = None
+    profile.save()
 
 
 # eof
