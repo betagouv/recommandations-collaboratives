@@ -7,10 +7,8 @@
 {% endblock og_title %}
 {% block content %}
     {{ categories|json_script:"categoriesArray" }}
-    <!-- Admin navigation -->
-    {% include "crm/fragments/navigation.html" with resources=True %}
     <!-- Breadcrumb -->
-    <div x-data="{ breadcrumbs: { links: [{url: '{% url 'crm-site-dashboard' %}', title: 'Admin'}, {url: '{% url 'resources-resource-search' %}', title: 'Ressources'}], current: 'Création de fiche ressource' } }"
+    <div x-data="{ breadcrumbs: { links: [{url: '{% url 'resources-resource-search' %}', title: 'Ressources'}], current: 'Création de fiche ressource' } }"
          class="fr-p-0">{% include "tools/breadcrumb.html" %}</div>
     {% include "resources/resource/form_resource.html" %}
 {% endblock content %}

@@ -132,9 +132,9 @@
         {% include "header/menu-top-secondary-left.html" %}
         <!-- Ressources -->
         <li class="navigation__item-resource responsive-header__element-not-mobile"
-            style="{% if url_name == 'resources-resource-search' %}activated{% endif %}">
+            style="{% if 'ressource' in request.path and not 'crm' in request.path %}activated{% endif %}">
             <a href="{% url 'resources-resource-search' %}"
-               class="fr-link {% if url_name == 'resources-resource-search' %}active{% endif %}"
+               class="fr-link {% if 'ressource' in request.path and not 'crm' in request.path %}active{% endif %}"
                data-test-id="link-ressources">
                 <span class="fr-mx-1v align-middle">Ressources</span>
             </a>
