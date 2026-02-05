@@ -77,7 +77,7 @@ dependencies = [
     "sib-api-v3-sdk>=7.6.0",
     "tqdm>=4.67.1",
     "urllib3>=2.6.3",
-    "wagtail==6.3.5",
+    "wagtail==6.3.6",
 ]
 
 [project.urls]
