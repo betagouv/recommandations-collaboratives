@@ -7,7 +7,7 @@
     {% vite_asset 'js/styles/resources.css.js' %}
     {% vite_asset 'js/styles/resource-card.css.js' %}
     {% vite_asset 'js/styles/segmented_ctrl.css.js' %}
-    {% vite_asset 'js/styles/multi_select.css.js' %}
+    {% vite_asset 'js/styles/multi-select.css.js' %}
     {% vite_asset 'js/components/MultiSelect2.js' %}
     {% vite_asset 'js/components/resourceCategoryFilter.js' %}
 {% endblock js %}
@@ -19,19 +19,24 @@
 {% endblock og_title %}
 {% block content %}
     {{ category_options|json_script:"categoryOptions" }}
-    <div x-data="ResourceFilter(JSON.parse(document.getElementById('categoryOptions').textContent))" class="col-12 fr-p-3w fr-mx-auto">
+    <div x-data="ResourceFilter(JSON.parse(document.getElementById('categoryOptions').textContent))"
+         class="col-12 fr-p-3w fr-mx-auto">
         <div x-data="{ breadcrumbs: { links: [{url: '{% url 'home' %}', title: 'Accueil'}], current: 'Ressources' } }"
              class="fr-p-0">{% include "tools/breadcrumb.html" with margin_bottom_only=True %}</div>
-        <div class="row">
-            <div class="col">
-                <h1 class=" align-items-center fr-mb-2w">
-                    {% if resources_count %}{{ resources_count }}{% endif %} Ressources
-                </h1>
-            </div>
+        <div class="d-flex justify-content-between align-items-center fr-mb-2w">
+            <h1 class=" align-items-center fr-mb-2w">
+                {% if resources_count %}{{ resources_count }}{% endif %}
+                Ressources
+            </h1>
+            {% if "manage_resources" in user_site_perms %}
+                <a class="fr-btn fr-btn--sm fr-btn--primary fr-mr-1w"
+                   href="{% url 'resources-resource-create' %}">Créer une ressource</a>
+            {% endif %}
         </div>
         <form method="get">
             <div class="d-flex">
-                <div class="w-50 position-relative" @keydown.enter.prevent="$el.closest('form').submit()">
+                <div class="w-50 position-relative"
+                     @keydown.enter.prevent="$el.closest('form').submit()">
                     {% include "projects/project/fragments/search_bar.html" with action_search="onSearch" placeholder="Rechercher" value=query %}
                     <input type="hidden" value="on" name="searching">
                 </div>
@@ -47,8 +52,8 @@
                         </div>
                     </div>
                     <div x-data="{ selectedCodes: {{ selected_departments_codes|default:'[]' }}, normalize(payload) { if (!payload) return []; if (Array.isArray(payload) && typeof payload[0] === 'string') return payload; if (Array.isArray(payload) && typeof payload[0] === 'object') { return payload.filter(d => d.active).map(d => d.code); } return []; }}"
-                        @selected-departments="selectedCodes = normalize($event.detail)"
-                        @user-close-selector="$nextTick(() => $el.closest('form').submit())">
+                         @selected-departments="selectedCodes = normalize($event.detail)"
+                         @user-close-selector="$nextTick(() => $el.closest('form').submit())">
                         <template x-for="code in selectedCodes" :key="code">
                             <input type="hidden" name="limit_area" :value="code">
                         </template>
