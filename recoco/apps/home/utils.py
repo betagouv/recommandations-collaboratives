@@ -12,6 +12,7 @@ from typing import Optional
 
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 from django.core.files import File
 from django.db import transaction
@@ -24,6 +25,7 @@ from recoco.apps.survey import models as survey_models
 from recoco.utils import assign_site_staff, get_group_for_site
 
 from ..communication.digests import normalize_user_name
+from ..crm.models import Note
 from . import models
 
 
@@ -113,6 +115,35 @@ def make_new_site(
 
 
 # rgpd users auto deletion
+
+FIRST_WARNING_DAYS_BEFORE = 30
+SECOND_WARNING_DAYS_BEFORE = 7
+DELETION_ABSENT_FOR_DAYS = 365 * 2
+
+
+def delete_user(user: User):
+    user.first_name = ""
+    user.last_name = "Compte supprimé"
+    user.email = f"{user.id}@deleted.recoconseil.fr"
+    user.username = user.email
+    user.is_active = False
+    user.is_superuser = False  # just in case
+    user.last_login = None
+    user.save()
+    user.set_unusable_password()
+
+    user.profile.phone_no = ""
+    user.profile.previous_activity_at = None
+    user.profile.previous_deletion_warning = None
+    user.profile.previous_activity_site = None
+    user.profile.nb_deletion_warning = 0
+    user.profile.deleted = timezone.now()
+    user.profile.save()
+
+    user_content_type = ContentType.objects.get_for_model(User)
+    Note.objects.filter(
+        content_type_id=user_content_type.id, object_id=user.id
+    ).delete()
 
 
 def deactivate_user(user: User):
