@@ -569,7 +569,8 @@ def test_crm_user_deactivate_processing(request, client):
     # user data is updated
     end_user.refresh_from_db()
     assert end_user.is_active is False
-    assert end_user.profile.deleted is not None
+    assert end_user.profile.deleted is None
+    assert end_user.profile.disabled is not None
 
 
 ########################################################################
@@ -623,7 +624,7 @@ def test_crm_user_reactivate_processing(request, client):
     # user data is updated
     end_user.refresh_from_db()
     assert end_user.is_active is True
-    assert end_user.profile.deleted is None
+    assert end_user.profile.disabled is None
 
 
 ########################################################################
