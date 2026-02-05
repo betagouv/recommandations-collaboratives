@@ -44,16 +44,16 @@
                 </div>
                 {% include "resources/resource/modal_resource.html" %}
             </div>
-            <div class="fr-grid-row">
+            <div class="fr-grid-row fr-mt-2w">
                 <!-- Column 1 -->
                 <div class="fr-col-8 fr-col-md-8 fr-col-sm-12 fr-pr-4w">
                     <!-- Title -->
                     <div class="fr-input-group" :class="formFields['title']?.className">
                         <label class="fr-label text-modal-main-msg" for="id_title">
-                            Titre
+                            Titre <span class="color-important">*</span> (obligatoire)
                             <span x-show="resourceFormData?.title?.length > 0" class="fr-text--xs">
                                 (<span x-text="256 - resourceFormData?.title?.length"></span>
-                            /256 caractères)</span>
+                            caractères restants)</span>
                         </label>
                         <input type="text"
                                name="title"
@@ -73,7 +73,7 @@
                             Sous-titre
                             <span x-show="resourceFormData?.subtitle?.length > 0" class="fr-text--xs">
                                 (<span x-text="512 - resourceFormData?.subtitle?.length"></span>
-                            /512 caractères)</span>
+                            caractères restants)</span>
                         </label>
                         <input type="text"
                                name="subtitle"
@@ -98,7 +98,7 @@
                             Résumé
                             <span x-show="resourceFormData?.summary?.length > 0" class="fr-text--xs">
                                 (<span x-text="512 - resourceFormData?.summary?.length"></span>
-                            /512 caractères)</span>
+                            caractères restants)</span>
                         </label>
                         <textarea name="summary" class="fr-input" id="id_summary" maxlength="512" x-model="resourceFormData.summary">
                         </textarea>
@@ -166,7 +166,7 @@
                             <span x-show="resourceFormData?.support_orga?.length > 0"
                                   class="fr-text--xs">
                                 (<span x-text="256 - resourceFormData?.support_orga?.length"></span>
-                            /256 caractères)</span>
+                            caractères restants)</span>
                         </label>
                         <input type="text"
                                name="support_orga"
