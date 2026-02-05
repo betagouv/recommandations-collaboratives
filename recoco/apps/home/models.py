@@ -143,6 +143,8 @@ class UserProfile(models.Model):
 
     deleted = models.DateTimeField(null=True, blank=True)
 
+    disabled = models.DateTimeField(null=True, blank=True)
+
     class Meta:
         verbose_name = "profil utilisateur"
         verbose_name_plural = "profils utilisateurs"

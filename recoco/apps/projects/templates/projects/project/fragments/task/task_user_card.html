@@ -109,7 +109,12 @@
             </span>
         </template>
         <template x-if="!currentUser.is_active">
-            <span class="fr-p-1v fr-px-2v font-very-small bg-grey-light w-100 d-flex fr-mt-1v text-nowrap specific-border-radius-2px">Compte desactivé depuis le {{ user.profile.deleted }}</span>
+            <template x-elseif="user.profile.deleted">
+                <span class="fr-p-1v fr-px-2v font-very-small bg-grey-light w-100 d-flex fr-mt-1v text-nowrap specific-border-radius-2px">Compte supprimé depuis le {{ user.profile.deleted }}</span>
+            </template>
+            <template x-if="user.profile.disabled">
+                <span class="fr-p-1v fr-px-2v font-very-small bg-grey-light w-100 d-flex fr-mt-1v text-nowrap specific-border-radius-2px">Compte desactivé depuis le {{ user.profile.disabled }}</span>
+            </template>
         </template>
     </div>
 </div>

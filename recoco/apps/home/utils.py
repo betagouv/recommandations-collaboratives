@@ -153,7 +153,7 @@ def deactivate_user(user: User):
     user.is_active = False
     user.save()
     profile = user.profile
-    profile.deleted = timezone.now()
+    profile.disabled = timezone.now()
     profile.save()
 
 
@@ -161,7 +161,7 @@ def reactivate_user(crm_user: User):
     crm_user.is_active = True
     crm_user.save()
     profile = crm_user.profile
-    profile.deleted = None
+    profile.disabled = None
     profile.save()
 
 
