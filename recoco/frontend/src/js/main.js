@@ -23,12 +23,14 @@ import './store/utils';
 import './store/editor';
 import './store/djangoData';
 import './store/app';
+import './store/crisp';
 
 //Global reused component
 import './components/Notification';
 import './components/Editor';
 import './components/FieldValidator';
 import './components/Toast';
+import './components/Crisp';
 
 //Global CSS
 import '../css/buttons.css';

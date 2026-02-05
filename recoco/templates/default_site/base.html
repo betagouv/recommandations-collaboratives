@@ -45,6 +45,7 @@
                  x-show="isOpen">
                 <span x-text="message"></span>
             </div>
+            <div x-data="Crisp" class="visually-hidden"></div>
             {% if messages %}
                 <div x-data="Toast"
                      x-init="init()"
