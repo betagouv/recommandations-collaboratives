@@ -92,6 +92,9 @@ class Migration(migrations.Migration):
         ),
         ("actstream", "0004_add_multisite_support"),
         ("sites", "0002_alter_domain_unique"),
+        ("conversations", "0007_auto_20251230_1707"),
+        ("projects", "0116_alter_projectsite_status"),
+        ("auth", "0012_alter_user_first_name_max_length"),
     ]
 
     operations = [
