@@ -159,7 +159,7 @@
                             (ex: diagnostic, cahier des charges, financement études, …).
                         </p>
                     </div>
-                    <!-- Carrier structure -->
+                    <!-- Support orga -->
                     <div class="fr-input-group" :class="formFields['support_orga']?.className">
                         <label class="fr-label text-modal-main-msg" for="id_support_orga">
                             Structure porteuse
@@ -170,13 +170,17 @@
                         </label>
                         <input type="text"
                                name="support_orga"
-                               class="fr-input"
+                               class="fr-input fr-mb-1w"
                                id="id_support_orga"
                                maxlength="256"
                                x-model="resourceFormData.support_orga">
                         <template x-for="(error, index) in getFieldErrors('support_orga')" :key="index">
                             <p class="fr-error-text" x-text="error"></p>
                         </template>
+                        <div class="create-resources__help-text fr-mb-3w">
+                            <span class="fr-icon fr-icon-information-line fr-icon--sm"></span>
+                            <p>Indiquez l'organisme qui porte ou finance ce dispositif (ex : Ademe, ANCT, Banque des Territoires…).</p>
+                        </div>
                     </div>
                     <!-- Departments/regions multiple select -->
                     <div x-data="{selectedDepartments: {{ selected_departments |default:'[]'|safe }} }">
