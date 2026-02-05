@@ -11,6 +11,8 @@ import os
 from typing import Optional
 
 import sentry_sdk
+from allauth.account.models import EmailAddress
+from allauth.socialaccount.models import SocialAccount
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
@@ -143,6 +145,8 @@ def delete_user(user: User):
     user.profile.deleted = timezone.now()
     user.profile.save()
 
+    EmailAddress.filter(user_id=user.id).delete()
+    SocialAccount.filter(user_id=user.id).delete()
     user_content_type = ContentType.objects.get_for_model(User)
     Note.objects.filter(
         content_type_id=user_content_type.id, object_id=user.id
