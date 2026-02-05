@@ -56,23 +56,13 @@ def resource_search(request):
     form.is_valid()
     query = form.cleaned_data.get("query", "")
 
-    limit_area = form.cleaned_data.get("limit_area")  # string or None (legacy)
-    limit_areas = request.GET.getlist("limit_area")  # list (new)
-
-    # normalize: if list is provided, use it; else fallback to legacy single value
-    if not limit_areas and limit_area:
-        limit_areas = [limit_area]
-
-    selected_departments_codes = request.GET.getlist("limit_area")
-    if not selected_departments_codes:
-        if limit_area and limit_area not in ("AUTO", ""):
-            selected_departments_codes = [limit_area]
+    limit_areas = request.GET.getlist("limit_area")
 
     searching = form.cleaned_data.get("searching", False)
 
     # Get user's own departments (for "Mes départements" shortcut)
     user_departments_codes = []
-    if request.user.is_authenticated and hasattr(request.user, "profile"):
+    if request.user.is_authenticated and request.user.profile:
         user_departments_codes = list(
             request.user.profile.departments.values_list("code", flat=True)
         )
@@ -80,9 +70,8 @@ def resource_search(request):
     # Auto-filter on first arrival for users with departments
     if not searching and not limit_areas and user_departments_codes:
         limit_areas = list(user_departments_codes)
-        selected_departments_codes = list(user_departments_codes)
 
-    select_all_departments = not bool(selected_departments_codes)
+    select_all_departments = not bool(limit_areas)
 
     categories = form.selected_categories
 
@@ -106,7 +95,7 @@ def resource_search(request):
     departments = geomatics_models.Department.objects.none()
     if check_if_advisor(request.user):
         departments = geomatics_models.Department.objects.order_by("name").all()
-    elif hasattr(request.user, "email"):
+    elif request.user.email:
         communes = [
             p.commune for p in projects.Project.on_site.filter(members=request.user)
         ]
@@ -114,24 +103,9 @@ def resource_search(request):
 
     # Apply department filter from URL parameters
     if limit_areas:
-        selected_departments_qs = geomatics_models.Department.objects.none()
-
-        if "AUTO" in limit_areas:
-            if hasattr(request.user, "profile"):
-                user_departments = request.user.profile.departments.all()
-                if user_departments:
-                    selected_departments_qs = (
-                        geomatics_models.Department.objects.filter(
-                            code__in=user_departments
-                        )
-                    )
-                    selected_departments_codes = list(
-                        selected_departments_qs.values_list("code", flat=True)
-                    )
-        else:
-            selected_departments_qs = geomatics_models.Department.objects.filter(
-                code__in=limit_areas
-            )
+        selected_departments_qs = geomatics_models.Department.objects.filter(
+            code__in=limit_areas
+        )
 
         if selected_departments_qs.exists():
             resources = resources.limit_area(selected_departments_qs)
