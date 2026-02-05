@@ -10,6 +10,7 @@ created: 2021-06-08 09:56:53 CEST
 import os
 from typing import Optional
 
+import sentry_sdk
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
@@ -172,6 +173,11 @@ def send_deletion_warning_to_profiles(profiles, warning_time):
     )
     for profile in profiles:
         if profile.previous_activity_site is None:
+            sentry_sdk.capture_exception(
+                Site.DoesNotExist(
+                    f"No 'previous_activity_site' for user {profile.user.id}. They could not be warned about incoming deletion"
+                )
+            )
             continue
         with settings.SITE_ID.override(profile.previous_activity_site):
             send_email(
