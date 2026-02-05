@@ -18,6 +18,9 @@
     Liste des ressources
 {% endblock og_title %}
 {% block content %}
+    {% if user.is_authenticated %}
+        {% get_obj_perms request.user for request.site as "user_site_perms" %}
+    {% endif %}
     {{ category_options|json_script:"categoryOptions" }}
     <div x-data="ResourceFilter(JSON.parse(document.getElementById('categoryOptions').textContent))"
          class="col-12 fr-p-3w fr-mx-auto">
