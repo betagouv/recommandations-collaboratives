@@ -5,6 +5,15 @@
     font-weight: 700;
     line-height: 1.5rem;
   }
+  &__header {
+    position: sticky;
+    top: 64px;
+    z-index: 10;
+    background-color: var(--background-default-grey, #fff);
+    padding: 0.75rem 0 0 0;
+    display: flex;
+    justify-content: flex-end;
+  }
   &__help-text {
     background: var(--light-background-action-low-blue-france, #e3e3fd);
     display: flex;
@@ -29,7 +38,7 @@
   // Editor
   .tiptap-menu-custom__container {
     position: sticky;
-    top: 57px;
+    top: 128px;
     width: 90%;
     z-index: 1;
   }
