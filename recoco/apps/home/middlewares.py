@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 import sentry_sdk
 from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpRequest
@@ -34,9 +36,17 @@ class PreviousActivityMiddleware:
         self.get_response = get_response
 
     def __call__(self, request: HttpRequest):
-        if request.user.is_authenticated and not request.user.is_hijacked:
+        now = timezone.now()
+        if (
+            request.user.is_authenticated
+            and not request.user.is_hijacked
+            and (
+                request.user.profile.previous_activity_at is None
+                or request.user.profile.previous_activity_at < now + timedelta(days=1)
+            )
+        ):
             try:
-                request.user.profile.previous_activity_at = timezone.now()
+                request.user.profile.previous_activity_at = now
                 request.user.profile.previous_activity_site = request.site
                 request.user.profile.save()
             except Exception as e:
