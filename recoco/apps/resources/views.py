@@ -75,11 +75,7 @@ def resource_search(request):
 
     categories = form.selected_categories
 
-    resources = (
-        models.Resource.search(query, categories)
-        .select_related("category")
-        .prefetch_related("task_recommendations")
-    )
+    resources = models.Resource.search(query, categories)
 
     if form.cleaned_data.get("no_category", False):
         resources = resources.filter(category__isnull=True)
@@ -92,14 +88,16 @@ def resource_search(request):
         )
 
     # Determine available departments based on user role
-    departments = geomatics_models.Department.objects.none()
     if check_if_advisor(request.user):
         departments = geomatics_models.Department.objects.order_by("name").all()
-    elif request.user.email:
-        communes = [
-            p.commune for p in projects.Project.on_site.filter(members=request.user)
-        ]
-        departments = set(c.department for c in communes if c)
+    elif request.user.is_authenticated:
+        departments = geomatics_models.Department.objects.filter(
+            communes__in=projects.Project.on_site.filter(members=request.user).values(
+                "commune"
+            )
+        )
+    else:
+        departments = geomatics_models.Department.objects.none()
 
     # Apply department filter from URL parameters
     if limit_areas:
@@ -138,6 +136,11 @@ def resource_search(request):
         {"value": str(c.id), "text": str(c), "search": str(c)}
         for c in models.Category.on_site.all()
     ]
+
+    # prefetch and select related must be after all filters, else they are useless
+    resources = resources.select_related("category").prefetch_related(
+        "task_recommendations"
+    )
 
     return render(
         request,
