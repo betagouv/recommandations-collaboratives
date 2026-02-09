@@ -204,15 +204,6 @@ class SearchForm(forms.Form):
                 selected.append(category)
         return selected
 
-    def limit_area_values(self):
-        vals = self.data.getlist("limit_area")
-        # keep legacy single value too
-        if not vals:
-            one = self.cleaned_data.get("limit_area")
-            if one:
-                vals = [one]
-        return [v for v in vals if v]
-
 
 ########################################################################
 # Seeing resources
