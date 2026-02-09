@@ -81,7 +81,12 @@ class UserProfileManager(models.Manager):
     """Manager for active UserProfile"""
 
     def get_queryset(self):
-        return super().get_queryset().filter(deleted=None)
+        return (
+            super()
+            .get_queryset()
+            .filter(deleted=None, disabled=None)
+            .exclude(user__username="AnonymousUser")
+        )
 
 
 class UserProfileOnSiteManager(CurrentSiteManager, UserProfileManager):
@@ -94,7 +99,7 @@ class DeletedUserProfileManager(models.Manager):
     """Manager for deleted UserProfile"""
 
     def get_queryset(self):
-        return super().get_queryset().exclude(deleted=None)
+        return super().get_queryset().exclude(deleted=None, disabled=None)
 
 
 class UserProfile(models.Model):

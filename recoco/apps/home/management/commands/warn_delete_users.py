@@ -1,6 +1,7 @@
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 from django.core.management import BaseCommand
+from django.utils import timezone
 from tqdm import tqdm
 
 from recoco.apps.home.models import UserProfile
@@ -22,16 +23,14 @@ class Command(BaseCommand):
         )
 
     def warn_and_delete(self, dry_run):
-        now = datetime.now()
+        now = timezone.now()
         so_long = now - timedelta(days=DELETION_ABSENT_FOR_DAYS)
         since_second_warning = now - timedelta(days=SECOND_WARNING_DAYS_BEFORE)
         since_first_warning = now - timedelta(
             days=FIRST_WARNING_DAYS_BEFORE - SECOND_WARNING_DAYS_BEFORE
         )
 
-        not_deleted_profiles = UserProfile.objects.exclude(
-            user__last_name="Compte supprimé"
-        )
+        not_deleted_profiles = UserProfile.objects
 
         # resets warning of users who used the platform lately
         not_deleted_profiles.filter(
@@ -50,7 +49,7 @@ class Command(BaseCommand):
         else:
             send_deletion_warning_to_profiles(to_first_warn_profiles, 1)
             to_first_warn_profiles.update(
-                nb_deletion_warnings=1, previous_deletion_warning_at=datetime.now()
+                nb_deletion_warnings=1, previous_deletion_warning_at=timezone.now()
             )
 
         # second warning
@@ -65,7 +64,7 @@ class Command(BaseCommand):
         else:
             send_deletion_warning_to_profiles(to_second_warn_profiles, 2)
             to_second_warn_profiles.update(
-                nb_deletion_warnings=2, previous_deletion_warning_at=datetime.now()
+                nb_deletion_warnings=2, previous_deletion_warning_at=timezone.now()
             )
 
         # actual deletion
@@ -77,7 +76,7 @@ class Command(BaseCommand):
         if dry_run:
             self.stdout.write("dry run: no account deleted")
         else:
-            for profile in tqdm(to_delete[:10]):
+            for profile in tqdm(to_delete):
                 delete_user(profile.user)
 
     def handle(self, *args, **options):

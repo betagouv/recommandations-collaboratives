@@ -139,14 +139,14 @@ def delete_user(user: User):
 
     user.profile.phone_no = ""
     user.profile.previous_activity_at = None
-    user.profile.previous_deletion_warning = None
+    user.profile.previous_deletion_warning_at = None
     user.profile.previous_activity_site = None
-    user.profile.nb_deletion_warning = 0
+    user.profile.nb_deletion_warnings = 0
     user.profile.deleted = timezone.now()
     user.profile.save()
 
-    EmailAddress.filter(user_id=user.id).delete()
-    SocialAccount.filter(user_id=user.id).delete()
+    EmailAddress.objects.filter(user_id=user.id).delete()
+    SocialAccount.objects.filter(user_id=user.id).delete()
     user_content_type = ContentType.objects.get_for_model(User)
     Note.objects.filter(
         content_type_id=user_content_type.id, object_id=user.id
