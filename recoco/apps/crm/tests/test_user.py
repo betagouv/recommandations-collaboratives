@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import django.core.mail
 import pytest
 from allauth.account.models import EmailAddress
@@ -411,6 +413,51 @@ def test_crm_user_update_profile_information_and_email_address(request, client):
 
 
 @pytest.mark.django_db
+def test_crm_user_update_cant_update_disabled_user(request, client):
+    site = get_current_site(request)
+
+    organization = baker.make(addressbook_models.Organization)
+
+    end_user = baker.make(auth_models.User, is_active=False)
+    end_user.profile.sites.add(site)
+    profile = end_user.profile
+    profile.deleted = datetime(2022, 12, 12)
+    profile.save()
+
+    url = reverse("crm-user-update", args=[end_user.id])
+    data = {
+        "username": "johndoe@example.org",
+        "first_name": "John",
+        "last_name": "DOE",
+        "phone_no": "01 23 45 67 89",
+        "organization": organization.id,
+        "organization_position": "staff",
+    }
+
+    with login(client) as user:
+        assign_perm("use_crm", user, site)
+        client.post(url, data=data)
+
+    # user data is updated
+    end_user.refresh_from_db()
+
+    assert end_user.username != data["username"]
+    assert end_user.email != data["username"]
+    assert end_user.first_name != data["first_name"]
+    assert end_user.last_name != data["last_name"]
+
+    # profile is updated
+    profile.refresh_from_db()
+
+    assert profile.phone_no != data["phone_no"]
+    assert profile.organization != organization
+    assert profile.organization_position != data["organization_position"]
+
+    # the confirmation email has been sent
+    assert len(django.core.mail.outbox) == 0
+
+
+@pytest.mark.django_db
 def test_crm_user_update_profile_information_with_email_address_exists(request, client):
     site = get_current_site(request)
 
@@ -625,6 +672,34 @@ def test_crm_user_reactivate_processing(request, client):
     end_user.refresh_from_db()
     assert end_user.is_active is True
     assert end_user.profile.disabled is None
+
+
+@pytest.mark.django_db
+def test_crm_user_reactivate_only_active(request, client):
+    site = get_current_site(request)
+
+    disabled = datetime(2025, 9, 12)
+    deleted = datetime(2026, 1, 16)
+
+    end_user = baker.make(auth_models.User, is_active=False)
+    end_user.profile.sites.add(site)
+    end_user.profile.disabled = disabled
+    end_user.profile.deleted = deleted
+    end_user.profile.save()
+
+    url = reverse("crm-user-reactivate", args=[end_user.id])
+
+    with login(client) as user:
+        assign_perm("use_crm", user, site)
+        response = client.post(url)
+
+    assert response.status_code == 400
+
+    # user data is updated
+    end_user.refresh_from_db()
+    assert end_user.is_active is False
+    assert end_user.profile.disabled is not None
+    assert end_user.profile.deleted is not None
 
 
 ########################################################################
