@@ -19,34 +19,18 @@
             {{ resource.subtitle }}
         </div>
         <div class="card-resource__date">
-            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
-                <path fill-rule="evenodd" clip-rule="evenodd" d="M4.5 0.5V1.5H7.5V0.5H8.5V1.5H10.5C10.7761 1.5 11 1.72386 11 2V10C11 10.2761 10.7761 10.5 10.5 10.5H1.5C1.22386 10.5 1 10.2761 1 10V2C1 1.72386 1.22386 1.5 1.5 1.5H3.5V0.5H4.5ZM10 5.5H2V9.5H10V5.5ZM5.5 6.5V8.5H3V6.5H5.5ZM3.5 2.5H2V4.5H10V2.5H8.5V3.5H7.5V2.5H4.5V3.5H3.5V2.5Z" fill="#666666"/>
-              </svg>
-            <span class="card-resource__footer--label">Mise à jour le : {{ resource.updated_on|date:"d/m/Y" }}</span>
+            <span class="card-resource__footer--label fr-icon-calendar-line fr-icon--sm fr-btn--icon-left">Mise à jour le : {{ resource.updated_on|date:"d/m/Y" }}</span>
         </div>
         <div class="card-resource__orga-related">
             {% if resource.support_orga %}
-                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
-                    <path d="M10 3H11.5V4H11V9.5H11.5V10.5H0.5V9.5H1V4H0.5V3H2V2C2 1.72386 2.22386 1.5 2.5 1.5H9.5C9.77615 1.5 10 1.72386 10 2V3ZM10 4H2V9.5H3.5V6H4.5V9.5H5.5V6H6.5V9.5H7.5V6H8.5V9.5H10V4ZM3 2.5V3H9V2.5H3Z" fill="#666666"/>
-                </svg>
-                <span class="card-resource__footer--label">
+                <span class="card-resource__footer--label fr-icon-building-line fr-icon--sm fr-btn--icon-left">
                     {{ resource.support_orga.name }}
                 </span>
             {% endif %}
         </div>
         <div class="card-resource__departments">
             {% if resource.departments.all %}
-                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
-                    <g clip-path="url(#clip0_61_959)">
-                    <path d="M5.5 2.53544C3.96715 2.7547 2.7547 3.96715 2.53544 5.5H3.5V6.5H2.53544C2.7547 8.03285 3.96715 9.2453 5.5 9.46455V8.5H6.5V9.46455C8.03285 9.2453 9.2453 8.03285 9.46455 6.5H8.5V5.5H9.46455C9.2453 3.96715 8.03285 2.7547 6.5 2.53544V3.5H5.5V2.53544ZM1.52746 5.5C1.75804 3.41419 3.41419 1.75804 5.5 1.52746V0.5H6.5V1.52746C8.5858 1.75804 10.242 3.41419 10.4726 5.5H11.5V6.5H10.4726C10.242 8.5858 8.5858 10.242 6.5 10.4726V11.5H5.5V10.4726C3.41419 10.242 1.75804 8.5858 1.52746 6.5H0.5V5.5H1.52746ZM7 6C7 6.5523 6.5523 7 6 7C5.4477 7 5 6.5523 5 6C5 5.4477 5.4477 5 6 5C6.5523 5 7 5.4477 7 6Z" fill="#666666"/>
-                    </g>
-                    <defs>
-                    <clipPath id="clip0_61_959">
-                        <rect width="12" height="12" fill="white"/>
-                    </clipPath>
-                    </defs>
-                </svg>
-                <span class="card-resource__footer--label">
+                <span class="card-resource__footer--label fr-icon-target-line fr-icon--sm fr-btn--icon-left">
                     {% for dept in resource.departments.all %}
                         {{ dept.pk }}{% if not forloop.last %}, {% endif %}
                     {% endfor %}
