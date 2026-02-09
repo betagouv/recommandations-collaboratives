@@ -37,13 +37,13 @@
             {% endif %}
         </div>
         <form method="get">
-            <div class="d-flex">
-                <div class="searchbar position-relative"
+            <div class="d-flex gap-1">
+                <div class="w-100 position-relative"
                      @keydown.enter.prevent="$el.closest('form').submit()">
                     {% include "projects/project/fragments/search_bar.html" with placeholder="Rechercher" value=query %}
                     <input type="hidden" value="on" name="searching">
                 </div>
-                <div class="w-50 d-flex justify-content-around align-items-center">
+                <div class="w-100 d-flex justify-content-around align-items-center">
                     <div @multi-select-change="selectedIds = $event.detail || []; $nextTick(() => $el.closest('form').submit());"
                          class="d-flex align-items-center w-100 fr-mx-2w">
                         <label class="fr-segmented__legend inline text-nowrap fr-mb-0 fr-mr-1w">Catégories :</label>
@@ -54,6 +54,8 @@
                             {% include "tools/multi_select.html" with extra_classes="multi-select--pill align-items-center fr-pl-1w" placeholder="Toutes les catégories" %}
                         </div>
                     </div>
+                </div>
+                <div class="w-100 d-flex align-items-center">
                     <div x-data="{ selectedCodes: {{ limit_areas|default:'[]' }}, normalize(payload) { if (!payload) return []; if (Array.isArray(payload) && typeof payload[0] === 'string') return payload; if (Array.isArray(payload) && typeof payload[0] === 'object') { return payload.filter(d => d.active).map(d => d.code); } return []; }}"
                          @selected-departments="selectedCodes = normalize($event.detail)"
                          @user-close-selector="$nextTick(() => $el.closest('form').submit())">
