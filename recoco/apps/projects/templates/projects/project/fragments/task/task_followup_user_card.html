@@ -109,10 +109,10 @@
             </span>
         </template>
         <template x-if="!f.who.is_active">
-            <template x-elseif="user.profile.deleted">
+            <template x-if="user.profile.deleted">
                 <span class="fr-p-1v fr-px-2v font-very-small bg-grey-light w-100 d-flex fr-mt-1v text-nowrap specific-border-radius-2px">Compte supprimé depuis le {{ user.profile.deleted }}</span>
             </template>
-            <template x-if="user.profile.disabled">
+            <template x-if="!user.profile.deleted && user.profile.disabled">
                 <span class="fr-p-1v fr-px-2v font-very-small bg-grey-light w-100 d-flex fr-mt-1v text-nowrap specific-border-radius-2px">Compte desactivé depuis le {{ user.profile.disabled }}</span>
             </template>
         </template>
