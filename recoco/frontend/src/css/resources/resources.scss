@@ -80,3 +80,13 @@
   border-color: transparent;
   box-shadow: none;
 }
+
+.searchbar {
+  width: 50%;
+}
+@media screen and (max-width: 1800px) {
+  .searchbar {
+    width: 40%;
+  }
+
+}

@@ -38,19 +38,19 @@
         </div>
         <form method="get">
             <div class="d-flex">
-                <div class="w-50 position-relative"
+                <div class="searchbar position-relative"
                      @keydown.enter.prevent="$el.closest('form').submit()">
                     {% include "projects/project/fragments/search_bar.html" with placeholder="Rechercher" value=query %}
                     <input type="hidden" value="on" name="searching">
                 </div>
                 <div class="w-50 d-flex justify-content-around align-items-center">
                     <div @multi-select-change="selectedIds = $event.detail || []; $nextTick(() => $el.closest('form').submit());"
-                         class="d-flex align-items-center">
+                         class="d-flex align-items-center w-100 fr-mx-2w">
                         <label class="fr-segmented__legend inline text-nowrap fr-mb-0 fr-mr-1w">Catégories :</label>
                         <template x-for="id in selectedIds" :key="id">
                             <input type="hidden" :name="categoryMap[id]" value="on">
                         </template>
-                        <div x-data="{ selected: selectedIds }">
+                        <div x-data="{ selected: selectedIds }" class="w-100">
                             {% include "tools/multi_select.html" with extra_classes="multi-select--pill align-items-center fr-pl-1w" placeholder="Toutes les catégories" %}
                         </div>
                     </div>
