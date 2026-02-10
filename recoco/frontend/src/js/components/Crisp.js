@@ -12,6 +12,10 @@ const MAX_POPUP_VIEWS = 3;
 export default function Crisp() {
   return {
     init() {
+      // Force display on mobile
+      window.$crisp = window.$crisp || [];
+      window.$crisp.push(['config', 'hide:on:mobile', [false]]);
+
       const viewCount = parseInt(
         localStorage.getItem(CRISP_POPUP_STORAGE_KEY) || '0',
         10
