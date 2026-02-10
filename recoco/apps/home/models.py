@@ -105,6 +105,7 @@ class DeletedUserProfileManager(models.Manager):
 class UserProfile(models.Model):
     """Represents the profile of a user"""
 
+    all = models.Manager()
     objects = UserProfileManager()
     on_site = UserProfileOnSiteManager()
     deleted_objects = DeletedUserProfileManager()
