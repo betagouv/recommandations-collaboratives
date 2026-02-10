@@ -7,8 +7,6 @@ import api, { projectsProjectSitesUrl, projectsUrl } from '../utils/api';
 Alpine.data('KanbanProjects', function (currentSiteId, departments, regions) {
   return {
     makeProjectURL,
-    projectList: null,
-    projectListFiltered: null,
     isViewInitialized: false,
     currentSiteId: currentSiteId,
     isDisplayingOnlyUserProjects:
@@ -30,14 +28,36 @@ Alpine.data('KanbanProjects', function (currentSiteId, departments, regions) {
         code: 'TO_PROCESS',
         title: 'À traiter',
         color_class: 'border-secondary',
+        projects: [],
+        allProjects: [],
       },
-      { code: 'READY', title: 'En attente', color_class: 'border-info' },
-      { code: 'IN_PROGRESS', title: 'En cours', color_class: 'border-primary' },
-      { code: 'DONE', title: 'Traité', color_class: 'border-success' },
+      {
+        code: 'READY',
+        title: 'En attente',
+        color_class: 'border-info',
+        projects: [],
+        allProjects: [],
+      },
+      {
+        code: 'IN_PROGRESS',
+        title: 'En cours',
+        color_class: 'border-primary',
+        projects: [],
+        allProjects: [],
+      },
+      {
+        code: 'DONE',
+        title: 'Traité',
+        color_class: 'border-success',
+        projects: [],
+        allProjects: [],
+      },
       {
         code: 'STUCK',
         title: 'Conseil interrompu',
         color_class: 'border-dark',
+        projects: [],
+        allProjects: [],
       },
     ],
     async init() {
@@ -45,36 +65,38 @@ Alpine.data('KanbanProjects', function (currentSiteId, departments, regions) {
       this.isViewInitialized = true;
     },
     async getData() {
-      const projects = await api.get(
-        projectsUrl({
-          searchText: this.backendSearch.searchText,
-          departments: this.backendSearch.searchDepartment,
-          lastActivity: this.backendSearch.lastActivity,
-          status: ['TO_PROCESS', 'STUCK', 'READY', 'IN_PROGRESS', 'DONE'],
-        })
-      );
-      this.projectList = await this.$store.projects.mapperProjetsProjectSites(
-        projects.data.results,
-        this.currentSiteId
-      );
+      await Promise.all(
+        this.boards.map(async (board) => {
+          const response = await api.get(
+            projectsUrl({
+              searchText: this.backendSearch.searchText,
+              departments: this.backendSearch.searchDepartment,
+              lastActivity: this.backendSearch.lastActivity,
+              limit: 10,
+              status: [board.code],
+            })
+          );
 
-      this.projectList = projects.data.results.map((d) =>
-        Object.assign(d, {
-          uuid: generateUUID(),
+          const mappedProjects =
+            await this.$store.projects.mapperProjetsProjectSites(
+              response.data.results,
+              this.currentSiteId
+            );
+
+          board.projects = mappedProjects.map((d) =>
+            Object.assign(d, { uuid: generateUUID() })
+          );
+          board.allProjects = [...board.projects];
         })
       );
-      this.projectListFiltered = [...this.projectList];
       this.filterMyProjects();
     },
-    get view() {
-      return this.projectListFiltered.sort(this.sortFn.bind(this));
+    getBoard(status) {
+      return this.boards.find((board) => board.code === status);
     },
     column(status) {
-      if (status instanceof Array) {
-        return this.view.filter((d) => status.indexOf(d.status) !== -1);
-      } else {
-        return this.view.filter((d) => d.status === status);
-      }
+      const board = this.getBoard(status);
+      return board ? board.projects.sort(this.sortFn.bind(this)) : [];
     },
     onDragStart(event, uuid) {
       event.dataTransfer.clearData();
@@ -110,6 +132,15 @@ Alpine.data('KanbanProjects', function (currentSiteId, departments, regions) {
       event.preventDefault();
       event.dataTransfer.dropEffect = 'move';
     },
+    findProjectByUuid(uuid) {
+      for (const board of this.boards) {
+        const project = board.projects.find((d) => d.uuid === uuid);
+        if (project) {
+          return project;
+        }
+      }
+      return null;
+    },
     async onDrop(event, status) {
       event.preventDefault();
 
@@ -120,10 +151,11 @@ Alpine.data('KanbanProjects', function (currentSiteId, departments, regions) {
       if (!uuid) {
         return;
       }
-      const droppedProject = this.projectList.find((d) => d.uuid === uuid);
-      if (!droppedProject) {
+      const found = this.findProjectByUuid(uuid);
+      if (!found) {
         return;
       }
+      const droppedProject = found;
       const projectSite = droppedProject.project_sites.find(
         (project_site) => project_site.site === this.currentSiteId
       );
@@ -150,13 +182,15 @@ Alpine.data('KanbanProjects', function (currentSiteId, departments, regions) {
       this.filterMyProjects();
     },
     filterMyProjects() {
-      if (this.isDisplayingOnlyUserProjects) {
-        this.projectListFiltered = this.projectList.filter(
-          (d) => d.is_observer || d.is_switchtender
-        );
-      } else {
-        this.projectListFiltered = [...this.projectList];
-      }
+      this.boards.forEach((board) => {
+        if (this.isDisplayingOnlyUserProjects) {
+          board.projects = board.allProjects.filter(
+            (d) => d.is_observer || d.is_switchtender
+          );
+        } else {
+          board.projects = [...board.allProjects];
+        }
+      });
     },
     async onSearch(event) {
       this.backendSearch.searchText = event.target.value;
