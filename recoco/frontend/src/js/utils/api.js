@@ -217,6 +217,10 @@ export function resourcePreviewUrl(resourceId, taskId) {
   return `/ressource/${resourceId}/embed/`;
 }
 
+export function resourcesUrl() {
+  return `/api/resources/`;
+}
+
 export function postExternalRessourceUrl() {
   return `/api/resources/import_from_uri/`;
 }
@@ -224,6 +228,11 @@ export function postExternalRessourceUrl() {
 // Regions :
 export function regionsUrl() {
   return `/api/regions/`;
+}
+
+// Communes :
+export function communesUrl() {
+  return `/api/communes/`;
 }
 
 // Challenges
