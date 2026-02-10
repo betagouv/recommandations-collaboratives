@@ -23,6 +23,7 @@ Alpine.data('KanbanProjects', function (currentSiteId, departments, regions) {
     filterProjectLastActivity: localStorage.getItem('lastActivity') ?? '30',
     regions: JSON.parse(regions.textContent),
     territorySelectAll: true,
+    pageSize: 10,
     boards: [
       {
         code: 'TO_PROCESS',
@@ -30,6 +31,10 @@ Alpine.data('KanbanProjects', function (currentSiteId, departments, regions) {
         color_class: 'border-secondary',
         projects: [],
         allProjects: [],
+        offset: 0,
+        totalCount: 0,
+        hasMore: true,
+        isLoading: false,
       },
       {
         code: 'READY',
@@ -37,6 +42,10 @@ Alpine.data('KanbanProjects', function (currentSiteId, departments, regions) {
         color_class: 'border-info',
         projects: [],
         allProjects: [],
+        offset: 0,
+        totalCount: 0,
+        hasMore: true,
+        isLoading: false,
       },
       {
         code: 'IN_PROGRESS',
@@ -44,6 +53,10 @@ Alpine.data('KanbanProjects', function (currentSiteId, departments, regions) {
         color_class: 'border-primary',
         projects: [],
         allProjects: [],
+        offset: 0,
+        totalCount: 0,
+        hasMore: true,
+        isLoading: false,
       },
       {
         code: 'DONE',
@@ -51,6 +64,10 @@ Alpine.data('KanbanProjects', function (currentSiteId, departments, regions) {
         color_class: 'border-success',
         projects: [],
         allProjects: [],
+        offset: 0,
+        totalCount: 0,
+        hasMore: true,
+        isLoading: false,
       },
       {
         code: 'STUCK',
@@ -58,6 +75,10 @@ Alpine.data('KanbanProjects', function (currentSiteId, departments, regions) {
         color_class: 'border-dark',
         projects: [],
         allProjects: [],
+        offset: 0,
+        totalCount: 0,
+        hasMore: true,
+        isLoading: false,
       },
     ],
     async init() {
@@ -67,12 +88,17 @@ Alpine.data('KanbanProjects', function (currentSiteId, departments, regions) {
     async getData() {
       await Promise.all(
         this.boards.map(async (board) => {
+          // Reset pagination state
+          board.offset = 0;
+          board.hasMore = true;
+          board.isLoading = true;
+
           const response = await api.get(
             projectsUrl({
               searchText: this.backendSearch.searchText,
               departments: this.backendSearch.searchDepartment,
               lastActivity: this.backendSearch.lastActivity,
-              limit: 10,
+              limit: this.pageSize,
               status: [board.code],
             })
           );
@@ -87,9 +113,62 @@ Alpine.data('KanbanProjects', function (currentSiteId, departments, regions) {
             Object.assign(d, { uuid: generateUUID() })
           );
           board.allProjects = [...board.projects];
+
+          // Update pagination state
+          board.totalCount = response.data.count;
+          board.offset = board.projects.length;
+          board.hasMore = board.offset < board.totalCount;
+          board.isLoading = false;
         })
       );
       this.filterMyProjects();
+    },
+    async loadMoreProjects(board) {
+      if (board.isLoading || !board.hasMore) {
+        return;
+      }
+
+      board.isLoading = true;
+
+      const response = await api.get(
+        projectsUrl({
+          searchText: this.backendSearch.searchText,
+          departments: this.backendSearch.searchDepartment,
+          lastActivity: this.backendSearch.lastActivity,
+          limit: this.pageSize,
+          offset: board.offset,
+          status: [board.code],
+        })
+      );
+
+      const mappedProjects =
+        await this.$store.projects.mapperProjetsProjectSites(
+          response.data.results,
+          this.currentSiteId
+        );
+
+      const newProjects = mappedProjects.map((d) =>
+        Object.assign(d, { uuid: generateUUID() })
+      );
+
+      board.allProjects = [...board.allProjects, ...newProjects];
+      board.offset = board.allProjects.length;
+      board.hasMore = board.offset < board.totalCount;
+      board.isLoading = false;
+
+      this.filterMyProjects();
+    },
+    onColumnScroll(event, board) {
+      const element = event.target;
+      const scrollThreshold = 100; // pixels from bottom to trigger load
+
+      const isNearBottom =
+        element.scrollHeight - element.scrollTop - element.clientHeight <
+        scrollThreshold;
+
+      if (isNearBottom && board.hasMore && !board.isLoading) {
+        this.loadMoreProjects(board);
+      }
     },
     getBoard(status) {
       return this.boards.find((board) => board.code === status);

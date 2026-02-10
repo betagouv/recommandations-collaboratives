@@ -34,7 +34,7 @@
             {% include "projects/project/fragments/tasks_inline_kanban/tasks_inline_kanban_filters.html" %}
             <div class="kanban-header__toolbar">{% include "projects/project/fragments/list-toolbars.html" %}</div>
         </div>
-        <template x-if="isViewInitialized && boards.every(b => b.projects.length === 0)">
+        <template x-if="isViewInitialized && boards.every(b => b.projects.length === 0 && !b.isLoading)">
             <div class="fr-notice fr-notice--info fr-my-8w">
                 <div class="fr-container">
                     <div class="fr-notice__body">
@@ -62,7 +62,8 @@
                                         <div class="d-flex justify-content-between justify-items-center fr-px-2v fr-py-2v sticky top-0">
                                             <h5 x-text="board.title" class="font-medium text-gray-800 fr-mb-0"></h5>
                                         </div>
-                                        <div class="kanban-column__content">
+                                        <div class="kanban-column__content"
+                                             @scroll="onColumnScroll($event, board)">
                                             <div class="fr-px-2v fr-py-1v fr-pb-1v h-100 d-flex flex-column">
                                                 <template x-if="column(board.code).length === 0">
                                                     <div class="drag-targetable fr-py-2v h-100"
@@ -191,15 +192,29 @@
                                                          @dragend="onDragEnd(event)"
                                                          data-test-id="drag-target"></div>
                                                 </template>
-                                            </div>
-                                        </div>
+                                                <!-- Loading indicator -->
+                                                <template x-if="board.isLoading">
+                                                    <div class="text-center fr-py-2v">
+                                                        <div class="spinner-border spinner-border-sm" role="status">
+                                                            <span class="visually-hidden">Chargement...</span>
+                                                        </div>
+                                                    </div>
+                                                </template>
+                                                {% comment %} <!-- Load more indicator -->
+                                                                                                <template x-if="board.hasMore && !board.isLoading">
+                                                                                                    <div class="text-center fr-py-1v text-muted small">
+                                                                                                    <span x-text="`${board.offset} / ${board.totalCount} dossiers`"></span>
+                                                                                            </div>
+                                        </template> {% endcomment %}
                                     </div>
                                 </div>
-                            </template>
+                            </div>
                         </div>
-                    </div>
+                    </template>
                 </div>
             </div>
-        </template>
+        </div>
     </div>
+</template>
+</div>
 {% endblock project_list_content %}
