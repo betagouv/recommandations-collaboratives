@@ -364,46 +364,46 @@ def resource_update(request, resource_id=None):
         models.Category.on_site.values("id", "name", "color", "icon").order_by("name")
     )
 
-    # if request.method == "POST":
-    #     form = EditResourceForm(request.POST, instance=resource)
-    #
-    #     if form.is_valid():
-    #         needs_copy = (resource.site_origin != request.site) and (
-    #             resource.site_origin is not None
-    #         )
-    #
-    #         if needs_copy:
-    #             with transaction.atomic():
-    #                 new_resource = resource.make_clone()
-    #                 form.instance = new_resource
-    #
-    #                 with reversion.create_revision():
-    #                     reversion.set_comment(
-    #                         f"Ressource dupliquée à l'écriture depuis {resource.site_origin.name}"
-    #                     )
-    #                     reversion.set_user(request.user)
-    #                     resource.updated_on = timezone.now()
-    #                     new_resource.site_origin = request.site
-    #                     new_resource.sites.clear()
-    #                     new_resource.sites.add(request.site)
-    #                     # new_resource.save()
-    #                     form.save()
-    #
-    #                 resource.sites.remove(request.site)
-    #
-    #         else:
-    #             with reversion.create_revision():
-    #                 resource = form.save(commit=False)
-    #                 resource.updated_on = timezone.now()
-    #                 resource.save()
-    #
-    #                 reversion.set_user(request.user)
-    #                 form.save_m2m()
-    #
-    #         next_url = reverse("resources-resource-detail", args=[form.instance.id])
-    #         return redirect(next_url)
-    # else:
-    #     form = EditResourceForm(instance=resource)
+    if request.method == "POST":
+        form = EditResourceForm(request.POST, instance=resource)
+
+        if form.is_valid():
+            needs_copy = (resource.site_origin != request.site) and (
+                resource.site_origin is not None
+            )
+
+            if needs_copy:
+                with transaction.atomic():
+                    new_resource = resource.make_clone()
+                    form.instance = new_resource
+
+                    with reversion.create_revision():
+                        reversion.set_comment(
+                            f"Ressource dupliquée à l'écriture depuis {resource.site_origin.name}"
+                        )
+                        reversion.set_user(request.user)
+                        resource.updated_on = timezone.now()
+                        new_resource.site_origin = request.site
+                        new_resource.sites.clear()
+                        new_resource.sites.add(request.site)
+                        # new_resource.save()
+                        form.save()
+
+                    resource.sites.remove(request.site)
+
+            else:
+                with reversion.create_revision():
+                    resource = form.save(commit=False)
+                    resource.updated_on = timezone.now()
+                    resource.save()
+
+                    reversion.set_user(request.user)
+                    form.save_m2m()
+
+            next_url = reverse("resources-resource-detail", args=[form.instance.id])
+            return redirect(next_url)
+    else:
+        form = EditResourceForm(instance=resource)
     return render(request, "resources/resource/update.html", locals())
 
 
@@ -418,27 +418,28 @@ def resource_create(request):
         models.Category.on_site.values("id", "name", "color", "icon").order_by("name")
     )
 
-    # if request.method == "POST":
-    #     form = EditResourceForm(request.POST)
-    #     if form.is_valid():
-    #         resource = form.save(commit=False)
-    #         resource.created_by = request.user
-    #         resource.site_origin = request.site
-    #         with reversion.create_revision():
-    #             reversion.set_user(request.user)
-    #             resource.save()
-    #             resource.sites.add(request.site)
-    #             form.save_m2m()
-    #
-    #         next_url = reverse("resources-resource-detail", args=[resource.id])
-    #         return redirect(next_url)
-    # else:
-    #     form = EditResourceForm()
+    if request.method == "POST":
+        form = EditResourceForm(request.POST)
+        if form.is_valid():
+            resource = form.save(commit=False)
+            resource.created_by = request.user
+            resource.site_origin = request.site
+            with reversion.create_revision():
+                reversion.set_user(request.user)
+                resource.save()
+                resource.sites.add(request.site)
+                form.save_m2m()
+
+            next_url = reverse("resources-resource-detail", args=[resource.id])
+            return redirect(next_url)
+    else:
+        form = EditResourceForm()
     return render(
         request,
         "resources/resource/create.html",
         {
             "categories": categories,
+            "form": form,
         },
     )
 

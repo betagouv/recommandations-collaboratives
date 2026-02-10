@@ -69,20 +69,6 @@ class ResourceViewSet(viewsets.ModelViewSet):
         IsResourceManagerOrReadOnly,
     ]
 
-    def update(self, request, *args, **kwargs):
-        pass
-
-    def create(self, request, *args, **kwargs):
-        pass
-    # resource = form.save(commit=False)
-    #         resource.created_by = request.user
-    #         resource.site_origin = request.site
-    #         with reversion.create_revision():
-    #             reversion.set_user(request.user)
-    #             resource.save()
-    #             resource.sites.add(request.site)
-    #             form.save_m2m()
-
     @action(
         detail=False,
         methods=["post"],

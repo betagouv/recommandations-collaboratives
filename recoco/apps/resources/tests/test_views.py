@@ -75,22 +75,6 @@ def test_draft_resources_are_not_available_to_non_staff_users(request, client):
 
 
 @pytest.mark.django_db
-def test_draft_resources_are_available_to_advisors(request, client):
-    resource = Recipe(
-        models.Resource,
-        sites=[get_current_site(request)],
-        status=models.Resource.DRAFT,
-        title="a draft resource",
-    ).make()
-    url = reverse("resources-resource-search")
-    with login(client, groups=["example_com_advisor"]):
-        response = client.get(url)
-    detail_url = reverse("resources-resource-detail", args=[resource.id])
-    assertContains(response, detail_url)
-
-
-
-@pytest.mark.django_db
 def test_draft_resources_are_available_to_staff_users(request, client):
     resource = Recipe(
         models.Resource,
@@ -428,16 +412,33 @@ def test_create_resource_not_available_for_non_switchtender_users(client):
 @pytest.mark.django_db
 def test_create_resource_available_for_authorized_users(client):
     url = reverse("resources-resource-create")
-
     with login(client, groups=["example_com_staff"]):
         response = client.get(url)
     assert response.status_code == 200
-    assertContains(response, 'form id="form-resource-create"')
+    assertContains(response, 'form id="form-resource"')
 
-    with login(client, groups=["example_com_advisor"]):
-        response = client.get(url)
-    assert response.status_code == 200
-    assertContains(response, 'form id="form-resource-create"')
+
+@pytest.mark.resource_create
+@pytest.mark.django_db
+def test_create_new_resource_and_redirect(request, client):
+    data = {
+        "title": "a title",
+        "subtitle": "a sub title",
+        "status": 0,
+        "summary": "a summary",
+        "tags": "#tag",
+        "content": "this is some content",
+        "support_orga": "Big Brother",
+    }
+
+    with login(client, groups=["example_com_staff"]):
+        response = client.post(reverse("resources-resource-create"), data=data)
+
+    assert response.status_code == 302
+
+    resource = models.Resource.on_site.all()[0]
+    assert resource.content == data["content"]
+    assert resource.site_origin == get_current_site(request)
 
 
 ########################################################################
@@ -459,7 +460,7 @@ def test_update_resource_not_available_for_non_staff(request, client):
 
 @pytest.mark.resource_update
 @pytest.mark.django_db
-def test_update_resource_available_for_authorized_users(request, client):
+def test_update_resource_available_for_staff(request, client):
     resource = Recipe(models.Resource, sites=[get_current_site(request)]).make()
 
     url = reverse("resources-resource-update", args=[resource.id])
@@ -467,15 +468,39 @@ def test_update_resource_available_for_authorized_users(request, client):
         response = client.get(url)
 
     assert response.status_code == 200
-
     assertContains(response, 'form id="form-resource-update"')
+
+
+@pytest.mark.resource_update
+@pytest.mark.django_db
+def test_update_resource_from_origin_site_and_redirect(request, client):
+    resource = baker.make(models.Resource)
+    current_site = get_current_site(request)
+    resource.site_origin = current_site
+    resource.save()
+
+    previous_update = resource.updated_on
 
     url = reverse("resources-resource-update", args=[resource.id])
-    with login(client, groups=["example_com_advisors"]):
-        response = client.get(url)
 
-    assert response.status_code == 200
-    assertContains(response, 'form id="form-resource-update"')
+    data = {
+        "title": "a title",
+        "subtitle": "a sub title",
+        "status": 0,
+        "summary": "a summary",
+        "tags": "#tag",
+        "content": "this is some updated content",
+        "support_orga": "New Big Brother",
+    }
+
+    with login(client, groups=["example_com_staff"]):
+        response = client.post(url, data=data)
+
+    assert response.status_code == 302
+
+    resource.refresh_from_db()
+    assert resource.content == data["content"]
+    assert resource.updated_on > previous_update
 
 
 @pytest.mark.resource_update
