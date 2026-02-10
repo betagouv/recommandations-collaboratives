@@ -1,5 +1,4 @@
 import Alpine from 'alpinejs';
-import { generateUUID } from '../utils/uuid';
 import { makeProjectURL } from '../utils/createProjectUrl';
 
 import api, { projectsProjectSitesUrl, projectsUrl } from '../utils/api';
@@ -106,9 +105,7 @@ Alpine.data('KanbanProjects', function (currentSiteId, departments, regions) {
               this.currentSiteId
             );
 
-          board.projects = mappedProjects.map((d) =>
-            Object.assign(d, { uuid: generateUUID() })
-          );
+          board.projects = mappedProjects;
           board.allProjects = [...board.projects];
 
           // Update pagination state
@@ -143,11 +140,7 @@ Alpine.data('KanbanProjects', function (currentSiteId, departments, regions) {
           this.currentSiteId
         );
 
-      const newProjects = mappedProjects.map((d) =>
-        Object.assign(d, { uuid: generateUUID() })
-      );
-
-      board.allProjects = [...board.allProjects, ...newProjects];
+      board.allProjects = [...board.allProjects, ...mappedProjects];
       board.offset = board.allProjects.length;
       board.hasMore = board.offset < board.totalCount;
       board.isLoading = false;
@@ -173,10 +166,10 @@ Alpine.data('KanbanProjects', function (currentSiteId, departments, regions) {
       const board = this.getBoard(status);
       return board ? board.projects.sort(this.sortFn.bind(this)) : [];
     },
-    onDragStart(event, uuid) {
+    onDragStart(event, projectId) {
       event.dataTransfer.clearData();
       event.dataTransfer.effectAllowed = 'move';
-      event.dataTransfer.setData('application/uuid', uuid);
+      event.dataTransfer.setData('application/project-id', projectId);
       event.target.classList.add('drag-dragging');
       document
         .querySelectorAll('.drop-column')
@@ -207,9 +200,9 @@ Alpine.data('KanbanProjects', function (currentSiteId, departments, regions) {
       event.preventDefault();
       event.dataTransfer.dropEffect = 'move';
     },
-    findProjectByUuid(uuid) {
+    findProjectById(projectId) {
       for (const board of this.boards) {
-        const project = board.projects.find((d) => d.uuid === uuid);
+        const project = board.projects.find((d) => d.id === projectId);
         if (project) {
           return project;
         }
@@ -222,15 +215,14 @@ Alpine.data('KanbanProjects', function (currentSiteId, departments, regions) {
       this.currentlyHoveredElement.classList.remove('drag-target');
       this.currentlyHoveredElement = null;
 
-      const uuid = event.dataTransfer.getData('application/uuid');
-      if (!uuid) {
+      const projectId = Number(event.dataTransfer.getData('application/project-id'));
+      if (!projectId) {
         return;
       }
-      const found = this.findProjectByUuid(uuid);
-      if (!found) {
+      const droppedProject = this.findProjectById(projectId);
+      if (!droppedProject) {
         return;
       }
-      const droppedProject = found;
       const projectSite = droppedProject.project_sites.find(
         (project_site) => project_site.site === this.currentSiteId
       );

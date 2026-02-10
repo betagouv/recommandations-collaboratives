@@ -68,11 +68,9 @@
                                                 <template x-if="column(board.code).length === 0">
                                                     <div class="drag-targetable fr-py-2v h-100"
                                                          @dragover="onDragOver(event, null)"
-                                                         @drop="onDrop(event, board.code, null)"
+                                                         @drop="onDrop(event, board.code)"
                                                          @dragenter="onDragEnter(event)"
                                                          @dragleave="onDragLeave(event)"
-                                                         @dragstart="onDragStart(event, t.uuid)"
-                                                         @dragend="onDragEnd(event)"
                                                          data-test-id="drag-target"></div>
                                                 </template>
                                                 <!-- Task Template -->
@@ -81,10 +79,10 @@
                                                          class="drag-targetable kanban-card-container"
                                                          data-cy="card-project"
                                                          @dragover="onDragOver(event)"
-                                                         @drop="onDrop(event, board.code, t.uuid)"
+                                                         @drop="onDrop(event, board.code)"
                                                          @dragenter="onDragEnter(event)"
                                                          @dragleave="onDragLeave(event)"
-                                                         @dragstart="onDragStart(event, t.uuid)"
+                                                         @dragstart="onDragStart(event, t.id)"
                                                          @dragend="onDragEnd(event)">
                                                         <a :href="makeProjectURL('{% url 'projects-project-detail' 0 %}', t.id)">
                                                             <div class="kanban-card rounded fr-p-4v w-100 position-relative"
@@ -185,11 +183,9 @@
                                                 <template x-if="column(board.code).length > 0">
                                                     <div class="drag-targetable fr-py-2v flex-grow-1"
                                                          @dragover="onDragOver(event, null)"
-                                                         @drop="onDrop(event, board.code, null)"
+                                                         @drop="onDrop(event, board.code)"
                                                          @dragenter="onDragEnter(event)"
                                                          @dragleave="onDragLeave(event)"
-                                                         @dragstart="onDragStart(event, t.uuid)"
-                                                         @dragend="onDragEnd(event)"
                                                          data-test-id="drag-target"></div>
                                                 </template>
                                                 <!-- Loading indicator -->
