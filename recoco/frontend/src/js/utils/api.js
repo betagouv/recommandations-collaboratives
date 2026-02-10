@@ -256,6 +256,11 @@ export function regionsUrl() {
   return `/api/regions/`;
 }
 
+// Communes :
+export function communesUrl() {
+  return `/api/communes/`;
+}
+
 // Challenges
 export function challengeUrl(code) {
   return `/api/challenges/${code}/`;
