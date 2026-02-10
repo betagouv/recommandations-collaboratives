@@ -301,7 +301,7 @@ def test_command_deletes(user_to_delete, mocker, current_site):
     user_to_delete.profile.refresh_from_db()
 
     assert user_to_delete.first_name == ""
-    assert user_to_delete.last_name == "Compte supprimé"
+    assert user_to_delete.last_name == "Utilisateur supprimé"
     assert user_to_delete.email == f"{user_to_delete.id}@deleted.recoconseil.fr"
     assert user_to_delete.username == f"{user_to_delete.id}@deleted.recoconseil.fr"
     assert not user_to_delete.is_active

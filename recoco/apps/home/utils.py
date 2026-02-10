@@ -128,7 +128,7 @@ DELETION_ABSENT_FOR_DAYS = 365 * 2
 
 def delete_user(user: User):
     user.first_name = ""
-    user.last_name = "Compte supprimé"
+    user.last_name = "Utilisateur supprimé"
     user.email = f"{user.id}@deleted.recoconseil.fr"
     user.username = user.email
     user.is_active = False
@@ -138,6 +138,7 @@ def delete_user(user: User):
     user.set_unusable_password()
 
     user.profile.phone_no = ""
+    user.profile.organization_position = ""
     user.profile.previous_activity_at = None
     user.profile.previous_deletion_warning_at = None
     user.profile.previous_activity_site = None
