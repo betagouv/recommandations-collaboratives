@@ -40,7 +40,7 @@
             <div class="d-flex gap-1 align-items-center">
                 <div class="w-100 position-relative"
                      @keydown.enter.prevent="$el.closest('form').submit()">
-                    {% include "projects/project/fragments/search_bar.html" with placeholder="Rechercher" value=query %}
+                    {% include "projects/project/fragments/search_bar.html" with placeholder="Rechercher" value=query show_search_button=True %}
                     <input type="hidden" value="on" name="searching">
                 </div>
                 <div class="w-100 d-flex justify-content-around">

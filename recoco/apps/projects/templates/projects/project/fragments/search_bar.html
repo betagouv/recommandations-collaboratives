@@ -7,6 +7,7 @@ variables to pass :
 - placeholder : le texte à afficher dans la barre de recherche
 - x_model : le nom du modèle x-data à lier à la barre de recherche (optionnel)
 - value : la valeur initiale de la barre de recherche (optionnel)
+- show_search_button : afficher un bouton de recherche (optionnel)
 
 {% endcomment %}
 {% load django_vite %}
@@ -17,9 +18,14 @@ variables to pass :
        type="search"
        name="{{ name|default:'query' }}"
        data-cy="search-bar-project"
-       class="placeholder-position searchbar-input"
+       class="placeholder-position searchbar-input{% if show_search_button %} searchbar-input--with-button{% endif %}"
        placeholder="{{ placeholder|default:"Rechercher" }}"
        {% if value %}value="{{ value }}"{% endif %}
        @input.debounce.500ms="{{ action_search }}"
        {% if x_model %}x-model="{{ x_model }}"{% endif %}>
 <span class="fr-icon-search-line correct-position" aria-hidden="true"></span>
+{% if show_search_button %}
+<button type="submit" class="searchbar-button fr-btn fr-btn--sm" title="Rechercher">
+    <span class="sr-only">Rechercher</span>
+</button>
+{% endif %}
