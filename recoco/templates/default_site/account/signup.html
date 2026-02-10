@@ -2,6 +2,20 @@
 {% load static %}
 {% load i18n %}
 {% load django_vite %}
+{% block title %}
+    {% if request.GET.next == '/advisor-access-request' %}
+        Demander un accès conseiller
+    {% else %}
+        Créer mon compte
+    {% endif %}
+{% endblock title %}
+{% block og_title %}
+    {% if request.GET.next == '/advisor-access-request' %}
+        Demander un accès conseiller
+    {% else %}
+        Créer mon compte
+    {% endif %}
+{% endblock og_title %}
 {% block js %}
     {% vite_asset 'js/styles/home-auth.css.js' %}
     {% vite_asset 'js/styles/account-login.css.js' %}

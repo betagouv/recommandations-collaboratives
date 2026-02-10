@@ -25,6 +25,10 @@
                         <a href="{% url 'crm-user-deactivate' crm_user.pk %}"
                            class="btn btn-danger">Suspendre ce compte</a>
                     </div>
+                {% elif crm_user.profile.deleted %}
+                    <div class="alert alert-danger" role="alert">
+                        Ce compte a été supprimé. Ceci signifie que la personne ne peut plus se connecter à {{ request.site.name }}.
+                    </div>
                 {% else %}
                     <div class="alert alert-danger" role="alert">
                         Ce compte a été suspendu. Ceci signifie que la personne ne peut plus se connecter à {{ request.site.name }}.

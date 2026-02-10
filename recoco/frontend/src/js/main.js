@@ -23,6 +23,7 @@ import './store/utils';
 import './store/editor';
 import './store/djangoData';
 import './store/app';
+import './store/onLeaveAlert';
 
 //Global reused component
 import './components/Notification';

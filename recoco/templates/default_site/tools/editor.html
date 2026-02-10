@@ -24,7 +24,7 @@ Parameters:
     {% vite_asset 'js/styles/contact-card.css.js' %}
 {% endblock js %}
 <div class="w-100 position-relative editor-container"
-     {% if initial_content_escapejs %} x-data='editor("{{ initial_content|escapejs }}", "{{ placeholder }}", "{{ is_action_pusher }}" == "True" )' {% elif initial_content_js %} x-data='editor({{ initial_content }}, "{{ placeholder }}", "{{ is_action_pusher }}" == "True")' {% else %} x-data='editor("{{ initial_content }}", "{{ placeholder }}", "{{ is_action_pusher }}" == "True")' {% endif %}
+     {% if initial_content_escapejs %} x-data='editor("{{ initial_content|escapejs }}", "{{ placeholder }}", "{{ is_action_pusher }}" == "True", {{ on_leave_alert|yesno:"true,false" }})' {% elif initial_content_js %} x-data='editor({{ initial_content }}, "{{ placeholder }}", "{{ is_action_pusher }}" == "True", {{ on_leave_alert|yesno:"true,false" }})' {% else %} x-data='editor("{{ initial_content }}", "{{ placeholder }}", "{{ is_action_pusher }}" == "True", {{ on_leave_alert|yesno:"true,false" }})' {% endif %}
      @reset-contact="handleResetContact()"
      @set-comment.window="setMarkdownContent(event)"
      @modal-response="closeSearchContactModal($event)"

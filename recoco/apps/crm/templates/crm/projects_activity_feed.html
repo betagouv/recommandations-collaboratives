@@ -1,6 +1,12 @@
 {% extends "base.html" %}
 {% load static %}
 {% load django_vite %}
+{% block title %}
+    Dernières activités sur le site
+{% endblock title %}
+{% block og_title %}
+    Dernières activités sur le site
+{% endblock og_title %}
 {% block js %}
     {% vite_asset 'js/apps/crm.js' %}
 {% endblock js %}

@@ -81,7 +81,12 @@ class UserProfileManager(models.Manager):
     """Manager for active UserProfile"""
 
     def get_queryset(self):
-        return super().get_queryset().filter(deleted=None)
+        return (
+            super()
+            .get_queryset()
+            .filter(deleted=None, disabled=None)
+            .exclude(user__username="AnonymousUser")
+        )
 
 
 class UserProfileOnSiteManager(CurrentSiteManager, UserProfileManager):
@@ -94,12 +99,13 @@ class DeletedUserProfileManager(models.Manager):
     """Manager for deleted UserProfile"""
 
     def get_queryset(self):
-        return super().get_queryset().exclude(deleted=None)
+        return super().get_queryset().exclude(deleted=None, disabled=None)
 
 
 class UserProfile(models.Model):
     """Represents the profile of a user"""
 
+    all = models.Manager()
     objects = UserProfileManager()
     on_site = UserProfileOnSiteManager()
     deleted_objects = DeletedUserProfileManager()
@@ -126,9 +132,24 @@ class UserProfile(models.Model):
 
     organization_position = models.CharField(null=True, blank=True, max_length=200)
 
-    previous_login_at = models.DateTimeField(null=True, blank=True)
+    previous_activity_at = models.DateTimeField(null=True, blank=True)
+
+    previous_deletion_warning_at = models.DateTimeField(null=True, blank=True)
+
+    previous_activity_site = models.ForeignKey(
+        Site,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        verbose_name="Dernier site consulté",
+        related_name="users_previous_activity",
+    )
+
+    nb_deletion_warnings = models.IntegerField(default=0)
 
     deleted = models.DateTimeField(null=True, blank=True)
+
+    disabled = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         verbose_name = "profil utilisateur"

@@ -85,7 +85,7 @@ def test_user_challenge_not_returned_when_is_snoozed_and_repeat_set_to_zero_week
 def test_get_acquired_challenge_when_user_has_no_previous_login():
     site = baker.make(site_models.Site)
     user = baker.make(auth_models.User, last_login=timezone.now())
-    user.profile.previous_login_at = None
+    user.profile.previous_activity_at = None
     user.profile.save()
 
     definition = baker.make(
@@ -147,7 +147,7 @@ def test_user_challenge_returned_when_inactivity_more_than_one_month():
     site = baker.make(site_models.Site)
     more_than_one_month = timezone.now() - datetime.timedelta(weeks=5)
     user = baker.make(auth_models.User, last_login=more_than_one_month)
-    user.profile.previous_login_at = more_than_one_month
+    user.profile.previous_activity_at = more_than_one_month
     user.profile.save()
 
     definition = baker.make(
@@ -173,7 +173,7 @@ def test_user_challenge_not_returned_when_inactivity_less_than_one_month():
     more_than_one_month = timezone.now() - datetime.timedelta(weeks=5)
     less_than_one_month = timezone.now() - datetime.timedelta(weeks=3)
     user = baker.make(auth_models.User, last_login=less_than_one_month)
-    user.profile.previous_login_at = less_than_one_month
+    user.profile.previous_activity_at = less_than_one_month
     user.profile.save()
 
     definition = baker.make(
@@ -199,7 +199,7 @@ def test_user_challenge_not_returned_when_inactivity_but_acquired_less_than_one_
     more_than_one_month = timezone.now() - datetime.timedelta(weeks=5)
     less_than_one_month = timezone.now() - datetime.timedelta(weeks=3)
     user = baker.make(auth_models.User, last_login=more_than_one_month)
-    user.profile.previous_login_at = more_than_one_month
+    user.profile.previous_activity_at = more_than_one_month
     user.profile.save()
 
     definition = baker.make(

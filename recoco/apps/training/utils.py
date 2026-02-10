@@ -42,8 +42,8 @@ def get_challenge_for(user, codename):
     if challenge.acquired_on:
         last_month = timezone.now() - datetime.timedelta(weeks=4)
         if (
-            user.profile.previous_login_at
-            and user.profile.previous_login_at < last_month
+            user.profile.previous_activity_at
+            and user.profile.previous_activity_at < last_month
         ) and challenge.acquired_on < last_month:
             challenge.acquired_on = None
             challenge.save()

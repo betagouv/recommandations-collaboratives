@@ -16,7 +16,7 @@
 {% elif not user.is_authenticated and request.site.configuration.logo_large %}
     <div class="navbar-logo">
         <a href="{% url 'home' %}"
-           class="d-flex align-middle fr-p-2w align-items-center">
+           class="d-flex align-middle fr-pl-2w align-items-center">
             {% include "header/menu-top-logo-supp.html" %}
             <img class="logo-{{ request.site.name|lower }}"
                  src="{{ request.site.configuration.logo_large.url }}"
@@ -28,7 +28,7 @@
 {% else %}
     <div class="navbar-logo">
         <a href="{% url 'home' %}"
-           class="d-flex align-middle fr-p-2w align-items-center">
+           class="d-flex align-middle fr-pl-2w align-items-center">
             {% include "header/menu-top-logo-supp.html" %}
             <span class="fw-bold span-specific-fontsize-30 specific-ml-30">{{ request.site.name }}</span>
         </a>

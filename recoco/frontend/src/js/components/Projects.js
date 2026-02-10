@@ -120,7 +120,7 @@ function AdvisorDashboard() {
       const data = this.data.find((d) => d.id === JSON.parse(id));
 
       try {
-        await api.patch(`/api/userprojectstatus/${data.id}/`, {
+        await api.patch(`${userProjectStatusUrl()}/${data?.id}/`, {
           status: status,
         });
       } catch (err) {

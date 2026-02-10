@@ -13,7 +13,7 @@ import { ToastType } from '../models/toastType';
 
 const MarkdownEditor = createMarkdownEditor(Editor);
 
-Alpine.data('editor', (content, placeholder, isActionPusher = false) => {
+Alpine.data('editor', (content, placeholder, isActionPusher = false, onLeaveAlert = false) => {
   let editor;
 
   return {
@@ -104,6 +104,9 @@ Alpine.data('editor', (content, placeholder, isActionPusher = false) => {
           _this.$nextTick(() => {
             _this.updatedAt = Date.now();
           });
+          if (onLeaveAlert) {
+            _this.$store.onLeaveAlert.setDirty(true);
+          }
         },
         onSelectionUpdate({ editor }) {
           _this.updatedAt = Date.now();

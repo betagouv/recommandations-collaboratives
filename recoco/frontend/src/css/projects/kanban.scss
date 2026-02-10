@@ -143,8 +143,6 @@
     &__project {
       &-container {
         margin-top: -5px;
-        overflow: hidden;
-        text-overflow: ellipsis;
         display: flex;
         flex-direction: column;
       }
@@ -163,8 +161,8 @@
         color: #161616;
         font-size: var(--font-size-md);
         font-weight: 700;
-        white-space: nowrap;
-        height: 22px;
+        line-height: 1rem;
+        margin-bottom: 4px;
       }
 
       &-organization {
