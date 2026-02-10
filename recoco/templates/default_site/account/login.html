@@ -42,6 +42,7 @@
                     Connectez vous à votre espace {{ site.name }} en utilisant vos identifiants ou votre compte ProConnect
                 </p>
             </div>
+            {% if not SOCIALACCOUNT_ONLY %}
             <div class="d-flex justify-content-center">
                 <div class="{% flag "proconnect_login" %}w-50 {% else %}w-100 {% endflag %}fr-p-4v">
                     {% comment %} <div class="w-50 fr-p-4v"> {% endcomment %}
@@ -115,8 +116,12 @@
                         </p>
                     </div>
                 </div>
-            {% endflag %}
+                {% endflag %}
         </div>
+        {% endif %}
+        {% if SOCIALACCOUNT_ENABLED %}
+            {% include "socialaccount/snippets/login.html" with page_layout="entrance" %}
+        {% endif %}
         <hr class="fr-my-8w login-page__separator">
         <div class="d-flex fr-mt-1v">
             <div class="fr-form-group">
