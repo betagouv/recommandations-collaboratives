@@ -99,7 +99,7 @@
             </div>
         </main>
         {% include "tools/on_leave_modal.html" %}
-        {% if not debug %}
+        {% if debug is False %}
             <script src="https://sentry.incubateur.net/js-sdk-loader/caf46e9eca66a6aee8e9dfc9434f00a8.min.js"
                     crossorigin="anonymous"></script>
         {% endif %}
