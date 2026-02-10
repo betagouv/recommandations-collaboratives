@@ -107,6 +107,7 @@ Alpine.data('CreateContactModal', () => {
       this.modalCreateContact.classList.toggle('d-none');
       // create organization modal
       this.isCreateOrganizationModalOpen = true;
+      this.$store.crisp.isPopupOpen = true;
     },
     closeCreateOrganizationModal(event) {
       if (event.target.id !== 'create-organization-modal') {
@@ -116,6 +117,7 @@ Alpine.data('CreateContactModal', () => {
         this.handleSetOrganization(event.detail);
       }
       this.isCreateOrganizationModalOpen = false;
+      this.$store.crisp.isPopupOpen = false;
       this.modalCreateContact.classList.toggle('d-none');
     },
     initCreateContactModalData($event) {
