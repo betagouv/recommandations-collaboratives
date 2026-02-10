@@ -17,10 +17,8 @@ Alpine.data('KanbanProjects', function (currentSiteId, departments, regions) {
     backendSearch: {
       searchText: '',
       searchDepartment: [],
-      lastActivity: localStorage.getItem('lastActivity') ?? '30',
     },
     searchText: '',
-    filterProjectLastActivity: localStorage.getItem('lastActivity') ?? '30',
     regions: JSON.parse(regions.textContent),
     territorySelectAll: true,
     pageSize: 10,
@@ -97,7 +95,6 @@ Alpine.data('KanbanProjects', function (currentSiteId, departments, regions) {
             projectsUrl({
               searchText: this.backendSearch.searchText,
               departments: this.backendSearch.searchDepartment,
-              lastActivity: this.backendSearch.lastActivity,
               limit: this.pageSize,
               status: [board.code],
             })
@@ -134,7 +131,6 @@ Alpine.data('KanbanProjects', function (currentSiteId, departments, regions) {
         projectsUrl({
           searchText: this.backendSearch.searchText,
           departments: this.backendSearch.searchDepartment,
-          lastActivity: this.backendSearch.lastActivity,
           limit: this.pageSize,
           offset: board.offset,
           status: [board.code],
@@ -247,11 +243,6 @@ Alpine.data('KanbanProjects', function (currentSiteId, departments, regions) {
 
       await this.getData();
     },
-    async onLastActivityChange(event) {
-      this.backendSearch.lastActivity = event.target.value;
-      localStorage.setItem('lastActivity', this.backendSearch.lastActivity);
-      await this.getData();
-    },
     toggleMyProjectsFilter() {
       this.isDisplayingOnlyUserProjects = !this.isDisplayingOnlyUserProjects;
       localStorage.setItem(
@@ -273,30 +264,13 @@ Alpine.data('KanbanProjects', function (currentSiteId, departments, regions) {
     },
     async onSearch(event) {
       this.backendSearch.searchText = event.target.value;
-      await this.backendSearchProjects({ resetLastActivity: true });
-    },
-    async backendSearchProjects(options = { resetLastActivity: false }) {
-      if (this.backendSearch.searchText !== '') {
-        if (this.$refs.selectFilterProjectDuration) {
-          this.$refs.selectFilterProjectDuration.disabled = true;
-          this.$refs.selectFilterProjectDuration.value = 1460;
-        }
-        this.backendSearch.lastActivity = '';
-      } else if (options.resetLastActivity) {
-        if (this.$refs.selectFilterProjectDuration) {
-          this.$refs.selectFilterProjectDuration.disabled = false;
-          this.$refs.selectFilterProjectDuration.value = 30;
-        }
-        this.backendSearch.lastActivity = '30';
-      }
-
       await this.getData();
     },
     async saveSelectedDepartment(event) {
       if (!event.detail) return;
 
       this.backendSearch.searchDepartment = [...event.detail];
-      await this.backendSearchProjects();
+      await this.getData();
     },
 
     sortFn(a, b) {
@@ -315,7 +289,7 @@ Alpine.data('KanbanProjects', function (currentSiteId, departments, regions) {
     async onTagClick(tag) {
       this.backendSearch.searchText = tag;
       this.searchText = '#' + tag;
-      await this.backendSearchProjects({ resetLastActivity: true });
+      await this.getData();
     },
   };
 });
