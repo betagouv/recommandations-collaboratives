@@ -1,7 +1,25 @@
 from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpRequest
+from django.shortcuts import redirect, reverse
 
 from recoco.apps.home.models import SiteConfiguration
+
+
+class RedirectIncompleteProfileUserMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request: HttpRequest):
+        if not request.user.is_authenticated:
+            return self.get_response(request)
+        if (
+            request.user.profile.needs_profile_update
+            and request.path != reverse("home-update-incomplete-profile")
+            and request.headers.get("accept") == "text/html"
+        ):  # don't redirect xhr or debug requests
+            return redirect(reverse("home-update-incomplete-profile"))
+
+        return self.get_response(request)
 
 
 class CurrentSiteConfigurationMiddleware:

@@ -114,7 +114,7 @@ class UserProfile(models.Model):
 
     organization = models.ForeignKey(
         addressbook_models.Organization,
-        blank=True,
+        blank=False,
         null=True,
         on_delete=models.SET_NULL,
         related_name="registered_profiles",
@@ -122,13 +122,15 @@ class UserProfile(models.Model):
 
     sites = models.ManyToManyField(Site)
 
-    phone_no = PhoneNumberField(blank=True)
+    phone_no = PhoneNumberField(blank=False)
 
-    organization_position = models.CharField(null=True, blank=True, max_length=200)
+    organization_position = models.CharField(null=True, blank=False, max_length=200)
 
     previous_login_at = models.DateTimeField(null=True, blank=True)
 
     deleted = models.DateTimeField(null=True, blank=True)
+
+    needs_profile_update = models.BooleanField(default=False)
 
     class Meta:
         verbose_name = "profil utilisateur"

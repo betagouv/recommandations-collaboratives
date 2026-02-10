@@ -135,6 +135,7 @@ MIDDLEWARE = [
     "wagtail.contrib.redirects.middleware.RedirectMiddleware",
     "waffle.middleware.WaffleMiddleware",
     "django_htmx.middleware.HtmxMiddleware",
+    "recoco.apps.home.middlewares.RedirectIncompleteProfileUserMiddleware",
 ]
 
 ROOT_URLCONF = "recoco.urls"

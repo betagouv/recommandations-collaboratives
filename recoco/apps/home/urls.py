@@ -98,6 +98,11 @@ urlpatterns = [
         name="advisor-access-request-moderator",
     ),
     path(r"site/create", views.SiteCreateView.as_view(), name="site-create"),
+    path(
+        r"profile-complete/",
+        views.update_profile_if_incomplete,
+        name="home-update-incomplete-profile",
+    ),
 ]
 
 # eof
