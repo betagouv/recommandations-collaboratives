@@ -38,4 +38,14 @@ class Migration(migrations.Migration):
             name="previous_deletion_warning_at",
             field=models.DateTimeField(blank=True, null=True),
         ),
+        migrations.RenameField(
+            model_name="userprofile",
+            old_name="deleted",
+            new_name="disabled",
+        ),
+        migrations.AddField(
+            model_name="userprofile",
+            name="deleted",
+            field=models.DateTimeField(blank=True, null=True),
+        ),
     ]
