@@ -175,7 +175,7 @@ def send_deletion_warning_to_profiles(profiles, warning_time):
         if warning_time == 1
         else communication_constants.TPL_RGDP_DELETION_SECOND_WARNING
     )
-    for profile in profiles:
+    for profile in profiles.filter(disabled=None):
         if profile.previous_activity_site is None:
             sentry_sdk.capture_exception(
                 Site.DoesNotExist(
