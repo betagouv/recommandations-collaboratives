@@ -4,6 +4,7 @@ import {
   removeAndAddClassConditionaly,
   removeClassIfExists,
 } from '../utils/cssUtils';
+import { communesUrl } from '../utils/api';
 
 Alpine.data('CitySearch', CitySearch);
 
@@ -78,7 +79,7 @@ function CitySearch(required = false, requestMethod = 'GET', dsfr = false) {
       if (this.postal == '') return;
 
       this.isLoading = true;
-      fetch(`/api/communes/?postal=${this.postal}`)
+      fetch(`${communesUrl()}?postal=${this.postal}`)
         .then((res) => res.json())
         .then((data) => {
           this.isLoading = false;
