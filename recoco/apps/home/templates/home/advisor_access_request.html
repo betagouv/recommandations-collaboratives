@@ -5,16 +5,16 @@
     {% vite_asset 'js/components/RegionDepartmentPreparer.js' %}
 {% endblock js %}
 {% block title %}
-    Devenir conseiller·e
+    Demander un accès conseiller
 {% endblock title %}
 {% block og_title %}
-    Devenir conseiller·e
+    Demander un accès conseiller
 {% endblock og_title %}
 {% block content %}
     {{ departments|json_script:"departmentsArray" }}
     <div>
         {% if advisor_access_request %}
-            {% include "account/fragments/pending_advisor_request_redirect.html" with title="Devenir conseiller·e" %}
+            {% include "account/fragments/pending_advisor_request_redirect.html" with title="Devenir conseiller" %}
         {% else %}
             {% include "account/fragments/departements_select_form.html" with stepper=True total_steps=2 step_number=2 current_step_title="Précisions sur votre demande" title="Devenir conseiller•e" %}
         {% endif %}
