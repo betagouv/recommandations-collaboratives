@@ -92,7 +92,7 @@ def resource_search(request):
         departments = geomatics_models.Department.objects.order_by("name").all()
     elif request.user.is_authenticated:
         departments = geomatics_models.Department.objects.filter(
-            communes__in=projects.Project.on_site.filter(members=request.user).values(
+            commune__in=projects.Project.on_site.filter(members=request.user).values(
                 "commune"
             )
         )
