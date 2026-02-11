@@ -14,6 +14,7 @@ requires-python = ">=3.11,<3.14"
 dependencies = [
     "beautifulsoup4==4.12.3",
     "celery==5.4.0",
+    "cryptography==46.0.5",
     "django>=5.1.15,<5.2",
     "django-activity-stream",
     "django-admin-csvexport==2.2",
