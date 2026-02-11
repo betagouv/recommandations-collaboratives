@@ -30,7 +30,7 @@ from django.template import TemplateDoesNotExist
 from django.template.loader import get_template
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
-from django.views.generic.detail import DetailView, View
+from django.views.generic.detail import DetailView, SingleObjectMixin, View
 from django.views.generic.edit import DeleteView
 from markdownx.fields import MarkdownxFormField
 from reversion.models import Version
@@ -261,6 +261,42 @@ class BaseResourceDetailView(DetailView):
             context["contacts_to_display"] = []
 
         return context
+
+
+class DuplicateResourceView(
+    LoginRequiredMixin, PermissionRequiredMixin, SingleObjectMixin, View
+):
+    model = models.Resource
+    permission_required = "sites.manage_resources"
+    http_method_names = ["get"]
+    pk_url_kwarg = "resource_id"
+
+    def has_permission(self):
+        site = get_current_site(self.request)
+        return self.request.user.has_perm(self.permission_required, site)
+
+    def get(self, request, *args, **kwargs):
+        current_site = get_current_site(request)
+        resource_to_copy = self.get_object()
+
+        with transaction.atomic():
+            new_resource = models.Resource.objects.create(
+                site_origin=current_site,
+                status=models.Resource.DRAFT,
+                created_by=request.user,
+                imported_from=resource_to_copy.imported_from,  # todo or None
+                category=resource_to_copy.category,
+                title=resource_to_copy.title,
+                subtitle=resource_to_copy.subtitle,
+                summary=resource_to_copy.summary,
+                content=resource_to_copy.content,
+                support_orga=resource_to_copy.support_orga,
+            )
+
+            new_resource.sites.set([current_site])
+            new_resource.tags.set(resource_to_copy.tags.all())
+
+        return redirect("resources-resource-update", new_resource.id)
 
 
 class ResourceDetailView(UserPassesTestMixin, BaseResourceDetailView):
