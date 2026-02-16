@@ -63,8 +63,8 @@ Parameter Alpine:
                 </template>
                 <template x-if="!recommendation.resource">
                     <div>
-                        <p x-html="renderMarkdown(recommendation.content)"></p>
-                        <div class="task-item__resource">
+                        <div class="task-item__resource"
+                             :class="{'task-item__resource--bordered': !recommendation.visited}">
                             <template x-if="recommendation.topic">
                                 <div class="task-item__topic"
                                      :style="{ '--color-topic': stringToColor(recommendation.topic?.name) }">
@@ -73,16 +73,9 @@ Parameter Alpine:
                                        x-text="recommendation.topic?.name"></p>
                                 </div>
                             </template>
-                            <template x-if="recommendation.resource">
-                                <h4 class="fr-link" x-text="recommendation.intent"></h4>
-                            </template>
-                            <template x-if="!recommendation.resource">
-                                <h4 x-text="recommendation.intent"></h4>
-                            </template>
-                            <template x-if="recommendation.resource">
-                                <p class="task-item__resource-subtitle fr-mt-1w fr-mb-0"
-                                   x-text="recommendation.resource.subtitle"></p>
-                            </template>
+                            <h4 x-text="recommendation.intent"></h4>
+                            <div class="task-item__content task-item__content-ellipsis"
+                                 x-html="renderMarkdown(recommendation.content)"></div>
                             {% include "conversations/messages/fragments/tasks_status_buttons_js.html" %}
                         </div>
                     </div>

@@ -298,7 +298,8 @@
             line-height: 100%;
           }
         }
-        &__content {
+        &__content,
+        &__content > p {
           color: var(--light-neutral-grey-200, #3a3a3a);
           font-family: Marianne;
           font-size: 0.875rem;
@@ -306,12 +307,17 @@
           font-weight: 400;
           line-height: 1.5em;
         }
+        &__content-ellipsis {
+          height: 6rem;
+          overflow: hidden;
+        }
         &__resource {
           border-radius: 2px;
           border: 1px solid #c0c0c0;
           background: #fff;
           padding: 1em;
           position: relative;
+          width: calc(50% - 1rem);
           &--bordered {
             border: 1px solid var(--background-action-high-blue-france, #000091);
           }
