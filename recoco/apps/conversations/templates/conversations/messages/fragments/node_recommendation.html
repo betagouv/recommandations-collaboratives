@@ -41,21 +41,17 @@ Parameter Alpine:
                                            x-text="recommendation.topic?.name"></p>
                                     </div>
                                 </template>
-                                <template x-if="recommendation.resource">
-                                    <h4 class="fr-link" x-text="recommendation.intent"></h4>
+                                <h4 class="fr-link" x-text="recommendation.intent"></h4>
+                                <template x-if="recommendation.resource.support_orga">
+                                    <p class="task-item__resource-orga fr-mt-1v fr-mb-0">
+                                        <span class="fr-icon fr-icon--xs fr-icon-government-line"></span> <span x-text="recommendation.resource.support_orga"></span>
+                                    </p>
                                 </template>
-                                <template x-if="!recommendation.resource">
-                                    <h4 x-text="recommendation.intent"></h4>
-                                </template>
-                                <template x-if="recommendation.resource">
-                                    <p class="task-item__resource-subtitle fr-mt-1w fr-mb-0"
-                                       x-text="recommendation.resource.subtitle"></p>
-                                </template>
+                                <p class="task-item__resource-subtitle fr-mt-1w fr-mb-0"
+                                   x-text="recommendation.resource.subtitle"></p>
                                 <div class="d-flex justify-content-between">
                                     {% include "conversations/messages/fragments/tasks_status_buttons_js.html" %}
-                                    <template x-if="recommendation.resource">
-                                        <button class="fr-btn fr-btn--sm fr-btn--primary fr-mt-1w">Consulter</button>
-                                    </template>
+                                    <button class="fr-btn fr-btn--sm fr-btn--primary fr-mt-1w">Consulter</button>
                                 </div>
                             </div>
                         </div>
