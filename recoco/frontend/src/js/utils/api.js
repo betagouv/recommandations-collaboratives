@@ -240,11 +240,10 @@ export function resourcesUrl({
       params.append('status', s);
     });
   }
+  const url = new URL('/api/resources/', window.location.origin);
   const paramStr = params.toString();
-  let url = '/api/resources/';
-  if (paramStr) url += '?' + paramStr;
-  console.log(url);
-  return url;
+  if (paramStr) url.search = paramStr;
+  return url.toString();
 }
 
 export function postExternalRessourceUrl() {
