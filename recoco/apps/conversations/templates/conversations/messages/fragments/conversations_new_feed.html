@@ -23,6 +23,7 @@
                     </div>
                 </template>
                 <template x-if="element.type == 'message'">
+                    {% comment %} TODO {% endcomment %}
                     {% include "conversations/messages/message_item.html" %}
                 </template>
                 <template x-if="element.type == 'activity'">

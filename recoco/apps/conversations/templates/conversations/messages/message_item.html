@@ -8,10 +8,13 @@
                 <p class="d-flex">
                     <span class="fr-icon-corner-down-right-line fr-icon--sm"></span>
                     en réponse à : <a class="fr-ml-1v"
-    :href="`#message-${element.in_reply_to}`"
-    x-html="renderMarkdown(await getShortMessageInReplyTo(element.in_reply_to))"></a>
+                                      :href="`#message-${element.in_reply_to}`"
+                                      x-html="renderMarkdown(await getShortMessageInReplyTo(element.in_reply_to))"></a>
                 </p>
             </div>
+        </template>
+        <template x-if="element.in_reply_to">
+            <div class="message-item__reply-to-content">
         </template>
         <template x-if="element.deleted">
             <div class="text-muted fr-italic fr-small">(Ce contenu a été supprimé)</div>
@@ -91,5 +94,8 @@
                 </div>
             </div>
         </template>
+        <template x-if="element.in_reply_to">
+        </div>
+    </template>
     </div>
 </div>
