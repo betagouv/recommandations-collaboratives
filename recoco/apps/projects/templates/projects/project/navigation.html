@@ -38,8 +38,8 @@
                 {% endif %}
                 {% if "list_projects" in user_site_perms or "view_surveys" in user_project_perms %}
                     <div class="fr-segmented__element"
-                         :class="{'visual-hint': $store.tutorialsEvents.isTutorialForProjectPage==2}">
-                        <template x-if="$store.tutorialsEvents.isTutorialForProjectPage==2">
+                         :class="{'visual-hint': $store.tutorialsEvents?.isTutorialForProjectPage==2}">
+                        <template x-if="$store.tutorialsEvents?.isTutorialForProjectPage==2">
                             {% include "projects/project/fragments/onboarding-tutorials/visual-hint.html" %}
                         </template>
                         <input value="survey"
@@ -59,15 +59,15 @@
                                 {% endcomment %}
                             </a>
                         </label>
-                        <template x-if="$store.tutorialsEvents.isTutorialForProjectPage==2">
+                        <template x-if="$store.tutorialsEvents?.isTutorialForProjectPage==2">
                             {% include "projects/project/fragments/onboarding-tutorials/svg-hint.html" with rect_x="4" rect_y="5" rect_width="94" rect_height="28" view_box_size="0 0 100 100" %}
                         </template>
                     </div>
                 {% endif %}
                 <div class="fr-segmented__element"
-                     :class="{'visual-hint': $store.tutorialsEvents.isTutorialForProjectPage === 3}"
+                     :class="{'visual-hint': $store.tutorialsEvents?.isTutorialForProjectPage === 3}"
                      {% if "view_public_notes" not in user_project_perms and "use_public_notes" not in user_project_perms %} aria-describedby="tooltip-lock-access-conversations" {% endif %}>
-                    <template x-if="$store.tutorialsEvents.isTutorialForProjectPage === 3">
+                    <template x-if="$store.tutorialsEvents?.isTutorialForProjectPage === 3">
                         {% include "projects/project/fragments/onboarding-tutorials/visual-hint.html" %}
                     </template>
                     {% include "projects/project/fragments/navigation/tooltip_lock_access.html" with id="tooltip-lock-access-conversations" %}
@@ -81,7 +81,7 @@
                     <label class="fr-label" for="segmented-control-tasks">
                         <a class="stretched-link"
                            data-test-id="project-navigation-conversations-new"
-                           @click="if ($store.tutorialsEvents.isTutorialForProjectPage === 3) { localStorage.setItem('isTutorialForProjectPage', 3.5) }"
+                           @click="if ($store.tutorialsEvents?.isTutorialForProjectPage === 3) { localStorage.setItem('isTutorialForProjectPage', 3.5) }"
                            href="{% if "view_public_notes" in user_project_perms or "use_public_notes" in user_project_perms %} {% url 'projects-project-detail-conversations' project.pk %}{% else %}#{% endif %}">Conversation
                             {% if "view_public_notes" in user_project_perms or "use_public_notes" in user_project_perms %}
                                 {% if active_project_conversation_notifications_count %}
@@ -92,7 +92,7 @@
                             {% endif %}
                         </a>
                     </label>
-                    <template x-if="$store.tutorialsEvents.isTutorialForProjectPage === 3">
+                    <template x-if="$store.tutorialsEvents?.isTutorialForProjectPage === 3">
                         {% include "projects/project/fragments/onboarding-tutorials/svg-hint.html" with rect_x="3" rect_y="3" rect_width="60" rect_height="18" view_box_size="0 0 65 50" %}
                     </template>
                 </div>
@@ -194,24 +194,24 @@
                    href="{% url 'crm-project-details' project.pk %}">CRM</a>
             {% endif %}
             <button class="fr-btn fr-btn--sm fr-btn--tertiary"
-                    :class="{'visual-hint': $store.tutorialsEvents.isTutorialForProjectPage === 4}"
+                    :class="{'visual-hint': $store.tutorialsEvents?.isTutorialForProjectPage === 4}"
                     data-test-id="button-invite-collaborators"
                     @click="if ($store.tutorialsEvents.isTutorialForProjectPage === 4) { localStorage.setItem('isTutorialForProjectPage', 4.5) };">
                 <a data-test-id="link-invite-collaborators"
                    href="{% url 'projects-project-administration' project.pk %}#user-management">Inviter</a>
             </button>
             {% if "use_crm" in user_site_perms and not disable_crm %}
-                <template x-if="$store.tutorialsEvents.isTutorialForProjectPage === 4">
+                <template x-if="$store.tutorialsEvents?.isTutorialForProjectPage === 4">
                     {% include "projects/project/fragments/onboarding-tutorials/visual-hint.html" with extra_classes="position-visual-circle-hint--if-crm-chat" %}
                 </template>
-                <template x-if="$store.tutorialsEvents.isTutorialForProjectPage === 4">
+                <template x-if="$store.tutorialsEvents?.isTutorialForProjectPage === 4">
                     {% include "projects/project/fragments/onboarding-tutorials/svg-hint.html" with rect_x="57" rect_y="35" rect_width="31" rect_height="50" view_box_size="0 0 100 100" is_over=True %}
                 </template>
             {% else %}
-                <template x-if="$store.tutorialsEvents.isTutorialForProjectPage === 4">
+                <template x-if="$store.tutorialsEvents?.isTutorialForProjectPage === 4">
                     {% include "projects/project/fragments/onboarding-tutorials/visual-hint.html" %}
                 </template>
-                <template x-if="$store.tutorialsEvents.isTutorialForProjectPage === 4">
+                <template x-if="$store.tutorialsEvents?.isTutorialForProjectPage === 4">
                     {% include "projects/project/fragments/onboarding-tutorials/svg-hint.html" with rect_x="30" rect_y="35" rect_width="50" rect_height="50" view_box_size="0 0 100 100" is_over=True %}
                 </template>
             {% endif %}
@@ -225,15 +225,15 @@
                         id="select-observer-or-advisor-button"
                         data-test-id="select-observer-or-advisor-button"
                         class="fr-btn fr-btn--tertiary-no-outline fr-icon-team-line {% if advising_position.is_advisor or advising_position.is_observer %}fr-pr-25v{% else %}fr-pr-28v{% endif %}"
-                        :class="{'visual-hint': $store.tutorialsEvents.isTutorialForProjectPage === 1}"
-                        @click="if ($store.tutorialsEvents.isTutorialForProjectPage==1) { $store.tutorialsEvents.isTutorialForProjectPage=1.5; } if ($store.tutorialsEvents.isTutorialPopupOpen) { $store.tutorialsEvents.wasOpen=true; $store.tutorialsEvents.isTutorialPopupOpen = false; } else { $store.crisp.isPopupOpen = true; }">
+                        :class="{'visual-hint': $store.tutorialsEvents?.isTutorialForProjectPage === 1}"
+                        @click="if ($store.tutorialsEvents?.isTutorialForProjectPage==1) { $store.tutorialsEvents.isTutorialForProjectPage=1.5; } if ($store.tutorialsEvents?.isTutorialPopupOpen) { $store.tutorialsEvents.wasOpen=true; $store.tutorialsEvents.isTutorialPopupOpen = false; } else { $store.crisp.isPopupOpen = true; }">
                     {% if advising_position.is_advisor or advising_position.is_observer %}
                         Quitter
                     {% else %}
                         Rejoindre
                     {% endif %}
                 </button>
-                <template x-if="$store.tutorialsEvents.isTutorialForProjectPage === 1">
+                <template x-if="$store.tutorialsEvents?.isTutorialForProjectPage === 1">
                     {% include "projects/project/fragments/onboarding-tutorials/svg-hint.html" with rect_x="12" rect_y="26" rect_width="87" rect_height="70" view_box_size="0 0 100 100" is_over=True %}
                 </template>
                 <dialog id="modal-action"
@@ -253,7 +253,7 @@
                                                 title="Fermer"
                                                 type="button"
                                                 class="fr-btn--close fr-btn"
-                                                @click="if ($store.tutorialsEvents.wasOpen) { $store.tutorialsEvents.isTutorialPopupOpen = true; $store.tutorialsEvents.wasOpen = false; $store.crisp.isPopupOpen = true; } else { $store.crisp.isPopupOpen = false; }">
+                                                @click="if ($store.tutorialsEvents?.wasOpen) { $store.tutorialsEvents.isTutorialPopupOpen = true; $store.tutorialsEvents.wasOpen = false; $store.crisp.isPopupOpen = true; } else { $store.crisp.isPopupOpen = false; }">
                                         </button>
                                     </div>
                                     <div class="fr-modal__content fr-p-3v fr-mb-0">
@@ -281,7 +281,7 @@
                                                         aria-controls="modal-action"
                                                         title="Fermer"
                                                         type="button"
-                                                        @click="if ($store.tutorialsEvents.wasOpen) { $store.tutorialsEvents.isTutorialPopupOpen = true; $store.tutorialsEvents.wasOpen = false; $store.crisp.isPopupOpen = true; } else { $store.crisp.isPopupOpen = false; }">
+                                                        @click="if ($store.tutorialsEvents?.wasOpen) { $store.tutorialsEvents.isTutorialPopupOpen = true; $store.tutorialsEvents.wasOpen = false; $store.crisp.isPopupOpen = true; } else { $store.crisp.isPopupOpen = false; }">
                                                     Annuler
                                                 </button>
                                                 <form method="post"
@@ -298,7 +298,7 @@
                                                         aria-controls="modal-action"
                                                         title="Fermer"
                                                         type="button"
-                                                        @click="if ($store.tutorialsEvents.wasOpen) { $store.tutorialsEvents.isTutorialPopupOpen = true; $store.tutorialsEvents.wasOpen = false; $store.crisp.isPopupOpen = true; }">
+                                                        @click="if ($store.tutorialsEvents?.wasOpen) { $store.tutorialsEvents.isTutorialPopupOpen = true; $store.tutorialsEvents?.wasOpen = false; $store.crisp.isPopupOpen = true; }">
                                                     Annuler
                                                 </button>
                                                 <form method="post"
@@ -306,15 +306,15 @@
                                                       action="{% url 'projects-project-switchtender-join' project.pk %}">
                                                     {% csrf_token %}
                                                     <button class="fr-btn fr-btn--sm w-100 justify-content-center"
-                                                            :class="{'visual-hint': $store.tutorialsEvents.isTutorialForProjectPage === 1.5}"
-                                                            @click="if ($store.tutorialsEvents.isTutorialForProjectPage==1.5) { $store.tutorialsEvents.isTutorialForProjectPageOneCompleted=true; } if ($store.tutorialsEvents.wasOpen) { $store.tutorialsEvents.wasOpen=false; localStorage.setItem('projectPageTutorialPopupOpen', true); }"
+                                                            :class="{'visual-hint': $store.tutorialsEvents?.isTutorialForProjectPage === 1.5}"
+                                                            @click="if ($store.tutorialsEvents?.isTutorialForProjectPage==1.5) { $store.tutorialsEvents.isTutorialForProjectPageOneCompleted=true; } if ($store.tutorialsEvents?.wasOpen) { $store.tutorialsEvents.wasOpen=false; localStorage.setItem('projectPageTutorialPopupOpen', true); }"
                                                             data-test-id="button-become-advisor">
                                                         Rejoindre le dossier
                                                     </button>
-                                                    <template x-if="$store.tutorialsEvents.isTutorialForProjectPage === 1.5">
+                                                    <template x-if="$store.tutorialsEvents?.isTutorialForProjectPage === 1.5">
                                                         {% include "projects/project/fragments/onboarding-tutorials/visual-hint.html" with extra_classes="position-visual-circle-hint--45px-y" %}
                                                     </template>
-                                                    <template x-if="$store.tutorialsEvents.isTutorialForProjectPage === 1.5">
+                                                    <template x-if="$store.tutorialsEvents?.isTutorialForProjectPage === 1.5">
                                                         {% include "projects/project/fragments/onboarding-tutorials/svg-hint.html" with rect_x="32" rect_y="82" rect_width="66.5" rect_height="15.5" view_box_size="0 0 100 100" is_over=True %}
                                                     </template>
                                                 </form>
@@ -326,7 +326,7 @@
                         </div>
                     </div>
                 </dialog>
-                <template x-if="$store.tutorialsEvents.isTutorialForProjectPage === 1">
+                <template x-if="$store.tutorialsEvents?.isTutorialForProjectPage === 1">
                     {% include "projects/project/fragments/onboarding-tutorials/visual-hint.html" %}
                 </template>
             </div>
