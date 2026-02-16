@@ -22,9 +22,11 @@
                         <div class="notification-limit__line"></div>
                     </div>
                 </template>
-                <template x-if="element.type == 'message'">
-                    {% comment %} TODO {% endcomment %}
-                    {% include "conversations/messages/message_item.html" %}
+                <template x-if="element.type == 'message' && element.in_reply_to">
+                    {% include "conversations/messages/message_item.html" with in_reply_to=True %}
+                </template>
+                <template x-if="element.type == 'message' && !element.in_reply_to">
+                    {% include "conversations/messages/message_item.html" with in_reply_to=False %}
                 </template>
                 <template x-if="element.type == 'activity'">
                     {% include "conversations/messages/fragments/type_followup_item.html" with element="node" %}
