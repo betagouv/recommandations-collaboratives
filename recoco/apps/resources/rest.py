@@ -40,8 +40,6 @@ class ResourceViewSet(viewsets.ModelViewSet):
     API endpoint that allows resources to be listed or edited, with pagination support.
     """
 
-    serializer_class = ResourceSerializer
-    serializer_detail_class = ResourceDetailSerializer
     permission_classes = [
         permissions.IsAuthenticatedOrReadOnly,
         IsResourceManagerOrReadOnly,
