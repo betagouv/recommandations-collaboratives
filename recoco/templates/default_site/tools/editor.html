@@ -37,10 +37,10 @@ Parameters:
             </div>
         {% endif %} {% endcomment %}
         <div class="tiptap-editor position-relative {% if wide %}is-wide{% endif %}"
-             :class="{'visual-hint': $store.tutorialsEvents && $store.tutorialsEvents.isTutorialForProjectPage==3.5}"
+             :class="{'visual-hint': $store.tutorialsEvents?.isTutorialForProjectPage == 3.5}"
              data-test-id="tiptap-editor-content"
              x-ref="element"
-             @click.stop="isEditorFocused = true; $store.tutorialsEvents && $store.tutorialsEvents.isTutorialForProjectPage==3.5 ? $store.tutorialsEvents.isTutorialForProjectPageThreeCompleted=true : null ;"
+             @click.stop="isEditorFocused = true; $store.tutorialsEvents && $store.tutorialsEvents.isTutorialForProjectPage == 3.5 ? $store.tutorialsEvents.isTutorialForProjectPageThreeCompleted = true : null ;"
              id="comment-text-ref">
             <template x-if="isLoaded()">
                 <div class="tiptap-menu-custom__container">
@@ -84,10 +84,10 @@ Parameters:
                     </div>
                 </div>
             </template>
-            <template x-if="$store.tutorialsEvents && $store.tutorialsEvents.isTutorialForProjectPage==3.5">
+            <template x-if="$store.tutorialsEvents?.isTutorialForProjectPage == 3.5">
                 {% include "projects/project/fragments/onboarding-tutorials/visual-hint.html" %}
             </template>
-            <template x-if="$store.tutorialsEvents && $store.tutorialsEvents.isTutorialForProjectPage==3.5">
+            <template x-if="$store.tutorialsEvents?.isTutorialForProjectPage == 3.5">
                 {% include "projects/project/fragments/onboarding-tutorials/svg-hint.html" with rect_x="0.1" rect_y="0.3" rect_width="99.7" rect_height="9.2" view_box_size="0 0 100 10" is_over=True inset0=True %}
             </template>
         </div>
