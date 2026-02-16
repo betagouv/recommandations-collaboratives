@@ -1,0 +1,59 @@
+{# Modale DSFR d'alerte pour saisie non terminée #}
+{# Le store $store.onLeaveAlert gère l'affichage automatiquement #}
+<dialog aria-labelledby="on-leave-alert-modal-title"
+        aria-describedby="on-leave-alert-modal-desc"
+        id="on-leave-alert-modal"
+        class="fr-modal"
+        x-data="{ previousActiveElement: null }"
+        x-trap.inert.noscroll="$store.onLeaveAlert.isOpen"
+        @keydown.escape.window="$store.onLeaveAlert.isOpen && $store.onLeaveAlert.cancelLeave()"
+        x-effect="if ($store.onLeaveAlert.isOpen) {
+            previousActiveElement = document.activeElement;
+            $nextTick(() => $refs.stayButton?.focus());
+        } else if (previousActiveElement) {
+            previousActiveElement.focus();
+            previousActiveElement = null;
+        }"
+        :open="$store.onLeaveAlert.isOpen"
+        :class="{ 'fr-modal--opened': $store.onLeaveAlert.isOpen }"
+        :aria-modal="$store.onLeaveAlert.isOpen"
+        :aria-hidden="!$store.onLeaveAlert.isOpen"
+        role="alertdialog">
+    <div class="fr-container fr-container--fluid fr-container-md">
+        <div class="fr-grid-row fr-grid-row--center">
+            <div class="fr-col-12 fr-col-md-8 fr-col-lg-6">
+                <div class="fr-modal__body">
+                    <div class="fr-modal__header">
+                        <button class="fr-btn--close fr-btn"
+                                title="Fermer la fenêtre de dialogue"
+                                aria-label="Fermer la fenêtre de dialogue"
+                                @click="$store.onLeaveAlert.cancelLeave()">Fermer</button>
+                    </div>
+                    <div class="fr-modal__content">
+                        <h1 id="on-leave-alert-modal-title" class="fr-modal__title">
+                            <span class="fr-icon-warning-fill fr-icon--lg" aria-hidden="true"></span>
+                            Modifications non enregistrées
+                        </h1>
+                        <p id="on-leave-alert-modal-desc">
+                            Vous avez des modifications non enregistrées.
+                            Si vous quittez cette page, vos changements seront perdus.
+                        </p>
+                    </div>
+                    <div class="fr-modal__footer">
+                        <div class="fr-btns-group fr-btns-group--inline-reverse fr-btns-group--inline-lg">
+                            <button class="fr-btn"
+                                    x-ref="stayButton"
+                                    @click="$store.onLeaveAlert.cancelLeave()">
+                                Rester sur la page
+                            </button>
+                            <button class="fr-btn fr-btn--secondary"
+                                    @click="$store.onLeaveAlert.confirmLeave()">
+                                Quitter sans enregistrer
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</dialog>

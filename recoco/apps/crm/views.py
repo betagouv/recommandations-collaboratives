@@ -29,6 +29,7 @@ from django.contrib.sites.models import Site
 from django.contrib.syndication.views import Feed
 from django.core.cache import cache
 from django.core.cache.utils import make_template_fragment_key
+from django.core.exceptions import BadRequest
 from django.db import transaction
 from django.db.models import (
     Count,
@@ -75,6 +76,7 @@ from recoco.utils import (
     make_group_name_for_site,
 )
 
+from ..home.utils import deactivate_user, reactivate_user
 from . import filters, forms, models
 from .forms import SiteConfigurationForm
 
@@ -465,9 +467,9 @@ def user_list(request):
     # filtered users
     users = filters.UserFilter(
         request.GET,
-        queryset=User.objects.filter(profile__sites=request.site).prefetch_related(
-            "profile__organization"
-        ),
+        queryset=User.objects.filter(
+            profile__sites=request.site, profile__deleted__isnull=True
+        ).prefetch_related("profile__organization"),
     )
 
     # required by default on crm
@@ -489,6 +491,8 @@ def user_update(request, user_id=None):
     if request.method == "POST":
         form = forms.CRMProfileForm(request.POST, instance=profile)
         if form.is_valid():
+            if crm_user.profile.deleted:
+                form.add_error(None, "Cannot update a deleted user")
             with transaction.atomic():
                 username = form.cleaned_data.get("username")
                 email_changed = username != crm_user.username
@@ -567,11 +571,7 @@ def user_deactivate(request, user_id=None):
     crm_user = get_object_or_404(User, pk=user_id, profile__sites=request.site)
 
     if request.method == "POST":
-        crm_user.is_active = False
-        crm_user.save()
-        profile = crm_user.profile
-        profile.deleted = timezone.now()
-        profile.save()
+        deactivate_user(crm_user)
         return redirect(reverse("crm-user-details", args=[crm_user.id]))
 
     # required by default on crm
@@ -587,11 +587,9 @@ def user_reactivate(request, user_id=None):
     crm_user = get_object_or_404(User, pk=user_id, profile__sites=request.site)
 
     if request.method == "POST":
-        crm_user.is_active = True
-        crm_user.save()
-        profile = crm_user.profile
-        profile.deleted = None
-        profile.save()
+        if crm_user.profile.deleted:
+            raise BadRequest("Cannot reactivate a deleted user")
+        reactivate_user(crm_user)
         return redirect(reverse("crm-user-details", args=[crm_user.id]))
 
     # required by default on crm
