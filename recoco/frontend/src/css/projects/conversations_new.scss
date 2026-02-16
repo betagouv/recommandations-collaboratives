@@ -329,7 +329,8 @@
 
             position: absolute;
             top: -0.625rem;
-            left: 1rem;
+            left: -1px;
+            border-radius: 0;
           }
           h4 {
             color: var(--text-action-high-blue-france);
