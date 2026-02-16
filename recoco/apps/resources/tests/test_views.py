@@ -468,7 +468,7 @@ def test_update_resource_available_for_staff(request, client):
         response = client.get(url)
 
     assert response.status_code == 200
-    assertContains(response, 'form id="form-resource-update"')
+    assertContains(response, 'form id="form-resource"')
 
 
 @pytest.mark.resource_update
