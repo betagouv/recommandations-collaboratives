@@ -1,6 +1,6 @@
 import Alpine from 'alpinejs';
 import MiniSearch from 'minisearch';
-import api, { postExternalRessourceUrl } from '../utils/api';
+import api, { postExternalRessourceUrl, resourcesUrl } from '../utils/api';
 
 import { ToastType } from '../models/toastType';
 
@@ -149,7 +149,7 @@ Alpine.data('ActionPusher', () => {
     async getResources() {
       this.isBusy = true;
 
-      const response = await fetch('/api/resources/');
+      const response = await fetch(resourcesUrl());
       const resourcesFromApi = await response.json(); //extract JSON from the http response
 
       resourcesFromApi.forEach((t) => {
