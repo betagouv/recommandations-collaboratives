@@ -183,11 +183,6 @@ Alpine.data('FormResource', (resourceId) => {
       return this.formFields[fieldName]?.errors || [];
     },
 
-    // validateField(fieldName) {
-    //   // Validate on blur/change for real-time feedback after first submit
-    //   this.validate();
-    // },
-
     validateField(field) {
       this.validate();
       if (
