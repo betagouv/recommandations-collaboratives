@@ -196,21 +196,15 @@
                                                         </div>
                                                     </div>
                                                 </template>
-                                                {% comment %} <!-- Load more indicator -->
-                                                                                                <template x-if="board.hasMore && !board.isLoading">
-                                                                                                    <div class="text-center fr-py-1v text-muted small">
-                                                                                                    <span x-text="`${board.offset} / ${board.totalCount} dossiers`"></span>
-                                                                                            </div>
-                                        </template> {% endcomment %}
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                            </template>
                         </div>
-                    </template>
+                    </div>
                 </div>
             </div>
-        </div>
+        </template>
     </div>
-</template>
-</div>
 {% endblock project_list_content %}
