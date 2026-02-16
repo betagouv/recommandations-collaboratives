@@ -2,6 +2,12 @@
 {% load static %}
 {% load django_vite %}
 {% load watson %}
+{% block title %}
+    Résultats pour "{{ query }}"
+{% endblock title %}
+{% block og_title %}
+    Résultats pour "{{ query }}"
+{% endblock og_title %}
 {% block js %}
     {% vite_asset 'js/apps/crm.js' %}
 {% endblock js %}

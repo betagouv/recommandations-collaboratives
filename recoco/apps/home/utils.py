@@ -10,16 +10,27 @@ created: 2021-06-08 09:56:53 CEST
 import os
 from typing import Optional
 
+import sentry_sdk
+from allauth.account.models import EmailAddress
+from allauth.socialaccount.models import SocialAccount
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 from django.core.files import File
 from django.db import transaction
+from django.urls import reverse
+from django.utils import timezone
 from guardian.shortcuts import assign_perm
 
+from recoco.apps.communication import constants as communication_constants
+from recoco.apps.communication.api import send_email
 from recoco.apps.survey import models as survey_models
 from recoco.utils import assign_site_staff, get_group_for_site
 
+from ... import utils
+from ..communication.digests import normalize_user_name
+from ..crm.models import Note
 from . import models
 
 
@@ -106,6 +117,91 @@ def make_new_site(
         return site
 
     return None
+
+
+# rgpd users auto deletion
+
+FIRST_WARNING_DAYS_BEFORE = 30
+SECOND_WARNING_DAYS_BEFORE = 7
+DELETION_ABSENT_FOR_DAYS = 365 * 2
+
+
+def delete_user(user: User):
+    user.first_name = ""
+    user.last_name = "Utilisateur supprimé"
+    user.email = f"{user.id}@deleted.recoconseil.fr"
+    user.username = user.email
+    user.is_active = False
+    user.is_superuser = False  # just in case
+    user.last_login = None
+    user.save()
+    user.set_unusable_password()
+
+    user.profile.phone_no = ""
+    user.profile.organization_position = ""
+    user.profile.previous_activity_at = None
+    user.profile.previous_deletion_warning_at = None
+    user.profile.previous_activity_site = None
+    user.profile.nb_deletion_warnings = 0
+    user.profile.deleted = timezone.now()
+    user.profile.save()
+
+    EmailAddress.objects.filter(user_id=user.id).delete()
+    SocialAccount.objects.filter(user_id=user.id).delete()
+    user_content_type = ContentType.objects.get_for_model(User)
+    Note.objects.filter(
+        content_type_id=user_content_type.id, object_id=user.id
+    ).delete()
+
+
+def deactivate_user(user: User):
+    user.is_active = False
+    user.save()
+    profile = user.profile
+    profile.disabled = timezone.now()
+    profile.save()
+
+
+def reactivate_user(crm_user: User):
+    crm_user.is_active = True
+    crm_user.save()
+    profile = crm_user.profile
+    profile.disabled = None
+    profile.save()
+
+
+def send_deletion_warning_to_profiles(profiles, warning_time):
+    template = (
+        communication_constants.TPL_RGDP_DELETION_FIRST_WARNING
+        if warning_time == 1
+        else communication_constants.TPL_RGDP_DELETION_SECOND_WARNING
+    )
+    for profile in profiles.filter(disabled=None):
+        if profile.previous_activity_site is None:
+            sentry_sdk.capture_exception(
+                Site.DoesNotExist(
+                    f"No 'previous_activity_site' for user {profile.user.id}. They could not be warned about incoming deletion"
+                )
+            )
+            continue
+        with settings.SITE_ID.override(profile.previous_activity_site):
+            send_email(
+                template_name=template,
+                recipients=[
+                    {
+                        "name": normalize_user_name(profile.user),
+                        "email": profile.user.email,
+                    }
+                ],
+                params={
+                    "dashboard_url": utils.build_absolute_url(
+                        reverse("projects-project-list")
+                        if profile.user.groups.filter(name__contains="advisor").exists()
+                        else reverse("home"),
+                        auto_login_user=profile.user,
+                    )
+                },
+            )
 
 
 # eof

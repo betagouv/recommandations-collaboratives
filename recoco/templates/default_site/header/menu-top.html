@@ -44,10 +44,11 @@
         <div class="fr-header__body">
             <div class="fr-container">
                 <div class="fr-header__body-row">
+                    {% comment %} TODO : change padding body-row from 1.5 rem to less if header is to big for users {% endcomment %}
                     <div class="fr-header__brand fr-enlarge-link">
                         <div class="fr-header__brand-top">
                             {% include "header/fragments/offline_menu_marianne.html" %}
-                            <div class="fr-header__service order-2">
+                            <div class="fr-header__service order-2 fr-p-0">
                                 <a href="{% url 'home' %}">{% include "header/menu-top-logo.html" %}</a>
                             </div>
                             <div class="fr-header__navbar">
