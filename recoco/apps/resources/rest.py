@@ -79,11 +79,6 @@ class ResourceViewSet(viewsets.ModelViewSet):
             case _:
                 return ResourceSerializer
 
-    permission_classes = [
-        permissions.IsAuthenticatedOrReadOnly,
-        IsResourceManagerOrReadOnly,
-    ]
-
     @action(
         detail=False,
         methods=["post"],
