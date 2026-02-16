@@ -34,7 +34,7 @@
             {% include "projects/project/fragments/tasks_inline_kanban/tasks_inline_kanban_filters.html" %}
             <div class="kanban-header__toolbar">{% include "projects/project/fragments/list-toolbars.html" %}</div>
         </div>
-        <template x-if="isViewInitialized && projectList.length == 0">
+        <template x-if="isViewInitialized && boards.every(b => b.projects.length === 0 && !b.isLoading)">
             <div class="fr-notice fr-notice--info fr-my-8w">
                 <div class="fr-container">
                     <div class="fr-notice__body">
@@ -49,7 +49,7 @@
                 </div>
             </div>
         </template>
-        <template x-if="isViewInitialized && projectList.length > 0">
+        <template x-if="isViewInitialized && boards.some(b => b.projects.length > 0)">
             <div x-cloak class="d-flex">
                 <div class="flex-grow-1 kanban-container">
                     <div class="fr-py-3w md-py-8">
@@ -62,29 +62,27 @@
                                         <div class="d-flex justify-content-between justify-items-center fr-px-2v fr-py-2v sticky top-0">
                                             <h5 x-text="board.title" class="font-medium text-gray-800 fr-mb-0"></h5>
                                         </div>
-                                        <div class="kanban-column__content">
+                                        <div class="kanban-column__content"
+                                             @scroll="onColumnScroll($event, board)">
                                             <div class="fr-px-2v fr-py-1v fr-pb-1v h-100 d-flex flex-column">
                                                 <template x-if="column(board.code).length === 0">
                                                     <div class="drag-targetable fr-py-2v h-100"
                                                          @dragover="onDragOver(event, null)"
-                                                         @drop="onDrop(event, board.code, null)"
+                                                         @drop="onDrop(event, board.code)"
                                                          @dragenter="onDragEnter(event)"
                                                          @dragleave="onDragLeave(event)"
-                                                         @dragstart="onDragStart(event, t.uuid)"
-                                                         @dragend="onDragEnd(event)"
                                                          data-test-id="drag-target"></div>
                                                 </template>
                                                 <!-- Task Template -->
                                                 <template x-for="(t, taskIndex) in column(board.code)" :key="t.id">
                                                     <div :id="t.id"
-                                                         x-show="((t.is_observer || t.is_switchtender) && isDisplayingOnlyUserProjects) || !isDisplayingOnlyUserProjects"
                                                          class="drag-targetable kanban-card-container"
                                                          data-cy="card-project"
                                                          @dragover="onDragOver(event)"
-                                                         @drop="onDrop(event, board.code, t.uuid)"
+                                                         @drop="onDrop(event, board.code)"
                                                          @dragenter="onDragEnter(event)"
                                                          @dragleave="onDragLeave(event)"
-                                                         @dragstart="onDragStart(event, t.uuid)"
+                                                         @dragstart="onDragStart(event, t.id)"
                                                          @dragend="onDragEnd(event)">
                                                         <a :href="makeProjectURL('{% url 'projects-project-detail' 0 %}', t.id)">
                                                             <div class="kanban-card rounded fr-p-4v w-100 position-relative"
@@ -185,12 +183,18 @@
                                                 <template x-if="column(board.code).length > 0">
                                                     <div class="drag-targetable fr-py-2v flex-grow-1"
                                                          @dragover="onDragOver(event, null)"
-                                                         @drop="onDrop(event, board.code, null)"
+                                                         @drop="onDrop(event, board.code)"
                                                          @dragenter="onDragEnter(event)"
                                                          @dragleave="onDragLeave(event)"
-                                                         @dragstart="onDragStart(event, t.uuid)"
-                                                         @dragend="onDragEnd(event)"
                                                          data-test-id="drag-target"></div>
+                                                </template>
+                                                <!-- Loading indicator -->
+                                                <template x-if="board.isLoading">
+                                                    <div class="text-center fr-py-2v">
+                                                        <div class="spinner-border spinner-border-sm" role="status">
+                                                            <span class="visually-hidden">Chargement...</span>
+                                                        </div>
+                                                    </div>
                                                 </template>
                                             </div>
                                         </div>
