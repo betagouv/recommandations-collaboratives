@@ -177,7 +177,7 @@ def send_deletion_warning_to_profiles(profiles, warning_time):
         if warning_time == 1
         else communication_constants.TPL_RGDP_DELETION_SECOND_WARNING
     )
-    error_ids = []
+    error_profile_ids = []
     for profile in profiles.filter(disabled=None):
         if profile.previous_activity_site is None:
             sentry_sdk.capture_exception(
@@ -208,8 +208,8 @@ def send_deletion_warning_to_profiles(profiles, warning_time):
                     },
                 )
             except ApiException:
-                error_ids.append(profile.id)
-    return error_ids
+                error_profile_ids.append(profile.id)
+    return error_profile_ids
 
 
 # eof
