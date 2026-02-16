@@ -54,6 +54,7 @@ Alpine.data('SearchContactModal', () => ({
     this.modalSearchContact.classList.toggle('d-none');
     // create contact modal
     this.isCreateContactModalOpen = true;
+    this.$store.crisp.isPopupOpen = true;
   },
   closeCreateContactModal(event) {
     if (event.target.id !== 'create-contact-modal') {
@@ -63,6 +64,7 @@ Alpine.data('SearchContactModal', () => ({
       this.onSelect(event.detail);
     }
     this.isCreateContactModalOpen = false;
+    this.$store.crisp.isPopupOpen = false;
     this.modalSearchContact.classList.toggle('d-none');
   },
 }));

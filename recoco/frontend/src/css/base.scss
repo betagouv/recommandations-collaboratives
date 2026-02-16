@@ -178,3 +178,11 @@ p {
     width: auto;
   }
 }
+
+// Prevent Crisp from causing horizontal scroll on mobile
+@media (max-width: 767px) {
+  html,
+  body {
+    overflow-x: clip;
+  }
+}

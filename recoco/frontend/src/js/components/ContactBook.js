@@ -179,6 +179,7 @@ Alpine.data('ContactBook', (departments, regions) => {
     openModalCreateContact(contact = null) {
       // create contact modal
       this.isCreateContactModalOpen = true;
+      this.$store.crisp.isPopupOpen = true;
       if (contact) {
         this.$nextTick(() => {
           this.$dispatch('init-create-contact-modal-data', contact);
@@ -189,6 +190,7 @@ Alpine.data('ContactBook', (departments, regions) => {
     isCreateOrganizationModalOpen: false,
     openModalCreateOrganization(organization = null, nationalGroup = null) {
       this.isCreateOrganizationModalOpen = true;
+      this.$store.crisp.isPopupOpen = true;
       if (organization) {
         if (nationalGroup && nationalGroup.name !== 'Autres') {
           organization.group = nationalGroup;
@@ -201,6 +203,7 @@ Alpine.data('ContactBook', (departments, regions) => {
     closeCreatesModal(event) {
       if (event.target.id == 'create-organization-modal') {
         this.isCreateOrganizationModalOpen = false;
+        this.$store.crisp.isPopupOpen = false;
         return;
       }
       if (event.target.id == 'create-contact-modal') {
@@ -208,7 +211,7 @@ Alpine.data('ContactBook', (departments, regions) => {
         // TODO: insert new contact in the contact list
         // this.insertNewContact(event.detail);
         this.isCreateContactModalOpen = false;
-
+        this.$store.crisp.isPopupOpen = false;
         return;
       }
       return;

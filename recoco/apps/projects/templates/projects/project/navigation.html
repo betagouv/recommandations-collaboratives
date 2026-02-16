@@ -226,7 +226,7 @@
                         data-test-id="select-observer-or-advisor-button"
                         class="fr-btn fr-btn--tertiary-no-outline fr-icon-team-line {% if advising_position.is_advisor or advising_position.is_observer %}fr-pr-25v{% else %}fr-pr-28v{% endif %}"
                         :class="{'visual-hint': $store.tutorialsEvents?.isTutorialForProjectPage === 1}"
-                        @click="if ($store.tutorialsEvents?.isTutorialForProjectPage==1) { $store.tutorialsEvents.isTutorialForProjectPage=1.5; } if ($store.tutorialsEvents?.isTutorialPopupOpen) { $store.tutorialsEvents.wasOpen=true; $store.tutorialsEvents.isTutorialPopupOpen = false; }">
+                        @click="if ($store.tutorialsEvents?.isTutorialForProjectPage==1) { $store.tutorialsEvents.isTutorialForProjectPage=1.5; } if ($store.tutorialsEvents?.isTutorialPopupOpen) { $store.tutorialsEvents.wasOpen=true; $store.tutorialsEvents.isTutorialPopupOpen = false; } else { $store.crisp.isPopupOpen = true; }">
                     {% if advising_position.is_advisor or advising_position.is_observer %}
                         Quitter
                     {% else %}
@@ -253,7 +253,7 @@
                                                 title="Fermer"
                                                 type="button"
                                                 class="fr-btn--close fr-btn"
-                                                @click="if ($store.tutorialsEvents?.wasOpen) { $store.tutorialsEvents.isTutorialPopupOpen = true; $store.tutorialsEvents.wasOpen = false; }">
+                                                @click="if ($store.tutorialsEvents?.wasOpen) { $store.tutorialsEvents.isTutorialPopupOpen = true; $store.tutorialsEvents.wasOpen = false; $store.crisp.isPopupOpen = true; } else { $store.crisp.isPopupOpen = false; }">
                                         </button>
                                     </div>
                                     <div class="fr-modal__content fr-p-3v fr-mb-0">
@@ -281,7 +281,7 @@
                                                         aria-controls="modal-action"
                                                         title="Fermer"
                                                         type="button"
-                                                        @click="if ($store.tutorialsEvents?.wasOpen) { $store.tutorialsEvents.isTutorialPopupOpen = true; $store.tutorialsEvents.wasOpen = false; }">
+                                                        @click="if ($store.tutorialsEvents?.wasOpen) { $store.tutorialsEvents.isTutorialPopupOpen = true; $store.tutorialsEvents.wasOpen = false; $store.crisp.isPopupOpen = true; } else { $store.crisp.isPopupOpen = false; }">
                                                     Annuler
                                                 </button>
                                                 <form method="post"
@@ -298,7 +298,7 @@
                                                         aria-controls="modal-action"
                                                         title="Fermer"
                                                         type="button"
-                                                        @click="if ($store.tutorialsEvents?.wasOpen) { $store.tutorialsEvents.isTutorialPopupOpen = true; $store.tutorialsEvents?.wasOpen = false; }">
+                                                        @click="if ($store.tutorialsEvents?.wasOpen) { $store.tutorialsEvents.isTutorialPopupOpen = true; $store.tutorialsEvents?.wasOpen = false; $store.crisp.isPopupOpen = true; }">
                                                     Annuler
                                                 </button>
                                                 <form method="post"

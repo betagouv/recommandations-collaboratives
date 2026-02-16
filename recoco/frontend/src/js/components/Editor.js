@@ -212,6 +212,7 @@ Alpine.data('editor', (content, placeholder, isActionPusher = false, onLeaveAler
     },
     openModalSearchContact() {
       this.isSearchContactModalOpen = true;
+      this.$store.crisp.isPopupOpen = true;
     },
     closeSearchContactModal(event) {
       if (event.target.id !== 'search-contact-modal') {
@@ -224,6 +225,7 @@ Alpine.data('editor', (content, placeholder, isActionPusher = false, onLeaveAler
         this.insertContactCard(contact);
       }
       this.isSearchContactModalOpen = false;
+      this.$store.crisp.isPopupOpen = false;
     },
     insertContactCard(contact) {
       if (editor && contact) {
