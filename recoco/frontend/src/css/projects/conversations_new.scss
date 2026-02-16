@@ -277,6 +277,14 @@
         }
       }
       .task-item {
+        [target='_blank']:after {
+          content: '';
+          height: 100%;
+          width: 100%;
+          mask-image: none;
+          -webkit-mask-image: none;
+          background-color: none;
+        }
         &__topic {
           --color-topic: #667dcf;
           color: var(--color-topic);

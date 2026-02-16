@@ -20,15 +20,15 @@ Parameter Alpine:
         <template x-if="recommendation">
             <div>
                 <template x-if="recommendation.resource">
-                    <a :href="recommendation?.resource?.web_url"
-                       class="stretched-link"
-                       target="_blank"
-                       :title="`ouvrir la fiche ressource - nouvel onglet`"
-                       @click="await onClickRessourceConsummeNotification(recommendation, element)">
-                        <div>
-                            <p x-html="renderMarkdown(recommendation.content)"></p>
-                            <div class="task-item__resource"
-                                 :class="{'task-item__resource--bordered': !recommendation.visited}">
+                    <div>
+                        <p x-html="renderMarkdown(recommendation.content)"></p>
+                        <div class="task-item__resource"
+                             :class="{'task-item__resource--bordered': !recommendation.visited}">
+                            <a :href="recommendation?.resource?.web_url"
+                               class="stretched-link"
+                               target="_blank"
+                               :title="`ouvrir la fiche ressource - nouvel onglet`"
+                               @click="await onClickRessourceConsummeNotification(recommendation, element)">
                                 <template x-if="!recommendation.visited">
                                     <span class="badge text-white task-item__resource-badge"
                                           x-text="!$store.djangoData.isAdvisor ? 'Nouveau' : 'Non lu par le demandeur' "></span>
@@ -53,9 +53,9 @@ Parameter Alpine:
                                     {% include "conversations/messages/fragments/tasks_status_buttons_js.html" %}
                                     <button class="fr-btn fr-btn--sm fr-btn--primary fr-mt-1w">Consulter</button>
                                 </div>
-                            </div>
+                            </a>
                         </div>
-                    </a>
+                    </div>
                 </template>
                 <template x-if="!recommendation.resource">
                     <div>
