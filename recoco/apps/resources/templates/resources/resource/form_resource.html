@@ -36,10 +36,10 @@
                     {% comment %} TODO: Uncomment this when the preview modal is ready {% endcomment %}
                     {% comment %} <button @click.prevent data-bs-toggle="modal" :data-bs-target="`#resource-preview-`+{{ resource.id|default:'null'|safe }}" role="button" class="fr-btn fr-btn--tertiary fr-btn--sm fr-mr-1w">Prévisualiser</button> {% endcomment %}
                     <button type="submit"
-                            @click="resourceFormData.status = 0"
+                            @click.prevent="resourceFormData.status = 0; $refs.formResource.submit()"
                             class="fr-btn fr-btn--tertiary fr-mr-1w">Sauvegarder en brouillon</button>
                     <button type="submit"
-                            @click="resourceFormData.status = 2"
+                            @click.prevent="resourceFormData.status = 2; $refs.formResource.submit()"
                             class="fr-btn fr-btn--primary fr-mr-1w">Sauvegarder et publier</button>
                 </div>
                 {% include "resources/resource/modal_resource.html" %}
