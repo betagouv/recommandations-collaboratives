@@ -93,10 +93,6 @@ a {
   opacity: 1;
 }
 
-.custom-input-border {
-  border: 1px solid var(--light-border-default-grey, #e5e5e5);
-}
-
 /* ¯¯¯¯ *\
   ICONS
 \* ˍˍˍˍ */
@@ -805,6 +801,10 @@ form > p {
   pointer-events: none;
 }
 
+.border-light-grey {
+  border: 1px solid var(--light-border-default-grey, #e5e5e5);
+}
+
 .specific-backgroundcolor-1b1b35 {
   background-color: #1b1b35;
 }
@@ -1071,6 +1071,12 @@ form > p {
 
 .fr-pt-05v {
   padding-top: 2px;
+}
+
+.top-right-corner {
+  position: absolute;
+  top: 12px;
+  right: 12px;
 }
 
 /* ¯¯¯¯¯¯¯¯ *\

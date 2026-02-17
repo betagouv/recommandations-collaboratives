@@ -72,6 +72,10 @@
   height: 64px;
 }
 
+.h-auto {
+  height: auto;
+}
+
 @media (max-width: 1200px) {
   .user-info .dropdown-menu {
     transform: translate3d(-130px, 0, 0);

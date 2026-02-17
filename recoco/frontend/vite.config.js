@@ -202,6 +202,13 @@ const config = {
           './src/js/styles/projects-onboarding-tutorial.css.js'
         ),
         marianneStyles: resolve('./src/js/styles/marianne.css.js'),
+        formResourcesStyles: resolve(
+          './src/js/styles/form-resources.css.js'
+        ),
+        formResource: resolve('./src/js/components/Resources/FormResource.js'),
+        ajvValidationSchema: resolve(
+          './src/js/components/AjvValidationSchema.js'
+        ),
         projectDetailsStyles: resolve('./src/js/styles/project-details.css.js'),
         resourceListCrm: resolve('./src/js/apps/CRM/resourceListCrm.js'),
       },

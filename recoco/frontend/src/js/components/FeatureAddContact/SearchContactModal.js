@@ -3,7 +3,7 @@ import api, { searchContactsUrl } from '../../utils/api';
 import { Modal } from '../../models/Modal.model';
 import { formatDate } from '../../utils/date';
 
-Alpine.data('SearchContactModal', () => ({
+Alpine.data('SearchContactModal', ({ searchbarOnly = false, noModal = false } = {}) => ({
   Modal: null,
   formatDate,
   contactsFound: [],
@@ -40,6 +40,11 @@ Alpine.data('SearchContactModal', () => ({
   },
   addContact() {
     this.Modal.responseModal(this.selectedContact);
+    if (searchbarOnly) {
+      this.selectedContact = null;
+      this.userInputSearchContact = '';
+      this.noSearch = true;
+    }
   },
   onCancelSelectContact() {
     this.selectedContact = null;
@@ -49,9 +54,11 @@ Alpine.data('SearchContactModal', () => ({
   },
   isCreateContactModalOpen: false,
   openModalCreateContact() {
-    // hide search contact modal
-    this.modalSearchContact = this.$refs.searchContactModal;
-    this.modalSearchContact.classList.toggle('d-none');
+    if (!noModal) {
+      // hide search contact modal
+      this.modalSearchContact = this.$refs.searchContactModal;
+      this.modalSearchContact.classList.toggle('d-none');
+    }
     // create contact modal
     this.isCreateContactModalOpen = true;
     this.$store.crisp.isPopupOpen = true;
@@ -64,6 +71,9 @@ Alpine.data('SearchContactModal', () => ({
       this.onSelect(event.detail);
     }
     this.isCreateContactModalOpen = false;
+    if (!noModal) {
+      this.modalSearchContact.classList.toggle('d-none');
+    }
     this.$store.crisp.isPopupOpen = false;
     this.modalSearchContact.classList.toggle('d-none');
   },

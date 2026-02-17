@@ -215,6 +215,10 @@ export function resourcePreviewUrl(resourceId, taskId) {
   return `/ressource/${resourceId}/embed/`;
 }
 
+export function postExternalRessourceUrl() {
+  return `/api/resources/import_from_uri/`;
+}
+
 export function resourcesUrl({
   search = '',
   category = [],
@@ -244,8 +248,8 @@ export function resourcesUrl({
   return url.toString();
 }
 
-export function postExternalRessourceUrl() {
-  return `/api/resources/import_from_uri/`;
+export function resourceUrl(resourceId) {
+  return `/api/resources/${resourceId}/`;
 }
 
 // Regions :
