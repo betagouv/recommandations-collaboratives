@@ -61,6 +61,10 @@ Parameter Alpine:
                     <div>
                         <div class="task-item__resource"
                              :class="{'task-item__resource--bordered': !recommendation.visited}">
+                            <template x-if="!recommendation.visited">
+                                <span class="badge text-white task-item__resource-badge"
+                                      x-text="!$store.djangoData.isAdvisor ? 'Nouveau' : 'Non lu par le demandeur' "></span>
+                            </template>
                             <template x-if="recommendation.topic">
                                 <div class="task-item__topic"
                                      :style="{ '--color-topic': stringToColor(recommendation.topic?.name) }">
