@@ -44,6 +44,12 @@
                 </div>
                 {% include "resources/resource/modal_resource.html" %}
             </div>
+            {% if form.non_field_errors %}
+                <div class="fr-alert fr-alert--error fr-mb-2w">
+                    <p class="fr-alert__title">Erreur</p>
+                    {% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}
+                </div>
+            {% endif %}
             <div class="fr-grid-row fr-mt-2w">
                 <!-- Column 1 -->
                 <div class="fr-col-8 fr-col-md-8 fr-col-sm-12 fr-pr-4w">
@@ -65,6 +71,9 @@
                         <template x-for="(error, index) in getFieldErrors('title')" :key="index">
                             <p class="fr-error-text" x-text="error"></p>
                         </template>
+                        {% if form.title.errors %}
+                            {% for error in form.title.errors %}<p class="fr-error-text">{{ error }}</p>{% endfor %}
+                        {% endif %}
                     </div>
                     <!-- Subtitle -->
                     <div class="fr-input-group fr-mb-1w"
@@ -84,11 +93,14 @@
                         <template x-for="(error, index) in getFieldErrors('subtitle')" :key="index">
                             <p class="fr-error-text" x-text="error"></p>
                         </template>
+                        {% if form.subtitle.errors %}
+                            {% for error in form.subtitle.errors %}<p class="fr-error-text">{{ error }}</p>{% endfor %}
+                        {% endif %}
                     </div>
                     <div class="create-resources__help-text fr-mb-3w">
                         <span class="fr-icon fr-icon-information-line fr-icon--sm"></span>
                         <p>
-                            Affiché sur la page de la ressource, sur la liste des ressources, dans l’aperçu d’une recommandation avec ressource, dans l’email qui informe d’une nouvelle recommandation.
+                            Affiché sur la page de la ressource, sur la liste des ressources, dans l'aperçu d'une recommandation avec ressource, dans l'email qui informe d'une nouvelle recommandation.
                         </p>
                     </div>
                     <!-- Summary -->
@@ -105,6 +117,9 @@
                         <template x-for="(error, index) in getFieldErrors('summary')" :key="index">
                             <p class="fr-error-text" x-text="error"></p>
                         </template>
+                        {% if form.summary.errors %}
+                            {% for error in form.summary.errors %}<p class="fr-error-text">{{ error }}</p>{% endfor %}
+                        {% endif %}
                     </div>
                     <div class="create-resources__help-text fr-mb-3w">
                         <span class="fr-icon fr-icon-information-line fr-icon--sm"></span>
@@ -117,6 +132,9 @@
                         <template x-for="(error, index) in getFieldErrors('content')" :key="index">
                             <p class="fr-error-text" x-text="error"></p>
                         </template>
+                        {% if form.content.errors %}
+                            {% for error in form.content.errors %}<p class="fr-error-text">{{ error }}</p>{% endfor %}
+                        {% endif %}
                     </div>
                 </div>
                 <!-- Column 2 -->
@@ -139,6 +157,9 @@
                         <template x-for="(error, index) in getFieldErrors('category')" :key="index">
                             <p class="fr-error-text" x-text="error"></p>
                         </template>
+                        {% if form.category.errors %}
+                            {% for error in form.category.errors %}<p class="fr-error-text">{{ error }}</p>{% endfor %}
+                        {% endif %}
                     </div>
                     <!-- Keywords multi-select -->
                     <div class="fr-input-group fr-mb-1w"
@@ -150,6 +171,9 @@
                                class="fr-input"
                                id="id_tags"
                                x-model="resourceFormData.tags">
+                        {% if form.tags.errors %}
+                            {% for error in form.tags.errors %}<p class="fr-error-text">{{ error }}</p>{% endfor %}
+                        {% endif %}
                     </div>
                     <div class="create-resources__help-text fr-mb-3w">
                         <span class="fr-icon fr-icon-information-line fr-icon--sm"></span>
@@ -177,6 +201,9 @@
                         <template x-for="(error, index) in getFieldErrors('support_orga')" :key="index">
                             <p class="fr-error-text" x-text="error"></p>
                         </template>
+                        {% if form.support_orga.errors %}
+                            {% for error in form.support_orga.errors %}<p class="fr-error-text">{{ error }}</p>{% endfor %}
+                        {% endif %}
                         <div class="create-resources__help-text fr-mb-3w">
                             <span class="fr-icon fr-icon-information-line fr-icon--sm"></span>
                             <p>Organisme qui porte ou finance ce dispositif (ex : Ademe, ANCT, Banque des Territoires…).</p>
@@ -215,6 +242,9 @@
                         <template x-for="(error, index) in getFieldErrors('expires_on')" :key="index">
                             <p class="fr-error-text" x-text="error"></p>
                         </template>
+                        {% if form.expires_on.errors %}
+                            {% for error in form.expires_on.errors %}<p class="fr-error-text">{{ error }}</p>{% endfor %}
+                        {% endif %}
                     </div>
                     <!-- Contacts component (multiple) -->
                     <!-- add contacts -->
@@ -224,6 +254,9 @@
                         <label class="fr-label text-modal-main-msg" for="id_contacts">Contacts</label>
                         {% include "tools/contacts/searchbar_for_contacts.html" with add_contact="from_search" %}
                         {% include "tools/contacts/create_contact_modal.html" with is_it_returning_data=True %}
+                        {% if form.contacts.errors %}
+                            {% for error in form.contacts.errors %}<p class="fr-error-text">{{ error }}</p>{% endfor %}
+                        {% endif %}
                     </div>
                     <!-- display contacts -->
                     <div>
