@@ -5,6 +5,7 @@
     Parameters:
         - options: The options to select from (array of objects with value, text, search, selected, color, dataTestId).
         - selected: The selected options.
+        - extra_classes: Additional CSS classes to apply to the multi-select container.
         - name: The name of the input.
         - id: The id of the input.
         - element_id: (optional) unique DOM id for the hidden select element. Default: 'multiSelect2'
@@ -19,7 +20,7 @@
     {% vite_asset 'js/components/MultiSelect2.js' %}
 {% endblock js %}
 <div class="w-100 multi-select"
-     x-data="MultiSelect2({elementId:'{{ element_id|default:'multiSelect2' }}', options: {{ options_var|default:'options' }}})">
+     x-data="MultiSelect2({elementId:'{{ element_id|default:'multiSelect2' }}', options: {{ options_var|default:'options' }}, selected: selected})">
     <select class="d-none" id="{{ element_id|default:'multiSelect2' }}">
         <template x-for="option in options" :key="option.value">
             <option :value="option.value" :data-search="option.search">
@@ -38,8 +39,10 @@
             <div class="d-flex flex-column align-items-center position-relative">
                 <!-- Selected elements container -->
                 <div class="w-100">
-                    <div class="multi-select__container d-flex">
-                        <div class="d-flex flex-auto flex-wrap" x-on:click="open">
+                    <div class="multi-select__container d-flex custom-input-border bg-white {% if extra_classes %}{{ extra_classes }}{% endif %}"
+                         :class="isOpen() ? 'multi-select--open' : ''"
+                         data-test-id="multi-select-container">
+                        <div class="d-flex flex-auto flex-wrap w-100" x-on:click="open">
                             <!-- iterating over selected elements -->
                             <div x-show="selectedElms.length > 0" class="multi-select__input">
                                 <template x-for="(option,index) in selectedElms" :key="option.value">
@@ -59,8 +62,8 @@
                             </div>
                             <!-- None items selected -->
                             <div x-show="selectedElms.length == 0" class="flex-grow-1">
-                                <input placeholder="Sélectionnez pour filtrer"
-                                       class="multi-select__input"
+                                <input placeholder="{% if placeholder %}{{ placeholder }}{% else %}Sélectionnez pour filtrer{% endif %}"
+                                       class="multi-select__input bg-transparent p-1 px-2 appearance-none outline-none h-full w-100 text-gray-800 border-0"
                                        x-bind:value="selectedElements()"
                                        data-test-id="multi-select-input">
                             </div>
@@ -70,7 +73,7 @@
                             <button type="button"
                                     x-show="!isOpen()"
                                     x-on:click="open()"
-                                    class="cursor-pointer w-6 h-6 text-gray-600 outline-none focus:outline-none">
+                                    class="cursor-pointer w-6 h-6 text-gray-600 outline-none focus:outline-none fr-pb-0-5v">
                                 <span class="fr-icon-arrow-down-s-line fr-icon--sm"></span>
                             </button>
                             <button type="button"

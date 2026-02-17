@@ -56,19 +56,35 @@ def resource_search(request):
     form.is_valid()
     query = form.cleaned_data.get("query", "")
 
-    limit_area = form.cleaned_data.get("limit_area")
+    limit_areas = request.GET.getlist("limit_area")
+
     searching = form.cleaned_data.get("searching", False)
 
-    if (not searching) and (limit_area is None):
-        limit_area = "AUTO"
+    # Get user's own departments (for "Mes départements" shortcut)
+    user_departments_codes = []
+    if request.user.is_authenticated and request.user.profile:
+        if check_if_advisor(request.user, request.site):
+            user_departments_codes = list(
+                request.user.profile.departments.values_list("code", flat=True)
+            )
+        else:
+            user_departments_codes = list(
+                geomatics_models.Department.objects.filter(
+                    commune__in=projects.Project.on_site.filter(
+                        members=request.user
+                    ).values("commune")
+                ).values_list("code", flat=True)
+            )
+
+    # Auto-filter on first arrival for users with departments
+    if not searching and not limit_areas and user_departments_codes:
+        limit_areas = list(user_departments_codes)
+
+    select_all_departments = not bool(limit_areas)
 
     categories = form.selected_categories
 
-    resources = (
-        models.Resource.search(query, categories)
-        .select_related("category")
-        .prefetch_related("task_recommendations")
-    )
+    resources = models.Resource.search(query, categories)
 
     if form.cleaned_data.get("no_category", False):
         resources = resources.filter(category__isnull=True)
@@ -80,43 +96,26 @@ def resource_search(request):
             imported_from=None
         )
 
-    # If we are a advisor, allow any departement to be filtered
-    # Otherwise, show only departments related to my projects
-    departments = geomatics_models.Department.objects.none()
+    # Determine available departments based on user role
     if check_if_advisor(request.user):
         departments = geomatics_models.Department.objects.order_by("name").all()
-        if limit_area:
-            selected_departments = geomatics_models.Department.objects.none()
-            if limit_area == "AUTO":
-                # Select departments from profile
-                user_departments = request.user.profile.departments.all()
-                if user_departments:
-                    selected_departments = geomatics_models.Department.objects.filter(
-                        code__in=user_departments
-                    )
-                else:
-                    limit_area = None
-            else:
-                # Get current one from parameters
-                selected_departments = geomatics_models.Department.objects.filter(
-                    code=limit_area
-                )
-
-            if selected_departments:
-                resources = resources.limit_area(selected_departments)
-
+    elif request.user.is_authenticated:
+        departments = geomatics_models.Department.objects.filter(
+            commune__in=projects.Project.on_site.filter(members=request.user).values(
+                "commune"
+            )
+        )
     else:
-        communes = []
-        if hasattr(request.user, "email"):
-            communes = [
-                p.commune for p in projects.Project.on_site.filter(members=request.user)
-            ]
-            if not communes:
-                limit_area = None  # does not apply if no projects
+        departments = geomatics_models.Department.objects.none()
 
-            departments = set(c.department for c in communes if c)
-            if limit_area:
-                resources = resources.limit_area(departments)
+    # Apply department filter from URL parameters
+    if limit_areas:
+        selected_departments_qs = geomatics_models.Department.objects.filter(
+            code__in=limit_areas
+        )
+
+        if selected_departments_qs.exists():
+            resources = resources.limit_area(selected_departments_qs)
 
     # staff can search resources
     staff_redux = Q()
@@ -141,6 +140,16 @@ def resource_search(request):
         staff_redux |= Q(status=models.Resource.PUBLISHED)
 
     resources = resources.filter(staff_redux)
+
+    category_options = [
+        {"value": str(c.id), "text": str(c), "search": str(c)}
+        for c in models.Category.on_site.all()
+    ]
+
+    # prefetch and select related must be after all filters, else they are useless
+    resources = resources.select_related("category").prefetch_related(
+        "task_recommendations"
+    )
 
     return render(
         request,

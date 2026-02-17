@@ -2,6 +2,38 @@
   margin-bottom: 0px;
 }
 
+// Pill style to match departments selector
+.multi-select__container.multi-select--pill {
+  border: solid 1px #e5e5e5;
+  border-radius: 20px;
+  background-color: white;
+
+  &.multi-select--open {
+    outline: #0d6efd auto 1px;
+    border-radius: 20px;
+  }
+
+  .multi-select__input {
+    padding: 5px 15px;
+    min-width: 200px;
+    color: #161616;
+    font-weight: 400;
+
+    &::placeholder {
+      color: #161616;
+      font-weight: 400;
+    }
+  }
+
+  .border-left {
+    border-left: none;
+  }
+}
+
+.multi-select--pill svg {
+  color: #666666;
+}
+
 .border-left {
   border-left: 1px solid var(--light-border-default-grey, #e5e5e5);
 }

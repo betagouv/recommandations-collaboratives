@@ -16,7 +16,9 @@
         - input_region_name (string): name of the input for regions
         - input_department_name (string): name of the input for departments
         - selected_departments (list): list of selected departments (default=null)
+        - user_departments (list): list of user's own department codes for "Mes départements" shortcut (default=null)
         - label_filter (string): label to display in the filter button (default="Filtrer :")
+        - extra_classes (string): additional CSS classes; use "inline-chevron" to use inline SVG chevron instead of Bootstrap Icons
 
     Event to listen in parent component:
         - selected-departments: when a department is selected, the event is triggered with the selected departments
@@ -26,21 +28,33 @@
 <div class="d-flex align-items-center">
     <label class="fr-segmented__legend inline text-nowrap fr-mb-0">{{ label_filter | default:"Filtrer :" }}</label>
     <div class="input-item position-relative active specific-border-solid1pxE5E5E5"
-         x-data="DepartmentsSelector({ listZone: {{ zone_objects|default:'null' }}, selectAll : '{{ select_all | default:'False' }}' == 'True', filterByRegions : '{{ filter_by_regions }}' == 'True' , selectedDepartments: {{ selected_departments|default:'null' }} })"
+         x-data="DepartmentsSelector({ listZone: {{ zone_objects|default:'null' }}, selectAll : '{{ select_all | default:'False' }}' == 'True', filterByRegions : '{{ filter_by_regions }}' == 'True' , selectedDepartments: {{ selected_departments|default:'null' }}, userDepartments: {{ user_departments|default:'null' }} })"
          x-on:click.outside="open && $dispatch('user-close-selector'); open = false; ">
-        <div class="d-flex align-items-center fr-pr-3w bg-white rounded-pill"
+        <div class="d-flex align-items-center {% if "inline-chevron" in extra_classes %}fr-pr-1w {% else %}fr-pr-3w {% endif %}bg-white rounded-pill"
              x-on:click.prevent="open = !open"
              type="button"
              :class="{'input-active':open}">
             <button class="input-field bg-transparent fr-px-2w fw-normal text-dark appearance-none no-wrap"
                     data-cy="check-display-project">{{ label |default:"Dossiers de mon territoire" }}</button>
-            {% comment %} TODO Use DSFR icon {% endcomment %}
+            {% if "inline-chevron" in extra_classes %}
+            <svg xmlns="http://www.w3.org/2000/svg"
+                 class="departments-selector__chevron"
+                 width="20"
+                 height="20"
+                 fill="none"
+                 viewBox="0 0 24 24"
+                 stroke="currentColor"
+                 stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+            </svg>
+            {% else %}
             <svg class="input-icon right black bi align-baseline fr-mr-2v"
                  width="15"
                  height="15"
                  fill="#000000">
                 <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#chevron-down" />
             </svg>
+            {% endif %}
         </div>
         <ul x-show="open"
             :class="{'show':open}"
@@ -60,6 +74,22 @@
                     </label>
                 </div>
             </li>
+            {% if user_departments %}
+                <li class="bg-white appearance-none w-100 d-flex justify-content-start align-items-center border-bottom department-item">
+                    <div class="form-check w-100 d-flex align-items-center fr-p-0">
+                        <input x-on:input.change="handleMyDepartments()"
+                               class="form-check-input fw-normal fr-ml-2v fr-px-2v fr-py-2v fr-mr-2v"
+                               type="checkbox"
+                               data-cy="check-my-departments"
+                               :checked="myDepartmentsActive"
+                               id="myDepartments" />
+                        <label class="w-100 fr-pr-2v fr-py-2v d-flex align-items-center"
+                               for="myDepartments">
+                            <span class="fw-normal">Mes départements</span>
+                        </label>
+                    </div>
+                </li>
+            {% endif %}
             {% if filter_by_regions %}
                 <template x-for="region in regions">
                     <div class="region-filter-item">

@@ -6,6 +6,10 @@
 {% block js %}
     {% vite_asset 'js/styles/resources.css.js' %}
     {% vite_asset 'js/styles/resource-card.css.js' %}
+    {% vite_asset 'js/styles/segmented_ctrl.css.js' %}
+    {% vite_asset 'js/styles/multi-select.css.js' %}
+    {% vite_asset 'js/components/MultiSelect2.js' %}
+    {% vite_asset 'js/components/ResourceCategoryFilter.js' %}
 {% endblock js %}
 {% block title %}
     Liste des ressources
@@ -17,178 +21,52 @@
     {% if user.is_authenticated %}
         {% get_obj_perms request.user for request.site as "user_site_perms" %}
     {% endif %}
-    {% comment %} <!-- Admin navigation -->
-    {% include "crm/fragments/navigation.html" with resources=True %} {% endcomment %}
-    <!-- Breadcrumb -->
-    {% comment %} <div x-data="{ breadcrumbs: { links: [{url: '{% url 'crm-site-dashboard' %}', title: 'Admin'}], current: 'Ressources' } }" class="fr-p-0">{% include "tools/breadcrumb.html" %}</div> {% endcomment %}
-    <div class="col-12 fr-p-3w fr-mx-auto">
-        <div class="row">
-            <div class="col">
-                <h1 class=" align-items-center fr-mb-2w">
-                    <svg class="bi" width="38" height="38" fill="currentColor">
-                        <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#key" />
-                    </svg>
-                    Ressources
-                    {% if resources_count %}<span class="text-secondary">({{ resources_count }})</span>{% endif %}
-                </h1>
-                <div class="text-secondary small fr-mb-2w">
-                    Nous créons des ressources en fonction des besoins que vous nous soumettez !
-                </div>
-            </div>
+    {{ category_options|json_script:"categoryOptions" }}
+    <div x-data="ResourceFilter(JSON.parse(document.getElementById('categoryOptions').textContent))"
+         class="col-12 fr-p-3w fr-mx-auto">
+        <div x-data="{ breadcrumbs: { links: [{url: '{% url 'home' %}', title: 'Accueil'}], current: 'Ressources' } }"
+             class="fr-p-0">{% include "tools/breadcrumb.html" with margin_bottom_only=True %}</div>
+        <div class="d-flex justify-content-between align-items-center fr-mb-2w">
+            <h1 class=" align-items-center fr-mb-2w">
+                {% if resources_count %}{{ resources_count }}{% endif %}
+                Ressources
+            </h1>
             {% if "manage_resources" in user_site_perms %}
-                <!-- Sidebar -->
-                <div class="col-sm-4 col-lg-2 col-xl-2 align-content-top border-start fr-mb-2w">
-                    <span class="text-secondary small smallcaps">Administration</span>
-                    <!-- Staff actions -->
-                    <div class="d-grid gap-2 fr-mt-2w">
-                        <a class="btn btn-light btn-sm"
-                           href="{% url 'resources-resource-create' %}"
-                           role="button">
-                            <svg class="bi" width="16" height="16" fill="currentColor">
-                                <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#plus-circle" />
-                            </svg>
-                            &nbsp;
-                            Créer une ressource
-                        </a>
-                    </div>
-                </div>
+                <a class="fr-btn fr-btn--sm fr-btn--primary fr-mr-1w"
+                   href="{% url 'resources-resource-create' %}">Créer une ressource</a>
             {% endif %}
         </div>
-        <!-- Search -->
-        <div class="quick-search fr-mb-6w">
-            <form method="get">
-                <input id="searching" type="hidden" value="on" name="searching">
-                <div class="input-group fr-mb-2w">
-                    {% if is_switchtender %}
-                        <select id="limit_area"
-                                name="limit_area"
-                                class="form-select specific-minwidth-200 specific-flex"
-                                aria-label="Limiter la zone géographique">
-                            <option {% if not limit_area %}selected{% endif %} value="">France entière</option>
-                            <option {% if limit_area == 'AUTO' %}selected{% endif %} value="AUTO">Mes départements</option>
-                            {% for department in departments %}
-                                <option {% if department.code == limit_area %}selected{% endif %}
-                                        value="{{ department.code }}">{{ department.name }}</option>
-                            {% endfor %}
-                        </select>
-                    {% elif limit_area != '' and user.is_authenticated %}
-                        <select id="limit_area"
-                                name="limit_area"
-                                class="form-select specific-flex specific-minwidth-200 specific-flex"
-                                aria-label="Limiter la zone géographique">
-                            <option {% if not limit_area %}selected{% endif %} value="">France entière</option>
-                            <option {% if limit_area == 'AUTO' %}selected{% endif %} value="AUTO">
-                                {% for department in departments %}
-                                    {{ department.name }}
-                                    {% if not forloop.last %},{% endif %}
-                                {% endfor %}
-                            </option>
-                        </select>
-                    {% endif %}
-                    <input type="text"
-                           name="{{ form.query.name }}"
-                           value="{{ form.query.value|default:"" }}"
-                           class="form-control"
-                           placeholder="Saisissez vos mots clés (ex: diagnostic, cahier des charges, financement études, …)"
-                           aria-label="Search Text input" />
-                    <button class="btn btn-outline-primary" type="submit">
-                        <svg class="bi" width="16" height="16" fill="currentColor">
-                            <use xlink:href="{% static 'svg/bootstrap-icons.svg' %}#search" />
-                        </svg>
-                        &nbsp;
-                        Rechercher
-                    </button>
+        <form method="get">
+            <div class="d-flex gap-1 align-items-center">
+                <div class="w-100 position-relative"
+                     @keydown.enter.prevent="$el.closest('form').submit()">
+                    {% include "projects/project/fragments/search_bar.html" with placeholder="Rechercher" value=query show_search_button=True %}
+                    <input type="hidden" value="on" name="searching">
                 </div>
-                <div class="fr-grid-row">
-                    <div class="fr-col">
-                        <!-- Categories -->
-                        <div class="filters-categories">
-                            <span class="small text-secondary">Catégories :</span>&nbsp;
-                            {% for category in form.category_fields %}
-                                <span class="form-check form-switch form-check-inline">
-                                    <input class="form-check-input"
-                                           type="checkbox"
-                                           name="{{ category.the_category.form_label }}"
-                                           id="check-{{ category.the_category.form_label }}"
-                                           onchange="this.form.submit()"
-                                           {% if category.checked %}checked{% endif %}>
-                                    <label class="form-check-label text-secondary"
-                                           for="check-{{ category.the_category.form_label }}">
-                                        {{ category.the_category }}
-                                    </label>
-                                </span>
-                            {% endfor %}
-                            <span class="form-check form-switch form-check-inline">
-                                <input class="form-check-input"
-                                       type="checkbox"
-                                       name="no_category"
-                                       id="check-no-category"
-                                       onchange="this.form.submit()"
-                                       {% if form.no_category.value %}checked{% endif %}>
-                                <label class="form-check-label text-secondary" for="check-no-category">Sans catégorie</label>
-                            </span>
-                        </div>
-                        {% if "manage_resources" in user_site_perms %}
-                            <!-- Internal filters -->
-                            <div class="filters-internal fr-mt-2v">
-                                <span class="small text-secondary">Gestion interne :</span>&nbsp;
-                                <span class="form-check form-switch form-check-inline">
-                                    <input class="form-check-input"
-                                           type="checkbox"
-                                           name="{{ form.published.name }}"
-                                           id="check-published"
-                                           onchange="this.form.submit()"
-                                           {% if form.published.value %}checked{% endif %}>
-                                    <label class="form-check-label text-secondary" for="check-published">Publiées</label>
-                                </span>
-                                <span class="form-check form-switch form-check-inline">
-                                    <input class="form-check-input"
-                                           type="checkbox"
-                                           name="{{ form.to_review.name }}"
-                                           id="check-to-review"
-                                           onchange="this.form.submit()"
-                                           {% if form.to_review.value %}checked{% endif %}>
-                                    <label class="form-check-label text-secondary" for="check-to-review">A relire</label>
-                                </span>
-                                <span class="form-check form-switch form-check-inline">
-                                    <input class="form-check-input"
-                                           type="checkbox"
-                                           name="{{ form.draft.name }}"
-                                           id="check-draft"
-                                           onchange="this.form.submit()"
-                                           {% if form.draft.value %}checked{% endif %}>
-                                    <label class="form-draft-label text-secondary" for="check-draft">Brouillons</label>
-                                </span>
-                            </div>
-                            <div class="filters-internal fr-mt-2v toggle-expired">
-                                {% comment %} <span class="form-check form-switch form-check-inline">
-                                    <input class="form-check-input" type="checkbox" name="{{ form.expired.name }}" id="check-expired" onchange="this.form.submit()" {% if form.expired.value %}checked{% endif %}>
-                                    <label class="form-check-label text-secondary" for="check-expired">Expirées</label>
-                                </span> {% endcomment %}
-                                <div class="fr-toggle fr-toggle--label-left">
-                                    <input type="checkbox"
-                                           class="fr-toggle__input"
-                                           aria-describedby="toggle-4633-messages"
-                                           name="{{ form.expired.name }}"
-                                           onchange="this.form.submit()"
-                                           id="check-expired"
-                                           {% if form.expired.value %}checked{% endif %}>
-                                    <label class="fr-toggle__label" for="check-expired">Afficher les ressource expirées</label>
-                                    <div class="fr-messages-group"
-                                         id="check-expired-messages"
-                                         aria-live="polite"></div>
-                                </div>
-                            </div>
-                        {% endif %}
-                    </div>
-                    <div class="fr-col">
-                        <div>
-                            <a href="{% url 'resources-resource-search' %}">Réinitialiser les filtres</a>
+                <div class="w-100 d-flex justify-content-around">
+                    <div @multi-select-change="selectedIds = $event.detail || []; $nextTick(() => $el.closest('form').submit());"
+                         class="d-flex align-items-center w-100 fr-mx-2w">
+                        <label class="fr-segmented__legend inline text-nowrap fr-mb-0 fr-mr-1w">Catégories :</label>
+                        <template x-for="id in selectedIds" :key="id">
+                            <input type="hidden" :name="categoryMap[id]" value="on">
+                        </template>
+                        <div x-data="{ selected: selectedIds }" class="w-100">
+                            {% include "tools/multi_select.html" with extra_classes="multi-select--pill align-items-center fr-pl-1w" placeholder="Toutes les catégories" %}
                         </div>
                     </div>
                 </div>
-            </form>
-        </div>
+                <div class="w-100 d-flex">
+                    <div x-data="{ selectedCodes: {{ limit_areas|default:'[]' }}, normalize(payload) { if (!payload) return []; if (Array.isArray(payload) && typeof payload[0] === 'string') return payload; if (Array.isArray(payload) && typeof payload[0] === 'object') { return payload.filter(d => d.active).map(d => d.code); } return []; }}"
+                         @selected-departments="selectedCodes = normalize($event.detail)"
+                         @user-close-selector="$nextTick(() => $el.closest('form').submit())">
+                        <template x-for="code in selectedCodes" :key="code">
+                            <input type="hidden" name="limit_area" :value="code">
+                        </template>
+                        {% include "projects/project/fragments/departments_selector.html" with label="Sélectionnez des départements" filter_by_regions=True select_all=select_all_departments selected_departments=limit_areas user_departments=user_departments_codes label_filter="Territoire :" extra_classes="inline-chevron" %}
+                    </div>
+                </div>
+            </div>
+        </form>
         <!-- Results -->
         {% if query %}
             <div class="row align-center fr-mb-2w">
@@ -214,7 +92,7 @@
             </div>
         {% endif %}
         <!-- Result cards -->
-        <div class="row row-cols-1 row-cols-md-4 g-4">
+        <div class="row row-cols-1 row-cols-md-4 g-4 fr-m-0">
             {% for resource in resources %}
                 <!-- Card Grid -->
                 <div class="col-xxl-3 col-xl-4 col-lg-6 col-md-12">{% include "resources/resource/widgets/card_standard.html" %}</div>

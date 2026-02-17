@@ -93,6 +93,7 @@ const config = {
         actionPusher: resolve('./src/js/apps/actionPusher.js'),
         NewFeatureBanner: resolve('./src/js/components/NewFeatureBanner.js'),
         contactBookApp: resolve('./src/js/apps/contactBookApp.js'),
+        ResourceCategoryFilter: resolve('./src/js/components/ResourceCategoryFilter.js'),
         departmentsSelector: resolve(
           './src/js/styles/departments-selector.css.js'
         ),

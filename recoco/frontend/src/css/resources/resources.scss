@@ -71,3 +71,12 @@
   min-width: 300px;
   max-width: 20%;
 }
+
+.rework-bootstrap-select {
+  border-radius: 20px;
+}
+.rework-bootstrap-select:focus {
+  outline: #0d6efd auto 1px;
+  border-color: transparent;
+  box-shadow: none;
+}
