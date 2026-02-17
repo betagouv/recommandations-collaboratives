@@ -1,5 +1,5 @@
-.project-list-crm {
-  .project-list-crm__filters {
+.resource-list-crm {
+  .resource-list-crm__filters {
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -13,7 +13,7 @@
       margin-right: 0.625rem;
     }
   }
-  &__projects-count-label {
+  &__resources-count-label {
     color: var(--light-text-default-grey, #3a3a3a);
     font-size: 0.875rem;
     font-weight: 700;
@@ -34,8 +34,8 @@
       justify-content: center;
       align-items: center;
       border-radius: 2px;
-      height: 100%;
-      margin-left: 2px;
+      height: 1.5rem;
+      margin: 5px 2px;
     }
     &__input {
       border-radius: 99px 0 0 99px;

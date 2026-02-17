@@ -3,9 +3,11 @@ from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
+from recoco.rest_api.filters import WatsonSearchFilter
 from recoco.rest_api.pagination import StandardResultsSetPagination
 from recoco.utils import has_perm
 
+from .filters import ResourceCategoryFilter, ResourceStatusFilter
 from .importers import ResourceImporter
 from .models import Resource, ResourceAddon
 from .serializers import (
@@ -35,8 +37,19 @@ class IsResourceManagerOrReadOnly(permissions.BasePermission):
 
 class ResourceViewSet(viewsets.ModelViewSet):
     """
-    API endpoint that allows resources to be listed or edited
+    API endpoint that allows resources to be listed or edited, with pagination support.
     """
+
+    permission_classes = [
+        permissions.IsAuthenticatedOrReadOnly,
+        IsResourceManagerOrReadOnly,
+    ]
+    pagination_class = StandardResultsSetPagination
+    filter_backends = [
+        WatsonSearchFilter,
+        ResourceCategoryFilter,
+        ResourceStatusFilter,
+    ]
 
     def get_queryset(self):
         qs = Resource.on_site
@@ -63,11 +76,6 @@ class ResourceViewSet(viewsets.ModelViewSet):
                 return ResourceWritableSerializer
             case _:
                 return ResourceSerializer
-
-    permission_classes = [
-        permissions.IsAuthenticatedOrReadOnly,
-        IsResourceManagerOrReadOnly,
-    ]
 
     @action(
         detail=False,

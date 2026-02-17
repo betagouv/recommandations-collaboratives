@@ -214,7 +214,7 @@ def test_rest_api_responds_to_xml_content_type(client, request):
 
     assert response.status_code == 200
     assert "application/xml" in response.headers["content-type"]
-    assert len(response.data) == 1
+    assert response.data["count"] == 1
 
 
 @pytest.mark.django_db

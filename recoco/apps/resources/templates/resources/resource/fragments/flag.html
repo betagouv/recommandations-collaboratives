@@ -24,16 +24,14 @@
             <span class="title-info text-uppercase fr-my-0 fr-mr-2w">Édition</span>
             <p class="text-info-custom fr-my-0">
                 Cette ressource est en cours d'écriture. Pensez à la
-                <a href="{% url 'resources-resource-update' resource.id %}">rendre visible</a> en cochant <strong><em>Public</em></strong> si vous souhaitez que les visiteurs puissent la consulter !
+                <a href="{% url 'resources-resource-update' resource.id %}">rendre visible</a> en <strong><em>la publiant</em></strong> si vous souhaitez que les visiteurs puissent la consulter !
             </p>
         </div>
     {% endif %}
 {% else %}
     {% if not resource.public %}
         <div class="flag orange fr-mb-3w d-flex align-items-center justify-content-start">
-            <p class="text-info-custom fr-my-0">
-                Cette ressource est en cours d'écriture.
-            </p>
+            <p class="text-info-custom fr-my-0">Cette ressource est en cours d'écriture.</p>
         </div>
     {% endif %}
 {% endif %}
