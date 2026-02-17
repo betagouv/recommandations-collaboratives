@@ -94,10 +94,10 @@ Alpine.data('ResourceListCrm', (departments, categories) => ({
         offset: 0,
       });
     } catch (error) {
-      this.showToast(
-        `Erreur lors de la recherche des ressources`,
-        ToastType.error
-      );
+      this.$store.app.displayToastMessage({
+        message: `Erreur lors de la recherche des ressources`,
+        type: ToastType.error,
+      });
       throw new Error(`Error while searching resources`, error);
     }
   },
@@ -113,19 +113,6 @@ Alpine.data('ResourceListCrm', (departments, categories) => ({
       this.resources[pageNumber - 1] = [...resourcesResponse.results];
     }
     this.resourcesToDisplay = [...this.resources[pageNumber - 1]];
-    this.pagination.currentPage = pageNumber;
-  },
-  async handleChangePage(pageNumber) {
-    const resources = await api.get(
-      resourcesUrl({
-        limit: this.pagination.limit,
-        offset: this.pagination.limit * (pageNumber - 1),
-        search: this.backendSearch.searchText,
-        status: this.backendSearch.searchStatus,
-        category: this.backendSearch.searchCategory,
-      })
-    );
-    this.resources.push(...resources.data.results);
     this.pagination.currentPage = pageNumber;
   },
 
@@ -145,22 +132,12 @@ Alpine.data('ResourceListCrm', (departments, categories) => ({
       );
       return response.data;
     } catch (error) {
-      this.showToast(
-        `Erreur lors de la récupération des ressources`,
-        ToastType.error
-      );
+      this.$store.app.displayToastMessage({
+        message: `Erreur lors de la récupération des ressources`,
+        type: ToastType.error,
+      });
       throw new Error(`Error while getting resources`, error);
     }
-  },
-
-  /************************
-   * Informational functions
-   **************************/
-  showToast(message, type) {
-    this.$store.app.notification.message = message;
-    this.$store.app.notification.timeout = 5000;
-    this.$store.app.notification.isOpen = true;
-    this.$store.app.notification.type = type || ToastType.error;
   },
 
   /*******************
