@@ -144,7 +144,7 @@ def test_resource_list_contains_only_resource_with_area(request, client):
     ).make()
 
     url = reverse("resources-resource-search")
-    url = f"{url}?limit_area=true&query=resource"
+    url = f"{url}?limit_areas=f{departments[0]}&query=resource"
 
     membership = baker.make(projects_models.ProjectMember)
     with login(client, user=membership.member):

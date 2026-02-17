@@ -63,9 +63,18 @@ def resource_search(request):
     # Get user's own departments (for "Mes départements" shortcut)
     user_departments_codes = []
     if request.user.is_authenticated and request.user.profile:
-        user_departments_codes = list(
-            request.user.profile.departments.values_list("code", flat=True)
-        )
+        if check_if_advisor(request.user, request.site):
+            user_departments_codes = list(
+                request.user.profile.departments.values_list("code", flat=True)
+            )
+        else:
+            user_departments_codes = list(
+                geomatics_models.Department.objects.filter(
+                    commune__in=projects.Project.on_site.filter(
+                        members=request.user
+                    ).values("commune")
+                ).values_list("code", flat=True)
+            )
 
     # Auto-filter on first arrival for users with departments
     if not searching and not limit_areas and user_departments_codes:
