@@ -111,22 +111,18 @@ Alpine.data('FormResource', (resourceId) => {
         // TODO : show a message to the user
       }
     },
-    onSubmit(event) {
+    onSubmit() {
       this.submitted = true;
 
       // Validate the form using AJV
       const isValid = this.validate();
-
       if (!isValid) {
-        // Prevent form submission if validation fails
-        event.preventDefault();
-        console.log('Validation failed:', this.errors);
         return;
       }
 
       // Form is valid - let the standard form submission proceed
       // The hidden fields will carry the complex data (status, content, contacts)
-      console.log('Form is valid, submitting...', this.resourceFormData);
+      this.$refs.formResource.submit();
     },
 
     validate() {
@@ -174,23 +170,24 @@ Alpine.data('FormResource', (resourceId) => {
         if (fieldName && this.formFields[fieldName]) {
           this.formFields[fieldName].errors.push(error.message);
           this.formFields[fieldName].hasError = true;
+          this.formFields[fieldName].className = 'fr-input-group--error';
         }
       });
     },
 
     getFieldErrors(fieldName) {
-      if (this.formFields[fieldName]?.pristine) return [];
+      if (this.formFields[fieldName]?.pristine && !this.submitted) return [];
       return this.formFields[fieldName]?.errors || [];
     },
 
     validateField(field) {
       this.validate();
       if (
-        !this.formFields[field.name].pristine &&
-        (this.formFields[field.name]?.hasError || false)
+        (!this.formFields[field.name].pristine) &&
+        this.formFields[field.name]?.hasError
       ) {
         this.formFields[field.name].className = 'fr-input-group--error';
-      } else {
+      } else if (!this.formFields[field.name]?.hasError) {
         this.formFields[field.name].className = 'fr-input-group--valid';
       }
     },
@@ -213,7 +210,7 @@ Alpine.data('FormResource', (resourceId) => {
             });
           });
           field.addEventListener('input', (e) => {
-            if (this.formFields[e.target.name].pristine) return;
+
             this.validateField(e.target);
           });
         } else {
