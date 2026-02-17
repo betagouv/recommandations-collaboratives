@@ -197,6 +197,7 @@
       }
       .message-item {
         scroll-margin-top: 133px;
+        border-top-right-radius: 4px;;
 
         // &:target {
 
@@ -213,9 +214,9 @@
           background: #f6f6f6;
         }
         &.current-user-message {
-          background: var(--light-background-alt-blue-france, #f5f5fe);
+          background: var(--light-background-alt-blue-france, #f6f6f6);
           .message-item__reply-to {
-            background: #e4e4fe;
+            background: #f6f6f6;
           }
         }
         .message-item__date {
@@ -227,9 +228,9 @@
         }
         &__reply-to {
           display: flex;
-          margin: -0.75rem -0.75rem 0 -0.75rem;
+          margin: -0.75rem 0 0 -0.75rem;
           background: #eaeaea;
-          border-top-left-radius: 0.5rem;
+          border-bottom-right-radius: 0.5rem;
           border-top-right-radius: 0.5rem;
           padding-left: 0.75rem;
           padding-right: 0.75rem;
@@ -241,8 +242,13 @@
             font-size: 0.875rem;
           }
           &-content {
-            margin: 16px;
-            background: white;
+            padding: 12px;
+            background: #F5F5FE;
+            border-top: solid 16px white;
+            border-left: solid 16px white;
+            border-bottom-right-radius: 0.5rem;
+            border-bottom-left-radius: 0.5rem;
+            box-shadow: white 0px 50px;
           }
         }
         .document-item {
@@ -415,9 +421,6 @@
     text-align: center;
     margin-top: 1rem;
     margin-bottom: 1rem;
-  }
-
-  .message-item {
   }
 
   .user-card {

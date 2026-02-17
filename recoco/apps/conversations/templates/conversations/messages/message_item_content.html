@@ -48,14 +48,14 @@
                         <button data-fr-opened="false"
                                 aria-controls="modal"
                                 type="button"
-                                class="fr-btn fr-btn--sm fr-btn--tertiary fr-mr-1v"
+                                class="fr-btn fr-btn--sm fr-btn--tertiary fr-btn--tertiary-dark-background fr-mr-1v"
                                 @click="setElementToDelete(element)">Supprimer</button>
                         <template x-if="element.nodes.some(x => x.type == 'RecommendationNode')">
-                            <a class="fr-btn fr-btn--sm fr-btn--tertiary fr-mr-1v"
+                            <a class="fr-btn fr-btn--sm fr-btn--tertiary fr-btn--tertiary-dark-background fr-mr-1v"
                                :href="editTaskUrl(element.nodes.find(x => x.type == 'RecommendationNode').recommendation_id, '{{ request.path }}')">Modifier</a>
                         </template>
                         <template x-if="!element.nodes.some(x => x.type == 'RecommendationNode')">
-                            <button class="fr-btn fr-btn--sm fr-btn--tertiary fr-mr-1v"
+                            <button class="fr-btn fr-btn--sm fr-btn--tertiary fr-btn--tertiary-dark-background fr-mr-1v"
                                     @click="onClickHandleEdit(element)">Modifier</button>
                         </template>
                     </div>
