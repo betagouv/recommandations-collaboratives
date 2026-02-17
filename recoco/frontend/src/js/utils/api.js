@@ -219,8 +219,33 @@ export function postExternalRessourceUrl() {
   return `/api/resources/import_from_uri/`;
 }
 
-export function resourcesUrl() {
-  return `/api/resources/`;
+export function resourcesUrl({
+  search = '',
+  category = [],
+  status = [],
+  limit = 50,
+  offset = 0,
+} = {}) {
+  const params = new URLSearchParams();
+  if (search) params.set('search', search);
+  if (limit) params.set('limit', limit);
+  if (offset) params.set('offset', offset);
+  // category is multi-value: ?category=1&category=2
+  if (category) {
+    category.forEach((c) => {
+      params.append('category', c);
+    });
+  }
+  // status is multi-value: ?status=0&status=2
+  if (status) {
+    status.forEach((s) => {
+      params.append('status', s);
+    });
+  }
+  const url = new URL('/api/resources/', window.location.origin);
+  const paramStr = params.toString();
+  if (paramStr) url.search = paramStr;
+  return url.toString();
 }
 
 export function resourceUrl(resourceId) {

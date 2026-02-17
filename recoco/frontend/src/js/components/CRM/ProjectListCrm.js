@@ -125,10 +125,10 @@ Alpine.data('ProjectListCrm', (departments, regions) => ({
         status: this.backendSearch.searchStatus,
       });
     } catch (error) {
-      this.showToast(
-        `Erreur lors de la recherche des projets`,
-        ToastType.error
-      );
+      this.$store.app.displayToastMessage({
+        message: `Erreur lors de la recherche des projets`,
+        type: ToastType.error,
+      });
       throw new Error(`Error while searching projects`, error);
     }
   },
@@ -145,19 +145,6 @@ Alpine.data('ProjectListCrm', (departments, regions) => ({
       this.projects[pageNumber - 1] = [...projectsResponse.results];
     }
     this.projectsToDisplay = [...this.projects[pageNumber - 1]];
-    this.pagination.currentPage = pageNumber;
-  },
-  async handleChangePage(pageNumber) {
-    const projects = await api.get(
-      projectsUrl({
-        limit: this.pagination.limit,
-        offset: 0,
-        page: 1,
-        searchText: this.backendSearch.searchText,
-        departments: this.backendSearch.searchDepartment,
-      })
-    );
-    this.projects.push(...projects.data.results);
     this.pagination.currentPage = pageNumber;
   },
 
@@ -178,10 +165,10 @@ Alpine.data('ProjectListCrm', (departments, regions) => ({
       );
       return response.data;
     } catch (error) {
-      this.showToast(
-        `Erreur lors de la récupération des projets de la page ${page}`,
-        ToastType.error
-      );
+      this.$store.app.displayToastMessage({
+        message: `Erreur lors de la récupération des projets de la page ${page}`,
+        type: ToastType.error,
+      });
       throw new Error(`Error while getting projects from page ${page}`, error);
     }
   },
@@ -216,16 +203,16 @@ Alpine.data('ProjectListCrm', (departments, regions) => ({
       this.projectsToDisplay = [
         ...this.projects[this.pagination.currentPage - 1],
       ];
-      this.showToast(
-        this.getToastMessage(projectToUpdate, data),
-        ToastType.success
-      );
+      this.$store.app.displayToastMessage({
+        message: this.getToastMessage(projectToUpdate, data),
+        type: ToastType.success,
+      });
     } catch (error) {
-      this.showToast(
-        'Erreur lors de la mise à jour des paramètres du projet',
-        ToastType.error
-      );
-      throw new Error('Error while updating project param', error);
+      this.$store.app.displayToastMessage({
+        message: 'Erreur lors de la mise à jour des paramètres du projet',
+        type: ToastType.error,
+      });
+      throw new Error(`Error while updating project param`, error);
     }
   },
 
@@ -246,12 +233,6 @@ Alpine.data('ProjectListCrm', (departments, regions) => ({
         return 'Les notifications sont désactivées pour le projet';
       }
     }
-  },
-  showToast(message, type) {
-    this.$store.app.notification.message = message;
-    this.$store.app.notification.timeout = 5000;
-    this.$store.app.notification.isOpen = true;
-    this.$store.app.notification.type = type || ToastType.error;
   },
 
   /*******************

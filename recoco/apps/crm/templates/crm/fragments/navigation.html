@@ -68,6 +68,18 @@
                 </label>
             </div> {% endcomment %}
             <div class="fr-segmented__element">
+                <input value="resources"
+                       type="radio"
+                       {% if resources %}checked{% endif %}
+                       aria-checked="{% if resources %}true{% else %}false{% endif %}"
+                       id="segmented-control-resources"
+                       name="segmented-control-project"
+                       @click="window.location='{% url 'crm-resource-list' %}'">
+                <label class="fr-label" for="segmented-control-resources">
+                    <a class="stretched-link" href="{% url 'crm-resource-list' %}">Ressources</a>
+                </label>
+            </div>
+            <div class="fr-segmented__element">
                 <input value="overview"
                        type="radio"
                        {% if site_configuration %}checked{% endif %}
