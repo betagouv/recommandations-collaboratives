@@ -268,14 +268,14 @@ class DuplicateResourceView(
 ):
     model = models.Resource
     permission_required = "sites.manage_resources"
-    http_method_names = ["get"]
+    http_method_names = ["post"]
     pk_url_kwarg = "resource_id"
 
     def has_permission(self):
         site = get_current_site(self.request)
         return self.request.user.has_perm(self.permission_required, site)
 
-    def get(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         current_site = get_current_site(request)
         resource_to_copy = self.get_object()
 
@@ -284,7 +284,7 @@ class DuplicateResourceView(
                 site_origin=current_site,
                 status=models.Resource.DRAFT,
                 created_by=request.user,
-                imported_from=resource_to_copy.imported_from,  # todo or None
+                imported_from=resource_to_copy.imported_from,
                 category=resource_to_copy.category,
                 title=resource_to_copy.title,
                 subtitle=resource_to_copy.subtitle,

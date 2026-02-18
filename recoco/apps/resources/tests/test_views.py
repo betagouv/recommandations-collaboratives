@@ -334,7 +334,7 @@ def test_duplication_creates_new_resource(request, client, current_site):
     url = reverse("resources-resource-duplicate", args=[old_resource.id])
 
     with login(client, groups=["example_com_advisor"]) as user:
-        response = client.get(url, follow=True)
+        response = client.post(url, follow=True)
         assert response.status_code == 200
         last_url, status_code = response.redirect_chain[-1]
         assert status_code == 302
@@ -349,7 +349,7 @@ def test_duplication_creates_new_resource(request, client, current_site):
         assert new_resource.status == models.Resource.DRAFT
         assert new_resource.expires_on is None
         assert new_resource.created_by == user
-        assert new_resource.imported_from == old_resource.imported_from  # todo or None
+        assert new_resource.imported_from == old_resource.imported_from
         assert new_resource.category == old_resource.category
         assert new_resource.title == old_resource.title
         assert new_resource.subtitle == old_resource.subtitle
@@ -372,7 +372,7 @@ def test_duplication_needs_permission(request, client, current_site):
     url = reverse("resources-resource-duplicate", args=[old_resource.id])
 
     with login(client):
-        response = client.get(url, follow=True)
+        response = client.post(url, follow=True)
         assert response.status_code == 403
         assert models.Resource.objects.count() == 1
 
