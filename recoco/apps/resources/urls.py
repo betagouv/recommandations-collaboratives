@@ -28,6 +28,11 @@ urlpatterns = [
         name="resources-resource-create",
     ),
     path(
+        r"ressource/<int:resource_id>/duplicate",
+        views.DuplicateResourceView.as_view(),
+        name="resources-resource-duplicate",
+    ),
+    path(
         r"ressource/<int:resource_id>/",
         views.ResourceDetailView.as_view(),
         name="resources-resource-detail",
