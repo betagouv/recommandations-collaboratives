@@ -214,7 +214,7 @@
           background: #f6f6f6;
         }
         &.current-user-message {
-          background: var(--light-background-alt-blue-france, #f6f6f6);
+          background: #F5F5FE;
           .message-item__reply-to {
             background: #f6f6f6;
           }
@@ -574,4 +574,8 @@
 
 .stretched-link::after {
   cursor: pointer;
+}
+
+.current-user-message:has(.message-item__reply-to) {
+  background: #f6f6f6 !important;
 }
