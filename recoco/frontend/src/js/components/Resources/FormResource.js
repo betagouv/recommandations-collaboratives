@@ -122,7 +122,9 @@ Alpine.data('FormResource', (resourceId) => {
 
       // Form is valid - let the standard form submission proceed
       // The hidden fields will carry the complex data (status, content, contacts)
-      this.$refs.formResource.submit();
+      this.$nextTick(() => {
+        this.$refs.formResource.submit();
+      });
     },
 
     validate() {
