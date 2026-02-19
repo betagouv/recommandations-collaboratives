@@ -149,10 +149,9 @@ Alpine.data('ActionPusher', () => {
     async getResources() {
       this.isBusy = true;
 
-      const response = await fetch(resourcesUrl());
-      const resourcesFromApi = await response.json(); //extract JSON from the http response
+      const response = await api.get(resourcesUrl({ limit: 2000 }));
 
-      resourcesFromApi.forEach((t) => {
+      response.data.results.forEach((t) => {
         let entry = {
           id: t.id,
           title: t.title,
