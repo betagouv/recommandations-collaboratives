@@ -45,6 +45,7 @@ from ..utils import (
     get_advising_context_for_project,
     is_regional_actor_for_project,
     notify_advisors_of_project,
+    notify_members_of_project,
     refresh_user_projects_in_session,
     unassign_advisor,
     unassign_collaborator,
@@ -293,6 +294,22 @@ def promote_collaborator_as_referent(request, project_id, user_id=None):
         members.filter(member=user).update(is_owner=True)
         project.phone = user.profile.phone_no
         project.save()
+
+    action.send(
+        sender=user,
+        verb=verbs.Project.NEW_OWNER,
+        action_object=project,
+        target=project,
+    )
+
+    notification = {
+        "sender": user,
+        "verb": verbs.Project.NEW_OWNER,
+        "action_object": project,
+        "target": project,
+    }
+    notify_advisors_of_project(project, notification)
+    notify_members_of_project(project, notification)
 
     return redirect(reverse("projects-project-administration", args=[project_id]))
 

@@ -643,6 +643,32 @@ def test_project_is_updated_by_project_patch_api(request, api_client, project_dr
     assert project_draft.name == new_name
 
 
+@pytest.mark.django_db
+def test_project_advisors_note_cannot_be_updated_by_project_patch_api(
+    request, api_client, project_draft
+):
+    site = get_current_site(request)
+    user = baker.make(auth_models.User, email="me@example.com")
+
+    utils.assign_advisor(user, project_draft, site)
+
+    new_name = "new name"
+    new_note = "new note"
+
+    api_client.force_authenticate(user)
+
+    url = reverse("projects-detail", args=[project_draft.id])
+    response = api_client.patch(url, data={"name": new_name, "advisors_note": new_note})
+
+    assert response.status_code == 200
+    assert response.data["name"] == new_name
+    assert response.data["advisors_note"] != new_note
+
+    project_draft.refresh_from_db()
+    assert project_draft.name == new_name
+    assert project_draft.advisors_note != new_note
+
+
 ################
 # Project Site Status
 ################

@@ -44,9 +44,18 @@ def current_site():
 def staff_user(current_site):
     staff = baker.make(User)
     staff.profile.sites.add(current_site)
-    gstaff = Group.objects.get(name="example_com_staff")
+    gstaff, _ = Group.objects.get_or_create(name="example_com_staff")
     staff.groups.add(gstaff)
     return staff
+
+
+@pytest.fixture
+def admin_user(current_site):
+    admin = baker.make(User)
+    admin.profile.sites.add(current_site)
+    gadmin, _ = Group.objects.get_or_create(name="example_com_admin")
+    admin.groups.add(gadmin)
+    return admin
 
 
 # -- Project Fixtures

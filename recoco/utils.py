@@ -16,6 +16,7 @@ from urllib.parse import parse_qs, urlencode, urljoin, urlparse, urlunparse
 
 from django.conf import settings
 from django.contrib.auth import models as auth
+from django.contrib.auth import models as auth_models
 from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.sites.models import Site
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
@@ -165,6 +166,18 @@ def assign_site_admin(site, user):
     staff_group = get_group_for_site("admin", site, create=True)
     user.profile.sites.add(site)
     staff_group.user_set.add(user)
+
+
+def get_staff_for_site(site=None):
+    site = site or Site.objects.get_current()
+    group_name = make_group_name_for_site("staff", site)
+    return auth_models.Group.objects.get(name=group_name).user_set.all()
+
+
+def get_admin_for_site(site=None):
+    site = site or Site.objects.get_current()
+    group_name = make_group_name_for_site("admin", site)
+    return auth_models.Group.objects.get(name=group_name).user_set.all()
 
 
 ########################################################################

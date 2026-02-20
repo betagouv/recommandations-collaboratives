@@ -10,6 +10,9 @@ created: 2023-06-26 14:37:45 CEST
 
 class User:
     LOGIN = "s'est connecté·e"
+    ADVISOR_REQUEST = "a demandé un accès conseiller"
+    ADVISOR_ACCEPTED = "a accepté la demande de compte conseiller de"
+    ADVISOR_REJECTED = "a refusé la demande de compte conseiller de"
 
 
 class Document:
@@ -43,12 +46,15 @@ class Project:
     INVITATION = "a invité un·e collaborateur·rice à rejoindre le dossier"
 
     JOINED = "a rejoint le dossier"
+    JOINED_OWNER = "a rejoint en tant que référent le dossier"
+    NEW_OWNER = "est dorénavant référent sur le dossier"
 
     SUBMITTED = "a été déposé"  # FIXME to be removed and keep _BY
-    SUBMITTED_BY = "a déposé un nouveau dossier, qui est en attente de validation"
+    SUBMITTED_BY = "a déposé un nouveau dossier, en attente de validation"
 
     VALIDATED = "a été validé"
     VALIDATED_BY = "a validé le dossier"
+    REJECTED_BY = "a refusé à la modération le dossier"
 
     # FIXME redondant avec VALIDATED
     AVAILABLE = "a déposé le dossier"
@@ -68,6 +74,7 @@ class Project:
     SET_ACTIVE = "a réactivé le dossier"
 
     EDITED = "a modifé les informations du dossier"
+    UPDATE_ADVISORS_NOTE = "a modifié la note interne du dossier"
 
 
 class Survey:

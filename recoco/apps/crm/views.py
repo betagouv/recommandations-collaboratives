@@ -10,7 +10,7 @@ from collections import Counter, OrderedDict, defaultdict
 from datetime import datetime, timedelta
 
 from actstream import action
-from actstream.models import Action, actor_stream, target_stream
+from actstream.models import Action, target_stream
 from allauth.account.internal.flows.email_verification import (
     send_verification_email_for_user,
 )
@@ -655,7 +655,9 @@ def user_details(request, user_id):
     group_name = make_group_name_for_site("advisor", request.site)
     crm_user_is_advisor = crm_user.groups.filter(name=group_name).exists()
 
-    actions = actor_stream(crm_user)
+    actions = crm_user.actor_actions.exclude(
+        verb__in=[verbs.Project.REJECTED_BY, verbs.Project.VALIDATED_BY]
+    )
 
     user_ct = ContentType.objects.get_for_model(User)
 

@@ -31,6 +31,7 @@ from .utils import (
 
 project_submitted = django.dispatch.Signal()
 project_validated = django.dispatch.Signal()
+project_rejected = django.dispatch.Signal()
 
 # not using default signal but our own for easier processing
 project_userprojectstatus_updated = django.dispatch.Signal()
@@ -40,6 +41,7 @@ project_observer_joined = django.dispatch.Signal()
 project_switchtender_leaved = django.dispatch.Signal()
 
 project_member_joined = django.dispatch.Signal()
+project_owner_joined = django.dispatch.Signal()
 
 document_uploaded = django.dispatch.Signal()
 
@@ -92,6 +94,27 @@ def log_project_validated(sender, site, moderator, project, **kwargs):
         action_object=project,
         target=project,
     )
+
+
+@receiver(project_rejected)
+def log_project_rejected(sender, site, moderator, project, **kwargs):
+    action.send(
+        sender=moderator,
+        verb=verbs.Project.REJECTED_BY,
+        action_object=project,
+        target=project,
+    )
+
+
+@receiver(project_rejected)
+def unnotify_project_submitted_on_rejection(site, project, **kwargs):
+    project_ct = ContentType.objects.get_for_model(project)
+    notifications_models.Notification.objects.filter(
+        action_object_content_type=project_ct.pk,
+        action_object_object_id=project.pk,
+        site=site,
+        verb=verbs.Project.SUBMITTED_BY,
+    ).update(emailed=True, unread=False)
 
 
 @receiver(
@@ -191,6 +214,16 @@ def log_project_member_joined(sender, project, **kwargs):
     action.send(
         sender,
         verb=verbs.Project.JOINED,
+        action_object=project,
+        target=project,
+    )
+
+
+@receiver(project_owner_joined)
+def log_project_owner_joined(sender, project, **kwargs):
+    action.send(
+        sender,
+        verb=verbs.Project.JOINED_OWNER,
         action_object=project,
         target=project,
     )
