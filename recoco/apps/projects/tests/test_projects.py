@@ -703,7 +703,7 @@ def test_general_notifications_are_consumed_on_project_overview(request, client)
         notify.send(  # should e a signal
             sender=project,
             recipient=user,
-            verb=verbs.Project.VALIDATED,
+            verb=verbs.Project.VALIDATED_BY,
             target=project,
         )
 
