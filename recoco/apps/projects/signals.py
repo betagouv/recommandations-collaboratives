@@ -41,6 +41,7 @@ project_observer_joined = django.dispatch.Signal()
 project_switchtender_leaved = django.dispatch.Signal()
 
 project_member_joined = django.dispatch.Signal()
+project_owner_joined = django.dispatch.Signal()
 
 document_uploaded = django.dispatch.Signal()
 
@@ -213,6 +214,16 @@ def log_project_member_joined(sender, project, **kwargs):
     action.send(
         sender,
         verb=verbs.Project.JOINED,
+        action_object=project,
+        target=project,
+    )
+
+
+@receiver(project_owner_joined)
+def log_project_owner_joined(sender, project, **kwargs):
+    action.send(
+        sender,
+        verb=verbs.Project.JOINED_OWNER,
         action_object=project,
         target=project,
     )
