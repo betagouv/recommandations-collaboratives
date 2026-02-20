@@ -128,6 +128,13 @@ def project_moderation_project_refuse(request: HttpRequest, project_id: int):
 
         messages.success(request, f"Le dossier '{project.name}' a été refusé.")
 
+        signals.project_rejected.send(
+            sender=models.Project,
+            site=request.site,
+            moderator=request.user,
+            project=project,
+        )
+
         if owner := project.owner:
             send_email(
                 template_name=communication_constants.TPL_PROJECT_REFUSED,
@@ -178,7 +185,7 @@ def project_moderation_project_accept(request: HttpRequest, project_id: int):
             project_site = project.project_sites.get(site=request.site)
 
             if project_site.is_origin:
-                # Update owner permissions now the project is no in DRAFT state anymore
+                # Update owner permissions now the project is not in DRAFT state anymore
                 assign_collaborator(owner, project, is_owner=True)
 
                 # Send an email to the project owner

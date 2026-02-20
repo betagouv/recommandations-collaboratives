@@ -31,6 +31,7 @@ from .utils import (
 
 project_submitted = django.dispatch.Signal()
 project_validated = django.dispatch.Signal()
+project_rejected = django.dispatch.Signal()
 
 # not using default signal but our own for easier processing
 project_userprojectstatus_updated = django.dispatch.Signal()
@@ -89,6 +90,16 @@ def log_project_validated(sender, site, moderator, project, **kwargs):
         sender=project.owner,
         recipient=get_regional_actors_for_project(site, project),
         verb=verbs.Project.AVAILABLE,
+        action_object=project,
+        target=project,
+    )
+
+
+@receiver(project_rejected)
+def log_project_rejected(sender, site, moderator, project, **kwargs):
+    action.send(
+        sender=moderator,
+        verb=verbs.Project.REJECTED_BY,
         action_object=project,
         target=project,
     )

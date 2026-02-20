@@ -655,7 +655,9 @@ def user_details(request, user_id):
     group_name = make_group_name_for_site("advisor", request.site)
     crm_user_is_advisor = crm_user.groups.filter(name=group_name).exists()
 
-    actions = actor_stream(crm_user)
+    actions = actor_stream(
+        crm_user
+    )  # or request.user.actor_actions.all() which makes it easer to filter out verbs
 
     user_ct = ContentType.objects.get_for_model(User)
 

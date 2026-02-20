@@ -182,6 +182,7 @@ def test_project_moderation_refuse_and_redirect(current_site, client):
     assert project.updated_on > updated_on_before
 
     assert response.status_code == 302
+    assert project.action_object_actions.count() == 1
 
     mock_make_project_digest.assert_called_once_with(
         project=project,

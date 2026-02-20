@@ -50,6 +50,7 @@ class Project:
 
     VALIDATED = "a été validé"
     VALIDATED_BY = "a validé le dossier"
+    REJECTED_BY = "a refusé à la modération le dossier"
 
     # FIXME redondant avec VALIDATED
     AVAILABLE = "a déposé le dossier"
