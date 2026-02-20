@@ -28,8 +28,8 @@
                    {% empty %}
                        sur la France entière,
                    {% endfor %}
-                   avec le commentaire : {{ action.action_object.comment }}.
                 </strong>
+                 avec le commentaire : "{{ action.action_object.comment }}".
             </span>
             <span class="fr-ml-1v small text-secondary">il y a {{ action.timestamp|timesince }}</span>
         </div>

@@ -46,7 +46,7 @@ class Project:
     INVITATION = "a invité un·e collaborateur·rice à rejoindre le dossier"
 
     JOINED = "a rejoint le dossier"
-    JOINED_OWNER = "a rejoint le dossier en tant que référent"
+    JOINED_OWNER = "a rejoint en tant que référent le dossier"
     NEW_OWNER = "est dorénavant référent sur le dossier"
 
     SUBMITTED = "a été déposé"  # FIXME to be removed and keep _BY
