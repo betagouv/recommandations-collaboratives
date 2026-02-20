@@ -127,6 +127,8 @@ def mark_notifications_as_seen(user, project):
         verbs.Project.BECAME_ADVISOR,
         verbs.Project.BECAME_OBSERVER,
         verbs.Project.JOINED,
+        verbs.Project.JOINED_OWNER,
+        verbs.Project.NEW_OWNER,
         verbs.Project.SUBMITTED_BY,
         verbs.Project.VALIDATED,
         verbs.Project.VALIDATED_BY,
@@ -398,7 +400,6 @@ def project_create_or_update_topics(request, project_id=None):
                     sender=request.user,
                     verb=verbs.Project.UPDATE_ADVISORS_NOTE,
                     action_object=project,
-                    target=project,
                 )
 
                 notify_advisors_of_project(
@@ -407,7 +408,6 @@ def project_create_or_update_topics(request, project_id=None):
                         "sender": request.user,
                         "verb": verbs.Project.UPDATE_ADVISORS_NOTE,
                         "action_object": project,
-                        "target": project,
                     },
                 )
 
