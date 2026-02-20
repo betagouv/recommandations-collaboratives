@@ -7,6 +7,7 @@ author  : raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created : 2022-03-07 15:56:20 CEST -- HB David!
 """
 
+from actstream import action
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
@@ -37,6 +38,7 @@ from ..utils import (
     is_advisor_for_project,
     is_member,
     is_regional_actor_for_project,
+    notify_advisors_of_project,
 )
 
 
@@ -369,7 +371,7 @@ def project_internal_followup_tracking(request, project_id=None):
 
 @login_required
 def project_create_or_update_topics(request, project_id=None):
-    """Create/Update topics for a project"""
+    """Create/Update topics for a project and updates advisor's note"""
     project = get_object_or_404(models.Project, sites=request.site, pk=project_id)
 
     advising, advising_position = get_advising_context_for_project(
@@ -385,10 +387,29 @@ def project_create_or_update_topics(request, project_id=None):
         form = ProjectTopicsForm(request.POST, instance=project)
         if form.is_valid() and topic_formset.is_valid():
             project = form.save(commit=False)
-            project.advisors_note_on = timezone.now()
-            project.advisors_note_by = request.user
+            changed_note = "advisors_note" in form.changed_data
+            if changed_note:
+                project.advisors_note_on = timezone.now()
+                project.advisors_note_by = request.user
             project.save()
             form.save_m2m()
+            if changed_note:
+                action.send(
+                    sender=request.user,
+                    verb=verbs.Project.UPDATE_ADVISORS_NOTE,
+                    action_object=project,
+                    target=project,
+                )
+
+                notify_advisors_of_project(
+                    project,
+                    {
+                        "sender": request.user,
+                        "verb": verbs.Project.UPDATE_ADVISORS_NOTE,
+                        "action_object": project,
+                        "target": project,
+                    },
+                )
 
             # Handle topics
             # Add new ones to project or removed deleted ones.

@@ -12,6 +12,7 @@ import io
 import json
 
 import pytest
+from actstream import models as action_models
 from django.contrib.auth import models as auth
 from django.contrib.sites import models as sites
 from django.contrib.sites.shortcuts import get_current_site
@@ -21,6 +22,7 @@ from django.utils import timezone
 from django.utils.http import urlencode
 from model_bakery import baker
 from model_bakery.recipe import Recipe
+from notifications import models as notifications_models
 from notifications import notify
 from pytest_django.asserts import assertContains, assertNotContains
 
@@ -1132,6 +1134,18 @@ def test_switchtender_writes_advisors_note(request, client, project):
     assert project.advisors_note is not None
     assert project.advisors_note_on is not None
     assert project.advisors_note_by == user
+    assert (
+        action_models.Action.objects.filter(
+            verb=verbs.Project.UPDATE_ADVISORS_NOTE
+        ).count()
+        == 1
+    )
+    assert (
+        notifications_models.Notification.objects.filter(
+            verb=verbs.Project.UPDATE_ADVISORS_NOTE
+        ).count()
+        == 1
+    )
 
 
 @pytest.mark.django_db
