@@ -6,7 +6,10 @@ from django.urls import reverse
 from guardian.shortcuts import get_user_perms
 from model_bakery import baker
 from model_bakery.recipe import Recipe
+from notifications import models as notifications_models
+from notifications.signals import notify
 
+from recoco import verbs
 from recoco.apps.geomatics import models as geomatics
 from recoco.apps.geomatics.models import Department
 from recoco.apps.home.models import AdvisorAccessRequest, SiteConfiguration
@@ -162,6 +165,13 @@ def test_project_moderation_refuse_and_redirect(current_site, client):
 
     project = Recipe(Project, sites=[current_site], name="My project").make()
     baker.make(ProjectMember, project=project, member=owner, is_owner=True)
+    notify.send(
+        sender=owner,
+        verb=verbs.Project.SUBMITTED_BY,
+        action_object=project,
+        target=project,
+        recipient=owner,  # unrealistic but ok for the test
+    )
 
     updated_on_before = project.updated_on
     url = reverse("projects-moderation-project-refuse", args=[project.id])
@@ -183,6 +193,9 @@ def test_project_moderation_refuse_and_redirect(current_site, client):
 
     assert response.status_code == 302
     assert project.action_object_actions.count() == 1
+    assert notifications_models.Notification.objects.count() == 1
+    assert notifications_models.Notification.objects.filter(unread=True).count() == 0
+    assert notifications_models.Notification.objects.filter(emailed=False).count() == 0
 
     mock_make_project_digest.assert_called_once_with(
         project=project,

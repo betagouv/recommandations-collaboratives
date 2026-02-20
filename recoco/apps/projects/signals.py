@@ -105,6 +105,17 @@ def log_project_rejected(sender, site, moderator, project, **kwargs):
     )
 
 
+@receiver(project_rejected)
+def unnotify_project_submitted_on_rejection(site, project, **kwargs):
+    project_ct = ContentType.objects.get_for_model(project)
+    notifications_models.Notification.objects.filter(
+        action_object_content_type=project_ct.pk,
+        action_object_object_id=project.pk,
+        site=site,
+        verb=verbs.Project.SUBMITTED_BY,
+    ).update(emailed=True, unread=False)
+
+
 @receiver(
     pre_delete,
     sender=models.Project,
