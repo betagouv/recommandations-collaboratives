@@ -50,7 +50,7 @@ class Project:
     NEW_OWNER = "est dorénavant référent sur le dossier"
 
     SUBMITTED = "a été déposé"  # FIXME to be removed and keep _BY
-    SUBMITTED_BY = "a déposé un nouveau dossier, qui est en attente de validation"
+    SUBMITTED_BY = "a déposé un nouveau dossier, en attente de validation"
 
     VALIDATED = "a été validé"
     VALIDATED_BY = "a validé le dossier"
