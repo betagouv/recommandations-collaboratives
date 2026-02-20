@@ -1,0 +1,36 @@
+<li class="d-flex flex-columns list-group-item">
+    {% if action.actor %}
+        <div class="align-middle fr-mx-2v flex-shrink">
+            <img class="rounded-circle"
+                 src="{% gravatar_url action.actor.email size=24 %}"
+                 alt="{{ action.actor }}">
+        </div>
+    {% endif %}
+    <div class=" flex-row flex-grow-1">
+        <div class="flex-grow w-100 flex-grow-1">
+            {% if action.actor %}
+                <span class="actor">
+                    <a href="{% url 'crm-user-details' action.actor.pk %}">
+                        {{ action.actor.first_name|default:action.actor.email }}
+                        {{ action.actor.last_name|default:"" }}
+                    </a>
+                </span>
+            {% else %}
+                <span class="actor">(compte supprimé)</span>
+            {% endif %}
+            <span class="verb">
+                <strong>a demandé un accès conseiller
+                   {% for department in action.action_object.departments.all %}
+                        {% if not forloop.first %}sur les départements{% endif %}
+                        {{ department.name }} ({{ department.code }})
+                        {% if not forloop.last %}, {% endif %}
+                   {% empty %}
+                       sur la France entière,
+                   {% endfor %}
+                   avec le commentaire : {{ action.action_object.comment }}.
+                </strong>
+            </span>
+            <span class="fr-ml-1v small text-secondary">il y a {{ action.timestamp|timesince }}</span>
+        </div>
+    </div>
+</li>
