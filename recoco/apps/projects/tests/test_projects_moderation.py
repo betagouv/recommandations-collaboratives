@@ -1,6 +1,7 @@
 from unittest.mock import ANY, Mock, patch
 
 import pytest
+from actstream import models as action_models
 from django.contrib.auth import models as auth
 from django.urls import reverse
 from guardian.shortcuts import get_user_perms
@@ -336,6 +337,12 @@ class TestProjectModerationAdvisorRefuse:
                 "message": "My comment",
             },
         )
+        assert (
+            action_models.Action.objects.filter(
+                verb=verbs.User.ADVISOR_REJECTED
+            ).count()
+            == 1
+        )
 
 
 class TestProjectModerationAdvisorAccept:
@@ -434,6 +441,12 @@ class TestProjectModerationAdvisorAccept:
             mock_send_email.mock_calls[0]
             .kwargs["params"]["dashboard_url"]
             .startswith("https://example.com/projects/?sesame=")
+        )
+        assert (
+            action_models.Action.objects.filter(
+                verb=verbs.User.ADVISOR_ACCEPTED
+            ).count()
+            == 1
         )
 
 

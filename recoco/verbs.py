@@ -10,6 +10,8 @@ created: 2023-06-26 14:37:45 CEST
 
 class User:
     LOGIN = "s'est connecté·e"
+    ADVISOR_ACCEPTED = "a accepté la demande de compte conseiller de"
+    ADVISOR_REJECTED = "a refusé la demande de compte conseiller de"
 
 
 class Document:

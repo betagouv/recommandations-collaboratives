@@ -7,6 +7,7 @@ author  : raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created : 2021-05-26 15:56:20 CEST
 """
 
+from actstream import action
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
@@ -272,6 +273,12 @@ def project_moderation_advisor_refuse(
         advisor_group = get_group_for_site("advisor", request.site)
         advisor_access_request.user.groups.remove(advisor_group)
 
+    action.send(
+        sender=request.user,
+        verb=verbs.User.ADVISOR_REJECTED,
+        action_object=advisor_access_request.user,
+        target=advisor_access_request,
+    )
     messages.success(
         request,
         f"La demande d'accès conseiller pour '{advisor_access_request.user.email}' a été refusée.",
@@ -319,6 +326,12 @@ def project_moderation_advisor_accept(
     messages.success(
         request,
         f"La demande d'accès conseiller pour '{advisor_access_request.user.email}' a été acceptée.",
+    )
+    action.send(
+        sender=request.user,
+        verb=verbs.User.ADVISOR_ACCEPTED,
+        action_object=advisor_access_request.user,
+        target=advisor_access_request,
     )
 
     send_email(
