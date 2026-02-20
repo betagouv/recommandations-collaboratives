@@ -409,6 +409,7 @@ def project_create_or_update_topics(request, project_id=None):
                         "verb": verbs.Project.UPDATE_ADVISORS_NOTE,
                         "action_object": project,
                     },
+                    exclude=request.user,
                 )
 
             # Handle topics
