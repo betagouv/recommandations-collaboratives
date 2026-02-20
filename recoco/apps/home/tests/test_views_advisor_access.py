@@ -1,10 +1,13 @@
 from unittest.mock import Mock, patch
 
 import pytest
+from actstream import models as action_models
 from django.contrib.auth.models import User
 from django.urls import reverse
 from model_bakery import baker
+from notifications import models as notifications_models
 
+from recoco import verbs
 from recoco.apps.geomatics.models import Department
 from recoco.apps.home.models import AdvisorAccessRequest, SiteConfiguration
 from recoco.utils import get_group_for_site
@@ -56,7 +59,7 @@ class TestAdvisorAccessRequestView:
         assert response.context["selected_departments"] == ["40"]
 
     @pytest.mark.django_db(transaction=True)
-    def test_post_request(self, client, current_site):
+    def test_post_request(self, client, current_site, staff_user, admin_user):
         baker.make(SiteConfiguration, site=current_site)
         user = baker.make(User)
         baker.make(Department, code="64", name="Pyrénées-Atlantiques")
@@ -91,6 +94,17 @@ class TestAdvisorAccessRequestView:
         assert advisor_access_request.departments.count() == 2
         assert advisor_access_request.comment == "Merci pour votre aide !"
 
+        assert (
+            action_models.Action.objects.filter(verb=verbs.User.ADVISOR_REQUEST).count()
+            == 1
+        )
+        assert (
+            notifications_models.Notification.objects.filter(
+                verb=verbs.User.ADVISOR_REQUEST
+            ).count()
+            == 2
+        )  # one for admin and one for staff
+
         response = client.post(
             reverse("advisor-access-request"),
             data={
@@ -106,36 +120,22 @@ class TestAdvisorAccessRequestView:
         assert advisor_access_request.departments.count() == 3
         assert advisor_access_request.comment == "Test comment"
 
-        @pytest.mark.django_db(transaction=True)
-        def test_post_request_ensures_department(self, client, current_site):
-            baker.make(SiteConfiguration, site=current_site)
-            user = baker.make(User)
-            baker.make(Department, code="40", name="Landes")
-
-            client.force_login(user)
-            response = client.get(reverse("advisor-access-request"))
-            assert response.status_code == 200
-            assert response.context.get("advisor_access_request") is None
-
-            assert AdvisorAccessRequest.objects.count() == 0
-
-            response = client.post(
-                reverse("advisor-access-request"),
-                data={
-                    "advisor_access_type": "Regional",
-                    "departments": [],
-                    "comment": "Merci pour votre aide !",
-                },
-            )
-            assert response.status_code == 400
-
-            advisor_access_request = AdvisorAccessRequest.objects.filter(
-                site=current_site
-            ).first()
-            assert advisor_access_request is None
+        # should not notify again if request is only modified
+        assert (
+            action_models.Action.objects.filter(verb=verbs.User.ADVISOR_REQUEST).count()
+            == 1
+        )
+        assert (
+            notifications_models.Notification.objects.filter(
+                verb=verbs.User.ADVISOR_REQUEST
+            ).count()
+            == 2
+        )  # one for admin and one for staff
 
     @pytest.mark.django_db(transaction=True)
-    def test_post_request_national_no_dep_ok(self, client, current_site):
+    def test_post_request_national_no_dep_ok(
+        self, client, current_site, staff_user, admin_user
+    ):
         baker.make(SiteConfiguration, site=current_site)
         user = baker.make(User)
         baker.make(Department, code="40", name="Landes")
