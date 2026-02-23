@@ -13,6 +13,7 @@ function initGlobalCache() {
     gravatarLocalStorage = new LocalStorageMgmt({
       dataLabel: 'gravatar-map',
       expiringData: false,
+      version: '0.2.0',
     });
     globalCache = gravatarLocalStorage.get() || {};
   }
