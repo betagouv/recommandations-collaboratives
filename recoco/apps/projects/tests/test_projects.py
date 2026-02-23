@@ -1116,6 +1116,8 @@ def test_next_url_redirect_after_update_location(request, client, project):
 @pytest.mark.django_db
 def test_switchtender_writes_advisors_note(request, client, project):
     site = get_current_site(request)
+    other_advisor = baker.make(auth.User)
+    utils.assign_advisor(other_advisor, project, site)
 
     with login(client) as user:
         utils.assign_advisor(user, project, site)
@@ -1144,7 +1146,7 @@ def test_switchtender_writes_advisors_note(request, client, project):
         notifications_models.Notification.objects.filter(
             verb=verbs.Project.UPDATE_ADVISORS_NOTE
         ).count()
-        == 1
+        == 1  # one for other_advisor and none for sender
     )
 
 
