@@ -22,6 +22,7 @@ from django.db import transaction
 from django.urls import reverse
 from django.utils import timezone
 from guardian.shortcuts import assign_perm
+from sib_api_v3_sdk.rest import ApiException
 
 from recoco.apps.communication import constants as communication_constants
 from recoco.apps.communication.api import send_email
@@ -128,7 +129,7 @@ DELETION_ABSENT_FOR_DAYS = 365 * 2
 
 def delete_user(user: User):
     user.first_name = ""
-    user.last_name = "Compte supprimé"
+    user.last_name = "Utilisateur supprimé"
     user.email = f"{user.id}@deleted.recoconseil.fr"
     user.username = user.email
     user.is_active = False
@@ -138,6 +139,7 @@ def delete_user(user: User):
     user.set_unusable_password()
 
     user.profile.phone_no = ""
+    user.profile.organization_position = ""
     user.profile.previous_activity_at = None
     user.profile.previous_deletion_warning_at = None
     user.profile.previous_activity_site = None
@@ -175,6 +177,7 @@ def send_deletion_warning_to_profiles(profiles, warning_time):
         if warning_time == 1
         else communication_constants.TPL_RGDP_DELETION_SECOND_WARNING
     )
+    error_profile_ids = []
     for profile in profiles.filter(disabled=None):
         if profile.previous_activity_site is None:
             sentry_sdk.capture_exception(
@@ -184,23 +187,29 @@ def send_deletion_warning_to_profiles(profiles, warning_time):
             )
             continue
         with settings.SITE_ID.override(profile.previous_activity_site):
-            send_email(
-                template_name=template,
-                recipients=[
-                    {
-                        "name": normalize_user_name(profile.user),
-                        "email": profile.user.email,
-                    }
-                ],
-                params={
-                    "dashboard_url": utils.build_absolute_url(
-                        reverse("projects-project-list")
-                        if profile.user.groups.filter(name__contains="advisor").exists()
-                        else reverse("home"),
-                        auto_login_user=profile.user,
-                    )
-                },
-            )
+            try:
+                send_email(
+                    template_name=template,
+                    recipients=[
+                        {
+                            "name": normalize_user_name(profile.user),
+                            "email": profile.user.email,
+                        }
+                    ],
+                    params={
+                        "dashboard_url": utils.build_absolute_url(
+                            reverse("projects-project-list")
+                            if profile.user.groups.filter(
+                                name__contains="advisor"
+                            ).exists()
+                            else reverse("home"),
+                            auto_login_user=profile.user,
+                        )
+                    },
+                )
+            except ApiException:
+                error_profile_ids.append(profile.id)
+    return error_profile_ids
 
 
 # eof

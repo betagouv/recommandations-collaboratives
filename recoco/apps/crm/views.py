@@ -67,6 +67,7 @@ from recoco.apps.home import models as home_models
 from recoco.apps.onboarding import utils as onboarding_utils
 from recoco.apps.projects.models import Project, Topic
 from recoco.apps.reminders import models as reminders_models
+from recoco.apps.resources.models import Category
 from recoco.apps.tasks.models import Task
 from recoco.utils import (
     get_group_for_site,
@@ -907,6 +908,27 @@ def project_toggle_annotation(request, project_id=None):
 
     url = reverse("crm-project-details", args=[project.id])
     return redirect(url)
+
+
+########################################################################
+# resources
+########################################################################
+
+
+@login_required
+def resource_list(request):
+    has_perm_or_403(request.user, "use_crm", request.site)
+
+    departments = list(geomatics.Department.objects.values("code", "name"))
+
+    categories = list(Category.on_site.values("id", "name").order_by("name"))
+
+    context = {
+        "departments": departments,
+        "categories": categories,
+    }
+
+    return render(request, "crm/resource_list.html", context)
 
 
 def handle_create_note_for_object(

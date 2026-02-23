@@ -251,6 +251,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     } else {
       await this.sendMessage();
     }
+    this.$store.onLeaveAlert.setDirty(false);
   },
   uploadFile(file) {
     const formData = new FormData();

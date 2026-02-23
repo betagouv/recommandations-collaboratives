@@ -1,0 +1,185 @@
+import Alpine from 'alpinejs';
+import api, { resourcesUrl } from '../../utils/api';
+import { ToastType } from '../../models/toastType';
+
+Alpine.data('ResourceListCrm', (departments, categories) => ({
+  dataLoaded: false,
+  resources: [],
+  resourcesToDisplay: [],
+  resourcesTotal: 0,
+  departments: JSON.parse(departments.textContent),
+  categories: JSON.parse(categories.textContent),
+  categoryOptions: [],
+  territorySelectAll: true,
+  backendSearch: {
+    searchText: '',
+    searchDepartment: [],
+    searchStatus: [],
+    searchCategory: [],
+  },
+  searchText: '',
+  pagination: {
+    currentPage: 1,
+    limit: 20,
+    total: 0,
+  },
+  options: [
+    {
+      value: 0,
+      text: 'Brouillon',// DRAFT
+      color: 'fr-badge--new fr-badge fr-badge--no-icon font-size-10px',
+      tooltip:
+        "La ressource est en cours de création",
+    },
+    {
+      value: 1,
+      text: 'A relire',// TO_REVIEW
+      color: 'fr-badge--info fr-badge fr-badge--no-icon font-size-10px',
+      tooltip: 'La ressource est en attente de validation',
+    },
+    {
+      value: 2,
+      text: 'Publié',// PUBLISHED
+      color: 'fr-badge--success-lighter fr-badge fr-badge--no-icon font-size-10px',
+      tooltip: "La ressource est publiée",
+    },
+  ],
+  displayResourceIndex: false,
+  async init() {
+    this.departmentsMap = this.departments.reduce((acc, department) => {
+      acc[department.code] = department.name;
+      return acc;
+    }, {});
+    this.categoryOptions = (this.categories || []).map((cat) => ({
+      value: cat.id,
+      text: cat.name,
+      search: cat.name,
+    }));
+
+    const resourcesResponse = await this.getResources();
+    this.resources.push([...resourcesResponse.results]);
+    this.resourcesToDisplay = [...resourcesResponse.results];
+    this.resourcesTotal = resourcesResponse.count;
+    this.pagination.total = Math.ceil(
+      resourcesResponse.count / this.pagination.limit
+    );
+    this.dataLoaded = true;
+  },
+  /************************
+   * Filtering functions
+   **************************/
+  updateResourceListAndPagination(resources) {
+    this.resources = [];
+    this.resources.push([...resources.results]);
+    this.resourcesToDisplay = [...resources.results];
+    this.resourcesTotal = resources.count;
+    this.pagination.currentPage = 1;
+    this.pagination.total = Math.ceil(resources.count / this.pagination.limit);
+  },
+
+  async saveSelectedFilter(event, key) {
+    if (!event.detail) return;
+
+    this.backendSearch[key] = [...event.detail];
+    const resources = await this.handleResourceSearch();
+    this.updateResourceListAndPagination(resources);
+  },
+  async onSearch() {
+    const resources = await this.handleResourceSearch();
+    this.updateResourceListAndPagination(resources);
+  },
+  async handleResourceSearch() {
+    try {
+      return await this.getResources({
+        offset: 0,
+      });
+    } catch (error) {
+      this.$store.app.displayToastMessage({
+        message: `Erreur lors de la recherche des ressources`,
+        type: ToastType.error,
+      });
+      throw new Error(`Error while searching resources`, error);
+    }
+  },
+
+  /************************
+   * Pagination functions
+   **************************/
+  async onChangePage(pageNumber) {
+    if (this.resources.length <= this.pagination.limit * (pageNumber - 1)) {
+      const resourcesResponse = await this.getResources({
+        offset: this.pagination.limit * (pageNumber - 1),
+      });
+      this.resources[pageNumber - 1] = [...resourcesResponse.results];
+    }
+    this.resourcesToDisplay = [...this.resources[pageNumber - 1]];
+    this.pagination.currentPage = pageNumber;
+  },
+
+  /************************
+   * CRUD functions
+   **************************/
+  async getResources({ offset = 0 } = {}) {
+    try {
+      const response = await api.get(
+        resourcesUrl({
+          limit: this.pagination.limit,
+          offset: offset,
+          search: this.backendSearch.searchText,
+          status: this.backendSearch.searchStatus,
+          category: this.backendSearch.searchCategory,
+        })
+      );
+      return response.data;
+    } catch (error) {
+      this.$store.app.displayToastMessage({
+        message: `Erreur lors de la récupération des ressources`,
+        type: ToastType.error,
+      });
+      throw new Error(`Error while getting resources`, error);
+    }
+  },
+
+  /*******************
+   * Display functions
+   ********************/
+  resourcesCountLabel() {
+    if (this.resourcesTotal > 0) {
+      return `${this.resourcesTotal} résultat${this.resourcesTotal > 1 ? 's' : ''}`;
+    } else {
+      return 'Aucun résultat';
+    }
+  },
+  resourceStatusLabel(status) {
+    return (
+      this.options.find((option) => option.value === status).text || status
+    );
+  },
+  isResourceExpired(resource) {
+    return resource?.expires_on && new Date(resource?.expires_on) < new Date();
+  },
+  resourceDepartmentsLabel(resource) {
+    if (resource?.departments.length) {
+      let departments = [...resource?.departments];
+      departments = departments.map((department) => this.departmentsMap[department]);
+      return departments.join(', ');
+    }
+    return "Non renseigné";
+  },
+  resourceStatusColor(status) {
+    switch (status) {
+      case 0:
+        return 'fr-badge--new';
+      case 1:
+        return 'fr-badge--info';
+      case 2:
+        return 'fr-badge--success-lighter';
+      default:
+        return '';
+    }
+  },
+  resourceTooltip(resource) {
+    return this.options.find((option) => option.value === resource.status)
+      .tooltip;
+  },
+}));

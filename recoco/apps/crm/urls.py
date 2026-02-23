@@ -184,6 +184,13 @@ urlpatterns = [
         views.update_note_for_organization,
         name="crm-organization-note-update",
     ),
+    #
+    # Resources
+    path(
+        r"crm/resource",
+        views.resource_list,
+        name="crm-resource-list",
+    ),
     path(
         r"crm/user/<int:user_id>/create-note",
         views.create_note_for_user,

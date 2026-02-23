@@ -144,7 +144,7 @@ def test_resource_list_contains_only_resource_with_area(request, client):
     ).make()
 
     url = reverse("resources-resource-search")
-    url = f"{url}?limit_area=true&query=resource"
+    url = f"{url}?limit_areas=f{departments[0]}&query=resource"
 
     membership = baker.make(projects_models.ProjectMember)
     with login(client, user=membership.member):
@@ -415,7 +415,7 @@ def test_create_resource_available_for_authorized_users(client):
     with login(client, groups=["example_com_staff"]):
         response = client.get(url)
     assert response.status_code == 200
-    assertContains(response, 'form id="form-resource-create"')
+    assertContains(response, 'form id="form-resource"')
 
 
 @pytest.mark.resource_create
@@ -468,7 +468,7 @@ def test_update_resource_available_for_staff(request, client):
         response = client.get(url)
 
     assert response.status_code == 200
-    assertContains(response, 'form id="form-resource-update"')
+    assertContains(response, 'form id="form-resource"')
 
 
 @pytest.mark.resource_update

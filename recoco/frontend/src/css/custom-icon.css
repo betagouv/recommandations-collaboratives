@@ -67,3 +67,13 @@
 .fr-icon-calendar-line::before {
   mask-image: url(../assets/calendar.svg);
 }
+
+.fr-icon-target-line::after,
+.fr-icon-target-line::before {
+  mask-image: url(../assets/target.svg);
+}
+
+.fr-icon-building-line::after,
+.fr-icon-building-line::before {
+  mask-image: url(../assets/building.svg);
+}
