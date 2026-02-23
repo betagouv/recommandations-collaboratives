@@ -1,3 +1,5 @@
+from django.db.models import Count, OuterRef, Subquery, Value
+from django.db.models.functions import Coalesce
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
@@ -7,6 +9,7 @@ from recoco.rest_api.filters import WatsonSearchFilter
 from recoco.rest_api.pagination import StandardResultsSetPagination
 from recoco.utils import has_perm
 
+from ..tasks.models import Task
 from .filters import ResourceCategoryFilter, ResourceStatusFilter
 from .importers import ResourceImporter
 from .models import Resource, ResourceAddon
@@ -55,11 +58,22 @@ class ResourceViewSet(viewsets.ModelViewSet):
         qs = Resource.on_site
         if not has_perm(self.request.user, "sites.manage_resources", self.request.site):
             qs = qs.filter(status__gt=Resource.TO_REVIEW)
+
+        task_sb = (
+            Task.objects.filter(
+                project__exclude_stats=False,
+                site_id=self.request.site,
+                resource_id=OuterRef("pk"),
+            )
+            .annotate(c=Count("*"))
+            .values_list("c", flat=True)
+        )
         return (
             qs.with_ds_annotations()
             .select_related("created_by", "category")
             .prefetch_related("tags")
             .order_by("-created_on", "-updated_on")
+            .annotate(nb_uses=Coalesce(Subquery(task_sb), Value(0)))
         )
 
     def get_serializer_class(self):
