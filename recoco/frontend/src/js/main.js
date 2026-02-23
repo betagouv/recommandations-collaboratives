@@ -17,6 +17,10 @@ import 'tippy.js/dist/tippy.css';
 import 'vite/modulepreload-polyfill';
 import './utils/globals';
 import './utils/tooltipInitialization.js';
+import { initAvatarEnhancer } from './utils/avatarEnhancer';
+
+// Initialize avatar enhancer for server-rendered avatars
+initAvatarEnhancer();
 
 //Global Store
 import './store/utils';
