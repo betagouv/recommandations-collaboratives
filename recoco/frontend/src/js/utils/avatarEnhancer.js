@@ -178,14 +178,12 @@ export function enhanceAvatars(container = document) {
  * Runs on page load and sets up a MutationObserver for dynamic content.
  */
 export function initAvatarEnhancer() {
-  // Enhance existing avatars
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => enhanceAvatars());
   } else {
     enhanceAvatars();
   }
 
-  // Set up observer for dynamically added content
   const observer = new MutationObserver((mutations) => {
     mutations.forEach((mutation) => {
       mutation.addedNodes.forEach((node) => {
