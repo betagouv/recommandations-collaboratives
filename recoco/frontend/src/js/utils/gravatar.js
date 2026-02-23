@@ -35,7 +35,6 @@ function generateLocalAvatar(size, name, hexColor = 'DDDDDD') {
  * Checks Gravatar in background using Image preload.
  */
 function checkGravatarInBackground(email, size, name, hexColor, cacheKey) {
-  if (email == 'anouk.jeanneau@beta.gouv.fr') debugger;
   const hash = md5(email.toLowerCase().trim());
   const gravatarUrl = `https://www.gravatar.com/avatar/${hash}?s=${size}&d=404`;
 
@@ -75,7 +74,6 @@ export function gravatar_url(
   name = 'Inconnu',
   hexColor = 'DDDDDD'
 ) {
-  if (email == 'anouk.jeanneau@beta.gouv.fr') debugger;
   if (!name || name.trim() === '') name = 'Inconnu';
   hexColor = hexColor.replace('#', '');
 
