@@ -77,3 +77,8 @@
 .fr-icon-building-line::before {
   mask-image: url(../assets/building.svg);
 }
+
+.fr-icon-file-copy-2-line::after,
+.fr-icon-file-copy-2-line::before {
+  mask-image: url(../assets/file-copy-2-line.svg);
+}
