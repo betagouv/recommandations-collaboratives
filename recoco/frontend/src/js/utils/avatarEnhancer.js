@@ -82,7 +82,7 @@ function parseGravatarUrl(url) {
 /**
  * Checks if gravatar exists and updates the image.
  */
-function checkGravatar(img, hash, size, name) {
+function checkGravatar(img, hash, size) {
   const cacheKey = `${hash}-${size}`;
 
   // If already cached, apply immediately
@@ -149,9 +149,9 @@ function processGravatarImage(img) {
 
   // Check gravatar in background
   if ('requestIdleCallback' in window) {
-    requestIdleCallback(() => checkGravatar(img, hash, size, name));
+    requestIdleCallback(() => checkGravatar(img, hash, size));
   } else {
-    setTimeout(() => checkGravatar(img, hash, size, name), 100);
+    setTimeout(() => checkGravatar(img, hash, size), 100);
   }
 }
 
