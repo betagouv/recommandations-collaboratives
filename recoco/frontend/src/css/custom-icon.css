@@ -67,3 +67,8 @@
 .fr-icon-calendar-line::before {
   mask-image: url(../assets/calendar.svg);
 }
+
+.fr-icon-chat-1-line::after,
+.fr-icon-chat-1-line::before {
+  mask-image: url(../assets/chat-1-line.svg);
+}

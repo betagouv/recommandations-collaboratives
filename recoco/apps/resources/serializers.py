@@ -72,14 +72,21 @@ class ResourceDetailSerializer(ResourceSerializer):
             "created_on",
             "updated_on",
             "contacts",
+            "expires_on",
+            "expired",
         ]
         read_only_fields = ResourceSerializer.Meta.read_only_fields + [
             "created_on",
             "updated_on",
             "created_by",
+            "expires_on",
         ]
 
     contacts = serializers.PrimaryKeyRelatedField(queryset=Contact.objects, many=True)
+    expired = serializers.SerializerMethodField()
+
+    def get_expired(self, obj):
+        return obj.expired
 
 
 class ResourceWritableSerializer(ResourceDetailSerializer):

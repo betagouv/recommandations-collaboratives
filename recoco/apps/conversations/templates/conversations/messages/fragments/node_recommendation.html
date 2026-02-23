@@ -18,13 +18,12 @@ Parameter Alpine:
          x-init="recommendation = getRecommendationById(node.recommendation_id)"
          class="task-item rounded-3 fr-my-2v">
         <template x-if="recommendation">
-            <div>
+            <div class="position-relative">
                 <template x-if="recommendation.resource">
-                    <a :href="recommendation?.resource?.web_url"
+                    <a href="#"
                        class="stretched-link"
-                       target="_blank"
-                       :title="`ouvrir la fiche ressource - nouvel onglet`"
-                       @click="await onClickRessourceConsummeNotification(recommendation, element)">
+                       :title="`voir la fiche ressource`"
+                       @click.prevent="await openResourcePreviewPanel(recommendation, element)">
                         <div>
                             <p x-html="renderMarkdown(recommendation.content)"></p>
                             <div class="task-item__resource"

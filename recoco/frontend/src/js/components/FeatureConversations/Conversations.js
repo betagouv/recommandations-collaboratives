@@ -11,11 +11,13 @@ import api, {
   editTaskUrl,
   markTaskNotificationAsVisited,
   conversationsMessageMarkAsReadUrl,
+  resourcePreviewUrl
 } from '../../utils/api';
 import { trackOpenRessource } from '../../utils/trackingMatomo';
 import { formatDateFrench } from '../../utils/date';
 
 Alpine.data('Conversations', (projectId, currentUserId) => ({
+  resourcePreviewUrl,
   projectId,
   currentUserId,
   feed: {},
@@ -507,6 +509,23 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
       }
     } catch (error) {
       throw new Error('Failed to mark task notification as visited', error);
+    }
+  },
+  async openResourcePreviewPanel(recommendation, message) {
+    console.log('openResourcePreviewPanel called', { recommendation, message });
+    try {
+      // Mark as visited and track analytics
+      await this.onClickRessourceConsummeNotification(recommendation, message);
+      // Open the preview panel
+      console.log('About to open panel, store:', this.$store.resourcePreviewPanel);
+      if (this.$store.resourcePreviewPanel) {
+        this.$store.resourcePreviewPanel.open(recommendation, message);
+        console.log('Panel opened, isOpen:', this.$store.resourcePreviewPanel.isOpen);
+      } else {
+        console.error('resourcePreviewPanel store not found!');
+      }
+    } catch (error) {
+      console.error('Error in openResourcePreviewPanel:', error);
     }
   },
   replaceMessage(message, messageIdToEdit) {

@@ -10,6 +10,7 @@
 {% endblock og_title %}
 {% block js %}
     {% vite_asset 'js/styles/projects-conversations-new.css.js' %}
+    {% vite_asset 'js/styles/resource-preview-panel.css.js' %}
     {% vite_asset 'js/apps/conversationsNew.js' %}
     {% vite_asset 'js/apps/featureAddContact.js' %}
 {% endblock js %}
@@ -135,6 +136,7 @@
         </template>
         {% include "projects/project/onboarding_tutorial.html" %}
         {% include "conversations/messages/fragments/confirm_delete_message.html" %}
+        {% include "conversations/messages/fragments/resource_preview_panel.html" %}
     </div>
     {% include "projects/project/fragments/project_banner/banner_wrapper.html" with part="close" %}
 {% endblock project_detail %}
