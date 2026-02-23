@@ -389,8 +389,8 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
       this.countOf.messages += change;
     }
   },
-  onClickHandleReply(message) {
-    this.messageIdToReply = message.id;
+  onClickHandleReply(messageId) {
+    this.messageIdToReply = messageId;
     this.isEditorInReplyMode = true;
     Alpine.raw(this.$store.editor.editorInstance).commands.focus();
   },

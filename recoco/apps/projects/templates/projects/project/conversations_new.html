@@ -34,7 +34,8 @@
     {% include "projects/project/fragments/project_banner/banner_wrapper.html" with part="open" %}
     {% regroup feed by topic as topic_list %}
     <div class="conversation-new d-flex"
-         x-data="Conversations({{ project.id }}, {{ request.user.id }})">
+         x-data="Conversations({{ project.id }}, {{ request.user.id }})"
+         @on-click-handle-reply.window="onClickHandleReply($event.detail)">
         <div class="conversation-new__topics">
             <div class="justify-content-between">
                 {% include "conversations/messages/fragments/conversation_topic.html" with topic_name=topic.grouper message_number=topic.list %}
