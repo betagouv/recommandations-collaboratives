@@ -5,46 +5,32 @@
             <span class="fr-icon-chat-1-line fr-icon--xs fr-mr-1w" aria-hidden="true"></span>
             <span class="fw-medium">Commentaire du conseiller</span>
         </div>
-        <button class="fr-btn fr-btn--sm fr-btn--tertiary fr-btn--tertiary-dark-background"
-                @click.prevent="$store.resourcePreviewPanel.scrollToMessage()">
-            <span class="fr-icon-link fr-icon--sm fr-mr-1v" aria-hidden="true"></span>
-            Voir le message
-        </button>
+        <button class="fr-btn fr-btn--sm fr-icon-link fr-btn--icon-left fr-btn--tertiary fr-btn--tertiary-dark-background fr-mr-1w"
+                @click.prevent="$store.resourcePreviewPanel.scrollToMessage()">Voir le message</button>
     </div>
     <div class="resource-preview-panel__advisor-comment-content">
         <template x-if="$store.resourcePreviewPanel.recommendation?.content">
             <p x-html="renderMarkdown($store.resourcePreviewPanel.recommendation.content)"
                class="fr-mb-0 text-break"></p>
         </template>
-    </div>
-    <div class="resource-preview-panel__advisor-comment-footer">
-        <template x-if="$store.resourcePreviewPanel.recommendation?.created_by">
-            <div class="d-flex align-items-center">
-                <img class="rounded-circle fr-mr-1v"
-                     width="24"
-                     height="24"
-                     :src="gravatar_url($store.resourcePreviewPanel.recommendation.created_by.email, 24, $store.resourcePreviewPanel.recommendation.created_by.first_name + ' ' + $store.resourcePreviewPanel.recommendation.created_by.last_name, stringToColor($store.resourcePreviewPanel.recommendation.created_by.email))"
-                     :alt="`${$store.resourcePreviewPanel.recommendation.created_by.first_name} ${$store.resourcePreviewPanel.recommendation.created_by.last_name}`">
-                <span class="fw-medium text-capitalize"
-                      x-text="`${$store.resourcePreviewPanel.recommendation.created_by.first_name} ${$store.resourcePreviewPanel.recommendation.created_by.last_name}`"></span>
-                <template x-if="$store.resourcePreviewPanel.recommendation.created_by.profile?.organization?.name">
-                    <span class="text-muted fr-ml-1v"
-                          x-text="$store.resourcePreviewPanel.recommendation.created_by.profile.organization.name"></span>
-                </template>
+        <div class="d-flex align-items-center">
+            <template x-if="$store.resourcePreviewPanel.recommendation?.created_by">
+                <div class="d-flex align-items-center"
+                     x-data="{user: null}"
+                     x-init="user = getUserById($store.resourcePreviewPanel.recommendation.created_by.id);">
+                    {% include "user/user_card_js.html" with class_name="font-size-14px" %}
+                </div>
+            </template>
+            <template x-if="$store.resourcePreviewPanel.message?.created">
+                <span class="text-muted fr-ml-1w"
+                      x-text="`le ${formatDate($store.resourcePreviewPanel.message.created, { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })}`">
+                </span>
+            </template>
+            <div class="d-flex align-items-center fr-ml-auto">
+                <button type="button"
+                        class="fr-btn fr-btn--sm fr-icon-reply-line fr-btn--icon-left fr-btn--tertiary fr-btn--tertiary-dark-background"
+                        @click="$store.resourcePreviewPanel.scrollToMessage()">Répondre</button>
             </div>
-        </template>
-        <template x-if="$store.resourcePreviewPanel.message?.created">
-            <span class="text-muted fr-ml-2w"
-                  x-text="`le ${formatDate($store.resourcePreviewPanel.message.created, { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })}`">
-            </span>
-        </template>
-        <div class="d-flex align-items-center fr-ml-auto">
-            <button type="button"
-                    class="fr-btn fr-btn--sm fr-btn--tertiary-no-outline"
-                    @click="$store.resourcePreviewPanel.scrollToMessage()">
-                <span class="fr-icon-chat-1-line fr-mr-1v" aria-hidden="true"></span>
-                Répondre
-            </button>
         </div>
     </div>
 </div>

@@ -9,6 +9,7 @@ document.addEventListener('alpine:init', () => {
 
     open(recommendation, message) {
       this.recommendation = recommendation;
+      this.recommendation.created_by.id = message.posted_by;
       this.message = message;
       this.messageId = message?.id;
       this.isOpen = true;

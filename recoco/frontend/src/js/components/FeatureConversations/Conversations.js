@@ -190,9 +190,9 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
       user.data = {
         id: +id,
         place: this.users.length,
-        first_name: 'John',
-        last_name: 'Doe',
-        email: 'john.doe@example.com',
+        first_name: 'Inconnu',
+        last_name: 'Inconnu',
+        email: 'inconnu@example.com',
         phone_no: '0642424242',
         last_login: {
           date: '2021-01-01',
@@ -512,15 +512,11 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     }
   },
   async openResourcePreviewPanel(recommendation, message) {
-    console.log('openResourcePreviewPanel called', { recommendation, message });
     try {
       // Mark as visited and track analytics
       await this.onClickRessourceConsummeNotification(recommendation, message);
-      // Open the preview panel
-      console.log('About to open panel, store:', this.$store.resourcePreviewPanel);
       if (this.$store.resourcePreviewPanel) {
         this.$store.resourcePreviewPanel.open(recommendation, message);
-        console.log('Panel opened, isOpen:', this.$store.resourcePreviewPanel.isOpen);
       } else {
         console.error('resourcePreviewPanel store not found!');
       }

@@ -72,3 +72,8 @@
 .fr-icon-chat-1-line::before {
   mask-image: url(../assets/chat-1-line.svg);
 }
+
+.fr-icon-reply-line::after,
+.fr-icon-reply-line::before {
+  mask-image: url(../assets/reply-line.svg);
+}
