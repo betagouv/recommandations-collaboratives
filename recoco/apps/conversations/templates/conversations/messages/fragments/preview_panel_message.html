@@ -11,26 +11,8 @@
     <div class="resource-preview-panel__advisor-comment-content">
         <template x-if="$store.resourcePreviewPanel.recommendation?.content">
             <p x-html="renderMarkdown($store.resourcePreviewPanel.recommendation.content)"
-               class="fr-mb-0 text-break"></p>
+               class="fr-mb-0 text-break rendered-markdown"></p>
         </template>
-        <div class="d-flex align-items-center">
-            <template x-if="$store.resourcePreviewPanel.recommendation?.created_by">
-                <div class="d-flex align-items-center"
-                     x-data="{user: null}"
-                     x-init="user = getUserById($store.resourcePreviewPanel.recommendation.created_by.id);">
-                    {% include "user/user_card_js.html" with class_name="font-size-14px" %}
-                </div>
-            </template>
-            <template x-if="$store.resourcePreviewPanel.message?.created">
-                <span class="text-muted fr-ml-1w"
-                      x-text="`le ${formatDate($store.resourcePreviewPanel.message.created, { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })}`">
-                </span>
-            </template>
-            <div class="d-flex align-items-center fr-ml-auto">
-                <button type="button"
-                        class="fr-btn fr-btn--sm fr-icon-reply-line fr-btn--icon-left fr-btn--tertiary fr-btn--tertiary-dark-background"
-                        @click="$store.resourcePreviewPanel.replyToMessage()">Répondre</button>
-            </div>
-        </div>
+        {% include "conversations/messages/fragments/created_by_reply.html" %}
     </div>
 </div>

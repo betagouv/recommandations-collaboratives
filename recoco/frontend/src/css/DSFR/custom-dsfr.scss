@@ -1048,6 +1048,22 @@ form > p {
   text-overflow: ellipsis;
 }
 
+.rendered-markdown {
+  margin-bottom: 0.75rem;
+  line-height: 1rem;
+  &--margin-lg {
+    margin-bottom: 1rem;
+    p {
+      margin-bottom: 0.75rem;
+      line-height: 1rem;
+    }
+  }
+  p {
+    margin-bottom: 0.75rem;
+    line-height: 1rem;
+  }
+}
+
 /* ¯¯¯ *\
   Size
 \* ˍˍˍ */

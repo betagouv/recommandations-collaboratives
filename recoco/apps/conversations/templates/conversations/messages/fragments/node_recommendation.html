@@ -25,7 +25,8 @@ Parameter Alpine:
                        :title="`voir la fiche ressource`"
                        @click.prevent="await openResourcePreviewPanel(recommendation, element)">
                         <div>
-                            <p x-html="renderMarkdown(recommendation.content)"></p>
+                            <p class="rendered-markdown--margin-lg"
+                               x-html="renderMarkdown(recommendation.content)"></p>
                             <div class="task-item__resource"
                                  :class="{'task-item__resource--bordered': !recommendation.visited}">
                                 <template x-if="!recommendation.visited">
@@ -61,8 +62,12 @@ Parameter Alpine:
                     </a>
                 </template>
                 <template x-if="!recommendation.resource">
-                    <div>
-                        <p x-html="renderMarkdown(recommendation.content)"></p>
+                    <a href="#"
+                       class="stretched-link"
+                       :title="`voir la fiche ressource`"
+                       @click.prevent="await openResourcePreviewPanel(recommendation, element)">
+                        <p class="rendered-markdown--margin-lg"
+                           x-html="renderMarkdown(recommendation.content)"></p>
                         <div class="task-item__resource">
                             <template x-if="recommendation.topic">
                                 <div class="task-item__topic"
@@ -84,7 +89,7 @@ Parameter Alpine:
                             </template>
                             {% include "conversations/messages/fragments/tasks_status_buttons_js.html" %}
                         </div>
-                    </div>
+                    </a>
                 </template>
             </div>
         </template>

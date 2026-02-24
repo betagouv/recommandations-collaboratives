@@ -24,6 +24,12 @@
     background: #fafafa;
     flex-shrink: 0;
   }
+  &__title {
+    color: var(--light-neutral-grey-50, #161616);
+    font-size: 1.75rem;
+    font-weight: 700;
+    line-height: 2.25rem;
+  }
 
   &__back-btn {
     display: flex;
