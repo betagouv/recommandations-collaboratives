@@ -72,3 +72,8 @@
 .fr-icon-answer-arrow-line::before {
   mask-image: url(../assets/answer-arrows.svg);
 }
+
+.fr-icon-answer-delete::after,
+.fr-icon-answer-delete::before {
+  mask-image: url(../assets/delete.svg);
+}

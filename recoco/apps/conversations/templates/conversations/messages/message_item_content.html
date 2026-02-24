@@ -1,5 +1,5 @@
 <template x-if="element.deleted">
-    <div class="text-muted fr-italic fr-small">(Ce contenu a été supprimé)</div>
+    <div class="text-muted fr-italic fr-small fr-px-3v fr-py-1v"><span class="fr-icon-answer-delete fr-icon--sm"></span> 1 message supprimé de <span class="fw-700" x-text="getUserById(element.posted_by).first_name + ' ' + getUserById(element.posted_by).last_name"></span></div>
 </template>
 <template x-if="!element.deleted">
     <template x-for="node in element.nodes">
@@ -19,7 +19,7 @@
         </div>
     </template>
 </template>
-<template x-if="element.posted_by && messagesParticipants.length > 0">
+<template x-if="element.posted_by && messagesParticipants.length > 0 && !element.deleted">
     <div class="d-flex justify-content-between">
         <div class="d-flex">
             <div class="d-flex align-items-center"
