@@ -45,8 +45,11 @@ document.addEventListener('alpine:init', () => {
             }, 2000);
           }
         }, 100);
-        window.dispatchEvent(new CustomEvent('on-click-handle-reply', { detail: messageId }));
       }
+    },
+    replyToMessage() {
+      this.scrollToMessage();
+      window.dispatchEvent(new CustomEvent('on-click-handle-reply', { detail: this.messageId }));
     },
   });
 });
