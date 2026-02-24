@@ -1,9 +1,15 @@
 <div class="observed-element"
      :data-notifications="JSON.stringify({id: element.id, unread: element.unread, type: element.type})">
+     {% comment %}
+        la couleur de background doit être #F5F5FE si l'émetteur est l'utilisateur courant et que le message n'est pas en réponse à
+        Sinon si l'émetteur n'est pas le user courant et que le message est en réponse à et que le user courant est l'auteur du message en réponse à, alors la couleur du background est #F5F5FE
+        Sinon la couleur de background doit être #f6f6f6
+     {% endcomment %}
     <div class="message-item fr-pt-3v fr-pl-3v fr-my-2v"
          :id="`message-${element.id}`"
          :class="{'current-user-message fr-ml-5w': {{ request.user.id }} == element.posted_by, 'other-user-message fr-mr-5w': {{ request.user.id }} != element.posted_by}">
         {% if in_reply_to %}
+        {% comment %} la couleur du background est #f6f6f6 si la couleur du background de la div parente est #F5F5FE et inversement {% endcomment %}
             <div class="message-item__reply-to text-muted fr-italic fr-small">
                 <p class="d-flex">
                     <span class="fr-icon-corner-down-right-line fr-icon--sm"></span>
