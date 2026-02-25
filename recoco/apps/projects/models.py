@@ -43,7 +43,6 @@ from recoco.utils import (
     strip_accents,
 )
 
-from ..conversations.models import Message
 from . import apps
 from .utils import generate_ro_key
 from .validators import MimetypeValidator
@@ -191,8 +190,8 @@ class ProjectQuerySet(models.QuerySet):
             ),
             conversation_notifications_count=Subquery(
                 notification_query.filter(
-                    action_object_content_type=ContentType.objects.get_for_model(
-                        Message
+                    action_object_content_type=ContentType.objects.get(
+                        app_label="conversations", model="message"
                     ),
                 )
                 .unread()
