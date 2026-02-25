@@ -52,10 +52,18 @@ Parameter Alpine:
                                 <div class="d-flex justify-content-between fr-mt-1w">
                                     <div class="d-flex">
                                         {% include "conversations/messages/fragments/tasks_status_buttons_js.html" %}
-                                        <div class="d-flex align-items-center active-reminder">
-                                            <span class="fr-icon-notification-on-line fr-icon--sm fr-mr-1v" aria-hidden="true"></span>
-                                            <span > Rappels actifs</span>
-                                        </div>
+                                        <template x-if="recommendation.status !== 3 && recommendation.status !== 4 && recommendation.status !== 5 && !{{ project.is_inactive_since|yesno:'true,false' }}">
+                                            <div class="d-flex align-items-center active-reminder">
+                                                <span class="fr-icon-notification-on-line fr-icon--sm fr-mr-1v" aria-hidden="true"></span>
+                                                <span>Rappels actifs</span>
+                                            </div>
+                                        </template>
+                                        <template x-if="recommendation.status === 3 || recommendation.status === 4 || recommendation.status === 5 || {{ project.is_inactive_since|yesno:'true,false' }}">
+                                            <div class="d-flex align-items-center non-active-reminder">
+                                                <span class="fr-icon-notification-off-line fr-icon--sm fr-mr-1v" aria-hidden="true"></span>
+                                                <span>Pas de rappel prévu</span>
+                                            </div>
+                                        </template>
                                     </div>
                                     <button class="fr-btn fr-btn--sm fr-btn--primary">Consulter</button>
                                 </div>
