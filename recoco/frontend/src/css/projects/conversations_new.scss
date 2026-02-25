@@ -607,3 +607,12 @@
 .grey-background {
   background: #f6f6f6 !important;
 }
+
+.active-reminder {
+  color: var(--light-text-title-blue-france, #000091);
+  font-family: Marianne;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 18px; /* 150% */
+}

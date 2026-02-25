@@ -49,9 +49,15 @@ Parameter Alpine:
                                 </template>
                                 <p class="task-item__resource-subtitle fr-mt-1w fr-mb-0"
                                    x-text="recommendation.resource.subtitle"></p>
-                                <div class="d-flex justify-content-between">
-                                    {% include "conversations/messages/fragments/tasks_status_buttons_js.html" %}
-                                    <button class="fr-btn fr-btn--sm fr-btn--primary fr-mt-1w">Consulter</button>
+                                <div class="d-flex justify-content-between fr-mt-1w">
+                                    <div class="d-flex">
+                                        {% include "conversations/messages/fragments/tasks_status_buttons_js.html" %}
+                                        <div class="d-flex align-items-center active-reminder">
+                                            <span class="fr-icon-notification-on-line fr-icon--sm fr-mr-1v" aria-hidden="true"></span>
+                                            <span > Rappels actifs</span>
+                                        </div>
+                                    </div>
+                                    <button class="fr-btn fr-btn--sm fr-btn--primary">Consulter</button>
                                 </div>
                             </a>
                         </div>
