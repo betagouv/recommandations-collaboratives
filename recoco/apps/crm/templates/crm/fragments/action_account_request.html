@@ -22,9 +22,11 @@
             <span class="verb">
                 <strong>a demandé un accès conseiller
                    {% for department in action.action_object.departments.all %}
-                        {% if not forloop.first %}sur les départements{% endif %}
-                        {{ department.name }} ({{ department.code }})
-                        {% if not forloop.last %}, {% endif %}
+                       {% with count=action.action_object.departments.count %}
+                          {% if forloop.first %}sur le{{ count|pluralize }} département{{ count|pluralize }}{% endif %}
+                          {{ department.name }} ({{ department.code }})
+                          {% if not forloop.last %}, {% endif %}
+                       {% endwith %}
                    {% empty %}
                        sur la France entière,
                    {% endfor %}
