@@ -77,3 +77,7 @@
 .fr-icon-answer-delete::before {
   mask-image: url(../assets/delete.svg);
 }
+.fr-icon-send-message::after,
+.fr-icon-send-message::before {
+  mask-image: url(../assets/send-message-paper-plan.svg);
+}

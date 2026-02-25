@@ -183,8 +183,11 @@ Parameters:
                             :disabled="!isFormValid || sendingMessage"
                             form="{{ form_id|default:'conversation-form' }}"
                             class="fr-btn fr-btn--sm"
+                            :class="{'fr-icon-send-message fr-icon--sm fr-btn--icon-left': !isEditorInEditMode}"
                             type="submit"
-                            x-text="isEditorInEditMode ? 'Modifier' : 'Envoyer'"></button>
+                            x-text="isEditorInEditMode ? 'Modifier' : 'Envoyer'"
+                            >
+                    </button>
                 </div>
             </div>
         {% endif %}
