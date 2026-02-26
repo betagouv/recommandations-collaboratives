@@ -7,6 +7,7 @@
     <img class="fr-mt-1v align-middle rounded-circle d-inline-block {% if not transparent_background %}bg-white{% endif %}"
          width="18px"
          :src='$store.utils.gravatar_url("{{ action.actor }}", 18, "{{ action.actor.first_name }}" + " " + "{{ action.actor.last_name }}")'
+         data-gravatar-key="{{ action.actor }}-18"
          data-bs-toggle="tooltip"
          data-bs-placement="bottom"
          tabindex="0">
