@@ -77,7 +77,13 @@
 .fr-icon-answer-delete::before {
   mask-image: url(../assets/delete.svg);
 }
+
 .fr-icon-send-message::after,
 .fr-icon-send-message::before {
   mask-image: url(../assets/send-message-paper-plan.svg);
+}
+
+.fr-icon-attention::after,
+.fr-icon-attention::before {
+  mask-image: url(../assets/attention-indicator.svg);
 }
