@@ -42,7 +42,7 @@ from recoco.apps.tasks import models as tasks_models
 from recoco.apps.tasks import signals as tasks_signals
 
 from ...conversations.utils import gather_annotations_for_message_notification
-from .. import digests
+from .. import digests, helpers
 
 ########################################################################
 # new reco digests
@@ -381,7 +381,7 @@ def test_send_digests_for_switchtender_does_not_include_new_recos(
 
 @pytest.mark.django_db
 def test_notification_formatter(request, make_project):
-    formatter = digests.NotificationFormatter()
+    formatter = helpers.NotificationFormatter()
 
     user = Recipe(auth.User, username="Bob", first_name="Bobi", last_name="Joe").make()
     organization = Recipe(addressbook_models.Organization, name="DuckCorp").make()
@@ -498,7 +498,7 @@ def test_notification_formatter(request, make_project):
 
 @pytest.mark.django_db
 def test_notification_formatter_with_bogus_user():
-    formatter = digests.NotificationFormatter()
+    formatter = helpers.NotificationFormatter()
 
     user = Recipe(auth.User, username="Bob", first_name="Bobi", last_name="Joe").make()
     private_note = baker.make(projects_models.Note)

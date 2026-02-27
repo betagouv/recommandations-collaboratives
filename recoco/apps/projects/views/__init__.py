@@ -27,7 +27,6 @@ from recoco import utils, verbs
 from recoco.apps.communication import constants as communication_constants
 from recoco.apps.communication import digests
 from recoco.apps.communication.api import send_email
-from recoco.apps.communication.digests import normalize_user_name
 from recoco.apps.geomatics import models as geomatics_models
 from recoco.apps.geomatics.serializers import RegionSerializer
 from recoco.apps.home.models import AdvisorAccessRequest
@@ -39,6 +38,7 @@ from recoco.utils import (
     is_staff_for_site,
 )
 
+from ...communication.helpers import normalize_user_name
 from .. import forms, models, signals
 from ..utils import (
     assign_advisor,
