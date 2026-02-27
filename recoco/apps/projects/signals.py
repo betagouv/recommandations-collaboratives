@@ -48,12 +48,20 @@ document_uploaded = django.dispatch.Signal()
 
 @receiver(project_submitted)
 def log_project_submitted(sender, site, submitter, project, **kwargs):
-    action.send(
-        sender=submitter,
-        verb=verbs.Project.SUBMITTED_BY,
-        action_object=project,
-        target=project,
-    )
+    if project.submitted_by == project.owner:
+        action.send(
+            sender=project.submitted_by,
+            verb=verbs.Project.SUBMITTED_BY,
+            action_object=project,
+            target=project,
+        )
+    else:
+        action.send(
+            sender=project.submitted_by,
+            verb=verbs.Project.SUBMITTED_BY_ADVISOR,
+            action_object=project.owner,
+            target=project,
+        )
 
 
 @receiver(project_submitted)
@@ -61,13 +69,22 @@ def notify_moderators_project_submitted(sender, site, submitter, project, **kwar
     recipients = get_project_moderators(site)
 
     # Notify project moderators
-    notify.send(
-        sender=submitter,
-        recipient=recipients,
-        verb=verbs.Project.SUBMITTED_BY,
-        action_object=project,
-        target=project,
-    )
+    if project.submitted_by == project.owner:
+        notify.send(
+            sender=project.submitted_by,
+            recipient=recipients,
+            verb=verbs.Project.SUBMITTED_BY,
+            action_object=project,
+            target=project,
+        )
+    else:
+        notify.send(
+            sender=project.submitted_by,
+            recipient=recipients,
+            verb=verbs.Project.SUBMITTED_BY_ADVISOR,
+            action_object=project.owner,
+            target=project,
+        )
 
 
 @receiver(project_validated)
@@ -366,7 +383,7 @@ def project_document_uploaded(sender, instance, **kwargs):
         return
 
     # Add a trace
-    action.send(
+    action.send(  # ADDED ici
         instance.uploaded_by,
         verb=verbs.Document.ADDED,
         action_object=instance,
