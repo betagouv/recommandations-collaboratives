@@ -383,9 +383,9 @@ def project_document_uploaded(sender, instance, **kwargs):
         return
 
     # Add a trace
-    action.send(  # ADDED ici
+    action.send(
         instance.uploaded_by,
-        verb=verbs.Document.ADDED,
+        verb=verbs.Document.ADDED_FILE if instance.the_file else instance.the_link,
         action_object=instance,
         target=project,
     )
