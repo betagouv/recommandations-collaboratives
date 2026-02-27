@@ -993,6 +993,9 @@ class Document(models.Model):
     def filename(self):
         return os.path.basename(self.the_file.name)
 
+    def feed_label(self):
+        return self.filename()
+
     deleted = models.DateTimeField(null=True, blank=True)
 
     class Meta:
