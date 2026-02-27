@@ -64,7 +64,7 @@
                                             {% if action.verb != verbs.Project.SUBMITTED_BY and action.verb != verbs.Survey.UPDATED %}
                                                 <a class="d-inline hover-underline"
                                                    href="{{ action.action_object.get_absolute_url }}">
-                                                    {% if action.verb == verbs.Conversation.PUBLIC_MESSAGE or  action.verb == verbs.Conversation.PRIVATE_MESSAGE %}
+                                                    {% if action.verb == verbs.Conversation.POST_MESSAGE or action.verb == verbs.Conversation.PRIVATE_MESSAGE %}
                                                         ici
                                                     {% else %}
                                                         {% if action.action_object %}"{{ action.action_object }}"{% endif %}
