@@ -73,7 +73,7 @@ class Project:
     SET_INACTIVE = "a mis en pause le dossier"
     SET_ACTIVE = "a réactivé le dossier"
 
-    EDITED = "a modifé les informations du dossier"
+    EDITED = "a modifié les informations du dossier"
     UPDATE_ADVISORS_NOTE = "a modifié la note interne du dossier"
 
 
