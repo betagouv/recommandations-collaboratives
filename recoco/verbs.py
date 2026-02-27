@@ -45,7 +45,7 @@ class Recommendation:
 class Project:
     INVITATION = "a invité un·e collaborateur·rice à rejoindre le dossier"
 
-    JOINED = "a rejoint le dossier"
+    JOINED = "a accepté l'invitation"
     JOINED_OWNER = "a rejoint en tant que référent le dossier"
     NEW_OWNER = "est dorénavant référent sur le dossier"
 
