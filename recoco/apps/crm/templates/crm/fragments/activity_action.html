@@ -56,7 +56,7 @@
                                             </a>
                                         {% else %}
                                             <span>{{ action.verb }}</span>
-                                            {% if action.verb != verbs.Project.SUBMITTED_BY and action.verb != verbs.Survey.UPDATED %}
+                                            {% if action.verb != verbs.Project.SUBMITTED_BY and action.verb != verbs.Survey.UPDATED and action.verb != verbs.Survey.STARTED %}
                                                 <a class="d-inline hover-underline"
                                                    href="{{ action.action_object.get_absolute_url }}">
                                                     {% if action.verb == verbs.Conversation.POST_MESSAGE or action.verb == verbs.Conversation.PRIVATE_MESSAGE %}
