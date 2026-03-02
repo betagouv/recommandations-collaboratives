@@ -1,5 +1,8 @@
 <template x-if="element.deleted">
-    <div class="text-muted fr-italic fr-small fr-px-3v fr-py-1v"><span class="fr-icon-answer-delete fr-icon--sm"></span> 1 message supprimé de <span class="fw-700" x-text="getUserById(element.posted_by).first_name + ' ' + getUserById(element.posted_by).last_name"></span></div>
+    <div class="text-muted fr-italic fr-small fr-px-3v fr-py-1v">
+        <span class="fr-icon-answer-delete fr-icon--sm"></span> 1 message supprimé de <span class="fw-700"
+       x-text="getUserById(element.posted_by).first_name + ' ' + getUserById(element.posted_by).last_name"></span>
+    </div>
 </template>
 <template x-if="!element.deleted">
     <template x-for="node in element.nodes">
@@ -65,8 +68,9 @@
                     <div class="action-button">
                         <div class="d-flex justify-content-end">
                             <button class="fr-btn fr-btn--sm fr-btn--tertiary fr-btn--tertiary-dark-background"
-                                    @click="onClickHandleReply(element);trackReplyToMessage();">
-                                <span class="fr-icon-answer-arrow-line fr-icon--sm fr-mr-1v" aria-hidden="true"></span>
+                                    @click="onClickHandleReply(element.id);trackReplyToMessage();">
+                                <span class="fr-icon-answer-arrow-line fr-icon--sm fr-mr-1v"
+                                      aria-hidden="true"></span>
                                 Répondre
                             </button>
                         </div>
