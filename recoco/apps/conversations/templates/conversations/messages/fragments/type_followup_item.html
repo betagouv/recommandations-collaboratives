@@ -5,6 +5,6 @@
         <div class="d-flex align-items-center"
              x-data="{user: null}"
              x-init="user = getUserById(element.actor.id);">{% include "user/user_card_js.html" %}</div>
-        <span class="followup-item__action fr-ml-1v" x-text="element.verb"></span>
+        <span class="followup-item__action fr-ml-1v" x-text="element.verb + ' : ' + element.action_object.feed_label"></span>
     </div>
 </div>
