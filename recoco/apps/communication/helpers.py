@@ -27,6 +27,7 @@ class NotificationFormatter:
             verbs.Project.BECAME_OBSERVER: self.format_action_became_observer,
             verbs.Project.AVAILABLE: self.format_new_project_available,
             verbs.Project.SUBMITTED_BY: self.format_project_submitted,
+            verbs.Project.SUBMITTED_BY_ADVISOR: self.format_project_submitted,
             verbs.Recommendation.COMMENTED: self.format_action_commented,
             verbs.Recommendation.CREATED: self.format_action_recommended,
             verbs.Document.ADDED_FILE: self.format_document_uploaded,
@@ -167,7 +168,7 @@ class NotificationFormatter:
         """A project was submitted for moderation"""
         subject = self._represent_user(notification.actor)
         complement = self._represent_project(notification.action_object)
-        summary = f"{subject} {verbs.Project.SUBMITTED_BY}: '{complement}'"
+        summary = f"{subject} {notification.verb} : '{complement}'"
 
         excerpt = self._represent_project_excerpt(notification.action_object)
 
