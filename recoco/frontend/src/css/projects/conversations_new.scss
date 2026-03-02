@@ -352,7 +352,7 @@
           line-height: 1.5em;
         }
         &__content-ellipsis {
-          height: 6rem;
+          max-height: 6rem;
           overflow: hidden;
         }
         &__resource {
