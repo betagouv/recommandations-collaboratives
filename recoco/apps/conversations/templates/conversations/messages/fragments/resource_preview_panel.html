@@ -1,0 +1,53 @@
+{% comment %}
+Resource Preview Panel - Overlay panel that displays when clicking a recommendation with resource.
+Managed by Alpine store: $store.resourcePreviewPanel
+{% endcomment %}
+<template x-if="$store.resourcePreviewPanel.isOpen">
+    <div>
+        <div class="resource-preview-panel"
+             @keydown.escape.window="$store.resourcePreviewPanel.close()">
+            <!-- Header -->
+            <div class="resource-preview-panel__header">
+                <button type="button"
+                        class="resource-preview-panel__back-btn"
+                        @click="$store.resourcePreviewPanel.close()">
+                    <span class="fr-icon-arrow-left-line fr-mr-1v" aria-hidden="true"></span>
+                    Recommandations
+                </button>
+                <button type="button"
+                        class="resource-preview-panel__close-btn fr-btn--close fr-btn"
+                        aria-label="Fermer"
+                        @click="$store.resourcePreviewPanel.close()">Fermer</button>
+            </div>
+            <template x-if="$store.resourcePreviewPanel.recommendation?.resource">
+                <!-- Scrollable content area -->
+                <div class="resource-preview-panel__body">
+                    {% include "conversations/messages/fragments/preview_panel_message.html" %}
+                    <!-- Attention banner for expiring resources -->
+                    <template x-if="$store.resourcePreviewPanel.recommendation?.resource?.expires_on && !$store.resourcePreviewPanel.recommendation?.resource?.expired">
+                        <div class="fr-callout fr-callout--blue-ecume fr-my-3w">
+                            <p class="fr-callout__title">
+                                <span class="text-uppercase fw-bold text-info">Attention</span>
+                            </p>
+                            <p class="fr-callout__text">
+                                Cet appel à projet a une date de limite de dépôt fixée au
+                                <strong x-text="formatDate($store.resourcePreviewPanel.recommendation.resource.expires_on, { day: 'numeric', month: 'long', year: 'numeric' })"></strong>
+                            </p>
+                        </div>
+                    </template>
+                    <iframe class="w-100 h-100 d-flex flex-column rounded"
+                            :src="resourcePreviewUrl($store.resourcePreviewPanel.recommendation.resource.id, $store.resourcePreviewPanel.messageId)"></iframe>
+                </div>
+            </template>
+            <template x-if="!$store.resourcePreviewPanel.recommendation?.resource">
+                <div class="resource-preview-panel__body">
+                    <h2 class="resource-preview-panel__title fr-mb-1w"
+                        x-text="$store.resourcePreviewPanel.recommendation.intent"></h2>
+                    {% include "conversations/messages/fragments/created_by_reply.html" with button_class="fr-btn-primary" %}
+                    <p class="fr-mt-3w rendered-markdown"
+                       x-html="renderMarkdown($store.resourcePreviewPanel.recommendation.content)"></p>
+                </div>
+            </template>
+        </div>
+    </div>
+</template>

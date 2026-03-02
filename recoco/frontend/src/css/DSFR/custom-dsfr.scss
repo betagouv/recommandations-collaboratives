@@ -740,23 +740,18 @@ form > p {
   flex-basis: 48.8%;
 }
 
-.font-size-14px {
-  font-size: 14px;
-}
-
+.font-size-14px,
 .font-size-14px p {
   font-size: 14px;
 }
 
-.font-size-12px {
-  font-size: 12px;
-}
-
+.font-size-12px,
 .font-size-12px p {
   font-size: 12px;
 }
 
-.font-size-10px {
+.font-size-10px,
+.font-size-10px p {
   font-size: 10px;
 }
 
@@ -1051,6 +1046,22 @@ form > p {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.rendered-markdown {
+  margin-bottom: 0.75rem;
+  line-height: 1rem;
+  &--margin-lg {
+    margin-bottom: 1rem;
+    p {
+      margin-bottom: 0.75rem;
+      line-height: 1rem;
+    }
+  }
+  p {
+    margin-bottom: 0.75rem;
+    line-height: 1rem;
+  }
 }
 
 /* ¯¯¯ *\

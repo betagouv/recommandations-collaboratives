@@ -40,7 +40,6 @@ export default instance;
 export function projectsUrl({
   searchText = '',
   departments = [],
-  lastActivity = 1460,
   limit = 2000,
   offset = 0,
   page = 1,
@@ -62,7 +61,6 @@ export function projectsUrl({
   }
   const params = new URLSearchParams({
     search: searchText,
-    last_activity: lastActivity,
     limit,
     offset,
     page,

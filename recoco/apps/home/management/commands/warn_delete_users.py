@@ -1,5 +1,6 @@
 from datetime import timedelta
 
+import sentry_sdk
 from django.core.management import BaseCommand
 from django.utils import timezone
 from tqdm import tqdm
@@ -39,6 +40,8 @@ class Command(BaseCommand):
             previous_activity_at__gte=since_second_warning, nb_deletion_warnings__gt=0
         ).update(nb_deletion_warnings=0, previous_deletion_warning_at=None)
 
+        error_profile_ids = []
+
         # first warning
         to_first_warn_profiles = not_deleted_profiles.filter(
             previous_activity_at__lt=so_long, nb_deletion_warnings=0
@@ -49,8 +52,10 @@ class Command(BaseCommand):
         if dry_run:
             self.stdout.write("dry run: no email sent")
         else:
-            send_deletion_warning_to_profiles(to_first_warn_profiles, 1)
-            to_first_warn_profiles.update(
+            error_profile_ids = send_deletion_warning_to_profiles(
+                to_first_warn_profiles, 1
+            )
+            to_first_warn_profiles.exclude(pk__in=error_profile_ids).update(
                 nb_deletion_warnings=1, previous_deletion_warning_at=timezone.now()
             )
 
@@ -64,9 +69,16 @@ class Command(BaseCommand):
         if dry_run:
             self.stdout.write("dry run: no email sent")
         else:
-            send_deletion_warning_to_profiles(to_second_warn_profiles, 2)
-            to_second_warn_profiles.update(
+            error_profile_ids = send_deletion_warning_to_profiles(
+                to_second_warn_profiles, 2
+            )
+            to_second_warn_profiles.exclude(pk__in=error_profile_ids).update(
                 nb_deletion_warnings=2, previous_deletion_warning_at=timezone.now()
+            )
+
+        if error_profile_ids:
+            sentry_sdk.capture_message(
+                f"following profile ids could not be warned about incoming deletion. They won't be deleted automatically since we cannot warn them \n {error_profile_ids}"
             )
 
         # actual deletion

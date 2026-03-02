@@ -11,11 +11,13 @@ import api, {
   editTaskUrl,
   markTaskNotificationAsVisited,
   conversationsMessageMarkAsReadUrl,
+  resourcePreviewUrl
 } from '../../utils/api';
 import { trackOpenRessource } from '../../utils/trackingMatomo';
 import { formatDateFrench } from '../../utils/date';
 
 Alpine.data('Conversations', (projectId, currentUserId) => ({
+  resourcePreviewUrl,
   projectId,
   currentUserId,
   feed: {},
@@ -188,9 +190,9 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
       user.data = {
         id: +id,
         place: this.users.length,
-        first_name: 'John',
-        last_name: 'Doe',
-        email: 'john.doe@example.com',
+        first_name: 'Inconnu',
+        last_name: 'Inconnu',
+        email: 'inconnu@example.com',
         phone_no: '0642424242',
         last_login: {
           date: '2021-01-01',
@@ -387,8 +389,8 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
       this.countOf.messages += change;
     }
   },
-  onClickHandleReply(message) {
-    this.messageIdToReply = message.id;
+  onClickHandleReply(messageId) {
+    this.messageIdToReply = messageId;
     this.isEditorInReplyMode = true;
     Alpine.raw(this.$store.editor.editorInstance).commands.focus();
   },
@@ -507,6 +509,19 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
       }
     } catch (error) {
       throw new Error('Failed to mark task notification as visited', error);
+    }
+  },
+  async openResourcePreviewPanel(recommendation, message) {
+    try {
+      // Mark as visited and track analytics
+      await this.onClickRessourceConsummeNotification(recommendation, message);
+      if (this.$store.resourcePreviewPanel) {
+        this.$store.resourcePreviewPanel.open(recommendation, message);
+      } else {
+        console.error('resourcePreviewPanel store not found!');
+      }
+    } catch (error) {
+      console.error('Error in openResourcePreviewPanel:', error);
     }
   },
   replaceMessage(message, messageIdToEdit) {

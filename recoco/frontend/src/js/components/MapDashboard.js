@@ -21,10 +21,8 @@ function MapDashboard(currentSiteId, regions) {
     backendSearch: {
       searchText: '',
       searchDepartment: [],
-      lastActivity: localStorage.getItem('lastActivity') ?? '30',
     },
     searchText: '',
-    filterProjectLastActivity: localStorage.getItem('lastActivity') ?? '30',
     isDisplayingOnlyUserProjects:
       JSON.parse(localStorage.getItem('isDisplayingOnlyUserProjects')) ?? false,
     //*** departments
@@ -68,19 +66,12 @@ function MapDashboard(currentSiteId, regions) {
     },
     //*** filters functions
 
-    async onLastActivityChange(event) {
-      this.backendSearch.lastActivity = event.target.value;
-      localStorage.setItem('lastActivity', this.backendSearch.lastActivity);
-      await this.getDataFiltered();
-    },
-
     async getDataFiltered() {
-      const { searchText, searchDepartment, lastActivity } = this.backendSearch;
+      const { searchText, searchDepartment } = this.backendSearch;
       const projects = await api.get(
         projectsUrl({
           searchText: searchText,
           departments: searchDepartment,
-          lastActivity: lastActivity,
           status: ['TO_PROCESS', 'STUCK', 'READY', 'IN_PROGRESS', 'DONE'],
         })
       );
@@ -127,25 +118,6 @@ function MapDashboard(currentSiteId, regions) {
 
     async onSearch(event) {
       this.backendSearch.searchText = event.target.value;
-      await this.backendSearchProjects({ resetLastActivity: true });
-    },
-
-    async backendSearchProjects(options = { resetLastActivity: false }) {
-      if (this.backendSearch.searchText !== '') {
-        if (this.$refs.selectFilterProjectDuration) {
-          this.$refs.selectFilterProjectDuration.disabled = true;
-          this.$refs.selectFilterProjectDuration.value = 1460;
-        }
-        this.backendSearch.lastActivity = '';
-      } else if (options.resetLastActivity) {
-        const lastActivity = localStorage.getItem('lastActivity') ?? 30;
-        if (this.$refs.selectFilterProjectDuration) {
-          this.$refs.selectFilterProjectDuration.disabled = false;
-          this.$refs.selectFilterProjectDuration.value = lastActivity;
-        }
-        this.backendSearch.lastActivity = lastActivity.toString();
-      }
-
       await this.getDataFiltered();
     },
 
@@ -153,7 +125,7 @@ function MapDashboard(currentSiteId, regions) {
       if (!event.detail) return;
 
       this.backendSearch.searchDepartment = [...event.detail];
-      await this.backendSearchProjects();
+      await this.getDataFiltered();
     },
   };
 }

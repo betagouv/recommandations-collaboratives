@@ -18,17 +18,17 @@ Parameter Alpine:
          x-init="recommendation = getRecommendationById(node.recommendation_id)"
          class="task-item rounded-3 fr-my-2v">
         <template x-if="recommendation">
-            <div>
+            <div class="position-relative">
                 <template x-if="recommendation.resource">
-                    <div>
-                        <p x-html="renderMarkdown(recommendation.content)"></p>
-                        <div class="task-item__resource"
-                             :class="{'task-item__resource--bordered': !recommendation.visited}">
-                            <a :href="recommendation?.resource?.web_url"
-                               class="stretched-link"
-                               target="_blank"
-                               :title="`ouvrir la fiche ressource - nouvel onglet`"
-                               @click="await onClickRessourceConsummeNotification(recommendation, element)">
+                    <a href="#"
+                       class="stretched-link"
+                       :title="`voir la fiche ressource`"
+                       @click.prevent="await openResourcePreviewPanel(recommendation, element)">
+                        <div>
+                            <p class="rendered-markdown--margin-lg"
+                               x-html="renderMarkdown(recommendation.content)"></p>
+                            <div class="task-item__resource"
+                                 :class="{'task-item__resource--bordered': !recommendation.visited}">
                                 <template x-if="!recommendation.visited">
                                     <span class="badge text-white task-item__resource-badge"
                                           x-text="!$store.djangoData.isAdvisor ? 'Nouveau' : 'Non lu par le demandeur' "></span>
@@ -54,13 +54,15 @@ Parameter Alpine:
                                         {% include "conversations/messages/fragments/tasks_status_buttons_js.html" %}
                                         <template x-if="recommendation.status !== 3 && recommendation.status !== 4 && recommendation.status !== 5 && !{{ project.is_inactive_since|yesno:'true,false' }}">
                                             <div class="d-flex align-items-center active-reminder">
-                                                <span class="fr-icon-notification-on-line fr-icon--sm fr-mr-1v" aria-hidden="true"></span>
+                                                <span class="fr-icon-notification-on-line fr-icon--sm fr-mr-1v"
+                                                      aria-hidden="true"></span>
                                                 <span>Rappels actifs</span>
                                             </div>
                                         </template>
                                         <template x-if="recommendation.status === 3 || recommendation.status === 4 || recommendation.status === 5 || {{ project.is_inactive_since|yesno:'true,false' }}">
                                             <div class="d-flex align-items-center non-active-reminder">
-                                                <span class="fr-icon-notification-off-line fr-icon--sm fr-mr-1v" aria-hidden="true"></span>
+                                                <span class="fr-icon-notification-off-line fr-icon--sm fr-mr-1v"
+                                                      aria-hidden="true"></span>
                                                 <span>Pas de rappel prévu</span>
                                             </div>
                                         </template>
@@ -72,9 +74,13 @@ Parameter Alpine:
                     </div>
                 </template>
                 <template x-if="!recommendation.resource">
-                    <div>
-                        <div class="task-item__resource"
-                             :class="{'task-item__resource--bordered': !recommendation.visited}">
+                    <a href="#"
+                       class="stretched-link"
+                       :title="`voir la fiche ressource`"
+                       @click.prevent="await openResourcePreviewPanel(recommendation, element)">
+                        <p class="rendered-markdown--margin-lg"
+                           x-html="renderMarkdown(recommendation.content)"></p>
+                        <div class="task-item__resource">
                             <template x-if="!recommendation.visited">
                                 <span class="badge text-white task-item__resource-badge"
                                       x-text="!$store.djangoData.isAdvisor ? 'Nouveau' : 'Non lu par le demandeur' "></span>
@@ -92,7 +98,7 @@ Parameter Alpine:
                                  x-html="renderMarkdown(recommendation.content)"></div>
                             {% include "conversations/messages/fragments/tasks_status_buttons_js.html" %}
                         </div>
-                    </div>
+                    </a>
                 </template>
             </div>
         </template>

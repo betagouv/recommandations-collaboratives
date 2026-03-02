@@ -1,0 +1,18 @@
+<!-- Advisor comment section -->
+<div class="resource-preview-panel__advisor-comment">
+    <div class="resource-preview-panel__advisor-comment-header">
+        <div class="d-flex align-items-center">
+            <span class="fr-icon-chat-1-line fr-icon--xs fr-mr-1w" aria-hidden="true"></span>
+            <span class="fw-medium">Commentaire du conseiller</span>
+        </div>
+        <button class="fr-btn fr-btn--sm fr-icon-link fr-btn--icon-left fr-btn--tertiary fr-btn--tertiary-dark-background fr-mr-1w"
+                @click.prevent="$store.resourcePreviewPanel.scrollToMessage()">Voir le message</button>
+    </div>
+    <div class="resource-preview-panel__advisor-comment-content">
+        <template x-if="$store.resourcePreviewPanel.recommendation?.content">
+            <p x-html="renderMarkdown($store.resourcePreviewPanel.recommendation.content)"
+               class="fr-mb-0 text-break rendered-markdown"></p>
+        </template>
+        {% include "conversations/messages/fragments/created_by_reply.html" %}
+    </div>
+</div>

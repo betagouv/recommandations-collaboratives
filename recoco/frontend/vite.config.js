@@ -203,6 +203,7 @@ const config = {
         ),
         marianneStyles: resolve('./src/js/styles/marianne.css.js'),
         projectDetailsStyles: resolve('./src/js/styles/project-details.css.js'),
+        resourcePreviewPanelStyles: resolve('./src/js/styles/resource-preview-panel.css.js'),
       },
       output: {
         chunkFileNames: undefined,

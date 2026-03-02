@@ -17,7 +17,7 @@
                     {% if not user_popup_deactivate %}@click="onUserClick"{% endif %}
                     class="d-flex align-items-center flex-wrap user-info border-0 fr-p-0 bg-transparent {% if user_popup_deactivate %}no-underline{% endif %}"
                     data-test-id="button-open-tooltip-user-card">
-                <span class="fr-mr-1v d-flex align-items-center font-very-small">
+                <span class="fr-mr-1v d-flex align-items-center {% if class_name %}{{ class_name }}{% else %}font-very-small{% endif %}">
                     <img class="user-card__gravatar rounded-circle fr-mr-1v"
                          :class="user.is_active ? 'border-0' : 'neutral-role-border border-2'"
                          :src='gravatar_url(currentUser.email, 18, `${currentUser.first_name} ${currentUser.last_name}`, stringToColor(currentUser.email) )'
@@ -32,11 +32,11 @@
                     </template>
                 </span>
                 <template x-if="currentUser?.profile?.organization?.name">
-                    <span class="user-card__org-name fw-normal font-italic font-very-small"
+                    <span class="user-card__org-name fw-normal font-italic {% if class_name %}{{ class_name }}{% else %}font-very-small{% endif %}"
                           x-text="currentUser.profile.organization.name"></span>
                 </template>
                 <template x-if="!currentUser?.profile?.organization?.name">
-                    <span class="user-card__org-name fw-normal font-italic font-very-small">{{ project.org_name }}</span>
+                    <span class="user-card__org-name fw-normal font-italic {% if class_name %}{{ class_name }}{% else %}font-very-small{% endif %}">{{ project.org_name }}</span>
                 </template>
             </button>
             {% if 'use_crm' in user_site_perms and user_activity %}
@@ -63,7 +63,7 @@
              class="user-card-popup flex-column"
              :class="user.is_active && 'neutral-role-border'">
             <template x-if="currentUser?.profile?.organization_position">
-                <div class="d-flex align-items-center justify-content-between text-blue font-very-small specific-my">
+                <div class="d-flex align-items-center justify-content-between text-blue {% if class_name %}{{ class_name }}{% else %}font-very-small{% endif %} specific-my">
                     <div class="d-flex align-items-center">
                         <svg class="bi align-middle fr-mr-2v specific-ml-012"
                              width="18"
@@ -77,7 +77,7 @@
                 </div>
             </template>
             <template x-if="currentUser.is_active">
-                <span class="d-flex align-items-center justify-content-between text-blue font-very-small fr-mt-1v">
+                <span class="d-flex align-items-center justify-content-between text-blue {% if class_name %}{{ class_name }}{% else %}font-very-small{% endif %} fr-mt-1v">
                     <div class="d-flex align-items-center">
                         <svg class="bi align-middle fr-mr-2v"
                              width="18"
@@ -103,7 +103,7 @@
             </template>
             {% if not advising_position.is_observer %}
                 <template x-if="currentUser.is_active && currentUser.phone_no">
-                    <span class="d-flex align-items-center justify-content-between text-blue font-very-small fr-mt-1v">
+                    <span class="d-flex align-items-center justify-content-between text-blue {% if class_name %}{{ class_name }}{% else %}font-very-small{% endif %} fr-mt-1v">
                         <div class="d-flex align-items-center">
                             <svg class="bi align-middle fr-mr-2v"
                                  width="15"
@@ -130,12 +130,12 @@
             {% endif %}
             <template x-if="currentUser && !currentUser.is_active">
                 <span data-test-id="deactivated-user-details"
-                      class="fr-p-1v fr-px-2v font-very-small bg-grey-light w-100 d-flex fr-mt-1v text-nowrap specific-borderradius-2px"
+                      class="fr-p-1v fr-px-2v {% if class_name %}{{ class_name }}{% else %}font-very-small{% endif %} bg-grey-light w-100 d-flex fr-mt-1v text-nowrap specific-borderradius-2px"
                       x-text="`Compte desactivé depuis le ${new Date(currentUser.last_login.date).toLocaleDateString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' })}`"></span>
             </template>
             <template x-if="!currentUser">
                 <span data-test-id="deleted-user-details"
-                      class="fr-p-1v fr-px-2v font-very-small bg-grey-light w-100 d-flex fr-mt-1v text-nowrap specific-borderradius-2px">Compte desactivé</span>
+                      class="fr-p-1v fr-px-2v {% if class_name %}{{ class_name }}{% else %}font-very-small{% endif %} bg-grey-light w-100 d-flex fr-mt-1v text-nowrap specific-borderradius-2px">Compte desactivé</span>
             </template>
         </div>
     </div>
