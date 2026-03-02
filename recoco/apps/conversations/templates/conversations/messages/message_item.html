@@ -2,17 +2,20 @@
      :data-notifications="JSON.stringify({id: element.id, unread: element.unread, type: element.type})">
     <div class="message-item"
          :id="`message-${element.id}`"
-         :class="{ 'current-user-message fr-ml-5w': {{ request.user.id }} == element.posted_by, 'other-user-message fr-mr-5w': {{ request.user.id }} != element.posted_by, 'answering-my-message': {{ request.user.id }} != element.posted_by && {{ request.user.id }} == getMessageById(element.in_reply_to)?.posted_by, 'fr-p-0': element.deleted, 'fr-pt-3v fr-pl-3v fr-my-2v': !element.deleted && {{ request.user.id }} == element.posted_by, 'fr-pt-3v fr-pr-3v fr-my-2v': !element.deleted && {{ request.user.id }} != element.posted_by, }">
+         :class="{ 'current-user-message fr-ml-5w': {{ request.user.id }} == element.posted_by, 'other-user-message fr-mr-5w fr-pt-3v fr-pr-3v fr-my-3v': {{ request.user.id }} != element.posted_by, 'answering-my-message': {{ request.user.id }} != element.posted_by && {{ request.user.id }} == getMessageById(element.in_reply_to)?.posted_by, 'fr-p-0': element.deleted, 'fr-pt-3v fr-pl-3v fr-my-3v': !element.deleted && {{ request.user.id }} == element.posted_by }">
         {% if in_reply_to %}
-            <div class="message-item__reply-to text-muted fr-italic fr-small"
-                 :class="{ 'answering-my-message': {{ request.user.id }} == getMessageById(element.in_reply_to)?.posted_by, 'fr-ml-0': {{ request.user.id }} != element.posted_by, 'grey-background': {{ request.user.id }} != element.posted_by && {{ request.user.id }} != getMessageById(element.in_reply_to)?.posted_by, }">
-                <p class="d-flex">
-                    <span class="fr-icon-corner-down-right-line fr-icon--sm"></span>
-                    en réponse à : <a class="fr-ml-1v"
-    :href="`#message-${element.in_reply_to}`"
-    x-html="renderMarkdown(await getShortMessageInReplyTo(element.in_reply_to))"></a>
-                </p>
-            </div>
+            <template x-if="!element.deleted">
+                <div class="message-item__reply-to text-muted fr-italic fr-small"
+                     :class="{ 'answering-my-message': {{ request.user.id }} == getMessageById(element.in_reply_to)?.posted_by, 'fr-ml-0': {{ request.user.id }} != element.posted_by, 'grey-background': {{ request.user.id }} != element.posted_by && {{ request.user.id }} != getMessageById(element.in_reply_to)?.posted_by, }">
+                    <p class="d-flex">
+                        <span class="fr-icon-corner-down-right-line fr-icon--sm"></span>
+                        en réponse à :
+                        <a class="fr-ml-1v"
+                           :href="`#message-${element.in_reply_to}`"
+                           x-html="renderMarkdown(await getShortMessageInReplyTo(element.in_reply_to))"></a>
+                    </p>
+                </div>
+            </template>
             <div :class="{ 'message-item__reply-to-content': {{ request.user.id }} == element.posted_by, 'message-item__reply-to-content--from-others': {{ request.user.id }} == getMessageById(element.in_reply_to)?.posted_by, 'message-item__reply-to-others': {{ request.user.id }} != element.posted_by && {{ request.user.id }} != getMessageById(element.in_reply_to)?.posted_by, }">
                 {% include "conversations/messages/message_item_content.html" %}
             </div>

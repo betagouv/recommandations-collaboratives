@@ -216,13 +216,13 @@
           background: #f6f6f6;
         }
         &.current-user-message {
-          background: #F5F5FE;
+          background: #f5f5fe;
           .message-item__reply-to {
             background: #f6f6f6;
           }
         }
         &.answering-my-message {
-          background: #F5F5FE;
+          background: #f5f5fe;
         }
         .message-item__date {
           color: var(--light-neutral-grey-625, #929292);
@@ -249,7 +249,7 @@
           &-content {
             padding: 12px;
             background: #f5f5fe;
-            border-top: solid 16px white;
+            border-top: solid 12px white;
             border-left: solid 16px white;
             border-bottom-right-radius: 0.5rem;
             border-bottom-left-radius: 0.5rem;
@@ -257,7 +257,7 @@
             &--from-others {
               padding: 12px;
               background: #f6f6f6;
-              border-top: solid 16px white;
+              border-top: solid 12px white;
               border-right: solid 16px white;
               border-bottom-right-radius: 0.5rem;
               border-bottom-left-radius: 0.5rem;
@@ -267,14 +267,14 @@
           &-others {
             padding: 12px;
             background: #f6f6f6;
-            border-top: solid 16px white;
+            border-top: solid 12px white;
             border-right: solid 16px white;
             border-bottom-right-radius: 0.5rem;
             border-bottom-left-radius: 0.5rem;
             box-shadow: white 0px 50px;
           }
           &.answering-my-message {
-            background: #F5F5FE;
+            background: #f5f5fe;
           }
         }
         .document-item {
