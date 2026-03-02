@@ -14,7 +14,7 @@ def normalize_user_name(user):
 @dataclass
 class FormattedNotification:
     summary: str
-    excerpt: str = None
+    excerpt: str | None = None
 
 
 class NotificationFormatter:
@@ -29,7 +29,8 @@ class NotificationFormatter:
             verbs.Project.SUBMITTED_BY: self.format_project_submitted,
             verbs.Recommendation.COMMENTED: self.format_action_commented,
             verbs.Recommendation.CREATED: self.format_action_recommended,
-            verbs.Document.ADDED: self.format_document_uploaded,
+            verbs.Document.ADDED_FILE: self.format_document_uploaded,
+            verbs.Document.ADDED_LINK: self.format_document_uploaded,
         }
 
     def format(self, notification):
@@ -112,7 +113,9 @@ class NotificationFormatter:
     def format_document_uploaded(self, notification):
         """A document was uploaded by a user"""
         subject = self._represent_user(notification.actor)
-        summary = f"{subject} {verbs.Document.ADDED}"
+        summary = (
+            f"{subject} {notification.verb} {notification.action_object.feed_label()}"
+        )
 
         return FormattedNotification(summary=summary, excerpt=None)
 
