@@ -78,9 +78,8 @@ Parameter Alpine:
                        class="stretched-link"
                        :title="`voir la fiche ressource`"
                        @click.prevent="await openResourcePreviewPanel(recommendation, element)">
-                        <p class="rendered-markdown--margin-lg"
-                           x-html="renderMarkdown(recommendation.content)"></p>
-                        <div class="task-item__resource">
+                        <div class="task-item__resource"
+                             :class="{'task-item__resource--bordered': !recommendation.visited}">
                             <template x-if="!recommendation.visited">
                                 <span class="badge text-white task-item__resource-badge"
                                       x-text="!$store.djangoData.isAdvisor ? 'Nouveau' : 'Non lu par le demandeur' "></span>
