@@ -44,6 +44,7 @@ class Recommendation:
 
 class Project:
     INVITATION = "a invité un·e collaborateur·rice à rejoindre le dossier"
+    INVITATION_OWNER = "a invité en tant que référent"
 
     JOINED = "a accepté l'invitation"
     JOINED_OWNER = "a rejoint en tant que référent le dossier"
@@ -51,7 +52,7 @@ class Project:
 
     SUBMITTED = "a été déposé"  # FIXME to be removed and keep _BY
     SUBMITTED_BY = "a déposé une nouvelle demande"
-    SUBMITTED_BY_ADVISOR = "a créé le dossier et invité en tant que référent"
+    SUBMITTED_BY_ADVISOR = "a créé en tant que conseiller le dossier"
 
     VALIDATED = "a été validé"
     VALIDATED_BY = "a validé le dossier"

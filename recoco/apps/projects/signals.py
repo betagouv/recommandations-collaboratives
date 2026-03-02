@@ -59,6 +59,12 @@ def log_project_submitted(sender, site, submitter, project, **kwargs):
         action.send(
             sender=project.submitted_by,
             verb=verbs.Project.SUBMITTED_BY_ADVISOR,
+            action_object=project,
+            target=project,
+        )
+        action.send(
+            sender=project.submitted_by,
+            verb=verbs.Project.INVITATION_OWNER,
             action_object=project.owner,
             target=project,
         )
@@ -82,7 +88,7 @@ def notify_moderators_project_submitted(sender, site, submitter, project, **kwar
             sender=project.submitted_by,
             recipient=recipients,
             verb=verbs.Project.SUBMITTED_BY_ADVISOR,
-            action_object=project.owner,
+            action_object=project,
             target=project,
         )
 
