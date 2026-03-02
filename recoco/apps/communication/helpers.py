@@ -28,6 +28,7 @@ class NotificationFormatter:
             verbs.Project.AVAILABLE: self.format_new_project_available,
             verbs.Project.SUBMITTED_BY: self.format_project_submitted,
             verbs.Project.SUBMITTED_BY_ADVISOR: self.format_project_submitted,
+            verbs.Project.NEW_OWNER: self.format_new_owner,
             verbs.Recommendation.COMMENTED: self.format_action_commented,
             verbs.Recommendation.CREATED: self.format_action_recommended,
             verbs.Document.ADDED_FILE: self.format_document_uploaded,
@@ -169,6 +170,16 @@ class NotificationFormatter:
         subject = self._represent_user(notification.actor)
         complement = self._represent_project(notification.action_object)
         summary = f"{subject} {notification.verb} : '{complement}'"
+
+        excerpt = self._represent_project_excerpt(notification.action_object)
+
+        return FormattedNotification(summary=summary, excerpt=excerpt)
+
+    def format_new_owner(self, notification):
+        """A new project is now available"""
+        subject = self._represent_user(notification.actor)
+        complement = self._represent_project(notification.action_object)
+        summary = f"{subject} {verbs.Project.NEW_OWNER} '{complement}'"
 
         excerpt = self._represent_project_excerpt(notification.action_object)
 
