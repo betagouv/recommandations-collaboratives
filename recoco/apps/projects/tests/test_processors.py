@@ -13,6 +13,7 @@ from django.shortcuts import reverse
 from model_bakery import baker
 from notifications.signals import notify
 
+from recoco.apps.conversations import models as conversation_models
 from recoco.apps.home import models as home_models
 from recoco.apps.tasks import models as task_models
 from recoco.utils import login
@@ -31,7 +32,7 @@ def test_active_project_processor(request, client):
 
     objects = (
         baker.make(models.Document, project=project, the_link="http://nowhe.re"),
-        baker.make(models.Note, project=project, public=True),
+        baker.make(conversation_models.Message, project=project),
         baker.make(models.Note, project=project, public=False),
         baker.make(task_models.Task, project=project, public=False),
         # NOTE should we also add a Task w/ public=True ?

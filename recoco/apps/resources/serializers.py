@@ -49,9 +49,11 @@ class ResourceSerializer(
             "departments",
             "created_by",
             "expires_on",
+            "nb_uses",
         ]
         read_only_fields = [
             "created_by",
+            "nb_uses",
         ]
 
     web_url = serializers.URLField(source="get_absolute_url", read_only=True)
@@ -63,6 +65,7 @@ class ResourceSerializer(
     departments = serializers.PrimaryKeyRelatedField(
         queryset=Department.objects, many=True
     )
+    nb_uses = serializers.IntegerField(required=False)
 
 
 class ResourceDetailSerializer(ResourceSerializer):
@@ -73,7 +76,6 @@ class ResourceDetailSerializer(ResourceSerializer):
             "created_on",
             "updated_on",
             "contacts",
-            "expires_on",
         ]
         read_only_fields = ResourceSerializer.Meta.read_only_fields + [
             "created_on",

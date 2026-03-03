@@ -12,6 +12,7 @@ import io
 import json
 
 import pytest
+from actstream import models as action_models
 from django.contrib.auth import models as auth
 from django.contrib.sites import models as sites
 from django.contrib.sites.shortcuts import get_current_site
@@ -21,6 +22,7 @@ from django.utils import timezone
 from django.utils.http import urlencode
 from model_bakery import baker
 from model_bakery.recipe import Recipe
+from notifications import models as notifications_models
 from notifications import notify
 from pytest_django.asserts import assertContains, assertNotContains
 
@@ -701,7 +703,7 @@ def test_general_notifications_are_consumed_on_project_overview(request, client)
         notify.send(  # should e a signal
             sender=project,
             recipient=user,
-            verb=verbs.Project.VALIDATED,
+            verb=verbs.Project.VALIDATED_BY,
             target=project,
         )
 
@@ -1114,6 +1116,8 @@ def test_next_url_redirect_after_update_location(request, client, project):
 @pytest.mark.django_db
 def test_switchtender_writes_advisors_note(request, client, project):
     site = get_current_site(request)
+    other_advisor = baker.make(auth.User)
+    utils.assign_advisor(other_advisor, project, site)
 
     with login(client) as user:
         utils.assign_advisor(user, project, site)
@@ -1132,6 +1136,18 @@ def test_switchtender_writes_advisors_note(request, client, project):
     assert project.advisors_note is not None
     assert project.advisors_note_on is not None
     assert project.advisors_note_by == user
+    assert (
+        action_models.Action.objects.filter(
+            verb=verbs.Project.UPDATE_ADVISORS_NOTE
+        ).count()
+        == 1
+    )
+    assert (
+        notifications_models.Notification.objects.filter(
+            verb=verbs.Project.UPDATE_ADVISORS_NOTE
+        ).count()
+        == 1  # one for other_advisor and none for sender
+    )
 
 
 @pytest.mark.django_db

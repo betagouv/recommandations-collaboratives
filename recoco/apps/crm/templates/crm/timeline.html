@@ -5,6 +5,8 @@
     {% for action in actions %}
         {% if action.verb == verbs.Project.INVITATION %}
             {% include "crm/fragments/action_invite.html" %}
+        {% elif action.verb == verbs.User.ADVISOR_REQUEST %}
+          {% include "crm/fragments/action_account_request.html" %}
         {% else %}
             <li class="d-flex flex-columns list-group-item">
                 {% if action.actor %}
@@ -50,6 +52,6 @@
                 {% endif %}
             </div>
         </li>
-    {% endif %}
-{% endfor %}
+        {% endif %}
+    {% endfor %}
 </ul>
