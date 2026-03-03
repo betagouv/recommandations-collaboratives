@@ -552,6 +552,7 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
 
   async goToCreateRecommendation(url) {
     if (this.$store.editor.currentMessageJSON) {
+      this.$store.onLeaveAlert.setDirty(false);
       const parsedNodesFromEditor = this.$store.editor.parseTipTapContent(
         this.$store.editor.currentMessageJSON
       );
