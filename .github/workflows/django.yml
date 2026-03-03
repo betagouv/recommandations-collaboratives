@@ -1,5 +1,8 @@
 name: main.yml
 
+permissions:
+  contents: read
+
 on:
   push:
     branches: ['main', 'develop', 'release/*', 'feature/*']
