@@ -91,6 +91,7 @@ def site_action_stream(site):
             Q(target_content_type=ctype)
             | Q(action_object_content_type=ctype)
             | Q(actor_content_type=ctype)
+            | Q(verb=verbs.User.ADVISOR_REQUEST)
         )
         .order_by("-timestamp")
         # https://docs.djangoproject.com/en/5.1/ref/contrib/contenttypes/#genericprefetch
@@ -117,7 +118,7 @@ class CRMSiteDashboardView(LoginRequiredMixin, UserPassesTestMixin, TemplateView
         context["project_model"] = Project
         context["user_model"] = User
 
-        context["projects_stream"] = site_action_stream(self.request.site)[:100]
+        context["site_action_stream"] = site_action_stream(self.request.site)[:100]
 
         context["crm_notif_stream"] = (
             self.request.user.notifications.filter(public=False)
