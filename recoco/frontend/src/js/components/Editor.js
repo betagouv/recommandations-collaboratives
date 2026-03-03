@@ -212,6 +212,7 @@ Alpine.data('editor', (content, placeholder, isActionPusher = false, onLeaveAler
     },
     openModalSearchContact() {
       this.isSearchContactModalOpen = true;
+      this.$store.crisp.isPopupOpen = true;
     },
     closeSearchContactModal(event) {
       if (event.target.id !== 'search-contact-modal') {
@@ -224,6 +225,7 @@ Alpine.data('editor', (content, placeholder, isActionPusher = false, onLeaveAler
         this.insertContactCard(contact);
       }
       this.isSearchContactModalOpen = false;
+      this.$store.crisp.isPopupOpen = false;
     },
     insertContactCard(contact) {
       if (editor && contact) {
@@ -325,7 +327,7 @@ Alpine.data('editor', (content, placeholder, isActionPusher = false, onLeaveAler
       // - Un fichier sélectionné
       // - Des cartes de fichiers dans l'éditeur
       // unused variable hasMessage but necessary to force reactivity
-      const hasMessage = this.$store.editor.currentMessage !== '';
+      const hasMessage = this.$store?.editor.currentMessage !== '';
       const isEditorEmpty = !editor.state.doc.textContent.trim().length;
       const hasContact = this.selectedContact !== null;
       const hasFile = this.selectedFile !== null;

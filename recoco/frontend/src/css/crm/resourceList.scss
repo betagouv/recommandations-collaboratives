@@ -1,0 +1,44 @@
+.resource-list-crm {
+  .resource-list-crm__filters {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 1rem;
+    .filter__label,
+    label {
+      color: var(--light-text-mention-grey, #666);
+      font-size: 0.875rem;
+      font-weight: 400;
+      line-height: 1.5rem;
+      margin-right: 0.625rem;
+    }
+  }
+  &__resources-count-label {
+    color: var(--light-text-default-grey, #3a3a3a);
+    font-size: 0.875rem;
+    font-weight: 700;
+    line-height: 1.5rem;
+    text-wrap: nowrap;
+  }
+
+  .multi-select {
+    &__container {
+      border-radius: 99px;
+      height: 2.25rem;
+      width: 100%;
+      padding: 0 3px;
+    }
+    &__selected-item {
+      display: flex;
+      padding: 0 var(--gap-x-small, 4px);
+      justify-content: center;
+      align-items: center;
+      border-radius: 2px;
+      height: 1.5rem;
+      margin: 5px 2px;
+    }
+    &__input {
+      border-radius: 99px 0 0 99px;
+    }
+  }
+}

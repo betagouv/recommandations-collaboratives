@@ -7,6 +7,7 @@ author  : raphael.marvie@beta.gouv.fr,guillaume.libersat@beta.gouv.fr
 created : 2021-05-26 15:56:20 CEST
 """
 
+from actstream import action
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
@@ -128,6 +129,13 @@ def project_moderation_project_refuse(request: HttpRequest, project_id: int):
 
         messages.success(request, f"Le dossier '{project.name}' a été refusé.")
 
+        signals.project_rejected.send(
+            sender=models.Project,
+            site=request.site,
+            moderator=request.user,
+            project=project,
+        )
+
         if owner := project.owner:
             send_email(
                 template_name=communication_constants.TPL_PROJECT_REFUSED,
@@ -178,7 +186,7 @@ def project_moderation_project_accept(request: HttpRequest, project_id: int):
             project_site = project.project_sites.get(site=request.site)
 
             if project_site.is_origin:
-                # Update owner permissions now the project is no in DRAFT state anymore
+                # Update owner permissions now the project is not in DRAFT state anymore
                 assign_collaborator(owner, project, is_owner=True)
 
                 # Send an email to the project owner
@@ -265,6 +273,12 @@ def project_moderation_advisor_refuse(
         advisor_group = get_group_for_site("advisor", request.site)
         advisor_access_request.user.groups.remove(advisor_group)
 
+    action.send(
+        sender=request.user,
+        verb=verbs.User.ADVISOR_REJECTED,
+        action_object=advisor_access_request.user,
+        target=advisor_access_request,
+    )
     messages.success(
         request,
         f"La demande d'accès conseiller pour '{advisor_access_request.user.email}' a été refusée.",
@@ -312,6 +326,12 @@ def project_moderation_advisor_accept(
     messages.success(
         request,
         f"La demande d'accès conseiller pour '{advisor_access_request.user.email}' a été acceptée.",
+    )
+    action.send(
+        sender=request.user,
+        verb=verbs.User.ADVISOR_ACCEPTED,
+        action_object=advisor_access_request.user,
+        target=advisor_access_request,
     )
 
     send_email(

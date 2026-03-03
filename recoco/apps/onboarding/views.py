@@ -17,7 +17,6 @@ from django.contrib.sites import models as sites
 from django.db import transaction
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
-from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils.http import urlencode
 
@@ -36,7 +35,7 @@ from recoco.utils import (
     is_switchtender_or_403,
 )
 
-from . import forms, models, utils
+from . import forms, utils
 
 
 class OnboardingLogin(LoginView):
@@ -538,29 +537,6 @@ def get_organization(site: sites.Site, name: str) -> addressbook.Organization:
     organization = addressbook.Organization.get_or_create(name)
     organization.sites.add(site)
     return organization
-
-
-def create_initial_note(
-    site: sites.Site, onboarding_response: models.OnboardingResponse
-) -> None:
-    """Create the initial note that describe the project"""
-
-    project = onboarding_response.project
-
-    markdown_content = render_to_string(
-        "projects/project/onboarding_initial_note.md",
-        {
-            "onboarding_response": onboarding_response,
-            "project": project,
-        },
-    )
-
-    projects.Note.objects.create(
-        project=project,
-        content=(f"# Demande initiale\n\n{project.description}\n\n{markdown_content}"),
-        public=True,
-        site=site,
-    )
 
 
 # eof

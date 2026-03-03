@@ -1,0 +1,280 @@
+{% load django_vite %}
+{% block js %}
+    {% vite_asset 'js/styles/form-resources.css.js' %}
+    {% vite_asset 'js/components/Resources/FormResource.js' %}
+    {% vite_asset 'js/components/MultiSelectRegionDepartment.js' %}
+    {% vite_asset 'js/components/RegionDepartmentPreparer.js' %}
+    {% vite_asset 'js/apps/featureAddContact.js' %}
+    {% vite_asset 'js/components/AjvValidationSchema.js' %}
+{% endblock js %}
+<!-- Form -->
+<div x-data="AjvValidationSchema('schemaResourceFormValidator')">
+    <div x-data="FormResource({{ resource.id|default:'null'|safe }})"
+         class="create-resources"
+         @modal-response="closeCreateContactModal($event)"
+         @multi-select-change="resourceFormData.tags = $event.detail">
+        <form id="form-resource"
+              x-ref="formResource"
+              method="post"
+              action="{% if edit_resource %}{% url 'resources-resource-update' resource.id %}{% else %}{% url 'resources-resource-create' %}{% endif %}">
+            {% csrf_token %}
+            <!-- Hidden fields for complex data -->
+            <input type="hidden" name="status" :value="resourceFormData.status">
+            <input type="hidden" name="content" :value="resourceFormData.content.text">
+            <template x-for="contact in resourceFormData.contacts"
+                      :key="contact.id || contact">
+                <input type="hidden" name="contacts" :value="contact.id || contact">
+            </template>
+            <div class="d-flex justify-content-between create-resources__header">
+                {% if edit_resource %}
+                    <h2 class="create-resources__title text-modal-main-msg">Modification de fiche ressource</h2>
+                {% else %}
+                    <h2 class="create-resources__title text-modal-main-msg">Création de fiche ressource</h2>
+                {% endif %}
+                <div>
+                    {% comment %} TODO: Uncomment this when the preview modal is ready {% endcomment %}
+                    {% comment %} <button @click.prevent data-bs-toggle="modal" :data-bs-target="`#resource-preview-`+{{ resource.id|default:'null'|safe }}" role="button" class="fr-btn fr-btn--tertiary fr-btn--sm fr-mr-1w">Prévisualiser</button> {% endcomment %}
+                    <button type="submit"
+                            @click.prevent="resourceFormData.status = 0; onSubmit()"
+                            class="fr-btn fr-btn--tertiary fr-mr-1w">Sauvegarder en brouillon</button>
+                    <button type="submit"
+                            @click.prevent="resourceFormData.status = 2; onSubmit()"
+                            class="fr-btn fr-btn--primary fr-mr-1w">Sauvegarder et publier</button>
+                </div>
+                {% include "resources/resource/modal_resource.html" %}
+            </div>
+            {% if form.non_field_errors %}
+                <div class="fr-alert fr-alert--error fr-mb-2w">
+                    <p class="fr-alert__title">Erreur</p>
+                    {% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}
+                </div>
+            {% endif %}
+            <div class="fr-grid-row fr-mt-2w">
+                <!-- Column 1 -->
+                <div class="fr-col-8 fr-col-md-8 fr-col-sm-12 fr-pr-4w">
+                    <!-- Title -->
+                    <div class="fr-input-group" :class="formFields['title']?.className">
+                        <label class="fr-label text-modal-main-msg" for="id_title">
+                            Titre <span class="color-important">*</span> (obligatoire)
+                            <span x-show="resourceFormData?.title?.length > 0" class="fr-text--xs">
+                                (<span x-text="256 - resourceFormData?.title?.length"></span>
+                            caractères restants)</span>
+                        </label>
+                        <input type="text"
+                               name="title"
+                               class="fr-input"
+                               id="id_title"
+                               required
+                               maxlength="256"
+                               x-model="resourceFormData.title">
+                        <template x-for="(error, index) in getFieldErrors('title')" :key="index">
+                            <p class="fr-error-text" x-text="error"></p>
+                        </template>
+                        {% if form.title.errors %}
+                            {% for error in form.title.errors %}<p class="fr-error-text">{{ error }}</p>{% endfor %}
+                        {% endif %}
+                    </div>
+                    <!-- Subtitle -->
+                    <div class="fr-input-group fr-mb-1w"
+                         :class="formFields['subtitle']?.className">
+                        <label class="fr-label text-modal-main-msg" for="id_subtitle">
+                            Sous-titre
+                            <span x-show="resourceFormData?.subtitle?.length > 0" class="fr-text--xs">
+                                (<span x-text="512 - resourceFormData?.subtitle?.length"></span>
+                            caractères restants)</span>
+                        </label>
+                        <input type="text"
+                               name="subtitle"
+                               class="fr-input"
+                               id="id_subtitle"
+                               maxlength="512"
+                               x-model="resourceFormData.subtitle">
+                        <template x-for="(error, index) in getFieldErrors('subtitle')" :key="index">
+                            <p class="fr-error-text" x-text="error"></p>
+                        </template>
+                        {% if form.subtitle.errors %}
+                            {% for error in form.subtitle.errors %}<p class="fr-error-text">{{ error }}</p>{% endfor %}
+                        {% endif %}
+                    </div>
+                    <div class="create-resources__help-text fr-mb-3w">
+                        <span class="fr-icon fr-icon-information-line fr-icon--sm"></span>
+                        <p>
+                            Affiché sur la page de la ressource, sur la liste des ressources, dans l'aperçu d'une recommandation avec ressource, dans l'email qui informe d'une nouvelle recommandation.
+                        </p>
+                    </div>
+                    <!-- Summary -->
+                    <div class="fr-input-group fr-mb-1w"
+                         :class="formFields['summary']?.className">
+                        <label class="fr-label text-modal-main-msg" for="id_summary">
+                            Résumé
+                            <span x-show="resourceFormData?.summary?.length > 0" class="fr-text--xs">
+                                (<span x-text="512 - resourceFormData?.summary?.length"></span>
+                            caractères restants)</span>
+                        </label>
+                        <textarea name="summary" class="fr-input" id="id_summary" maxlength="512" x-model="resourceFormData.summary">
+                        </textarea>
+                        <template x-for="(error, index) in getFieldErrors('summary')" :key="index">
+                            <p class="fr-error-text" x-text="error"></p>
+                        </template>
+                        {% if form.summary.errors %}
+                            {% for error in form.summary.errors %}<p class="fr-error-text">{{ error }}</p>{% endfor %}
+                        {% endif %}
+                    </div>
+                    <div class="create-resources__help-text fr-mb-3w">
+                        <span class="fr-icon fr-icon-information-line fr-icon--sm"></span>
+                        <p>Affiché uniquement sur la page de la ressource.</p>
+                    </div>
+                    <!-- Content with tiptap editor -->
+                    <div class="fr-input-group" :class="formFields['content']?.className">
+                        <label class="fr-label text-modal-main-msg" for="id_content">Contenu</label>
+                        {% include "tools/editor.html" with input_name=form.content.name initial_content=form.content.value|default:'' input_required=True initial_content_escapejs=True %}
+                        <template x-for="(error, index) in getFieldErrors('content')" :key="index">
+                            <p class="fr-error-text" x-text="error"></p>
+                        </template>
+                        {% if form.content.errors %}
+                            {% for error in form.content.errors %}<p class="fr-error-text">{{ error }}</p>{% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+                <!-- Column 2 -->
+                <div class="fr-col-4 fr-col-md-4 fr-col-sm-12 "
+                     @set-departments="resourceFormData.departments = $event.detail">
+                    <!-- Category select -->
+                    <div class="fr-input-group" :class="formFields['category']?.className">
+                        <label class="fr-label text-modal-main-msg" for="id_category">Catégorie</label>
+                        <select name="category"
+                                id="id_category"
+                                class="fr-select"
+                                valueAsNumber
+                                x-model="resourceFormData.category">
+                            <option value="" selected disabled>Sélectionner une catégorie</option>
+                            {% for category in categories %}
+                                <option :data="JSON.stringify({id: {{ category.id }}, name: '{{ category.name }}'})"
+                                        value="{{ category.id }}">{{ category.name }}</option>
+                            {% endfor %}
+                        </select>
+                        <template x-for="(error, index) in getFieldErrors('category')" :key="index">
+                            <p class="fr-error-text" x-text="error"></p>
+                        </template>
+                        {% if form.category.errors %}
+                            {% for error in form.category.errors %}<p class="fr-error-text">{{ error }}</p>{% endfor %}
+                        {% endif %}
+                    </div>
+                    <!-- Keywords multi-select -->
+                    <div class="fr-input-group fr-mb-1w"
+                         x-data="{selected : resourceFormData.tags}"
+                         :class="formFields['tags']?.className">
+                        <label class="fr-label text-modal-main-msg" for="id_tags">Mots-clés</label>
+                        <input type="text"
+                               name="tags"
+                               class="fr-input"
+                               id="id_tags"
+                               x-model="resourceFormData.tags">
+                        {% if form.tags.errors %}
+                            {% for error in form.tags.errors %}<p class="fr-error-text">{{ error }}</p>{% endfor %}
+                        {% endif %}
+                    </div>
+                    <div class="create-resources__help-text fr-mb-3w">
+                        <span class="fr-icon fr-icon-information-line fr-icon--sm"></span>
+                        <p>
+                            Saisissez vos mots clés séparés par des virgules.
+                            <br>
+                            (ex: diagnostic, cahier des charges, financement études, …).
+                        </p>
+                    </div>
+                    <!-- Support orga -->
+                    <div class="fr-input-group" :class="formFields['support_orga']?.className">
+                        <label class="fr-label text-modal-main-msg" for="id_support_orga">
+                            Structure porteuse
+                            <span x-show="resourceFormData?.support_orga?.length > 0"
+                                  class="fr-text--xs">
+                                (<span x-text="256 - resourceFormData?.support_orga?.length"></span>
+                            caractères restants)</span>
+                        </label>
+                        <input type="text"
+                               name="support_orga"
+                               class="fr-input fr-mb-1w"
+                               id="id_support_orga"
+                               maxlength="256"
+                               x-model="resourceFormData.support_orga">
+                        <template x-for="(error, index) in getFieldErrors('support_orga')" :key="index">
+                            <p class="fr-error-text" x-text="error"></p>
+                        </template>
+                        {% if form.support_orga.errors %}
+                            {% for error in form.support_orga.errors %}<p class="fr-error-text">{{ error }}</p>{% endfor %}
+                        {% endif %}
+                        <div class="create-resources__help-text fr-mb-3w">
+                            <span class="fr-icon fr-icon-information-line fr-icon--sm"></span>
+                            <p>Organisme qui porte ou finance ce dispositif (ex : Ademe, ANCT, Banque des Territoires…).</p>
+                        </div>
+                    </div>
+                    <!-- Departments/regions multiple select -->
+                    <div x-data="{selectedDepartments: {{ selected_departments |default:'[]'|safe }} }">
+                        <div class="fr-input-group multi-select-region"
+                             :class="formFields['departments']?.className"
+                             x-data="RegionDepartmentPreparer({ selectedDepartments: selectedDepartments })">
+                            <label class="fr-label text-modal-main-msg" for="id_departments">Territoire</label>
+                            <template x-if="objectsToSelect && objectsToSelect.length">
+                                <div x-data="MultiSelectRegionDepartment({ selected: selectedDepartments, objectsToSelect: objectsToSelect, displayRegions: true })">
+                                    {% include "tools/contacts/multi_select.html" with name="departments" id="id_departments" placeholder="Cherchez et sélectionnez vos départements et régions" label="none" display_regions=True skip_hidden_input=True %}
+                                    <template x-for="dept in selectedDepartments" :key="dept">
+                                        <input type="hidden" name="departments" :value="dept">
+                                    </template>
+                                    {% if form.departments.errors %}
+                                        <div class="fr-error-text form-mandatory-element">{{ form.departments.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                            </template>
+                            <template x-for="(error, index) in getFieldErrors('departments')" :key="index">
+                                <p class="fr-error-text" x-text="error"></p>
+                            </template>
+                        </div>
+                    </div>
+                    <!-- Expires on date picker -->
+                    <div class="fr-input-group" :class="formFields['expires_on']?.className">
+                        <label class="fr-label text-modal-main-msg" for="id_expires_on">Date d'expiration</label>
+                        <input type="date"
+                               name="expires_on"
+                               class="fr-input"
+                               id="id_expires_on"
+                               x-model="resourceFormData.expires_on">
+                        <template x-for="(error, index) in getFieldErrors('expires_on')" :key="index">
+                            <p class="fr-error-text" x-text="error"></p>
+                        </template>
+                        {% if form.expires_on.errors %}
+                            {% for error in form.expires_on.errors %}<p class="fr-error-text">{{ error }}</p>{% endfor %}
+                        {% endif %}
+                    </div>
+                    <!-- Contacts component (multiple) -->
+                    <!-- add contacts -->
+                    <div class="fr-input-group"
+                         x-data="SearchContactModal({searchbarOnly:true, noModal:true})"
+                         @modal-response="closeCreateContactModal($event)">
+                        <label class="fr-label text-modal-main-msg" for="id_contacts">Contacts</label>
+                        {% include "tools/contacts/searchbar_for_contacts.html" with add_contact="from_search" %}
+                        {% include "tools/contacts/create_contact_modal.html" with is_it_returning_data=True %}
+                        {% if form.contacts.errors %}
+                            {% for error in form.contacts.errors %}<p class="fr-error-text">{{ error }}</p>{% endfor %}
+                        {% endif %}
+                    </div>
+                    <!-- display contacts -->
+                    <div>
+                        <template x-if="resourceFormData.contacts.length > 0">
+                            <template x-for="contact in resourceFormData.contacts" :key="contact.id">
+                                <div class="fr-mb-2w border-light-grey"
+                                     x-data="{contact:contact,isOpenDeleteContact:null}">
+                                    <div class="position-relative d-flex justify-content-end">
+                                        <span class="fr-icon-delete-line top-right-corner cursor-pointer"
+                                              aria-label="supprimer contact"
+                                              @click="suppressContact(contact)"></span>
+                                    </div>
+                                    {% include "tools/contacts/contact_card.html" with full_width=true %}
+                                </div>
+                            </template>
+                        </template>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

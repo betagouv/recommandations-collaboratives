@@ -1,0 +1,51 @@
+import { minLengthErrorMessage, schemaFormInputs } from './ajv.schema.forms';
+
+/**
+ * Validation schema for the form: FormResource
+ */
+export const schemaResourceFormValidator = {
+  $id: '#/definitions/ResourceFormValidator',
+  type: 'object',
+  properties: {
+    title: {
+      type: 'string',
+      minLength: 1,
+      maxLength: 256,
+      errorMessage: {
+        minLength: "Le titre est requis",
+        maxLength: "Le titre est limité à 256 caractères",
+      },
+    },
+    category: {
+      type: 'integer',
+    },
+    tags: {
+      type: 'string',
+    },
+    subtitle: {
+      type: 'string',
+      maxLength: 512,
+      errorMessage: 'Le sous-titre est limité à 512 caractères',
+    },
+    summary: {
+      type: 'string',
+      maxLength: 512,
+      errorMessage: 'Le résumé est limité à 512 caractères',
+    },
+    content: {
+      type: 'string',
+      minLength: 1,
+      errorMessage: 'Le contenu est requis',
+    },
+    support_orga: {
+      type: 'string',
+      maxLength: 256,
+      errorMessage: 'La nom de la structure porteuse est limitée à 256 caractères',
+    },
+  },
+  required: [
+    'content',
+    'title',
+  ],
+  definitions: schemaFormInputs,
+};

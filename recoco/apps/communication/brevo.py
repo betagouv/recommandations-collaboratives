@@ -1,7 +1,9 @@
+import sentry_sdk
 import sib_api_v3_sdk as brevo_sdk
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
+from sib_api_v3_sdk.rest import ApiException
 
 
 class Brevo:
@@ -36,9 +38,7 @@ class Brevo:
                 brevo_sdk.SendTestEmail()
             )  # XXX disabled to default to test list;
             # email_to=[recipients[0]["email"]])
-            response = self.api_instance.send_test_template(
-                template_id, send_test_email
-            )
+            return self.api_instance.send_test_template(template_id, send_test_email)
         else:
             send_to = [
                 brevo_sdk.SendSmtpEmailTo(
@@ -52,9 +52,13 @@ class Brevo:
                 template_id=template_id, to=send_to, params=params
             )
 
-            response = self.api_instance.send_transac_email(send_smtp_email)
-
-        return response
+            try:
+                return self.api_instance.send_transac_email(send_smtp_email)
+            except ApiException as e:
+                print(
+                    f"error sending email to users {','.join(str(recipient.id) for recipient in recipients if hasattr(recipient, 'id'))}"
+                )
+                sentry_sdk.capture_exception(e)
 
     def get_emails_from_transactionid(self, transaction_id):
         return self.api_instance.get_transac_emails_list(message_id=transaction_id)

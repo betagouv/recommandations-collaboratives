@@ -214,7 +214,7 @@ def test_rest_api_responds_to_xml_content_type(client, request):
 
     assert response.status_code == 200
     assert "application/xml" in response.headers["content-type"]
-    assert len(response.data) == 1
+    assert response.data["count"] == 1
 
 
 @pytest.mark.django_db
@@ -228,6 +228,30 @@ def test_assign_site_staff(client, request):
     staff_group = utils.get_group_for_site("staff", site)
     assert user in staff_group.user_set.all()
     assert site in user.profile.sites.all()
+
+
+@pytest.mark.django_db
+def test_return_staff(client, request):
+    site = get_current_site(request)
+
+    user = baker.make(auth.User)
+
+    utils.assign_site_staff(site, user)
+
+    staff_group = utils.get_group_for_site("staff", site)
+    assert set(utils.get_staff_for_site(site)) == set(staff_group.user_set.all())
+
+
+@pytest.mark.django_db
+def test_return_admin(client, request):
+    site = get_current_site(request)
+
+    user = baker.make(auth.User)
+
+    utils.assign_site_admin(site, user)
+
+    admin_group = utils.get_group_for_site("admin", site)
+    assert set(utils.get_admin_for_site(site)) == set(admin_group.user_set.all())
 
 
 class CustomBaker(baker.Baker):

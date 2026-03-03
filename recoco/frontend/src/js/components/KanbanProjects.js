@@ -1,5 +1,4 @@
 import Alpine from 'alpinejs';
-import { generateUUID } from '../utils/uuid';
 import { makeProjectURL } from '../utils/createProjectUrl';
 
 import api, { projectsProjectSitesUrl, projectsUrl } from '../utils/api';
@@ -7,8 +6,6 @@ import api, { projectsProjectSitesUrl, projectsUrl } from '../utils/api';
 Alpine.data('KanbanProjects', function (currentSiteId, departments, regions) {
   return {
     makeProjectURL,
-    projectList: null,
-    projectListFiltered: null,
     isViewInitialized: false,
     currentSiteId: currentSiteId,
     isDisplayingOnlyUserProjects:
@@ -19,25 +16,66 @@ Alpine.data('KanbanProjects', function (currentSiteId, departments, regions) {
     backendSearch: {
       searchText: '',
       searchDepartment: [],
-      lastActivity: localStorage.getItem('lastActivity') ?? '30',
     },
     searchText: '',
-    filterProjectLastActivity: localStorage.getItem('lastActivity') ?? '30',
     regions: JSON.parse(regions.textContent),
     territorySelectAll: true,
+    pageSize: 10,
     boards: [
       {
         code: 'TO_PROCESS',
         title: 'À traiter',
         color_class: 'border-secondary',
+        projects: [],
+        allProjects: [],
+        offset: 0,
+        totalCount: 0,
+        hasMore: true,
+        isLoading: false,
       },
-      { code: 'READY', title: 'En attente', color_class: 'border-info' },
-      { code: 'IN_PROGRESS', title: 'En cours', color_class: 'border-primary' },
-      { code: 'DONE', title: 'Traité', color_class: 'border-success' },
+      {
+        code: 'READY',
+        title: 'En attente',
+        color_class: 'border-info',
+        projects: [],
+        allProjects: [],
+        offset: 0,
+        totalCount: 0,
+        hasMore: true,
+        isLoading: false,
+      },
+      {
+        code: 'IN_PROGRESS',
+        title: 'En cours',
+        color_class: 'border-primary',
+        projects: [],
+        allProjects: [],
+        offset: 0,
+        totalCount: 0,
+        hasMore: true,
+        isLoading: false,
+      },
+      {
+        code: 'DONE',
+        title: 'Traité',
+        color_class: 'border-success',
+        projects: [],
+        allProjects: [],
+        offset: 0,
+        totalCount: 0,
+        hasMore: true,
+        isLoading: false,
+      },
       {
         code: 'STUCK',
         title: 'Conseil interrompu',
         color_class: 'border-dark',
+        projects: [],
+        allProjects: [],
+        offset: 0,
+        totalCount: 0,
+        hasMore: true,
+        isLoading: false,
       },
     ],
     async init() {
@@ -45,41 +83,93 @@ Alpine.data('KanbanProjects', function (currentSiteId, departments, regions) {
       this.isViewInitialized = true;
     },
     async getData() {
-      const projects = await api.get(
+      await Promise.all(
+        this.boards.map(async (board) => {
+          // Reset pagination state
+          board.offset = 0;
+          board.hasMore = true;
+          board.isLoading = true;
+
+          const response = await api.get(
+            projectsUrl({
+              searchText: this.backendSearch.searchText,
+              departments: this.backendSearch.searchDepartment,
+              limit: this.pageSize,
+              status: [board.code],
+            })
+          );
+
+          const mappedProjects =
+            await this.$store.projects.mapperProjetsProjectSites(
+              response.data.results,
+              this.currentSiteId
+            );
+
+          board.projects = mappedProjects;
+          board.allProjects = [...board.projects];
+
+          // Update pagination state
+          board.totalCount = response.data.count;
+          board.offset = board.projects.length;
+          board.hasMore = board.offset < board.totalCount;
+          board.isLoading = false;
+        })
+      );
+      this.filterMyProjects();
+    },
+    async loadMoreProjects(board) {
+      if (board.isLoading || !board.hasMore) {
+        return;
+      }
+
+      board.isLoading = true;
+
+      const response = await api.get(
         projectsUrl({
           searchText: this.backendSearch.searchText,
           departments: this.backendSearch.searchDepartment,
-          lastActivity: this.backendSearch.lastActivity,
-          status: ['TO_PROCESS', 'STUCK', 'READY', 'IN_PROGRESS', 'DONE'],
+          limit: this.pageSize,
+          offset: board.offset,
+          status: [board.code],
         })
-      );
-      this.projectList = await this.$store.projects.mapperProjetsProjectSites(
-        projects.data.results,
-        this.currentSiteId
       );
 
-      this.projectList = projects.data.results.map((d) =>
-        Object.assign(d, {
-          uuid: generateUUID(),
-        })
-      );
-      this.projectListFiltered = [...this.projectList];
+      const mappedProjects =
+        await this.$store.projects.mapperProjetsProjectSites(
+          response.data.results,
+          this.currentSiteId
+        );
+
+      board.allProjects = [...board.allProjects, ...mappedProjects];
+      board.offset = board.allProjects.length;
+      board.hasMore = board.offset < board.totalCount;
+      board.isLoading = false;
+
       this.filterMyProjects();
     },
-    get view() {
-      return this.projectListFiltered.sort(this.sortFn.bind(this));
-    },
-    column(status) {
-      if (status instanceof Array) {
-        return this.view.filter((d) => status.indexOf(d.status) !== -1);
-      } else {
-        return this.view.filter((d) => d.status === status);
+    onColumnScroll(event, board) {
+      const element = event.target;
+      const scrollThreshold = 100; // pixels from bottom to trigger load
+
+      const isNearBottom =
+        element.scrollHeight - element.scrollTop - element.clientHeight <
+        scrollThreshold;
+
+      if (isNearBottom && board.hasMore && !board.isLoading) {
+        this.loadMoreProjects(board);
       }
     },
-    onDragStart(event, uuid) {
+    getBoard(status) {
+      return this.boards.find((board) => board.code === status);
+    },
+    column(status) {
+      const board = this.getBoard(status);
+      return board ? board.projects.sort(this.sortFn.bind(this)) : [];
+    },
+    onDragStart(event, projectId) {
       event.dataTransfer.clearData();
       event.dataTransfer.effectAllowed = 'move';
-      event.dataTransfer.setData('application/uuid', uuid);
+      event.dataTransfer.setData('application/project-id', projectId);
       event.target.classList.add('drag-dragging');
       document
         .querySelectorAll('.drop-column')
@@ -110,17 +200,26 @@ Alpine.data('KanbanProjects', function (currentSiteId, departments, regions) {
       event.preventDefault();
       event.dataTransfer.dropEffect = 'move';
     },
+    findProjectById(projectId) {
+      for (const board of this.boards) {
+        const project = board.projects.find((d) => d.id === projectId);
+        if (project) {
+          return project;
+        }
+      }
+      return null;
+    },
     async onDrop(event, status) {
       event.preventDefault();
 
       this.currentlyHoveredElement.classList.remove('drag-target');
       this.currentlyHoveredElement = null;
 
-      const uuid = event.dataTransfer.getData('application/uuid');
-      if (!uuid) {
+      const projectId = Number(event.dataTransfer.getData('application/project-id'));
+      if (!projectId) {
         return;
       }
-      const droppedProject = this.projectList.find((d) => d.uuid === uuid);
+      const droppedProject = this.findProjectById(projectId);
       if (!droppedProject) {
         return;
       }
@@ -136,11 +235,6 @@ Alpine.data('KanbanProjects', function (currentSiteId, departments, regions) {
 
       await this.getData();
     },
-    async onLastActivityChange(event) {
-      this.backendSearch.lastActivity = event.target.value;
-      localStorage.setItem('lastActivity', this.backendSearch.lastActivity);
-      await this.getData();
-    },
     toggleMyProjectsFilter() {
       this.isDisplayingOnlyUserProjects = !this.isDisplayingOnlyUserProjects;
       localStorage.setItem(
@@ -150,40 +244,25 @@ Alpine.data('KanbanProjects', function (currentSiteId, departments, regions) {
       this.filterMyProjects();
     },
     filterMyProjects() {
-      if (this.isDisplayingOnlyUserProjects) {
-        this.projectListFiltered = this.projectList.filter(
-          (d) => d.is_observer || d.is_switchtender
-        );
-      } else {
-        this.projectListFiltered = [...this.projectList];
-      }
+      this.boards.forEach((board) => {
+        if (this.isDisplayingOnlyUserProjects) {
+          board.projects = board.allProjects.filter(
+            (d) => d.is_observer || d.is_switchtender
+          );
+        } else {
+          board.projects = [...board.allProjects];
+        }
+      });
     },
     async onSearch(event) {
       this.backendSearch.searchText = event.target.value;
-      await this.backendSearchProjects({ resetLastActivity: true });
-    },
-    async backendSearchProjects(options = { resetLastActivity: false }) {
-      if (this.backendSearch.searchText !== '') {
-        if (this.$refs.selectFilterProjectDuration) {
-          this.$refs.selectFilterProjectDuration.disabled = true;
-          this.$refs.selectFilterProjectDuration.value = 1460;
-        }
-        this.backendSearch.lastActivity = '';
-      } else if (options.resetLastActivity) {
-        if (this.$refs.selectFilterProjectDuration) {
-          this.$refs.selectFilterProjectDuration.disabled = false;
-          this.$refs.selectFilterProjectDuration.value = 30;
-        }
-        this.backendSearch.lastActivity = '30';
-      }
-
       await this.getData();
     },
     async saveSelectedDepartment(event) {
       if (!event.detail) return;
 
       this.backendSearch.searchDepartment = [...event.detail];
-      await this.backendSearchProjects();
+      await this.getData();
     },
 
     sortFn(a, b) {
@@ -202,7 +281,7 @@ Alpine.data('KanbanProjects', function (currentSiteId, departments, regions) {
     async onTagClick(tag) {
       this.backendSearch.searchText = tag;
       this.searchText = '#' + tag;
-      await this.backendSearchProjects({ resetLastActivity: true });
+      await this.getData();
     },
   };
 });

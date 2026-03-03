@@ -10,7 +10,7 @@ from collections import Counter, OrderedDict, defaultdict
 from datetime import datetime, timedelta
 
 from actstream import action
-from actstream.models import Action, actor_stream, target_stream
+from actstream.models import Action, target_stream
 from allauth.account.internal.flows.email_verification import (
     send_verification_email_for_user,
 )
@@ -67,6 +67,7 @@ from recoco.apps.home import models as home_models
 from recoco.apps.onboarding import utils as onboarding_utils
 from recoco.apps.projects.models import Project, Topic
 from recoco.apps.reminders import models as reminders_models
+from recoco.apps.resources.models import Category
 from recoco.apps.tasks.models import Task
 from recoco.utils import (
     get_group_for_site,
@@ -654,7 +655,9 @@ def user_details(request, user_id):
     group_name = make_group_name_for_site("advisor", request.site)
     crm_user_is_advisor = crm_user.groups.filter(name=group_name).exists()
 
-    actions = actor_stream(crm_user)
+    actions = crm_user.actor_actions.exclude(
+        verb__in=[verbs.Project.REJECTED_BY, verbs.Project.VALIDATED_BY]
+    )
 
     user_ct = ContentType.objects.get_for_model(User)
 
@@ -907,6 +910,27 @@ def project_toggle_annotation(request, project_id=None):
 
     url = reverse("crm-project-details", args=[project.id])
     return redirect(url)
+
+
+########################################################################
+# resources
+########################################################################
+
+
+@login_required
+def resource_list(request):
+    has_perm_or_403(request.user, "use_crm", request.site)
+
+    departments = list(geomatics.Department.objects.values("code", "name"))
+
+    categories = list(Category.on_site.values("id", "name").order_by("name"))
+
+    context = {
+        "departments": departments,
+        "categories": categories,
+    }
+
+    return render(request, "crm/resource_list.html", context)
 
 
 def handle_create_note_for_object(

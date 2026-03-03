@@ -4,13 +4,21 @@ import api, { regionsUrl, departmentsUrl } from '../utils/api';
 Alpine.data(
   'DepartmentsSelector',
   (
-    { listZone, selectAll, filterByRegions, selectedDepartments } = {
+    {
+      listZone,
+      selectAll,
+      filterByRegions,
+      selectedDepartments,
+      userDepartments,
+    } = {
       selectAll: true,
     }
   ) => {
     return {
       open: false,
       territorySelectAll: true,
+      myDepartmentsActive: false,
+      userDepartments: userDepartments || [],
       regions: listZone,
       async init() {
         try {
@@ -35,6 +43,8 @@ Alpine.data(
         if (selectAll) {
           this.handleTerritorySelectAll(selectAll, { init: true });
         }
+
+        this.updateMyDepartmentsActive();
       },
       initSelectedDepartments() {
         if (this.regions) {
@@ -65,6 +75,64 @@ Alpine.data(
           });
         }
       },
+      updateMyDepartmentsActive() {
+        if (!this.userDepartments || !this.userDepartments.length) {
+          this.myDepartmentsActive = false;
+          return;
+        }
+        let activeCodes;
+        if (this.regions) {
+          activeCodes = this.extractDepartmentFromSelectedRegions(this.regions);
+        } else if (this.departments) {
+          activeCodes = this.departments
+            .filter((d) => d.active)
+            .map((d) => d.code);
+        } else {
+          this.myDepartmentsActive = false;
+          return;
+        }
+        this.myDepartmentsActive =
+          activeCodes.length === this.userDepartments.length &&
+          this.userDepartments.every((code) => activeCodes.includes(code));
+      },
+      handleMyDepartments() {
+        if (!this.userDepartments || !this.userDepartments.length) return;
+
+        const willActivate = !this.myDepartmentsActive;
+
+        if (this.regions) {
+          this.regions = this.regions.map((region) => ({
+            ...region,
+            departments: region.departments.map((department) => ({
+              ...department,
+              active: willActivate
+                ? this.userDepartments.includes(department.code)
+                : false,
+            })),
+            active: willActivate
+              ? region.departments.every((d) =>
+                  this.userDepartments.includes(d.code)
+                )
+              : false,
+          }));
+          this.territorySelectAll = this.regions.every((r) => r.active);
+          this.$dispatch(
+            'selected-departments',
+            this.extractDepartmentFromSelectedRegions(this.regions)
+          );
+        } else if (this.departments) {
+          this.departments = this.departments.map((department) => ({
+            ...department,
+            active: willActivate
+              ? this.userDepartments.includes(department.code)
+              : false,
+          }));
+          this.territorySelectAll = this.departments.every((d) => d.active);
+          this.$dispatch('selected-departments', this.departments);
+        }
+
+        this.myDepartmentsActive = willActivate;
+      },
       handleTerritorySelectAll(
         selectAll = !this.territorySelectAll,
         { init = false } = {}
@@ -86,6 +154,7 @@ Alpine.data(
             this.extractDepartmentFromSelectedRegions(this.regions)
           );
         }
+        this.updateMyDepartmentsActive();
       },
       handleRegionFilter(selectedRegion) {
         this.regions = this.regions.map((region) => {
@@ -107,6 +176,7 @@ Alpine.data(
           'selected-departments',
           this.extractDepartmentFromSelectedRegions(this.regions)
         );
+        this.updateMyDepartmentsActive();
       },
       handleDepartmentFilter(selectedDepartment) {
         this.regions = this.regions.map((region) => ({
@@ -131,6 +201,7 @@ Alpine.data(
           'selected-departments',
           this.extractDepartmentFromSelectedRegions(this.regions)
         );
+        this.updateMyDepartmentsActive();
       },
       extractDepartmentFromSelectedRegions(regions) {
         const extractedDepartements = regions
@@ -150,6 +221,7 @@ Alpine.data(
           active: this.territorySelectAll,
         }));
         this.$dispatch('selected-departments', this.departments);
+        this.updateMyDepartmentsActive();
       },
       handleTerritoryFilter(selectedDepartment, isInit = false) {
         this.departments = this.departments.map((department) => {
@@ -165,6 +237,7 @@ Alpine.data(
           this.departments.length;
 
         this.$dispatch('selected-departments', this.departments);
+        this.updateMyDepartmentsActive();
       },
     };
   }

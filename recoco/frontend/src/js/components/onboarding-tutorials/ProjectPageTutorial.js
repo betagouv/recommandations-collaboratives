@@ -43,6 +43,7 @@ Alpine.data('ProjectPageTutorial', () => {
       }
       if( localStorage.getItem('projectPageTutorialPopupOpen') === 'true' || localStorage.getItem('projectPageTutorialPopupOpen') === null ) {
         this.$store.tutorialsEvents.isTutorialPopupOpen = true;
+        this.$store.crisp.isPopupOpen = true;
       }
       // Watch for completion of step 1 triggered on role selection validation
       this.$watch(
@@ -159,10 +160,14 @@ Alpine.data('ProjectPageTutorial', () => {
     },
     handleTutorialPopup() {
       this.$store.tutorialsEvents.isTutorialPopupOpen = !this.$store.tutorialsEvents.isTutorialPopupOpen;
+      if (this.$store.tutorialsEvents.isTutorialPopupOpen) {
+        this.$store.crisp.isPopupOpen = true;
+      }
       localStorage.setItem('projectPageTutorialPopupOpen', this.$store.tutorialsEvents.isTutorialPopupOpen);
     },
     handleCloseTutorialPopup() {
       this.$store.tutorialsEvents.isTutorialPopupOpen = false;
+      this.$store.crisp.isPopupOpen = false;
       localStorage.setItem('projectPageTutorialPopupOpen', 'false');
     },
   };
