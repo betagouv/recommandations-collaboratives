@@ -18,12 +18,11 @@
                             {{ action.actor.last_name|default:"" }}
                         </a>
                         <span class="text-dark fw-normal font-italic font-small">{{ action.actor.profile.organization.name|default:'' }}</span>
-                        <span class="d-inline-block">
                             <span class="d-inline">
                                 {% if action.verb == verbs.Project.INVITATION %}
                                     {% if action.action_object.role %}
                                         <span>a invité
-                                            <strong class="d-inline-block fw-bold text-dark">{{ action.action_object.email }}</strong> en tant que
+                                            <strong class="fw-bold text-dark">{{ action.action_object.email }}</strong> en tant que
                                             {% if action.action_object.role == "SWITCHTENDER" or action.action_object.role == "OBSERVER" or action.action_object.role == "ADVISOR" %}
                                                 <strong class="text-dark">conseiller·e</strong> sur le dossier
                                             {% else %}
@@ -70,7 +69,7 @@
                                     {% endif %}
                                     {% if action.target %}
                                         {% if action.verb != verbs.Project.SUBMITTED_BY and action.verb != verbs.Project.VALIDATED_BY and action.verb != verbs.Project.LEFT_ADVISING and action.verb != verbs.Project.JOINED and action.verb != verbs.Project.BECAME_ADVISOR and action.verb != verbs.Project.BECAME_OBSERVER %}
-                                            <div class="d-inline-block fr-ml-1v">
+                                            <span class="fr-ml-1v">
                                                 {% if action.verb == verbs.Conversation.PUBLIC_MESSAGE or  action.verb == verbs.Conversation.PRIVATE_MESSAGE %}
                                                     <span>à propos de</span>
                                                 {% else %}
@@ -81,13 +80,12 @@
                                                 {% else %}
                                                     <strong class="fw-normal">{{ action.target }}</strong>
                                                 {% endif %}
-                                            </div>
+                                            </span>
                                         {% endif %}
                                     {% endif %}
                                 {% endif %}
                             </span>
                         </span>
-                    </span>
                 </div>
             </div>
         </div>
