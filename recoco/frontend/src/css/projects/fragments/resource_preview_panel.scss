@@ -87,6 +87,20 @@
     padding: 12px;
     border: 12px solid white;
     border-right: none;
+    position: relative;
+    &::after {
+      content: ' ';
+      position: absolute;
+      width: 0;
+      height: 0;
+      right: auto;
+      top: auto;
+      bottom: -12px;
+      border: 12px solid;
+      border-color: var(--background-alt-grey, #f6f6f6);
+      border-color: #f6f6f6 transparent transparent #f6f6f6;
+      border-radius: 6px;
+    }
 
     p {
       line-height: 1.6;
