@@ -1,6 +1,7 @@
 import '../store/tasksData.js';
 import '../store/tasks.js';
 import '../store/idbObjectStoreMgmt.js';
+import '../store/editor.js'
 import '../store/resourcePreviewPanel.js';
 
 import { renderMarkdown } from '../utils/markdown.js';
