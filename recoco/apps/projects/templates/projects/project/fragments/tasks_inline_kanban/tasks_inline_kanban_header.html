@@ -11,9 +11,13 @@
                     {% endif %}
                 </div>
                 {% if advising or is_staff %}
-                    <a href="{% url 'projects-project-tasks-suggest' project.pk %}"
-                        class="fr-btn fr-btn--secondary"
-                        data-test-id="see-suggest-task-button">Examiner les ressources suggérées</a>
+                    <div class="d-flex">
+                        <a href="{% url 'projects-project-tasks-exploration-ia' project.pk %}"
+                           class="fr-btn fr-btn--secondary fr-mr-2v fr-icon-lightbulb-line fr-btn--icon-left">Exploration assistée des ressources</a>
+                        <a href="{% url 'projects-project-tasks-suggest' project.pk %}"
+                           class="fr-btn fr-btn--secondary"
+                           data-test-id="see-suggest-task-button">Examiner les ressources suggérées</a>
+                    </div>
                 {% endif %}
             </div>
         </template>
@@ -27,11 +31,11 @@
                         {% include "projects/project/fragments/tasks_inline_kanban/tasks_inline_kanban_switcher.html" %}
                     {% endif %}
                 </div>
-                    {% if advising or is_staff %}
-                        <a href="{% url 'projects-project-tasks-suggest' project.pk %}"
-                            class="fr-btn fr-btn--secondary"
-                            data-test-id="see-suggest-task-button">Examiner les ressources suggérées</a>
-                    {% endif %}
+                {% if advising or is_staff %}
+                    <a href="{% url 'projects-project-tasks-suggest' project.pk %}"
+                       class="fr-btn fr-btn--secondary"
+                       data-test-id="see-suggest-task-button">Examiner les ressources suggérées</a>
+                {% endif %}
             </div>
         </template>
     </div>

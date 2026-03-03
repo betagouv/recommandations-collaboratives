@@ -95,6 +95,11 @@ urlpatterns = [
         tasks.presuggest_task,
         name="projects-project-tasks-suggest",
     ),
+    path(
+        r"project/<int:project_id>/exploration-ia/",
+        tasks.exploration_ia_task,
+        name="projects-project-tasks-exploration-ia",
+    ),
 ]
 
 # eof
