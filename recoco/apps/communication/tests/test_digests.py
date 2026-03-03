@@ -400,6 +400,8 @@ def test_notification_formatter(request, make_project):
     private_note = Recipe(
         projects_models.Note, content="my content", public=False
     ).make()
+    file = Recipe(projects_models.Document).make(the_file="toto")
+    link = Recipe(projects_models.Document).make(the_link="toto")
 
     followup = Recipe(tasks_models.TaskFollowup, task=task, comment="Hello!").make()
 
@@ -449,7 +451,7 @@ def test_notification_formatter(request, make_project):
             verbs.Project.SUBMITTED_BY,
             project,
             (
-                f"Bobi Joe (DuckCorp) {verbs.Project.SUBMITTED_BY}: 'Nice Project'",
+                f"Bobi Joe (DuckCorp) {verbs.Project.SUBMITTED_BY} : 'Nice Project'",
                 "Super description",
             ),
         ),
@@ -462,10 +464,18 @@ def test_notification_formatter(request, make_project):
             ),
         ),
         (
-            verbs.Document.ADDED,  # FIXME replace w/ ADDED_FILE ADDED_LINK
-            project,
+            verbs.Document.ADDED_FILE,
+            file,
             (
-                f"Bobi Joe (DuckCorp) {verbs.Document.ADDED}",
+                f"Bobi Joe (DuckCorp) {verbs.Document.ADDED_FILE} {file.feed_label()}",
+                None,
+            ),
+        ),
+        (
+            verbs.Document.ADDED_LINK,
+            link,
+            (
+                f"Bobi Joe (DuckCorp) {verbs.Document.ADDED_LINK} {link.feed_label()}",
                 None,
             ),
         ),
