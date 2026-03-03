@@ -10,10 +10,6 @@ from model_utils.models import TimeStampedModel
 from notifications.models import Notification
 from polymorphic.models import PolymorphicModel
 
-from recoco.apps.addressbook import models as addressbook_models
-from recoco.apps.projects import models as projects_models
-from recoco.apps.tasks import models as tasks_models
-
 
 class MessageNotDeletedManager(models.Manager):
     def get_queryset(self):
@@ -25,7 +21,7 @@ class Message(TimeStampedModel):
     not_deleted = MessageNotDeletedManager()
 
     project = models.ForeignKey(
-        projects_models.Project,
+        "projects.Project",
         on_delete=models.CASCADE,
         related_name="public_messages",
     )
@@ -93,7 +89,7 @@ class MarkdownNode(Node, MarkdownTextMixin):
 
 
 class RecommendationNode(Node, MarkdownTextMixin):
-    recommendation = models.ForeignKey(tasks_models.Task, on_delete=models.CASCADE)
+    recommendation = models.ForeignKey("tasks.Task", on_delete=models.CASCADE)
     count_label = "recommandation"
 
     def get_digest_recap(self):
@@ -114,11 +110,11 @@ class RecommendationNode(Node, MarkdownTextMixin):
 
 
 class ContactNode(Node):
-    contact = models.ForeignKey(addressbook_models.Contact, on_delete=models.CASCADE)
+    contact = models.ForeignKey("addressbook.Contact", on_delete=models.CASCADE)
     count_label = "contact"
 
     def get_digest_recap(self):
-        c: addressbook_models.Contact = self.contact
+        c = self.contact
         return {
             "type": "contact",
             "first_name": c.first_name,
@@ -132,7 +128,7 @@ class ContactNode(Node):
 
 
 class DocumentNode(Node):
-    document = models.ForeignKey(projects_models.Document, on_delete=models.CASCADE)
+    document = models.ForeignKey("projects.Document", on_delete=models.CASCADE)
     count_label = "document"
 
     def save(self, **kwargs):
@@ -148,5 +144,5 @@ class DocumentNode(Node):
             super().delete(**kwargs)
 
     def get_digest_recap(self):
-        d: projects_models.Document = self.document
+        d = self.document
         return {"type": "document", "name": d.filename()}

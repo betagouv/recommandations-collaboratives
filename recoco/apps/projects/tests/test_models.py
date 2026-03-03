@@ -19,6 +19,7 @@ from recoco.apps.projects.models import Document, Note
 from recoco.apps.tasks import models as task_models
 from recoco.apps.tasks.models import Task, TaskFollowup
 
+from ...conversations.models import Message
 from .. import models
 
 
@@ -119,7 +120,7 @@ def test_projectsite_queryset():
 def test_project_queryset_unread_notifications():
     project = baker.make(models.Project)
     user = baker.make(settings.AUTH_USER_MODEL)
-    public_note = baker.make(Note, project=project, public=True)
+    message = baker.make(Message, project=project)
     private_note = baker.make(Note, project=project, public=False)
 
     project_ct = ContentType.objects.get_for_model(models.Project)
@@ -127,6 +128,7 @@ def test_project_queryset_unread_notifications():
     task_followup_ct = ContentType.objects.get_for_model(TaskFollowup)
     note_ct = ContentType.objects.get_for_model(Note)
     document_ct = ContentType.objects.get_for_model(Document)
+    message_ct = ContentType.objects.get_for_model(Message)
 
     baker.make(
         Notification,
@@ -150,8 +152,8 @@ def test_project_queryset_unread_notifications():
         target_object_id=project.id,
         target_content_type=project_ct,
         unread=True,
-        action_object_content_type=note_ct,
-        action_object_object_id=public_note.id,
+        action_object_content_type=message_ct,
+        action_object_object_id=message.id,
     )
     baker.make(
         Notification,

@@ -8,6 +8,7 @@ created: 2022-04-20 10:11:56 CEST
 """
 
 import pytest
+from actstream import models as action_models
 from django.contrib.auth import models as auth_models
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
@@ -22,6 +23,7 @@ from recoco.apps.projects import models as projects_models
 from recoco.apps.projects.utils import assign_advisor, assign_collaborator
 from recoco.utils import has_perm, login
 
+from ... import verbs
 from . import api, models
 
 
@@ -307,6 +309,59 @@ def test_accept_invite_as_team_member_triggers_notification(request, client, pro
 
     assert response.status_code == 302
     assert membership.member.notifications.count() == 1
+
+
+@pytest.mark.django_db
+def test_accept_invite_as_team_member_triggers_action_trace(request, client, project):
+    current_site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=current_site)
+
+    membership = baker.make(
+        projects_models.ProjectMember, member__is_staff=False, is_owner=True
+    )
+
+    project.projectmember_set.add(membership)
+
+    with login(client, email="invited@here.tld", username="invited@here.tld") as user:
+        invite = Recipe(
+            models.Invite,
+            project=project,
+            site=current_site,
+            email=user.email,
+            role="COLLABORATOR",
+        ).make()
+        url = reverse("invites-invite-accept", args=[invite.pk])
+        response = client.post(url)
+
+    assert response.status_code == 302
+    assert action_models.Action.objects.filter(verb=verbs.Project.JOINED).count() == 1
+
+
+@pytest.mark.django_db
+def test_accept_invite_as_owner_triggers_specific_action_trace(
+    request, client, project
+):
+    current_site = get_current_site(request)
+    baker.make(home_models.SiteConfiguration, site=current_site)
+
+    with login(client, email="invited@here.tld", username="invited@here.tld") as user:
+        assign_collaborator(user, project, is_owner=True)
+        invite = Recipe(
+            models.Invite,
+            project=project,
+            site=current_site,
+            email=user.email,
+            role="COLLABORATOR",
+        ).make()
+
+        url = reverse("invites-invite-accept", args=[invite.pk])
+        response = client.post(url)
+
+    assert response.status_code == 302
+    assert (
+        action_models.Action.objects.filter(verb=verbs.Project.JOINED_OWNER).count()
+        == 1
+    )
 
 
 @pytest.mark.django_db
