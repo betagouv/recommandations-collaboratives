@@ -199,9 +199,14 @@ urlpatterns = [
         name="projects-project-administration",
     ),
     path(
-        r"project/<int:project_id>/administration/<int:user_id>/promote/",
+        r"project/<int:project_id>/administration/<int:user_id>/promote-referent/",
         administration.promote_collaborator_as_referent,
         name="projects-project-promote-referent",
+    ),
+    path(
+        r"project/<int:project_id>/administration/<int:user_id>/promote-advisor/",
+        administration.promote_collaborator_as_advisor,
+        name="projects-project-promote-advisor",
     ),
     path(
         r"project/<int:project_id>/administration/access/collectivity/invite",
