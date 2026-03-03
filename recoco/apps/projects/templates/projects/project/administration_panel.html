@@ -218,6 +218,17 @@
                                     {% include "user/user_card.html" with user=pm.member user_activity=True %}
                                     <div class="d-flex align-items-center">
                                         {% if is_staff %}
+                                            <form id="form-projects-access-promote-advisor"
+                                                  class="fr-mr-2v"
+                                                  action="{% url 'projects-project-promote-advisor' project.pk pm.member.pk %}"
+                                                  method="post">
+                                                {% csrf_token %}
+                                                <button data-bs-toggle="tooltip"
+                                                        data-bs-title="Accorder les droits Conseiller sur ce dossier"
+                                                        class="fr-btn fr-btn--secondary fr-icon-magic-fill">
+                                                    Accorder les droits Conseiller sur ce dossier
+                                                </button>
+                                            </form>
                                             <form id="form-projects-access-promote-user"
                                                   class="fr-mr-2v"
                                                   action="{% url 'projects-project-promote-referent' project.pk pm.member.pk %}"
