@@ -16,7 +16,6 @@ class User:
 
 
 class Document:
-    ADDED = "a ajouté un lien ou un document"
     ADDED_FILE = "a ajouté le document"
     ADDED_LINK = "a ajouté le lien"
 

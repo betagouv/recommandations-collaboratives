@@ -38,33 +38,23 @@
                                         </span>
                                     {% endif %}
                                 {% else %}
-                                    {% if action.verb == verbs.Document.ADDED %}
-                                        a ajouté
-                                        {% if action.action_object.the_link %}le lien{% endif %}
-                                        {% if action.action_object.the_file %}le document{% endif %}
-                                            <a class="d-inline hover-underline"
-                                               href="{{ action.action_object.get_absolute_url }}">
-                                                {{ action.action_object.feed_label }}
-                                            </a>
+                                    {% if action.action_object.feed_label %}
+                                        {{ action.verb }}
+                                        <a class="d-inline hover-underline"
+                                           href="{{ action.action_object.get_absolute_url }}">
+                                            {{ action.action_object.feed_label }}
+                                        </a>
                                     {% else %}
-                                        {% if action.action_object.feed_label %}
-                                            {{ action.verb }}
+                                        <span>{{ action.verb }}</span>
+                                        {% if action.verb != verbs.Project.SUBMITTED_BY and action.verb != verbs.Survey.UPDATED and action.verb != verbs.Survey.STARTED %}
                                             <a class="d-inline hover-underline"
                                                href="{{ action.action_object.get_absolute_url }}">
-                                                {{ action.action_object.feed_label }}
+                                                {% if action.verb == verbs.Conversation.POST_MESSAGE or action.verb == verbs.Conversation.PRIVATE_MESSAGE %}
+                                                    ici
+                                                {% else %}
+                                                    {% if action.action_object %}"{{ action.action_object }}"{% endif %}
+                                                {% endif %}
                                             </a>
-                                        {% else %}
-                                            <span>{{ action.verb }}</span>
-                                            {% if action.verb != verbs.Project.SUBMITTED_BY and action.verb != verbs.Survey.UPDATED and action.verb != verbs.Survey.STARTED %}
-                                                <a class="d-inline hover-underline"
-                                                   href="{{ action.action_object.get_absolute_url }}">
-                                                    {% if action.verb == verbs.Conversation.POST_MESSAGE or action.verb == verbs.Conversation.PRIVATE_MESSAGE %}
-                                                        ici
-                                                    {% else %}
-                                                        {% if action.action_object %}"{{ action.action_object }}"{% endif %}
-                                                    {% endif %}
-                                                </a>
-                                            {% endif %}
                                         {% endif %}
                                     {% endif %}
                                     {% if action.target %}
