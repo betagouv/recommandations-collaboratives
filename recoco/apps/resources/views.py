@@ -305,7 +305,8 @@ class DuplicateResourceView(
             new_resource.sites.set([current_site])
             new_resource.tags.set(resource_to_copy.tags.all())
 
-        return redirect("resources-resource-update", new_resource.id)
+        url = reverse("resources-resource-update", args=[new_resource.id])
+        return redirect(f"{url}?is_duplicate=true")
 
 
 class ResourceDetailView(UserPassesTestMixin, BaseResourceDetailView):
@@ -364,7 +365,7 @@ class EmbededResourceDetailView(BaseResourceDetailView):
 class ResourceDeleteView(UserPassesTestMixin, DeleteView):
     model = models.Resource
     template_name = "resources/resource/delete.html"
-    success_url = reverse_lazy("resources-resource-search")
+    success_url = reverse_lazy("crm-resource-list")
     pk_url_kwarg = "resource_id"
 
     def form_valid(self, form):
