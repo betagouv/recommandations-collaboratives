@@ -212,6 +212,8 @@ const config = {
         ),
         projectDetailsStyles: resolve('./src/js/styles/project-details.css.js'),
         resourceListCrm: resolve('./src/js/apps/CRM/resourceListCrm.js'),
+        explorationIA: resolve('./src/js/apps/explorationIA.js'),
+        explorationIAStyles: resolve('./src/js/styles/exploration-ia.css.js'),
       },
       output: {
         chunkFileNames: undefined,

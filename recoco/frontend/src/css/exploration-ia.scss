@@ -1,0 +1,117 @@
+.exploration-ia {
+  &__header {
+    margin-bottom: 1.5rem;
+  }
+
+  &__stepper {
+    margin-bottom: 2rem;
+  }
+}
+
+.exploration-ia-card {
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  border: 2px solid transparent;
+  background-color: #ffffff;
+
+  &:hover {
+    border-color: var(--light-accent-blue-france, #000091);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  &--selected {
+    border-color: var(--light-accent-green-emeraude, #00a95f);
+    background-color: var(
+      --light-background-action-low-green-emeraude,
+      #e3fdeb
+    );
+
+    &:hover {
+      border-color: var(--light-accent-green-emeraude, #00a95f);
+    }
+  }
+
+  .card-body {
+    min-height: 150px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .card-title {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--light-text-title-grey, #161616);
+  }
+
+  .card-text {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    color: var(--light-text-mention-grey, #666);
+    font-size: 0.85rem;
+    flex-grow: 1;
+  }
+
+  .card-footer {
+    font-size: 0.8rem;
+  }
+}
+
+.exploration-ia-history {
+  &__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+}
+
+.exploration-ia-synthesis {
+  &__section {
+    margin-bottom: 2rem;
+
+    h3 {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+  }
+
+  &__empty {
+    color: var(--light-text-mention-grey, #666);
+    font-style: italic;
+    padding: 1rem;
+    background-color: var(--light-background-alt-grey, #f6f6f6);
+    border-radius: 4px;
+  }
+}
+
+// Animation pour le chargement
+.exploration-ia-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1rem;
+
+  .spinner-border {
+    width: 3rem;
+    height: 3rem;
+  }
+}
+
+// Badge de score
+.exploration-ia-score {
+  font-size: 0.75rem;
+  padding: 0.15rem 0.4rem;
+  background-color: var(--light-background-alt-grey, #f6f6f6);
+  border-radius: 4px;
+}
