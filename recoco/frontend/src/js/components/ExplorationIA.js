@@ -58,7 +58,9 @@ Alpine.data('ExplorationIA', (config = {}) => ({
       }
 
       const data = await response.json();
+      console.log('ExplorationIA API response:', data);
       this.results = this.mapResults(data);
+      console.log('ExplorationIA mapped results:', this.results);
     } catch (err) {
       this.error = 'Erreur lors de la recherche. Veuillez reessayer.';
       console.error('ExplorationIA search error:', err);
@@ -72,17 +74,24 @@ Alpine.data('ExplorationIA', (config = {}) => ({
   },
 
   mapResults(apiResponse) {
+    // L'API renvoie un tableau de [document, score]
     // Adapter la reponse API au format interne
-    return (apiResponse || []).map((item) => ({
-      id: item.id,
-      title: item.metadata?.title || 'Sans titre',
-      resourceId: item.metadata?.resource_id,
-      startIndex: item.metadata?.start_index,
-      content: item.page_content || '',
-      type: item.type || 'resource',
-      score: item.score || 0,
-      isSelected: false,
-    }));
+    return (apiResponse || []).map((item) => {
+      // Chaque item est un tableau [document, score]
+      const doc = Array.isArray(item) ? item[0] : item;
+      const score = Array.isArray(item) ? item[1] : item.score || 0;
+
+      return {
+        id: doc.id,
+        title: doc.metadata?.title || 'Sans titre',
+        resourceId: doc.metadata?.resource_id,
+        startIndex: doc.metadata?.start_index,
+        content: doc.page_content || '',
+        type: doc.type || 'resource',
+        score: score,
+        isSelected: false,
+      };
+    });
   },
 
   // === SELECTION ===
