@@ -7,10 +7,11 @@ authors: raphael.marvie@beta.gouv.fr, guillaume.libersat@beta.gouv.fr
 created: 2021-06-16 17:56:10 CEST
 """
 
-from datetime import datetime
+from datetime import date, datetime
 
 import pytest
 import reversion
+from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.contrib.sites.shortcuts import get_current_site
 from django.db import transaction
@@ -25,6 +26,7 @@ from recoco.apps.addressbook.models import Contact
 from recoco.apps.geomatics import models as geomatics
 from recoco.apps.hitcount.models import Hit, HitCount
 from recoco.apps.projects import models as projects_models
+from recoco.apps.resources import models as resources_models
 from recoco.apps.tasks.models import Task
 from recoco.utils import login
 
@@ -306,6 +308,73 @@ def test_resource_list_contains_only_published(current_site, client):
     assertContains(response, detail_url)
     detail_url = reverse("resources-resource-detail", args=[resource2.id])
     assertNotContains(response, detail_url)
+
+
+#
+# duplication
+
+
+@pytest.mark.django_db
+def test_duplication_creates_new_resource(request, client, current_site):
+    old_resource = Recipe(
+        models.Resource,
+        status=models.Resource.PUBLISHED,
+        sites=[get_current_site(request), baker.make(Site)],
+        title="A Nice title",
+        expires_on=date(2022, 12, 12),
+        created_by=baker.make(User),
+        imported_from="https://toto.com",
+        category=baker.make(resources_models.Category),
+        subtitle="sous-titre",
+        summary="ceci est un résumé",
+        content="ceci est un contenu",
+        support_orga="Organisation porteuse",
+    ).make()
+    old_resource.tags.set("tag1 tag2")
+    url = reverse("resources-resource-duplicate", args=[old_resource.id])
+
+    with login(client, groups=["example_com_advisor"]) as user:
+        response = client.post(url, follow=True)
+        assert response.status_code == 200
+        last_url, status_code = response.redirect_chain[-1]
+        assert status_code == 302
+
+        assert models.Resource.objects.count() == 2
+
+        new_resource = models.Resource.objects.exclude(id=old_resource.id).first()
+
+        assert last_url == reverse("resources-resource-update", args=(new_resource.id,))
+
+        assert new_resource.site_origin == current_site
+        assert new_resource.status == models.Resource.DRAFT
+        assert new_resource.expires_on is None
+        assert new_resource.created_by == user
+        assert new_resource.imported_from == old_resource.imported_from
+        assert new_resource.category == old_resource.category
+        assert new_resource.title == old_resource.title
+        assert new_resource.subtitle == old_resource.subtitle
+        assert new_resource.summary == old_resource.summary
+        assert new_resource.content == old_resource.content
+        assert new_resource.support_orga == old_resource.support_orga
+
+        assert list(new_resource.tags.all()) == list(old_resource.tags.all())
+        assert list(new_resource.sites.all()) == [current_site]
+
+
+@pytest.mark.django_db
+def test_duplication_needs_permission(request, client, current_site):
+    old_resource = Recipe(
+        models.Resource,
+        status=models.Resource.PUBLISHED,
+        sites=[get_current_site(request)],
+        title="A Nice title",
+    ).make()
+    url = reverse("resources-resource-duplicate", args=[old_resource.id])
+
+    with login(client):
+        response = client.post(url, follow=True)
+        assert response.status_code == 403
+        assert models.Resource.objects.count() == 1
 
 
 #

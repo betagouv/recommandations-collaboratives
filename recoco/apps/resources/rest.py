@@ -65,6 +65,8 @@ class ResourceViewSet(viewsets.ModelViewSet):
                 site_id=self.request.site,
                 resource_id=OuterRef("pk"),
             )
+            .order_by()
+            .values("resource")
             .annotate(c=Count("*"))
             .values_list("c", flat=True)
         )

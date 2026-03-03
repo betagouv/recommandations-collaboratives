@@ -109,6 +109,10 @@ def invite_accept(request, invite_id):
                     projects_signals.project_member_joined.send(
                         sender=request.user, project=project
                     )
+                elif project.owner == user:
+                    projects_signals.project_owner_joined.send(
+                        sender=request.user, project=project
+                    )
 
             invite.accepted_on = timezone.now()
             invite.save()
