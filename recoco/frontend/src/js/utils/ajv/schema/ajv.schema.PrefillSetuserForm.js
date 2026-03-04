@@ -2,6 +2,7 @@ import {
   schemaFormInputs,
   maxLengthErrorMessage,
   minLengthErrorMessage,
+  textOptional,
 } from './ajv.schema.forms';
 
 /**
@@ -40,7 +41,7 @@ export const schemaOnboardingPrefillSetuserFormValidator = {
       ],
     },
     role: { $ref: '#/definitions/text' },
-    message: { $ref: '#/definitions/text' },
+    message: textOptional(3, 100),
     email: { $ref: '#/definitions/email' },
     phone: { $ref: '#/definitions/phone' },
   },
