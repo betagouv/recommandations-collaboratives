@@ -82,3 +82,8 @@
 .fr-icon-file-copy-2-line::before {
   mask-image: url(../assets/file-copy-2-line.svg);
 }
+
+.fr-icon-magic-fill::after,
+.fr-icon-magic-fill::before {
+  mask-image: url(../assets/magic-fill.svg);
+}

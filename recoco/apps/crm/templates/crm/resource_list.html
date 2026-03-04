@@ -66,7 +66,7 @@
                             <th scope="col" class="column column--small">Catégorie</th>
                             <th scope="col" class="column column--small">Date d'expiration</th>
                             <th scope="col" class="column column--small">Statut</th>
-                            {% comment %} <th scope="col" class="column column--small">Nb d'utilisations</th> {% endcomment %}
+                            <th scope="col" class="column column--small">Nb d'utilisations</th>
                             <th scope="col" class="column column--small">Actions</th>
                         </tr>
                     </thead>
@@ -107,8 +107,8 @@
                                           x-tooltip="resourceTooltip(resource)"
                                           :class="resourceStatusColor(resource.status)"></span>
                                 </td>
-                                {% comment %} <!-- Number of uses -->
-                                <td class="resource-table__status">--</td> {% endcomment %}
+                                <!-- Number of uses -->
+                                <td class="resource-table__status" x-text="resource.nb_uses"></td>
                                 <!-- Actions -->
                                 <td class="d-flex">
                                     <!-- Go to resource page -->
