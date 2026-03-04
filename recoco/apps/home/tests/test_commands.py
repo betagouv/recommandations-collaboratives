@@ -9,8 +9,10 @@ created: 2023-07-10 14:07:17 CEST
 
 from datetime import datetime
 from io import StringIO
+from unittest.mock import patch
 
 import pytest
+from actstream.models import Action
 from allauth.account.models import EmailAddress
 from allauth.socialaccount.models import SocialAccount
 from django.conf import settings
@@ -321,6 +323,38 @@ def test_command_deletes(user_to_delete, mocker, current_site):
     assert not Note.objects.filter(
         content_type_id=user_content_type.id, object_id=user_to_delete.id
     ).exists()
+
+
+@pytest.mark.django_db
+@patch("builtins.input", return_value="yes")
+def test_command_update_verbs(input, current_site):
+    v1_old = "old v1"
+    v1_new = "new v1"
+    v2_old = "old v2"
+    v2_new = "new v2"
+    v3_still = "v3"
+
+    changes = [{"old": v1_old, "new": v1_new}, {"old": v2_old, "new": v2_new}]
+
+    action1_v1 = baker.make(Action, verb=v1_old, site=current_site)
+    action2_v1 = baker.make(Action, verb=v1_old, site=current_site)
+    baker.make(Action, verb=v3_still, site=current_site)
+
+    from recoco.apps.home.management.commands.update_verbs import (
+        Command as UpdateVerbCommand,
+    )
+
+    cmd = UpdateVerbCommand()
+    cmd.update(changes)
+
+    assert not Action.objects.filter(verb=v1_old).exists()
+    action1_v1.refresh_from_db()
+    action2_v1.refresh_from_db()
+    assert action1_v1.verb == v1_new
+    assert action2_v1.verb == v1_new
+    assert (
+        Action.objects.filter(verb=v3_still).count() == 1
+    )  # does not touch actions that should not be impacted
 
 
 # # eof
