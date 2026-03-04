@@ -25,7 +25,9 @@ class Command(BaseCommand):
                         "new": row["new"].replace("'", "''"),
                     }
                 )
+        return matching
 
+    def save_matching(self, matching):
         query = (  # noqa: S608
             "INSERT INTO verb_mapping (old, new) VALUES \n"  # noqa: S608
             + ",\n".join(f"('{row['old']}', '{row['new']}')" for row in matching)  # noqa: S608 need access to server to be a pb
@@ -88,9 +90,13 @@ class Command(BaseCommand):
             self.stdout.write("commit changes")
             cursor.execute("COMMIT ;")
 
-    def handle(self, *args, **options):
-        matching_path = options["matching_path"]
-        self.parse_matching(matching_path)
+    def update(self, matching):
+        self.save_matching(matching)
         self.update_verbs()
         self.display_all_verbs_to_check()
         self.clean_temp_db_and_commit()
+
+    def handle(self, *args, **options):
+        matching_path = options["matching_path"]
+        matching = self.parse_matching(matching_path)
+        self.update(matching)
