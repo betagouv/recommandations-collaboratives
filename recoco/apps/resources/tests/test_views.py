@@ -345,7 +345,7 @@ def test_duplication_creates_new_resource(request, client, current_site):
 
         assert (
             last_url
-            == f"{reverse('resources-resource-update', args=[new_resource.id])}?is_duplicate=true"
+            == reverse('resources-resource-update', args=[new_resource.id], query={"is_duplicate": True})
         )
 
         assert new_resource.site_origin == current_site
