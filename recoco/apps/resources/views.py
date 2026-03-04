@@ -305,8 +305,7 @@ class DuplicateResourceView(
             new_resource.sites.set([current_site])
             new_resource.tags.set(resource_to_copy.tags.all())
 
-        url = reverse("resources-resource-update", args=[new_resource.id])
-        return redirect(f"{url}?is_duplicate=true")
+        return redirect(reverse("resources-resource-update", args=[new_resource.id], query={"is_duplicate": True}))
 
 
 class ResourceDetailView(UserPassesTestMixin, BaseResourceDetailView):
