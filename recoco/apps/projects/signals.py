@@ -236,7 +236,7 @@ def delete_joined_on_switchtender_leaved_if_same_day(sender, project, **kwargs):
 def log_project_member_joined(sender, project, **kwargs):
     action.send(
         sender,
-        verb=verbs.Project.JOINED,
+        verb=verbs.Project.JOINED_BY_INVITATION,
         action_object=project,
         target=project,
     )
@@ -259,7 +259,7 @@ def notify_project_member_joined(sender, project, **kwargs):
 
     notification = {
         "sender": sender,
-        "verb": verbs.Project.JOINED,
+        "verb": verbs.Project.JOINED_BY_INVITATION,
         "action_object": project,
         "target": project,
     }

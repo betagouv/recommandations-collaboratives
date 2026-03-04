@@ -125,7 +125,7 @@ def mark_notifications_as_seen(user, project):
         verbs.Project.BECAME_SWITCHTENDER,
         verbs.Project.BECAME_ADVISOR,
         verbs.Project.BECAME_OBSERVER,
-        verbs.Project.JOINED,
+        verbs.Project.JOINED_BY_INVITATION,
         verbs.Project.JOINED_OWNER,
         verbs.Project.NEW_OWNER,
         verbs.Project.SUBMITTED_BY,

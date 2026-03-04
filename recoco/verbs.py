@@ -45,7 +45,7 @@ class Project:
     INVITATION = "a invité un·e collaborateur·rice à rejoindre le dossier"
     INVITATION_OWNER = "a invité en tant que référent"
 
-    JOINED = "a accepté l'invitation"
+    JOINED_BY_INVITATION = "a accepté l'invitation"
     JOINED_OWNER = "a rejoint en tant que référent le dossier"
     NEW_OWNER = "est dorénavant référent sur le dossier"
 

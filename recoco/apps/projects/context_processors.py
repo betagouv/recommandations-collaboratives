@@ -63,7 +63,7 @@ def unread_notifications_processor(request):
         verbs.Survey.STARTED,
         verbs.Survey.UPDATED,
         verbs.Project.INVITATION,
-        verbs.Project.JOINED,
+        verbs.Project.JOINED_BY_INVITATION,
         verbs.Project.JOINED_OWNER,
         verbs.Project.NEW_OWNER,
         verbs.Project.UPDATE_ADVISORS_NOTE,
