@@ -456,6 +456,14 @@ def test_notification_formatter(request, make_project):
             ),
         ),
         (
+            verbs.Project.SUBMITTED_BY_ADVISOR,
+            project,
+            (
+                f"Bobi Joe (DuckCorp) {verbs.Project.SUBMITTED_BY_ADVISOR} : 'Nice Project'",
+                "Super description",
+            ),
+        ),
+        (
             verbs.Project.AVAILABLE,  # FIXME redondant avec VALIDATED
             project,
             (
