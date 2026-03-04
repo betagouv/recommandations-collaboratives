@@ -22,6 +22,7 @@
                          :class="user.is_active ? 'border-0' : 'neutral-role-border border-2'"
                          :src='gravatar_url(currentUser.email, 18, `${currentUser.first_name} ${currentUser.last_name}`, stringToColor(currentUser.email) )'
                          :style="{ '--current-bg-color': stringToColor(currentUser.email) }"
+                         :data-gravatar-key="`${currentUser.email}-18`"
                          :alt="`${currentUser.first_name} ${currentUser.last_name}`">
                     <template x-if="currentUser">
                         <strong class="user-card__name text-nowrap text-capitalize"

@@ -43,6 +43,19 @@
   padding: 0;
 }
 
+// Customize
+
+.container {
+  --bs-bg-opacity: 1;
+  background-color: rgba(var(--bs-white-rgb), var(--bs-bg-opacity));
+  border: var(--bs-border-width) var(--bs-border-style) var(--bs-border-color);
+  border-radius: var(--bs-border-radius, 0.375rem);
+  &__button {
+    margin-left: auto;
+    border-left: 1px solid var(--light-border-default-grey, #e5e5e5);
+  }
+}
+
 @media screen and (max-height: 720px) {
   .max-h-80 {
     max-height: 10rem;

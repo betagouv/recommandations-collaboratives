@@ -30,7 +30,7 @@ from django.template import TemplateDoesNotExist
 from django.template.loader import get_template
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
-from django.views.generic.detail import DetailView, View
+from django.views.generic.detail import DetailView, SingleObjectMixin, View
 from django.views.generic.edit import DeleteView
 from markdownx.fields import MarkdownxFormField
 from reversion.models import Version
@@ -56,19 +56,35 @@ def resource_search(request):
     form.is_valid()
     query = form.cleaned_data.get("query", "")
 
-    limit_area = form.cleaned_data.get("limit_area")
+    limit_areas = request.GET.getlist("limit_area")
+
     searching = form.cleaned_data.get("searching", False)
 
-    if (not searching) and (limit_area is None):
-        limit_area = "AUTO"
+    # Get user's own departments (for "Mes départements" shortcut)
+    user_departments_codes = []
+    if request.user.is_authenticated and request.user.profile:
+        if check_if_advisor(request.user, request.site):
+            user_departments_codes = list(
+                request.user.profile.departments.values_list("code", flat=True)
+            )
+        else:
+            user_departments_codes = list(
+                geomatics_models.Department.objects.filter(
+                    commune__in=projects.Project.on_site.filter(
+                        members=request.user
+                    ).values("commune")
+                ).values_list("code", flat=True)
+            )
+
+    # Auto-filter on first arrival for users with departments
+    if not searching and not limit_areas and user_departments_codes:
+        limit_areas = list(user_departments_codes)
+
+    select_all_departments = not bool(limit_areas)
 
     categories = form.selected_categories
 
-    resources = (
-        models.Resource.search(query, categories)
-        .select_related("category")
-        .prefetch_related("task_recommendations")
-    )
+    resources = models.Resource.search(query, categories)
 
     if form.cleaned_data.get("no_category", False):
         resources = resources.filter(category__isnull=True)
@@ -80,43 +96,26 @@ def resource_search(request):
             imported_from=None
         )
 
-    # If we are a advisor, allow any departement to be filtered
-    # Otherwise, show only departments related to my projects
-    departments = geomatics_models.Department.objects.none()
+    # Determine available departments based on user role
     if check_if_advisor(request.user):
         departments = geomatics_models.Department.objects.order_by("name").all()
-        if limit_area:
-            selected_departments = geomatics_models.Department.objects.none()
-            if limit_area == "AUTO":
-                # Select departments from profile
-                user_departments = request.user.profile.departments.all()
-                if user_departments:
-                    selected_departments = geomatics_models.Department.objects.filter(
-                        code__in=user_departments
-                    )
-                else:
-                    limit_area = None
-            else:
-                # Get current one from parameters
-                selected_departments = geomatics_models.Department.objects.filter(
-                    code=limit_area
-                )
-
-            if selected_departments:
-                resources = resources.limit_area(selected_departments)
-
+    elif request.user.is_authenticated:
+        departments = geomatics_models.Department.objects.filter(
+            commune__in=projects.Project.on_site.filter(members=request.user).values(
+                "commune"
+            )
+        )
     else:
-        communes = []
-        if hasattr(request.user, "email"):
-            communes = [
-                p.commune for p in projects.Project.on_site.filter(members=request.user)
-            ]
-            if not communes:
-                limit_area = None  # does not apply if no projects
+        departments = geomatics_models.Department.objects.none()
 
-            departments = set(c.department for c in communes if c)
-            if limit_area:
-                resources = resources.limit_area(departments)
+    # Apply department filter from URL parameters
+    if limit_areas:
+        selected_departments_qs = geomatics_models.Department.objects.filter(
+            code__in=limit_areas
+        )
+
+        if selected_departments_qs.exists():
+            resources = resources.limit_area(selected_departments_qs)
 
     # staff can search resources
     staff_redux = Q()
@@ -141,6 +140,16 @@ def resource_search(request):
         staff_redux |= Q(status=models.Resource.PUBLISHED)
 
     resources = resources.filter(staff_redux)
+
+    category_options = [
+        {"value": str(c.id), "text": str(c), "search": str(c)}
+        for c in models.Category.on_site.all()
+    ]
+
+    # prefetch and select related must be after all filters, else they are useless
+    resources = resources.select_related("category").prefetch_related(
+        "task_recommendations"
+    )
 
     return render(
         request,
@@ -263,6 +272,43 @@ class BaseResourceDetailView(DetailView):
         return context
 
 
+class DuplicateResourceView(
+    LoginRequiredMixin, PermissionRequiredMixin, SingleObjectMixin, View
+):
+    model = models.Resource
+    permission_required = "sites.manage_resources"
+    http_method_names = ["post"]
+    pk_url_kwarg = "resource_id"
+
+    def has_permission(self):
+        site = get_current_site(self.request)
+        return self.request.user.has_perm(self.permission_required, site)
+
+    def post(self, request, *args, **kwargs):
+        current_site = get_current_site(request)
+        resource_to_copy = self.get_object()
+
+        with transaction.atomic():
+            new_resource = models.Resource.objects.create(
+                site_origin=current_site,
+                status=models.Resource.DRAFT,
+                created_by=request.user,
+                imported_from=resource_to_copy.imported_from,
+                category=resource_to_copy.category,
+                title=resource_to_copy.title,
+                subtitle=resource_to_copy.subtitle,
+                summary=resource_to_copy.summary,
+                content=resource_to_copy.content,
+                support_orga=resource_to_copy.support_orga,
+            )
+
+            new_resource.sites.set([current_site])
+            new_resource.tags.set(resource_to_copy.tags.all())
+
+        url = reverse("resources-resource-update", args=[new_resource.id])
+        return redirect(f"{url}?is_duplicate=true")
+
+
 class ResourceDetailView(UserPassesTestMixin, BaseResourceDetailView):
     model = models.Resource
     template_name = "resources/resource/details.html"
@@ -319,7 +365,7 @@ class EmbededResourceDetailView(BaseResourceDetailView):
 class ResourceDeleteView(UserPassesTestMixin, DeleteView):
     model = models.Resource
     template_name = "resources/resource/delete.html"
-    success_url = reverse_lazy("resources-resource-search")
+    success_url = reverse_lazy("crm-resource-list")
     pk_url_kwarg = "resource_id"
 
     def form_valid(self, form):
@@ -358,6 +404,11 @@ def resource_update(request, resource_id=None):
     has_perm_or_403(request.user, "sites.manage_resources", request.site)
 
     resource = get_object_or_404(models.Resource, pk=resource_id)
+    selected_departments = list(resource.departments.values_list("code", flat=True))
+
+    categories = list(
+        models.Category.on_site.values("id", "name", "color", "icon").order_by("name")
+    )
 
     if request.method == "POST":
         form = EditResourceForm(request.POST, instance=resource)
@@ -409,6 +460,10 @@ def resource_create(request):
     """
     has_perm_or_403(request.user, "sites.manage_resources", request.site)
 
+    categories = list(
+        models.Category.on_site.values("id", "name", "color", "icon").order_by("name")
+    )
+
     if request.method == "POST":
         form = EditResourceForm(request.POST)
         if form.is_valid():
@@ -425,7 +480,14 @@ def resource_create(request):
             return redirect(next_url)
     else:
         form = EditResourceForm()
-    return render(request, "resources/resource/create.html", locals())
+    return render(
+        request,
+        "resources/resource/create.html",
+        {
+            "categories": categories,
+            "form": form,
+        },
+    )
 
 
 class EditResourceForm(forms.ModelForm):

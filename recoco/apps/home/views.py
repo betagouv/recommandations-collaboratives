@@ -8,6 +8,7 @@ created: 2021-08-16 15:40:08 CEST
 """
 
 import django.core.mail
+from actstream import action
 from django.contrib import messages
 from django.contrib.auth import login as log_user
 from django.contrib.auth import models as auth
@@ -22,6 +23,7 @@ from django.utils.decorators import method_decorator
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.generic import FormView, View
 from django.views.generic.base import TemplateView
+from notifications.signals import notify
 
 from recoco.apps.geomatics.models import Department
 from recoco.apps.projects import models as projects
@@ -31,8 +33,9 @@ from recoco.apps.projects.utils import (
 )
 from recoco.apps.resources import models as resources_models
 from recoco.apps.tasks import models as tasks
-from recoco.utils import check_if_advisor
+from recoco.utils import check_if_advisor, get_admin_for_site, get_staff_for_site
 
+from ... import verbs
 from . import models
 from .forms import (
     AdvisorAccessRequestForm,
@@ -319,7 +322,8 @@ def advisor_access_request_view(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         form = AdvisorAccessRequestForm(request.POST)
         if form.is_valid():
-            if not advisor_access_request:
+            new_request = not advisor_access_request
+            if new_request:
                 advisor_access_request = AdvisorAccessRequest(
                     site=request.site, user=request.user
                 )
@@ -328,6 +332,23 @@ def advisor_access_request_view(request: HttpRequest) -> HttpResponse:
             advisor_access_request.save()
 
             advisor_access_request.departments.set(form.cleaned_data["departments"])
+
+            if new_request:
+                notify.send(
+                    sender=advisor_access_request.user,
+                    recipient=list(
+                        set(get_admin_for_site(request.site)).union(
+                            get_staff_for_site(request.site)
+                        )
+                    ),
+                    verb=verbs.User.ADVISOR_REQUEST,
+                    action_object=advisor_access_request,
+                )
+                action.send(
+                    sender=advisor_access_request.user,
+                    verb=verbs.User.ADVISOR_REQUEST,
+                    action_object=advisor_access_request,
+                )
 
     return render(
         request,

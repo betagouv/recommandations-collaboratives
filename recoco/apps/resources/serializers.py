@@ -48,9 +48,12 @@ class ResourceSerializer(
             "support_orga",
             "departments",
             "created_by",
+            "expires_on",
+            "nb_uses",
         ]
         read_only_fields = [
             "created_by",
+            "nb_uses",
         ]
 
     web_url = serializers.URLField(source="get_absolute_url", read_only=True)
@@ -62,6 +65,7 @@ class ResourceSerializer(
     departments = serializers.PrimaryKeyRelatedField(
         queryset=Department.objects, many=True
     )
+    nb_uses = serializers.IntegerField(required=False)
 
 
 class ResourceDetailSerializer(ResourceSerializer):
@@ -71,6 +75,7 @@ class ResourceDetailSerializer(ResourceSerializer):
             "content",
             "created_on",
             "updated_on",
+            "nb_uses",
             "contacts",
             "expires_on",
             "expired",
@@ -79,14 +84,11 @@ class ResourceDetailSerializer(ResourceSerializer):
             "created_on",
             "updated_on",
             "created_by",
-            "expires_on",
+            "nb_uses",
         ]
 
     contacts = serializers.PrimaryKeyRelatedField(queryset=Contact.objects, many=True)
-    expired = serializers.SerializerMethodField()
-
-    def get_expired(self, obj):
-        return obj.expired
+    nb_uses = serializers.IntegerField(required=False)
 
 
 class ResourceWritableSerializer(ResourceDetailSerializer):

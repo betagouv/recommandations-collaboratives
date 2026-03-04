@@ -15,8 +15,9 @@ export class LocalStorageMgmt {
     tag = null,
     expiringData = false,
     expiringTime = null,
+    version = '0.1.0',
   }) {
-    this.version = '0.1.0';
+    this.version = version;
     this.fullDataLabel = `${dataLabel}${tag ? `-${tag}` : ''}`;
     this.expiringData = expiringData;
     this.expiringTime = expiringTime;

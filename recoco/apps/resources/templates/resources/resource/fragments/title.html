@@ -1,4 +1,13 @@
-{% if resource.title %}<h1 class="title-primary text-black">{{ resource.title|capfirst }}</h1>{% endif %}
+{% if resource.title %}
+    <h1 class="title-primary text-black {% if resource.support_orga %}fr-mb-1v{% endif %}">
+        {{ resource.title|capfirst }}
+    </h1>
+{% endif %}
+{% if resource.support_orga %}
+    <div class="fr-mb-1w">
+        <span class="subtitle-primary text-black-secondary">{{ resource.support_orga|upper }}</span>
+    </div>
+{% endif %}
 {% if resource.subtitle %}
     <span class="subtitle-primary text-black-secondary">{{ resource.subtitle|capfirst }}</span>
 {% endif %}

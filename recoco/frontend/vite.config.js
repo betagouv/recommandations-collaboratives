@@ -93,6 +93,7 @@ const config = {
         actionPusher: resolve('./src/js/apps/actionPusher.js'),
         NewFeatureBanner: resolve('./src/js/components/NewFeatureBanner.js'),
         contactBookApp: resolve('./src/js/apps/contactBookApp.js'),
+        ResourceCategoryFilter: resolve('./src/js/components/ResourceCategoryFilter.js'),
         departmentsSelector: resolve(
           './src/js/styles/departments-selector.css.js'
         ),
@@ -202,8 +203,16 @@ const config = {
           './src/js/styles/projects-onboarding-tutorial.css.js'
         ),
         marianneStyles: resolve('./src/js/styles/marianne.css.js'),
+        formResourcesStyles: resolve(
+          './src/js/styles/form-resources.css.js'
+        ),
+        formResource: resolve('./src/js/components/Resources/FormResource.js'),
+        ajvValidationSchema: resolve(
+          './src/js/components/AjvValidationSchema.js'
+        ),
         projectDetailsStyles: resolve('./src/js/styles/project-details.css.js'),
         resourcePreviewPanelStyles: resolve('./src/js/styles/resource-preview-panel.css.js'),
+        resourceListCrm: resolve('./src/js/apps/CRM/resourceListCrm.js'),
       },
       output: {
         chunkFileNames: undefined,

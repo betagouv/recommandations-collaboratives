@@ -68,21 +68,6 @@
 }
 
 /* ¯¯¯¯ *\
-  BUTTONS
-\* ˍˍˍˍ */
-
-a {
-  text-decoration: none;
-
-  &.btn,
-  &.button,
-  &.nav-link,
-  &.link-secondary {
-    text-decoration: none;
-  }
-}
-
-/* ¯¯¯¯ *\
   INPUTS
 \* ˍˍˍˍ */
 
@@ -91,10 +76,6 @@ a {
   color: var(--text-mention-grey);
   font-style: italic;
   opacity: 1;
-}
-
-.custom-input-border {
-  border: 1px solid var(--light-border-default-grey, #e5e5e5);
 }
 
 /* ¯¯¯¯ *\
@@ -124,80 +105,7 @@ p {
   }
 }
 
-.fr-btn--grey {
-  background-color: var(--light-background-alt-grey, #f6f6f6);
-  color: var(--light-text-default-grey, #3a3a3a);
-  font-size: 14px;
-  font-weight: 700;
-  &:not(:disabled):hover {
-    background-color: var(--light-background-alt-grey-hover, #e6e6e6);
-    background: var(--light-background-alt-grey-hover, #e6e6e6);
-    color: var(--light-text-default-grey-hover, #3a3a3a);
-  }
-}
 
-// a.fr-btn {
-//   &:hover {
-//     &:not(.fr-btn--primary),
-//     &:not(.fr-btn--secondary),
-//     &:not(.fr-btn--tertiary),
-//     &:not(.fr-btn--tertiary-no-outline) {
-//       color: white !important;
-//     }
-
-//     &.fr-btn--primary,
-//     &.fr-btn--secondary,
-//     &.fr-btn--tertiary,
-//     &.fr-btn--tertiary-no-outline {
-//       color: var(--text-active-blue-france) !important;
-//     }
-//   }
-// }
-
-.fr-btn--secondary {
-  &:is(.black) {
-    box-shadow: inset 0 0 0 1px var(--variant-secondary-black);
-  }
-  &.black {
-    color: var(--variant-secondary-black);
-    background-color: transparent;
-  }
-}
-
-.custom-login-button {
-  min-width: 300px;
-  justify-content: center;
-}
-
-.custom-button {
-  background: #00bbc3 !important;
-  color: white !important;
-  text-decoration: none;
-
-  &:hover {
-    background: #479195 !important;
-    color: white !important;
-  }
-}
-
-.fr-btn-custom-hover:hover {
-  background-color: #8585f6 !important;
-  box-shadow: 0 0 0 1px #8585f6 !important;
-}
-
-button.fr-text-inverted--grey,
-a.fr-text-inverted--grey {
-  &:hover {
-    color: var(--text-active-blue-france) !important;
-  }
-}
-
-.fr-btn--xs {
-  font-size: 0.5rem;
-  line-height: 1rem;
-  min-height: 1.5rem;
-  padding: 0.125rem 0.5rem;
-}
 
 .mt-n150px {
   margin-top: 0;
@@ -800,6 +708,10 @@ form > p {
   pointer-events: none;
 }
 
+.border-light-grey {
+  border: 1px solid var(--light-border-default-grey, #e5e5e5);
+}
+
 .specific-backgroundcolor-1b1b35 {
   background-color: #1b1b35;
 }
@@ -861,6 +773,92 @@ form > p {
    Buttons
 \* ˍˍˍˍˍˍˍˍˍˍˍˍˍˍˍ */
 
+a {
+  text-decoration: none;
+
+  &.btn,
+  &.button,
+  &.nav-link,
+  &.link-secondary {
+    text-decoration: none;
+  }
+}
+
+.fr-btn--grey {
+  background-color: var(--light-background-alt-grey, #f6f6f6);
+  color: var(--light-text-default-grey, #3a3a3a);
+  font-size: 14px;
+  font-weight: 700;
+  &:not(:disabled):hover {
+    background-color: var(--light-background-alt-grey-hover, #e6e6e6);
+    background: var(--light-background-alt-grey-hover, #e6e6e6);
+    color: var(--light-text-default-grey-hover, #3a3a3a);
+  }
+}
+
+// a.fr-btn {
+//   &:hover {
+//     &:not(.fr-btn--primary),
+//     &:not(.fr-btn--secondary),
+//     &:not(.fr-btn--tertiary),
+//     &:not(.fr-btn--tertiary-no-outline) {
+//       color: white !important;
+//     }
+
+//     &.fr-btn--primary,
+//     &.fr-btn--secondary,
+//     &.fr-btn--tertiary,
+//     &.fr-btn--tertiary-no-outline {
+//       color: var(--text-active-blue-france) !important;
+//     }
+//   }
+// }
+
+.fr-btn--secondary {
+  &:is(.black) {
+    box-shadow: inset 0 0 0 1px var(--variant-secondary-black);
+  }
+  &.black {
+    color: var(--variant-secondary-black);
+    background-color: transparent;
+  }
+}
+
+.custom-login-button {
+  min-width: 300px;
+  justify-content: center;
+}
+
+.custom-button {
+  background: #00bbc3 !important;
+  color: white !important;
+  text-decoration: none;
+
+  &:hover {
+    background: #479195 !important;
+    color: white !important;
+  }
+}
+
+.fr-btn-custom-hover:hover {
+  background-color: #8585f6 !important;
+  box-shadow: 0 0 0 1px #8585f6 !important;
+}
+
+button.fr-text-inverted--grey,
+a.fr-text-inverted--grey {
+  &:hover {
+    color: var(--text-active-blue-france) !important;
+  }
+}
+
+.fr-btn--xs {
+  font-size: 0.5rem;
+  line-height: 1rem;
+  min-height: 1.5rem;
+  padding: 0.125rem 0.5rem;
+}
+
 .introjs-skipbutton {
   cursor: pointer !important;
 }
@@ -868,7 +866,7 @@ form > p {
 // rewrite dsfr btn style
 .fr-btn--tertiary {
   color: #3a3a3a !important;
-  background: var(--light-background-alt-grey, #f6f6f6);
+  background: var(--light-background-alt-grey, #eee);
   &-dark-background {
     background: var(--light-background-default-grey, #fff);
   }
@@ -1082,6 +1080,12 @@ form > p {
 
 .fr-pt-05v {
   padding-top: 2px;
+}
+
+.top-right-corner {
+  position: absolute;
+  top: 12px;
+  right: 12px;
 }
 
 /* ¯¯¯¯¯¯¯¯ *\

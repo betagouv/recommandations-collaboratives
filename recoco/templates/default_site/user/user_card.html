@@ -22,6 +22,7 @@
                     <img class="user-card__gravatar rounded-circle fr-mr-1v {% if not user.is_active and not user_email %}border-0{% else %}neutral-role-border border-2{% endif %}"
                          :src='gravatar_url("{{ user.email }}", 18, "{{ user.first_name }}" + " " + "{{ user.last_name }}", stringToColor("{{ user.email }}") )'
                          :style="{ '--current-bg-color': stringToColor('{{ user.email }}') }"
+                         data-gravatar-key="{{ user.email }}-18"
                          alt="{{ action.actor }}">
                     <strong class="user-card__name text-nowrap text-capitalize {% if not user.is_active %}inactive-status{% endif %}"
                             data-test-id="user-card-intro">
@@ -37,7 +38,8 @@
                 {% elif user_email %}
                     <img class="user-card__gravatar rounded-circle fr-mr-1v neutral-role-border border-2"
                          :src='gravatar_url("{{ user_email }}", 18, "{{ user_email }}", stringToColor("{{ user_email }}") )'
-                         :style="{ '--current-bg-color': stringToColor('{{ user.email }}') }"
+                         :style="{ '--current-bg-color': stringToColor('{{ user_email }}') }"
+                         data-gravatar-key="{{ user_email }}-18"
                          alt="{{ action.actor }}">
                     <strong class="user-card__name text-nowrap">{{ user_email }}</strong>
                 {% endif %}
