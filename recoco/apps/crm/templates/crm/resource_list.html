@@ -110,7 +110,7 @@
                                 <!-- Number of uses -->
                                 <td class="resource-table__status" x-text="resource.nb_uses"></td>
                                 <!-- Actions -->
-                                <td>
+                                <td class="d-flex">
                                     <!-- Go to resource page -->
                                     <button class="fr-btn fr-btn--sm fr-icon-eye-line fr-btn--tertiary-no-outline position-relative"
                                             title="Accéder à la page de la ressource">
@@ -123,11 +123,13 @@
                                         <a :href="'{% url 'resources-resource-update' 0 %}'.replace('0', resource.id)"
                                            class="stretched-link">Éditer</a>
                                     </button>
-                                    {% comment %} TODO Add duplicate button with backend functionnality {% endcomment %}
                                     <!-- Duplicate -->
-                                    {% comment %} <button class="fr-btn fr-btn--sm fr-icon-pencil-line fr-btn--tertiary-no-outline position-relative" title="Dupliquer la ressource">
-                                        <a :href="'{% url 'resources-resource-update' 0 %}'.replace('0', resource.id)" class="stretched-link">Dupliquer</a>
-                                    </button> {% endcomment %}
+                                    <form method="post"
+                                          :action="'{% url 'resources-resource-duplicate' 0 %}'.replace('0', resource.id)">
+                                        {% csrf_token %}
+                                        <button class="fr-btn fr-btn--sm fr-icon-file-copy-2-line fr-btn--tertiary-no-outline position-relative"
+                                                title="Dupliquer la ressource">Dupliquer</button>
+                                    </form>
                                     <!-- Delete -->
                                     <button class="fr-btn fr-btn--sm fr-icon-delete-line fr-btn--tertiary-no-outline position-relative"
                                             title="Supprimer la ressource">

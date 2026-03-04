@@ -343,7 +343,10 @@ def test_duplication_creates_new_resource(request, client, current_site):
 
         new_resource = models.Resource.objects.exclude(id=old_resource.id).first()
 
-        assert last_url == reverse("resources-resource-update", args=(new_resource.id,))
+        assert (
+            last_url
+            == f"{reverse('resources-resource-update', args=[new_resource.id])}?is_duplicate=true"
+        )
 
         assert new_resource.site_origin == current_site
         assert new_resource.status == models.Resource.DRAFT
