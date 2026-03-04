@@ -79,7 +79,7 @@ class Project:
 
 
 class Survey:
-    STARTED = "a démarré l'état des lieux"
+    STARTED = "a commencé à remplir l'état des lieux"
     UPDATED = "a mis à jour l'état des lieux"
 
 
