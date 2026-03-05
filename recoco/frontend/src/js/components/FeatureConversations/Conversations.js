@@ -62,15 +62,118 @@ Alpine.data('Conversations', (projectId, currentUserId) => ({
     }, 500);
     this.$store.tasksData._subscribe(() => {
       this.tasks = this.$store.tasksData.tasks;
+      // Re-extract shared contents when tasks are updated
+      this.extractSharedContents();
     });
     this.$store.tasksData._notify();
     this.countElementsInDiscussion();
+    this.extractSharedContents();
+    this.loadExternalFiles();
+  },
+  /**
+   * Load external files from EDL (État des lieux) into the shared contents panel store
+   */
+  loadExternalFiles() {
+    const edlFilesElement = document.getElementById('djangoEdlFiles');
+    if (edlFilesElement && this.$store.sharedContentsPanel) {
+      try {
+        const edlFiles = JSON.parse(edlFilesElement.textContent);
+        this.$store.sharedContentsPanel.setExternalFiles(edlFiles || []);
+      } catch (error) {
+        console.error('Failed to parse EDL files:', error);
+      }
+    }
   },
   getRecommendationById(id) {
     const foundRecommendation = this.tasks.find(
       (recommendation) => recommendation.id == id
     );
     return foundRecommendation;
+  },
+  /**
+   * Extract recommendations and files from feed elements and populate the sharedContentsPanel store
+   */
+  extractSharedContents() {
+    if (!this.feed.elements) return;
+
+    const recommendations = [];
+    const files = [];
+
+    // Iterate over feed elements in reverse (most recent first)
+    const sortedElements = [...this.feed.elements]
+      .filter((el) => el.type === 'message' && !el.deleted)
+      .sort((a, b) => {
+        const ta = Date.parse(a.created ?? 0);
+        const tb = Date.parse(b.created ?? 0);
+        return tb - ta; // Descending order (most recent first)
+      });
+
+    for (const message of sortedElements) {
+      if (!message.nodes) continue;
+
+      for (const node of message.nodes) {
+        if (node.type === 'RecommendationNode') {
+          const recommendation = this.getRecommendationById(node.recommendation_id);
+          if (recommendation) {
+            recommendations.push({
+              ...recommendation,
+              messageId: message.id,
+              messageCreated: message.created,
+              nodeId: node.id,
+            });
+          }
+        } else if (node.type === 'DocumentNode') {
+          const document = this.documents.find((d) => d.id === node.document_id);
+          if (document) {
+            files.push({
+              ...document,
+              messageId: message.id,
+              messageCreated: message.created,
+              nodeId: node.id,
+            });
+          } else {
+            // If document not in cache, add a placeholder with basic info
+            files.push({
+              id: node.document_id,
+              messageId: message.id,
+              messageCreated: message.created,
+              nodeId: node.id,
+            });
+          }
+        }
+      }
+    }
+
+    // Update the store
+    if (this.$store.sharedContentsPanel) {
+      this.$store.sharedContentsPanel.setRecommendations(recommendations);
+      this.$store.sharedContentsPanel.setFiles(files);
+    }
+  },
+  /**
+   * Open a recommendation from the shared contents panel
+   * Closes the panel list and opens the resource detail panel
+   */
+  async openRecommendationFromPanel(recommendation) {
+    // Close the shared contents panel but mark for re-open
+    this.$store.sharedContentsPanel.closeForDetail();
+
+    // Find the corresponding message
+    const message = this.getMessageById(recommendation.messageId);
+
+    if (message && recommendation) {
+      // Open the resource preview panel
+      await this.openResourcePreviewPanel(recommendation, message);
+    }
+  },
+  /**
+   * Format file size in human-readable format
+   */
+  formatFileSize(bytes) {
+    if (!bytes || bytes === 0) return '';
+    const units = ['o', 'Ko', 'Mo', 'Go'];
+    const i = Math.floor(Math.log(bytes) / Math.log(1024));
+    return Math.round(bytes / Math.pow(1024, i)) + ' ' + units[i];
   },
   getMessageById(id) {
     return this.feed.messages.find((message) => message.id === +id);

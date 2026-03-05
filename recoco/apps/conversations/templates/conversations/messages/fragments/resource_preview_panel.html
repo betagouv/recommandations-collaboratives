@@ -10,7 +10,7 @@ Managed by Alpine store: $store.resourcePreviewPanel
             <div class="resource-preview-panel__header">
                 <button type="button"
                         class="resource-preview-panel__back-btn"
-                        @click="$store.resourcePreviewPanel.close()">
+                        @click="$store.resourcePreviewPanel.close(); $store.sharedContentsPanel && $store.sharedContentsPanel.reopenIfNeeded()">
                     <span class="fr-icon-arrow-left-line fr-mr-1v" aria-hidden="true"></span>
                     Recommandations
                 </button>

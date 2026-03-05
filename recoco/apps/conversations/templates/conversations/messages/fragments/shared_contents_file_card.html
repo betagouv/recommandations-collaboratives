@@ -1,0 +1,27 @@
+{% comment %}
+File card for shared contents panel.
+Displays file info with icon, name, size, and download button.
+Data comes from Alpine: file object in x-for loop
+{% endcomment %}
+<div class="shared-contents-file-card">
+    <div class="shared-contents-file-card__info">
+        <div class="shared-contents-file-card__icon">
+            <span class="fr-icon fr-icon-file-line" aria-hidden="true"></span>
+        </div>
+        <div class="shared-contents-file-card__details">
+            <p class="shared-contents-file-card__name" x-text="file.filename || file.name || 'Fichier'"></p>
+            <template x-if="file.size">
+                <p class="shared-contents-file-card__meta" x-text="formatFileSize(file.size)"></p>
+            </template>
+        </div>
+    </div>
+    <div class="shared-contents-file-card__actions">
+        <a class="shared-contents-file-card__download-btn fr-btn fr-btn--sm fr-btn--tertiary-no-outline"
+           :href="file.the_file || file.url"
+           target="_blank"
+           rel="noopener noreferrer">
+            <span class="fr-icon fr-icon-download-line fr-icon--sm fr-mr-1v" aria-hidden="true"></span>
+            Télécharger
+        </a>
+    </div>
+</div>

@@ -147,6 +147,29 @@
           color: var(--light-background-flat-info, #0063cb);
           font-weight: 700;
         }
+        &--button {
+          display: flex;
+          flex-wrap: wrap;
+          align-items: center;
+          gap: 0.25rem;
+          background: none;
+          border: none;
+          padding: 0;
+          cursor: pointer;
+          text-align: left;
+          &:hover {
+            color: var(--light-background-action-high-blue-france, #000091);
+            text-decoration: underline;
+          }
+        }
+      }
+      &__shared-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+      }
+      &__shared-separator {
+        color: var(--light-text-mention-grey, #666);
       }
     }
   }

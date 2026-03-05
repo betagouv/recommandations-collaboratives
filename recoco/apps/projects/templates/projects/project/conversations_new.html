@@ -11,6 +11,7 @@
 {% block js %}
     {% vite_asset 'js/styles/projects-conversations-new.css.js' %}
     {% vite_asset 'js/styles/resource-preview-panel.css.js' %}
+    {% vite_asset 'js/styles/shared-contents-panel.css.js' %}
     {% vite_asset 'js/apps/conversationsNew.js' %}
     {% vite_asset 'js/apps/featureAddContact.js' %}
 {% endblock js %}
@@ -30,6 +31,7 @@
     {{ advising_position.is_observer|json_script:"isObserverOnProject" }}
     {{ advising_position.is_advisor|json_script:"isAdvisorOnProject" }}
     {{ is_switchtender|json_script:"isSwitchtender" }}
+    {{ edl_files|json_script:"djangoEdlFiles" }}
     {% include "projects/project/navigation.html" with conversations_new=True %}
     {% include "projects/project/fragments/project_banner/banner_wrapper.html" with part="open" %}
     {% regroup feed by topic as topic_list %}
@@ -138,6 +140,7 @@
         {% include "projects/project/onboarding_tutorial.html" %}
         {% include "conversations/messages/fragments/confirm_delete_message.html" %}
         {% include "conversations/messages/fragments/resource_preview_panel.html" %}
+        {% include "conversations/messages/fragments/shared_contents_panel.html" %}
     </div>
     {% include "projects/project/fragments/project_banner/banner_wrapper.html" with part="close" %}
 {% endblock project_detail %}

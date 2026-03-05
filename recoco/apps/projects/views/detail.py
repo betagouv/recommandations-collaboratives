@@ -311,6 +311,14 @@ def project_conversations_new(request, project_id=None):
         )
     )
 
+    # Get files from EDL (État des lieux) surveys
+    edl_files = list(
+        survey_models.Answer.objects.filter(session__project=project)
+        .exclude(attachment="")
+        .exclude(attachment__isnull=True)
+        .values("id", "attachment", "updated_on")
+    )
+
     return render(
         request,
         "projects/project/conversations_new.html",
@@ -320,6 +328,7 @@ def project_conversations_new(request, project_id=None):
             "advising": advising,
             "advising_position": advising_position,
             "recipients": recipients_data,
+            "edl_files": edl_files,
         },
     )
 

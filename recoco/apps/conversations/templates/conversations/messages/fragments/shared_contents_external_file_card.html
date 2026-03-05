@@ -1,0 +1,27 @@
+{% comment %}
+External file card for shared contents panel (files from EDL - État des lieux).
+Displays file info with dashed border styling to distinguish from conversation files.
+Data comes from Alpine: file object in x-for loop
+{% endcomment %}
+<div class="shared-contents-file-card shared-contents-file-card--external">
+    <div class="shared-contents-file-card__info">
+        <div class="shared-contents-file-card__icon">
+            <span class="fr-icon fr-icon-attachment-line" aria-hidden="true"></span>
+        </div>
+        <div class="shared-contents-file-card__details">
+            <p class="shared-contents-file-card__name" x-text="file.filename || file.attachment?.split('/').pop() || 'Fichier'"></p>
+            <template x-if="file.updated_on">
+                <p class="shared-contents-file-card__meta" x-text="'Ajouté le ' + formatDateFrench(file.updated_on)"></p>
+            </template>
+        </div>
+    </div>
+    <div class="shared-contents-file-card__actions">
+        <a class="shared-contents-file-card__download-btn fr-btn fr-btn--sm fr-btn--tertiary-no-outline"
+           :href="file.attachment"
+           target="_blank"
+           rel="noopener noreferrer">
+            <span class="fr-icon fr-icon-download-line fr-icon--sm fr-mr-1v" aria-hidden="true"></span>
+            Télécharger
+        </a>
+    </div>
+</div>
