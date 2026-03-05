@@ -44,9 +44,12 @@
                         <span class="list-project__project-name no-underline">{{ project.name }} <span class="list-project__project-org-name_title no-underline">{{ project.owner.profile.organization.name|default:project.org_name }}</span></span>
                     {% else %}
                         <template x-if="currentProject">
-                            <div>
-                                <span class="no-underline" x-text="currentProject.commune.name"></span>
-                                <span class="list-project__project-name" x-text='currentProject.name'></span>
+                            <div class="text-ellipsis">
+                                <span class="list-project__project-name no-underline"
+                                      x-text='currentProject.name'></span>
+                                <span class="list-project__project-org-name_title no-underline"
+                                      x-text="currentProject.org_name"></span>
+                                {% comment %} <span class="no-underline" x-text="currentProject.commune.name"></span> {% endcomment %}
                             </div>
                         </template>
                         <template x-if="!currentProject">

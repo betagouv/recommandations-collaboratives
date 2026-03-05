@@ -110,6 +110,9 @@
           font-size: 14px;
           font-style: normal;
           font-weight: 700;
+          width: 100%;
+          text-overflow: ellipsis;
+          overflow: hidden;
         }
         &__project-org-name {
           font-size: 10px;
