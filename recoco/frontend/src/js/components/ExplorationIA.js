@@ -1,4 +1,6 @@
 import Alpine from 'alpinejs';
+import { marked } from 'marked';
+import DOMPurify from 'dompurify';
 import { ToastType } from '../models/toastType';
 
 const ML_API_BASE_URL = 'https://ml.recoconseil.fr';
@@ -22,8 +24,14 @@ Alpine.data('ExplorationIA', (config = {}) => ({
   error: null,
 
   // === RESULTATS ===
-  results: [], // Resultats de la recherche courante
+  results: [], // Resultats de la recherche courante (ancien format)
   selectedResults: [], // IDs des resultats selectionnes dans la phase courante
+
+  // === REPONSE IA (nouveau format) ===
+  answerChunks: [], // Textes de reponse avec sources
+  citations: [], // Sources/bibliographie
+  foundAnswer: false, // Si une reponse a ete trouvee
+  selectedChunks: [], // Indices des chunks selectionnes
 
   // === ACCUMULATION POUR SYNTHESE ===
   allSelectedItems: [], // Tous les items selectionnes au fil des phases
@@ -39,6 +47,69 @@ Alpine.data('ExplorationIA', (config = {}) => ({
   // === LIFECYCLE ===
   init() {
     // Initialisation du composant
+  },
+
+  // === MODE TEST ===
+  loadMockData() {
+    this.answerChunks = [
+      {
+        text: "Voici les informations trouvées concernant les aides pour mettre en place un jardin partagé.",
+        sources: []
+      },
+      {
+        text: "Le plan de relance a prévu un budget de **17 millions d'euros en 2021** pour financer les jardins partagés et collectifs via des appels à projets départementaux gérés par les DDT (Directions Départementales des Territoires).",
+        sources: ["1.1"]
+      },
+      {
+        text: "Les taux de subvention varient selon le bénéficiaire :\n- **Associations** : jusqu'à **80%** du coût global du projet\n- **Collectivités territoriales et leurs groupements** : jusqu'à **50%**\n- **Bailleurs sociaux (publics ou privés)** : jusqu'à **50%**",
+        sources: ["1.1"]
+      },
+      {
+        text: "Les dépenses éligibles incluent les investissements **matériels et immatériels**, comme les prestations d'ingénierie ou les études de sols.",
+        sources: ["1.1"]
+      },
+      {
+        text: "Vous pouvez aussi consulter les aides régionales et européennes en cliquant sur ce lien : [Aides et appels à projets de la région Île-de-France](https://www.iledefrance.fr/aides-et-appels-a-projets).",
+        sources: ["2.1"]
+      },
+      {
+        text: "Un guide méthodologique sur l'accès collectif au foncier (mis à jour en 2007) évoque des montages juridiques et financiers, comme l'association des amis d'une SCI, pour faciliter l'obtention de subventions.",
+        sources: ["3.1"]
+      }
+    ];
+
+    this.citations = [
+      {
+        label: "1.1",
+        title: "Financer la création de jardins partagés et collectifs",
+        content: "Pour encourager le développement de l'agriculture urbaine, le plan de relance a prévu d'engager un budget global de 17 millions d'euros en 2021...",
+        resource_id: 120,
+        reco_id: null,
+        project_id: null,
+        source_type: "Resource"
+      },
+      {
+        label: "2.1",
+        title: "Bénéficier des aides régionales et européennes",
+        content: "Vous pouvez également retrouver l'ensemble des aides de la région...",
+        resource_id: null,
+        reco_id: 5623,
+        project_id: 2557,
+        source_type: "Recommendation"
+      },
+      {
+        label: "3.1",
+        title: "Quelques éléments sur l'articulation SCI - association",
+        content: "Par ailleurs, il existe un guide méthodologique sur l'accès collectif et solidaire au foncier et au bâti...",
+        resource_id: null,
+        reco_id: 4521,
+        project_id: 778,
+        source_type: "Recommendation"
+      }
+    ];
+
+    this.foundAnswer = true;
+    this.searchQuery = "Quelles aides puis-je avoir pour mettre en place un jardin partagé ?";
   },
 
   // === RECHERCHE API ML ===
@@ -76,8 +147,18 @@ Alpine.data('ExplorationIA', (config = {}) => ({
 
       const data = await response.json();
       console.log('ExplorationIA API response:', data);
-      this.results = this.mapResults(data);
-      console.log('ExplorationIA mapped results:', this.results);
+
+      // Nouveau format avec answer_chunks et citations
+      if (data.answer_chunks && data.citations) {
+        this.answerChunks = data.answer_chunks || [];
+        this.citations = data.citations || [];
+        this.foundAnswer = data.found_answer || false;
+        this.selectedChunks = [];
+      } else {
+        // Ancien format (fallback)
+        this.results = this.mapResults(data);
+      }
+      console.log('ExplorationIA mapped results:', this.answerChunks, this.citations);
     } catch (err) {
       this.error = 'Erreur lors de la recherche. Veuillez reessayer.';
       console.error('ExplorationIA search error:', err);
@@ -275,6 +356,10 @@ Alpine.data('ExplorationIA', (config = {}) => ({
     this.results = [];
     this.selectedResults = [];
     this.allSelectedItems = [];
+    this.answerChunks = [];
+    this.citations = [];
+    this.foundAnswer = false;
+    this.selectedChunks = [];
     this.synthesis = {
       resources: [],
       projects: [],
@@ -290,6 +375,141 @@ Alpine.data('ExplorationIA', (config = {}) => ({
 
   saveContext() {
     this.isEditingContext = false;
+  },
+
+  // === GESTION DES CHUNKS ===
+  toggleChunkSelection(index) {
+    const chunk = this.answerChunks[index];
+    // Ne permettre la selection que des chunks avec sources
+    if (!chunk || !chunk.sources || chunk.sources.length === 0) return;
+
+    const idx = this.selectedChunks.indexOf(index);
+    if (idx > -1) {
+      this.selectedChunks.splice(idx, 1);
+    } else {
+      this.selectedChunks.push(index);
+    }
+  },
+
+  isChunkSelected(index) {
+    return this.selectedChunks.includes(index);
+  },
+
+  getSelectableChunksCount() {
+    return this.answerChunks.filter(
+      (chunk) => chunk.sources && chunk.sources.length > 0
+    ).length;
+  },
+
+  clearChunkSelection() {
+    this.selectedChunks = [];
+  },
+
+  getSelectedChunksData() {
+    return this.selectedChunks.map((index) => {
+      const chunk = this.answerChunks[index];
+      const sourceCitations = (chunk.sources || []).map((label) =>
+        this.getCitationByLabel(label)
+      ).filter(Boolean);
+      return {
+        text: chunk.text,
+        sources: chunk.sources,
+        citations: sourceCitations,
+      };
+    });
+  },
+
+  async searchRelatedRecommendations() {
+    if (this.selectedChunks.length === 0) return;
+
+    const selectedData = this.getSelectedChunksData();
+
+    // Construire le contexte a partir des chunks selectionnes
+    const selectedTexts = selectedData.map((d) => d.text).join('\n\n');
+    const citationTitles = selectedData
+      .flatMap((d) => d.citations.map((c) => c.title))
+      .filter((v, i, a) => a.indexOf(v) === i) // unique
+      .join(', ');
+
+    // Mettre a jour la requete avec le contexte des selections
+    this.searchQuery = `Recommandations liées à : ${citationTitles}`;
+
+    // Ajouter le contexte des selections au contexte du projet
+    const enhancedContext = `${this.projectContext}\n\nPassages sélectionnés :\n${selectedTexts}`;
+
+    this.isLoading = true;
+    this.error = null;
+
+    try {
+      const headers = {
+        'Content-Type': 'application/json',
+      };
+
+      if (this.apiToken) {
+        headers['Authorization'] = `Bearer ${this.apiToken}`;
+      }
+
+      const response = await fetch(`${ML_API_BASE_URL}/ask`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          query: this.searchQuery,
+          context: enhancedContext,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Erreur API: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log('ExplorationIA related search response:', data);
+
+      if (data.answer_chunks && data.citations) {
+        this.answerChunks = data.answer_chunks || [];
+        this.citations = data.citations || [];
+        this.foundAnswer = data.found_answer || false;
+        this.selectedChunks = [];
+      }
+    } catch (err) {
+      this.error = 'Erreur lors de la recherche. Veuillez reessayer.';
+      console.error('ExplorationIA related search error:', err);
+    } finally {
+      this.isLoading = false;
+    }
+  },
+
+  getCitationByLabel(label) {
+    return this.citations.find((c) => c.label === label);
+  },
+
+  getCitationUrl(citation) {
+    if (citation.resource_id) {
+      return `/ressource/${citation.resource_id}/`;
+    }
+    if (citation.reco_id && citation.project_id) {
+      return `/project/${citation.project_id}/actions/#action-${citation.reco_id}`;
+    }
+    return null;
+  },
+
+  getSourceTypeLabel(sourceType) {
+    const labels = {
+      Resource: 'Ressource',
+      Recommendation: 'Recommandation',
+      Project: 'Projet',
+    };
+    return labels[sourceType] || sourceType;
+  },
+
+  hasAnswerResults() {
+    return this.answerChunks.length > 0 || this.citations.length > 0;
+  },
+
+  parseMarkdown(text) {
+    if (!text) return '';
+    const html = marked.parse(text, { breaks: true });
+    return DOMPurify.sanitize(html);
   },
 
   // === UTILITAIRES ===

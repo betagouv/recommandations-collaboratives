@@ -115,3 +115,107 @@
   background-color: var(--light-background-alt-grey, #f6f6f6);
   border-radius: 4px;
 }
+
+// Chunks de reponse IA
+.exploration-ia-chunk {
+  padding: 1rem;
+  margin-bottom: 0.5rem;
+  border-radius: 4px;
+  border: 1px solid transparent;
+  transition: all 0.15s ease-in-out;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  &--with-source {
+    padding-left: 1rem;
+    border-left: 3px solid var(--light-accent-blue-france, #000091);
+    background-color: var(--light-background-alt-grey, #f6f6f6);
+
+    &:hover {
+      background-color: var(--light-background-contrast-grey, #eeeeee);
+    }
+  }
+
+  &--selected {
+    background-color: var(
+      --light-background-action-low-blue-france,
+      #e3e3fd
+    ) !important;
+    border-color: var(--light-accent-blue-france, #000091);
+  }
+
+  &__checkbox {
+    padding-top: 0.25rem;
+
+    input[type='checkbox'] {
+      width: 1.25rem;
+      height: 1.25rem;
+      cursor: pointer;
+      accent-color: var(--light-accent-blue-france, #000091);
+    }
+  }
+
+  &__text {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: var(--light-text-default-grey, #3a3a3a);
+
+    strong {
+      font-weight: 600;
+      color: var(--light-text-title-grey, #161616);
+    }
+
+    ul,
+    ol {
+      margin: 0.5rem 0;
+      padding-left: 1.5rem;
+    }
+
+    li {
+      margin-bottom: 0.25rem;
+    }
+
+    a {
+      color: var(--light-accent-blue-france, #000091);
+      text-decoration: underline;
+    }
+  }
+
+  &__sources {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+  }
+}
+
+// Bibliographie
+.exploration-ia-bibliography {
+  position: sticky;
+  top: 1rem;
+
+  .card-header {
+    border-bottom: 1px solid var(--light-border-default-grey, #e5e5e5);
+
+    h3 {
+      display: flex;
+      align-items: center;
+    }
+  }
+}
+
+.exploration-ia-citation {
+  background-color: var(--light-background-alt-grey, #f6f6f6);
+  border-radius: 4px;
+  border: 1px solid var(--light-border-default-grey, #e5e5e5);
+
+  &:last-child {
+    margin-bottom: 0 !important;
+  }
+
+  p {
+    font-size: 0.9rem;
+    line-height: 1.4;
+  }
+}
