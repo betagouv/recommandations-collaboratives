@@ -6,6 +6,11 @@ const ML_API_BASE_URL = 'https://ml.recoconseil.fr';
 Alpine.data('ExplorationIA', (config = {}) => ({
   // === CONFIGURATION ===
   projectId: config.projectId || null,
+  apiToken: config.apiToken || '',
+
+  // === CONTEXTE DU PROJET ===
+  projectContext: config.projectContext || '',
+  isEditingContext: false,
 
   // === ETAT DES PHASES ===
   currentPhase: 1, // 1 = Recherche initiale, 2 = Exploration iterative, 3 = Synthese
@@ -48,10 +53,22 @@ Alpine.data('ExplorationIA', (config = {}) => ({
     this.results = [];
 
     try {
-      const encodedQuery = encodeURIComponent(this.searchQuery.trim());
-      const response = await fetch(
-        `${ML_API_BASE_URL}/search?query=${encodedQuery}`
-      );
+      const headers = {
+        'Content-Type': 'application/json',
+      };
+
+      if (this.apiToken) {
+        headers['Authorization'] = `Bearer ${this.apiToken}`;
+      }
+
+      const response = await fetch(`${ML_API_BASE_URL}/ask`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          query: this.searchQuery.trim(),
+          context: this.projectContext || '',
+        }),
+      });
 
       if (!response.ok) {
         throw new Error(`Erreur API: ${response.status}`);
@@ -264,6 +281,15 @@ Alpine.data('ExplorationIA', (config = {}) => ({
       recommendations: [],
     };
     this.error = null;
+  },
+
+  // === CONTEXTE DU PROJET ===
+  toggleEditContext() {
+    this.isEditingContext = !this.isEditingContext;
+  },
+
+  saveContext() {
+    this.isEditingContext = false;
   },
 
   // === UTILITAIRES ===
