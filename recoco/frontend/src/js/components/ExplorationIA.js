@@ -32,6 +32,7 @@ Alpine.data('ExplorationIA', (config = {}) => ({
   citations: [], // Sources/bibliographie
   foundAnswer: false, // Si une reponse a ete trouvee
   selectedChunks: [], // Indices des chunks selectionnes
+  hoveredSources: [], // Labels des sources survolees
 
   // === ACCUMULATION POUR SYNTHESE ===
   allSelectedItems: [], // Tous les items selectionnes au fil des phases
@@ -360,6 +361,7 @@ Alpine.data('ExplorationIA', (config = {}) => ({
     this.citations = [];
     this.foundAnswer = false;
     this.selectedChunks = [];
+    this.hoveredSources = [];
     this.synthesis = {
       resources: [],
       projects: [],
@@ -481,6 +483,27 @@ Alpine.data('ExplorationIA', (config = {}) => ({
 
   getCitationByLabel(label) {
     return this.citations.find((c) => c.label === label);
+  },
+
+  // === SURVOL DES SOURCES ===
+  highlightSources(sources) {
+    this.hoveredSources = sources || [];
+  },
+
+  clearHighlight() {
+    this.hoveredSources = [];
+  },
+
+  isSourceHighlighted(label) {
+    return this.hoveredSources.includes(label);
+  },
+
+  isSourceSelected(label) {
+    // Verifie si la source est liee a un chunk selectionne
+    return this.selectedChunks.some((index) => {
+      const chunk = this.answerChunks[index];
+      return chunk && chunk.sources && chunk.sources.includes(label);
+    });
   },
 
   getCitationUrl(citation) {

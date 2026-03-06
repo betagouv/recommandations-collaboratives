@@ -208,7 +208,8 @@
 .exploration-ia-citation {
   background-color: var(--light-background-alt-grey, #f6f6f6);
   border-radius: 4px;
-  border: 1px solid var(--light-border-default-grey, #e5e5e5);
+  border: 2px solid var(--light-border-default-grey, #e5e5e5);
+  transition: all 0.2s ease-in-out;
 
   &:last-child {
     margin-bottom: 0 !important;
@@ -217,5 +218,36 @@
   p {
     font-size: 0.9rem;
     line-height: 1.4;
+  }
+
+  // Etat surligne au survol d'un chunk
+  &--highlighted {
+    background-color: var(
+      --light-background-action-low-blue-france,
+      #e3e3fd
+    );
+    border-color: var(--light-accent-blue-france, #000091);
+    transform: scale(1.02);
+    box-shadow: 0 4px 12px rgba(0, 0, 145, 0.15);
+
+    .fr-badge--blue-cumulus {
+      background-color: var(--light-accent-blue-france, #000091);
+      color: #fff;
+    }
+  }
+
+  // Etat selectionne (chunk coche)
+  &--selected {
+    background-color: var(
+      --light-background-action-low-blue-france,
+      #e3e3fd
+    );
+    border-color: var(--light-accent-blue-france, #000091);
+    box-shadow: 0 2px 8px rgba(0, 0, 145, 0.1);
+
+    .fr-badge--blue-cumulus {
+      background-color: var(--light-accent-blue-france, #000091);
+      color: #fff;
+    }
   }
 }

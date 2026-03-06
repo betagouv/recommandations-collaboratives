@@ -183,6 +183,8 @@
                                          'exploration-ia-chunk--selected': isChunkSelected(index)
                                      }"
                                      @click="chunk.sources && chunk.sources.length > 0 ? toggleChunkSelection(index) : null"
+                                     @mouseenter="highlightSources(chunk.sources)"
+                                     @mouseleave="clearHighlight()"
                                      :style="chunk.sources && chunk.sources.length > 0 ? 'cursor: pointer;' : ''"
                                      :data-test-id="'exploration-ia-chunk-' + index">
                                     <!-- Checkbox de selection -->
@@ -225,6 +227,10 @@
                         <div class="card-body">
                             <template x-for="citation in citations" :key="citation.label">
                                 <div class="exploration-ia-citation fr-mb-2w fr-p-2w"
+                                     :class="{
+                                         'exploration-ia-citation--highlighted': isSourceHighlighted(citation.label),
+                                         'exploration-ia-citation--selected': isSourceSelected(citation.label)
+                                     }"
                                      :data-test-id="'exploration-ia-citation-' + citation.label">
                                     <div class="d-flex justify-content-between align-items-start fr-mb-1w">
                                         <span class="fr-badge fr-badge--sm fr-badge--blue-cumulus"
