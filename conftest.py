@@ -66,8 +66,6 @@ def make_project(request):
             "description": "Super description",
             "location": "SomeWhere",
         }
-        if "submitted_by" not in kwargs:
-            default_data["submitted_by"] = baker.make(User)
 
         default_data.update(**kwargs)
 
